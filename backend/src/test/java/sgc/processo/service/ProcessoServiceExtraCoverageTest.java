@@ -402,7 +402,7 @@ class ProcessoServiceExtraCoverageTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
-        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
+        when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
 
         Boolean elegivel = ReflectionTestUtils.invokeMethod(
                 processoService,
@@ -560,8 +560,8 @@ class ProcessoServiceExtraCoverageTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_VALIDADO);
 
-        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.ACEITAR_MAPA)).thenReturn(false);
-        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.HOMOLOGAR_MAPA)).thenReturn(true);
+        when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, AcaoPermissao.ACEITAR_MAPA)).thenReturn(false);
+        when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, AcaoPermissao.HOMOLOGAR_MAPA)).thenReturn(true);
 
         Boolean elegivel = ReflectionTestUtils.invokeMethod(
                 processoService,
@@ -637,7 +637,7 @@ class ProcessoServiceExtraCoverageTest {
             sp.setUnidade(uni);
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
-            when(permissionEvaluator.verificarPermissao(u, sp, sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(u, sp, sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
 
@@ -800,7 +800,7 @@ class ProcessoServiceExtraCoverageTest {
             sp.setCodigo(100L);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             
-            when(permissionEvaluator.verificarPermissao(u, sp, sgc.seguranca.AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(u, sp, sgc.seguranca.AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
 
             // Chamando via listarSubprocessosElegiveis para testar o metodo privado
             u.setPerfilAtivo(Perfil.ADMIN);

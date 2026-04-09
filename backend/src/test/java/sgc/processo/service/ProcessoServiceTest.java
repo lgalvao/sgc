@@ -378,10 +378,10 @@ class ProcessoServiceTest {
                     s1.getCodigo(), u1,
                     s2.getCodigo(), u1
             ));
-            when(permissionEvaluator.verificarPermissao(usuario, s1, AcaoPermissao.ACEITAR_CADASTRO)).thenReturn(true);
-            when(permissionEvaluator.verificarPermissao(usuario, s1, AcaoPermissao.HOMOLOGAR_CADASTRO)).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(usuario, s2, AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
-            when(permissionEvaluator.verificarPermissao(usuario, s2, AcaoPermissao.HOMOLOGAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s1, AcaoPermissao.ACEITAR_CADASTRO)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s1, AcaoPermissao.HOMOLOGAR_CADASTRO)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s2, AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s2, AcaoPermissao.HOMOLOGAR_MAPA)).thenReturn(false);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
 
@@ -498,8 +498,8 @@ class ProcessoServiceTest {
             sp.setUnidade(new Unidade());
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(false);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).isEmpty();
@@ -519,7 +519,7 @@ class ProcessoServiceTest {
             sp.setUnidade(new Unidade());
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(permissionEvaluator.verificarPermissao(usuario, sp, DISPONIBILIZAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, DISPONIBILIZAR_MAPA)).thenReturn(false);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).isEmpty();
@@ -1048,7 +1048,7 @@ class ProcessoServiceTest {
             sp.setSituacao(situacao);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(), any(), any())).thenReturn(true);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
@@ -1069,8 +1069,8 @@ class ProcessoServiceTest {
             sp.setUnidade(new Unidade());
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);

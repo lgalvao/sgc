@@ -581,22 +581,22 @@ public class ProcessoService {
 
     private boolean podeAceitarCadastroEmBloco(Subprocesso subprocesso, Usuario usuario) {
         return isSituacaoCadastroDisponibilizado(subprocesso.getSituacao())
-                && permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_CADASTRO);
+                && permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, ACEITAR_CADASTRO);
     }
 
     private boolean podeAceitarMapaEmBloco(Subprocesso subprocesso, Usuario usuario) {
         return isSituacaoMapaAnaliseConcluida(subprocesso.getSituacao())
-                && permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_MAPA);
+                && permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, ACEITAR_MAPA);
     }
 
     private boolean podeHomologarCadastroEmBloco(Subprocesso subprocesso, Usuario usuario) {
         return isSituacaoCadastroDisponibilizado(subprocesso.getSituacao())
-                && permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_CADASTRO);
+                && permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, HOMOLOGAR_CADASTRO);
     }
 
     private boolean podeHomologarMapaEmBloco(Subprocesso subprocesso, Usuario usuario) {
         return isSituacaoMapaAnaliseConcluida(subprocesso.getSituacao())
-                && permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_MAPA);
+                && permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, HOMOLOGAR_MAPA);
     }
 
     private boolean podeDisponibilizarEmBloco(Subprocesso subprocesso, Usuario usuario) {
@@ -605,7 +605,8 @@ public class ProcessoService {
                 || situacao == MAPEAMENTO_MAPA_CRIADO
                 || situacao == REVISAO_CADASTRO_HOMOLOGADA
                 || situacao == REVISAO_MAPA_AJUSTADO;
-        return elegivelDisponibilizacao && permissionEvaluator.verificarPermissao(usuario, subprocesso, DISPONIBILIZAR_MAPA);
+        return elegivelDisponibilizacao
+                && permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, DISPONIBILIZAR_MAPA);
     }
 
     private boolean isElegivelParaAcaoEmBloco(Subprocesso subprocesso, Usuario usuario) {

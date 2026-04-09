@@ -116,7 +116,7 @@ class ProcessoServiceCoverageTest {
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(subprocesso));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(subprocesso.getCodigo(), unidade));
         when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
-        when(permissionEvaluator.verificarPermissao(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class))).thenReturn(true);
+        when(permissionEvaluator.verificarPermissaoSilenciosa(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class))).thenReturn(true);
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
         ProcessoDetalheDto resultado = target.obterDetalhesCompleto(cod, true);
@@ -260,7 +260,7 @@ class ProcessoServiceCoverageTest {
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-            when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, true))
@@ -293,7 +293,7 @@ class ProcessoServiceCoverageTest {
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-            when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             assertThatCode(() -> target.obterDetalhesCompleto(cod, true))
@@ -326,7 +326,7 @@ class ProcessoServiceCoverageTest {
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-            when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);
@@ -466,8 +466,8 @@ class ProcessoServiceCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
             
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull();
@@ -481,8 +481,8 @@ class ProcessoServiceCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
 
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
 
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull();
@@ -496,8 +496,8 @@ class ProcessoServiceCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
             
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
             
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull();
@@ -511,8 +511,8 @@ class ProcessoServiceCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(REVISAO_MAPA_VALIDADO);
 
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
 
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull();
@@ -526,7 +526,7 @@ class ProcessoServiceCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
 
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
 
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull();
@@ -540,7 +540,7 @@ class ProcessoServiceCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(REVISAO_MAPA_AJUSTADO);
 
-            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
 
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull();

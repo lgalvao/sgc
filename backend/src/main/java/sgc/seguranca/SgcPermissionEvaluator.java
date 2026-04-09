@@ -55,10 +55,10 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         AcaoPermissao acao = resolverAcao((String) permissao);
         return switch (alvo) {
-            case Subprocesso sp -> verificarSubprocesso(usuario, sp, acao);
+            case Subprocesso sp -> verificarSubprocesso(usuario, sp, acao, true);
             case Processo p -> verificarProcesso(usuario, p, acao);
-            case Mapa m -> verificarSubprocesso(usuario, m.getSubprocesso(), acao);
-            case Atividade a -> verificarSubprocesso(usuario, a.getMapa().getSubprocesso(), acao);
+            case Mapa m -> verificarSubprocesso(usuario, m.getSubprocesso(), acao, true);
+            case Atividade a -> verificarSubprocesso(usuario, a.getMapa().getSubprocesso(), acao, true);
             default -> false;
         };
     }
@@ -77,16 +77,16 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         return switch (tipoAlvo) {
             case "Subprocesso" -> subprocessoRepo.buscarPorCodigoComMapaEAtividades((Long) codigoAlvo)
-                    .map(sp -> verificarSubprocesso(usuario, sp, acao))
+                    .map(sp -> verificarSubprocesso(usuario, sp, acao, true))
                     .orElse(false);
             case "Processo" -> processoRepo.buscarPorCodigoComParticipantes((Long) codigoAlvo)
                     .map(p -> verificarProcesso(usuario, p, acao))
                     .orElse(false);
             case "Mapa" -> mapaRepo.findById((Long) codigoAlvo)
-                    .map(m -> verificarSubprocesso(usuario, m.getSubprocesso(), acao))
+                    .map(m -> verificarSubprocesso(usuario, m.getSubprocesso(), acao, true))
                     .orElse(false);
             case "Atividade" -> atividadeRepo.findById((Long) codigoAlvo)
-                    .map(a -> verificarSubprocesso(usuario, a.getMapa().getSubprocesso(), acao))
+                    .map(a -> verificarSubprocesso(usuario, a.getMapa().getSubprocesso(), acao, true))
                     .orElse(false);
             default -> false;
         };
@@ -95,11 +95,19 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     // ── API pública para facades/services ───────────────────────────
 
     public boolean verificarPermissao(@Nullable Usuario usuario, @Nullable Object alvo, AcaoPermissao acao) {
+        return verificarPermissao(usuario, alvo, acao, true);
+    }
+
+    public boolean verificarPermissaoSilenciosa(@Nullable Usuario usuario, @Nullable Object alvo, AcaoPermissao acao) {
+        return verificarPermissao(usuario, alvo, acao, false);
+    }
+
+    private boolean verificarPermissao(@Nullable Usuario usuario, @Nullable Object alvo, AcaoPermissao acao, boolean logarNegacao) {
         if (usuario == null) return false;
 
         return switch (alvo) {
-            case Collection<?> colecao -> colecao.stream().allMatch(item -> verificarPermissao(usuario, item, acao));
-            case Subprocesso sp -> verificarSubprocesso(usuario, sp, acao);
+            case Collection<?> colecao -> colecao.stream().allMatch(item -> verificarPermissao(usuario, item, acao, logarNegacao));
+            case Subprocesso sp -> verificarSubprocesso(usuario, sp, acao, logarNegacao);
             case Processo processo -> verificarProcesso(usuario, processo, acao);
             case null, default -> false;
         };
@@ -107,7 +115,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
     // ── Verificação de Subprocesso ──────────────────────────────────
 
-    private boolean verificarSubprocesso(Usuario usuario, Subprocesso sp, AcaoPermissao acao) {
+    private boolean verificarSubprocesso(Usuario usuario, Subprocesso sp, AcaoPermissao acao, boolean logarNegacao) {
         Perfil perfil = usuario.getPerfilAtivo();
         Processo processo = sp.getProcesso();
 
@@ -133,7 +141,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             return false;
         }
 
-        return verificarLocalizacao(usuario, sp);
+        return verificarLocalizacao(usuario, sp, logarNegacao);
     }
 
     // ── Verificação de Processo ──────────────────────────────────────
@@ -172,11 +180,11 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
     // ── Verificação de Localização ──────────────────────────────────
 
-    private boolean verificarLocalizacao(Usuario usuario, Subprocesso sp) {
+    private boolean verificarLocalizacao(Usuario usuario, Subprocesso sp, boolean logarNegacao) {
         Unidade localizacao = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
         boolean permitido = Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
 
-        if (!permitido) {
+        if (!permitido && logarNegacao) {
             log.info("Acesso negado por localização. Usuário: {} (Unidade ativa: {}). Subprocesso {} localizado em {}.",
                     mascarar(usuario.getTituloEleitoral()),
                     usuario.getUnidadeAtivaCodigo(),
