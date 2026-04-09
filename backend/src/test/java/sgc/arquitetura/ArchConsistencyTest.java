@@ -280,6 +280,15 @@ public class ArchConsistencyTest {
             })
             .because("Controller, Facade e Service de aplicação não devem receber Usuario para representar o usuário autenticado atual");
 
+    @ArchTest
+    static final ArchRule only_security_organization_and_e2e_should_access_security_context_holder = noClasses()
+            .that()
+            .resideOutsideOfPackages("sgc.organizacao..", "sgc.seguranca..", "sgc.e2e..")
+            .should()
+            .accessClassesThat()
+            .haveFullyQualifiedName("org.springframework.security.core.context.SecurityContextHolder")
+            .because("Acesso direto ao SecurityContextHolder deve ficar restrito à infraestrutura de autenticação e ao adapter de E2E");
+
     /**
      * Garante nomenclatura consistente de Controllers.
      */
