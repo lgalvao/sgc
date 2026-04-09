@@ -756,8 +756,7 @@ public class SubprocessoTransicaoService {
         String descAlerta = isRevisao
                 ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
                 : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
-        Unidade admin = obterUnidadeAdmin();
-        alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, admin, sp.getUnidade());
+        alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, obterUnidadeAdmin(), sp.getUnidade());
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {
@@ -855,27 +854,32 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarEfeitosDerivadosAlteracaoDataLimite(Subprocesso sp, LocalDate novaDataLimite, String situacaoSp) {
-        String novaDataStr = novaDataLimite.format(DATE_FORMATTER);
-        enviarEmailAlteracaoDataLimite(sp, novaDataStr);
-        criarAlertaAlteracaoDataLimite(sp, situacaoSp, novaDataStr);
-    }
-
-    private void enviarEmailAlteracaoDataLimite(Subprocesso sp, String novaDataStr) {
-        String assunto = Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA;
-        String corpo = Mensagens.CORPO_DATA_LIMITE_ALTERADA
-                .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
-
-        String emailDestino = notificacaoService.getEmailUnidade(sp.getUnidade());
-        emailService.enviarEmail(emailDestino, assunto, corpo);
-    }
-
-    private void criarAlertaAlteracaoDataLimite(Subprocesso sp, String situacaoSp, String novaDataStr) {
+        String novaDataFormatada = novaDataLimite.format(DATE_FORMATTER);
         int etapa = obterEtapaPorSituacao(situacaoSp);
-        alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
+        notificarAlteracaoDataLimite(sp, novaDataFormatada, etapa);
     }
 
     private int obterEtapaPorSituacao(String situacaoSp) {
         return situacaoSp.contains("MAPA") ? 2 : 1;
+    }
+
+    private void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
+        String assunto = Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA;
+        String corpo = Mensagens.CORPO_DATA_LIMITE_ALTERADA
+                .formatted(
+                        sp.getUnidade().getSigla(),
+                        sp.getProcesso().getDescricao(),
+                        novaDataFormatada
+                );
+        String emailDestino = notificacaoService.getEmailUnidade(sp.getUnidade());
+
+        emailService.enviarEmail(emailDestino, assunto, corpo);
+        alertaService.criarAlertaAlteracaoDataLimite(
+                sp.getProcesso(),
+                sp.getUnidade(),
+                novaDataFormatada,
+                etapa
+        );
     }
 
 

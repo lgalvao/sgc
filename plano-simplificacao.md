@@ -2,6 +2,12 @@
 
 Documento operacional com foco exclusivo no que ainda falta fazer. Este arquivo deve refletir o código atual; histórico de rodadas concluídas, medições antigas e cortes já aplicados não devem permanecer aqui.
 
+Premissa operacional:
+
+* o sistema é simples, com baixa concorrência e volume moderado de dados;
+* simplificação aqui significa reduzir leitura, ramificações e superfície do código;
+* evitar abstrações genéricas, infraestrutura interna “elegante” e preparo especulativo para escala que o sistema não precisa.
+
 ## Objetivo
 
 Reduzir complexidade acidental sem alterar:
@@ -57,22 +63,22 @@ Objetivo:
 
 Próximo corte:
 
-* mapear pontos ainda acoplados entre transição de estado e efeitos derivados;
-* separar, em fronteira interna coesa, pelo menos um destes grupos:
-  * persistência de workflow;
-  * notificação/e-mail;
-  * alertas.
+* priorizar cortes que removam código ou o substituam por helpers locais mais curtos;
+* manter juntos apenas os trechos que realmente pertencem ao mesmo fluxo de negócio;
+* evitar dispatcher, hierarquia interna de comandos, strategies ou camadas privadas genéricas para alertas/notificações.
 
 Restrições:
 
 * não criar facade nova só para esconder complexidade;
 * não misturar refatoração estrutural com mudança de regra;
 * se surgir método com mais de 3 parâmetros, usar objeto de transporte.
+* não aceitar simplificação que aumente o arquivo de forma líquida sem remover complexidade visível no fluxo principal.
 
 Critério de pronto:
 
 * fluxo principal mais legível;
 * menos branches e menos dependências cruzadas por responsabilidade;
+* diff pequeno e defensável, preferencialmente com redução líquida de código ou aumento mínimo justificado;
 * sem regressão em testes focados do backend.
 
 ## Frente 2 — `SubprocessoConsultaService`
@@ -83,8 +89,9 @@ Objetivo:
 
 Próximo corte:
 
-* isolar melhor a montagem de permissões de UI;
+* isolar melhor a montagem de permissões de UI sem criar camada nova;
 * reduzir a mistura entre fetch de dados, contexto rico e payload de resposta;
+* preferir extrair helpers privados curtos ou remover pass-throughs restantes antes de introduzir novos tipos internos;
 * manter DTOs externos e contratos HTTP intactos.
 
 Critério de pronto:
@@ -152,7 +159,7 @@ Critério de pronto:
 1. Continuar pela Frente 1.
 2. Retomar a Frente 2 assim que houver um corte pequeno e seguro.
 3. Escolher uma view grande do frontend como primeiro alvo real da Frente 3.
-4. Fazer a auditoria formal de `LoadingButton.vue` antes de discutir remoção de wrappers.
+4. Tratar `LoadingButton.vue` como item de baixa prioridade até surgir evidência concreta de custo real.
 5. Reavaliar `E2eController` só depois das frentes acima ou quando ele bloquear alguma rodada.
 
 ## Validação mínima por rodada
