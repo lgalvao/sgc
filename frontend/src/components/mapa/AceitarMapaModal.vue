@@ -39,13 +39,13 @@ import {TEXTOS} from "@/constants/textos";
 
 interface Props {
   mostrarModal: boolean;
-  perfil?: string;
+  homologacao?: boolean;
   loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
-  perfil: ""
+  homologacao: false
 });
 
 const emit = defineEmits<{
@@ -63,19 +63,19 @@ const mostrarModalComputado = computed({
 });
 
 const tituloModal = computed(() => {
-  return props.perfil === "ADMIN"
+  return props.homologacao
       ? TEXTOS.mapa.MODAL_HOMOLOGAR_TITULO
       : TEXTOS.mapa.MODAL_ACEITE_TITULO;
 });
 
 const corpoModal = computed(() => {
-  return props.perfil === "ADMIN"
+  return props.homologacao
       ? TEXTOS.mapa.MODAL_HOMOLOGAR_TEXTO
       : TEXTOS.mapa.MODAL_ACEITE_TEXTO;
 });
 
 const rotuloConfirmar = computed(() => {
-  return props.perfil === "ADMIN"
+  return props.homologacao
       ? TEXTOS.mapa.LABEL_HOMOLOGAR
       : TEXTOS.mapa.BOTAO_ACEITAR;
 });

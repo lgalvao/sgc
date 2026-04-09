@@ -125,8 +125,8 @@
 
     <AceitarMapaModal
         :loading="isLoading"
+        :homologacao="isHomologacao"
         :mostrar-modal="mostrarModalAceitar"
-        :perfil="perfilSelecionado || undefined"
         @fechar-modal="fecharModalAceitar"
         @confirmar-aceitacao="confirmarAceitacao"
     />
@@ -246,7 +246,6 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
-import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
@@ -267,7 +266,6 @@ const router = useRouter();
 const subprocessosStore = useSubprocessos();
 const {notify} = useNotification();
 const toastStore = useToastStore();
-const {perfilSelecionado, isAdmin} = usePerfil();
 const mapa = ref<MapaVisualizacao | null>(null);
 const analisesCadastro = ref<Analise[]>([]);
 
@@ -306,6 +304,7 @@ const habilitarAnalisarMapa = computed(() => {
   );
 });
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
+const isHomologacao = computed(() => podeHomologarMapa.value);
 
 const historicoAnalise = computed(() => {
   return analisesCadastro.value || [];
@@ -372,17 +371,16 @@ async function confirmarValidacao() {
 
 async function confirmarAceitacao(observacao = "") {
   if (!codSubprocesso.value) return;
-  const isHomologacao = podeHomologarMapa.value || isAdmin.value;
 
   try {
     await executarComLoading(async () => {
-      if (isHomologacao) {
+      if (isHomologacao.value) {
         await homologarValidacaoService(codSubprocesso.value!, {texto: observacao});
       } else {
         await aceitarValidacaoService(codSubprocesso.value!, {texto: observacao});
       }
       await concluirAcaoPainel(
-          isHomologacao ? TEXTOS.mapa.SUCESSO_HOMOLOGACAO : TEXTOS.sucesso.ACEITE_REGISTRADO,
+          isHomologacao.value ? TEXTOS.mapa.SUCESSO_HOMOLOGACAO : TEXTOS.sucesso.ACEITE_REGISTRADO,
           fecharModalAceitar,
       );
     });
@@ -484,11 +482,11 @@ onMounted(async () => {
 });
 
 defineExpose({
-  perfilSelecionado,
   mapa,
   unidade,
   podeValidar,
   podeAnalisar,
+  isHomologacao,
   podeVerSugestoes,
   temHistoricoAnalise,
   historicoAnalise,
