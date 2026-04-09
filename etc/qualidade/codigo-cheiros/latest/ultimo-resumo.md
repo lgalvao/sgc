@@ -1,7 +1,7 @@
 # Auditoria de cheiros de codigo
 
-Gerado em: 2026-04-08T13:54:42.886Z
-Pontuacao: 1249 (critico)
+Gerado em: 2026-04-08T23:51:44.741Z
+Pontuacao: 1250 (critico)
 
 ## Contagens
 
@@ -10,8 +10,8 @@ Pontuacao: 1249 (critico)
 | Backend DTOs com @Nullable | 89 | 0 | 5 |
 | Backend checks explicitos de null | 200 | 0 | 2 |
 | Backend Objects.isNull/nonNull | 5 | 0 | 2 |
-| Frontend producao com any explicito | 1 | -2 | 4 |
-| Frontend testes com any explicito | 322 | 0 | 1 |
+| Frontend producao com any explicito | 0 | 0 | 4 |
+| Frontend testes com any explicito | 327 | 0 | 1 |
 | Frontend catch tipado como any | 0 | 0 | 3 |
 | Frontend checks explicitos de null | 22 | 0 | 2 |
 | Frontend fallbacks defensivos com || | 24 | 0 | 1 |
@@ -39,5 +39,5 @@ Pontuacao: 1249 (critico)
 ## Escopos
 
 - backend: 855 ponto(s)
-- frontend: 72 ponto(s)
-- frontend_testes: 322 ponto(s)
+- frontend: 68 ponto(s)
+- frontend_testes: 327 ponto(s)

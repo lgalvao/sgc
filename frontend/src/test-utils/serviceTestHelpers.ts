@@ -10,7 +10,7 @@ vi.mock("@/axios-setup", () => ({
     },
 }));
 
-const mockApi = apiClient as any;
+const mockApi = vi.mocked(apiClient);
 
 /**
  * Utilitário para configurar testes de Service

@@ -1,21 +1,21 @@
 {
-  "geradoEm": "2026-04-08T13:54:42.886Z",
+  "geradoEm": "2026-04-08T23:51:44.741Z",
   "base": "/app",
   "pontuacao": {
-    "total": 1249,
+    "total": 1250,
     "faixa": "critico",
     "porEscopo": {
       "backend": 855,
-      "frontend": 72,
-      "frontend_testes": 322
+      "frontend": 68,
+      "frontend_testes": 327
     }
   },
   "contagens": {
     "backend_nullable_dto": 89,
     "backend_null_checks": 200,
     "backend_objects_null": 5,
-    "frontend_any_producao": 1,
-    "frontend_any_testes": 322,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": 327,
     "frontend_catch_any": 0,
     "frontend_null_checks": 22,
     "frontend_fallback_or": 24
@@ -24,7 +24,7 @@
     "backend_nullable_dto": 0,
     "backend_null_checks": 0,
     "backend_objects_null": 0,
-    "frontend_any_producao": -2,
+    "frontend_any_producao": 0,
     "frontend_any_testes": 0,
     "frontend_catch_any": 0,
     "frontend_null_checks": 0,
