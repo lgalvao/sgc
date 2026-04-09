@@ -156,6 +156,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   habilitarEdicao: true,
+  erroValidacao: undefined,
 });
 
 const emit = defineEmits<{

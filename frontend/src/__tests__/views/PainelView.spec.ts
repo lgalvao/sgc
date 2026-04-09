@@ -41,7 +41,16 @@ describe("PainelView.vue", () => {
             perfilSelecionado: "ADMIN",
             unidadeSelecionada: 1,
             usuarioCodigo: 100,
-            perfis: [] as string[]
+            perfis: [] as string[],
+            permissoesSessao: {
+                mostrarCriarProcesso: true,
+                mostrarArvoreCompletaUnidades: true,
+                mostrarCtaPainelVazio: true,
+                mostrarDiagnosticoOrganizacional: true,
+                mostrarMenuConfiguracoes: true,
+                mostrarMenuAdministradores: true,
+                mostrarCriarAtribuicaoTemporaria: true,
+            }
         },
         processos: {
             processosPainel: []
@@ -141,14 +150,20 @@ describe("PainelView.vue", () => {
     it("deve mostrar botão de criar processo apenas para admin", async () => {
         // Admin
         const wrapperAdmin = mount(PainelView, mountOptions({
-            perfil: {perfilSelecionado: "ADMIN"}
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                permissoesSessao: { mostrarCriarProcesso: true }
+            }
         }));
         await flushPromises();
         expect(wrapperAdmin.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(true);
 
         // Not admin
         const wrapperUser = mount(PainelView, mountOptions({
-            perfil: {perfilSelecionado: "USER"}
+            perfil: {
+                perfilSelecionado: "USER",
+                permissoesSessao: { mostrarCriarProcesso: false }
+            }
         }));
         await flushPromises();
         expect(wrapperUser.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(false);

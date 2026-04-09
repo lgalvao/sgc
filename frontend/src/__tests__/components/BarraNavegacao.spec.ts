@@ -160,7 +160,10 @@ describe('BarraNavegacao.vue', () => {
             mockRoute.name = 'Unidade';
             mockRoute.params = {codUnidade: '1'};
             const wrapper = mountComponent({
-                perfil: {perfilSelecionado: Perfil.ADMIN},
+                perfil: {
+                    perfilSelecionado: Perfil.ADMIN,
+                    permissoesSessao: { mostrarArvoreCompletaUnidades: true }
+                },
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             // Home -> ADMIN -> Unidades

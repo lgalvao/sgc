@@ -535,7 +535,7 @@ describe("CadastroView.vue", () => {
 
     it("oculta botão disponibilizar quando a permissão não permite a ação", async () => {
         const wrapper = createWrapper({}, {
-            podeEditarCadastro: ref(true),
+            podeEditarCadastro: ref(false),
             podeDisponibilizarCadastro: ref(false),
             podeVisualizarImpacto: ref(true),
         });

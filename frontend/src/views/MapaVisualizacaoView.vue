@@ -277,7 +277,6 @@ const codSubprocesso = ref<number | null>(null);
 
 const {
   podeValidarMapa,
-  podeAceitarMapa,
   podeDevolverMapa,
   podeVerSugestoes: podeMostrarVerSugestoes,
   habilitarDevolverMapa,

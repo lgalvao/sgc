@@ -134,7 +134,10 @@ describe("BarraNavegacao.vue", () => {
                 createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {codUnidade: "1"}),
             );
             const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.ADMIN}
+                perfil: {
+                    perfilSelecionado: Perfil.ADMIN,
+                    permissoesSessao: { mostrarArvoreCompletaUnidades: true }
+                }
             }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
@@ -151,7 +154,10 @@ describe("BarraNavegacao.vue", () => {
                 createMockRoute("/unidade/456", mockMatchedUnidade, "Unidade", {codUnidade: "456"}),
             );
             const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.GESTOR}
+                perfil: {
+                    perfilSelecionado: Perfil.GESTOR,
+                    permissoesSessao: { mostrarArvoreCompletaUnidades: false }
+                }
             }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);

@@ -260,6 +260,8 @@ describe("CadastroView coverage", () => {
             podeEditarCadastro: ref(true),
             podeDisponibilizarCadastro: ref(true),
             podeVisualizarImpacto: ref(true),
+            habilitarEditarCadastro: ref(true),
+            habilitarDisponibilizarCadastro: ref(true),
         } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
         const pinia = createTestingPinia({stubActions: true});

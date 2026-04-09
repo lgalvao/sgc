@@ -240,7 +240,6 @@ const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const {
   podeEditarCadastro,
-  podeDisponibilizarCadastro,
   podeVisualizarImpacto,
   habilitarEditarCadastro,
   habilitarDisponibilizarCadastro

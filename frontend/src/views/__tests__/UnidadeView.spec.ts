@@ -96,6 +96,9 @@ describe('UnidadeView.vue', () => {
                 {
                     perfil: {
                         perfilSelecionado: 'USER',
+                        permissoesSessao: {
+                            mostrarCriarAtribuicaoTemporaria: false,
+                        }
                     },
                     ...initialStateOverride
                 },
@@ -154,10 +157,12 @@ describe('UnidadeView.vue', () => {
         const {wrapper, perfilStore} = createWrapper();
         await flushPromises();
         perfilStore.perfilSelecionado = 'ADMIN';
+        perfilStore.permissoesSessao = { mostrarCriarAtribuicaoTemporaria: true };
         await wrapper.vm.$nextTick();
         expect(wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').exists()).toBe(true);
 
         perfilStore.perfilSelecionado = 'USER';
+        perfilStore.permissoesSessao = { mostrarCriarAtribuicaoTemporaria: false };
         await wrapper.vm.$nextTick();
         expect(wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').exists()).toBe(false);
     });
@@ -166,6 +171,7 @@ describe('UnidadeView.vue', () => {
         const {wrapper, perfilStore} = createWrapper();
         await flushPromises();
         perfilStore.perfilSelecionado = 'ADMIN';
+        perfilStore.permissoesSessao = { mostrarCriarAtribuicaoTemporaria: true };
         await wrapper.vm.$nextTick();
 
         await wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').trigger('click');
