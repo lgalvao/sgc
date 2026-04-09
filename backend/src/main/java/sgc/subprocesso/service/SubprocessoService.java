@@ -46,6 +46,21 @@ public class SubprocessoService {
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
 
+    public record CriarSubprocessosMapeamentoCommand(
+            Processo processo,
+            Collection<Unidade> unidades,
+            Unidade unidadeOrigem
+    ) {
+    }
+
+    public record CriarSubprocessoComMapaCommand(
+            Processo processo,
+            Unidade unidade,
+            UnidadeMapa unidadeMapa,
+            Unidade unidadeOrigem
+    ) {
+    }
+
     @Transactional
     public Mapa salvarMapa(Long codSubprocesso, SalvarMapaRequest request) {
         return salvarMapaSubprocesso(codSubprocesso, request);
@@ -113,8 +128,11 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
-        List<Unidade> unidadesElegiveis = listarUnidadesElegiveisParaMapeamento(unidades);
+    public void criarParaMapeamento(CriarSubprocessosMapeamentoCommand command) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Processo processo = command.processo();
+        Unidade unidadeOrigem = command.unidadeOrigem();
+        List<Unidade> unidadesElegiveis = listarUnidadesElegiveisParaMapeamento(command.unidades());
 
         if (unidadesElegiveis.isEmpty()) {
             log.warn("Nenhuma unidade elegível encontrada para o processo {}", processo.getCodigo());
@@ -142,15 +160,19 @@ public class SubprocessoService {
         movimentacaoRepo.saveAll(movimentacoes);
     }
 
-    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
-        criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario, NAO_INICIADO, "Processo iniciado");
-        log.info("Criado subprocesso para unidade {}", unidade.getSigla());
+    public void criarParaRevisao(CriarSubprocessoComMapaCommand command) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        criarSubprocessoComMapa(command.processo(), command.unidade(), command.unidadeMapa(), command.unidadeOrigem(),
+                usuario, NAO_INICIADO, "Processo iniciado");
+        log.info("Criado subprocesso para unidade {}", command.unidade().getSigla());
     }
 
-    public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
-        Subprocesso subprocessoSalvo = criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario,
+    public void criarParaDiagnostico(CriarSubprocessoComMapaCommand command) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Subprocesso subprocessoSalvo = criarSubprocessoComMapa(command.processo(), command.unidade(), command.unidadeMapa(),
+                command.unidadeOrigem(), usuario,
                 DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, "Processo de diagnóstico iniciado");
-        log.info("Criado subprocesso {} para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
+        log.info("Criado subprocesso {} para unidade {}", subprocessoSalvo.getCodigo(), command.unidade().getSigla());
     }
 
     private Subprocesso criarSubprocessoComMapa(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa,

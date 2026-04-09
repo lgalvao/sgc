@@ -117,9 +117,8 @@ class SubprocessoServiceTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(null);
         Unidade unidadeOrigem = new Unidade();
-        Usuario usuario = new Usuario();
-
-        assertThatThrownBy(() -> service.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario))
+        assertThatThrownBy(() -> service.criarParaRevisao(
+                new SubprocessoService.CriarSubprocessoComMapaCommand(processo, unidade, unidadeMapa, unidadeOrigem)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
     }
@@ -133,9 +132,8 @@ class SubprocessoServiceTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(null);
         Unidade unidadeOrigem = new Unidade();
-        Usuario usuario = new Usuario();
-
-        assertThatThrownBy(() -> service.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario))
+        assertThatThrownBy(() -> service.criarParaDiagnostico(
+                new SubprocessoService.CriarSubprocessoComMapaCommand(processo, unidade, unidadeMapa, unidadeOrigem)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
     }

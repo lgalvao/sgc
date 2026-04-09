@@ -383,7 +383,7 @@ class ProcessoServiceCoverageTest {
 
         when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
         target.iniciar(cod, List.of(10L)); // branch 419 (DIAGNOSTICO)
-        verify(subprocessoService).criarParaDiagnostico(any(), any(), any(), any(), any());
+        verify(subprocessoService).criarParaDiagnostico(any());
     }
 
     @Test

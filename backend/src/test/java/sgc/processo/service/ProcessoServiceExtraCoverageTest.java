@@ -388,7 +388,11 @@ class ProcessoServiceExtraCoverageTest {
                 usuario
         );
 
-        verify(subprocessoService).criarParaDiagnostico(eq(processo), eq(unidade), eq(unidadeMapa), eq(unidadeAdmin), eq(usuario));
+        verify(subprocessoService).criarParaDiagnostico(argThat(command ->
+                command.processo() == processo
+                        && command.unidade() == unidade
+                        && command.unidadeMapa() == unidadeMapa
+                        && command.unidadeOrigem() == unidadeAdmin));
     }
 
     @Test
@@ -462,7 +466,11 @@ class ProcessoServiceExtraCoverageTest {
                 usuario
         );
 
-        verify(subprocessoService).criarParaRevisao(eq(processo), eq(unidade), eq(unidadeMapa), eq(unidadeAdmin), eq(usuario));
+        verify(subprocessoService).criarParaRevisao(argThat(command ->
+                command.processo() == processo
+                        && command.unidade() == unidade
+                        && command.unidadeMapa() == unidadeMapa
+                        && command.unidadeOrigem() == unidadeAdmin));
     }
 
     @Test
@@ -539,7 +547,10 @@ class ProcessoServiceExtraCoverageTest {
                 usuario
         );
 
-        verify(subprocessoService).criarParaMapeamento(eq(processo), eq(Set.of(unidade)), eq(unidadeAdmin), eq(usuario));
+        verify(subprocessoService).criarParaMapeamento(argThat(command ->
+                command.processo() == processo
+                        && command.unidades().equals(Set.of(unidade))
+                        && command.unidadeOrigem() == unidadeAdmin));
     }
 
     @Test
@@ -771,7 +782,10 @@ class ProcessoServiceExtraCoverageTest {
 
             processoService.iniciar(1L, List.of());
 
-            verify(subprocessoService).criarParaDiagnostico(eq(p), eq(uni), any(), eq(admin), any());
+            verify(subprocessoService).criarParaDiagnostico(argThat(command ->
+                    command.processo() == p
+                            && command.unidade() == uni
+                            && command.unidadeOrigem() == admin));
         }
     }
 

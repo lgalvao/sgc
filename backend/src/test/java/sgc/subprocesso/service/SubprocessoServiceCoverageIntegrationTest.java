@@ -148,8 +148,10 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             sgc.organizacao.model.Usuario user = new sgc.organizacao.model.Usuario();
             user.setTituloEleitoral("123");
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
 
-            subprocessoService.criarParaMapeamento(proc, java.util.List.of(u), u, user);
+            subprocessoService.criarParaMapeamento(
+                    new SubprocessoService.CriarSubprocessosMapeamentoCommand(proc, java.util.List.of(u), u));
 
             assertThat(subprocessoRepo.listarPorProcessoComUnidade(proc.getCodigo())).isEmpty();
         }

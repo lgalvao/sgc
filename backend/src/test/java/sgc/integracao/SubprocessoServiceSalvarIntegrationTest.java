@@ -2,12 +2,14 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.util.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -17,6 +19,7 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @Tag("integration")
 @Transactional
@@ -77,6 +80,9 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
 
+    @MockitoBean
+    private UsuarioFacade usuarioFacade;
+
     @Test
     @DisplayName("criarParaDiagnostico: deve criar subprocesso com copia de mapa")
     void criarParaDiagnostico() {
@@ -126,7 +132,15 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
                 .build();
         unidadeMapaRepo.save(um);
 
-        subprocessoService.criarParaDiagnostico(procDiag, uniDiag, um, subprocesso.getUnidade(), user);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+        subprocessoService.criarParaDiagnostico(
+                new sgc.subprocesso.service.SubprocessoService.CriarSubprocessoComMapaCommand(
+                        procDiag,
+                        uniDiag,
+                        um,
+                        subprocesso.getUnidade()
+                ));
         
         List<Subprocesso> lista = subprocessoRepo.findAll();
         assertThat(lista).anyMatch(sp -> sp.getProcesso().getCodigo().equals(procDiag.getCodigo()) 

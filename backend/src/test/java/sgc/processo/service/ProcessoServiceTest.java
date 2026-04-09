@@ -204,7 +204,11 @@ class ProcessoServiceTest {
             processoService.iniciar(id, List.of(1L));
 
             verify(processoRepo).save(any(Processo.class));
-            verify(subprocessoService).criarParaRevisao(p, uni, um, uniAdmin, usuario);
+            verify(subprocessoService).criarParaRevisao(argThat(command ->
+                    command.processo() == p
+                            && command.unidade() == uni
+                            && command.unidadeMapa() == um
+                            && command.unidadeOrigem() == uniAdmin));
         }
 
         @Test
@@ -947,7 +951,11 @@ class ProcessoServiceTest {
             processoService.iniciar(id, List.of());
 
             verify(processoRepo).save(any(Processo.class));
-            verify(subprocessoService).criarParaDiagnostico(p, uni, um, uniAdmin, usuario);
+            verify(subprocessoService).criarParaDiagnostico(argThat(command ->
+                    command.processo() == p
+                            && command.unidade() == uni
+                            && command.unidadeMapa() == um
+                            && command.unidadeOrigem() == uniAdmin));
         }
 
         @Test

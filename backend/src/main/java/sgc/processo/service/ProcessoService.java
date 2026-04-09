@@ -470,19 +470,24 @@ public class ProcessoService {
         Map<Long, UnidadeMapa> mapUm = ums.stream().collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, m -> m));
         Map<Long, Unidade> unidadesPorCodigo = pars.stream()
                 .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
-        if (tipo == MAPEAMENTO) subprocessoService.criarParaMapeamento(processo, pars, adm, user);
-        else if (tipo == REVISAO) cods.forEach(c -> subprocessoService.criarParaRevisao(
-                processo,
-                obterUnidadeObrigatoria(unidadesPorCodigo, c),
-                obterUnidadeMapaObrigatorio(mapUm, c),
-                adm,
-                user));
-        else if (tipo == DIAGNOSTICO) pars.forEach(u -> subprocessoService.criarParaDiagnostico(
-                processo,
-                u,
-                obterUnidadeMapaObrigatorio(mapUm, u.getCodigo()),
-                adm,
-                user));
+        if (tipo == MAPEAMENTO) {
+            subprocessoService.criarParaMapeamento(new SubprocessoService.CriarSubprocessosMapeamentoCommand(
+                    processo, pars, adm));
+        } else if (tipo == REVISAO) {
+            cods.forEach(c -> subprocessoService.criarParaRevisao(new SubprocessoService.CriarSubprocessoComMapaCommand(
+                    processo,
+                    obterUnidadeObrigatoria(unidadesPorCodigo, c),
+                    obterUnidadeMapaObrigatorio(mapUm, c),
+                    adm
+            )));
+        } else if (tipo == DIAGNOSTICO) {
+            pars.forEach(u -> subprocessoService.criarParaDiagnostico(new SubprocessoService.CriarSubprocessoComMapaCommand(
+                    processo,
+                    u,
+                    obterUnidadeMapaObrigatorio(mapUm, u.getCodigo()),
+                    adm
+            )));
+        }
     }
 
     private void montarHierarquiaNoDto(
