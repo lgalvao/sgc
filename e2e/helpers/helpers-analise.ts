@@ -13,6 +13,7 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
     await row.click();
 
     await navegarParaSubprocesso(page, siglaUnidade);
+    await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 }
 
 /**
@@ -26,6 +27,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
     await linhaProcesso.click();
 
     await navegarParaSubprocesso(page, siglaUnidade);
+    await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 }
 
 /**
@@ -38,6 +40,7 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
 
     await navegarParaSubprocesso(page, siglaUnidade);
+    await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 }
 
 /**

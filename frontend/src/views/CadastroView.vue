@@ -42,7 +42,7 @@
         </BButton>
 
         <LoadingButton
-            v-if="podeDisponibilizarCadastro"
+            v-if="podeEditarCadastro"
             :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
@@ -56,7 +56,7 @@
     </PageHeader>
 
     <BFormCheckbox
-        v-if="podeDisponibilizarCadastro && isRevisao"
+        v-if="podeEditarCadastro && isRevisao"
         v-model="disponibilizacaoSemMudancas"
         class="mt-3 mb-2"
         data-testid="chk-disponibilizacao-sem-mudancas"

@@ -590,6 +590,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologação para captura');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
+            await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 
             await navegarParaMapa(page);
             await abrirModalCriarCompetencia(page);
@@ -1168,7 +1170,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             // Capturar botão de aceitar em bloco (se visível)
-            const btnAceitarBloco = page.getByRole('button', {name: /Aceitar.*Bloco/i});
+            const btnAceitarBloco = page.getByTestId('btn-processo-aceitar-bloco');
             await expect(btnAceitarBloco).toBeVisible();
             await btnAceitarBloco.click();
             await expect(page.getByRole('dialog')).toBeVisible();
@@ -1190,7 +1192,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
             
-            const btnAceitarBlocoSec2 = page.getByRole('button', {name: /Aceitar.*Bloco/i});
+            const btnAceitarBlocoSec2 = page.getByTestId('btn-processo-aceitar-bloco');
             await expect(btnAceitarBlocoSec2).toBeVisible();
             await btnAceitarBlocoSec2.click();
             await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
@@ -1203,7 +1205,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
             // Capturar botão de homologar cadastro em bloco (CDU-23)
-            const btnHomologarBloco = page.getByRole('button', {name: /Homologar.*Bloco/i});
+            const btnHomologarBloco = page.getByTestId('btn-processo-homologar-bloco');
             await expect(btnHomologarBloco).toBeVisible();
             await btnHomologarBloco.click();
             await expect(page.getByRole('dialog')).toBeVisible();
@@ -1219,8 +1221,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});
             await expect(btnAceitarMapaBloco).toBeHidden();
 
-            const btnHomologarMapaBloco = page.getByRole('button', {name: /Homologar.*mapa.*Bloco/i});
-            await expect(btnHomologarMapaBloco).toBeHidden();
+            const btnHomologarMapaBloco = page.getByTestId('btn-processo-homologar-mapas-bloco');
+            await expect(btnHomologarMapaBloco).toBeVisible();
+            await expect(btnHomologarMapaBloco).toBeDisabled();
         });
     });
 
