@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.test.util.*;
 import sgc.organizacao.model.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.service.*;
@@ -26,6 +27,11 @@ class SubprocessoConsultaServiceTest {
 
     @InjectMocks
     private SubprocessoConsultaService service;
+
+    @BeforeEach
+    void configurarDependenciasAdicionais() {
+        ReflectionTestUtils.setField(service, "analiseHistoricoService", new AnaliseHistoricoService(unidadeService));
+    }
 
     @Test
     @DisplayName("buscarSubprocesso deve falhar quando codigo nao existir")

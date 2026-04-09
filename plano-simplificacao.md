@@ -30,18 +30,6 @@ Se este plano divergir do código real, prevalece o código verificado e o plano
 * Remover código morto assim que a simplificação o tornar órfão.
 * Validar em passos pequenos e registrar aprendizado no plano.
 
-## Estado consolidado
-
-### O que já foi confirmado
-
-* As rodadas anteriores já reduziram parte da complexidade em scripts de QA.
-* `SubprocessoConsultaService` já existe e centraliza parte relevante das leituras.
-* `SubprocessoService` não é mais o principal hotspot do módulo `subprocesso`.
-* `SubprocessoTransicaoService` continua sendo o maior concentrador de responsabilidades do fluxo de workflow.
-* `LoadingButton.vue` segue como wrapper fino, mas ainda possui adoção ampla o suficiente para exigir auditoria antes de remoção.
-* A suíte de backend voltou a ficar íntegra com `./gradlew --no-configuration-cache :backend:test` verde, após saneamento das invariáveis de domínio refletidas no `schema.sql`.
-* O backend permanece íntegro após nova rodada de simplificação: `1412` testes executados, `1411` passando e `1` ignorado.
-
 ### Aprendizados consolidados da rodada mais recente
 
 * A limpeza de simplificação ficou bloqueada por inconsistências reais entre modelo, schema e testes. Esse débito já foi reduzido e não deve mais competir com a Frente 1.
@@ -54,32 +42,12 @@ Se este plano divergir do código real, prevalece o código verificado e o plano
 * Testes unitários que constroem services manualmente precisam acompanhar a evolução das dependências explícitas; isso não deve ser compensado com afrouxamento do código de produção.
 * Parte da rodada recente revelou bugs reais fora da frente principal, como nulidade defensiva ausente em `ImpactoMapaService` e configuração insegura do `TestSecurityConfig`; esses ajustes foram tratados como correções de robustez, não como mudança de escopo arquitetural.
 
-### Premissas antigas que deixam de valer
-
-* `SubprocessoService` não deve mais ser tratado como “superclasse” prioritária por tamanho.
-* O objetivo não é criar um `SubprocessoConsultaService`; ele já existe.
-* A próxima rodada de backend não deve partir automaticamente para uma `SubprocessoWorkflowFacade`.
-
-### Hipóteses de `simplification-suggestions.md` absorvidas com ajuste
-
-* Interfaces de implementação única continuam sem valor por padrão, mas isso não autoriza colapsar fronteiras úteis já existentes.
-* Wrappers visuais finos continuam sob suspeita e devem passar por auditoria explícita.
-* Stores e composables pass-through continuam sendo maus alvos e devem ser reduzidos quando não houver estado compartilhado real.
-* Hotspots como `PdfFactory`, facades específicas e views extensas entram como candidatos de investigação, não como remoção automática.
-
-### Hipóteses de `simplification-suggestions.md` rejeitadas neste plano
-
-* Controllers não devem ser encorajados a acessar repositórios diretamente fora de leituras triviais sem regra, segurança contextual ou montagem de resposta.
-* O plano não autoriza retorno direto de entidades JPA como política geral para GET.
-* `SubprocessoTransicaoService`, `SubprocessoValidacaoService` e `SubprocessoService` não devem ser fundidos mecanicamente.
-* Facades existentes não devem ser removidas por decreto; primeiro é preciso comprovar que são pass-through reais e que a remoção não espalha regra, permissão ou composição.
-
 ## Diagnóstico consolidado por área
 
 ### 1. Scripts de QA
 
 Diagnóstico:
-
+* 
 * Havia concentração de complexidade em `etc/scripts/qa/snapshot-coletar-execucao.mjs`.
 * Parte dessa complexidade era justificável pela consolidação de múltiplas fontes.
 * Parte era acidental, especialmente repetição de parse, agregação e cálculo de percentuais.

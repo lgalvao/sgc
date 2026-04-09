@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 Write-Host "[smoke-test] backend:test" -ForegroundColor Cyan
-.\gradlew.bat :backend:test
+.\gradlew.bat :backend:test -q
 
 Write-Host "[smoke-test] typecheck" -ForegroundColor Cyan
 npm run typecheck
