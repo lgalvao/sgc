@@ -405,7 +405,7 @@ function descreverBackends() {
 
 try {
     validarPerfilLifecycle();
-    if (modoE2e()) {
+    if (modoE2e() || modoHomologacao()) {
         startSmtpServer();
     } else {
         lifecycleLogger.warn(
