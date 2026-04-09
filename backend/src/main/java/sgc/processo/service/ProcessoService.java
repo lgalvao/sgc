@@ -212,7 +212,8 @@ public class ProcessoService {
     }
 
 
-    public void iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
+    public void iniciar(Long codigo, List<Long> codsUnidadesParam) {
+        Usuario usuario = usuarioService.usuarioAutenticado();
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
             throw new ErroValidacao(Mensagens.PROCESSO_SO_INICIAVEL_EM_CRIADO);
@@ -647,7 +648,7 @@ public class ProcessoService {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_DISPONIBILIZAR);
         }
         DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(command.dataLimite(), "Disponibilização em bloco");
-        transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
+        transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq);
     }
 
     private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, Usuario user, List<Subprocesso> list) {
@@ -661,11 +662,11 @@ public class ProcessoService {
         List<Long> validacao = separacao.getOrDefault(false, List.of());
 
         if (req.acao() == ACEITAR) {
-            if (!cadastro.isEmpty()) transicaoService.aceitarCadastroEmBloco(cadastro, user);
-            if (!validacao.isEmpty()) transicaoService.aceitarValidacaoEmBloco(validacao, user);
+            if (!cadastro.isEmpty()) transicaoService.aceitarCadastroEmBloco(cadastro);
+            if (!validacao.isEmpty()) transicaoService.aceitarValidacaoEmBloco(validacao);
         } else if (req.acao() == HOMOLOGAR) {
-            if (!cadastro.isEmpty()) transicaoService.homologarCadastroEmBloco(cadastro, user);
-            if (!validacao.isEmpty()) transicaoService.homologarValidacaoEmBloco(validacao, user);
+            if (!cadastro.isEmpty()) transicaoService.homologarCadastroEmBloco(cadastro);
+            if (!validacao.isEmpty()) transicaoService.homologarValidacaoEmBloco(validacao);
         }
     }
 

@@ -344,7 +344,7 @@ class UsuarioServiceTest {
                     () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
 
             // Remover
-            usuarioService.removerAdministrador(tituloNovoAdmin, TITULO_ADMIN);
+            usuarioService.removerAdministrador(tituloNovoAdmin);
             assertFalse(usuarioServiceInternal.isAdministrador(tituloNovoAdmin));
         }
 
@@ -352,18 +352,18 @@ class UsuarioServiceTest {
         @DisplayName("Deve falhar ao remover a si mesmo")
         void deveFalharRemoverSiMesmo() {
             assertThrows(ErroValidacao.class,
-                    () -> usuarioService.removerAdministrador(TITULO_ADMIN, TITULO_ADMIN));
+                    () -> usuarioService.removerAdministrador(TITULO_ADMIN));
         }
 
         @Test
         @DisplayName("Deve falhar ao remover único admin")
         void deveFalharRemoverUnicoAdmin() {
 
-            usuarioService.removerAdministrador("6", "OUTRO");
-            usuarioService.removerAdministrador("999999999999", "OUTRO");
+            usuarioService.removerAdministrador("6");
+            usuarioService.removerAdministrador("999999999999");
 
             assertThrows(ErroValidacao.class,
-                    () -> usuarioService.removerAdministrador(TITULO_ADMIN, "OUTRO"));
+                    () -> usuarioService.removerAdministrador(TITULO_ADMIN));
         }
     }
 }

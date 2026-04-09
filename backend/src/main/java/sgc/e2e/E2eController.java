@@ -740,7 +740,7 @@ public class E2eController {
             List<Long> unidades = List.of(unidade.getCodigo());
             Long processoCodigo = processo.getCodigo();
             Usuario usuario = obterUsuarioParaIniciacao();
-            processoService.iniciar(processoCodigo, unidades, usuario);
+            processoService.iniciar(processoCodigo, unidades);
 
             // Recarregar processo após iniciar
             processo = processoService.buscarPorCodigo(processoCodigo);

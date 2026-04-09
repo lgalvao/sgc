@@ -113,7 +113,9 @@ class SubprocessoTransicaoServiceTest {
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(1L);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
 
-        service.aceitarValidacao(1L, "Aceite final", usuario);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+        service.aceitarValidacao(1L, "Aceite final");
 
         verify(analiseRepo).save(argThat(analise ->
                 analise.getSubprocesso().equals(subprocesso)
@@ -169,7 +171,9 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 
-            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, criarUsuario()))
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
         }
 
@@ -182,7 +186,9 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 
             SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Justificativa", null, List.of());
-            service.submeterMapaAjustado(1L, req, criarUsuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+            service.submeterMapaAjustado(1L, req);
 
             assertThat(sp.getSituacao()).isEqualTo(REVISAO_MAPA_DISPONIBILIZADO);
         }
@@ -207,7 +213,9 @@ class SubprocessoTransicaoServiceTest {
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
             when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
 
-            service.devolverValidacao(1L, "Justif", criarUsuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+            service.devolverValidacao(1L, "Justif");
 
             verify(analiseRepo).save(any());
         }
@@ -223,7 +231,9 @@ class SubprocessoTransicaoServiceTest {
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(spMap)).thenReturn(spMap.getUnidade());
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(spRev)).thenReturn(spRev.getUnidade());
 
-            service.aceitarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+            service.aceitarCadastroEmBloco(List.of(10L, 20L));
 
             assertThat(spMap.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
@@ -239,7 +249,9 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.buscarSubprocesso(20L)).thenReturn(spRev);
             when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
-            service.homologarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+            service.homologarCadastroEmBloco(List.of(10L, 20L));
 
             assertThat(spMap.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
@@ -268,7 +280,9 @@ class SubprocessoTransicaoServiceTest {
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
 
-            assertThatThrownBy(() -> service.devolverCadastro(1L, criarUsuario(), "Obs"))
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+            assertThatThrownBy(() -> service.devolverCadastro(1L, "Obs"))
                     .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                     .hasMessageContaining("Historico de movimentacoes inconsistente");
         }
@@ -286,7 +300,9 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
-            service.disponibilizarMapa(1L, req, criarUsuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+            service.disponibilizarMapa(1L, req);
 
             assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_DISPONIBILIZADO);
         }
@@ -318,7 +334,9 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
 
-            service.aceitarValidacao(1L, "Obs", usuario);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+            service.aceitarValidacao(1L, "Obs");
 
             verify(analiseRepo, never()).save(any());
             verify(notificacaoService, never()).notificarTransicao(any());
@@ -375,7 +393,9 @@ class SubprocessoTransicaoServiceTest {
         Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, u);
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
-        service.aceitarRevisaoCadastro(1L, criarUsuario(), "Obs");
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+
+        service.aceitarRevisaoCadastro(1L, "Obs");
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
     }
 

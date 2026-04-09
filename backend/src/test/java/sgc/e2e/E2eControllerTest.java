@@ -280,7 +280,7 @@ class E2eControllerTest {
         Processo result = controller.criarProcessoRevisao(req);
 
         assertEquals(100L, result.getCodigo());
-        verify(processoService).iniciar(eq(100L), eq(List.of(1L)), any());
+        verify(processoService).iniciar(eq(100L), eq(List.of(1L)));
     }
 
     @Test
@@ -303,7 +303,7 @@ class E2eControllerTest {
         Processo result = controller.criarProcessoMapeamento(req);
 
         assertEquals(100L, result.getCodigo());
-        verify(processoService).iniciar(eq(100L), eq(List.of(1L)), any());
+        verify(processoService).iniciar(eq(100L), eq(List.of(1L)));
     }
 
     @Test
@@ -379,7 +379,7 @@ class E2eControllerTest {
         Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoService.criar(any())).thenReturn(proc);
-        doNothing().when(processoService).iniciar(eq(100L), anyList(), any());
+        doNothing().when(processoService).iniciar(eq(100L), anyList());
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
         when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
@@ -389,7 +389,7 @@ class E2eControllerTest {
 
         method.invoke(controller, req, TipoProcesso.DIAGNOSTICO);
 
-        verify(processoService).iniciar(eq(100L), eq(List.of(1L)), any());
+        verify(processoService).iniciar(eq(100L), eq(List.of(1L)));
     }
 
     @Test
@@ -410,7 +410,7 @@ class E2eControllerTest {
         when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         // Simular retorno de erros vazio (sucesso)
-        doNothing().when(processoService).iniciar(anyLong(), anyList(), any());
+        doNothing().when(processoService).iniciar(anyLong(), anyList());
 
         var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
@@ -418,7 +418,7 @@ class E2eControllerTest {
 
         method.invoke(controller, req, TipoProcesso.MAPEAMENTO);
 
-        verify(processoService).iniciar(eq(100L), anyList(), any());
+        verify(processoService).iniciar(eq(100L), anyList());
     }
 
     @Nested
@@ -498,7 +498,7 @@ class E2eControllerTest {
             when(usuarioFacadeMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
             doThrow(new ErroValidacao("Erro 1, Erro 2"))
-                    .when(processoServiceMock).iniciar(eq(100L), anyList(), any());
+                    .when(processoServiceMock).iniciar(eq(100L), anyList());
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroValidacao.class)
@@ -518,7 +518,7 @@ class E2eControllerTest {
             when(processoServiceMock.criar(any())).thenReturn(dto);
             when(usuarioFacadeMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
-            doNothing().when(processoServiceMock).iniciar(eq(100L), anyList(), any()); // Sucesso
+            doNothing().when(processoServiceMock).iniciar(eq(100L), anyList()); // Sucesso
 
             when(processoServiceMock.buscarPorCodigo(100L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 100L)); // Falha ao recarregar
 

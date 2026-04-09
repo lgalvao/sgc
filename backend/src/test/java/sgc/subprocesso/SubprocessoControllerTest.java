@@ -98,7 +98,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Cadastro de atividades disponibilizado"));
 
-            verify(transicaoService).disponibilizarCadastro(eq(1L), any());
+            verify(transicaoService).disponibilizarCadastro(1L);
         }
 
         @Test
@@ -106,14 +106,14 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "CHEFE")
         void deveDisponibilizarCadastroComErroValidacao() throws Exception {
             doThrow(new ErroValidacao("Cadastro incompleto."))
-                    .when(transicaoService).disponibilizarCadastro(eq(1L), any());
+                    .when(transicaoService).disponibilizarCadastro(1L);
 
             mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar")
                             .with(csrf()))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Cadastro incompleto."));
 
-            verify(transicaoService).disponibilizarCadastro(eq(1L), any());
+            verify(transicaoService).disponibilizarCadastro(1L);
         }
 
         @Test
@@ -128,7 +128,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).devolverCadastro(eq(1L), any(), anyString());
+            verify(transicaoService).devolverCadastro(eq(1L), anyString());
         }
 
         @Test
@@ -144,7 +144,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.details").exists());
 
-            verify(transicaoService, never()).devolverCadastro(anyLong(), any(), anyString());
+            verify(transicaoService, never()).devolverCadastro(anyLong(), anyString());
         }
 
         @Test
@@ -159,7 +159,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).aceitarCadastro(eq(1L), any(), eq("Parecer"));
+            verify(transicaoService).aceitarCadastro(eq(1L), eq("Parecer"));
         }
 
         @Test
@@ -174,7 +174,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).homologarCadastro(eq(1L), any(), eq("Homologado"));
+            verify(transicaoService).homologarCadastro(eq(1L), eq("Homologado"));
         }
 
         @Test
@@ -186,7 +186,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Revisão do cadastro disponibilizada"));
 
-            verify(transicaoService).disponibilizarRevisao(eq(1L), any());
+            verify(transicaoService).disponibilizarRevisao(1L);
         }
 
         @Test
@@ -213,7 +213,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).devolverRevisaoCadastro(eq(1L), any(), eq("Ajustar revisão"));
+            verify(transicaoService).devolverRevisaoCadastro(eq(1L), eq("Ajustar revisão"));
         }
 
         @Test
@@ -228,7 +228,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).aceitarRevisaoCadastro(eq(1L), any(), eq("Aceite revisão"));
+            verify(transicaoService).aceitarRevisaoCadastro(eq(1L), eq("Aceite revisão"));
         }
 
         @Test
@@ -243,7 +243,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).homologarRevisaoCadastro(eq(1L), any(), eq("Homologar revisão"));
+            verify(transicaoService).homologarRevisaoCadastro(eq(1L), eq("Homologar revisão"));
         }
 
         @Test
@@ -258,7 +258,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).aceitarCadastro(eq(1L), any(), eq(""));
+            verify(transicaoService).aceitarCadastro(eq(1L), eq(""));
         }
     }
 
@@ -297,7 +297,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).disponibilizarMapa(eq(1L), any(), any());
+            verify(transicaoService).disponibilizarMapa(eq(1L), any());
         }
 
         @Test
@@ -311,7 +311,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isBadRequest());
 
-            verify(transicaoService, never()).disponibilizarMapa(anyLong(), any(), any());
+            verify(transicaoService, never()).disponibilizarMapa(anyLong(), any());
         }
 
         @Test
@@ -368,7 +368,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestão"), any());
+            verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestão"));
         }
 
         @Test
@@ -382,7 +382,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk());
 
-            verify(transicaoService).apresentarSugestoes(eq(1L), eq(" "), any());
+            verify(transicaoService).apresentarSugestoes(eq(1L), eq(" "));
         }
 
         @Test
@@ -391,7 +391,7 @@ class SubprocessoControllerTest {
         void devePropagarErroAoApresentarSugestoes() throws Exception {
             TextoRequest req = new TextoRequest("Sugestão");
             doThrow(new ErroValidacao("Sugestão inválida"))
-                    .when(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestão"), any());
+                    .when(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestão"));
 
             mockMvc.perform(post("/api/subprocessos/1/apresentar-sugestoes")
                             .with(csrf())
@@ -400,7 +400,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Sugestão inválida"));
 
-            verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestão"), any());
+            verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestão"));
         }
     }
 
@@ -418,7 +418,7 @@ class SubprocessoControllerTest {
                     .build();
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(transicaoService.criarAnalise(any(), any(), any(), any())).thenReturn(new Analise());
+            when(transicaoService.criarAnalise(any(), any(), any())).thenReturn(new Analise());
 
             mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
                             .with(csrf())
@@ -426,7 +426,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated());
 
-            verify(transicaoService).criarAnalise(any(), any(), any(), any());
+            verify(transicaoService).criarAnalise(any(), any(), any());
         }
 
         @Test
@@ -441,7 +441,7 @@ class SubprocessoControllerTest {
 
             Analise analise = new Analise();
             when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO), any())).thenReturn(analise);
+            when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO))).thenReturn(analise);
             when(analiseHistoricoService.converter(analise)).thenReturn(new AnaliseHistoricoDto(
                     TipoAnalise.VALIDACAO,
                     TipoAcaoAnalise.ACEITE_MAPEAMENTO,
@@ -459,7 +459,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.tipo").value("VALIDACAO"));
 
-            verify(transicaoService).criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO), any());
+            verify(transicaoService).criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO));
         }
 
         @Test
@@ -473,7 +473,7 @@ class SubprocessoControllerTest {
                     .build();
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.CADASTRO), any()))
+            when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.CADASTRO)))
                     .thenThrow(new ErroValidacao("Parecer inválido"));
 
             mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
@@ -483,7 +483,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Parecer inválido"));
 
-            verify(transicaoService).criarAnalise(any(), any(), eq(TipoAnalise.CADASTRO), any());
+            verify(transicaoService).criarAnalise(any(), any(), eq(TipoAnalise.CADASTRO));
         }
 
         @Test
@@ -504,7 +504,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.details").exists());
 
-            verify(transicaoService, never()).criarAnalise(any(), any(), any(), any());
+            verify(transicaoService, never()).criarAnalise(any(), any(), any());
         }
     }
 }

@@ -284,17 +284,25 @@ class UsuarioFacadeTest {
 
             String tituloRemover = "111111";
             String tituloAtual = "222222";
+            configurarAutenticacao(tituloAtual);
+            when(usuarioService.buscar(tituloAtual)).thenReturn(criarUsuario(tituloAtual));
+            when(usuarioService.buscarPerfisPorUsuarioTitulo(tituloAtual)).thenReturn(List.of(Perfil.ADMIN));
 
-            facade.removerAdministrador(tituloRemover, tituloAtual);
+            facade.removerAdministrador(tituloRemover);
 
             verify(usuarioService).removerAdministrador(tituloRemover);
+            SecurityContextHolder.clearContext();
         }
 
         @Test
         @DisplayName("removerAdministrador deve falhar ao remover a si mesmo")
         void deveFalharAoRemoverSiMesmo() {
-            assertThatThrownBy(() -> facade.removerAdministrador("111", "111"))
+            configurarAutenticacao("111");
+            when(usuarioService.buscar("111")).thenReturn(criarUsuario("111"));
+            when(usuarioService.buscarPerfisPorUsuarioTitulo("111")).thenReturn(List.of(Perfil.ADMIN));
+            assertThatThrownBy(() -> facade.removerAdministrador("111"))
                     .isInstanceOf(ErroValidacao.class);
+            SecurityContextHolder.clearContext();
         }
     }
 

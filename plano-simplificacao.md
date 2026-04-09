@@ -40,14 +40,7 @@ Ordem de precedência:
   * leitura de entidade;
   * montagem de detalhe/contexto;
   * cálculo de permissões para UI.
-* Ainda existe repasse espúrio de `Usuario` em leituras/contextos em partes do backend, especialmente em `processo`:
-  * controllers repassam o usuário autenticado só para leitura contextual;
-  * services públicos misturam leitura da sessão atual com assinatura parametrizada por usuário;
-  * isso amplia contrato sem ganho real e fragiliza autorização por divergência de chamada.
-* O contexto do usuário autenticado ainda aparece de forma dispersa em alguns fluxos como `titulo`, `perfil` e `unidade` separados:
-  * isso aumenta a chance de UI e backend divergirem sobre o mesmo acesso;
-  * `tituloEleitoral` só deve circular explicitamente quando for chave de negócio real, como login e alertas pessoais;
-  * fora desses casos, o preferível é concentrar o contexto autenticado em um ponto só.
+* A padronização do contexto autenticado saiu deste plano e passou a ser tratada separadamente em `plano-contexto-autenticado.md`.
 * `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java` segue grande, mas não há evidência de que deva liderar a fila antes dos dois pontos acima.
 * `backend/src/main/java/sgc/e2e/E2eController.java` continua extenso e com muitos endpoints/fixtures, mas ainda precisa de medição melhor antes de um corte estrutural.
 
@@ -94,16 +87,10 @@ Critério de pronto:
 Objetivo:
 
 * separar leitura básica da composição de detalhe/contexto/permissões.
-* reduzir vazamento do contexto autenticado para controller, facade e service público.
-
 Próximo corte:
 
 * isolar melhor a montagem de permissões de UI sem criar camada nova;
 * reduzir a mistura entre fetch de dados, contexto rico e payload de resposta;
-* remover parâmetros `Usuario` de leituras/contextos quando o service sempre opera sobre a sessão autenticada atual;
-* remover transporte acidental de `titulo/perfil/unidade` em trio quando esses dados só representam a sessão atual;
-* preferir um contexto autenticado curto e coeso para leituras realmente contextualizadas;
-* manter `tituloEleitoral` explícito apenas onde ele é chave de negócio do fluxo, como autenticação e alerta pessoal;
 * preferir extrair helpers privados curtos ou remover pass-throughs restantes antes de introduzir novos tipos internos;
 * manter DTOs externos e contratos HTTP intactos.
 
@@ -111,7 +98,6 @@ Critério de pronto:
 
 * leitura simples mais previsível;
 * menos lógica incidental em torno de detalhe/permissões;
-* menos dependências ocultas entre sessão, autorização e botões da UI;
 * menos motivos para esse service crescer em direções diferentes.
 
 ## Frente 3 — Views grandes do frontend

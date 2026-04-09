@@ -295,7 +295,7 @@ public class SubprocessoTransicaoService {
                 .motivo(cmd.motivoAnalise())
                 .build();
 
-        criarAnalise(sp, request, cmd.tipoAnalise(), usuario);
+        criarAnalise(sp, request, cmd.tipoAnalise());
 
         sp.setSituacao(cmd.novaSituacao());
 
@@ -309,7 +309,8 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo, Usuario usuario) {
+    public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         Analise analise = Analise.builder()
                 .subprocesso(sp)
                 .dataHora(LocalDateTime.now())
@@ -325,10 +326,11 @@ public class SubprocessoTransicaoService {
     }
 
     @Transactional
-    public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
+    public void disponibilizarCadastro(Long codSubprocesso) {
         log.info("Disponibilizando cadastro do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario);
     }
 
@@ -342,10 +344,11 @@ public class SubprocessoTransicaoService {
         log.info("Subprocesso {} transicionado para REVISAO_CADASTRO_EM_ANDAMENTO", codSubprocesso);
     }
 
-    public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
+    public void disponibilizarRevisao(Long codSubprocesso) {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario);
     }
 
@@ -359,12 +362,14 @@ public class SubprocessoTransicaoService {
     }
 
     @Transactional
-    public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
+    public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarDisponibilizacaoMapa(codSubprocesso, request, usuario);
     }
 
     @Transactional
-    public void disponibilizarMapaEmBloco(List<Long> subprocessoCodigos, DisponibilizarMapaRequest request, Usuario usuario) {
+    public void disponibilizarMapaEmBloco(List<Long> subprocessoCodigos, DisponibilizarMapaRequest request) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         subprocessoCodigos.forEach(codSubprocesso -> executarDisponibilizacaoMapa(codSubprocesso, request, usuario));
     }
 
@@ -425,7 +430,8 @@ public class SubprocessoTransicaoService {
         return dataLimiteEtapa2.toLocalDate();
     }
 
-    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {
+    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
@@ -448,7 +454,8 @@ public class SubprocessoTransicaoService {
     }
 
     @Transactional
-    public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes, Usuario usuario) {
+    public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -467,7 +474,8 @@ public class SubprocessoTransicaoService {
     }
 
     @Transactional
-    public void validarMapa(Long codSubprocesso, Usuario usuario) {
+    public void validarMapa(Long codSubprocesso) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
@@ -479,7 +487,8 @@ public class SubprocessoTransicaoService {
         log.info("Validado mapa do SP {}", codSubprocesso);
     }
 
-    public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
+    public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -504,11 +513,13 @@ public class SubprocessoTransicaoService {
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
     }
 
-    public void aceitarValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
+    public void aceitarValidacao(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarAceiteValidacao(codSubprocesso, observacoes, usuario);
     }
 
-    public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
+    public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         subprocessoCodigos.forEach(codSubprocesso -> executarAceiteValidacao(codSubprocesso, null, usuario));
     }
 
@@ -531,11 +542,13 @@ public class SubprocessoTransicaoService {
         log.info("Validação aceita para mapa do SP {}", codSubprocesso);
     }
 
-    public void homologarValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
+    public void homologarValidacao(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarHomologacaoValidacao(codSubprocesso, observacoes, usuario);
     }
 
-    public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
+    public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         subprocessoCodigos.forEach(codSubprocesso -> executarHomologacaoValidacao(codSubprocesso, null, usuario));
     }
 
@@ -551,11 +564,13 @@ public class SubprocessoTransicaoService {
         registrarTransicaoDentroDoAdmin(sp, TipoTransicao.MAPA_HOMOLOGADO, usuario, normalizarTexto(observacoes));
     }
 
-    public void devolverCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
+    public void devolverCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarDevolucao(codSubprocesso, usuario, observacoes, false);
     }
 
-    public void devolverRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
+    public void devolverRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarDevolucao(codSubprocesso, usuario, observacoes, true);
     }
 
@@ -693,16 +708,19 @@ public class SubprocessoTransicaoService {
         return unidadeService.buscarAdmin();
     }
 
-    public void aceitarCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
+    public void aceitarCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarAceite(codSubprocesso, usuario, observacoes, false);
     }
 
-    public void aceitarRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
+    public void aceitarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarAceite(codSubprocesso, usuario, observacoes, true);
     }
 
     @Transactional
-    public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
+    public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         subprocessoCodigos.forEach(codSubprocesso -> {
             boolean isRevisao = isRevisao(codSubprocesso);
             executarAceite(codSubprocesso, usuario, "Avaliação em bloco", isRevisao);
@@ -724,15 +742,18 @@ public class SubprocessoTransicaoService {
         ));
     }
 
-    public void homologarCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
+    public void homologarCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarHomologacao(codSubprocesso, usuario, observacoes, false);
     }
 
-    public void homologarRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
+    public void homologarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarHomologacao(codSubprocesso, usuario, observacoes, true);
     }
 
-    public void homologarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
+    public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         subprocessoCodigos.forEach(codSubprocesso -> {
             boolean isRevisao = isRevisao(codSubprocesso);
             executarHomologacao(codSubprocesso, usuario, "Homologação em bloco", isRevisao);

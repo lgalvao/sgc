@@ -228,7 +228,8 @@ class ProcessoServiceCoverageTest {
 
         List<Long> unidadeCods = List.of(10L);
         Usuario usuario = new Usuario();
-        assertThatThrownBy(() -> target.iniciar(cod, unidadeCods, usuario))
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        assertThatThrownBy(() -> target.iniciar(cod, unidadeCods))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("sem mapa vigente");
     }
@@ -380,7 +381,8 @@ class ProcessoServiceCoverageTest {
         when(unidadeService.buscarAdmin()).thenReturn(admin);
         mockarResponsaveisEfetivos();
 
-        target.iniciar(cod, List.of(10L), new Usuario()); // branch 419 (DIAGNOSTICO)
+        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+        target.iniciar(cod, List.of(10L)); // branch 419 (DIAGNOSTICO)
         verify(subprocessoService).criarParaDiagnostico(any(), any(), any(), any(), any());
     }
 
@@ -406,7 +408,8 @@ class ProcessoServiceCoverageTest {
 
         List<Long> codigos = List.of(10L, 11L);
         Usuario usuario = new Usuario();
-        assertThatThrownBy(() -> target.iniciar(cod, codigos, usuario))
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        assertThatThrownBy(() -> target.iniciar(cod, codigos))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");
     }
@@ -423,7 +426,7 @@ class ProcessoServiceCoverageTest {
         when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
         target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
-        verify(transicaoService).homologarCadastroEmBloco(anyList(), any());
+        verify(transicaoService).homologarCadastroEmBloco(anyList());
     }
 
     @Nested

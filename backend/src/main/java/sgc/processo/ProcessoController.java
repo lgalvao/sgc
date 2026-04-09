@@ -6,7 +6,6 @@ import jakarta.validation.*;
 import lombok.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
-import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.*;
 import sgc.comum.*;
@@ -153,9 +152,8 @@ public class ProcessoController {
     @Operation(summary = "Inicia um processo")
     public ResponseEntity<ProcessoResumoDto> iniciar(
             @PathVariable Long codigo,
-            @Valid @RequestBody IniciarProcessoRequest req,
-            @AuthenticationPrincipal Usuario usuario) {
-        processoService.iniciar(codigo, req.unidades(), usuario);
+            @Valid @RequestBody IniciarProcessoRequest req) {
+        processoService.iniciar(codigo, req.unidades());
 
         Processo processoAtualizado = processoService.buscarPorCodigoComParticipantes(codigo);
         return ResponseEntity.ok(ProcessoResumoDto.fromEntity(processoAtualizado));

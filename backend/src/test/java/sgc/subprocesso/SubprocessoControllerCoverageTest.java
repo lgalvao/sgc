@@ -365,7 +365,7 @@ class SubprocessoControllerCoverageTest {
                         .content(req))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).aceitarCadastroEmBloco(anyList(), any());
+        verify(transicaoService).aceitarCadastroEmBloco(anyList());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -457,7 +457,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).disponibilizarMapa(eq(1L), any(), any());
+        verify(transicaoService).disponibilizarMapa(eq(1L), any());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -488,7 +488,7 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).validarMapa(eq(1L), any());
+        verify(transicaoService).validarMapa(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -504,7 +504,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).devolverValidacao(eq(1L), any(), any());
+        verify(transicaoService).devolverValidacao(eq(1L), any());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -520,7 +520,7 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).aceitarValidacao(eq(1L), eq("Obs"), any());
+        verify(transicaoService).aceitarValidacao(eq(1L), eq("Obs"));
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -536,7 +536,7 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).homologarValidacao(eq(1L), eq("Obs"), any());
+        verify(transicaoService).homologarValidacao(eq(1L), eq("Obs"));
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -552,7 +552,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).submeterMapaAjustado(eq(1L), any(), any());
+        verify(transicaoService).submeterMapaAjustado(eq(1L), any());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -568,7 +568,7 @@ class SubprocessoControllerCoverageTest {
                         .content(req))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).aceitarValidacaoEmBloco(anyList(), any());
+        verify(transicaoService).aceitarValidacaoEmBloco(anyList());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -584,7 +584,7 @@ class SubprocessoControllerCoverageTest {
                         .content(req))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).homologarValidacaoEmBloco(anyList(), any());
+        verify(transicaoService).homologarValidacaoEmBloco(anyList());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -757,7 +757,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details").exists());
 
-        verify(transicaoService, never()).devolverValidacao(anyLong(), any(), any());
+        verify(transicaoService, never()).devolverValidacao(anyLong(), any());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -773,7 +773,7 @@ class SubprocessoControllerCoverageTest {
                         .content(req))
                 .andExpect(status().isBadRequest());
 
-        verify(transicaoService, never()).aceitarCadastroEmBloco(anyList(), any());
+        verify(transicaoService, never()).aceitarCadastroEmBloco(anyList());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -790,7 +790,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.mensagem").value("Mapa de competências disponibilizado."));
 
-        verify(transicaoService).disponibilizarMapa(eq(1L), eq(req), any());
+        verify(transicaoService).disponibilizarMapa(eq(1L), eq(req));
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -896,7 +896,7 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).aceitarValidacao(eq(1L), isNull(), any());
+        verify(transicaoService).aceitarValidacao(eq(1L), isNull());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 

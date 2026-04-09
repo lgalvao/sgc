@@ -54,14 +54,14 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void disponibilizarCadastroErro() throws Exception {
         doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
-                .when(transicaoService).disponibilizarCadastro(eq(1L), any());
+                .when(transicaoService).disponibilizarCadastro(1L);
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar").with(csrf()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value("Existem atividades sem conhecimentos associados."));
 
-        verify(transicaoService).disponibilizarCadastro(eq(1L), any());
+        verify(transicaoService).disponibilizarCadastro(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -70,14 +70,14 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void disponibilizarRevisaoErro() throws Exception {
         doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
-                .when(transicaoService).disponibilizarRevisao(eq(1L), any());
+                .when(transicaoService).disponibilizarRevisao(1L);
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_REVISAO_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao").with(csrf()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value("Existem atividades sem conhecimentos associados."));
 
-        verify(transicaoService).disponibilizarRevisao(eq(1L), any());
+        verify(transicaoService).disponibilizarRevisao(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -127,7 +127,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).disponibilizarMapaEmBloco(eq(List.of(1L)), any(), any());
+        verify(transicaoService).disponibilizarMapaEmBloco(eq(List.of(1L)), any());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -167,7 +167,7 @@ class SubprocessoControllerCoverageExtraTest {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
-        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any())).thenReturn(a);
+        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO))).thenReturn(a);
         when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.VALIDACAO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
@@ -186,7 +186,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(jsonPath("$.tipo").value("VALIDACAO"));
 
         verify(consultaService).buscarSubprocesso(1L);
-        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any());
+        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO));
         verify(analiseHistoricoService).converter(a);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
@@ -197,7 +197,7 @@ class SubprocessoControllerCoverageExtraTest {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
-        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any())).thenReturn(a);
+        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO))).thenReturn(a);
         when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.CADASTRO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
@@ -216,7 +216,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(jsonPath("$.tipo").value("CADASTRO"));
 
         verify(consultaService).buscarSubprocesso(1L);
-        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any());
+        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO));
         verify(analiseHistoricoService).converter(a);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
@@ -265,7 +265,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestao"), any());
+        verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestao"));
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 

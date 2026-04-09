@@ -358,7 +358,7 @@ class ProcessoControllerTest {
             Processo processo = criarProcessoResumoValido("Processo teste", SituacaoProcesso.EM_ANDAMENTO);
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
-            doNothing().when(processoService).iniciar(eq(1L), anyList(), any());
+            doNothing().when(processoService).iniciar(eq(1L), anyList());
 
             mockMvc.perform(
                             post("/api/processos/1/iniciar")
@@ -369,7 +369,7 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo teste"));
 
-            verify(processoService).iniciar(eq(1L), eq(List.of(1L)), any());
+            verify(processoService).iniciar(eq(1L), eq(List.of(1L)));
         }
 
         @Test
@@ -645,9 +645,9 @@ class ProcessoControllerTest {
         void deveLancarErroValidacaoQuandoIniciarProcessoRetornaErros() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             doThrow(new ErroValidacao("erro"))
-                    .when(processoServiceMock).iniciar(anyLong(), anyList(), any());
+                    .when(processoServiceMock).iniciar(anyLong(), anyList());
 
-            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req, new Usuario()));
+            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req));
             assertEquals(HttpStatus.UNPROCESSABLE_CONTENT, ex.getStatus());
             assertEquals("erro", ex.getMessage());
         }

@@ -249,8 +249,9 @@ class ProcessoServiceExtraCoverageTest {
             Processo p = new Processo();
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of(), new Usuario()));
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of()));
         }
 
         @Test
@@ -260,8 +261,9 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.REVISAO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of(), new Usuario()));
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of()));
         }
 
         @Test
@@ -271,8 +273,9 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of(), new Usuario()));
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of()));
         }
     }
 
@@ -764,8 +767,9 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade admin = new Unidade();
             when(unidadeService.buscarAdmin()).thenReturn(admin);
+            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            processoService.iniciar(1L, List.of(), new Usuario());
+            processoService.iniciar(1L, List.of());
 
             verify(subprocessoService).criarParaDiagnostico(eq(p), eq(uni), any(), eq(admin), any());
         }

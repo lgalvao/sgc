@@ -132,7 +132,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
                     .motivo("Motivo")
                     .build();
 
-            Analise analise = transicaoService.criarAnalise(sp, request, TipoAnalise.CADASTRO, user);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            Analise analise = transicaoService.criarAnalise(sp, request, TipoAnalise.CADASTRO);
 
             assertThat(analise).isNotNull();
             assertThat(analise.getSubprocesso()).isEqualTo(sp);
@@ -264,7 +266,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo()))
                     .thenReturn(java.util.List.of());
 
-            transicaoService.disponibilizarCadastro(sp.getCodigo(), user);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            transicaoService.disponibilizarCadastro(sp.getCodigo());
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
@@ -315,7 +319,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
                 .dataLimite(proc.getDataCriacao().toLocalDate().plusDays(1))
                 .build();
 
-            transicaoService.disponibilizarMapa(sp.getCodigo(), request, user);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            transicaoService.disponibilizarMapa(sp.getCodigo(), request);
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
@@ -359,7 +365,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
                 .dataLimiteEtapa2(java.time.LocalDateTime.of(2025, 12, 31, 0, 0))
                 .build();
 
-            transicaoService.submeterMapaAjustado(sp.getCodigo(), request, user);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            transicaoService.submeterMapaAjustado(sp.getCodigo(), request);
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
@@ -412,7 +420,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             when(unidadeService.buscarPorSigla("U6")).thenReturn(uSp);
             when(hierarquiaService.isSubordinada(uSp, uAnalise)).thenReturn(true);
 
-            transicaoService.devolverValidacao(sp.getCodigo(), "justificativa erro", user);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            transicaoService.devolverValidacao(sp.getCodigo(), "justificativa erro");
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
@@ -457,7 +467,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
 
             when(unidadeService.buscarPorSigla("U7")).thenReturn(uSp);
 
-            transicaoService.aceitarValidacao(sp.getCodigo(), "Observacao aceite", user);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            transicaoService.aceitarValidacao(sp.getCodigo(), "Observacao aceite");
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);

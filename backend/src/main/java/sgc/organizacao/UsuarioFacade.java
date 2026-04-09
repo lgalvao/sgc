@@ -155,7 +155,8 @@ public class UsuarioFacade {
     }
 
     @Transactional
-    public void removerAdministrador(String usuarioTitulo, String usuarioAtualTitulo) {
+    public void removerAdministrador(String usuarioTitulo) {
+        String usuarioAtualTitulo = contextoAutenticado().usuarioTitulo();
         if (usuarioTitulo.equals(usuarioAtualTitulo)) {
             throw new ErroValidacao(Mensagens.NAO_REMOVER_A_SI_MESMO);
         }

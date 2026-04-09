@@ -137,6 +137,7 @@ class UsuarioControllerTest {
         Usuario usuarioAtual = new Usuario();
         usuarioAtual.setTituloEleitoral("999");
         usuarioAtual.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("999", 1L, Perfil.ADMIN));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores/123/remover")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -144,9 +145,8 @@ class UsuarioControllerTest {
                 .andExpect(status().isOk());
 
         ArgumentCaptor<String> captorTitulo = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> captorAutor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(usuarioFacade).removerAdministrador(captorTitulo.capture(), captorAutor.capture());
+        Mockito.verify(usuarioFacade).removerAdministrador(captorTitulo.capture());
 
         Assertions.assertThat(captorTitulo.getValue())
                 .as("Título do usuário a ser removido (PathVariable)")

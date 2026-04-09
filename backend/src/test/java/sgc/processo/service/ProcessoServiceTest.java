@@ -129,8 +129,8 @@ class ProcessoServiceTest {
 
             processoService.executarAcaoEmBloco(codProcesso, req);
 
-            verify(transicaoService, never()).aceitarCadastroEmBloco(any(), any());
-            verify(transicaoService, never()).homologarCadastroEmBloco(any(), any());
+            verify(transicaoService, never()).aceitarCadastroEmBloco(any());
+            verify(transicaoService, never()).homologarCadastroEmBloco(any());
         }
     }
 
@@ -154,6 +154,7 @@ class ProcessoServiceTest {
         void deveIniciarMapeamentoComSucesso() {
             Long id = 100L;
             Usuario usuario = new Usuario();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             
             Processo p = new Processo();
             p.setCodigo(id);
@@ -168,7 +169,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 
-            processoService.iniciar(id, List.of(), usuario);
+            processoService.iniciar(id, List.of());
 
             verify(processoRepo).save(any(Processo.class));
         }
@@ -178,6 +179,7 @@ class ProcessoServiceTest {
         void deveIniciarRevisaoComSucesso() {
             Long id = 100L;
             Usuario usuario = new Usuario();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -199,7 +201,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 
-            processoService.iniciar(id, List.of(1L), usuario);
+            processoService.iniciar(id, List.of(1L));
 
             verify(processoRepo).save(any(Processo.class));
             verify(subprocessoService).criarParaRevisao(p, uni, um, uniAdmin, usuario);
@@ -223,8 +225,9 @@ class ProcessoServiceTest {
             when(processoRepo.listarUnidadesEmProcessoAtivo(eq(SituacaoProcesso.EM_ANDAMENTO), anyList()))
                     .thenReturn(List.of(1L));
             mockarResponsaveisEfetivos();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of(), usuario))
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.UNIDADES_EM_PROCESSO_ATIVO);
         }
@@ -248,8 +251,9 @@ class ProcessoServiceTest {
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of());
             when(unidadeService.buscarSiglasPorCodigos(anyList())).thenReturn(List.of("U1"));
             mockarResponsaveisEfetivos();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L), usuario))
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L)))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.UNIDADES_SEM_MAPA);
         }
@@ -289,8 +293,9 @@ class ProcessoServiceTest {
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(false);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of(), usuario))
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
@@ -547,14 +552,14 @@ class ProcessoServiceTest {
             // Teste ACEITAR
             ProcessarAnaliseEmBlocoCommand reqAceitar = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), ACEITAR);
             processoService.executarAcaoEmBloco(1L, reqAceitar);
-            verify(transicaoService).aceitarCadastroEmBloco(List.of(10L), usuario);
-            verify(transicaoService).aceitarValidacaoEmBloco(List.of(20L), usuario);
+            verify(transicaoService).aceitarCadastroEmBloco(List.of(10L));
+            verify(transicaoService).aceitarValidacaoEmBloco(List.of(20L));
 
             // Teste HOMOLOGAR
             ProcessarAnaliseEmBlocoCommand reqHomologar = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), HOMOLOGAR);
             processoService.executarAcaoEmBloco(1L, reqHomologar);
-            verify(transicaoService).homologarCadastroEmBloco(List.of(10L), usuario);
-            verify(transicaoService).homologarValidacaoEmBloco(List.of(20L), usuario);
+            verify(transicaoService).homologarCadastroEmBloco(List.of(10L));
+            verify(transicaoService).homologarValidacaoEmBloco(List.of(20L));
         }
     }
 
@@ -785,8 +790,7 @@ class ProcessoServiceTest {
                         ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
                 verify(transicaoService).disponibilizarMapaEmBloco(
                         eq(List.of(1001L, 1002L, 1003L)),
-                        captor.capture(),
-                        eq(usuario)
+                        captor.capture()
                 );
 
                 DisponibilizarMapaRequest captured = captor.getValue();
@@ -825,7 +829,7 @@ class ProcessoServiceTest {
 
                 processoService.executarAcaoEmBloco(100L, req);
 
-                verify(transicaoService).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
+                verify(transicaoService).aceitarCadastroEmBloco(List.of(1L, 2L));
             }
 
             @Test
@@ -850,7 +854,7 @@ class ProcessoServiceTest {
 
                 processoService.executarAcaoEmBloco(100L, req);
 
-                verify(transicaoService).aceitarValidacaoEmBloco(List.of(1L), usuario);
+                verify(transicaoService).aceitarValidacaoEmBloco(List.of(1L));
             }
         }
 
@@ -879,7 +883,7 @@ class ProcessoServiceTest {
 
                 processoService.executarAcaoEmBloco(100L, req);
 
-                verify(transicaoService).homologarCadastroEmBloco(List.of(1L), usuario);
+                verify(transicaoService).homologarCadastroEmBloco(List.of(1L));
             }
 
             @Test
@@ -904,7 +908,7 @@ class ProcessoServiceTest {
 
                 processoService.executarAcaoEmBloco(100L, req);
 
-                verify(transicaoService).homologarValidacaoEmBloco(List.of(1L), usuario);
+                verify(transicaoService).homologarValidacaoEmBloco(List.of(1L));
             }
         }
     }
@@ -918,6 +922,7 @@ class ProcessoServiceTest {
         void deveIniciarDiagnosticoComSucesso() {
             Long id = 100L;
             Usuario usuario = new Usuario();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -939,7 +944,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 
-            processoService.iniciar(id, List.of(), usuario);
+            processoService.iniciar(id, List.of());
 
             verify(processoRepo).save(any(Processo.class));
             verify(subprocessoService).criarParaDiagnostico(p, uni, um, uniAdmin, usuario);
@@ -1067,6 +1072,7 @@ class ProcessoServiceTest {
         void deveFalharAoIniciarRevisaoSemUnidades() {
             Long id = 100L;
             Usuario usuario = new Usuario();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -1075,7 +1081,7 @@ class ProcessoServiceTest {
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of(), usuario))
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
         }

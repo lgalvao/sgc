@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
-import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
@@ -64,10 +63,8 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Remove um administrador")
     public ResponseEntity<Void> removerAdministrador(
-            @PathVariable String usuarioTitulo,
-            @AuthenticationPrincipal Usuario usuarioAtual) {
-
-        usuarioFacade.removerAdministrador(usuarioTitulo, usuarioAtual.getTituloEleitoral());
+            @PathVariable String usuarioTitulo) {
+        usuarioFacade.removerAdministrador(usuarioTitulo);
         return ResponseEntity.ok().build();
     }
 }

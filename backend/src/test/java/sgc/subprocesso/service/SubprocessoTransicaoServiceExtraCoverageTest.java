@@ -101,7 +101,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         doThrow(new sgc.comum.erros.ErroValidacao("erro"))
             .when(validacaoService).validarSituacaoPermitida(any(Subprocesso.class), eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO));
         
-        assertThatThrownBy(() -> service.disponibilizarRevisao(100L, new Usuario()))
+        assertThatThrownBy(() -> service.disponibilizarRevisao(100L))
                 .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
     }
 
@@ -144,7 +144,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        service.apresentarSugestoes(100L, "sugestoes", new Usuario());
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+
+        service.apresentarSugestoes(100L, "sugestoes");
 
         verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), admin)));
     }
@@ -172,7 +174,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        service.validarMapa(100L, new Usuario());
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+
+        service.validarMapa(100L);
 
         verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), admin)));
     }
@@ -201,7 +205,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        service.aceitarValidacao(100L, "obs", new Usuario());
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+
+        service.aceitarValidacao(100L, "obs");
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         verify(analiseRepo).save(any());
@@ -312,7 +318,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
         when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true); // branch 489
 
-        service.devolverCadastro(1L, new Usuario(), "Obs");
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+
+        service.devolverCadastro(1L, "Obs");
 
         // Deve ter devolvido para uOrigem (destino da transicao)
         verify(notificacaoService).notificarTransicao(argThat(cmd -> cmd.unidadeDestino().equals(uOrigem)));
@@ -327,7 +335,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        service.homologarRevisaoCadastro(1L, new Usuario(), "Obs"); // branch 583 (temImpactos = true)
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+
+        service.homologarRevisaoCadastro(1L, "Obs");
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
@@ -341,7 +351,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 
-        service.homologarRevisaoCadastro(1L, new Usuario(), "Obs"); // branch 583 (temImpactos = false)
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+
+        service.homologarRevisaoCadastro(1L, "Obs");
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
@@ -357,7 +369,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");
-        service.disponibilizarMapa(1L, req, new Usuario()); // branch 228 (ultima != null && isBefore = false)
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+
+        service.disponibilizarMapa(1L, req);
 
         assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 1, 1, 0, 0));
     }
