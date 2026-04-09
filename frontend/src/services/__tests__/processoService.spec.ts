@@ -216,10 +216,10 @@ describe('processoService', () => {
         expect(apiClient.post).toHaveBeenCalledWith(`/processos/${payload.codProcesso}/acoes-em-bloco`, payload);
     });
 
-    it('executarAcaoEmBloco deve fazer requisição POST com ação em maiúsculo', async () => {
+    it('executarAcaoEmBloco deve fazer requisição POST com ação explícita', async () => {
         await processoService.executarAcaoEmBloco(1, {
             unidadeCodigos: [10],
-            acao: 'aceitar',
+            acao: 'ACEITAR',
             dataLimite: '2026-12-31'
         });
         expect(apiClient.post).toHaveBeenCalledWith('/processos/1/acao-em-bloco', {

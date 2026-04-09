@@ -38,33 +38,14 @@
           </BButton>
 
           <BButton
-              v-if="podeAceitarBloco"
-              id="btn-aceitar-bloco"
-              :disabled="!habilitarAceiteBloco"
-              data-testid="btn-processo-aceitar-bloco"
+              v-for="acao in acoesBlocoVisiveis"
+              :id="obterIdBotaoAcao(acao.codigo)"
+              :key="acao.codigo"
+              :data-testid="obterTestIdBotaoAcao(acao.codigo)"
+              :disabled="!acao.habilitar || processandoAcaoBloco"
               variant="success"
-              @click="abrirModalBloco('aceitar')">
-            {{ rotuloAcaoAceitarBloco }}
-          </BButton>
-
-          <BButton
-              v-if="podeHomologarBloco"
-              id="btn-homologar-bloco"
-              :disabled="!habilitarHomologacaoBloco"
-              data-testid="btn-processo-homologar-bloco"
-              variant="success"
-              @click="abrirModalBloco('homologar')">
-            {{ rotuloAcaoHomologarBloco }}
-          </BButton>
-
-          <BButton
-              v-if="podeDisponibilizarBloco"
-              id="btn-disponibilizar-bloco"
-              :disabled="!habilitarDisponibilizacaoBloco"
-              data-testid="btn-processo-disponibilizar-bloco"
-              variant="success"
-              @click="abrirModalBloco('disponibilizar')">
-            {{ rotuloAcaoDisponibilizarBloco }}
+              @click="abrirModalBloco(acao)">
+            {{ acao.rotulo }}
           </BButton>
         </template>
       </PageHeader>
@@ -83,10 +64,10 @@
     <ModalAcaoBloco
         :id="'modal-acao-bloco'"
         ref="modalBlocoRef"
-        :mostrar-data-limite="acaoBlocoAtual === 'disponibilizar'"
-        :rotulo-botao="rotuloBotaoBloco"
-        :texto="textoModalBloco"
-        :titulo="tituloModalBloco"
+        :mostrar-data-limite="acaoBlocoAtual?.requerDataLimite ?? false"
+        :rotulo-botao="acaoBlocoAtual?.rotuloBotao ?? ''"
+        :texto="acaoBlocoAtual?.texto ?? ''"
+        :titulo="acaoBlocoAtual?.titulo ?? ''"
         :unidades="unidadesElegiveis"
         :unidades-pre-selecionadas="idsElegiveis"
         @confirmar="executarAcaoBloco"/>
@@ -127,7 +108,7 @@ import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
-import type {Processo, SubprocessoElegivel} from "@/types/tipos";
+import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
@@ -135,14 +116,6 @@ import {normalizeError, type NormalizedError} from "@/utils/apiError";
 import * as processoService from "@/services/processoService";
 import {TEXTOS} from "@/constants/textos";
 
-type ContextoBloco = "cadastro" | "validacao" | "misto";
-type AcaoBloco = "aceitar" | "homologar" | "disponibilizar";
-type ConfiguracaoTextoAcaoBloco = {
-  rotulo: string;
-  titulo: string;
-  texto: string;
-  mensagemSucesso: string;
-};
 type LinhaParticipante = {
   clickable?: boolean;
   sigla?: string;
@@ -171,11 +144,10 @@ const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
-const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
 const lastError = ref<NormalizedError | null>(null);
 const modalBlocoRef = ref<ModalAcaoBlocoRef | null>(null);
 const mostrarModalFinalizacao = ref(false);
-const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
+const acaoBlocoAtual = ref<AcaoBlocoProcesso | null>(null);
 const processandoAcaoBloco = ref(false);
 const carregamentoInicialConcluido = ref(false);
 
@@ -186,13 +158,11 @@ function clearError() {
 async function carregarContextoCompleto() {
   clearError();
   processo.value = null;
-  subprocessosElegiveis.value = [];
 
   try {
     const data = await processoService.buscarContextoCompleto(codProcesso);
     if (data) {
       processo.value = data;
-      subprocessosElegiveis.value = data.elegiveis ?? [];
     }
     return data;
   } catch (error) {
@@ -201,94 +171,7 @@ async function carregarContextoCompleto() {
   }
 }
 
-const configuracoesAcaoBloco: Record<AcaoBloco, Record<ContextoBloco, ConfiguracaoTextoAcaoBloco>> = {
-  aceitar: {
-    cadastro: {
-      rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO,
-      titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
-      texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
-      mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
-    },
-    validacao: {
-      rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO,
-      titulo: TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO,
-      texto: TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO,
-      mensagemSucesso: TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO,
-    },
-    misto: {
-      rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_MISTO,
-      titulo: TEXTOS.acaoBloco.aceitar.TITULO_MISTO,
-      texto: TEXTOS.acaoBloco.aceitar.TEXTO_MISTO,
-      mensagemSucesso: TEXTOS.sucesso.ACEITES_REGISTRADOS_EM_BLOCO,
-    },
-  },
-  homologar: {
-    cadastro: {
-      rotulo: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO,
-      titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
-      texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
-      mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
-    },
-    validacao: {
-      rotulo: TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO,
-      titulo: TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
-      texto: TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
-      mensagemSucesso: TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
-    },
-    misto: {
-      rotulo: TEXTOS.acaoBloco.homologar.ROTULO_MISTO,
-      titulo: TEXTOS.acaoBloco.homologar.TITULO_MISTO,
-      texto: TEXTOS.acaoBloco.homologar.TEXTO_MISTO,
-      mensagemSucesso: TEXTOS.sucesso.HOMOLOGACOES_REGISTRADAS_EM_BLOCO,
-    },
-  },
-  disponibilizar: {
-    cadastro: {
-      rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
-      titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
-      texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
-      mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
-    },
-    validacao: {
-      rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
-      titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
-      texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
-      mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
-    },
-    misto: {
-      rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
-      titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
-      texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
-      mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
-    },
-  },
-};
-
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
-
-const podeAceitarBloco = computed(() => {
-  return processo.value?.podeAceitarCadastroBloco ?? false;
-});
-
-const podeHomologarBloco = computed(() => {
-  return (processo.value?.podeHomologarCadastro ?? false) || (processo.value?.podeHomologarMapa ?? false);
-});
-
-const podeDisponibilizarBloco = computed(() => {
-  return !isProcessoFinalizado.value && (processo.value?.podeDisponibilizarMapaBloco || false);
-});
-
-const habilitarAceiteBloco = computed(() => {
-  return !processandoAcaoBloco.value && unidadesElegiveisPorAcao.value.aceitar.length > 0;
-});
-
-const habilitarHomologacaoBloco = computed(() => {
-  return !processandoAcaoBloco.value && unidadesElegiveisPorAcao.value.homologar.length > 0;
-});
-
-const habilitarDisponibilizacaoBloco = computed(() => {
-  return !processandoAcaoBloco.value && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
-});
 
 const podeFinalizar = computed(() => {
   return processo.value?.podeFinalizar || false;
@@ -298,67 +181,11 @@ const isProcessoFinalizado = computed(() => {
   return processo.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
-function isSituacaoCadastroPronto(situacao: SituacaoSubprocesso) {
-  return situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-      situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
-}
-
-function isSituacaoMapaValidadoOuAjustado(situacao: SituacaoSubprocesso) {
-  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-      situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
-}
-
-function obterSituacao(item: { situacaoSubprocesso?: SituacaoSubprocesso, situacao?: SituacaoSubprocesso }) {
-  return item.situacaoSubprocesso ?? item.situacao;
-}
-
-function obterContextoBloco(unidades: Array<Pick<LinhaParticipante, "situacaoSubprocesso" | "situacao">>): ContextoBloco {
-  const temCadastro = unidades.some(u => {
-    const situacao = obterSituacao(u);
-    return situacao ? isSituacaoCadastroPronto(situacao) : false;
-  });
-  const temValidacao = unidades.some(u => {
-    const situacao = obterSituacao(u);
-    return situacao ? isSituacaoMapaValidadoOuAjustado(situacao) : false;
-  });
-
-  if (temCadastro && !temValidacao) {
-    return "cadastro";
-  }
-  if (temValidacao && !temCadastro) {
-    return "validacao";
-  }
-  return "misto";
-}
-
-function obterUnidadesContextoAcao(acao: AcaoBloco, ids?: number[]) {
-  const unidadesAcao = unidadesElegiveisPorAcao.value[acao] ?? [];
-  if (!ids || ids.length === 0) {
-    return unidadesAcao;
-  }
-  return unidadesAcao.filter(unidade => ids.includes(unidade.unidadeCodigo));
-}
-
-function obterContextoAtualAcao(acao: AcaoBloco, ids?: number[]): ContextoBloco {
-  return obterContextoBloco(obterUnidadesContextoAcao(acao, ids));
-}
-
-function obterConfiguracaoAcaoBloco(acao: AcaoBloco, contexto: ContextoBloco): ConfiguracaoTextoAcaoBloco {
-  return configuracoesAcaoBloco[acao][contexto];
-}
-
-const unidadesElegiveisPorAcao = computed(() => ({
-  aceitar: subprocessosElegiveis.value.filter(u => u.habilitarAceitarBloco),
-  homologar: subprocessosElegiveis.value.filter(u => u.habilitarHomologarBloco),
-  disponibilizar: subprocessosElegiveis.value.filter(u => u.habilitarDisponibilizarBloco)
-}));
+const acoesBlocoVisiveis = computed(() => (processo.value?.acoesBloco ?? []).filter(acao => acao.mostrar));
 
 const unidadesElegiveis = computed(() => {
-  const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtual.value];
-  if (!elegiveis) return [];
-  return elegiveis.map(u => ({
+  const elegiveis = acaoBlocoAtual.value?.unidades ?? [];
+  return elegiveis.map((u: SubprocessoElegivel) => ({
     codigo: u.unidadeCodigo,
     sigla: u.unidadeSigla,
     nome: u.unidadeNome,
@@ -368,47 +195,6 @@ const unidadesElegiveis = computed(() => {
 });
 
 const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
-
-const contextoAceiteBloco = computed<ContextoBloco>(() => obterContextoBloco(unidadesElegiveisPorAcao.value.aceitar));
-const contextoHomologacaoBloco = computed<ContextoBloco>(() => obterContextoBloco(unidadesElegiveisPorAcao.value.homologar));
-const contextoDisponibilizacaoBloco = computed<ContextoBloco>(() => "misto");
-
-const rotuloAcaoAceitarBloco = computed(() => obterConfiguracaoAcaoBloco("aceitar", contextoAceiteBloco.value).rotulo);
-
-const rotuloAcaoHomologarBloco = computed(() => obterConfiguracaoAcaoBloco("homologar", contextoHomologacaoBloco.value).rotulo);
-
-const rotuloAcaoDisponibilizarBloco = computed(() => obterConfiguracaoAcaoBloco("disponibilizar", contextoDisponibilizacaoBloco.value).rotulo);
-
-const contextoAtualAcaoBloco = computed<ContextoBloco>(() => {
-  if (acaoBlocoAtual.value === "aceitar") {
-    return contextoAceiteBloco.value;
-  }
-  if (acaoBlocoAtual.value === "homologar") {
-    return contextoHomologacaoBloco.value;
-  }
-  return contextoDisponibilizacaoBloco.value;
-});
-
-const tituloModalBloco = computed(() => obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoAtualAcaoBloco.value).titulo);
-
-const textoModalBloco = computed(() => obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoAtualAcaoBloco.value).texto);
-
-const rotuloBotaoBloco = computed(() => {
-  switch (acaoBlocoAtual.value) {
-    case "aceitar":
-      return TEXTOS.acaoBloco.aceitar.BOTAO;
-    case "homologar":
-      return TEXTOS.acaoBloco.homologar.BOTAO;
-    case "disponibilizar":
-      return TEXTOS.acaoBloco.disponibilizar.BOTAO;
-    default:
-      return "";
-  }
-});
-
-const mensagemSucessoAcaoBloco = computed(() => {
-  return obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoAtualAcaoBloco.value).mensagemSucesso;
-});
 
 async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
   if (!row.clickable || !row.sigla) {
@@ -432,6 +218,40 @@ function finalizarProcesso() {
   mostrarModalFinalizacao.value = true;
 }
 
+function obterIdBotaoAcao(codigoAcao: string) {
+  switch (codigoAcao) {
+    case "aceitar-cadastro":
+      return "btn-aceitar-bloco";
+    case "aceitar-mapa":
+      return "btn-aceitar-mapas-bloco";
+    case "homologar-cadastro":
+      return "btn-homologar-bloco";
+    case "homologar-mapa":
+      return "btn-homologar-mapas-bloco";
+    case "disponibilizar-mapa":
+      return "btn-disponibilizar-bloco";
+    default:
+      return `btn-${codigoAcao}`;
+  }
+}
+
+function obterTestIdBotaoAcao(codigoAcao: string) {
+  switch (codigoAcao) {
+    case "aceitar-cadastro":
+      return "btn-processo-aceitar-bloco";
+    case "aceitar-mapa":
+      return "btn-processo-aceitar-mapas-bloco";
+    case "homologar-cadastro":
+      return "btn-processo-homologar-bloco";
+    case "homologar-mapa":
+      return "btn-processo-homologar-mapas-bloco";
+    case "disponibilizar-mapa":
+      return "btn-processo-disponibilizar-bloco";
+    default:
+      return `btn-processo-${codigoAcao}`;
+  }
+}
+
 async function confirmarFinalizacao() {
   try {
     clearError();
@@ -445,7 +265,7 @@ async function confirmarFinalizacao() {
   }
 }
 
-function abrirModalBloco(acao: AcaoBloco) {
+function abrirModalBloco(acao: AcaoBlocoProcesso) {
   acaoBlocoAtual.value = acao;
   modalBlocoRef.value?.abrir();
 }
@@ -455,25 +275,26 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     clearError();
     processandoAcaoBloco.value = true;
     modalBlocoRef.value?.setProcessando(true);
-    const contextoExecucao = obterContextoAtualAcao(acaoBlocoAtual.value, dados.ids);
-    const mensagemSucesso = obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoExecucao).mensagemSucesso;
     if (!processo.value) {
       modalBlocoRef.value?.setErro("Detalhes do processo não carregados.");
       processandoAcaoBloco.value = false;
       return;
     }
+    if (!acaoBlocoAtual.value) {
+      modalBlocoRef.value?.setErro(TEXTOS.processo.ERRO_ACAO_BLOCO);
+      processandoAcaoBloco.value = false;
+      return;
+    }
     await processoService.executarAcaoEmBloco(processo.value.codigo, {
       unidadeCodigos: dados.ids,
-      acao: acaoBlocoAtual.value,
+      acao: acaoBlocoAtual.value.acao,
       dataLimite: dados.dataLimite,
     });
 
     modalBlocoRef.value?.fechar();
-    const deveRedirecionarPainel = acaoBlocoAtual.value === "aceitar" ||
-        acaoBlocoAtual.value === "disponibilizar" ||
-        (acaoBlocoAtual.value === "homologar" && contextoExecucao === "validacao");
+    const {mensagemSucesso, redirecionarPainel} = acaoBlocoAtual.value;
 
-    if (deveRedirecionarPainel) {
+    if (redirecionarPainel) {
       toastStore.setPending(mensagemSucesso);
       await router.push("/painel");
       return;
@@ -517,12 +338,6 @@ defineExpose({
   executarAcaoBloco,
   acaoBlocoAtual,
   unidadesElegiveis,
-  rotuloAcaoAceitarBloco,
-  rotuloAcaoHomologarBloco,
-  rotuloAcaoDisponibilizarBloco,
-  tituloModalBloco,
-  textoModalBloco,
-  rotuloBotaoBloco,
-  mensagemSucessoAcaoBloco,
+  acoesBlocoVisiveis,
 });
 </script>
