@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {createTestingPinia} from '@pinia/testing';
+import {ref} from 'vue';
 import VisMapa from '@/views/MapaVisualizacaoView.vue';
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import {useToastStore} from "@/stores/toast";
@@ -128,16 +129,16 @@ describe("VisMapa.vue", () => {
 
     const mountComponent = (initialState: any = {}, _ = "TEST", accessOverrides: any = {}) => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeValidarMapa: {value: true},
-            podeApresentarSugestoes: {value: true},
-            podeVerSugestoes: {value: false},
-            podeAceitarMapa: {value: true},
-            podeDevolverMapa: {value: true},
-            habilitarValidarMapa: {value: true},
-            habilitarDevolverMapa: {value: true},
-            acaoPrincipalMapa: {value: criarAcaoPrincipalMapa('ACEITAR')},
-            podeVerPagina: {value: true},
-            podeVisualizarMapa: {value: true},
+            podeValidarMapa: ref(true),
+            podeApresentarSugestoes: ref(true),
+            podeVerSugestoes: ref(false),
+            podeAceitarMapa: ref(true),
+            podeDevolverMapa: ref(true),
+            habilitarValidarMapa: ref(true),
+            habilitarDevolverMapa: ref(true),
+            acaoPrincipalMapa: ref(criarAcaoPrincipalMapa('ACEITAR')),
+            podeVerPagina: ref(true),
+            podeVisualizarMapa: ref(true),
             ...accessOverrides
         });
         context.wrapper = mount(VisMapa, {
@@ -352,6 +353,7 @@ describe("VisMapa.vue", () => {
             },
         });
         await wrapper.vm.$nextTick();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="btn-mapa-devolver"]').exists()).toBe(
             true,
@@ -362,7 +364,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens validar modal and confirms", async () => {
-        const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
+        const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -378,7 +380,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens sugestoes modal and confirms", async () => {
-        const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
+        const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
 
         await wrapper
             .find('[data-testid="btn-mapa-sugestoes"]')
@@ -450,6 +452,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
+        await flushPromises();
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
             .trigger("click");
@@ -479,7 +482,8 @@ describe("VisMapa.vue", () => {
                     ],
                 },
             },
-        }, "TEST", {acaoPrincipalMapa: {value: criarAcaoPrincipalMapa('HOMOLOGAR')}});
+        }, "TEST", {acaoPrincipalMapa: ref(criarAcaoPrincipalMapa('HOMOLOGAR'))});
+        await flushPromises();
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
             .trigger("click");
@@ -526,10 +530,10 @@ describe("VisMapa.vue", () => {
                 },
             },
         }, "TEST", {
-            podeVerSugestoes: {value: true},
-            podeAceitarMapa: {value: false},
-            podeDevolverMapa: {value: false},
-            acaoPrincipalMapa: {value: null},
+            podeVerSugestoes: ref(true),
+            podeAceitarMapa: ref(false),
+            podeDevolverMapa: ref(false),
+            acaoPrincipalMapa: ref(null),
         });
         await wrapper.vm.$nextTick();
 
@@ -577,7 +581,8 @@ describe("VisMapa.vue", () => {
                     ],
                 },
             },
-        });
+        }, "TEST", {acaoPrincipalMapa: ref(criarAcaoPrincipalMapa('HOMOLOGAR'))});
+        await flushPromises();
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
             .trigger("click");
@@ -606,6 +611,7 @@ describe("VisMapa.vue", () => {
             },
         });
         vi.mocked(processoServiceModule.aceitarValidacao).mockRejectedValue(new Error("Fail"));
+        await flushPromises();
 
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
@@ -650,7 +656,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarValidacao", async () => {
-        const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
+        const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
         vi.mocked(processoServiceModule.validarMapa).mockRejectedValue(new Error("Fail"));
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
@@ -664,7 +670,7 @@ describe("VisMapa.vue", () => {
     it("handles error in confirmarSugestoes", async () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "CHEFE"}
-        }, "TEST", {podeValidarMapa: {value: true}});
+        }, "TEST", {podeValidarMapa: ref(true)});
         vi.mocked(processoServiceModule.apresentarSugestoes).mockRejectedValue(new Error("Fail"));
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -679,10 +685,10 @@ describe("VisMapa.vue", () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"},
         }, "TEST", {
-            podeVerSugestoes: {value: true},
-            podeAceitarMapa: {value: false},
-            podeDevolverMapa: {value: false},
-            acaoPrincipalMapa: {value: null}
+            podeVerSugestoes: ref(true),
+            podeAceitarMapa: ref(false),
+            podeDevolverMapa: ref(false),
+            acaoPrincipalMapa: ref(null)
         });
         await flushPromises();
 
@@ -696,7 +702,7 @@ describe("VisMapa.vue", () => {
     it("closes historico modal", async () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"}
-        }, "TEST", {podeAceitarMapa: {value: true}});
+        }, "TEST", {podeAceitarMapa: ref(true)});
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-historico"]').trigger("click");
@@ -708,7 +714,7 @@ describe("VisMapa.vue", () => {
         expect(wrapper.vm.mostrarModalHistorico).toBe(false);
     });
     it("triggers focus on shown in sugestoes modal", async () => {
-        const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
+        const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
 
@@ -719,7 +725,7 @@ describe("VisMapa.vue", () => {
     it("triggers focus on shown in devolucao modal", async () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"}
-        }, "TEST", {podeDevolverMapa: {value: true}});
+        }, "TEST", {podeDevolverMapa: ref(true)});
         await flushPromises();
         await wrapper.vm.$nextTick();
 

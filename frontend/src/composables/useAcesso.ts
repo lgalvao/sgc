@@ -1,5 +1,5 @@
 import {computed, type Ref, unref} from 'vue';
-import type {SubprocessoDetalhe} from '@/types/tipos';
+import {TipoProcesso, type SubprocessoDetalhe} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
 
 type AcaoPrincipalCadastro = {
@@ -31,7 +31,7 @@ type AcaoPrincipalMapa = {
 export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | SubprocessoDetalhe) {
     const getSubprocesso = () => unref(subprocessoRef);
     const getPermissoes = () => getSubprocesso()?.permissoes;
-    const isRevisao = computed(() => getSubprocesso()?.tipoProcesso === 'REVISAO');
+    const isRevisao = computed(() => getSubprocesso()?.tipoProcesso === TipoProcesso.REVISAO);
 
     const podeEditarCadastro = computed(() => getPermissoes()?.podeEditarCadastro ?? false);
     const podeDisponibilizarCadastro = computed(() => getPermissoes()?.podeDisponibilizarCadastro ?? false);

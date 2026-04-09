@@ -361,15 +361,18 @@ async function confirmarValidacao() {
 async function confirmarAceitacao(observacao = "") {
   if (!codSubprocesso.value) return;
 
+  const acao = acaoPrincipalMapa.value;
+  if (!acao) return;
+
   try {
     await executarComLoading(async () => {
-      if (acaoPrincipalMapa.value?.codigo === "HOMOLOGAR") {
+      if (acao.codigo === "HOMOLOGAR") {
         await homologarValidacaoService(codSubprocesso.value!, {texto: observacao});
       } else {
         await aceitarValidacaoService(codSubprocesso.value!, {texto: observacao});
       }
       await concluirAcaoPainel(
-          acaoPrincipalMapa.value?.mensagemSucesso ?? TEXTOS.sucesso.ACEITE_REGISTRADO,
+          acao.mensagemSucesso,
           fecharModalAceitar,
       );
     });

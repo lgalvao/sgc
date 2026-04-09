@@ -182,6 +182,31 @@ describe('useAcesso', () => {
     expect(acesso3.podeAnalisarMapa.value).toBe(true);
   });
 
+  it('deve expor a ação principal pronta para cadastro e mapa', () => {
+    const subprocesso = criarSubprocesso({
+      tipoProcesso: TipoProcesso.REVISAO,
+      permissoes: criarPermissoes({
+        podeAceitarCadastro: true,
+        habilitarAceitarCadastro: true,
+        podeHomologarMapa: true,
+        habilitarHomologarMapa: false,
+      }),
+    });
+
+    const acesso = useAcesso(subprocesso);
+
+    expect(acesso.acaoPrincipalCadastro.value).toMatchObject({
+      codigo: 'ACEITAR',
+      mostrar: true,
+      habilitar: true,
+    });
+    expect(acesso.acaoPrincipalMapa.value).toMatchObject({
+      codigo: 'HOMOLOGAR',
+      mostrar: true,
+      habilitar: false,
+    });
+  });
+
   it('deve retornar permissoes adicionais como podeVerSugestoes e habilitarAcessoCadastro', () => {
     const subprocesso = criarSubprocesso({permissoes: criarPermissoes({podeVerSugestoes: true, habilitarAcessoCadastro: true})});
     const acesso = useAcesso(subprocesso);
