@@ -20,22 +20,29 @@ Documento operacional com foco no **que ainda falta fazer** e em lições úteis
   * fechamento de modal e criação pré-início menos repetitivos;
   * remoção de branch morta.
 * Compatibilidade residual removida em `ModalAcaoBloco.vue` (campo não usado).
+* `SubprocessoTransicaoService` — fetch de `Subprocesso` movido para métodos públicos:
+  * `executarAceite`, `executarHomologacao` e `executarDevolucao` passam a receber `Subprocesso` em vez de `Long`;
+  * operações em bloco (`aceitarCadastroEmBloco`, `homologarCadastroEmBloco`) eliminam fetch extra e derivam `isRevisao` diretamente do SP já carregado;
+  * método privado `isRevisao(Long)` removido.
+* `CadastroView.vue` — estado inicial consolidado:
+  * `sincronizarEstadoInicialContexto` passou a incluir `atividadesSnapshotInicial`, `disponibilizacaoSemMudancas` e `unidade`, eliminando duplicação em `carregarContextoInicial` e `handleImportAtividades`;
+  * dois watchers com lógica idêntica mesclados em um único `watch([...])`.
 
 ## O que ainda precisa ser feito
 
-### 1) Frente 1 — `SubprocessoTransicaoService` (principal pendência)
+### 1) Frente 1 — `SubprocessoTransicaoService` (continua pendente, mas avançou)
 
 **Objetivo:** reduzir mistura de workflow, persistência, notificação, alerta e e-mail no mesmo fluxo.
 
 **Próximos cortes recomendados (incrementais):**
 
-* mapear e separar trechos de "decisão de transição" vs "efeitos colaterais" com helpers curtos;
-* eliminar passagens indiretas desnecessárias e blocos com responsabilidade dupla;
-* revisar pontos com normalização/validação repetida para consolidar em um único ponto do fluxo.
+* `normalizarTexto()` ainda é chamado ad-hoc em vários pontos antes de repassar ao workflow; considerar centralizar na entrada pública (ou no builder do command);
+* `registrarWorkflowComDestino()` é um adaptador sem lógica — avaliar se vale inlinar em `registrarAnalise()`;
+* duplicação residual de "buscar + validar situação" em `executarAceiteValidacao` e `executarHomologacaoValidacao`.
 
 **Restrições:**
 
-* não criar dispatcher/strategy/facade interna para “esconder” complexidade;
+* não criar dispatcher/strategy/facade interna para "esconder" complexidade;
 * não alterar regra funcional de transição;
 * manter no máximo 3 parâmetros por método público/privado novo (usar command quando necessário).
 
@@ -43,7 +50,6 @@ Documento operacional com foco no **que ainda falta fazer** e em lições úteis
 
 **Alvos prioritários:**
 
-* `CadastroView.vue`
 * `MapaView.vue`
 * `AtribuicaoTemporariaView.vue`
 
@@ -62,12 +68,13 @@ Documento operacional com foco no **que ainda falta fazer** e em lições úteis
 * simplificação efetiva aqui funciona melhor com **cortes pequenos e reversíveis**, não com extrações arquiteturais amplas;
 * nem toda extração reduz complexidade: se o tipo/helper só encapsula passagem de dados sem clareza líquida, tende a piorar;
 * no frontend, ganhos reais vieram de remover duplicação de fluxo e branches mortos, não de criar novos composables genéricos;
-* evitar “compatibilidade por precaução”: campos/aliases sem uso real acumulam dívida e confundem manutenção.
+* evitar "compatibilidade por precaução": campos/aliases sem uso real acumulam dívida e confundem manutenção;
+* mover o fetch do agregado para o método público (em vez de passar ID e buscar internamente) elimina fetches duplicados nas operações em bloco e torna o fluxo de dados explícito.
 
 ## Sequência recomendada (atualizada)
 
-1. atacar `SubprocessoTransicaoService` com cortes pequenos orientados a fluxo;
-2. escolher **uma** view grande por rodada (começar em `CadastroView.vue`);
+1. continuar em `SubprocessoTransicaoService` com cortes nos pontos residuais acima;
+2. escolher **uma** view grande por rodada (próxima: `MapaView.vue`);
 3. reavaliar `E2eController` só após avanço concreto nas duas frentes acima.
 
 ## Validação mínima por rodada
