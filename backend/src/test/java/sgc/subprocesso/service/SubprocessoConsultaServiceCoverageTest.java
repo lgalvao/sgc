@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.ContextoUsuarioAutenticado;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.TipoUnidade;
@@ -77,6 +78,14 @@ class SubprocessoConsultaServiceCoverageTest {
     @Mock
     private AnaliseHistoricoService analiseHistoricoService;
 
+    private void stubContextoAutenticado(Usuario usuario) {
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+                usuario.getTituloEleitoral(),
+                usuario.getUnidadeAtivaCodigo(),
+                usuario.getPerfilAtivo()
+        ));
+    }
+
     @Test
     @DisplayName("listarHistoricoValidacao deve delegar conversão para AnaliseHistoricoService")
     void deveDelegarConversaoHistoricoValidacao() {
@@ -118,6 +127,7 @@ class SubprocessoConsultaServiceCoverageTest {
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
 
         Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123456789012");
         usuario.setPerfilAtivo(Perfil.ADMIN);
         usuario.setUnidadeAtivaCodigo(10L);
 
@@ -132,7 +142,7 @@ class SubprocessoConsultaServiceCoverageTest {
         mapa.setAtividades(Set.of(atividade));
         mapa.setCompetencias(Set.of());
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        stubContextoAutenticado(usuario);
         when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(subprocesso));
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of());
         when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(unidade);

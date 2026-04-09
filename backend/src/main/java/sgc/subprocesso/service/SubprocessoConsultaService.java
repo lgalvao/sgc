@@ -414,17 +414,7 @@ public class SubprocessoConsultaService {
     }
 
     private ContextoUsuarioAutenticado obterContextoUsuarioAutenticado() {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        if (contextoUsuario != null) {
-            return contextoUsuario;
-        }
-
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        return new ContextoUsuarioAutenticado(
-                Optional.ofNullable(usuario.getTituloEleitoral()).orElse(""),
-                usuario.getUnidadeAtivaCodigo(),
-                Optional.ofNullable(usuario.getPerfilAtivo()).orElse(Perfil.SERVIDOR)
-        );
+        return Objects.requireNonNull(usuarioFacade.contextoAutenticado(), "contexto autenticado obrigatorio");
     }
 
     private Unidade resolverLocalizacaoAtual(Subprocesso sp, List<Movimentacao> movimentacoes) {
