@@ -50,6 +50,7 @@ public class ProcessoService {
     private final ResponsavelUnidadeService responsavelUnidadeService;
     private final SubprocessoService subprocessoService;
     private final SubprocessoConsultaService consultaService;
+    private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final SubprocessoValidacaoService validacaoService;
     private final UsuarioFacade usuarioService;
     private final AlertaFacade servicoAlertas;
@@ -154,7 +155,7 @@ public class ProcessoService {
                 .toList();
         Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas != null
                 ? localizacoesPrecarregadas
-                : consultaService.obterLocalizacoesAtuais(subprocessosElegiveis);
+                : localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessosElegiveis);
 
         return subprocessosElegiveis.stream()
                 .map(subprocesso -> toElegivelDto(subprocesso, obterLocalizacaoAtual(subprocesso, localizacoesPorSubprocesso)))
@@ -294,7 +295,7 @@ public class ProcessoService {
     public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, Usuario usuario, boolean incluirElegiveis) {
         Processo processo = buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
-        Map<Long, Unidade> localizacoesPorSubprocesso = consultaService.obterLocalizacoesAtuais(subprocessos);
+        Map<Long, Unidade> localizacoesPorSubprocesso = localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessos);
         Set<Long> unidadesAcesso = obterIdsUnidadesAcesso(processo, usuario);
         Perfil perfil = usuario.getPerfilAtivo();
 
@@ -527,7 +528,7 @@ public class ProcessoService {
     }
 
     private Unidade obterLocalizacao(Subprocesso sp) {
-        return consultaService.obterLocalizacaoAtual(sp);
+        return localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
     }
 
     private Unidade obterLocalizacaoAtual(Subprocesso sp, Map<Long, Unidade> localizacoesPorSubprocesso) {

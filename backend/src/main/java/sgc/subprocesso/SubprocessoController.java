@@ -32,6 +32,7 @@ import java.util.*;
 public class SubprocessoController {
 
     private final SubprocessoConsultaService consultaService;
+    private final AnaliseHistoricoService analiseHistoricoService;
     private final SubprocessoService subprocessoService;
     private final SubprocessoTransicaoService transicaoService;
     private final UnidadeService unidadeService;
@@ -547,6 +548,6 @@ public class SubprocessoController {
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo, Usuario usuario) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Analise analise = transicaoService.criarAnalise(sp, request, tipo, usuario);
-        return consultaService.paraHistoricoDto(analise);
+        return analiseHistoricoService.converter(analise);
     }
 }

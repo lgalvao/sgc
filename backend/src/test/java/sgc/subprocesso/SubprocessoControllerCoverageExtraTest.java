@@ -36,6 +36,7 @@ class SubprocessoControllerCoverageExtraTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean private SubprocessoConsultaService consultaService;
+    @MockitoBean private AnaliseHistoricoService analiseHistoricoService;
     
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
@@ -167,7 +168,7 @@ class SubprocessoControllerCoverageExtraTest {
         when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any())).thenReturn(a);
-        when(consultaService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
+        when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.VALIDACAO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
                 "123456789012",
@@ -186,7 +187,7 @@ class SubprocessoControllerCoverageExtraTest {
 
         verify(consultaService).buscarSubprocesso(1L);
         verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any());
-        verify(consultaService).paraHistoricoDto(a);
+        verify(analiseHistoricoService).converter(a);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
     @Test
@@ -197,7 +198,7 @@ class SubprocessoControllerCoverageExtraTest {
         when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any())).thenReturn(a);
-        when(consultaService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
+        when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.CADASTRO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
                 "123456789012",
@@ -216,7 +217,7 @@ class SubprocessoControllerCoverageExtraTest {
 
         verify(consultaService).buscarSubprocesso(1L);
         verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any());
-        verify(consultaService).paraHistoricoDto(a);
+        verify(analiseHistoricoService).converter(a);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 

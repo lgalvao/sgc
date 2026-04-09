@@ -28,6 +28,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @DisplayName("SubprocessoConsultaService Extra Coverage Test")
 @SuppressWarnings("NullAway.Init")
 class SubprocessoConsultaServiceExtraCoverageTest {
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
@@ -48,7 +49,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(consultaService, "localizacaoSubprocessoService", new LocalizacaoSubprocessoService(movimentacaoRepo));
+        localizacaoSubprocessoService = new LocalizacaoSubprocessoService(movimentacaoRepo);
+        ReflectionTestUtils.setField(consultaService, "analiseHistoricoService", new AnaliseHistoricoService(unidadeService));
+        ReflectionTestUtils.setField(consultaService, "localizacaoSubprocessoService", localizacaoSubprocessoService);
     }
 
     private Subprocesso criarSubprocessoComMapa(@Nullable Long codigo) {
@@ -103,7 +106,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(100L)).thenReturn(Optional.of(mov));
 
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u2);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u2);
         }
 
         @Test
@@ -112,7 +115,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade u = new Unidade();
             Subprocesso sp = criarSubprocessoComMapa(null);
             sp.setUnidade(u);
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
 
         @Test
@@ -122,7 +125,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setUnidade(u);
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
 
         @Test
@@ -134,7 +137,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Movimentacao mov = new Movimentacao();
             mov.setUnidadeDestino(null);
 
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }
 
@@ -546,17 +549,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             assertThat(res.podeApresentarSugestoes()).isTrue();
         }
 
-        @Test
-        @DisplayName("obterMapaObrigatorio - deve lançar IllegalStateException se mapa for null")
-        void obterMapaObrigatorioNull() {
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(100L);
-            sp.setMapa(null);
-
-            assertThatThrownBy(() -> consultaService.obterMapaObrigatorio(sp))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("sem mapa associado");
-        }
     }
 
     @Nested
@@ -621,23 +613,35 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     @DisplayName("Análises e Histórico")
     class AnalisesEHistorico {
         @Test
-        @DisplayName("listarAnalisesPorSubprocesso sem filtro")
-        void listarAnalisesSemFiltro() {
+        @DisplayName("listarHistoricoCadastro filtra analises de cadastro")
+        void listarHistoricoCadastroFiltraAnalises() {
             Analise a1 = new Analise();
+            a1.setTipo(TipoAnalise.CADASTRO);
+            a1.setUnidadeCodigo(10L);
             Analise a2 = new Analise();
+            a2.setTipo(TipoAnalise.VALIDACAO);
+            a2.setUnidadeCodigo(10L);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
+            when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
+                    new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
+            ));
 
-            assertThat(consultaService.listarAnalisesPorSubprocesso(1L)).containsExactly(a1, a2);
+            assertThat(consultaService.listarHistoricoCadastro(1L)).hasSize(1);
         }
 
         @Test
-        @DisplayName("listarAnalisesPorSubprocesso com filtro de tipo")
-        void listarAnalisesComFiltro() {
+        @DisplayName("listarHistoricoValidacao filtra analises de validacao")
+        void listarHistoricoValidacaoFiltraAnalises() {
             Analise a1 = new Analise(); a1.setTipo(TipoAnalise.CADASTRO);
+            a1.setUnidadeCodigo(10L);
             Analise a2 = new Analise(); a2.setTipo(TipoAnalise.VALIDACAO);
+            a2.setUnidadeCodigo(10L);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
+            when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
+                    new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
+            ));
 
-            assertThat(consultaService.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO)).containsExactly(a1);
+            assertThat(consultaService.listarHistoricoValidacao(1L)).hasSize(1);
         }
 
         @Test
@@ -666,11 +670,11 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setSituacaoForcada(NAO_INICIADO);
             
             // Branch: localização resolvida para a própria unidade
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
 
             // Branch: sp.getCodigo() == null
             sp.setCodigo(null);
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
 
             // Branch: movimentacao encontrada
             sp.setCodigo(1L);
@@ -678,11 +682,11 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Movimentacao m = new Movimentacao();
             m.setUnidadeDestino(dest);
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(m));
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
 
             // Branch: sem movimentação útil, usa unidade base
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
+            assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
 
         @Test
@@ -695,7 +699,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> consultaService.obterLocalizacaoAtual(sp))
+            assertThatThrownBy(() -> localizacaoSubprocessoService.obterLocalizacaoAtual(sp))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining("Subprocesso persistido sem movimentação");
         }

@@ -72,6 +72,7 @@ public class SubprocessoConsultaService {
     private final HierarquiaService hierarquiaService;
     private final SubprocessoValidacaoService validacaoService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    private final AnaliseHistoricoService analiseHistoricoService;
 
     public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
@@ -318,14 +319,6 @@ public class SubprocessoConsultaService {
         return listarAtividadesSubprocesso(codSubprocesso);
     }
 
-    public List<Analise> listarAnalisesPorSubprocesso(Long codSubprocesso) {
-        return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso);
-    }
-
-    public List<Analise> listarAnalisesPorSubprocesso(Long codSubprocesso, TipoAnalise tipo) {
-        return listarAnalisesPorTipo(codSubprocesso, tipo);
-    }
-
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
         return listarHistoricoPorTipo(codSubprocesso, TipoAnalise.CADASTRO);
     }
@@ -335,54 +328,7 @@ public class SubprocessoConsultaService {
     }
 
     private List<AnaliseHistoricoDto> listarHistoricoPorTipo(Long codSubprocesso, TipoAnalise tipo) {
-        List<Analise> analises = listarAnalisesPorTipo(codSubprocesso, tipo);
-        Map<Long, UnidadeResumoLeitura> unidadesPorCodigo = carregarUnidadesPorCodigo(analises);
-        return analises.stream()
-                .map(analise -> paraHistoricoDto(analise, unidadesPorCodigo))
-                .toList();
-    }
-
-    public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
-        return paraHistoricoDto(analise, carregarUnidadesPorCodigo(List.of(analise)));
-    }
-
-    private AnaliseHistoricoDto paraHistoricoDto(Analise analise, Map<Long, UnidadeResumoLeitura> unidadesPorCodigo) {
-        UnidadeResumoLeitura unidade = Optional.ofNullable(unidadesPorCodigo.get(analise.getUnidadeCodigo()))
-                .orElseThrow(() -> new IllegalStateException(
-                        "Unidade %d ausente no histórico de análises".formatted(analise.getUnidadeCodigo())));
-
-        return AnaliseHistoricoDto.builder()
-                .dataHora(analise.getDataHora())
-                .observacoes(analise.getObservacoes())
-                .acao(analise.getAcao())
-                .unidadeSigla(unidade.sigla())
-                .unidadeNome(unidade.nome())
-                .analistaUsuarioTitulo(analise.getUsuarioTitulo())
-                .motivo(analise.getMotivo())
-                .tipo(analise.getTipo())
-                .build();
-    }
-
-    private Map<Long, UnidadeResumoLeitura> carregarUnidadesPorCodigo(List<Analise> analises) {
-        List<Long> codigos = analises.stream()
-                .map(Analise::getUnidadeCodigo)
-                .distinct()
-                .toList();
-
-        if (codigos.isEmpty()) {
-            return Map.of();
-        }
-
-        return unidadeService.buscarResumosPorCodigos(codigos).stream()
-                .collect(HashMap::new, (mapa, unidade) -> mapa.put(unidade.codigo(), unidade), HashMap::putAll);
-    }
-
-    public Unidade obterLocalizacaoAtual(Subprocesso sp) {
-        return localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
-    }
-
-    public Map<Long, Unidade> obterLocalizacoesAtuais(Collection<Subprocesso> subprocessos) {
-        return localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessos);
+        return analiseHistoricoService.converterLista(listarAnalisesPorTipo(codSubprocesso, tipo));
     }
 
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
@@ -398,7 +344,7 @@ public class SubprocessoConsultaService {
         );
     }
 
-    public Mapa obterMapaObrigatorio(Subprocesso subprocesso) {
+    private Mapa obterMapaObrigatorio(Subprocesso subprocesso) {
         Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
             throw new IllegalStateException("Subprocesso %s sem mapa associado".formatted(subprocesso.getCodigo()));
@@ -406,7 +352,7 @@ public class SubprocessoConsultaService {
         return mapa;
     }
 
-    public Long obterCodigoMapaObrigatorio(Subprocesso subprocesso) {
+    private Long obterCodigoMapaObrigatorio(Subprocesso subprocesso) {
         return obterMapaObrigatorio(subprocesso).getCodigo();
     }
 
@@ -501,7 +447,7 @@ public class SubprocessoConsultaService {
         if (!movimentacoes.isEmpty()) {
             return movimentacoes.getFirst().getUnidadeDestino();
         }
-        return obterLocalizacaoAtual(sp);
+        return localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
     }
 
     private ContextoPermissaoSubprocesso montarContextoPermissao(ContextoConsultaSubprocesso contextoConsulta) {

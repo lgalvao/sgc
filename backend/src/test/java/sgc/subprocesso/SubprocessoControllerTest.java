@@ -35,6 +35,7 @@ class SubprocessoControllerTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean private SubprocessoConsultaService consultaService;
+    @MockitoBean private AnaliseHistoricoService analiseHistoricoService;
 
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
@@ -441,7 +442,7 @@ class SubprocessoControllerTest {
             Analise analise = new Analise();
             when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
             when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO), any())).thenReturn(analise);
-            when(consultaService.paraHistoricoDto(analise)).thenReturn(new AnaliseHistoricoDto(
+            when(analiseHistoricoService.converter(analise)).thenReturn(new AnaliseHistoricoDto(
                     TipoAnalise.VALIDACAO,
                     TipoAcaoAnalise.ACEITE_MAPEAMENTO,
                     "123456789012",

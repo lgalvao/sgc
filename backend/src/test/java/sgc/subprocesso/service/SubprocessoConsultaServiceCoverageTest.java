@@ -10,11 +10,9 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeResumoLeitura;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.processo.model.Processo;
-import sgc.subprocesso.dto.AnaliseHistoricoDto;
 import sgc.subprocesso.dto.ContextoEdicaoResponse;
 import sgc.subprocesso.model.Analise;
 import sgc.subprocesso.model.AnaliseRepo;
@@ -76,58 +74,28 @@ class SubprocessoConsultaServiceCoverageTest {
 
     @Mock
     private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @Mock
+    private AnaliseHistoricoService analiseHistoricoService;
 
     @Test
-    @DisplayName("Deve converter análise para DTO de histórico chamando carregarUnidades")
-    void deveConverterParaHistoricoDto() {
-        Long codUnidade = 1L;
+    @DisplayName("listarHistoricoValidacao deve delegar conversão para AnaliseHistoricoService")
+    void deveDelegarConversaoHistoricoValidacao() {
+        Long codSubprocesso = 100L;
         Analise analise = Analise.builder()
                 .codigo(10L)
-                .unidadeCodigo(codUnidade)
+                .unidadeCodigo(1L)
                 .dataHora(LocalDateTime.now())
                 .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                 .tipo(TipoAnalise.VALIDACAO)
-                .usuarioTitulo("123456789012") // TituloEleitoral (12 chars)
+                .usuarioTitulo("123456789012")
                 .build();
-
-        when(unidadeService.buscarResumosPorCodigos(List.of(codUnidade))).thenReturn(List.of(
-                new UnidadeResumoLeitura(codUnidade, "Nome da Unidade", "SIGLA", TipoUnidade.OPERACIONAL)
-        ));
-
-        AnaliseHistoricoDto dto = target.paraHistoricoDto(analise);
-
-        assertThat(dto).isNotNull();
-        assertThat(dto.unidadeSigla()).isEqualTo("SIGLA");
-        verify(unidadeService).buscarResumosPorCodigos(List.of(codUnidade));
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção quando unidade está ausente no histórico")
-    void deveLancaoExcecaoUnidadeAusente() {
-        Long codUnidade = 1L;
-        Analise analise = Analise.builder()
-                .unidadeCodigo(codUnidade)
-                .build();
-
-        // Fazemos unidadeService retornar lista vazia para simular ausência
-        when(unidadeService.buscarResumosPorCodigos(List.of(codUnidade))).thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(() -> target.paraHistoricoDto(analise))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unidade 1 ausente no histórico de análises");
-    }
-
-    @Test
-    @DisplayName("Deve retornar mapa vazio quando lista de análises para carregar unidades for vazia")
-    void deveRetornarMapaVazioParaAnalisesVazias() {
-        Long codSubprocesso = 100L;
         when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso))
-                .thenReturn(Collections.emptyList());
+                .thenReturn(List.of(analise));
+        when(analiseHistoricoService.converterLista(List.of(analise))).thenReturn(List.of());
 
-        List<AnaliseHistoricoDto> resultado = target.listarHistoricoValidacao(codSubprocesso);
+        target.listarHistoricoValidacao(codSubprocesso);
 
-        assertThat(resultado).isEmpty();
-        verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
+        verify(analiseHistoricoService).converterLista(List.of(analise));
     }
 
     @Test

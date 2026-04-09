@@ -55,6 +55,8 @@ class ProcessoServiceTest {
     @Mock
     private SubprocessoConsultaService consultaService;
     @Mock
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
     private UsuarioFacade usuarioService;
@@ -321,7 +323,7 @@ class ProcessoServiceTest {
             sp.setUnidade(u);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
             when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
@@ -362,7 +364,7 @@ class ProcessoServiceTest {
             s3.setUnidade(u3);
 
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
                     s1.getCodigo(), u1,
                     s2.getCodigo(), u1
             ));
@@ -411,7 +413,7 @@ class ProcessoServiceTest {
             // Filho não tem subprocesso para cobrir branch sp != null
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uPai));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uPai));
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -455,7 +457,7 @@ class ProcessoServiceTest {
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
             when(permissionEvaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp1, sp2));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
                     sp1.getCodigo(), unidadeComSigla,
                     sp2.getCodigo(), unidadeSemSigla
             ));
@@ -963,7 +965,7 @@ class ProcessoServiceTest {
             sp.setMapa(null); // Explicitly null
             
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -995,7 +997,7 @@ class ProcessoServiceTest {
             sp.setMapa(mapa);
             
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -1027,7 +1029,7 @@ class ProcessoServiceTest {
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
-            when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);
@@ -1049,7 +1051,7 @@ class ProcessoServiceTest {
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
             when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
-            when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);

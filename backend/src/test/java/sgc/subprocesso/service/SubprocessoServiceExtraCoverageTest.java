@@ -346,8 +346,6 @@ class SubprocessoServiceExtraCoverageTest {
             Usuario user = criarUsuarioMock();
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
             when(permissionEvaluator.verificarPermissao(eq(user), any(), any())).thenReturn(true);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(0L);
-
             subprocessoService.importarAtividades(1L, 2L, List.of());
             
             assertThat(spDest.getSituacao()).isEqualTo(NAO_INICIADO); // Não mudou no switch
@@ -391,9 +389,6 @@ class SubprocessoServiceExtraCoverageTest {
             when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(true);
             
-            when(consultaService.obterCodigoMapaObrigatorio(spOrig)).thenReturn(200L);
-            when(consultaService.obterCodigoMapaObrigatorio(spDest)).thenReturn(100L);
-
             subprocessoService.importarAtividades(1L, 2L, List.of());
             verify(subprocessoRepo).save(spDest);
             verify(copiaMapaService).importarAtividadesDeOutroMapa(eq(200L), eq(100L), any());
@@ -419,9 +414,6 @@ class SubprocessoServiceExtraCoverageTest {
             when(permissionEvaluator.verificarPermissao(eq(user), eq(spDest), any())).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(eq(user), eq(spOrig), any())).thenReturn(true);
             
-            when(consultaService.obterCodigoMapaObrigatorio(spOrig)).thenReturn(200L);
-            when(consultaService.obterCodigoMapaObrigatorio(spDest)).thenReturn(100L);
-
             subprocessoService.importarAtividades(1L, 2L, List.of());
             assertThat(spDest.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
         }
