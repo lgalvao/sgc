@@ -90,7 +90,6 @@ export interface UnidadeSelecao {
   nome: string;
   situacao: string;
   ultimaDataLimite?: string;
-  selecionada?: boolean; // For compatibility if passed from parent with this prop
 }
 
 const props = defineProps<{

@@ -183,7 +183,7 @@ const {mostrarDiagnosticoOrganizacional} = usePerfil();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
-const ultimaBuscaUnidadesKey = ref<string | null>(null);
+const ultimaBuscaUnidades = ref<{ tipoProcesso: TipoProcesso; codProcesso?: number } | null>(null);
 const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
 const erroDiagnosticoOrganizacional = ref<string | null>(null);
 
@@ -231,9 +231,13 @@ function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
 }
 
 async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcesso?: number) {
-  const chave = `${tipoProcesso}-${codProcesso ?? ''}`;
-  if (chave === ultimaBuscaUnidadesKey.value) return;
-  ultimaBuscaUnidadesKey.value = chave;
+  if (
+      ultimaBuscaUnidades.value?.tipoProcesso === tipoProcesso
+      && ultimaBuscaUnidades.value?.codProcesso === codProcesso
+  ) {
+    return;
+  }
+  ultimaBuscaUnidades.value = {tipoProcesso, codProcesso};
   isLoadingUnidades.value = true;
   try {
     const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
@@ -273,33 +277,7 @@ onMounted(async () => {
 
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
-    isLoadingData.value = true;
-    try {
-      const processo = await processoService.obterDetalhesProcesso(Number(codProcesso));
-      if (processo) {
-        // Redireciona se o processo não está em situação CRIADO (não pode ser editado)
-        if (processo.situacao !== 'CRIADO') {
-          await router.push(`/processo/${processo.codigo}`);
-          return;
-        }
-
-        processoEditando.value = processo;
-        descricao.value = processo.descricao;
-        tipo.value = processo.tipo;
-        dataLimite.value = processo.dataLimite.split("T")[0];
-        unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
-        await buscarUnidadesParaProcesso(
-            processo.tipo,
-            processo.codigo,
-        );
-        await nextTick();
-      }
-    } catch (error) {
-      notify(TEXTOS.processo.cadastro.ERRO_CARREGAR_DETALHES, 'danger');
-      logger.error("Erro ao carregar processo:", error);
-    } finally {
-      isLoadingData.value = false;
-    }
+    await carregarProcessoParaEdicao(Number(codProcesso));
   } else if (tipo.value) {
     await buscarUnidadesParaProcesso(tipo.value);
   }
@@ -310,6 +288,33 @@ onMounted(async () => {
     formFieldsRef.value?.inputDescricaoRef?.$el?.focus();
   }
 });
+
+async function carregarProcessoParaEdicao(codProcesso: number) {
+  isLoadingData.value = true;
+  try {
+    const processo = await processoService.obterDetalhesProcesso(codProcesso);
+    if (!processo) {
+      return;
+    }
+    if (processo.situacao !== 'CRIADO') {
+      await router.push(`/processo/${processo.codigo}`);
+      return;
+    }
+
+    processoEditando.value = processo;
+    descricao.value = processo.descricao;
+    tipo.value = processo.tipo;
+    dataLimite.value = processo.dataLimite.split("T")[0];
+    unidadesSelecionadas.value = processo.unidades.map((unidade) => unidade.codUnidade);
+    await buscarUnidadesParaProcesso(processo.tipo, processo.codigo);
+    await nextTick();
+  } catch (error) {
+    notify(TEXTOS.processo.cadastro.ERRO_CARREGAR_DETALHES, 'danger');
+    logger.error("Erro ao carregar processo:", error);
+  } finally {
+    isLoadingData.value = false;
+  }
+}
 
 watch(tipo, async (novoTipo) => {
   const codProcesso = processoEditando.value
@@ -389,7 +394,7 @@ async function salvarProcesso() {
   }
 }
 
-async function abrirModalConfirmacao() {
+function abrirModalConfirmacao() {
   mostrarModalConfirmacao.value = true;
 }
 

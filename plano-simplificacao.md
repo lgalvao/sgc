@@ -1,171 +1,74 @@
 # Plano de Simplificação do SGC
 
-Documento operacional com foco exclusivo no que ainda falta fazer. Este arquivo deve refletir o código atual; histórico de rodadas concluídas, medições antigas e cortes já aplicados não devem permanecer aqui.
+Documento operacional com foco no **que ainda falta fazer** e em lições úteis para as próximas rodadas.
 
-Premissa operacional:
+## Premissas (mantidas)
 
-* o sistema é simples, com baixa concorrência e volume moderado de dados;
-* simplificação aqui significa reduzir leitura, ramificações e superfície do código;
-* evitar abstrações genéricas, infraestrutura interna “elegante” e preparo especulativo para escala que o sistema não precisa.
+* simplificar sem alterar regra de negócio, contrato HTTP, DTO externo, transações e regras de acesso;
+* evitar abstrações genéricas e camadas de compatibilidade;
+* priorizar redução de leitura acidental, branches e acoplamento local.
 
-## Objetivo
+## Situação atual (abril/2026)
 
-Reduzir complexidade acidental sem alterar:
+### Já estabilizado nas últimas rodadas
 
-* regras de negócio;
-* contratos HTTP;
-* DTOs externos;
-* regras de acesso;
-* transações;
-* textos relevantes de interface.
+* `SubprocessoConsultaService` ficou mais previsível no fluxo de permissões e no caminho de detalhe:
+  * cálculo de permissões separado da montagem do DTO;
+  * menos código morto e menos camada intermediária sem ganho real.
+* `ProcessoCadastroView.vue` teve redução de duplicação no fluxo de carregar/salvar/iniciar/remover:
+  * hidratação de edição centralizada;
+  * fechamento de modal e criação pré-início menos repetitivos;
+  * remoção de branch morta.
+* Compatibilidade residual removida em `ModalAcaoBloco.vue` (campo não usado).
 
-## Fontes de verdade
+## O que ainda precisa ser feito
 
-Ordem de precedência:
+### 1) Frente 1 — `SubprocessoTransicaoService` (principal pendência)
 
-* `AGENTS.md`
-* `etc/docs/regras-acesso.md`
-* `etc/reqs`
-* este plano
+**Objetivo:** reduzir mistura de workflow, persistência, notificação, alerta e e-mail no mesmo fluxo.
 
-## Achados confirmados no código atual
+**Próximos cortes recomendados (incrementais):**
 
-### Backend
+* mapear e separar trechos de "decisão de transição" vs "efeitos colaterais" com helpers curtos;
+* eliminar passagens indiretas desnecessárias e blocos com responsabilidade dupla;
+* revisar pontos com normalização/validação repetida para consolidar em um único ponto do fluxo.
 
-* `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java` continua sendo o principal hotspot:
-  * arquivo ainda muito grande;
-  * muitas dependências diretas;
-  * workflow, persistência, notificação, e-mail e alertas ainda convivem no mesmo service.
-* `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java` ainda mistura:
-  * leitura de entidade;
-  * montagem de detalhe/contexto;
-  * cálculo de permissões para UI.
-* A padronização do contexto autenticado saiu deste plano e passou a ser tratada separadamente em `plano-contexto-autenticado.md`.
-* `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java` segue grande, mas não há evidência de que deva liderar a fila antes dos dois pontos acima.
-* `backend/src/main/java/sgc/e2e/E2eController.java` continua extenso e com muitos endpoints/fixtures, mas ainda precisa de medição melhor antes de um corte estrutural.
+**Restrições:**
 
-### Frontend
+* não criar dispatcher/strategy/facade interna para “esconder” complexidade;
+* não alterar regra funcional de transição;
+* manter no máximo 3 parâmetros por método público/privado novo (usar command quando necessário).
 
-* Existem views grandes com responsabilidades misturadas, especialmente:
-  * `frontend/src/views/CadastroView.vue`
-  * `frontend/src/views/ProcessoCadastroView.vue`
-  * `frontend/src/views/MapaView.vue`
-  * `frontend/src/views/AtribuicaoTemporariaView.vue`
-* O frontend ainda precisa de uma passada final para remover verificações de acesso remanescentes por perfil em pontos de navegação e breadcrumb; a direção correta é usar permissões vindas do backend ou contexto de sessão explícito, não inferência local.
-* A nomenclatura atual mistura `pode...` e `habilitar...` em permissões de subprocesso:
-  * o padrão continua funcional, mas a semântica ficou pouco coesa;
-  * revisar depois com critério explícito de “mostrar”, “permitir” e “habilitar”, sem renomeação apressada no meio das simplificações.
-* `frontend/src/components/comum/LoadingButton.vue` segue sendo um wrapper fino.
-* `LoadingButton.vue` é amplamente usado e já possui stories e testes, então qualquer remoção ou fusão exige auditoria explícita; não é um alvo de remoção automática.
+### 2) Frente 3 — views grandes ainda pendentes
 
-## Prioridades pendentes
+**Alvos prioritários:**
 
-## Frente 1 — `SubprocessoTransicaoService`
+* `CadastroView.vue`
+* `MapaView.vue`
+* `AtribuicaoTemporariaView.vue`
 
-Objetivo:
+**Foco da próxima rodada:**
 
-* reduzir mistura de responsabilidades no workflow sem mudar contrato externo.
+* reduzir lógica incidental no `<script setup>` (watchers e sincronizações repetidas);
+* remover inferências locais de acesso quando o backend/contexto já entrega a decisão;
+* centralizar tratamento de erro repetido sem criar camada genérica demais.
 
-Próximo corte:
+### 3) Frente 5 — hotspot fora de subprocesso
 
-* priorizar cortes que removam código ou o substituam por helpers locais mais curtos;
-* manter juntos apenas os trechos que realmente pertencem ao mesmo fluxo de negócio;
-* evitar dispatcher, hierarquia interna de comandos, strategies ou camadas privadas genéricas para alertas/notificações.
+* `E2eController` continua grande; ainda falta recorte por grupos coesos de endpoint com medição simples (tamanho + acoplamento + frequência de alteração).
 
-Restrições:
+## Lições aprendidas relevantes
 
-* não criar facade nova só para esconder complexidade;
-* não misturar refatoração estrutural com mudança de regra;
-* se surgir método com mais de 3 parâmetros, usar objeto de transporte.
-* não aceitar simplificação que aumente o arquivo de forma líquida sem remover complexidade visível no fluxo principal.
+* simplificação efetiva aqui funciona melhor com **cortes pequenos e reversíveis**, não com extrações arquiteturais amplas;
+* nem toda extração reduz complexidade: se o tipo/helper só encapsula passagem de dados sem clareza líquida, tende a piorar;
+* no frontend, ganhos reais vieram de remover duplicação de fluxo e branches mortos, não de criar novos composables genéricos;
+* evitar “compatibilidade por precaução”: campos/aliases sem uso real acumulam dívida e confundem manutenção.
 
-Critério de pronto:
+## Sequência recomendada (atualizada)
 
-* fluxo principal mais legível;
-* menos branches e menos dependências cruzadas por responsabilidade;
-* diff pequeno e defensável, preferencialmente com redução líquida de código ou aumento mínimo justificado;
-* sem regressão em testes focados do backend.
-
-## Frente 2 — `SubprocessoConsultaService`
-
-Objetivo:
-
-* separar leitura básica da composição de detalhe/contexto/permissões.
-Próximo corte:
-
-* isolar melhor a montagem de permissões de UI sem criar camada nova;
-* reduzir a mistura entre fetch de dados, contexto rico e payload de resposta;
-* preferir extrair helpers privados curtos ou remover pass-throughs restantes antes de introduzir novos tipos internos;
-* manter DTOs externos e contratos HTTP intactos.
-
-Critério de pronto:
-
-* leitura simples mais previsível;
-* menos lógica incidental em torno de detalhe/permissões;
-* menos motivos para esse service crescer em direções diferentes.
-
-## Frente 3 — Views grandes do frontend
-
-Objetivo:
-
-* reduzir lógica incidental em `<script setup>` e tornar sincronização de dados mais explícita.
-
-Próximo corte:
-
-* priorizar views que acumulam carregamento, transformação, decisão de fluxo e tratamento de erro no mesmo arquivo;
-* continuar removendo do frontend verificações de acesso ou contexto que o backend já conhece;
-* reduzir dependência de estado implícito quando a tela já tem o dado necessário no contexto local;
-* manter `normalizeError` e exibição de erro nas camadas corretas.
-
-Critério de pronto:
-
-* menos branches e watchers acidentais por view;
-* menos parsing ou sincronização repetidos;
-* leitura mais curta do fluxo principal da tela.
-
-## Frente 4 — Auditoria de wrappers visuais
-
-Objetivo:
-
-* revisar wrappers finos com critério explícito, sem remoção automática.
-
-Escopo inicial:
-
-* começar por `frontend/src/components/comum/LoadingButton.vue`;
-* decidir entre manter, ajustar ou remover com base em:
-  * padronização real;
-  * redução de duplicação;
-  * acessibilidade/comportamento adicional;
-  * custo de manutenção dos usos, stories e testes.
-
-Critério de pronto:
-
-* decisão explícita por wrapper auditado;
-* nenhuma remoção baseada apenas em tamanho pequeno do componente.
-
-## Frente 5 — Hotspots fora de `subprocesso`
-
-Objetivo:
-
-* atacar arquivos grandes fora da frente principal apenas quando houver diagnóstico suficiente.
-
-Escopo inicial:
-
-* medir `backend/src/main/java/sgc/e2e/E2eController.java` por grupos de endpoints e helpers;
-* só escolher extração depois de confirmar coesão real.
-
-Critério de pronto:
-
-* hotspot priorizado por evidência;
-* corte pequeno e validável.
-
-## Sequência recomendada
-
-1. Continuar pela Frente 2 até estabilizar leitura contextual e permissões de UI.
-2. Retomar a Frente 1 com cortes pequenos no workflow.
-3. Escolher uma view grande do frontend como primeiro alvo real da Frente 3.
-4. Tratar `LoadingButton.vue` como item de baixa prioridade até surgir evidência concreta de custo real.
-5. Reavaliar `E2eController` só depois das frentes acima ou quando ele bloquear alguma rodada.
+1. atacar `SubprocessoTransicaoService` com cortes pequenos orientados a fluxo;
+2. escolher **uma** view grande por rodada (começar em `CadastroView.vue`);
+3. reavaliar `E2eController` só após avanço concreto nas duas frentes acima.
 
 ## Validação mínima por rodada
 
@@ -182,11 +85,11 @@ Critério de pronto:
 
 ### QA dashboard
 
-Quando a rodada afetar testes, lint, typecheck, cobertura ou E2E:
+Quando a rodada afetar testes/lint/typecheck/cobertura/E2E:
 
 * `npm run qa:dashboard`
 
-Fonte de verdade:
+Fontes de verdade:
 
 * `etc/qa-dashboard/latest/ultimo-snapshot.json`
 * `etc/qa-dashboard/latest/ultimo-resumo.md`
