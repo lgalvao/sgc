@@ -79,6 +79,26 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Não deve finalizar revisão quando estiver somente com cadastro homologado")
+    void naoDeveFinalizarRevisaoComCadastroHomologado() throws Exception {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processoRepo.save(processo);
+
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        subprocessoRepo.save(subprocesso);
+
+        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.message").value(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS));
+
+        Processo atualizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+        assertThat(atualizado.getDataFinalizacao()).isNull();
+    }
+
+    @Test
     @DisplayName("Deve finalizar processo e definir mapa vigente da unidade")
     void deveFinalizarProcessoEAtualizarMapaVigente() throws Exception {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
@@ -96,5 +116,24 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo()).orElseThrow();
         assertThat(unidadeMapa.getMapaVigente()).isNotNull();
         assertThat(unidadeMapa.getMapaVigente().getCodigo()).isEqualTo(subprocesso.getMapa().getCodigo());
+    }
+
+    @Test
+    @DisplayName("Deve finalizar revisão com subprocesso em mapa homologado")
+    void deveFinalizarRevisaoComMapaHomologado() throws Exception {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processoRepo.save(processo);
+
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+        subprocessoRepo.save(subprocesso);
+
+        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Processo atualizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
+        assertThat(atualizado.getDataFinalizacao()).isNotNull();
     }
 }
