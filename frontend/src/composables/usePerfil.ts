@@ -8,27 +8,25 @@ export function usePerfil() {
     const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
     const unidadeSelecionada = computed(() => perfilStore.unidadeSelecionadaSigla);
-
     const isAdmin = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN);
-    const isGestor = computed(() => perfilStore.perfilSelecionado === Perfil.GESTOR);
-    const isChefe = computed(() => perfilStore.perfilSelecionado === Perfil.CHEFE);
-    const isServidor = computed(() => perfilStore.perfilSelecionado === Perfil.SERVIDOR);
-
-    const podeAcessoGeralAdminGestor = computed(() => isAdmin.value || isGestor.value);
-    const podeCriarProcesso = computed(() => isAdmin.value);
-    const podeAcessarTodasUnidades = computed(() => isAdmin.value);
-    const podeVisualizarTabelaCtaVazio = computed(() => isAdmin.value);
+    const mostrarCriarProcesso = computed(() => perfilStore.permissoesSessao?.mostrarCriarProcesso === true);
+    const mostrarArvoreCompletaUnidades = computed(() => perfilStore.permissoesSessao?.mostrarArvoreCompletaUnidades === true);
+    const mostrarCtaPainelVazio = computed(() => perfilStore.permissoesSessao?.mostrarCtaPainelVazio === true);
+    const mostrarDiagnosticoOrganizacional = computed(() => perfilStore.permissoesSessao?.mostrarDiagnosticoOrganizacional === true);
+    const mostrarMenuConfiguracoes = computed(() => perfilStore.permissoesSessao?.mostrarMenuConfiguracoes === true);
+    const mostrarMenuAdministradores = computed(() => perfilStore.permissoesSessao?.mostrarMenuAdministradores === true);
+    const mostrarCriarAtribuicaoTemporaria = computed(() => perfilStore.permissoesSessao?.mostrarCriarAtribuicaoTemporaria === true);
 
     return {
         perfilSelecionado,
         unidadeSelecionada,
         isAdmin,
-        isGestor,
-        isChefe,
-        isServidor,
-        podeAcessoGeralAdminGestor,
-        podeCriarProcesso,
-        podeAcessarTodasUnidades,
-        podeVisualizarTabelaCtaVazio,
+        mostrarCriarProcesso,
+        mostrarArvoreCompletaUnidades,
+        mostrarCtaPainelVazio,
+        mostrarDiagnosticoOrganizacional,
+        mostrarMenuConfiguracoes,
+        mostrarMenuAdministradores,
+        mostrarCriarAtribuicaoTemporaria,
     };
 }

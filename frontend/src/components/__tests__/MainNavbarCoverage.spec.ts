@@ -31,7 +31,10 @@ describe("MainNavbar.vue Coverage", () => {
         perfilSelecionado: ref("GESTOR"),
         unidadeSelecionada: ref("Unidade teste"),
         usuarioNome: ref("User"),
-        podeAcessarTodasUnidades: ref(false)
+        mostrarArvoreCompletaUnidades: ref(false),
+        mostrarMenuConfiguracoes: ref(false),
+        mostrarMenuAdministradores: ref(false),
+        isAdmin: ref(false)
     } as any);
 
     it("deve atualizar isMobile ao redimensionar a janela", async () => {

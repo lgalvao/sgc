@@ -89,7 +89,7 @@ type LinhaUnidadeArvore = {
 
 const unidades = ref<Unidade[]>([]);
 const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
-const {isAdmin} = usePerfil();
+const {mostrarDiagnosticoOrganizacional} = usePerfil();
 const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
 const erroDiagnosticoOrganizacional = ref<string | null>(null);
 const router = useRouter();
@@ -105,7 +105,8 @@ const resumoDiagnostico = computed(() =>
         ?? ""
 );
 const exibirAlertaDiagnostico = computed(() =>
-    isAdmin.value && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
+    mostrarDiagnosticoOrganizacional.value
+    && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
 );
 
 const colunas = [
@@ -138,7 +139,7 @@ async function carregarUnidades() {
 }
 
 async function carregarDiagnostico() {
-  if (!isAdmin.value) {
+  if (!mostrarDiagnosticoOrganizacional.value) {
     return;
   }
 

@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import router from "../index";
 import {usePerfilStore} from "@/stores/perfil";
-import {Perfil} from "@/types/tipos";
 
 describe("Router", () => {
     let perfilStore: any;
@@ -28,16 +27,8 @@ describe("Router", () => {
         expect(router.currentRoute.value.path).toBe("/painel");
     });
 
-    it("redireciona para painel se autenticado sem perfil ADMIN em rota administrativa", async () => {
+    it("permite rota administrativa quando autenticado", async () => {
         perfilStore.usuarioCodigo = "123";
-        perfilStore.perfilSelecionado = Perfil.GESTOR;
-        await router.push("/administracao/limpeza-processos");
-        expect(router.currentRoute.value.path).toBe("/painel");
-    });
-
-    it("permite rota administrativa para ADMIN autenticado", async () => {
-        perfilStore.usuarioCodigo = "123";
-        perfilStore.perfilSelecionado = Perfil.ADMIN;
         await router.push("/administracao/limpeza-processos");
         expect(router.currentRoute.value.path).toBe("/administracao/limpeza-processos");
     });

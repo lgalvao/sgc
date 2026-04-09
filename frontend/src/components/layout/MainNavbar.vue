@@ -38,7 +38,7 @@
         </BNavItem>
 
         <BNavItem
-            v-if="isAdmin"
+            v-if="mostrarMenuConfiguracoes"
             class="me-lg-1"
             data-testid="btn-configuracoes"
             title="Configurações"
@@ -52,7 +52,7 @@
         </BNavItem>
 
         <BNavItem
-            v-if="isAdmin"
+            v-if="mostrarMenuAdministradores"
             class="me-lg-1"
             data-testid="btn-administradores"
             title="Administradores do sistema"
@@ -93,7 +93,14 @@ import {TEXTOS} from "@/constants/textos";
 const router = useRouter();
 const perfilStore = usePerfilStore();
 
-const {perfilSelecionado, unidadeSelecionada, podeAcessarTodasUnidades, isAdmin} = usePerfil();
+const {
+  perfilSelecionado,
+  unidadeSelecionada,
+  isAdmin,
+  mostrarArvoreCompletaUnidades,
+  mostrarMenuConfiguracoes,
+  mostrarMenuAdministradores
+} = usePerfil();
 
 // Controle reativo de largura para desabilitar tooltips no mobile
 const windowWidth = ref(window.innerWidth);
@@ -106,9 +113,9 @@ const isMobile = computed(() => windowWidth.value < 992);
 
 // Para ADMIN: mostra "Unidades" e direciona para a árvore completa
 // Para outros perfis: mostra "Minha unidade" e direciona para unidade do usuário
-const labelUnidade = computed(() => podeAcessarTodasUnidades.value ? TEXTOS.comum.MENU_UNIDADES : TEXTOS.comum.MENU_MINHA_UNIDADE);
-const iconUnidade = computed(() => podeAcessarTodasUnidades.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
-const linkUnidade = computed(() => podeAcessarTodasUnidades.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
+const labelUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? TEXTOS.comum.MENU_UNIDADES : TEXTOS.comum.MENU_MINHA_UNIDADE);
+const iconUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
+const linkUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
 
 function handleLogout() {
   perfilStore.logout();

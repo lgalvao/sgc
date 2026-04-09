@@ -1,8 +1,6 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
-import * as usePerfilModule from "@/composables/usePerfil";
 import * as subprocessoService from "@/services/subprocessoService";
 import CadastroView from "@/views/CadastroView.vue";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
@@ -12,8 +10,6 @@ const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 vi.mock("vue-router", () => ({
     useRouter: () => ({push: pushMock}),
 }));
-
-vi.mock("@/composables/usePerfil", () => ({usePerfil: vi.fn()}));
 
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
@@ -43,11 +39,6 @@ const stubs = {
 describe("CadastroView - permissões no carregamento", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-
-        vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
-            perfilSelecionado: ref(Perfil.CHEFE),
-            isChefe: ref(true),
-        } as any);
 
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({

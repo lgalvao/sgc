@@ -1,7 +1,6 @@
 import type {RouteRecordRaw} from "vue-router";
 import {createMemoryHistory, createRouter, createWebHistory,} from "vue-router";
 import {usePerfilStore} from "@/stores/perfil";
-import {Perfil} from "@/types/tipos";
 import mainRoutes from "./main.routes";
 import processoRoutes from "./processo.routes";
 import unidadeRoutes from "./unidade.routes";
@@ -29,10 +28,6 @@ router.beforeEach((to) => {
 
     if (authRequired && !isAuthenticated) {
         return "/login";
-    }
-
-    if (to.meta?.requiresAdmin && perfilStore.perfilSelecionado !== Perfil.ADMIN) {
-        return "/painel";
     }
 
     return true;

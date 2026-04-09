@@ -1,11 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {usePerfilStore} from "@/stores/perfil";
 import type {SubprocessoDetalhe} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 
 vi.mock("@/services/subprocessoService");
-vi.mock("@/stores/perfil");
 vi.mock("@/utils", () => ({
     logger: {
         error: vi.fn(),
@@ -51,7 +49,6 @@ const permissoesPadrao = {
 describe("useSubprocessos", () => {
     let useSubprocessos: typeof import("../useSubprocessos").useSubprocessos;
     let service: typeof import("@/services/subprocessoService");
-    let perfilStore: {perfilSelecionado: string | null; unidadeAtual: number | null};
 
     const criarDetalheMinimo = (sobrescritas: Partial<SubprocessoDetalhe> = {}): SubprocessoDetalhe => ({
         codigo: 10,
@@ -96,12 +93,6 @@ describe("useSubprocessos", () => {
             elementosProcesso: [],
             permissoes: dto.permissoes,
         }));
-        perfilStore = {
-            perfilSelecionado: "ADMIN",
-            unidadeAtual: 1,
-        };
-        vi.mocked(usePerfilStore).mockReturnValue(perfilStore as unknown as ReturnType<typeof usePerfilStore>);
-
         ({useSubprocessos} = await import("../useSubprocessos"));
     });
 
@@ -146,16 +137,6 @@ describe("useSubprocessos", () => {
         expect(store.lastError?.message).toBe("Falha");
     });
 
-    it("deve retornar null se buscarContextoEdicao falhar por pre-condição", async () => {
-        const store = useSubprocessos();
-        perfilStore.perfilSelecionado = null;
-
-        const resultado = await store.buscarContextoEdicao(10);
-
-        expect(resultado).toBeUndefined();
-        expect(store.lastError?.message).toBe("Informações de perfil ou unidade não disponíveis.");
-    });
-
     it("deve retornar null se buscarSubprocessoPorProcessoEUnidade falhar", async () => {
         const store = useSubprocessos();
         vi.mocked(service.buscarSubprocessoPorProcessoEUnidade).mockRejectedValue(new Error("Erro busca ID"));
@@ -172,15 +153,6 @@ describe("useSubprocessos", () => {
         store.atualizarStatusLocal({codigo: 10, situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO});
 
         expect(store.subprocessoDetalhe).toBeNull();
-    });
-
-    it("deve validar pre-condições de perfil", async () => {
-        const store = useSubprocessos();
-        perfilStore.perfilSelecionado = null;
-
-        await store.buscarSubprocessoDetalhe(10);
-
-        expect(store.lastError?.message).toBe("Informações de perfil ou unidade não disponíveis.");
     });
 
     it("deve buscar contexto de edicao", async () => {
@@ -241,16 +213,6 @@ describe("useSubprocessos", () => {
 
         expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         expect(store.subprocessoDetalhe?.permissoes).toEqual({...permissoesPadrao, podeEditarCadastro: true});
-    });
-
-    it("deve lidar com o cenário sem perfil Global e sem unidade", async () => {
-        const store = useSubprocessos();
-        perfilStore.perfilSelecionado = "SERVIDOR";
-        perfilStore.unidadeAtual = null;
-
-        await store.buscarSubprocessoDetalhe(10);
-
-        expect(store.lastError?.message).toBe("Informações de perfil ou unidade não disponíveis.");
     });
 
     it("deve permitir setar erro e detalhe manualmente", () => {

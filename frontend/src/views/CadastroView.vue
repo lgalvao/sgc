@@ -23,7 +23,7 @@
           <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
         </BButton>
         <BButton
-            v-if="codSubprocesso && isChefe"
+            v-if="codSubprocesso && podeEditarCadastro"
             :disabled="!habilitarEditarCadastro"
             data-testid="btn-cad-atividades-historico"
             variant="outline-secondary"
@@ -32,7 +32,7 @@
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
         </BButton>
         <BButton
-            v-if="codSubprocesso && isChefe"
+            v-if="codSubprocesso && podeEditarCadastro"
             :disabled="!habilitarEditarCadastro"
             data-testid="btn-cad-atividades-importar"
             variant="outline-secondary"
@@ -42,7 +42,7 @@
         </BButton>
 
         <LoadingButton
-            v-if="isChefe"
+            v-if="podeDisponibilizarCadastro"
             :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
@@ -56,7 +56,7 @@
     </PageHeader>
 
     <BFormCheckbox
-        v-if="isChefe && isRevisao"
+        v-if="podeDisponibilizarCadastro && isRevisao"
         v-model="disponibilizacaoSemMudancas"
         class="mt-3 mb-2"
         data-testid="chk-disponibilizacao-sem-mudancas"
@@ -119,6 +119,7 @@
           :atividade="atividade"
           :erro-validacao="obterErroParaAtividade(atividade.codigo)"
           :pode-editar="podeEditarCadastro"
+          :habilitar-edicao="habilitarEditarCadastro"
           @atualizar-atividade="(desc: string) => salvarEdicaoAtividade(atividade.codigo, desc)"
           @remover-atividade="() => removerAtividade(idx)"
           @adicionar-conhecimento="(desc: string) => adicionarConhecimento(idx, desc)"
@@ -191,7 +192,6 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
-import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {
   type Analise,
@@ -233,9 +233,6 @@ const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = mapasStore;
-
-const perfil = usePerfil();
-const isChefe = computed(() => perfil.isChefe.value);
 const codSubprocesso = ref<number | null>(null);
 
 const codMapa = computed(() => mapasStore.mapaCompleto.value?.codigo ?? null);
@@ -243,6 +240,7 @@ const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const {
   podeEditarCadastro,
+  podeDisponibilizarCadastro,
   podeVisualizarImpacto,
   habilitarEditarCadastro,
   habilitarDisponibilizarCadastro

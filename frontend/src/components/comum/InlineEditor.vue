@@ -42,6 +42,7 @@
         <BButton
             :aria-label="ariaLabelEdit"
             :data-testid="testCodigoEditar"
+            :disabled="!editEnabled"
             :size="size"
             class="me-1"
             variant="outline-primary"
@@ -62,6 +63,7 @@ import {BButton, BFormInput} from 'bootstrap-vue-next';
 interface Props {
   modelValue: string;
   canEdit?: boolean;
+  editEnabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
   ariaLabel?: string;
   ariaLabelSave?: string;
@@ -75,6 +77,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   canEdit: true,
+  editEnabled: true,
   size: 'sm',
   ariaLabel: 'Editar',
   ariaLabelSave: 'Salvar',
@@ -98,6 +101,9 @@ const isEditing = ref(false);
 const editValue = ref('');
 
 function startEdit() {
+  if (!props.editEnabled) {
+    return;
+  }
   editValue.value = props.modelValue;
   isEditing.value = true;
   emit('edit-start');

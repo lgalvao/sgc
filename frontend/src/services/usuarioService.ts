@@ -1,4 +1,4 @@
-import type {FluxoLoginResponseDto, PerfilUnidadeDto, SessaoLoginDto, UsuarioDto} from "@/types/dtos";
+import type {FluxoLoginResponseDto, PerfilUnidadeDto, PermissoesSessaoDto, SessaoLoginDto, UsuarioDto} from "@/types/dtos";
 import type {Usuario, UsuarioPesquisa} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
@@ -64,6 +64,17 @@ export interface SessaoLogin {
     nome: string;
     perfil: Perfil;
     unidadeCodigo: number;
+    permissoes: PermissoesSessao;
+}
+
+export interface PermissoesSessao {
+    mostrarCriarProcesso: boolean;
+    mostrarArvoreCompletaUnidades: boolean;
+    mostrarCtaPainelVazio: boolean;
+    mostrarDiagnosticoOrganizacional: boolean;
+    mostrarMenuConfiguracoes: boolean;
+    mostrarMenuAdministradores: boolean;
+    mostrarCriarAtribuicaoTemporaria: boolean;
 }
 
 export interface FluxoLogin {
@@ -73,12 +84,25 @@ export interface FluxoLogin {
     sessao: SessaoLogin | null;
 }
 
+export function mapPermissoesSessaoToFrontend(response: PermissoesSessaoDto): PermissoesSessao {
+    return {
+        mostrarCriarProcesso: response.mostrarCriarProcesso,
+        mostrarArvoreCompletaUnidades: response.mostrarArvoreCompletaUnidades,
+        mostrarCtaPainelVazio: response.mostrarCtaPainelVazio,
+        mostrarDiagnosticoOrganizacional: response.mostrarDiagnosticoOrganizacional,
+        mostrarMenuConfiguracoes: response.mostrarMenuConfiguracoes,
+        mostrarMenuAdministradores: response.mostrarMenuAdministradores,
+        mostrarCriarAtribuicaoTemporaria: response.mostrarCriarAtribuicaoTemporaria,
+    };
+}
+
 export function mapSessaoLoginToFrontend(response: SessaoLoginDto): SessaoLogin {
     return {
         tituloEleitoral: response.tituloEleitoral,
         nome: response.nome,
         perfil: response.perfil as Perfil,
         unidadeCodigo: response.unidadeCodigo,
+        permissoes: mapPermissoesSessaoToFrontend(response.permissoes),
     };
 }
 

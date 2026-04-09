@@ -75,6 +75,7 @@ public class LoginController {
                     .nome(usuario.getNome())
                     .perfil(perfilUnidade.perfil())
                     .unidadeCodigo(perfilUnidade.unidade().codigo())
+                    .permissoes(construirPermissoesSessao(perfilUnidade.perfil()))
                     .build();
 
             return ResponseEntity.ok(FluxoLoginResponse.builder()
@@ -116,6 +117,7 @@ public class LoginController {
                 .nome(usuario.getNome())
                 .perfil(Perfil.valueOf(request.perfil()))
                 .unidadeCodigo(request.unidadeCodigo())
+                .permissoes(construirPermissoesSessao(Perfil.valueOf(request.perfil())))
                 .build();
 
         adicionarCookieJwt(httpResponse, token);
@@ -149,6 +151,19 @@ public class LoginController {
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+    }
+
+    private PermissoesSessaoResponse construirPermissoesSessao(Perfil perfil) {
+        boolean admin = perfil == Perfil.ADMIN;
+        return PermissoesSessaoResponse.builder()
+                .mostrarCriarProcesso(admin)
+                .mostrarArvoreCompletaUnidades(admin)
+                .mostrarCtaPainelVazio(admin)
+                .mostrarDiagnosticoOrganizacional(admin)
+                .mostrarMenuConfiguracoes(admin)
+                .mostrarMenuAdministradores(admin)
+                .mostrarCriarAtribuicaoTemporaria(admin)
+                .build();
     }
 
     private String extrairTituloPreAuth(HttpServletRequest request) {

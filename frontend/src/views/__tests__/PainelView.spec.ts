@@ -34,6 +34,15 @@ vi.mock('bootstrap-vue-next', async (importOriginal) => {
 });
 
 function createMountOptions(initialStateOverrides = {}) {
+  const permissoesAdmin = {
+    mostrarCriarProcesso: true,
+    mostrarArvoreCompletaUnidades: true,
+    mostrarCtaPainelVazio: true,
+    mostrarDiagnosticoOrganizacional: true,
+    mostrarMenuConfiguracoes: true,
+    mostrarMenuAdministradores: true,
+    mostrarCriarAtribuicaoTemporaria: true,
+  };
   return {
     global: {
       plugins: [
@@ -44,7 +53,7 @@ function createMountOptions(initialStateOverrides = {}) {
               perfilSelecionado: 'ADMIN',
               unidadeSelecionada: 1,
               usuarioCodigo: 'U123',
-              permissoesAcesso: { 'ADMIN': true },
+              permissoesSessao: permissoesAdmin,
               ...initialStateOverrides
             }
           },

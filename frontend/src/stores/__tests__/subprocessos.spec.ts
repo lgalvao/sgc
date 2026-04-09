@@ -196,13 +196,14 @@ describe('Subprocessos store', () => {
         });
 
         it('deve falhar se não houver perfil selecionado', async () => {
-            mockPerfilStore.perfilSelecionado = null;
+            vi.mocked(buscarSubprocessoDetalhe).mockResolvedValue(criarRespostaDetalhe({
+                subprocesso: {...criarRespostaDetalhe().subprocesso, situacao: SituacaoSubprocesso.NAO_INICIADO}
+            }));
 
             await store.buscarSubprocessoDetalhe(1);
 
-            expect(store.lastError).toBeTruthy();
-            expect(store.lastError?.message).toBe("Informações de perfil ou unidade não disponíveis.");
-            expect(buscarSubprocessoDetalhe).not.toHaveBeenCalled();
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1);
+            expect(store.lastError).toBeNull();
         });
 
         it('deve buscar com sucesso para ADMIN (global)', async () => {
@@ -214,7 +215,7 @@ describe('Subprocessos store', () => {
 
             await store.buscarSubprocessoDetalhe(1);
 
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'ADMIN', null);
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1);
             expect(store.subprocessoDetalhe).toMatchObject({codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO});
             expect(store.lastError).toBeNull();
         });
@@ -229,7 +230,7 @@ describe('Subprocessos store', () => {
 
             await store.buscarSubprocessoDetalhe(1);
 
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'SERVIDOR', 10);
+            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('deve lidar com erro do serviço', async () => {
@@ -296,10 +297,10 @@ describe('Subprocessos store', () => {
         });
 
         it('deve falhar se não houver perfil', async () => {
-            mockPerfilStore.perfilSelecionado = null;
+            vi.mocked(buscarContextoEdicao).mockResolvedValue(criarContexto());
             await store.buscarContextoEdicao(1);
-            expect(store.lastError).toBeTruthy();
-            expect(buscarContextoEdicao).not.toHaveBeenCalled();
+            expect(buscarContextoEdicao).toHaveBeenCalledWith(1);
+            expect(store.lastError).toBeNull();
         });
 
         it('deve lidar com erro do serviço', async () => {

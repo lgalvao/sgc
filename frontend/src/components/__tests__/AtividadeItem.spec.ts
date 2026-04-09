@@ -179,4 +179,22 @@ describe("AtividadeItem.vue", () => {
         await context.wrapper.find('[data-testid="btn-cancelar-edicao-conhecimento"]').trigger('click');
         expect(context.wrapper.find('[data-testid="inp-editar-conhecimento"]').exists()).toBe(false);
     });
+
+    it("deve manter controles visíveis e desabilitados quando edição não estiver habilitada", async () => {
+        const mountOptions = getCommonMountOptions({}, commonStubs);
+        context.wrapper = mount(AtividadeItem, {
+            ...mountOptions,
+            props: {atividade: atividadeMock, podeEditar: true, habilitarEdicao: false},
+        });
+
+        const btnEditarAtividade = context.wrapper.find('[data-testid="btn-editar-atividade"]');
+        const btnRemoverAtividade = context.wrapper.find('[data-testid="btn-remover-atividade"]');
+        const inputConhecimento = context.wrapper.find('[data-testid="inp-novo-conhecimento"]');
+        const btnAdicionarConhecimento = context.wrapper.find('[data-testid="btn-adicionar-conhecimento"]');
+
+        expect(btnEditarAtividade.attributes('disabled')).toBeDefined();
+        expect(btnRemoverAtividade.attributes('disabled')).toBeDefined();
+        expect(inputConhecimento.attributes('disabled')).toBeDefined();
+        expect(btnAdicionarConhecimento.attributes('disabled')).toBeDefined();
+    });
 });

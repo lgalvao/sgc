@@ -82,6 +82,8 @@ class LoginControllerTest {
                 .andExpect(jsonPath("$.autenticado").value(true))
                 .andExpect(jsonPath("$.requerSelecaoPerfil").value(false))
                 .andExpect(jsonPath("$.sessao.nome").value("Admin user"))
+                .andExpect(jsonPath("$.sessao.permissoes.mostrarCriarProcesso").value(true))
+                .andExpect(jsonPath("$.sessao.permissoes.mostrarMenuAdministradores").value(true))
                 .andExpect(cookie().exists("jwtToken"))
                 .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));
 
@@ -216,6 +218,7 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome").value("Admin user"))
+                .andExpect(jsonPath("$.permissoes.mostrarMenuConfiguracoes").value(true))
                 .andExpect(cookie().value("jwtToken", "token-jwt"))
                 .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));
     }

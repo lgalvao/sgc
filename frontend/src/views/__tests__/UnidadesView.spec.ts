@@ -12,7 +12,7 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/composables/usePerfil", () => ({
     usePerfil: () => ({
-        isAdmin: {value: true}
+        mostrarDiagnosticoOrganizacional: {value: true}
     })
 }));
 

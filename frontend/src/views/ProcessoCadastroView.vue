@@ -179,7 +179,7 @@ const router = useRouter();
 const route = useRoute();
 const toastStore = useToastStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
-const {isAdmin} = usePerfil();
+const {mostrarDiagnosticoOrganizacional} = usePerfil();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
@@ -194,7 +194,8 @@ const resumoDiagnostico = computed(() =>
         ?? ""
 );
 const exibirAlertaDiagnostico = computed(() =>
-    isAdmin.value && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
+    mostrarDiagnosticoOrganizacional.value
+    && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
 );
 
 function extrairErrosGenericos(error: ReturnType<typeof normalizeError>): string[] {
@@ -247,7 +248,7 @@ async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcess
 }
 
 async function carregarDiagnosticoOrganizacional() {
-  if (!isAdmin.value) {
+  if (!mostrarDiagnosticoOrganizacional.value) {
     return;
   }
 

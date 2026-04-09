@@ -11,7 +11,7 @@
         <PageHeader :title="TEXTOS.painel.PROCESSOS" title-test-codigo="txt-painel-titulo-processos">
           <template #actions>
             <BButton
-                v-if="perfil.podeCriarProcesso.value"
+                v-if="perfil.mostrarCriarProcesso.value"
                 :to="{ name: 'CadProcesso' }"
                 data-testid="btn-painel-criar-processo"
                 variant="outline-primary"
@@ -24,7 +24,7 @@
             :compacto="true"
             :criterio-ordenacao="criterio"
             :direcao-ordenacao-asc="asc"
-            :mostrar-cta-vazio="perfil.podeVisualizarTabelaCtaVazio.value"
+            :mostrar-cta-vazio="perfil.mostrarCtaPainelVazio.value"
             :processos="processosOrdenados"
             @ordenar="ordenarPor"
             @selecionar-processo="abrirDetalhesProcesso"

@@ -31,6 +31,16 @@ Object.defineProperty(globalThis, "localStorage", {value: mockLocalStorage});
 Object.defineProperty(globalThis, "sessionStorage", {value: mockSessionStorage});
 
 describe("usePerfilStore", () => {
+    const permissoesAdmin = {
+        mostrarCriarProcesso: true,
+        mostrarArvoreCompletaUnidades: true,
+        mostrarCtaPainelVazio: true,
+        mostrarDiagnosticoOrganizacional: true,
+        mostrarMenuConfiguracoes: true,
+        mostrarMenuAdministradores: true,
+        mostrarCriarAtribuicaoTemporaria: true,
+    };
+
     beforeEach(() => {
         mockLocalStorage.clear();
         mockSessionStorage.clear();
@@ -75,6 +85,7 @@ describe("usePerfilStore", () => {
                 perfil: Perfil.ADMIN,
                 unidadeCodigo: 123,
                 unidadeSigla: "TEST",
+                permissoes: permissoesAdmin,
                 nome: "Nome Pessoal",
             });
             
@@ -95,6 +106,7 @@ describe("usePerfilStore", () => {
                 perfil: Perfil.ADMIN,
                 unidadeCodigo,
                 unidadeSigla,
+                permissoes: permissoesAdmin,
             });
 
             expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
@@ -105,6 +117,7 @@ describe("usePerfilStore", () => {
                 perfil: Perfil.ADMIN,
                 unidadeCodigo,
                 unidadeSigla,
+                permissoes: permissoesAdmin,
                 nome: "Nome teste",
             });
             expect(context.store.usuarioNome).toBe("Nome teste");
@@ -125,6 +138,16 @@ describe("usePerfilStore", () => {
                     unidadeCodigo: 1,
                     tituloEleitoral: "123",
                     nome: "João da Silva",
+                    permissoes: {
+                        ...permissoesAdmin,
+                        mostrarCriarProcesso: false,
+                        mostrarArvoreCompletaUnidades: false,
+                        mostrarCtaPainelVazio: false,
+                        mostrarDiagnosticoOrganizacional: false,
+                        mostrarMenuConfiguracoes: false,
+                        mostrarMenuAdministradores: false,
+                        mostrarCriarAtribuicaoTemporaria: false,
+                    },
                 },
             };
 
@@ -140,6 +163,7 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.CHEFE);
             expect(context.store.unidadeSelecionada).toBe(1);
             expect(context.store.unidadeSelecionadaSigla).toBe("UT");
+            expect(context.store.permissoesSessao?.mostrarCriarProcesso).toBe(false);
             expect(result.autenticado).toBe(true);
             expect(result.sessao?.tituloEleitoral).toBe("123");
         });
@@ -184,6 +208,16 @@ describe("usePerfilStore", () => {
                 unidadeCodigo: 2,
                 tituloEleitoral: "456",
                 nome: "Maria oliveira",
+                permissoes: {
+                    ...permissoesAdmin,
+                    mostrarCriarProcesso: false,
+                    mostrarArvoreCompletaUnidades: false,
+                    mostrarCtaPainelVazio: false,
+                    mostrarDiagnosticoOrganizacional: false,
+                    mostrarMenuConfiguracoes: false,
+                    mostrarMenuAdministradores: false,
+                    mostrarCriarAtribuicaoTemporaria: false,
+                },
             };
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 
@@ -196,6 +230,7 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.GESTOR);
             expect(context.store.unidadeSelecionada).toBe(2);
             expect(context.store.unidadeSelecionadaSigla).toBe("XYZ");
+            expect(context.store.permissoesSessao?.mostrarMenuConfiguracoes).toBe(false);
             expect(context.store.usuarioCodigo).toBe("456");
         });
 
@@ -233,6 +268,7 @@ describe("usePerfilStore", () => {
             expect(context.store.usuarioCodigo).toBeNull();
             expect(context.store.perfilSelecionado).toBeNull();
             expect(context.store.unidadeSelecionada).toBeNull();
+            expect(context.store.permissoesSessao).toBeNull();
         });
 
         it("deve limpar o erro", () => {

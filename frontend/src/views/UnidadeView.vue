@@ -27,7 +27,7 @@
             />{{ TEXTOS.unidade.BOTAO_MAPA_VIGENTE }}
           </BButton>
           <BButton
-              v-if="isAdmin"
+              v-if="mostrarCriarAtribuicaoTemporaria"
               data-testid="unidade-view__btn-criar-atribuicao"
               variant="outline-secondary"
               @click="irParaCriarAtribuicao"
@@ -131,7 +131,7 @@ import type {MapaVigenteReferencia} from "@/types/tipos";
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
-const {isAdmin} = usePerfil();
+const {mostrarCriarAtribuicaoTemporaria} = usePerfil();
 const {definirUnidadeAtual} = useUnidadeAtual();
 
 const unidade = ref<Unidade | null>(null);

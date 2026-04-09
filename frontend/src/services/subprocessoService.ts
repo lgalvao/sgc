@@ -114,23 +114,15 @@ export async function obterStatus(codSubprocesso: number): Promise<SubprocessoSt
 
 export async function buscarSubprocessoDetalhe(
     codSubprocesso: number,
-    perfil: string,
-    unidadeCodigo: number,
 ): Promise<SubprocessoDetalheResponse> {
-    const response = await apiClient.get<SubprocessoDetalheResponse>(`/subprocessos/${codSubprocesso}`, {
-        params: {perfil, unidadeUsuario: unidadeCodigo},
-    });
+    const response = await apiClient.get<SubprocessoDetalheResponse>(`/subprocessos/${codSubprocesso}`);
     return response.data;
 }
 
 export async function buscarContextoEdicao(
     codSubprocesso: number,
-    perfil: string,
-    unidadeCodigo: number,
 ): Promise<ContextoEdicaoSubprocesso> {
-    const response = await apiClient.get<ContextoEdicaoResponseBackend>(`/subprocessos/${codSubprocesso}/contexto-edicao`, {
-        params: {perfil, unidadeUsuario: unidadeCodigo},
-    });
+    const response = await apiClient.get<ContextoEdicaoResponseBackend>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
     return {
         ...response.data,
         detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),

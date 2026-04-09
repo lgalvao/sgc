@@ -7,6 +7,16 @@ import {usePerfil} from "../usePerfil";
 vi.mock("@/stores/perfil");
 
 describe("usePerfil", () => {
+    const permissoesAdmin = {
+        mostrarCriarProcesso: true,
+        mostrarArvoreCompletaUnidades: true,
+        mostrarCtaPainelVazio: true,
+        mostrarDiagnosticoOrganizacional: true,
+        mostrarMenuConfiguracoes: true,
+        mostrarMenuAdministradores: true,
+        mostrarCriarAtribuicaoTemporaria: true,
+    };
+
     beforeEach(() => {
         initPinia();
         vi.clearAllMocks();
@@ -17,6 +27,7 @@ describe("usePerfil", () => {
             perfilSelecionado: Perfil.CHEFE,
             unidadeSelecionada: 123,
             unidadeSelecionadaSigla: "TESTE",
+            permissoesSessao: null,
         } as any);
 
         const {perfilSelecionado, unidadeSelecionada} = usePerfil();
@@ -29,6 +40,7 @@ describe("usePerfil", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
             unidadeSelecionadaSigla: null,
             unidadeSelecionada: 123,
+            permissoesSessao: null,
         } as any);
 
         const {unidadeSelecionada} = usePerfil();
@@ -40,6 +52,7 @@ describe("usePerfil", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
             unidadeSelecionadaSigla: "SIGLA_EXISTENTE",
             unidadeSelecionada: 123,
+            permissoesSessao: null,
         } as any);
 
         const {unidadeSelecionada} = usePerfil();
@@ -47,52 +60,48 @@ describe("usePerfil", () => {
         expect(unidadeSelecionada.value).toBe("SIGLA_EXISTENTE");
     });
 
-    it("deve identificar corretamente os perfis", () => {
+    it("deve identificar corretamente o perfil admin para exibição", () => {
         const mockStore = {
             perfilSelecionado: Perfil.ADMIN,
-            unidadeSelecionada: 1
+            unidadeSelecionada: 1,
+            permissoesSessao: permissoesAdmin,
         };
         vi.mocked(usePerfilStore).mockReturnValue(mockStore as any);
 
-        const {isAdmin, isGestor, isChefe, isServidor} = usePerfil();
+        const {isAdmin} = usePerfil();
 
         expect(isAdmin.value).toBe(true);
-        expect(isGestor.value).toBe(false);
-        expect(isChefe.value).toBe(false);
-        expect(isServidor.value).toBe(false);
     });
 
-    it("deve identificar perfil servidor e gestor", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({perfilSelecionado: Perfil.SERVIDOR} as any);
-        const {isServidor, isGestor} = usePerfil();
-        expect(isServidor.value).toBe(true);
-        expect(isGestor.value).toBe(false);
+    it("deve expor permissões de sessão vindas do backend", () => {
+        vi.mocked(usePerfilStore).mockReturnValue({
+            perfilSelecionado: Perfil.ADMIN,
+            permissoesSessao: permissoesAdmin,
+        } as any);
+        const {
+            mostrarCriarProcesso,
+            mostrarArvoreCompletaUnidades,
+            mostrarCtaPainelVazio,
+            mostrarDiagnosticoOrganizacional,
+            mostrarMenuConfiguracoes,
+            mostrarMenuAdministradores,
+            mostrarCriarAtribuicaoTemporaria
+        } = usePerfil();
 
-        vi.mocked(usePerfilStore).mockReturnValue({perfilSelecionado: Perfil.GESTOR} as any);
-        const {isGestor: isGestor2} = usePerfil();
-        expect(isGestor2.value).toBe(true);
-    });
-
-    it("deve calcular permissões baseadas no perfil ADMIN", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({perfilSelecionado: Perfil.ADMIN} as any);
-        const {podeCriarProcesso, podeAcessarTodasUnidades, podeVisualizarTabelaCtaVazio, podeAcessoGeralAdminGestor} = usePerfil();
-
-        expect(podeCriarProcesso.value).toBe(true);
-        expect(podeAcessarTodasUnidades.value).toBe(true);
-        expect(podeVisualizarTabelaCtaVazio.value).toBe(true);
-        expect(podeAcessoGeralAdminGestor.value).toBe(true);
-    });
-
-    it("deve calcular podeAcessoGeralAdminGestor para GESTOR", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({perfilSelecionado: Perfil.GESTOR} as any);
-        const {podeAcessoGeralAdminGestor} = usePerfil();
-        expect(podeAcessoGeralAdminGestor.value).toBe(true);
+        expect(mostrarCriarProcesso.value).toBe(true);
+        expect(mostrarArvoreCompletaUnidades.value).toBe(true);
+        expect(mostrarCtaPainelVazio.value).toBe(true);
+        expect(mostrarDiagnosticoOrganizacional.value).toBe(true);
+        expect(mostrarMenuConfiguracoes.value).toBe(true);
+        expect(mostrarMenuAdministradores.value).toBe(true);
+        expect(mostrarCriarAtribuicaoTemporaria.value).toBe(true);
     });
 
     it("deve retornar nulo se unidadeSelecionada e sigla forem nulas", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
             unidadeSelecionadaSigla: null,
             unidadeSelecionada: null,
+            permissoesSessao: null,
         } as any);
 
         const {unidadeSelecionada} = usePerfil();

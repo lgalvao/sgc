@@ -19,6 +19,15 @@ vi.mock("vue-router", () => ({
 }));
 
 describe("LoginView.vue", () => {
+    const permissoesAdmin = {
+        mostrarCriarProcesso: true,
+        mostrarArvoreCompletaUnidades: true,
+        mostrarCtaPainelVazio: true,
+        mostrarDiagnosticoOrganizacional: true,
+        mostrarMenuConfiguracoes: true,
+        mostrarMenuAdministradores: true,
+        mostrarCriarAtribuicaoTemporaria: true,
+    };
     let routerPushMock: any;
 
     beforeEach(() => {
@@ -105,7 +114,13 @@ describe("LoginView.vue", () => {
             autenticado: true,
             requerSelecaoPerfil: false,
             perfisUnidades: [MOCK_PERFIS[0]],
-            sessao: {} as any
+            sessao: {
+                tituloEleitoral: "123",
+                nome: "Admin",
+                perfil: Perfil.ADMIN,
+                unidadeCodigo: 1,
+                permissoes: permissoesAdmin,
+            }
         });
         perfilStore.perfisUnidades = [MOCK_PERFIS[0]];
 

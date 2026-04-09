@@ -10,6 +10,16 @@ vi.mock('@/axios-setup', () => ({
 }));
 
 describe('usuarioService', () => {
+  const permissoesAdmin = {
+    mostrarCriarProcesso: true,
+    mostrarArvoreCompletaUnidades: true,
+    mostrarCtaPainelVazio: true,
+    mostrarDiagnosticoOrganizacional: true,
+    mostrarMenuConfiguracoes: true,
+    mostrarMenuAdministradores: true,
+    mostrarCriarAtribuicaoTemporaria: true,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -31,7 +41,7 @@ describe('usuarioService', () => {
     });
 
     it('entrar', async () => {
-      const mockData = { tituloEleitoral: '123', nome: 'Teste', perfil: 'ADMIN', unidadeCodigo: 1 };
+      const mockData = { tituloEleitoral: '123', nome: 'Teste', perfil: 'ADMIN', unidadeCodigo: 1, permissoes: permissoesAdmin };
       (apiClient.post as any).mockResolvedValueOnce({ data: mockData });
       const result = await usuarioService.entrar({ perfil: 'ADMIN', unidadeCodigo: 1 });
       expect(apiClient.post).toHaveBeenCalledWith('/usuarios/entrar', { perfil: 'ADMIN', unidadeCodigo: 1 });
@@ -90,8 +100,10 @@ describe('usuarioService', () => {
         nome: 'Teste',
         perfil: 'ADMIN',
         unidadeCodigo: 1,
+        permissoes: permissoesAdmin,
       });
       expect(result.perfil).toBe('ADMIN');
+      expect(result.permissoes.mostrarCriarProcesso).toBe(true);
     });
 
     it('mapFluxoLoginToFrontend', () => {
@@ -108,6 +120,7 @@ describe('usuarioService', () => {
           nome: 'Teste',
           perfil: 'ADMIN',
           unidadeCodigo: 1,
+          permissoes: permissoesAdmin,
         }
       });
       expect(result.autenticado).toBe(true);

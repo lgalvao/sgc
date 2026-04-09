@@ -13,6 +13,7 @@
       >
         <InlineEditor
             :can-edit="podeEditar"
+            :edit-enabled="habilitarEdicao"
             :model-value="atividade.descricao"
             aria-label="Editar atividade"
             test-codigo-cancelar="btn-cancelar-edicao-atividade"
@@ -33,6 +34,7 @@
                 :aria-label="'Remover atividade: ' + atividade.descricao"
                 class="ms-1"
                 data-testid="btn-remover-atividade"
+                :disabled="!habilitarEdicao"
                 size="sm"
                 title="Remover"
                 variant="outline-danger"
@@ -70,6 +72,7 @@
         >
           <InlineEditor
               :can-edit="podeEditar"
+              :edit-enabled="habilitarEdicao"
               :model-value="conhecimento.descricao"
               aria-label="Editar conhecimento"
               size="sm"
@@ -86,6 +89,7 @@
                   :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
                   class="ms-1"
                   data-testid="btn-remover-conhecimento"
+                  :disabled="!habilitarEdicao"
                   size="sm"
                   title="Remover"
                   variant="outline-danger"
@@ -107,6 +111,7 @@
                 v-model="novoConhecimento"
                 :class="{ 'border-danger': !!erroValidacao }"
                 aria-label="Novo conhecimento"
+                :disabled="!habilitarEdicao"
                 data-testid="inp-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 size="sm"
@@ -117,6 +122,7 @@
             <BButton
                 aria-label="Adicionar conhecimento"
                 data-testid="btn-adicionar-conhecimento"
+                :disabled="!habilitarEdicao"
                 size="sm"
                 title="Adicionar conhecimento"
                 type="submit"
@@ -144,10 +150,13 @@ import InlineEditor from "@/components/comum/InlineEditor.vue";
 interface Props {
   atividade: Atividade;
   podeEditar: boolean;
+  habilitarEdicao?: boolean;
   erroValidacao?: string;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  habilitarEdicao: true,
+});
 
 const emit = defineEmits<{
   (e: "atualizar-atividade", novaDescricao: string): void;
@@ -162,6 +171,9 @@ const emEdicao = ref(false);
 const novoConhecimento = ref("");
 
 function adicionarConhecimento() {
+  if (!props.habilitarEdicao) {
+    return;
+  }
   const descricao = novoConhecimento.value.trim();
   if (descricao) {
     emit("adicionar-conhecimento", descricao);

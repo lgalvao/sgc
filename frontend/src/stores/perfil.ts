@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
-import type {FluxoLogin, PerfilUnidade} from "@/services/usuarioService";
+import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/services/usuarioService";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -13,6 +13,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     const perfilSelecionado = useLocalStorage<Perfil | null>("perfilSelecionado", null);
     const unidadeSelecionada = useLocalStorage<number | null>("unidadeSelecionada", null);
     const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
+    const permissoesSessao = useLocalStorage<PermissoesSessao | null>("permissoesSessao", null);
     const usuarioNome = useSessionStorage<string | null>("usuarioNome", null);
     const perfis = useLocalStorage<Perfil[]>("perfis", []);
 
@@ -42,6 +43,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfil: Perfil;
         unidadeCodigo: number;
         unidadeSigla: string;
+        permissoes: PermissoesSessao;
         nome?: string;
     }
 
@@ -49,6 +51,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfilSelecionado.value = dados.perfil;
         unidadeSelecionada.value = dados.unidadeCodigo;
         unidadeSelecionadaSigla.value = dados.unidadeSigla;
+        permissoesSessao.value = dados.permissoes;
         if (dados.nome) {
             usuarioNome.value = dados.nome;
         }
@@ -80,6 +83,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                     perfil: fluxoLogin.sessao.perfil as unknown as Perfil,
                     unidadeCodigo: fluxoLogin.sessao.unidadeCodigo,
                     unidadeSigla: perfilUnidadeSelecionado.unidade.sigla,
+                    permissoes: fluxoLogin.sessao.permissoes,
                     nome: fluxoLogin.sessao.nome,
                 });
                 definirUsuarioCodigo(fluxoLogin.sessao.tituloEleitoral);
@@ -111,6 +115,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 perfil: loginResponse.perfil as unknown as Perfil,
                 unidadeCodigo: loginResponse.unidadeCodigo,
                 unidadeSigla: perfilUnidade.unidade.sigla,
+                permissoes: loginResponse.permissoes,
                 nome: loginResponse.nome,
             });
             definirUsuarioCodigo(loginResponse.tituloEleitoral);
@@ -123,6 +128,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfilSelecionado.value = null;
         unidadeSelecionada.value = null;
         unidadeSelecionadaSigla.value = null;
+        permissoesSessao.value = null;
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
@@ -133,6 +139,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfilSelecionado,
         unidadeSelecionada,
         unidadeSelecionadaSigla,
+        permissoesSessao,
         usuarioNome,
         perfisUnidades,
         perfis,

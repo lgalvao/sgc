@@ -69,6 +69,15 @@ function criarErroApi(message: string, subErrors: Array<{field?: string | null; 
 
 describe('ProcessoCadastroView.vue', () => {
     const context = setupComponentTest();
+    const permissoesAdmin = {
+        mostrarCriarProcesso: true,
+        mostrarArvoreCompletaUnidades: true,
+        mostrarCtaPainelVazio: true,
+        mostrarDiagnosticoOrganizacional: true,
+        mostrarMenuConfiguracoes: true,
+        mostrarMenuAdministradores: true,
+        mostrarCriarAtribuicaoTemporaria: true,
+    };
 
     const createWrapper = (initialState = {}) => {
         const processoInicial = (initialState as any).processos?.processoDetalhe ?? null;
@@ -161,7 +170,10 @@ describe('ProcessoCadastroView.vue', () => {
         } as any);
 
         const {wrapper} = createWrapper({
-            perfil: {perfilSelecionado: 'ADMIN'}
+            perfil: {
+                perfilSelecionado: 'ADMIN',
+                permissoesSessao: permissoesAdmin,
+            }
         });
         await flushPromises();
 

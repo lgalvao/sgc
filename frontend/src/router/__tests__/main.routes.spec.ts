@@ -101,7 +101,6 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/administradores");
         expect(route?.meta?.title).toBe("Administradores");
-        expect(route?.meta?.requiresAdmin).toBe(true);
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();
@@ -114,7 +113,6 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/administracao/limpeza-processos");
         expect(route?.meta?.title).toBe("Limpeza de processos");
-        expect(route?.meta?.requiresAdmin).toBe(true);
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();

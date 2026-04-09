@@ -51,6 +51,10 @@ Ordem de precedência:
   * `frontend/src/views/ProcessoCadastroView.vue`
   * `frontend/src/views/MapaView.vue`
   * `frontend/src/views/AtribuicaoTemporariaView.vue`
+* O frontend ainda precisa de uma passada final para remover verificações de acesso remanescentes por perfil em pontos de navegação e breadcrumb; a direção correta é usar permissões vindas do backend ou contexto de sessão explícito, não inferência local.
+* A nomenclatura atual mistura `pode...` e `habilitar...` em permissões de subprocesso:
+  * o padrão continua funcional, mas a semântica ficou pouco coesa;
+  * revisar depois com critério explícito de “mostrar”, “permitir” e “habilitar”, sem renomeação apressada no meio das simplificações.
 * `frontend/src/components/comum/LoadingButton.vue` segue sendo um wrapper fino.
 * `LoadingButton.vue` é amplamente usado e já possui stories e testes, então qualquer remoção ou fusão exige auditoria explícita; não é um alvo de remoção automática.
 
@@ -109,6 +113,7 @@ Objetivo:
 Próximo corte:
 
 * priorizar views que acumulam carregamento, transformação, decisão de fluxo e tratamento de erro no mesmo arquivo;
+* continuar removendo do frontend verificações de acesso ou contexto que o backend já conhece;
 * reduzir dependência de estado implícito quando a tela já tem o dado necessário no contexto local;
 * manter `normalizeError` e exibição de erro nas camadas corretas.
 

@@ -105,6 +105,17 @@ export interface SessaoLoginDto {
     nome: string;
     perfil: string;
     unidadeCodigo: number;
+    permissoes: PermissoesSessaoDto;
+}
+
+export interface PermissoesSessaoDto {
+    mostrarCriarProcesso: boolean;
+    mostrarArvoreCompletaUnidades: boolean;
+    mostrarCtaPainelVazio: boolean;
+    mostrarDiagnosticoOrganizacional: boolean;
+    mostrarMenuConfiguracoes: boolean;
+    mostrarMenuAdministradores: boolean;
+    mostrarCriarAtribuicaoTemporaria: boolean;
 }
 
 export interface FluxoLoginResponseDto {

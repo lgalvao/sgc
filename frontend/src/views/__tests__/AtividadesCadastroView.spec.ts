@@ -2,7 +2,6 @@ import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {reactive, ref} from "vue";
-import * as usePerfilModule from "@/composables/usePerfil";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
@@ -276,11 +275,6 @@ function createWrapper(customState = {}, accessOverrides = {}) {
         ...accessOverrides
     } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
-    vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
-        perfilSelecionado: ref(Perfil.CHEFE),
-        isChefe: ref(true),
-    } as unknown as ReturnType<typeof usePerfilModule.usePerfil>);
-
     const wrapper = mount(CadastroView, {
         global: {
             plugins: [createTestingPinia({
@@ -539,7 +533,7 @@ describe("CadastroView.vue", () => {
         expect(btn.attributes('disabled')).toBeUndefined();
     });
 
-    it("mantem botão visivel e desabilitado quando chefe pode editar mas ainda nao pode disponibilizar", async () => {
+    it("oculta botão disponibilizar quando a permissão não permite a ação", async () => {
         const wrapper = createWrapper({}, {
             podeEditarCadastro: ref(true),
             podeDisponibilizarCadastro: ref(false),
@@ -548,8 +542,7 @@ describe("CadastroView.vue", () => {
         await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
-        expect(btn.exists()).toBe(true);
-        expect(btn.attributes('disabled')).toBeDefined();
+        expect(btn.exists()).toBe(false);
     });
 
     it("recarrega contexto completo apos importar atividades", async () => {

@@ -35,12 +35,12 @@ describe("MainNavbar.vue", () => {
 
         // Default mock for usePerfil
         vi.mocked(usePerfil).mockReturnValue({
-            servidorLogado: ref({nome: "Usuario teste"}),
             perfilSelecionado: ref("GESTOR"),
             unidadeSelecionada: ref("Unidade teste"),
-            podeAcessarTodasUnidades: ref(false),
+            mostrarArvoreCompletaUnidades: ref(false),
+            mostrarMenuConfiguracoes: ref(false),
+            mostrarMenuAdministradores: ref(false),
             isAdmin: ref(false),
-            isGestor: ref(true),
         } as any);
     });
 
@@ -54,7 +54,9 @@ describe("MainNavbar.vue", () => {
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("ADMIN"),
             unidadeSelecionada: ref("TRE-PR"),
-            podeAcessarTodasUnidades: ref(true),
+            mostrarArvoreCompletaUnidades: ref(true),
+            mostrarMenuConfiguracoes: ref(true),
+            mostrarMenuAdministradores: ref(true),
             isAdmin: ref(true),
         } as any);
 
@@ -79,7 +81,9 @@ describe("MainNavbar.vue", () => {
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("GESTOR"),
             unidadeSelecionada: ref("456"),
-            podeAcessarTodasUnidades: ref(false),
+            mostrarArvoreCompletaUnidades: ref(false),
+            mostrarMenuConfiguracoes: ref(false),
+            mostrarMenuAdministradores: ref(false),
             isAdmin: ref(false),
         } as any);
 
@@ -101,13 +105,17 @@ describe("MainNavbar.vue", () => {
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("CHEFE"),
             unidadeSelecionada: ref("TRE-PR"),
-            podeAcessarTodasUnidades: ref(false),
+            mostrarArvoreCompletaUnidades: ref(false),
+            mostrarMenuConfiguracoes: ref(false),
+            mostrarMenuAdministradores: ref(false),
         } as any);
 
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("CHEFE"),
             unidadeSelecionada: ref("TRE-PR"),
-            podeAcessarTodasUnidades: ref(false),
+            mostrarArvoreCompletaUnidades: ref(false),
+            mostrarMenuConfiguracoes: ref(false),
+            mostrarMenuAdministradores: ref(false),
         } as any);
 
         const options = getCommonMountOptions({
@@ -129,7 +137,9 @@ describe("MainNavbar.vue", () => {
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("ADMIN"),
             unidadeSelecionada: ref("456"),
-            podeAcessarTodasUnidades: ref(true),
+            mostrarArvoreCompletaUnidades: ref(true),
+            mostrarMenuConfiguracoes: ref(true),
+            mostrarMenuAdministradores: ref(true),
             isAdmin: ref(true),
         } as any);
 
@@ -162,7 +172,9 @@ describe("MainNavbar.vue", () => {
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("GESTOR"),
             unidadeSelecionada: ref("456"),
-            podeAcessarTodasUnidades: ref(false),
+            mostrarArvoreCompletaUnidades: ref(false),
+            mostrarMenuConfiguracoes: ref(false),
+            mostrarMenuAdministradores: ref(false),
             isAdmin: ref(false),
         } as any);
 
@@ -185,7 +197,9 @@ describe("MainNavbar.vue", () => {
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("ADMIN"),
             unidadeSelecionada: ref("456"),
-            podeAcessarTodasUnidades: ref(true),
+            mostrarArvoreCompletaUnidades: ref(true),
+            mostrarMenuConfiguracoes: ref(true),
+            mostrarMenuAdministradores: ref(true),
             isAdmin: ref(true),
         } as any);
 

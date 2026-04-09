@@ -11,5 +11,6 @@ public record EntrarResponse(
         String tituloEleitoral,
         String nome,
         Perfil perfil,
-        Long unidadeCodigo) {
+        Long unidadeCodigo,
+        PermissoesSessaoResponse permissoes) {
 }

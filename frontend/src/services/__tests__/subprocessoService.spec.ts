@@ -94,10 +94,8 @@ describe('subprocessoService', () => {
       localizacaoAtual: 'UND',
       permissoes: {},
     } } as never);
-    await subprocessoService.buscarSubprocessoDetalhe(1, 'ADMIN', 2);
-    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1', {
-      params: { perfil: 'ADMIN', unidadeUsuario: 2 }
-    });
+    await subprocessoService.buscarSubprocessoDetalhe(1);
+    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1');
   });
 
   it('buscarContextoEdicao', async () => {
@@ -137,10 +135,8 @@ describe('subprocessoService', () => {
       mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' },
       atividadesDisponiveis: [],
     } } as never);
-    const resultado = await subprocessoService.buscarContextoEdicao(1, 'ADMIN', 2);
-    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao', {
-      params: { perfil: 'ADMIN', unidadeUsuario: 2 }
-    });
+    const resultado = await subprocessoService.buscarContextoEdicao(1);
+    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao');
     expect(resultado.detalhes).toMatchObject({
       codigo: 1,
       processoDescricao: 'Processo',
