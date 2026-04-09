@@ -251,7 +251,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U1");
     }
 
@@ -278,7 +278,7 @@ class PainelFacadeTest {
         
         when(unidadeService.buscarSiglasPorCodigos(List.of(2L))).thenReturn(List.of("U2"));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U2");
     }
 
@@ -301,7 +301,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result).isNotEmpty();
     }
 
@@ -332,7 +332,7 @@ class PainelFacadeTest {
         when(unidadeService.buscarSiglasPorCodigos(argThat(list -> list.contains(1L) && list.contains(2L))))
                 .thenReturn(List.of("U1", "U2"));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1", "U2");
     }
 
@@ -356,7 +356,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         verify(processoService).listarTodos(any());
     }
 
@@ -367,7 +367,7 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         Pageable sorted = PageRequest.of(0, 10, Sort.by("descricao"));
-        painelFacade.listarProcessos(Perfil.ADMIN, 100L, sorted);
+        painelFacade.listarProcessos(CONTEXTO_ADMIN, sorted);
         
         verify(processoService).listarTodos(sorted);
     }
@@ -398,7 +398,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         verify(processoService).listarTodos(any());
     }
 

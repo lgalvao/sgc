@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
@@ -31,6 +32,7 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("Budget de Queries de Processo e Subprocesso")
 class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcessoSubprocessoViewsQueryBudgetIntegrationTest.class);
+    private static final String TITULO_USUARIO_CHEFE = "111111111111";
 
     @Autowired
     private EntityManager entityManager;
@@ -49,6 +51,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
 
     private Unidade unidadeFilha;
     private Usuario usuarioAdmin;
+    private Usuario usuarioChefe;
     private Subprocesso subprocesso;
     private MetricasExecucaoTeste medidor;
 
@@ -57,7 +60,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
         Unidade unidadeRaiz = criarUnidade("UNR", "Unidade raiz budget", null);
         unidadeFilha = criarUnidade("UNF", "Unidade filha budget", unidadeRaiz);
 
-        Usuario usuarioChefe = usuarioRepo.findById("111111111111").orElseThrow();
+        usuarioChefe = usuarioRepo.findById(TITULO_USUARIO_CHEFE).orElseThrow();
         usuarioChefe.setPerfilAtivo(Perfil.CHEFE);
         usuarioChefe.setUnidadeAtivaCodigo(unidadeFilha.getCodigo());
 
@@ -86,8 +89,11 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     void painelDeveListarProcessosSemLookupUnitarioPorItem() {
         MetricasExecucaoTeste.ResultadoMedicao medicao = medir("painel.listarProcessos", () -> {
             Page<ProcessoResumoDto> pagina = painelFacade.listarProcessos(
-                    Perfil.CHEFE,
-                    unidadeFilha.getCodigo(),
+                    new ContextoUsuarioAutenticado(
+                            usuarioChefe.getTituloEleitoral(),
+                            unidadeFilha.getCodigo(),
+                            Perfil.CHEFE
+                    ),
                     PageRequest.of(0, 20)
             );
 
@@ -121,9 +127,11 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     void painelDeveListarAlertasSemLookupUnitarioDeLeitura() {
         MetricasExecucaoTeste.ResultadoMedicao medicao = medir("painel.listarAlertas", () -> {
             Page<Alerta> pagina = painelFacade.listarAlertas(
-                    usuarioAdmin.getTituloEleitoral(),
-                    unidadeFilha.getCodigo(),
-                    Perfil.ADMIN.name(),
+                    new ContextoUsuarioAutenticado(
+                            usuarioAdmin.getTituloEleitoral(),
+                            unidadeFilha.getCodigo(),
+                            Perfil.ADMIN
+                    ),
                     PageRequest.of(0, 10)
             );
 

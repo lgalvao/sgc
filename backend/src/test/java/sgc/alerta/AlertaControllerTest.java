@@ -52,7 +52,7 @@ class AlertaControllerTest {
                             .content("[1, 2, 3]"))
                     .andExpect(status().isOk());
 
-            verify(alertaFacade).marcarComoLidos(eq(TITULO_TESTE), anyList());
+            verify(alertaFacade).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
         }
 
         @Test
@@ -70,7 +70,7 @@ class AlertaControllerTest {
                             .content("[]"))
                     .andExpect(status().isOk());
 
-            verify(alertaFacade).marcarComoLidos(eq(TITULO_TESTE), anyList());
+            verify(alertaFacade).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
         }
     }
 

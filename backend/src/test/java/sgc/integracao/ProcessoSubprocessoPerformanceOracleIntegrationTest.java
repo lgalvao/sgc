@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.TestPropertySource;
 import sgc.alerta.model.Alerta;
+import sgc.organizacao.ContextoUsuarioAutenticado;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
@@ -106,17 +107,22 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
         resultados.add(medidor.medir(
                 "painel.listarProcessos.gestor",
                 () -> painelFacade.listarProcessos(
-                        amostras.perfilPainel(),
-                        amostras.codigoUnidadeBase(),
+                        new ContextoUsuarioAutenticado(
+                                amostras.usuarioBase().getTituloEleitoral(),
+                                amostras.codigoUnidadeBase(),
+                                amostras.perfilPainel()
+                        ),
                         PageRequest.of(0, 20)),
                 "VW_UNIDADE", "PROCESSO"
         ));
         resultados.add(medidor.medir(
                 "painel.listarAlertas.gestor",
                 () -> painelFacade.listarAlertas(
-                        amostras.usuarioBase().getTituloEleitoral(),
-                        amostras.codigoUnidadeBase(),
-                        amostras.perfilPainel().name(),
+                        new ContextoUsuarioAutenticado(
+                                amostras.usuarioBase().getTituloEleitoral(),
+                                amostras.codigoUnidadeBase(),
+                                amostras.perfilPainel()
+                        ),
                         PageRequest.of(0, 20)),
                 "ALERTA", "ALERTA_USUARIO"
         ));
