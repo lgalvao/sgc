@@ -565,19 +565,20 @@ public class SubprocessoTransicaoService {
     }
 
     public void devolverCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarDevolucao(codSubprocesso, usuario, observacoes, false);
+        executarDevolucao(sp, usuario, observacoes, false);
     }
 
     public void devolverRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarDevolucao(codSubprocesso, usuario, observacoes, true);
+        executarDevolucao(sp, usuario, observacoes, true);
     }
 
-    private void executarDevolucao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
+    private void executarDevolucao(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
         FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
-        log.info("Devolvendo {} do subprocesso {}", contexto.etapa(), codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        log.info("Devolvendo {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
@@ -709,28 +710,29 @@ public class SubprocessoTransicaoService {
     }
 
     public void aceitarCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceite(codSubprocesso, usuario, observacoes, false);
+        executarAceite(sp, usuario, observacoes, false);
     }
 
     public void aceitarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceite(codSubprocesso, usuario, observacoes, true);
+        executarAceite(sp, usuario, observacoes, true);
     }
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         subprocessoCodigos.forEach(codSubprocesso -> {
-            boolean isRevisao = isRevisao(codSubprocesso);
-            executarAceite(codSubprocesso, usuario, "Avaliação em bloco", isRevisao);
+            Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+            executarAceite(sp, usuario, "Avaliação em bloco", REVISAO == sp.getProcesso().getTipo());
         });
     }
 
-    private void executarAceite(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
+    private void executarAceite(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
         FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
-        log.info("Aceitando {} do subprocesso {}", contexto.etapa(), codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        log.info("Aceitando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand.cadastroParaSuperiorAtual(
@@ -743,27 +745,28 @@ public class SubprocessoTransicaoService {
     }
 
     public void homologarCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacao(codSubprocesso, usuario, observacoes, false);
+        executarHomologacao(sp, usuario, observacoes, false);
     }
 
     public void homologarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacao(codSubprocesso, usuario, observacoes, true);
+        executarHomologacao(sp, usuario, observacoes, true);
     }
 
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         subprocessoCodigos.forEach(codSubprocesso -> {
-            boolean isRevisao = isRevisao(codSubprocesso);
-            executarHomologacao(codSubprocesso, usuario, "Homologação em bloco", isRevisao);
+            Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+            executarHomologacao(sp, usuario, "Homologação em bloco", REVISAO == sp.getProcesso().getTipo());
         });
     }
 
-    private void executarHomologacao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
+    private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
         FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
-        log.info("Homologando {} do subprocesso {}", contexto.etapa(), codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        log.info("Homologando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         sp.setSituacao(contexto.situacaoHomologada());
@@ -911,10 +914,6 @@ public class SubprocessoTransicaoService {
             throw new IllegalStateException("Tipo de processo %s sem situação configurada para %s".formatted(tipoProcesso, contexto));
         }
         return situacao;
-    }
-
-    private boolean isRevisao(Long codSubprocesso) {
-        return REVISAO == consultaService.buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
     }
 
     private FluxoCadastroContexto obterContextoCadastro(boolean isRevisao) {

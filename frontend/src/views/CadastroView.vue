@@ -306,14 +306,8 @@ async function iniciarRevisaoSeNecessario() {
   }
 }
 
-watch(disponibilizacaoSemMudancas, async (marcado) => {
-  if (marcado && precisaIniciarRevisao.value) {
-    await iniciarRevisaoSeNecessario();
-  }
-});
-
-watch(houveAlteracaoCadastro, async (alterou) => {
-  if (alterou && precisaIniciarRevisao.value) {
+watch([disponibilizacaoSemMudancas, houveAlteracaoCadastro], async ([marcado, alterou]) => {
+  if ((marcado || alterou) && precisaIniciarRevisao.value) {
     await iniciarRevisaoSeNecessario();
   }
 });
@@ -387,6 +381,9 @@ function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
     permissoes: data.detalhes.permissoes,
     atividadesAtualizadas: data.atividadesDisponiveis,
   });
+  atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
+  disponibilizacaoSemMudancas.value = false;
+  unidade.value = data.unidade;
 }
 
 async function carregarContextoInicial() {
@@ -406,10 +403,6 @@ async function carregarContextoInicial() {
 
   sincronizarEstadoInicialContexto(data);
   mapasStore.mapaCompleto.value = data.mapa;
-  atividades.value = data.atividadesDisponiveis;
-  atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
-  disponibilizacaoSemMudancas.value = false;
-  unidade.value = data.unidade;
 }
 
 async function adicionarAtividade(): Promise<boolean> {
@@ -544,10 +537,6 @@ async function handleImportAtividades(aviso?: string) {
       const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
       if (data) {
         sincronizarEstadoInicialContexto(data);
-        atividades.value = data.atividadesDisponiveis;
-        atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
-        disponibilizacaoSemMudancas.value = false;
-        unidade.value = data.unidade;
       }
     });
   }
