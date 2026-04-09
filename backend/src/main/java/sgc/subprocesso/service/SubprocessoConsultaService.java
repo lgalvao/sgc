@@ -303,7 +303,7 @@ public class SubprocessoConsultaService {
         if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
             throw new ErroValidacao("SGC-MSG-100230"); // Utilização simplificada para código temporário
         }
-        return listarAtividadesSubprocesso(codSubprocesso);
+        return listarAtividadesSubprocesso(subprocesso);
     }
 
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
@@ -320,14 +320,14 @@ public class SubprocessoConsultaService {
 
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        DadosMapaAjuste dadosMapaAjuste = carregarDadosMapaAjuste(sp);
+        Long codMapa = obterCodigoMapaObrigatorio(sp);
 
         return MapaAjusteDto.of(
                 sp,
                 obterAnaliseMaisRecentePorTipo(codSubprocesso),
-                dadosMapaAjuste.competencias(),
-                dadosMapaAjuste.atividades(),
-                dadosMapaAjuste.conhecimentos()
+                mapaManutencaoService.competenciasCodMapaSemRels(codMapa),
+                mapaManutencaoService.atividadesMapaCodigoSemRels(codMapa),
+                mapaManutencaoService.conhecimentosCodMapa(codMapa)
         );
     }
 
@@ -380,15 +380,6 @@ public class SubprocessoConsultaService {
 
     private @Nullable Analise obterAnaliseMaisRecentePorTipo(Long codSubprocesso) {
         return listarAnalisesPorTipo(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
-    }
-
-    private DadosMapaAjuste carregarDadosMapaAjuste(Subprocesso subprocesso) {
-        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
-        return new DadosMapaAjuste(
-                mapaManutencaoService.competenciasCodMapaSemRels(codMapa),
-                mapaManutencaoService.atividadesMapaCodigoSemRels(codMapa),
-                mapaManutencaoService.conhecimentosCodMapa(codMapa)
-        );
     }
 
     private @Nullable Usuario buscarTitularSeInformado(Unidade unidade) {
@@ -465,13 +456,6 @@ public class SubprocessoConsultaService {
             SubprocessoDetalheResponse detalhes,
             MapaCompletoDto mapa,
             List<AtividadeDto> atividades
-    ) {
-    }
-
-    private record DadosMapaAjuste(
-            List<sgc.mapa.model.Competencia> competencias,
-            List<Atividade> atividades,
-            List<sgc.mapa.model.Conhecimento> conhecimentos
     ) {
     }
 
