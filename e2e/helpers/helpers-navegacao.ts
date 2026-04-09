@@ -16,13 +16,28 @@ export async function limparNotificacoes(page: Page): Promise<void> {
         // BOrchestrator renderiza toasts como role="alert" ou .toast
         // Procuramos botões de fechar (X) em toasts, alertas ou no orchestrator
         const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close, .alert .btn-close, button[aria-label="Close"]');
-        
-        // count() é rápido, mas isVisible() e click() podem falhar se a página fechar
-        const count = await closeButtons.count();
-        for (let i = 0; i < count; i++) {
-            const btn = closeButtons.nth(i);
-            if (await btn.isVisible()) {
-                await btn.click();
+
+        // Os toasts podem desaparecer ou reordenar durante a iteração.
+        // Reconsultamos sempre o primeiro botão para evitar índices obsoletos.
+        while (await closeButtons.count() > 0) {
+            const btn = closeButtons.first();
+            if (!(await btn.isVisible())) {
+                break;
+            }
+
+            try {
+                await btn.click({timeout: 500});
+            } catch (e: any) {
+                const mensagem = (e.message ?? '').toLowerCase();
+                if (
+                    mensagem.includes('not visible')
+                    || mensagem.includes('not attached')
+                    || mensagem.includes('detached from the dom')
+                    || mensagem.includes('timeout')
+                ) {
+                    continue;
+                }
+                throw e;
             }
         }
     } catch (e: any) {

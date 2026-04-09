@@ -74,7 +74,6 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         request,
         page
     }) => {
-        test.setTimeout(30000);
         // Reseta o banco para evitar conflito com unidade já em processo ativo dos cenários anteriores
         await resetDatabase(request);
         const descIsolada = `Mapeamento CDU-25 alerta ${Date.now()}`;

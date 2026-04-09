@@ -15,5 +15,8 @@ public class SubprocessoElegivelDto {
     String unidadeSigla;
     Long localizacaoCodigo;
     SituacaoSubprocesso situacao;
+    boolean habilitarAceitarBloco;
+    boolean habilitarHomologarBloco;
+    boolean habilitarDisponibilizarBloco;
     @Nullable LocalDateTime ultimaDataLimite;
 }

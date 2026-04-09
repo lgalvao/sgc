@@ -125,7 +125,6 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
-import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import type {Processo, SubprocessoElegivel} from "@/types/tipos";
@@ -168,7 +167,6 @@ type LinhaCliqueSubprocesso = {
 
 const route = useRoute();
 const router = useRouter();
-const perfilStore = usePerfilStore();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
@@ -312,11 +310,6 @@ function isSituacaoMapaValidadoOuAjustado(situacao: SituacaoSubprocesso) {
       situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
 }
 
-function isSituacaoDisponibilizacaoMapa(situacao: SituacaoSubprocesso) {
-  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO;
-}
-
 function obterSituacao(item: { situacaoSubprocesso?: SituacaoSubprocesso, situacao?: SituacaoSubprocesso }) {
   return item.situacaoSubprocesso ?? item.situacao;
 }
@@ -356,16 +349,11 @@ function obterConfiguracaoAcaoBloco(acao: AcaoBloco, contexto: ContextoBloco): C
   return configuracoesAcaoBloco[acao][contexto];
 }
 
-const unidadesElegiveisPorAcao = computed(() => {
-  const unidades = subprocessosElegiveis.value;
-  const unidadeAtiva = perfilStore.unidadeSelecionada;
-
-  return {
-    aceitar: unidades.filter(u => (isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)) && u.localizacaoCodigo === unidadeAtiva),
-    homologar: unidades.filter(u => (isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)) && u.localizacaoCodigo === unidadeAtiva),
-    disponibilizar: unidades.filter(u => isSituacaoDisponibilizacaoMapa(u.situacao) && u.localizacaoCodigo === unidadeAtiva)
-  };
-});
+const unidadesElegiveisPorAcao = computed(() => ({
+  aceitar: subprocessosElegiveis.value.filter(u => u.habilitarAceitarBloco),
+  homologar: subprocessosElegiveis.value.filter(u => u.habilitarHomologarBloco),
+  disponibilizar: subprocessosElegiveis.value.filter(u => u.habilitarDisponibilizarBloco)
+}));
 
 const unidadesElegiveis = computed(() => {
   const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtual.value];
@@ -529,7 +517,6 @@ defineExpose({
   executarAcaoBloco,
   acaoBlocoAtual,
   unidadesElegiveis,
-  perfilStore,
   rotuloAcaoAceitarBloco,
   rotuloAcaoHomologarBloco,
   rotuloAcaoDisponibilizarBloco,

@@ -119,7 +119,7 @@ export async function excluirCompetenciaConfirmando(page: Page, descricao: strin
     await expect(modal).toContainText(descricao);
 
     const btnConfirmar = modal.getByTestId('btn-confirmar-exclusao-competencia');
-    await btnConfirmar.waitFor({ state: 'visible', timeout: 5000 });
+    await btnConfirmar.waitFor({ state: 'visible'});
     await btnConfirmar.scrollIntoViewIfNeeded();
     await btnConfirmar.click();
     await expect(modal).toBeHidden();
@@ -177,7 +177,11 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
 export async function aceitarOuHomologarMapa(page: Page, observacao: string) {
     await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
     await page.getByTestId('btn-mapa-homologar-aceite').click();
+    const modal = page.getByTestId('body-aceite-mapa');
+    await expect(modal).toBeVisible();
     await page.getByTestId('inp-aceite-mapa-observacao').fill(observacao);
     await page.getByTestId('btn-aceite-mapa-confirmar').click();
-    await page.waitForURL(/\/painel$/);
+    await expect(modal).toBeHidden();
+    await verificarPaginaPainel(page);
+    await verificarToast(page, new RegExp(`${TEXTOS.sucesso.ACEITE_REGISTRADO}|${TEXTOS.mapa.SUCESSO_HOMOLOGACAO}`, 'i'));
 }

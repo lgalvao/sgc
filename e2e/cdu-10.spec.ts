@@ -100,7 +100,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Aguardar transição de estado e verificar nova situação
         await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(/Revisão em andamento/i, {timeout: 5000});
-        await expect(botaoDisponibilizar).toBeEnabled({timeout: 5000});
+        await expect(botaoDisponibilizar).toBeEnabled();
 
         await botaoDisponibilizar.click();
         await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();

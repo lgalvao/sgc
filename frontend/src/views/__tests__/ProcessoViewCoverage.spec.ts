@@ -212,7 +212,10 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeCodigo: 1,
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
-                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        habilitarAceitarBloco: true,
+                        habilitarHomologarBloco: true,
+                        habilitarDisponibilizarBloco: false
                     }
                 ]
             }
@@ -232,7 +235,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         }
     });
 
-    it("deve calcular unidades elegíveis para Disponibilizar", async () => {
+    it("deve filtrar unidades elegíveis para Disponibilizar a partir do backend", async () => {
         const wrapper = createWrapper({
             processos: {
                 subprocessosElegiveis: [
@@ -241,14 +244,20 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
                         situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
-                        localizacaoCodigo: 100
-                    }, // Eligible
+                        localizacaoCodigo: 100,
+                        habilitarAceitarBloco: false,
+                        habilitarHomologarBloco: false,
+                        habilitarDisponibilizarBloco: true
+                    },
                     {
                         unidadeCodigo: 2,
                         unidadeSigla: "B",
                         unidadeNome: "Unidade B",
                         situacao: "OUTRO",
-                        localizacaoCodigo: 100
+                        localizacaoCodigo: 100,
+                        habilitarAceitarBloco: false,
+                        habilitarHomologarBloco: false,
+                        habilitarDisponibilizarBloco: false
                     }
                 ]
             }
@@ -259,7 +268,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
     });
 
-    it("deve calcular unidades elegíveis para Homologar", async () => {
+    it("deve filtrar unidades elegíveis para Homologar a partir do backend", async () => {
         const wrapper = createWrapper({
             processos: {
                 subprocessosElegiveis: [
@@ -268,14 +277,20 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
                         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                        localizacaoCodigo: 100
-                    }, // Eligible
+                        localizacaoCodigo: 100,
+                        habilitarAceitarBloco: false,
+                        habilitarHomologarBloco: true,
+                        habilitarDisponibilizarBloco: false
+                    },
                     {
                         unidadeCodigo: 2,
                         unidadeSigla: "B",
                         unidadeNome: "Unidade B",
                         situacao: "OUTRO",
-                        localizacaoCodigo: 100
+                        localizacaoCodigo: 100,
+                        habilitarAceitarBloco: false,
+                        habilitarHomologarBloco: false,
+                        habilitarDisponibilizarBloco: false
                     }
                 ]
             }
@@ -285,7 +300,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
     });
 
-    it("deve calcular unidades elegíveis para Aceitar (incluindo REVISAO_DISPONIBILIZADA)", async () => {
+    it("deve filtrar unidades elegíveis para Aceitar a partir do backend", async () => {
         const wrapper = createWrapper({
             processos: {
                 subprocessosElegiveis: [
@@ -294,14 +309,20 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
                         situacao: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                        localizacaoCodigo: 100
-                    }, // Eligible
+                        localizacaoCodigo: 100,
+                        habilitarAceitarBloco: true,
+                        habilitarHomologarBloco: false,
+                        habilitarDisponibilizarBloco: false
+                    },
                     {
                         unidadeCodigo: 2,
                         unidadeSigla: "B",
                         unidadeNome: "Unidade B",
                         situacao: "OUTRO",
-                        localizacaoCodigo: 100
+                        localizacaoCodigo: 100,
+                        habilitarAceitarBloco: false,
+                        habilitarHomologarBloco: false,
+                        habilitarDisponibilizarBloco: false
                     }
                 ]
             }

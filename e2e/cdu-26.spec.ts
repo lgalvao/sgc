@@ -145,7 +145,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         page,
         _autenticadoComoAdmin
     }) => {
-        test.setTimeout(30000);
         const descIsolada = `Mapeamento CDU-26 alerta ${Date.now()}`;
         const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
             descricao: descIsolada,

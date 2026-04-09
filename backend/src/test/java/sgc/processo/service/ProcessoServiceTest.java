@@ -379,7 +379,9 @@ class ProcessoServiceTest {
                     s2.getCodigo(), u1
             ));
             when(permissionEvaluator.verificarPermissao(usuario, s1, AcaoPermissao.ACEITAR_CADASTRO)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(usuario, s1, AcaoPermissao.HOMOLOGAR_CADASTRO)).thenReturn(false);
             when(permissionEvaluator.verificarPermissao(usuario, s2, AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(usuario, s2, AcaoPermissao.HOMOLOGAR_MAPA)).thenReturn(false);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
 

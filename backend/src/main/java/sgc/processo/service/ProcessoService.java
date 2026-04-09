@@ -150,15 +150,31 @@ public class ProcessoService {
             Usuario usuario,
             Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        List<Subprocesso> subprocessosElegiveis = subprocessos.stream()
-                .filter(subprocesso -> isElegivelParaAcaoEmBloco(subprocesso, usuario))
-                .toList();
+        List<Subprocesso> subprocessosElegiveis = new ArrayList<>();
+        Map<Long, ElegibilidadeAcaoBloco> elegibilidadesPorSubprocesso = new HashMap<>();
+
+        for (Subprocesso subprocesso : subprocessos) {
+            ElegibilidadeAcaoBloco elegibilidade = avaliarElegibilidadeAcaoBloco(subprocesso, usuario);
+            if (!elegibilidade.possuiAlgumaAcao()) {
+                continue;
+            }
+            subprocessosElegiveis.add(subprocesso);
+            elegibilidadesPorSubprocesso.put(subprocesso.getCodigo(), elegibilidade);
+        }
+
         Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas != null
                 ? localizacoesPrecarregadas
                 : localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessosElegiveis);
 
         return subprocessosElegiveis.stream()
-                .map(subprocesso -> toElegivelDto(subprocesso, obterLocalizacaoAtual(subprocesso, localizacoesPorSubprocesso)))
+                .map(subprocesso -> toElegivelDto(
+                        subprocesso,
+                        obterLocalizacaoAtual(subprocesso, localizacoesPorSubprocesso),
+                        Objects.requireNonNull(
+                                elegibilidadesPorSubprocesso.get(subprocesso.getCodigo()),
+                                "Elegibilidade obrigatoria para subprocesso elegivel"
+                        )
+                ))
                 .toList();
     }
 
@@ -557,33 +573,52 @@ public class ProcessoService {
                 .collect(Collectors.toSet());
     }
 
-    private boolean isElegivelParaAcaoEmBloco(Subprocesso subprocesso, Usuario usuario) {
+    private boolean podeAceitarEmBloco(Subprocesso subprocesso, Usuario usuario) {
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         boolean elegivelCadastro = situacao == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || situacao == REVISAO_CADASTRO_DISPONIBILIZADA;
         if (elegivelCadastro) {
-            return permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_CADASTRO)
-                    || permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_CADASTRO);
+            return permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_CADASTRO);
         }
 
         boolean elegivelMapa = (situacao.ordinal() >= MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= MAPEAMENTO_MAPA_VALIDADO.ordinal()) ||
                 (situacao.ordinal() >= REVISAO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= REVISAO_MAPA_VALIDADO.ordinal());
-        if (elegivelMapa) {
-            return permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_MAPA)
-                    || permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_MAPA);
+        return elegivelMapa && permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_MAPA);
+    }
+
+    private boolean podeHomologarEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        SituacaoSubprocesso situacao = subprocesso.getSituacao();
+        boolean elegivelCadastro = situacao == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || situacao == REVISAO_CADASTRO_DISPONIBILIZADA;
+        if (elegivelCadastro) {
+            return permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_CADASTRO);
         }
 
+        boolean elegivelMapa = (situacao.ordinal() >= MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= MAPEAMENTO_MAPA_VALIDADO.ordinal()) ||
+                (situacao.ordinal() >= REVISAO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= REVISAO_MAPA_VALIDADO.ordinal());
+        return elegivelMapa && permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_MAPA);
+    }
+
+    private boolean podeDisponibilizarEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        SituacaoSubprocesso situacao = subprocesso.getSituacao();
         boolean elegivelDisponibilizacao = situacao == MAPEAMENTO_CADASTRO_HOMOLOGADO
                 || situacao == MAPEAMENTO_MAPA_CRIADO
                 || situacao == REVISAO_CADASTRO_HOMOLOGADA
                 || situacao == REVISAO_MAPA_AJUSTADO;
-        if (!elegivelDisponibilizacao) {
-            return false;
-        }
-
-        return permissionEvaluator.verificarPermissao(usuario, subprocesso, DISPONIBILIZAR_MAPA);
+        return elegivelDisponibilizacao && permissionEvaluator.verificarPermissao(usuario, subprocesso, DISPONIBILIZAR_MAPA);
     }
 
-    private SubprocessoElegivelDto toElegivelDto(Subprocesso sp, Unidade localizacao) {
+    private boolean isElegivelParaAcaoEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        return avaliarElegibilidadeAcaoBloco(subprocesso, usuario).possuiAlgumaAcao();
+    }
+
+    private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(Subprocesso subprocesso, Usuario usuario) {
+        return new ElegibilidadeAcaoBloco(
+                podeAceitarEmBloco(subprocesso, usuario),
+                podeHomologarEmBloco(subprocesso, usuario),
+                podeDisponibilizarEmBloco(subprocesso, usuario)
+        );
+    }
+
+    private SubprocessoElegivelDto toElegivelDto(Subprocesso sp, Unidade localizacao, ElegibilidadeAcaoBloco elegibilidade) {
         return SubprocessoElegivelDto.builder()
                 .codigo(sp.getCodigo())
                 .unidadeCodigo(sp.getUnidade().getCodigo())
@@ -591,8 +626,21 @@ public class ProcessoService {
                 .unidadeSigla(sp.getUnidade().getSigla())
                 .localizacaoCodigo(localizacao.getCodigo())
                 .situacao(sp.getSituacao())
+                .habilitarAceitarBloco(elegibilidade.habilitarAceitarBloco())
+                .habilitarHomologarBloco(elegibilidade.habilitarHomologarBloco())
+                .habilitarDisponibilizarBloco(elegibilidade.habilitarDisponibilizarBloco())
                 .ultimaDataLimite(obterUltimaDataLimite(sp))
                 .build();
+    }
+
+    private record ElegibilidadeAcaoBloco(
+            boolean habilitarAceitarBloco,
+            boolean habilitarHomologarBloco,
+            boolean habilitarDisponibilizarBloco
+    ) {
+        private boolean possuiAlgumaAcao() {
+            return habilitarAceitarBloco || habilitarHomologarBloco || habilitarDisponibilizarBloco;
+        }
     }
 
     private UnidadeMapa obterUnidadeMapaObrigatorio(Map<Long, UnidadeMapa> mapasPorUnidade, Long codigoUnidade) {

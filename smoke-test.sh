@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
-echo "[smoke-test] backend:test" -q
+echo "[smoke-test] backend:test" --quiet
 ./gradlew :backend:test
 
 echo "[smoke-test] typecheck"
@@ -14,7 +14,7 @@ npm run typecheck
 echo "[smoke-test] lint"
 npm run lint
 
-echo "[smoke-test] frontend vitest"
+echo "[smoke-test] frontend vitest --changed"
 (
   cd frontend
   npx vitest run

@@ -72,21 +72,30 @@ const mockElegiveis = [
         unidadeSigla: "UNI1",
         unidadeNome: "Unidade 1",
         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-        localizacaoCodigo: 999
+        localizacaoCodigo: 999,
+        habilitarAceitarBloco: true,
+        habilitarHomologarBloco: true,
+        habilitarDisponibilizarBloco: false
     },
     {
         unidadeCodigo: 103,
         unidadeSigla: "UNI3",
         unidadeNome: "Unidade 3",
         situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-        localizacaoCodigo: 999
+        localizacaoCodigo: 999,
+        habilitarAceitarBloco: true,
+        habilitarHomologarBloco: true,
+        habilitarDisponibilizarBloco: false
     },
     {
         unidadeCodigo: 104,
         unidadeSigla: "UNI4",
         unidadeNome: "Unidade 4",
         situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
-        localizacaoCodigo: 999
+        localizacaoCodigo: 999,
+        habilitarAceitarBloco: false,
+        habilitarHomologarBloco: false,
+        habilitarDisponibilizarBloco: true
     }
 ];
 

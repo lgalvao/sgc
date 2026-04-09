@@ -1146,7 +1146,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 09 - OPERAÇÕES EM BLOCO (CDUs 22-26)
     test.describe('09 - Operações em Bloco', () => {
         test('Captura fluxo de aceitar cadastros em bloco', async ({page, request}) => {
-            test.setTimeout(60000); // Fluxo muito longo (múltiplos logins/logouts)
+            test.setTimeout(30000); // Fluxo muito longo (múltiplos logins/logouts)
             
             const descricao = `Processo bloco ${Date.now()}`;
             // Prepara cenário: criar processo com cadastro disponibilizado 

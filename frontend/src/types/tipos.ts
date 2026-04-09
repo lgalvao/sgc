@@ -452,6 +452,9 @@ export interface SubprocessoElegivel {
     unidadeSigla: string;
     localizacaoCodigo: number;
     situacao: SituacaoSubprocesso;
+    habilitarAceitarBloco: boolean;
+    habilitarHomologarBloco: boolean;
+    habilitarDisponibilizarBloco: boolean;
     ultimaDataLimite?: string;
 }
 
