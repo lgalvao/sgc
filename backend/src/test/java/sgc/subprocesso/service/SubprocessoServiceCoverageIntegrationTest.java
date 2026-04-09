@@ -393,10 +393,15 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             sgc.organizacao.model.Usuario user = new sgc.organizacao.model.Usuario();
             user.setTituloEleitoral("999");
+            user.setPerfilAtivo(Perfil.SERVIDOR);
             user.setUnidadeLotacao(u); // Mesma unidade
             user.setUnidadeAtivaCodigo(u.getCodigo());
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+                    user.getTituloEleitoral(),
+                    user.getUnidadeAtivaCodigo(),
+                    user.getPerfilAtivo()
+            ));
             when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(anyString())).thenReturn(ResponsavelDto.builder().build());
             when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(user);
 
