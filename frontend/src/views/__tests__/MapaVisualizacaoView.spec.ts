@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
-import * as usePerfilModule from "@/composables/usePerfil";
 import * as analiseService from "@/services/analiseService";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
@@ -116,11 +115,6 @@ describe("MapaVisualizacaoView.vue", () => {
             ...accessOverrides
         } as any);
 
-        vi.spyOn(usePerfilModule, 'usePerfil').mockReturnValue({
-            perfilSelecionado: ref('CHEFE'),
-            isAdmin: ref(false),
-        } as any);
-
         return mount(MapaVisualizacaoView, {
             global: {
                 plugins: [createTestingPinia({
@@ -183,11 +177,14 @@ describe("MapaVisualizacaoView.vue", () => {
     });
 
     it("abre modal e confirma aceite", async () => {
-        const wrapper = createWrapper();
+        const wrapper = createWrapper({
+            podeAceitarMapa: ref(true),
+            podeHomologarMapa: ref(false),
+            habilitarAceitarMapa: ref(true),
+            habilitarHomologarMapa: ref(false),
+        });
         await flushPromises();
         vi.mocked(processoService.aceitarValidacao).mockResolvedValue(undefined as never);
-        // Garante que não é homologação para testar aceitarValidacao
-        (wrapper.vm as any).podeHomologarMapa = false;
 
         await wrapper.find('[data-testid="btn-mapa-homologar-aceite"]').trigger("click");
         await wrapper.find('[data-testid="btn-confirmar-aceite"]').trigger("click");

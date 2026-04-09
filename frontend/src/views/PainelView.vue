@@ -103,7 +103,7 @@ async function buscarProcessosPainel(
 }
 
 async function carregarDados() {
-  const unidadeCodigo = obterCodigoUnidadeSelecionada();
+  const unidadeCodigo = perfilStore.unidadeAtual;
   if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
     carregandoPainel.value = false;
     return;
@@ -175,7 +175,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  const unidadeCodigo = obterCodigoUnidadeSelecionada();
+  const unidadeCodigo = perfilStore.unidadeAtual;
   if (!unidadeCodigo) {
     return;
   }
@@ -187,20 +187,6 @@ function ordenarPor(campo: keyof ProcessoResumo) {
       sort: criterio.value,
       order: asc.value ? "asc" : "desc",
   });
-}
-
-function obterCodigoUnidadeSelecionada() {
-  const unidadeSelecionada = perfilStore.unidadeSelecionada as unknown;
-
-  if (typeof unidadeSelecionada === "number") {
-    return unidadeSelecionada;
-  }
-
-  if (typeof unidadeSelecionada === "object" && unidadeSelecionada !== null && "codigo" in unidadeSelecionada) {
-    return Number(unidadeSelecionada.codigo);
-  }
-
-  return null;
 }
 
 function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {

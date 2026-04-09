@@ -18,7 +18,7 @@ type Story = StoryObj<typeof AceitarMapaModal>;
 export const Gestor: Story = {
     args: {
         mostrarModal: true,
-        perfil: 'GESTOR',
+        homologacao: false,
         loading: false,
     },
     render: (args) => ({
@@ -39,7 +39,7 @@ export const Gestor: Story = {
 export const Admin: Story = {
     args: {
         mostrarModal: true,
-        perfil: 'ADMIN',
+        homologacao: true,
         loading: false,
     },
     render: (args) => ({
@@ -60,7 +60,7 @@ export const Admin: Story = {
 export const Carregando: Story = {
     args: {
         mostrarModal: true,
-        perfil: 'GESTOR',
+        homologacao: false,
         loading: true,
     },
 };
