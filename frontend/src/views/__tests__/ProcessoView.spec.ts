@@ -600,7 +600,50 @@ describe("Processo.vue", () => {
         wrapper = createWrapper({
             processo: {
                 ...mockProcesso,
-                acoesBloco: criarAcoesBloco([mockElegiveis[0]]),
+                acoesBloco: [
+                    {
+                        codigo: "aceitar-cadastro",
+                        acao: "ACEITAR",
+                        mostrar: true,
+                        habilitar: true,
+                        requerDataLimite: false,
+                        redirecionarPainel: true,
+                        rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO,
+                        titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
+                        texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
+                        rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+                        unidades: [mockElegiveis[0]],
+                    },
+                    {
+                        codigo: "homologar-cadastro",
+                        acao: "HOMOLOGAR",
+                        mostrar: false,
+                        habilitar: false,
+                        requerDataLimite: false,
+                        redirecionarPainel: false,
+                        rotulo: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO,
+                        titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
+                        texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
+                        rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+                        unidades: [mockElegiveis[0]],
+                    },
+                    {
+                        codigo: "disponibilizar-mapa",
+                        acao: "DISPONIBILIZAR",
+                        mostrar: false,
+                        habilitar: false,
+                        requerDataLimite: true,
+                        redirecionarPainel: true,
+                        rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
+                        titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
+                        texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
+                        rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+                        unidades: [],
+                    },
+                ],
             },
             elegiveis: [mockElegiveis[0]],
         });
@@ -624,7 +667,50 @@ describe("Processo.vue", () => {
         wrapper = createWrapper({
             processo: {
                 ...mockProcesso,
-                acoesBloco: criarAcoesBloco([mockElegiveis[1], mockElegiveis[2]]),
+                acoesBloco: [
+                    {
+                        codigo: "aceitar-cadastro",
+                        acao: "ACEITAR",
+                        mostrar: false,
+                        habilitar: false,
+                        requerDataLimite: false,
+                        redirecionarPainel: true,
+                        rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO,
+                        titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
+                        texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
+                        rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+                        unidades: [],
+                    },
+                    {
+                        codigo: "homologar-mapa",
+                        acao: "HOMOLOGAR",
+                        mostrar: true,
+                        habilitar: true,
+                        requerDataLimite: false,
+                        redirecionarPainel: true,
+                        rotulo: TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO,
+                        titulo: TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
+                        texto: TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
+                        rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
+                        unidades: [mockElegiveis[1]],
+                    },
+                    {
+                        codigo: "disponibilizar-mapa",
+                        acao: "DISPONIBILIZAR",
+                        mostrar: true,
+                        habilitar: true,
+                        requerDataLimite: true,
+                        redirecionarPainel: true,
+                        rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
+                        titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
+                        texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
+                        rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+                        unidades: [mockElegiveis[2]],
+                    },
+                ],
             },
             elegiveis: [mockElegiveis[1], mockElegiveis[2]],
         });
@@ -634,7 +720,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        expect(wrapper.find('[data-testid="btn-processo-homologar-bloco"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-processo-homologar-bloco"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="btn-processo-homologar-mapas-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-disponibilizar-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').exists()).toBe(false);

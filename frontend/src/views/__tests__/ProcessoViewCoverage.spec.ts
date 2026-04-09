@@ -64,6 +64,41 @@ const commonStubs = {
     BSpinner: {template: '<span>Loading</span>'}
 };
 
+function criarAcoesBloco(subprocessosElegiveis: any[]) {
+    const filtrar = (campo: string) => subprocessosElegiveis.filter((item) => item[campo]);
+    const criarAcao = (
+        codigo: string,
+        acao: "ACEITAR" | "HOMOLOGAR" | "DISPONIBILIZAR",
+        campo: string,
+        redirecionarPainel: boolean,
+        requerDataLimite = false,
+    ) => {
+        const unidades = filtrar(campo);
+        return {
+            codigo,
+            acao,
+            mostrar: unidades.length > 0,
+            habilitar: unidades.length > 0,
+            requerDataLimite,
+            redirecionarPainel,
+            rotulo: codigo,
+            titulo: codigo,
+            texto: codigo,
+            rotuloBotao: codigo,
+            mensagemSucesso: codigo,
+            unidades,
+        };
+    };
+
+    return [
+        criarAcao("aceitar-cadastro", "ACEITAR", "habilitarAceitarCadastroBloco", true),
+        criarAcao("aceitar-mapa", "ACEITAR", "habilitarAceitarMapaBloco", true),
+        criarAcao("homologar-cadastro", "HOMOLOGAR", "habilitarHomologarCadastroBloco", false),
+        criarAcao("homologar-mapa", "HOMOLOGAR", "habilitarHomologarMapaBloco", true),
+        criarAcao("disponibilizar-mapa", "DISPONIBILIZAR", "habilitarDisponibilizarMapaBloco", true, true),
+    ];
+}
+
 describe("ProcessoViewCoverage.spec.ts", () => {
     const createWrapper = (initialState: any = {}, shallow = false) => {
         const pinia = createTestingPinia({
@@ -99,6 +134,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
                 ...processo,
                 elegiveis: subprocessosElegiveis,
+                acoesBloco: criarAcoesBloco(subprocessosElegiveis),
             } as any);
         }
         vi.mocked(processoService.finalizarProcesso).mockResolvedValue(undefined);
@@ -213,9 +249,11 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
                         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                        habilitarAceitarBloco: true,
-                        habilitarHomologarBloco: true,
-                        habilitarDisponibilizarBloco: false
+                        habilitarAceitarCadastroBloco: true,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: true,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
                     }
                 ]
             }
@@ -224,7 +262,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
         const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
 
-        (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find((acao: any) => acao.codigo === 'aceitar-cadastro');
         vi.mocked(processoService.executarAcaoEmBloco).mockRejectedValue(new Error("Erro bloco"));
 
         await modal.vm.$emit("confirmar", {ids: [1]});
@@ -245,9 +283,11 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeNome: "Unidade A",
                         situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
                         localizacaoCodigo: 100,
-                        habilitarAceitarBloco: false,
-                        habilitarHomologarBloco: false,
-                        habilitarDisponibilizarBloco: true
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: true
                     },
                     {
                         unidadeCodigo: 2,
@@ -255,15 +295,17 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeNome: "Unidade B",
                         situacao: "OUTRO",
                         localizacaoCodigo: 100,
-                        habilitarAceitarBloco: false,
-                        habilitarHomologarBloco: false,
-                        habilitarDisponibilizarBloco: false
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
                     }
                 ]
             }
         });
         await flushPromises();
-        (wrapper.vm as any).acaoBlocoAtual = 'disponibilizar';
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find((acao: any) => acao.codigo === 'disponibilizar-mapa');
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
         expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
     });
@@ -278,9 +320,11 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeNome: "Unidade A",
                         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                         localizacaoCodigo: 100,
-                        habilitarAceitarBloco: false,
-                        habilitarHomologarBloco: true,
-                        habilitarDisponibilizarBloco: false
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: true,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
                     },
                     {
                         unidadeCodigo: 2,
@@ -288,15 +332,17 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeNome: "Unidade B",
                         situacao: "OUTRO",
                         localizacaoCodigo: 100,
-                        habilitarAceitarBloco: false,
-                        habilitarHomologarBloco: false,
-                        habilitarDisponibilizarBloco: false
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
                     }
                 ]
             }
         });
         await flushPromises();
-        (wrapper.vm as any).acaoBlocoAtual = 'homologar';
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find((acao: any) => acao.codigo === 'homologar-cadastro');
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
     });
 
@@ -310,9 +356,11 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeNome: "Unidade A",
                         situacao: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                         localizacaoCodigo: 100,
-                        habilitarAceitarBloco: true,
-                        habilitarHomologarBloco: false,
-                        habilitarDisponibilizarBloco: false
+                        habilitarAceitarCadastroBloco: true,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
                     },
                     {
                         unidadeCodigo: 2,
@@ -320,15 +368,17 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeNome: "Unidade B",
                         situacao: "OUTRO",
                         localizacaoCodigo: 100,
-                        habilitarAceitarBloco: false,
-                        habilitarHomologarBloco: false,
-                        habilitarDisponibilizarBloco: false
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
                     }
                 ]
             }
         });
         await flushPromises();
-        (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find((acao: any) => acao.codigo === 'aceitar-cadastro');
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
         expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
     });

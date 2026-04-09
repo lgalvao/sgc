@@ -348,7 +348,7 @@ public class ProcessoService {
         if (incluirElegiveis) {
             dto.getElegiveis().addAll(subprocessosElegiveis);
         }
-        dto.getAcoesBloco().addAll(montarAcoesBloco(processo, subprocessosElegiveis));
+        dto.getAcoesBloco().addAll(montarAcoesBloco(processo, subprocessosElegiveis, perfil));
 
         return dto;
     }
@@ -657,13 +657,15 @@ public class ProcessoService {
 
     private List<ProcessoDetalheDto.AcaoBlocoDto> montarAcoesBloco(
             Processo processo,
-            List<SubprocessoElegivelDto> subprocessosElegiveis
+            List<SubprocessoElegivelDto> subprocessosElegiveis,
+            Perfil perfil
     ) {
         return List.of(
                 criarAcaoBloco(
                         "aceitar-cadastro",
                         ACEITAR,
                         filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarCadastroBloco),
+                        AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
                         false,
                         true,
                         "Aceitar cadastro em bloco",
@@ -677,6 +679,7 @@ public class ProcessoService {
                         "aceitar-mapa",
                         ACEITAR,
                         filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarMapaBloco),
+                        perfil == Perfil.GESTOR,
                         false,
                         true,
                         "Aceitar mapas em bloco",
@@ -690,6 +693,7 @@ public class ProcessoService {
                         "homologar-cadastro",
                         HOMOLOGAR,
                         filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarCadastroBloco),
+                        AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
                         false,
                         false,
                         "Homologar em bloco",
@@ -703,6 +707,7 @@ public class ProcessoService {
                         "homologar-mapa",
                         HOMOLOGAR,
                         filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarMapaBloco),
+                        AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil),
                         false,
                         true,
                         "Homologar mapas em bloco",
@@ -716,13 +721,14 @@ public class ProcessoService {
                         "disponibilizar-mapa",
                         DISPONIBILIZAR,
                         filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarDisponibilizarMapaBloco),
+                        AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil),
                         true,
                         true,
                         "Disponibilizar em bloco",
                         "Disponibilização de mapa em bloco",
                         "Selecione as unidades cujos mapas deverão ser disponibilizados:",
                         "Disponibilizar",
-                        "Mapas disponibilizados em bloco",
+                        "Mapas de competências disponibilizados em bloco",
                         processo.getSituacao() != FINALIZADO
                 )
         );
@@ -732,6 +738,7 @@ public class ProcessoService {
             String codigo,
             AcaoProcesso acao,
             List<SubprocessoElegivelDto> unidades,
+            boolean perfilPermite,
             boolean requerDataLimite,
             boolean redirecionarPainel,
             String rotulo,
@@ -741,12 +748,13 @@ public class ProcessoService {
             String mensagemSucesso,
             boolean processoAtivo
     ) {
-        boolean mostrar = processoAtivo && !unidades.isEmpty();
+        boolean mostrar = perfilPermite;
+        boolean habilitar = perfilPermite && processoAtivo && !unidades.isEmpty();
         return ProcessoDetalheDto.AcaoBlocoDto.builder()
                 .codigo(codigo)
                 .acao(acao)
                 .mostrar(mostrar)
-                .habilitar(mostrar)
+                .habilitar(habilitar)
                 .requerDataLimite(requerDataLimite)
                 .redirecionarPainel(redirecionarPainel)
                 .rotulo(rotulo)
@@ -757,6 +765,7 @@ public class ProcessoService {
                 .unidades(new ArrayList<>(unidades))
                 .build();
     }
+
 
     private List<SubprocessoElegivelDto> filtrarElegiveis(
             List<SubprocessoElegivelDto> subprocessosElegiveis,
