@@ -118,7 +118,8 @@ class ProcessoServiceCoverageTest {
         when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
         when(permissionEvaluator.verificarPermissao(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class))).thenReturn(true);
 
-        ProcessoDetalheDto resultado = target.obterDetalhesCompleto(cod, usuario, true);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        ProcessoDetalheDto resultado = target.obterDetalhesCompleto(cod, true);
 
         assertThat(resultado.getElegiveis()).hasSize(1);
         verify(consultaService, times(1)).listarEntidadesPorProcesso(cod);
@@ -260,7 +261,8 @@ class ProcessoServiceCoverageTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
-            assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, u, true))
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, true))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("sem data limite da etapa 1");
         }
@@ -292,7 +294,8 @@ class ProcessoServiceCoverageTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
-            assertThatCode(() -> target.obterDetalhesCompleto(cod, u, true))
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            assertThatCode(() -> target.obterDetalhesCompleto(cod, true))
                     .doesNotThrowAnyException();
         }
         
@@ -324,7 +327,8 @@ class ProcessoServiceCoverageTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
-            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, u, true);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);
             assertThat(res.getElegiveis()).isNotEmpty();
             assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(d2);
         }
@@ -351,7 +355,8 @@ class ProcessoServiceCoverageTest {
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class))).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
 
-            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, u, false);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, false);
             assertThat(res.getUnidades()).hasSize(1);
             assertThat(res.getUnidades().getFirst().getMapaCodigo()).isNull();
         }

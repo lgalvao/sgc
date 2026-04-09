@@ -40,6 +40,10 @@ Ordem de precedência:
   * leitura de entidade;
   * montagem de detalhe/contexto;
   * cálculo de permissões para UI.
+* Ainda existe repasse espúrio de `Usuario` em leituras/contextos em partes do backend, especialmente em `processo`:
+  * controllers repassam o usuário autenticado só para leitura contextual;
+  * services públicos misturam leitura da sessão atual com assinatura parametrizada por usuário;
+  * isso amplia contrato sem ganho real e fragiliza autorização por divergência de chamada.
 * `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java` segue grande, mas não há evidência de que deva liderar a fila antes dos dois pontos acima.
 * `backend/src/main/java/sgc/e2e/E2eController.java` continua extenso e com muitos endpoints/fixtures, mas ainda precisa de medição melhor antes de um corte estrutural.
 
@@ -91,6 +95,7 @@ Próximo corte:
 
 * isolar melhor a montagem de permissões de UI sem criar camada nova;
 * reduzir a mistura entre fetch de dados, contexto rico e payload de resposta;
+* remover parâmetros `Usuario` de leituras/contextos quando o service sempre opera sobre a sessão autenticada atual;
 * preferir extrair helpers privados curtos ou remover pass-throughs restantes antes de introduzir novos tipos internos;
 * manter DTOs externos e contratos HTTP intactos.
 

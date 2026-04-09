@@ -215,21 +215,21 @@ class ProcessoControllerTest {
                             .dataCriacao(LocalDateTime.now())
                             .build();
 
-            when(processoService.obterDetalhesCompleto(eq(1L), any(Usuario.class), anyBoolean())).thenReturn(dto);
+            when(processoService.obterDetalhesCompleto(eq(1L), anyBoolean())).thenReturn(dto);
 
             mockMvc.perform(get("/api/processos/1/detalhes"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo detalhado"));
 
-            verify(processoService).obterDetalhesCompleto(eq(1L), any(Usuario.class), anyBoolean());
+            verify(processoService).obterDetalhesCompleto(eq(1L), anyBoolean());
         }
 
         @Test
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 403 Forbidden ao obter detalhes se acesso negado")
         void deveRetornarForbiddenAoObterDetalhesQuandoAcessoNegado() throws Exception {
-            doThrow(new ErroAcessoNegado("Acesso negado")).when(processoService).obterDetalhesCompleto(eq(1L), any(Usuario.class), anyBoolean());
+            doThrow(new ErroAcessoNegado("Acesso negado")).when(processoService).obterDetalhesCompleto(eq(1L), anyBoolean());
             mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
         }
 
@@ -559,7 +559,7 @@ class ProcessoControllerTest {
         @DisplayName("obterContextoCompleto deve retornar detalhes do processo")
         void deveObterContextoCompleto() throws Exception {
             ProcessoDetalheDto dto = ProcessoDetalheDto.builder().codigo(1L).build();
-            when(processoService.obterDetalhesCompleto(eq(1L), any(), eq(true))).thenReturn(dto);
+            when(processoService.obterDetalhesCompleto(eq(1L), eq(true))).thenReturn(dto);
 
             mockMvc.perform(get("/api/processos/1/contexto-completo"))
                     .andExpect(status().isOk())

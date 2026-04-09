@@ -47,8 +47,8 @@ public class SubprocessoController {
 
     @GetMapping("/{codSubprocesso}")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
-        return consultaService.obterDetalhes(codSubprocesso, usuario);
+    public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codSubprocesso) {
+        return consultaService.obterDetalhes(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/status")
@@ -302,8 +302,8 @@ public class SubprocessoController {
 
     @GetMapping("/{codSubprocesso}/impactos-mapa")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VERIFICAR_IMPACTOS')")
-    public ImpactoMapaResponse verificarImpactos(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
-        return consultaService.verificarImpactos(codSubprocesso, usuario);
+    public ImpactoMapaResponse verificarImpactos(@PathVariable Long codSubprocesso) {
+        return consultaService.verificarImpactos(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/mapa")

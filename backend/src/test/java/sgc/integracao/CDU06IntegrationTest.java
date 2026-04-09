@@ -59,6 +59,13 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         SecurityContextHolder.clearContext();
+        when(usuarioService.usuarioAutenticado()).thenAnswer(invocacao -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Usuario usuario) {
+                return usuario;
+            }
+            return null;
+        });
     }
 
     private Authentication setupSecurityContext(Unidade unidade, Perfil perfil) {

@@ -8,6 +8,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.*;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.*;
@@ -26,15 +27,17 @@ class ImpactoMapaServiceCoverageTest {
 
     @Mock private MapaRepo mapaRepo;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
+    @Mock private UsuarioFacade usuarioFacade;
 
     @Test
     @DisplayName("verificarImpactos deve lançar ErroAcessoNegado quando sem permissão")
     void verificarImpactosSemPermissao() {
         Usuario user = new Usuario();
         Subprocesso sp = new Subprocesso();
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(false);
 
-        assertThatThrownBy(() -> target.verificarImpactos(sp, user))
+        assertThatThrownBy(() -> target.verificarImpactos(sp))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
 
@@ -51,10 +54,11 @@ class ImpactoMapaServiceCoverageTest {
         sp.setUnidade(u);
         sp.setSituacao(NAO_INICIADO);
         
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.empty());
 
-        ImpactoMapaResponse res = target.verificarImpactos(sp, user);
+        ImpactoMapaResponse res = target.verificarImpactos(sp);
         assertThat(res.temImpactos()).isFalse();
     }
 
@@ -72,16 +76,17 @@ class ImpactoMapaServiceCoverageTest {
         sp.setUnidade(u);
         sp.setSituacao(NAO_INICIADO);
         
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new Mapa()));
         when(mapaRepo.buscarPorSubprocesso(100L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> target.verificarImpactos(sp, user))
+        assertThatThrownBy(() -> target.verificarImpactos(sp))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Nested
-    @DisplayName("Testes de Situação (checkSituacao)")
+    @DisplayName("Testes de Situação")
     class CheckSituacaoTest {
         @Test
         @DisplayName("CHEFE - situações válidas")
@@ -118,14 +123,11 @@ class ImpactoMapaServiceCoverageTest {
             user.setPerfilAtivo(perfil);
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(situacao);
-            
-            if (expected) {
-                assertThatCode(() -> ReflectionTestUtils.invokeMethod(target, "checkSituacao", user, sp))
-                        .doesNotThrowAnyException();
-            } else {
-                assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(target, "checkSituacao", user, sp))
-                        .isInstanceOf(ErroValidacao.class);
-            }
+
+            when(permissionEvaluator.verificarPermissao(user, sp, sgc.seguranca.AcaoPermissao.VERIFICAR_IMPACTOS)).thenReturn(true);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            assertThat(target.podeVisualizarImpactos(sp)).isEqualTo(expected);
         }
     }
 

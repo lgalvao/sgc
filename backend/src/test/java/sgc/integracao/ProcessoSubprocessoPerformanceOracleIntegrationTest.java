@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.TestPropertySource;
@@ -91,6 +94,13 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
         AmostrasBenchmark amostras = carregarAmostras();
         MetricasExecucaoTeste medidor = new MetricasExecucaoTeste(entityManager, entityManagerFactory);
         Usuario usuarioAdmin = criarUsuarioAdmin(amostras.usuarioBase());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        usuarioAdmin,
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                )
+        );
 
         List<MetricasExecucaoTeste.ResultadoMedicao> resultados = new ArrayList<>();
         resultados.add(medidor.medir(
@@ -112,7 +122,7 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
         ));
         resultados.add(medidor.medir(
                 "subprocesso.obterDetalhes",
-                () -> subprocessoConsultaService.obterDetalhes(amostras.codigoSubprocessoDetalhe(), usuarioAdmin),
+                () -> subprocessoConsultaService.obterDetalhes(amostras.codigoSubprocessoDetalhe()),
                 "SUBPROCESSO", "MOVIMENTACAO", "VW_UNIDADE"
         ));
         resultados.add(medidor.medir(

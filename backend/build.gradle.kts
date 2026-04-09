@@ -5,7 +5,7 @@ import net.ltgt.gradle.errorprone.*
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val argumentosJvmSemAvisoUnsafe = if (JavaVersion.current().majorVersion.toInt() >= 24) {
+val argumentosJvmSemAvisoUnsafe = if (JavaVersion.current().majorVersion.toInt() >= 25) {
     listOf("--sun-misc-unsafe-memory-access=allow")
 } else {
     emptyList()
@@ -18,8 +18,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.openrewrite.rewrite")
     id("com.github.spotbugs") version "6.4.8"
-    id("net.ltgt.errorprone") version "4.3.0"
-    id("info.solidsoft.pitest") version "1.19.0-rc.3"
+    id("net.ltgt.errorprone") version "5.1.0"
+    id("info.solidsoft.pitest") version "1.19.0"
     id("com.github.ben-manes.versions") version "0.53.0"
 }
 
@@ -32,17 +32,6 @@ tasks.withType<JavaCompile>().configureEach {
     options.errorprone {
         disableAllChecks = true
         disableWarningsInGeneratedCode = true
-        check("NullAway", CheckSeverity.WARN)
-        option(
-            "NullAway:AnnotatedPackages",
-            listOf(
-                "sgc.comum.erros",
-                "sgc.processo.dto",
-                "sgc.subprocesso.dto",
-                "sgc.mapa.dto"
-            ).joinToString(",")
-        )
-        option("NullAway:JSpecifyMode", "true")
         excludedPaths = listOf(
             """.*[\\/](build[\\/]generated)[\\/].*""",
             """.*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*"""
@@ -51,7 +40,6 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.named<JavaCompile>("compileTestJava") {
-    options.errorprone.check("NullAway", CheckSeverity.WARN)
     options.errorprone.excludedPaths = listOf(
         """.*[\\/](build[\\/]generated)[\\/].*""",
         """.*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*""",
@@ -63,13 +51,8 @@ extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.44"
 extra["jjwt.version"] = "0.13.0"
 
-dependencyManagement {
-    imports {
-        mavenBom("com.fasterxml.jackson:jackson-bom:2.21.1")
-    }
-}
-
 dependencies {
+    implementation(platform("tools.jackson:jackson-bom:3.1.1"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -80,10 +63,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("jakarta.servlet:jakarta.servlet-api")
-    implementation("tools.jackson.core:jackson-core:3.1.0")
+    implementation("tools.jackson.core:jackson-core:3.1.1")
+    testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.junit.platform:junit-platform-suite-api")
-    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine")
+    testImplementation("org.junit.platform:junit-platform-suite-api:6.0.3")
+    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.0.3")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
@@ -97,9 +81,9 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:9.1.0.Final")
 
-    implementation("com.github.librepdf:openpdf:3.0.0")
+    implementation("com.github.librepdf:openpdf:3.0.3")
 
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
     implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
@@ -107,42 +91,23 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
     testImplementation("net.jqwik:jqwik:1.9.3")
-    testImplementation("nl.jqno.equalsverifier:equalsverifier:4.3.1")
+    testImplementation("nl.jqno.equalsverifier:equalsverifier:4.4.2")
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
-    testImplementation("com.icegreen:greenmail-junit5:2.1.3")
+    testImplementation("com.icegreen:greenmail-junit5:2.1.8")
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
-    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
+    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.39")
     implementation("org.mozilla:rhino:1.9.1")
     implementation("com.github.ben-manes.caffeine:caffeine")
-    testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
+    testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.1")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    errorprone("com.google.errorprone:error_prone_core:2.48.0")
-    errorprone("com.uber.nullaway:nullaway:0.13.1")
-
+    errorprone("com.google.errorprone:error_prone_core:2.49.0")
     rewrite("org.openrewrite:rewrite-java:8.75.5")
 }
-
-val receitaRewriteAtiva = providers.gradleProperty("rewriteRecipe")
-    .orElse("sgc.java.renomearMetodosRepoCategoriaA")
-val arquivoConfigRewrite = providers.gradleProperty("rewriteConfig")
-    .orElse("etc/openrewrite/renomear-metodos-repo-categoria-a.yml")
-
-rewrite {
-    activeRecipe(receitaRewriteAtiva.get())
-    configFile = rootProject.file(arquivoConfigRewrite.get())
-}
-
-listOf("rewriteDiscover", "rewriteDryRun", "rewriteRun").forEach { nomeTarefa ->
-    tasks.named(nomeTarefa) {
-        notCompatibleWithConfigurationCache("OpenRewrite ainda nao e compativel com configuration cache neste build")
-    }
-}
-
 
 tasks.withType<BootJar> {
     enabled = true
@@ -294,10 +259,7 @@ tasks.jacocoTestReport {
                     "sgc/e2e/**",
                     "sgc/**/config/**",
                     "sgc/**/*Config*.class",
-                    "sgc/**/*Properties.class",
-                    "sgc/**/*Exception.class",
                     "sgc/**/Erro*.class",
-                    "sgc/**/Status*.class",
                     "sgc/**/Tipo*.class",
                     "sgc/**/Situacao*.class",
                     "sgc/**/*Dto.class",
@@ -314,7 +276,6 @@ tasks.jacocoTestReport {
                     "sgc/**/model/Administrador.class",
                     "sgc/**/model/Vinculacao*.class",
                     "sgc/**/model/Atribuicao*.class",
-                    "sgc/**/model/Parametro.class",
                     "sgc/**/model/Movimentacao.class",
                     "sgc/**/model/Analise.class",
                     "sgc/**/model/Alerta*.class",

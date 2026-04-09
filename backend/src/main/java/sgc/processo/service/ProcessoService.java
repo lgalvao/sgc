@@ -292,7 +292,8 @@ public class ProcessoService {
 
 
     @Transactional(readOnly = true)
-    public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, Usuario usuario, boolean incluirElegiveis) {
+    public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, boolean incluirElegiveis) {
+        Usuario usuario = usuarioService.usuarioAutenticado();
         Processo processo = buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
         Map<Long, Unidade> localizacoesPorSubprocesso = localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessos);

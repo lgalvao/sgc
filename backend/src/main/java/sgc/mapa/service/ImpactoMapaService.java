@@ -8,6 +8,7 @@ import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
@@ -26,13 +27,12 @@ public class ImpactoMapaService {
     private final CompetenciaRepo competenciaRepo;
     private final MapaManutencaoService mapaManutencaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
-    @Transactional(readOnly = true)
-    public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
-        if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
-            throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
-        }
+    private final UsuarioFacade usuarioFacade;
 
-        checkSituacao(usuario, subprocesso);
+    @Transactional(readOnly = true)
+    public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        validarPermissaoVisualizacaoImpacto(subprocesso, usuario);
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.buscarMapaVigentePorUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {
@@ -72,24 +72,38 @@ public class ImpactoMapaService {
                 .build();
     }
 
-    private void checkSituacao(Usuario usuario, Subprocesso sp) {
-        SituacaoSubprocesso situacao = sp.getSituacao();
-        Perfil perfil = usuario.getPerfilAtivo();
+    @Transactional(readOnly = true)
+    public boolean podeVisualizarImpactos(Subprocesso subprocesso) {
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        return permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)
+                && situacaoPermiteVisualizarImpactos(usuario.getPerfilAtivo(), subprocesso.getSituacao());
+    }
 
-        boolean situacaoValida = switch (perfil) {
-          case Perfil.CHEFE -> (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO);
-          case Perfil.GESTOR -> (situacao == REVISAO_CADASTRO_DISPONIBILIZADA);
-          case Perfil.ADMIN -> Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
-              REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
-              REVISAO_MAPA_AJUSTADO).contains(situacao);
-          default -> false;
-        };
+    private void validarPermissaoVisualizacaoImpacto(Subprocesso subprocesso, Usuario usuario) {
+        if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
+            throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
+        }
 
-        if (!situacaoValida) {
+        if (!situacaoPermiteVisualizarImpactos(usuario.getPerfilAtivo(), subprocesso.getSituacao())) {
             throw new ErroValidacao(
                     Mensagens.SITUACAO_IMPEDE_IMPACTO
-                            .formatted(situacao, perfil));
+                            .formatted(subprocesso.getSituacao(), usuario.getPerfilAtivo()));
         }
+    }
+
+    private boolean situacaoPermiteVisualizarImpactos(Perfil perfil, SituacaoSubprocesso situacao) {
+        return switch (perfil) {
+            case Perfil.CHEFE -> situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO;
+            case Perfil.GESTOR -> situacao == REVISAO_CADASTRO_DISPONIBILIZADA;
+            case Perfil.ADMIN -> Set.of(
+                    NAO_INICIADO,
+                    REVISAO_CADASTRO_EM_ANDAMENTO,
+                    REVISAO_CADASTRO_DISPONIBILIZADA,
+                    REVISAO_CADASTRO_HOMOLOGADA,
+                    REVISAO_MAPA_AJUSTADO
+            ).contains(situacao);
+            default -> false;
+        };
     }
 
     private List<Atividade> obterAtividadesDoMapa(Mapa mapa) {

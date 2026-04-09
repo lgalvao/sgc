@@ -326,7 +326,8 @@ class ProcessoServiceTest {
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
             when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
 
-            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
 
             assertThat(result).isNotNull();
             assertThat(result.getCodigo()).isEqualTo(codProcesso);
@@ -415,7 +416,8 @@ class ProcessoServiceTest {
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uPai));
 
-            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
 
             assertThat(result.getUnidades()).isNotEmpty();
             assertThat(result.getUnidades().getFirst().getFilhos()).isNotEmpty();
@@ -463,7 +465,8 @@ class ProcessoServiceTest {
             ));
             when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
 
-            assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, usuario, false))
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("Snapshot inconsistente de unidade participante")
                     .hasMessageContaining("processo 1")
@@ -967,7 +970,8 @@ class ProcessoServiceTest {
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
-            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
 
             assertThat(result.getUnidades().getFirst().getMapaCodigo()).isNull();
         }
@@ -999,7 +1003,8 @@ class ProcessoServiceTest {
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
-            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
 
             assertThat(result.getUnidades().getFirst().getMapaCodigo()).isEqualTo(500L);
         }

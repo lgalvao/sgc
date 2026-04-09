@@ -216,12 +216,12 @@ const camposAlertas = [
   {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},
 ];
 
-const rowClassAlerta = (item: Alerta | null, type: string) => {
+const rowClassAlerta = (item: Alerta | null, type = "row") => {
   if (!item || type !== "row") return "";
   return item.dataHoraLeitura ? "" : "fw-bold";
 };
 
-const rowAttrAlerta = (item: Alerta | null, type: string) => {
+const rowAttrAlerta = (item: Alerta | null, type = "row") => {
   if (item && type === "row") {
     return {'data-testid': `row-alerta-${item.codigo}`};
   }

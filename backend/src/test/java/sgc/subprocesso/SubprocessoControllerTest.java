@@ -344,13 +344,13 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter impactos de mapa")
         @WithMockUser
         void deveObterImpactosMapa() throws Exception {
-            when(consultaService.verificarImpactos(eq(1L), any())).thenReturn(ImpactoMapaResponse.builder().temImpactos(false).build());
+            when(consultaService.verificarImpactos(1L)).thenReturn(ImpactoMapaResponse.builder().temImpactos(false).build());
 
             mockMvc.perform(get("/api/subprocessos/1/impactos-mapa"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.temImpactos").value(false));
 
-            verify(consultaService).verificarImpactos(eq(1L), any());
+            verify(consultaService).verificarImpactos(1L);
         }
     }
 

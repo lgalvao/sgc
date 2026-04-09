@@ -87,7 +87,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("obterDetalhes: Deve obter os detalhes de um subprocesso")
     void obterDetalhes_Sucesso() {
-        SubprocessoDetalheResponse detalhes = consultaService.obterDetalhes(subprocesso.getCodigo(), admin);
+        SubprocessoDetalheResponse detalhes = consultaService.obterDetalhes(subprocesso.getCodigo());
 
         assertThat(detalhes).isNotNull();
         assertThat(detalhes.subprocesso().codigo()).isEqualTo(subprocesso.getCodigo());
@@ -144,7 +144,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processoRepo.save(processo);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarCadastro()).isFalse();
         assertThat(permissoes.podeEditarMapa()).isFalse();
@@ -158,7 +158,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeHomologarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
@@ -173,7 +173,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeReabrirCadastro()).isTrue();
     }
@@ -184,7 +184,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.CHEFE);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarCadastro()).isTrue();
         assertThat(permissoes.podeDisponibilizarCadastro()).isTrue();
@@ -199,7 +199,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.CHEFE);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarCadastro()).isTrue();
         assertThat(permissoes.podeDisponibilizarCadastro()).isTrue();
@@ -212,7 +212,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.GESTOR);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeAceitarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
@@ -227,7 +227,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.GESTOR);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarCadastro()).isFalse();
         assertThat(permissoes.podeAceitarCadastro()).isTrue();
@@ -243,7 +243,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.CHEFE);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarCadastro()).isFalse();
         assertThat(permissoes.podeDisponibilizarCadastro()).isFalse();
@@ -259,7 +259,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarCadastro()).isFalse();
         assertThat(permissoes.podeHomologarCadastro()).isFalse();
@@ -275,7 +275,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeVisualizarImpacto()).isTrue();
     }
@@ -286,7 +286,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarMapa()).isFalse();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
@@ -299,7 +299,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
 
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso, admin);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeEditarMapa()).isFalse();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();

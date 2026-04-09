@@ -8,6 +8,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
@@ -34,7 +35,7 @@ class ImpactoMapaServiceTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @Mock
-    private ComumRepo repo;
+    private UsuarioFacade usuarioFacade;
 
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
@@ -45,10 +46,11 @@ class ImpactoMapaServiceTest {
         Subprocesso subprocesso = new Subprocesso();
         Usuario usuario = new Usuario();
 
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         doReturn(false).when(permissionEvaluator).verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS);
 
         assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
-            impactoMapaService.verificarImpactos(subprocesso, usuario));
+            impactoMapaService.verificarImpactos(subprocesso));
     }
 
     private Usuario usuarioAdmin() {
@@ -59,6 +61,10 @@ class ImpactoMapaServiceTest {
 
     private void mockAcessoLivre() {
         doReturn(true).when(permissionEvaluator).verificarPermissao(any(), any(), any());
+    }
+
+    private void mockUsuarioAutenticado(Usuario usuario) {
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
     }
 
     private Subprocesso criarSubprocessoParaImpacto(
@@ -81,6 +87,7 @@ class ImpactoMapaServiceTest {
     void semMapaVigente() {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         Unidade unidade = new Unidade();
@@ -89,7 +96,7 @@ class ImpactoMapaServiceTest {
 
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.empty());
 
-        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
         assertNotNull(result);
         assertTrue(result.inseridas().isEmpty());
@@ -102,6 +109,7 @@ class ImpactoMapaServiceTest {
     void deveDetectarInserida() {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
@@ -129,7 +137,7 @@ class ImpactoMapaServiceTest {
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
         assertEquals(1, result.inseridas().size());
         assertEquals("Nova", result.inseridas().getFirst().descricao());
@@ -141,6 +149,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.SERVIDOR);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -148,7 +157,7 @@ class ImpactoMapaServiceTest {
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
 
-        assertThrows(ErroValidacao.class, () -> impactoMapaService.verificarImpactos(subprocesso, usuario));
+        assertThrows(ErroValidacao.class, () -> impactoMapaService.verificarImpactos(subprocesso));
     }
 
     @Test
@@ -157,11 +166,12 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.CHEFE);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoParaImpacto(SituacaoSubprocesso.NAO_INICIADO, 7L);
 
         when(mapaRepo.buscarMapaVigentePorUnidade(7L)).thenReturn(Optional.empty());
 
-        ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso);
 
         assertNotNull(resultado);
         assertFalse(resultado.temImpactos());
@@ -173,6 +183,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.GESTOR);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoParaImpacto(
                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                 8L
@@ -180,7 +191,7 @@ class ImpactoMapaServiceTest {
 
         when(mapaRepo.buscarMapaVigentePorUnidade(8L)).thenReturn(Optional.empty());
 
-        ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso);
 
         assertNotNull(resultado);
         assertFalse(resultado.temImpactos());
@@ -192,6 +203,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.CHEFE);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoParaImpacto(
                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                 9L
@@ -199,7 +211,7 @@ class ImpactoMapaServiceTest {
 
         ErroValidacao erro = assertThrows(
                 ErroValidacao.class,
-                () -> impactoMapaService.verificarImpactos(subprocesso, usuario)
+                () -> impactoMapaService.verificarImpactos(subprocesso)
         );
 
         assertTrue(erro.getMessage().contains("REVISAO_CADASTRO_DISPONIBILIZADA"));
@@ -211,6 +223,7 @@ class ImpactoMapaServiceTest {
     void deveDetectarRemovida() {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
+        mockUsuarioAutenticado(usuario);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
@@ -243,7 +256,7 @@ class ImpactoMapaServiceTest {
         comp.setAtividades(Set.of(antiga));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.singletonList(comp));
 
-        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
         assertEquals(1, result.removidas().size());
         assertEquals("Antiga", result.removidas().getFirst().descricao());
@@ -257,6 +270,7 @@ class ImpactoMapaServiceTest {
     void deveDetectarAlterada() {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
+        mockUsuarioAutenticado(usuario);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
@@ -294,7 +308,7 @@ class ImpactoMapaServiceTest {
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
         assertEquals(1, result.alteradas().size());
         assertEquals("Ativ A", result.alteradas().getFirst().descricao());
@@ -309,6 +323,7 @@ class ImpactoMapaServiceTest {
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         Usuario usuario = usuarioAdmin();
+        mockUsuarioAutenticado(usuario);
 
         Atividade ativVigente = Atividade.builder()
                 .codigo(1L)
@@ -330,7 +345,7 @@ class ImpactoMapaServiceTest {
                 .thenReturn(Collections.singletonList(ativAtual));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
         assertEquals(0, result.alteradas().size());
     }
@@ -344,6 +359,7 @@ class ImpactoMapaServiceTest {
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         Usuario usuario = usuarioAdmin();
+        mockUsuarioAutenticado(usuario);
 
         Conhecimento c1 = Conhecimento.builder().codigo(1L).descricao("C1").build();
         Conhecimento c2 = Conhecimento.builder().codigo(2L).descricao("C2").build();
@@ -369,7 +385,7 @@ class ImpactoMapaServiceTest {
                 .thenReturn(Collections.singletonList(ativAtual));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
         assertEquals(1, result.alteradas().size());
         assertEquals("Ativ teste", result.alteradas().getFirst().descricao());
@@ -403,11 +419,12 @@ class ImpactoMapaServiceTest {
             u.setCodigo(100L);
             sp.setUnidade(u);
             Usuario usuario = usuarioAdmin();
+            mockUsuarioAutenticado(usuario);
 
             when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(new Mapa()));
             when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> impactoMapaService.verificarImpactos(sp, usuario));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> impactoMapaService.verificarImpactos(sp));
         }
 
         @Test
@@ -445,7 +462,8 @@ class ImpactoMapaServiceTest {
 
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(Collections.emptyList());
 
-            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+            mockUsuarioAutenticado(usuarioAdmin());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
             assertEquals(2, response.removidas().size());
         }
@@ -492,7 +510,8 @@ class ImpactoMapaServiceTest {
 
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
 
-            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+            mockUsuarioAutenticado(usuarioAdmin());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
             assertEquals(1, response.alteradas().size());
             assertEquals(1, response.competenciasImpactadas().size());
@@ -526,7 +545,8 @@ class ImpactoMapaServiceTest {
             compSemAtividades.setAtividades(Set.of());
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(compSemAtividades));
 
-            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+            mockUsuarioAutenticado(usuarioAdmin());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
             assertNotNull(response);
             assertFalse(response.temImpactos());
@@ -582,7 +602,8 @@ class ImpactoMapaServiceTest {
             comp.setAtividades(Set.of(removida, alteradaVigente));
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
 
-            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+            mockUsuarioAutenticado(usuarioAdmin());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
             assertEquals(1, response.removidas().size());
             assertEquals(1, response.alteradas().size());
@@ -621,7 +642,8 @@ class ImpactoMapaServiceTest {
             when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L)).thenReturn(List.of(a2));
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of());
 
-            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+            mockUsuarioAutenticado(usuarioAdmin());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
             assertFalse(response.temImpactos()); // branch 157 false
             assertTrue(response.alteradas().isEmpty());

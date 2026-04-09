@@ -114,11 +114,10 @@ class AtividadeFacadeTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
+            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.singletonList(
                     new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
-            when(consultaService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
@@ -151,11 +150,10 @@ class AtividadeFacadeTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
+            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.singletonList(
                     new AtividadeDto(999L, "Outra atividade", List.of())
             ));
-            when(consultaService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
@@ -191,11 +189,10 @@ class AtividadeFacadeTest {
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
+            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.singletonList(
                     new AtividadeDto(atividadeCodigo, "Antiga desc", List.of())
             ));
-            when(consultaService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
@@ -231,9 +228,8 @@ class AtividadeFacadeTest {
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
-            when(consultaService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
+            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.emptyList());
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
@@ -278,11 +274,10 @@ class AtividadeFacadeTest {
             when(mapaManutencaoService.criarConhecimento(atividadeCodigo, request)).thenReturn(conhecimentoSalvo);
 
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
+            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.singletonList(
                     new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
-            when(consultaService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
@@ -320,11 +315,10 @@ class AtividadeFacadeTest {
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
+            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.singletonList(
                     new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
-            when(consultaService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
@@ -361,11 +355,10 @@ class AtividadeFacadeTest {
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
+            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.singletonList(
                     new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
-            when(consultaService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 

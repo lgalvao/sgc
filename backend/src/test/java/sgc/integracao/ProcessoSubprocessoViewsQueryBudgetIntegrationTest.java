@@ -7,6 +7,9 @@ import org.junit.jupiter.api.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.data.domain.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.authority.*;
+import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.mapa.model.*;
@@ -61,6 +64,13 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
         usuarioAdmin = usuarioRepo.findById("3").orElseThrow();
         usuarioAdmin.setPerfilAtivo(Perfil.ADMIN);
         usuarioAdmin.setUnidadeAtivaCodigo(unidadeFilha.getCodigo());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        usuarioAdmin,
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                )
+        );
 
         criarProcessosPainel(unidadeFilha);
         subprocesso = criarSubprocessoDetalhe(unidadeFilha);
@@ -95,7 +105,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     @DisplayName("Detalhe de subprocesso deve manter budget estavel de consultas")
     void detalheDeSubprocessoDeveManterBudgetEstavel() {
         MetricasExecucaoTeste.ResultadoMedicao medicao = medir("subprocesso.obterDetalhes", () -> {
-            SubprocessoDetalheResponse detalhes = subprocessoConsultaService.obterDetalhes(subprocesso.getCodigo(), usuarioAdmin);
+            SubprocessoDetalheResponse detalhes = subprocessoConsultaService.obterDetalhes(subprocesso.getCodigo());
 
             assertThat(detalhes).isNotNull();
             assertThat(detalhes.subprocesso().codigo()).isEqualTo(subprocesso.getCodigo());

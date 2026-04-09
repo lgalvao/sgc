@@ -56,11 +56,6 @@ public class SubprocessoConsultaService {
             REVISAO_CADASTRO_HOMOLOGADA,
             REVISAO_MAPA_AJUSTADO,
             DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
-    private static final Set<SituacaoSubprocesso> SITUACOES_IMPACTO_ADMIN = Set.of(
-            REVISAO_CADASTRO_DISPONIBILIZADA,
-            REVISAO_CADASTRO_HOMOLOGADA,
-            REVISAO_MAPA_AJUSTADO);
-
     private final SubprocessoRepo subprocessoRepo;
     private final AnaliseRepo analiseRepo;
     private final UnidadeService unidadeService;
@@ -79,9 +74,9 @@ public class SubprocessoConsultaService {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(sp);
     }
 
-    public ImpactoMapaResponse verificarImpactos(Long codSubprocesso, Usuario usuario) {
+    public ImpactoMapaResponse verificarImpactos(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        return impactoMapaService.verificarImpactos(sp, usuario);
+        return impactoMapaService.verificarImpactos(sp);
     }
 
     public MapaCompletoDto mapaCompletoDtoPorSubprocesso(Long codSubprocesso) {
@@ -115,6 +110,10 @@ public class SubprocessoConsultaService {
 
     public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        return obterStatus(subprocesso);
+    }
+
+    public SubprocessoSituacaoDto obterStatus(Subprocesso subprocesso) {
         return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .situacao(subprocesso.getSituacao())
@@ -132,8 +131,11 @@ public class SubprocessoConsultaService {
 
     public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        List<AtividadeDto> atividades = listarAtividadesSubprocesso(codSubprocesso);
-        return SubprocessoCadastroDto.fromEntity(subprocesso, atividades);
+        return obterCadastro(subprocesso);
+    }
+
+    public SubprocessoCadastroDto obterCadastro(Subprocesso subprocesso) {
+        return SubprocessoCadastroDto.fromEntity(subprocesso, listarAtividadesSubprocesso(subprocesso));
     }
 
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
@@ -165,31 +167,34 @@ public class SubprocessoConsultaService {
         return validacaoService.validarCadastro(sp);
     }
 
-    public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
+    public SubprocessoDetalheResponse obterDetalhes(Long codigo) {
         Subprocesso sp = buscarSubprocesso(codigo);
-        return obterDetalhes(sp, usuarioAutenticado);
+        return obterDetalhes(sp);
     }
 
-    public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
+    public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp) {
         List<Movimentacao> movimentacoes = listarMovimentacoes(sp);
-        ContextoConsultaSubprocesso contexto = montarContextoConsulta(sp, usuarioAutenticado, movimentacoes);
+        ContextoConsultaSubprocesso contexto = montarContextoConsulta(sp, usuarioFacade.usuarioAutenticado(), movimentacoes);
         return construirDetalhe(contexto, movimentacoes);
     }
 
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        DadosContextoEdicao dadosContexto = montarDadosContextoEdicao(codSubprocesso, usuario);
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo());
+
         return new ContextoEdicaoResponse(
-                dadosContexto.unidade(),
-                SubprocessoResumoDto.fromEntity(dadosContexto.subprocesso()),
-                dadosContexto.detalhes(),
-                dadosContexto.mapa(),
-                dadosContexto.atividades()
+                subprocesso.getUnidade(),
+                SubprocessoResumoDto.fromEntity(subprocesso),
+                obterDetalhes(subprocesso),
+                MapaCompletoDto.fromEntity(mapaCompleto),
+                mapaCompleto.getAtividades().stream()
+                        .map(AtividadeDto::fromEntity)
+                        .toList()
         );
     }
 
-    public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
-        return resolverPermissoes(montarContextoPermissao(montarContextoConsulta(sp, usuario)));
+    public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp) {
+        return resolverPermissoes(montarContextoPermissao(montarContextoConsulta(sp, usuarioFacade.usuarioAutenticado())));
     }
 
     private PermissoesSubprocessoDto construirPermissoes(ContextoPermissaoSubprocesso contexto) {
@@ -257,9 +262,7 @@ public class SubprocessoConsultaService {
 
     private boolean verificarVisualizarImpacto(ContextoPermissaoSubprocesso contexto) {
         return contexto.temMapaVigente()
-                && ((contexto.mesmaUnidade() && contexto.isChefe() && contexto.situacao() == REVISAO_CADASTRO_EM_ANDAMENTO)
-                || (contexto.mesmaUnidade() && contexto.isGestor() && contexto.situacao() == REVISAO_CADASTRO_DISPONIBILIZADA)
-                || (contexto.isAdmin() && SITUACOES_IMPACTO_ADMIN.contains(contexto.situacao())));
+                && impactoMapaService.podeVisualizarImpactos(contexto.subprocesso());
     }
 
     private boolean verificarEditarMapa(ContextoPermissaoSubprocesso contexto) {
@@ -291,7 +294,7 @@ public class SubprocessoConsultaService {
         return listarAtividadesSubprocesso(subprocesso);
     }
 
-    private List<AtividadeDto> listarAtividadesSubprocesso(Subprocesso subprocesso) {
+    public List<AtividadeDto> listarAtividadesSubprocesso(Subprocesso subprocesso) {
         Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
         return mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa).stream()
                 .map(AtividadeDto::fromEntity)
@@ -358,20 +361,6 @@ public class SubprocessoConsultaService {
                 .build();
     }
 
-    private DadosContextoEdicao montarDadosContextoEdicao(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(sp.getCodigo());
-        return new DadosContextoEdicao(
-                sp,
-                sp.getUnidade(),
-                obterDetalhes(sp, usuario),
-                MapaCompletoDto.fromEntity(mapaCompleto),
-                mapaCompleto.getAtividades().stream()
-                        .map(AtividadeDto::fromEntity)
-                        .toList()
-        );
-    }
-
     private List<Analise> listarAnalisesPorTipo(Long codSubprocesso, TipoAnalise tipo) {
         return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso).stream()
                 .filter(analise -> analise.getTipo() == tipo)
@@ -433,6 +422,7 @@ public class SubprocessoConsultaService {
     private ContextoPermissaoSubprocesso montarContextoPermissao(ContextoConsultaSubprocesso contextoConsulta) {
         Subprocesso sp = contextoConsulta.subprocesso();
         return new ContextoPermissaoSubprocesso(
+                sp,
                 contextoConsulta.usuario().getPerfilAtivo(),
                 sp.getSituacao(),
                 sp.getUnidade(),
@@ -448,15 +438,6 @@ public class SubprocessoConsultaService {
             return construirPermissoesProcessoFinalizado(contexto);
         }
         return construirPermissoes(contexto);
-    }
-
-    private record DadosContextoEdicao(
-            Subprocesso subprocesso,
-            Unidade unidade,
-            SubprocessoDetalheResponse detalhes,
-            MapaCompletoDto mapa,
-            List<AtividadeDto> atividades
-    ) {
     }
 
     private record ContextoConsultaSubprocesso(
@@ -475,6 +456,7 @@ public class SubprocessoConsultaService {
     }
 
     private record ContextoPermissaoSubprocesso(
+            Subprocesso subprocesso,
             Perfil perfil,
             SituacaoSubprocesso situacao,
             Unidade unidadeAlvo,

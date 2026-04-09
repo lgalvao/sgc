@@ -135,20 +135,16 @@ public class ProcessoController {
 
     @GetMapping("/{codigo}/detalhes")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
-    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(
-            @PathVariable Long codigo,
-            @AuthenticationPrincipal Usuario usuario) {
-        ProcessoDetalheDto detalhes = processoService.obterDetalhesCompleto(codigo, usuario, false);
+    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long codigo) {
+        ProcessoDetalheDto detalhes = processoService.obterDetalhesCompleto(codigo, false);
         return ResponseEntity.ok(detalhes);
     }
 
     @GetMapping("/{codigo}/contexto-completo")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Obtém o contexto completo para visualização de processo (BFF)")
-    public ResponseEntity<ProcessoDetalheDto> obterContextoCompleto(
-            @PathVariable Long codigo,
-            @AuthenticationPrincipal Usuario usuario) {
-        return ResponseEntity.ok(processoService.obterDetalhesCompleto(codigo, usuario, true));
+    public ResponseEntity<ProcessoDetalheDto> obterContextoCompleto(@PathVariable Long codigo) {
+        return ResponseEntity.ok(processoService.obterDetalhesCompleto(codigo, true));
     }
 
     @SuppressWarnings("UnusedReturnValue")

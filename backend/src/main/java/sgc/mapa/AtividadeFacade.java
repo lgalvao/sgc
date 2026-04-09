@@ -123,34 +123,30 @@ public class AtividadeFacade {
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacaoPorAtividade(Long codigoAtividade) {
-        Long codSubprocesso = obterCodigoSubprocessoPorAtividade(codigoAtividade);
-        return criarRespostaOperacao(codSubprocesso, codigoAtividade, true);
+        Subprocesso subprocesso = obterSubprocessoPorAtividade(codigoAtividade);
+        return criarRespostaOperacao(subprocesso, codigoAtividade, true);
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacaoPorMapaCodigo(Long mapaCodigo, Long codigoAtividade, boolean incluirAtividade) {
-        Long codSubprocesso = obterCodigoSubprocessoPorMapa(mapaCodigo);
-        return criarRespostaOperacao(codSubprocesso, codigoAtividade, incluirAtividade);
+        Subprocesso subprocesso = obterSubprocessoPorMapa(mapaCodigo);
+        return criarRespostaOperacao(subprocesso, codigoAtividade, incluirAtividade);
     }
 
-    private Long obterCodigoSubprocessoPorMapa(Long codMapa) {
-        Subprocesso subprocesso = consultaService.obterEntidadePorCodigoMapa(codMapa);
-        return subprocesso.getCodigo();
+    private Subprocesso obterSubprocessoPorMapa(Long codMapa) {
+        return consultaService.obterEntidadePorCodigoMapa(codMapa);
     }
 
-    private Long obterCodigoSubprocessoPorAtividade(Long codigoAtividade) {
+    private Subprocesso obterSubprocessoPorAtividade(Long codigoAtividade) {
         Atividade atividade = mapaManutencaoService.atividadeCodigo(codigoAtividade);
         Mapa mapa = atividade.getMapa();
 
-        return obterCodigoSubprocessoPorMapa(mapa.getCodigo());
+        return obterSubprocessoPorMapa(mapa.getCodigo());
     }
 
-    private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
-        SubprocessoSituacaoDto situacaoDto = consultaService.obterStatus(codSubprocesso);
-        List<AtividadeDto> todasAtividades = consultaService.listarAtividadesSubprocesso(codSubprocesso);
-
-        Usuario usuario = usuarioService.usuarioAutenticado();
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(sp, usuario);
+    private AtividadeOperacaoResponse criarRespostaOperacao(Subprocesso subprocesso, Long codigoAtividade, boolean incluirAtividade) {
+        SubprocessoSituacaoDto situacaoDto = consultaService.obterStatus(subprocesso);
+        List<AtividadeDto> todasAtividades = consultaService.listarAtividadesSubprocesso(subprocesso);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         AtividadeDto atividadeVis = null;
         if (incluirAtividade) {
@@ -172,6 +168,4 @@ public class AtividadeFacade {
                 .build();
     }
 }
-
-
 

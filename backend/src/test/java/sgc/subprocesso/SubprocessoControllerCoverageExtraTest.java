@@ -289,12 +289,12 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void verificarImpactosOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VERIFICAR_IMPACTOS"))).thenReturn(true);
-        when(consultaService.verificarImpactos(eq(1L), any())).thenReturn(ImpactoMapaResponse.builder().build());
+        when(consultaService.verificarImpactos(1L)).thenReturn(ImpactoMapaResponse.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1/impactos-mapa"))
                 .andExpect(status().isOk());
 
-        verify(consultaService).verificarImpactos(eq(1L), any());
+        verify(consultaService).verificarImpactos(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 }

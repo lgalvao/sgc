@@ -29,7 +29,7 @@ export function useWebStorage<T>(
         }
 
         armazenamento.setItem(chave, JSON.stringify(novoValor));
-    }, {deep: true});
+    }, {deep: true, flush: 'sync'});
 
     return valorArmazenado;
 }
