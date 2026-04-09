@@ -238,7 +238,7 @@ public class SubprocessoService {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
 
-        Mapa mapa = consultaService.obterMapaObrigatorio(sp);
+        Mapa mapa = obterMapaObrigatorio(sp);
         mapaManutencaoService.mapaCodigo(mapa.getCodigo());
     }
 
@@ -261,9 +261,9 @@ public class SubprocessoService {
     private ContextoEdicaoMapa carregarContextoEdicaoMapa(Long codSubprocesso) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Mapa mapa = Optional.ofNullable(subprocesso.getMapa())
-                .orElseGet(() -> consultaService.obterMapaObrigatorio(subprocesso));
+                .orElseGet(() -> obterMapaObrigatorio(subprocesso));
         Long codMapa = Optional.ofNullable(mapa.getCodigo())
-                .orElseGet(() -> consultaService.obterCodigoMapaObrigatorio(subprocesso));
+                .orElseGet(() -> obterCodigoMapaObrigatorio(subprocesso));
         boolean mapaEstavaVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
         return new ContextoEdicaoMapa(subprocesso, mapa, codMapa, mapaEstavaVazio);
     }
@@ -417,8 +417,22 @@ public class SubprocessoService {
                 subprocessoDestino,
                 subprocessoOrigem,
                 usuario,
-                consultaService.obterCodigoMapaObrigatorio(subprocessoDestino),
-                consultaService.obterCodigoMapaObrigatorio(subprocessoOrigem));
+                obterCodigoMapaObrigatorio(subprocessoDestino),
+                obterCodigoMapaObrigatorio(subprocessoOrigem));
+    }
+
+    private Mapa obterMapaObrigatorio(Subprocesso subprocesso) {
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa == null) {
+            throw new IllegalStateException("Subprocesso %s sem mapa associado".formatted(subprocesso.getCodigo()));
+        }
+        return mapa;
+    }
+
+    private Long obterCodigoMapaObrigatorio(Subprocesso subprocesso) {
+        return Optional.ofNullable(obterMapaObrigatorio(subprocesso).getCodigo())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Subprocesso %s com mapa sem código associado".formatted(subprocesso.getCodigo())));
     }
 
     private void validarDestinoParaImportacao(Subprocesso subprocessoDestino) {

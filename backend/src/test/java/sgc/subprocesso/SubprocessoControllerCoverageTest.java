@@ -37,6 +37,7 @@ class SubprocessoControllerCoverageTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean private SubprocessoConsultaService consultaService;
+    @MockitoBean private AnaliseHistoricoService analiseHistoricoService;
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
     @MockitoBean

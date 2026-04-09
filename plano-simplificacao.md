@@ -503,6 +503,62 @@ O trabalho também revelou dívida de testes e seed: parte das suítes de integr
 
 Com a localização já consolidada e endurecida, o próximo corte seguro volta a ser estrutural: enxugar a montagem de permissões e detalhe em `SubprocessoConsultaService`, agora sem duplicação de regra de localização e sem cache transitório na entidade. O foco deve permanecer em reduzir mistura entre fetch, composição de payload e decisão de UI, sem reabrir a discussão de domínio já estabilizada nesta interrupção.
 
+### Continuação da Frente 2 (2026-04-08)
+
+Na retomada desta frente, o recorte escolhido foi remover camadas de compatibilidade que mantinham `SubprocessoConsultaService` como pass-through de localização e histórico sem agregar regra. O objetivo foi reduzir aliases entre services e explicitar dependências reais de `ProcessoService`, `ProcessoController` e `SubprocessoTransicaoService`.
+
+### Resultado objetivo da continuação
+
+`SubprocessoConsultaService` deixou de expor wrappers de localização (`obterLocalizacaoAtual` e `obterLocalizacoesAtuais`) e também removeu a sobrecarga pública redundante de histórico de análises. Os consumidores de workflow e processo passaram a depender diretamente de `LocalizacaoSubprocessoService`, eliminando uma camada intermediária sem semântica própria e mantendo as mesmas regras de domínio já centralizadas no service de localização.
+
+Com isso, a leitura de `SubprocessoConsultaService` fica mais aderente à Frente 2: consulta e composição de contexto, sem atuar como ponte de APIs de outro colaborador.
+
+### Registro da rodada
+
+* **Data da rodada:** 2026-04-08
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`, `backend/src/main/java/sgc/processo/service/ProcessoService.java`, `backend/src/main/java/sgc/processo/ProcessoController.java`, `plano-simplificacao.md`
+* **Corte aplicado:** remoção de aliases pass-through em `SubprocessoConsultaService` e ligação direta dos consumidores ao `LocalizacaoSubprocessoService`.
+* **Risco principal observado:** quebra silenciosa por desacoplamento de mocks/testes ainda configurados para chamadas via `SubprocessoConsultaService`.
+* **Validação executada:** compilação de testes do backend e suíte focada em `SubprocessoConsultaService`, `ProcessoService`, `ProcessoController` e `SubprocessoTransicaoService`.
+* **Pendência aberta para próxima rodada:** consolidar o acesso a análises de subprocesso em fronteira única (sem sobrecarga redundante) e continuar limpando composição de detalhe/permissões no `SubprocessoConsultaService`.
+
+### Continuação da Frente 2 (2026-04-08, etapa de mapa obrigatório)
+
+Nesta etapa, o corte foi remover mais uma superfície pública redundante de `SubprocessoConsultaService`: os helpers `obterMapaObrigatorio` e `obterCodigoMapaObrigatorio` eram consumidos apenas por `SubprocessoService` e não carregavam regra de consulta/contexto. A responsabilidade foi internalizada no próprio `SubprocessoService`, reduzindo acoplamento entre services e eliminando uso de consulta como utilitário genérico.
+
+### Resultado objetivo da etapa de mapa obrigatório
+
+`SubprocessoConsultaService` passou a usar os helpers de mapa apenas internamente, sem exposição pública. `SubprocessoService` ganhou helpers privados equivalentes para manter invariáveis de mapa/código no fluxo de edição/importação. O contrato HTTP continuou intacto e o corte reduziu uma dependência de compatibilidade entre escrita e consulta.
+
+### Registro da etapa de mapa obrigatório
+
+* **Data da rodada:** 2026-04-08
+* **Frente principal:** Frente 2 — Redução de superfície pública redundante em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java`, `backend/src/test/java/sgc/subprocesso/service/SubprocessoServiceExtraCoverageTest.java`, `backend/src/test/java/sgc/subprocesso/service/SubprocessoConsultaServiceExtraCoverageTest.java`, `plano-simplificacao.md`
+* **Corte aplicado:** despublicação dos helpers de mapa obrigatório em consulta e internalização da regra no service de escrita.
+* **Risco principal observado:** testes acoplados ao método público removido e expectativa de stub em `consultaService` para código de mapa.
+* **Validação executada:** compilação de testes e suíte focada de `SubprocessoService`/`SubprocessoConsultaService`.
+* **Pendência aberta para próxima rodada:** revisar se `paraHistoricoDto` deve permanecer como fronteira pública de consulta ou migrar para mapeamento explícito no controller.
+
+### Continuação da Frente 2 (2026-04-08, etapa de histórico de análise)
+
+A pendência da rodada anterior foi tratada com um corte maior: a conversão `Analise -> AnaliseHistoricoDto`, que ainda estava exposta por `SubprocessoConsultaService` como API utilitária (`paraHistoricoDto`), foi movida para um colaborador dedicado (`AnaliseHistoricoService`). Assim, o service de consulta deixou de atuar como mapper genérico para fluxos de criação.
+
+### Resultado objetivo da etapa de histórico de análise
+
+`SubprocessoConsultaService` passou a apenas consultar e delegar a conversão de histórico para `AnaliseHistoricoService`, removendo `paraHistoricoDto` da superfície pública. `SubprocessoController` foi ajustado para converter o retorno de `criarAnalise` via o novo service dedicado. Com isso, a separação entre consulta de subprocesso e mapeamento de histórico ficou explícita, sem mudança de contrato HTTP.
+
+### Registro da etapa de histórico de análise
+
+* **Data da rodada:** 2026-04-08
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/AnaliseHistoricoService.java`, `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `backend/src/main/java/sgc/subprocesso/SubprocessoController.java`, testes de `SubprocessoController` e cobertura de `SubprocessoConsultaService`, `plano-simplificacao.md`
+* **Corte aplicado:** extração da conversão de histórico para service dedicado e remoção do mapper utilitário público em consulta.
+* **Risco principal observado:** quebra de wiring em controllers de teste (`@WebMvcTest`) e de cobertura que verificava o método público removido.
+* **Validação executada:** compilação de testes e suíte focada de controller/consulta para fluxo de análises e histórico.
+* **Pendência aberta para próxima rodada:** revisar se a criação de análise pode sair de `SubprocessoController` com menos orquestração local (sem duplicar fluxo entre cadastro e validação).
+
 ### Continuação após estabilização da localização
 
 Com a localização atual já resolvida em ponto único, a continuação imediata da Frente 2 passou a atacar a costura entre detalhe de tela e permissões de UI em `SubprocessoConsultaService`. O problema remanescente era menos de regra duplicada e mais de dependência implícita: detalhe e permissões recalculavam partes do mesmo contexto de consulta em caminhos diferentes, especialmente localização, unidade do usuário e flags derivadas de processo finalizado, mesma unidade e mapa vigente.

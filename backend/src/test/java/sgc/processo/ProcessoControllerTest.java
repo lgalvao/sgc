@@ -55,6 +55,7 @@ class ProcessoControllerTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean private SubprocessoConsultaService consultaService;
+    @MockitoBean private LocalizacaoSubprocessoService localizacaoSubprocessoService;
 
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
@@ -452,7 +453,7 @@ class ProcessoControllerTest {
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .build();
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())
@@ -497,7 +498,7 @@ class ProcessoControllerTest {
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .build();
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())
@@ -636,7 +637,7 @@ class ProcessoControllerTest {
         @BeforeEach
         void setUp() {
             processoServiceMock = mock(ProcessoService.class);
-            controller = new ProcessoController(processoServiceMock, consultaService);
+            controller = new ProcessoController(processoServiceMock, consultaService, localizacaoSubprocessoService);
         }
 
         @Test

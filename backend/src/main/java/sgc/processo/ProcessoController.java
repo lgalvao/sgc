@@ -32,6 +32,7 @@ import java.util.stream.*;
 public class ProcessoController {
     private final ProcessoService processoService;
     private final SubprocessoConsultaService consultaService;
+    private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -108,7 +109,7 @@ public class ProcessoController {
         }
         Map<Long, Subprocesso> subprocessosPorUnidade = consultaService.listarEntidadesPorProcesso(codigo).stream()
                 .collect(Collectors.toMap(sp -> sp.getUnidade().getCodigo(), Function.identity(), (primeiro, duplicado) -> primeiro));
-        Map<Long, Unidade> localizacoesPorSubprocesso = consultaService.obterLocalizacoesAtuais(subprocessosPorUnidade.values());
+        Map<Long, Unidade> localizacoesPorSubprocesso = localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessosPorUnidade.values());
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
                 .map(snapshot -> {
                     ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.fromSnapshot(snapshot);
@@ -116,7 +117,7 @@ public class ProcessoController {
                     if (subprocesso != null) {
                         dto.preencherComSubprocesso(subprocesso,
                                 java.util.Objects.requireNonNullElseGet(localizacoesPorSubprocesso.get(subprocesso.getCodigo()),
-                                        () -> consultaService.obterLocalizacaoAtual(subprocesso)));
+                                        () -> localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)));
                     }
                     return dto;
                 })

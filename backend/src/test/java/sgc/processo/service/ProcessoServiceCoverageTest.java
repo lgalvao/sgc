@@ -40,6 +40,7 @@ class ProcessoServiceCoverageTest {
     @Mock private ResponsavelUnidadeService responsavelUnidadeService;
     @Mock private UsuarioFacade usuarioService;
     @Mock private SubprocessoService subprocessoService; @Mock private SubprocessoConsultaService consultaService;
+    @Mock private LocalizacaoSubprocessoService localizacaoSubprocessoService;
     @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private AlertaFacade servicoAlertas;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
@@ -113,7 +114,7 @@ class ProcessoServiceCoverageTest {
 
         when(repo.buscar(Processo.class, cod)).thenReturn(processo);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(subprocesso));
-        when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(subprocesso.getCodigo(), unidade));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(subprocesso.getCodigo(), unidade));
         when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
         when(permissionEvaluator.verificarPermissao(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class))).thenReturn(true);
 
@@ -121,7 +122,7 @@ class ProcessoServiceCoverageTest {
 
         assertThat(resultado.getElegiveis()).hasSize(1);
         verify(consultaService, times(1)).listarEntidadesPorProcesso(cod);
-        verify(consultaService, times(1)).obterLocalizacoesAtuais(anyCollection());
+        verify(localizacaoSubprocessoService, times(1)).obterLocalizacoesAtuais(anyCollection());
     }
 
     @Test
@@ -254,7 +255,7 @@ class ProcessoServiceCoverageTest {
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
@@ -286,7 +287,7 @@ class ProcessoServiceCoverageTest {
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
@@ -318,7 +319,7 @@ class ProcessoServiceCoverageTest {
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
@@ -346,7 +347,7 @@ class ProcessoServiceCoverageTest {
 
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class))).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
 
