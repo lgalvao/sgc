@@ -147,6 +147,7 @@ export interface Processo {
     podeDisponibilizarMapaBloco?: boolean;
     unidades: UnidadeParticipante[];
     resumoSubprocessos: ProcessoResumo[];
+    acoesBloco?: AcaoBlocoProcesso[];
 }
 
 export interface ProcessoResumo {
@@ -452,10 +453,29 @@ export interface SubprocessoElegivel {
     unidadeSigla: string;
     localizacaoCodigo: number;
     situacao: SituacaoSubprocesso;
-    habilitarAceitarBloco: boolean;
-    habilitarHomologarBloco: boolean;
-    habilitarDisponibilizarBloco: boolean;
+    habilitarAceitarCadastroBloco: boolean;
+    habilitarAceitarMapaBloco: boolean;
+    habilitarHomologarCadastroBloco: boolean;
+    habilitarHomologarMapaBloco: boolean;
+    habilitarDisponibilizarMapaBloco: boolean;
     ultimaDataLimite?: string;
+}
+
+export type AcaoProcessoBloco = "ACEITAR" | "HOMOLOGAR" | "DISPONIBILIZAR";
+
+export interface AcaoBlocoProcesso {
+    codigo: string;
+    acao: AcaoProcessoBloco;
+    mostrar: boolean;
+    habilitar: boolean;
+    requerDataLimite: boolean;
+    redirecionarPainel: boolean;
+    rotulo: string;
+    titulo: string;
+    texto: string;
+    rotuloBotao: string;
+    mensagemSucesso: string;
+    unidades: SubprocessoElegivel[];
 }
 
 export interface ErroValidacao {

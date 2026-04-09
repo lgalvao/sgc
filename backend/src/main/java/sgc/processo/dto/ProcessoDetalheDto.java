@@ -2,6 +2,7 @@ package sgc.processo.dto;
 
 import lombok.*;
 import org.jspecify.annotations.*;
+import sgc.processo.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
@@ -22,6 +23,9 @@ public class ProcessoDetalheDto {
 
     @Builder.Default
     private final List<SubprocessoElegivelDto> elegiveis = new ArrayList<>();
+
+    @Builder.Default
+    private final List<AcaoBlocoDto> acoesBloco = new ArrayList<>();
     private Long codigo;
     private String descricao;
     private String tipo;
@@ -34,6 +38,28 @@ public class ProcessoDetalheDto {
     private boolean podeHomologarMapa;
     private boolean podeAceitarCadastroBloco;
     private boolean podeDisponibilizarMapaBloco;
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AcaoBlocoDto {
+        private String codigo;
+        private AcaoProcesso acao;
+        private boolean mostrar;
+        private boolean habilitar;
+        private boolean requerDataLimite;
+        private boolean redirecionarPainel;
+        private String rotulo;
+        private String titulo;
+        private String texto;
+        private String rotuloBotao;
+        private String mensagemSucesso;
+
+        @Builder.Default
+        private final List<SubprocessoElegivelDto> unidades = new ArrayList<>();
+    }
 
     @Getter
     @Setter

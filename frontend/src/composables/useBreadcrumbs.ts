@@ -3,6 +3,7 @@ import {type RouteLocationNamedRaw, type RouteLocationNormalizedLoaded} from 'vu
 import {usePerfilStore} from '@/stores/perfil';
 import {Perfil} from '@/types/tipos';
 import {useUnidadeAtual} from '@/composables/useUnidadeAtual';
+import {usePerfil} from '@/composables/usePerfil';
 
 export interface Breadcrumb {
     label: string;
@@ -13,6 +14,7 @@ export interface Breadcrumb {
 export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     const perfil = usePerfilStore();
     const {unidadeAtual} = useUnidadeAtual();
+    const {mostrarArvoreCompletaUnidades} = usePerfil();
 
     const getProcessoBreadcrumbs = (
         codProcesso: string,
@@ -68,7 +70,6 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
         codUnidade: string,
         isUnidadeRoute: boolean,
         routeName: string,
-        perfilUsuario: Perfil | null
     ): Breadcrumb[] => {
         const crumbs: Breadcrumb[] = [];
         if (codUnidade && isUnidadeRoute) {
@@ -77,7 +78,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
                 to: routeName === "Unidade" ? undefined : {name: "Unidade", params: {codUnidade}},
             });
 
-            const unidadeLabel = perfilUsuario === Perfil.ADMIN ? "Unidades" : "Minha unidade";
+            const unidadeLabel = mostrarArvoreCompletaUnidades.value ? "Unidades" : "Minha unidade";
             const unidadePageTitles: Record<string, string> = {
                 Unidade: unidadeLabel,
                 Mapa: "Mapa de competências",
@@ -127,7 +128,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
         breadcrumbs.push(
             ...getProcessoBreadcrumbs(codProcesso, isProcessoRoute, isSubprocessoRoute, perfilUsuario),
             ...getSubprocessoBreadcrumbs(codProcesso, siglaUnidade, isSubprocessoRoute, routeName),
-            ...getUnidadeBreadcrumbs(codUnidade, isUnidadeRoute, routeName, perfilUsuario)
+            ...getUnidadeBreadcrumbs(codUnidade, isUnidadeRoute, routeName)
         );
 
         if (!isProcessoRoute && !isSubprocessoRoute && !isUnidadeRoute) {

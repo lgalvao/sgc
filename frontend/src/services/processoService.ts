@@ -135,12 +135,9 @@ export async function processarAcaoEmBloco(payload: {
 
 export async function executarAcaoEmBloco(
     codProcesso: number,
-    payload: { unidadeCodigos: number[]; acao: "aceitar" | "homologar" | "disponibilizar"; dataLimite?: string },
+    payload: { unidadeCodigos: number[]; acao: "ACEITAR" | "HOMOLOGAR" | "DISPONIBILIZAR"; dataLimite?: string },
 ): Promise<void> {
-    await apiClient.post(`/processos/${codProcesso}/acao-em-bloco`, {
-        ...payload,
-        acao: payload.acao.toUpperCase(),
-    });
+    await apiClient.post(`/processos/${codProcesso}/acao-em-bloco`, payload);
 }
 
 export async function buscarSubprocessosElegiveis(

@@ -74,6 +74,7 @@ export interface ProcessoDetalheDto {
     dataInicio?: string;
     dataFinalizacao?: string;
     unidades?: UnidadeParticipanteDto[];
+    acoesBloco?: unknown[];
 
     [key: string]: unknown; // Para campos adicionais do spread
 }

@@ -7,8 +7,16 @@ const perfilStoreMock = reactive({
     perfilSelecionado: null as Perfil | null,
 });
 
+const usePerfilMock = reactive({
+    mostrarArvoreCompletaUnidades: {value: false},
+});
+
 vi.mock("@/stores/perfil", () => ({
     usePerfilStore: () => perfilStoreMock,
+}));
+
+vi.mock("@/composables/usePerfil", () => ({
+    usePerfil: () => usePerfilMock,
 }));
 
 const unidadeAtualMock = {
@@ -88,6 +96,7 @@ describe("useBreadcrumbs", () => {
 
     it("deve incluir breadcrumbs de Unidade", () => {
         perfilStoreMock.perfilSelecionado = Perfil.ADMIN;
+        usePerfilMock.mostrarArvoreCompletaUnidades.value = true;
         unidadeAtualMock.unidadeAtual.value = {sigla: "MINHA_UNIT"};
         const route = {
             name: "Unidade",
@@ -103,6 +112,7 @@ describe("useBreadcrumbs", () => {
 
     it("deve usar fallback se a unidade atual não estiver carregada", () => {
         perfilStoreMock.perfilSelecionado = Perfil.CHEFE;
+        usePerfilMock.mostrarArvoreCompletaUnidades.value = false;
         unidadeAtualMock.unidadeAtual.value = null;
         const route = {
             name: "Unidade",

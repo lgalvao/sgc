@@ -335,14 +335,20 @@ public class ProcessoService {
                 .build();
 
         montarHierarquiaNoDto(dto, processo, subprocessos, unidadesAcesso, localizacoesPorSubprocesso);
+        List<Subprocesso> subprocessosVisiveis = usuario.getPerfilAtivo() == Perfil.ADMIN
+                ? subprocessos
+                : subprocessos.stream()
+                .filter(subprocesso -> unidadesAcesso.contains(subprocesso.getUnidade().getCodigo()))
+                .toList();
+        List<SubprocessoElegivelDto> subprocessosElegiveis = listarSubprocessosElegiveis(
+                subprocessosVisiveis,
+                usuario,
+                localizacoesPorSubprocesso
+        );
         if (incluirElegiveis) {
-            List<Subprocesso> subprocessosVisiveis = usuario.getPerfilAtivo() == Perfil.ADMIN
-                    ? subprocessos
-                    : subprocessos.stream()
-                    .filter(subprocesso -> unidadesAcesso.contains(subprocesso.getUnidade().getCodigo()))
-                    .toList();
-            dto.getElegiveis().addAll(listarSubprocessosElegiveis(subprocessosVisiveis, usuario, localizacoesPorSubprocesso));
+            dto.getElegiveis().addAll(subprocessosElegiveis);
         }
+        dto.getAcoesBloco().addAll(montarAcoesBloco(processo, subprocessosElegiveis));
 
         return dto;
     }
@@ -573,28 +579,24 @@ public class ProcessoService {
                 .collect(Collectors.toSet());
     }
 
-    private boolean podeAceitarEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        SituacaoSubprocesso situacao = subprocesso.getSituacao();
-        boolean elegivelCadastro = situacao == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || situacao == REVISAO_CADASTRO_DISPONIBILIZADA;
-        if (elegivelCadastro) {
-            return permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_CADASTRO);
-        }
-
-        boolean elegivelMapa = (situacao.ordinal() >= MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= MAPEAMENTO_MAPA_VALIDADO.ordinal()) ||
-                (situacao.ordinal() >= REVISAO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= REVISAO_MAPA_VALIDADO.ordinal());
-        return elegivelMapa && permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_MAPA);
+    private boolean podeAceitarCadastroEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        return isSituacaoCadastroDisponibilizado(subprocesso.getSituacao())
+                && permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_CADASTRO);
     }
 
-    private boolean podeHomologarEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        SituacaoSubprocesso situacao = subprocesso.getSituacao();
-        boolean elegivelCadastro = situacao == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || situacao == REVISAO_CADASTRO_DISPONIBILIZADA;
-        if (elegivelCadastro) {
-            return permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_CADASTRO);
-        }
+    private boolean podeAceitarMapaEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        return isSituacaoMapaAnaliseConcluida(subprocesso.getSituacao())
+                && permissionEvaluator.verificarPermissao(usuario, subprocesso, ACEITAR_MAPA);
+    }
 
-        boolean elegivelMapa = (situacao.ordinal() >= MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= MAPEAMENTO_MAPA_VALIDADO.ordinal()) ||
-                (situacao.ordinal() >= REVISAO_MAPA_COM_SUGESTOES.ordinal() && situacao.ordinal() <= REVISAO_MAPA_VALIDADO.ordinal());
-        return elegivelMapa && permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_MAPA);
+    private boolean podeHomologarCadastroEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        return isSituacaoCadastroDisponibilizado(subprocesso.getSituacao())
+                && permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_CADASTRO);
+    }
+
+    private boolean podeHomologarMapaEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        return isSituacaoMapaAnaliseConcluida(subprocesso.getSituacao())
+                && permissionEvaluator.verificarPermissao(usuario, subprocesso, HOMOLOGAR_MAPA);
     }
 
     private boolean podeDisponibilizarEmBloco(Subprocesso subprocesso, Usuario usuario) {
@@ -612,8 +614,10 @@ public class ProcessoService {
 
     private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(Subprocesso subprocesso, Usuario usuario) {
         return new ElegibilidadeAcaoBloco(
-                podeAceitarEmBloco(subprocesso, usuario),
-                podeHomologarEmBloco(subprocesso, usuario),
+                podeAceitarCadastroEmBloco(subprocesso, usuario),
+                podeAceitarMapaEmBloco(subprocesso, usuario),
+                podeHomologarCadastroEmBloco(subprocesso, usuario),
+                podeHomologarMapaEmBloco(subprocesso, usuario),
                 podeDisponibilizarEmBloco(subprocesso, usuario)
         );
     }
@@ -626,21 +630,150 @@ public class ProcessoService {
                 .unidadeSigla(sp.getUnidade().getSigla())
                 .localizacaoCodigo(localizacao.getCodigo())
                 .situacao(sp.getSituacao())
-                .habilitarAceitarBloco(elegibilidade.habilitarAceitarBloco())
-                .habilitarHomologarBloco(elegibilidade.habilitarHomologarBloco())
-                .habilitarDisponibilizarBloco(elegibilidade.habilitarDisponibilizarBloco())
+                .habilitarAceitarCadastroBloco(elegibilidade.habilitarAceitarCadastroBloco())
+                .habilitarAceitarMapaBloco(elegibilidade.habilitarAceitarMapaBloco())
+                .habilitarHomologarCadastroBloco(elegibilidade.habilitarHomologarCadastroBloco())
+                .habilitarHomologarMapaBloco(elegibilidade.habilitarHomologarMapaBloco())
+                .habilitarDisponibilizarMapaBloco(elegibilidade.habilitarDisponibilizarMapaBloco())
                 .ultimaDataLimite(obterUltimaDataLimite(sp))
                 .build();
     }
 
     private record ElegibilidadeAcaoBloco(
-            boolean habilitarAceitarBloco,
-            boolean habilitarHomologarBloco,
-            boolean habilitarDisponibilizarBloco
+            boolean habilitarAceitarCadastroBloco,
+            boolean habilitarAceitarMapaBloco,
+            boolean habilitarHomologarCadastroBloco,
+            boolean habilitarHomologarMapaBloco,
+            boolean habilitarDisponibilizarMapaBloco
     ) {
         private boolean possuiAlgumaAcao() {
-            return habilitarAceitarBloco || habilitarHomologarBloco || habilitarDisponibilizarBloco;
+            return habilitarAceitarCadastroBloco
+                    || habilitarAceitarMapaBloco
+                    || habilitarHomologarCadastroBloco
+                    || habilitarHomologarMapaBloco
+                    || habilitarDisponibilizarMapaBloco;
         }
+    }
+
+    private List<ProcessoDetalheDto.AcaoBlocoDto> montarAcoesBloco(
+            Processo processo,
+            List<SubprocessoElegivelDto> subprocessosElegiveis
+    ) {
+        return List.of(
+                criarAcaoBloco(
+                        "aceitar-cadastro",
+                        ACEITAR,
+                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarCadastroBloco),
+                        false,
+                        true,
+                        "Aceitar cadastro em bloco",
+                        "Aceite de cadastro em bloco",
+                        "Selecione as unidades cujos cadastros deverão ser aceitos:",
+                        "Registrar aceite",
+                        "Cadastros aceitos em bloco",
+                        processo.getSituacao() != FINALIZADO
+                ),
+                criarAcaoBloco(
+                        "aceitar-mapa",
+                        ACEITAR,
+                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarMapaBloco),
+                        false,
+                        true,
+                        "Aceitar mapas em bloco",
+                        "Aceite de mapas em bloco",
+                        "Selecione as unidades para aceite dos mapas correspondentes",
+                        "Registrar aceite",
+                        "Mapas aceitos em bloco",
+                        processo.getSituacao() != FINALIZADO
+                ),
+                criarAcaoBloco(
+                        "homologar-cadastro",
+                        HOMOLOGAR,
+                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarCadastroBloco),
+                        false,
+                        false,
+                        "Homologar em bloco",
+                        "Homologação de cadastro em bloco",
+                        "Selecione abaixo as unidades cujos cadastros deverão ser homologados:",
+                        "Homologar",
+                        "Cadastros homologados em bloco",
+                        processo.getSituacao() != FINALIZADO
+                ),
+                criarAcaoBloco(
+                        "homologar-mapa",
+                        HOMOLOGAR,
+                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarMapaBloco),
+                        false,
+                        true,
+                        "Homologar mapas em bloco",
+                        "Homologação de mapa em bloco",
+                        "Selecione abaixo as unidades cujos mapas deverão ser homologados:",
+                        "Homologar",
+                        "Mapas de competências homologados em bloco",
+                        processo.getSituacao() != FINALIZADO
+                ),
+                criarAcaoBloco(
+                        "disponibilizar-mapa",
+                        DISPONIBILIZAR,
+                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarDisponibilizarMapaBloco),
+                        true,
+                        true,
+                        "Disponibilizar em bloco",
+                        "Disponibilização de mapa em bloco",
+                        "Selecione as unidades cujos mapas deverão ser disponibilizados:",
+                        "Disponibilizar",
+                        "Mapas disponibilizados em bloco",
+                        processo.getSituacao() != FINALIZADO
+                )
+        );
+    }
+
+    private ProcessoDetalheDto.AcaoBlocoDto criarAcaoBloco(
+            String codigo,
+            AcaoProcesso acao,
+            List<SubprocessoElegivelDto> unidades,
+            boolean requerDataLimite,
+            boolean redirecionarPainel,
+            String rotulo,
+            String titulo,
+            String texto,
+            String rotuloBotao,
+            String mensagemSucesso,
+            boolean processoAtivo
+    ) {
+        boolean mostrar = processoAtivo && !unidades.isEmpty();
+        return ProcessoDetalheDto.AcaoBlocoDto.builder()
+                .codigo(codigo)
+                .acao(acao)
+                .mostrar(mostrar)
+                .habilitar(mostrar)
+                .requerDataLimite(requerDataLimite)
+                .redirecionarPainel(redirecionarPainel)
+                .rotulo(rotulo)
+                .titulo(titulo)
+                .texto(texto)
+                .rotuloBotao(rotuloBotao)
+                .mensagemSucesso(mensagemSucesso)
+                .unidades(new ArrayList<>(unidades))
+                .build();
+    }
+
+    private List<SubprocessoElegivelDto> filtrarElegiveis(
+            List<SubprocessoElegivelDto> subprocessosElegiveis,
+            java.util.function.Predicate<SubprocessoElegivelDto> filtro
+    ) {
+        return subprocessosElegiveis.stream().filter(filtro).toList();
+    }
+
+    private boolean isSituacaoCadastroDisponibilizado(SituacaoSubprocesso situacao) {
+        return situacao == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || situacao == REVISAO_CADASTRO_DISPONIBILIZADA;
+    }
+
+    private boolean isSituacaoMapaAnaliseConcluida(SituacaoSubprocesso situacao) {
+        return situacao == MAPEAMENTO_MAPA_COM_SUGESTOES
+                || situacao == MAPEAMENTO_MAPA_VALIDADO
+                || situacao == REVISAO_MAPA_COM_SUGESTOES
+                || situacao == REVISAO_MAPA_VALIDADO;
     }
 
     private UnidadeMapa obterUnidadeMapaObrigatorio(Map<Long, UnidadeMapa> mapasPorUnidade, Long codigoUnidade) {
