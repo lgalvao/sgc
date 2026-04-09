@@ -309,6 +309,18 @@ export interface PermissoesSubprocesso {
     mesmaUnidade: boolean;
     habilitarAcessoCadastro: boolean;
     habilitarAcessoMapa: boolean;
+    habilitarEditarCadastro: boolean;
+    habilitarDisponibilizarCadastro: boolean;
+    habilitarDevolverCadastro: boolean;
+    habilitarAceitarCadastro: boolean;
+    habilitarHomologarCadastro: boolean;
+    habilitarEditarMapa: boolean;
+    habilitarDisponibilizarMapa: boolean;
+    habilitarValidarMapa: boolean;
+    habilitarApresentarSugestoes: boolean;
+    habilitarDevolverMapa: boolean;
+    habilitarAceitarMapa: boolean;
+    habilitarHomologarMapa: boolean;
 }
 
 export interface ResponsavelDto {

@@ -120,6 +120,18 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
             mesmaUnidade: true,
             habilitarAcessoCadastro: false,
             habilitarAcessoMapa: true,
+            habilitarEditarCadastro: false,
+            habilitarDisponibilizarCadastro: false,
+            habilitarDevolverCadastro: false,
+            habilitarAceitarCadastro: false,
+            habilitarHomologarCadastro: false,
+            habilitarEditarMapa: true,
+            habilitarDisponibilizarMapa: true,
+            habilitarValidarMapa: false,
+            habilitarApresentarSugestoes: false,
+            habilitarDevolverMapa: false,
+            habilitarAceitarMapa: false,
+            habilitarHomologarMapa: false,
         },
     };
     return {

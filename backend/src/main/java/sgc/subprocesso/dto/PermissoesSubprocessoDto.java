@@ -28,6 +28,18 @@ public record PermissoesSubprocessoDto(
         boolean podeEnviarLembrete,
         boolean mesmaUnidade,
         boolean habilitarAcessoCadastro,
-        boolean habilitarAcessoMapa
+        boolean habilitarAcessoMapa,
+        boolean habilitarEditarCadastro,
+        boolean habilitarDisponibilizarCadastro,
+        boolean habilitarDevolverCadastro,
+        boolean habilitarAceitarCadastro,
+        boolean habilitarHomologarCadastro,
+        boolean habilitarEditarMapa,
+        boolean habilitarDisponibilizarMapa,
+        boolean habilitarValidarMapa,
+        boolean habilitarApresentarSugestoes,
+        boolean habilitarDevolverMapa,
+        boolean habilitarAceitarMapa,
+        boolean habilitarHomologarMapa
 ) {
 }

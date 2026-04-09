@@ -27,6 +27,18 @@ function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): Permiss
     mesmaUnidade: false,
     habilitarAcessoCadastro: false,
     habilitarAcessoMapa: false,
+    habilitarEditarCadastro: false,
+    habilitarDisponibilizarCadastro: false,
+    habilitarDevolverCadastro: false,
+    habilitarAceitarCadastro: false,
+    habilitarHomologarCadastro: false,
+    habilitarEditarMapa: false,
+    habilitarDisponibilizarMapa: false,
+    habilitarValidarMapa: false,
+    habilitarApresentarSugestoes: false,
+    habilitarDevolverMapa: false,
+    habilitarAceitarMapa: false,
+    habilitarHomologarMapa: false,
     ...parciais,
   };
 }
@@ -177,22 +189,21 @@ describe('useAcesso', () => {
     expect(acesso.habilitarAcessoCadastro.value).toBe(true);
   });
 
-  it('deve calcular habilitadores baseados na mesmaUnidade', () => {
+  it('deve usar habilitadores enviados pelo backend', () => {
     const subprocesso = criarSubprocesso({
       permissoes: criarPermissoes({
-        mesmaUnidade: true,
-        podeEditarCadastro: true,
-        podeDisponibilizarCadastro: true,
-        podeDevolverCadastro: true,
-        podeAceitarCadastro: true,
-        podeHomologarCadastro: true,
-        podeEditarMapa: true,
-        podeDisponibilizarMapa: true,
-        podeValidarMapa: true,
-        podeApresentarSugestoes: true,
-        podeDevolverMapa: true,
-        podeAceitarMapa: true,
-        podeHomologarMapa: true,
+        habilitarEditarCadastro: true,
+        habilitarDisponibilizarCadastro: true,
+        habilitarDevolverCadastro: true,
+        habilitarAceitarCadastro: true,
+        habilitarHomologarCadastro: true,
+        habilitarEditarMapa: true,
+        habilitarDisponibilizarMapa: true,
+        habilitarValidarMapa: true,
+        habilitarApresentarSugestoes: true,
+        habilitarDevolverMapa: true,
+        habilitarAceitarMapa: true,
+        habilitarHomologarMapa: true,
       }),
     });
     const acesso = useAcesso(subprocesso);
@@ -210,8 +221,7 @@ describe('useAcesso', () => {
     expect(acesso.habilitarAceitarMapa.value).toBe(true);
     expect(acesso.habilitarHomologarMapa.value).toBe(true);
 
-    // Test false case for mesmaUnidade
-    const subprocessoFalse = criarSubprocesso({permissoes: criarPermissoes({mesmaUnidade: false, podeEditarCadastro: true})});
+    const subprocessoFalse = criarSubprocesso({permissoes: criarPermissoes({podeEditarCadastro: true, habilitarEditarCadastro: false})});
     const acessoFalse = useAcesso(subprocessoFalse);
     expect(acessoFalse.habilitarEditarCadastro.value).toBe(false);
   });
@@ -219,7 +229,6 @@ describe('useAcesso', () => {
   it('deve calcular analisadores de mapa e flags de habilitação de mapa', () => {
     const subprocesso = criarSubprocesso({
       permissoes: criarPermissoes({
-        mesmaUnidade: true,
         podeDevolverMapa: true,
         podeAceitarMapa: false,
         podeHomologarMapa: false,
@@ -227,6 +236,13 @@ describe('useAcesso', () => {
         podeDisponibilizarMapa: true,
         podeValidarMapa: true,
         podeApresentarSugestoes: true,
+        habilitarDevolverMapa: true,
+        habilitarAceitarMapa: false,
+        habilitarHomologarMapa: false,
+        habilitarEditarMapa: true,
+        habilitarDisponibilizarMapa: true,
+        habilitarValidarMapa: true,
+        habilitarApresentarSugestoes: true,
       }),
     });
     const acesso = useAcesso(subprocesso);

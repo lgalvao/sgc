@@ -104,6 +104,18 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
         mesmaUnidade: false,
         habilitarAcessoCadastro: false,
         habilitarAcessoMapa: false,
+        habilitarEditarCadastro: false,
+        habilitarDisponibilizarCadastro: false,
+        habilitarDevolverCadastro: false,
+        habilitarAceitarCadastro: false,
+        habilitarHomologarCadastro: false,
+        habilitarEditarMapa: false,
+        habilitarDisponibilizarMapa: false,
+        habilitarValidarMapa: false,
+        habilitarApresentarSugestoes: false,
+        habilitarDevolverMapa: false,
+        habilitarAceitarMapa: false,
+        habilitarHomologarMapa: false,
     };
     const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
     const mapa: MapaCompleto = {codigo: 100, subprocessoCodigo: 123, observacoes: "", competencias: [], situacao: "CRIADO"};

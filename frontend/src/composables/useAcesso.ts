@@ -41,19 +41,19 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const habilitarAcessoCadastro = computed(() => getPermissoes()?.habilitarAcessoCadastro ?? false);
     const habilitarAcessoMapa = computed(() => getPermissoes()?.habilitarAcessoMapa ?? false);
 
-    const habilitarEditarCadastro = computed(() => podeEditarCadastro.value && mesmaUnidade.value);
-    const habilitarDisponibilizarCadastro = computed(() => podeDisponibilizarCadastro.value && mesmaUnidade.value);
-    const habilitarDevolverCadastro = computed(() => podeDevolverCadastro.value && mesmaUnidade.value);
-    const habilitarAceitarCadastro = computed(() => podeAceitarCadastro.value && mesmaUnidade.value);
-    const habilitarHomologarCadastro = computed(() => podeHomologarCadastro.value && mesmaUnidade.value);
+    const habilitarEditarCadastro = computed(() => getPermissoes()?.habilitarEditarCadastro ?? false);
+    const habilitarDisponibilizarCadastro = computed(() => getPermissoes()?.habilitarDisponibilizarCadastro ?? false);
+    const habilitarDevolverCadastro = computed(() => getPermissoes()?.habilitarDevolverCadastro ?? false);
+    const habilitarAceitarCadastro = computed(() => getPermissoes()?.habilitarAceitarCadastro ?? false);
+    const habilitarHomologarCadastro = computed(() => getPermissoes()?.habilitarHomologarCadastro ?? false);
 
-    const habilitarEditarMapa = computed(() => podeEditarMapa.value && mesmaUnidade.value);
-    const habilitarDisponibilizarMapa = computed(() => podeDisponibilizarMapa.value && mesmaUnidade.value);
-    const habilitarValidarMapa = computed(() => podeValidarMapa.value && mesmaUnidade.value);
-    const habilitarApresentarSugestoes = computed(() => podeApresentarSugestoes.value && mesmaUnidade.value);
-    const habilitarDevolverMapa = computed(() => podeDevolverMapa.value && mesmaUnidade.value);
-    const habilitarAceitarMapa = computed(() => podeAceitarMapa.value && mesmaUnidade.value);
-    const habilitarHomologarMapa = computed(() => podeHomologarMapa.value && mesmaUnidade.value);
+    const habilitarEditarMapa = computed(() => getPermissoes()?.habilitarEditarMapa ?? false);
+    const habilitarDisponibilizarMapa = computed(() => getPermissoes()?.habilitarDisponibilizarMapa ?? false);
+    const habilitarValidarMapa = computed(() => getPermissoes()?.habilitarValidarMapa ?? false);
+    const habilitarApresentarSugestoes = computed(() => getPermissoes()?.habilitarApresentarSugestoes ?? false);
+    const habilitarDevolverMapa = computed(() => getPermissoes()?.habilitarDevolverMapa ?? false);
+    const habilitarAceitarMapa = computed(() => getPermissoes()?.habilitarAceitarMapa ?? false);
+    const habilitarHomologarMapa = computed(() => getPermissoes()?.habilitarHomologarMapa ?? false);
 
     return {
         mesmaUnidade,

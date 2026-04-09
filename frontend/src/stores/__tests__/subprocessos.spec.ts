@@ -77,6 +77,18 @@ function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): Permiss
         mesmaUnidade: false,
         habilitarAcessoCadastro: false,
         habilitarAcessoMapa: false,
+        habilitarEditarCadastro: false,
+        habilitarDisponibilizarCadastro: false,
+        habilitarDevolverCadastro: false,
+        habilitarAceitarCadastro: false,
+        habilitarHomologarCadastro: false,
+        habilitarEditarMapa: false,
+        habilitarDisponibilizarMapa: false,
+        habilitarValidarMapa: false,
+        habilitarApresentarSugestoes: false,
+        habilitarDevolverMapa: false,
+        habilitarAceitarMapa: false,
+        habilitarHomologarMapa: false,
         ...parciais,
     };
 }
