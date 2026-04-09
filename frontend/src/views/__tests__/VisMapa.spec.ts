@@ -11,6 +11,16 @@ import * as useAcessoModule from '@/composables/useAcesso';
 import * as processoServiceModule from '@/services/processoService';
 import * as subprocessoServiceModule from '@/services/subprocessoService';
 
+function criarAcaoPrincipalMapa(codigo: 'ACEITAR' | 'HOMOLOGAR' = 'ACEITAR') {
+    return {
+        codigo,
+        mostrar: true,
+        habilitar: true,
+        rotuloBotao: codigo === 'HOMOLOGAR' ? 'Homologar' : 'Registrar aceite',
+        mensagemSucesso: codigo === 'HOMOLOGAR' ? 'Mapa homologado' : 'Aceite registrado',
+    };
+}
+
 vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn().mockResolvedValue({sigla: 'TEST', nome: 'Unidade'}),
 }));
@@ -123,11 +133,9 @@ describe("VisMapa.vue", () => {
             podeVerSugestoes: {value: false},
             podeAceitarMapa: {value: true},
             podeDevolverMapa: {value: true},
-            podeHomologarMapa: {value: false},
             habilitarValidarMapa: {value: true},
-            habilitarAceitarMapa: {value: true},
             habilitarDevolverMapa: {value: true},
-            habilitarHomologarMapa: {value: false},
+            acaoPrincipalMapa: {value: criarAcaoPrincipalMapa('ACEITAR')},
             podeVerPagina: {value: true},
             podeVisualizarMapa: {value: true},
             ...accessOverrides
@@ -471,7 +479,7 @@ describe("VisMapa.vue", () => {
                     ],
                 },
             },
-        }, "TEST", {podeHomologarMapa: {value: true}});
+        }, "TEST", {acaoPrincipalMapa: {value: criarAcaoPrincipalMapa('HOMOLOGAR')}});
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
             .trigger("click");
@@ -491,8 +499,7 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
         await flushPromises();
 
-        // Para GESTOR, o botão é btn-mapa-historico-gestor
-        const btn = wrapper.find('[data-testid="btn-mapa-historico-gestor"]');
+        const btn = wrapper.find('[data-testid="btn-mapa-historico"]');
         expect(btn.exists()).toBe(true);
 
         // Verificar que o modal pode ser aberto (teste básico)
@@ -522,7 +529,7 @@ describe("VisMapa.vue", () => {
             podeVerSugestoes: {value: true},
             podeAceitarMapa: {value: false},
             podeDevolverMapa: {value: false},
-            podeHomologarMapa: {value: false},
+            acaoPrincipalMapa: {value: null},
         });
         await wrapper.vm.$nextTick();
 
@@ -675,7 +682,7 @@ describe("VisMapa.vue", () => {
             podeVerSugestoes: {value: true},
             podeAceitarMapa: {value: false},
             podeDevolverMapa: {value: false},
-            podeHomologarMapa: {value: false}
+            acaoPrincipalMapa: {value: null}
         });
         await flushPromises();
 
@@ -692,7 +699,7 @@ describe("VisMapa.vue", () => {
         }, "TEST", {podeAceitarMapa: {value: true}});
         await flushPromises();
 
-        await wrapper.find('[data-testid="btn-mapa-historico-gestor"]').trigger("click");
+        await wrapper.find('[data-testid="btn-mapa-historico"]').trigger("click");
         await flushPromises();
         expect(wrapper.vm.mostrarModalHistorico).toBe(true);
 

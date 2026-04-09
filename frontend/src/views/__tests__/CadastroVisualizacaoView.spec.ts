@@ -16,7 +16,7 @@ import type {NormalizedError} from "@/utils/apiError";
 type CadastroVisualizacaoVm = {
     observacaoDevolucao: string;
     observacaoValidacao: string;
-    podeHomologarCadastro: boolean;
+    acaoPrincipalCadastro: {codigo: 'ACEITAR' | 'HOMOLOGAR'; habilitar: boolean; mostrar: boolean; mensagemSucesso: string; redirecionarParaPainel: boolean};
     mostrarModalImpacto: boolean;
     mostrarModalHistoricoAnalise: boolean;
     mostrarModalValidar: boolean;
@@ -36,6 +36,20 @@ type CadastroVisualizacaoVm = {
     fecharModalDevolver: () => void;
     $nextTick: () => Promise<void>;
 };
+
+function criarAcaoPrincipalCadastro(codigo: 'ACEITAR' | 'HOMOLOGAR' = 'HOMOLOGAR') {
+    return {
+        codigo,
+        mostrar: true,
+        habilitar: true,
+        tituloModal: codigo === 'HOMOLOGAR' ? 'Homologar cadastro' : 'Aceitar cadastro',
+        textoModal: codigo === 'HOMOLOGAR' ? 'Homologar cadastro' : 'Aceitar cadastro',
+        rotuloBotao: codigo === 'HOMOLOGAR' ? 'Homologar' : 'Aceitar',
+        rotuloConfirmacao: codigo === 'HOMOLOGAR' ? 'Homologar' : 'Aceitar',
+        mensagemSucesso: codigo === 'HOMOLOGAR' ? 'Homologado' : 'Aceito',
+        redirecionarParaPainel: codigo === 'ACEITAR',
+    };
+}
 
 type FluxoSubprocessoMock = {
     aceitarCadastro: ReturnType<typeof vi.fn>;
@@ -209,13 +223,10 @@ describe("CadastroVisualizacaoView coverage", () => {
         };
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeHomologarCadastro: ref(true),
-            podeAceitarCadastro: ref(true),
             podeDevolverCadastro: ref(true),
             podeVisualizarImpacto: ref(true),
-            habilitarHomologarCadastro: ref(true),
-            habilitarAceitarCadastro: ref(true),
             habilitarDevolverCadastro: ref(true),
+            acaoPrincipalCadastro: ref(criarAcaoPrincipalCadastro()),
             ...accessOverrides
         } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
@@ -252,13 +263,13 @@ describe("CadastroVisualizacaoView coverage", () => {
         await flushPromises();
         expect(fluxoSubprocesso.devolverCadastro).toHaveBeenCalled();
 
-        vm.podeHomologarCadastro = false;
+        vm.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('ACEITAR');
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
         expect(fluxoSubprocesso.aceitarCadastro).toHaveBeenCalled();
 
-        vm.podeHomologarCadastro = true;
+        vm.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('HOMOLOGAR');
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
@@ -268,12 +279,12 @@ describe("CadastroVisualizacaoView coverage", () => {
         await flushPromises();
 
         const vmRevisao = wrapperRevisao.vm as unknown as CadastroVisualizacaoVm;
-        vmRevisao.podeHomologarCadastro = true;
+        vmRevisao.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('HOMOLOGAR');
         await vmRevisao.confirmarValidacao();
         expect(fluxoSubprocesso.homologarRevisaoCadastro).toHaveBeenCalled();
 
         // Aceitar Revisão
-        vmRevisao.podeHomologarCadastro = false;
+        vmRevisao.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('ACEITAR');
         await vmRevisao.confirmarValidacao();
         expect(fluxoSubprocesso.aceitarRevisaoCadastro).toHaveBeenCalled();
 
@@ -369,7 +380,7 @@ describe("CadastroVisualizacaoView coverage", () => {
 
         // Falha no aceite
         fluxoSubprocesso.aceitarCadastro.mockResolvedValue(false);
-        vm.podeHomologarCadastro = false;
+        vm.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('ACEITAR');
         vm.mostrarModalValidar = true;
         vm.observacaoValidacao = "Teste falha";
         await vm.confirmarValidacao();
@@ -377,7 +388,7 @@ describe("CadastroVisualizacaoView coverage", () => {
 
         // Falha na homologação
         fluxoSubprocesso.homologarCadastro.mockResolvedValue(false);
-        vm.podeHomologarCadastro = true;
+        vm.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('HOMOLOGAR');
         await vm.confirmarValidacao();
         expect(vm.mostrarModalValidar).toBe(true);
 
@@ -400,12 +411,9 @@ describe("CadastroVisualizacaoView coverage", () => {
 
     it("deve manter devolucao e homologacao visiveis, porem desabilitadas, fora da localizacao permitida", async () => {
         const wrapper = createWrapper({
-            podeHomologarCadastro: ref(true),
-            podeAceitarCadastro: ref(false),
             podeDevolverCadastro: ref(true),
-            habilitarHomologarCadastro: ref(false),
-            habilitarAceitarCadastro: ref(false),
             habilitarDevolverCadastro: ref(false),
+            acaoPrincipalCadastro: ref({...criarAcaoPrincipalCadastro('HOMOLOGAR'), habilitar: false}),
         });
         await flushPromises();
 

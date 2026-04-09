@@ -27,7 +27,7 @@
 
         <BButton
             v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
-            :data-testid="podeAnalisar ? 'btn-mapa-historico-gestor' : 'btn-mapa-historico'"
+            data-testid="btn-mapa-historico"
             variant="outline-secondary"
             @click="verHistorico"
         >
@@ -37,7 +37,7 @@
         <BButton
             v-if="podeAnalisar"
             data-testid="btn-mapa-devolver"
-            :disabled="!habilitarAnalisarMapa"
+            :disabled="!habilitarDevolverMapa"
             variant="secondary"
             @click="abrirModalDevolucao"
         >
@@ -55,13 +55,13 @@
         </BButton>
 
         <BButton
-            v-if="podeAnalisar"
+            v-if="acaoPrincipalMapa?.mostrar"
             data-testid="btn-mapa-homologar-aceite"
-            :disabled="!habilitarAnalisarMapa"
+            :disabled="!acaoPrincipalMapa.habilitar"
             variant="success"
             @click="abrirModalAceitar"
         >
-          {{ podeHomologarMapa ? TEXTOS.mapa.LABEL_HOMOLOGAR : TEXTOS.mapa.LABEL_REGISTRAR_ACEITE }}
+          {{ acaoPrincipalMapa.rotuloBotao }}
         </BButton>
       </template>
     </PageHeader>
@@ -125,7 +125,7 @@
 
     <AceitarMapaModal
         :loading="isLoading"
-        :homologacao="isHomologacao"
+        :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
         :mostrar-modal="mostrarModalAceitar"
         @fechar-modal="fecharModalAceitar"
         @confirmar-aceitacao="confirmarAceitacao"
@@ -279,32 +279,21 @@ const {
   podeValidarMapa,
   podeAceitarMapa,
   podeDevolverMapa,
-  podeHomologarMapa,
   podeVerSugestoes: podeMostrarVerSugestoes,
-  habilitarAceitarMapa,
   habilitarDevolverMapa,
-  habilitarHomologarMapa,
-  habilitarValidarMapa
+  habilitarValidarMapa,
+  acaoPrincipalMapa
 } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
 const podeValidar = computed(() => podeValidarMapa.value);
 const habilitarValidar = computed(() => habilitarValidarMapa.value);
 const podeAnalisar = computed(() => {
   return (
-      podeAceitarMapa.value ||
-      podeDevolverMapa.value ||
-      podeHomologarMapa.value
-  );
-});
-const habilitarAnalisarMapa = computed(() => {
-  return (
-      habilitarAceitarMapa.value ||
-      habilitarDevolverMapa.value ||
-      habilitarHomologarMapa.value
+      Boolean(acaoPrincipalMapa.value?.mostrar) ||
+      podeDevolverMapa.value
   );
 });
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
-const isHomologacao = computed(() => podeHomologarMapa.value);
 
 const historicoAnalise = computed(() => {
   return analisesCadastro.value || [];
@@ -374,13 +363,13 @@ async function confirmarAceitacao(observacao = "") {
 
   try {
     await executarComLoading(async () => {
-      if (isHomologacao.value) {
+      if (acaoPrincipalMapa.value?.codigo === "HOMOLOGAR") {
         await homologarValidacaoService(codSubprocesso.value!, {texto: observacao});
       } else {
         await aceitarValidacaoService(codSubprocesso.value!, {texto: observacao});
       }
       await concluirAcaoPainel(
-          isHomologacao.value ? TEXTOS.mapa.SUCESSO_HOMOLOGACAO : TEXTOS.sucesso.ACEITE_REGISTRADO,
+          acaoPrincipalMapa.value?.mensagemSucesso ?? TEXTOS.sucesso.ACEITE_REGISTRADO,
           fecharModalAceitar,
       );
     });
@@ -486,7 +475,7 @@ defineExpose({
   unidade,
   podeValidar,
   podeAnalisar,
-  isHomologacao,
+  acaoPrincipalMapa,
   podeVerSugestoes,
   temHistoricoAnalise,
   historicoAnalise,

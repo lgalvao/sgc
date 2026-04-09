@@ -36,14 +36,14 @@
           {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
         </BButton>
         <BButton
-            v-if="podeAceitarCadastro || podeHomologarCadastro"
+            v-if="acaoPrincipalCadastro?.mostrar"
             data-testid="btn-acao-analisar-principal"
-            :disabled="!habilitarAnalisarCadastro"
-            :title="podeHomologarCadastro ? TEXTOS.atividades.BOTAO_HOMOLOGAR : TEXTOS.atividades.BOTAO_ACEITAR"
+            :disabled="!acaoPrincipalCadastro.habilitar"
+            :title="acaoPrincipalCadastro.rotuloBotao"
             variant="success"
             @click="validarCadastro"
         >
-          {{ podeHomologarCadastro ? TEXTOS.atividades.BOTAO_HOMOLOGAR : TEXTOS.atividades.BOTAO_ACEITAR }}
+          {{ acaoPrincipalCadastro.rotuloBotao }}
         </BButton>
       </template>
     </PageHeader>
@@ -92,15 +92,13 @@
         v-model="mostrarModalValidar"
         :auto-close="false"
         :loading="loadingValidacao"
-        :titulo="isHomologacao ? TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO : (isRevisao ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TITULO : TEXTOS.atividades.MODAL_VALIDAR_TITULO)"
-        :ok-title="isHomologacao ? TEXTOS.comum.BOTAO_HOMOLOGAR : (isRevisao ? TEXTOS.comum.BOTAO_ACEITAR : TEXTOS.comum.BOTAO_VALIDAR)"
+        :titulo="acaoPrincipalCadastro?.tituloModal ?? ''"
+        :ok-title="acaoPrincipalCadastro?.rotuloConfirmacao ?? ''"
         test-codigo-confirmar="btn-aceite-cadastro-confirmar"
         variant="success"
         @confirmar="confirmarValidacao"
     >
-      <p>{{
-          isHomologacao ? TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO : (isRevisao ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TEXTO : TEXTOS.atividades.MODAL_VALIDAR_TEXTO)
-        }}</p>
+      <p>{{ acaoPrincipalCadastro?.textoModal }}</p>
       <BFormGroup class="mb-3" :label="TEXTOS.comum.OBSERVACAO" label-for="observacaoValidacao">
         <BFormTextarea
             id="observacaoValidacao"
@@ -202,18 +200,11 @@ const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
 
 const {
-  podeHomologarCadastro,
-  podeAceitarCadastro,
   podeDevolverCadastro,
   podeVisualizarImpacto,
-  habilitarAceitarCadastro,
   habilitarDevolverCadastro,
-  habilitarHomologarCadastro
+  acaoPrincipalCadastro
 } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
-
-
-const isHomologacao = computed(() => podeHomologarCadastro.value);
-const habilitarAnalisarCadastro = computed(() => habilitarAceitarCadastro.value || habilitarHomologarCadastro.value);
 
 const atividades = ref<Atividade[]>([]);
 const isRevisao = computed(() => subprocessosStore.subprocessoDetalhe?.tipoProcesso === TipoProcesso.REVISAO);
@@ -278,11 +269,14 @@ function fecharModalDevolver() {
 async function confirmarValidacao() {
   if (!codSubprocesso.value) return;
 
+  const acao = acaoPrincipalCadastro.value;
+  if (!acao) return;
+
   loadingValidacao.value = true;
   try {
     let sucesso: boolean;
 
-    if (isHomologacao.value) {
+    if (acao.codigo === "HOMOLOGAR") {
       const req: HomologarCadastroRequest = {
         observacoes: observacaoValidacao.value,
       };
@@ -294,14 +288,18 @@ async function confirmarValidacao() {
 
       if (sucesso) {
         fecharModalValidar();
-        toastStore.setPending(TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA);
-        await router.push({
-          name: "Subprocesso",
-          params: {
-            codProcesso: props.codProcesso,
-            siglaUnidade: props.sigla,
-          },
-        });
+        toastStore.setPending(acao.mensagemSucesso);
+        if (acao.redirecionarParaPainel) {
+          await router.push({name: "Painel"});
+        } else {
+          await router.push({
+            name: "Subprocesso",
+            params: {
+              codProcesso: props.codProcesso,
+              siglaUnidade: props.sigla,
+            },
+          });
+        }
       }
     } else {
       const req: AceitarCadastroRequest = {
@@ -315,7 +313,7 @@ async function confirmarValidacao() {
 
       if (sucesso) {
         fecharModalValidar();
-        toastStore.setPending(TEXTOS.sucesso.ACEITE_REGISTRADO);
+        toastStore.setPending(acao.mensagemSucesso);
         await router.push({name: "Painel"});
       }
     }

@@ -1,5 +1,26 @@
 import {computed, type Ref, unref} from 'vue';
 import type {SubprocessoDetalhe} from '@/types/tipos';
+import {TEXTOS} from '@/constants/textos';
+
+type AcaoPrincipalCadastro = {
+    codigo: 'ACEITAR' | 'HOMOLOGAR';
+    mostrar: boolean;
+    habilitar: boolean;
+    tituloModal: string;
+    textoModal: string;
+    rotuloBotao: string;
+    rotuloConfirmacao: string;
+    mensagemSucesso: string;
+    redirecionarParaPainel: boolean;
+};
+
+type AcaoPrincipalMapa = {
+    codigo: 'ACEITAR' | 'HOMOLOGAR';
+    mostrar: boolean;
+    habilitar: boolean;
+    rotuloBotao: string;
+    mensagemSucesso: string;
+};
 
 /**
  * Hook to access permissions calculated by the backend.
@@ -10,6 +31,7 @@ import type {SubprocessoDetalhe} from '@/types/tipos';
 export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | SubprocessoDetalhe) {
     const getSubprocesso = () => unref(subprocessoRef);
     const getPermissoes = () => getSubprocesso()?.permissoes;
+    const isRevisao = computed(() => getSubprocesso()?.tipoProcesso === 'REVISAO');
 
     const podeEditarCadastro = computed(() => getPermissoes()?.podeEditarCadastro ?? false);
     const podeDisponibilizarCadastro = computed(() => getPermissoes()?.podeDisponibilizarCadastro ?? false);
@@ -55,6 +77,70 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const habilitarAceitarMapa = computed(() => getPermissoes()?.habilitarAceitarMapa ?? false);
     const habilitarHomologarMapa = computed(() => getPermissoes()?.habilitarHomologarMapa ?? false);
 
+    const acaoPrincipalCadastro = computed<AcaoPrincipalCadastro | null>(() => {
+        if (podeHomologarCadastro.value) {
+            return {
+                codigo: 'HOMOLOGAR',
+                mostrar: true,
+                habilitar: habilitarHomologarCadastro.value,
+                tituloModal: TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO,
+                textoModal: TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO,
+                rotuloBotao: TEXTOS.atividades.BOTAO_HOMOLOGAR,
+                rotuloConfirmacao: TEXTOS.comum.BOTAO_HOMOLOGAR,
+                mensagemSucesso: TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA,
+                redirecionarParaPainel: false,
+            };
+        }
+
+        if (podeAceitarCadastro.value) {
+            return {
+                codigo: 'ACEITAR',
+                mostrar: true,
+                habilitar: habilitarAceitarCadastro.value,
+                tituloModal: isRevisao.value
+                    ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TITULO
+                    : TEXTOS.atividades.MODAL_VALIDAR_TITULO,
+                textoModal: isRevisao.value
+                    ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TEXTO
+                    : TEXTOS.atividades.MODAL_VALIDAR_TEXTO,
+                rotuloBotao: isRevisao.value
+                    ? TEXTOS.atividades.BOTAO_ACEITAR
+                    : TEXTOS.atividades.BOTAO_ACEITAR,
+                rotuloConfirmacao: isRevisao.value
+                    ? TEXTOS.comum.BOTAO_ACEITAR
+                    : TEXTOS.comum.BOTAO_VALIDAR,
+                mensagemSucesso: TEXTOS.sucesso.ACEITE_REGISTRADO,
+                redirecionarParaPainel: true,
+            };
+        }
+
+        return null;
+    });
+
+    const acaoPrincipalMapa = computed<AcaoPrincipalMapa | null>(() => {
+        if (podeHomologarMapa.value) {
+            return {
+                codigo: 'HOMOLOGAR',
+                mostrar: true,
+                habilitar: habilitarHomologarMapa.value,
+                rotuloBotao: TEXTOS.mapa.LABEL_HOMOLOGAR,
+                mensagemSucesso: TEXTOS.mapa.SUCESSO_HOMOLOGACAO,
+            };
+        }
+
+        if (podeAceitarMapa.value) {
+            return {
+                codigo: 'ACEITAR',
+                mostrar: true,
+                habilitar: habilitarAceitarMapa.value,
+                rotuloBotao: TEXTOS.mapa.LABEL_REGISTRAR_ACEITE,
+                mensagemSucesso: TEXTOS.sucesso.ACEITE_REGISTRADO,
+            };
+        }
+
+        return null;
+    });
+
     return {
         mesmaUnidade,
         podeEditarCadastro,
@@ -90,6 +176,8 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         habilitarApresentarSugestoes,
         habilitarDevolverMapa,
         habilitarAceitarMapa,
-        habilitarHomologarMapa
+        habilitarHomologarMapa,
+        acaoPrincipalCadastro,
+        acaoPrincipalMapa
     };
 }

@@ -9,6 +9,16 @@ import * as subprocessoService from "@/services/subprocessoService";
 import * as unidadeService from "@/services/unidadeService";
 import MapaVisualizacaoView from "../MapaVisualizacaoView.vue";
 
+function criarAcaoPrincipalMapa(codigo: 'ACEITAR' | 'HOMOLOGAR' = 'HOMOLOGAR') {
+    return {
+        codigo,
+        mostrar: true,
+        habilitar: true,
+        rotuloBotao: codigo === 'HOMOLOGAR' ? 'Homologar' : 'Registrar aceite',
+        mensagemSucesso: codigo === 'HOMOLOGAR' ? 'Mapa homologado' : 'Aceite registrado',
+    };
+}
+
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
 vi.mock("vue-router", () => ({
@@ -106,12 +116,10 @@ describe("MapaVisualizacaoView.vue", () => {
             podeValidarMapa: ref(true),
             podeAceitarMapa: ref(true),
             podeDevolverMapa: ref(true),
-            podeHomologarMapa: ref(true),
             podeVerSugestoes: ref(true),
             habilitarValidarMapa: ref(true),
-            habilitarAceitarMapa: ref(true),
             habilitarDevolverMapa: ref(true),
-            habilitarHomologarMapa: ref(true),
+            acaoPrincipalMapa: ref(criarAcaoPrincipalMapa()),
             ...accessOverrides
         } as any);
 
@@ -179,9 +187,7 @@ describe("MapaVisualizacaoView.vue", () => {
     it("abre modal e confirma aceite", async () => {
         const wrapper = createWrapper({
             podeAceitarMapa: ref(true),
-            podeHomologarMapa: ref(false),
-            habilitarAceitarMapa: ref(true),
-            habilitarHomologarMapa: ref(false),
+            acaoPrincipalMapa: ref(criarAcaoPrincipalMapa('ACEITAR')),
         });
         await flushPromises();
         vi.mocked(processoService.aceitarValidacao).mockResolvedValue(undefined as never);
@@ -211,7 +217,7 @@ describe("MapaVisualizacaoView.vue", () => {
         await flushPromises();
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
 
-        await wrapper.find('[data-testid="btn-mapa-historico-gestor"]').trigger("click");
+        await wrapper.find('[data-testid="btn-mapa-historico"]').trigger("click");
         await flushPromises();
 
         expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(123);
@@ -220,9 +226,8 @@ describe("MapaVisualizacaoView.vue", () => {
     it("deve manter devolucao, aceite e validacao visiveis, porem desabilitadas, fora da localizacao permitida", async () => {
         const wrapper = createWrapper({
             habilitarValidarMapa: ref(false),
-            habilitarAceitarMapa: ref(false),
             habilitarDevolverMapa: ref(false),
-            habilitarHomologarMapa: ref(false),
+            acaoPrincipalMapa: ref({...criarAcaoPrincipalMapa('HOMOLOGAR'), habilitar: false}),
         });
         await flushPromises();
 
