@@ -173,16 +173,7 @@ public class SubprocessoConsultaService {
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
         List<Movimentacao> movimentacoes = listarMovimentacoes(sp);
         ContextoConsultaSubprocesso contexto = montarContextoConsulta(sp, usuarioAutenticado, movimentacoes);
-        DadosDetalheSubprocesso dadosDetalhe = montarDadosDetalhe(contexto, movimentacoes);
-
-        return SubprocessoDetalheResponse.builder()
-                .subprocesso(SubprocessoResumoDto.fromEntity(sp))
-                .responsavel(dadosDetalhe.responsavel())
-                .titular(UsuarioResumoDto.fromEntity(dadosDetalhe.titular()))
-                .movimentacoes(dadosDetalhe.movimentacoes())
-                .localizacaoAtual(dadosDetalhe.localizacaoAtual())
-                .permissoes(dadosDetalhe.permissoes())
-                .build();
+        return construirDetalhe(contexto, movimentacoes);
     }
 
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
@@ -198,11 +189,7 @@ public class SubprocessoConsultaService {
     }
 
     public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
-        ContextoPermissaoSubprocesso contexto = montarContextoPermissao(montarContextoConsulta(sp, usuario));
-        if (contexto.processoFinalizado()) {
-            return construirPermissoesProcessoFinalizado(contexto);
-        }
-        return construirPermissoes(contexto);
+        return resolverPermissoes(montarContextoPermissao(montarContextoConsulta(sp, usuario)));
     }
 
     private PermissoesSubprocessoDto construirPermissoes(ContextoPermissaoSubprocesso contexto) {
@@ -356,17 +343,19 @@ public class SubprocessoConsultaService {
         return obterMapaObrigatorio(subprocesso).getCodigo();
     }
 
-    private DadosDetalheSubprocesso montarDadosDetalhe(ContextoConsultaSubprocesso contexto, List<Movimentacao> movimentacoes) {
-        ContextoPermissaoSubprocesso contextoPermissao = montarContextoPermissao(contexto);
-        return new DadosDetalheSubprocesso(
-                contexto.localizacaoAtual().getSigla(),
-                usuarioFacade.buscarResponsabilidadeDetalhadaAtual(contexto.unidadeAlvo().getCodigo()),
-                buscarTitularSeInformado(contexto.unidadeAlvo()),
-                listarMovimentacoesDto(movimentacoes),
-                contextoPermissao.processoFinalizado()
-                        ? construirPermissoesProcessoFinalizado(contextoPermissao)
-                        : construirPermissoes(contextoPermissao)
-        );
+    private SubprocessoDetalheResponse construirDetalhe(ContextoConsultaSubprocesso contexto, List<Movimentacao> movimentacoes) {
+        Subprocesso subprocesso = contexto.subprocesso();
+        Unidade unidadeAlvo = contexto.unidadeAlvo();
+        Usuario titular = buscarTitularSeInformado(unidadeAlvo);
+
+        return SubprocessoDetalheResponse.builder()
+                .subprocesso(SubprocessoResumoDto.fromEntity(subprocesso))
+                .responsavel(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(unidadeAlvo.getCodigo()))
+                .titular(UsuarioResumoDto.fromEntity(titular))
+                .movimentacoes(listarMovimentacoesDto(movimentacoes))
+                .localizacaoAtual(contexto.localizacaoAtual().getSigla())
+                .permissoes(resolverPermissoes(montarContextoPermissao(contexto)))
+                .build();
     }
 
     private DadosContextoEdicao montarDadosContextoEdicao(Long codSubprocesso, Usuario usuario) {
@@ -463,13 +452,11 @@ public class SubprocessoConsultaService {
         );
     }
 
-    private record DadosDetalheSubprocesso(
-            String localizacaoAtual,
-            ResponsavelDto responsavel,
-            @Nullable Usuario titular,
-            List<MovimentacaoDto> movimentacoes,
-            PermissoesSubprocessoDto permissoes
-    ) {
+    private PermissoesSubprocessoDto resolverPermissoes(ContextoPermissaoSubprocesso contexto) {
+        if (contexto.processoFinalizado()) {
+            return construirPermissoesProcessoFinalizado(contexto);
+        }
+        return construirPermissoes(contexto);
     }
 
     private record DadosContextoEdicao(
