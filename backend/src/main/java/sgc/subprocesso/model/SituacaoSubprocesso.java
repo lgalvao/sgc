@@ -91,7 +91,7 @@ public enum SituacaoSubprocesso {
         return switch (this) {
             case REVISAO_CADASTRO_EM_ANDAMENTO -> nova == REVISAO_CADASTRO_DISPONIBILIZADA;
             case REVISAO_CADASTRO_DISPONIBILIZADA ->
-                    nova == REVISAO_CADASTRO_EM_ANDAMENTO || nova == REVISAO_CADASTRO_HOMOLOGADA || nova == REVISAO_MAPA_HOMOLOGADO;
+                    nova == REVISAO_CADASTRO_EM_ANDAMENTO || nova == REVISAO_CADASTRO_HOMOLOGADA;
             case REVISAO_CADASTRO_HOMOLOGADA ->
                     nova == REVISAO_MAPA_AJUSTADO || nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_CADASTRO_EM_ANDAMENTO;
             case REVISAO_MAPA_AJUSTADO ->
