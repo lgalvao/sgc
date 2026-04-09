@@ -58,7 +58,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
         await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
 
         // Verifica que o botão "Ver sugestões" NÃO aparece (situação é "Mapa validado", não "Mapa com sugestões")
@@ -88,7 +88,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await expect(page.getByText(TEXTOS.mapa.SUCESSO_HOMOLOGACAO).first()).toBeVisible();
+        await verificarPaginaPainel(page);
     });
 
 });
@@ -116,7 +116,7 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         await expect(page.getByTestId('btn-mapa-ver-sugestoes')).toBeVisible();
 
         // Os demais botões de análise também devem estar presentes
-        await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
         await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
 
         // Clique no botão abre modal com sugestões registradas
