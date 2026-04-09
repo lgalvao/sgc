@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
@@ -24,6 +25,13 @@ import static org.mockito.Mockito.*;
 @DisplayName("PainelFacade Test")
 @SuppressWarnings("NullAway.Init")
 class PainelFacadeTest {
+    private static final ContextoUsuarioAutenticado CONTEXTO_ADMIN =
+            new ContextoUsuarioAutenticado("123", 100L, Perfil.ADMIN);
+    private static final ContextoUsuarioAutenticado CONTEXTO_GESTOR =
+            new ContextoUsuarioAutenticado("123", 100L, Perfil.GESTOR);
+    private static final ContextoUsuarioAutenticado CONTEXTO_CHEFE =
+            new ContextoUsuarioAutenticado("123", 100L, Perfil.CHEFE);
+
     @Mock
     private ProcessoService processoService;
     @Mock
@@ -44,7 +52,7 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(page);
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/cadastro?codProcesso=1");
@@ -59,7 +67,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarDescendentes(eq(100L), anyMap())).thenReturn(List.of(101L));
         when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.GESTOR, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_GESTOR, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1");
@@ -83,7 +91,7 @@ class PainelFacadeTest {
         when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeService.buscarSiglaPorCodigo(100L)).thenReturn(unidade.getSigla());
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_CHEFE, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(2);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1/ASSESSORIA_22");
@@ -97,7 +105,7 @@ class PainelFacadeTest {
         when(unidadeService.buscarSiglaPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, pageRequest))
+        assertThatThrownBy(() -> painelFacade.listarProcessos(CONTEXTO_CHEFE, pageRequest))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Erro");
     }
@@ -118,11 +126,11 @@ class PainelFacadeTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
+        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
         when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", Pageable.unpaged());
+        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
@@ -147,11 +155,11 @@ class PainelFacadeTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
+        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
         when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", sorted);
+        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, sorted);
         assertThat(result).hasSize(1);
     }
 
@@ -172,11 +180,11 @@ class PainelFacadeTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
+        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
         when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", unsortedPaged);
+        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, unsortedPaged);
         assertThat(result).hasSize(1);
     }
 
@@ -186,7 +194,7 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, Pageable.unpaged());
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, Pageable.unpaged());
 
         assertThat(result).isEmpty();
         verify(processoService).listarTodos(Pageable.unpaged());
@@ -213,7 +221,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1");
     }
 

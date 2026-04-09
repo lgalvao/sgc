@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.integracao.mocks.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
 
@@ -30,6 +31,8 @@ class AlertaControllerTest {
     private SgcPermissionEvaluator permissionEvaluator;
     @MockitoBean
     private AlertaFacade alertaFacade;
+    @MockitoBean
+    private UsuarioFacade usuarioFacade;
 
     @Nested
     @DisplayName("Marcar como Lidos")
@@ -40,6 +43,7 @@ class AlertaControllerTest {
             Usuario usuarioMock = Usuario.builder()
                     .tituloEleitoral(TITULO_TESTE)
                     .build();
+            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
 
             mockMvc.perform(post("/api/alertas/marcar-como-lidos")
                             .with(user(usuarioMock))
@@ -57,6 +61,7 @@ class AlertaControllerTest {
             Usuario usuarioMock = Usuario.builder()
                     .tituloEleitoral(TITULO_TESTE)
                     .build();
+            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
 
             mockMvc.perform(post("/api/alertas/marcar-como-lidos")
                             .with(user(usuarioMock))
@@ -80,8 +85,9 @@ class AlertaControllerTest {
                     .unidadeAtivaCodigo(1L)
                     .perfilAtivo(Perfil.GESTOR)
                     .build();
+            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
 
-            when(alertaFacade.alertasPorUsuario(eq(TITULO_TESTE), eq(1L), anyString()))
+            when(alertaFacade.alertasPorUsuario(any(ContextoUsuarioAutenticado.class)))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas")
@@ -91,7 +97,7 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaFacade).alertasPorUsuario(eq(TITULO_TESTE), eq(1L), anyString());
+            verify(alertaFacade).alertasPorUsuario(any(ContextoUsuarioAutenticado.class));
         }
 
         @Test
@@ -102,8 +108,9 @@ class AlertaControllerTest {
                     .unidadeAtivaCodigo(1L)
                     .perfilAtivo(Perfil.GESTOR)
                     .build();
+            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
 
-            when(alertaFacade.listarNaoLidos(eq(TITULO_TESTE), eq(1L), anyString()))
+            when(alertaFacade.listarNaoLidos(any(ContextoUsuarioAutenticado.class)))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas/nao-lidos")
@@ -113,9 +120,8 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaFacade).listarNaoLidos(eq(TITULO_TESTE), eq(1L), anyString());
+            verify(alertaFacade).listarNaoLidos(any(ContextoUsuarioAutenticado.class));
         }
     }
 
 }
-

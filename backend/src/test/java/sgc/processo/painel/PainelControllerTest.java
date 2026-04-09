@@ -11,6 +11,7 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.alerta.model.*;
 import sgc.integracao.mocks.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.seguranca.*;
@@ -34,6 +35,8 @@ class PainelControllerTest {
 
     @MockitoBean
     private PainelFacade painelFacade;
+    @MockitoBean
+    private UsuarioFacade usuarioFacade;
 
     @Test
     @DisplayName("GET /api/painel/processos - Deve listar processos com sucesso usando contexto do Token")
@@ -44,9 +47,10 @@ class PainelControllerTest {
                 .unidadeAtivaCodigo(1L)
                 .build();
         usuarioMock.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<ProcessoResumoDto> page = new PageImpl<>(Collections.emptyList());
-        when(painelFacade.listarProcessos(eq(Perfil.ADMIN), eq(1L), any(Pageable.class))).thenReturn(page);
+        when(painelFacade.listarProcessos(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/processos")
                         .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
@@ -64,9 +68,10 @@ class PainelControllerTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
                 .build();
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<Alerta> page = new PageImpl<>(Collections.emptyList());
-        when(painelFacade.listarAlertas(eq("123"), eq(1L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
+        when(painelFacade.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
@@ -84,10 +89,10 @@ class PainelControllerTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
                 .build();
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<Alerta> page = new PageImpl<>(Collections.emptyList());
-        // O Mock espera os dados do TOKEN (123 e 1L), ignorando os lixos passados na URL
-        when(painelFacade.listarAlertas(eq("123"), eq(1L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
+        when(painelFacade.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .param("usuarioTitulo", "ATAQUE_IDOR")
@@ -96,7 +101,7 @@ class PainelControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(painelFacade).listarAlertas(eq("123"), eq(1L), eq("ADMIN"), any(Pageable.class));
+        verify(painelFacade).listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class));
     }
 
 }

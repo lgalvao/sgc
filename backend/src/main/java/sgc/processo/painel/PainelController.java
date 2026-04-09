@@ -7,10 +7,10 @@ import org.springframework.data.domain.*;
 import org.springframework.data.web.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
-import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 
@@ -21,21 +21,16 @@ import sgc.processo.dto.*;
 @PreAuthorize("isAuthenticated()")
 public class PainelController {
     private final PainelFacade painelFacade;
+    private final UsuarioFacade usuarioFacade;
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.
      */
     @GetMapping("/processos")
     @Operation(summary = "Lista processos para o painel com base no contexto do Token JWT")
-    public ResponseEntity<Page<ProcessoResumoDto>> listarProcessos(
-            @AuthenticationPrincipal Usuario usuario,
-            @PageableDefault(size = 20) Pageable pageable) {
-
-        Page<ProcessoResumoDto> page = painelFacade.listarProcessos(
-                usuario.getPerfilAtivo(), 
-                usuario.getUnidadeAtivaCodigo(), 
-                pageable
-        );
+    public ResponseEntity<Page<ProcessoResumoDto>> listarProcessos(@PageableDefault(size = 20) Pageable pageable) {
+        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        Page<ProcessoResumoDto> page = painelFacade.listarProcessos(contextoUsuario, pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -45,16 +40,9 @@ public class PainelController {
      */
     @GetMapping("/alertas")
     @Operation(summary = "Lista alertas para o painel com base no contexto do Token JWT")
-    public ResponseEntity<Page<AlertaDto>> listarAlertas(
-            @AuthenticationPrincipal Usuario usuario,
-            @PageableDefault(size = 20) Pageable pageable) {
-
-        Page<Alerta> page = painelFacade.listarAlertas(
-                usuario.getTituloEleitoral(), 
-                usuario.getUnidadeAtivaCodigo(), 
-                usuario.getPerfilAtivo().name(), 
-                pageable
-        );
+    public ResponseEntity<Page<AlertaDto>> listarAlertas(@PageableDefault(size = 20) Pageable pageable) {
+        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        Page<Alerta> page = painelFacade.listarAlertas(contextoUsuario, pageable);
         return ResponseEntity.ok(page.map(AlertaDto::fromEntity));
     }
 }

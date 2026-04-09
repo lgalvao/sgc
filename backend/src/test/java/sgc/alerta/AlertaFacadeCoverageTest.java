@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -19,6 +20,9 @@ import static org.mockito.Mockito.*;
 @DisplayName("AlertaFacade - Cobertura adicional")
 @SuppressWarnings("NullAway.Init")
 class AlertaFacadeCoverageTest {
+    private static final ContextoUsuarioAutenticado CONTEXTO_USUARIO =
+            new ContextoUsuarioAutenticado("user1", 10L, Perfil.GESTOR);
+
     @Mock
     private AlertaService alertaService;
     @Mock
@@ -120,7 +124,7 @@ class AlertaFacadeCoverageTest {
         when(alertaService.alertasUsuarios(usuarioTitulo, codigos)).thenReturn(List.of(au));
         when(alertaService.salvarAlertasUsuarios(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
+        alertaFacade.marcarComoLidos(CONTEXTO_USUARIO, codigos);
 
         assertThat(au.getDataHoraLeitura()).isNotNull();
         verify(alertaService).salvarAlertasUsuarios(argThat(alertasUsuarios -> alertasUsuarios.contains(au)));
@@ -142,7 +146,7 @@ class AlertaFacadeCoverageTest {
         au.setDataHoraLeitura(leituraAnterior);
         when(alertaService.alertasUsuarios(usuarioTitulo, codigos)).thenReturn(List.of(au));
 
-        alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
+        alertaFacade.marcarComoLidos(CONTEXTO_USUARIO, codigos);
 
         assertThat(au.getDataHoraLeitura()).isEqualTo(leituraAnterior);
         verify(alertaService, never()).salvarAlertasUsuarios(anyList());

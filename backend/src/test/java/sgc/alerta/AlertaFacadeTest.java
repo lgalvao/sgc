@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -21,6 +22,11 @@ import static org.mockito.Mockito.*;
 @DisplayName("AlertaFacade Test")
 @SuppressWarnings("NullAway.Init")
 class AlertaFacadeTest {
+    private static final ContextoUsuarioAutenticado CONTEXTO_GESTAO =
+            new ContextoUsuarioAutenticado("123", 1L, Perfil.GESTOR);
+    private static final ContextoUsuarioAutenticado CONTEXTO_SERVIDOR =
+            new ContextoUsuarioAutenticado("123", 1L, Perfil.SERVIDOR);
+
     @Mock
     private AlertaService alertaService;
     @Mock
@@ -43,7 +49,7 @@ class AlertaFacadeTest {
             String titulo = "123";
             when(alertaService.listarParaServidor(titulo)).thenReturn(Collections.emptyList());
 
-            alertaFacade.alertasPorUsuario(titulo, 1L, "SERVIDOR");
+            alertaFacade.alertasPorUsuario(CONTEXTO_SERVIDOR);
 
             verify(alertaService).listarParaServidor(titulo);
             verify(alertaService, never()).listarParaGestao(anyLong(), anyString());
@@ -56,7 +62,7 @@ class AlertaFacadeTest {
             Long codUnidade = 1L;
             when(alertaService.listarParaGestao(codUnidade, titulo)).thenReturn(Collections.emptyList());
 
-            alertaFacade.alertasPorUsuario(titulo, codUnidade, "GESTOR");
+            alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
 
             verify(alertaService).listarParaGestao(codUnidade, titulo);
             verify(alertaService, never()).listarParaServidor(anyString());
@@ -79,7 +85,7 @@ class AlertaFacadeTest {
 
             when(alertaService.alertasUsuarios(eq(titulo), anyList())).thenReturn(List.of(au1));
 
-            List<Alerta> resultado = alertaFacade.listarNaoLidos(titulo, 1L, "GESTOR");
+            List<Alerta> resultado = alertaFacade.listarNaoLidos(CONTEXTO_GESTAO);
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().getCodigo()).isEqualTo(2L);
@@ -95,7 +101,7 @@ class AlertaFacadeTest {
             Pageable p = Pageable.unpaged();
             when(alertaService.listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class))).thenReturn(Page.empty());
 
-            alertaFacade.listarPorUnidade("123", 1L, "GESTOR", p);
+            alertaFacade.listarPorUnidade(CONTEXTO_GESTAO, p);
 
             verify(alertaService).listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class));
         }
@@ -106,7 +112,7 @@ class AlertaFacadeTest {
             Pageable p = Pageable.unpaged();
             when(alertaService.listarParaServidorPaginado(anyString(), any(Pageable.class))).thenReturn(Page.empty());
 
-            alertaFacade.listarPorUnidade("123", 1L, "SERVIDOR", p);
+            alertaFacade.listarPorUnidade(CONTEXTO_SERVIDOR, p);
 
             verify(alertaService).listarParaServidorPaginado(anyString(), any(Pageable.class));
         }
@@ -141,7 +147,7 @@ class AlertaFacadeTest {
         when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(alerta));
         when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of(leitura));
 
-        List<Alerta> resultado = alertaFacade.alertasPorUsuario(titulo, 1L, "GESTOR");
+        List<Alerta> resultado = alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().getDataHoraLeitura()).isNull();

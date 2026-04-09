@@ -70,6 +70,16 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
+    public ContextoUsuarioAutenticado contextoAutenticado() {
+        Usuario usuario = usuarioAutenticado();
+        return new ContextoUsuarioAutenticado(
+                usuario.getTituloEleitoral(),
+                usuario.getUnidadeAtivaCodigo(),
+                usuario.getPerfilAtivo()
+        );
+    }
+
+    @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
         return responsavelUnidadeService.buscarResponsavelAtual(sigla);
     }

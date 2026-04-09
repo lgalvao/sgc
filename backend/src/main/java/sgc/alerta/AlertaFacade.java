@@ -5,6 +5,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.organizacao.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -27,12 +28,13 @@ public class AlertaFacade {
         return unidadeService.buscarPorCodigo(1L);
     }
 
-    public List<Alerta> alertasPorUsuario(String usuarioTitulo, Long codigoUnidadeAtiva, String perfil) {
+    public List<Alerta> alertasPorUsuario(ContextoUsuarioAutenticado contextoUsuario) {
+        String usuarioTitulo = contextoUsuario.usuarioTitulo();
         List<Alerta> alertas;
-        if ("SERVIDOR".equals(perfil)) {
+        if (contextoUsuario.perfil() == Perfil.SERVIDOR) {
             alertas = alertaService.listarParaServidor(usuarioTitulo);
         } else {
-            alertas = alertaService.listarParaGestao(codigoUnidadeAtiva, usuarioTitulo);
+            alertas = alertaService.listarParaGestao(contextoUsuario.unidadeAtivaCodigo(), usuarioTitulo);
         }
 
         if (alertas.isEmpty()) return Collections.emptyList();
@@ -51,23 +53,27 @@ public class AlertaFacade {
         return alertas;
     }
 
-    public List<Alerta> listarNaoLidos(String usuarioTitulo, Long codigoUnidadeAtiva, String perfil) {
-        return alertasPorUsuario(usuarioTitulo, codigoUnidadeAtiva, perfil).stream()
+    public List<Alerta> listarNaoLidos(ContextoUsuarioAutenticado contextoUsuario) {
+        return alertasPorUsuario(contextoUsuario).stream()
                 .filter(alerta -> alerta.getDataHoraLeitura() == null)
                 .toList();
     }
 
-    public Page<Alerta> listarPorUnidade(String usuarioTitulo, Long codigoUnidade, String perfil, Pageable pageable) {
+    public Page<Alerta> listarPorUnidade(ContextoUsuarioAutenticado contextoUsuario, Pageable pageable) {
         // Regra CDU-02 (3.3): Ordenação decrescente obrigatória por data/hora
         Pageable sortedPageable = pageable.isPaged()
                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
                 : pageable;
 
         // Regra expressiva CDU-02 (3.2)
-        if ("SERVIDOR".equals(perfil)) {
-            return alertaService.listarParaServidorPaginado(usuarioTitulo, sortedPageable);
+        if (contextoUsuario.perfil() == Perfil.SERVIDOR) {
+            return alertaService.listarParaServidorPaginado(contextoUsuario.usuarioTitulo(), sortedPageable);
         } else {
-            return alertaService.listarParaGestaoPaginado(codigoUnidade, usuarioTitulo, sortedPageable);
+            return alertaService.listarParaGestaoPaginado(
+                    contextoUsuario.unidadeAtivaCodigo(),
+                    contextoUsuario.usuarioTitulo(),
+                    sortedPageable
+            );
         }
     }
 
@@ -192,11 +198,12 @@ public class AlertaFacade {
     }
 
     @Transactional
-    public void marcarComoLidos(String usuarioTitulo, List<Long> alertaCodigos) {
+    public void marcarComoLidos(ContextoUsuarioAutenticado contextoUsuario, List<Long> alertaCodigos) {
         if (alertaCodigos.isEmpty()) {
             return;
         }
 
+        String usuarioTitulo = contextoUsuario.usuarioTitulo();
         Usuario usuario = usuarioService.buscar(usuarioTitulo);
         LocalDateTime agora = LocalDateTime.now();
         Map<Long, AlertaUsuario> existentesPorCodigo = alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos).stream()

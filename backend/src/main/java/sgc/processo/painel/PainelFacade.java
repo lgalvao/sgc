@@ -8,6 +8,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
@@ -39,7 +40,9 @@ public class PainelFacade {
      * - CHEFE e SERVIDOR: veem processos APENAS da própria unidade
      * - Processos no estado 'CRIADO' são omitidos para perfis não-ADMIN
      */
-    public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
+    public Page<ProcessoResumoDto> listarProcessos(ContextoUsuarioAutenticado contextoUsuario, Pageable pageable) {
+        Perfil perfil = contextoUsuario.perfil();
+        Long codigoUnidade = contextoUsuario.unidadeAtivaCodigo();
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
         Page<Processo> processos;
         String siglaUnidadeUsuario = obterSiglaUnidadeUsuario(perfil, codigoUnidade);
@@ -72,14 +75,14 @@ public class PainelFacade {
     }
 
     @Transactional
-    public Page<Alerta> listarAlertas(String usuarioTitulo, Long codigoUnidade, String perfil, Pageable pageable) {
+    public Page<Alerta> listarAlertas(ContextoUsuarioAutenticado contextoUsuario, Pageable pageable) {
         Pageable sortedPageable = pageable.isPaged()
                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
                 : pageable;
 
-        Page<Alerta> alertasPage = alertaFacade.listarPorUnidade(usuarioTitulo, codigoUnidade, perfil, sortedPageable);
+        Page<Alerta> alertasPage = alertaFacade.listarPorUnidade(contextoUsuario, sortedPageable);
         Map<Long, LocalDateTime> leiturasPorAlerta = alertaFacade.obterMapaDataHoraLeitura(
-                usuarioTitulo,
+                contextoUsuario.usuarioTitulo(),
                 alertasPage.stream().map(Alerta::getCodigo).toList());
         List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
         alertasPage.forEach(alerta -> {
@@ -92,7 +95,7 @@ public class PainelFacade {
         });
 
         if (!alertasNaoLidosVisualizados.isEmpty()) {
-            alertaFacade.marcarComoLidos(usuarioTitulo, alertasNaoLidosVisualizados);
+            alertaFacade.marcarComoLidos(contextoUsuario, alertasNaoLidosVisualizados);
         }
 
         return alertasPage;
