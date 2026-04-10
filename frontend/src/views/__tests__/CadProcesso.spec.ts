@@ -155,21 +155,25 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('exibe alerta fixo de pendencias organizacionais para ADMIN', async () => {
-        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValueOnce({
-            possuiViolacoes: true,
-            resumo: 'Foram encontradas 2 inconsistencias.',
-            quantidadeTiposViolacao: 1,
-            quantidadeOcorrencias: 2,
-            grupos: [
-                {
-                    tipo: 'Unidade sem responsável',
-                    quantidadeOcorrencias: 2,
-                    ocorrencias: ['sigla=Z1', 'sigla=Z2'],
-                },
-            ],
-        } as any);
-
+        // Pré-popula a organizacaoStore via initialState (evita dependência da chamada HTTP)
         const {wrapper} = createWrapper({
+            organizacao: {
+                diagnostico: {
+                    possuiViolacoes: true,
+                    resumo: 'Foram encontradas 2 inconsistencias.',
+                    quantidadeTiposViolacao: 1,
+                    quantidadeOcorrencias: 2,
+                    grupos: [
+                        {
+                            tipo: 'Unidade sem responsável',
+                            quantidadeOcorrencias: 2,
+                            ocorrencias: ['sigla=Z1', 'sigla=Z2'],
+                        },
+                    ],
+                },
+                erroDiagnostico: null,
+                carregado: true,
+            },
             perfil: {
                 perfilSelecionado: 'ADMIN',
                 permissoesSessao: permissoesAdmin,
