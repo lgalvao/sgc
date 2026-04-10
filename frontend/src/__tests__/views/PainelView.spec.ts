@@ -19,6 +19,7 @@ vi.mock("vue-router", () => ({
 const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, size: 10, first: true, last: true, empty: true};
 
 vi.mock("@/services/painelService", () => ({
+    obterBootstrap: vi.fn(),
     listarProcessos: vi.fn(),
     listarAlertas: vi.fn(),
     marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
@@ -32,6 +33,10 @@ describe("PainelView.vue", () => {
         routerPushMock = vi.fn();
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
+        });
+        (painelService.obterBootstrap as any).mockResolvedValue({
+            processos: [],
+            alertas: []
         });
         (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
         (painelService.listarProcessos as any).mockResolvedValue(mockPageVazia);
@@ -125,8 +130,7 @@ describe("PainelView.vue", () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});
-        expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 200, sort: "dataHora", order: "desc"});
+        expect(painelService.obterBootstrap).toHaveBeenCalled();
     });
 
     it("não deve carregar dados se perfil não estiver selecionado", async () => {
@@ -171,7 +175,7 @@ describe("PainelView.vue", () => {
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
 
         // Ordenação é agora local — não deve chamar o backend
-        expect(painelService.listarProcessos).not.toHaveBeenCalled();
+        expect(painelService.obterBootstrap).not.toHaveBeenCalled();
     });
 
     it("deve navegar ao selecionar processo", async () => {

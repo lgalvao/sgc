@@ -1025,13 +1025,13 @@ public class ProcessoService {
         return usuarioService.buscarPorLogin(tituloTitular);
     }
 
-    private record ContextoInicioProcesso(
+    record ContextoInicioProcesso(
             TipoProcesso tipo,
             List<Long> codigosUnidades,
             Set<Unidade> unidadesParaProcessar
     ) {}
 
-    private record InicioSubprocessosContexto(
+    record InicioSubprocessosContexto(
             Processo processo,
             TipoProcesso tipo,
             List<Long> codigosUnidades,

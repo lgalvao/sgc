@@ -226,8 +226,7 @@ class ProcessoServiceCoverageTest {
         when(unidadeService.buscarAdmin()).thenReturn(admin);
 
         List<Long> unidadeCods = List.of(10L);
-        Usuario usuario = new Usuario();
-        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário nesta versão
         assertThatThrownBy(() -> target.iniciar(cod, unidadeCods))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("sem mapa vigente");
@@ -380,7 +379,7 @@ class ProcessoServiceCoverageTest {
         when(unidadeService.buscarAdmin()).thenReturn(admin);
         mockarResponsaveisEfetivos();
 
-        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+        // when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario()); - desnecessário
         target.iniciar(cod, List.of(10L)); // branch 419 (DIAGNOSTICO)
         verify(subprocessoService).criarParaDiagnostico(any());
     }
@@ -406,8 +405,7 @@ class ProcessoServiceCoverageTest {
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
         List<Long> codigos = List.of(10L, 11L);
-        Usuario usuario = new Usuario();
-        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário
         assertThatThrownBy(() -> target.iniciar(cod, codigos))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");

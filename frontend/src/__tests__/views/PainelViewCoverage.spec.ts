@@ -32,6 +32,7 @@ vi.mock("bootstrap-vue-next", async () => {
 const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, size: 10, first: true, last: true, empty: true};
 
 vi.mock("@/services/painelService", () => ({
+    obterBootstrap: vi.fn(),
     listarProcessos: vi.fn(),
     listarAlertas: vi.fn(),
     marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
@@ -45,6 +46,10 @@ describe('PainelView Coverage', () => {
         routerPushMock = vi.fn();
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
+        });
+        (painelService.obterBootstrap as any).mockResolvedValue({
+            processos: [],
+            alertas: []
         });
         (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
         (painelService.listarProcessos as any).mockResolvedValue(mockPageVazia);
@@ -89,8 +94,7 @@ describe('PainelView Coverage', () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(painelService.listarProcessos).toHaveBeenCalled();
-        expect(painelService.listarAlertas).toHaveBeenCalled();
+        expect(painelService.obterBootstrap).toHaveBeenCalled();
     });
 
     it('ordenarPor altera estado local sem chamar o backend', async () => {
@@ -113,15 +117,15 @@ describe('PainelView Coverage', () => {
             }
         });
         await flushPromises();
-        const callsAfterMount = (painelService.listarProcessos as any).mock.calls.length;
+        const callsAfterMount = (painelService.obterBootstrap as any).mock.calls.length;
 
         // Ordenar: deve alterar estado local, sem chamar o backend
         await (wrapper.vm as any).ordenarPor('descricao');
-        expect(painelService.listarProcessos).toHaveBeenCalledTimes(callsAfterMount);
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(callsAfterMount);
         expect((wrapper.vm as any).asc).toBe(false);
 
         await (wrapper.vm as any).ordenarPor('tipo');
-        expect(painelService.listarProcessos).toHaveBeenCalledTimes(callsAfterMount);
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(callsAfterMount);
         expect((wrapper.vm as any).criterio).toBe('tipo');
         expect((wrapper.vm as any).asc).toBe(true);
     });
@@ -167,7 +171,7 @@ describe('PainelView Coverage', () => {
         if (activated) {
             const hooks = Array.isArray(activated) ? activated : [activated];
             for (const hook of hooks) {
-                await hook.call(wrapper.vm);
+                hook.call(wrapper.vm);
             }
             expect(toastStore.consumePending).toHaveBeenCalledTimes(2);
         }

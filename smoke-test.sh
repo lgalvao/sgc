@@ -6,7 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
 echo "[smoke-test] junit"
-./gradlew :backend:test -q
+./gradlew :backend:test
 
 echo "[smoke-test] typecheck"
 npm run typecheck -s

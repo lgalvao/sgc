@@ -287,7 +287,7 @@ describe('UnidadeView.vue', () => {
         await wrapper.vm.$nextTick();
         await flushPromises();
 
-        expect((wrapper.vm as any).dadosFormatadosSubordinadas).toEqual([]);
+        expect((wrapper.vm).dadosFormatadosSubordinadas).toEqual([]);
 
         const treeTable = wrapper.findComponent(TreeTableStub);
         expect(treeTable.exists()).toBe(false);

@@ -1,10 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import {nextTick} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
 import * as processoService from '@/services/processoService';
+import {useUnidadeStore} from '@/stores/unidade';
 
 vi.mock('@/services/processoService', () => ({
     obterDetalhesProcesso: vi.fn(),
@@ -74,12 +76,17 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         const processoInicial = (initialState as any).processos?.processoDetalhe ?? null;
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(processoInicial);
 
+        const pinia = createTestingPinia({
+            createSpy: vi.fn,
+            initialState,
+        });
+        const unidadeStore = useUnidadeStore(pinia);
+        vi.mocked(unidadeStore.garantirArvoreElegibilidade).mockResolvedValue([]);
+
         context.wrapper = mount(ProcessoCadastroView, {
-            ...getCommonMountOptions(
-                {
-                    ...initialState
-                },
-                {
+            global: {
+                plugins: [pinia],
+                stubs: {
                     BContainer: {template: '<div><slot /></div>'},
                     BAlert: {template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant']},
                     BForm: {template: '<form @submit.prevent><slot /></form>'},
@@ -100,7 +107,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
                     BFormInvalidFeedback: {template: '<div><slot /></div>'},
                     LoadingButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'}
                 }
-            )
+            }
         });
         return {wrapper: context.wrapper};
     };
@@ -257,7 +264,8 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         (wrapper.vm).tipo = 'MAPEAMENTO';
         await nextTick();
 
-        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', undefined);
+        const unidadeStore = useUnidadeStore();
+        expect(unidadeStore.garantirArvoreElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', undefined);
     });
 
     it('populates fields when loading an existing process', async () => {
@@ -288,6 +296,8 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect((wrapper.vm).tipo).toBe('MAPEAMENTO');
         expect((wrapper.vm).dataLimite).toBe('2023-12-31');
         expect((wrapper.vm).unidadesSelecionadas).toEqual([1, 2]);
-        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', 123);
+
+        const unidadeStore = useUnidadeStore();
+        expect(unidadeStore.garantirArvoreElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', 123);
     });
 });

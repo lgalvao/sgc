@@ -139,6 +139,31 @@ const stubs = {
     ModalConfirmacao: {template: '<div v-if="modelValue"></div>', props: ['modelValue']},
 };
 
+function createWrapper() {
+    vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+        podeEditarCadastro: ref(true),
+        podeDisponibilizarCadastro: ref(true),
+        podeVisualizarImpacto: ref(true),
+    } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
+
+    const pinia = createTestingPinia({stubActions: true});
+    const mapas = useMapas();
+    mapas.mapaCompleto.value = {codigo: 100} as unknown as typeof mapas.mapaCompleto.value;
+    mapas.impactoMapa.value = null;
+    mapas.erro.value = null;
+
+    return mount(CadastroView, {
+        global: {
+            plugins: [pinia],
+            stubs
+        },
+        props: {
+            codProcesso: "1",
+            sigla: "TESTE"
+        }
+    });
+}
+
 describe("CadastroView coverage", () => {
     const permissoesPadrao: PermissoesSubprocesso = {
         podeEditarCadastro: true,
@@ -250,32 +275,6 @@ describe("CadastroView coverage", () => {
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoCadastroAtividades).mockResolvedValue(criarContextoCadastro());
     });
-
-    function createWrapper() {
-        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeEditarCadastro: ref(true),
-            podeDisponibilizarCadastro: ref(true),
-            podeVisualizarImpacto: ref(true),
-        } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
-
-        const pinia = createTestingPinia({stubActions: true});
-        const mapas = useMapas();
-        mapas.mapaCompleto.value = {codigo: 100} as unknown as typeof mapas.mapaCompleto.value;
-        mapas.impactoMapa.value = null;
-        mapas.erro.value = null;
-
-        return mount(CadastroView, {
-            global: {
-                plugins: [pinia],
-                stubs
-            },
-            props: {
-                codProcesso: "1",
-                sigla: "TESTE"
-            }
-        });
-    }
-
     it("cobre ramos de erro e fluxos alternativos", async () => {
         const wrapper = createWrapper();
         await flushPromises();

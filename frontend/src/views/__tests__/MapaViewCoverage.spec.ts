@@ -195,6 +195,45 @@ const stubs = {
     DisponibilizarMapaModal: {template: '<div></div>', props: ['mostrar']},
 };
 
+function createWrapper(initialMapaCompleto: MapaCompleto = criarMapaCompleto()) {
+    vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+        podeVisualizarImpacto: ref(true),
+        podeEditarMapa: ref(true),
+        podeDisponibilizarMapa: ref(true),
+    } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
+
+    const mapas = useMapas();
+    mapas.mapaCompleto.value = initialMapaCompleto;
+    mapas.impactoMapa.value = null;
+    mapas.erro.value = null;
+    mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
+
+    return mount(MapaView, {
+        global: {
+            plugins: [createTestingPinia({
+                stubActions: true,
+                initialState: {
+                    mapas: {
+                        mapaCompleto: initialMapaCompleto,
+                        impactoMapa: null,
+                        erro: null
+                    },
+                    processos: {
+                        processoDetalhe: {
+                            unidades: [{sigla: "TESTE", codSubprocesso: 123}]
+                        }
+                    }
+                }
+            })],
+            stubs
+        },
+        props: {
+            codProcesso: "1",
+            sigla: "TESTE"
+        }
+    });
+}
+
 describe("MapaView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -215,46 +254,6 @@ describe("MapaView coverage", () => {
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
-
-    function createWrapper(initialMapaCompleto: MapaCompleto = criarMapaCompleto()) {
-        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeVisualizarImpacto: ref(true),
-            podeEditarMapa: ref(true),
-            podeDisponibilizarMapa: ref(true),
-        } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
-
-        const mapas = useMapas();
-        mapas.mapaCompleto.value = initialMapaCompleto;
-        mapas.impactoMapa.value = null;
-        mapas.erro.value = null;
-        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
-
-        return mount(MapaView, {
-            global: {
-                plugins: [createTestingPinia({
-                    stubActions: true,
-                    initialState: {
-                        mapas: {
-                            mapaCompleto: initialMapaCompleto,
-                            impactoMapa: null,
-                            erro: null
-                        },
-                        processos: {
-                            processoDetalhe: {
-                                unidades: [{sigla: "TESTE", codSubprocesso: 123}]
-                            }
-                        }
-                    }
-                })],
-                stubs
-            },
-            props: {
-                codProcesso: "1",
-                sigla: "TESTE"
-            }
-        });
-    }
-
     it("cobre fluxos de erro e modais", async () => {
         const wrapper = createWrapper();
         await flushPromises();
@@ -447,7 +446,7 @@ describe("MapaView coverage", () => {
         if (mounted) {
             const hooks = Array.isArray(mounted) ? mounted : [mounted];
             for (const hook of hooks) {
-                await hook.call(vm);
+                hook.call(vm);
             }
         }
 

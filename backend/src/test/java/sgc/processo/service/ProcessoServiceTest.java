@@ -153,8 +153,8 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar mapeamento com sucesso e salvar")
         void deveIniciarMapeamentoComSucesso() {
             Long id = 100L;
-            Usuario usuario = new Usuario();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // Usuario usuario = new Usuario();
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             
             Processo p = new Processo();
             p.setCodigo(id);
@@ -178,8 +178,8 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar revisao com sucesso e salvar")
         void deveIniciarRevisaoComSucesso() {
             Long id = 100L;
-            Usuario usuario = new Usuario();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // Usuario usuario = new Usuario();
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -215,8 +215,8 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar revisao ignorando unidade ancestral selecionada junto com a descendente")
         void deveIniciarRevisaoIgnorandoAncestralRedundante() {
             Long id = 101L;
-            Usuario usuario = new Usuario();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // Usuario usuario = new Usuario();
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo processo = new Processo();
             processo.setCodigo(id);
@@ -253,7 +253,7 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar processo se houver unidades em processo ativo")
         void deveFalharAoIniciarSeHouverUnidadesEmProcessoAtivo() {
             Long id = 100L;
-            Usuario usuario = new Usuario();
+            // Usuario usuario = new Usuario();
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -267,7 +267,7 @@ class ProcessoServiceTest {
             when(processoRepo.listarUnidadesEmProcessoAtivo(eq(SituacaoProcesso.EM_ANDAMENTO), anyList()))
                     .thenReturn(List.of(1L));
             mockarResponsaveisEfetivos();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
                     .isInstanceOf(ErroValidacao.class)
@@ -278,7 +278,7 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar processo se houver unidades sem mapa em REVISAO")
         void deveFalharAoIniciarSeHouverUnidadesSemMapaEmRevisao() {
             Long id = 100L;
-            Usuario usuario = new Usuario();
+            // Usuario usuario = new Usuario();
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -293,7 +293,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of());
             when(unidadeService.buscarSiglasPorCodigos(anyList())).thenReturn(List.of("U1"));
             mockarResponsaveisEfetivos();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L)))
                     .isInstanceOf(ErroValidacao.class)
@@ -323,7 +323,7 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar processo se houver unidades sem responsavel efetivo")
         void deveFalharAoIniciarSeHouverUnidadesSemResponsavelEfetivo() {
             Long id = 100L;
-            Usuario usuario = new Usuario();
+            // Usuario usuario = new Usuario();
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -335,7 +335,7 @@ class ProcessoServiceTest {
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(false);
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
                     .isInstanceOf(ErroValidacao.class)
@@ -965,8 +965,8 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar diagnostico com sucesso e salvar")
         void deveIniciarDiagnosticoComSucesso() {
             Long id = 100L;
-            Usuario usuario = new Usuario();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // Usuario usuario = new Usuario();
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -1119,8 +1119,8 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar revisao com unidades vazias")
         void deveFalharAoIniciarRevisaoSemUnidades() {
             Long id = 100L;
-            Usuario usuario = new Usuario();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            // Usuario usuario = new Usuario();
+            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo p = new Processo();
             p.setCodigo(id);

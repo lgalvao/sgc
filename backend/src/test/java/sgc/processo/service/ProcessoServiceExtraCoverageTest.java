@@ -249,9 +249,9 @@ class ProcessoServiceExtraCoverageTest {
             Processo p = new Processo();
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of()));
+            List<Long> unidades = List.of();
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
         }
 
         @Test
@@ -261,9 +261,9 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.REVISAO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of()));
+            List<Long> unidades = List.of();
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
         }
 
         @Test
@@ -273,9 +273,9 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, List.of()));
+            List<Long> unidades = List.of();
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
         }
     }
 
@@ -345,7 +345,8 @@ class ProcessoServiceExtraCoverageTest {
     @Test
     @DisplayName("validarUnidadesInicio deve ignorar erro de mapa quando nenhuma sigla for retornada")
     void validarUnidadesInicioSemSiglaNaoAdicionaErroMapa() {
-        when(unidadeService.buscarPorCodigos(List.of(30L))).thenReturn(List.of(criarUnidadeValida(30L)));
+        List<Unidade> unidades = List.of(criarUnidadeValida(30L));
+        // when(unidadeService.buscarPorCodigos(List.of(30L))).thenReturn(unidades); - desnecessário, unidades passadas por parâmetro
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(30L))).thenReturn(true);
         when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of());
         when(unidadeService.buscarSiglasPorCodigos(List.of(30L))).thenReturn(List.of());
@@ -355,7 +356,8 @@ class ProcessoServiceExtraCoverageTest {
                 processoService,
                 "validarUnidadesInicio",
                 TipoProcesso.REVISAO,
-                List.of(30L)
+                List.of(30L),
+                unidades
         );
 
         assertThat(erros).isEmpty();
@@ -374,18 +376,18 @@ class ProcessoServiceExtraCoverageTest {
         List<UnidadeMapa> unidadesMapa = List.of(unidadeMapa);
 
         Unidade unidadeAdmin = criarUnidadeValida(99L);
-        Usuario usuario = new Usuario();
 
         ReflectionTestUtils.invokeMethod(
                 processoService,
                 "efetivarInicioSubprocessos",
-                processo,
-                TipoProcesso.DIAGNOSTICO,
-                List.of(40L),
-                participantes,
-                unidadesMapa,
-                unidadeAdmin,
-                usuario
+                new sgc.processo.service.ProcessoService.InicioSubprocessosContexto(
+                        processo,
+                        TipoProcesso.DIAGNOSTICO,
+                        List.of(40L),
+                        participantes,
+                        unidadesMapa,
+                        unidadeAdmin
+                )
         );
 
         verify(subprocessoService).criarParaDiagnostico(argThat(command ->
@@ -429,7 +431,7 @@ class ProcessoServiceExtraCoverageTest {
     @Test
     @DisplayName("validarUnidadesInicio deve retornar erro quando houver unidade bloqueada em processo ativo")
     void validarUnidadesInicioDeveRetornarErroQuandoHouverUnidadeBloqueada() {
-        when(unidadeService.buscarPorCodigos(List.of(50L))).thenReturn(List.of(criarUnidadeValida(50L)));
+        List<Unidade> unidades = List.of(criarUnidadeValida(50L));
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(50L))).thenReturn(true);
         when(processoRepo.listarUnidadesEmProcessoAtivo(SituacaoProcesso.EM_ANDAMENTO, List.of(50L))).thenReturn(List.of(50L));
 
@@ -437,7 +439,8 @@ class ProcessoServiceExtraCoverageTest {
                 processoService,
                 "validarUnidadesInicio",
                 TipoProcesso.MAPEAMENTO,
-                List.of(50L)
+                List.of(50L),
+                unidades
         );
 
         assertThat(erros).isNotEmpty();
@@ -452,18 +455,18 @@ class ProcessoServiceExtraCoverageTest {
         unidadeMapa.setUnidadeCodigo(60L);
         unidadeMapa.setMapaVigente(new Mapa());
         Unidade unidadeAdmin = criarUnidadeValida(99L);
-        Usuario usuario = new Usuario();
 
         ReflectionTestUtils.invokeMethod(
                 processoService,
                 "efetivarInicioSubprocessos",
-                processo,
-                TipoProcesso.REVISAO,
-                List.of(60L),
-                Set.of(unidade),
-                List.of(unidadeMapa),
-                unidadeAdmin,
-                usuario
+                new sgc.processo.service.ProcessoService.InicioSubprocessosContexto(
+                        processo,
+                        TipoProcesso.REVISAO,
+                        List.of(60L),
+                        Set.of(unidade),
+                        List.of(unidadeMapa),
+                        unidadeAdmin
+                )
         );
 
         verify(subprocessoService).criarParaRevisao(argThat(command ->
@@ -511,7 +514,7 @@ class ProcessoServiceExtraCoverageTest {
     @Test
     @DisplayName("validarUnidadesInicio deve adicionar erro de mapa para processo de diagnostico")
     void validarUnidadesInicioDeveAdicionarErroMapaParaDiagnostico() {
-        when(unidadeService.buscarPorCodigos(List.of(70L))).thenReturn(List.of(criarUnidadeValida(70L)));
+        List<Unidade> unidades = List.of(criarUnidadeValida(70L));
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(70L))).thenReturn(true);
         when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of());
         when(unidadeService.buscarSiglasPorCodigos(List.of(70L))).thenReturn(List.of("U70"));
@@ -521,7 +524,8 @@ class ProcessoServiceExtraCoverageTest {
                 processoService,
                 "validarUnidadesInicio",
                 TipoProcesso.DIAGNOSTICO,
-                List.of(70L)
+                List.of(70L),
+                unidades
         );
 
         assertThat(erros).isNotEmpty();
@@ -533,18 +537,18 @@ class ProcessoServiceExtraCoverageTest {
         Processo processo = new Processo();
         Unidade unidade = criarUnidadeValida(80L);
         Unidade unidadeAdmin = criarUnidadeValida(99L);
-        Usuario usuario = new Usuario();
 
         ReflectionTestUtils.invokeMethod(
                 processoService,
                 "efetivarInicioSubprocessos",
-                processo,
-                TipoProcesso.MAPEAMENTO,
-                List.of(80L),
-                Set.of(unidade),
-                List.of(),
-                unidadeAdmin,
-                usuario
+                new sgc.processo.service.ProcessoService.InicioSubprocessosContexto(
+                        processo,
+                        TipoProcesso.MAPEAMENTO,
+                        List.of(80L),
+                        Set.of(unidade),
+                        List.of(),
+                        unidadeAdmin
+                )
         );
 
         verify(subprocessoService).criarParaMapeamento(argThat(command ->
@@ -778,7 +782,6 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade admin = new Unidade();
             when(unidadeService.buscarAdmin()).thenReturn(admin);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
             processoService.iniciar(1L, List.of());
 

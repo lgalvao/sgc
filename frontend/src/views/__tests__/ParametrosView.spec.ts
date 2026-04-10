@@ -14,7 +14,7 @@ describe('ParametrosView', () => {
 
     const setupWrapper = (loading = false, error: string | null = null, storeParams: any[] | null = null) => {
         configuracoesStore = {
-            configuracoes: ref(storeParams !== null ? storeParams : [
+            configuracoes: ref(storeParams ?? [
                 {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
                 {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
             ]),
@@ -25,7 +25,7 @@ describe('ParametrosView', () => {
             carregarConfiguracoes: vi.fn().mockResolvedValue([]),
             salvarConfiguracoes: vi.fn().mockResolvedValue(true)
         };
-        vi.mocked(useConfiguracoes).mockReturnValue(configuracoesStore as any);
+        vi.mocked(useConfiguracoes).mockReturnValue(configuracoesStore);
 
         wrapper = mount(ParametrosView, {
             global: {
