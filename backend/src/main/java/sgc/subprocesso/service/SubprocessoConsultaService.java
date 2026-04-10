@@ -202,8 +202,20 @@ public class SubprocessoConsultaService {
         );
     }
 
+    public ContextoCadastroAtividadesResponse obterContextoCadastroAtividades(Long codSubprocesso) {
+        Subprocesso subprocesso = buscarSubprocessoComMapa(codSubprocesso);
+        ContextoConsultaSubprocesso contexto = montarContextoConsultaLeve(subprocesso);
+
+        return new ContextoCadastroAtividadesResponse(
+                subprocesso.getUnidade(),
+                construirDetalheCadastro(contexto),
+                MapaResumoDto.fromEntity(obterMapaObrigatorio(subprocesso)),
+                listarAtividadesSubprocesso(subprocesso)
+        );
+    }
+
     public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp) {
-        return resolverPermissoes(montarContextoConsulta(sp));
+        return resolverPermissoes(montarContextoConsultaLeve(sp));
     }
 
     private PermissoesSubprocessoDto construirPermissoes(ContextoConsultaSubprocesso contexto) {
@@ -475,6 +487,10 @@ public class SubprocessoConsultaService {
         return movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
     }
 
+    private ContextoConsultaSubprocesso montarContextoConsultaLeve(Subprocesso sp) {
+        return montarContextoConsulta(sp, List.of());
+    }
+
     private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp) {
         return montarContextoConsulta(sp, listarMovimentacoes(sp));
     }
@@ -545,6 +561,19 @@ public class SubprocessoConsultaService {
             return construirPermissoesProcessoFinalizado(contexto);
         }
         return construirPermissoes(contexto);
+    }
+
+    private SubprocessoDetalheResponse construirDetalheCadastro(ContextoConsultaSubprocesso contexto) {
+        Subprocesso subprocesso = contexto.subprocesso();
+
+        return SubprocessoDetalheResponse.builder()
+                .subprocesso(SubprocessoResumoDto.fromEntity(subprocesso))
+                .responsavel(null)
+                .titular(null)
+                .movimentacoes(List.of())
+                .localizacaoAtual(contexto.localizacaoAtual().getSigla())
+                .permissoes(resolverPermissoes(contexto))
+                .build();
     }
 
     private record ContextoConsultaSubprocesso(

@@ -133,6 +133,12 @@ public class SubprocessoController {
         return ResponseEntity.ok(consultaService.obterContextoEdicao(codSubprocesso));
     }
 
+    @GetMapping("/{codSubprocesso}/contexto-cadastro-atividades")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public ResponseEntity<ContextoCadastroAtividadesResponse> obterContextoCadastroAtividades(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(consultaService.obterContextoCadastroAtividades(codSubprocesso));
+    }
+
     @GetMapping("/contexto-edicao/buscar")
     @PostAuthorize("hasPermission(returnObject.body.detalhes.subprocesso.codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicaoPorProcessoEUnidade(
@@ -142,6 +148,17 @@ public class SubprocessoController {
         Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
         Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(consultaService.obterContextoEdicao(subprocesso.getCodigo()));
+    }
+
+    @GetMapping("/contexto-cadastro-atividades/buscar")
+    @PostAuthorize("hasPermission(returnObject.body.detalhes.subprocesso.codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public ResponseEntity<ContextoCadastroAtividadesResponse> obterContextoCadastroAtividadesPorProcessoEUnidade(
+            @RequestParam Long codProcesso,
+            @RequestParam String siglaUnidade
+    ) {
+        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
+        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        return ResponseEntity.ok(consultaService.obterContextoCadastroAtividades(subprocesso.getCodigo()));
     }
 
     @GetMapping("/{codSubprocesso}/atividades-importacao")

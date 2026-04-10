@@ -193,6 +193,48 @@ describe("useSubprocessos", () => {
         expect(resultado).toEqual(mockContexto);
     });
 
+    it("deve buscar contexto enxuto do cadastro", async () => {
+        const store = useSubprocessos();
+        const mockContexto = {
+            detalhes: {
+                codigo: 16,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                localizacaoAtual: "U1",
+                permissoes: permissoesPadrao,
+            },
+            mapa: {codigo: 21, subprocessoCodigo: 16},
+            atividadesDisponiveis: [],
+            unidade: {codigo: 1, sigla: "U1", nome: "Unidade 1"},
+        };
+        vi.mocked(service.buscarContextoCadastroAtividades).mockResolvedValue(mockContexto as never);
+
+        const resultado = await store.buscarContextoCadastroAtividades(16);
+
+        expect(store.subprocessoDetalhe?.codigo).toBe(16);
+        expect(resultado).toEqual(mockContexto);
+    });
+
+    it("deve buscar contexto enxuto do cadastro por processo e unidade", async () => {
+        const store = useSubprocessos();
+        const mockContexto = {
+            detalhes: {
+                codigo: 17,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                localizacaoAtual: "U1",
+                permissoes: permissoesPadrao,
+            },
+            mapa: {codigo: 22, subprocessoCodigo: 17},
+            atividadesDisponiveis: [],
+            unidade: {codigo: 1, sigla: "U1", nome: "Unidade 1"},
+        };
+        vi.mocked(service.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(mockContexto as never);
+
+        const resultado = await store.buscarContextoCadastroAtividadesPorProcessoEUnidade(1, "U1");
+
+        expect(store.subprocessoDetalhe?.codigo).toBe(17);
+        expect(resultado).toEqual(mockContexto);
+    });
+
     it("deve usar detalhes obrigatorios do contexto de edição", async () => {
         const store = useSubprocessos();
         const dataMock = {

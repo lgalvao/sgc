@@ -380,6 +380,22 @@ export interface ContextoEdicaoSubprocesso {
     atividadesDisponiveis: Atividade[];
 }
 
+export interface MapaResumo {
+    codigo: number;
+    subprocessoCodigo: number;
+    dataHoraDisponibilizado?: string | null;
+    observacoesDisponibilizacao?: string | null;
+    sugestoes?: string | null;
+    dataHoraHomologado?: string | null;
+}
+
+export interface ContextoCadastroAtividadesSubprocesso {
+    unidade: Unidade;
+    detalhes: SubprocessoDetalhe;
+    mapa: MapaResumo;
+    atividadesDisponiveis: Atividade[];
+}
+
 export interface MapaVisualizacao {
     codigo: number;
     descricao: string;

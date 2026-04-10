@@ -1,5 +1,7 @@
 import {ref} from "vue";
 import {
+    buscarContextoCadastroAtividades as serviceBuscarContextoCadastroAtividades,
+    buscarContextoCadastroAtividadesPorProcessoEUnidade as serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade,
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
     buscarSubprocessoDetalhe as serviceBuscarSubprocessoDetalhe,
@@ -8,6 +10,7 @@ import {
 } from "@/services/subprocessoService";
 import {useMapas} from "@/composables/useMapas";
 import type {
+    ContextoCadastroAtividadesSubprocesso,
     ContextoEdicaoSubprocesso,
     PermissoesSubprocesso,
     SituacaoSubprocesso,
@@ -69,11 +72,37 @@ async function buscarContextoEdicaoPorProcessoEUnidade(codProcesso: number, sigl
     });
 }
 
+async function buscarContextoCadastroAtividades(codigo: number) {
+    subprocessoDetalhe.value = null;
+
+    return withErrorHandling(async () => {
+        const data = await serviceBuscarContextoCadastroAtividades(codigo);
+        atualizarContextoCadastroLocal(data);
+
+        return data;
+    });
+}
+
+async function buscarContextoCadastroAtividadesPorProcessoEUnidade(codProcesso: number, siglaUnidade: string) {
+    subprocessoDetalhe.value = null;
+
+    return withErrorHandling(async () => {
+        const data = await serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade(codProcesso, siglaUnidade);
+        atualizarContextoCadastroLocal(data);
+
+        return data;
+    });
+}
+
 function atualizarContextoEdicaoLocal(data: ContextoEdicaoSubprocesso) {
     atualizarDetalheLocal(data.detalhes);
 
     const {mapaCompleto} = useMapas();
     mapaCompleto.value = data.mapa;
+}
+
+function atualizarContextoCadastroLocal(data: ContextoCadastroAtividadesSubprocesso) {
+    atualizarDetalheLocal(data.detalhes);
 }
 
 function atualizarStatusLocal(status: {
@@ -110,6 +139,8 @@ export function useSubprocessos() {
         buscarSubprocessoDetalhe,
         buscarContextoEdicao,
         buscarContextoEdicaoPorProcessoEUnidade,
+        buscarContextoCadastroAtividades,
+        buscarContextoCadastroAtividadesPorProcessoEUnidade,
         buscarSubprocessoPorProcessoEUnidade,
         atualizarStatusLocal,
     };

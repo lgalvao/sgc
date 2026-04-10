@@ -12,7 +12,7 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
-import type {AtividadeOperacaoResponse, ContextoEdicaoSubprocesso, MapaCompleto, PermissoesSubprocesso, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
+import type {AtividadeOperacaoResponse, ContextoCadastroAtividadesSubprocesso, MapaResumo, PermissoesSubprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 vi.mock("@/utils/logger", () => ({
@@ -72,6 +72,8 @@ type SubprocessoStoreMock = {
         unidade?: {sigla: string};
         permissoes?: Record<string, boolean>;
     } | null;
+    buscarContextoCadastroAtividadesPorProcessoEUnidade: ReturnType<typeof vi.fn>;
+    buscarContextoCadastroAtividades: ReturnType<typeof vi.fn>;
     buscarContextoEdicaoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarContextoEdicao: ReturnType<typeof vi.fn>;
     buscarSubprocessoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
@@ -81,7 +83,7 @@ type SubprocessoStoreMock = {
     clearError: ReturnType<typeof vi.fn>;
 };
 
-function criarContextoEdicao(): ContextoEdicaoSubprocesso {
+function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
     const permissoes: PermissoesSubprocesso = {
         podeEditarCadastro: false,
         podeDisponibilizarCadastro: false,
@@ -118,17 +120,7 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
         habilitarHomologarMapa: false,
     };
     const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
-    const mapa: MapaCompleto = {codigo: 100, subprocessoCodigo: 123, observacoes: "", competencias: [], situacao: "CRIADO"};
-    const subprocesso: Subprocesso = {
-        codigo: 123,
-        unidade,
-        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-        dataLimite: "2025-01-01T00:00:00",
-        dataFimEtapa1: "",
-        dataLimiteEtapa2: "",
-        atividades: [],
-        codUnidade: unidade.codigo,
-    };
+    const mapa: MapaResumo = {codigo: 100, subprocessoCodigo: 123};
     const detalhes: SubprocessoDetalhe = {
         codigo: 123,
         unidade,
@@ -148,7 +140,6 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
         permissoes,
     };
     return {
-        subprocesso,
         detalhes,
         mapa,
         atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}],
@@ -158,6 +149,8 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
 
 const subprocessosMock = reactive({
     subprocessoDetalhe: null as SubprocessoStoreMock["subprocessoDetalhe"],
+    buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
+    buscarContextoCadastroAtividades: vi.fn(),
     buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
@@ -175,6 +168,8 @@ vi.mock("vue-router", () => ({
 vi.mock("@/composables/usePerfil", () => ({usePerfil: vi.fn()}));
 
 vi.mock("@/services/subprocessoService", () => ({
+    buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
+    buscarContextoCadastroAtividades: vi.fn(),
     buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
@@ -332,6 +327,8 @@ describe("CadastroView.vue", () => {
             permissoes: {}
         };
         subprocessosMock.lastError = null;
+        subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade = vi.fn();
+        subprocessosMock.buscarContextoCadastroAtividades = vi.fn();
         subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade = vi.fn();
         subprocessosMock.buscarContextoEdicao = vi.fn();
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn();
@@ -342,9 +339,9 @@ describe("CadastroView.vue", () => {
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
-        vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
+        vi.mocked(subprocessoService.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
+        vi.mocked(subprocessoService.buscarContextoCadastroAtividades).mockResolvedValue(criarContextoEdicao());
     });
 
     it("renderiza corretamente", async () => {
@@ -567,7 +564,7 @@ describe("CadastroView.vue", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const subprocessosStore = subprocessosMock;
-        subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
+        subprocessosStore.buscarContextoCadastroAtividades = vi.fn().mockResolvedValue({
             ...criarContextoEdicao(),
             detalhes: {
                 ...criarContextoEdicao().detalhes,
@@ -583,7 +580,7 @@ describe("CadastroView.vue", () => {
         const vm = wrapper.vm as unknown as CadastroViewVm;
         await vm.handleImportAtividades();
 
-        expect(subprocessosStore.buscarContextoEdicao).toHaveBeenCalledWith(123);
+        expect(subprocessosStore.buscarContextoCadastroAtividades).toHaveBeenCalledWith(123);
         expect(vm.atividades).toEqual([
             {codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}
         ]);
@@ -652,7 +649,7 @@ describe("CadastroView.vue", () => {
         vm.timeoutLimpezaErros();
         
         // Cobre ramo sem contexto agregado
-        subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(null);
         await vm.carregarContextoInicial();
 
         // 375-377 (adicionarAtividade success branch)

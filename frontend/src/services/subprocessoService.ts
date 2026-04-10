@@ -1,6 +1,7 @@
 import type {
     Analise,
     Atividade,
+    ContextoCadastroAtividadesSubprocesso,
     AtividadeImpactada,
     CompetenciaImpactada,
     ContextoEdicaoSubprocesso,
@@ -29,6 +30,10 @@ interface BuscarSubprocessoPorProcessoEUnidadeResponse {
 }
 
 interface ContextoEdicaoResponseBackend extends Omit<ContextoEdicaoSubprocesso, "detalhes"> {
+    detalhes: SubprocessoDetalheResponse;
+}
+
+interface ContextoCadastroAtividadesResponseBackend extends Omit<ContextoCadastroAtividadesSubprocesso, "detalhes"> {
     detalhes: SubprocessoDetalheResponse;
 }
 
@@ -136,6 +141,34 @@ export async function buscarContextoEdicaoPorProcessoEUnidade(
     const response = await apiClient.get<ContextoEdicaoResponseBackend>("/subprocessos/contexto-edicao/buscar", {
         params: {codProcesso, siglaUnidade},
     });
+    return {
+        ...response.data,
+        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
+    };
+}
+
+export async function buscarContextoCadastroAtividades(
+    codSubprocesso: number,
+): Promise<ContextoCadastroAtividadesSubprocesso> {
+    const response = await apiClient.get<ContextoCadastroAtividadesResponseBackend>(
+        `/subprocessos/${codSubprocesso}/contexto-cadastro-atividades`,
+    );
+    return {
+        ...response.data,
+        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
+    };
+}
+
+export async function buscarContextoCadastroAtividadesPorProcessoEUnidade(
+    codProcesso: number,
+    siglaUnidade: string,
+): Promise<ContextoCadastroAtividadesSubprocesso> {
+    const response = await apiClient.get<ContextoCadastroAtividadesResponseBackend>(
+        "/subprocessos/contexto-cadastro-atividades/buscar",
+        {
+            params: {codProcesso, siglaUnidade},
+        },
+    );
     return {
         ...response.data,
         detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),

@@ -198,7 +198,7 @@ import {
   type AtividadeOperacaoResponse,
   type Atividade,
   type Conhecimento,
-  type ContextoEdicaoSubprocesso,
+  type ContextoCadastroAtividadesSubprocesso,
   type CriarConhecimentoRequest,
   type ErroValidacao,
   SituacaoSubprocesso,
@@ -234,8 +234,7 @@ const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = mapasStore;
 const codSubprocesso = ref<number | null>(null);
-
-const codMapa = computed(() => mapasStore.mapaCompleto.value?.codigo ?? null);
+const codMapa = ref<number | null>(null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const acesso = useAcesso(subprocesso);
@@ -373,15 +372,19 @@ function processarRespostaLocal(response: RespostaLocalCadastro) {
   });
 }
 
-function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
+function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso) {
   processarRespostaLocal({
-    subprocesso: data.subprocesso,
+    subprocesso: {
+      codigo: data.detalhes.codigo,
+      situacao: data.detalhes.situacao,
+    },
     permissoes: data.detalhes.permissoes,
     atividadesAtualizadas: data.atividadesDisponiveis,
   });
   atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
   disponibilizacaoSemMudancas.value = false;
   unidade.value = data.unidade;
+  codMapa.value = data.mapa.codigo;
 }
 
 async function executarAtualizacaoCadastro(
@@ -402,7 +405,7 @@ async function executarAtualizacaoCadastro(
 
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
-  const data = await subprocessosStore.buscarContextoEdicaoPorProcessoEUnidade(codProcessoRef, props.sigla);
+  const data = await subprocessosStore.buscarContextoCadastroAtividadesPorProcessoEUnidade(codProcessoRef, props.sigla);
   if (!data) {
     logger.error("ERRO: Subprocesso não encontrado!");
     return;
@@ -410,7 +413,6 @@ async function carregarContextoInicial() {
 
   codSubprocesso.value = data.detalhes.codigo;
   sincronizarEstadoInicialContexto(data);
-  mapasStore.mapaCompleto.value = data.mapa;
 }
 
 async function adicionarAtividade(): Promise<boolean> {
@@ -532,7 +534,7 @@ async function handleImportAtividades(aviso?: string) {
   const codigoSubprocesso = codSubprocesso.value;
   if (codigoSubprocesso !== null) {
     await withErrorHandling(async () => {
-      const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
+      const data = await subprocessosStore.buscarContextoCadastroAtividades(codigoSubprocesso);
       if (data) {
         sincronizarEstadoInicialContexto(data);
       }
