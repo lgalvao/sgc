@@ -177,11 +177,11 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     });
 
     it('handles error starting process during initiation flow', async () => {
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+        const {wrapper} = createWrapper();
+        const unidadeStore = useUnidadeStore();
+        vi.mocked(unidadeStore.garantirArvoreElegibilidade).mockResolvedValue([
             {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
         ] as any);
-
-        const {wrapper} = createWrapper();
 
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -270,10 +270,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
     it('populates fields when loading an existing process', async () => {
         mockRoute.query = {codProcesso: '123'};
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
-            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []},
-            {codigo: 2, sigla: 'U2', nome: 'Unidade 2', isElegivel: true, filhas: []}
-        ] as any);
 
         const mockProcesso = {
             codigo: 123,
@@ -290,6 +286,12 @@ describe('ProcessoCadastroView.vue Coverage', () => {
             }
         });
 
+        const unidadeStore = useUnidadeStore();
+        vi.mocked(unidadeStore.garantirArvoreElegibilidade).mockResolvedValue([
+            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []},
+            {codigo: 2, sigla: 'U2', nome: 'Unidade 2', isElegivel: true, filhas: []}
+        ] as any);
+
         await flushPromises();
 
         expect((wrapper.vm).descricao).toBe('Processo existente');
@@ -297,7 +299,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect((wrapper.vm).dataLimite).toBe('2023-12-31');
         expect((wrapper.vm).unidadesSelecionadas).toEqual([1, 2]);
 
-        const unidadeStore = useUnidadeStore();
         expect(unidadeStore.garantirArvoreElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', 123);
     });
 });
