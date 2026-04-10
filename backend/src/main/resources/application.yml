@@ -75,6 +75,8 @@ sgc:
     ativo: false
     trace-completo: false
     limite-alerta-ms: 500
+    limite-lento-ms: 100
+    limite-muito-lento-ms: 300
     permitir-ativacao-por-header: true
     taxa-amostragem: 0.0
 

@@ -21,7 +21,7 @@ Instrumentar frontend e backend para permitir diagnostico de desempenho ponta a 
 - Medir duracao total percebida no navegador.
 - Enviar headers `X-Correlacao-Id` e `X-Monitoramento-Ativo` quando aplicavel.
 - Permitir ativacao por:
-  - `VITE_MONITORAMENTO_MODO=full`
+  - `VITE_MONITORAMENTO_MODO=on`
   - `sessionStorage.setItem('sgc.monitoramento.ativo', 'true')`
   - parametro de URL `?monitoramento=1`
 
@@ -41,9 +41,7 @@ Instrumentar frontend e backend para permitir diagnostico de desempenho ponta a 
 - Aproveitar `e2e/lifecycle.js` como ponto oficial para subir a aplicacao em modo diagnostico.
 - Adicionar modos:
   - `off`
-  - `lento`
-  - `sob-demanda`
-  - `full`
+  - `on`
 - Repassar configuracoes para backend e frontend via argumentos/variaveis de ambiente.
 
 ## Validacao

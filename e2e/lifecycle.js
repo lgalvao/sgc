@@ -21,6 +21,9 @@ const MAX_BACKEND_PORT_SCAN = Number.parseInt(process.env.E2E_BACKEND_PORT_SCAN_
 const MODO_MONITORAMENTO = process.env.SGC_MONITORAMENTO || 'off';
 const LIMITE_MONITORAMENTO_ALERTA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_ALERTA_MS || '500', 10);
 const TAXA_AMOSTRAGEM_MONITORAMENTO = process.env.SGC_MONITORAMENTO_AMOSTRAGEM || '0.0';
+const ANSI_RESET = '\u001b[0m';
+const ANSI_AMARELO = '\u001b[33m';
+const ANSI_VERMELHO = '\u001b[31m';
 
 const backendProcessos = [];
 const frontendProcessos = [];
@@ -90,15 +93,20 @@ const LOG_FILTERS = [
     /WARNING:/,
 
     /^> Task :/,
+    /Calculating task graph as no cached configuration is available/,
     /logStarted/,
     /UP-TO-DATE/,
     /Starting a Gradle daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
     /Starting/,
+    /Perfil Spring ativado:/,
+    /Carregando configurações de:/,
+    /Arquivo \.env\..*não encontrado, usando configurações padrão/,
 
     // Spring Boot - Inicialização
     /The following.*profile.*is active/,
     /Initializing spring/,
+    /Initializing Spring DispatcherServlet/,
     /Initializing spring embedded WebApplicationContext/,
     /Initializing spring DispatcherServlet/,
     /Started .* in .* seconds/,
@@ -130,12 +138,56 @@ function shouldFilterLog(line) {
     return LOG_FILTERS.some(pattern => pattern.test(line));
 }
 
+function normalizarLinhaBackend(line) {
+    const semPrefixoLogger = line.replace(
+        /^(INFO|WARN|ERROR|DEBUG)\s+[^:]+(?::[^:]+)?:(\d+):\s+/,
+        (_match, nivel) => nivel === 'INFO' ? '' : `${nivel} `
+    ).trim();
+    return semPrefixoLogger;
+}
+
+function colorirLinha(line) {
+    if (line.startsWith('HTTP-MUITO-LENTO')) {
+        return `${ANSI_VERMELHO}${line}${ANSI_RESET}`;
+    }
+
+    if (line.startsWith('HTTP-LENTO') || line.startsWith('WARN ')) {
+        return `${ANSI_AMARELO}${line}${ANSI_RESET}`;
+    }
+
+    if (line.startsWith('ERROR ')) {
+        return `${ANSI_VERMELHO}${line}${ANSI_RESET}`;
+    }
+
+    return line;
+}
+
+function formatarLinha(prefix, line) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+        return null;
+    }
+
+    if (prefix === 'BACKEND' || prefix === 'BACKEND_ERR') {
+        return colorirLinha(normalizarLinhaBackend(trimmed));
+    }
+
+    if (prefix === 'FRONTEND' || prefix === 'FRONTEND_ERR') {
+        return trimmed;
+    }
+
+    return `[${prefix}] ${trimmed}`;
+}
+
 function log(prefix, data) {
     const lines = data.toString().split('\n');
     lines.forEach(line => {
         const trimmed = line.trim();
         if (trimmed && !shouldFilterLog(line)) {
-            lifecycleLogger.info(`[${prefix}] ${line}`);
+            const linhaFormatada = formatarLinha(prefix, line);
+            if (linhaFormatada) {
+                lifecycleLogger.info(linhaFormatada);
+            }
         }
     });
 }
@@ -173,11 +225,11 @@ function validarPerfilLifecycle() {
 }
 
 function validarModoMonitoramento() {
-    const modosSuportados = new Set(['off', 'lento', 'sob-demanda', 'full']);
+    const modosSuportados = new Set(['off', 'on']);
     if (!modosSuportados.has(MODO_MONITORAMENTO)) {
         throw new Error(
             `Modo de monitoramento inválido: ${MODO_MONITORAMENTO}. ` +
-            'Use SGC_MONITORAMENTO=off, lento, sob-demanda ou full.'
+            'Use SGC_MONITORAMENTO=off ou on.'
         );
     }
 }
@@ -187,11 +239,11 @@ function monitoramentoAtivo() {
 }
 
 function monitoramentoTraceCompleto() {
-    return MODO_MONITORAMENTO === 'full';
+    return MODO_MONITORAMENTO === 'on';
 }
 
 function monitoramentoPermiteHeader() {
-    return MODO_MONITORAMENTO === 'sob-demanda' || monitoramentoTraceCompleto();
+    return MODO_MONITORAMENTO === 'on';
 }
 
 function requestStatus(url, method = 'GET') {
@@ -454,12 +506,6 @@ try {
         `>>> Infra ${PERFIL_LIFECYCLE.toUpperCase()} no ar. Frontend: ${FRONTEND_PORT}. ` +
         `${descreverBackends()}. Monitoramento: ${MODO_MONITORAMENTO}.`
     );
-    if (MODO_MONITORAMENTO === 'sob-demanda') {
-        lifecycleLogger.info(
-            '>>> Ative no navegador com sessionStorage.setItem(\'sgc.monitoramento.ativo\', \'true\') ' +
-            'ou usando ?monitoramento=1.'
-        );
-    }
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);
     process.exit(1);

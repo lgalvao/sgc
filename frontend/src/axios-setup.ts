@@ -49,7 +49,7 @@ function isMonitoramentoSolicitadoPorUrl(): boolean {
 }
 
 function isMonitoramentoAtivo(): boolean {
-    return MODO_MONITORAMENTO === 'full'
+    return MODO_MONITORAMENTO === 'on'
         || isMonitoramentoSolicitadoPorSessao()
         || isMonitoramentoSolicitadoPorUrl();
 }

@@ -10,6 +10,8 @@ public class MonitoramentoProperties {
     private boolean ativo = false;
     private boolean traceCompleto = false;
     private long limiteAlertaMs = 500;
+    private long limiteLentoMs = 100;
+    private long limiteMuitoLentoMs = 300;
     private boolean permitirAtivacaoPorHeader = true;
     private double taxaAmostragem = 0.0;
 }

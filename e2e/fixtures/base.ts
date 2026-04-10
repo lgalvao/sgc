@@ -5,6 +5,10 @@ import {useProcessoCleanup} from '../hooks/hooks-limpeza.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+function monitoramentoAtivoNoPlaywright(): boolean {
+    return process.env.SGC_MONITORAMENTO === 'on';
+}
+
 function obterBaseUrlWorker(_workerIndex: number): string {
     const portaFrontend = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
     return `http://localhost:${portaFrontend}`;
@@ -29,6 +33,19 @@ function ehRuidoAutenticacaoEmDetalhes(url: string, status?: number, method?: st
         && /\/api\/processos\/\d+\/detalhes$/.test(url);
 }
 
+function ehErroHttpMonitoradoEsperado(args: unknown[]): boolean {
+    return args.some(arg => {
+        if (!arg || typeof arg !== 'object') {
+            return false;
+        }
+
+        const payload = arg as {url?: string; status?: number; metodo?: string};
+        return payload.url === '/usuarios/login'
+            && payload.status === 401
+            && String(payload.metodo || '').toUpperCase() === 'POST';
+    });
+}
+
 export const test = base.extend<{
     cleanupAutomatico: ReturnType<typeof useProcessoCleanup>;
 }>({
@@ -37,7 +54,8 @@ export const test = base.extend<{
         const context = await browser.newContext({
             baseURL,
             extraHTTPHeaders: {
-                'x-e2e-worker': String(testInfo.parallelIndex)
+                'x-e2e-worker': String(testInfo.parallelIndex),
+                ...(monitoramentoAtivoNoPlaywright() ? {'X-Monitoramento-Ativo': 'true'} : {})
             }
         });
         await use(context);
@@ -49,7 +67,8 @@ export const test = base.extend<{
         const request = await playwright.request.newContext({
             baseURL,
             extraHTTPHeaders: {
-                'x-e2e-worker': String(testInfo.parallelIndex)
+                'x-e2e-worker': String(testInfo.parallelIndex),
+                ...(monitoramentoAtivoNoPlaywright() ? {'X-Monitoramento-Ativo': 'true'} : {})
             }
         });
         await use(request);
@@ -59,6 +78,12 @@ export const test = base.extend<{
     page: async ({page}, use, testInfo) => {
         let ultimoRuidoAutenticacaoDetalhesEm = 0;
         const logs: string[] = [];
+
+        if (monitoramentoAtivoNoPlaywright()) {
+            await page.addInitScript(() => {
+                window.sessionStorage.setItem('sgc.monitoramento.ativo', 'true');
+            });
+        }
 
         // Listener para logs do console
         page.on('console', async msg => {
@@ -88,18 +113,28 @@ export const test = base.extend<{
 
             // Tenta expandir argumentos se forem objetos (ex: AxiosError)
             let expandedArgs: string;
+            let argsExpandidos: unknown[] = [];
             try {
-                const args = await Promise.all(msg.args().map(arg => arg.jsonValue().catch(() => null)));
-                expandedArgs = args.map(a => {
+                argsExpandidos = await Promise.all(msg.args().map(arg => arg.jsonValue().catch(() => null)));
+                expandedArgs = argsExpandidos.map(a => {
                     if (a && typeof a === 'object') {
+                        const objeto = a as {
+                            code?: string;
+                            isAxiosError?: boolean;
+                            message?: string;
+                            config?: {url?: string; method?: string};
+                            response?: {status?: number; data?: unknown};
+                        };
                         // Se for um erro do Axios, tenta extrair detalhes úteis
-                        if (a.code === 'ERR_BAD_REQUEST' || a.isAxiosError || (a.config && a.response)) {
+                        if (objeto.code === 'ERR_BAD_REQUEST'
+                            || objeto.isAxiosError
+                            || (objeto.config && objeto.response)) {
                             return JSON.stringify({
-                                message: a.message,
-                                url: a.config?.url,
-                                method: a.config?.method,
-                                status: a.response?.status,
-                                responseData: a.response?.data
+                                message: objeto.message,
+                                url: objeto.config?.url,
+                                method: objeto.config?.method,
+                                status: objeto.response?.status,
+                                responseData: objeto.response?.data
                             });
                         }
                         return JSON.stringify(a);
@@ -108,6 +143,17 @@ export const test = base.extend<{
                 }).join(' ');
             } catch {
                 expandedArgs = text; // Fallback
+            }
+
+            if (monitoramentoAtivoNoPlaywright()
+                && (text.includes('[http] inicio') || text.includes('[http] fim'))) {
+                return;
+            }
+
+            if (monitoramentoAtivoNoPlaywright()
+                && text.includes('[http] erro')
+                && ehErroHttpMonitoradoEsperado(argsExpandidos)) {
+                return;
             }
 
             if (type === 'error'

@@ -62,13 +62,9 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             response.setHeader("Server-Timing", "app;dur=" + duracaoMs);
 
             if (monitoramentoAtivoNaRequisicao) {
-                log.info("HTTP MONITORADO: {} {} -> {} em {} ms",
-                        request.getMethod(),
-                        obterCaminhoComQueryString(request),
-                        response.getStatus(),
-                        duracaoMs);
+                log.info(formatarLinhaHttp(definirTagHttp(duracaoMs), request, response, duracaoMs));
             } else if (duracaoMs > monitoramentoProperties.getLimiteAlertaMs()) {
-                log.warn("HTTP LENTO: {} {} -> {} em {} ms",
+                log.warn("HTTP LENTO {} {} {} {}ms",
                         request.getMethod(),
                         obterCaminhoComQueryString(request),
                         response.getStatus(),
@@ -77,6 +73,32 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
 
             MDC.remove(MDC_CORRELACAO_ID);
         }
+    }
+
+    private String definirTagHttp(long duracaoMs) {
+        if (duracaoMs >= monitoramentoProperties.getLimiteMuitoLentoMs()) {
+            return "HTTP-MUITO-LENTO";
+        }
+
+        if (duracaoMs >= monitoramentoProperties.getLimiteLentoMs()) {
+            return "HTTP-LENTO";
+        }
+
+        return "HTTP";
+    }
+
+    private String formatarLinhaHttp(String tag,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     long duracaoMs) {
+        String caminho = obterCaminhoComQueryString(request);
+        int status = response.getStatus();
+
+        if (status == HttpServletResponse.SC_OK) {
+            return String.format("%s %s %s %dms", tag, request.getMethod(), caminho, duracaoMs);
+        }
+
+        return String.format("%s %s %s %d %dms", tag, request.getMethod(), caminho, status, duracaoMs);
     }
 
     public static boolean isMonitoramentoAtivoNaRequisicao() {

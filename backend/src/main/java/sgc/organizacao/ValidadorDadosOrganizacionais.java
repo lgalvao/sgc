@@ -41,8 +41,6 @@ public class ValidadorDadosOrganizacionais {
     @Cacheable(CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL)
     @Transactional(readOnly = true)
     public DiagnosticoOrganizacionalDto diagnosticar() {
-        log.info("Gerando diagnostico das invariantes organizacionais...");
-
         List<UnidadeHierarquiaLeitura> unidadesParticipantes = carregarUnidadesParticipantes();
         Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade = carregarResponsabilidades(unidadesParticipantes);
         Map<String, List<String>> violacoesPorTipo = new LinkedHashMap<>();
