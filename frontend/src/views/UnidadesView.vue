@@ -70,12 +70,12 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
-import {buscarDiagnosticoOrganizacional, buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
-import type {DiagnosticoOrganizacional, Unidade} from "@/types/tipos";
+import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
+import type {Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {usePerfil} from "@/composables/usePerfil";
-import {logger} from "@/utils";
+import {useOrganizacaoStore} from "@/stores/organizacao";
 
 type LinhaUnidadeArvore = {
   codigo: number;
@@ -90,8 +90,9 @@ type LinhaUnidadeArvore = {
 const unidades = ref<Unidade[]>([]);
 const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
-const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
-const erroDiagnosticoOrganizacional = ref<string | null>(null);
+const organizacaoStore = useOrganizacaoStore();
+const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
+const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
 const router = useRouter();
 const carregamentoInicialConcluido = ref(false);
 
@@ -139,18 +140,7 @@ async function carregarUnidades() {
 }
 
 async function carregarDiagnostico() {
-  if (!mostrarDiagnosticoOrganizacional.value) {
-    return;
-  }
-
-  try {
-    diagnosticoOrganizacional.value = await buscarDiagnosticoOrganizacional();
-    erroDiagnosticoOrganizacional.value = null;
-  } catch (error) {
-    diagnosticoOrganizacional.value = null;
-    erroDiagnosticoOrganizacional.value = "Não foi possível verificar as pendências organizacionais desta tela.";
-    logger.error("Erro ao carregar diagnostico organizacional das unidades:", error);
-  }
+  await organizacaoStore.garantirDiagnostico(mostrarDiagnosticoOrganizacional.value);
 }
 
 function mapearUnidadeParaLinha(unidade: Unidade): LinhaUnidadeArvore {

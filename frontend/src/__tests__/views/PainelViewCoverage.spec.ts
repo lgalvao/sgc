@@ -34,6 +34,7 @@ const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, 
 vi.mock("@/services/painelService", () => ({
     listarProcessos: vi.fn(),
     listarAlertas: vi.fn(),
+    marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('PainelView Coverage', () => {
@@ -92,7 +93,7 @@ describe('PainelView Coverage', () => {
         expect(painelService.listarAlertas).toHaveBeenCalled();
     });
 
-    it('ordenarPor toggles asc/desc correctly', async () => {
+    it('ordenarPor altera estado local sem chamar o backend', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
@@ -111,19 +112,18 @@ describe('PainelView Coverage', () => {
                 stubs: commonStubs
             }
         });
+        await flushPromises();
+        const callsAfterMount = (painelService.listarProcessos as any).mock.calls.length;
 
-        // Initial default: descricao ASC (implied by refs initialization in component)
-
+        // Ordenar: deve alterar estado local, sem chamar o backend
         await (wrapper.vm as any).ordenarPor('descricao');
-
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
-            codUnidade: 1, page: 0, size: 10, sort: 'descricao', order: 'desc'
-        });
+        expect(painelService.listarProcessos).toHaveBeenCalledTimes(callsAfterMount);
+        expect((wrapper.vm as any).asc).toBe(false);
 
         await (wrapper.vm as any).ordenarPor('tipo');
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
-            codUnidade: 1, page: 0, size: 10, sort: 'tipo', order: 'asc'
-        });
+        expect(painelService.listarProcessos).toHaveBeenCalledTimes(callsAfterMount);
+        expect((wrapper.vm as any).criterio).toBe('tipo');
+        expect((wrapper.vm as any).asc).toBe(true);
     });
 
     it('redirects to CadProcesso on cta-vazio event', async () => {

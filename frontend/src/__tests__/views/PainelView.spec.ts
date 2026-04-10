@@ -21,6 +21,7 @@ const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, 
 vi.mock("@/services/painelService", () => ({
     listarProcessos: vi.fn(),
     listarAlertas: vi.fn(),
+    marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe("PainelView.vue", () => {
@@ -59,6 +60,7 @@ describe("PainelView.vue", () => {
                     initialState: {
                         perfil: {...initialState.perfil, ...(customState as any).perfil},
                         processos: {...initialState.processos, ...(customState as any).processos},
+                        painel: {alertas: [], processos: [], invalido: false, ...(customState as any).painel},
                     },
                     stubActions: true,
                 }),
@@ -96,25 +98,22 @@ describe("PainelView.vue", () => {
     });
 
     it("deve renderizar a tabela de alertas quando houver itens", async () => {
-        (painelService.listarAlertas as any).mockResolvedValue({
-            ...mockPageVazia,
-            content: [{
-                codigo: 1,
-                codProcesso: 10,
-                unidadeOrigem: 'SEC',
-                unidadeDestino: 'CGP',
-                descricao: 'Alerta',
-                dataHora: '2026-03-18T10:00:00',
-                dataHoraLeitura: null,
-                mensagem: 'Processo pendente',
-                origem: 'Secretaria',
-                processo: 'Processo 10',
-            }],
-            empty: false,
-            totalElements: 1,
-        });
-
-        const wrapper = mount(PainelView, mountOptions());
+        const alertaMock = {
+            codigo: 1,
+            codProcesso: 10,
+            unidadeOrigem: 'SEC',
+            unidadeDestino: 'CGP',
+            descricao: 'Alerta',
+            dataHora: '2026-03-18T10:00:00',
+            dataHoraLeitura: null,
+            mensagem: 'Processo pendente',
+            origem: 'Secretaria',
+            processo: 'Processo 10',
+        };
+        // stubActions=true impede as actions de executar — populamos o estado diretamente
+        const wrapper = mount(PainelView, mountOptions({
+            painel: {alertas: [alertaMock], processos: [], invalido: false}
+        }));
         await flushPromises();
 
         expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(true);
@@ -127,7 +126,7 @@ describe("PainelView.vue", () => {
         await wrapper.vm.$nextTick();
 
         expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});
-        expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: "dataHora", order: "desc"});
+        expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 200, sort: "dataHora", order: "desc"});
     });
 
     it("não deve carregar dados se perfil não estiver selecionado", async () => {
@@ -163,23 +162,16 @@ describe("PainelView.vue", () => {
         expect(wrapperUser.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(false);
     });
 
-    it("deve reordenar processos ao receber evento da tabela", async () => {
+    it("deve reordenar processos localmente sem chamar o backend", async () => {
         const wrapper = mount(PainelView, mountOptions());
         await flushPromises();
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
-        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
 
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
-            codUnidade: 1, page: 0, size: 10, sort: "dataCriacao", order: "asc"
-        });
-
-        await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
-            codUnidade: 1, page: 0, size: 10, sort: "dataCriacao", order: "desc"
-        });
+        // Ordenação é agora local — não deve chamar o backend
+        expect(painelService.listarProcessos).not.toHaveBeenCalled();
     });
 
     it("deve navegar ao selecionar processo", async () => {

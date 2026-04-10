@@ -9,6 +9,7 @@ import {createMemoryHistory, createRouter} from 'vue-router';
 vi.mock('@/services/painelService', () => ({
   listarProcessos: vi.fn(),
   listarAlertas: vi.fn(),
+  marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
 }));
 
 const mockRouterPush = vi.fn();
@@ -109,7 +110,7 @@ describe('PainelView', () => {
     await flushPromises();
 
     expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});
-    expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: 'dataHora', order: 'desc'});
+    expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 200, sort: 'dataHora', order: 'desc'});
     expect(mockToastCreate).toHaveBeenCalledWith(expect.objectContaining({ props: expect.objectContaining({ body: 'Sucesso' }) }));
   });
 
@@ -154,22 +155,23 @@ describe('PainelView', () => {
     expect(painelService.listarAlertas).not.toHaveBeenCalled();
   });
 
-  it('deve ordenar processos corretamente', async () => {
+  it('deve ordenar processos corretamente sem chamar o backend', async () => {
     const wrapper = mount(PainelView, createMountOptions());
     await flushPromises();
 
     const vm = wrapper.vm as any;
-    
+
     // Inverter direção no mesmo critério (default é "descricao" e asc=true)
     vm.ordenarPor('descricao');
     expect(vm.asc).toBe(false);
-    expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: 'descricao', order: 'desc'});
+    // Ordenação é local — não chama o backend
+    expect(painelService.listarProcessos).toHaveBeenCalledTimes(1); // apenas no onMounted
 
     // Mudar critério
     vm.ordenarPor('dataCriacao');
     expect(vm.criterio).toBe('dataCriacao');
     expect(vm.asc).toBe(true);
-    expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: 'dataCriacao', order: 'asc'});
+    expect(painelService.listarProcessos).toHaveBeenCalledTimes(1); // ainda apenas o onMounted
   });
 
   it('deve abrir detalhes do processo se linkDestino existir', async () => {

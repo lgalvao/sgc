@@ -137,13 +137,13 @@ import {TEXTOS} from "@/constants/textos";
 
 import {useToastStore} from "@/stores/toast";
 import {usePainelStore} from "@/stores/painel";
+import {useOrganizacaoStore} from "@/stores/organizacao";
 import {
   buscarArvoreComElegibilidade,
-  buscarDiagnosticoOrganizacional,
   mapUnidadesArray
 } from "@/services/unidadeService";
 import * as processoService from "@/services/processoService";
-import {type DiagnosticoOrganizacional, Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
+import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
 import {usePerfil} from "@/composables/usePerfil";
 
 const {
@@ -184,14 +184,15 @@ const router = useRouter();
 const route = useRoute();
 const toastStore = useToastStore();
 const painelStore = usePainelStore();
+const organizacaoStore = useOrganizacaoStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
 const ultimaBuscaUnidades = ref<{ tipoProcesso: TipoProcesso; codProcesso?: number } | null>(null);
-const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
-const erroDiagnosticoOrganizacional = ref<string | null>(null);
+const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
+const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
 
 const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
 const resumoDiagnostico = computed(() =>
@@ -258,18 +259,7 @@ async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcess
 }
 
 async function carregarDiagnosticoOrganizacional() {
-  if (!mostrarDiagnosticoOrganizacional.value) {
-    return;
-  }
-
-  try {
-    diagnosticoOrganizacional.value = await buscarDiagnosticoOrganizacional();
-    erroDiagnosticoOrganizacional.value = null;
-  } catch (err) {
-    diagnosticoOrganizacional.value = null;
-    erroDiagnosticoOrganizacional.value = "Não foi possível verificar as pendências organizacionais desta operação.";
-    logger.error("Erro ao carregar diagnostico organizacional:", err);
-  }
+  await organizacaoStore.garantirDiagnostico(mostrarDiagnosticoOrganizacional.value);
 }
 
 const mostrarModalConfirmacao = ref(false);
