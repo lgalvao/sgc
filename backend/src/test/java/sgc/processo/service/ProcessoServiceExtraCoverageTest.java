@@ -637,7 +637,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             sp.setUnidade(uni);
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);

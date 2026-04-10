@@ -1067,9 +1067,7 @@ class ProcessoServiceTest {
                 "REVISAO_CADASTRO_DISPONIBILIZADA",
                 "REVISAO_MAPA_COM_SUGESTOES",
                 "REVISAO_MAPA_VALIDADO",
-                "MAPEAMENTO_CADASTRO_HOMOLOGADO",
                 "MAPEAMENTO_MAPA_CRIADO",
-                "REVISAO_CADASTRO_HOMOLOGADA",
                 "REVISAO_MAPA_AJUSTADO"
         })
 

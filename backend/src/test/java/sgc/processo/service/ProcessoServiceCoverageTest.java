@@ -517,17 +517,15 @@ class ProcessoServiceCoverageTest {
         }
 
         @Test
-        @DisplayName("isElegivelParaAcaoEmBloco - disponibilizar revisão homologada")
-        void isElegivel_DisponibilizarRevisaoHomologada() {
+        @DisplayName("isElegivelParaAcaoEmBloco - nao elegivel em revisão cadastro homologado (sem mapa criado)")
+        void isElegivel_NaoElegivelRevisaoCadastroHomologado() {
             Usuario user = new Usuario();
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
 
-            when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
-
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull();
-            assertThat(res).isTrue();
+            assertThat(res).isFalse();
         }
 
         @Test

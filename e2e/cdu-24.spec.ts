@@ -37,6 +37,24 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         validarProcessoFixture(processo, descProcesso);
     });
 
+    /**
+     * Regressão - Issue #1520:
+     * O botão "Disponibilizar em bloco" ficava habilitado na situação MAPEAMENTO_CADASTRO_HOMOLOGADO,
+     * antes mesmo de qualquer mapa ser criado. O CDU-24 exige que o botão só seja habilitado quando
+     * existir ao menos um subprocesso em MAPEAMENTO_MAPA_CRIADO ou REVISAO_MAPA_AJUSTADO.
+     */
+    test('Botão "Disponibilizar em bloco" deve estar desabilitado quando nenhum mapa foi criado', async ({
+        _resetAutomatico,
+        page,
+        _autenticadoComoAdmin
+    }) => {
+        await acessarDetalhesProcesso(page, descProcesso);
+
+        const btnDisponibilizar = page.getByTestId('btn-processo-disponibilizar-bloco');
+        await expect(btnDisponibilizar).toBeVisible();
+        await expect(btnDisponibilizar).toBeDisabled();
+    });
+
     test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);

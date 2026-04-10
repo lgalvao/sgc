@@ -635,9 +635,7 @@ public class ProcessoService {
 
     private boolean podeDisponibilizarEmBloco(Subprocesso subprocesso, Usuario usuario) {
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
-        boolean elegivelDisponibilizacao = situacao == MAPEAMENTO_CADASTRO_HOMOLOGADO
-                || situacao == MAPEAMENTO_MAPA_CRIADO
-                || situacao == REVISAO_CADASTRO_HOMOLOGADA
+        boolean elegivelDisponibilizacao = situacao == MAPEAMENTO_MAPA_CRIADO
                 || situacao == REVISAO_MAPA_AJUSTADO;
         return elegivelDisponibilizacao
                 && permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, DISPONIBILIZAR_MAPA);
