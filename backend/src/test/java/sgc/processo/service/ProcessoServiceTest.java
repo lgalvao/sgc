@@ -212,6 +212,44 @@ class ProcessoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve iniciar revisao ignorando unidade ancestral selecionada junto com a descendente")
+        void deveIniciarRevisaoIgnorandoAncestralRedundante() {
+            Long id = 101L;
+            Usuario usuario = new Usuario();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Processo processo = new Processo();
+            processo.setCodigo(id);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.REVISAO);
+
+            Unidade unidadePai = criarUnidadeValida(10L);
+            Unidade unidadeFilha = criarUnidadeValida(20L);
+            processo.adicionarParticipantes(Set.of(unidadePai, unidadeFilha));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(unidadeHierarquiaService.buscarMapaFilhoPai()).thenReturn(Map.of(20L, 10L));
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(10L));
+            when(unidadeService.buscarPorCodigos(List.of(20L))).thenReturn(List.of(unidadeFilha));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(20L));
+            when(unidadeService.buscarMapasPorUnidades(List.of(20L))).thenReturn(List.of(
+                    UnidadeMapa.builder().unidadeCodigo(20L).build()
+            ));
+            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidadePai));
+            Unidade admin = criarUnidadeValida(999L);
+            when(unidadeService.buscarAdmin()).thenReturn(admin);
+            mockarResponsaveisEfetivos();
+
+            processoService.iniciar(id, List.of(10L, 20L));
+
+            verify(subprocessoService, times(1)).criarParaRevisao(any());
+            verify(subprocessoService).criarParaRevisao(argThat(command ->
+                    command.processo() == processo
+                            && command.unidade().getCodigo().equals(20L)
+            ));
+        }
+
+        @Test
         @DisplayName("Deve falhar ao iniciar processo se houver unidades em processo ativo")
         void deveFalharAoIniciarSeHouverUnidadesEmProcessoAtivo() {
             Long id = 100L;

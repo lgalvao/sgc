@@ -980,7 +980,30 @@ public class ProcessoService {
         if (codsUnidadesParam.isEmpty()) {
             throw new ErroValidacao(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
         }
-        return codsUnidadesParam;
+        // Em revisão, se vierem pai e filho juntos, mantemos apenas os mais específicos (folhas selecionadas).
+        // Isso evita criar subprocessos redundantes em unidades ancestrais que não deveriam participar da execução.
+        Map<Long, Long> mapaFilhoPai = unidadeHierarquiaService.buscarMapaFilhoPai();
+        return removerAncestraisRedundantesRevisao(codsUnidadesParam, mapaFilhoPai);
+    }
+
+    private List<Long> removerAncestraisRedundantesRevisao(List<Long> codigosSelecionados, Map<Long, Long> mapaFilhoPai) {
+        LinkedHashSet<Long> codigosUnicos = new LinkedHashSet<>(codigosSelecionados);
+        Set<Long> codigosParaRemover = new HashSet<>();
+
+        for (Long codigoSelecionado : codigosUnicos) {
+            // Navega pelo mapa filho->pai já carregado para evitar múltiplas leituras de hierarquia.
+            Long codigoSuperior = mapaFilhoPai.get(codigoSelecionado);
+            while (codigoSuperior != null) {
+                if (codigosUnicos.contains(codigoSuperior)) {
+                    codigosParaRemover.add(codigoSuperior);
+                }
+                codigoSuperior = mapaFilhoPai.get(codigoSuperior);
+            }
+        }
+
+        return codigosUnicos.stream()
+                .filter(codigo -> !codigosParaRemover.contains(codigo))
+                .toList();
     }
 
     private List<Long> validarCodigosParticipantes(List<Long> codigosParticipantes) {
