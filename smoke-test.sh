@@ -21,6 +21,6 @@ echo "[smoke-test] vitest"
 )
 
 echo "[smoke-test] e2es fluxo geral"
-npx playwright test captura jornada --reporter=dot
+npx playwright test captura jornada
 
 echo "[smoke-test] Finalizado"
