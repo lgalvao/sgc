@@ -167,6 +167,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
+import {useProcessoStore} from "@/stores/processo";
 import type {
   AceitarCadastroRequest,
   Analise,
@@ -192,6 +193,7 @@ const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const painelStore = usePainelStore();
 const subprocessoStoreCache = useSubprocessoStore();
+const processoStore = useProcessoStore();
 const {impactoMapa: impactos} = mapasStore;
 
 const unidadeId = computed(() => props.sigla);
@@ -295,6 +297,8 @@ async function confirmarValidacao() {
         toastStore.setPending(acao.mensagemSucesso);
         if (acao.redirecionarParaPainel) {
           painelStore.invalidar();
+          subprocessoStoreCache.invalidar();
+          processoStore.invalidar();
           await router.push({name: "Painel"});
         } else {
           subprocessoStoreCache.invalidar();
@@ -321,6 +325,8 @@ async function confirmarValidacao() {
         fecharModalValidar();
         toastStore.setPending(acao.mensagemSucesso);
         painelStore.invalidar();
+        subprocessoStoreCache.invalidar();
+        processoStore.invalidar();
         await router.push({name: "Painel"});
       }
     }
@@ -351,6 +357,8 @@ async function confirmarDevolucao() {
       fecharModalDevolver();
       toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
       painelStore.invalidar();
+      subprocessoStoreCache.invalidar();
+      processoStore.invalidar();
       await router.push("/painel");
     }
   } finally {
