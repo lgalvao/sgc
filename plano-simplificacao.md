@@ -258,6 +258,60 @@ O frontend de produção não está crítico por tipagem (`any` em produção ze
 * `./gradlew :backend:jacocoTestReport`
 * `node etc/scripts/sgc.js backend cobertura complexidade`
 
+---
+
+## Progresso executado em 10/04/2026
+
+### Rodada A — `ProcessoService` (P1)
+
+* aplicado recorte de contexto para início de subprocessos via `InicioSubprocessosContexto`, removendo assinatura com muitos parâmetros no miolo do fluxo e deixando o ponto de entrada do caso de uso mais linear;
+* reduzida duplicação no processamento de ações em bloco (`ACEITAR`/`HOMOLOGAR`) com função única de aplicação condicional de transições;
+* mantido contrato funcional (mesmas chamadas para `SubprocessoService` e `SubprocessoTransicaoService`, sem alteração de DTO externo ou regras de permissão).
+
+**Aprendizados desta rodada**
+
+* extrações locais com `record` privado funcionam bem para reduzir carga cognitiva sem introduzir camada nova;
+* trechos de switch com ramos espelhados dão ganho rápido de legibilidade quando isolamos apenas a variação (qual transição chamar), preservando o fluxo principal.
+
+### Rodada B — `MapaView.vue` (P1)
+
+* consolidado padrão repetido de guarda de `codSubprocesso` em um executor único (`executarComSubprocesso`) para operações assíncronas da tela;
+* extraído cálculo derivado de atividades associadas para `computed` dedicado, reduzindo reconstrução incidental no fluxo de filtragem;
+* mantido comportamento de erro (`handleErrors`), atualização de mapa e navegação pós-disponibilização.
+
+**Aprendizados desta rodada**
+
+* a maior fonte de complexidade da view estava na repetição de pré-condições e não em regra de negócio;
+* pequenos utilitários locais no `<script setup>` trazem simplificação mensurável sem mover lógica para composables genéricos.
+
+### Próximos passos recomendados (mantendo backlog original)
+
+1. avançar em `SubprocessoConsultaService` (P1), com pipeline interno explícito de contexto/permissão/resposta;
+2. executar rodada dedicada em `AtribuicaoTemporariaView.vue` (P2) para separar estado transitório de regras de habilitação;
+3. rodar nova coleta (`qa dashboard` + complexidade backend) ao fim da próxima onda para comparar tendência com o snapshot de 09/04/2026.
+
+### Rodada C — `SubprocessoConsultaService` (P1)
+
+* iniciado pipeline interno de contexto com `DadosContextoConsulta`, reduzindo acoplamento no método `montarContextoConsulta`;
+* simplificadas verificações de acesso de cadastro/mapa com early return para estados indisponíveis, mantendo as mesmas regras de perfil;
+* padronizada resolução de localização atual por expressão única, reduzindo branch incidental.
+
+**Aprendizados desta rodada**
+
+* o maior ganho de legibilidade veio da separação entre “coleta de dados do contexto” e “cálculo de permissões”;
+* early return nas verificações de acesso elimina combinações redundantes sem alterar política de autorização.
+
+### Rodada D — `AtribuicaoTemporariaView.vue` (P2)
+
+* consolidada validação de submissão em `computed` único (`formularioValido`), removendo condição longa repetida no submit;
+* padronizado fluxo de pesquisa incremental de usuários com funções de intenção (`devePesquisarUsuarios`, `agendarPesquisaUsuarios`, `cancelarPesquisaUsuariosPendente`);
+* simplificada navegação por teclado da busca com `switch` e guarda única para cenário sem resultados.
+
+**Aprendizados desta rodada**
+
+* no front, a redução de complexidade veio mais de nomear intenções de fluxo do que de extrair composables;
+* helpers pequenos para “estado de pesquisa” diminuem risco de drift entre eventos de input, blur e teclado.
+
 ### Frontend
 
 * `npm run typecheck`

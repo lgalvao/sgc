@@ -185,6 +185,14 @@ async function carregarContextoEdicao(codigo: number) {
   return data;
 }
 
+async function executarComSubprocesso(
+    callback: (codigoSubprocesso: number) => Promise<void>
+) {
+  const codigoSubprocesso = codSubprocesso.value;
+  if (!codigoSubprocesso) return;
+  await callback(codigoSubprocesso);
+}
+
 function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   if (mapaAtualizado) {
     mapasStore.mapaCompleto.value = mapaAtualizado;
@@ -213,18 +221,19 @@ onMounted(async () => {
 const atividades = ref<Atividade[]>([]);
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
+const codigosAtividadesAssociadas = computed(() => {
+  return new Set(
+      competencias.value.flatMap((competencia) =>
+          (competencia.atividades || []).map((atividade) => atividade.codigo)
+      )
+  );
+});
 const atividadesSemCompetencia = computed(() => {
   if (atividades.value.length === 0) {
     return [];
   }
 
-  const atividadesAssociadas = new Set(
-      competencias.value.flatMap((competencia) =>
-          (competencia.atividades || []).map((atividade) => atividade.codigo)
-      )
-  );
-
-  return atividades.value.filter((atividade) => !atividadesAssociadas.has(atividade.codigo));
+  return atividades.value.filter((atividade) => !codigosAtividadesAssociadas.value.has(atividade.codigo));
 });
 
 const existeCompetenciaSemAtividade = computed(() => {
@@ -293,25 +302,25 @@ function abrirModalDisponibilizar() {
 }
 
 async function adicionarCompetenciaEFecharModal(dados: { descricao: string; atividadesSelecionadas: number[] }) {
-  const codigoSubprocesso = codSubprocesso.value;
-  if (!codigoSubprocesso) return;
-  const request: SalvarCompetenciaRequest = {
-    descricao: dados.descricao,
-    atividadesIds: dados.atividadesSelecionadas,
-  };
+  await executarComSubprocesso(async (codigoSubprocesso) => {
+    const request: SalvarCompetenciaRequest = {
+      descricao: dados.descricao,
+      atividadesIds: dados.atividadesSelecionadas,
+    };
 
-  try {
-    if (competenciaSendoEditada.value) {
-      sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigoSubprocesso, competenciaSendoEditada.value.codigo, request));
-    } else {
-      sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigoSubprocesso, request));
+    try {
+      if (competenciaSendoEditada.value) {
+        sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigoSubprocesso, competenciaSendoEditada.value.codigo, request));
+      } else {
+        sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigoSubprocesso, request));
+      }
+
+      await carregarContextoEdicao(codigoSubprocesso);
+      fecharModalCriarNovaCompetencia();
+    } catch {
+      handleErrors(fluxoMapa);
     }
-
-    await carregarContextoEdicao(codigoSubprocesso);
-    fecharModalCriarNovaCompetencia();
-  } catch {
-    handleErrors(fluxoMapa);
-  }
+  });
 }
 
 function excluirCompetencia(codigo: number) {
@@ -324,19 +333,20 @@ function excluirCompetencia(codigo: number) {
 
 async function confirmarExclusaoCompetencia() {
   const competencia = competenciaParaExcluir.value;
-  const codigoSubprocesso = codSubprocesso.value;
-  if (!competencia || !codigoSubprocesso) return;
+  if (!competencia) return;
 
-  loadingExclusao.value = true;
-  try {
-    sincronizarMapa(await fluxoMapa.removerCompetencia(codigoSubprocesso, competencia.codigo));
-    await carregarContextoEdicao(codigoSubprocesso);
-    fecharModalExcluirCompetencia();
-  } catch {
-    handleErrors(fluxoMapa);
-  } finally {
-    loadingExclusao.value = false;
-  }
+  await executarComSubprocesso(async (codigoSubprocesso) => {
+    loadingExclusao.value = true;
+    try {
+      sincronizarMapa(await fluxoMapa.removerCompetencia(codigoSubprocesso, competencia.codigo));
+      await carregarContextoEdicao(codigoSubprocesso);
+      fecharModalExcluirCompetencia();
+    } catch {
+      handleErrors(fluxoMapa);
+    } finally {
+      loadingExclusao.value = false;
+    }
+  });
 }
 
 function fecharModalExcluirCompetencia() {
@@ -345,42 +355,41 @@ function fecharModalExcluirCompetencia() {
 }
 
 async function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
-  const codigoSubprocesso = codSubprocesso.value;
-  if (!codigoSubprocesso) return;
-  const competencia = competencias.value.find(
-      (comp) => comp.codigo === competenciaId,
-  );
+  const competencia = competencias.value.find((comp) => comp.codigo === competenciaId);
   if (!competencia) return;
 
-  const atividadesIds = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== codAtividade);
-  const request: SalvarCompetenciaRequest = {
-    descricao: competencia.descricao,
-    atividadesIds: atividadesIds,
-  };
+  await executarComSubprocesso(async (codigoSubprocesso) => {
+    const atividadesIds = (competencia.atividades || []).map((atividade) => atividade.codigo)
+        .filter((codigoAtividade) => codigoAtividade !== codAtividade);
+    const request: SalvarCompetenciaRequest = {
+      descricao: competencia.descricao,
+      atividadesIds: atividadesIds,
+    };
 
-  sincronizarMapa(await fluxoMapa.atualizarCompetencia(
-      codigoSubprocesso,
-      competencia.codigo,
-      request,
-  ));
+    sincronizarMapa(await fluxoMapa.atualizarCompetencia(
+        codigoSubprocesso,
+        competencia.codigo,
+        request,
+    ));
+  });
 }
 
 async function disponibilizarMapa(payload: { dataLimite: string; observacoes: string }) {
-  const codigoSubprocesso = codSubprocesso.value;
-  if (!codigoSubprocesso) return;
-  fluxoMapa.clearError();
-  loadingDisponibilizacao.value = true;
+  await executarComSubprocesso(async (codigoSubprocesso) => {
+    fluxoMapa.clearError();
+    loadingDisponibilizacao.value = true;
 
-  try {
-    await fluxoMapa.disponibilizarMapa(codigoSubprocesso, payload);
-    fecharModalDisponibilizar();
-    toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
-    await router.push({name: "Painel"});
-  } catch {
-    handleErrors(fluxoMapa);
-  } finally {
-    loadingDisponibilizacao.value = false;
-  }
+    try {
+      await fluxoMapa.disponibilizarMapa(codigoSubprocesso, payload);
+      fecharModalDisponibilizar();
+      toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
+      await router.push({name: "Painel"});
+    } catch {
+      handleErrors(fluxoMapa);
+    } finally {
+      loadingDisponibilizacao.value = false;
+    }
+  });
 }
 
 function fecharModalDisponibilizar() {
