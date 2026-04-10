@@ -245,16 +245,14 @@ public class ProcessoService {
                 ? unidadeService.buscarMapasPorUnidades(contexto.codigosUnidades())
                 : List.of();
 
-        Unidade admin = unidadeService.buscarAdmin();
-        efetivarInicioSubprocessos(
+        efetivarInicioSubprocessos(new InicioSubprocessosContexto(
                 processo,
                 contexto.tipo(),
                 contexto.codigosUnidades(),
                 contexto.unidadesParaProcessar(),
                 unidadesMapas,
-                admin,
-                usuario
-        );
+                unidadeService.buscarAdmin()
+        ));
 
         processo.setSituacao(EM_ANDAMENTO);
         processoRepo.save(processo);
@@ -469,28 +467,49 @@ public class ProcessoService {
         return arvore;
     }
 
-    private void efetivarInicioSubprocessos(Processo processo, TipoProcesso tipo, List<Long> cods, Set<Unidade> pars, List<UnidadeMapa> ums, Unidade adm, Usuario user) {
-        Map<Long, UnidadeMapa> mapUm = ums.stream().collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, m -> m));
-        Map<Long, Unidade> unidadesPorCodigo = pars.stream()
+    private void efetivarInicioSubprocessos(InicioSubprocessosContexto contexto) {
+        Map<Long, UnidadeMapa> mapUm = contexto.unidadesMapas().stream()
+                .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, mapa -> mapa));
+        Map<Long, Unidade> unidadesPorCodigo = contexto.unidadesParaProcessar().stream()
                 .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
-        if (tipo == MAPEAMENTO) {
+        if (contexto.tipo() == MAPEAMENTO) {
             subprocessoService.criarParaMapeamento(new SubprocessoService.CriarSubprocessosMapeamentoCommand(
-                    processo, pars, adm));
-        } else if (tipo == REVISAO) {
-            cods.forEach(c -> subprocessoService.criarParaRevisao(new SubprocessoService.CriarSubprocessoComMapaCommand(
-                    processo,
-                    obterUnidadeObrigatoria(unidadesPorCodigo, c),
-                    obterUnidadeMapaObrigatorio(mapUm, c),
-                    adm
+                    contexto.processo(), contexto.unidadesParaProcessar(), contexto.unidadeAdmin()));
+        } else if (contexto.tipo() == REVISAO) {
+            contexto.codigosUnidades().forEach(codigoUnidade -> subprocessoService.criarParaRevisao(new SubprocessoService.CriarSubprocessoComMapaCommand(
+                    contexto.processo(),
+                    obterUnidadeObrigatoria(unidadesPorCodigo, codigoUnidade),
+                    obterUnidadeMapaObrigatorio(mapUm, codigoUnidade),
+                    contexto.unidadeAdmin()
             )));
-        } else if (tipo == DIAGNOSTICO) {
-            pars.forEach(u -> subprocessoService.criarParaDiagnostico(new SubprocessoService.CriarSubprocessoComMapaCommand(
-                    processo,
-                    u,
-                    obterUnidadeMapaObrigatorio(mapUm, u.getCodigo()),
-                    adm
+        } else if (contexto.tipo() == DIAGNOSTICO) {
+            contexto.unidadesParaProcessar().forEach(unidade -> subprocessoService.criarParaDiagnostico(new SubprocessoService.CriarSubprocessoComMapaCommand(
+                    contexto.processo(),
+                    unidade,
+                    obterUnidadeMapaObrigatorio(mapUm, unidade.getCodigo()),
+                    contexto.unidadeAdmin()
             )));
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void efetivarInicioSubprocessos(
+            Processo processo,
+            TipoProcesso tipo,
+            List<Long> cods,
+            Set<Unidade> pars,
+            List<UnidadeMapa> ums,
+            Unidade adm,
+            Usuario user
+    ) {
+        efetivarInicioSubprocessos(new InicioSubprocessosContexto(
+                processo,
+                tipo,
+                cods,
+                pars,
+                ums,
+                adm
+        ));
     }
 
     private void montarHierarquiaNoDto(
@@ -839,23 +858,33 @@ public class ProcessoService {
         List<Long> validacao = separacao.getOrDefault(false, List.of());
 
         switch (req.acao()) {
-            case ACEITAR -> {
-                if (!cadastro.isEmpty()) {
-                    transicaoService.aceitarCadastroEmBloco(cadastro);
-                }
-                if (!validacao.isEmpty()) {
-                    transicaoService.aceitarValidacaoEmBloco(validacao);
-                }
-            }
-            case HOMOLOGAR -> {
-                if (!cadastro.isEmpty()) {
-                    transicaoService.homologarCadastroEmBloco(cadastro);
-                }
-                if (!validacao.isEmpty()) {
-                    transicaoService.homologarValidacaoEmBloco(validacao);
-                }
-            }
+            case ACEITAR -> executarTransicoesEmBloco(
+                    cadastro,
+                    validacao,
+                    transicaoService::aceitarCadastroEmBloco,
+                    transicaoService::aceitarValidacaoEmBloco
+            );
+            case HOMOLOGAR -> executarTransicoesEmBloco(
+                    cadastro,
+                    validacao,
+                    transicaoService::homologarCadastroEmBloco,
+                    transicaoService::homologarValidacaoEmBloco
+            );
             default -> log.debug("Ação em bloco {} sem processamento no fluxo de análise", req.acao());
+        }
+    }
+
+    private void executarTransicoesEmBloco(
+            List<Long> codigosCadastro,
+            List<Long> codigosValidacao,
+            java.util.function.Consumer<List<Long>> acaoCadastro,
+            java.util.function.Consumer<List<Long>> acaoValidacao
+    ) {
+        if (!codigosCadastro.isEmpty()) {
+            acaoCadastro.accept(codigosCadastro);
+        }
+        if (!codigosValidacao.isEmpty()) {
+            acaoValidacao.accept(codigosValidacao);
         }
     }
 
@@ -942,5 +971,14 @@ public class ProcessoService {
             TipoProcesso tipo,
             List<Long> codigosUnidades,
             Set<Unidade> unidadesParaProcessar
+    ) {}
+
+    private record InicioSubprocessosContexto(
+            Processo processo,
+            TipoProcesso tipo,
+            List<Long> codigosUnidades,
+            Set<Unidade> unidadesParaProcessar,
+            List<UnidadeMapa> unidadesMapas,
+            Unidade unidadeAdmin
     ) {}
 }

@@ -198,6 +198,14 @@ let timeoutOcultarResultadosUsuarios: ReturnType<typeof setTimeout> | null = nul
 const erroUsuario = ref("");
 const validacaoSubmetida = ref(false);
 const termoPesquisaMinimaAtingida = computed(() => termoUsuario.value.trim().length >= 2);
+const formularioValido = computed(() => {
+  return Boolean(
+      usuarioSelecionado.value
+      && dataInicio.value
+      && dataTermino.value
+      && justificativa.value.trim()
+  );
+});
 
 watch(usuariosEncontrados, (usuarios) => {
   indiceUsuarioDestacado.value = usuarios.length > 0 ? 0 : -1;
@@ -239,19 +247,17 @@ onBeforeUnmount(() => {
 
 function aoAlterarTermoUsuario(valor: string | number | null) {
   termoUsuario.value = valor == null ? "" : String(valor);
-  mostrarResultadosUsuarios.value = termoPesquisaMinimaAtingida.value;
+  mostrarResultadosUsuarios.value = podeExibirResultadosPesquisa();
   indiceUsuarioDestacado.value = -1;
   atualizarUsuarioSelecionadoPorNome(termoUsuario.value);
-  limparTimeoutPesquisaUsuarios();
+  cancelarPesquisaUsuariosPendente();
 
-  if (!termoPesquisaMinimaAtingida.value || !termoUsuario.value.trim()) {
+  if (!devePesquisarUsuarios()) {
     limparResultadosPesquisaUsuarios();
     return;
   }
 
-  timeoutPesquisaUsuarios = setTimeout(async () => {
-    await executarPesquisaUsuarios();
-  }, 300);
+  agendarPesquisaUsuarios();
 }
 
 function atualizarUsuarioSelecionadoPorNome(nome: string) {
@@ -284,33 +290,32 @@ async function destacarUsuario(indice: number) {
 }
 
 async function aoPressionarTeclaUsuario(evento: KeyboardEvent) {
-  if (!mostrarResultadosUsuarios.value || usuariosEncontrados.value.length === 0) {
+  if (!podeNavegarResultadosUsuarios()) {
     if (evento.key === "ArrowDown" && termoPesquisaMinimaAtingida.value) {
       mostrarResultadosUsuarios.value = true;
     }
     return;
   }
 
-  if (evento.key === "ArrowDown") {
-    evento.preventDefault();
-    await destacarUsuario(calcularProximoIndice(1));
-    return;
-  }
-
-  if (evento.key === "ArrowUp") {
-    evento.preventDefault();
-    await destacarUsuario(calcularProximoIndice(-1));
-    return;
-  }
-
-  if (evento.key === "Enter" && indiceUsuarioDestacado.value >= 0) {
-    evento.preventDefault();
-    selecionarUsuario(usuariosEncontrados.value[indiceUsuarioDestacado.value]!);
-    return;
-  }
-
-  if (evento.key === "Escape") {
-    ocultarResultadosUsuarios();
+  switch (evento.key) {
+    case "ArrowDown":
+      evento.preventDefault();
+      await destacarUsuario(calcularProximoIndice(1));
+      return;
+    case "ArrowUp":
+      evento.preventDefault();
+      await destacarUsuario(calcularProximoIndice(-1));
+      return;
+    case "Enter":
+      if (indiceUsuarioDestacado.value < 0) return;
+      evento.preventDefault();
+      selecionarUsuario(usuariosEncontrados.value[indiceUsuarioDestacado.value]!);
+      return;
+    case "Escape":
+      ocultarResultadosUsuarios();
+      return;
+    default:
+      return;
   }
 }
 
@@ -320,7 +325,13 @@ async function criarAtribuicao() {
   validacaoSubmetida.value = true;
   erroUsuario.value = "";
 
-  if (!usuarioSelecionado.value || !dataInicio.value || !dataTermino.value || !justificativa.value.trim()) {
+  if (!formularioValido.value) {
+    notify(TEXTOS.atribuicaoTemporaria.ERRO_PREENCHIMENTO, 'danger');
+    return;
+  }
+
+  const tituloEleitoralUsuario = usuarioSelecionado.value;
+  if (!tituloEleitoralUsuario) {
     notify(TEXTOS.atribuicaoTemporaria.ERRO_PREENCHIMENTO, 'danger');
     return;
   }
@@ -329,7 +340,7 @@ async function criarAtribuicao() {
 
   try {
     await criarAtribuicaoTemporaria(unidadeAtual.codigo, {
-      tituloEleitoralUsuario: usuarioSelecionado.value,
+      tituloEleitoralUsuario,
       dataInicio: dataInicio.value,
       dataTermino: dataTermino.value,
       justificativa: justificativa.value
@@ -350,6 +361,10 @@ function limparTimeoutPesquisaUsuarios() {
     clearTimeout(timeoutPesquisaUsuarios);
     timeoutPesquisaUsuarios = null;
   }
+}
+
+function cancelarPesquisaUsuariosPendente() {
+  limparTimeoutPesquisaUsuarios();
 }
 
 function limparTimeoutOcultarResultadosUsuarios() {
@@ -373,6 +388,24 @@ function limparResultadosPesquisaUsuarios() {
   usuariosEncontrados.value = [];
   pesquisandoUsuarios.value = false;
   ocultarResultadosUsuarios();
+}
+
+function agendarPesquisaUsuarios() {
+  timeoutPesquisaUsuarios = setTimeout(async () => {
+    await executarPesquisaUsuarios();
+  }, 300);
+}
+
+function devePesquisarUsuarios() {
+  return termoPesquisaMinimaAtingida.value && Boolean(termoUsuario.value.trim());
+}
+
+function podeExibirResultadosPesquisa() {
+  return termoPesquisaMinimaAtingida.value;
+}
+
+function podeNavegarResultadosUsuarios() {
+  return mostrarResultadosUsuarios.value && usuariosEncontrados.value.length > 0;
 }
 
 async function executarPesquisaUsuarios() {

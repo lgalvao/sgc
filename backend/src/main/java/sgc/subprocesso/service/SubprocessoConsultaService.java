@@ -303,20 +303,27 @@ public class SubprocessoConsultaService {
         }
 
         boolean cadastroDisponibilizado = verificarCadastroDisponibilizadoParaVisualizacao(contexto.situacao());
+        if (!cadastroDisponibilizado) {
+            return false;
+        }
+
         return switch (contexto.perfil()) {
-            case Perfil.ADMIN -> cadastroDisponibilizado;
-            case Perfil.GESTOR -> cadastroDisponibilizado && contexto.isUnidadeAlvoNaHierarquiaUsuario();
-            case Perfil.SERVIDOR -> cadastroDisponibilizado && contexto.isMesmaUnidadeAlvo();
+            case Perfil.ADMIN -> true;
+            case Perfil.GESTOR -> contexto.isUnidadeAlvoNaHierarquiaUsuario();
+            case Perfil.SERVIDOR -> contexto.isMesmaUnidadeAlvo();
             default -> false;
         };
     }
 
     private boolean verificarAcessoMapaHabilitado(ContextoConsultaSubprocesso contexto) {
         boolean mapaDisponibilizado = verificarMapaDisponibilizadoParaVisualizacao(contexto.situacao());
+        boolean mesmaHierarquia = contexto.isUnidadeAlvoNaHierarquiaUsuario();
+        boolean mesmaUnidadeAlvo = contexto.isMesmaUnidadeAlvo();
+
         return switch (contexto.perfil()) {
             case Perfil.ADMIN -> verificarMapaHabilitadoParaAdmin(contexto.situacao());
-            case Perfil.GESTOR -> mapaDisponibilizado && contexto.isUnidadeAlvoNaHierarquiaUsuario();
-            case Perfil.CHEFE, Perfil.SERVIDOR -> mapaDisponibilizado && contexto.isMesmaUnidadeAlvo();
+            case Perfil.GESTOR -> mapaDisponibilizado && mesmaHierarquia;
+            case Perfil.CHEFE, Perfil.SERVIDOR -> mapaDisponibilizado && mesmaUnidadeAlvo;
         };
     }
 
@@ -466,26 +473,36 @@ public class SubprocessoConsultaService {
     }
 
     private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp, List<Movimentacao> movimentacoes) {
-        ContextoUsuarioAutenticado contextoUsuario = obterContextoUsuarioAutenticado();
-        Unidade unidadeUsuario = unidadeService.buscarPorCodigoComSuperior(contextoUsuario.unidadeAtivaCodigo());
-        Unidade unidadeAlvo = sp.getUnidade();
-        Long unidadeAtivaCodigo = contextoUsuario.unidadeAtivaCodigo();
-        Unidade localizacaoAtual = resolverLocalizacaoAtual(sp, movimentacoes);
-        boolean processoFinalizado = processoFinalizado(sp);
+        DadosContextoConsulta dadosContexto = resolverDadosContexto(sp, movimentacoes);
+        Long unidadeAtivaCodigo = dadosContexto.unidadeAtivaCodigo();
+        Unidade unidadeAlvo = dadosContexto.unidadeAlvo();
         boolean mesmaUnidadeAlvo = Objects.equals(unidadeAtivaCodigo, unidadeAlvo.getCodigo());
-        boolean mesmaUnidade = mesmaUnidadeLocalizacao(unidadeAtivaCodigo, localizacaoAtual, processoFinalizado);
-        boolean unidadeAlvoNaHierarquiaUsuario = isUnidadeAlvoNaHierarquiaUsuario(unidadeAlvo, unidadeUsuario, mesmaUnidadeAlvo);
-        boolean temMapaVigente = temMapaVigente(unidadeAlvo.getCodigo(), processoFinalizado);
+        boolean mesmaUnidade = mesmaUnidadeLocalizacao(unidadeAtivaCodigo, dadosContexto.localizacaoAtual(), dadosContexto.processoFinalizado());
+        boolean unidadeAlvoNaHierarquiaUsuario = isUnidadeAlvoNaHierarquiaUsuario(unidadeAlvo, dadosContexto.unidadeUsuario(), mesmaUnidadeAlvo);
+        boolean temMapaVigente = temMapaVigente(unidadeAlvo.getCodigo(), dadosContexto.processoFinalizado());
 
         return new ContextoConsultaSubprocesso(
                 sp,
-                contextoUsuario.perfil(),
-                localizacaoAtual,
-                processoFinalizado,
+                dadosContexto.perfil(),
+                dadosContexto.localizacaoAtual(),
+                dadosContexto.processoFinalizado(),
                 mesmaUnidade,
                 mesmaUnidadeAlvo,
                 unidadeAlvoNaHierarquiaUsuario,
                 temMapaVigente
+        );
+    }
+
+    private DadosContextoConsulta resolverDadosContexto(Subprocesso sp, List<Movimentacao> movimentacoes) {
+        ContextoUsuarioAutenticado contextoUsuario = obterContextoUsuarioAutenticado();
+        Long unidadeAtivaCodigo = contextoUsuario.unidadeAtivaCodigo();
+        return new DadosContextoConsulta(
+                contextoUsuario.perfil(),
+                unidadeService.buscarPorCodigoComSuperior(unidadeAtivaCodigo),
+                sp.getUnidade(),
+                unidadeAtivaCodigo,
+                resolverLocalizacaoAtual(sp, movimentacoes),
+                processoFinalizado(sp)
         );
     }
 
@@ -511,10 +528,9 @@ public class SubprocessoConsultaService {
     }
 
     private Unidade resolverLocalizacaoAtual(Subprocesso sp, List<Movimentacao> movimentacoes) {
-        if (!movimentacoes.isEmpty()) {
-            return movimentacoes.getFirst().getUnidadeDestino();
-        }
-        return localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
+        return movimentacoes.isEmpty()
+                ? localizacaoSubprocessoService.obterLocalizacaoAtual(sp)
+                : movimentacoes.getFirst().getUnidadeDestino();
     }
 
     private PermissoesSubprocessoDto resolverPermissoes(ContextoConsultaSubprocesso contexto) {
@@ -567,6 +583,15 @@ public class SubprocessoConsultaService {
             return isGestor() || isAdmin();
         }
     }
+
+    private record DadosContextoConsulta(
+            Perfil perfil,
+            Unidade unidadeUsuario,
+            Unidade unidadeAlvo,
+            Long unidadeAtivaCodigo,
+            Unidade localizacaoAtual,
+            boolean processoFinalizado
+    ) {}
 
     private record PermissoesFluxo(
             boolean podeEditarCadastro,
