@@ -236,26 +236,18 @@ public class ProcessoService {
         }
 
         ContextoInicioProcesso contexto = resolverContextoInicio(processo, codsUnidadesParam);
-        List<String> erros = validarUnidadesInicio(contexto.tipo(), contexto.codigosUnidades(), contexto.unidadesParaProcessar());
-        if (!erros.isEmpty()) {
-            throw new ErroValidacao(String.join(", ", erros));
-        }
-
-        List<UnidadeMapa> unidadesMapas = (contexto.tipo() == REVISAO || contexto.tipo() == DIAGNOSTICO)
-                ? unidadeService.buscarMapasPorUnidades(contexto.codigosUnidades())
-                : List.of();
+        validarInicioSemErros(contexto);
 
         efetivarInicioSubprocessos(new InicioSubprocessosContexto(
                 processo,
                 contexto.tipo(),
                 contexto.codigosUnidades(),
                 contexto.unidadesParaProcessar(),
-                unidadesMapas,
+                carregarMapasParaInicio(contexto),
                 unidadeService.buscarAdmin()
         ));
 
-        processo.setSituacao(EM_ANDAMENTO);
-        processoRepo.save(processo);
+        persistirProcessoIniciado(processo);
         notificarInicioProcesso(processo, new ArrayList<>(contexto.unidadesParaProcessar()));
 
         log.info("Processo {} iniciado para {} unidades.", codigo, contexto.codigosUnidades().size());
@@ -437,6 +429,25 @@ public class ProcessoService {
         return erros;
     }
 
+    private void validarInicioSemErros(ContextoInicioProcesso contexto) {
+        List<String> erros = validarUnidadesInicio(contexto.tipo(), contexto.codigosUnidades(), contexto.unidadesParaProcessar());
+        if (!erros.isEmpty()) {
+            throw new ErroValidacao(String.join(", ", erros));
+        }
+    }
+
+    private List<UnidadeMapa> carregarMapasParaInicio(ContextoInicioProcesso contexto) {
+        if (contexto.tipo() != REVISAO && contexto.tipo() != DIAGNOSTICO) {
+            return List.of();
+        }
+        return unidadeService.buscarMapasPorUnidades(contexto.codigosUnidades());
+    }
+
+    private void persistirProcessoIniciado(Processo processo) {
+        processo.setSituacao(EM_ANDAMENTO);
+        processoRepo.save(processo);
+    }
+
     private boolean possuiUnidadeSemResponsavelEfetivo(List<Unidade> unidades) {
         List<Long> codigos = unidades.stream().map(Unidade::getCodigo).toList();
         return !responsavelUnidadeService.todasPossuemResponsavelEfetivo(codigos);
@@ -468,27 +479,10 @@ public class ProcessoService {
     }
 
     private void efetivarInicioSubprocessos(InicioSubprocessosContexto contexto) {
-        Map<Long, UnidadeMapa> mapUm = contexto.unidadesMapas().stream()
-                .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, mapa -> mapa));
-        Map<Long, Unidade> unidadesPorCodigo = contexto.unidadesParaProcessar().stream()
-                .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
-        if (contexto.tipo() == MAPEAMENTO) {
-            subprocessoService.criarParaMapeamento(new SubprocessoService.CriarSubprocessosMapeamentoCommand(
-                    contexto.processo(), contexto.unidadesParaProcessar(), contexto.unidadeAdmin()));
-        } else if (contexto.tipo() == REVISAO) {
-            contexto.codigosUnidades().forEach(codigoUnidade -> subprocessoService.criarParaRevisao(new SubprocessoService.CriarSubprocessoComMapaCommand(
-                    contexto.processo(),
-                    obterUnidadeObrigatoria(unidadesPorCodigo, codigoUnidade),
-                    obterUnidadeMapaObrigatorio(mapUm, codigoUnidade),
-                    contexto.unidadeAdmin()
-            )));
-        } else if (contexto.tipo() == DIAGNOSTICO) {
-            contexto.unidadesParaProcessar().forEach(unidade -> subprocessoService.criarParaDiagnostico(new SubprocessoService.CriarSubprocessoComMapaCommand(
-                    contexto.processo(),
-                    unidade,
-                    obterUnidadeMapaObrigatorio(mapUm, unidade.getCodigo()),
-                    contexto.unidadeAdmin()
-            )));
+        switch (contexto.tipo()) {
+            case MAPEAMENTO -> iniciarSubprocessosMapeamento(contexto);
+            case REVISAO -> iniciarSubprocessosRevisao(contexto);
+            case DIAGNOSTICO -> iniciarSubprocessosDiagnostico(contexto);
         }
     }
 
@@ -510,6 +504,51 @@ public class ProcessoService {
                 ums,
                 adm
         ));
+    }
+
+    private void iniciarSubprocessosMapeamento(InicioSubprocessosContexto contexto) {
+        subprocessoService.criarParaMapeamento(new SubprocessoService.CriarSubprocessosMapeamentoCommand(
+                contexto.processo(),
+                contexto.unidadesParaProcessar(),
+                contexto.unidadeAdmin()
+        ));
+    }
+
+    private void iniciarSubprocessosRevisao(InicioSubprocessosContexto contexto) {
+        Map<Long, UnidadeMapa> mapasPorUnidade = mapearMapasPorUnidade(contexto.unidadesMapas());
+        Map<Long, Unidade> unidadesPorCodigo = mapearUnidadesPorCodigo(contexto.unidadesParaProcessar());
+
+        contexto.codigosUnidades().forEach(codigoUnidade -> subprocessoService.criarParaRevisao(
+                new SubprocessoService.CriarSubprocessoComMapaCommand(
+                        contexto.processo(),
+                        obterUnidadeObrigatoria(unidadesPorCodigo, codigoUnidade),
+                        obterUnidadeMapaObrigatorio(mapasPorUnidade, codigoUnidade),
+                        contexto.unidadeAdmin()
+                )
+        ));
+    }
+
+    private void iniciarSubprocessosDiagnostico(InicioSubprocessosContexto contexto) {
+        Map<Long, UnidadeMapa> mapasPorUnidade = mapearMapasPorUnidade(contexto.unidadesMapas());
+
+        contexto.unidadesParaProcessar().forEach(unidade -> subprocessoService.criarParaDiagnostico(
+                new SubprocessoService.CriarSubprocessoComMapaCommand(
+                        contexto.processo(),
+                        unidade,
+                        obterUnidadeMapaObrigatorio(mapasPorUnidade, unidade.getCodigo()),
+                        contexto.unidadeAdmin()
+                )
+        ));
+    }
+
+    private Map<Long, UnidadeMapa> mapearMapasPorUnidade(List<UnidadeMapa> unidadesMapas) {
+        return unidadesMapas.stream()
+                .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, mapa -> mapa));
+    }
+
+    private Map<Long, Unidade> mapearUnidadesPorCodigo(Collection<Unidade> unidades) {
+        return unidades.stream()
+                .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
     }
 
     private void montarHierarquiaNoDto(

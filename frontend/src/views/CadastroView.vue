@@ -363,6 +363,7 @@ const erroGlobalFormatado = computed(() =>
 );
 
 type RespostaLocalCadastro = Pick<AtividadeOperacaoResponse, "subprocesso" | "permissoes" | "atividadesAtualizadas">;
+type AcaoAtualizacaoCadastro = () => Promise<RespostaLocalCadastro>;
 
 function processarRespostaLocal(response: RespostaLocalCadastro) {
   atividades.value = response.atividadesAtualizadas;
@@ -381,6 +382,22 @@ function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
   atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
   disponibilizacaoSemMudancas.value = false;
   unidade.value = data.unidade;
+}
+
+async function executarAtualizacaoCadastro(
+    acao: AcaoAtualizacaoCadastro,
+    mensagemErro: string,
+) {
+  try {
+    await withErrorHandling(async () => {
+      const response = await acao();
+      processarRespostaLocal(response);
+    });
+    return true;
+  } catch {
+    notify(mensagemErro, "danger");
+    return false;
+  }
 }
 
 async function carregarContextoInicial() {
@@ -432,17 +449,19 @@ async function confirmarRemocao() {
   const {tipo, index, conhecimentoCodigo} = dadosRemocao.value;
 
   try {
-    await withErrorHandling(async () => {
-      if (tipo === "atividade") {
-        const atividadeRemovida = atividades.value[index];
+    if (tipo === "atividade") {
+      const atividadeRemovida = atividades.value[index];
+      await withErrorHandling(async () => {
         const response = await atividadeService.excluirAtividade(atividadeRemovida.codigo);
         processarRespostaLocal(response);
-      } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
-        const atividade = atividades.value[index];
+      });
+    } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
+      const atividade = atividades.value[index];
+      await withErrorHandling(async () => {
         const response = await atividadeService.excluirConhecimento(atividade.codigo, conhecimentoCodigo);
         processarRespostaLocal(response);
-      }
-    });
+      });
+    }
     mostrarModalConfirmacaoRemocao.value = false;
     dadosRemocao.value = null;
   } catch (e: unknown) {
@@ -456,18 +475,14 @@ async function salvarEdicaoAtividade(codigo: number, descricao: string) {
   if (descricao.trim() && codSubprocesso.value) {
     const atividadeOriginal = atividades.value.find((a) => a.codigo === codigo);
     if (atividadeOriginal) {
-      const atividadeAtualizada: Atividade = {
-        ...atividadeOriginal,
-        descricao: descricao.trim(),
-      };
-      try {
-        await withErrorHandling(async () => {
-          const response = await atividadeService.atualizarAtividade(codigo, atividadeAtualizada);
-          processarRespostaLocal(response);
-        });
-      } catch {
-        notify(TEXTOS.atividades.ERRO_SALVAR_ATIVIDADE, "danger");
-      }
+      const descricaoAtualizada = descricao.trim();
+      await executarAtualizacaoCadastro(
+          () => atividadeService.atualizarAtividade(codigo, {
+            ...atividadeOriginal,
+            descricao: descricaoAtualizada,
+          }),
+          TEXTOS.atividades.ERRO_SALVAR_ATIVIDADE,
+      );
     }
   }
 }
@@ -479,14 +494,10 @@ async function adicionarConhecimento(idx: number, descricao: string) {
     const request: CriarConhecimentoRequest = {
       descricao: descricao.trim(),
     };
-    try {
-      await withErrorHandling(async () => {
-        const response = await atividadeService.criarConhecimento(atividade.codigo, request);
-        processarRespostaLocal(response);
-      });
-    } catch {
-      notify(TEXTOS.atividades.ERRO_ADICIONAR_CONHECIMENTO, "danger");
-    }
+    await executarAtualizacaoCadastro(
+        () => atividadeService.criarConhecimento(atividade.codigo, request),
+        TEXTOS.atividades.ERRO_ADICIONAR_CONHECIMENTO,
+    );
   }
 }
 
@@ -500,22 +511,18 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
   if (!codSubprocesso.value) return;
 
   if (descricao.trim()) {
-    const conhecimentoAtualizado: Conhecimento = {
-      codigo: conhecimentoCodigo,
-      descricao: descricao.trim(),
-    };
-    try {
-      await withErrorHandling(async () => {
-        const response = await atividadeService.atualizarConhecimento(
+    const descricaoAtualizada = descricao.trim();
+    await executarAtualizacaoCadastro(
+        () => atividadeService.atualizarConhecimento(
             atividadeCodigo,
             conhecimentoCodigo,
-            conhecimentoAtualizado,
-        );
-        processarRespostaLocal(response);
-      });
-    } catch {
-      notify(TEXTOS.atividades.ERRO_ATUALIZAR_CONHECIMENTO, "danger");
-    }
+            {
+              codigo: conhecimentoCodigo,
+              descricao: descricaoAtualizada,
+            },
+        ),
+        TEXTOS.atividades.ERRO_ATUALIZAR_CONHECIMENTO,
+    );
   }
 }
 
@@ -562,14 +569,12 @@ function scrollParaPrimeiroErro() {
 }
 
 async function disponibilizarCadastro() {
-  const situacoesPermitidas = isRevisao.value
-      ? [SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO]
-      : [SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO];
+  const situacaoAtualCadastro = subprocesso.value?.situacao;
+  const situacaoReferencia = isRevisao.value
+      ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+      : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
-  if (!subprocesso.value?.situacao || !situacoesPermitidas.includes(subprocesso.value.situacao)) {
-    const situacaoReferencia = isRevisao.value
-        ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-        : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+  if (!situacaoAtualCadastro || situacaoAtualCadastro !== situacaoReferencia) {
     notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
     return;
   }

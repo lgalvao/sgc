@@ -11,6 +11,12 @@ Documento operacional com foco no **que realmente falta fazer** no checkout vali
 * remover código `@Deprecated` assim que não houver dependências internas;
 * considerar concluído apenas o que já foi confirmado no código atual, não apenas no snapshot anterior.
 
+### Diretrizes operacionais desta frente
+
+1. tirar do frontend o código que expressa melhor regra, permissão, montagem de contexto ou estrutura pronta de domínio no backend;
+2. usar o máximo possível dos recursos do BootstrapVueNext antes de manter lógica, markup e estilos manuais;
+3. evitar que o frontend faça múltiplas chamadas para montar estruturas que podem vir prontas em uma chamada única.
+
 ---
 
 ## Base usada nesta revisão
@@ -134,14 +140,16 @@ Estas frentes não devem seguir como prioridade principal apenas por inércia do
 ### Alvos que ainda faltam
 
 1. **`CadastroView.vue`**
-   * separar estado de edição de cadastro do estado derivado de permissão e revisão;
-   * consolidar fluxos repetidos de sincronização local, validação e atualização de status;
-   * reduzir o número de pontos que coordenam modal, erro, histórico e disponibilização no mesmo bloco.
+   * reduzir lógica de domínio e montagem de estrutura que ainda está na view e deveria vir pronta do backend;
+   * consolidar fluxos repetidos de sincronização local, validação e atualização de status apenas onde a coordenação for estritamente de UI;
+   * reduzir o número de pontos que coordenam modal, erro, histórico e disponibilização no mesmo bloco;
+   * substituir lógica e markup manuais por recursos nativos do BootstrapVueNext quando houver cobertura equivalente.
 
 2. **`MapaVisualizacaoView.vue`**
    * isolar o fluxo das ações de análise, aceite, devolução e validação;
    * separar capacidade de ação do estado de carregamento e histórico;
-   * reduzir carga cognitiva do `<script setup>` sem extrair composables genéricos.
+   * reduzir carga cognitiva do `<script setup>` sem extrair composables genéricos;
+   * revisar se a tela está recompondo no frontend estruturas que deveriam vir prontas do backend.
 
 3. **`AtribuicaoTemporariaView.vue`**
    * desacoplar pesquisa incremental de usuário da validação de submissão;
@@ -200,7 +208,8 @@ Estas frentes não devem seguir como prioridade principal apenas por inércia do
 ### Onda 1
 
 * atacar `ProcessoService` + `CadastroView.vue`;
-* objetivo: reduzir leitura local dos dois maiores concentradores atuais.
+* objetivo: reduzir leitura local dos dois maiores concentradores atuais;
+* regra adicional: no frontend, priorizar remoção de responsabilidade indevida antes de apenas reorganizar helpers locais.
 
 ### Onda 2
 
@@ -233,7 +242,9 @@ Estas frentes não devem seguir como prioridade principal apenas por inércia do
 * reduzir **15%+** das linhas da view alvo ou justificar objetivamente por que a simplificação foi estrutural, não volumétrica;
 * reduzir pontos de coordenação local concorrentes, especialmente carregamento, erro, modal e permissão;
 * manter `frontend_any_producao = 0`;
-* não introduzir novo acoplamento genérico por composables artificiais.
+* não introduzir novo acoplamento genérico por composables artificiais;
+* reduzir chamadas redundantes ao backend quando a estrutura puder vir pronta do servidor;
+* demonstrar que a rodada removeu responsabilidade indevida do frontend, e não apenas redistribuiu o mesmo acoplamento.
 
 ### Observabilidade da simplificação
 
@@ -256,6 +267,12 @@ Registrar no PR, para cada alvo:
 
 * **Risco:** simplificação de view deslocar lógica para composables genéricos e pouco transparentes.
   * **Contenção:** preferir helpers locais e composables específicos de domínio quando houver duplicação real.
+
+* **Risco:** simplificação de frontend preservar a arquitetura de protótipo e só mover código de lugar.
+  * **Contenção:** sempre perguntar se a decisão, a permissão ou a estrutura deveria nascer resolvida no backend.
+
+* **Risco:** reinventar componentes e estados que o BootstrapVueNext já oferece.
+  * **Contenção:** revisar primeiro o que o componente nativo já resolve antes de manter implementação manual.
 
 * **Risco:** usar métricas antigas para justificar prioridade errada.
   * **Contenção:** sempre reconferir volume e sinais estruturais do arquivo antes de iniciar a rodada.
@@ -282,3 +299,35 @@ Registrar no PR, para cada alvo:
 * `node etc/scripts/sgc.js codigo smells auditar --json`
 * `node etc/scripts/sgc.js projeto arvore-linhas`
 * `npm run qa:dashboard` quando a rodada afetar qualidade percebida mais ampla
+
+---
+
+## Progresso executado em 10/04/2026
+
+### Rodada A — `ProcessoService`
+
+* o fluxo público `iniciar` foi deixado mais linear, com separação explícita entre validação de início, carregamento de mapas necessários e persistência da transição para `EM_ANDAMENTO`;
+* `efetivarInicioSubprocessos` deixou de concentrar toda a ramificação por tipo de processo no mesmo corpo e passou a delegar para métodos privados nomeados por intenção (`iniciarSubprocessosMapeamento`, `iniciarSubprocessosRevisao`, `iniciarSubprocessosDiagnostico`);
+* a simplificação preservou contrato público, assinatura externa e comportamento transacional.
+
+Validação desta rodada:
+
+* `./gradlew :backend:test --tests "sgc.processo.*"` passou com **215 testes**;
+* `./gradlew :backend:test --tests "sgc.processo.service.ProcessoServiceTest" --tests "sgc.processo.service.ProcessoServiceExtraCoverageTest" --tests "sgc.processo.service.ProcessoServiceCoverageTest"` passou com **112 testes**.
+
+### Rodada B — `CadastroView.vue`
+
+* foi consolidado o padrão repetido de “executar ação de atividade/conhecimento e sincronizar resposta local” em helper único de atualização;
+* a checagem de situação permitida para disponibilização ficou mais direta, reduzindo ramificação incidental;
+* a view permanece em revisão para a próxima etapa, agora com o critério explícito de remover responsabilidade indevida do frontend em vez de apenas reorganizar helpers locais.
+
+Validação desta rodada:
+
+* `npm run test:unit -- src/views/__tests__/AtividadesCadastroView.spec.ts src/views/__tests__/CadastroViewCoverage.spec.ts` passou com **22 testes**.
+
+### Próximo passo recomendado
+
+* continuar a `Onda 1` revisando `CadastroView.vue` com foco em:
+  * identificar o que deve migrar para backend;
+  * reduzir chamadas e estruturas montadas em etapas;
+  * aproveitar melhor recursos do BootstrapVueNext antes de novos recortes locais.
