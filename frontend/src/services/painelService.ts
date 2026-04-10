@@ -59,3 +59,7 @@ export async function listarAlertas(
     });
     return response.data;
 }
+
+export async function marcarAlertasLidos(codigos: number[]): Promise<void> {
+    await apiClient.post("/painel/alertas/marcar-lidos", codigos);
+}

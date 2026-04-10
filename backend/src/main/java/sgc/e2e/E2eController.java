@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
@@ -52,7 +51,6 @@ public class E2eController {
     private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
     private final UnidadeService unidadeService;
-    private final UsuarioFacade usuarioFacade;
     private final ResourceLoader resourceLoader;
     private final CacheManager cacheManager;
 

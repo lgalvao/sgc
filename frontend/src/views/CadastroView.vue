@@ -192,6 +192,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
+import {usePainelStore} from "@/stores/painel";
 import {useAcesso} from "@/composables/useAcesso";
 import {
   type Analise,
@@ -231,6 +232,7 @@ const mapasStore = useMapas();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
+const painelStore = usePainelStore();
 const {impactoMapa: impactos} = mapasStore;
 const codSubprocesso = ref<number | null>(null);
 const codMapa = ref<number | null>(null);
@@ -618,6 +620,7 @@ async function confirmarDisponibilizacao() {
         ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
         : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO;
     toastStore.setPending(msg);
+    painelStore.invalidar();
     await router.push("/painel");
   }
 }

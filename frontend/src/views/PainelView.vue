@@ -76,18 +76,16 @@ import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
 import {useToastStore} from "@/stores/toast";
+import {usePainelStore} from "@/stores/painel";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
-import type {Page} from "@/services/painelService";
 import * as painelService from "@/services/painelService";
 import {TEXTOS} from "@/constants/textos";
 
 const perfilStore = usePerfilStore();
 const perfil = usePerfil();
 const toastStore = useToastStore();
+const painelStore = usePainelStore();
 const toast = useToast();
-const processosPainel = ref<ProcessoResumo[]>([]);
-const alertas = ref<Alerta[]>([]);
-const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
 const carregandoPainel = ref(true);
 
 const router = useRouter();
@@ -95,12 +93,22 @@ const router = useRouter();
 const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
 
-async function buscarProcessosPainel(
-    params: painelService.ListarParams<keyof ProcessoResumo>
-) {
-  const response = await painelService.listarProcessos(params);
-  processosPainel.value = response?.content ?? [];
-}
+// Ordenação local: sem round-trip ao backend
+const processosOrdenados = computed(() => {
+  const lista = [...painelStore.processos];
+  const campo = criterio.value;
+  const direcao = asc.value ? 1 : -1;
+  return lista.sort((a, b) => {
+    const va = a[campo] ?? "";
+    const vb = b[campo] ?? "";
+    if (va < vb) return -1 * direcao;
+    if (va > vb) return 1 * direcao;
+    return 0;
+  });
+});
+
+// Alertas já ordenados pelo backend (desc dataHora); exibidos diretamente
+const alertas = computed(() => painelStore.alertas);
 
 async function carregarDados() {
   const unidadeCodigo = perfilStore.unidadeSelecionada;
@@ -111,6 +119,7 @@ async function carregarDados() {
 
   carregandoPainel.value = true;
   try {
+    // Alertas: carrega tudo de uma vez (volume máximo: dezenas)
     const [processosResponse, alertasResponse] = await Promise.all([
       painelService.listarProcessos({
         codUnidade: unidadeCodigo,
@@ -120,14 +129,24 @@ async function carregarDados() {
       painelService.listarAlertas({
         codUnidade: unidadeCodigo,
         page: 0,
-        size: 10,
+        size: 200,
         sort: "dataHora",
-        order: "desc"
+        order: "desc",
       }),
     ]);
-    processosPainel.value = processosResponse?.content ?? [];
-    alertas.value = alertasResponse.content;
-    alertasPage.value = alertasResponse;
+
+    painelStore.definirDados(
+        processosResponse?.content ?? [],
+        alertasResponse.content
+    );
+
+    // Marcar não lidos como lidos: fire-and-forget, não bloqueia a tela
+    const codigosNaoLidos = alertasResponse.content
+        .filter((a: Alerta) => !a.dataHoraLeitura)
+        .map((a: Alerta) => a.codigo);
+    if (codigosNaoLidos.length > 0) {
+      painelService.marcarAlertasLidos(codigosNaoLidos).catch(() => {/* silencioso: não crítico para a UI */});
+    }
   } finally {
     carregandoPainel.value = false;
   }
@@ -150,23 +169,22 @@ function exibirToastPendente() {
   return false;
 }
 
-let initialMountComplete = true;
+// Controla se o mount inicial já ocorreu para evitar double-load com onActivated
+let montadoUmaVez = false;
 
 onMounted(async () => {
+  montadoUmaVez = true;
   exibirToastPendente();
   await carregarDados();
 });
 
 onActivated(async () => {
-  if (initialMountComplete) {
-    initialMountComplete = false;
-    return;
-  }
+  if (!montadoUmaVez) return;
   exibirToastPendente();
+  // Só recarrega se o cache foi invalidado (ex: após ação de workflow)
+  if (painelStore.dadosValidos()) return;
   await carregarDados();
 });
-
-const processosOrdenados = computed(() => processosPainel.value);
 
 function ordenarPor(campo: keyof ProcessoResumo) {
   if (criterio.value === campo) {
@@ -175,18 +193,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  const unidadeCodigo = perfilStore.unidadeSelecionada;
-  if (!unidadeCodigo) {
-    return;
-  }
-
-  buscarProcessosPainel({
-      codUnidade: unidadeCodigo,
-      page: 0,
-      size: 10,
-      sort: criterio.value,
-      order: asc.value ? "asc" : "desc",
-  });
+  // Ordenação aplicada localmente via computed — sem chamada ao backend
 }
 
 function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {

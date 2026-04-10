@@ -13,6 +13,8 @@ import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.processo.dto.*;
 
+import java.util.*;
+
 @RestController
 @RequestMapping("/api/painel")
 @RequiredArgsConstructor

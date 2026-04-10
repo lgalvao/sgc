@@ -136,6 +136,7 @@ import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
 
 import {useToastStore} from "@/stores/toast";
+import {usePainelStore} from "@/stores/painel";
 import {
   buscarArvoreComElegibilidade,
   buscarDiagnosticoOrganizacional,
@@ -182,6 +183,7 @@ const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const toastStore = useToastStore();
+const painelStore = usePainelStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
 
@@ -383,11 +385,13 @@ async function salvarProcesso() {
           request,
       );
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_ALTERADO);
+      painelStore.invalidar();
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
       await processoService.criarProcesso(request);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_CRIADO);
+      painelStore.invalidar();
       await router.push("/painel");
     }
     limparCampos();
@@ -436,6 +440,7 @@ async function confirmarIniciarProcesso() {
     );
 
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_INICIADO);
+    painelStore.invalidar();
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
   } catch (error) {
@@ -461,6 +466,7 @@ async function confirmarRemocao() {
     try {
       await processoService.excluirProcesso(processoEditando.value.codigo);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
+      painelStore.invalidar();
       await router.push("/painel");
       if (!processoEditando.value) {
         limparCampos();

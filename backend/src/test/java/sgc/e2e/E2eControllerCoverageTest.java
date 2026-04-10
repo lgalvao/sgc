@@ -8,8 +8,6 @@ import org.springframework.cache.*;
 import org.springframework.core.io.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.*;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
@@ -48,7 +46,7 @@ class E2eControllerCoverageTest {
     @BeforeEach
     void setUp() {
         SecurityContextHolder.clearContext();
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
     }
 
     @Test
@@ -97,7 +95,6 @@ class E2eControllerCoverageTest {
         Processo dto = Processo.builder().codigo(100L).build();
         when(processoService.criar(any())).thenReturn(dto);
         when(processoService.buscarPorCodigo(100L)).thenReturn(dto);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(200L);
@@ -131,7 +128,6 @@ class E2eControllerCoverageTest {
         Processo dto = Processo.builder().codigo(100L).build();
         when(processoService.criar(any())).thenReturn(dto);
         when(processoService.buscarPorCodigo(100L)).thenReturn(dto);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(200L);
@@ -168,7 +164,6 @@ class E2eControllerCoverageTest {
         Processo dto = Processo.builder().codigo(100L).build();
         when(processoService.criar(any())).thenReturn(dto);
         when(processoService.buscarPorCodigo(anyLong())).thenReturn(dto);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(200L);
@@ -190,22 +185,6 @@ class E2eControllerCoverageTest {
     }
 
     @Test
-    @DisplayName("obterUsuarioParaIniciacao: Deve retornar principal se for Usuario")
-    void deveCobrirObterUsuarioParaIniciacaoComUsuarioPrincipal() throws Exception {
-        Usuario usuario = new Usuario();
-        var auth = new UsernamePasswordAuthenticationToken(usuario, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        try {
-            var method = E2eController.class.getDeclaredMethod("obterUsuarioParaIniciacao");
-            method.setAccessible(true);
-            Usuario result = (Usuario) method.invoke(controller);
-            assertEquals(usuario, result);
-        } finally {
-            SecurityContextHolder.clearContext();
-        }
-    }
-
-    @Test
     @DisplayName("criarProcessoMapeamentoComCadastroDisponibilizado: Deve chamar criarProcessoNaSituacao")
     void deveCriarProcessoMapeamentoComCadastroDisponibilizado() {
         var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
@@ -220,7 +199,6 @@ class E2eControllerCoverageTest {
         Processo dto = Processo.builder().codigo(100L).build();
         when(processoService.criar(any())).thenReturn(dto);
         when(processoService.buscarPorCodigo(anyLong())).thenReturn(dto);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(200L);

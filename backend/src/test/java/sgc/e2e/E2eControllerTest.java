@@ -75,7 +75,7 @@ class E2eControllerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
     }
 
     @AfterEach
@@ -275,7 +275,6 @@ class E2eControllerTest {
         proc.setCodigo(100L);
         when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         Processo result = controller.criarProcessoRevisao(req);
 
@@ -298,7 +297,6 @@ class E2eControllerTest {
         proc.setCodigo(100L);
         when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         Processo result = controller.criarProcessoMapeamento(req);
 
@@ -314,7 +312,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Error"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
         var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
         Assertions.assertNotNull(exception);
     }
@@ -347,7 +345,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Erro simulado na conexao"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
 
         var exception = Assertions.assertThrows(RuntimeException.class, () -> controllerComErro.limparProcessoCompleto(999L));
         assertThat(exception).hasMessageContaining("Falha na limpeza do processo");
@@ -359,7 +357,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         when(mockJdbc.getDataSource()).thenReturn(null);
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
 
         // Deve retornar silenciosamente
         Assertions.assertDoesNotThrow(() -> controllerComErro.limparProcessoCompleto(999L));
@@ -381,7 +379,6 @@ class E2eControllerTest {
         when(processoService.criar(any())).thenReturn(proc);
         doNothing().when(processoService).iniciar(eq(100L), anyList());
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
@@ -407,7 +404,6 @@ class E2eControllerTest {
         proc.setCodigo(100L);
         when(processoService.criar(any())).thenReturn(proc);
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
-        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         // Simular retorno de erros vazio (sucesso)
         doNothing().when(processoService).iniciar(anyLong(), anyList());
@@ -443,7 +439,7 @@ class E2eControllerTest {
             var subprocessoRepoMock = mock(SubprocessoRepo.class);
             var mapaRepoMock = mock(MapaRepo.class);
             CacheManager cacheManagerMock = mock(CacheManager.class);
-            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoServiceMock, processoRepoMock, subprocessoRepoMock, mapaRepoMock, unidadeServiceMock, usuarioFacadeMock, resourceLoaderMock, cacheManagerMock);
+            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoServiceMock, processoRepoMock, subprocessoRepoMock, mapaRepoMock, unidadeServiceMock, resourceLoaderMock, cacheManagerMock);
         }
 
         @Test

@@ -165,6 +165,7 @@ import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
+import {usePainelStore} from "@/stores/painel";
 import type {
   AceitarCadastroRequest,
   Analise,
@@ -188,6 +189,7 @@ const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
+const painelStore = usePainelStore();
 const {impactoMapa: impactos} = mapasStore;
 
 const unidadeId = computed(() => props.sigla);
@@ -290,6 +292,7 @@ async function confirmarValidacao() {
         fecharModalValidar();
         toastStore.setPending(acao.mensagemSucesso);
         if (acao.redirecionarParaPainel) {
+          painelStore.invalidar();
           await router.push({name: "Painel"});
         } else {
           await router.push({
@@ -314,6 +317,7 @@ async function confirmarValidacao() {
       if (sucesso) {
         fecharModalValidar();
         toastStore.setPending(acao.mensagemSucesso);
+        painelStore.invalidar();
         await router.push({name: "Painel"});
       }
     }
@@ -343,6 +347,7 @@ async function confirmarDevolucao() {
     if (sucesso) {
       fecharModalDevolver();
       toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
+      painelStore.invalidar();
       await router.push("/painel");
     }
   } finally {
