@@ -24,6 +24,28 @@ Com base no monitoramento já implantado e na execução integral da suíte E2E 
 - há forte indício de oportunidades de consolidação de endpoints orientados à view
 - é plausível que existam N+1 ou loops de montagem de DTO em endpoints de contexto mais rico
 
+Importante:
+
+- a suíte E2E completa não foi desenhada para medir desempenho e contém repetição estrutural de login, troca de perfil e reentrada em telas
+- por isso, frequência absoluta da suíte completa não deve ser tomada isoladamente como proxy de produção
+- os testes mais representativos para reality check funcional de ponta a ponta passam a ser [captura.spec.ts](/Users/leonardo/sgc/e2e/captura.spec.ts) e [jornada.spec.ts](/Users/leonardo/sgc/e2e/jornada.spec.ts)
+- a primeira tentativa de coleta dedicada desses cenários foi invalidada por infra E2E reaproveitada de forma inconsistente; essa causa já foi endurecida em `playwright.config.ts` e `e2e/lifecycle.js`
+
+## Achados já confirmados
+
+Os itens abaixo já deixaram de ser hipótese genérica e passaram a ser evidência concreta no código atual:
+
+- o [PainelView.vue](/Users/leonardo/sgc/frontend/src/views/PainelView.vue) dispara sempre duas chamadas independentes na carga principal da tela: `GET /api/painel/processos` e `GET /api/painel/alertas`
+- o [PainelView.vue](/Users/leonardo/sgc/frontend/src/views/PainelView.vue) recarrega o painel inteiro em `onMounted` e também em `onActivated`, o que aumenta a chance de repetição ao voltar para a rota
+- a ordenação do painel não reaproveita o resultado local: ela dispara nova chamada de `processos`, mesmo quando só muda o critério visual
+- `GET /api/unidades/diagnostico-organizacional` não vem do painel; os chamadores confirmados no frontend são [ProcessoCadastroView.vue](/Users/leonardo/sgc/frontend/src/views/ProcessoCadastroView.vue) e [UnidadesView.vue](/Users/leonardo/sgc/frontend/src/views/UnidadesView.vue)
+- `GET /api/unidades/arvore-com-elegibilidade` também não vem do painel; o chamador confirmado é [ProcessoCadastroView.vue](/Users/leonardo/sgc/frontend/src/views/ProcessoCadastroView.vue)
+- no backend, [PainelFacade.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/painel/PainelFacade.java) trata `alertas` e `processos` em rotas separadas, sem bootstrap único orientado à tela
+- em [PainelFacade.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/painel/PainelFacade.java), a carga de alertas tem efeito colateral: além de listar, ela busca leituras e marca itens como lidos, o que merece cuidado antes de qualquer cache
+- em [ProcessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/service/ProcessoService.java), a lista do painel já é paginada em duas etapas: primeiro busca só códigos e depois recarrega a página com participantes
+- em [PainelFacade.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/painel/PainelFacade.java), a montagem de `ProcessoResumoDto` ainda usa mapa de hierarquia completo e pode buscar siglas complementares para participantes sem sigla carregada
+- em [ValidadorDadosOrganizacionais.java](/Users/leonardo/sgc/backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java), o diagnóstico já usa `@Cacheable`, então a frequência alta observada na suíte indica mais problema de repetição de chamada do que custo bruto por chamada depois do aquecimento
+
 ## Princípios de atuação
 
 ### 1. Otimizar o fluxo, não só a query
@@ -126,6 +148,7 @@ Exemplos prováveis:
 - contexto de processo
 - contexto de subprocesso
 - árvores de unidade e elegibilidade
+- diagnóstico organizacional
 - configurações
 
 #### Fase 2.4: consolidar fetch por tela
@@ -165,6 +188,8 @@ Começar por:
 
 - `/api/painel/alertas`
 - `/api/painel/processos`
+- `/api/unidades/diagnostico-organizacional`
+- `/api/unidades/arvore-com-elegibilidade`
 - `/api/processos/{codigo}/contexto-completo`
 - `/api/subprocessos/{codigo}/contexto-edicao`
 - `/api/subprocessos/buscar`

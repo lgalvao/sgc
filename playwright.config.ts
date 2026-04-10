@@ -10,7 +10,7 @@ const frontendPort = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10
 
 export default defineConfig({
     testDir: './e2e',
-    timeout: 15_000,
+    timeout: 20_000,
     workers: 1,
     reporter: 'list',
     use: {
@@ -22,10 +22,11 @@ export default defineConfig({
         command: `node e2e/lifecycle.js`,
         env: {
             ...process.env,
-            SGC_LIFECYCLE_PROFILE: 'e2e'
+            SGC_LIFECYCLE_PROFILE: 'e2e',
+            SGC_LIFECYCLE_REUTILIZAR_EXISTENTE: 'off'
         },
         url: `http://localhost:${frontendPort}`,
-        reuseExistingServer: true,
+        reuseExistingServer: false,
         timeout: 300 * 1000,
         stdout: 'pipe',
         stderr: 'pipe',

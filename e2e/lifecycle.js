@@ -19,6 +19,7 @@ const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
 const DB_NAME_PREFIX = process.env.E2E_DB_NAME_PREFIX || 'sgc-e2e-w';
 const MAX_BACKEND_PORT_SCAN = Number.parseInt(process.env.E2E_BACKEND_PORT_SCAN_LIMIT || '20', 10);
 const MODO_MONITORAMENTO = process.env.SGC_MONITORAMENTO || 'off';
+const REUTILIZAR_EXISTENTE = process.env.SGC_LIFECYCLE_REUTILIZAR_EXISTENTE || 'on';
 const LIMITE_MONITORAMENTO_ALERTA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_ALERTA_MS || '500', 10);
 const TAXA_AMOSTRAGEM_MONITORAMENTO = process.env.SGC_MONITORAMENTO_AMOSTRAGEM || '0.0';
 const ANSI_RESET = '\u001b[0m';
@@ -234,6 +235,16 @@ function validarModoMonitoramento() {
     }
 }
 
+function validarReutilizacaoExistente() {
+    const modosSuportados = new Set(['off', 'on']);
+    if (!modosSuportados.has(REUTILIZAR_EXISTENTE)) {
+        throw new Error(
+            `Modo de reutilização inválido: ${REUTILIZAR_EXISTENTE}. ` +
+            'Use SGC_LIFECYCLE_REUTILIZAR_EXISTENTE=off ou on.'
+        );
+    }
+}
+
 function monitoramentoAtivo() {
     return MODO_MONITORAMENTO !== 'off';
 }
@@ -272,6 +283,12 @@ async function resolverBackendExistenteOuPortaLivre() {
         }
 
         if (status === 405) {
+            if (REUTILIZAR_EXISTENTE === 'off') {
+                throw new Error(
+                    `Backend E2E já está ativo na porta ${porta}. ` +
+                    'Finalize a instância anterior antes de iniciar o lifecycle novamente.'
+                );
+            }
             lifecycleLogger.warn(`Backend E2E já ativo na porta ${porta}; reutilizando instância existente.`);
             return {porta, reutilizar: true};
         }
@@ -377,6 +394,16 @@ function startFrontend() {
     });
 }
 
+async function validarPortaFrontendLivre() {
+    const status = await requestStatus(`http://localhost:${FRONTEND_PORT}`);
+    if (status !== null) {
+        throw new Error(
+            `Frontend já está ativo na porta ${FRONTEND_PORT}. ` +
+            'Finalize a instância anterior antes de iniciar o lifecycle novamente.'
+        );
+    }
+}
+
 function startSmtpServer() {
     smtpServer = new SMTPServer({
         authOptional: true,
@@ -478,6 +505,7 @@ async function subirBackends() {
 }
 
 async function subirFrontend() {
+    await validarPortaFrontendLivre();
     startFrontend();
     await checkHttpHealth(`http://localhost:${FRONTEND_PORT}`, 200, 400);
 }
@@ -494,6 +522,7 @@ function descreverBackends() {
 try {
     validarPerfilLifecycle();
     validarModoMonitoramento();
+    validarReutilizacaoExistente();
     if (modoE2e() || modoHomologacao()) {
         startSmtpServer();
     } else {
