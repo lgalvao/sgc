@@ -234,12 +234,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-  if (timeoutPesquisaUsuarios) {
-    clearTimeout(timeoutPesquisaUsuarios);
-  }
-  if (timeoutOcultarResultadosUsuarios) {
-    clearTimeout(timeoutOcultarResultadosUsuarios);
-  }
+  limparTimeoutsUsuarios();
 });
 
 function aoAlterarTermoUsuario(valor: string | number | null) {
@@ -247,30 +242,15 @@ function aoAlterarTermoUsuario(valor: string | number | null) {
   mostrarResultadosUsuarios.value = termoPesquisaMinimaAtingida.value;
   indiceUsuarioDestacado.value = -1;
   atualizarUsuarioSelecionadoPorNome(termoUsuario.value);
+  limparTimeoutPesquisaUsuarios();
 
-  if (timeoutPesquisaUsuarios) {
-    clearTimeout(timeoutPesquisaUsuarios);
-  }
-
-  if (!termoPesquisaMinimaAtingida.value) {
-    usuariosEncontrados.value = [];
-    pesquisandoUsuarios.value = false;
-    indiceUsuarioDestacado.value = -1;
+  if (!termoPesquisaMinimaAtingida.value || !termoUsuario.value.trim()) {
+    limparResultadosPesquisaUsuarios();
     return;
   }
 
   timeoutPesquisaUsuarios = setTimeout(async () => {
-    pesquisandoUsuarios.value = true;
-    try {
-      usuariosEncontrados.value = await pesquisarUsuarios(termoUsuario.value.trim());
-      atualizarUsuarioSelecionadoPorNome(termoUsuario.value);
-    } catch (error) {
-      usuariosEncontrados.value = [];
-      logger.error("Erro ao pesquisar usuários:", error);
-      notify(TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR, 'danger');
-    } finally {
-      pesquisandoUsuarios.value = false;
-    }
+    await executarPesquisaUsuarios();
   }, 300);
 }
 
@@ -282,17 +262,13 @@ function atualizarUsuarioSelecionadoPorNome(nome: string) {
 function selecionarUsuario(usuario: UsuarioPesquisa) {
   usuarioSelecionado.value = usuario.tituloEleitoral;
   termoUsuario.value = usuario.nome;
-  mostrarResultadosUsuarios.value = false;
-  indiceUsuarioDestacado.value = -1;
+  ocultarResultadosUsuarios();
 }
 
 function agendarOcultacaoResultadosUsuarios() {
-  if (timeoutOcultarResultadosUsuarios) {
-    clearTimeout(timeoutOcultarResultadosUsuarios);
-  }
+  limparTimeoutOcultarResultadosUsuarios();
   timeoutOcultarResultadosUsuarios = setTimeout(() => {
-    mostrarResultadosUsuarios.value = false;
-    indiceUsuarioDestacado.value = -1;
+    ocultarResultadosUsuarios();
   }, 150);
 }
 
@@ -317,19 +293,13 @@ async function aoPressionarTeclaUsuario(evento: KeyboardEvent) {
 
   if (evento.key === "ArrowDown") {
     evento.preventDefault();
-    const proximoIndice = indiceUsuarioDestacado.value < usuariosEncontrados.value.length - 1
-        ? indiceUsuarioDestacado.value + 1
-        : 0;
-    await destacarUsuario(proximoIndice);
+    await destacarUsuario(calcularProximoIndice(1));
     return;
   }
 
   if (evento.key === "ArrowUp") {
     evento.preventDefault();
-    const proximoIndice = indiceUsuarioDestacado.value > 0
-        ? indiceUsuarioDestacado.value - 1
-        : usuariosEncontrados.value.length - 1;
-    await destacarUsuario(proximoIndice);
+    await destacarUsuario(calcularProximoIndice(-1));
     return;
   }
 
@@ -340,8 +310,7 @@ async function aoPressionarTeclaUsuario(evento: KeyboardEvent) {
   }
 
   if (evento.key === "Escape") {
-    mostrarResultadosUsuarios.value = false;
-    indiceUsuarioDestacado.value = -1;
+    ocultarResultadosUsuarios();
   }
 }
 
@@ -367,22 +336,75 @@ async function criarAtribuicao() {
     });
 
     notify(TEXTOS.atribuicaoTemporaria.SUCESSO, 'success');
-
-    usuarioSelecionado.value = null;
-    termoUsuario.value = "";
-    usuariosEncontrados.value = [];
-    mostrarResultadosUsuarios.value = false;
-    indiceUsuarioDestacado.value = -1;
-    dataInicio.value = "";
-    dataTermino.value = "";
-    justificativa.value = "";
-    validacaoSubmetida.value = false;
+    resetarFormularioAtribuicao();
   } catch (error) {
     logger.error(error);
     notify(TEXTOS.atribuicaoTemporaria.ERRO_CRIAR, 'danger');
   } finally {
     isLoading.value = false;
   }
+}
+
+function limparTimeoutPesquisaUsuarios() {
+  if (timeoutPesquisaUsuarios) {
+    clearTimeout(timeoutPesquisaUsuarios);
+    timeoutPesquisaUsuarios = null;
+  }
+}
+
+function limparTimeoutOcultarResultadosUsuarios() {
+  if (timeoutOcultarResultadosUsuarios) {
+    clearTimeout(timeoutOcultarResultadosUsuarios);
+    timeoutOcultarResultadosUsuarios = null;
+  }
+}
+
+function limparTimeoutsUsuarios() {
+  limparTimeoutPesquisaUsuarios();
+  limparTimeoutOcultarResultadosUsuarios();
+}
+
+function ocultarResultadosUsuarios() {
+  mostrarResultadosUsuarios.value = false;
+  indiceUsuarioDestacado.value = -1;
+}
+
+function limparResultadosPesquisaUsuarios() {
+  usuariosEncontrados.value = [];
+  pesquisandoUsuarios.value = false;
+  ocultarResultadosUsuarios();
+}
+
+async function executarPesquisaUsuarios() {
+  pesquisandoUsuarios.value = true;
+  try {
+    usuariosEncontrados.value = await pesquisarUsuarios(termoUsuario.value.trim());
+    atualizarUsuarioSelecionadoPorNome(termoUsuario.value);
+  } catch (error) {
+    limparResultadosPesquisaUsuarios();
+    logger.error("Erro ao pesquisar usuários:", error);
+    notify(TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR, 'danger');
+  } finally {
+    pesquisandoUsuarios.value = false;
+  }
+}
+
+function calcularProximoIndice(deslocamento: 1 | -1) {
+  const ultimoIndice = usuariosEncontrados.value.length - 1;
+  if (deslocamento === 1) {
+    return indiceUsuarioDestacado.value < ultimoIndice ? indiceUsuarioDestacado.value + 1 : 0;
+  }
+  return indiceUsuarioDestacado.value > 0 ? indiceUsuarioDestacado.value - 1 : ultimoIndice;
+}
+
+function resetarFormularioAtribuicao() {
+  usuarioSelecionado.value = null;
+  termoUsuario.value = "";
+  limparResultadosPesquisaUsuarios();
+  dataInicio.value = "";
+  dataTermino.value = "";
+  justificativa.value = "";
+  validacaoSubmetida.value = false;
 }
 
 defineExpose({

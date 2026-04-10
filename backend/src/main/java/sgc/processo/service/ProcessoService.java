@@ -235,42 +235,32 @@ public class ProcessoService {
             throw new ErroValidacao(Mensagens.PROCESSO_SO_INICIAVEL_EM_CRIADO);
         }
 
-        TipoProcesso tipo = processo.getTipo();
-        List<Long> codigosUnidades;
-        Set<Unidade> unidadesParaProcessar;
-
-        if (tipo == REVISAO) {
-            if (codsUnidadesParam.isEmpty()) {
-                throw new ErroValidacao(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
-            }
-            codigosUnidades = codsUnidadesParam;
-            unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
-            processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
-        } else {
-            codigosUnidades = processo.getCodigosParticipantes();
-            if (codigosUnidades.isEmpty()) {
-                throw new ErroValidacao(Mensagens.SEM_UNIDADES_PARTICIPANTES);
-            }
-            unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
-        }
-
-        List<String> erros = validarUnidadesInicio(tipo, codigosUnidades, unidadesParaProcessar);
+        ContextoInicioProcesso contexto = resolverContextoInicio(processo, codsUnidadesParam);
+        List<String> erros = validarUnidadesInicio(contexto.tipo(), contexto.codigosUnidades(), contexto.unidadesParaProcessar());
         if (!erros.isEmpty()) {
             throw new ErroValidacao(String.join(", ", erros));
         }
 
-        List<UnidadeMapa> unidadesMapas = (tipo == REVISAO || tipo == DIAGNOSTICO)
-                ? unidadeService.buscarMapasPorUnidades(codigosUnidades)
+        List<UnidadeMapa> unidadesMapas = (contexto.tipo() == REVISAO || contexto.tipo() == DIAGNOSTICO)
+                ? unidadeService.buscarMapasPorUnidades(contexto.codigosUnidades())
                 : List.of();
 
         Unidade admin = unidadeService.buscarAdmin();
-        efetivarInicioSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, admin, usuario);
-        
+        efetivarInicioSubprocessos(
+                processo,
+                contexto.tipo(),
+                contexto.codigosUnidades(),
+                contexto.unidadesParaProcessar(),
+                unidadesMapas,
+                admin,
+                usuario
+        );
+
         processo.setSituacao(EM_ANDAMENTO);
         processoRepo.save(processo);
-        notificarInicioProcesso(processo, new ArrayList<>(unidadesParaProcessar));
+        notificarInicioProcesso(processo, new ArrayList<>(contexto.unidadesParaProcessar()));
 
-        log.info("Processo {} iniciado para {} unidades.", codigo, codigosUnidades.size());
+        log.info("Processo {} iniciado para {} unidades.", codigo, contexto.codigosUnidades().size());
     }
 
     public void finalizar(Long codigo) {
@@ -304,7 +294,7 @@ public class ProcessoService {
             return;
         }
 
-        processarAcoesBlocoAceiteHomologacao((ProcessarAnaliseEmBlocoCommand) command, usuario, subprocessos);
+        processarAcoesBlocoAceiteHomologacao((ProcessarAnaliseEmBlocoCommand) command, subprocessos);
     }
 
 
@@ -362,20 +352,11 @@ public class ProcessoService {
             throw new ErroValidacao(Mensagens.UNIDADE_NAO_PARTICIPA);
         }
 
-        LocalDateTime dataLimite = processo.getDataLimite();
-        String dataLimiteText;
-        if (dataLimite != null) {
-            dataLimiteText = dataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        } else {
-            throw new IllegalStateException("Processo %d sem data limite para envio de lembrete".formatted(codProcesso));
-        }
+        LocalDateTime dataLimite = obterDataLimiteObrigatoria(processo, codProcesso);
+        String dataLimiteText = dataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
-        String tituloTitular = unidade.getTituloTitular();
-        if (tituloTitular == null || tituloTitular.isBlank()) {
-            throw new IllegalStateException("Unidade %d sem titular oficial para envio de lembrete".formatted(unidadeCodigo));
-        }
-        Usuario titular = usuarioService.buscarPorLogin(tituloTitular);
+        Usuario titular = buscarTitularObrigatorio(unidade, unidadeCodigo);
         emailService.enviarEmailHtml(titular.getEmail(), "SGC: Lembrete - " + processo.getDescricao(), corpoHtml);
         servicoAlertas.criarAlertaAdmin(processo, unidade,
                 "Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em " + dataLimiteText);
@@ -847,7 +828,7 @@ public class ProcessoService {
         transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq);
     }
 
-    private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, Usuario user, List<Subprocesso> list) {
+    private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, List<Subprocesso> list) {
         Map<Boolean, List<Long>> separacao = list.stream()
                 .collect(Collectors.partitioningBy(
                         sp -> isSituacaoCadastro(sp.getSituacao()),
@@ -857,13 +838,34 @@ public class ProcessoService {
         List<Long> cadastro = separacao.getOrDefault(true, List.of());
         List<Long> validacao = separacao.getOrDefault(false, List.of());
 
-        if (req.acao() == ACEITAR) {
-            if (!cadastro.isEmpty()) transicaoService.aceitarCadastroEmBloco(cadastro);
-            if (!validacao.isEmpty()) transicaoService.aceitarValidacaoEmBloco(validacao);
-        } else if (req.acao() == HOMOLOGAR) {
-            if (!cadastro.isEmpty()) transicaoService.homologarCadastroEmBloco(cadastro);
-            if (!validacao.isEmpty()) transicaoService.homologarValidacaoEmBloco(validacao);
+        switch (req.acao()) {
+            case ACEITAR -> {
+                if (!cadastro.isEmpty()) {
+                    transicaoService.aceitarCadastroEmBloco(cadastro);
+                }
+                if (!validacao.isEmpty()) {
+                    transicaoService.aceitarValidacaoEmBloco(validacao);
+                }
+            }
+            case HOMOLOGAR -> {
+                if (!cadastro.isEmpty()) {
+                    transicaoService.homologarCadastroEmBloco(cadastro);
+                }
+                if (!validacao.isEmpty()) {
+                    transicaoService.homologarValidacaoEmBloco(validacao);
+                }
+            }
+            default -> log.debug("Ação em bloco {} sem processamento no fluxo de análise", req.acao());
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void processarAcoesBlocoAceiteHomologacao(
+            ProcessarAnaliseEmBlocoCommand req,
+            Usuario user,
+            List<Subprocesso> list
+    ) {
+        processarAcoesBlocoAceiteHomologacao(req, list);
     }
 
     private boolean isSituacaoCadastro(SituacaoSubprocesso s) {
@@ -891,4 +893,54 @@ public class ProcessoService {
             throw new ErroValidacao(Mensagens.UNIDADES_SEM_SUBPROCESSOS.formatted(faltando));
         }
     }
+
+    private ContextoInicioProcesso resolverContextoInicio(Processo processo, List<Long> codsUnidadesParam) {
+        TipoProcesso tipo = processo.getTipo();
+        List<Long> codigosUnidades = tipo == REVISAO
+                ? validarCodigosRevisao(codsUnidadesParam)
+                : validarCodigosParticipantes(processo.getCodigosParticipantes());
+        Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
+
+        if (tipo == REVISAO) {
+            processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
+        }
+
+        return new ContextoInicioProcesso(tipo, codigosUnidades, unidadesParaProcessar);
+    }
+
+    private List<Long> validarCodigosRevisao(List<Long> codsUnidadesParam) {
+        if (codsUnidadesParam.isEmpty()) {
+            throw new ErroValidacao(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
+        }
+        return codsUnidadesParam;
+    }
+
+    private List<Long> validarCodigosParticipantes(List<Long> codigosParticipantes) {
+        if (codigosParticipantes.isEmpty()) {
+            throw new ErroValidacao(Mensagens.SEM_UNIDADES_PARTICIPANTES);
+        }
+        return codigosParticipantes;
+    }
+
+    private LocalDateTime obterDataLimiteObrigatoria(Processo processo, Long codProcesso) {
+        LocalDateTime dataLimite = processo.getDataLimite();
+        if (dataLimite == null) {
+            throw new IllegalStateException("Processo %d sem data limite para envio de lembrete".formatted(codProcesso));
+        }
+        return dataLimite;
+    }
+
+    private Usuario buscarTitularObrigatorio(Unidade unidade, Long unidadeCodigo) {
+        String tituloTitular = unidade.getTituloTitular();
+        if (tituloTitular == null || tituloTitular.isBlank()) {
+            throw new IllegalStateException("Unidade %d sem titular oficial para envio de lembrete".formatted(unidadeCodigo));
+        }
+        return usuarioService.buscarPorLogin(tituloTitular);
+    }
+
+    private record ContextoInicioProcesso(
+            TipoProcesso tipo,
+            List<Long> codigosUnidades,
+            Set<Unidade> unidadesParaProcessar
+    ) {}
 }

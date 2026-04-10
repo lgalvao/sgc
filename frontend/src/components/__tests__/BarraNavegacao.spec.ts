@@ -5,6 +5,7 @@ import {useRoute} from "vue-router";
 import {Perfil} from "@/types/tipos";
 import BarraNavegacao from "../layout/BarraNavegacao.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 
 const mockRouter = {
     back: vi.fn(),
@@ -58,6 +59,8 @@ describe("BarraNavegacao.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        const {definirUnidadeAtual} = useUnidadeAtual();
+        definirUnidadeAtual(null);
     });
 
     describe("Visibilidade dos Elementos", () => {
@@ -130,34 +133,43 @@ describe("BarraNavegacao.vue", () => {
         });
 
         it("deve renderizar breadcrumbs para rotas de unidade (ADMIN vê 'Unidades')", () => {
+            const {definirUnidadeAtual} = useUnidadeAtual();
+            definirUnidadeAtual({codigo: 1, sigla: "UNIDADE_1"} as any);
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {codUnidade: "1"}),
             );
             const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.ADMIN}
+                perfil: {
+                    perfilSelecionado: Perfil.ADMIN,
+                    permissoesSessao: {mostrarArvoreCompletaUnidades: true}
+                }
             }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(3); // Home + sigla/codigo + "Unidades"
             expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            // Sem unidade carregada no store, mostra "Unidade X"
-            expect(items[1].text()).toBe("Unidade 1");
+            expect(items[1].text()).toBe("UNIDADE_1");
             // ADMIN vê "Unidades" em vez de "Minha unidade"
             expect(items[2].text()).toBe("Unidades");
         });
 
         it("deve renderizar breadcrumbs para rotas de unidade (não-ADMIN vê 'Minha unidade')", () => {
+            const {definirUnidadeAtual} = useUnidadeAtual();
+            definirUnidadeAtual({codigo: 456, sigla: "UNIDADE_456"} as any);
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/unidade/456", mockMatchedUnidade, "Unidade", {codUnidade: "456"}),
             );
             const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.GESTOR}
+                perfil: {
+                    perfilSelecionado: Perfil.GESTOR,
+                    permissoesSessao: {mostrarArvoreCompletaUnidades: false}
+                }
             }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
             expect(items).toHaveLength(3); // Home + sigla/codigo + "Minha unidade"
             expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            expect(items[1].text()).toBe("Unidade 456");
+            expect(items[1].text()).toBe("UNIDADE_456");
             // Não-ADMIN vê "Minha unidade"
             expect(items[2].text()).toBe("Minha unidade");
         });

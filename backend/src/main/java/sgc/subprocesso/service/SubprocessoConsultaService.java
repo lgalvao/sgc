@@ -153,6 +153,9 @@ public class SubprocessoConsultaService {
     }
 
     public List<Subprocesso> listarPorProcessoEUnidadeCodigosESituacoes(Long codProcesso, List<Long> codigosUnidades, List<SituacaoSubprocesso> situacoes) {
+        if (codigosUnidades.isEmpty() || situacoes.isEmpty()) {
+            return List.of();
+        }
         return subprocessoRepo.listarPorProcessoEUnidadesComUnidade(codProcesso, codigosUnidades).stream()
                 .filter(sp -> situacoes.contains(sp.getSituacao()))
                 .toList();
@@ -174,8 +177,7 @@ public class SubprocessoConsultaService {
 
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp) {
         List<Movimentacao> movimentacoes = listarMovimentacoes(sp);
-        ContextoConsultaSubprocesso contexto = montarContextoConsulta(sp, movimentacoes);
-        return construirDetalhe(contexto, movimentacoes);
+        return construirDetalhe(montarContextoConsulta(sp, movimentacoes), movimentacoes);
     }
 
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
@@ -467,14 +469,14 @@ public class SubprocessoConsultaService {
         ContextoUsuarioAutenticado contextoUsuario = obterContextoUsuarioAutenticado();
         Unidade unidadeUsuario = unidadeService.buscarPorCodigoComSuperior(contextoUsuario.unidadeAtivaCodigo());
         Unidade unidadeAlvo = sp.getUnidade();
+        Long unidadeAtivaCodigo = contextoUsuario.unidadeAtivaCodigo();
         Unidade localizacaoAtual = resolverLocalizacaoAtual(sp, movimentacoes);
         boolean processoFinalizado = processoFinalizado(sp);
-        Long unidadeAtivaCodigo = contextoUsuario.unidadeAtivaCodigo();
-        boolean mesmaUnidade = isMesmaUnidadeLocalizacao(unidadeAtivaCodigo, localizacaoAtual, processoFinalizado);
-        boolean mesmaUnidadeAlvo = Objects.equals(contextoUsuario.unidadeAtivaCodigo(), unidadeAlvo.getCodigo());
-        boolean unidadeAlvoNaHierarquiaUsuario = mesmaUnidadeAlvo
-                || hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
-        boolean temMapaVigente = !processoFinalizado && unidadeService.temMapaVigente(unidadeAlvo.getCodigo());
+        boolean mesmaUnidadeAlvo = Objects.equals(unidadeAtivaCodigo, unidadeAlvo.getCodigo());
+        boolean mesmaUnidade = mesmaUnidadeLocalizacao(unidadeAtivaCodigo, localizacaoAtual, processoFinalizado);
+        boolean unidadeAlvoNaHierarquiaUsuario = isUnidadeAlvoNaHierarquiaUsuario(unidadeAlvo, unidadeUsuario, mesmaUnidadeAlvo);
+        boolean temMapaVigente = temMapaVigente(unidadeAlvo.getCodigo(), processoFinalizado);
+
         return new ContextoConsultaSubprocesso(
                 sp,
                 contextoUsuario.perfil(),
@@ -492,8 +494,16 @@ public class SubprocessoConsultaService {
         return processo != null && processo.getSituacao() == SituacaoProcesso.FINALIZADO;
     }
 
-    private boolean isMesmaUnidadeLocalizacao(Long unidadeAtivaCodigo, Unidade localizacaoAtual, boolean processoFinalizado) {
+    private boolean mesmaUnidadeLocalizacao(Long unidadeAtivaCodigo, Unidade localizacaoAtual, boolean processoFinalizado) {
         return !processoFinalizado && Objects.equals(unidadeAtivaCodigo, localizacaoAtual.getCodigo());
+    }
+
+    private boolean isUnidadeAlvoNaHierarquiaUsuario(Unidade unidadeAlvo, Unidade unidadeUsuario, boolean mesmaUnidadeAlvo) {
+        return mesmaUnidadeAlvo || hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
+    }
+
+    private boolean temMapaVigente(Long unidadeCodigo, boolean processoFinalizado) {
+        return !processoFinalizado && unidadeService.temMapaVigente(unidadeCodigo);
     }
 
     private ContextoUsuarioAutenticado obterContextoUsuarioAutenticado() {
@@ -551,10 +561,6 @@ public class SubprocessoConsultaService {
 
         private boolean isAdmin() {
             return perfil == Perfil.ADMIN;
-        }
-
-        private boolean isServidor() {
-            return perfil == Perfil.SERVIDOR;
         }
 
         private boolean isGestorOuAdmin() {

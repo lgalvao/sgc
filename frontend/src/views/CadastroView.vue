@@ -42,7 +42,7 @@
         </BButton>
 
         <LoadingButton
-            v-if="podeEditarCadastro"
+            v-if="codSubprocesso && podeDisponibilizarCadastro"
             :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
@@ -238,13 +238,10 @@ const codSubprocesso = ref<number | null>(null);
 const codMapa = computed(() => mapasStore.mapaCompleto.value?.codigo ?? null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
-const {
-  podeEditarCadastro,
-  podeDisponibilizarCadastro,
-  podeVisualizarImpacto,
-  habilitarEditarCadastro,
-  habilitarDisponibilizarCadastro
-} = useAcesso(subprocesso);
+const acesso = useAcesso(subprocesso);
+const {podeEditarCadastro, podeVisualizarImpacto, habilitarEditarCadastro} = acesso;
+const podeDisponibilizarCadastro = computed(() => acesso.podeDisponibilizarCadastro?.value ?? false);
+const habilitarDisponibilizarCadastro = computed(() => acesso.habilitarDisponibilizarCadastro?.value ?? false);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 
 

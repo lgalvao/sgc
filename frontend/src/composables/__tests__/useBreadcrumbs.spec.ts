@@ -110,7 +110,7 @@ describe("useBreadcrumbs", () => {
         expect(breadcrumbs.value[2].label).toBe("Unidades");
     });
 
-    it("deve usar fallback se a unidade atual não estiver carregada", () => {
+    it("deve manter label da unidade vazia se a unidade atual não estiver carregada", () => {
         perfilStoreMock.perfilSelecionado = Perfil.CHEFE;
         usePerfilMock.mostrarArvoreCompletaUnidades.value = false;
         unidadeAtualMock.unidadeAtual.value = null;
@@ -121,7 +121,7 @@ describe("useBreadcrumbs", () => {
         } as any;
         const {breadcrumbs} = useBreadcrumbs(route);
 
-        expect(breadcrumbs.value[1].label).toBe("Unidade 456");
+        expect(breadcrumbs.value[1].label).toBe("");
     });
 
     it("deve processar metadados de breadcrumb da rota (fallback)", () => {
