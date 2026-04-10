@@ -8,7 +8,7 @@ import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
 import MapaView from "../MapaView.vue";
 import type {ContextoEdicaoSubprocesso, MapaCompleto, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
-import {TipoProcesso, SituacaoSubprocesso} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 type CompetenciaMapa = {
     codigo: number;

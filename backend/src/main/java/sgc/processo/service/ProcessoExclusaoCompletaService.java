@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
 import sgc.processo.model.*;
 
-import java.util.Locale;
+import java.util.*;
 
 @Service
 @Profile("hom")

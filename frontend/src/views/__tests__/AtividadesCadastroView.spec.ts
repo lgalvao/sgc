@@ -12,7 +12,14 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
-import type {AtividadeOperacaoResponse, ContextoCadastroAtividadesSubprocesso, MapaResumo, PermissoesSubprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
+import type {
+    AtividadeOperacaoResponse,
+    ContextoCadastroAtividadesSubprocesso,
+    MapaResumo,
+    PermissoesSubprocesso,
+    SubprocessoDetalhe,
+    Unidade
+} from "@/types/tipos";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 vi.mock("@/utils/logger", () => ({

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
-import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 
 @RestController
@@ -44,5 +43,17 @@ public class PainelController {
         ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
         Page<Alerta> page = painelFacade.listarAlertas(contextoUsuario, pageable);
         return ResponseEntity.ok(page.map(AlertaDto::fromEntity));
+    }
+
+    /**
+     * Marca alertas visualizados como lidos.
+     * Chamado pelo frontend de forma assíncrona após exibir a lista de alertas.
+     */
+    @PostMapping("/alertas/marcar-lidos")
+    @Operation(summary = "Marca alertas como lidos para o usuário autenticado")
+    public ResponseEntity<Void> marcarAlertasLidos(@RequestBody List<Long> codigos) {
+        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        painelFacade.marcarAlertasLidos(contextoUsuario, codigos);
+        return ResponseEntity.noContent().build();
     }
 }

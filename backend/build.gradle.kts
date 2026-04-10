@@ -1,7 +1,7 @@
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import info.solidsoft.gradle.pitest.PitestTask
-import net.ltgt.gradle.errorprone.*
+import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 

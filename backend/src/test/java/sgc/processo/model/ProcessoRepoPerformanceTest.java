@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.transaction.annotation.*;
 import sgc.organizacao.model.*;
+
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

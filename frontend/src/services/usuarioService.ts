@@ -1,4 +1,10 @@
-import type {FluxoLoginResponseDto, PerfilUnidadeDto, PermissoesSessaoDto, SessaoLoginDto, UsuarioDto} from "@/types/dtos";
+import type {
+    FluxoLoginResponseDto,
+    PerfilUnidadeDto,
+    PermissoesSessaoDto,
+    SessaoLoginDto,
+    UsuarioDto
+} from "@/types/dtos";
 import type {Usuario, UsuarioPesquisa} from "@/types/tipos";
 import apiClient from "../axios-setup";
 

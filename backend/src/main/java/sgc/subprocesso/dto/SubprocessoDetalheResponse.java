@@ -3,6 +3,7 @@ package sgc.subprocesso.dto;
 import lombok.*;
 import org.jspecify.annotations.*;
 import sgc.organizacao.dto.*;
+
 import java.util.*;
 
 @Builder

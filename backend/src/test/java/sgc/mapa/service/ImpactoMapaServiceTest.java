@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;

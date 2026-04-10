@@ -1,9 +1,9 @@
 package sgc.subprocesso.model;
 
 import org.junit.jupiter.api.*;
-import org.springframework.data.domain.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
+import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.*;
 import sgc.organizacao.model.*;
 

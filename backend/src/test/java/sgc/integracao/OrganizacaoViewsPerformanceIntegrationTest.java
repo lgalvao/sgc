@@ -2,7 +2,6 @@ package sgc.integracao;
 
 import com.fasterxml.jackson.databind.*;
 import jakarta.persistence.*;
-import javax.sql.*;
 import org.hibernate.*;
 import org.hibernate.stat.*;
 import org.junit.jupiter.api.*;
@@ -14,6 +13,7 @@ import org.springframework.util.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 
+import javax.sql.*;
 import java.io.*;
 import java.nio.file.*;
 import java.sql.*;

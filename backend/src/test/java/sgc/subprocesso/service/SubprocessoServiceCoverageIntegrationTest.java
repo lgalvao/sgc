@@ -3,12 +3,12 @@ package sgc.subprocesso.service;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
+import org.springframework.mail.javamail.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.context.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
-import org.springframework.mail.javamail.*;
 import sgc.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -20,7 +20,6 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
-import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;

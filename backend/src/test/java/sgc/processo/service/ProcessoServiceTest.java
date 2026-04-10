@@ -13,6 +13,7 @@ import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.fixture.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -23,16 +24,15 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 import sgc.subprocesso.service.SubprocessoValidacaoService.*;
-import sgc.mapa.model.Mapa;
 
 import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.seguranca.AcaoPermissao.*;
-import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService Test suite")

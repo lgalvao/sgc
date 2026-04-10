@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {BBadge, BButton, BTable} from "bootstrap-vue-next";
 import type {BTableSortBy} from "bootstrap-vue-next";
+import {BBadge, BButton, BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {type ProcessoResumo, SituacaoProcesso} from "@/types/tipos";

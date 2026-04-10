@@ -1,9 +1,9 @@
 package sgc.organizacao.model;
 
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.*;
 import org.springframework.stereotype.*;
-import org.springframework.data.domain.*;
 import sgc.organizacao.dto.*;
 
 import java.util.*;

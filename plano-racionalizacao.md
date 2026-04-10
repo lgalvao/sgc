@@ -45,6 +45,7 @@ Os itens abaixo já deixaram de ser hipótese genérica e passaram a ser evidên
 - em [ProcessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/service/ProcessoService.java), a lista do painel já é paginada em duas etapas: primeiro busca só códigos e depois recarrega a página com participantes
 - em [PainelFacade.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/painel/PainelFacade.java), a montagem de `ProcessoResumoDto` ainda usa mapa de hierarquia completo e pode buscar siglas complementares para participantes sem sigla carregada
 - em [ValidadorDadosOrganizacionais.java](/Users/leonardo/sgc/backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java), o diagnóstico já usa `@Cacheable`, então a frequência alta observada na suíte indica mais problema de repetição de chamada do que custo bruto por chamada depois do aquecimento
+- o tracing interno do backend já está funcional com `SGC_MONITORAMENTO=on`; a causa do sumiço era a escolha do construtor errado em [MonitoramentoAspect.java](/Users/leonardo/sgc/backend/src/main/java/sgc/comum/util/MonitoramentoAspect.java), que podia deixar `ativo=false`
 
 ## Reality Check: captura e jornada
 
@@ -62,6 +63,25 @@ Conclusão operacional desta rodada:
 
 - o primeiro foco continua correto: racionalizar chamadas do painel, reduzir reabertura de contexto de subprocesso e revisar validações/workflows específicos
 - o segundo foco deve ser a sequência de leitura em telas de subprocesso, porque ela reaparece até nos fluxos mais representativos e não só na suíte completa
+
+## Reality Check Com Trace Interno
+
+Com base na coleta com trace interno registrada em `e2e/monitoramento-reality-check-trace.txt`, surgiram sinais novos e mais úteis sobre o backend:
+
+- `painel/alertas` é de fato mais caro que `painel/processos` porque sua cadeia inclui `AlertaFacade.listarPorUnidade`, `AlertaFacade.obterMapaDataHoraLeitura` e, em muitos casos, `AlertaFacade.marcarComoLidos`
+- `painel/processos` também tem custo composto: `ProcessoRepo.listarCodigos*`, `ProcessoRepo.listarPorCodigosComParticipantes` e enriquecimento de siglas por `UnidadeService.buscarSiglasPorCodigos`
+- o maior outlier interno não é query pesada, e sim `EmailService.enviarEmailHtml`, com picos na faixa de 100 a 200 ms
+- `SubprocessoNotificacaoService.notificarTransicao` e `SubprocessoTransicaoService.disponibilizarCadastro` aparecem como custo relevante em transições de workflow
+- `ProcessoService.obterDetalhesCompleto` teve pico de 60 ms e merece revisão de composição, mas ficou atrás do custo de e-mail e notificação
+- `SubprocessoConsultaService.obterContextoEdicao` teve pico de 41 ms; isso confirma que o endpoint não é só repetido, ele também tem trabalho interno não trivial
+- `UnidadeHierarquiaService.buscarArvoreComElegibilidade` apareceu com pico de 21 ms, mas ainda abaixo dos principais pontos de atenção
+
+Conclusão operacional desta rodada com trace:
+
+- a racionalização agora tem três frentes iniciais claramente justificadas:
+- reduzir round-trips do painel e da leitura de subprocesso
+- tirar custo síncrono de notificação/e-mail do caminho crítico das transições
+- revisar a montagem de contexto completo e contexto de edição para reduzir recomposição interna
 
 ## Princípios de atuação
 

@@ -195,9 +195,8 @@ import {useToastStore} from "@/stores/toast";
 import {useAcesso} from "@/composables/useAcesso";
 import {
   type Analise,
-  type AtividadeOperacaoResponse,
   type Atividade,
-  type Conhecimento,
+  type AtividadeOperacaoResponse,
   type ContextoCadastroAtividadesSubprocesso,
   type CriarConhecimentoRequest,
   type ErroValidacao,

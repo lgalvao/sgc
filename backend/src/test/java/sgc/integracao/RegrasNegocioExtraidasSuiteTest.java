@@ -1,9 +1,7 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.platform.suite.api.SelectClasses;
-import org.junit.platform.suite.api.Suite;
+import org.junit.jupiter.api.*;
+import org.junit.platform.suite.api.*;
 
 @Suite
 @Tag("integration")

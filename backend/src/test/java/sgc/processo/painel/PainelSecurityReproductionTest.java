@@ -12,7 +12,6 @@ import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
 import java.time.*;
-
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;

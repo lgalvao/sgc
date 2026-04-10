@@ -14,9 +14,9 @@ import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
+import java.lang.reflect.*;
 import java.time.*;
 import java.util.*;
-import java.lang.reflect.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;

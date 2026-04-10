@@ -2,6 +2,7 @@ package sgc.organizacao.dto;
 
 import org.junit.jupiter.api.*;
 import sgc.organizacao.model.*;
+
 import java.lang.reflect.*;
 
 import static org.assertj.core.api.Assertions.*;

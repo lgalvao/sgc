@@ -1,7 +1,7 @@
 package sgc.subprocesso.model;
 
-import org.springframework.data.jpa.repository.*;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.*;
 import org.springframework.stereotype.*;
 import sgc.organizacao.model.*;

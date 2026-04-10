@@ -229,7 +229,6 @@ public class ProcessoService {
 
 
     public void iniciar(Long codigo, List<Long> codsUnidadesParam) {
-        Usuario usuario = usuarioService.usuarioAutenticado();
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
             throw new ErroValidacao(Mensagens.PROCESSO_SO_INICIAVEL_EM_CRIADO);
@@ -405,10 +404,6 @@ public class ProcessoService {
                     .toList();
             if (!semMapa.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
         }
-    }
-
-    private List<String> validarUnidadesInicio(TipoProcesso tipo, List<Long> cods) {
-        return validarUnidadesInicio(tipo, cods, unidadeService.buscarPorCodigos(cods));
     }
 
     private List<String> validarUnidadesInicio(TipoProcesso tipo, List<Long> cods, Collection<Unidade> unidadesCarregadas) {
@@ -646,10 +641,6 @@ public class ProcessoService {
                 || situacao == REVISAO_MAPA_AJUSTADO;
         return elegivelDisponibilizacao
                 && permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, DISPONIBILIZAR_MAPA);
-    }
-
-    private boolean isElegivelParaAcaoEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return avaliarElegibilidadeAcaoBloco(subprocesso, usuario).possuiAlgumaAcao();
     }
 
     private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(Subprocesso subprocesso, Usuario usuario) {

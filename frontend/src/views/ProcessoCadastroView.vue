@@ -136,7 +136,11 @@ import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
 
 import {useToastStore} from "@/stores/toast";
-import {buscarArvoreComElegibilidade, buscarDiagnosticoOrganizacional, mapUnidadesArray} from "@/services/unidadeService";
+import {
+  buscarArvoreComElegibilidade,
+  buscarDiagnosticoOrganizacional,
+  mapUnidadesArray
+} from "@/services/unidadeService";
 import * as processoService from "@/services/processoService";
 import {type DiagnosticoOrganizacional, Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
 import {usePerfil} from "@/composables/usePerfil";

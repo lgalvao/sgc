@@ -5,7 +5,7 @@ import {executarNode} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
 import {executarDoctor} from "./projeto/doctor.js";
 import {executarLimpeza} from "./projeto/limpar.js";
-import {PERFIS, executarPerfilQualidade} from "./projeto/qualidade.js";
+import {executarPerfilQualidade, PERFIS} from "./projeto/qualidade.js";
 import {executarSetup} from "./projeto/setup.js";
 import {executarSnapshotQa} from "./qa/snapshot-coletar.js";
 import {executarResumoQa} from "./qa/resumo.js";

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.test.util.*;
 import sgc.alerta.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -13,7 +14,6 @@ import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import org.springframework.test.util.*;
 import java.time.*;
 import java.util.*;
 

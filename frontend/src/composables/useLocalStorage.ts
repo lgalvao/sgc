@@ -1,9 +1,5 @@
 import type {Ref} from 'vue';
-import {
-    removerDoArmazenamento,
-    removerMultiplosDoArmazenamento,
-    useWebStorage
-} from '@/composables/useWebStorage';
+import {removerDoArmazenamento, removerMultiplosDoArmazenamento, useWebStorage} from '@/composables/useWebStorage';
 
 /**
  * Composable para sincronizar ref com localStorage

@@ -1,10 +1,10 @@
 import {computed, ref} from "vue";
 import {useAsyncAction} from "@/composables/useAsyncAction";
+import type {Parametro} from "@/services/configuracaoService";
 import {
     buscarConfiguracoes as serviceBuscarConfiguracoes,
     salvarConfiguracoes as serviceSalvarConfiguracoes,
 } from "@/services/configuracaoService";
-import type {Parametro} from "@/services/configuracaoService";
 
 export type {Parametro};
 

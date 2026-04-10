@@ -1,9 +1,9 @@
 import type {
     Analise,
     Atividade,
-    ContextoCadastroAtividadesSubprocesso,
     AtividadeImpactada,
     CompetenciaImpactada,
+    ContextoCadastroAtividadesSubprocesso,
     ContextoEdicaoSubprocesso,
     DisponibilizarMapaRequest,
     ImpactoMapa,
@@ -14,8 +14,8 @@ import type {
     SalvarCompetenciaRequest,
     SalvarMapaRequest,
     SubprocessoDetalhe,
-    SubprocessoStatus,
     SubprocessoDetalheResponse,
+    SubprocessoStatus,
     ValidacaoCadastro
 } from "@/types/tipos";
 import apiClient from "../axios-setup";

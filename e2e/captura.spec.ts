@@ -7,11 +7,7 @@ import {
     extrairProcessoCodigo,
     iniciarProcessoPeloCadastro
 } from './helpers/helpers-processos.js';
-import {
-    navegarParaSubprocesso,
-    verificarAppAlert,
-    verificarPaginaPainel
-} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,

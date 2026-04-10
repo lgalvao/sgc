@@ -2,6 +2,7 @@ package sgc.subprocesso.dto;
 
 import sgc.mapa.dto.*;
 import sgc.organizacao.model.*;
+
 import java.util.*;
 
 /**

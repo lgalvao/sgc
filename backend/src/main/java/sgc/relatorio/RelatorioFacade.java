@@ -15,9 +15,8 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
 import java.io.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

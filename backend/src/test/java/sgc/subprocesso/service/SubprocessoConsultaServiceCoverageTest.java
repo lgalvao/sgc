@@ -1,38 +1,21 @@
 package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.processo.model.Processo;
-import sgc.subprocesso.dto.ContextoEdicaoResponse;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.AnaliseRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
-import sgc.organizacao.service.UnidadeService;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.mapa.service.MapaVisualizacaoService;
-import sgc.subprocesso.model.MovimentacaoRepo;
+import org.mockito.junit.jupiter.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

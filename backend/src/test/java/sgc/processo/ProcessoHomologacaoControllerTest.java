@@ -1,7 +1,6 @@
 package sgc.processo;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
 import org.springframework.context.annotation.*;
@@ -10,7 +9,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
-import sgc.comum.erros.RestExceptionHandler;
+import sgc.comum.erros.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
 import sgc.processo.service.*;

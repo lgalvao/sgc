@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
-import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 
 import java.util.*;

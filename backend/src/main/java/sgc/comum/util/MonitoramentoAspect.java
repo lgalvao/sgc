@@ -3,6 +3,7 @@ package sgc.comum.util;
 import lombok.extern.slf4j.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.util.*;
 
@@ -27,6 +28,7 @@ public class MonitoramentoAspect {
         this.limiteAlertaMs = limiteAlertaMs;
     }
 
+    @Autowired
     public MonitoramentoAspect(MonitoramentoProperties monitoramentoProperties) {
         this(
                 monitoramentoProperties.isAtivo(),

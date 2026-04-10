@@ -11,8 +11,8 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
+import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

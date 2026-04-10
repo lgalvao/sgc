@@ -491,10 +491,6 @@ public class SubprocessoConsultaService {
         return montarContextoConsulta(sp, List.of());
     }
 
-    private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp) {
-        return montarContextoConsulta(sp, listarMovimentacoes(sp));
-    }
-
     private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp, List<Movimentacao> movimentacoes) {
         DadosContextoConsulta dadosContexto = resolverDadosContexto(sp, movimentacoes);
         Long unidadeAtivaCodigo = dadosContexto.unidadeAtivaCodigo();

@@ -1,20 +1,18 @@
 package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.UnidadeService;
-import sgc.subprocesso.dto.AnaliseHistoricoDto;
+import sgc.organizacao.service.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

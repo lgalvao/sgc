@@ -2,7 +2,6 @@ package sgc.processo.dto;
 
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.processo.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;

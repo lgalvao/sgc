@@ -74,7 +74,6 @@ public class PainelFacade {
         return pageable;
     }
 
-    @Transactional
     public Page<Alerta> listarAlertas(ContextoUsuarioAutenticado contextoUsuario, Pageable pageable) {
         Pageable sortedPageable = pageable.isPaged()
                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
@@ -84,21 +83,16 @@ public class PainelFacade {
         Map<Long, LocalDateTime> leiturasPorAlerta = alertaFacade.obterMapaDataHoraLeitura(
                 contextoUsuario.usuarioTitulo(),
                 alertasPage.stream().map(Alerta::getCodigo).toList());
-        List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
-        alertasPage.forEach(alerta -> {
-            Long codigoAlerta = alerta.getCodigo();
-            LocalDateTime dataHoraLeitura = leiturasPorAlerta.get(codigoAlerta);
-            if (dataHoraLeitura == null) {
-                alertasNaoLidosVisualizados.add(codigoAlerta);
-            }
-            alerta.setDataHoraLeitura(dataHoraLeitura);
-        });
-
-        if (!alertasNaoLidosVisualizados.isEmpty()) {
-            alertaFacade.marcarComoLidos(contextoUsuario, alertasNaoLidosVisualizados);
-        }
-
+        alertasPage.forEach(alerta -> alerta.setDataHoraLeitura(leiturasPorAlerta.get(alerta.getCodigo())));
         return alertasPage;
+    }
+
+    @Transactional
+    public void marcarAlertasLidos(ContextoUsuarioAutenticado contextoUsuario, List<Long> codigos) {
+        if (codigos.isEmpty()) {
+            return;
+        }
+        alertaFacade.marcarComoLidos(contextoUsuario, codigos);
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo,

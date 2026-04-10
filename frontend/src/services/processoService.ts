@@ -1,9 +1,9 @@
 import {
-    SituacaoSubprocesso,
     type AtualizarProcessoRequest,
     type CriarProcessoRequest,
     type Processo,
     type ProcessoResumo,
+    SituacaoSubprocesso,
     type Subprocesso,
     type SubprocessoElegivel,
     type UnidadeImportacao,

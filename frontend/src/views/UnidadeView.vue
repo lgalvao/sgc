@@ -113,8 +113,8 @@ import {BAlert, BButton, BCard, BCardBody, BCol, BRow} from "bootstrap-vue-next"
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, onActivated, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
-import type {Unidade, Usuario} from "@/types/tipos";
-import TreeTable, { type TreeItem } from "@/components/comum/TreeTable.vue";
+import type {MapaVigenteReferencia, Unidade, Usuario} from "@/types/tipos";
+import TreeTable, {type TreeItem} from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {
@@ -126,7 +126,6 @@ import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
-import type {MapaVigenteReferencia} from "@/types/tipos";
 
 const props = defineProps<{ codUnidade: number }>();
 

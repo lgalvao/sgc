@@ -19,7 +19,7 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.*;
 
 import static sgc.organizacao.model.TipoUnidade.*;

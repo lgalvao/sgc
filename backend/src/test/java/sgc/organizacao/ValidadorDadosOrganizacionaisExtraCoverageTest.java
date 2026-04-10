@@ -1,12 +1,13 @@
 package sgc.organizacao;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.mockito.junit.jupiter.*;
+import org.springframework.jdbc.core.namedparam.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

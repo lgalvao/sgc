@@ -5,10 +5,11 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.test.util.*;
-import sgc.organizacao.model.*;
 import sgc.comum.erros.*;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.subprocesso.model.*;
+
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

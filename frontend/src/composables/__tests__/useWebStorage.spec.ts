@@ -1,10 +1,6 @@
 import {nextTick} from 'vue';
 import {beforeEach, describe, expect, it} from 'vitest';
-import {
-    removerDoArmazenamento,
-    removerMultiplosDoArmazenamento,
-    useWebStorage
-} from '@/composables/useWebStorage';
+import {removerDoArmazenamento, removerMultiplosDoArmazenamento, useWebStorage} from '@/composables/useWebStorage';
 
 describe('useWebStorage', () => {
     beforeEach(() => {

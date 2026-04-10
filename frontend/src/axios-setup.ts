@@ -1,5 +1,5 @@
-import axios, {AxiosHeaders} from "axios";
 import type {AxiosResponse, InternalAxiosRequestConfig} from "axios";
+import axios, {AxiosHeaders} from "axios";
 import type {Router} from "vue-router";
 import {normalizeError, shouldNotifyGlobally} from '@/utils/apiError';
 import {logger} from "@/utils";

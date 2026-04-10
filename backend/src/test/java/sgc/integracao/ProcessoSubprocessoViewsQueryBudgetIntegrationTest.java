@@ -1,8 +1,6 @@
 package sgc.integracao;
 
 import jakarta.persistence.*;
-import org.hibernate.*;
-import org.hibernate.stat.*;
 import org.junit.jupiter.api.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
@@ -12,8 +10,8 @@ import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
-import sgc.organizacao.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;

@@ -1,5 +1,5 @@
 import {computed, type Ref, unref} from 'vue';
-import {TipoProcesso, type SubprocessoDetalhe} from '@/types/tipos';
+import {type SubprocessoDetalhe, TipoProcesso} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
 
 type AcaoPrincipalCadastro = {

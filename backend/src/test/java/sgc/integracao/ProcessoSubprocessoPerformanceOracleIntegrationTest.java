@@ -1,55 +1,35 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.TestPropertySource;
-import sgc.alerta.model.Alerta;
-import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.painel.PainelFacade;
-import sgc.subprocesso.dto.AnaliseHistoricoDto;
-import sgc.subprocesso.dto.SubprocessoDetalheResponse;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.AnaliseRepo;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.json.*;
+import jakarta.persistence.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.*;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.data.domain.*;
+import org.springframework.mail.javamail.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.authority.*;
+import org.springframework.security.core.context.*;
+import org.springframework.test.context.*;
+import org.springframework.test.context.bean.override.mockito.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.painel.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import javax.sql.DataSource;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import javax.sql.*;
+import java.nio.file.*;
+import java.sql.*;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
 
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 @SpringBootTest
 @ActiveProfiles("hom")

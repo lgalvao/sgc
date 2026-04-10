@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.testutils.*;

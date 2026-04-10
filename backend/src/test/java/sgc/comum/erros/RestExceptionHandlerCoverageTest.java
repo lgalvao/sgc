@@ -1,18 +1,14 @@
 package sgc.comum.erros;
 
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.junit.jupiter.*;
+import org.springframework.http.*;
+import org.springframework.http.converter.*;
+import org.springframework.web.context.request.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;

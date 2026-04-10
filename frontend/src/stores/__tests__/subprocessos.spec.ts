@@ -2,7 +2,12 @@ import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useMapas} from '@/composables/useMapas';
 import {useSubprocessos} from '@/composables/useSubprocessos';
-import type {ContextoEdicaoSubprocesso, PermissoesSubprocesso, SubprocessoDetalhe, SubprocessoDetalheResponse} from '@/types/tipos';
+import type {
+    ContextoEdicaoSubprocesso,
+    PermissoesSubprocesso,
+    SubprocessoDetalhe,
+    SubprocessoDetalheResponse
+} from '@/types/tipos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import {usePerfilStore} from '../perfil';
 import {

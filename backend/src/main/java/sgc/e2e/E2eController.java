@@ -5,8 +5,8 @@ import jakarta.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.Nullable;
-import org.springframework.cache.*;
 import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.cache.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.*;
 import org.springframework.core.io.Resource;
@@ -739,7 +739,6 @@ public class E2eController {
         if (Boolean.TRUE.equals(request.iniciar())) {
             List<Long> unidades = List.of(unidade.getCodigo());
             Long processoCodigo = processo.getCodigo();
-            Usuario usuario = obterUsuarioParaIniciacao();
             processoService.iniciar(processoCodigo, unidades);
 
             // Recarregar processo após iniciar
@@ -763,19 +762,6 @@ public class E2eController {
             throw new IllegalStateException("Unidade %s sem unidade superior para fixture E2E".formatted(unidade.getSigla()));
         }
         return unidadeSuperior;
-    }
-
-    private Usuario obterUsuarioParaIniciacao() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth != null && auth.getPrincipal() instanceof Usuario u) {
-            return u;
-        }
-
-        String login = (auth != null && auth.getPrincipal() instanceof String s) 
-                ? s : TITULO_USUARIO_FIXTURE_ADMIN;
-        
-        return usuarioFacade.buscarPorLogin(login);
     }
 
     private void setSituacaoProcesso(Long codProcesso) {

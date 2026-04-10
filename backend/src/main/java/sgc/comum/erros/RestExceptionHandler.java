@@ -13,8 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.*;
 import sgc.comum.util.*;
 import sgc.seguranca.sanitizacao.*;
 
-import java.util.*;
-
 /**
  * Handler centralizado para tratamento de exceções REST.
  *

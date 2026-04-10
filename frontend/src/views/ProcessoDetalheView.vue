@@ -111,7 +111,7 @@ import {useToastStore} from "@/stores/toast";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
-import {normalizeError, type NormalizedError} from "@/utils/apiError";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 import * as processoService from "@/services/processoService";
 import {TEXTOS} from "@/constants/textos";
 

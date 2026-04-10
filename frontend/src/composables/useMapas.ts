@@ -1,8 +1,5 @@
 import {ref} from "vue";
-import {
-    obterMapaCompleto,
-    verificarImpactosMapa
-} from "@/services/subprocessoService";
+import {obterMapaCompleto, verificarImpactosMapa} from "@/services/subprocessoService";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useAsyncAction} from "@/composables/useAsyncAction";

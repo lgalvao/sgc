@@ -15,6 +15,7 @@ Importante:
 - `captura.spec.ts` e `jornada.spec.ts` devem ser tratados como reality check principal de fluxos representativos
 - a primeira coleta dedicada desses dois cenários foi invalidada por reaproveitamento indevido de infra antiga; o endurecimento foi aplicado em [playwright.config.ts](/Users/leonardo/sgc/playwright.config.ts) e [lifecycle.js](/Users/leonardo/sgc/e2e/lifecycle.js)
 - a coleta válida e mais recente desses cenários está em [monitoramento-reality-check.txt](/Users/leonardo/sgc/e2e/monitoramento-reality-check.txt)
+- o tracing interno do backend ficou disponível após corrigir a injeção de propriedades em [MonitoramentoAspect.java](/Users/leonardo/sgc/backend/src/main/java/sgc/comum/util/MonitoramentoAspect.java)
 
 ## Hotspots observados
 
