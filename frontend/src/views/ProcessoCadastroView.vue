@@ -139,9 +139,6 @@ import {useToastStore} from "@/stores/toast";
 import {usePainelStore} from "@/stores/painel";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useUnidadeStore} from "@/stores/unidade";
-import {
-  mapUnidadesArray
-} from "@/services/unidadeService";
 import * as processoService from "@/services/processoService";
 import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
 import {usePerfil} from "@/composables/usePerfil";
