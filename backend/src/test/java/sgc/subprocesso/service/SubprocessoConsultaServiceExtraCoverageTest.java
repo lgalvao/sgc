@@ -97,10 +97,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         if (sp.getCodigo() == null) {
             return;
         }
-        Movimentacao mov = new Movimentacao();
-        mov.setUnidadeOrigem(sp.getUnidade());
-        mov.setUnidadeDestino(sp.getUnidade());
-        when(movimentacaoRepo.buscarUltimaPorSubprocesso(sp.getCodigo())).thenReturn(Optional.of(mov));
+        when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(sp.getCodigo()), any()))
+                .thenReturn(List.of(sp.getUnidade()));
     }
 
     @Nested
@@ -115,10 +113,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             u2.setCodigo(2L);
             Subprocesso sp = criarSubprocessoComMapa(100L);
             sp.setUnidade(u1);
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeDestino(u2);
-
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(100L)).thenReturn(Optional.of(mov));
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(100L), any()))
+                    .thenReturn(List.of(u2));
 
             assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u2);
         }
@@ -138,19 +134,19 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade u = new Unidade();
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setUnidade(u);
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
+                    .thenReturn(List.of());
             assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
 
         @Test
-        @DisplayName("deve retornar unidade quando última movimentação não possui destino")
-        void destinoNuloNaMovimentacao() {
+        @DisplayName("deve retornar unidade quando consulta nao retorna destino")
+        void destinoAusenteNaConsulta() {
             Unidade u = new Unidade();
             Subprocesso sp = criarSubprocessoComMapa(2L);
             sp.setUnidade(u);
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeDestino(null);
-
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(2L), any()))
+                    .thenReturn(List.of());
             assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }
@@ -349,9 +345,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             Unidade dest = new Unidade();
             dest.setCodigo(30L);
-            Movimentacao movLocalizacao = new Movimentacao();
-            movLocalizacao.setUnidadeDestino(dest);
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(movLocalizacao));
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
+                    .thenReturn(List.of(dest));
 
             Usuario user = new Usuario();
             user.setPerfilAtivo(Perfil.ADMIN);
@@ -710,13 +705,13 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             // Branch: movimentacao encontrada
             sp.setCodigo(1L);
             Unidade dest = new Unidade();
-            Movimentacao m = new Movimentacao();
-            m.setUnidadeDestino(dest);
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(m));
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
+                    .thenReturn(List.of(dest));
             assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
 
             // Branch: sem movimentação útil, usa unidade base
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
+                    .thenReturn(List.of());
             assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
 
@@ -728,7 +723,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setCodigo(1L);
             sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
+                    .thenReturn(List.of());
 
             assertThatThrownBy(() -> localizacaoSubprocessoService.obterLocalizacaoAtual(sp))
                     .isInstanceOf(ErroValidacao.class)

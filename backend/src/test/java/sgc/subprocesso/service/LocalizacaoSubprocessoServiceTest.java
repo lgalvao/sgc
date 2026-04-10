@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.data.domain.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
@@ -48,13 +49,8 @@ class LocalizacaoSubprocessoServiceTest {
                 .unidade(unidadeOriginal)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO)
                 .build();
-        Movimentacao movimentacao = Movimentacao.builder()
-                .subprocesso(subprocesso)
-                .unidadeOrigem(unidadeOriginal)
-                .unidadeDestino(unidadeAtual)
-                .build();
-
-        when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(movimentacao));
+        when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(1L, PageRequest.of(0, 1)))
+                .thenReturn(List.of(unidadeAtual));
 
         Unidade localizacao = service.obterLocalizacaoAtual(subprocesso);
 
@@ -71,7 +67,8 @@ class LocalizacaoSubprocessoServiceTest {
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
                 .build();
 
-        when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
+        when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(1L, PageRequest.of(0, 1)))
+                .thenReturn(List.of());
 
         Unidade localizacao = service.obterLocalizacaoAtual(subprocesso);
 
@@ -87,7 +84,8 @@ class LocalizacaoSubprocessoServiceTest {
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .build();
 
-        when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
+        when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(1L, PageRequest.of(0, 1)))
+                .thenReturn(List.of());
 
         assertThatThrownBy(() -> service.obterLocalizacaoAtual(subprocesso))
                 .isInstanceOf(ErroValidacao.class)

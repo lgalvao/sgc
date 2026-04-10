@@ -1,8 +1,10 @@
 package sgc.subprocesso.model;
 
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.domain.*;
 import org.springframework.data.repository.query.*;
 import org.springframework.stereotype.*;
+import sgc.organizacao.model.*;
 
 import java.util.*;
 
@@ -32,6 +34,16 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             LIMIT 1
             """)
     Optional<Movimentacao> buscarUltimaPorSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);
+
+    @Query("""
+            SELECT m.unidadeDestino FROM Movimentacao m
+            WHERE m.subprocesso.codigo = :subprocessoCodigo
+            ORDER BY m.dataHora DESC, m.codigo DESC
+            """)
+    List<Unidade> listarUltimasUnidadesDestinoPorSubprocesso(
+            @Param("subprocessoCodigo") Long subprocessoCodigo,
+            Pageable pageable
+    );
 
     @Query("""
             SELECT m FROM Movimentacao m

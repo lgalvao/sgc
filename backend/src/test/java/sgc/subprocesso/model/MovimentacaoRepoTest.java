@@ -1,6 +1,7 @@
 package sgc.subprocesso.model;
 
 import org.junit.jupiter.api.*;
+import org.springframework.data.domain.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.transaction.annotation.*;
@@ -59,6 +60,38 @@ class MovimentacaoRepoTest {
                 .extracting(Movimentacao::getDescricao)
                 .isEqualTo("Movimentacao recente");
         assertThat(movimentacaoRepo.findBySubprocessoCodigo(60000L)).hasSizeGreaterThanOrEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("deve buscar ultima unidade de destino sem carregar a movimentacao completa")
+    void deveBuscarUltimaUnidadeDestino() {
+        Subprocesso subprocesso = subprocessoRepo.findById(60000L).orElseThrow();
+        Unidade origem = unidadeRepo.findById(1L).orElseThrow();
+        Unidade destinoAntigo = unidadeRepo.findById(8L).orElseThrow();
+        Unidade destinoRecente = unidadeRepo.findById(9L).orElseThrow();
+        Usuario usuario = usuarioRepo.findById("1").orElseThrow();
+
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destinoAntigo)
+                .usuario(usuario)
+                .descricao("Destino antigo")
+                .dataHora(LocalDateTime.of(2099, 1, 7, 8, 0))
+                .build());
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destinoRecente)
+                .usuario(usuario)
+                .descricao("Destino recente")
+                .dataHora(LocalDateTime.of(2099, 1, 7, 9, 0))
+                .build());
+
+        assertThat(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(60000L, PageRequest.of(0, 1)))
+                .singleElement()
+                .extracting(Unidade::getCodigo)
+                .isEqualTo(destinoRecente.getCodigo());
     }
 
     @Test

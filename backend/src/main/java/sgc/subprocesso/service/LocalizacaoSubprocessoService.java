@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import lombok.*;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
@@ -15,6 +16,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LocalizacaoSubprocessoService {
+    private static final Pageable PRIMEIRO_RESULTADO = PageRequest.of(0, 1);
 
     private final MovimentacaoRepo movimentacaoRepo;
 
@@ -24,8 +26,9 @@ public class LocalizacaoSubprocessoService {
             return unidadeBase;
         }
 
-        return movimentacaoRepo.buscarUltimaPorSubprocesso(subprocesso.getCodigo())
-                .map(Movimentacao::getUnidadeDestino)
+        return movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(subprocesso.getCodigo(), PRIMEIRO_RESULTADO)
+                .stream()
+                .findFirst()
                 .orElseGet(() -> obterLocalizacaoSemMovimentacao(subprocesso, unidadeBase));
     }
 
