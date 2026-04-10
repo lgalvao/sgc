@@ -46,6 +46,23 @@ Os itens abaixo já deixaram de ser hipótese genérica e passaram a ser evidên
 - em [PainelFacade.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/painel/PainelFacade.java), a montagem de `ProcessoResumoDto` ainda usa mapa de hierarquia completo e pode buscar siglas complementares para participantes sem sigla carregada
 - em [ValidadorDadosOrganizacionais.java](/Users/leonardo/sgc/backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java), o diagnóstico já usa `@Cacheable`, então a frequência alta observada na suíte indica mais problema de repetição de chamada do que custo bruto por chamada depois do aquecimento
 
+## Reality Check: captura e jornada
+
+Com base na execução dedicada registrada em `e2e/monitoramento-reality-check.txt`, os sinais mais confiáveis para priorização inicial são:
+
+- em [captura.spec.ts](/Users/leonardo/sgc/e2e/captura.spec.ts), os campeões de frequência continuam sendo `painel/processos`, `painel/alertas`, `usuarios/login`, `unidades/diagnostico-organizacional`, `subprocessos/{codigo}/contexto-edicao` e `subprocessos/buscar`
+- em [jornada.spec.ts](/Users/leonardo/sgc/e2e/jornada.spec.ts), a frequência relevante se concentra menos em diversidade e mais em ciclos repetidos de `subprocessos/buscar` + `subprocessos/{codigo}/contexto-edicao` + `processos/{codigo}/contexto-completo`
+- no reality check, quase todos os tempos absolutos ficaram baixos; isso reforça que o problema dominante é chatice de protocolo e recomposição de contexto, não latência extrema unitária
+- o outlier mais claro de `captura` continua sendo `POST /api/subprocessos/405/cadastro/disponibilizar` com 143 ms
+- em `jornada`, o ponto mais suspeito foi `GET /api/subprocessos/401/validar-cadastro` com 92 ms, seguido por `POST /api/subprocessos/401/disponibilizar-revisao` com 36 ms
+- `painel/alertas` e `painel/processos` seguem abrindo praticamente toda transição de papel ou retorno a fluxo, inclusive em jornadas já contextualizadas
+- os pares `subprocessos/buscar` e `subprocessos/{codigo}/contexto-edicao` reaparecem várias vezes dentro do mesmo subprocesso, o que fortalece a hipótese de reentrada de tela e recomposição redundante
+
+Conclusão operacional desta rodada:
+
+- o primeiro foco continua correto: racionalizar chamadas do painel, reduzir reabertura de contexto de subprocesso e revisar validações/workflows específicos
+- o segundo foco deve ser a sequência de leitura em telas de subprocesso, porque ela reaparece até nos fluxos mais representativos e não só na suíte completa
+
 ## Princípios de atuação
 
 ### 1. Otimizar o fluxo, não só a query

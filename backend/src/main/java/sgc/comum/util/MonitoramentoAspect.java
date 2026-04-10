@@ -35,7 +35,11 @@ public class MonitoramentoAspect {
         );
     }
 
-    @Around("execution(* sgc..*Service.*(..)) || execution(* sgc..*Repo.*(..))")
+    @Around(
+            "execution(* sgc..*Service.*(..))" +
+            " || execution(* sgc..*Repo.*(..))" +
+            " || execution(* sgc..*Facade.*(..))"
+    )
     public Object monitorarExecucao(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!ativo) {
             return joinPoint.proceed();
@@ -57,14 +61,14 @@ public class MonitoramentoAspect {
             boolean monitoramentoDetalhado = traceCompleto || FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao();
 
             if (monitoramentoDetalhado) {
-                log.info("EXECUCAO MONITORADA #{} [{}]: {}.{} levou {} ms",
+                log.info("TRACE #{} [{}] {}.{} {}ms",
                         numeroChamada,
                         correlacaoId,
                         classe,
                         metodo,
                         tempoTotal);
             } else if (tempoTotal > limiteAlertaMs) {
-                log.warn("EXECUCAO LENTA [{}]: {}.{} levou {} ms",
+                log.warn("TRACE-LENTO [{}] {}.{} {}ms",
                         correlacaoId,
                         classe,
                         metodo,

@@ -1,0 +1,705 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m> vite --port 5173
+[2m[WebServer] [22m[32m[1mVITE[22m v7.3.2[39m  [2mready in [0m[1m248[22m[2m[0m ms[22m
+[2m[WebServer] [22m[32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Infra E2E no ar. Frontend: 5173. Backend: 10000 (perfil e2e). Monitoramento: on.
+
+Running 20 tests using 1 worker
+
+[2m[WebServer] [22mTodos os caches de aplicação foram limpos.
+[2m[WebServer] [22mReset do banco de dados e caches concluído.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[33mWARN Erro de autenticação: Credenciais inválidas[0m
+[2m[WebServer] [22m[33mHTTP-LENTO POST /api/usuarios/login 401 127ms[0m
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1111
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 66ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1111
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mUsuário ***1111 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/entrar 44ms
+  ✓   1 [chromium] › e2e/captura.spec.ts:353:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login (1.7s)
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 45ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 68ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 28ms
+[2m[WebServer] [22m[33mWARN DIAGN. ORGANIZACIONAL [Unidade sem responsável]: 1 ocorrencia(s). sigla=SECAO_SEM_RESP, tipo=OPERACIONAL[0m
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 32ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 35ms
+[2m[WebServer] [22mProcesso criado com 3 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 43ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 7ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 3ms
+[2m[WebServer] [22mHTTP GET /api/processos/400/detalhes 52ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 8ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 8ms
+  ✓   2 [chromium] › e2e/captura.spec.ts:398:9 › Captura de Telas - Sistema SGC › 02 - Painel principal › Captura painel ADMIN (2.0s)
+[2m[WebServer] [22mLimpeza robusta do processo 400 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 7ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 5ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 7ms
+[2m[WebServer] [22mProcesso criado com 3 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 12ms
+[2m[WebServer] [22mCriando 3 subprocessos para o processo 401
+[2m[WebServer] [22mNotificando início do processo 401
+[2m[WebServer] [22mProcesso 401 iniciado para 3 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/401/iniciar 37ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 8ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 14ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2222
+[2m[WebServer] [22mUsuário ***2222 autorizado: GESTOR-COORD_11
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 8ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=5 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=5&sort=dataHora,desc 11ms
+  ✓   3 [chromium] › e2e/captura.spec.ts:462:9 › Captura de Telas - Sistema SGC › 02 - Painel principal › Captura painel GESTOR (3.3s)
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 402
+[2m[WebServer] [22mNotificando início do processo 402
+[2m[WebServer] [22mProcesso 402 iniciado para 1 unidades.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1010
+[2m[WebServer] [22mUsuário ***1010 autorizado: CHEFE-SECAO_211
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=15 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=15&sort=dataHora,desc 9ms
+  ✓   4 [chromium] › e2e/captura.spec.ts:484:9 › Captura de Telas - Sistema SGC › 02 - Painel principal › Captura painel CHEFE (536ms)
+[2m[WebServer] [22mLimpeza robusta do processo 402 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 7ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 3ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 7ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 30ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 10ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 4ms
+[2m[WebServer] [22mHTTP GET /api/processos/403/detalhes 8ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO&codProcesso=403 12ms
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 403
+[2m[WebServer] [22mNotificando início do processo 403
+[2m[WebServer] [22mProcesso 403 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/403/iniciar 19ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 10ms
+[2m[WebServer] [22mHTTP GET /api/processos/403/contexto-completo 24ms
+  ✓   5 [chromium] › e2e/captura.spec.ts:499:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura criação e detalhamento de processo (1.9s)
+[2m[WebServer] [22mLimpeza robusta do processo 403 concluída.
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 404
+[2m[WebServer] [22mNotificando início do processo 404
+[2m[WebServer] [22mProcesso 404 iniciado para 1 unidades.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1515
+[2m[WebServer] [22mUsuário ***1515 autorizado: CHEFE-ASSESSORIA_12
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=4 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=4&sort=dataHora,desc 17ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 19ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 50ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/contexto-cadastro-atividades/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 19ms
+[2m[WebServer] [22mAtividade criada no mapa 405
+[2m[WebServer] [22mSubprocesso 405 (MAPEAMENTO) movido para em andamento
+[2m[WebServer] [22mHTTP POST /api/atividades 201 30ms
+[2m[WebServer] [22mConhecimento criado na atividade 4000
+[2m[WebServer] [22mHTTP POST /api/atividades/4000/conhecimentos 201 15ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/validar-cadastro 7ms
+[2m[WebServer] [22mDisponibilizando cadastro do subprocesso 405
+[2m[WebServer] [22m[33mHTTP-LENTO POST /api/subprocessos/405/cadastro/disponibilizar 143ms[0m
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=4&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=4 7ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mUsuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22mHTTP POST /api/usuarios/entrar 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 8ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 19ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 5ms
+[2m[WebServer] [22mAceitando cadastro do subprocesso 405
+[2m[WebServer] [22mHTTP POST /api/subprocessos/405/aceitar-cadastro 15ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 5ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 18ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 5ms
+[2m[WebServer] [22mHomologando cadastro do subprocesso 405
+[2m[WebServer] [22mHTTP POST /api/subprocessos/405/homologar-cadastro 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=404&siglaUnidade=ASSESSORIA_12 8ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 7ms
+[2m[WebServer] [22mCompetência criada
+[2m[WebServer] [22mHTTP POST /api/subprocessos/405/competencia 23ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/405/contexto-edicao 5ms
+[2m[WebServer] [22mDisponibilizando mapa do subprocesso 405
+[2m[WebServer] [22mHTTP POST /api/subprocessos/405/disponibilizar-mapa 25ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 4ms
+  ✓   6 [chromium] › e2e/captura.spec.ts:545:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura fluxo de cadastro ate mapa disponibilizado (4.5s)
+[2m[WebServer] [22mLimpeza robusta do processo 404 concluída.
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 405
+[2m[WebServer] [22mNotificando início do processo 405
+[2m[WebServer] [22mProcesso 405 iniciado para 1 unidades.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1515
+[2m[WebServer] [22mUsuário ***1515 autorizado: CHEFE-ASSESSORIA_12
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=4 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=4&sort=dataHora,desc 11ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=405&siglaUnidade=ASSESSORIA_12 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/406/contexto-edicao 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/sigla/ASSESSORIA_12 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=405&siglaUnidade=ASSESSORIA_12 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/406 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/406/mapa-visualizacao 10ms
+[2m[WebServer] [22mValidado mapa do SP 406
+[2m[WebServer] [22mHTTP POST /api/subprocessos/406/validar-mapa 14ms
+  ✓   7 [chromium] › e2e/captura.spec.ts:608:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validacao do mapa (1.3s)
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=4&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=4 4ms
+[2m[WebServer] [22mLimpeza robusta do processo 405 concluída.
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 406
+[2m[WebServer] [22mNotificando início do processo 406
+[2m[WebServer] [22mProcesso 406 iniciado para 1 unidades.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 9ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 12ms
+[2m[WebServer] [22mHTTP GET /api/processos/406/contexto-completo 4ms
+  ✓   8 [chromium] › e2e/captura.spec.ts:634:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura processo homologado e finalizacao (836ms)
+[2m[WebServer] [22mLimpeza robusta do processo 406 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 10ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 7ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 11ms
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 407
+[2m[WebServer] [22mNotificando início do processo 407
+[2m[WebServer] [22mProcesso 407 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/407/iniciar 12ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 12ms
+[2m[WebServer] [22mHTTP GET /api/processos/407/contexto-completo 13ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1010
+[2m[WebServer] [22mUsuário ***1010 autorizado: CHEFE-SECAO_211
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=15 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=15&sort=dataHora,desc 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=407&siglaUnidade=SECAO_211 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/408/contexto-edicao 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/contexto-cadastro-atividades/buscar?codProcesso=407&siglaUnidade=SECAO_211 7ms
+[2m[WebServer] [22mAtividade criada no mapa 408
+[2m[WebServer] [22mSubprocesso 408 (MAPEAMENTO) movido para em andamento
+[2m[WebServer] [22mHTTP POST /api/atividades 201 7ms
+[2m[WebServer] [22mConhecimento criado na atividade 4003
+[2m[WebServer] [22mHTTP POST /api/atividades/4003/conhecimentos 201 7ms
+[2m[WebServer] [22mConhecimento criado na atividade 4003
+[2m[WebServer] [22mHTTP POST /api/atividades/4003/conhecimentos 201 6ms
+[2m[WebServer] [22mConhecimento criado na atividade 4003
+[2m[WebServer] [22mHTTP POST /api/atividades/4003/conhecimentos 201 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/408/validar-cadastro 4ms
+[2m[WebServer] [22mDisponibilizando cadastro do subprocesso 408
+[2m[WebServer] [22mHTTP POST /api/subprocessos/408/cadastro/disponibilizar 11ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=15&sort=dataHora,desc 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=15 4ms
+  ✓   9 [chromium] › e2e/captura.spec.ts:668:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades (incluindo validações de form) (5.0s)
+[2m[WebServer] [22mLimpeza robusta do processo 407 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 3ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 5ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 8ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 5ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/processos/408/detalhes 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO&codProcesso=408 13ms
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 408
+[2m[WebServer] [22mNotificando início do processo 408
+[2m[WebServer] [22mProcesso 408 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/408/iniciar 13ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 6ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1818
+[2m[WebServer] [22mUsuário ***1818 autorizado: CHEFE-SECAO_212
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=16 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=16&sort=dataHora,desc 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=408&siglaUnidade=SECAO_212 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/409/contexto-edicao 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/contexto-cadastro-atividades/buscar?codProcesso=408&siglaUnidade=SECAO_212 7ms
+[2m[WebServer] [22mAtividade criada no mapa 409
+[2m[WebServer] [22mSubprocesso 409 (MAPEAMENTO) movido para em andamento
+[2m[WebServer] [22mHTTP POST /api/atividades 201 20ms
+[2m[WebServer] [22mAtividade criada no mapa 409
+[2m[WebServer] [22mHTTP POST /api/atividades 201 10ms
+[2m[WebServer] [22mAtividade criada no mapa 409
+[2m[WebServer] [22mHTTP POST /api/atividades 201 16ms
+[2m[WebServer] [22mConhecimento criado na atividade 4006
+[2m[WebServer] [22mHTTP POST /api/atividades/4006/conhecimentos 201 15ms
+[2m[WebServer] [22mConhecimento criado na atividade 4004
+[2m[WebServer] [22mHTTP POST /api/atividades/4004/conhecimentos 201 13ms
+[2m[WebServer] [22mConhecimento criado na atividade 4005
+[2m[WebServer] [22mHTTP POST /api/atividades/4005/conhecimentos 201 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/409/validar-cadastro 5ms
+[2m[WebServer] [22mLimpeza robusta do processo 408 concluída.
+  ✓  10 [chromium] › e2e/captura.spec.ts:785:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades (3.6s)
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 8ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 11ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 11ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 3ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 6ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 9ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 9ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/processos/409/detalhes 5ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO&codProcesso=409 4ms
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 409
+[2m[WebServer] [22mNotificando início do processo 409
+[2m[WebServer] [22mProcesso 409 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/409/iniciar 9ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 4ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1717
+[2m[WebServer] [22mUsuário ***1717 autorizado: CHEFE-SECAO_121
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=10 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=10&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 7ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/contexto-cadastro-atividades/buscar?codProcesso=409&siglaUnidade=SECAO_121 8ms
+[2m[WebServer] [22mAtividade criada no mapa 410
+[2m[WebServer] [22mSubprocesso 410 (MAPEAMENTO) movido para em andamento
+[2m[WebServer] [22mHTTP POST /api/atividades 201 6ms
+[2m[WebServer] [22mConhecimento criado na atividade 4007
+[2m[WebServer] [22mHTTP POST /api/atividades/4007/conhecimentos 201 6ms
+[2m[WebServer] [22mConhecimento criado na atividade 4007
+[2m[WebServer] [22mHTTP POST /api/atividades/4007/conhecimentos 201 6ms
+[2m[WebServer] [22mAtividade criada no mapa 410
+[2m[WebServer] [22mHTTP POST /api/atividades 201 5ms
+[2m[WebServer] [22mConhecimento criado na atividade 4008
+[2m[WebServer] [22mHTTP POST /api/atividades/4008/conhecimentos 201 6ms
+[2m[WebServer] [22mConhecimento criado na atividade 4008
+[2m[WebServer] [22mHTTP POST /api/atividades/4008/conhecimentos 201 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/validar-cadastro 4ms
+[2m[WebServer] [22mDisponibilizando cadastro do subprocesso 410
+[2m[WebServer] [22mHTTP POST /api/subprocessos/410/cadastro/disponibilizar 9ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=10&sort=dataHora,desc 63ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=10 64ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2223
+[2m[WebServer] [22mUsuário ***2223 autorizado: GESTOR-COORD_12
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=9 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=9&sort=dataHora,desc 8ms
+[2m[WebServer] [22mHTTP GET /api/processos/409/contexto-completo 12ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 7ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 4ms
+[2m[WebServer] [22mAceitando cadastro do subprocesso 410
+[2m[WebServer] [22mHTTP POST /api/subprocessos/410/aceitar-cadastro 12ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=9&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=9 4ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mUsuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22mHTTP POST /api/usuarios/entrar 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 6ms
+[2m[WebServer] [22mHTTP GET /api/processos/409/contexto-completo 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 10ms
+[2m[WebServer] [22mAceitando cadastro do subprocesso 410
+[2m[WebServer] [22mHTTP POST /api/subprocessos/410/aceitar-cadastro 9ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 6ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 8ms
+[2m[WebServer] [22mHTTP GET /api/processos/409/contexto-completo 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 4ms
+[2m[WebServer] [22mHomologando cadastro do subprocesso 410
+[2m[WebServer] [22mHTTP POST /api/subprocessos/410/homologar-cadastro 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=409&siglaUnidade=SECAO_121 8ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 4ms
+[2m[WebServer] [22mCompetência criada
+[2m[WebServer] [22mHTTP POST /api/subprocessos/410/competencia 8ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/410/contexto-edicao 4ms
+[2m[WebServer] [22mDisponibilizando mapa do subprocesso 410
+[2m[WebServer] [22mHTTP POST /api/subprocessos/410/disponibilizar-mapa 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 3ms
+  ✓  11 [chromium] › e2e/captura.spec.ts:918:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura fluxo de mapa de competências (7.9s)
+[2m[WebServer] [22mLimpeza robusta do processo 409 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 5ms
+[2m[WebServer] [22mHTTP GET /api/configuracoes 13ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades 3ms
+[2m[WebServer] [22mHTTP GET /api/unidades 1ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 1ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=100&unidade=1 5ms
+[2m[WebServer] [22mHTTP GET /api/processos/finalizados 5ms
+  ✓  12 [chromium] › e2e/captura.spec.ts:1060:9 › Captura de Telas - Sistema SGC › 06 - Navegação e Menus › Captura elementos de navegação (1.2s)
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 2ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 5ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/processos/410/detalhes 3ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO&codProcesso=410 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 8ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=REVISAO 9ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 8ms
+[2m[WebServer] [22mCriado subprocesso para unidade ASSESSORIA_12
+[2m[WebServer] [22mNotificando início do processo 411
+[2m[WebServer] [22mProcesso 411 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/411/iniciar 17ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 5ms
+  ✓  13 [chromium] › e2e/captura.spec.ts:1092:9 › Captura de Telas - Sistema SGC › 07 - Estados e Situações › Captura diferentes estados de processo (2.5s)
+[2m[WebServer] [22mLimpeza robusta do processo 410 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 3ms
+  ✓  14 [chromium] › e2e/captura.spec.ts:1129:9 › Captura de Telas - Sistema SGC › 08 - Responsividade (Tamanhos de Tela) › Captura em diferentes resoluções (519ms)
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 412
+[2m[WebServer] [22mNotificando início do processo 412
+[2m[WebServer] [22mProcesso 412 iniciado para 1 unidades.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1313
+[2m[WebServer] [22mUsuário ***1313 autorizado: GESTOR-COORD_22
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=17 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=17&sort=dataHora,desc 9ms
+[2m[WebServer] [22mHTTP GET /api/processos/412/contexto-completo 5ms
+[2m[WebServer] [22mAceitando cadastro do subprocesso 412
+[2m[WebServer] [22mHTTP POST /api/processos/412/acao-em-bloco 38ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=17&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=17 5ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2121
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mUsuário ***2121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22mHTTP POST /api/usuarios/entrar 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=11 31ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=11&sort=dataHora,desc 33ms
+[2m[WebServer] [22mHTTP GET /api/processos/412/contexto-completo 5ms
+[2m[WebServer] [22mAceitando cadastro do subprocesso 412
+[2m[WebServer] [22mHTTP POST /api/processos/412/acao-em-bloco 23ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=11&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=11 4ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 11ms
+[2m[WebServer] [22mHTTP GET /api/processos/412/contexto-completo 5ms
+  ✓  15 [chromium] › e2e/captura.spec.ts:1150:9 › Captura de Telas - Sistema SGC › 09 - Operações em Bloco › Captura fluxo de aceitar cadastros em bloco (3.9s)
+[2m[WebServer] [22mLimpeza robusta do processo 412 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 2ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 7ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 26ms
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 413
+[2m[WebServer] [22mNotificando início do processo 413
+[2m[WebServer] [22mProcesso 413 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/413/iniciar 25ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 8ms
+[2m[WebServer] [22mHTTP GET /api/processos/413/contexto-completo 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=413&siglaUnidade=SECAO_121 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/413/contexto-edicao 4ms
+  ✓  16 [chromium] › e2e/captura.spec.ts:1232:9 › Captura de Telas - Sistema SGC › 10 - Gestão de Subprocessos › Captura modais de gestão de subprocesso (4.0s)
+[2m[WebServer] [22mLimpeza robusta do processo 413 concluída.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 5ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades 1ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 1ms
+[2m[WebServer] [22mHTTP GET /api/unidades/10/arvore 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades/10/mapa-vigente/referencia 204 5ms
+[2m[WebServer] [22mHTTP GET /api/usuarios/171717 6ms
+[2m[WebServer] [22mHTTP GET /api/unidades/10 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades/10/arvore 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades/10/mapa-vigente/referencia 204 3ms
+[2m[WebServer] [22mHTTP GET /api/usuarios/171717 1ms
+[2m[WebServer] [22mHTTP GET /api/processos/finalizados 2ms
+[2m[WebServer] [22mHTTP GET /api/configuracoes 1ms
+[2m[WebServer] [22mHTTP GET /api/usuarios/administradores 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=100&unidade=1 11ms
+  ✓  17 [chromium] › e2e/captura.spec.ts:1278:9 › Captura de Telas - Sistema SGC › Admin - Consultas e Configurações › Captura telas administrativas (Unidades, Histórico, Configurações e Relatórios) (2.5s)
+[2m[WebServer] [22mTodos os caches de aplicação foram limpos.
+[2m[WebServer] [22mReset do banco de dados e caches concluído.
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 6ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 5ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=MAPEAMENTO 4ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 6ms
+[2m[WebServer] [22mCriando 1 subprocessos para o processo 400
+[2m[WebServer] [22mNotificando início do processo 400
+[2m[WebServer] [22mProcesso 400 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/400/iniciar 9ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 5ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***5555
+[2m[WebServer] [22mUsuário ***5555 autorizado: CHEFE-ASSESSORIA_11
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=3 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=3&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/contexto-cadastro-atividades/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 6ms
+[2m[WebServer] [22mHTTP GET /api/processos/para-importacao 3ms
+[2m[WebServer] [22mHTTP GET /api/processos/200/unidades-importacao 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/200/atividades-importacao 4ms
+[2m[WebServer] [22mImportando 1 atividades do mapa #200 para o mapa #400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/importar-atividades 12ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-cadastro-atividades 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/validar-cadastro 4ms
+[2m[WebServer] [22mDisponibilizando cadastro do subprocesso 400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/cadastro/disponibilizar 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=3 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=3&sort=dataHora,desc 3ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 6ms
+[2m[WebServer] [22mUsuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22mHTTP POST /api/usuarios/entrar 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 8ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 11ms
+[2m[WebServer] [22mHTTP GET /api/processos/400/contexto-completo 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 12ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 4ms
+[2m[WebServer] [22mAceitando cadastro do subprocesso 400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/aceitar-cadastro 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 2ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 2ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 47ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 20ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 25ms
+[2m[WebServer] [22mHTTP GET /api/processos/400/contexto-completo 12ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 8ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 5ms
+[2m[WebServer] [22mHomologando cadastro do subprocesso 400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/homologar-cadastro 7ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 3ms
+  ✓  18 [chromium] › e2e/jornada.spec.ts:16:5 › Jornada do Ciclo de Vida Completo do SGC › Fase 1: Mapeamento Inicial - Cadastro de Atividades (8.9s)
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 5ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 3ms
+[2m[WebServer] [22mHTTP GET /api/processos/400/contexto-completo 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 7ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 7ms
+[2m[WebServer] [22mCompetência criada
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/competencia 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 7ms
+[2m[WebServer] [22mDisponibilizando mapa do subprocesso 400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/disponibilizar-mapa 14ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 5ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***5555
+[2m[WebServer] [22mUsuário ***5555 autorizado: CHEFE-ASSESSORIA_11
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=3 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=3&sort=dataHora,desc 7ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 7ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/sigla/ASSESSORIA_11 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/mapa-visualizacao 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400 5ms
+[2m[WebServer] [22mValidado mapa do SP 400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/validar-mapa 11ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=3&sort=dataHora,desc 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=3 5ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mUsuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22mHTTP POST /api/usuarios/entrar 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 10ms
+[2m[WebServer] [22mHTTP GET /api/processos/400/contexto-completo 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/sigla/ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/mapa-visualizacao 2ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400 3ms
+[2m[WebServer] [22mValidação aceita para mapa do SP 400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/aceitar-validacao 13ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 3ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 12ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 10ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 15ms
+[2m[WebServer] [22mHTTP GET /api/processos/400/contexto-completo 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/contexto-edicao 4ms
+[2m[WebServer] [22mHTTP GET /api/unidades/sigla/ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400/mapa-visualizacao 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/400 3ms
+[2m[WebServer] [22mHomologando validação do mapa do subprocesso 400
+[2m[WebServer] [22mHTTP POST /api/subprocessos/400/homologar-validacao 7ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 9ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 10ms
+[2m[WebServer] [22mHTTP GET /api/processos/400/contexto-completo 4ms
+[2m[WebServer] [22mNotificando finalização do processo 400
+[2m[WebServer] [22mProcesso 400 finalizado
+[2m[WebServer] [22mHTTP POST /api/processos/400/finalizar 12ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 2ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 2ms
+  ✓  19 [chromium] › e2e/jornada.spec.ts:23:5 › Jornada do Ciclo de Vida Completo do SGC › Fase 2: Elaboração e Homologação do Mapa (8.9s)
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 2ms
+[2m[WebServer] [22mHTTP GET /api/unidades/diagnostico-organizacional 5ms
+[2m[WebServer] [22mHTTP GET /api/unidades/arvore-com-elegibilidade?tipoProcesso=REVISAO 4ms
+[2m[WebServer] [22mProcesso criado com 1 unidades participantes
+[2m[WebServer] [22mHTTP POST /api/processos 201 11ms
+[2m[WebServer] [22mCriado subprocesso para unidade ASSESSORIA_11
+[2m[WebServer] [22mNotificando início do processo 401
+[2m[WebServer] [22mProcesso 401 iniciado para 1 unidades.
+[2m[WebServer] [22mHTTP POST /api/processos/401/iniciar 14ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 6ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***5555
+[2m[WebServer] [22mUsuário ***5555 autorizado: CHEFE-ASSESSORIA_11
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 12ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=3 6ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=3&sort=dataHora,desc 10ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 13ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/contexto-edicao 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/contexto-cadastro-atividades/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 10ms
+[2m[WebServer] [22mSubprocesso 401 (REVISAO) movido para em andamento
+[2m[WebServer] [22mConhecimento criado na atividade 4001
+[2m[WebServer] [22mHTTP POST /api/atividades/4001/conhecimentos 201 10ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/validar-cadastro 92ms
+[2m[WebServer] [22mDisponibilizando revisão do subprocesso 401
+[2m[WebServer] [22mHTTP POST /api/subprocessos/401/disponibilizar-revisao 36ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=3&sort=dataHora,desc 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=3 4ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 3ms
+[2m[WebServer] [22mUsuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22mHTTP POST /api/usuarios/entrar 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 5ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 7ms
+[2m[WebServer] [22mHTTP GET /api/processos/401/contexto-completo 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/contexto-edicao 18ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 6ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/contexto-edicao 5ms
+[2m[WebServer] [22mAceitando revisão do subprocesso 401
+[2m[WebServer] [22mHTTP POST /api/subprocessos/401/aceitar-revisao-cadastro 11ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=2 3ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=2&sort=dataHora,desc 3ms
+[2m[WebServer] [22mUsuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22mUsuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22mHTTP POST /api/usuarios/login 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/processos?page=0&size=10&unidade=1 4ms
+[2m[WebServer] [22mHTTP GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc 5ms
+[2m[WebServer] [22mHTTP GET /api/processos/401/contexto-completo 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 3ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/contexto-edicao 4ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/contexto-edicao 5ms
+[2m[WebServer] [22mHomologando revisão do subprocesso 401
+[2m[WebServer] [22mHTTP POST /api/subprocessos/401/homologar-revisao-cadastro 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 5ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/contexto-edicao 4ms
+  ✓  20 [chromium] › e2e/jornada.spec.ts:30:5 › Jornada do Ciclo de Vida Completo do SGC › Fase 3: Ciclo de Revisão e Manutenção (8.7s)
+[2m[WebServer] [22mHTTP GET /api/subprocessos/buscar?codProcesso=401&siglaUnidade=ASSESSORIA_11 9ms
+[2m[WebServer] [22mHTTP GET /api/subprocessos/401/contexto-edicao 5ms
+
+  20 passed (1.4m)

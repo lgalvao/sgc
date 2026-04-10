@@ -14,6 +14,7 @@ Importante:
 - as prioridades abaixo valorizam repetição por fluxo e impacto em tela, não apenas picos isolados
 - `captura.spec.ts` e `jornada.spec.ts` devem ser tratados como reality check principal de fluxos representativos
 - a primeira coleta dedicada desses dois cenários foi invalidada por reaproveitamento indevido de infra antiga; o endurecimento foi aplicado em [playwright.config.ts](/Users/leonardo/sgc/playwright.config.ts) e [lifecycle.js](/Users/leonardo/sgc/e2e/lifecycle.js)
+- a coleta válida e mais recente desses cenários está em [monitoramento-reality-check.txt](/Users/leonardo/sgc/e2e/monitoramento-reality-check.txt)
 
 ## Hotspots observados
 
@@ -35,6 +36,8 @@ Esses endpoints apareceram como os mais frequentes da amostra monitorada e se re
 - a entrada da tela sempre dispara duas chamadas independentes em paralelo
 - a reativação da view também pode disparar recarga integral
 - a ordenação volta ao backend para recarregar `processos`
+- no reality check de [monitoramento-reality-check.txt](/Users/leonardo/sgc/e2e/monitoramento-reality-check.txt), `painel/processos` e `painel/alertas` seguiram liderando a frequência em `captura.spec.ts`
+- no mesmo reality check, eles aparecem repetidamente também em `jornada.spec.ts`, sobretudo após login, troca de papel e retorno de ações
 
 #### Hipóteses
 
@@ -58,6 +61,7 @@ Essas rotas aparecem repetidamente em múltiplos fluxos de processo.
 - convivem com outras chamadas complementares para subprocessos e árvore de unidades
 - podem estar entregando mais informação que a tela usa imediatamente
 - `GET /api/processos/400/contexto-completo` apareceu 26 vezes na execução integral
+- no reality check, `GET /api/processos/400/contexto-completo` apareceu 4 vezes só na jornada do ciclo completo
 
 #### Hipóteses
 
@@ -81,6 +85,9 @@ Essas rotas aparecem em cascata e com repetição em várias jornadas.
 - navegação por cards/modais parece recompor contexto já conhecido
 - `GET /api/subprocessos/400/contexto-edicao` apareceu 33 vezes na execução integral
 - a repetição em poucos códigos sugere reabertura do mesmo contexto dentro do mesmo fluxo
+- no reality check, `GET /api/subprocessos/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_11` apareceu 9 vezes em `jornada.spec.ts`
+- no reality check, `GET /api/subprocessos/400/contexto-edicao` apareceu 7 vezes em `jornada.spec.ts`
+- o mesmo padrão reaparece para o processo de revisão `401`
 
 #### Hipóteses
 
@@ -101,6 +108,8 @@ Essas rotas aparecem em cascata e com repetição em várias jornadas.
 
 - `cadastro/disponibilizar` apareceu como outlier relevante
 - outras ações de workflow ficaram em geral rápidas, mas devem ser revisitadas com tracing interno
+- no reality check, o outlier mais claro de `captura.spec.ts` foi `POST /api/subprocessos/405/cadastro/disponibilizar` com 143 ms
+- no reality check, o ponto mais suspeito de `jornada.spec.ts` foi `GET /api/subprocessos/401/validar-cadastro` com 92 ms
 
 #### Hipóteses
 
@@ -206,6 +215,7 @@ Descobrir quem dispara:
 - confirmado que o painel não chama `diagnostico-organizacional`
 - confirmado que o painel chama apenas `painel/processos` e `painel/alertas`
 - confirmado que o retorno para a rota pode recarregar ambos os blocos por `onActivated`
+- confirmado pelo reality check que essas chamadas continuam dominando a navegação real, não apenas a suíte completa
 
 ### Item 1.2
 
@@ -251,6 +261,26 @@ Trocar hipótese genérica de fan-out interno por evidência concreta de consult
 - medir o custo relativo de `listarCodigosPorParticipantesESituacaoDiferente` versus `listarPorCodigosComParticipantes`
 - medir o custo de `alertaFacade.listarPorUnidade`, `obterMapaDataHoraLeitura` e `marcarComoLidos`
 - verificar se a montagem de `unidadesParticipantes` no painel está puxando trabalho demais para cada item
+
+## Bloco 2A: sequência de leitura do subprocesso
+
+### Item 2A.1
+
+Rastrear e racionalizar o trio `processos/{codigo}/contexto-completo` + `subprocessos/buscar` + `subprocessos/{codigo}/contexto-edicao`.
+
+### Objetivo
+
+Entender por que a mesma navegação reabre repetidamente o mesmo contexto dentro de `jornada.spec.ts`.
+
+### Saída esperada
+
+- grafo exato de requests por tela
+- identificação de reabertura redundante
+- proposta de cache ou consolidação orientada ao fluxo
+
+### Prioridade
+
+Alta. O padrão apareceu de forma limpa no reality check e não parece ser mero artefato da suíte completa.
 
 ### Item 1.3
 
@@ -394,9 +424,9 @@ Separar custo de:
 ## Sequência sugerida
 
 1. Painel backend
-2. Diagnóstico organizacional e elegibilidade
-3. Processo `contexto-completo`
-4. Subprocesso `contexto-edicao`
+2. Sequência de leitura do subprocesso
+3. Diagnóstico organizacional e elegibilidade
+4. Processo `contexto-completo`
 5. `cadastro/disponibilizar`
 
 ## Entregáveis esperados das próximas rodadas
