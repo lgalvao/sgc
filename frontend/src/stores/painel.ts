@@ -14,6 +14,7 @@ export const usePainelStore = defineStore("painel", () => {
     const processos = ref<ProcessoResumo[]>([]);
     const alertas = ref<Alerta[]>([]);
     const carregado = ref(false);
+    const codigosMarcadosComoLidos = ref(new Set<number>());
 
     function definirDados(novosProcessos: ProcessoResumo[], novosAlertas: Alerta[]) {
         processos.value = novosProcessos;
@@ -29,5 +30,22 @@ export const usePainelStore = defineStore("painel", () => {
         return carregado.value;
     }
 
-    return {processos, alertas, carregado, definirDados, invalidar, dadosValidos};
+    function registrarLeitura(codigos: number[]) {
+        codigos.forEach(c => codigosMarcadosComoLidos.value.add(c));
+    }
+
+    function isMarcadoComoLido(codigo: number): boolean {
+        return codigosMarcadosComoLidos.value.has(codigo);
+    }
+
+    return {
+        processos,
+        alertas,
+        carregado,
+        definirDados,
+        invalidar,
+        dadosValidos,
+        registrarLeitura,
+        isMarcadoComoLido
+    };
 });

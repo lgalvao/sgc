@@ -129,9 +129,10 @@ async function carregarDados() {
 
     // Marcar não lidos como lidos: fire-and-forget, não bloqueia a tela
     const codigosNaoLidos = bootstrap.alertas
-        .filter((a: Alerta) => !a.dataHoraLeitura)
+        .filter((a: Alerta) => !a.dataHoraLeitura && !painelStore.isMarcadoComoLido(a.codigo))
         .map((a: Alerta) => a.codigo);
     if (codigosNaoLidos.length > 0) {
+      painelStore.registrarLeitura(codigosNaoLidos);
       painelService.marcarAlertasLidos(codigosNaoLidos).catch(() => {/* silencioso: não crítico para a UI */});
     }
   } finally {

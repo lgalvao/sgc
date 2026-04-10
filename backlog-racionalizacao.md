@@ -19,7 +19,7 @@ Importante:
 
 ## Hotspots observados
 
-### Hotspot 1: painel
+### Hotspot 1: painel [RESOLVIDO]
 
 #### Evidência
 
@@ -47,7 +47,7 @@ Esses endpoints apareceram como os mais frequentes da amostra monitorada e se re
 - `alertas` pode estar fazendo mais trabalho que o necessário
 - existe oportunidade de cache curto ou reuso local por unidade/perfil
 
-## Hotspot 2: contexto de processo
+## Hotspot 2: contexto de processo [OTIMIZADO]
 
 #### Evidência
 
@@ -70,7 +70,7 @@ Essas rotas aparecem repetidamente em múltiplos fluxos de processo.
 - reentrada em tela disparando recarga integral
 - oportunidade de segmentação por aba/estado ou cache local
 
-## Hotspot 3: contexto de subprocesso
+## Hotspot 3: contexto de subprocesso [RESOLVIDO]
 
 #### Evidência
 
@@ -296,7 +296,7 @@ Reduzir round-trips de entrada de tela.
 - proposta de contrato
 - custo/benefício de adoção
 
-## Bloco 1A: diagnóstico organizacional e elegibilidade
+## Bloco 1A: diagnóstico organizacional e elegibilidade [RESOLVIDO]
 
 ### Item 1A.1
 
@@ -451,4 +451,7 @@ Separar custo de:
 
 ## Próximo passo recomendado
 
-Executar o item 1.2.1 e o bloco 1A em paralelo, começando pelo backend do painel e pelos chamadores administrativos de frontend.
+Investigar as 7 falhas remanescentes na suíte E2E que não estão relacionadas à performance (CDU-10, 17, 19, 20, 23).
+
+---
+*Atualizado em 10/04/2026: Consolidação de bootstrap do painel, cache de unidades e cache de subprocessos implementados e validados.*

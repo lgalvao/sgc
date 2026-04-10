@@ -2,6 +2,7 @@ package sgc.alerta;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -252,7 +253,12 @@ public class AlertaFacade {
         }
 
         if (!alertasUsuariosParaSalvar.isEmpty()) {
-            alertaService.salvarAlertasUsuarios(alertasUsuariosParaSalvar);
+            try {
+                alertaService.salvarAlertasUsuarios(alertasUsuariosParaSalvar);
+            } catch (DataIntegrityViolationException e) {
+                log.warn("Concorrência ao marcar alertas como lidos para usuário {}: {}", usuarioTitulo, e.getMessage());
+                // Silencioso: se já foi marcado por outra thread, o objetivo foi atingido.
+            }
         }
     }
 
