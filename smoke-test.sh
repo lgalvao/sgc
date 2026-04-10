@@ -9,18 +9,18 @@ echo "[smoke-test] backend:test"
 ./gradlew :backend:test -q
 
 echo "[smoke-test] typecheck"
-npm run typecheck
+npm run typecheck -s
 
 echo "[smoke-test] lint"
-npm run lint
+npm run lint -s
 
 echo "[smoke-test] frontend vitest"
 (
   cd frontend
-  npx vitest run --changed
+  npx vitest run --silent
 )
 
 echo "[smoke-test] playwright captura"
-npx playwright test captura
+npx playwright test captura --quiet
 
 echo "[smoke-test] concluido"

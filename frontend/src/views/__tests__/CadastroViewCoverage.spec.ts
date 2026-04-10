@@ -6,7 +6,7 @@ import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {ContextoCadastroAtividadesSubprocesso, MapaResumo, PermissoesSubprocesso, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
+import type {ContextoCadastroAtividadesSubprocesso, MapaResumo, PermissoesSubprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
 import {contarChamadas} from "@/test-utils/orcamentoChamadas";

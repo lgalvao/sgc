@@ -73,7 +73,10 @@ public class UsuarioService {
     }
 
     public List<Perfil> buscarPerfisPorUsuarioTitulo(String usuarioTitulo) {
-        return usuarioPerfilCacheService.buscarPerfisPorUsuarioTitulo(usuarioTitulo);
+        return buscarAutorizacoesPerfil(usuarioTitulo).stream()
+                .map(UsuarioPerfilAutorizacaoLeitura::perfil)
+                .distinct()
+                .toList();
     }
 
     public void carregarAuthorities(Usuario usuario) {

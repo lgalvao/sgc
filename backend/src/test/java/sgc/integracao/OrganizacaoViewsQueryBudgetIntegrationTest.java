@@ -52,6 +52,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
         assertThat(contarQueriesViews(() -> usuarioService.buscarPorUnidadeLotacao(amostras.codigoUnidadeLotacao()))).isLessThanOrEqualTo(2);
         assertThat(contarQueriesViews(() -> usuarioService.pesquisarPorNome(amostras.termoBuscaUsuario()))).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(() -> usuarioService.buscarAutorizacoesPerfil(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> usuarioService.buscarPerfisPorUsuarioTitulo(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsavelAtual(amostras.siglaUnidadeComResponsavel()))).isLessThanOrEqualTo(3);
         assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsaveisUnidades(amostras.codigosUnidadesComResponsavel()))).isLessThanOrEqualTo(2);
     }
@@ -71,6 +72,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
         AmostrasConsulta amostras = carregarAmostras();
         assertThat(contarQueriesViews(() -> usuarioService.buscarAutorizacoesPerfil(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(() -> usuarioService.buscarAutorizacoesPerfil(amostras.tituloUsuarioComPerfil()))).isZero();
+        assertThat(contarQueriesViews(() -> usuarioService.buscarPerfisPorUsuarioTitulo(amostras.tituloUsuarioComPerfil()))).isZero();
     }
 
     @Test
