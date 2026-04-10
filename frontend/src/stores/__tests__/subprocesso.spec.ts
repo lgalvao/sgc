@@ -1,0 +1,129 @@
+import {describe, expect, it, vi} from "vitest";
+import {useSubprocessoStore} from "../subprocesso";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
+import * as subprocessoService from "@/services/subprocessoService";
+import {logger} from "@/utils";
+
+vi.mock("@/services/subprocessoService");
+vi.mock("@/utils", async () => {
+    const actual = await vi.importActual("@/utils") as any;
+    return {
+        ...actual,
+        logger: {
+            error: vi.fn(),
+        },
+    };
+});
+
+describe("subprocesso store", () => {
+    const context = setupStoreTest(useSubprocessoStore);
+
+    it("deve inicializar com estado padrão", () => {
+        expect(context.store.contextoEdicao).toBeNull();
+        expect(context.store.codSubprocessoCarregado).toBeNull();
+        expect(context.store.invalido).toBe(true);
+    });
+
+    it("dadosValidos deve retornar false se estiver inválido", () => {
+        context.store.invalido = true;
+        context.store.codSubprocessoCarregado = 1;
+        context.store.contextoEdicao = {} as any;
+        expect(context.store.dadosValidos(1)).toBe(false);
+    });
+
+    it("dadosValidos deve retornar false para outro código de subprocesso", () => {
+        context.store.invalido = false;
+        context.store.codSubprocessoCarregado = 1;
+        context.store.contextoEdicao = {} as any;
+        expect(context.store.dadosValidos(2)).toBe(false);
+    });
+
+    it("dadosValidos deve retornar true se estiver válido e com código correto", () => {
+        context.store.invalido = false;
+        context.store.codSubprocessoCarregado = 1;
+        context.store.contextoEdicao = {} as any;
+        expect(context.store.dadosValidos(1)).toBe(true);
+    });
+
+    it("invalidar deve marcar como inválido", () => {
+        context.store.invalido = false;
+        context.store.invalidar();
+        expect(context.store.invalido).toBe(true);
+    });
+
+    describe("garantirContextoEdicao", () => {
+        it("deve usar cache se dados forem válidos", async () => {
+            const mockContexto = {codigo: 1} as any;
+            context.store.invalido = false;
+            context.store.codSubprocessoCarregado = 1;
+            context.store.contextoEdicao = mockContexto;
+
+            const result = await context.store.garantirContextoEdicao(1);
+
+            expect(subprocessoService.buscarContextoEdicao).not.toHaveBeenCalled();
+            expect(result).toEqual(mockContexto);
+        });
+
+        it("deve buscar do service se cache for inválido", async () => {
+            const mockContexto = {codigo: 1} as any;
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(mockContexto);
+
+            const result = await context.store.garantirContextoEdicao(1);
+
+            expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledWith(1);
+            expect(result).toEqual(mockContexto);
+            expect(context.store.contextoEdicao).toEqual(mockContexto);
+            expect(context.store.codSubprocessoCarregado).toBe(1);
+            expect(context.store.invalido).toBe(false);
+        });
+
+        it("deve retornar null e logar erro se o service falhar", async () => {
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue(new Error("Erro API"));
+
+            const result = await context.store.garantirContextoEdicao(1);
+
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalled();
+        });
+    });
+
+    describe("garantirContextoEdicaoPorProcessoEUnidade", () => {
+        it("deve usar cache se já houver contexto para a mesma unidade", async () => {
+            const mockContexto = {detalhes: {unidade: {sigla: "TEST"}}} as any;
+            context.store.invalido = false;
+            context.store.codSubprocessoCarregado = 10;
+            context.store.contextoEdicao = mockContexto;
+
+            const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+
+            expect(subprocessoService.buscarSubprocessoPorProcessoEUnidade).not.toHaveBeenCalled();
+            expect(result).toEqual({codigo: 10, contexto: mockContexto});
+        });
+
+        it("deve buscar do service se não houver cache para a unidade", async () => {
+            const mockSubprocesso = {codigo: 20};
+            const mockContexto = {detalhes: {unidade: {sigla: "TEST"}}} as any;
+
+            vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(mockSubprocesso as any);
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(mockContexto);
+
+            const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+
+            expect(subprocessoService.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST");
+            expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledWith(20);
+            expect(result).toEqual({codigo: 20, contexto: mockContexto});
+            expect(context.store.contextoEdicao).toEqual(mockContexto);
+            expect(context.store.codSubprocessoCarregado).toBe(20);
+            expect(context.store.invalido).toBe(false);
+        });
+
+        it("deve retornar null e logar erro se a busca falhar", async () => {
+            vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockRejectedValue(new Error("Erro API"));
+
+            const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalled();
+        });
+    });
+});

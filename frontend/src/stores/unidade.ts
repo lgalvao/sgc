@@ -52,6 +52,7 @@ export const useUnidadeStore = defineStore("unidade", () => {
     }
 
     return {
+        cacheArvoreElegibilidade,
         garantirArvoreElegibilidade,
         invalidarCache
     };
