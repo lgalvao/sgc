@@ -10,7 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.*;
+import org.springframework.security.web.context.*;
 import org.springframework.web.cors.*;
+import sgc.comum.util.*;
 import sgc.organizacao.*;
 import sgc.seguranca.*;
 import sgc.seguranca.login.*;
@@ -60,7 +62,9 @@ public class E2eSecurityConfig {
      * a autenticação para outros endpoints da API.
      */
     @Bean
-    public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http, FiltroJwt filtroJwt) {
+    public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http,
+                                                      FiltroJwt filtroJwt,
+                                                      FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/login",
                                 "/api/usuarios/entrar",
@@ -83,6 +87,7 @@ public class E2eSecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 }))
+                .addFilterBefore(filtroMonitoramentoHttp, SecurityContextHolderFilter.class)
                 .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

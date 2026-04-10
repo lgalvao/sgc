@@ -72,8 +72,11 @@ aplicacao:
 
 sgc:
   monitoramento:
+    ativo: false
     trace-completo: false
     limite-alerta-ms: 500
+    permitir-ativacao-por-header: true
+    taxa-amostragem: 0.0
 
 ---
 spring:

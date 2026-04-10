@@ -13,9 +13,11 @@ import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.*;
+import org.springframework.security.web.context.*;
 import org.springframework.security.web.csrf.*;
 import org.springframework.web.filter.*;
 import org.springframework.web.cors.*;
+import sgc.comum.util.*;
 import sgc.organizacao.*;
 import sgc.seguranca.*;
 import sgc.seguranca.login.*;
@@ -62,7 +64,8 @@ public class ConfigSeguranca {
     @Bean("defaultSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    CorsConfigurationSource corsConfigurationSource,
-                                                   FiltroJwt filtroJwt) {
+                                                   FiltroJwt filtroJwt,
+                                                   FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/login",
                                 "/api/usuarios/entrar")
@@ -105,6 +108,7 @@ public class ConfigSeguranca {
                         filterChain.doFilter(request, response);
                     }
                 }, CsrfFilter.class)
+                .addFilterBefore(filtroMonitoramentoHttp, SecurityContextHolderFilter.class)
                 .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

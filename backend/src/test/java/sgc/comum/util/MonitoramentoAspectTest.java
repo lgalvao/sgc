@@ -12,7 +12,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do Aspecto de Monitoramento")
 class MonitoramentoAspectTest {
-    private final MonitoramentoAspect aspect = new MonitoramentoAspect();
+    private final MonitoramentoAspect aspect = new MonitoramentoAspect(true, false, 500);
+    private final MonitoramentoAspect aspectInativo = new MonitoramentoAspect(false, false, 500);
 
     @Mock
     private ProceedingJoinPoint joinPoint;
@@ -27,6 +28,17 @@ class MonitoramentoAspectTest {
         Object result = aspect.monitorarExecucao(joinPoint);
 
         assertThat(result).isEqualTo("OK");
+    }
+
+    @Test
+    @DisplayName("Deve executar sem monitoramento quando estiver inativo")
+    void deveExecutarSemMonitoramentoQuandoInativo() throws Throwable {
+        when(joinPoint.proceed()).thenReturn("OK");
+
+        Object result = aspectInativo.monitorarExecucao(joinPoint);
+
+        assertThat(result).isEqualTo("OK");
+        verify(joinPoint).proceed();
     }
 
     @Test
@@ -49,7 +61,7 @@ class MonitoramentoAspectTest {
     @Test
     @DisplayName("Deve executar com trace completo mesmo sem assinatura")
     void deveExecutarComTraceCompletoSemAssinatura() throws Throwable {
-        MonitoramentoAspect aspectoComTrace = new MonitoramentoAspect(true, 1_000);
+        MonitoramentoAspect aspectoComTrace = new MonitoramentoAspect(true, true, 1_000);
         when(joinPoint.getSignature()).thenReturn(null);
         when(joinPoint.proceed()).thenReturn("TRACE");
 

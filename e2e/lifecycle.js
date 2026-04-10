@@ -18,6 +18,9 @@ const FRONTEND_PORT = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 1
 const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
 const DB_NAME_PREFIX = process.env.E2E_DB_NAME_PREFIX || 'sgc-e2e-w';
 const MAX_BACKEND_PORT_SCAN = Number.parseInt(process.env.E2E_BACKEND_PORT_SCAN_LIMIT || '20', 10);
+const MODO_MONITORAMENTO = process.env.SGC_MONITORAMENTO || 'off';
+const LIMITE_MONITORAMENTO_ALERTA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_ALERTA_MS || '500', 10);
+const TAXA_AMOSTRAGEM_MONITORAMENTO = process.env.SGC_MONITORAMENTO_AMOSTRAGEM || '0.0';
 
 const backendProcessos = [];
 const frontendProcessos = [];
@@ -169,6 +172,28 @@ function validarPerfilLifecycle() {
     }
 }
 
+function validarModoMonitoramento() {
+    const modosSuportados = new Set(['off', 'lento', 'sob-demanda', 'full']);
+    if (!modosSuportados.has(MODO_MONITORAMENTO)) {
+        throw new Error(
+            `Modo de monitoramento inválido: ${MODO_MONITORAMENTO}. ` +
+            'Use SGC_MONITORAMENTO=off, lento, sob-demanda ou full.'
+        );
+    }
+}
+
+function monitoramentoAtivo() {
+    return MODO_MONITORAMENTO !== 'off';
+}
+
+function monitoramentoTraceCompleto() {
+    return MODO_MONITORAMENTO === 'full';
+}
+
+function monitoramentoPermiteHeader() {
+    return MODO_MONITORAMENTO === 'sob-demanda' || monitoramentoTraceCompleto();
+}
+
 function requestStatus(url, method = 'GET') {
     return new Promise((resolve) => {
         const req = http.request(url, {method}, (res) => {
@@ -227,12 +252,22 @@ function startBackend() {
     const argsAplicacao = modoHomologacao()
         ? [
             `--server.port=${backendPort}`,
-            `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
+            `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`,
+            `--sgc.monitoramento.ativo=${monitoramentoAtivo()}`,
+            `--sgc.monitoramento.trace-completo=${monitoramentoTraceCompleto()}`,
+            `--sgc.monitoramento.limite-alerta-ms=${LIMITE_MONITORAMENTO_ALERTA_MS}`,
+            `--sgc.monitoramento.permitir-ativacao-por-header=${monitoramentoPermiteHeader()}`,
+            `--sgc.monitoramento.taxa-amostragem=${TAXA_AMOSTRAGEM_MONITORAMENTO}`
         ].join(' ')
         : [
             `--server.port=${backendPort}`,
             `--spring.datasource.url=${dbUrl()}`,
-            `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
+            `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`,
+            `--sgc.monitoramento.ativo=${monitoramentoAtivo()}`,
+            `--sgc.monitoramento.trace-completo=${monitoramentoTraceCompleto()}`,
+            `--sgc.monitoramento.limite-alerta-ms=${LIMITE_MONITORAMENTO_ALERTA_MS}`,
+            `--sgc.monitoramento.permitir-ativacao-por-header=${monitoramentoPermiteHeader()}`,
+            `--sgc.monitoramento.taxa-amostragem=${TAXA_AMOSTRAGEM_MONITORAMENTO}`
         ].join(' ');
     const argsGradle = isWindows ? `--args="${argsAplicacao}"` : `--args=${argsAplicacao}`;
 
@@ -267,7 +302,8 @@ function startFrontend() {
         env: {
             ...normalizarEnv(),
             E2E_BACKEND_BASE_PORT: String(BACKEND_BASE_PORT),
-            E2E_WORKER_COUNT: '1'
+            E2E_WORKER_COUNT: '1',
+            VITE_MONITORAMENTO_MODO: MODO_MONITORAMENTO
         }
     };
 
@@ -405,6 +441,7 @@ function descreverBackends() {
 
 try {
     validarPerfilLifecycle();
+    validarModoMonitoramento();
     if (modoE2e() || modoHomologacao()) {
         startSmtpServer();
     } else {
@@ -414,8 +451,15 @@ try {
     }
     await subirInfra();
     lifecycleLogger.info(
-        `>>> Infra ${PERFIL_LIFECYCLE.toUpperCase()} no ar. Frontend: ${FRONTEND_PORT}. ${descreverBackends()}.`
+        `>>> Infra ${PERFIL_LIFECYCLE.toUpperCase()} no ar. Frontend: ${FRONTEND_PORT}. ` +
+        `${descreverBackends()}. Monitoramento: ${MODO_MONITORAMENTO}.`
     );
+    if (MODO_MONITORAMENTO === 'sob-demanda') {
+        lifecycleLogger.info(
+            '>>> Ative no navegador com sessionStorage.setItem(\'sgc.monitoramento.ativo\', \'true\') ' +
+            'ou usando ?monitoramento=1.'
+        );
+    }
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);
     process.exit(1);

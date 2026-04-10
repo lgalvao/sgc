@@ -17,10 +17,10 @@ npm run lint -s
 echo "[smoke-test] frontend vitest"
 (
   cd frontend
-  npx vitest run --silent
+  npx vitest run --reporter=dot --silent
 )
 
 echo "[smoke-test] playwright captura"
-npx playwright test captura --quiet
+npx playwright test captura --reporter=line
 
 echo "[smoke-test] concluido"

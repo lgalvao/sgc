@@ -3,7 +3,6 @@ package sgc.comum.util;
 import lombok.extern.slf4j.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.util.*;
 
@@ -13,24 +12,35 @@ import java.util.concurrent.atomic.*;
 @Component
 @Slf4j
 public class MonitoramentoAspect {
+    private final boolean ativo;
     private final boolean traceCompleto;
     private final long limiteAlertaMs;
     private final AtomicLong contadorChamadas = new AtomicLong();
 
     public MonitoramentoAspect() {
-        this(false, 500);
+        this(false, false, 500);
     }
 
-    public MonitoramentoAspect(
-            @Value("${sgc.monitoramento.trace-completo:false}") boolean traceCompleto,
-            @Value("${sgc.monitoramento.limite-alerta-ms:500}") long limiteAlertaMs
-    ) {
+    public MonitoramentoAspect(boolean ativo, boolean traceCompleto, long limiteAlertaMs) {
+        this.ativo = ativo;
         this.traceCompleto = traceCompleto;
         this.limiteAlertaMs = limiteAlertaMs;
     }
 
+    public MonitoramentoAspect(MonitoramentoProperties monitoramentoProperties) {
+        this(
+                monitoramentoProperties.isAtivo(),
+                monitoramentoProperties.isTraceCompleto(),
+                monitoramentoProperties.getLimiteAlertaMs()
+        );
+    }
+
     @Around("execution(* sgc..*Service.*(..)) || execution(* sgc..*Repo.*(..))")
     public Object monitorarExecucao(ProceedingJoinPoint joinPoint) throws Throwable {
+        if (!ativo) {
+            return joinPoint.proceed();
+        }
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -43,15 +53,19 @@ public class MonitoramentoAspect {
             Signature assinatura = joinPoint.getSignature();
             String classe = assinatura != null ? assinatura.getDeclaringTypeName() : joinPoint.getClass().getName();
             String metodo = assinatura != null ? assinatura.getName() : "desconhecido";
+            String correlacaoId = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
+            boolean monitoramentoDetalhado = traceCompleto || FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao();
 
-            if (traceCompleto) {
-                log.info("EXECUCAO MONITORADA #{}: {}.{} levou {} ms",
+            if (monitoramentoDetalhado) {
+                log.info("EXECUCAO MONITORADA #{} [{}]: {}.{} levou {} ms",
                         numeroChamada,
+                        correlacaoId,
                         classe,
                         metodo,
                         tempoTotal);
             } else if (tempoTotal > limiteAlertaMs) {
-                log.warn("EXECUCAO LENTA: {}.{} levou {} ms",
+                log.warn("EXECUCAO LENTA [{}]: {}.{} levou {} ms",
+                        correlacaoId,
                         classe,
                         metodo,
                         tempoTotal);

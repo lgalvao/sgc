@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.*;
 @EnableAsync
 @EnableScheduling
 @ConfigurationPropertiesScan
+@EnableConfigurationProperties(sgc.comum.util.MonitoramentoProperties.class)
 @SpringBootApplication(excludeName = {
         "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
 })

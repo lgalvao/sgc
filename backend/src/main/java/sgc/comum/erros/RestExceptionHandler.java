@@ -10,6 +10,7 @@ import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
+import sgc.comum.util.*;
 import sgc.seguranca.sanitizacao.*;
 
 import java.util.*;
@@ -56,6 +57,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return atual;
     }
 
+    private String gerarTraceId() {
+        return FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
+    }
+
 
 
     /**
@@ -64,7 +69,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(ErroNegocioBase.class)
     protected ResponseEntity<ErroApi> handleErroNegocio(ErroNegocioBase ex) {
-        String traceId = UUID.randomUUID().toString();
+        String traceId = gerarTraceId();
 
         if (ex.getStatus().is4xxClientError()) {
             log.warn("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage());
@@ -105,7 +110,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
 
-        String traceId = UUID.randomUUID().toString();
+        String traceId = gerarTraceId();
         Throwable causaRaiz = obterCausaRaiz(ex);
         String requisicao = descreverRequisicao(request);
 
@@ -150,7 +155,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErroApi> handleConstraintViolationException(
             ConstraintViolationException ex) {
-        String traceId = UUID.randomUUID().toString();
+        String traceId = gerarTraceId();
         log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém dados inválidos.";
         var subErrors = ex.getConstraintViolations().stream().map(violation -> new ErroSubApi(
@@ -175,7 +180,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ErroApi> handleErroAutenticacao(ErroAutenticacao ex) {
         log.warn("Erro de autenticação: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO",
-                UUID.randomUUID().toString()));
+                gerarTraceId()));
     }
 
     /**
@@ -186,7 +191,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(ErroInterno.class)
     protected ResponseEntity<ErroApi> handleErroInterno(ErroInterno ex) {
-        String traceId = UUID.randomUUID().toString();
+        String traceId = gerarTraceId();
         log.error("[{}] ERRO INTERNO DO SISTEMA - BUG DETECTADO: {}",
                 traceId, ex.getMessage(), ex);
 
@@ -197,7 +202,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<ErroApi> handleIllegalStateException(IllegalStateException ex) {
-        String traceId = UUID.randomUUID().toString();
+        String traceId = gerarTraceId();
         log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
         String message = "ESTADO ILEGAL: " + ex.getMessage();
         ErroApi erroApi = new ErroApi(HttpStatus.CONFLICT, message, "ESTADO_ILEGAL", traceId);
@@ -206,7 +211,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     protected ResponseEntity<ErroApi> handleIllegalArgumentException(IllegalArgumentException ex) {
-        String traceId = UUID.randomUUID().toString();
+        String traceId = gerarTraceId();
         log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
         String message = "ARGUMENTO INVÁLIDO: " + ex.getMessage();
         ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, "ARGUMENTO_INVALIDO", traceId);
@@ -215,7 +220,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErroApi> handleGenericException(Exception ex) {
-        String traceId = UUID.randomUUID().toString();
+        String traceId = gerarTraceId();
         log.error("[{}] ERRO NÃO TRATADO DETECTADO: {}", traceId, ex.getMessage(), ex);
 
         String message = "ERRO INESPERADO: " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName());
