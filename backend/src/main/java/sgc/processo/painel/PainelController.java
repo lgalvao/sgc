@@ -12,6 +12,7 @@ import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.processo.dto.*;
+import sgc.processo.painel.dto.PainelBootstrapDto;
 
 import java.util.*;
 
@@ -23,6 +24,13 @@ import java.util.*;
 public class PainelController {
     private final PainelFacade painelFacade;
     private final UsuarioFacade usuarioFacade;
+
+    @GetMapping("/bootstrap")
+    @Operation(summary = "Obtém todos os dados iniciais do painel (processos e alertas) em uma única chamada")
+    public ResponseEntity<PainelBootstrapDto> obterBootstrap() {
+        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        return ResponseEntity.ok(painelFacade.obterBootstrap(contextoUsuario));
+    }
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.

@@ -54,7 +54,7 @@ public class MonitoramentoAspect {
             return joinPoint.proceed();
         } finally {
             stopWatch.stop();
-            long tempoTotal = stopWatch.getTotalTimeMillis();
+            long tempoTotal = stopWatch.getTotalTimeNanos();
             long numeroChamada = contadorChamadas.incrementAndGet();
             Signature assinatura = joinPoint.getSignature();
             String classe = assinatura != null ? assinatura.getDeclaringTypeName() : joinPoint.getClass().getName();
@@ -63,14 +63,14 @@ public class MonitoramentoAspect {
             boolean monitoramentoDetalhado = traceCompleto || FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao();
 
             if (monitoramentoDetalhado) {
-                log.info("TRACE #{} [{}] {}.{} {}ms",
+                log.info("TRACE #{} [{}] {}.{} {}ns",
                         numeroChamada,
                         correlacaoId,
                         classe,
                         metodo,
                         tempoTotal);
             } else if (tempoTotal > limiteAlertaMs) {
-                log.warn("TRACE-LENTO [{}] {}.{} {}ms",
+                log.warn("TRACE-LENTO [{}] {}.{} {}ns",
                         correlacaoId,
                         classe,
                         metodo,

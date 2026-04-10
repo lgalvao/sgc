@@ -27,6 +27,15 @@ vi.mock('@/services/unidadeService', () => ({
     mapUnidadesArray: vi.fn((arr) => arr || []),
 }));
 
+const unidadeStoreMock = {
+    garantirArvoreElegibilidade: vi.fn().mockResolvedValue([]),
+    invalidarCache: vi.fn(),
+};
+
+vi.mock('@/stores/unidade', () => ({
+    useUnidadeStore: () => unidadeStoreMock,
+}));
+
 const {mockPush, mockRoute} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
@@ -129,6 +138,7 @@ describe('ProcessoCadastroView.vue', () => {
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(null as any);
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
+        vi.mocked(unidadeStoreMock.garantirArvoreElegibilidade).mockResolvedValue([]);
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
             possuiViolacoes: false,
             resumo: '',
@@ -149,7 +159,7 @@ describe('ProcessoCadastroView.vue', () => {
     it('renders correctly in creation mode', async () => {
         const {wrapper} = createWrapper();
         expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
-        expect(unidadeService.buscarArvoreComElegibilidade).not.toHaveBeenCalled();
+        expect(unidadeStoreMock.garantirArvoreElegibilidade).not.toHaveBeenCalled();
         expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
     });
@@ -286,7 +296,7 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('updates an existing process', async () => {
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
             {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
         ] as any);
 
@@ -313,7 +323,7 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('initiates a process (confirmation flow)', async () => {
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
             {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
         ] as any);
 
@@ -339,7 +349,7 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('initiates an existing process', async () => {
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
             {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
         ] as any);
 
@@ -380,11 +390,11 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper} = createWrapper();
         wrapper.vm.tipo = 'REVISAO';
         await nextTick();
-        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith('REVISAO', undefined);
+        expect(unidadeStoreMock.garantirArvoreElegibilidade).toHaveBeenCalledWith('REVISAO', undefined);
     });
 
     it('remove unidades selecionadas inelegíveis ao trocar tipo para revisão', async () => {
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockImplementation(async (tipoProcesso: string) => {
+        unidadeStoreMock.garantirArvoreElegibilidade.mockImplementation(async (tipoProcesso: string) => {
             if (tipoProcesso === 'MAPEAMENTO') {
                 return [
                     {codigo: 1, sigla: 'ASSESSORIA_11', nome: 'A11', isElegivel: true, filhas: []},
@@ -573,7 +583,7 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('shows loading spinner when units are loading', async () => {
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockReturnValueOnce(new Promise(() => {}));
+        unidadeStoreMock.garantirArvoreElegibilidade.mockReturnValueOnce(new Promise(() => {}));
         const {wrapper} = createWrapper();
         wrapper.vm.tipo = 'MAPEAMENTO';
         await nextTick();

@@ -119,29 +119,16 @@ async function carregarDados() {
 
   carregandoPainel.value = true;
   try {
-    // Alertas: carrega tudo de uma vez (volume máximo: dezenas)
-    const [processosResponse, alertasResponse] = await Promise.all([
-      painelService.listarProcessos({
-        codUnidade: unidadeCodigo,
-        page: 0,
-        size: 10,
-      }),
-      painelService.listarAlertas({
-        codUnidade: unidadeCodigo,
-        page: 0,
-        size: 200,
-        sort: "dataHora",
-        order: "desc",
-      }),
-    ]);
+    // Bootstrap: carrega processos e alertas em um único round-trip
+    const bootstrap = await painelService.obterBootstrap();
 
     painelStore.definirDados(
-        processosResponse?.content ?? [],
-        alertasResponse.content
+        bootstrap.processos,
+        bootstrap.alertas
     );
 
     // Marcar não lidos como lidos: fire-and-forget, não bloqueia a tela
-    const codigosNaoLidos = alertasResponse.content
+    const codigosNaoLidos = bootstrap.alertas
         .filter((a: Alerta) => !a.dataHoraLeitura)
         .map((a: Alerta) => a.codigo);
     if (codigosNaoLidos.length > 0) {

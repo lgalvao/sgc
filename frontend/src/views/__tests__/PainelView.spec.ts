@@ -7,6 +7,7 @@ import * as painelService from '@/services/painelService';
 import {createMemoryHistory, createRouter} from 'vue-router';
 
 vi.mock('@/services/painelService', () => ({
+  obterBootstrap: vi.fn(),
   listarProcessos: vi.fn(),
   listarAlertas: vi.fn(),
   marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
@@ -84,19 +85,9 @@ function criarPromessaPendente<T>() {
 describe('PainelView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(painelService.listarProcessos).mockResolvedValue({
-      content: [{codigo: 1, descricao: 'Proc 1'}],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
-    } as any);
-    vi.mocked(painelService.listarAlertas).mockResolvedValue({
-      content: [{codigo: 1, mensagem: 'Alerta 1'}],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
+    vi.mocked(painelService.obterBootstrap).mockResolvedValue({
+      processos: [{codigo: 1, descricao: 'Proc 1'}],
+      alertas: [{codigo: 1, mensagem: 'Alerta 1'}],
     } as any);
   });
 
@@ -109,16 +100,13 @@ describe('PainelView', () => {
     mount(PainelView, options);
     await flushPromises();
 
-    expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});
-    expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 200, sort: 'dataHora', order: 'desc'});
+    expect(painelService.obterBootstrap).toHaveBeenCalled();
     expect(mockToastCreate).toHaveBeenCalledWith(expect.objectContaining({ props: expect.objectContaining({ body: 'Sucesso' }) }));
   });
 
-  it('deve manter o carregando ate processos e alertas concluirem', async () => {
-    const processos = criarPromessaPendente<any>();
-    const alertas = criarPromessaPendente<any>();
-    vi.mocked(painelService.listarProcessos).mockReturnValueOnce(processos.promise);
-    vi.mocked(painelService.listarAlertas).mockReturnValueOnce(alertas.promise);
+  it('deve manter o carregando ate o bootstrap concluir', async () => {
+    const bootstrapPromise = criarPromessaPendente<any>();
+    vi.mocked(painelService.obterBootstrap).mockReturnValueOnce(bootstrapPromise.promise);
 
     const wrapper = mount(PainelView, createMountOptions());
     await wrapper.vm.$nextTick();
@@ -126,22 +114,9 @@ describe('PainelView', () => {
     expect(wrapper.find('[data-testid="painel-carregando"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="tbl-processos"]').exists()).toBe(false);
 
-    processos.resolve({
-      content: [{codigo: 1, descricao: 'Proc 1'}],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
-    });
-    await flushPromises();
-    expect(wrapper.find('[data-testid="painel-carregando"]').exists()).toBe(true);
-
-    alertas.resolve({
-      content: [{codigo: 1, mensagem: 'Alerta 1'}],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
+    bootstrapPromise.resolve({
+      processos: [{codigo: 1, descricao: 'Proc 1'}],
+      alertas: [{codigo: 1, mensagem: 'Alerta 1'}],
     });
     await flushPromises();
 
@@ -149,10 +124,10 @@ describe('PainelView', () => {
     expect(wrapper.find('[data-testid="tbl-processos"]').exists()).toBe(true);
   });
 
-  it('nao deve carregar alertas se unidadeSelecionada for nula', async () => {
+  it('nao deve carregar dados se unidadeSelecionada for nula', async () => {
     const options = createMountOptions({ unidadeSelecionada: null });
     mount(PainelView, options);
-    expect(painelService.listarAlertas).not.toHaveBeenCalled();
+    expect(painelService.obterBootstrap).not.toHaveBeenCalled();
   });
 
   it('deve ordenar processos corretamente sem chamar o backend', async () => {
@@ -165,13 +140,13 @@ describe('PainelView', () => {
     vm.ordenarPor('descricao');
     expect(vm.asc).toBe(false);
     // Ordenação é local — não chama o backend
-    expect(painelService.listarProcessos).toHaveBeenCalledTimes(1); // apenas no onMounted
+    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1); // apenas no onMounted
 
     // Mudar critério
     vm.ordenarPor('dataCriacao');
     expect(vm.criterio).toBe('dataCriacao');
     expect(vm.asc).toBe(true);
-    expect(painelService.listarProcessos).toHaveBeenCalledTimes(1); // ainda apenas o onMounted
+    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1); // ainda apenas o onMounted
   });
 
   it('deve abrir detalhes do processo se linkDestino existir', async () => {

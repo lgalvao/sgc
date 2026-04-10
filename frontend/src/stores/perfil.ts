@@ -6,6 +6,8 @@ import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 import {useSessionStorage} from "@/composables/useSessionStorage";
+import {usePainelStore} from "@/stores/painel";
+import {useUnidadeStore} from "@/stores/unidade";
 
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage/sessionStorage usando composable
@@ -20,6 +22,8 @@ export const usePerfilStore = defineStore("perfil", () => {
     // Estados não persistidos
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
+    const painelStore = usePainelStore();
+    const unidadeStore = useUnidadeStore();
 
     // Map para lookup O(1) de perfil -> unidade
     const perfilUnidadeMap = computed(() =>
@@ -132,6 +136,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
+        painelStore.invalidar();
+        unidadeStore.invalidarCache();
     }
 
     return {

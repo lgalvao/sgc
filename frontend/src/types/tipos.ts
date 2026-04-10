@@ -583,3 +583,8 @@ export interface DiagnosticoOrganizacional {
     quantidadeOcorrencias: number;
     grupos: GrupoViolacaoOrganizacional[];
 }
+
+export interface PainelBootstrap {
+    processos: ProcessoResumo[];
+    alertas: Alerta[];
+}

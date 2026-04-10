@@ -1,5 +1,10 @@
-import type {Alerta, ProcessoResumo} from "@/types/tipos";
+import type {Alerta, PainelBootstrap, ProcessoResumo} from "@/types/tipos";
 import apiClient from "../axios-setup";
+
+export async function obterBootstrap(): Promise<PainelBootstrap> {
+    const response = await apiClient.get<PainelBootstrap>("/painel/bootstrap");
+    return response.data;
+}
 
 export interface Page<T> {
     content: T[];

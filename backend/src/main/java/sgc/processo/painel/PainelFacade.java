@@ -13,7 +13,9 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
+import sgc.processo.painel.dto.PainelBootstrapDto;
 import sgc.processo.service.*;
+import sgc.alerta.dto.AlertaDto;
 
 import java.time.*;
 import java.util.*;
@@ -218,6 +220,16 @@ public class PainelFacade {
             throw new IllegalStateException("Sigla da unidade do usuário ausente");
         }
         return String.format("/processo/%s/%s", processo.getCodigo(), siglaUnidadeUsuario);
+    }
+
+    public PainelBootstrapDto obterBootstrap(ContextoUsuarioAutenticado contextoUsuario) {
+        Page<ProcessoResumoDto> processos = listarProcessos(contextoUsuario, PageRequest.of(0, 10));
+        Page<Alerta> alertas = listarAlertas(contextoUsuario, PageRequest.of(0, 200));
+
+        return PainelBootstrapDto.builder()
+                .processos(processos.getContent())
+                .alertas(alertas.getContent().stream().map(AlertaDto::fromEntity).toList())
+                .build();
     }
 
     private @Nullable String obterSiglaUnidadeUsuario(Perfil perfil, Long codigoUnidade) {

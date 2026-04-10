@@ -138,8 +138,8 @@ import {TEXTOS} from "@/constants/textos";
 import {useToastStore} from "@/stores/toast";
 import {usePainelStore} from "@/stores/painel";
 import {useOrganizacaoStore} from "@/stores/organizacao";
+import {useUnidadeStore} from "@/stores/unidade";
 import {
-  buscarArvoreComElegibilidade,
   mapUnidadesArray
 } from "@/services/unidadeService";
 import * as processoService from "@/services/processoService";
@@ -185,6 +185,7 @@ const route = useRoute();
 const toastStore = useToastStore();
 const painelStore = usePainelStore();
 const organizacaoStore = useOrganizacaoStore();
+const unidadeStore = useUnidadeStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
 
@@ -247,8 +248,7 @@ async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcess
   ultimaBuscaUnidades.value = {tipoProcesso, codProcesso};
   isLoadingUnidades.value = true;
   try {
-    const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
-    const unidadesMapeadas = mapUnidadesArray(Array.isArray(response) ? response : []);
+    const unidadesMapeadas = await unidadeStore.garantirArvoreElegibilidade(tipoProcesso, codProcesso);
     unidades.value = unidadesMapeadas;
     sincronizarUnidadesSelecionadasElegiveis(unidadesMapeadas);
   } catch (error) {
