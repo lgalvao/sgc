@@ -93,7 +93,6 @@ import {BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner, BTab, BTa
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useRelatorios} from "@/composables/api/useRelatorios";
@@ -101,7 +100,6 @@ import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";
 import type {ProcessoResumo} from "@/types/tipos";
 
-const perfil = usePerfil();
 const perfilStore = usePerfilStore();
 const { notify } = useNotification();
 const { obterRelatorioAndamento, downloadRelatorioAndamentoPdf, downloadRelatorioMapasPdf } = useRelatorios();

@@ -145,7 +145,10 @@ describe('BarraNavegacao.vue', () => {
             mockRoute.name = 'Unidade';
             mockRoute.params = {codUnidade: '10'};
             const wrapper = mountComponent({
-                perfil: {perfilSelecionado: Perfil.GESTOR},
+                perfil: {
+                    perfilSelecionado: Perfil.GESTOR,
+                    permissoesSessao: {mostrarArvoreCompletaUnidades: false}
+                },
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             // Home -> MINHA_UNIDADE -> Minha unidade (Título da pagina)
@@ -160,7 +163,10 @@ describe('BarraNavegacao.vue', () => {
             mockRoute.name = 'Unidade';
             mockRoute.params = {codUnidade: '1'};
             const wrapper = mountComponent({
-                perfil: {perfilSelecionado: Perfil.ADMIN},
+                perfil: {
+                    perfilSelecionado: Perfil.ADMIN,
+                    permissoesSessao: {mostrarArvoreCompletaUnidades: true}
+                },
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             // Home -> ADMIN -> Unidades
@@ -169,15 +175,17 @@ describe('BarraNavegacao.vue', () => {
             expect(items[2].text()).toBe('Unidades');
         });
 
-        it('deve usar ID da unidade se sigla não estiver na store', () => {
+        it('deve manter label vazio quando sigla da unidade não estiver carregada', () => {
             mockRoute.name = 'Unidade';
             mockRoute.params = {codUnidade: '99'};
             const wrapper = mountComponent({
-                perfil: {perfilSelecionado: Perfil.GESTOR},
+                perfil: {
+                    perfilSelecionado: Perfil.GESTOR,
+                    permissoesSessao: {mostrarArvoreCompletaUnidades: false}
+                },
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
-            // Home -> Unidade 99 -> Minha unidade
-            expect(items[1].text()).toBe('Unidade 99');
+            expect(items[1].text()).toBe('');
         });
 
         it('deve usar meta.breadcrumb para rotas genéricas', () => {

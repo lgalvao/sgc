@@ -109,24 +109,12 @@ import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocesso
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
-import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 import {normalizeError, type NormalizedError} from "@/utils/apiError";
 import * as processoService from "@/services/processoService";
 import {TEXTOS} from "@/constants/textos";
 
-type LinhaParticipante = {
-  clickable?: boolean;
-  sigla?: string;
-  situacaoSubprocesso?: SituacaoSubprocesso;
-  situacao?: SituacaoSubprocesso;
-  unidadeCodigo: number;
-  unidadeSigla: string;
-  unidadeNome: string;
-  ultimaDataLimite?: string;
-  localizacaoCodigo?: number;
-};
 type ModalAcaoBlocoRef = {
   abrir: () => void;
   fechar: () => void;
@@ -175,10 +163,6 @@ const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
 const podeFinalizar = computed(() => {
   return processo.value?.podeFinalizar || false;
-});
-
-const isProcessoFinalizado = computed(() => {
-  return processo.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
 const acoesBlocoVisiveis = computed(() => (processo.value?.acoesBloco ?? []).filter(acao => acao.mostrar));

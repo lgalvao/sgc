@@ -74,7 +74,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
         const crumbs: Breadcrumb[] = [];
         if (codUnidade && isUnidadeRoute) {
             crumbs.push({
-                label: unidadeAtual.value?.sigla || `Unidade ${codUnidade}`,
+                label: unidadeAtual.value?.sigla ?? "",
                 to: routeName === "Unidade" ? undefined : {name: "Unidade", params: {codUnidade}},
             });
 
