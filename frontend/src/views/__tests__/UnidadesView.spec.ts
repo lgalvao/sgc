@@ -126,12 +126,15 @@ describe("Unidades.vue", () => {
         }
         await flushPromises();
 
+        // buscarTodasUnidades deve ser chamado no onActivated
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
-        expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalled();
+        // buscarDiagnosticoOrganizacional NÃO deve ser chamado novamente — cache de sessão ativo
+        expect(unidadeService.buscarDiagnosticoOrganizacional).not.toHaveBeenCalled();
     });
 
     it("deve exibir alerta fixo com resumo do diagnostico para ADMIN", async () => {
-        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValueOnce({
+        // Pré-popula a organizacaoStore via initialState (evita dependência da chamada HTTP)
+        const diagMock = {
             possuiViolacoes: true,
             resumo: "Foram encontradas 3 inconsistencias.",
             quantidadeTiposViolacao: 2,
@@ -148,13 +151,44 @@ describe("Unidades.vue", () => {
                     ocorrencias: ["sigla=43ª Z.E."]
                 }
             ]
-        } as any);
+        };
 
-        const wrapper = createWrapper({
-            perfil: {perfilSelecionado: "ADMIN"},
-            unidades: mockUnidades
-        } as any);
+        context.wrapper = mount(Unidades, {
+            ...getCommonMountOptions(
+                {
+                    organizacao: {diagnostico: diagMock, erroDiagnostico: null, carregado: true}
+                },
+                {
+                    PageHeader: {
+                        template: "<div><h1>Page header</h1><slot name='description' /></div>"
+                    },
+                    TreeTable: {
+                        name: "TreeTable",
+                        template: `
+                          <div data-testid="tree-table">
+                            <button
+                              v-if="data && data.length > 0"
+                              data-testid="tree-table-row-click"
+                              type="button"
+                              @click="$emit('row-click', data[0])"
+                            >
+                              Abrir
+                            </button>
+                          </div>
+                        `,
+                        props: ["data", "columns", "title"]
+                    },
+                    BContainer: {template: "<div><slot /></div>"},
+                    BAlert: {
+                        name: "BAlert",
+                        template: "<div><slot /></div>",
+                        props: ["modelValue", "variant", "dismissible"]
+                    },
+                }
+            )
+        });
         await flushPromises();
+        const wrapper = context.wrapper;
 
         expect(wrapper.text()).toContain("Pendências organizacionais identificadas.");
         expect(wrapper.text()).toContain("VW_USUARIO com titulo duplicado: 2 ocorrência(s)");
