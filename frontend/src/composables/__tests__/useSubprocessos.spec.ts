@@ -174,6 +174,25 @@ describe("useSubprocessos", () => {
         expect(resultado).toEqual(mockContexto);
     });
 
+    it("deve buscar contexto de edicao por processo e unidade", async () => {
+        const store = useSubprocessos();
+        const mockContexto = {
+            detalhes: {
+                codigo: 15,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                localizacaoAtual: "U1",
+                permissoes: permissoesPadrao,
+            },
+            mapa: {codigo: 20},
+        };
+        vi.mocked(service.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(mockContexto as never);
+
+        const resultado = await store.buscarContextoEdicaoPorProcessoEUnidade(1, "U1");
+
+        expect(store.subprocessoDetalhe?.codigo).toBe(15);
+        expect(resultado).toEqual(mockContexto);
+    });
+
     it("deve usar detalhes obrigatorios do contexto de edição", async () => {
         const store = useSubprocessos();
         const dataMock = {

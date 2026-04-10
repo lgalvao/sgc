@@ -12,6 +12,7 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/services/subprocessoService", () => ({
+    buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     validarCadastro: vi.fn(),
@@ -40,15 +41,8 @@ describe("CadastroView - permissões no carregamento", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+        vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue({
             detalhes: {
-                subprocesso: {
-                    codigo: 123,
-                    unidade: {sigla: "TESTE"},
-                    situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                    tipoProcesso: TipoProcesso.MAPEAMENTO,
-                },
                 permissoes: {
                     podeEditarCadastro: true,
                     podeDisponibilizarCadastro: true,
@@ -70,7 +64,17 @@ describe("CadastroView - permissões no carregamento", () => {
                     podeEnviarLembrete: false,
                     habilitarAcessoCadastro: true,
                     habilitarAcessoMapa: false,
-                }
+                },
+                codigo: 123,
+                unidade: {sigla: "TESTE"},
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                tipoProcesso: TipoProcesso.MAPEAMENTO,
+            },
+            subprocesso: {
+                codigo: 123,
+                unidade: {sigla: "TESTE"},
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                tipoProcesso: TipoProcesso.MAPEAMENTO,
             },
             mapa: {codigo: 100},
             atividadesDisponiveis: [{

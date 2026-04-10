@@ -20,6 +20,7 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -190,6 +191,46 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             assertThat(dto).isNotNull();
             assertThat(dto.getCodMapa()).isEqualTo(mapa.getCodigo());
+        }
+    }
+
+    @Nested
+    @DisplayName("obterContextoEdicao")
+    class ObterContextoEdicao {
+
+        @Test
+        @DisplayName("deve manter conhecimentos das atividades ao montar contexto")
+        void deveManterConhecimentosDasAtividadesAoMontarContexto() {
+            Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(60004L).orElseThrow();
+            Usuario usuario = usuarioRepo.findById("111111111111").orElseThrow();
+            usuario.setPerfilAtivo(Perfil.CHEFE);
+            usuario.setUnidadeAtivaCodigo(sp.getUnidade().getCodigo());
+
+            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+                    usuario.getTituloEleitoral(),
+                    sp.getUnidade().getCodigo(),
+                    Perfil.CHEFE
+            ));
+            when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(sp.getUnidade().getCodigo())).thenReturn(null);
+
+            ContextoEdicaoResponse contexto = consultaService.obterContextoEdicao(sp.getCodigo());
+
+            assertThat(contexto.atividadesDisponiveis()).singleElement().satisfies(atividadeDto -> {
+                assertThat(atividadeDto.descricao()).isEqualTo("Atividade 1");
+                assertThat(atividadeDto.conhecimentos())
+                        .extracting(ConhecimentoResumoDto::descricao)
+                        .containsExactly("Atendimento ao público");
+            });
+
+            assertThat(contexto.mapa().competencias()).singleElement().satisfies(competenciaDto -> {
+                assertThat(competenciaDto.descricao()).isEqualTo("Competência A");
+                assertThat(competenciaDto.atividades()).singleElement().satisfies(atividadeMapaDto -> {
+                    assertThat(atividadeMapaDto.descricao()).isEqualTo("Atividade 1");
+                    assertThat(atividadeMapaDto.conhecimentos())
+                            .extracting(ConhecimentoResumoDto::descricao)
+                            .containsExactly("Atendimento ao público");
+                });
+            });
         }
     }
 

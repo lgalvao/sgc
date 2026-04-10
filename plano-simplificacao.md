@@ -319,11 +319,15 @@ Validação desta rodada:
 
 * foi consolidado o padrão repetido de “executar ação de atividade/conhecimento e sincronizar resposta local” em helper único de atualização;
 * a checagem de situação permitida para disponibilização ficou mais direta, reduzindo ramificação incidental;
+* a montagem inicial da tela deixou de depender de duas chamadas (`buscarSubprocessoPorProcessoEUnidade` + `buscarContextoEdicao`) e passou a usar um contexto agregado único por processo e unidade;
+* foi criado endpoint específico para esse carregamento agregado, reduzindo responsabilidade de montagem no frontend;
 * a view permanece em revisão para a próxima etapa, agora com o critério explícito de remover responsabilidade indevida do frontend em vez de apenas reorganizar helpers locais.
 
 Validação desta rodada:
 
 * `npm run test:unit -- src/views/__tests__/AtividadesCadastroView.spec.ts src/views/__tests__/CadastroViewCoverage.spec.ts` passou com **22 testes**.
+* `npm run test:unit -- src/services/__tests__/subprocessoService.spec.ts src/composables/__tests__/useSubprocessos.spec.ts src/views/__tests__/AtividadesCadastroView.spec.ts src/views/__tests__/CadastroViewCoverage.spec.ts src/views/__tests__/CadastroViewPermissoes.spec.ts` passou com **63 testes**.
+* `./gradlew :backend:test --tests "sgc.subprocesso.SubprocessoControllerTest"` passou com **28 testes**.
 
 ### Próximo passo recomendado
 

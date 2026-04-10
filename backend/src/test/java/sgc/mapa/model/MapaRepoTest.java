@@ -63,4 +63,19 @@ class MapaRepoTest {
                 .extracting(Atividade::getCodigo)
                 .containsExactly(30000L);
     }
+
+    @Test
+    @DisplayName("deve buscar mapa por subprocesso com competencias e atividades carregadas")
+    void deveBuscarMapaPorSubprocessoComCompetenciasEAtividadesCarregadas() {
+        Mapa mapa = mapaRepo.buscarComCompetenciasEAtividadesPorSubprocesso(60004L).orElseThrow();
+
+        assertThat(mapa.getCodigo()).isEqualTo(1004L);
+        assertThat(Hibernate.isInitialized(mapa.getCompetencias())).isTrue();
+
+        Competencia competencia = mapa.getCompetencias().iterator().next();
+        assertThat(Hibernate.isInitialized(competencia.getAtividades())).isTrue();
+        assertThat(competencia.getAtividades())
+                .extracting(Atividade::getCodigo)
+                .containsExactly(30000L);
+    }
 }

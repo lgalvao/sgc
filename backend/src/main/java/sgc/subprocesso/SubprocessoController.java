@@ -133,6 +133,17 @@ public class SubprocessoController {
         return ResponseEntity.ok(consultaService.obterContextoEdicao(codSubprocesso));
     }
 
+    @GetMapping("/contexto-edicao/buscar")
+    @PostAuthorize("hasPermission(returnObject.body.detalhes.subprocesso.codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicaoPorProcessoEUnidade(
+            @RequestParam Long codProcesso,
+            @RequestParam String siglaUnidade
+    ) {
+        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
+        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        return ResponseEntity.ok(consultaService.obterContextoEdicao(subprocesso.getCodigo()));
+    }
+
     @GetMapping("/{codSubprocesso}/atividades-importacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CONSULTAR_PARA_IMPORTACAO')")
     @Operation(summary = "Lista todas as atividades de um subprocesso finalizado para importação")

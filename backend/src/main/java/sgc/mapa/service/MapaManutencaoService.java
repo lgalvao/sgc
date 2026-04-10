@@ -105,6 +105,11 @@ public class MapaManutencaoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
     }
 
+    public Mapa mapaComCompetenciasEAtividadesSubprocesso(Long subprocessoCodigo) {
+        return mapaRepo.buscarComCompetenciasEAtividadesPorSubprocesso(subprocessoCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
+    }
+
     public Mapa mapaCodigo(Long codigo) {
         return repo.buscar(Mapa.class, codigo);
     }

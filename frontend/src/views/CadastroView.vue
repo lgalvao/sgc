@@ -402,19 +402,13 @@ async function executarAtualizacaoCadastro(
 
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
-  const codigo = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
-
-  if (!codigo) {
+  const data = await subprocessosStore.buscarContextoEdicaoPorProcessoEUnidade(codProcessoRef, props.sigla);
+  if (!data) {
     logger.error("ERRO: Subprocesso não encontrado!");
     return;
   }
 
-  codSubprocesso.value = codigo;
-  const data = await subprocessosStore.buscarContextoEdicao(codigo);
-  if (!data) {
-    return;
-  }
-
+  codSubprocesso.value = data.detalhes.codigo;
   sincronizarEstadoInicialContexto(data);
   mapasStore.mapaCompleto.value = data.mapa;
 }

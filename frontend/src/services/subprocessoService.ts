@@ -129,6 +129,19 @@ export async function buscarContextoEdicao(
     };
 }
 
+export async function buscarContextoEdicaoPorProcessoEUnidade(
+    codProcesso: number,
+    siglaUnidade: string,
+): Promise<ContextoEdicaoSubprocesso> {
+    const response = await apiClient.get<ContextoEdicaoResponseBackend>("/subprocessos/contexto-edicao/buscar", {
+        params: {codProcesso, siglaUnidade},
+    });
+    return {
+        ...response.data,
+        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
+    };
+}
+
 export async function buscarSubprocessoPorProcessoEUnidade(
     codProcesso: number,
     siglaUnidade: string,

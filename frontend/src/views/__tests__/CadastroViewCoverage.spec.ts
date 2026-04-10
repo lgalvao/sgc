@@ -68,6 +68,7 @@ type FluxoSubprocessoMock = {
 
 const subprocessosMock = reactive({
     subprocessoDetalhe: null as SubprocessoMinimo | null,
+    buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
@@ -82,6 +83,7 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/services/subprocessoService", () => ({
+    buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarContextoEdicao: vi.fn(),
@@ -241,6 +243,7 @@ describe("CadastroView coverage", () => {
         subprocessosMock.subprocessoDetalhe = {
             ...criarSubprocessoMinimo(),
         };
+        subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade = vi.fn().mockResolvedValue(criarContextoEdicao());
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
         subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue(criarContextoEdicao());
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
@@ -251,6 +254,7 @@ describe("CadastroView coverage", () => {
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
+        vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
@@ -331,9 +335,8 @@ describe("CadastroView coverage", () => {
         await flushPromises();
 
         expect(contarChamadas(
-            subprocessosMock.buscarContextoEdicao,
-            subprocessosMock.buscarSubprocessoPorProcessoEUnidade,
-        )).toBe(2);
+            subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade,
+        )).toBe(1);
     });
 
     it("cobre funções complementares e modais", async () => {
@@ -463,12 +466,12 @@ describe("CadastroView coverage", () => {
     it("cobre ramos de erro ao buscar contexto", async () => {
         const wrapper = createWrapper();
         const vm = wrapper.vm as unknown as CadastroViewVm;
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
 
         await vm.carregarContextoInicial();
 
-        // Cobre branch where data is null
-        subprocessosMock.buscarContextoEdicao.mockResolvedValue(null);
+        // Cobre branch where o contexto agregado não retorna dados
+        subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
         vm.codSubprocesso = 123;
         await vm.carregarContextoInicial();
     });

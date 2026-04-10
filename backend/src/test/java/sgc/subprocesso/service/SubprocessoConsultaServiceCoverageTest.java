@@ -108,8 +108,8 @@ class SubprocessoConsultaServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("obterContextoEdicao deve reaproveitar mapa completo para montar atividades")
-    void obterContextoEdicaoDeveReaproveitarMapaCompleto() {
+    @DisplayName("obterContextoEdicao deve separar carga de mapa e atividades")
+    void obterContextoEdicaoDeveSepararCargaDeMapaEAtividades() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         unidade.setSigla("U10");
@@ -139,23 +139,24 @@ class SubprocessoConsultaServiceCoverageTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(300L);
         mapa.setSubprocesso(subprocesso);
-        mapa.setAtividades(Set.of(atividade));
         mapa.setCompetencias(Set.of());
+        subprocesso.setMapa(mapa);
 
         stubContextoAutenticado(usuario);
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(subprocesso));
+        when(subprocessoRepo.buscarPorCodigoComMapa(100L)).thenReturn(Optional.of(subprocesso));
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of());
         when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(unidade);
         when(unidadeService.temMapaVigente(10L)).thenReturn(false);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
         when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(10L)).thenReturn(null);
-        when(mapaManutencaoService.mapaCompletoSubprocesso(100L)).thenReturn(mapa);
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of(atividade));
+        when(mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(100L)).thenReturn(mapa);
 
         ContextoEdicaoResponse contexto = target.obterContextoEdicao(100L);
 
         assertThat(contexto.atividadesDisponiveis()).hasSize(1);
         assertThat(contexto.atividadesDisponiveis().getFirst().descricao()).isEqualTo("Atividade");
-        verify(mapaManutencaoService).mapaCompletoSubprocesso(100L);
-        verify(mapaManutencaoService, never()).atividadesMapaCodigoComConhecimentos(anyLong());
+        verify(mapaManutencaoService).mapaComCompetenciasEAtividadesSubprocesso(100L);
+        verify(mapaManutencaoService).atividadesMapaCodigoComConhecimentos(300L);
     }
 }

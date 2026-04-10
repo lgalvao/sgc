@@ -104,6 +104,11 @@ public class SubprocessoConsultaService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codigo));
     }
 
+    private Subprocesso buscarSubprocessoComMapa(Long codigo) {
+        return subprocessoRepo.buscarPorCodigoComMapa(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codigo));
+    }
+
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
         return subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
     }
@@ -181,15 +186,17 @@ public class SubprocessoConsultaService {
     }
 
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
-        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo());
+        Subprocesso subprocesso = buscarSubprocessoComMapa(codSubprocesso);
+        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
+        List<Atividade> atividadesComConhecimentos = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
+        Mapa mapaCompleto = mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(subprocesso.getCodigo());
 
         return new ContextoEdicaoResponse(
                 subprocesso.getUnidade(),
                 SubprocessoResumoDto.fromEntity(subprocesso),
                 obterDetalhes(subprocesso),
                 MapaCompletoDto.fromEntity(mapaCompleto),
-                mapaCompleto.getAtividades().stream()
+                atividadesComConhecimentos.stream()
                         .map(AtividadeDto::fromEntity)
                         .toList()
         );

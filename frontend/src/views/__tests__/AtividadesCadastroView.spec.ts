@@ -72,6 +72,7 @@ type SubprocessoStoreMock = {
         unidade?: {sigla: string};
         permissoes?: Record<string, boolean>;
     } | null;
+    buscarContextoEdicaoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarContextoEdicao: ReturnType<typeof vi.fn>;
     buscarSubprocessoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarSubprocessoDetalhe: ReturnType<typeof vi.fn>;
@@ -157,6 +158,7 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
 
 const subprocessosMock = reactive({
     subprocessoDetalhe: null as SubprocessoStoreMock["subprocessoDetalhe"],
+    buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
@@ -173,6 +175,7 @@ vi.mock("vue-router", () => ({
 vi.mock("@/composables/usePerfil", () => ({usePerfil: vi.fn()}));
 
 vi.mock("@/services/subprocessoService", () => ({
+    buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarContextoEdicao: vi.fn(),
@@ -329,6 +332,7 @@ describe("CadastroView.vue", () => {
             permissoes: {}
         };
         subprocessosMock.lastError = null;
+        subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade = vi.fn();
         subprocessosMock.buscarContextoEdicao = vi.fn();
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn();
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
@@ -338,6 +342,7 @@ describe("CadastroView.vue", () => {
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
+        vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
@@ -646,8 +651,8 @@ describe("CadastroView.vue", () => {
         vm.timeoutLimparErros = setTimeout(() => {}, 100);
         vm.timeoutLimpezaErros();
         
-        // Covering 351-352
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
+        // Cobre ramo sem contexto agregado
+        subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
         await vm.carregarContextoInicial();
 
         // 375-377 (adicionarAtividade success branch)

@@ -1,6 +1,7 @@
 import {ref} from "vue";
 import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
+    buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
     buscarSubprocessoDetalhe as serviceBuscarSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
     mapSubprocessoDetalheResponseParaModel,
@@ -57,6 +58,17 @@ async function buscarContextoEdicao(codigo: number) {
     });
 }
 
+async function buscarContextoEdicaoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string) {
+    subprocessoDetalhe.value = null;
+
+    return withErrorHandling(async () => {
+        const data = await serviceBuscarContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade);
+        atualizarContextoEdicaoLocal(data);
+
+        return data;
+    });
+}
+
 function atualizarContextoEdicaoLocal(data: ContextoEdicaoSubprocesso) {
     atualizarDetalheLocal(data.detalhes);
 
@@ -97,6 +109,7 @@ export function useSubprocessos() {
         clearError,
         buscarSubprocessoDetalhe,
         buscarContextoEdicao,
+        buscarContextoEdicaoPorProcessoEUnidade,
         buscarSubprocessoPorProcessoEUnidade,
         atualizarStatusLocal,
     };

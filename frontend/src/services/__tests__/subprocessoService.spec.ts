@@ -147,6 +147,55 @@ describe('subprocessoService', () => {
     });
   });
 
+  it('buscarContextoEdicaoPorProcessoEUnidade', async () => {
+    getMock.mockResolvedValueOnce({ data: {
+      unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+      subprocesso: {
+        codigo: 1,
+        unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+        situacao: SituacaoSubprocesso.NAO_INICIADO,
+        dataLimite: '2025-01-01T00:00:00',
+        dataFimEtapa1: '',
+        dataLimiteEtapa2: '',
+        atividades: [],
+        codUnidade: 1,
+      },
+      detalhes: {
+        subprocesso: {
+          codigo: 1,
+          unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+          situacao: SituacaoSubprocesso.NAO_INICIADO,
+          dataLimiteEtapa1: '2025-01-01T00:00:00',
+          dataFimEtapa1: null,
+          dataLimiteEtapa2: null,
+          dataFimEtapa2: null,
+          processoDescricao: 'Processo',
+          dataCriacaoProcesso: '2024-01-01T00:00:00',
+          tipoProcesso: TipoProcesso.MAPEAMENTO,
+          isEmAndamento: true,
+          etapaAtual: 1,
+        },
+        titular: null,
+        responsavel: null,
+        movimentacoes: [],
+        localizacaoAtual: 'UND',
+        permissoes: {},
+      },
+      mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' },
+      atividadesDisponiveis: [],
+    } } as never);
+    const resultado = await subprocessoService.buscarContextoEdicaoPorProcessoEUnidade(1, 'SIGLA');
+    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/contexto-edicao/buscar', {
+      params: { codProcesso: 1, siglaUnidade: 'SIGLA' }
+    });
+    expect(resultado.detalhes).toMatchObject({
+      codigo: 1,
+      processoDescricao: 'Processo',
+      situacao: SituacaoSubprocesso.NAO_INICIADO,
+      localizacaoAtual: 'UND',
+    });
+  });
+
   it('buscarSubprocessoPorProcessoEUnidade', async () => {
     getMock.mockResolvedValueOnce({ data: { codigo: 1 } } as never);
     await subprocessoService.buscarSubprocessoPorProcessoEUnidade(1, 'SIGLA');
