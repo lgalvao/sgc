@@ -30,6 +30,16 @@ vi.mock('@/services/processoService', () => ({
     enviarLembrete: vi.fn(),
 }));
 
+// Mock da store de cache de subprocesso (Rodada 2)
+const subprocessoStoreCacheMock = {
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    dadosValidos: vi.fn().mockReturnValue(false),
+    invalidar: vi.fn(),
+};
+vi.mock('@/stores/subprocesso', () => ({
+    useSubprocessoStore: () => subprocessoStoreCacheMock,
+}));
+
 const SubprocessoHeaderStub = {template: '<div />'};
 const SubprocessoCardsStub = {template: '<div />'};
 const SubprocessoModalStub = {template: '<div />'};
@@ -77,6 +87,26 @@ describe('SubprocessoView Coverage', () => {
         });
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
+        // Configura o cache mock
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
+            subprocessosMock.subprocessoDetalhe = {
+                codigo: 123,
+                unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
+                movimentacoes: [],
+            };
+            return {
+                codigo: 123,
+                contexto: {
+                    detalhes: subprocessosMock.subprocessoDetalhe,
+                    mapa: {codigo: 1},
+                    unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
+                    atividadesDisponiveis: [],
+                    subprocesso: null,
+                },
+            };
+        });
+        subprocessoStoreCacheMock.dadosValidos.mockReturnValue(false);
+        subprocessoStoreCacheMock.invalidar = vi.fn();
     });
 
     it('renders loading state when no data and no error', () => {
@@ -226,15 +256,21 @@ describe('SubprocessoView Coverage', () => {
     it('abrirModalAlterarDataLimite and confirmarAlteracaoDataLimite coverage', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
 
-        subprocessosMock.buscarContextoEdicao.mockImplementation(async () => {
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
             subprocessosMock.subprocessoDetalhe = {
                 codigo: 123,
                 unidade: {codigo: 1, sigla: 'TEST'},
                 prazoEtapaAtual: '2025-01-01'
             };
             return {
-                detalhes: subprocessosMock.subprocessoDetalhe,
-                mapa: {codigo: 1},
+                codigo: 123,
+                contexto: {
+                    detalhes: subprocessosMock.subprocessoDetalhe,
+                    mapa: {codigo: 1},
+                    unidade: {codigo: 1, sigla: 'TEST'},
+                    atividadesDisponiveis: [],
+                    subprocesso: null,
+                },
             };
         });
 
@@ -365,15 +401,8 @@ describe('SubprocessoView Coverage', () => {
         expect(vm.formatTipoResponsabilidade({tipo: 'Titular'})).toBe('Titular');
 
         // error path for onMounted
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockRejectedValueOnce({ response: { data: 'Err' } });
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValueOnce(null);
 
-        mount(SubprocessoView, {
-            global: { plugins: [pinia], stubs },
-            props: { codProcesso: 1, siglaUnidade: 'TEST' }
-        });
-
-        // branch where id is not found
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValueOnce(null);
         mount(SubprocessoView, {
             global: { plugins: [pinia], stubs },
             props: { codProcesso: 1, siglaUnidade: 'TEST' }

@@ -109,6 +109,7 @@ import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocesso
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePainelStore} from "@/stores/painel";
+import {useProcessoStore} from "@/stores/processo";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
@@ -132,6 +133,7 @@ const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const painelStore = usePainelStore();
+const processoStore = useProcessoStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
 const lastError = ref<NormalizedError | null>(null);
@@ -150,7 +152,7 @@ async function carregarContextoCompleto() {
   processo.value = null;
 
   try {
-    const data = await processoService.buscarContextoCompleto(codProcesso);
+    const data = await processoStore.garantirContextoCompleto(codProcesso);
     if (data) {
       processo.value = data;
     }
@@ -244,6 +246,7 @@ async function confirmarFinalizacao() {
     await processoService.finalizarProcesso(codProcesso);
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
     painelStore.invalidar();
+    processoStore.invalidar();
     await router.push("/painel");
   } catch (error) {
     lastError.value = normalizeError(error);
@@ -288,6 +291,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
       return;
     }
     notify(mensagemSucesso, 'success');
+    processoStore.invalidar();
     await carregarContextoCompleto();
   } catch (error) {
     lastError.value = normalizeError(error);
@@ -313,7 +317,11 @@ onActivated(async () => {
   if (!codProcesso || !carregamentoInicialConcluido.value) {
     return;
   }
-
+  // Só recarrega se o cache tiver sido invalidado por ação de workflow
+  if (processoStore.dadosValidos(codProcesso)) {
+    processo.value = processoStore.contextoCompleto;
+    return;
+  }
   try {
     await carregarContextoCompleto();
   } catch {

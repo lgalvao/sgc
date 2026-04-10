@@ -238,10 +238,10 @@ import {enviarLembrete as enviarLembreteService} from "@/services/processoServic
 import {useAcesso} from "@/composables/useAcesso";
 import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatDateTimeBR, logger, parseDate} from "@/utils";
-import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useToastStore} from "@/stores/toast";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -263,6 +263,7 @@ function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
 
 const subprocessosStore = useSubprocessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
+const subprocessoStoreCache = useSubprocessoStore();
 
 const mapaStore = useMapas();
 const {notificacao, notify, clear} = useNotification();
@@ -343,31 +344,20 @@ function exibirToastPendente() {
 async function carregarSubprocesso() {
   subprocessosStore.subprocessoDetalhe = null;
 
-  try {
-    const codigo = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
-        props.codProcesso,
-        props.siglaUnidade,
-    );
+  const resultado = await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
+      props.codProcesso,
+      props.siglaUnidade,
+  );
 
-    if (codigo) {
-      erroNaoEncontrado.value = false;
-      codSubprocesso.value = codigo;
-      const data = await subprocessosStore.buscarContextoEdicao(codigo);
-      if (data) {
-        mapaStore.mapaCompleto.value = data.mapa;
-      } else {
-        await mapaStore.buscarMapaCompleto(codigo);
-      }
-    } else {
-      codSubprocesso.value = null;
-      erroNaoEncontrado.value = true;
-      logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
-    }
-  } catch (error: unknown) {
-    const erroNormalizado = normalizeError(error);
-    if (erroNormalizado.kind !== 'unauthorized') {
-      logger.error(`Erro ao carregar detalhes do subprocesso:`, error, erroNormalizado.message);
-    }
+  if (resultado) {
+    erroNaoEncontrado.value = false;
+    codSubprocesso.value = resultado.codigo;
+    subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
+    mapaStore.mapaCompleto.value = resultado.contexto.mapa;
+  } else {
+    codSubprocesso.value = null;
+    erroNaoEncontrado.value = true;
+    logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
   }
 }
 
@@ -380,6 +370,10 @@ onMounted(async () => {
 onActivated(async () => {
   exibirToastPendente();
   if (!carregamentoInicialConcluido.value) {
+    return;
+  }
+  // Só recarrega se o cache tiver sido invalidado por ação de workflow
+  if (codSubprocesso.value && subprocessoStoreCache.dadosValidos(codSubprocesso.value)) {
     return;
   }
   await carregarSubprocesso();
@@ -410,6 +404,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
       );
       fecharModalAlterarDataLimite();
       notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, 'success');
+      subprocessoStoreCache.invalidar();
     } catch {
       notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, 'danger');
     }
@@ -456,6 +451,7 @@ async function confirmarReabertura() {
               : TEXTOS.subprocesso.SUCESSO_REVISAO_REABERTA,
           'success',
       );
+      subprocessoStoreCache.invalidar();
     }
   });
 }

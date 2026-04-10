@@ -8,7 +8,6 @@ import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
 import CadastroVisualizacaoView from "../CadastroVisualizacaoView.vue";
-import {contarChamadas} from "@/test-utils/orcamentoChamadas";
 import type {ContextoEdicaoSubprocesso, MapaCompleto, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
@@ -162,6 +161,16 @@ vi.mock("@/services/subprocessoService", () => ({
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 
+// Mock da useSubprocessoStore (Rodada 2) — delega ao subprocessoService já mockado
+const subprocessoStoreCacheMock = {
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    dadosValidos: vi.fn().mockReturnValue(false),
+    invalidar: vi.fn(),
+};
+vi.mock("@/stores/subprocesso", () => ({
+    useSubprocessoStore: () => subprocessoStoreCacheMock,
+}));
+
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
     PageHeader: {
@@ -213,6 +222,13 @@ describe("CadastroVisualizacaoView coverage", () => {
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
+        // Configura o cache mock para retornar contexto por padrão
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+            codigo: 123,
+            contexto: criarContextoEdicao(),
+        });
+        subprocessoStoreCacheMock.dadosValidos.mockReturnValue(false);
+        subprocessoStoreCacheMock.invalidar = vi.fn();
     });
 
     function createWrapper(accessOverrides = {}, tipoProcesso: TipoProcesso = TipoProcesso.MAPEAMENTO) {
@@ -302,10 +318,8 @@ describe("CadastroVisualizacaoView coverage", () => {
         createWrapper();
         await flushPromises();
 
-        expect(contarChamadas(
-            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarContextoEdicao as unknown as {mock?: {calls: unknown[][]}},
-            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarSubprocessoPorProcessoEUnidade as unknown as {mock?: {calls: unknown[][]}},
-        )).toBe(2);
+        // Apenas 1 chamada ao cache (que consolida buscar+contexto internamente)
+        expect(subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
     });
 
     it("cobre ramos condicionais adicionais", async () => {
@@ -354,22 +368,13 @@ describe("CadastroVisualizacaoView coverage", () => {
     });
 
     it("deve lidar com onMounted quando o subprocesso não é encontrado", async () => {
-        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
-            subprocessoDetalhe: null,
-            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(null),
-            buscarContextoEdicao: vi.fn(),
-            buscarSubprocessoDetalhe: vi.fn(),
-            atualizarStatusLocal: vi.fn(),
-            lastError: null,
-            clearError: vi.fn(),
-        } as unknown as ReturnType<typeof useSubprocessosModule.useSubprocessos>);
+        // Simula cache retornando null (subprocesso não encontrado)
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
 
         createWrapper();
-        
         await flushPromises();
-        const store = useSubprocessosModule.useSubprocessos() as unknown as SubprocessoStoreMock;
-        expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
-        expect(store.buscarContextoEdicao).not.toHaveBeenCalled();
+
+        expect(subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
     });
 
     it("deve tratar falhas de sucesso nas validações e não fechar modais", async () => {

@@ -29,6 +29,20 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/services/processoService");
 
+// Mock da useProcessoStore (Rodada 2) — delega ao processoService já mockado
+vi.mock("@/stores/processo", async () => {
+    const processoSvc = await import("@/services/processoService");
+    return {
+        useProcessoStore: () => ({
+            garantirContextoCompleto: (codProcesso: number) => processoSvc.buscarContextoCompleto(codProcesso),
+            dadosValidos: () => false,
+            invalidar: vi.fn(),
+            contextoCompleto: null,
+        }),
+    };
+});
+
+
 const ModalAcaoBlocoStub = {
     name: 'ModalAcaoBloco',
     template: '<div>ModalAcaoBloco</div>',
@@ -135,7 +149,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 ...processo,
                 elegiveis: subprocessosElegiveis,
                 acoesBloco: criarAcoesBloco(subprocessosElegiveis),
-            } as any);
+            });
         }
         vi.mocked(processoService.finalizarProcesso).mockResolvedValue(undefined);
         vi.mocked(processoService.executarAcaoEmBloco).mockResolvedValue(undefined);

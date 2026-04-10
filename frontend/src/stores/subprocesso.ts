@@ -1,0 +1,95 @@
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import type {ContextoEdicaoSubprocesso} from "@/types/tipos";
+import {
+    buscarContextoEdicao as serviceBuscarContextoEdicao,
+    buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
+} from "@/services/subprocessoService";
+import {logger} from "@/utils";
+
+/**
+ * Cache de sessão para contexto de edição de subprocesso.
+ *
+ * Problema: SubprocessoView e CadastroVisualizacaoView buscam `subprocessos/buscar` +
+ * `subprocessos/{codigo}/contexto-edicao` em toda ativação (onMounted + onActivated),
+ * mesmo quando o contexto não mudou. Isso explica 7-9 chamadas repetidas por jornada.
+ *
+ * Estratégia: cache por código de subprocesso, invalidado explicitamente após ações
+ * de workflow (disponibilizar, aceitar, homologar, etc.).
+ */
+export const useSubprocessoStore = defineStore("subprocesso", () => {
+    const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
+    const codSubprocessoCarregado = ref<number | null>(null);
+    const invalido = ref(true);
+
+    /** Contexto ainda é válido para o subprocesso dado? */
+    function dadosValidos(codSubprocesso: number): boolean {
+        return !invalido.value && codSubprocessoCarregado.value === codSubprocesso && contextoEdicao.value !== null;
+    }
+
+    /** Invalida o cache — deve ser chamado após qualquer ação de workflow. */
+    function invalidar(): void {
+        invalido.value = true;
+    }
+
+    /**
+     * Retorna o contexto de edição do subprocesso, usando cache quando disponível.
+     * @returns o contexto (potencialmente do cache) ou null em caso de erro
+     */
+    async function garantirContextoEdicao(codSubprocesso: number): Promise<ContextoEdicaoSubprocesso | null> {
+        if (dadosValidos(codSubprocesso)) {
+            return contextoEdicao.value;
+        }
+
+        try {
+            const data = await serviceBuscarContextoEdicao(codSubprocesso);
+            contextoEdicao.value = data;
+            codSubprocessoCarregado.value = codSubprocesso;
+            invalido.value = false;
+            return data;
+        } catch (err) {
+            logger.error(`Erro ao buscar contexto de edição do subprocesso ${codSubprocesso}:`, err);
+            return null;
+        }
+    }
+
+    /**
+     * Resolve o código de subprocesso por processo+unidade e retorna seu contexto,
+     * usando cache quando disponível.
+     */
+    async function garantirContextoEdicaoPorProcessoEUnidade(
+        codProcesso: number,
+        siglaUnidade: string
+    ): Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso } | null> {
+        // Reutiliza cache se já temos contexto válido para a mesma unidade
+        if (contextoEdicao.value && !invalido.value && codSubprocessoCarregado.value !== null) {
+            const siglaCarregada = contextoEdicao.value.detalhes?.unidade?.sigla;
+            if (siglaCarregada === siglaUnidade) {
+                return {codigo: codSubprocessoCarregado.value, contexto: contextoEdicao.value};
+            }
+        }
+
+        try {
+            const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
+            const codigo = dto.codigo;
+            const data = await serviceBuscarContextoEdicao(codigo);
+            contextoEdicao.value = data;
+            codSubprocessoCarregado.value = codigo;
+            invalido.value = false;
+            return {codigo, contexto: data};
+        } catch (err) {
+            logger.error(`Erro ao buscar contexto de subprocesso para processo ${codProcesso} unidade ${siglaUnidade}:`, err);
+            return null;
+        }
+    }
+
+    return {
+        contextoEdicao,
+        codSubprocessoCarregado,
+        invalido,
+        dadosValidos,
+        invalidar,
+        garantirContextoEdicao,
+        garantirContextoEdicaoPorProcessoEUnidade,
+    };
+});

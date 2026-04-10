@@ -28,6 +28,19 @@ vi.mock("vue-router", () => ({
     useRouter: () => ({push: mocks.push})
 }));
 
+// Mock da useProcessoStore (Rodada 2) — delega ao processoService já mockado
+vi.mock("@/stores/processo", async () => {
+    const processoSvc = await import("@/services/processoService");
+    return {
+        useProcessoStore: () => ({
+            garantirContextoCompleto: (codProcesso: number) => processoSvc.buscarContextoCompleto(codProcesso),
+            dadosValidos: () => false,
+            invalidar: vi.fn(),
+            contextoCompleto: null,
+        }),
+    };
+});
+
 const mockProcesso = {
     codigo: 1,
     descricao: "Processo Teste",
@@ -260,7 +273,7 @@ describe("Processo.vue", () => {
                 ...processo,
                 elegiveis,
                 acoesBloco: processo.acoesBloco?.length ? processo.acoesBloco : criarAcoesBloco(elegiveis),
-            } as any);
+            });
         }
 
         vi.mocked(processoService.finalizarProcesso).mockResolvedValue(undefined);

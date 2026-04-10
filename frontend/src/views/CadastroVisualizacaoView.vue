@@ -166,6 +166,7 @@ import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {usePainelStore} from "@/stores/painel";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 import type {
   AceitarCadastroRequest,
   Analise,
@@ -190,6 +191,7 @@ const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const painelStore = usePainelStore();
+const subprocessoStoreCache = useSubprocessoStore();
 const {impactoMapa: impactos} = mapasStore;
 
 const unidadeId = computed(() => props.sigla);
@@ -295,6 +297,7 @@ async function confirmarValidacao() {
           painelStore.invalidar();
           await router.push({name: "Painel"});
         } else {
+          subprocessoStoreCache.invalidar();
           await router.push({
             name: "Subprocesso",
             params: {
@@ -356,18 +359,16 @@ async function confirmarDevolucao() {
 }
 
 onMounted(async () => {
-  const codigoSubprocesso = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+  const resultado = await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
       codProcesso.value,
       unidadeId.value,
   );
 
-  if (codigoSubprocesso) {
-    codSubprocesso.value = codigoSubprocesso;
-    const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
-    if (data) {
-      atividades.value = data.atividadesDisponiveis;
-      unidade.value = data.unidade as Unidade;
-    }
+  if (resultado) {
+    codSubprocesso.value = resultado.codigo;
+    subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
+    atividades.value = resultado.contexto.atividadesDisponiveis;
+    unidade.value = resultado.contexto.unidade as Unidade;
   }
 });
 

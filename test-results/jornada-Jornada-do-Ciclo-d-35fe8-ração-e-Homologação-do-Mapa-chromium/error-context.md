@@ -1,0 +1,113 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - heading "SGC" [level=1] [ref=e2]
+  - generic [ref=e3]:
+    - link "Pular para o conteúdo principal" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e5]:
+      - navigation [ref=e6]:
+        - generic [ref=e7]:
+          - link "SGC" [ref=e8] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e9]:
+            - list [ref=e10]:
+              - listitem [ref=e11]:
+                - link "Painel" [ref=e12] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e13]: 
+                  - text: Painel
+              - listitem [ref=e14]:
+                - link "Unidades" [ref=e15] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e16]: 
+                  - text: Unidades
+              - listitem [ref=e17]:
+                - link "Relatórios" [ref=e18] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e19]: 
+                  - text: Relatórios
+              - listitem [ref=e20]:
+                - link "Histórico" [ref=e21] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e22]: 
+                  - text: Histórico
+            - list [ref=e23]:
+              - listitem [ref=e24]:
+                - link "ADMIN" [ref=e25] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e26]:
+                    - generic [ref=e27]: 
+                    - generic [ref=e28]: ADMIN
+              - listitem "Configurações" [ref=e29]:
+                - link "Configurações" [ref=e30] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e31]: Configurações
+                  - generic [ref=e32]: 
+              - listitem "Administradores do sistema" [ref=e33]:
+                - link "Administradores" [ref=e34] [cursor=pointer]:
+                  - /url: /administradores
+                  - generic [ref=e35]: Administradores
+                  - generic [ref=e36]: 
+              - listitem "Sair" [ref=e37]:
+                - link "Sair" [ref=e38] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e39]: Sair
+                  - generic [ref=e40]: 
+      - generic [ref=e43]:
+        - button "Voltar" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: 
+        - navigation "breadcrumb" [ref=e46]:
+          - list [ref=e47]:
+            - listitem [ref=e48]:
+              - link "Início" [ref=e49] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e50]: 
+                - generic [ref=e51]: Início
+            - listitem [ref=e52]:
+              - text: ›
+              - generic [ref=e53]: Detalhes do processo
+      - main [ref=e54]:
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - heading "Mapeamento Ciclo Completo 1775840821837" [level=2] [ref=e59]
+              - paragraph [ref=e60]:
+                - generic [ref=e61]:
+                  - generic [ref=e62]:
+                    - strong [ref=e63]: "Tipo:"
+                    - text: Mapeamento
+                  - generic [ref=e64]:
+                    - strong [ref=e65]: "Situação:"
+                    - text: Em andamento
+            - generic [ref=e66]:
+              - button "Homologar em bloco" [disabled]
+              - button "Homologar mapas em bloco" [ref=e67] [cursor=pointer]
+              - button "Disponibilizar em bloco" [disabled]
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - heading "Unidades participantes" [level=4] [ref=e70]
+              - generic [ref=e71]:
+                - button "Expandir todas as linhas" [ref=e72] [cursor=pointer]:
+                  - generic [ref=e73]: 
+                - button "Recolher todas as linhas" [ref=e74] [cursor=pointer]:
+                  - generic [ref=e75]: 
+            - table [ref=e77]:
+              - rowgroup [ref=e82]:
+                - row "Unidade Situação Data limite" [ref=e83]:
+                  - columnheader "Unidade" [ref=e84]
+                  - columnheader "Situação" [ref=e85]
+                  - columnheader "Data limite" [ref=e86]
+              - rowgroup [ref=e87]:
+                - row "ASSESSORIA_11 - Assessoria 11 Mapa validado 10/05/2026" [ref=e88] [cursor=pointer]:
+                  - cell "ASSESSORIA_11 - Assessoria 11" [ref=e89]:
+                    - generic [ref=e92]: ASSESSORIA_11 - Assessoria 11
+                  - cell "Mapa validado" [ref=e93]
+                  - cell "10/05/2026" [ref=e94]
+      - contentinfo [ref=e95]:
+        - generic [ref=e96]:
+          - generic [ref=e97]: Versão 1.0.0
+          - generic [ref=e98]: © SESEL/COSIS/TRE-PE
+  - text:    
+```
