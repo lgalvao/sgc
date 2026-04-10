@@ -42,7 +42,7 @@
         </BButton>
 
         <LoadingButton
-            v-if="codSubprocesso && podeDisponibilizarCadastro"
+            v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
             :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"

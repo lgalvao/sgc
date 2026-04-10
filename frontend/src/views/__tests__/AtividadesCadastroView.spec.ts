@@ -533,9 +533,22 @@ describe("CadastroView.vue", () => {
         expect(btn.attributes('disabled')).toBeUndefined();
     });
 
-    it("oculta botão disponibilizar quando a permissão não permite a ação", async () => {
+    it("mantém botão disponibilizar visível e desabilitado quando o chefe ainda só pode editar", async () => {
         const wrapper = createWrapper({}, {
             podeEditarCadastro: ref(true),
+            podeDisponibilizarCadastro: ref(false),
+            podeVisualizarImpacto: ref(true),
+        });
+        await flushPromises();
+
+        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
+        expect(btn.exists()).toBe(true);
+        expect(btn.attributes('disabled')).toBeDefined();
+    });
+
+    it("oculta botão disponibilizar quando o perfil não tem ação de edição nem de disponibilização", async () => {
+        const wrapper = createWrapper({}, {
+            podeEditarCadastro: ref(false),
             podeDisponibilizarCadastro: ref(false),
             podeVisualizarImpacto: ref(true),
         });

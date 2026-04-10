@@ -1,251 +1,264 @@
 # Plano de Simplificação do SGC
 
-Documento operacional com foco no **que ainda falta fazer**, sustentado por medições objetivas coletadas em **09/04/2026**.
+Documento operacional com foco no **que realmente falta fazer** no checkout validado em **10/04/2026**.
 
-## Premissas (mantidas)
+## Premissas
 
 * simplificar sem alterar regra de negócio, contrato HTTP, DTO externo, transações e regras de acesso;
-* evitar abstrações genéricas e camadas de compatibilidade;
-* priorizar redução de leitura acidental, branches e acoplamento local;
-* manter métodos com no máximo 3 parâmetros (usar command/DTO quando necessário);
-* remover código `@Deprecated` quando não houver dependências internas.
+* evitar abstrações genéricas, camadas de compatibilidade e extrações sem ganho claro de leitura local;
+* priorizar redução de leitura acidental, branches, null checks repetidos e acoplamento local;
+* manter métodos com no máximo 3 parâmetros, usando command/DTO quando necessário;
+* remover código `@Deprecated` assim que não houver dependências internas;
+* considerar concluído apenas o que já foi confirmado no código atual, não apenas no snapshot anterior.
 
 ---
 
-## Metodologia e instrumentos usados nesta rodada
+## Base usada nesta revisão
 
-### Comandos executados
+### Fontes conferidas diretamente no código
 
-* `./gradlew :backend:test :backend:jacocoTestReport`
-* `node etc/scripts/sgc.js backend cobertura complexidade`
-* `node etc/scripts/sgc.js codigo smells auditar --json`
-* `node etc/scripts/sgc.js projeto arvore-linhas`
-* scripts locais em Python para inventário complementar:
-  * ranking de tamanho de arquivos `.vue/.ts` do frontend;
-  * contagem estrutural de `watch/computed/ref/async function` nas views;
-  * contagem estrutural de `if/for/switch`, checks de `null` e métodos no backend.
+* `backend/src/main/java/sgc/processo/service/ProcessoService.java`
+* `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`
+* `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`
+* `backend/src/main/java/sgc/e2e/E2eController.java`
+* `backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java`
+* `frontend/src/views/CadastroView.vue`
+* `frontend/src/views/MapaView.vue`
+* `frontend/src/views/AtribuicaoTemporariaView.vue`
+* `frontend/src/views/MapaVisualizacaoView.vue`
+* `frontend/src/views/SubprocessoView.vue`
+* `frontend/src/views/ProcessoCadastroView.vue`
 
-### Métricas principais coletadas
+### Instrumentos usados
 
-#### Backend (JaCoCo + ranking de complexidade)
+* leitura direta dos hotspots citados no plano anterior;
+* `wc -l` para revisão de volume por arquivo;
+* inventário estrutural local para contagem de métodos, `if/switch`, checks explícitos de `null`, `computed`, `watch` e funções assíncronas;
+* validação manual dos achados qualitativos contra o estado atual do repositório.
 
-* classes analisadas: **106**;
-* complexidade ciclomática total: **1787**;
-* branches totais: **1490**;
-* complexidade média por classe: **16,86**.
+### Observação sobre o snapshot anterior
 
-Top 5 por *complexity score*:
-
-1. `ProcessoService` (**155,4**)
-2. `SubprocessoConsultaService` (**127,0**)
-3. `ValidadorDadosOrganizacionais` (**78,9**)
-4. `SubprocessoTransicaoService` (**64,7**)
-5. `SubprocessoService` (**59,2**)
-
-#### Cheiros de código (snapshot consolidado)
-
-* pontuação total: **1248** (*faixa crítica*);
-* escopo backend: **857 pontos**;
-* escopo frontend produção: **61 pontos**;
-* escopo frontend testes: **330 pontos**.
-
-Sinais que mais pesam:
-
-* backend com `@Nullable` em DTOs: **89 ocorrências**;
-* checks explícitos de `null` no backend: **201 ocorrências**;
-* frontend produção com `null checks`: **19 ocorrências**;
-* frontend produção com fallbacks defensivos `||`: **23 ocorrências**.
-
-#### Tamanho/forma (inventário estrutural)
-
-* backend: **70.530 linhas** no diretório `backend`; `src/test` (41.692) já supera `src/main` (22.148), sugerindo boa blindagem para refatoração incremental;
-* frontend: **55.205 linhas** no diretório `frontend`.
-
-Maiores views de produção no frontend:
-
-1. `CadastroView.vue` (**649** linhas)
-2. `MapaVisualizacaoView.vue` (**513**)
-3. `SubprocessoView.vue` (**499**)
-4. `ProcessoCadastroView.vue` (**476**)
-5. `AtribuicaoTemporariaView.vue` (**445**)
-6. `MapaView.vue` (**430**)
-
-Hotspots de volume + sinais no backend (inventário complementar):
-
-1. `SubprocessoTransicaoService.java` (**927 linhas**, 63 métodos, 11 checks de `null`)
-2. `ProcessoService.java` (**895 linhas**, 58 métodos, 15 checks de `null`)
-3. `E2eController.java` (**807 linhas**, 40 métodos, 15 checks de `null`)
-4. `SubprocessoConsultaService.java` (**583 linhas**, 67 métodos)
-5. `ValidadorDadosOrganizacionais.java` (**535 linhas**, 26 métodos, 14 checks de `null`)
+O plano anterior estava sustentado por medições de **09/04/2026**. Parte do diagnóstico continua válida, mas alguns números, caminhos de arquivo e prioridades ficaram desatualizados. Este documento substitui o foco anterior pelo backlog que ainda faz sentido agora.
 
 ---
 
-## Diagnóstico integrado (backend + frontend)
+## Estado atual validado
 
-## 1) Backend — concentração de regras em poucos serviços
+### Backend
 
-Há forte concentração de complexidade em **5 classes**, com mistura de responsabilidades (orquestração de fluxo, validação, composição de resposta, notificação, permissões e infraestrutura).
+Hotspots confirmados por volume e concentração de responsabilidade:
 
-### Achados prioritários
+1. `ProcessoService.java`: **984 linhas**, **67 métodos**, **15 checks de null**, concentração de consulta, manutenção, workflow, validação e notificação.
+2. `SubprocessoTransicaoService.java`: **926 linhas**, **63 métodos**, **11 checks de null**, fluxo transacional ainda extenso apesar de melhorias recentes.
+3. `E2eController.java`: **806 linhas**, **40 métodos**, **15 checks de null**, mistura controller HTTP com utilidades de fixture, seed e manutenção de banco.
+4. `SubprocessoConsultaService.java`: **613 linhas**, **69 métodos**, **6 checks de null**, ainda concentra leitura, contexto, permissões e montagem de resposta.
+5. `ValidadorDadosOrganizacionais.java`: **534 linhas**, **26 métodos**, **14 checks de null**, hotspot real de regra de domínio.
 
-* `ProcessoService` e `SubprocessoConsultaService` lideram simultaneamente em score, branches e volume, sinalizando risco de alteração cruzada e efeitos colaterais;
-* `SubprocessoTransicaoService` continua grande (927 linhas), com ganhos recentes, mas ainda com oportunidade de padronização de entradas e redução de duplicidade;
-* `ValidadorDadosOrganizacionais` aparece como hotspot de domínio (não só infraestrutura), sugerindo regras de elegibilidade/árvore ainda pouco segmentadas por cenário;
-* `E2eController` permanece grande e utilitário demais para o papel de controller de apoio a testes.
+Sinais adicionais ainda relevantes:
 
-### Oportunidades de simplificação de maior retorno
+* `@Nullable` em DTOs backend: **57 ocorrências** no checkout atual;
+* o problema principal segue sendo concentração de lógica em poucos pontos centrais, não falta de cobertura estrutural para refatorar;
+* `ProcessoService` e `SubprocessoConsultaService` continuam sendo os pontos com maior risco de alteração cruzada.
 
-1. **Fatiar por caso de uso explícito dentro dos serviços grandes** (sem camada genérica nova):
-   * extrair blocos de decisão para métodos privados nomeados por intenção de regra;
-   * reduzir caminhos de early return duplicados.
+### Frontend
 
-2. **Padronizar normalização e validação de entrada no início do fluxo público**:
-   * manter o corpo dos métodos focado em regra de negócio;
-   * diminuir checks defensivos repetidos no meio do fluxo.
+Views de produção ainda grandes no checkout atual:
 
-3. **Converter `null checks` recorrentes para invariantes locais**:
-   * usar construção de contexto/command logo no início;
-   * falhar cedo com mensagens de negócio claras;
-   * evitar `if (x == null)` espalhado em cadeia.
+1. `CadastroView.vue`: **646 linhas**, **13 computed**, **2 watch**, **12 funções assíncronas**.
+2. `MapaVisualizacaoView.vue`: **512 linhas**, **9 computed**, **0 watch**, **7 funções assíncronas**.
+3. `SubprocessoView.vue`: **499 linhas**, **2 computed**, **0 watch**, **6 funções assíncronas**.
+4. `AtribuicaoTemporariaView.vue`: **500 linhas**, **7 computed**, **1 watch**, **4 funções assíncronas**.
+5. `ProcessoCadastroView.vue`: **476 linhas**, **4 computed**, **1 watch**, **6 funções assíncronas**.
+6. `MapaView.vue`: **434 linhas**, **9 computed**, **0 watch**, **7 funções assíncronas**.
 
-4. **Segmentar `E2eController` por grupos coesos de fixture/ação**:
-   * separar endpoints de criação de cenário, transição de estado e utilitários;
-   * manter fachada HTTP enxuta e roteamento sem regra interna extensa.
+Leitura correta para o estado atual:
 
-## 2) Frontend — views grandes como concentradores de estado incidental
-
-O frontend de produção não está crítico por tipagem (`any` em produção zerado), mas ainda há **complexidade incidental em views grandes**.
-
-### Achados prioritários
-
-* `CadastroView.vue` combina alto volume (649 linhas) com alta densidade de `computed` e funções assíncronas;
-* `AtribuicaoTemporariaView.vue` e `MapaView.vue` seguem como candidatos naturais por volume e multiplicidade de estado local;
-* os maiores arquivos de teste (`ProcessoView.spec.ts`, `VisMapa.spec.ts`) indicam cenários ricos, e podem servir de guia para extrair fluxos coesos de UI sem perda de cobertura.
-
-### Oportunidades de simplificação de maior retorno
-
-1. **Separar estado de edição vs estado derivado de permissão/contexto**:
-   * reduzir `computed` com regras mistas (UI + negócio + autorização);
-   * manter um bloco de “estado da tela” e outro de “capacidade de ação”.
-
-2. **Consolidar fluxos repetidos de carregamento/salvamento/erro**:
-   * reaproveitar funções utilitárias locais por domínio (não genéricas demais);
-   * manter `normalizeError` nos pontos de integração com service/store.
-
-3. **Eliminar sincronizações redundantes entre watchers e efeitos de montagem**:
-   * priorizar fonte única de verdade por trecho de estado;
-   * reduzir risco de corridas em trocas de rota/contexto.
+* `CadastroView.vue` continua sendo o principal concentrador de estado incidental no frontend;
+* `AtribuicaoTemporariaView.vue` segue elegível para simplificação, mas por acoplamento entre pesquisa, validação e submissão, não por volume isolado;
+* `MapaView.vue` ainda merece atenção, mas **não** por excesso de watchers; a complexidade remanescente está mais em cálculos derivados e handlers assíncronos;
+* `MapaVisualizacaoView.vue` hoje aparece como candidato mais plausível do que no plano anterior, por combinar volume com múltiplas ações condicionadas por permissão e estado.
 
 ---
 
-## Backlog priorizado (matriz impacto x esforço)
+## O que já foi suficientemente atacado
 
-## Prioridade P1 — alto impacto / baixo-médio esforço
+Estas frentes não devem seguir como prioridade principal apenas por inércia do plano anterior:
+
+1. `MapaView.vue` já recebeu simplificações úteis e hoje não sustenta mais prioridade P1 por problema de sincronização.
+2. O backlog anterior subestimava o crescimento de `ProcessoService` e `AtribuicaoTemporariaView.vue`; portanto as prioridades antigas ficaram distorcidas.
+3. O plano anterior tratava contagem de `@Nullable` em DTOs como um bloco maior do que o observado no checkout atual; continua sendo um tema válido, mas não é o melhor próximo passo isolado.
+
+---
+
+## Diagnóstico operacional do que falta fazer
+
+## 1) Backend
+
+### Ponto mais crítico
+
+`ProcessoService` ainda é o maior concentrador de regras e infraestrutura do domínio de processo. O arquivo cresceu e permanece com responsabilidades demais para um único ponto de entrada.
+
+### Alvos que ainda faltam
 
 1. **`ProcessoService`**
-   * Meta: reduzir branches e decisões por método nos fluxos mais usados.
-   * Ações:
-     * identificar top 5 métodos por densidade de `if/for/switch`;
-     * aplicar extrações por intenção (sem abstração genérica);
-     * padronizar pré-condições no início.
+   * separar melhor trechos de orquestração, elegibilidade, notificação e transições internas;
+   * reduzir branches nos fluxos mais usados, especialmente onde há decisões condicionadas por perfil, situação e localização;
+   * consolidar pré-condições e contexto no início dos fluxos públicos.
 
 2. **`SubprocessoConsultaService`**
-   * Meta: diminuir acoplamento entre permissão, busca e montagem de DTO.
-   * Ações:
-     * separar etapas em pipeline linear interno (`resolverContexto`, `validarPermissao`, `montarResposta`);
-     * remover branches de fallback quando já cobertos por contrato.
+   * continuar a separação entre busca, construção de contexto, cálculo de permissão e montagem de resposta;
+   * eliminar branches de fallback que hoje escondem contrato implícito;
+   * reduzir mistura entre consulta simples e lógica derivada de interface.
 
-3. **`MapaView.vue`**
-   * Meta: reduzir lógica incidental no `<script setup>`.
-   * Ações:
-     * centralizar cálculos derivados repetidos;
-     * colapsar watchers/sincronizações que tratam o mesmo gatilho.
+3. **`SubprocessoTransicaoService`**
+   * manter a estratégia incremental, focando em entradas públicas e blocos repetidos de “buscar + validar situação + registrar movimentação”;
+   * padronizar normalizações textuais e commands internos;
+   * evitar novos records/adaptadores que só renomeiem parâmetros sem simplificar leitura.
 
-## Prioridade P2 — alto impacto / médio esforço
+4. **`E2eController`**
+   * recortar por grupos coesos de responsabilidade, mantendo o contrato HTTP existente;
+   * mover implementação interna pesada para helpers ou serviços específicos de fixture, quando isso realmente reduzir o corpo do controller;
+   * evitar continuar adicionando SQL utilitário e bootstrap de cenário no mesmo arquivo.
+
+5. **`ValidadorDadosOrganizacionais`**
+   * segmentar regras por cenário de validação em vez de manter um agregado grande de elegibilidade;
+   * transformar null checks recorrentes em invariantes ou objetos de contexto locais;
+   * melhorar nomeação de blocos de regra para reduzir leitura acidental.
+
+## 2) Frontend
+
+### Ponto mais crítico
+
+`CadastroView.vue` continua sendo a view com maior custo de leitura e coordenação local. Ela mistura estado de edição, estado de revisão, permissões, validação, histórico, modais e integração com stores.
+
+### Alvos que ainda faltam
+
+1. **`CadastroView.vue`**
+   * separar estado de edição de cadastro do estado derivado de permissão e revisão;
+   * consolidar fluxos repetidos de sincronização local, validação e atualização de status;
+   * reduzir o número de pontos que coordenam modal, erro, histórico e disponibilização no mesmo bloco.
+
+2. **`MapaVisualizacaoView.vue`**
+   * isolar o fluxo das ações de análise, aceite, devolução e validação;
+   * separar capacidade de ação do estado de carregamento e histórico;
+   * reduzir carga cognitiva do `<script setup>` sem extrair composables genéricos.
+
+3. **`AtribuicaoTemporariaView.vue`**
+   * desacoplar pesquisa incremental de usuário da validação de submissão;
+   * centralizar estados transitórios de dropdown, destaque e timeouts;
+   * manter a view como candidata de médio esforço, não mais como principal aposta do frontend.
+
+4. **`MapaView.vue`**
+   * tratar apenas simplificações locais restantes em cálculos derivados e handlers assíncronos;
+   * não priorizar nova rodada ampla a menos que uma mudança funcional volte a inflar a tela.
+
+---
+
+## Backlog priorizado
+
+## Prioridade P1
+
+1. **`ProcessoService`**
+   * maior retorno imediato no backend;
+   * alvo principal para reduzir complexidade concentrada e risco de regressão em futuras mudanças.
+
+2. **`CadastroView.vue`**
+   * maior retorno imediato no frontend;
+   * concentra o pior acoplamento entre estado local, permissões e fluxo assíncrono.
+
+3. **`SubprocessoConsultaService`**
+   * deve continuar logo após `ProcessoService`;
+   * já tem sinais claros de ganho incremental possível sem mudar contrato.
+
+## Prioridade P2
 
 4. **`SubprocessoTransicaoService`**
-   * Meta: continuar a simplificação sem alterar regra funcional.
-   * Ações:
-     * consolidar normalização de texto na entrada pública;
-     * remover adaptadores sem lógica líquida;
-     * unificar blocos “buscar + validar situação”.
+   * segue relevante, mas não deve furar a fila de `ProcessoService` e `SubprocessoConsultaService`.
 
-5. **`AtribuicaoTemporariaView.vue`**
-   * Meta: separar estado transitório da tela e regras de habilitação.
-   * Ações:
-     * recortar funções longas em unidades de intenção;
-     * reduzir dependência cruzada entre `ref`s de formulário e permissões.
-
-## Prioridade P3 — médio impacto / baixo-médio esforço
+5. **`MapaVisualizacaoView.vue`**
+   * hoje merece entrar antes de nova rodada grande em `MapaView.vue`.
 
 6. **`E2eController`**
-   * Meta: melhorar legibilidade e manutenção de testes E2E.
-   * Ações:
-     * dividir por grupos de endpoint;
-     * manter contrato atual de rotas, mas com implementação interna mais coesa.
+   * importante para manutenção e previsibilidade dos testes, mas com impacto mais indireto no produto.
 
-7. **DTOs backend com `@Nullable` (89 ocorrências)**
-   * Meta: diminuir código defensivo cascata.
-   * Ações:
-     * revisar DTOs com maior incidência e promover campos obrigatórios quando o contrato permitir;
-     * para opcionais reais, encapsular semântica em métodos auxiliares de leitura.
+## Prioridade P3
 
----
+7. **`ValidadorDadosOrganizacionais`**
+   * hotspot real, porém mais sensível a regra de domínio e, por isso, pede rodada própria e cuidadosa.
 
-## Plano de execução em ondas (recomendado)
+8. **DTOs backend com `@Nullable`**
+   * revisar primeiro apenas DTOs mais usados nos fluxos alterados;
+   * não executar como iniciativa isolada e ampla neste momento.
 
-### Onda 1 (1 rodada)
-
-* atacar `ProcessoService` + `MapaView.vue`;
-* entregar redução mensurável em:
-  * branches do `ProcessoService`;
-  * linhas e blocos de sincronização em `MapaView.vue`.
-
-### Onda 2 (1 rodada)
-
-* atacar `SubprocessoConsultaService` + `AtribuicaoTemporariaView.vue`;
-* priorizar remoção de duplicação de fluxo e clareza de pré-condições.
-
-### Onda 3 (1 rodada)
-
-* concluir frente de `SubprocessoTransicaoService` e recorte de `E2eController`;
-* revisar lote inicial de DTOs com `@Nullable` mais frequente.
+9. **`AtribuicaoTemporariaView.vue` e `MapaView.vue`**
+   * manter como ajustes oportunistas ou segunda frente de frontend, não como foco principal da próxima onda.
 
 ---
 
-## Critérios objetivos de sucesso por rodada
+## Plano recomendado em ondas
 
-## Backend
+### Onda 1
 
-* reduzir **10%+** do *complexity score* no alvo principal da rodada;
-* reduzir contagem local de checks explícitos de `null` no alvo (sem trocar por “defensivo escondido”);
-* manter/elevar cobertura de branches nos hotspots alterados.
+* atacar `ProcessoService` + `CadastroView.vue`;
+* objetivo: reduzir leitura local dos dois maiores concentradores atuais.
 
-## Frontend
+### Onda 2
 
-* reduzir linhas da view alvo em **15%+** (ou justificar impossibilidade);
-* reduzir número de pontos de sincronização (`watch`, inicializações duplicadas, efeitos sobrepostos);
-* manter `frontend_any_producao = 0`.
+* atacar `SubprocessoConsultaService` + `MapaVisualizacaoView.vue`;
+* objetivo: clarear contexto/permissões no backend e ações condicionais no frontend.
 
-## Observabilidade de simplificação
+### Onda 3
 
-* registrar antes/depois no próprio PR:
-  * linhas do arquivo;
-  * total de condicionais aproximado;
-  * número de pontos de entrada assíncrona.
+* atacar `SubprocessoTransicaoService` + `E2eController`;
+* objetivo: consolidar simplificação de workflow e reduzir utilitário excessivo no apoio a E2E.
+
+### Onda 4
+
+* revisar `ValidadorDadosOrganizacionais` e lote pequeno de DTOs com `@Nullable` relacionados aos fluxos tocados;
+* objetivo: transformar defensividade repetida em contratos locais mais explícitos.
+
+---
+
+## Critérios objetivos de sucesso
+
+### Backend
+
+* reduzir **10%+** do score ou de sinais estruturais relevantes no alvo principal da rodada;
+* reduzir contagem local de checks explícitos de `null` sem escondê-los em helpers opacos;
+* reduzir número de branches ou métodos excessivamente longos no hotspot atacado;
+* manter ou elevar cobertura nos trechos alterados.
+
+### Frontend
+
+* reduzir **15%+** das linhas da view alvo ou justificar objetivamente por que a simplificação foi estrutural, não volumétrica;
+* reduzir pontos de coordenação local concorrentes, especialmente carregamento, erro, modal e permissão;
+* manter `frontend_any_producao = 0`;
+* não introduzir novo acoplamento genérico por composables artificiais.
+
+### Observabilidade da simplificação
+
+Registrar no PR, para cada alvo:
+
+* linhas antes/depois;
+* condicionais aproximadas antes/depois;
+* número de pontos de entrada assíncrona antes/depois;
+* resumo curto do que deixou de ficar espalhado.
 
 ---
 
 ## Riscos e contenções
 
-* **Risco:** extração “arquitetural” excessiva piorar legibilidade.
-  * **Contenção:** só extrair quando reduzir leitura local e duplicação de decisão.
+* **Risco:** extração arquitetural piorar legibilidade.
+  * **Contenção:** extrair apenas quando o novo nome reduzir leitura local e não criar navegação excessiva.
 
-* **Risco:** alterações em serviços centrais gerarem regressão comportamental.
-  * **Contenção:** reforçar testes de integração nos casos de uso alterados antes de refatorar.
+* **Risco:** refatoração em serviços centrais alterar comportamento de autorização ou workflow.
+  * **Contenção:** reforçar testes de integração nos casos alterados e preservar contratos externos.
 
-* **Risco:** simplificação de view quebrar fluxo de permissão.
-  * **Contenção:** validar estados de ação por perfil (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) nos cenários já existentes.
+* **Risco:** simplificação de view deslocar lógica para composables genéricos e pouco transparentes.
+  * **Contenção:** preferir helpers locais e composables específicos de domínio quando houver duplicação real.
+
+* **Risco:** usar métricas antigas para justificar prioridade errada.
+  * **Contenção:** sempre reconferir volume e sinais estruturais do arquivo antes de iniciar a rodada.
 
 ---
 
@@ -258,76 +271,14 @@ O frontend de produção não está crítico por tipagem (`any` em produção ze
 * `./gradlew :backend:jacocoTestReport`
 * `node etc/scripts/sgc.js backend cobertura complexidade`
 
----
-
-## Progresso executado em 10/04/2026
-
-### Rodada A — `ProcessoService` (P1)
-
-* aplicado recorte de contexto para início de subprocessos via `InicioSubprocessosContexto`, removendo assinatura com muitos parâmetros no miolo do fluxo e deixando o ponto de entrada do caso de uso mais linear;
-* reduzida duplicação no processamento de ações em bloco (`ACEITAR`/`HOMOLOGAR`) com função única de aplicação condicional de transições;
-* mantido contrato funcional (mesmas chamadas para `SubprocessoService` e `SubprocessoTransicaoService`, sem alteração de DTO externo ou regras de permissão).
-
-**Aprendizados desta rodada**
-
-* extrações locais com `record` privado funcionam bem para reduzir carga cognitiva sem introduzir camada nova;
-* trechos de switch com ramos espelhados dão ganho rápido de legibilidade quando isolamos apenas a variação (qual transição chamar), preservando o fluxo principal.
-
-### Rodada B — `MapaView.vue` (P1)
-
-* consolidado padrão repetido de guarda de `codSubprocesso` em um executor único (`executarComSubprocesso`) para operações assíncronas da tela;
-* extraído cálculo derivado de atividades associadas para `computed` dedicado, reduzindo reconstrução incidental no fluxo de filtragem;
-* mantido comportamento de erro (`handleErrors`), atualização de mapa e navegação pós-disponibilização.
-
-**Aprendizados desta rodada**
-
-* a maior fonte de complexidade da view estava na repetição de pré-condições e não em regra de negócio;
-* pequenos utilitários locais no `<script setup>` trazem simplificação mensurável sem mover lógica para composables genéricos.
-
-### Próximos passos recomendados (mantendo backlog original)
-
-1. avançar em `SubprocessoConsultaService` (P1), com pipeline interno explícito de contexto/permissão/resposta;
-2. executar rodada dedicada em `AtribuicaoTemporariaView.vue` (P2) para separar estado transitório de regras de habilitação;
-3. rodar nova coleta (`qa dashboard` + complexidade backend) ao fim da próxima onda para comparar tendência com o snapshot de 09/04/2026.
-
-### Rodada C — `SubprocessoConsultaService` (P1)
-
-* iniciado pipeline interno de contexto com `DadosContextoConsulta`, reduzindo acoplamento no método `montarContextoConsulta`;
-* simplificadas verificações de acesso de cadastro/mapa com early return para estados indisponíveis, mantendo as mesmas regras de perfil;
-* padronizada resolução de localização atual por expressão única, reduzindo branch incidental.
-
-**Aprendizados desta rodada**
-
-* o maior ganho de legibilidade veio da separação entre “coleta de dados do contexto” e “cálculo de permissões”;
-* early return nas verificações de acesso elimina combinações redundantes sem alterar política de autorização.
-
-### Rodada D — `AtribuicaoTemporariaView.vue` (P2)
-
-* consolidada validação de submissão em `computed` único (`formularioValido`), removendo condição longa repetida no submit;
-* padronizado fluxo de pesquisa incremental de usuários com funções de intenção (`devePesquisarUsuarios`, `agendarPesquisaUsuarios`, `cancelarPesquisaUsuariosPendente`);
-* simplificada navegação por teclado da busca com `switch` e guarda única para cenário sem resultados.
-
-**Aprendizados desta rodada**
-
-* no front, a redução de complexidade veio mais de nomear intenções de fluxo do que de extrair composables;
-* helpers pequenos para “estado de pesquisa” diminuem risco de drift entre eventos de input, blur e teclado.
-
 ### Frontend
 
 * `npm run typecheck`
 * `npm run lint`
 * `npm run test:unit`
 
-### Auditoria de simplificação
+### Auditoria complementar
 
 * `node etc/scripts/sgc.js codigo smells auditar --json`
 * `node etc/scripts/sgc.js projeto arvore-linhas`
-
-### QA dashboard (quando aplicável)
-
-* `npm run qa:dashboard`
-
-Fontes de verdade:
-
-* `etc/qa-dashboard/latest/ultimo-snapshot.json`
-* `etc/qa-dashboard/latest/ultimo-resumo.md`
+* `npm run qa:dashboard` quando a rodada afetar qualidade percebida mais ampla
