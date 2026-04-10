@@ -163,6 +163,13 @@ export async function obterMapaVisualizacao(
     return response.data;
 }
 
+export async function obterSugestoesMapa(
+    codSubprocesso: number,
+): Promise<string> {
+    const response = await apiClient.get<{sugestoes: string}>(`/subprocessos/${codSubprocesso}/sugestoes`);
+    return response.data.sugestoes ?? "";
+}
+
 export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
     const response = await apiClient.get<ImpactoMapaResponse>(`/subprocessos/${codSubprocesso}/impactos-mapa`);
     const data = response.data;

@@ -40,6 +40,7 @@ vi.mock("@/services/processoService", () => ({
 
 vi.mock("@/services/subprocessoService", () => ({
     obterMapaVisualizacao: vi.fn(),
+    obterSugestoesMapa: vi.fn(),
 }));
 
 vi.mock("@/services/unidadeService", () => ({
@@ -107,8 +108,10 @@ describe("MapaVisualizacaoView.vue", () => {
                     descricao: "Competencia 1",
                     atividades: [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhec 1"}]}]
                 }
-            ]
+            ],
+            sugestoes: "Sugestoes do mapa",
         } as any);
+        vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValue("Sugestoes do mapa");
     });
 
     function createWrapper(accessOverrides = {}) {
@@ -161,8 +164,10 @@ describe("MapaVisualizacaoView.vue", () => {
         const wrapper = createWrapper();
         await flushPromises();
         vi.mocked(processoService.apresentarSugestoes).mockResolvedValue(undefined as never);
+        vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValue("");
 
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
+        await flushPromises();
         expect(wrapper.find('[data-testid="btn-confirmar"]').attributes('disabled')).toBeDefined();
 
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
@@ -197,6 +202,19 @@ describe("MapaVisualizacaoView.vue", () => {
         await flushPromises();
 
         expect(processoService.aceitarValidacao).toHaveBeenCalledWith(123, {texto: 'Obs aceite'});
+    });
+
+    it("reabre modal de sugestões com texto atualizado do backend", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValue("Sugestão persistida");
+
+        await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
+        await flushPromises();
+
+        expect(subprocessoService.obterSugestoesMapa).toHaveBeenCalledWith(123);
+        expect((wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').element as HTMLTextAreaElement).value)
+            .toBe("Sugestão persistida");
     });
 
     it("abre modal e confirma devolução", async () => {

@@ -210,6 +210,13 @@ describe('subprocessoService', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/mapa-visualizacao');
   });
 
+  it('obterSugestoesMapa', async () => {
+    getMock.mockResolvedValueOnce({ data: { sugestoes: 'Texto salvo' } } as never);
+    const resultado = await subprocessoService.obterSugestoesMapa(1);
+    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/sugestoes');
+    expect(resultado).toBe('Texto salvo');
+  });
+
   it('verificarImpactosMapa', async () => {
     getMock.mockResolvedValueOnce({ 
       data: { 

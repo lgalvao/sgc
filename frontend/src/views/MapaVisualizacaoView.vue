@@ -249,7 +249,7 @@ import {useToastStore} from "@/stores/toast";
 import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
-import {obterMapaVisualizacao} from "@/services/subprocessoService";
+import {obterMapaVisualizacao, obterSugestoesMapa} from "@/services/subprocessoService";
 import {
   aceitarValidacao as aceitarValidacaoService,
   apresentarSugestoes as apresentarSugestoesService,
@@ -331,6 +331,21 @@ async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   await router.push({name: "Painel"});
 }
 
+async function sincronizarSugestoesMapa(): Promise<string> {
+  if (!codSubprocesso.value) {
+    return "";
+  }
+
+  const textoSugestoes = await obterSugestoesMapa(codSubprocesso.value);
+  if (mapa.value) {
+    mapa.value = {
+      ...mapa.value,
+      sugestoes: textoSugestoes,
+    };
+  }
+  return textoSugestoes;
+}
+
 async function confirmarSugestoes() {
   if (!codSubprocesso.value || !sugestoes.value.trim()) return;
   try {
@@ -338,6 +353,12 @@ async function confirmarSugestoes() {
       await apresentarSugestoesService(codSubprocesso.value!, {
         sugestoes: sugestoes.value,
       });
+      if (mapa.value) {
+        mapa.value = {
+          ...mapa.value,
+          sugestoes: sugestoes.value,
+        };
+      }
       await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
     });
   } catch {
@@ -404,8 +425,13 @@ function fecharModalAceitar() {
   mostrarModalAceitar.value = false;
 }
 
-function abrirModalSugestoes() {
-  sugestoes.value = mapa.value?.sugestoes ?? "";
+async function abrirModalSugestoes() {
+  try {
+    sugestoes.value = await sincronizarSugestoesMapa();
+  } catch (error) {
+    logger.error(error);
+    sugestoes.value = mapa.value?.sugestoes ?? "";
+  }
   mostrarModalSugestoes.value = true;
 }
 
@@ -414,8 +440,13 @@ function fecharModalSugestoes() {
   sugestoes.value = "";
 }
 
-function verSugestoes() {
-  sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+async function verSugestoes() {
+  try {
+    sugestoesVisualizacao.value = (await sincronizarSugestoesMapa()) || "Nenhuma sugestão registrada.";
+  } catch (error) {
+    logger.error(error);
+    sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+  }
   mostrarModalVerSugestoes.value = true;
 }
 
