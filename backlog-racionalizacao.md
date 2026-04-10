@@ -5,17 +5,6 @@
 Este backlog deriva de:
 
 - [plano-racionalizacao.md](/Users/leonardo/sgc/plano-racionalizacao.md)
-- execução monitorada integral da suíte E2E registrada em [monitoramento-e2e.txt](/Users/leonardo/sgc/e2e/monitoramento-e2e.txt)
-
-Importante:
-
-- a coleta considerada aqui é a execução integral da suíte E2E registrada em `e2e/monitoramento-e2e.txt`
-- parte dos logins repetidos é consequência do desenho da suíte E2E, não necessariamente do produto
-- as prioridades abaixo valorizam repetição por fluxo e impacto em tela, não apenas picos isolados
-- `captura.spec.ts` e `jornada.spec.ts` devem ser tratados como reality check principal de fluxos representativos
-- a primeira coleta dedicada desses dois cenários foi invalidada por reaproveitamento indevido de infra antiga; o endurecimento foi aplicado em [playwright.config.ts](/Users/leonardo/sgc/playwright.config.ts) e [lifecycle.js](/Users/leonardo/sgc/e2e/lifecycle.js)
-- a coleta válida e mais recente desses cenários está em [monitoramento-reality-check.txt](/Users/leonardo/sgc/e2e/monitoramento-reality-check.txt)
-- o tracing interno do backend ficou disponível após corrigir a injeção de propriedades em [MonitoramentoAspect.java](/Users/leonardo/sgc/backend/src/main/java/sgc/comum/util/MonitoramentoAspect.java)
 
 ## Hotspots observados
 
@@ -27,25 +16,6 @@ Importante:
 - `GET /api/painel/alertas?page=0&size=10&unidade=1&sort=dataHora,desc`
 
 Esses endpoints apareceram como os mais frequentes da amostra monitorada e se repetem em praticamente toda entrada de fluxo autenticado.
-
-#### Sinais
-
-- o primeiro acesso ao painel foi significativamente mais caro que os seguintes
-- `painel/alertas` tende a ser mais caro que `painel/processos`
-- há recargas do painel em transições de fluxo onde talvez uma atualização parcial bastasse
-- o chamador principal confirmado é [PainelView.vue](/Users/leonardo/sgc/frontend/src/views/PainelView.vue)
-- a entrada da tela sempre dispara duas chamadas independentes em paralelo
-- a reativação da view também pode disparar recarga integral
-- a ordenação volta ao backend para recarregar `processos`
-- no reality check de [monitoramento-reality-check.txt](/Users/leonardo/sgc/e2e/monitoramento-reality-check.txt), `painel/processos` e `painel/alertas` seguiram liderando a frequência em `captura.spec.ts`
-- no mesmo reality check, eles aparecem repetidamente também em `jornada.spec.ts`, sobretudo após login, troca de papel e retorno de ações
-
-#### Hipóteses
-
-- falta de bootstrap único do painel
-- tela recarregando processos e alertas mesmo quando apenas um bloco muda
-- `alertas` pode estar fazendo mais trabalho que o necessário
-- existe oportunidade de cache curto ou reuso local por unidade/perfil
 
 ## Hotspot 2: contexto de processo [OTIMIZADO]
 
@@ -445,13 +415,5 @@ Separar custo de:
 - proposta de redução de round-trips
 
 ### Rodada 3
-
 - ajustes de API e frontend
 - validação comparativa antes/depois
-
-## Próximo passo recomendado
-
-Investigar as 7 falhas remanescentes na suíte E2E que não estão relacionadas à performance (CDU-10, 17, 19, 20, 23).
-
----
-*Atualizado em 10/04/2026: Consolidação de bootstrap do painel, cache de unidades e cache de subprocessos implementados e validados.*
