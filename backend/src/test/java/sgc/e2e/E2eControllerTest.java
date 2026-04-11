@@ -246,9 +246,7 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 null, "SIGLA", false, null);
 
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -267,9 +265,7 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -289,9 +285,7 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -370,9 +364,7 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -396,9 +388,7 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "   ", "SIGLA", true, 10); // Blank description
 
-        Unidade un = new Unidade();
-        un.setCodigo(1L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -474,7 +464,7 @@ class E2eControllerTest {
         @DisplayName("criarProcessoFixture: Unidade não encontrada")
         void criarProcessoFixture_UnidadeNaoEncontrada() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", false, 30);
-            when(unidadeServiceMock.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
+            when(unidadeServiceMock.buscarCodigoPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -485,9 +475,7 @@ class E2eControllerTest {
         void criarProcessoFixture_FalhaIniciar() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(10L);
-            when(unidadeServiceMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            when(unidadeServiceMock.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
 
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoServiceMock.criar(any())).thenReturn(dto);
@@ -506,9 +494,7 @@ class E2eControllerTest {
         void criarProcessoFixture_FalhaRecarregar() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(10L);
-            when(unidadeServiceMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            when(unidadeServiceMock.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
 
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoServiceMock.criar(any())).thenReturn(dto);

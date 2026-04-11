@@ -56,6 +56,16 @@ class UnidadeServiceTest {
     }
 
     @Test
+    @DisplayName("buscarCodigoPorSigla - Sucesso")
+    void buscarCodigoPorSigla() {
+        when(unidadeRepo.buscarCodigoAtivoPorSigla("U1")).thenReturn(Optional.of(10L));
+
+        Long result = service.buscarCodigoPorSigla("U1");
+
+        assertThat(result).isEqualTo(10L);
+    }
+
+    @Test
     @DisplayName("buscarEntidadesPorIds - Sucesso")
     void buscarPorCodigos() {
         List<Unidade> lista = List.of(new Unidade());

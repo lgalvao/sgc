@@ -94,8 +94,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("buscarPorProcessoEUnidade - deve retornar subprocesso")
     @WithMockUser
     void buscarPorProcessoEUnidade() throws Exception {
-        Unidade un = new Unidade(); un.setCodigo(2L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(2L);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         when(consultaService.obterEntidadePorProcessoEUnidade(1L, 2L)).thenReturn(sp);
@@ -107,7 +106,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L));
 
-        verify(unidadeService).buscarPorSigla("SIGLA");
+        verify(unidadeService).buscarCodigoPorSigla("SIGLA");
         verify(consultaService).obterEntidadePorProcessoEUnidade(1L, 2L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
@@ -888,8 +887,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("obterContextoEdicaoPorProcessoEUnidade - deve retornar contexto e 200")
     @WithMockUser
     void obterContextoEdicaoPorProcessoEUnidade() throws Exception {
-        Unidade un = new Unidade(); un.setCodigo(2L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(2L);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         when(consultaService.obterEntidadePorProcessoEUnidade(1L, 2L)).thenReturn(sp);
@@ -905,8 +903,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("obterContextoCadastroAtividadesPorProcessoEUnidade - deve retornar contexto e 200")
     @WithMockUser
     void obterContextoCadastroAtividadesPorProcessoEUnidade() throws Exception {
-        Unidade un = new Unidade(); un.setCodigo(2L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(2L);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         when(consultaService.obterEntidadePorProcessoEUnidade(1L, 2L)).thenReturn(sp);

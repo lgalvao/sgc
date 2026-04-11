@@ -3,7 +3,7 @@ import {ref} from "vue";
 import type {ContextoEdicaoSubprocesso} from "@/types/tipos";
 import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
-    buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
+    buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
 import {logger} from "@/utils";
 
@@ -106,13 +106,12 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
         try {
             const promessaCarregamento = (async () => {
-                const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
-                const codigo = dto.codigo;
+                const data = await serviceBuscarContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade);
+                const codigo = data.detalhes.codigo;
                 mapaProcessoUnidadeParaCodigo.set(chaveProcessoUnidade, codigo);
-                const data = await garantirContextoEdicao(codigo);
-                if (!data) {
-                    throw new Error(`Contexto de edição indisponível para subprocesso ${codigo}`);
-                }
+                contextoEdicao.value = data;
+                codSubprocessoCarregado.value = codigo;
+                invalido.value = false;
                 return {codigo, contexto: data};
             })();
             carregamentosPorProcessoUnidade.set(chaveProcessoUnidade, promessaCarregamento);

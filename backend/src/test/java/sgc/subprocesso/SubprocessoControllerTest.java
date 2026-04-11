@@ -56,8 +56,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve buscar por processo e unidade")
         @WithMockUser
         void buscarPorProcessoEUnidade() throws Exception {
-            Unidade unidade = new Unidade(); unidade.setCodigo(10L);
-            when(unidadeService.buscarPorSigla("U1")).thenReturn(unidade);
+            when(unidadeService.buscarCodigoPorSigla("U1")).thenReturn(10L);
             when(consultaService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
 
             mockMvc.perform(get("/api/subprocessos/buscar")
@@ -66,7 +65,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(100));
 
-            verify(unidadeService).buscarPorSigla("U1");
+            verify(unidadeService).buscarCodigoPorSigla("U1");
             verify(consultaService).obterEntidadePorProcessoEUnidade(1L, 10L);
         }
 
@@ -74,14 +73,14 @@ class SubprocessoControllerTest {
         @DisplayName("deve retornar 500 quando sigla da unidade for inválida")
         @WithMockUser
         void buscarPorProcessoEUnidadeErro() throws Exception {
-            when(unidadeService.buscarPorSigla("U1")).thenThrow(new RuntimeException("erro ao buscar unidade"));
+            when(unidadeService.buscarCodigoPorSigla("U1")).thenThrow(new RuntimeException("erro ao buscar unidade"));
 
             mockMvc.perform(get("/api/subprocessos/buscar")
                             .param("codProcesso", "1")
                             .param("siglaUnidade", "U1"))
                     .andExpect(status().isInternalServerError());
 
-            verify(unidadeService).buscarPorSigla("U1");
+            verify(unidadeService).buscarCodigoPorSigla("U1");
             verify(consultaService, never()).obterEntidadePorProcessoEUnidade(anyLong(), anyLong());
         }
     }
@@ -357,9 +356,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter contexto de cadastro de atividades buscando processo e unidade")
         @WithMockUser
         void deveObterContextoCadastroAtividadesBusca() throws Exception {
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(10L);
-            when(unidadeService.buscarPorSigla("U10")).thenReturn(unidade);
+            when(unidadeService.buscarCodigoPorSigla("U10")).thenReturn(10L);
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);

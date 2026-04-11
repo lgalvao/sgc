@@ -40,8 +40,15 @@ public class UnidadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));
     }
 
+    @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADE_POR_SIGLA, key = "#sigla.toUpperCase()", sync = true)
     public Unidade buscarPorSigla(String sigla) {
         return unidadeRepo.buscarPorSiglaComResponsavel(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
+    }
+
+    @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADE_CODIGO_POR_SIGLA, key = "#sigla.toUpperCase()", sync = true)
+    public Long buscarCodigoPorSigla(String sigla) {
+        return unidadeRepo.buscarCodigoAtivoPorSigla(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
     }
 
