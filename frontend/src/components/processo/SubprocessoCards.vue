@@ -188,12 +188,19 @@ const {podeEditarCadastro, podeEditarMapa, habilitarAcessoCadastro, habilitarAce
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 
 function navegarPara(routeName: string) {
+  const sufixo = routeName === "SubprocessoCadastro"
+      ? "cadastro"
+      : routeName === "SubprocessoVisCadastro"
+          ? "vis-cadastro"
+          : routeName === "SubprocessoMapa"
+              ? "mapa"
+              : "vis-mapa";
+
   router.push({
-    name: routeName,
-    params: {
-      codProcesso: props.codProcesso,
-      siglaUnidade: props.siglaUnidade
-    }
+    path: `/processo/${props.codProcesso}/${props.siglaUnidade}/${sufixo}`,
+    state: {
+      codSubprocesso: props.codSubprocesso,
+    },
   });
 }
 

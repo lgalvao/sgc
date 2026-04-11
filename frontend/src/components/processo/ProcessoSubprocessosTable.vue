@@ -16,6 +16,7 @@ import {TEXTOS} from "@/constants/textos";
 
 type LinhaSubprocessoArvore = {
   codigo: number;
+  codSubprocesso: number;
   unidadeAtual: string;
   sigla: string;
   situacao: string;
@@ -47,6 +48,7 @@ const mapeamentoHierarquia = computed(() => {
 function mapUnidades(unidades: UnidadeParticipante[]): LinhaSubprocessoArvore[] {
   return unidades.map(u => ({
     codigo: u.codUnidade,
+    codSubprocesso: u.codSubprocesso,
     unidadeAtual: `${u.sigla} - ${u.nome}`,
     sigla: u.sigla,
     situacao: formatSituacaoSubprocesso(u.situacaoSubprocesso),

@@ -186,6 +186,16 @@ function ordenarPor(campo: keyof ProcessoResumo) {
 
 function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
   if (processo && processo.linkDestino) {
+    if (processo.codSubprocesso) {
+      router.push({
+        path: processo.linkDestino,
+        state: {
+          codSubprocesso: processo.codSubprocesso,
+        },
+      });
+      return;
+    }
+
     router.push(processo.linkDestino);
   }
 }

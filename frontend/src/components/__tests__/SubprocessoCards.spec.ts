@@ -65,24 +65,24 @@ describe('SubprocessoCards.vue', () => {
         // Click action
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoCadastro',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/cadastro',
+            state: {codSubprocesso: 100}
         });
 
         // Keydown enter action
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoCadastro',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/cadastro',
+            state: {codSubprocesso: 100}
         });
 
         // Keydown space action
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoCadastro',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/cadastro',
+            state: {codSubprocesso: 100}
         });
 
         // Mapa card actions
@@ -90,24 +90,24 @@ describe('SubprocessoCards.vue', () => {
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoMapa',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/mapa',
+            state: {codSubprocesso: 100}
         });
 
         // Enter
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoMapa',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/mapa',
+            state: {codSubprocesso: 100}
         });
 
         // Space
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoMapa',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/mapa',
+            state: {codSubprocesso: 100}
         });
     });
 
@@ -119,44 +119,44 @@ describe('SubprocessoCards.vue', () => {
         // Atividades vis actions
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoVisCadastro',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/vis-cadastro',
+            state: {codSubprocesso: 100}
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoVisCadastro',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/vis-cadastro',
+            state: {codSubprocesso: 100}
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoVisCadastro',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/vis-cadastro',
+            state: {codSubprocesso: 100}
         });
 
         // Mapa vis Actions
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoVisMapa',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/vis-mapa',
+            state: {codSubprocesso: 100}
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoVisMapa',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/vis-mapa',
+            state: {codSubprocesso: 100}
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'SubprocessoVisMapa',
-            params: {codProcesso: 1, siglaUnidade: 'TESTE'}
+            path: '/processo/1/TESTE/vis-mapa',
+            state: {codSubprocesso: 100}
         });
     });
 

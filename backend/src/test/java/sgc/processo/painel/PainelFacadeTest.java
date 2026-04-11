@@ -6,12 +6,14 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.*;
+import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
+import sgc.processo.painel.dto.PainelBootstrapDto;
 import sgc.processo.service.*;
 import sgc.testutils.*;
 
@@ -415,5 +417,41 @@ class PainelFacadeTest {
                 .build();
         p.adicionarParticipantes(Set.of(u));
         return p;
+    }
+
+    @Test
+    @DisplayName("Deve obter bootstrap com sucesso")
+    void deveObterBootstrap() {
+        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
+        Page<Processo> pageProcessos = new PageImpl<>(List.of(p));
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(pageProcessos);
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+
+        Alerta a = new Alerta();
+        a.setCodigo(1L);
+        a.setProcesso(p);
+        a.setDescricao("Alerta 1");
+        a.setUnidadeOrigem(new Unidade());
+        a.getUnidadeOrigem().setSigla("U1");
+        a.setUnidadeDestino(new Unidade());
+        a.getUnidadeDestino().setSigla("U2");
+        a.setDataHora(LocalDateTime.now());
+
+        Page<Alerta> pageAlertas = new PageImpl<>(List.of(a));
+        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(pageAlertas);
+        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L))).thenReturn(Map.of(1L, LocalDateTime.now()));
+
+        PainelBootstrapDto result = painelFacade.obterBootstrap(CONTEXTO_ADMIN);
+
+        assertThat(result.getProcessos()).hasSize(1);
+        assertThat(result.getAlertas()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Deve marcar alertas como lidos")
+    void deveMarcarAlertasLidos() {
+        List<Long> codigos = List.of(1L, 2L);
+        painelFacade.marcarAlertasLidos(CONTEXTO_ADMIN, codigos);
+        verify(alertaFacade).marcarComoLidos(CONTEXTO_ADMIN, codigos);
     }
 }

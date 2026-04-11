@@ -140,7 +140,10 @@ describe("SubprocessoCards.vue", () => {
         const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
         await card.trigger("click");
 
-        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({ name: "SubprocessoCadastro" }));
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
+            path: "/processo/1/U1/cadastro",
+            state: {codSubprocesso: 1}
+        }));
     });
 
     it("navega para visualização de cadastro se não pode editar", async () => {
@@ -158,7 +161,10 @@ describe("SubprocessoCards.vue", () => {
         const card = wrapper.find('[data-testid="card-subprocesso-atividades-vis"]');
         await card.trigger("click");
 
-        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({ name: "SubprocessoVisCadastro" }));
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
+            path: "/processo/1/U1/vis-cadastro",
+            state: {codSubprocesso: 1}
+        }));
     });
 
     it("prioriza o subprocesso recebido por prop para evitar rota stale na primeira renderização", async () => {
@@ -212,8 +218,8 @@ describe("SubprocessoCards.vue", () => {
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            name: "SubprocessoCadastro",
-            params: {codProcesso: 401, siglaUnidade: "ASSESSORIA_22"}
+            path: "/processo/401/ASSESSORIA_22/cadastro",
+            state: {codSubprocesso: 1}
         }));
     });
 
@@ -232,7 +238,10 @@ describe("SubprocessoCards.vue", () => {
         const card = wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]');
         await card.trigger("click");
 
-        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({ name: "SubprocessoMapa" }));
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
+            path: "/processo/1/U1/mapa",
+            state: {codSubprocesso: 1}
+        }));
     });
 
     it("navega para visualização de mapa se habilitado mas não pode editar", async () => {
@@ -250,7 +259,10 @@ describe("SubprocessoCards.vue", () => {
         const card = wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]');
         await card.trigger("click");
 
-        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({ name: "SubprocessoVisMapa" }));
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
+            path: "/processo/1/U1/vis-mapa",
+            state: {codSubprocesso: 1}
+        }));
     });
 
     it("renderiza cards de Diagnóstico", () => {

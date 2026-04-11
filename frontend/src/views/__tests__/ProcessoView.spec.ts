@@ -755,6 +755,7 @@ describe("Processo.vue", () => {
 
         const rowItem = {
             codigo: 101,
+            codSubprocesso: 201,
             unidadeAtual: "UNI1 - Unidade 1",
             sigla: "UNI1",
             clickable: true
@@ -767,7 +768,8 @@ describe("Processo.vue", () => {
             params: {
                 codProcesso: "1",
                 siglaUnidade: "UNI1"
-            }
+            },
+            state: {codSubprocesso: 201}
         });
     });
 
@@ -789,6 +791,7 @@ describe("Processo.vue", () => {
         const treeTable = wrapper.findComponent(TreeTableStub);
         const rowItem = {
             codigo: 101,
+            codSubprocesso: 201,
             unidadeAtual: "UNI1 - Unidade 1",
             sigla: "UNI1",
             clickable: true
@@ -801,7 +804,8 @@ describe("Processo.vue", () => {
             params: {
                 codProcesso: "1",
                 siglaUnidade: "UNI1"
-            }
+            },
+            state: {codSubprocesso: 201}
         });
     });
 
@@ -857,7 +861,7 @@ describe("Processo.vue", () => {
 
         // branch 414-416 (navigation error)
         mocks.push.mockRejectedValueOnce(new Error("Nav error"));
-        await vm.abrirDetalhesUnidade({clickable: true, sigla: "ERR"});
+        await vm.abrirDetalhesUnidade({clickable: true, sigla: "ERR", codSubprocesso: 999});
 
         // loading state (77-80)
         wrapper.unmount();

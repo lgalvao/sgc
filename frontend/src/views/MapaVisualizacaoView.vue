@@ -260,7 +260,6 @@ import {
   homologarValidacao as homologarValidacaoService,
   validarMapa as validarMapaService,
 } from "@/services/processoService";
-import {buscarUnidadePorSigla as buscarUnidadeServico} from "@/services/unidadeService";
 import type {Analise, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -497,17 +496,20 @@ function verHistorico() {
 }
 
 onMounted(async () => {
-  unidade.value = await buscarUnidadeServico(sigla.value) as Unidade;
-  codSubprocesso.value = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+  const codigoNavegacao = typeof window !== "undefined" && typeof window.history.state?.codSubprocesso === "number"
+      ? window.history.state.codSubprocesso
+      : null;
+  codSubprocesso.value = codigoNavegacao ?? await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       codProcesso.value,
       sigla.value,
   );
 
   if (codSubprocesso.value) {
-    const [, mapaVisualizacao] = await Promise.all([
+    const [subprocessoDetalhe, mapaVisualizacao] = await Promise.all([
       subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value),
       obterMapaVisualizacao(codSubprocesso.value),
     ]);
+    unidade.value = subprocessoDetalhe?.unidade ?? null;
     mapa.value = mapaVisualizacao;
   }
 });

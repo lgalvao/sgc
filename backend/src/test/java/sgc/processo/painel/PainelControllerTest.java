@@ -14,6 +14,7 @@ import sgc.integracao.mocks.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
+import sgc.processo.painel.dto.PainelBootstrapDto;
 import sgc.seguranca.*;
 
 import java.util.*;
@@ -104,4 +105,45 @@ class PainelControllerTest {
         verify(painelFacade).listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class));
     }
 
+    @Test
+    @DisplayName("GET /api/painel/bootstrap - Deve obter bootstrap com sucesso")
+    void obterBootstrap_Sucesso() throws Exception {
+        Usuario usuarioMock = Usuario.builder()
+                .tituloEleitoral("123")
+                .unidadeAtivaCodigo(1L)
+                .perfilAtivo(Perfil.ADMIN)
+                .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
+                .build();
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+
+        PainelBootstrapDto bootstrapDto = new PainelBootstrapDto();
+        when(painelFacade.obterBootstrap(any(ContextoUsuarioAutenticado.class))).thenReturn(bootstrapDto);
+
+        mockMvc.perform(get("/api/painel/bootstrap")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST /api/painel/alertas/marcar-lidos - Deve marcar alertas como lidos com sucesso")
+    void marcarAlertasLidos_Sucesso() throws Exception {
+        Usuario usuarioMock = Usuario.builder()
+                .tituloEleitoral("123")
+                .unidadeAtivaCodigo(1L)
+                .perfilAtivo(Perfil.ADMIN)
+                .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
+                .build();
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+
+        List<Long> codigos = Arrays.asList(1L, 2L);
+
+        mockMvc.perform(post("/api/painel/alertas/marcar-lidos")
+                        .content("[1, 2]")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(painelFacade).marcarAlertasLidos(any(ContextoUsuarioAutenticado.class), eq(codigos));
+    }
 }

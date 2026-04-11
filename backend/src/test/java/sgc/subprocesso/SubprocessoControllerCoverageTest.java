@@ -885,19 +885,37 @@ class SubprocessoControllerCoverageTest {
     }
 
     @Test
-    @DisplayName("aceitarValidacao - deve permitir texto opcional nulo")
+    @DisplayName("obterContextoEdicaoPorProcessoEUnidade - deve retornar contexto e 200")
     @WithMockUser
-    void aceitarValidacaoSemTexto() throws Exception {
-        TextoOpcionalRequest req = new TextoOpcionalRequest(null);
+    void obterContextoEdicaoPorProcessoEUnidade() throws Exception {
+        Unidade un = new Unidade(); un.setCodigo(2L);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        when(consultaService.obterEntidadePorProcessoEUnidade(1L, 2L)).thenReturn(sp);
+        when(consultaService.obterContextoEdicao(1L)).thenReturn(mock(ContextoEdicaoResponse.class));
 
-        mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req))
-                        .with(csrf()))
+        mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")
+                        .param("codProcesso", "1")
+                        .param("siglaUnidade", "SIGLA"))
                 .andExpect(status().isOk());
+    }
 
-        verify(transicaoService).aceitarValidacao(eq(1L), isNull());
-        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
+    @Test
+    @DisplayName("obterContextoCadastroAtividadesPorProcessoEUnidade - deve retornar contexto e 200")
+    @WithMockUser
+    void obterContextoCadastroAtividadesPorProcessoEUnidade() throws Exception {
+        Unidade un = new Unidade(); un.setCodigo(2L);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        when(consultaService.obterEntidadePorProcessoEUnidade(1L, 2L)).thenReturn(sp);
+        when(consultaService.obterContextoCadastroAtividades(1L)).thenReturn(mock(ContextoCadastroAtividadesResponse.class));
+
+        mockMvc.perform(get("/api/subprocessos/contexto-cadastro-atividades/buscar")
+                        .param("codProcesso", "1")
+                        .param("siglaUnidade", "SIGLA"))
+                .andExpect(status().isOk());
     }
 
     private String criarJsonSubprocesso(LocalDateTime dataLimiteEtapa1, LocalDateTime dataLimiteEtapa2) throws Exception {

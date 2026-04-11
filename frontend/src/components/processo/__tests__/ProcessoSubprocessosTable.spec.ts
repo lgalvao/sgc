@@ -47,6 +47,7 @@ describe("ProcessoSubprocessosTable.vue", () => {
 
         expect(admin?.clickable).toBe(false);
         expect(sec?.clickable).toBe(true);
+        expect(sec?.codSubprocesso).toBe(123);
     });
 
     it("deve formatar corretamente os dados para a tabela", () => {

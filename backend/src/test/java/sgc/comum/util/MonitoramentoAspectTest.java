@@ -69,4 +69,17 @@ class MonitoramentoAspectTest {
 
         assertThat(result).isEqualTo("TRACE");
     }
+
+    @Test
+    @DisplayName("Deve cobrir construtores do MonitoramentoAspect")
+    void deveCobrirConstrutores() {
+        assertThat(new MonitoramentoAspect()).isNotNull();
+        
+        MonitoramentoProperties props = new MonitoramentoProperties();
+        props.setAtivo(true);
+        props.setTraceCompleto(true);
+        props.setLimiteAlertaMs(100);
+        
+        assertThat(new MonitoramentoAspect(props)).isNotNull();
+    }
 }

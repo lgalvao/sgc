@@ -58,4 +58,42 @@ class FiltroMonitoramentoHttpTest {
 
         assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNull();
     }
+
+    @Test
+    @DisplayName("Deve registrar latência no header da resposta")
+    void deveRegistrarLatencia() throws ServletException, IOException {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        properties.setAtivo(true);
+
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/lento");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filtro.doFilter(request, response, (req, res) -> {
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_TEMPO_SERVIDOR_MS)).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("Deve usar amostragem probabilística")
+    void deveUsarAmostragemProbabilistica() throws ServletException, IOException {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        properties.setAtivo(true);
+        properties.setTaxaAmostragem(1.0); // 100% de amostragem
+
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/test");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filtro.doFilter(request, response, (req, res) -> {
+        });
+
+        assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNotNull();
+    }
 }

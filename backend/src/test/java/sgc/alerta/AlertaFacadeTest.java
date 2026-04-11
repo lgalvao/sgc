@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
@@ -203,5 +204,96 @@ class AlertaFacadeTest {
 
         assertThat(alertas).isNotEmpty();
         assertThat(alertas).anyMatch(alerta -> alerta.getUnidadeDestino() == raiz);
+    }
+
+    @Test
+    @DisplayName("Deve obter mapa de data hora de leitura corretamente")
+    void deveObterMapaDataHoraLeitura() {
+        String titulo = "123";
+        List<Long> codigos = List.of(1L, 2L);
+        LocalDateTime agora = LocalDateTime.now();
+
+        AlertaUsuario au1 = new AlertaUsuario();
+        au1.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
+        au1.setDataHoraLeitura(agora);
+
+        AlertaUsuario au2 = new AlertaUsuario();
+        au2.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(2L).usuarioTitulo(titulo).build());
+        au2.setDataHoraLeitura(null); // Deve ser filtrado
+
+        when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(List.of(au1, au2));
+
+        Map<Long, LocalDateTime> mapa = alertaFacade.obterMapaDataHoraLeitura(titulo, codigos);
+
+        assertThat(mapa).hasSize(1);
+        assertThat(mapa.get(1L)).isEqualTo(agora);
+    }
+
+    @Test
+    @DisplayName("Deve marcar como lidos alertas que já possuem entrada de AlertaUsuario e que não possuem")
+    void deveMarcarComoLidosAlertasExistentesEAusentes() {
+        String titulo = "123";
+        List<Long> codigos = List.of(1L, 2L, 3L);
+        Usuario usuario = Usuario.builder().tituloEleitoral(titulo).build();
+        when(usuarioService.buscar(titulo)).thenReturn(usuario);
+
+        // Alerta 1: Já tem entrada mas não lido
+        AlertaUsuario au1 = new AlertaUsuario();
+        au1.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
+        au1.setDataHoraLeitura(null);
+
+        // Alerta 2: Já tem entrada e lido (não deve ser atualizado)
+        AlertaUsuario au2 = new AlertaUsuario();
+        au2.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(2L).usuarioTitulo(titulo).build());
+        au2.setDataHoraLeitura(LocalDateTime.now().minusDays(1));
+
+        when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(List.of(au1, au2));
+
+        // Alerta 3: Não tem entrada (codigosAusentes = [3L])
+        Alerta a3 = new Alerta();
+        a3.setCodigo(3L);
+        when(alertaService.listarPorCodigos(List.of(3L))).thenReturn(List.of(a3));
+
+        alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos);
+
+        ArgumentCaptor<List<AlertaUsuario>> captor = ArgumentCaptor.forClass(List.class);
+        verify(alertaService).salvarAlertasUsuarios(captor.capture());
+        
+        List<AlertaUsuario> salvos = captor.getValue();
+        assertThat(salvos).hasSize(2); // au1 atualizado e nova entrada para a3
+        assertThat(salvos).anyMatch(au -> au.getCodigo().getAlertaCodigo() == 1L && au.getDataHoraLeitura() != null);
+        assertThat(salvos).anyMatch(au -> au.getCodigo().getAlertaCodigo() == 3L && au.getDataHoraLeitura() != null);
+    }
+
+    @Test
+    @DisplayName("Deve ignorar alertas inexistentes ao marcar como lidos")
+    void deveIgnorarAlertasInexistentesAoMarcarComoLidos() {
+        String titulo = "123";
+        List<Long> codigos = List.of(999L);
+        when(usuarioService.buscar(titulo)).thenReturn(new Usuario());
+        when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(Collections.emptyList());
+        when(alertaService.listarPorCodigos(List.of(999L))).thenReturn(Collections.emptyList());
+
+        alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos);
+
+        verify(alertaService, never()).salvarAlertasUsuarios(anyList());
+    }
+
+    @Test
+    @DisplayName("Deve silenciar erro de concorrência ao marcar como lidos")
+    void deveSilenciarErroDeConcorrenciaAoMarcarComoLidos() {
+        String titulo = "123";
+        List<Long> codigos = List.of(1L);
+        when(usuarioService.buscar(titulo)).thenReturn(new Usuario());
+        
+        Alerta a1 = new Alerta();
+        a1.setCodigo(1L);
+        when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(Collections.emptyList());
+        when(alertaService.listarPorCodigos(List.of(1L))).thenReturn(List.of(a1));
+        
+        doThrow(new DataIntegrityViolationException("Erro fake")).when(alertaService).salvarAlertasUsuarios(anyList());
+
+        assertThatCode(() -> alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos))
+                .doesNotThrowAnyException();
     }
 }

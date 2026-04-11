@@ -6,7 +6,6 @@ import * as useAcessoModule from "@/composables/useAcesso";
 import * as analiseService from "@/services/analiseService";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
-import * as unidadeService from "@/services/unidadeService";
 import MapaVisualizacaoView from "../MapaVisualizacaoView.vue";
 
 function criarAcaoPrincipalMapa(codigo: 'ACEITAR' | 'HOMOLOGAR' = 'HOMOLOGAR') {
@@ -43,17 +42,15 @@ vi.mock("@/services/subprocessoService", () => ({
     obterSugestoesMapa: vi.fn(),
 }));
 
-vi.mock("@/services/unidadeService", () => ({
-    buscarUnidadePorSigla: vi.fn(),
-}));
-
 const subprocessosMock = {
     subprocessoDetalhe: {
         codigo: 123,
         codSubprocesso: 123,
     } as any,
     buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
-    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue(undefined),
+    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({
+        unidade: {sigla: "TESTE", nome: "Unidade Teste"},
+    }),
 };
 
 vi.mock("@/composables/useSubprocessos", () => ({
@@ -98,8 +95,9 @@ describe("MapaVisualizacaoView.vue", () => {
         vi.clearAllMocks();
         subprocessosMock.subprocessoDetalhe = {codigo: 123, codSubprocesso: 123} as any;
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
-        subprocessosMock.buscarSubprocessoDetalhe.mockResolvedValue(undefined);
-        vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValue({sigla: "TESTE", nome: "Unidade Teste"} as any);
+        subprocessosMock.buscarSubprocessoDetalhe.mockResolvedValue({
+            unidade: {sigla: "TESTE", nome: "Unidade Teste"},
+        });
         vi.mocked(subprocessoService.obterMapaVisualizacao).mockResolvedValue({
             codigo: 100,
             competencias: [

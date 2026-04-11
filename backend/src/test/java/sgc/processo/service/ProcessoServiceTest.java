@@ -97,6 +97,37 @@ class ProcessoServiceTest {
             assertThat(resultado).containsExactlyInAnyOrder(10L, 20L);
         }
 
+        @Test
+        @DisplayName("deve efetivar inicio de subprocessos para DIAGNOSTICO")
+        void deveEfetivarInicioSubprocessosDiagnostico() throws Exception {
+            Processo processo = new Processo();
+            processo.setCodigo(1L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            UnidadeMapa um = new UnidadeMapa();
+            um.setUnidadeCodigo(10L);
+            Unidade adm = new Unidade();
+            adm.setCodigo(999L);
+
+            java.lang.reflect.Method metodo = ProcessoService.class.getDeclaredMethod("efetivarInicioSubprocessos", 
+                ProcessoService.InicioSubprocessosContexto.class);
+            metodo.setAccessible(true);
+
+            ProcessoService.InicioSubprocessosContexto contexto = new ProcessoService.InicioSubprocessosContexto(
+                processo,
+                TipoProcesso.DIAGNOSTICO,
+                List.of(10L),
+                Set.of(unidade),
+                List.of(um),
+                adm
+            );
+
+            metodo.invoke(processoService, contexto);
+
+            verify(subprocessoService).criarParaDiagnostico(any());
+        }
+    }
+
 
         @Test
         @DisplayName("executarAcaoEmBloco nao executa transicoes quando subprocesso nao eh elegivel")
@@ -132,7 +163,6 @@ class ProcessoServiceTest {
             verify(transicaoService, never()).aceitarCadastroEmBloco(any());
             verify(transicaoService, never()).homologarCadastroEmBloco(any());
         }
-    }
 
     @Nested
     @DisplayName("Segurança e Controle de Acesso")

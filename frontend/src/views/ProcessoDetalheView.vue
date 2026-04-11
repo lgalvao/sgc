@@ -126,6 +126,7 @@ type ModalAcaoBlocoRef = {
 type LinhaCliqueSubprocesso = {
   clickable?: boolean;
   sigla?: string;
+  codSubprocesso?: number;
 };
 
 const route = useRoute();
@@ -195,7 +196,10 @@ async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
       params: {
         codProcesso: codProcesso.toString(),
         siglaUnidade: row.sigla
-      }
+      },
+      state: row.codSubprocesso
+          ? {codSubprocesso: row.codSubprocesso}
+          : undefined,
     });
   } catch (error) {
     logger.error(`Erro ao navegar para detalhes da unidade ${row.sigla}:`, error);
