@@ -77,6 +77,23 @@ describe("processo store", () => {
             expect(context.store.invalido).toBe(false);
         });
 
+        it("deve reutilizar carregamento em andamento para evitar requisições duplicadas", async () => {
+            let resolver!: (valor: any) => void;
+            const promessa = new Promise<any>((resolve) => {
+                resolver = resolve;
+            });
+            vi.mocked(processoService.buscarContextoCompleto).mockReturnValue(promessa);
+
+            const requisicaoA = context.store.garantirContextoCompleto(1);
+            const requisicaoB = context.store.garantirContextoCompleto(1);
+
+            expect(processoService.buscarContextoCompleto).toHaveBeenCalledTimes(1);
+            resolver({codigo: 1});
+
+            await expect(requisicaoA).resolves.toEqual({codigo: 1});
+            await expect(requisicaoB).resolves.toEqual({codigo: 1});
+        });
+
         it("deve lançar erro se o service falhar", async () => {
             const error = new Error("Erro API");
             vi.mocked(processoService.buscarContextoCompleto).mockRejectedValue(error);
