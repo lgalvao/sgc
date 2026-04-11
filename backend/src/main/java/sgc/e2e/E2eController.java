@@ -267,8 +267,7 @@ public class E2eController {
         Processo processo = executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
         Long codProcesso = processo.getCodigo();
         
-        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
-        Long codUnidade = unidade.getCodigo();
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(request.unidadeSigla());
 
         Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
                 .map(Subprocesso::getCodigo)
@@ -327,9 +326,9 @@ public class E2eController {
     @JsonView(ProcessoViews.Publica.class)
     public Processo criarProcessoMapeamentoComMapaComSugestoes(@RequestBody ProcessoFixtureRequest request) {
         Processo processo = criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_COM_SUGESTOES");
-        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(request.unidadeSigla());
         Long codSubprocesso = subprocessoRepo
-                .findByProcessoCodigoAndUnidadeCodigo(processo.getCodigo(), unidade.getCodigo())
+                .findByProcessoCodigoAndUnidadeCodigo(processo.getCodigo(), codUnidade)
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Mapa mapa = mapaRepo.buscarPorSubprocesso(codSubprocesso).orElseThrow();
@@ -509,8 +508,9 @@ public class E2eController {
 
         Long codProcesso = processo.getCodigo();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long codUnidade = unidade.getCodigo();
         Unidade admin = unidadeService.buscarAdmin();
-        Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, unidade.getCodigo())
+        Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Long codMapa = mapaRepo.buscarPorSubprocesso(codSubprocesso)
@@ -581,12 +581,13 @@ public class E2eController {
 
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long codUnidade = unidade.getCodigo();
         Unidade admin = unidadeService.buscarAdmin();
 
         ProcessoFixtureRequest requestMapeamento = ProcessoFixtureRequest.mapaBase(request.unidadeSigla(), diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
         Long codProcessoMapeamento = processoMapeamento.getCodigo();
-        Long codSubprocessoMapeamento = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoMapeamento, unidade.getCodigo())
+        Long codSubprocessoMapeamento = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoMapeamento, codUnidade)
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Long codMapaVigente = mapaRepo.buscarPorSubprocesso(codSubprocessoMapeamento)
@@ -603,9 +604,9 @@ public class E2eController {
 
         setSituacaoSubprocesso(codSubprocessoMapeamento, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         setSituacaoProcesso(codProcessoMapeamento);
-        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigo());
+        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", codUnidade);
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
-                unidade.getCodigo(), codMapaVigente);
+                codUnidade, codMapaVigente);
         limparCaches();
 
         ProcessoFixtureRequest requestRevisao = ProcessoFixtureRequest.iniciado(
@@ -615,7 +616,7 @@ public class E2eController {
         );
         Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);
         Long codProcessoRevisao = processoRevisao.getCodigo();
-        Long codSubprocessoRevisao = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoRevisao, unidade.getCodigo())
+        Long codSubprocessoRevisao = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoRevisao, codUnidade)
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Long codMapaRevisao = mapaRepo.buscarPorSubprocesso(codSubprocessoRevisao)
@@ -712,7 +713,7 @@ public class E2eController {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
-        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(request.unidadeSigla());
 
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
@@ -729,13 +730,13 @@ public class E2eController {
                 .descricao(descricao)
                 .tipo(tipo)
                 .dataLimiteEtapa1(dataLimite)
-                .unidades(List.of(unidade.getCodigo()))
+                .unidades(List.of(codUnidade))
                 .build();
 
         Processo processo = processoService.criar(criarReq);
 
         if (Boolean.TRUE.equals(request.iniciar())) {
-            List<Long> unidades = List.of(unidade.getCodigo());
+            List<Long> unidades = List.of(codUnidade);
             Long processoCodigo = processo.getCodigo();
             processoService.iniciar(processoCodigo, unidades);
 

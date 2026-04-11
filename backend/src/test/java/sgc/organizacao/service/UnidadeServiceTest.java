@@ -48,11 +48,32 @@ class UnidadeServiceTest {
     @DisplayName("buscarPorSigla - Sucesso")
     void buscarPorSigla() {
         Unidade u = new Unidade();
-        when(unidadeRepo.buscarPorSiglaComResponsavel("U1")).thenReturn(Optional.of(u));
+        when(unidadeRepo.buscarPorSiglaComSuperior("U1")).thenReturn(Optional.of(u));
 
         Unidade result = service.buscarPorSigla("U1");
 
         assertThat(result).isSameAs(u);
+    }
+
+    @Test
+    @DisplayName("buscarPorSiglaComResponsavel - Sucesso")
+    void buscarPorSiglaComResponsavel() {
+        Unidade u = new Unidade();
+        when(unidadeRepo.buscarPorSiglaComResponsavel("U1")).thenReturn(Optional.of(u));
+
+        Unidade result = service.buscarPorSiglaComResponsavel("U1");
+
+        assertThat(result).isSameAs(u);
+    }
+
+    @Test
+    @DisplayName("buscarCodigoPorSigla - Sucesso")
+    void buscarCodigoPorSigla() {
+        when(unidadeRepo.buscarCodigoAtivoPorSigla("U1")).thenReturn(Optional.of(10L));
+
+        Long result = service.buscarCodigoPorSigla("U1");
+
+        assertThat(result).isEqualTo(10L);
     }
 
     @Test

@@ -61,8 +61,8 @@ public class SubprocessoController {
     @PostAuthorize("hasPermission(returnObject.body.codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public ResponseEntity<SubprocessoCodigoDto> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
-        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        Subprocesso sp = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(siglaUnidade);
+        Subprocesso sp = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
         return ResponseEntity.ok(new SubprocessoCodigoDto(sp.getCodigo()));
     }
 
@@ -145,8 +145,8 @@ public class SubprocessoController {
             @RequestParam Long codProcesso,
             @RequestParam String siglaUnidade
     ) {
-        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(siglaUnidade);
+        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
         return ResponseEntity.ok(consultaService.obterContextoEdicao(subprocesso.getCodigo()));
     }
 
@@ -156,8 +156,8 @@ public class SubprocessoController {
             @RequestParam Long codProcesso,
             @RequestParam String siglaUnidade
     ) {
-        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(siglaUnidade);
+        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
         return ResponseEntity.ok(consultaService.obterContextoCadastroAtividades(subprocesso.getCodigo()));
     }
 
