@@ -191,6 +191,90 @@ class AlertaFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve retornar optional com data de leitura")
+    void deveRetornarDataHoraLeitura() {
+        Optional<LocalDateTime> dataHora = Optional.of(LocalDateTime.now());
+        when(alertaService.dataHoraLeituraAlertaUsuario(1L, "123")).thenReturn(dataHora);
+
+        Optional<LocalDateTime> result = alertaFacade.obterDataHoraLeitura(1L, "123");
+
+        assertThat(result).isEqualTo(dataHora);
+        verify(alertaService).dataHoraLeituraAlertaUsuario(1L, "123");
+    }
+
+    @Nested
+    @DisplayName("Marcação de Lidos")
+    class MarcacaoLidos {
+        @Test
+        @DisplayName("Não deve fazer nada se lista de códigos for vazia")
+        void naoDeveFazerNadaSeVazia() {
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, Collections.emptyList());
+
+            verify(alertaService, never()).alertasUsuarios(anyString(), anyList());
+            verify(alertaService, never()).salvarAlertasUsuarios(anyList());
+        }
+
+        @Test
+        @DisplayName("Deve atualizar data e salvar quando leitura for nula e houver alerta existente")
+        void deveAtualizarDataQuandoLeituraNula() {
+            AlertaUsuario alertaUsuario = new AlertaUsuario();
+            alertaUsuario.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).build());
+            alertaUsuario.setDataHoraLeitura(null);
+
+            when(alertaService.alertasUsuarios("123", List.of(1L))).thenReturn(List.of(alertaUsuario));
+
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L));
+
+            assertThat(alertaUsuario.getDataHoraLeitura()).isNotNull();
+            verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.contains(alertaUsuario)));
+        }
+
+        @Test
+        @DisplayName("Deve criar novo alertaUsuario quando não existir na base e salvar")
+        void deveCriarNovoQuandoNaoExistir() {
+            when(alertaService.alertasUsuarios("123", List.of(2L))).thenReturn(Collections.emptyList());
+
+            Alerta alerta = new Alerta();
+            alerta.setCodigo(2L);
+            when(alertaService.listarPorCodigos(List.of(2L))).thenReturn(List.of(alerta));
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+            when(usuarioService.buscar("123")).thenReturn(usuario);
+
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(2L));
+
+            verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.stream().anyMatch(au -> au.getCodigo().getAlertaCodigo() == 2L)));
+        }
+
+        @Test
+        @DisplayName("Deve ignorar se o alerta não for encontrado ao criar novo")
+        void deveIgnorarSeAlertaNaoEncontrado() {
+            when(alertaService.alertasUsuarios("123", List.of(3L))).thenReturn(Collections.emptyList());
+            when(alertaService.listarPorCodigos(List.of(3L))).thenReturn(Collections.emptyList());
+
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(3L));
+
+            verify(alertaService, never()).salvarAlertasUsuarios(anyList());
+        }
+
+        @Test
+        @DisplayName("Deve capturar DataIntegrityViolationException silenciosamente")
+        void deveCapturarExcecaoSilenciosamente() {
+            AlertaUsuario alertaUsuario = new AlertaUsuario();
+            alertaUsuario.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).build());
+            alertaUsuario.setDataHoraLeitura(null);
+
+            when(alertaService.alertasUsuarios("123", List.of(1L))).thenReturn(List.of(alertaUsuario));
+            doThrow(new org.springframework.dao.DataIntegrityViolationException("Simulação de concorrência"))
+                    .when(alertaService).salvarAlertasUsuarios(anyList());
+
+            assertThatCode(() -> alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L)))
+                    .doesNotThrowAnyException();
+        }
+    }
+
+    @Test
     @DisplayName("Deve criar alerta para participante do tipo raiz")
     void deveCriarAlertaParaParticipanteRaiz() {
         Processo processo = new Processo();

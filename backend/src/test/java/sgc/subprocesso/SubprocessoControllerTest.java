@@ -352,6 +352,30 @@ class SubprocessoControllerTest {
 
             verify(consultaService).verificarImpactos(1L);
         }
+
+        @Test
+        @DisplayName("deve obter contexto de cadastro de atividades buscando processo e unidade")
+        @WithMockUser
+        void deveObterContextoCadastroAtividadesBusca() throws Exception {
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            when(unidadeService.buscarPorSigla("U10")).thenReturn(unidade);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            when(consultaService.obterEntidadePorProcessoEUnidade(5L, 10L)).thenReturn(sp);
+
+            when(consultaService.obterContextoCadastroAtividades(1L)).thenReturn(
+                    new sgc.subprocesso.dto.ContextoCadastroAtividadesResponse(null, null, null, List.of())
+            );
+
+            mockMvc.perform(get("/api/subprocessos/contexto-cadastro-atividades/buscar")
+                            .param("codProcesso", "5")
+                            .param("siglaUnidade", "U10"))
+                    .andExpect(status().isOk());
+
+            verify(consultaService).obterContextoCadastroAtividades(1L);
+        }
     }
 
     @Nested
