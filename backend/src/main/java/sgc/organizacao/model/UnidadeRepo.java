@@ -94,6 +94,14 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             """)
     Optional<Unidade> buscarPorSiglaComResponsavel(@Param("sigla") String sigla);
 
+    @Query("""
+            SELECT u FROM Unidade u
+            LEFT JOIN FETCH u.unidadeSuperior
+            WHERE UPPER(u.sigla) = UPPER(:sigla)
+            AND u.situacao = SituacaoUnidade.ATIVA
+            """)
+    Optional<Unidade> buscarPorSiglaComSuperior(@Param("sigla") String sigla);
+
     List<Unidade> findByUnidadeSuperiorCodigoAndSituacao(Long unidadeSuperiorCodigo, SituacaoUnidade situacao);
 
     default List<Unidade> findByUnidadeSuperiorCodigo(Long unidadeSuperiorCodigo) {

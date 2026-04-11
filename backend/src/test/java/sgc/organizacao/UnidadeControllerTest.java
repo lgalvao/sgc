@@ -202,7 +202,7 @@ class UnidadeControllerTest {
         u.setNome("Unidade SIGLA");
         u.setSigla("SIGLA");
         u.setTipo(TipoUnidade.OPERACIONAL);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(u);
+        when(unidadeService.buscarPorSiglaComResponsavel("SIGLA")).thenReturn(u);
 
         mockMvc.perform(get("/api/unidades/sigla/SIGLA")).andExpect(status().isOk());
     }

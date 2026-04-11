@@ -44,7 +44,9 @@ Este backlog mantém **apenas o que ainda falta executar** após as rodadas 3, 4
   - `UnidadeService.buscarCodigoPorSigla` foi introduzido para lookup enxuto (`codigo` somente), usando `UnidadeRepo.buscarCodigoAtivoPorSigla`.
   - Fluxos de alta frequência (controllers de subprocesso e fixtures E2E) deixaram de resolver `Unidade` completa quando só o código é necessário.
   - `UnidadeService.buscarCodigoPorSigla` passou a usar cache dedicado (`unidadeCodigoPorSigla`) com chave normalizada em maiúsculas para reduzir reconsulta por sigla.
-  - `UnidadeService.buscarPorSigla` segue com cache dedicado (`unidadePorSigla`) para reduzir repetição de leitura completa quando necessária.
+  - Estratégia de volatilidade aplicada:
+    - `buscarPorSigla` cacheia leitura estrutural (unidade + superior, sem responsabilidade), adequada para dados que mudam em ciclos longos;
+    - `buscarPorSiglaComResponsavel` permanece sem cache dedicado para manter responsividade a substituições/afastamentos de chefia.
 
 ## Pendências prioritárias
 

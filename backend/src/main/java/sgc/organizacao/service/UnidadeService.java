@@ -42,6 +42,11 @@ public class UnidadeService {
 
     @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADE_POR_SIGLA, key = "#sigla.toUpperCase()", sync = true)
     public Unidade buscarPorSigla(String sigla) {
+        return unidadeRepo.buscarPorSiglaComSuperior(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
+    }
+
+    public Unidade buscarPorSiglaComResponsavel(String sigla) {
         return unidadeRepo.buscarPorSiglaComResponsavel(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
     }

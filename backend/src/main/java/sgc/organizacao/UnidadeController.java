@@ -97,7 +97,7 @@ public class UnidadeController {
     @GetMapping("/sigla/{siglaUnidade}")
     public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String siglaUnidade) {
-        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
+        Unidade unidade = unidadeService.buscarPorSiglaComResponsavel(siglaUnidade);
         return ResponseEntity.ok(UnidadeDto.fromEntityObrigatoria(unidade));
     }
 
