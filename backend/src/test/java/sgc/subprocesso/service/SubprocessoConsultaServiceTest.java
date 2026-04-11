@@ -6,8 +6,10 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.test.util.*;
 import sgc.comum.erros.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -25,6 +27,14 @@ class SubprocessoConsultaServiceTest {
     private AnaliseRepo analiseRepo;
     @Mock
     private UnidadeService unidadeService;
+    @Mock
+    private UsuarioFacade usuarioFacade;
+    @Mock
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @Mock
+    private HierarquiaService hierarquiaService;
+    @Mock
+    private sgc.mapa.service.MapaManutencaoService mapaManutencaoService;
 
     @InjectMocks
     private SubprocessoConsultaService service;
@@ -72,10 +82,62 @@ class SubprocessoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("listarPorProcessoEUnidadeCodigosESituacoes deve retornar vazio se unidades for vazia")
+    void listarPorProcessoEUnidadesCodigosESituacoesDeveRetornarVazioSeUnidadesVazia() {
+        assertThat(service.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(), List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))).isEmpty();
+        verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
+    }
+
+    @Test
+    @DisplayName("listarPorProcessoEUnidadeCodigosESituacoes deve retornar vazio se situacoes for vazia")
+    void listarPorProcessoEUnidadesCodigosESituacoesDeveRetornarVazioSeSituacoesVazia() {
+        assertThat(service.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(1L), List.of())).isEmpty();
+        verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
+    }
+
+    @Test
     @DisplayName("listarEntidadesPorProcessoEUnidades deve retornar vazio quando lista de unidades estiver vazia")
     void listarEntidadesPorProcessoEUnidadesDeveRetornarVazioQuandoListaDeUnidadesEstiverVazia() {
         assertThat(service.listarEntidadesPorProcessoEUnidades(1L, List.of())).isEmpty();
         verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
+    }
+
+    @Test
+    @DisplayName("obterContextoCadastroAtividades deve retornar contexto")
+    void obterContextoCadastroAtividadesDeveRetornarContexto() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("U10");
+        unidade.setNome("Unidade 10");
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sgc.processo.model.Processo proc = new sgc.processo.model.Processo();
+        proc.setCodigo(5L);
+        subprocesso.setProcesso(proc);
+
+        sgc.mapa.model.Mapa mapa = new sgc.mapa.model.Mapa();
+        mapa.setCodigo(100L);
+        mapa.setSubprocesso(subprocesso);
+        subprocesso.setMapa(mapa);
+
+        when(subprocessoRepo.buscarPorCodigoComMapa(1L)).thenReturn(Optional.of(subprocesso));
+
+        ContextoUsuarioAutenticado ctxUsuario = new ContextoUsuarioAutenticado("123", 20L, sgc.organizacao.model.Perfil.SERVIDOR);
+        when(usuarioFacade.contextoAutenticado()).thenReturn(ctxUsuario);
+
+        when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(new Unidade());
+
+        Unidade locAtual = new Unidade();
+        locAtual.setSigla("LOC");
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(locAtual);
+
+        var result = service.obterContextoCadastroAtividades(1L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.mapa()).isNotNull();
+        assertThat(result.mapa().codigo()).isEqualTo(100L);
     }
 
     @Test

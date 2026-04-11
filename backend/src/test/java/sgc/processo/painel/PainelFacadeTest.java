@@ -337,6 +337,79 @@ class PainelFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção se sigla for nula e perfil não for gestor nem admin")
+    void deveLancarExcecaoSeSiglaNulaENaoGestorNemAdmin() {
+        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
+        Page<Processo> pageProcessos = new PageImpl<>(List.of(p));
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(pageProcessos);
+
+        ContextoUsuarioAutenticado contextoChefe = new ContextoUsuarioAutenticado("123", 10L, Perfil.CHEFE);
+        when(unidadeService.buscarSiglaPorCodigo(10L)).thenReturn(null);
+
+        assertThatThrownBy(() -> painelFacade.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Sigla da unidade do usuário ausente");
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se sigla for vazia e perfil não for gestor nem admin")
+    void deveLancarExcecaoSeSiglaVaziaENaoGestorNemAdmin() {
+        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
+        Page<Processo> pageProcessos = new PageImpl<>(List.of(p));
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(pageProcessos);
+
+        ContextoUsuarioAutenticado contextoChefe = new ContextoUsuarioAutenticado("123", 10L, Perfil.CHEFE);
+        when(unidadeService.buscarSiglaPorCodigo(10L)).thenReturn("  ");
+
+        assertThatThrownBy(() -> painelFacade.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Sigla da unidade do usuário ausente");
+    }
+
+    @Test
+    @DisplayName("Deve marcar alertas como lidos")
+    void deveMarcarAlertasLidos() {
+        painelFacade.marcarAlertasLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
+        verify(alertaFacade).marcarComoLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
+    }
+
+    @Test
+    @DisplayName("Não deve chamar alertaFacade se lista de alertas estiver vazia")
+    void naoDeveMarcarAlertasLidosSeListaVazia() {
+        painelFacade.marcarAlertasLidos(CONTEXTO_ADMIN, Collections.emptyList());
+        verify(alertaFacade, never()).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
+    }
+
+    @Test
+    @DisplayName("Deve obter bootstrap corretamente")
+    void deveObterBootstrap() {
+        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
+        Page<Processo> pageProcessos = new PageImpl<>(List.of(p));
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(pageProcessos);
+
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(10L);
+        alerta.setDescricao("Alerta teste");
+        alerta.setDataHora(LocalDateTime.now());
+        alerta.setProcesso(p);
+        alerta.setUnidadeOrigem(new Unidade());
+        alerta.setUnidadeDestino(new Unidade());
+        Page<Alerta> pageAlertas = new PageImpl<>(List.of(alerta));
+
+        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(pageAlertas);
+        when(alertaFacade.obterMapaDataHoraLeitura(anyString(), anyList())).thenReturn(Map.of());
+
+        sgc.processo.painel.dto.PainelBootstrapDto bootstrap = painelFacade.obterBootstrap(CONTEXTO_ADMIN);
+
+        assertThat(bootstrap.getProcessos()).hasSize(1);
+        assertThat(bootstrap.getAlertas()).hasSize(1);
+        assertThat(bootstrap.getAlertas().getFirst().codigo()).isEqualTo(10L);
+    }
+
+    @Test
     @DisplayName("Deve cobrir children sendo lista vazia")
     void deveCobrirChildrenVazia() {
         Processo p = mock(Processo.class);
