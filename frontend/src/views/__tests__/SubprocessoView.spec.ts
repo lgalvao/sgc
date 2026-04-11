@@ -8,6 +8,10 @@ import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
 
+vi.mock('vue-router', () => ({
+    useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),
+}));
+
 type SubprocessoViewVm = {
     mostrarModalAlterarDataLimite: boolean;
     mostrarModalReabrir: boolean;
@@ -89,6 +93,7 @@ vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: () => subproce
 
 // Mock da store de cache de subprocesso (Rodada 2)
 const subprocessoStoreCacheMock = {
+    garantirContextoEdicao: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
     dadosValidos: vi.fn().mockReturnValue(false),
     invalidar: vi.fn(),

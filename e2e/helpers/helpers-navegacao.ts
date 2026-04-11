@@ -156,7 +156,7 @@ export async function navegarParaSubprocesso(
     // Aguardar qualquer transição de rota antes de checar a URL
     await page.waitForURL(/\/processo\/\d+/);
 
-    const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`);
+    const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}(?:\?.*)?$`);
     if (urlSubprocesso.test(page.url())) return;
 
     await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();

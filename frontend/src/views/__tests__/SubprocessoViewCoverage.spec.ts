@@ -7,6 +7,10 @@ import * as useAcessoModule from '@/composables/useAcesso';
 import * as processoService from '@/services/processoService';
 import {reactive, ref} from 'vue';
 
+vi.mock('vue-router', () => ({
+    useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),
+}));
+
 const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
@@ -32,6 +36,7 @@ vi.mock('@/services/processoService', () => ({
 
 // Mock da store de cache de subprocesso (Rodada 2)
 const subprocessoStoreCacheMock = {
+    garantirContextoEdicao: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
     dadosValidos: vi.fn().mockReturnValue(false),
     invalidar: vi.fn(),

@@ -21,7 +21,7 @@ function criarAcaoPrincipalMapa(codigo: 'ACEITAR' | 'HOMOLOGAR' = 'HOMOLOGAR') {
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
 vi.mock("vue-router", () => ({
-    useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}}),
+    useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
     useRouter: () => ({push: pushMock}),
 }));
 

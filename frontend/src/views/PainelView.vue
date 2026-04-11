@@ -189,8 +189,8 @@ function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
     if (processo.codSubprocesso) {
       router.push({
         path: processo.linkDestino,
-        state: {
-          codSubprocesso: processo.codSubprocesso,
+        query: {
+          codSubprocesso: String(processo.codSubprocesso),
         },
       });
       return;

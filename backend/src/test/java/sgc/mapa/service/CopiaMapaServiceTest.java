@@ -33,6 +33,9 @@ class CopiaMapaServiceTest {
     @InjectMocks
     private CopiaMapaService service;
 
+    @Captor
+    private ArgumentCaptor<List<Competencia>> competenciaListCaptor;
+
     @Test
     @DisplayName("Deve copiar mapa com sucesso")
     @SuppressWarnings("unchecked")
@@ -77,10 +80,9 @@ class CopiaMapaServiceTest {
         verify(mapaRepo).save(any(Mapa.class));
         verify(atividadeRepo).saveAll(anyList());
 
-        ArgumentCaptor<List<Competencia>> captor = ArgumentCaptor.forClass(List.class);
-        verify(competenciaRepo).saveAll(captor.capture());
+        verify(competenciaRepo).saveAll(competenciaListCaptor.capture());
 
-        List<Competencia> competenciasSalvas = captor.getValue();
+        List<Competencia> competenciasSalvas = competenciaListCaptor.getValue();
         assertThat(competenciasSalvas).hasSize(1);
         Competencia competenciaSalva = competenciasSalvas.getFirst();
         assertThat(competenciaSalva.getAtividades()).hasSize(1);

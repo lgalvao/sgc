@@ -154,7 +154,7 @@ import {
   BFormTextarea
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
@@ -187,6 +187,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+const route = useRoute();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
@@ -367,10 +368,14 @@ async function confirmarDevolucao() {
 }
 
 onMounted(async () => {
-  const resultado = await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
-      codProcesso.value,
-      unidadeId.value,
-  );
+  const codigoQuery = Number(route.query.codSubprocesso);
+  const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
+      ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
+          .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
+      : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
+          codProcesso.value,
+          unidadeId.value,
+      );
 
   if (resultado) {
     codSubprocesso.value = resultado.codigo;

@@ -260,7 +260,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
 
         await page.getByTestId('card-subprocesso-atividades').click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 
@@ -277,8 +277,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
 
         await page.getByTestId('card-subprocesso-atividades').click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
-        await expect(page).not.toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/vis-cadastro$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
+        await expect(page).not.toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/vis-cadastro(?:\?.*)?$`));
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 

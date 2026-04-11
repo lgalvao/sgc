@@ -197,8 +197,8 @@ async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
         codProcesso: codProcesso.toString(),
         siglaUnidade: row.sigla
       },
-      state: row.codSubprocesso
-          ? {codSubprocesso: row.codSubprocesso}
+      query: row.codSubprocesso
+          ? {codSubprocesso: String(row.codSubprocesso)}
           : undefined,
     });
   } catch (error) {

@@ -19,7 +19,7 @@ export async function navegarParaMapa(page: Page) {
         await cardVisualizacao.click();
     }
 
-    await page.waitForURL(/\/(mapa|vis-mapa)$/);
+    await page.waitForURL(/\/(mapa|vis-mapa)(?:\?.*)?$/);
     await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
 }
 

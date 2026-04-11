@@ -142,7 +142,7 @@ describe("SubprocessoCards.vue", () => {
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
             path: "/processo/1/U1/cadastro",
-            state: {codSubprocesso: 1}
+            query: {codSubprocesso: "1"}
         }));
     });
 
@@ -163,7 +163,7 @@ describe("SubprocessoCards.vue", () => {
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
             path: "/processo/1/U1/vis-cadastro",
-            state: {codSubprocesso: 1}
+            query: {codSubprocesso: "1"}
         }));
     });
 
@@ -219,7 +219,7 @@ describe("SubprocessoCards.vue", () => {
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
             path: "/processo/401/ASSESSORIA_22/cadastro",
-            state: {codSubprocesso: 1}
+            query: {codSubprocesso: "1"}
         }));
     });
 
@@ -240,7 +240,7 @@ describe("SubprocessoCards.vue", () => {
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
             path: "/processo/1/U1/mapa",
-            state: {codSubprocesso: 1}
+            query: {codSubprocesso: "1"}
         }));
     });
 
@@ -261,7 +261,7 @@ describe("SubprocessoCards.vue", () => {
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
             path: "/processo/1/U1/vis-mapa",
-            state: {codSubprocesso: 1}
+            query: {codSubprocesso: "1"}
         }));
     });
 

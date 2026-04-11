@@ -7,7 +7,7 @@ export async function navegarParaAtividades(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();
     await card.click();
-    await page.waitForURL(/\/cadastro$/);
+    await page.waitForURL(/\/cadastro(?:\?.*)?$/);
 
     await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
@@ -19,7 +19,7 @@ export async function navegarParaAtividadesVisualizacao(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades-vis');
     await expect(card).toBeVisible();
     await card.click();
-    await page.waitForURL(/\/vis-cadastro$/);
+    await page.waitForURL(/\/vis-cadastro(?:\?.*)?$/);
     await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
 }
 

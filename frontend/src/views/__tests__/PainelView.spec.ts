@@ -167,7 +167,7 @@ describe('PainelView', () => {
     vm.abrirDetalhesProcesso({codigo: 1, linkDestino: '/detalhes', codSubprocesso: 99});
     expect(mockRouterPush).toHaveBeenCalledWith({
       path: '/detalhes',
-      state: {codSubprocesso: 99},
+      query: {codSubprocesso: '99'},
     });
   });
 

@@ -40,6 +40,9 @@ class AlertaFacadeTest {
     @InjectMocks
     private AlertaFacade alertaFacade;
 
+    @Captor
+    private ArgumentCaptor<List<AlertaUsuario>> alertaUsuarioListCaptor;
+
     @Nested
     @DisplayName("Listagem de Alertas")
     class ListagemAlertas {
@@ -256,10 +259,9 @@ class AlertaFacadeTest {
 
         alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos);
 
-        ArgumentCaptor<List<AlertaUsuario>> captor = ArgumentCaptor.forClass(List.class);
-        verify(alertaService).salvarAlertasUsuarios(captor.capture());
+        verify(alertaService).salvarAlertasUsuarios(alertaUsuarioListCaptor.capture());
         
-        List<AlertaUsuario> salvos = captor.getValue();
+        List<AlertaUsuario> salvos = alertaUsuarioListCaptor.getValue();
         assertThat(salvos).hasSize(2); // au1 atualizado e nova entrada para a3
         assertThat(salvos).anyMatch(au -> au.getCodigo().getAlertaCodigo() == 1L && au.getDataHoraLeitura() != null);
         assertThat(salvos).anyMatch(au -> au.getCodigo().getAlertaCodigo() == 3L && au.getDataHoraLeitura() != null);

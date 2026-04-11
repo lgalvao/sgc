@@ -216,7 +216,10 @@ async function carregarMapaInicial(codigo: number) {
 }
 
 onMounted(async () => {
-  const codigo = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
+  const codigoQuery = Number(route.query.codSubprocesso);
+  const codigo = Number.isFinite(codigoQuery) && codigoQuery > 0
+      ? codigoQuery
+      : await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
   if (!codigo) {
     return;
   }

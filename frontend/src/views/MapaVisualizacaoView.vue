@@ -496,10 +496,10 @@ function verHistorico() {
 }
 
 onMounted(async () => {
-  const codigoNavegacao = typeof window !== "undefined" && typeof window.history.state?.codSubprocesso === "number"
-      ? window.history.state.codSubprocesso
-      : null;
-  codSubprocesso.value = codigoNavegacao ?? await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+  const codigoQuery = Number(route.query.codSubprocesso);
+  codSubprocesso.value = Number.isFinite(codigoQuery) && codigoQuery > 0
+      ? codigoQuery
+      : await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
       codProcesso.value,
       sigla.value,
   );
