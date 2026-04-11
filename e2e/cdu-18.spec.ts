@@ -34,7 +34,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await linhaUnidade.click();
 
             // Verificar navegação para detalhes do subprocesso
-            await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_\d+$/);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/ASSESSORIA_\d+(?:\?.*)?$`));
         });
 
 
