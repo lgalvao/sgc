@@ -39,7 +39,8 @@ describe("ProcessoSubprocessosTable.vue", () => {
         const data = treeTable.props('data') as Array<{
             sigla: string;
             clickable: boolean;
-            children: Array<{sigla: string; clickable: boolean}>;
+            codSubprocesso: number;
+            children: Array<{sigla: string; clickable: boolean; codSubprocesso: number}>;
         }>;
 
         const admin = data.find((u) => u.sigla === "ADMIN");

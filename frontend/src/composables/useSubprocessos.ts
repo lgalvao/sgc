@@ -26,7 +26,7 @@ function atualizarDetalheLocal(detalhe: SubprocessoDetalhe) {
     subprocessoDetalhe.value = detalhe;
 }
 
-async function buscarSubprocessoDetalhe(codigo: number) {
+async function buscarSubprocessoDetalhe(codigo: number): Promise<SubprocessoDetalhe | null> {
     subprocessoDetalhe.value = null;
 
     await withErrorHandling(async () => {
@@ -36,6 +36,8 @@ async function buscarSubprocessoDetalhe(codigo: number) {
         logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, erro);
         subprocessoDetalhe.value = null;
     });
+
+    return subprocessoDetalhe.value;
 }
 
 async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string): Promise<number | null> {
