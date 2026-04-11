@@ -140,8 +140,8 @@ export async function esperarPaginaDetalhesProcesso(page: Page, codigo?: number)
  */
 export async function esperarPaginaSubprocesso(page: Page, siglaUnidade?: string): Promise<void> {
     const regex = siglaUnidade 
-        ? new RegExp(String.raw`\/processo\/\d+\/${siglaUnidade}$`) 
-        : /\/processo\/\d+\/[A-Z0-9_]+$/;
+        ? new RegExp(String.raw`\/processo\/\d+\/${siglaUnidade}(?:\?.*)?$`) 
+        : /\/processo\/\d+\/[A-Z0-9_]+(?:\?.*)?$/;
     await page.waitForURL(regex);
 }
 

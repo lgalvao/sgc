@@ -75,7 +75,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await acessarDetalhesProcesso(page, 'Processo 99');
 
             // CHEFE vai direto para detalhes do subprocesso da sua unidade
-            await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/ASSESSORIA_12(?:\?.*)?$`));
         });
 
         await test.step('3. Acessar mapa de competências', async () => {

@@ -38,7 +38,6 @@ class CopiaMapaServiceTest {
 
     @Test
     @DisplayName("Deve copiar mapa com sucesso")
-    @SuppressWarnings("unchecked")
     void deveCopiarMapaComSucesso() {
         Long origemId = 1L;
 
@@ -94,7 +93,8 @@ class CopiaMapaServiceTest {
     @DisplayName("Deve lançar erro se mapa origem não existir")
     void deveLancarErroSeMapaOrigemNaoExistir() {
         when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
-        assertThatThrownBy(() -> service.copiarMapaParaUnidade(1L, new Subprocesso()))
+        Subprocesso destino = new Subprocesso();
+        assertThatThrownBy(() -> service.copiarMapaParaUnidade(1L, destino))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 

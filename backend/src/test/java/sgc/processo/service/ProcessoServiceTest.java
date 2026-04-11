@@ -183,8 +183,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar mapeamento com sucesso e salvar")
         void deveIniciarMapeamentoComSucesso() {
             Long id = 100L;
-            // Usuario usuario = new Usuario();
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             
             Processo p = new Processo();
             p.setCodigo(id);
@@ -208,8 +206,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar revisao com sucesso e salvar")
         void deveIniciarRevisaoComSucesso() {
             Long id = 100L;
-            // Usuario usuario = new Usuario();
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -245,9 +241,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar revisao ignorando unidade ancestral selecionada junto com a descendente")
         void deveIniciarRevisaoIgnorandoAncestralRedundante() {
             Long id = 101L;
-            // Usuario usuario = new Usuario();
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-
             Processo processo = new Processo();
             processo.setCodigo(id);
             processo.setSituacao(SituacaoProcesso.CRIADO);
@@ -283,7 +276,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar processo se houver unidades em processo ativo")
         void deveFalharAoIniciarSeHouverUnidadesEmProcessoAtivo() {
             Long id = 100L;
-            // Usuario usuario = new Usuario();
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -297,9 +289,9 @@ class ProcessoServiceTest {
             when(processoRepo.listarUnidadesEmProcessoAtivo(eq(SituacaoProcesso.EM_ANDAMENTO), anyList()))
                     .thenReturn(List.of(1L));
             mockarResponsaveisEfetivos();
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
+            List<Long> unidades = List.of();
+            assertThatThrownBy(() -> processoService.iniciar(id, unidades))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.UNIDADES_EM_PROCESSO_ATIVO);
         }
@@ -308,7 +300,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar processo se houver unidades sem mapa em REVISAO")
         void deveFalharAoIniciarSeHouverUnidadesSemMapaEmRevisao() {
             Long id = 100L;
-            // Usuario usuario = new Usuario();
 
             Processo p = new Processo();
             p.setCodigo(id);
@@ -319,13 +310,14 @@ class ProcessoServiceTest {
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
+
             // Simular que a unidade não tem mapa vigente
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of());
             when(unidadeService.buscarSiglasPorCodigos(anyList())).thenReturn(List.of("U1"));
             mockarResponsaveisEfetivos();
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L)))
+            List<Long> unidades = List.of(1L);
+            assertThatThrownBy(() -> processoService.iniciar(id, unidades))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.UNIDADES_SEM_MAPA);
         }
@@ -353,8 +345,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar processo se houver unidades sem responsavel efetivo")
         void deveFalharAoIniciarSeHouverUnidadesSemResponsavelEfetivo() {
             Long id = 100L;
-            // Usuario usuario = new Usuario();
-
             Processo p = new Processo();
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
@@ -365,9 +355,9 @@ class ProcessoServiceTest {
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(false);
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
+            List<Long> unidades = List.of();
+            assertThatThrownBy(() -> processoService.iniciar(id, unidades))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
@@ -995,9 +985,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar diagnostico com sucesso e salvar")
         void deveIniciarDiagnosticoComSucesso() {
             Long id = 100L;
-            // Usuario usuario = new Usuario();
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-
             Processo p = new Processo();
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
@@ -1147,9 +1134,6 @@ class ProcessoServiceTest {
         @DisplayName("Deve falhar ao iniciar revisao com unidades vazias")
         void deveFalharAoIniciarRevisaoSemUnidades() {
             Long id = 100L;
-            // Usuario usuario = new Usuario();
-            // when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-
             Processo p = new Processo();
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
@@ -1157,7 +1141,8 @@ class ProcessoServiceTest {
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
 
-            assertThatThrownBy(() -> processoService.iniciar(id, List.of()))
+            List<Long> unidades = List.of();
+            assertThatThrownBy(() -> processoService.iniciar(id, unidades))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
         }
