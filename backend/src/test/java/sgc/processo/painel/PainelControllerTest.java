@@ -82,6 +82,52 @@ class PainelControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/painel/bootstrap - Deve obter dados de bootstrap com sucesso usando contexto do Token")
+    void obterBootstrap_Sucesso() throws Exception {
+        Usuario usuarioMock = Usuario.builder()
+                .tituloEleitoral("123")
+                .perfilAtivo(Perfil.ADMIN)
+                .unidadeAtivaCodigo(1L)
+                .build();
+        usuarioMock.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+
+        sgc.processo.painel.dto.PainelBootstrapDto dto = sgc.processo.painel.dto.PainelBootstrapDto.builder()
+                .processos(Collections.emptyList())
+                .alertas(Collections.emptyList())
+                .build();
+        when(painelFacade.obterBootstrap(any(ContextoUsuarioAutenticado.class))).thenReturn(dto);
+
+        mockMvc.perform(get("/api/painel/bootstrap")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.processos").isArray())
+                .andExpect(jsonPath("$.alertas").isArray());
+    }
+
+    @Test
+    @DisplayName("POST /api/painel/alertas/marcar-lidos - Deve marcar alertas como lidos com sucesso")
+    void marcarAlertasLidos_Sucesso() throws Exception {
+        Usuario usuarioMock = Usuario.builder()
+                .tituloEleitoral("123")
+                .perfilAtivo(Perfil.ADMIN)
+                .unidadeAtivaCodigo(1L)
+                .build();
+        usuarioMock.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+
+        mockMvc.perform(post("/api/painel/alertas/marcar-lidos")
+                        .with(csrf())
+                        .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[1, 2, 3]"))
+                .andExpect(status().isNoContent());
+
+        verify(painelFacade).marcarAlertasLidos(any(ContextoUsuarioAutenticado.class), eq(List.of(1L, 2L, 3L)));
+    }
+
+    @Test
     @DisplayName("GET /api/painel/alertas - Deve ignorar parâmetros de usuário/unidade da URL e usar o Token")
     void listarAlertas_IgnoraParametrosUrl() throws Exception {
         Usuario usuarioMock = Usuario.builder()
@@ -105,45 +151,4 @@ class PainelControllerTest {
         verify(painelFacade).listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class));
     }
 
-    @Test
-    @DisplayName("GET /api/painel/bootstrap - Deve obter bootstrap com sucesso")
-    void obterBootstrap_Sucesso() throws Exception {
-        Usuario usuarioMock = Usuario.builder()
-                .tituloEleitoral("123")
-                .unidadeAtivaCodigo(1L)
-                .perfilAtivo(Perfil.ADMIN)
-                .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
-                .build();
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
-
-        PainelBootstrapDto bootstrapDto = new PainelBootstrapDto();
-        when(painelFacade.obterBootstrap(any(ContextoUsuarioAutenticado.class))).thenReturn(bootstrapDto);
-
-        mockMvc.perform(get("/api/painel/bootstrap")
-                        .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("POST /api/painel/alertas/marcar-lidos - Deve marcar alertas como lidos com sucesso")
-    void marcarAlertasLidos_Sucesso() throws Exception {
-        Usuario usuarioMock = Usuario.builder()
-                .tituloEleitoral("123")
-                .unidadeAtivaCodigo(1L)
-                .perfilAtivo(Perfil.ADMIN)
-                .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
-                .build();
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
-
-        List<Long> codigos = Arrays.asList(1L, 2L);
-
-        mockMvc.perform(post("/api/painel/alertas/marcar-lidos")
-                        .content("[1, 2]")
-                        .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        verify(painelFacade).marcarAlertasLidos(any(ContextoUsuarioAutenticado.class), eq(codigos));
-    }
 }

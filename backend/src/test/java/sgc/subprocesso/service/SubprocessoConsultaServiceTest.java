@@ -6,9 +6,10 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.test.util.*;
 import sgc.comum.erros.*;
-import sgc.organizacao.model.*;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -26,13 +27,12 @@ class SubprocessoConsultaServiceTest {
     private AnaliseRepo analiseRepo;
     @Mock
     private UnidadeService unidadeService;
-
     @Mock
     private sgc.organizacao.UsuarioFacade usuarioFacade;
     @Mock
-    private sgc.subprocesso.service.LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
     @Mock
-    private sgc.organizacao.service.HierarquiaService hierarquiaService;
+    private HierarquiaService hierarquiaService;
     @Mock
     private sgc.mapa.service.MapaManutencaoService mapaManutencaoService;
 
@@ -82,17 +82,17 @@ class SubprocessoConsultaServiceTest {
     }
 
     @Test
-    @DisplayName("listarEntidadesPorProcessoEUnidades deve retornar vazio quando lista de unidades estiver vazia")
-    void listarEntidadesPorProcessoEUnidadesDeveRetornarVazioQuandoListaDeUnidadesEstiverVazia() {
-        assertThat(service.listarEntidadesPorProcessoEUnidades(1L, List.of())).isEmpty();
-        verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
-    }
-
-    @Test
     @DisplayName("listarPorProcessoEUnidadeCodigosESituacoes deve retornar vazio quando lista de unidades ou situacoes estiver vazia")
     void listarPorProcessoEUnidadeCodigosESituacoesDeveRetornarVazio() {
         assertThat(service.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(), List.of(SituacaoSubprocesso.NAO_INICIADO))).isEmpty();
         assertThat(service.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(10L), List.of())).isEmpty();
+        verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
+    }
+
+    @Test
+    @DisplayName("listarEntidadesPorProcessoEUnidades deve retornar vazio quando lista de unidades estiver vazia")
+    void listarEntidadesPorProcessoEUnidadesDeveRetornarVazioQuandoListaDeUnidadesEstiverVazia() {
+        assertThat(service.listarEntidadesPorProcessoEUnidades(1L, List.of())).isEmpty();
         verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
     }
 
@@ -104,7 +104,7 @@ class SubprocessoConsultaServiceTest {
         unidade.setCodigo(100L);
         unidade.setSigla("U100");
         unidade.setNome("Unidade 100");
-        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(500L);
@@ -155,5 +155,27 @@ class SubprocessoConsultaServiceTest {
 
         var permissoes = service.obterPermissoesUI(sp);
         assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
+    }
+
+    @Test
+    @DisplayName("listarHistoricoCadastro deve carregar unidades em lote")
+    void listarHistoricoCadastroDeveCarregarUnidadesEmLote() {
+        Analise analise1 = new Analise();
+        analise1.setUnidadeCodigo(10L);
+        analise1.setTipo(TipoAnalise.CADASTRO);
+
+        Analise analise2 = new Analise();
+        analise2.setUnidadeCodigo(20L);
+        analise2.setTipo(TipoAnalise.CADASTRO);
+
+        when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(analise1, analise2));
+        when(unidadeService.buscarResumosPorCodigos(List.of(10L, 20L))).thenReturn(List.of(
+                new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL),
+                new UnidadeResumoLeitura(20L, "Unidade 20", "U20", TipoUnidade.OPERACIONAL)
+        ));
+
+        assertThat(service.listarHistoricoCadastro(1L)).hasSize(2);
+        verify(unidadeService).buscarResumosPorCodigos(List.of(10L, 20L));
+        verify(unidadeService, never()).buscarPorCodigo(anyLong());
     }
 }
