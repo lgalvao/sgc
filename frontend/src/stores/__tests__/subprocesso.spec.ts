@@ -77,6 +77,23 @@ describe("subprocesso store", () => {
             expect(context.store.invalido).toBe(false);
         });
 
+        it("deve reutilizar carregamento em andamento por código", async () => {
+            let resolver!: (valor: any) => void;
+            const promessa = new Promise<any>((resolve) => {
+                resolver = resolve;
+            });
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockReturnValue(promessa);
+
+            const requisicaoA = context.store.garantirContextoEdicao(1);
+            const requisicaoB = context.store.garantirContextoEdicao(1);
+
+            expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledTimes(1);
+            resolver({detalhes: {unidade: {sigla: "TEST"}}});
+
+            await expect(requisicaoA).resolves.toEqual({detalhes: {unidade: {sigla: "TEST"}}});
+            await expect(requisicaoB).resolves.toEqual({detalhes: {unidade: {sigla: "TEST"}}});
+        });
+
         it("deve retornar null e logar erro se o service falhar", async () => {
             vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue(new Error("Erro API"));
 
@@ -115,6 +132,36 @@ describe("subprocesso store", () => {
             expect(context.store.contextoEdicao).toEqual(mockContexto);
             expect(context.store.codSubprocessoCarregado).toBe(20);
             expect(context.store.invalido).toBe(false);
+        });
+
+        it("deve reutilizar carregamento em andamento por processo+unidade", async () => {
+            let resolverSubprocesso!: (valor: any) => void;
+            let resolverContexto!: (valor: any) => void;
+            const promessaSubprocesso = new Promise<any>((resolve) => {
+                resolverSubprocesso = resolve;
+            });
+            const promessaContexto = new Promise<any>((resolve) => {
+                resolverContexto = resolve;
+            });
+            vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockReturnValue(promessaSubprocesso);
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockReturnValue(promessaContexto);
+
+            const requisicaoA = context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+            const requisicaoB = context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+
+            expect(subprocessoService.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
+            resolverSubprocesso({codigo: 20});
+            resolverContexto({detalhes: {unidade: {sigla: "TEST"}}});
+
+            await expect(requisicaoA).resolves.toEqual({
+                codigo: 20,
+                contexto: {detalhes: {unidade: {sigla: "TEST"}}}
+            });
+            await expect(requisicaoB).resolves.toEqual({
+                codigo: 20,
+                contexto: {detalhes: {unidade: {sigla: "TEST"}}}
+            });
+            expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledTimes(1);
         });
 
         it("deve retornar null e logar erro se a busca falhar", async () => {

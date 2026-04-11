@@ -18,6 +18,7 @@ export const useProcessoStore = defineStore("processo", () => {
     const contextoCompleto = ref<Processo | null>(null);
     const codProcessoCarregado = ref<number | null>(null);
     const invalido = ref(true);
+    const carregamentosEmAndamento = new Map<number, Promise<Processo>>();
 
     /** Contexto ainda é válido para o processo dado? */
     function dadosValidos(codProcesso: number): boolean {
@@ -27,6 +28,7 @@ export const useProcessoStore = defineStore("processo", () => {
     /** Invalida o cache — deve ser chamado após qualquer ação de workflow que altera o processo. */
     function invalidar(): void {
         invalido.value = true;
+        carregamentosEmAndamento.clear();
     }
 
     /**
@@ -38,8 +40,15 @@ export const useProcessoStore = defineStore("processo", () => {
             return contextoCompleto.value;
         }
 
+        const carregamentoExistente = carregamentosEmAndamento.get(codProcesso);
+        if (carregamentoExistente) {
+            return carregamentoExistente;
+        }
+
         try {
-            const data = await serviceBuscarContextoCompleto(codProcesso);
+            const promessaCarregamento = serviceBuscarContextoCompleto(codProcesso);
+            carregamentosEmAndamento.set(codProcesso, promessaCarregamento);
+            const data = await promessaCarregamento;
             contextoCompleto.value = data;
             codProcessoCarregado.value = codProcesso;
             invalido.value = false;
@@ -47,6 +56,8 @@ export const useProcessoStore = defineStore("processo", () => {
         } catch (err) {
             logger.error(`Erro ao buscar contexto completo do processo ${codProcesso}:`, err);
             throw err; // relança para que a view possa exibir erro inline
+        } finally {
+            carregamentosEmAndamento.delete(codProcesso);
         }
     }
 

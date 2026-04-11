@@ -21,6 +21,13 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
     const codSubprocessoCarregado = ref<number | null>(null);
     const invalido = ref(true);
+    const carregamentosPorCodigo = new Map<number, Promise<ContextoEdicaoSubprocesso>>();
+    const carregamentosPorProcessoUnidade = new Map<string, Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso }>>();
+    const mapaProcessoUnidadeParaCodigo = new Map<string, number>();
+
+    function gerarChaveProcessoUnidade(codProcesso: number, siglaUnidade: string): string {
+        return `${codProcesso}:${siglaUnidade}`;
+    }
 
     /** Contexto ainda é válido para o subprocesso dado? */
     function dadosValidos(codSubprocesso: number): boolean {
@@ -30,6 +37,9 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     /** Invalida o cache — deve ser chamado após qualquer ação de workflow. */
     function invalidar(): void {
         invalido.value = true;
+        carregamentosPorCodigo.clear();
+        carregamentosPorProcessoUnidade.clear();
+        mapaProcessoUnidadeParaCodigo.clear();
     }
 
     /**
@@ -41,8 +51,15 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             return contextoEdicao.value;
         }
 
+        const carregamentoExistente = carregamentosPorCodigo.get(codSubprocesso);
+        if (carregamentoExistente) {
+            return carregamentoExistente;
+        }
+
         try {
-            const data = await serviceBuscarContextoEdicao(codSubprocesso);
+            const promessaCarregamento = serviceBuscarContextoEdicao(codSubprocesso);
+            carregamentosPorCodigo.set(codSubprocesso, promessaCarregamento);
+            const data = await promessaCarregamento;
             contextoEdicao.value = data;
             codSubprocessoCarregado.value = codSubprocesso;
             invalido.value = false;
@@ -50,6 +67,8 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         } catch (err) {
             logger.error(`Erro ao buscar contexto de edição do subprocesso ${codSubprocesso}:`, err);
             return null;
+        } finally {
+            carregamentosPorCodigo.delete(codSubprocesso);
         }
     }
 
@@ -61,25 +80,52 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         codProcesso: number,
         siglaUnidade: string
     ): Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso } | null> {
+        const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
+
         // Reutiliza cache se já temos contexto válido para a mesma unidade
         if (contextoEdicao.value && !invalido.value && codSubprocessoCarregado.value !== null) {
             const siglaCarregada = contextoEdicao.value.detalhes?.unidade?.sigla;
             if (siglaCarregada === siglaUnidade) {
+                mapaProcessoUnidadeParaCodigo.set(chaveProcessoUnidade, codSubprocessoCarregado.value);
                 return {codigo: codSubprocessoCarregado.value, contexto: contextoEdicao.value};
             }
         }
 
+        const codigoMapeado = mapaProcessoUnidadeParaCodigo.get(chaveProcessoUnidade);
+        if (typeof codigoMapeado === "number") {
+            const contexto = await garantirContextoEdicao(codigoMapeado);
+            if (contexto) {
+                return {codigo: codigoMapeado, contexto};
+            }
+        }
+
+        const carregamentoExistente = carregamentosPorProcessoUnidade.get(chaveProcessoUnidade);
+        if (carregamentoExistente) {
+            return carregamentoExistente;
+        }
+
         try {
-            const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
-            const codigo = dto.codigo;
-            const data = await serviceBuscarContextoEdicao(codigo);
-            contextoEdicao.value = data;
+            const promessaCarregamento = (async () => {
+                const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
+                const codigo = dto.codigo;
+                mapaProcessoUnidadeParaCodigo.set(chaveProcessoUnidade, codigo);
+                const data = await garantirContextoEdicao(codigo);
+                if (!data) {
+                    throw new Error(`Contexto de edição indisponível para subprocesso ${codigo}`);
+                }
+                return {codigo, contexto: data};
+            })();
+            carregamentosPorProcessoUnidade.set(chaveProcessoUnidade, promessaCarregamento);
+            const {codigo, contexto} = await promessaCarregamento;
+            contextoEdicao.value = contexto;
             codSubprocessoCarregado.value = codigo;
             invalido.value = false;
-            return {codigo, contexto: data};
+            return {codigo, contexto};
         } catch (err) {
             logger.error(`Erro ao buscar contexto de subprocesso para processo ${codProcesso} unidade ${siglaUnidade}:`, err);
             return null;
+        } finally {
+            carregamentosPorProcessoUnidade.delete(chaveProcessoUnidade);
         }
     }
 
