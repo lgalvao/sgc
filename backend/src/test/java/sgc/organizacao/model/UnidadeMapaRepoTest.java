@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.transaction.annotation.*;
+import sgc.mapa.model.*;
 
 import java.util.*;
 
@@ -34,8 +35,10 @@ class UnidadeMapaRepoTest {
         assertThat(unidadeMapaRepo.existsById(8L)).isTrue();
         assertThat(unidadeMapaRepo.existsById(999L)).isFalse();
         assertThat(unidadeMapa.getUnidadeCodigoPersistido()).isEqualTo(8L);
-        assertThat(unidadeMapa.getMapaVigente()).isNotNull();
-        assertThat(unidadeMapa.getMapaVigente().getCodigo()).isEqualTo(1001L);
+
+        Mapa mapaVigente = unidadeMapa.getMapaVigente();
+        assertThat(mapaVigente).isNotNull();
+        assertThat(mapaVigente.getCodigo()).isEqualTo(1001L);
     }
 
     @Test

@@ -168,7 +168,9 @@ public class UnidadeHierarquiaService {
      */
     public Optional<String> buscarSiglaSuperior(String sigla) {
         Unidade unidade = unidadeService.buscarPorSigla(sigla);
-        Long codigoPai = buscarCodigoPai(unidade.getCodigo());
+        Long unidadeCodigo = unidade.getCodigo();
+        Long codigoPai = buscarCodigoPai(unidadeCodigo);
+
         if (codigoPai == null) return Optional.empty();
         return unidadeRepo.buscarSiglaPorCodigo(codigoPai);
     }

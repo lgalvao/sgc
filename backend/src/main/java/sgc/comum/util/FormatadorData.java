@@ -1,5 +1,7 @@
 package sgc.comum.util;
 
+import org.jspecify.annotations.*;
+
 import java.time.*;
 import java.time.format.*;
 
@@ -13,11 +15,11 @@ public class FormatadorData {
     private FormatadorData() {
     }
 
-    public static String formatarData(LocalDateTime data) {
+    public static String formatarData(@Nullable LocalDateTime data) {
         return data == null ? "-" : data.format(FORMATO_BR);
     }
 
-    public static String formatarDataHora(LocalDateTime data) {
+    public static String formatarDataHora(@Nullable LocalDateTime data) {
         return data == null ? "-" : data.format(FORMATO_BR_COM_HORA);
     }
 }

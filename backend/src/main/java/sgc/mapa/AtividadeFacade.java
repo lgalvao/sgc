@@ -56,7 +56,9 @@ public class AtividadeFacade {
         Atividade atividade = mapaManutencaoService.atividadeCodigo(codigo);
         Usuario usuario = usuarioService.usuarioAutenticado();
 
-        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
+        Mapa mapa = atividade.getMapa();
+        Long mapaCodigo = mapa.getCodigo();
+        verificarPermissaoEdicao(mapaCodigo, usuario);
         mapaManutencaoService.atualizarAtividade(codigo, request);
 
         return criarRespostaOperacaoPorAtividade(codigo);
@@ -64,7 +66,8 @@ public class AtividadeFacade {
 
     public AtividadeOperacaoResponse excluirAtividade(Long codigo) {
         Atividade atividade = mapaManutencaoService.atividadeCodigo(codigo);
-        Long codMapa = atividade.getMapa().getCodigo();
+        Mapa mapa = atividade.getMapa();
+        Long codMapa = mapa.getCodigo();
 
         Usuario usuario = usuarioService.usuarioAutenticado();
         verificarPermissaoEdicao(codMapa, usuario);
@@ -76,7 +79,10 @@ public class AtividadeFacade {
     public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.atividadeCodigo(codAtividade);
         Usuario usuario = usuarioService.usuarioAutenticado();
-        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
+
+        Mapa mapa = atividade.getMapa();
+        Long mapaCodigo = mapa.getCodigo();
+        verificarPermissaoEdicao(mapaCodigo, usuario);
 
         Conhecimento salvo = mapaManutencaoService.criarConhecimento(codAtividade, request);
         AtividadeOperacaoResponse response = criarRespostaOperacaoPorAtividade(codAtividade);
@@ -87,7 +93,9 @@ public class AtividadeFacade {
     public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.atividadeCodigo(codAtividade);
         Usuario usuario = usuarioService.usuarioAutenticado();
-        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
+
+        Mapa mapa = atividade.getMapa();
+        verificarPermissaoEdicao(mapa.getCodigo(), usuario);
 
         mapaManutencaoService.atualizarConhecimento(codAtividade, codConhecimento, request);
         return criarRespostaOperacaoPorAtividade(codAtividade);
@@ -97,7 +105,8 @@ public class AtividadeFacade {
         Atividade atividade = mapaManutencaoService.atividadeCodigo(codAtividade);
 
         Usuario usuario = usuarioService.usuarioAutenticado();
-        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
+        Mapa mapa = atividade.getMapa();
+        verificarPermissaoEdicao(mapa.getCodigo(), usuario);
 
         mapaManutencaoService.excluirConhecimento(codAtividade, codConhecimento);
         return criarRespostaOperacaoPorAtividade(codAtividade);
@@ -110,15 +119,16 @@ public class AtividadeFacade {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_EDITAR_ATIVIDADES);
         }
 
+        SituacaoSubprocesso situacao = sp.getSituacao();
         if (!Set.of(NAO_INICIADO,
                 MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                 REVISAO_CADASTRO_EM_ANDAMENTO,
                 MAPEAMENTO_MAPA_CRIADO,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
                 REVISAO_MAPA_AJUSTADO,
-                REVISAO_MAPA_COM_SUGESTOES).contains(sp.getSituacao())) {
+                REVISAO_MAPA_COM_SUGESTOES).contains(situacao)) {
 
-            throw new ErroValidacao(Mensagens.SITUACAO_ATUAL.formatted(sp.getSituacao()));
+            throw new ErroValidacao(Mensagens.SITUACAO_ATUAL.formatted(situacao));
         }
     }
 

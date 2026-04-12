@@ -66,8 +66,9 @@ public class UnidadeDto {
                 entity.getTituloTitular()
         );
 
-        if (entity.getResponsabilidade() != null) {
-            dto.setResponsavel(UsuarioResumoDto.fromEntityObrigatorio(entity.getResponsabilidade().getUsuario()));
+        Responsabilidade responsabilidade = entity.getResponsabilidade();
+        if (responsabilidade != null) {
+            dto.setResponsavel(UsuarioResumoDto.fromEntityObrigatorio(responsabilidade.getUsuario()));
         }
 
         return dto;

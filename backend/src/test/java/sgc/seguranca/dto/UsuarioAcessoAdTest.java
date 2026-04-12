@@ -30,10 +30,11 @@ class UsuarioAcessoAdTest {
         assertThat(usuario.getNivel()).isEqualTo(2);
         assertThat(usuario.getNomeNivel()).isEqualTo("Tático");
         assertThat(usuario.getTipo()).isEqualTo("SERVIDOR");
-        assertThat(usuario.getLotacao()).isSameAs(lotacao);
 
-        assertThat(usuario.getLotacao().getCodigo()).isEqualTo(123);
-        assertThat(usuario.getLotacao().getSigla()).isEqualTo("DIREX");
-        assertThat(usuario.getLotacao().getNome()).isEqualTo("Diretoria Executiva");
+        UsuarioAcessoAd.LotacaoAd lotacao1 = usuario.getLotacao();
+        assertThat(lotacao1).isSameAs(lotacao);
+        assertThat(lotacao1.getCodigo()).isEqualTo(123);
+        assertThat(lotacao1.getSigla()).isEqualTo("DIREX");
+        assertThat(lotacao1.getNome()).isEqualTo("Diretoria Executiva");
     }
 }

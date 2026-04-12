@@ -330,7 +330,7 @@ class LoginControllerTest {
     @DisplayName("deve tratar IP nulo em extrairIp")
     void deveTratarIpNulo() {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRemoteAddr((String) null);
+        request.setRemoteAddr(null);
 
         String ip = invokeMethod(loginController, "extrairIp", request);
 
