@@ -16,7 +16,7 @@ import java.util.*;
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
 public class Competencia extends EntidadeBase {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mapa_codigo", nullable = false)
     @JsonIgnore
     private Mapa mapa;

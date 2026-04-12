@@ -17,7 +17,7 @@ import java.time.*;
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
 public class Movimentacao extends EntidadeBase {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     @JsonView(ComumViews.Publica.class)
     private Subprocesso subprocesso;
@@ -27,12 +27,12 @@ public class Movimentacao extends EntidadeBase {
     @JsonView(ComumViews.Publica.class)
     private LocalDateTime dataHora = LocalDateTime.now();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_origem_codigo", nullable = false)
     @JsonView(ComumViews.Publica.class)
     private Unidade unidadeOrigem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_destino_codigo", nullable = false)
     @JsonView(ComumViews.Publica.class)
     private Unidade unidadeDestino;

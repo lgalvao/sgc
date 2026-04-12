@@ -2,9 +2,7 @@
 
 ## Visão geral
 
-O **SGC (Sistema de Gestão de Competências)** é uma aplicação corporativa para mapeamento, revisão e diagnóstico de
-competências organizacionais. O sistema permite que unidades mapeiem suas atividades e conhecimentos necessários,
-identifiquem gaps de competência e gerenciem o desenvolvimento de suas equipes.
+O **SGC (Sistema de Gestão de Competências)** é uma aplicação corporativa para mapeamento, revisão e diagnóstico de competências organizacionais. O sistema permite que unidades mapeiem suas atividades e conhecimentos necessários, identifiquem gaps de competência e gerenciem o desenvolvimento de suas equipes.
 
 ---
 

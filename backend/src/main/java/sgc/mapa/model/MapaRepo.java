@@ -10,12 +10,14 @@ import java.util.*;
 public interface MapaRepo extends JpaRepository<Mapa, Long> {
     @Query("""
             SELECT um.mapaVigente FROM UnidadeMapa um
+            LEFT JOIN FETCH um.mapaVigente.subprocesso
             WHERE um.unidadeCodigo = :unidadeCodigo
             """)
     Optional<Mapa> buscarMapaVigentePorUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
 
     @Query("""
             SELECT m FROM Mapa m
+            LEFT JOIN FETCH m.subprocesso
             WHERE m.subprocesso.codigo = :subprocessoCodigo
             """)
     Optional<Mapa> buscarPorSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);

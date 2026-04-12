@@ -14,7 +14,7 @@ import sgc.comum.model.*;
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
 public class Conhecimento extends EntidadeBase {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "atividade_codigo", nullable = false)
     @JsonIgnore
     @JsonIgnoreProperties("conhecimentos")

@@ -27,12 +27,12 @@ public class AlertaUsuario implements Serializable {
     private Chave codigo;
 
     @MapsId("alertaCodigo")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alerta_codigo", insertable = false, updatable = false)
     private Alerta alerta;
 
     @MapsId("usuarioTitulo")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "usuario_titulo",
             referencedColumnName = "titulo",

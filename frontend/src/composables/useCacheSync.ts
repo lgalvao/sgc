@@ -1,4 +1,3 @@
-import {onUnmounted} from "vue";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 
@@ -28,7 +27,7 @@ export function useCacheSync() {
         source.close();
     };
 
-    onUnmounted(() => {
+    return () => {
         source.close();
-    });
+    };
 }

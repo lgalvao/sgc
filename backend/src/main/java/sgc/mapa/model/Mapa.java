@@ -36,7 +36,7 @@ public class Mapa extends EntidadeBase {
     @Column(name = "data_hora_homologado")
     private @Nullable LocalDateTime dataHoraHomologado;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     @JsonIgnore
     private Subprocesso subprocesso;

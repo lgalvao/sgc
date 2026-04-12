@@ -7,8 +7,11 @@ import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
+import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -123,7 +126,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve atualizar atividade com sucesso")
         void deveAtualizarAtividade() {
             // Criando dados ad-hoc pois precisamos modificar, para não impactar outros testes com data.sql
-            Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
+            Subprocesso sub = criarSubprocessoSemMapa();
             Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(sub).build());
             Atividade atividade = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Antiga").build());
 
@@ -140,7 +143,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve excluir atividade com sucesso")
         void deveExcluirAtividade() {
-            Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
+            Subprocesso sub = criarSubprocessoSemMapa();
             Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(sub).build());
             Atividade atividade = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Para excluir").build());
 
@@ -158,7 +161,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve atualizar descrições em lote")
         void deveAtualizarDescricoesEmLote() {
-            Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
+            Subprocesso sub = criarSubprocessoSemMapa();
             Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(sub).build());
             Atividade a1 = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Antiga 1").build());
             Atividade a2 = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Antiga 2").build());
@@ -193,7 +196,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve criar, atualizar e remover competência")
         void cicloVida() {
-            Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
+            Subprocesso sub = criarSubprocessoSemMapa();
             Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(sub).build());
             Atividade a1 = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Atividade teste").build());
 
@@ -223,7 +226,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve criar, atualizar e excluir conhecimento")
         void cicloVida() {
-            Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
+            Subprocesso sub = criarSubprocessoSemMapa();
             Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(sub).build());
             Atividade atividade = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Ativ para Conhec").build());
 
@@ -253,5 +256,23 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             assertThat(service.conhecimentosCodigoAtividade(atividade.getCodigo())).isEmpty();
         }
+    }
+
+    private Subprocesso criarSubprocessoSemMapa() {
+        Processo processo = processoRepo.saveAndFlush(Processo.builder()
+                .descricao("Processo temporário mapa manutenção")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(10))
+                .build());
+
+        Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
+
+        return subprocessoRepo.saveAndFlush(Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(5))
+                .build());
     }
 }

@@ -18,7 +18,7 @@ public class UnidadeMapa {
     @Column(name = "unidade_codigo", nullable = false)
     private @Nullable Long unidadeCodigo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mapa_vigente_codigo", nullable = false)
     private @Nullable Mapa mapaVigente;
 

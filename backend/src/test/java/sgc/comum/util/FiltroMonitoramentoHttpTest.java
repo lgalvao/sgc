@@ -287,7 +287,7 @@ class FiltroMonitoramentoHttpTest {
 
     @Test
     @DisplayName("Deve usar HTTP LENTO (entre o alerta e o muito lento)")
-    void deveUsarLento() throws IOException {
+    void deveUsarLento() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
         properties.setAtivo(true);
         properties.setTraceCompleto(true);

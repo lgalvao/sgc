@@ -25,17 +25,17 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
 public class Subprocesso extends EntidadeBase {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "processo_codigo", nullable = false)
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Processo processo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_codigo", nullable = false)
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Unidade unidade;
 
-    @OneToOne(mappedBy = "subprocesso")
+    @OneToOne(mappedBy = "subprocesso", fetch = FetchType.LAZY)
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Mapa mapa;
 

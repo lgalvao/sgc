@@ -47,6 +47,7 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
 
     @Query("""
             SELECT m FROM Movimentacao m
+            LEFT JOIN FETCH m.subprocesso
             LEFT JOIN FETCH m.unidadeOrigem
             LEFT JOIN FETCH m.unidadeDestino
             LEFT JOIN FETCH m.usuario

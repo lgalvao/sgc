@@ -18,7 +18,7 @@ import java.time.*;
 @NoArgsConstructor
 @SuppressWarnings("NullAway.Init")
 public class Alerta extends EntidadeBase {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "processo_codigo", nullable = false)
     @JsonIgnore
     private Processo processo;
@@ -27,12 +27,12 @@ public class Alerta extends EntidadeBase {
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_origem_codigo", nullable = false)
     @JsonIgnore
     private Unidade unidadeOrigem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_destino_codigo", nullable = false)
     @JsonIgnore
     private Unidade unidadeDestino;
@@ -79,4 +79,3 @@ public class Alerta extends EntidadeBase {
         return descricao;
     }
 }
-

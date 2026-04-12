@@ -17,18 +17,18 @@ import java.time.*;
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
 public class Notificacao extends EntidadeBase {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private Subprocesso subprocesso;
 
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_origem_codigo", nullable = false)
     private Unidade unidadeOrigem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_destino_codigo", nullable = false)
     private Unidade unidadeDestino;
 

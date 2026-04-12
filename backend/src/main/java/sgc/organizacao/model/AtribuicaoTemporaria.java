@@ -19,7 +19,7 @@ import java.time.*;
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
 public class AtribuicaoTemporaria extends EntidadeBase {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_codigo", nullable = false)
     private Unidade unidade;
 
@@ -38,7 +38,7 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     @Column(name = "justificativa", length = 500)
     private String justificativa;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_titulo", insertable = false, updatable = false, nullable = false)
     private Usuario usuario;
 
