@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.boot.context.event.*;
 import org.springframework.context.*;
-import org.springframework.context.event.*;
 import org.springframework.stereotype.*;
 import sgc.organizacao.service.*;
 

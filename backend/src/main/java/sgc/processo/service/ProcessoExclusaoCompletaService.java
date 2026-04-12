@@ -63,14 +63,14 @@ public class ProcessoExclusaoCompletaService {
         if (tabelaExiste("AVALIACAO_SERVIDOR")) {
             jdbcTemplate.update("""
                     DELETE FROM sgc.avaliacao_servidor
-                    WHERE diagnostico_codigo IN """ + SUBQUERY_DIAGNOSTICOS +
+                    WHERE diagnostico_codigo IN""" + SUBQUERY_DIAGNOSTICOS +
                     " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigoProcesso, codigoProcesso);
         }
 
         if (tabelaExiste("OCUPACAO_CRITICA")) {
             jdbcTemplate.update("""
                     DELETE FROM sgc.ocupacao_critica
-                    WHERE diagnostico_codigo IN """ + SUBQUERY_DIAGNOSTICOS +
+                    WHERE diagnostico_codigo IN""" + SUBQUERY_DIAGNOSTICOS +
                     " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigoProcesso, codigoProcesso);
         }
 

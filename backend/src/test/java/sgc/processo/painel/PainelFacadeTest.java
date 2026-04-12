@@ -6,14 +6,12 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.*;
-import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.painel.dto.PainelBootstrapDto;
 import sgc.processo.service.*;
 import sgc.testutils.*;
 

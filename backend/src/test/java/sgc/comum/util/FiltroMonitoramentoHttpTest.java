@@ -25,15 +25,12 @@ class FiltroMonitoramentoHttpTest {
         request.addHeader(FiltroMonitoramentoHttp.HEADER_MONITORAMENTO_ATIVO, "true");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        FilterChain filterChain = new FilterChain() {
-            @Override
-            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) {
-                HttpServletRequest requestHttp = (HttpServletRequest) servletRequest;
-                assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_CORRELACAO_ID))
-                        .isEqualTo("corr-123");
-                assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO))
-                        .isEqualTo(true);
-            }
+        FilterChain filterChain = (servletRequest, servletResponse) -> {
+            HttpServletRequest requestHttp = (HttpServletRequest) servletRequest;
+            assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_CORRELACAO_ID))
+                    .isEqualTo("corr-123");
+            assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO))
+                    .isEqualTo(true);
         };
 
         filtro.doFilter(request, response, filterChain);
@@ -290,7 +287,7 @@ class FiltroMonitoramentoHttpTest {
 
     @Test
     @DisplayName("Deve usar HTTP LENTO (entre o alerta e o muito lento)")
-    void deveUsarLento() throws ServletException, IOException {
+    void deveUsarLento() throws IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
         properties.setAtivo(true);
         properties.setTraceCompleto(true);
@@ -380,9 +377,7 @@ class FiltroMonitoramentoHttpTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        filtro.doFilter(request, response, (req, res) -> {
-            assertThat((Boolean) req.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO)).isTrue();
-        });
+        filtro.doFilter(request, response, (req, res) -> assertThat((Boolean) req.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO)).isTrue());
     }
 
     @Test
@@ -397,9 +392,7 @@ class FiltroMonitoramentoHttpTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        filtro.doFilter(request, response, (req, res) -> {
-            assertThat((Boolean) req.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO)).isTrue();
-        });
+        filtro.doFilter(request, response, (req, res) -> assertThat((Boolean) req.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO)).isTrue());
     }
 
     @Test

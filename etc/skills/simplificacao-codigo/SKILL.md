@@ -123,7 +123,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Quem escreve ou decide.
 - Se a dependência é explícita, herdada ou duplicada.
 
-2. Classificar o alvo.
+1. Classificar o alvo.
 - duplicação interna;
 - superfície larga demais;
 - estado global desnecessário;
@@ -131,11 +131,11 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - wrapper fino;
 - código morto.
 
-3. Escolher o menor corte seguro.
+1. Escolher o menor corte seguro.
 - Uma fronteira por vez.
 - Não misturar simplificação estrutural com mudança de regra.
 
-4. Tornar o fluxo explícito.
+1. Tornar o fluxo explícito.
 - Se dois métodos diferem só por contexto, extraia o contexto.
 - Se várias validações repetem a mesma coleta, centralize a coleta.
 - Se uma função altera outro store por dentro, prefira fazê-la retornar o dado.
@@ -143,7 +143,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Se uma action busca um detalhe e a tela precisa dele imediatamente, prefira retornar esse detalhe em vez de depender de leitura posterior do store global.
 - Se uma recarga automática não tem consumidor real além do recurso local afetado, remova o efeito colateral e recarregue só o que a tela usa.
 
-5. Validar logo após cada bloco.
+1. Validar logo após cada bloco.
 
 ### Comandos úteis do SGC
 
@@ -163,7 +163,7 @@ npm run typecheck
 npm run lint
 ```
 
-6. Registrar aprendizado.
+1. Registrar aprendizado.
 - Atualize `plano-simplificacao.md` quando a rodada gerar critério novo ou novo mapa de risco.
 
 ## Perguntas de decisão

@@ -14,7 +14,6 @@ import sgc.integracao.mocks.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
-import sgc.processo.painel.dto.PainelBootstrapDto;
 import sgc.seguranca.*;
 
 import java.util.*;

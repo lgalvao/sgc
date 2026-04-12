@@ -180,25 +180,25 @@ Estas frentes não devem seguir como prioridade principal apenas por inércia do
 
 ## Prioridade P2
 
-4. **`SubprocessoTransicaoService`**
+1. **`SubprocessoTransicaoService`**
    * segue relevante, mas não deve furar a fila de `ProcessoService` e `SubprocessoConsultaService`.
 
-5. **`MapaVisualizacaoView.vue`**
+2. **`MapaVisualizacaoView.vue`**
    * hoje merece entrar antes de nova rodada grande em `MapaView.vue`.
 
-6. **`E2eController`**
+3. **`E2eController`**
    * importante para manutenção e previsibilidade dos testes, mas com impacto mais indireto no produto.
 
 ## Prioridade P3
 
-7. **`ValidadorDadosOrganizacionais`**
+1. **`ValidadorDadosOrganizacionais`**
    * hotspot real, porém mais sensível a regra de domínio e, por isso, pede rodada própria e cuidadosa.
 
-8. **DTOs backend com `@Nullable`**
+2. **DTOs backend com `@Nullable`**
    * revisar primeiro apenas DTOs mais usados nos fluxos alterados;
    * não executar como iniciativa isolada e ampla neste momento.
 
-9. **`AtribuicaoTemporariaView.vue` e `MapaView.vue`**
+3. **`AtribuicaoTemporariaView.vue` e `MapaView.vue`**
    * manter como ajustes oportunistas ou segunda frente de frontend, não como foco principal da próxima onda.
 
 ---

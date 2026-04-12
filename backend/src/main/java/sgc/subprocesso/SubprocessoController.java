@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.*;
 import sgc.comum.*;
 import sgc.mapa.dto.*;
-import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.seguranca.sanitizacao.*;
 import sgc.subprocesso.dto.*;
