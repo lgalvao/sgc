@@ -85,7 +85,7 @@ const subprocessosMock = reactive({
 });
 
 vi.mock("vue-router", () => ({
-    useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}}),
+    useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
     useRouter: () => ({push: pushMock}),
 }));
 

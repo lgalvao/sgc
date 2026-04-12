@@ -8,6 +8,7 @@ import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
 vi.mock("vue-router", () => ({
+    useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
     useRouter: () => ({push: pushMock}),
 }));
 
