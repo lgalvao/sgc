@@ -165,10 +165,7 @@ describe('PainelView', () => {
 
     mockRouterPush.mockClear();
     vm.abrirDetalhesProcesso({codigo: 1, linkDestino: '/detalhes', codSubprocesso: 99});
-    expect(mockRouterPush).toHaveBeenCalledWith({
-      path: '/detalhes',
-      query: {codSubprocesso: '99'},
-    });
+    expect(mockRouterPush).toHaveBeenCalledWith('/detalhes');
   });
 
   it('deve retornar classes e atributos da linha de alertas corretamente', async () => {

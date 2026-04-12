@@ -88,9 +88,7 @@ class E2eControllerCoverageTest {
     void deveCriarProcessoFinalizadoComAtividades() {
         var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(10L);
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
 
         Processo dto = Processo.builder().codigo(100L).build();
         when(processoService.criar(any())).thenReturn(dto);
@@ -118,6 +116,7 @@ class E2eControllerCoverageTest {
     void deveCriarProcessoMapeamentoComMapaComSugestoes() {
         var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         Unidade superior = new Unidade();
@@ -154,6 +153,7 @@ class E2eControllerCoverageTest {
     void deveCriarProcessoRevisaoComCadastroDisponibilizado() {
         var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         Unidade superior = new Unidade();
@@ -189,6 +189,7 @@ class E2eControllerCoverageTest {
     void deveCriarProcessoMapeamentoComCadastroDisponibilizado() {
         var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         Unidade superior = new Unidade();

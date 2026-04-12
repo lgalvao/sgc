@@ -26,7 +26,7 @@ vi.mock('@/composables/useFluxoMapa', () => ({useFluxoMapa: vi.fn()}));
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
-    useRoute: vi.fn(() => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}})),
+    useRoute: vi.fn(() => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}})),
     createRouter: vi.fn(() => ({
         beforeEach: vi.fn(),
         afterEach: vi.fn(),

@@ -46,24 +46,18 @@ vi.mock("@/services/processoService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue({codigo: 10}),
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({
-        subprocesso: {
-            codigo: 10,
-            unidade: {codigo: 10, sigla: "TEST", nome: "Unidade Teste", filhas: []},
-            situacao: "MAPEAMENTO_MAPA_DISPONIBILIZADO",
-            dataLimiteEtapa1: "2025-01-01T00:00:00",
-            dataFimEtapa1: null,
-            dataLimiteEtapa2: "2025-02-01T00:00:00",
-            dataFimEtapa2: null,
-            processoDescricao: "Processo teste",
-            dataCriacaoProcesso: "2024-01-01T00:00:00",
-            tipoProcesso: "MAPEAMENTO",
-            isEmAndamento: true,
-            etapaAtual: 2,
-        },
-        titular: null,
-        responsavel: null,
-        localizacaoAtual: "TEST",
-        movimentacoes: [],
+        codigo: 10,
+        unidade: {codigo: 10, sigla: "TEST", nome: "Unidade Teste", filhas: []},
+        situacao: "MAPEAMENTO_MAPA_DISPONIBILIZADO",
+        dataLimiteEtapa1: "2025-01-01T00:00:00",
+        dataFimEtapa1: null,
+        dataLimiteEtapa2: "2025-02-01T00:00:00",
+        dataFimEtapa2: null,
+        processoDescricao: "Processo teste",
+        dataCriacaoProcesso: "2024-01-01T00:00:00",
+        tipoProcesso: "MAPEAMENTO",
+        isEmAndamento: true,
+        etapaAtual: 2,
         permissoes: {
             podeEditarCadastro: false,
             podeDisponibilizarCadastro: false,
@@ -87,6 +81,10 @@ vi.mock("@/services/subprocessoService", () => ({
             habilitarAcessoCadastro: false,
             habilitarAcessoMapa: true,
         },
+        localizacaoAtual: "TEST",
+        movimentacoes: [],
+        titular: null,
+        responsavel: null,
     }),
     mapSubprocessoDetalheResponseParaModel: vi.fn((dto) => dto),
     obterMapaVisualizacao: vi.fn().mockResolvedValue({competencias: []}),
@@ -288,8 +286,13 @@ describe("VisMapa.vue", () => {
 
     it("resolves nested unit from store", async () => {
         await router.push("/processo/1/CHILD/vis-mapa");
-        const unidadeService = await import("@/services/unidadeService");
-        vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValueOnce({sigla: "CHILD", nome: "Child unit", filhas: []} as any);
+        vi.mocked(subprocessoServiceModule.buscarSubprocessoDetalhe).mockResolvedValueOnce({
+            codigo: 10,
+            unidade: {codigo: 11, sigla: "CHILD", nome: "Child unit", filhas: []},
+            situacao: "MAPEAMENTO_MAPA_HOMOLOGADO",
+            tipoProcesso: "MAPEAMENTO",
+            permissoes: {habilitarAcessoMapa: true},
+        } as any);
         const {wrapper} = mountComponent(
             {
                 processos: {
@@ -547,8 +550,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("does not show content if unit not found", async () => {
-        const unidadeService = await import("@/services/unidadeService");
-        vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValueOnce(null as any);
+        vi.mocked(subprocessoServiceModule.buscarSubprocessoDetalhe).mockResolvedValueOnce(null as any);
         const {wrapper} = mountComponent({});
         await flushPromises();
         expect(wrapper.text()).toContain("Unidade não encontrada");
