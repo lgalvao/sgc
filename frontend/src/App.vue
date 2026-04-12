@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 import {BOrchestrator} from "bootstrap-vue-next";
 import pkg from "../package.json";
@@ -19,12 +19,12 @@ const route = useRoute();
 const perfilStore = usePerfilStore();
 const version = (pkg as PackageJson).version;
 
-let cacheSyncAtivo = false;
+const sincronizacaoCacheAtiva = ref(false);
 watch(
     () => perfilStore.usuarioCodigo,
     (codigo) => {
-        if (codigo && !cacheSyncAtivo) {
-            cacheSyncAtivo = true;
+        if (codigo && !sincronizacaoCacheAtiva.value) {
+            sincronizacaoCacheAtiva.value = true;
             useCacheSync();
         }
     },

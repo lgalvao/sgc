@@ -28,7 +28,9 @@ public class AgendadorRefreshCache {
     private final CacheManager cacheManager;
     private final RegistroSseEmitter registroSseEmitter;
 
-    @Scheduled(fixedDelay = 600_000)
+    private static final long INTERVALO_REFRESH_MS = 600_000;
+
+    @Scheduled(fixedDelay = INTERVALO_REFRESH_MS)
     public void atualizarTudo() {
         try {
             log.debug("Iniciando refresh periódico dos caches organizacionais...");
@@ -37,7 +39,7 @@ public class AgendadorRefreshCache {
             registroSseEmitter.transmitir("org-cache-refreshed");
             log.debug("Refresh periódico dos caches concluído.");
         } catch (Exception e) {
-            log.warn("Falha no refresh periódico dos caches: {}", e.getMessage());
+            log.warn("Falha no refresh periódico dos caches", e);
         }
     }
 

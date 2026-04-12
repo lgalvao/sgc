@@ -17,7 +17,8 @@ import java.util.concurrent.*;
 @Slf4j
 public class RegistroSseEmitter {
 
-    private static final long TIMEOUT_EMITTER_MS = 0L;
+    /** Timeout zero indica conexão permanente (sem expiração automática). */
+    private static final long SEM_TIMEOUT = 0L;
 
     private final CopyOnWriteArrayList<SseEmitter> emissores = new CopyOnWriteArrayList<>();
 
@@ -25,7 +26,7 @@ public class RegistroSseEmitter {
      * Registra um novo emissor SSE para o cliente conectado.
      */
     public SseEmitter registrar() {
-        SseEmitter emitter = new SseEmitter(TIMEOUT_EMITTER_MS);
+        SseEmitter emitter = new SseEmitter(SEM_TIMEOUT);
         emissores.add(emitter);
         emitter.onCompletion(() -> emissores.remove(emitter));
         emitter.onTimeout(() -> emissores.remove(emitter));

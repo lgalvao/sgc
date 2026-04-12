@@ -35,7 +35,7 @@ public class CacheAquecimento implements ApplicationListener<ApplicationReadyEve
             unidadeHierarquiaService.buscarMapaFilhoPai();
             log.info("Caches organizacionais aquecidos com sucesso.");
         } catch (Exception e) {
-            log.warn("Falha no aquecimento inicial dos caches: {}", e.getMessage());
+            log.warn("Falha no aquecimento inicial dos caches", e);
         }
     }
 }
