@@ -182,14 +182,51 @@ describe('useAcesso', () => {
     expect(acesso3.podeAnalisarMapa.value).toBe(true);
   });
 
-  it('deve expor a ação principal pronta para cadastro e mapa', () => {
+  it('deve expor a ação principal pronta para cadastro quando pode homologar', () => {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeHomologarCadastro: true,
+        habilitarHomologarCadastro: true,
+      }),
+    });
+
+    const acesso = useAcesso(subprocesso);
+
+    expect(acesso.acaoPrincipalCadastro.value).toMatchObject({
+      codigo: 'HOMOLOGAR',
+      mostrar: true,
+      habilitar: true,
+      redirecionarParaPainel: false,
+    });
+  });
+
+  it('deve expor a ação principal pronta para cadastro quando pode aceitar (revisao)', () => {
     const subprocesso = criarSubprocesso({
       tipoProcesso: TipoProcesso.REVISAO,
       permissoes: criarPermissoes({
         podeAceitarCadastro: true,
         habilitarAceitarCadastro: true,
-        podeHomologarMapa: true,
-        habilitarHomologarMapa: false,
+      }),
+    });
+
+    const acesso = useAcesso(subprocesso);
+
+    expect(acesso.acaoPrincipalCadastro.value).toMatchObject({
+      codigo: 'ACEITAR',
+      mostrar: true,
+      habilitar: true,
+      redirecionarParaPainel: true,
+    });
+    // Verifica labels específicos de revisão
+    expect(acesso.acaoPrincipalCadastro.value?.rotuloConfirmacao).toContain('Aceitar');
+  });
+
+  it('deve expor a ação principal pronta para cadastro quando pode aceitar (mapeamento)', () => {
+    const subprocesso = criarSubprocesso({
+      tipoProcesso: TipoProcesso.MAPEAMENTO,
+      permissoes: criarPermissoes({
+        podeAceitarCadastro: true,
+        habilitarAceitarCadastro: true,
       }),
     });
 
@@ -200,11 +237,57 @@ describe('useAcesso', () => {
       mostrar: true,
       habilitar: true,
     });
+    // Verifica labels específicos de mapeamento (validar)
+    expect(acesso.acaoPrincipalCadastro.value?.rotuloConfirmacao).toContain('Validar');
+  });
+
+  it('deve expor a ação principal pronta para mapa quando pode homologar', () => {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeHomologarMapa: true,
+        habilitarHomologarMapa: false,
+      }),
+    });
+
+    const acesso = useAcesso(subprocesso);
+
     expect(acesso.acaoPrincipalMapa.value).toMatchObject({
       codigo: 'HOMOLOGAR',
       mostrar: true,
       habilitar: false,
     });
+  });
+
+  it('deve expor a ação principal pronta para mapa quando pode aceitar', () => {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeAceitarMapa: true,
+        habilitarAceitarMapa: true,
+      }),
+    });
+
+    const acesso = useAcesso(subprocesso);
+
+    expect(acesso.acaoPrincipalMapa.value).toMatchObject({
+      codigo: 'ACEITAR',
+      mostrar: true,
+      habilitar: true,
+    });
+  });
+
+  it('deve retornar null para ações principais quando não tem permissão', () => {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeAceitarCadastro: false,
+        podeHomologarCadastro: false,
+        podeAceitarMapa: false,
+        podeHomologarMapa: false,
+      }),
+    });
+
+    const acesso = useAcesso(subprocesso);
+    expect(acesso.acaoPrincipalCadastro.value).toBeNull();
+    expect(acesso.acaoPrincipalMapa.value).toBeNull();
   });
 
   it('deve retornar permissoes adicionais como podeVerSugestoes e habilitarAcessoCadastro', () => {
