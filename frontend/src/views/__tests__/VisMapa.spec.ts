@@ -12,6 +12,13 @@ import * as useAcessoModule from '@/composables/useAcesso';
 import * as processoServiceModule from '@/services/processoService';
 import * as subprocessoServiceModule from '@/services/subprocessoService';
 
+const subprocessoStoreCacheMock = {
+    dadosValidos: vi.fn(),
+    invalidar: vi.fn(),
+    garantirContextoEdicao: vi.fn(),
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+};
+
 function criarAcaoPrincipalMapa(codigo: 'ACEITAR' | 'HOMOLOGAR' = 'ACEITAR') {
     return {
         codigo,
@@ -93,6 +100,9 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn().mockResolvedValue([]),
     listarAnalisesValidacao: vi.fn().mockResolvedValue([]),
 }));
+vi.mock("@/stores/subprocesso", () => ({
+    useSubprocessoStore: () => subprocessoStoreCacheMock,
+}));
 
 const router = createRouter({
     history: createMemoryHistory(),
@@ -121,6 +131,27 @@ describe("VisMapa.vue", () => {
 
     beforeEach(async () => {
         vi.clearAllMocks();
+        subprocessoStoreCacheMock.garantirContextoEdicao.mockResolvedValue({
+            detalhes: {
+                codigo: 10,
+                unidade: {codigo: 10, sigla: "TEST", nome: "Unidade Teste", filhas: []},
+                situacao: "MAPEAMENTO_MAPA_DISPONIBILIZADO",
+                permissoes: {},
+            },
+            unidade: {codigo: 10, sigla: "TEST", nome: "Unidade Teste", filhas: []},
+        });
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+            codigo: 10,
+            contexto: {
+                detalhes: {
+                    codigo: 10,
+                    unidade: {codigo: 10, sigla: "TEST", nome: "Unidade Teste", filhas: []},
+                    situacao: "MAPEAMENTO_MAPA_DISPONIBILIZADO",
+                    permissoes: {},
+                },
+                unidade: {codigo: 10, sigla: "TEST", nome: "Unidade Teste", filhas: []},
+            },
+        });
         await router.push("/processo/1/TEST/vis-mapa");
         await router.isReady();
     });
@@ -286,13 +317,19 @@ describe("VisMapa.vue", () => {
 
     it("resolves nested unit from store", async () => {
         await router.push("/processo/1/CHILD/vis-mapa");
-        vi.mocked(subprocessoServiceModule.buscarSubprocessoDetalhe).mockResolvedValueOnce({
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValueOnce({
             codigo: 10,
-            unidade: {codigo: 11, sigla: "CHILD", nome: "Child unit", filhas: []},
-            situacao: "MAPEAMENTO_MAPA_HOMOLOGADO",
-            tipoProcesso: "MAPEAMENTO",
-            permissoes: {habilitarAcessoMapa: true},
-        } as any);
+            contexto: {
+                detalhes: {
+                    codigo: 10,
+                    unidade: {codigo: 11, sigla: "CHILD", nome: "Child unit", filhas: []},
+                    situacao: "MAPEAMENTO_MAPA_HOMOLOGADO",
+                    tipoProcesso: "MAPEAMENTO",
+                    permissoes: {habilitarAcessoMapa: true},
+                },
+                unidade: {codigo: 11, sigla: "CHILD", nome: "Child unit", filhas: []},
+            },
+        });
         const {wrapper} = mountComponent(
             {
                 processos: {
@@ -550,7 +587,18 @@ describe("VisMapa.vue", () => {
     });
 
     it("does not show content if unit not found", async () => {
-        vi.mocked(subprocessoServiceModule.buscarSubprocessoDetalhe).mockResolvedValueOnce(null as any);
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValueOnce({
+            codigo: 10,
+            contexto: {
+                detalhes: {
+                    codigo: 10,
+                    unidade: null,
+                    situacao: "MAPEAMENTO_MAPA_DISPONIBILIZADO",
+                    permissoes: {},
+                },
+                unidade: null,
+            },
+        });
         const {wrapper} = mountComponent({});
         await flushPromises();
         expect(wrapper.text()).toContain("Unidade não encontrada");

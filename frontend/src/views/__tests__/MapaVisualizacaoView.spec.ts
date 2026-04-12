@@ -19,6 +19,12 @@ function criarAcaoPrincipalMapa(codigo: 'ACEITAR' | 'HOMOLOGAR' = 'HOMOLOGAR') {
 }
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
+const subprocessoStoreCacheMock = {
+    dadosValidos: vi.fn(),
+    invalidar: vi.fn(),
+    garantirContextoEdicao: vi.fn(),
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+};
 
 vi.mock("vue-router", () => ({
     useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
@@ -55,6 +61,9 @@ const subprocessosMock = {
 
 vi.mock("@/composables/useSubprocessos", () => ({
     useSubprocessos: () => subprocessosMock,
+}));
+vi.mock("@/stores/subprocesso", () => ({
+    useSubprocessoStore: () => subprocessoStoreCacheMock,
 }));
 
 const stubs = {
@@ -97,6 +106,17 @@ describe("MapaVisualizacaoView.vue", () => {
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
         subprocessosMock.buscarSubprocessoDetalhe.mockResolvedValue({
             unidade: {sigla: "TESTE", nome: "Unidade Teste"},
+        });
+        subprocessoStoreCacheMock.garantirContextoEdicao.mockResolvedValue({
+            detalhes: {codigo: 123},
+            unidade: {sigla: "TESTE", nome: "Unidade Teste"},
+        });
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+            codigo: 123,
+            contexto: {
+                detalhes: {codigo: 123},
+                unidade: {sigla: "TESTE", nome: "Unidade Teste"},
+            },
         });
         vi.mocked(subprocessoService.obterMapaVisualizacao).mockResolvedValue({
             codigo: 100,

@@ -22,6 +22,7 @@ const MODO_MONITORAMENTO = process.env.SGC_MONITORAMENTO || 'off';
 const REUTILIZAR_EXISTENTE = process.env.SGC_LIFECYCLE_REUTILIZAR_EXISTENTE || 'on';
 const LIMITE_MONITORAMENTO_ALERTA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_ALERTA_MS || '500', 10);
 const TAXA_AMOSTRAGEM_MONITORAMENTO = process.env.SGC_MONITORAMENTO_AMOSTRAGEM || '0.0';
+const SILENT_LOGS = process.env.SGC_SILENT_LIFECYCLE === 'true';
 const ANSI_RESET = '\u001b[0m';
 const ANSI_AMARELO = '\u001b[33m';
 const ANSI_VERMELHO = '\u001b[31m';
@@ -39,7 +40,7 @@ const LOG_FILE = path.resolve(__dirname, 'server.log');
 const lifecycleLogger = {
     info: (msg) => {
         try {
-            console.log(msg);
+            if (!SILENT_LOGS) console.log(msg);
         } catch {
             // Ignorar erro de log
         }
@@ -51,7 +52,7 @@ const lifecycleLogger = {
     },
     warn: (msg) => {
         try {
-            console.warn(msg);
+            if (!SILENT_LOGS) console.warn(msg);
         } catch {
             // Ignorar erro de log
         }
@@ -63,7 +64,7 @@ const lifecycleLogger = {
     },
     error: (msg) => {
         try {
-            console.error(msg);
+            console.error(msg); // Error we always print
         } catch {
             // Ignorar erro de log
         }

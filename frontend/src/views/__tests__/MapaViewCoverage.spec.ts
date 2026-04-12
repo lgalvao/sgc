@@ -144,6 +144,12 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
 }
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
+const subprocessoStoreCacheMock = {
+    dadosValidos: vi.fn(),
+    invalidar: vi.fn(),
+    garantirContextoEdicao: vi.fn(),
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+};
 
 vi.mock("vue-router", () => ({
     useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
@@ -165,6 +171,7 @@ const subprocessosMock = reactive({
     clearError: vi.fn(),
 });
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
+vi.mock("@/stores/subprocesso", () => ({useSubprocessoStore: () => subprocessoStoreCacheMock}));
 const fluxoMapaMock = reactive({
     erro: null as {message: string} | null,
     lastError: null as FluxoMapaMock["lastError"],
@@ -243,6 +250,11 @@ describe("MapaView coverage", () => {
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
+        subprocessoStoreCacheMock.garantirContextoEdicao.mockResolvedValue(criarContextoEdicao());
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+            codigo: 123,
+            contexto: criarContextoEdicao(),
+        });
         fluxoMapaMock.erro = null;
         fluxoMapaMock.lastError = null;
         fluxoMapaMock.clearError = vi.fn();

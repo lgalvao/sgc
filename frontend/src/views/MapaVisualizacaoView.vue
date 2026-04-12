@@ -330,6 +330,28 @@ async function executarComLoading(acao: () => Promise<void>) {
   }
 }
 
+async function carregarContextoInicial() {
+  const codigoQuery = Number(route.query.codSubprocesso);
+  const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
+      ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
+          .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
+      : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
+          codProcesso.value,
+          sigla.value,
+      );
+
+  if (!resultado) {
+    codSubprocesso.value = null;
+    return null;
+  }
+
+  codSubprocesso.value = resultado.codigo;
+  subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
+  unidade.value = resultado.contexto.unidade;
+
+  return resultado;
+}
+
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   fecharModal();
   toastStore.setPending(mensagem);
@@ -496,21 +518,9 @@ function verHistorico() {
 }
 
 onMounted(async () => {
-  const codigoQuery = Number(route.query.codSubprocesso);
-  codSubprocesso.value = Number.isFinite(codigoQuery) && codigoQuery > 0
-      ? codigoQuery
-      : await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
-      codProcesso.value,
-      sigla.value,
-  );
-
-  if (codSubprocesso.value) {
-    const [subprocessoDetalhe, mapaVisualizacao] = await Promise.all([
-      subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value),
-      obterMapaVisualizacao(codSubprocesso.value),
-    ]);
-    unidade.value = subprocessoDetalhe?.unidade ?? null;
-    mapa.value = mapaVisualizacao;
+  const resultado = await carregarContextoInicial();
+  if (resultado?.codigo) {
+    mapa.value = await obterMapaVisualizacao(resultado.codigo);
   }
 });
 

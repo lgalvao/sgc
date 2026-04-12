@@ -180,15 +180,38 @@ const {
 } = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
 async function carregarContextoEdicao(codigo: number) {
-  const data = await subprocessosStore.buscarContextoEdicao(codigo);
+  const data = await subprocessoStoreCache.garantirContextoEdicao(codigo);
   if (!data) {
     return null;
   }
 
+  subprocessosStore.subprocessoDetalhe = data.detalhes;
   atividades.value = data.atividadesDisponiveis;
   unidade.value = data.unidade;
 
   return data;
+}
+
+async function carregarContextoInicial() {
+  const codigoQuery = Number(route.query.codSubprocesso);
+  const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
+      ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
+          .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
+      : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
+          codProcesso.value,
+          siglaUnidade.value,
+      );
+
+  if (!resultado) {
+    return null;
+  }
+
+  codSubprocesso.value = resultado.codigo;
+  subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
+  atividades.value = resultado.contexto.atividadesDisponiveis;
+  unidade.value = resultado.contexto.unidade;
+
+  return resultado.contexto;
 }
 
 async function executarComSubprocesso(
@@ -205,8 +228,8 @@ function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   }
 }
 
-async function carregarMapaInicial(codigo: number) {
-  const data = await carregarContextoEdicao(codigo);
+async function carregarMapaInicial(codigo: number, contextoInicial?: Awaited<ReturnType<typeof carregarContextoEdicao>> | null) {
+  const data = contextoInicial ?? await carregarContextoEdicao(codigo);
   if (data?.mapa) {
     sincronizarMapa(data.mapa);
     return;
@@ -216,15 +239,11 @@ async function carregarMapaInicial(codigo: number) {
 }
 
 onMounted(async () => {
-  const codigoQuery = Number(route.query.codSubprocesso);
-  const codigo = Number.isFinite(codigoQuery) && codigoQuery > 0
-      ? codigoQuery
-      : await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
-  if (!codigo) {
+  const contextoInicial = await carregarContextoInicial();
+  if (!codSubprocesso.value) {
     return;
   }
-  codSubprocesso.value = codigo;
-  await carregarMapaInicial(codigo);
+  await carregarMapaInicial(codSubprocesso.value, contextoInicial);
 });
 
 const atividades = ref<Atividade[]>([]);
