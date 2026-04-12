@@ -1,0 +1,4 @@
+interface:
+  display_name: "Otimização por Monitoramento"
+  short_description: "Otimizar fluxos reais com monitoramento do SGC"
+  default_prompt: "Use $otimizacao-por-monitoramento para medir este fluxo do SGC, identificar desperdícios reais no log monitorado e propor a menor otimização segura."

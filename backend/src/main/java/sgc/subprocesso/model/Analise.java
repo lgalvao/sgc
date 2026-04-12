@@ -26,7 +26,7 @@ public class Analise extends EntidadeBase {
     @Column(name = "tipo", length = 20, nullable = false)
     private TipoAnalise tipo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private Subprocesso subprocesso;
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Simplificação de Código"
+  short_description: "Simplificar código do SGC com segurança"
+  default_prompt: "Use $simplificacao-codigo para simplificar este trecho do SGC sem quebrar contratos, requisitos nem regras de acesso."
