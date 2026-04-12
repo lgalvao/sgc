@@ -2,51 +2,7 @@
 
 ## Contexto
 
-Este backlog mantém **apenas o que ainda falta executar** após as rodadas 3, 4 e 5 já iniciadas.
-
-## O que foi concluído nesta atualização
-
-- **Rodada 3 (A.1)**
-  - Refatorado o fluxo `processo + unidade -> contexto de edição` para **1 chamada** quando não há cache local:
-    - antes: `GET /api/subprocessos/buscar` + `GET /api/subprocessos/{codigo}/contexto-edicao`
-    - agora: `GET /api/subprocessos/contexto-edicao/buscar`
-  - Mantido cache por `codSubprocesso` e por chave `processo:unidade`, com invalidação explícita nas ações de workflow.
-
-- **Novos achados de monitoramento (e2e/monitoramento-e2e.txt)**
-  - Persistia alta recorrência de `GET /api/subprocessos/buscar` (70 chamadas no recorte), indicando custo de composição em cadeia.
-  - `GET /api/subprocessos/{codigo}/contexto-edicao` aparece em rajadas por mesma jornada (ex.: código 400 com 33 chamadas).
-  - `POST /api/subprocessos/{codigo}/cadastro/disponibilizar` segue como outlier pontual (amostra com pico ~152ms).
-  - `POST /api/processos/{codigo}/acao-em-bloco` já aparece abaixo do outlier principal no recorte analisado.
-- **Novo recorte da rodada (SGC_MONITORAMENTO=on + E2E cdu-24)**
-  - Com `npx playwright install --only-shell` + `npx playwright install-deps`, a suíte `cdu-24` passou completa com monitoramento ligado.
-  - Principais picos HTTP no recorte:
-    - `POST /api/processos/{codigo}/acao-em-bloco` (~321ms),
-    - `POST /api/usuarios/login` (pico ~188ms),
-    - `GET /api/painel/bootstrap` (pico ~166ms),
-    - `GET /api/subprocessos/{codigo}/contexto-edicao` (pico ~144ms).
-  - Principais picos TRACE no recorte:
-    - `EmailService.enviarEmailHtml` (~333ms),
-    - `ProcessoService.executarAcaoEmBloco` (~296ms),
-    - `SubprocessoTransicaoService.disponibilizarMapaEmBloco` (~284ms),
-    - `SubprocessoNotificacaoService.notificarTransicao` (~259ms).
-- **Nova coleta (rodada longa 2 — SGC_MONITORAMENTO=on + E2E cdu-24)**
-  - Suíte executada novamente após otimizações de lookup por sigla.
-  - Picos HTTP observados:
-    - `POST /api/processos/{codigo}/acao-em-bloco` (~426ms),
-    - `GET /api/subprocessos/{codigo}/contexto-edicao` (pico ~211ms),
-    - `POST /api/usuarios/login` (pico ~176ms).
-  - Picos TRACE observados:
-    - `ProcessoService.executarAcaoEmBloco` (~389ms),
-    - `SubprocessoTransicaoService.disponibilizarMapaEmBloco` (~372ms),
-    - `SubprocessoNotificacaoService.notificarTransicao` (~339ms),
-    - `EmailService.enviarEmailHtml` (~252ms).
-- **Otimização aplicada após o recorte**
-  - `UnidadeService.buscarCodigoPorSigla` foi introduzido para lookup enxuto (`codigo` somente), usando `UnidadeRepo.buscarCodigoAtivoPorSigla`.
-  - Fluxos de alta frequência (controllers de subprocesso e fixtures E2E) deixaram de resolver `Unidade` completa quando só o código é necessário.
-  - `UnidadeService.buscarCodigoPorSigla` passou a usar cache dedicado (`unidadeCodigoPorSigla`) com chave normalizada em maiúsculas para reduzir reconsulta por sigla.
-  - Estratégia de volatilidade aplicada:
-    - `buscarPorSigla` cacheia leitura estrutural (unidade + superior, sem responsabilidade), adequada para dados que mudam em ciclos longos;
-    - `buscarPorSiglaComResponsavel` permanece sem cache dedicado para manter responsividade a substituições/afastamentos de chefia.
+Este backlog mantém **apenas o que ainda falta executar** após as rodadas iniciadas.
 
 ## Pendências prioritárias
 

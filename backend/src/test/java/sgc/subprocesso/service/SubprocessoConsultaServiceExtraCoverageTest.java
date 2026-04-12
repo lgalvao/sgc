@@ -83,9 +83,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
     private void stubContextoAutenticado(Usuario usuario) {
         String usuarioTitulo = usuario.getTituloEleitoral();
-        if (usuarioTitulo.isBlank()) {
-            usuarioTitulo = "123456789012";
-        }
         when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
                 usuarioTitulo,
                 usuario.getUnidadeAtivaCodigo(),
@@ -348,7 +345,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
                     .thenReturn(List.of(dest));
 
-            Usuario user = new Usuario();
+            Usuario user = criarUsuarioMock();
             user.setPerfilAtivo(Perfil.ADMIN);
             user.setUnidadeAtivaCodigo(20L);
 
@@ -369,7 +366,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             u.setCodigo(10L);
             sp.setUnidade(u);
 
-            Usuario user = new Usuario();
+            Usuario user = criarUsuarioMock();
             user.setPerfilAtivo(Perfil.ADMIN);
             user.setUnidadeAtivaCodigo(10L);
 
@@ -394,7 +391,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             u.setCodigo(10L);
             sp.setUnidade(u);
 
-            Usuario user = new Usuario();
+            Usuario user = criarUsuarioMock();
             user.setPerfilAtivo(Perfil.ADMIN);
             user.setUnidadeAtivaCodigo(10L);
 
@@ -464,7 +461,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setUnidade(new Unidade());
             sp.setCodigo(1L);
 
-            Usuario user = new Usuario();
+            Usuario user = criarUsuarioMock();
             user.setUnidadeAtivaCodigo(10L);
             user.setPerfilAtivo(Perfil.ADMIN);
 
@@ -483,7 +480,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade uAlvo = new Unidade(); uAlvo.setCodigo(10L);
             sp.setUnidade(uAlvo);
 
-            Usuario user = new Usuario();
+            Usuario user = criarUsuarioMock();
             user.setUnidadeAtivaCodigo(20L);
             user.setPerfilAtivo(Perfil.GESTOR);
             Unidade uGestor = new Unidade(); uGestor.setCodigo(20L);
@@ -505,7 +502,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade uAlvo = new Unidade(); uAlvo.setCodigo(10L);
             sp.setUnidade(uAlvo);
 
-            Usuario user = new Usuario();
+            Usuario user = criarUsuarioMock();
             user.setUnidadeAtivaCodigo(20L);
             user.setPerfilAtivo(Perfil.SERVIDOR);
             Unidade uUser = new Unidade(); uUser.setCodigo(20L);
@@ -525,7 +522,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
             Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
 
-            Usuario user = new Usuario(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
+            Usuario user = criarUsuarioMock(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
 
@@ -543,7 +540,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         void obterPermissoesUI_PodeDisponibilizarMapa() {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
-            Usuario user = new Usuario(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
+            Usuario user = criarUsuarioMock(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
             stubContextoAutenticado(user);
@@ -562,7 +559,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
             Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
 
-            Usuario user = new Usuario();
+            Usuario user = criarUsuarioMock();
             user.setPerfilAtivo(Perfil.CHEFE);
             user.setUnidadeAtivaCodigo(10L);
 

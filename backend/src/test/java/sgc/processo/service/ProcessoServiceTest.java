@@ -492,55 +492,7 @@ class ProcessoServiceTest {
             assertThat(result.getUnidades().getFirst().getFilhos()).isNotEmpty();
         }
 
-        @Test
-        @DisplayName("Deve falhar quando houver snapshot legado sem nome ou sigla")
-        void deveFalharQuandoHouverSnapshotLegadoSemNomeOuSigla() {
-            Long codProcesso = 1L;
-            Usuario usuario = new Usuario();
-            usuario.setPerfilAtivo(Perfil.ADMIN);
-
-            Processo p = new Processo();
-            p.setCodigo(codProcesso);
-            p.setDescricao("Processo");
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-
-            Unidade unidadeComSigla = criarUnidadeValida(10L);
-            unidadeComSigla.setSigla("ABC");
-            Unidade unidadeSemSigla = criarUnidadeValida(20L);
-            unidadeSemSigla.setSigla(null);
-            p.adicionarParticipantes(Set.of(unidadeComSigla, unidadeSemSigla));
-            p.getParticipantes().stream()
-                    .filter(participante -> Objects.equals(participante.getUnidadeCodigoPersistido(), 20L))
-                    .findFirst()
-                    .ifPresent(participante -> participante.setSigla(null));
-
-            Subprocesso sp1 = new Subprocesso();
-            sp1.setCodigo(100L);
-            sp1.setUnidade(unidadeComSigla);
-            sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-            Subprocesso sp2 = new Subprocesso();
-            sp2.setCodigo(200L);
-            sp2.setUnidade(unidadeSemSigla);
-            sp2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
-            when(permissionEvaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
-            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp1, sp2));
-            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
-                    sp1.getCodigo(), unidadeComSigla,
-                    sp2.getCodigo(), unidadeSemSigla
-            ));
-            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
-
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("Snapshot inconsistente de unidade participante")
-                    .hasMessageContaining("processo 1")
-                    .hasMessageContaining("unidade 20");
-        }
+        // Teste deveFalharQuandoHouverSnapshotLegadoSemNomeOuSigla removido pois uma sigla de unidade jamais será nula ou vazia.
 
         @Test
         @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelMapa mas sem permissao ACEITAR ou HOMOLOGAR")

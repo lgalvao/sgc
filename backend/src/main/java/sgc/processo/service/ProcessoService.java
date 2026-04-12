@@ -162,7 +162,9 @@ public class ProcessoService {
             elegibilidadesPorSubprocesso.put(subprocesso.getCodigo(), elegibilidade);
         }
 
-        Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas;
+        Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas != null
+                ? localizacoesPrecarregadas
+                : localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessosElegiveis);
 
         return subprocessosElegiveis.stream()
                 .map(subprocesso -> toElegivelDto(
