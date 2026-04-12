@@ -83,7 +83,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
     private void stubContextoAutenticado(Usuario usuario) {
         String usuarioTitulo = usuario.getTituloEleitoral();
-        if (usuarioTitulo == null || usuarioTitulo.isBlank()) {
+        if (usuarioTitulo.isBlank()) {
             usuarioTitulo = "123456789012";
         }
         when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(

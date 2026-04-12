@@ -162,9 +162,7 @@ public class ProcessoService {
             elegibilidadesPorSubprocesso.put(subprocesso.getCodigo(), elegibilidade);
         }
 
-        Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas != null
-                ? localizacoesPrecarregadas
-                : localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessosElegiveis);
+        Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas;
 
         return subprocessosElegiveis.stream()
                 .map(subprocesso -> toElegivelDto(
@@ -582,8 +580,7 @@ public class ProcessoService {
     }
 
     private void validarDadosBasicosParticipante(Long codigoProcesso, UnidadeParticipanteDto unidadeDto) {
-        if (unidadeDto.getNome() == null || unidadeDto.getNome().isBlank()
-                || unidadeDto.getSigla() == null || unidadeDto.getSigla().isBlank()) {
+        if (unidadeDto.getNome().isBlank() || unidadeDto.getSigla().isBlank()) {
             throw new IllegalStateException(
                     "Snapshot inconsistente de unidade participante no processo %d para unidade %d"
                             .formatted(codigoProcesso, unidadeDto.getCodUnidade()));
@@ -782,12 +779,11 @@ public class ProcessoService {
             String mensagemSucesso,
             boolean processoAtivo
     ) {
-        boolean mostrar = perfilPermite;
         boolean habilitar = perfilPermite && processoAtivo && !unidades.isEmpty();
         return ProcessoDetalheDto.AcaoBlocoDto.builder()
                 .codigo(codigo)
                 .acao(acao)
-                .mostrar(mostrar)
+                .mostrar(perfilPermite)
                 .habilitar(habilitar)
                 .requerDataLimite(requerDataLimite)
                 .redirecionarPainel(redirecionarPainel)

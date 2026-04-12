@@ -44,10 +44,10 @@ class UsuarioServiceTest {
     @Autowired
     private UsuarioService usuarioServiceInternal;
 
-    private void autenticarComo(String titulo, Long unidadeAtivaCodigo, Perfil perfil) {
-        Usuario usuario = usuarioServiceInternal.buscar(titulo);
-        usuario.setUnidadeAtivaCodigo(unidadeAtivaCodigo);
-        usuario.setPerfilAtivo(perfil);
+    private void autenticarComo() {
+        Usuario usuario = usuarioServiceInternal.buscar(UsuarioServiceTest.TITULO_ADMIN);
+        usuario.setUnidadeAtivaCodigo(UsuarioServiceTest.COD_UNIT_SEC1);
+        usuario.setPerfilAtivo(Perfil.ADMIN);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(usuario, null, List.of()));
         SecurityContextHolder.setContext(context);
@@ -360,7 +360,7 @@ class UsuarioServiceTest {
                     () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
 
             // Remover
-            autenticarComo(TITULO_ADMIN, COD_UNIT_SEC1, Perfil.ADMIN);
+            autenticarComo();
             usuarioService.removerAdministrador(tituloNovoAdmin);
             assertFalse(usuarioServiceInternal.isAdministrador(tituloNovoAdmin));
         }
@@ -368,7 +368,7 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve falhar ao remover a si mesmo")
         void deveFalharRemoverSiMesmo() {
-            autenticarComo(TITULO_ADMIN, COD_UNIT_SEC1, Perfil.ADMIN);
+            autenticarComo();
             assertThrows(ErroValidacao.class,
                     () -> usuarioService.removerAdministrador(TITULO_ADMIN));
         }
@@ -377,7 +377,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve falhar ao remover único admin")
         void deveFalharRemoverUnicoAdmin() {
 
-            autenticarComo(TITULO_ADMIN, COD_UNIT_SEC1, Perfil.ADMIN);
+            autenticarComo();
             usuarioService.removerAdministrador("6");
             usuarioService.removerAdministrador("999999999999");
 
