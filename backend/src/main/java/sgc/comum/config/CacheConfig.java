@@ -20,6 +20,10 @@ public class CacheConfig {
     public static final String CACHE_MAPA_FILHO_PAI = "mapaFilhoPai";
     public static final String CACHE_USUARIO_PERFIS = "usuarioPerfis";
     public static final String CACHE_USUARIO_AUTORIZACOES = "usuarioAutorizacoes";
+    public static final String CACHE_VW_UNIDADE = "vwUnidade";
+    public static final String CACHE_VW_USUARIO = "vwUsuario";
+    public static final String CACHE_VW_RESPONSABILIDADE = "vwResponsabilidade";
+    public static final String CACHE_VW_USUARIO_PERFIL = "vwUsuarioPerfil";
 
     @Bean
     public CacheManager cacheManager() {
@@ -67,6 +71,26 @@ public class CacheConfig {
                 .recordStats()
                 .maximumSize(1000)
                 .expireAfterWrite(java.time.Duration.ofHours(2))
+                .build());
+        cacheManager.registerCustomCache(CACHE_VW_UNIDADE, Caffeine.newBuilder()
+                .recordStats()
+                .maximumSize(1)
+                .expireAfterWrite(java.time.Duration.ofMinutes(15))
+                .build());
+        cacheManager.registerCustomCache(CACHE_VW_USUARIO, Caffeine.newBuilder()
+                .recordStats()
+                .maximumSize(1)
+                .expireAfterWrite(java.time.Duration.ofMinutes(15))
+                .build());
+        cacheManager.registerCustomCache(CACHE_VW_RESPONSABILIDADE, Caffeine.newBuilder()
+                .recordStats()
+                .maximumSize(1)
+                .expireAfterWrite(java.time.Duration.ofMinutes(15))
+                .build());
+        cacheManager.registerCustomCache(CACHE_VW_USUARIO_PERFIL, Caffeine.newBuilder()
+                .recordStats()
+                .maximumSize(1)
+                .expireAfterWrite(java.time.Duration.ofMinutes(15))
                 .build());
         return cacheManager;
     }

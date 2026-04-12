@@ -68,7 +68,8 @@ public class ConfigSeguranca {
                                                    FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/login",
-                                "/api/usuarios/entrar")
+                                "/api/usuarios/entrar",
+                                "/api/eventos")
                         .permitAll()
                         .requestMatchers("/actuator/**")
                         .hasRole("ADMIN")

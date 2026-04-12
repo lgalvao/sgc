@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed} from "vue";
+import {computed, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 import {BOrchestrator} from "bootstrap-vue-next";
 import pkg from "../package.json";
@@ -7,6 +7,7 @@ import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
 import {TEXTOS} from "@/constants/textos";
 import {usePerfilStore} from "@/stores/perfil";
+import {useCacheSync} from "@/composables/useCacheSync";
 
 interface PackageJson {
   version: string;
@@ -17,6 +18,18 @@ interface PackageJson {
 const route = useRoute();
 const perfilStore = usePerfilStore();
 const version = (pkg as PackageJson).version;
+
+const sincronizacaoCacheAtiva = ref(false);
+watch(
+    () => perfilStore.usuarioCodigo,
+    (codigo) => {
+        if (codigo && !sincronizacaoCacheAtiva.value) {
+            sincronizacaoCacheAtiva.value = true;
+            useCacheSync();
+        }
+    },
+    {immediate: true}
+);
 
 const shouldShowNavBarExtras = computed(() => {
   if (route.path === "/login" || route.path === "/erro") return false;
