@@ -199,7 +199,7 @@ class FiltroMonitoramentoHttpTest {
                 new org.springframework.web.context.request.RequestAttributes() {
                     @Override
                     @NullUnmarked
-                    public Object getAttribute(String name, int scope) { return null; }
+                    public Object getAttribute(@NonNull String name, int scope) { return null; }
                     @Override
                     public void setAttribute(String name, Object value, int scope) {}
                     @Override
@@ -210,7 +210,7 @@ class FiltroMonitoramentoHttpTest {
                     public void registerDestructionCallback(String name, Runnable callback, int scope) {}
                     @Override
                     @NullUnmarked
-                    public Object resolveReference(String key) { return null; }
+                    public Object resolveReference(@NonNull String key) { return null; }
                     @Override
                     @NullUnmarked
                     public String getSessionId() { return null; }
@@ -335,7 +335,7 @@ class FiltroMonitoramentoHttpTest {
                 new org.springframework.web.context.request.RequestAttributes() {
                     @Override
                     @NullUnmarked
-                    public Object getAttribute(String name, int scope) { return null; }
+                    public Object getAttribute(@NonNull String name, int scope) { return null; }
                     @Override
                     public void setAttribute(String name, Object value, int scope) {}
                     @Override
@@ -346,7 +346,7 @@ class FiltroMonitoramentoHttpTest {
                     public void registerDestructionCallback(String name, Runnable callback, int scope) {}
                     @Override
                     @NullUnmarked
-                    public Object resolveReference(String key) { return null; }
+                    public Object resolveReference(@NonNull String key) { return null; }
                     @Override
                     @NullUnmarked
                     public String getSessionId() { return null; }
