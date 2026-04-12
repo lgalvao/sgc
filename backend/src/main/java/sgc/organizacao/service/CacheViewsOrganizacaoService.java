@@ -19,6 +19,7 @@ import java.util.*;
  * <p>Os caches de view são invalidados e recarregados periodicamente
  * pelo {@code AgendadorRefreshCache} e manualmente pelo {@code CacheAdminController}.
  */
+@SuppressWarnings("EmptyMethod")
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
