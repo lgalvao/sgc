@@ -36,6 +36,7 @@ public class CacheViewsOrganizacaoService {
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_UNIDADE, allEntries = true)
     public void evictarUnidades() {
+        // Apenas para anotação @CacheEvict
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_USUARIO, sync = true)
@@ -47,6 +48,7 @@ public class CacheViewsOrganizacaoService {
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_USUARIO, allEntries = true)
     public void evictarUsuarios() {
+        // Apenas para anotação @CacheEvict
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_RESPONSABILIDADE, sync = true)
@@ -58,6 +60,7 @@ public class CacheViewsOrganizacaoService {
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_RESPONSABILIDADE, allEntries = true)
     public void evictarResponsabilidades() {
+        // Apenas para anotação @CacheEvict
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_USUARIO_PERFIL, sync = true)
@@ -67,5 +70,6 @@ public class CacheViewsOrganizacaoService {
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_USUARIO_PERFIL, allEntries = true)
     public void evictarPerfisUnidade() {
+        // Apenas para anotação @CacheEvict
     }
 }

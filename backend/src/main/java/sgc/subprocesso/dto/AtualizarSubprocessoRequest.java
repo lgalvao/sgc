@@ -15,8 +15,8 @@ import java.util.*;
  */
 @Builder
 public record AtualizarSubprocessoRequest(
-        Long codUnidade,
-        Long codMapa,
+        @Nullable Long codUnidade,
+        @Nullable Long codMapa,
         @Nullable LocalDateTime dataLimiteEtapa1,
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,

@@ -1214,6 +1214,90 @@
       <entry_point TYPE="field" FQNAME="sgc.parametros.model.Parametro valor" />
       <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.OpenApi version" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService selfProvider" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto acao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto acoesBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.CacheAdminController agendadorRefreshCache" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoViewsQueryBudgetIntegrationTest alertaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.dto.PainelBootstrapDto alertas" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoViewsQueryBudgetIntegrationTest alertaUsuarioRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaService analiseHistoricoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController analiseHistoricoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageExtraTest analiseHistoricoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageTest analiseHistoricoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerTest analiseHistoricoService" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest analiseRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest application_public_methods_should_not_receive_usuario_param" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties ativo" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.cache.AgendadorRefreshCache cacheManager" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoExclusaoCompletaService cacheManager" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.cache.AgendadorRefreshCache cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.cache.CacheAquecimento cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest controllers_should_not_use_authentication_principal" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest dataSource" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest entityManager" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest entityManagerFactory" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto habilitar" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto habilitarAceitarCadastroBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto habilitarAceitarMapaBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto habilitarDisponibilizarMapaBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto habilitarHomologarCadastroBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto habilitarHomologarMapaBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest impactoMapaService" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest javaMailSender" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoExclusaoCompletaService jdbcTemplate" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties limiteAlertaMs" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties limiteLentoMs" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties limiteMuitoLentoMs" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoController localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerTest localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto mensagemSucesso" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoHomologacaoControllerTest mockMvc" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto mostrar" />
+      <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest only_security_organization_and_e2e_should_access_security_context_holder" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest painelFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoHomologacaoControllerTest permissionEvaluator" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties permitirAtivacaoPorHeader" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoHomologacaoController processoExclusaoCompletaService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoHomologacaoControllerTest processoExclusaoCompletaService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoExclusaoCompletaService processoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.dto.PainelBootstrapDto processos" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto redirecionarPainel" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.cache.AgendadorRefreshCache registroSseEmitter" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.CacheAdminController registroSseEmitter" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.EventosController registroSseEmitter" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto requerDataLimite" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService responsabilidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto rotulo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto rotuloBotao" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest subprocessoConsultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties taxaAmostragem" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto texto" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto titulo" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties traceCompleto" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.cache.AgendadorRefreshCache unidadeHierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.cache.CacheAquecimento unidadeHierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService unidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto unidades" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.AnaliseHistoricoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaController usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaControllerTest usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eControllerCoverageTest usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eControllerTest usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelController usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelControllerTest usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceSalvarIntegrationTest usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioPerfilCacheServiceTest usuarioPerfilCacheService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService usuarioPerfilCacheService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService usuarioPerfilRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioPerfilCacheService usuarioPerfilRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioPerfilCacheServiceTest usuarioPerfilRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService usuarioRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest usuarioRepo" />
     </entry_points>
     <list size="3">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
@@ -4158,6 +4242,202 @@
     <pattern value="sgc.mapa.service.ImpactoMapaServiceCoverageTest" method="verificarImpactosSemPermissao" />
     <pattern value="sgc.seguranca.SgcPermissionEvaluatorCoverageTest" method="verificarPermissaoDeveUsarLocalizacaoDerivada" />
     <pattern value="sgc.seguranca.SgcPermissionEvaluatorCoverageTest" method="verificarSubprocessoImportacaoDeveNegarForaDaHierarquia" />
+    <pattern value="sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto" />
+    <pattern value="sgc.processo.dto.AcaoEmBlocoRequestTest" />
+    <pattern value="sgc.comum.cache.AgendadorRefreshCache" />
+    <pattern value="sgc.subprocesso.service.AnaliseHistoricoService" />
+    <pattern value="sgc.subprocesso.service.AnaliseHistoricoServiceTest" />
+    <pattern value="sgc.organizacao.EventosController" method="assinar" />
+    <pattern value="sgc.mapa.dto.AtualizarMapaRequestTest" />
+    <pattern value="sgc.subprocesso.dto.AtualizarSubprocessoRequestTest" />
+    <pattern value="sgc.comum.cache.AgendadorRefreshCache" method="atualizarTudo" />
+    <pattern value="sgc.organizacao.service.UnidadeServiceTest" method="buscarCodigoPorSigla" />
+    <pattern value="sgc.organizacao.service.UnidadeServiceTest" method="buscarPorSiglaComResponsavel" />
+    <pattern value="sgc.organizacao.CacheAdminController" />
+    <pattern value="sgc.comum.cache.CacheAquecimento" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceTest" method="configurarDependenciasAdicionais" />
+    <pattern value="sgc.mapa.dto.CriarMapaRequestTest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceExtraCoverageTest" method="criarSubprocessoComMapa" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceExtraCoverageTest" method="criarUsuarioMock" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest.ObterUnidadeLocalizacao" method="destinoAusenteNaConsulta" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveAplicarAmostragem" />
+    <pattern value="sgc.alerta.AlertaFacadeTest.MarcacaoLidos" method="deveAtualizarDataQuandoLeituraNula" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveBuscarAdministradores" />
+    <pattern value="sgc.alerta.AlertaServiceTest" method="deveBuscarAlertaUsuario" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveBuscarAutorizacoesEPerfis" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveBuscarComOptional" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveBuscarComOptPorTituloELotacao" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveBuscarConsultaLeituraPorTitulo" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveBuscarConsultasLeituraPorLotacao" />
+    <pattern value="sgc.mapa.model.MapaRepoTest" method="deveBuscarMapaPorSubprocessoComCompetenciasEAtividadesCarregadas" />
+    <pattern value="sgc.subprocesso.model.MovimentacaoRepoTest" method="deveBuscarUltimasMovimentacoesEmLote" />
+    <pattern value="sgc.subprocesso.model.MovimentacaoRepoTest" method="deveBuscarUltimaUnidadeDestino" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveBuscarUsuariosPorTitulosInternal" />
+    <pattern value="sgc.organizacao.service.UsuarioPerfilCacheServiceTest" method="deveCachearAutorizacoesPorTituloEleitoral" />
+    <pattern value="sgc.organizacao.service.UsuarioPerfilCacheServiceTest" method="deveCachearPerfisPorTituloEleitoral" />
+    <pattern value="sgc.alerta.AlertaFacadeTest.MarcacaoLidos" method="deveCapturarExcecaoSilenciosamente" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveCarregarAuthorities" />
+    <pattern value="sgc.subprocesso.service.AnaliseHistoricoServiceTest" method="deveConverterMultiplasAnalisesCorretamente" />
+    <pattern value="sgc.mapa.dto.AtualizarMapaRequestTest" method="deveConverterParaCommand" />
+    <pattern value="sgc.mapa.dto.CriarMapaRequestTest" method="deveConverterParaCommand" />
+    <pattern value="sgc.subprocesso.dto.AtualizarSubprocessoRequestTest" method="deveConverterParaCommandComCamposNulos" />
+    <pattern value="sgc.subprocesso.dto.AtualizarSubprocessoRequestTest" method="deveConverterParaCommandComTodosCampos" />
+    <pattern value="sgc.subprocesso.service.AnaliseHistoricoServiceTest" method="deveConverterUmaAnaliseCorretamente" />
+    <pattern value="sgc.organizacao.dto.UnidadeResumoDtoTest" method="deveCriarAPartirDeEntidade" />
+    <pattern value="sgc.organizacao.dto.UnidadeResumoDtoTest" method="deveCriarAPartirDeEntidadeComCamposNulos" />
+    <pattern value="sgc.organizacao.dto.DiagnosticoOrganizacionalDtoTest" method="deveCriarDiagnosticoSemViolacoes" />
+    <pattern value="sgc.alerta.AlertaFacadeTest.MarcacaoLidos" method="deveCriarNovoQuandoNaoExistir" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceCoverageTest" method="deveDelegarConversaoHistoricoValidacao" />
+    <pattern value="sgc.processo.service.ProcessoServiceTest.CoverageTests" method="deveEfetivarInicioSubprocessosDiagnostico" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaServiceTest" method="deveExcluirDependentesEmOrdemELimparCaches" />
+    <pattern value="sgc.comum.util.MonitoramentoAspectTest" method="deveExecutarRapidoESemTrace" />
+    <pattern value="sgc.comum.util.MonitoramentoAspectTest" method="deveExecutarSemMonitoramentoQuandoInativo" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveFalharAoBuscarUsuarioInexistente" />
+    <pattern value="sgc.processo.service.ProcessoServiceTest.DetalhesEElegibilidade" method="deveFalharQuandoHouverSnapshotLegadoSemNomeOuSigla" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaServiceTest" method="deveFalharQuandoProcessoNaoExiste" />
+    <pattern value="sgc.integracao.CDU21IntegrationTest" method="deveFinalizarRevisaoComMapaHomologado" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveFormatarErro500SemAmostragem" />
+    <pattern value="sgc.seguranca.login.LoginControllerTest" method="deveHigienizarIp" />
+    <pattern value="sgc.alerta.AlertaFacadeTest" method="deveIgnorarAlertasInexistentesAoMarcarComoLidos" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveIgnorarRequisicaoForaDeApi" />
+    <pattern value="sgc.alerta.AlertaFacadeTest.MarcacaoLidos" method="deveIgnorarSeAlertaNaoEncontrado" />
+    <pattern value="sgc.seguranca.login.ClienteAcessoAdE2eTest" method="deveInicializarComRestClientCustomizado" />
+    <pattern value="sgc.processo.service.ProcessoServiceTest.Workflow" method="deveIniciarRevisaoIgnorandoAncestralRedundante" />
+    <pattern value="sgc.comum.util.MonitoramentoAspectTest" method="deveInvocarConstrutorVazio" />
+    <pattern value="sgc.mapa.service.MapaVisualizacaoServiceTest" method="deveLancarErroSeNaoEncontrarMapaNaSituacaoDeMapa" />
+    <pattern value="sgc.processo.dto.AcaoEmBlocoRequestTest" method="deveLancarErroValidacaoSeDataLimiteNaoInformadaAoDisponibilizar" />
+    <pattern value="sgc.organizacao.dto.UnidadeResumoDtoTest" method="deveLancarExcecaoQuandoCamposObrigatoriosFaltarem" />
+    <pattern value="sgc.organizacao.dto.UnidadeResumoDtoTest" method="deveLancarExcecaoQuandoEntidadeForNula" />
+    <pattern value="sgc.subprocesso.service.AnaliseHistoricoServiceTest" method="deveLancarExcecaoQuandoUnidadeNaoForEncontrada" />
+    <pattern value="sgc.processo.painel.PainelFacadeTest" method="deveLancarExcecaoSeSiglaNulaENaoGestorNemAdmin" />
+    <pattern value="sgc.processo.painel.PainelFacadeTest" method="deveLancarExcecaoSeSiglaVaziaENaoGestorNemAdmin" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaServiceTest" method="deveLidarComCacheRetornandoNull" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaServiceTest" method="deveLidarComNullsRetornadosAoChecarTabelasOpcionais" />
+    <pattern value="sgc.alerta.AlertaServiceTest" method="deveListarPorCodigos" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveLogarErroHTTP" />
+    <pattern value="sgc.comum.util.MonitoramentoAspectTest" method="deveLogarTraceAtivadoPelaRequisicao" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest.ObterContextoEdicao" method="deveManterConhecimentosDasAtividadesAoMontarContexto" />
+    <pattern value="sgc.processo.painel.PainelFacadeTest" method="deveMarcarAlertasLidos" />
+    <pattern value="sgc.alerta.AlertaFacadeTest" method="deveMarcarComoLidosAlertasExistentesEAusentes" />
+    <pattern value="sgc.seguranca.login.ClienteAcessoAdE2eTest" method="deveMascararTituloCurtoViaFluxoNormal" />
+    <pattern value="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest" method="deveMedirHotspotsDeProcessoESubprocessoNoOracleReal" />
+    <pattern value="sgc.processo.ProcessoHomologacaoControllerTest" method="deveNegarPerfilNaoAdministrador" />
+    <pattern value="sgc.processo.painel.PainelFacadeTest" method="deveObterBootstrap" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveObterContextoCadastroAtividadesBusca" />
+    <pattern value="sgc.alerta.AlertaFacadeTest" method="deveObterMapaDataHoraLeitura" />
+    <pattern value="sgc.processo.ProcessoHomologacaoControllerTest" method="devePermitirAdmin" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="devePropagarCorrelacaoEAtivarMonitoramentoPorHeader" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaServiceTest" method="devePularTabelasOpcionaisDeDiagnosticoAusentes" />
+    <pattern value="sgc.mapa.AtividadeControllerTest.OperacoesAtividade" method="deveRetornar403AoAtualizarAtividadeSemRole" />
+    <pattern value="sgc.mapa.AtividadeControllerTest.OperacoesConhecimento" method="deveRetornar403AoAtualizarConhecimentoSemRole" />
+    <pattern value="sgc.mapa.AtividadeControllerTest.OperacoesConhecimento" method="deveRetornar403AoCriarConhecimentoSemRole" />
+    <pattern value="sgc.mapa.AtividadeControllerTest.OperacoesAtividade" method="deveRetornar403AoExcluirAtividadeSemRole" />
+    <pattern value="sgc.mapa.AtividadeControllerTest.OperacoesConhecimento" method="deveRetornar403AoExcluirConhecimentoSemRole" />
+    <pattern value="sgc.mapa.AtividadeControllerTest.OperacoesConhecimento" method="deveRetornar403AoListarConhecimentosSemPermissao" />
+    <pattern value="sgc.mapa.AtividadeControllerTest.OperacoesAtividade" method="deveRetornar403AoObterAtividadeSemPermissao" />
+    <pattern value="sgc.subprocesso.model.SubprocessoTest" method="deveRetornarCodigosApenasQuandoDisponiveis" />
+    <pattern value="sgc.alerta.AlertaFacadeTest" method="deveRetornarDataHoraLeitura" />
+    <pattern value="sgc.processo.dto.AcaoEmBlocoRequestTest" method="deveRetornarDisponibilizarMapaEmBlocoCommandParaAcaoDisponibilizar" />
+    <pattern value="sgc.organizacao.HierarquiaServiceTest" method="deveRetornarFalseEmEhMesmaOuSubordinadaQuandoNaoSubordinada" />
+    <pattern value="sgc.organizacao.model.UnidadeElegibilidadeInfoTest" method="deveRetornarFalseQuandoResponsavelForApenasEspacos" />
+    <pattern value="sgc.organizacao.model.UnidadeElegibilidadeInfoTest" method="deveRetornarFalseQuandoResponsavelForNulo" />
+    <pattern value="sgc.organizacao.model.UnidadeElegibilidadeInfoTest" method="deveRetornarFalseQuandoResponsavelForVazio" />
+    <pattern value="sgc.subprocesso.service.AnaliseHistoricoServiceTest" method="deveRetornarListaVaziaQuandoNenhumaAnaliseForFornecida" />
+    <pattern value="sgc.subprocesso.service.LocalizacaoSubprocessoServiceTest" method="deveRetornarLocalizacoesParaLista" />
+    <pattern value="sgc.subprocesso.service.LocalizacaoSubprocessoServiceTest" method="deveRetornarMapaVazioSeListaVazia" />
+    <pattern value="sgc.processo.dto.AcaoEmBlocoRequestTest" method="deveRetornarProcessarAnaliseEmBlocoCommandParaOutrasAcoes" />
+    <pattern value="sgc.organizacao.model.UnidadeElegibilidadeInfoTest" method="deveRetornarTrueQuandoPossuiResponsavelEfetivo" />
+    <pattern value="sgc.mapa.service.MapaVisualizacaoServiceTest" method="deveRetornarVazioCasoNaoEncontreMapaMasSituacaoOk" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest.ConsultasUsuario" method="deveRetornarVazioTermoCurto" />
+    <pattern value="sgc.processo.service.ProcessoServiceCoverageTest" method="deveReutilizarSubprocessosAoListarElegiveisNoContextoCompleto" />
+    <pattern value="sgc.alerta.AlertaServiceTest" method="deveSalvarAlerta" />
+    <pattern value="sgc.alerta.AlertaServiceTest" method="deveSalvarAlertasUsuarios" />
+    <pattern value="sgc.alerta.AlertaServiceTest" method="deveSalvarAlertaUsuario" />
+    <pattern value="sgc.alerta.AlertaServiceTest" method="deveSalvarTodos" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveSerInativo" />
+    <pattern value="sgc.alerta.AlertaFacadeTest" method="deveSilenciarErroDeConcorrenciaAoMarcarComoLidos" />
+    <pattern value="sgc.seguranca.login.LoginControllerTest" method="deveTratarIpNulo" />
+    <pattern value="sgc.mapa.service.MapaVisualizacaoServiceTest" method="deveTratarSubprocessoComSituacaoNula" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveUsarAmostragemAtivando" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveUsarLento" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveUsarMuitoLento" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="deveUsarTraceCompletoDaProperties" />
+    <pattern value="sgc.organizacao.dto.DiagnosticoOrganizacionalDtoTest" />
+    <pattern value="sgc.organizacao.EventosController" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="evictarPerfisUnidade" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="evictarResponsabilidades" />
+    <pattern value="sgc.organizacao.CacheAdminController" method="evictarTudo" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="evictarUnidades" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="evictarUsuarios" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaService" method="excluirCompleto" />
+    <pattern value="sgc.processo.ProcessoHomologacaoController" method="excluirCompleto" />
+    <pattern value="sgc.processo.service.ProcessoServiceTest" method="executarAcaoEmBloco_NaoExecutaTransicoesQuandoNaoElegivel" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttp" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttp" method="FiltroMonitoramentoHttp" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" />
+    <pattern value="sgc.mapa.model.ConhecimentoRepo" method="findByAtividade_Codigo" />
+    <pattern value="sgc.integracao.ProcessoSubprocessoViewsQueryBudgetIntegrationTest" method="historicoDeValidacaoDeveCarregarUnidadesEmLote" />
+    <pattern value="sgc.processo.service.ProcessoServiceCoverageTest.ElegibilidadeHierarquia" method="isElegivel_NaoElegivelRevisaoCadastroHomologado" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="isMonitoramentoAtivoNaRequisicaoDeveRetornarDoRequest" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="isMonitoramentoAtivoNaRequisicaoDeveRetornarFalseQuandoContextInvalido" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="isMonitoramentoAtivoNaRequisicaoDeveRetornarFalseQuandoNull" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="isMonitoramentoAtivoNaRequisicaoDeveRetornarFalseQuandoSemContexto" />
+    <pattern value="sgc.organizacao.UsuarioServiceTest" method="limparContextoSeguranca" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest.AnalisesEHistorico" method="listarHistoricoCadastroFiltraAnalises" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest.AnalisesEHistorico" method="listarHistoricoValidacaoFiltraAnalises" />
+    <pattern value="sgc.mapa.model.ConhecimentoRepo" method="listarPorMapa" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceTest" method="listarPorProcessoEUnidadeCodigosESituacoesDeveRetornarVazio" />
+    <pattern value="sgc.integracao.mocks.ColetorSqlTeste" method="listarSqls" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="listarTodasResponsabilidades" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="listarTodasUnidades" />
+    <pattern value="sgc.organizacao.model.UnidadeMapaRepo" method="listarTodosCodigosUnidade" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="listarTodosPerfisUnidade" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoService" method="listarTodosUsuarios" />
+    <pattern value="sgc.alerta.AlertaFacadeTest.MarcacaoLidos" />
+    <pattern value="sgc.processo.painel.PainelController" method="marcarAlertasLidos" />
+    <pattern value="sgc.processo.painel.PainelControllerTest" method="marcarAlertasLidos_Sucesso" />
+    <pattern value="sgc.comum.util.MonitoramentoProperties" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="naoDeveAplicarAmostragem" />
+    <pattern value="sgc.alerta.AlertaFacadeTest.MarcacaoLidos" method="naoDeveFazerNadaSeVazia" />
+    <pattern value="sgc.integracao.CDU21IntegrationTest" method="naoDeveFinalizarRevisaoComCadastroHomologado" />
+    <pattern value="sgc.processo.painel.PainelFacadeTest" method="naoDeveMarcarAlertasLidosSeListaVazia" />
+    <pattern value="sgc.processo.painel.PainelController" method="obterBootstrap" />
+    <pattern value="sgc.processo.painel.PainelControllerTest" method="obterBootstrap_Sucesso" />
+    <pattern value="sgc.subprocesso.SubprocessoController" method="obterContextoCadastroAtividades" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerCoverageTest" method="obterContextoCadastroAtividadesPorProcessoEUnidade" />
+    <pattern value="sgc.subprocesso.SubprocessoController" method="obterContextoCadastroAtividadesPorProcessoEUnidade" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceTest" method="obterContextoCadastroAtividadesSucesso" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest.ObterContextoEdicao" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceCoverageTest" method="obterContextoEdicaoDeveSepararCargaDeMapaEAtividades" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerCoverageTest" method="obterContextoEdicaoPorProcessoEUnidade" />
+    <pattern value="sgc.subprocesso.SubprocessoController" method="obterContextoEdicaoPorProcessoEUnidade" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdAtualDeveRetornarDoRequest" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdAtualDeveRetornarUUIDQuandoRequestAtributoInvalido" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdAtualDeveRetornarUUIDQuandoSemContexto" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdDeveGerarNovoQuandoVazia" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdDeveRetornarDoMDC" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdDeveRetornarUUIDQuandoContextInvalido" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdDeveRetornarUUIDQuandoNull" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttpTest" method="obterCorrelacaoIdDeveRetornarUUIDQuandoRequestAtributoStringVazia" />
+    <pattern value="sgc.processo.painel.dto.PainelBootstrapDto" />
+    <pattern value="sgc.integracao.ProcessoSubprocessoViewsQueryBudgetIntegrationTest" method="painelDeveListarAlertasSemLookupUnitarioDeLeitura" />
+    <pattern value="sgc.seguranca.dto.PermissoesSessaoResponse" />
+    <pattern value="sgc.seguranca.dto.PermissoesSessaoResponse" method="PermissoesSessaoResponse" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaService" />
+    <pattern value="sgc.processo.service.ProcessoExclusaoCompletaServiceTest" />
+    <pattern value="sgc.processo.ProcessoHomologacaoController" />
+    <pattern value="sgc.processo.ProcessoHomologacaoControllerTest" />
+    <pattern value="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitter" method="registrar" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitter" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitter" method="transmitir" />
+    <pattern value="sgc.organizacao.model.UnidadeElegibilidadeInfoTest" />
+    <pattern value="sgc.organizacao.dto.UnidadeResumoDtoTest" />
+    <pattern value="sgc.organizacao.service.UsuarioPerfilCacheService" />
+    <pattern value="sgc.organizacao.service.UsuarioPerfilCacheServiceTest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceTest" method="verificarAcessoCadastroHabilitadoAdmin" />
+    <pattern value="sgc.integracao.MapaManutencaoServiceIntegrationTest" method="criarSubprocessoSemMapa" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

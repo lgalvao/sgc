@@ -148,7 +148,7 @@ public class ProcessoService {
     private List<SubprocessoElegivelDto> listarSubprocessosElegiveis(
             List<Subprocesso> subprocessos,
             Usuario usuario,
-            Map<Long, Unidade> localizacoesPrecarregadas
+            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         List<Subprocesso> subprocessosElegiveis = new ArrayList<>();
         Map<Long, ElegibilidadeAcaoBloco> elegibilidadesPorSubprocesso = new HashMap<>();

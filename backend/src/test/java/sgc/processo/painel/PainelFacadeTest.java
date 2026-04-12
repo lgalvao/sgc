@@ -345,7 +345,7 @@ class PainelFacadeTest {
         when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(pageProcessos);
 
         ContextoUsuarioAutenticado contextoChefe = new ContextoUsuarioAutenticado("123", 10L, Perfil.CHEFE);
-        when(unidadeService.buscarSiglaPorCodigo(10L)).thenReturn(null);
+        doReturn(null).when(unidadeService).buscarSiglaPorCodigo(10L);
 
         assertThatThrownBy(() -> painelFacade.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
             .isInstanceOf(IllegalStateException.class)

@@ -9,7 +9,7 @@ import java.util.*;
 @Builder
 public record SubprocessoDetalheResponse(
         SubprocessoResumoDto subprocesso,
-        ResponsavelDto responsavel,
+        @Nullable ResponsavelDto responsavel,
         @Nullable UsuarioResumoDto titular,
         List<MovimentacaoDto> movimentacoes,
         String localizacaoAtual,

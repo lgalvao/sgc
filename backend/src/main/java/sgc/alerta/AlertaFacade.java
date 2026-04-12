@@ -86,7 +86,7 @@ public class AlertaFacade {
                 .filter(alertaUsuario -> alertaUsuario.getDataHoraLeitura() != null)
                 .collect(java.util.stream.Collectors.toMap(
                         alertaUsuario -> alertaUsuario.getCodigo().getAlertaCodigo(),
-                        AlertaUsuario::getDataHoraLeitura,
+                        alertaUsuario -> java.util.Objects.requireNonNull(alertaUsuario.getDataHoraLeitura()),
                         (primeira, ignorada) -> primeira,
                         HashMap::new
                 ));
@@ -96,6 +96,7 @@ public class AlertaFacade {
         return alertaService.dataHoraLeituraAlertaUsuario(codigoAlerta, usuarioTitulo);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     @Transactional
     public Alerta criarAlertaAdmin(Processo processo, Unidade destino, String descricao) {
         return criarAlerta(processo, unidadeRaiz(), destino, descricao);

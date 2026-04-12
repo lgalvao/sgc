@@ -131,7 +131,7 @@ class SubprocessoConsultaServiceCoverageTest {
         when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(unidade);
         when(unidadeService.temMapaVigente(10L)).thenReturn(false);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
-        when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(10L)).thenReturn(null);
+        doReturn(null).when(usuarioFacade).buscarResponsabilidadeDetalhadaAtual(10L);
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of(atividade));
         when(mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(100L)).thenReturn(mapa);
 

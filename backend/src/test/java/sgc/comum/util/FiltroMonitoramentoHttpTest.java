@@ -2,6 +2,7 @@ package sgc.comum.util;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.springframework.mock.web.*;
 
@@ -197,6 +198,7 @@ class FiltroMonitoramentoHttpTest {
         org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
                 new org.springframework.web.context.request.RequestAttributes() {
                     @Override
+                    @NullUnmarked
                     public Object getAttribute(String name, int scope) { return null; }
                     @Override
                     public void setAttribute(String name, Object value, int scope) {}
@@ -207,10 +209,13 @@ class FiltroMonitoramentoHttpTest {
                     @Override
                     public void registerDestructionCallback(String name, Runnable callback, int scope) {}
                     @Override
+                    @NullUnmarked
                     public Object resolveReference(String key) { return null; }
                     @Override
+                    @NullUnmarked
                     public String getSessionId() { return null; }
                     @Override
+                    @NullUnmarked
                     public Object getSessionMutex() { return null; }
                 }
         );
@@ -329,6 +334,7 @@ class FiltroMonitoramentoHttpTest {
         org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
                 new org.springframework.web.context.request.RequestAttributes() {
                     @Override
+                    @NullUnmarked
                     public Object getAttribute(String name, int scope) { return null; }
                     @Override
                     public void setAttribute(String name, Object value, int scope) {}
@@ -339,10 +345,13 @@ class FiltroMonitoramentoHttpTest {
                     @Override
                     public void registerDestructionCallback(String name, Runnable callback, int scope) {}
                     @Override
+                    @NullUnmarked
                     public Object resolveReference(String key) { return null; }
                     @Override
+                    @NullUnmarked
                     public String getSessionId() { return null; }
                     @Override
+                    @NullUnmarked
                     public Object getSessionMutex() { return null; }
                 }
         );

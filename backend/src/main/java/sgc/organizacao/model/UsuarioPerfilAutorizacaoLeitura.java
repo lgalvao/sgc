@@ -8,7 +8,7 @@ public record UsuarioPerfilAutorizacaoLeitura(
         Long unidadeCodigo,
         @Nullable String unidadeNome,
         @Nullable String unidadeSigla,
-        TipoUnidade unidadeTipo,
-        SituacaoUnidade unidadeSituacao
+        @Nullable TipoUnidade unidadeTipo,
+        @Nullable SituacaoUnidade unidadeSituacao
 ) {
 }

@@ -210,7 +210,7 @@ class SubprocessoServiceCoverageIntegrationTest {
                     sp.getUnidade().getCodigo(),
                     Perfil.CHEFE
             ));
-            when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(sp.getUnidade().getCodigo())).thenReturn(null);
+            doReturn(null).when(usuarioFacade).buscarResponsabilidadeDetalhadaAtual(sp.getUnidade().getCodigo());
 
             ContextoEdicaoResponse contexto = consultaService.obterContextoEdicao(sp.getCodigo());
 
