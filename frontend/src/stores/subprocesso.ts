@@ -8,14 +8,14 @@ import {
 import {logger} from "@/utils";
 
 /**
- * Cache de sessão para contexto de edição de subprocesso.
+ * Dedupe de sessão para contexto de edição de subprocesso.
  *
- * Problema: SubprocessoView e CadastroVisualizacaoView buscam `subprocessos/buscar` +
- * `subprocessos/{codigo}/contexto-edicao` em toda ativação (onMounted + onActivated),
- * mesmo quando o contexto não mudou. Isso explica 7-9 chamadas repetidas por jornada.
+ * O contexto de edição carrega situação, permissões e ações disponíveis no momento.
+ * Como esses dados mudam ao longo do workflow, não é seguro reutilizar snapshots
+ * antigos entre navegações. Mantemos apenas deduplicação de requisições concorrentes,
+ * além do mapeamento processo+unidade -> código do subprocesso.
  *
- * Estratégia: cache por código de subprocesso, invalidado explicitamente após ações
- * de workflow (disponibilizar, aceitar, homologar, etc.).
+ * Estratégia: nunca considerar o contexto "válido" para reuso entre ativações.
  */
 export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
@@ -30,8 +30,8 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     }
 
     /** Contexto ainda é válido para o subprocesso dado? */
-    function dadosValidos(codSubprocesso: number): boolean {
-        return !invalido.value && codSubprocessoCarregado.value === codSubprocesso && contextoEdicao.value !== null;
+    function dadosValidos(_codSubprocesso: number): boolean {
+        return false;
     }
 
     /** Invalida o cache — deve ser chamado após qualquer ação de workflow. */
@@ -62,7 +62,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             const data = await promessaCarregamento;
             contextoEdicao.value = data;
             codSubprocessoCarregado.value = codSubprocesso;
-            invalido.value = false;
+            invalido.value = true;
             return data;
         } catch (err) {
             logger.error(`Erro ao buscar contexto de edição do subprocesso ${codSubprocesso}:`, err);
@@ -102,14 +102,14 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
                 mapaProcessoUnidadeParaCodigo.set(chaveProcessoUnidade, codigo);
                 contextoEdicao.value = data;
                 codSubprocessoCarregado.value = codigo;
-                invalido.value = false;
+                invalido.value = true;
                 return {codigo, contexto: data};
             })();
             carregamentosPorProcessoUnidade.set(chaveProcessoUnidade, promessaCarregamento);
             const {codigo, contexto} = await promessaCarregamento;
             contextoEdicao.value = contexto;
             codSubprocessoCarregado.value = codigo;
-            invalido.value = false;
+            invalido.value = true;
             return {codigo, contexto};
         } catch (err) {
             logger.error(`Erro ao buscar contexto de subprocesso para processo ${codProcesso} unidade ${siglaUnidade}:`, err);

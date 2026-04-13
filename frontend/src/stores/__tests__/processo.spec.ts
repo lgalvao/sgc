@@ -38,11 +38,11 @@ describe("processo store", () => {
         expect(context.store.dadosValidos(2)).toBe(false);
     });
 
-    it("dadosValidos deve retornar true se estiver válido e com código correto", () => {
+    it("dadosValidos deve retornar false mesmo com contexto carregado, pois não reusa snapshot de permissões", () => {
         context.store.invalido = false;
         context.store.codProcessoCarregado = 1;
         context.store.contextoCompleto = {} as any;
-        expect(context.store.dadosValidos(1)).toBe(true);
+        expect(context.store.dadosValidos(1)).toBe(false);
     });
 
     it("invalidar deve marcar como inválido", () => {
@@ -52,20 +52,11 @@ describe("processo store", () => {
     });
 
     describe("garantirContextoCompleto", () => {
-        it("deve usar cache se dados forem válidos", async () => {
+        it("deve buscar do service mesmo com contexto anterior carregado", async () => {
             const mockContexto = {codigo: 1} as any;
             context.store.invalido = false;
             context.store.codProcessoCarregado = 1;
-            context.store.contextoCompleto = mockContexto;
-
-            const result = await context.store.garantirContextoCompleto(1);
-
-            expect(processoService.buscarContextoCompleto).not.toHaveBeenCalled();
-            expect(result).toEqual(mockContexto);
-        });
-
-        it("deve buscar do service se cache for inválido", async () => {
-            const mockContexto = {codigo: 1} as any;
+            context.store.contextoCompleto = {codigo: 999} as any;
             vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue(mockContexto);
 
             const result = await context.store.garantirContextoCompleto(1);
@@ -74,7 +65,7 @@ describe("processo store", () => {
             expect(result).toEqual(mockContexto);
             expect(context.store.contextoCompleto).toEqual(mockContexto);
             expect(context.store.codProcessoCarregado).toBe(1);
-            expect(context.store.invalido).toBe(false);
+            expect(context.store.invalido).toBe(true);
         });
 
         it("deve reutilizar carregamento em andamento para evitar requisições duplicadas", async () => {

@@ -268,7 +268,7 @@ const subprocessosStore = useSubprocessos();
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStoreCache = useSubprocessoStore();
-const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
 const mapa = ref<MapaVisualizacao | null>(null);
 const analisesCadastro = ref<Analise[]>([]);
 
@@ -514,6 +514,7 @@ function verHistorico() {
 }
 
 onMounted(async () => {
+  limparEstadoSubprocessoAtual();
   const resultado = await carregarContextoInicial();
   if (resultado?.codigo) {
     mapa.value = await obterMapaVisualizacao(resultado.codigo);

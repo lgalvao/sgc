@@ -46,17 +46,36 @@ function Run-Step {
     # Inicia o job em background passando o diretório e o comando (como string)
     $job = Start-Job -ScriptBlock {
         param($dir, $commandString)
+
         Set-Location $dir
-        $sb = [scriptblock]::Create($commandString)
-        & $sb
+        $saida = [System.Collections.Generic.List[string]]::new()
+
+        try {
+            $sb = [scriptblock]::Create($commandString)
+            & $sb 2>&1 | ForEach-Object { $saida.Add($_.ToString()) }
+
+            $codigoSaida = if ($null -ne $LASTEXITCODE) { [int]$LASTEXITCODE }
+            elseif ($?) { 0 }
+            else { 1 }
+        }
+        catch {
+            $saida.Add(($_ | Out-String).TrimEnd())
+            $codigoSaida = 1
+        }
+
+        [pscustomobject]@{
+            CodigoSaida = $codigoSaida
+            Saida       = @($saida)
+        }
     } -ArgumentList $PSScriptRoot, $Script.ToString() -Name $Name
     
     # Mostra o spinner enquanto aguarda
     Show-Spinner -Job $job -StepName $Name
     
     # Recebe os resultados
-    $result = Wait-Job $job | Receive-Job
-    $exitCode = $job.ChildJobs[0].ExitCode
+    $jobResult = Wait-Job $job | Receive-Job
+    $result = @($jobResult.Saida)
+    $exitCode = $jobResult.CodigoSaida
     Remove-Job $job
 
     # Salva o output no log para referência se necessário

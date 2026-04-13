@@ -38,11 +38,11 @@ describe("subprocesso store", () => {
         expect(context.store.dadosValidos(2)).toBe(false);
     });
 
-    it("dadosValidos deve retornar true se estiver válido e com código correto", () => {
+    it("dadosValidos deve retornar false mesmo com contexto carregado, pois não reusa snapshot de permissões", () => {
         context.store.invalido = false;
         context.store.codSubprocessoCarregado = 1;
         context.store.contextoEdicao = {} as any;
-        expect(context.store.dadosValidos(1)).toBe(true);
+        expect(context.store.dadosValidos(1)).toBe(false);
     });
 
     it("invalidar deve marcar como inválido", () => {
@@ -52,20 +52,11 @@ describe("subprocesso store", () => {
     });
 
     describe("garantirContextoEdicao", () => {
-        it("deve usar cache se dados forem válidos", async () => {
+        it("deve buscar do service mesmo com contexto anterior carregado", async () => {
             const mockContexto = {codigo: 1} as any;
             context.store.invalido = false;
             context.store.codSubprocessoCarregado = 1;
-            context.store.contextoEdicao = mockContexto;
-
-            const result = await context.store.garantirContextoEdicao(1);
-
-            expect(subprocessoService.buscarContextoEdicao).not.toHaveBeenCalled();
-            expect(result).toEqual(mockContexto);
-        });
-
-        it("deve buscar do service se cache for inválido", async () => {
-            const mockContexto = {codigo: 1} as any;
+            context.store.contextoEdicao = {codigo: 999} as any;
             vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(mockContexto);
 
             const result = await context.store.garantirContextoEdicao(1);
@@ -74,7 +65,7 @@ describe("subprocesso store", () => {
             expect(result).toEqual(mockContexto);
             expect(context.store.contextoEdicao).toEqual(mockContexto);
             expect(context.store.codSubprocessoCarregado).toBe(1);
-            expect(context.store.invalido).toBe(false);
+            expect(context.store.invalido).toBe(true);
         });
 
         it("deve reutilizar carregamento em andamento por código", async () => {
@@ -105,17 +96,19 @@ describe("subprocesso store", () => {
     });
 
     describe("garantirContextoEdicaoPorProcessoEUnidade", () => {
-        it("deve reutilizar o cache quando processo e unidade já foram mapeados", async () => {
-            const mockContexto = {detalhes: {codigo: 10, unidade: {sigla: "TEST"}}} as any;
-            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(mockContexto);
+        it("deve buscar novamente mesmo quando processo e unidade já foram mapeados", async () => {
+            const contextoInicial = {detalhes: {codigo: 10, unidade: {sigla: "TEST"}}} as any;
+            const contextoAtualizado = {detalhes: {codigo: 10, unidade: {sigla: "TEST"}, permissoes: {podeEditarCadastro: true}}} as any;
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(contextoInicial);
 
             await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
-            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockClear();
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockReset();
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(contextoAtualizado);
 
             const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
 
-            expect(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
-            expect(result).toEqual({codigo: 10, contexto: mockContexto});
+            expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledWith(10);
+            expect(result).toEqual({codigo: 10, contexto: contextoAtualizado});
         });
 
         it("deve buscar novamente quando for o mesmo sigla mas outro processo", async () => {
@@ -144,7 +137,7 @@ describe("subprocesso store", () => {
             expect(result).toEqual({codigo: 20, contexto: mockContexto});
             expect(context.store.contextoEdicao).toEqual(mockContexto);
             expect(context.store.codSubprocessoCarregado).toBe(20);
-            expect(context.store.invalido).toBe(false);
+            expect(context.store.invalido).toBe(true);
         });
 
         it("deve reutilizar carregamento em andamento por processo+unidade", async () => {

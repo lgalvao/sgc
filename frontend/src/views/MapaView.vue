@@ -152,7 +152,7 @@ const {mapaCompleto, impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const subprocessoStoreCache = useSubprocessoStore();
-const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 usePerfil();
 
@@ -238,6 +238,7 @@ async function carregarMapaInicial(codigo: number, contextoInicial?: Awaited<Ret
 }
 
 onMounted(async () => {
+  limparEstadoSubprocessoAtual();
   const contextoInicial = await carregarContextoInicial();
   if (!codSubprocesso.value) {
     return;

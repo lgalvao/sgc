@@ -5,14 +5,14 @@ import {buscarContextoCompleto as serviceBuscarContextoCompleto} from "@/service
 import {logger} from "@/utils";
 
 /**
- * Cache de sessão para contexto completo de processo.
+ * Dedupe de sessão para contexto completo de processo.
  *
- * Problema: ProcessoDetalheView busca `processos/{codigo}/contexto-completo` em toda
- * ativação (onMounted + onActivated), mesmo quando o contexto não mudou. O endpoint
- * teve pico de 60ms e foi chamado 4 vezes na jornada do ciclo completo.
+ * O contexto completo carrega situação, permissões e ações disponíveis no momento.
+ * Como esses dados mudam ao longo do workflow, não é seguro reutilizar snapshots
+ * antigos entre navegações. Mantemos apenas deduplicação de requisições concorrentes
+ * e o último payload recebido para consumo imediato da própria view.
  *
- * Estratégia: cache por código de processo, invalidado após ações de workflow
- * (ação em bloco, finalização) que alteram o estado da tela.
+ * Estratégia: nunca considerar o contexto "válido" para reuso entre ativações.
  */
 export const useProcessoStore = defineStore("processo", () => {
     const contextoCompleto = ref<Processo | null>(null);
@@ -21,8 +21,8 @@ export const useProcessoStore = defineStore("processo", () => {
     const carregamentosEmAndamento = new Map<number, Promise<Processo>>();
 
     /** Contexto ainda é válido para o processo dado? */
-    function dadosValidos(codProcesso: number): boolean {
-        return !invalido.value && codProcessoCarregado.value === codProcesso && contextoCompleto.value !== null;
+    function dadosValidos(_codProcesso: number): boolean {
+        return false;
     }
 
     /** Invalida o cache — deve ser chamado após qualquer ação de workflow que altera o processo. */
@@ -51,7 +51,7 @@ export const useProcessoStore = defineStore("processo", () => {
             const data = await promessaCarregamento;
             contextoCompleto.value = data;
             codProcessoCarregado.value = codProcesso;
-            invalido.value = false;
+            invalido.value = true;
             return data;
         } catch (err) {
             logger.error(`Erro ao buscar contexto completo do processo ${codProcesso}:`, err);

@@ -192,7 +192,7 @@ const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const subprocessoStoreCache = useSubprocessoStore();
-const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
 const {impactoMapa: impactos} = mapasStore;
 
 const unidadeId = computed(() => props.sigla);
@@ -360,6 +360,7 @@ async function confirmarDevolucao() {
 }
 
 onMounted(async () => {
+  limparEstadoSubprocessoAtual();
   const codigoQuery = Number(route.query.codSubprocesso);
   const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
       ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)

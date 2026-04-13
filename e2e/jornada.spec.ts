@@ -63,6 +63,11 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AtividadeHelpers.navegarParaAtividades(page);
             await AtividadeHelpers.importarAtividadesVazia(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
             await AtividadeHelpers.disponibilizarCadastro(page);
+
+            await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -72,6 +77,10 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
             await AnaliseHelpers.aceitarCadastroMapeamento(page, 'Cadastro aceito pelo Gestor.');
+
+            await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro aceito/i);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -81,6 +90,11 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
             await AnaliseHelpers.homologarCadastroMapeamento(page);
+
+            await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -91,6 +105,11 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await MapaHelpers.navegarParaMapa(page);
             await MapaHelpers.criarCompetencia(page, 'Competência Técnica Básica', ['Atividade 1']);
             await MapaHelpers.disponibilizarMapa(page);
+
+            await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
+            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -102,6 +121,10 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await page.getByTestId('btn-mapa-validar').click();
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await page.waitForURL(/\/painel$/);
+
+            await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
+            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -110,6 +133,10 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
             await MapaHelpers.aceitarOuHomologarMapa(page, 'Mapa aceito pelo Gestor.');
+
+            await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa aceito/i);
+            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -149,6 +176,10 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByText('Atividade 1')).toBeVisible();
             await AtividadeHelpers.adicionarConhecimento(page, 'Atividade 1', 'Conhecimento Revisado');
             await AtividadeHelpers.disponibilizarCadastro(page);
+
+            await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoRevisao, siglaUnidade);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro disponibilizada/i);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -158,6 +189,9 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
             await AnaliseHelpers.aceitarRevisao(page, 'Revisão aceita.');
+
+            await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro aceita/i);
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -167,6 +201,10 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoRevisao, siglaUnidade);
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
             await AnaliseHelpers.homologarCadastroMapeamento(page, 'Revisão homologada. Ciclo de manutenção completo.');
+
+            await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro homologada/i);
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };
