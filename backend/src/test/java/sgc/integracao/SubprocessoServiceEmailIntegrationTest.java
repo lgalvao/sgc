@@ -2,6 +2,7 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.mail.javamail.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
@@ -14,6 +15,7 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
 import java.time.*;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,7 +35,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @MockitoBean
-    private EmailService emailService;
+    private JavaMailSenderImpl javaMailSender;
 
     private Unidade unidade;
     private Unidade unidadeDestino;
@@ -42,6 +44,8 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        when(javaMailSender.createMimeMessage()).thenAnswer(invocacao -> new jakarta.mail.internet.MimeMessage(jakarta.mail.Session.getInstance(new Properties())));
+
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_EMAIL_ORIG");
@@ -97,13 +101,13 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
 
         transicaoService.registrarTransicao(comando);
 
-        verify(emailService, atLeastOnce()).enviarEmailHtml(contains("test_email_dest"), anyString(), anyString());
+        verify(javaMailSender, atLeastOnce()).send(any(jakarta.mail.internet.MimeMessage.class));
     }
 
     @Test
     @DisplayName("registrarTransicao: Lança exceção ao falhar envio de email (try-catch removido)")
     void registrarTransicao_LancaExcecaoEmail() {
-        doThrow(new RuntimeException("Erro ao enviar email")).when(emailService).enviarEmailHtml(anyString(), anyString(), any());
+        doThrow(new RuntimeException("Erro ao enviar email")).when(javaMailSender).send(any(jakarta.mail.internet.MimeMessage[].class));
 
         RegistrarTransicaoCommand comando = RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
@@ -131,6 +135,6 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
 
         transicaoService.registrarTransicao(comando);
 
-        verify(emailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
+        verify(javaMailSender, never()).send(any(jakarta.mail.internet.MimeMessage.class));
     }
 }
