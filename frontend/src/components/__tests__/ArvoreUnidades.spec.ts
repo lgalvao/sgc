@@ -63,6 +63,85 @@ describe("ArvoreUnidades.vue", () => {
         expect(wrapper.findComponent({name: "UnidadeTreeNode"}).exists()).toBe(true);
     });
 
+    it("deve agrupar zonas eleitorais em um no visual", () => {
+        const unidades: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 10, sigla: "SJ", nome: "SECRETARIA JUDICIARIA", filhas: [], tipo: "ADMINISTRATIVA"},
+                    {codigo: 101, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: []},
+                    {codigo: 102, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", filhas: []},
+                ],
+            }
+        ];
+        const wrapper = createWrapper({unidades, ocultarRaiz: true});
+
+        expect((wrapper.vm as any).unidadesExibidas).toEqual([
+            {
+                codigo: 10,
+                sigla: "SJ",
+                nome: "SECRETARIA JUDICIARIA",
+                filhas: [],
+                tipo: "ADMINISTRATIVA",
+            },
+            {
+                codigo: -1999,
+                sigla: "",
+                nome: "ZONAS ELEITORAIS",
+                tipo: "AGRUPADOR_VISUAL",
+                isElegivel: false,
+                agrupadorVisual: true,
+                filhas: [
+                    {codigo: 101, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: []},
+                    {codigo: 102, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", filhas: []},
+                ],
+            }
+        ]);
+    });
+
+    it("deve marcar o grupo de zonas eleitorais como indeterminado quando apenas parte das zonas estiver selecionada", () => {
+        const unidades: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 101, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", isElegivel: true, filhas: []},
+                    {codigo: 102, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", isElegivel: true, filhas: []},
+                ],
+            }
+        ];
+        const wrapper = createWrapper({unidades, ocultarRaiz: true, modelValue: [101]});
+        const grupo = (wrapper.vm as any).unidadesExibidas[0];
+
+        expect((wrapper.vm as any).getEstadoSelecao(grupo)).toBe("indeterminate");
+    });
+
+    it("deve selecionar todas as zonas ao marcar o grupo visual", async () => {
+        const unidades: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 101, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", isElegivel: true, filhas: []},
+                    {codigo: 102, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", isElegivel: true, filhas: []},
+                ],
+            }
+        ];
+        const wrapper = createWrapper({unidades, ocultarRaiz: true, modelValue: [], modoSelecao: true});
+        const grupo = (wrapper.vm as any).unidadesExibidas[0];
+
+        (wrapper.vm as any).toggle(grupo, true);
+        await wrapper.vm.$nextTick();
+
+        const emitted = wrapper.emitted("update:modelValue");
+        expect(emitted).toBeTruthy();
+        expect(emitted![emitted!.length - 1][0]).toEqual([101, 102]);
+    });
+
     it("deve expandir unidades iniciais", () => {
         const wrapper = createWrapper();
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});

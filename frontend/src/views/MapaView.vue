@@ -225,6 +225,7 @@ async function executarComSubprocesso(
 function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   if (mapaAtualizado) {
     mapasStore.mapaCompleto.value = mapaAtualizado;
+    subprocessoStoreCache.invalidar();
   }
 }
 

@@ -523,4 +523,26 @@ describe("MapaView coverage", () => {
         vm.atividades = [];
         expect(vm.atividadesSemCompetencia).toEqual([]);
     });
+
+    it("invalida o cache de subprocesso após alterar o mapa para evitar voltar com competências stale", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as MapaViewVm;
+
+        vm.codSubprocesso = 123;
+        fluxoMapaMock.adicionarCompetencia = vi.fn().mockResolvedValue(criarMapaCompleto([
+            {
+                codigo: 99,
+                descricao: "Competência nova",
+                atividades: [{codigo: 1, descricao: "Atividade 1"}]
+            }
+        ]));
+
+        await vm.adicionarCompetenciaEFecharModal({
+            descricao: "Competência nova",
+            atividadesSelecionadas: [1]
+        });
+
+        expect(subprocessoStoreCacheMock.invalidar).toHaveBeenCalled();
+    });
 });

@@ -1,6 +1,0 @@
-
-Running 1 test using 1 worker
-
-  ok 1 [chromium] › e2e\regressao-cache-sessao.spec.ts:7:5 › Regressão - cache de sessão no subprocesso › deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA (4.8s)
-
-  1 passed (7.1s)

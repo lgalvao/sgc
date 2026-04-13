@@ -39,6 +39,10 @@ import {BButton} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
 import UnidadeTreeNode from "./UnidadeTreeNode.vue";
 
+type UnidadeExibida = Unidade & {
+  agrupadorVisual?: boolean;
+};
+
 interface Props {
   unidades: Unidade[];
   modelValue: number[]; 
@@ -56,6 +60,79 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+const TITULO_GRUPO_ZONAS_ELEITORAIS = "ZONAS ELEITORAIS";
+const TIPO_ZONA_ELEITORAL = "ZONA ELEITORAL";
+
+function criarCodigoGrupoZonasEleitorais(codigoPai: number): number {
+  return -((Math.abs(codigoPai) * 1000) + 999);
+}
+
+function ehTextoZonaEleitoral(valor: unknown): boolean {
+  return typeof valor === "string" && valor.trim().toUpperCase().includes(TIPO_ZONA_ELEITORAL);
+}
+
+function ehSiglaZonaEleitoral(valor: unknown): boolean {
+  return typeof valor === "string" && /Z\.?\s*E\.?/i.test(valor.trim());
+}
+
+function ehZonaEleitoral(unidade: Unidade): boolean {
+  return ehTextoZonaEleitoral(unidade.tipo)
+      || ehSiglaZonaEleitoral(unidade.sigla)
+      || ehTextoZonaEleitoral(unidade.nome);
+}
+
+function criarGrupoZonasEleitorais(codigoPai: number, filhas: UnidadeExibida[]): UnidadeExibida {
+  return {
+    codigo: criarCodigoGrupoZonasEleitorais(codigoPai),
+    sigla: "",
+    nome: TITULO_GRUPO_ZONAS_ELEITORAIS,
+    tipo: "AGRUPADOR_VISUAL",
+    isElegivel: false,
+    filhas,
+    agrupadorVisual: true,
+  };
+}
+
+function agruparZonasEleitorais(unidades: Unidade[], codigoPai: number): UnidadeExibida[] {
+  const lista: UnidadeExibida[] = [];
+  const zonasEleitorais: UnidadeExibida[] = [];
+
+  for (const unidade of unidades) {
+    const unidadeAgrupada: UnidadeExibida = {
+      ...unidade,
+      filhas: agruparZonasEleitorais(unidade.filhas ?? [], unidade.codigo),
+    };
+
+    if (ehZonaEleitoral(unidadeAgrupada)) {
+      zonasEleitorais.push(unidadeAgrupada);
+      continue;
+    }
+
+    lista.push(unidadeAgrupada);
+  }
+
+  if (zonasEleitorais.length > 0) {
+    lista.push(criarGrupoZonasEleitorais(codigoPai, zonasEleitorais));
+  }
+
+  return lista;
+}
+
+function coletarCodigosAgrupadoresVisuais(unidades: UnidadeExibida[]): number[] {
+  const codigos: number[] = [];
+
+  for (const unidade of unidades) {
+    if (unidade.agrupadorVisual) {
+      codigos.push(unidade.codigo);
+    }
+
+    if (unidade.filhas && unidade.filhas.length > 0) {
+      codigos.push(...coletarCodigosAgrupadoresVisuais(unidade.filhas as UnidadeExibida[]));
+    }
+  }
+
+  return codigos;
+}
 
 // Mapas para acesso rápido (Pai e Unidade)
 const maps = computed(() => {
@@ -63,6 +140,14 @@ const maps = computed(() => {
   const uMap = new Map<number, Unidade>();
 
   const traverse = (node: Unidade, parent?: Unidade) => {
+    const nodeVisual = node as UnidadeExibida;
+    if (nodeVisual.agrupadorVisual) {
+      if (node.filhas) {
+        node.filhas.forEach(child => traverse(child, parent));
+      }
+      return;
+    }
+
     uMap.set(node.codigo, node);
     if (parent) {
       pMap.set(node.codigo, parent);
@@ -78,15 +163,17 @@ const maps = computed(() => {
 
 const parentMap = computed(() => maps.value.parentMap);
 
-const unidadesExibidas = computed(() => {
+const unidadesExibidas = computed((): UnidadeExibida[] => {
   const filtradas = props.unidades.filter(props.filtrarPor);
-  const lista: Unidade[] = [];
+  const lista: UnidadeExibida[] = [];
 
   for (const u of filtradas) {
     if (props.ocultarRaiz) {
-      if (u.filhas) lista.push(...u.filhas);
+      if (u.filhas) {
+        lista.push(...agruparZonasEleitorais(u.filhas, u.codigo));
+      }
     } else {
-      lista.push(u);
+      lista.push(...agruparZonasEleitorais([u], u.codigo));
     }
   }
   return lista;
@@ -186,7 +273,12 @@ function toggle(unidade: Unidade, checked: boolean) {
     unitsToToggle.forEach(u => newSelection.delete(u.codigo));
   }
 
-  updateAncestors(unidade, newSelection);
+  const unidadeVisual = unidade as UnidadeExibida;
+  if (unidadeVisual.agrupadorVisual) {
+    (unidade.filhas ?? []).forEach(filha => updateAncestors(filha, newSelection));
+  } else {
+    updateAncestors(unidade, newSelection);
+  }
   unidadesSelecionadasLocal.value = Array.from(newSelection);
 }
 
@@ -257,7 +349,10 @@ watch(() => props.unidades, (newUnidades) => {
   }
 
   if (newUnidades && newUnidades.length > 0) {
-    expandedUnits.value = new Set(newUnidades.map(u => u.codigo));
+    expandedUnits.value = new Set([
+      ...newUnidades.map(u => u.codigo),
+      ...coletarCodigosAgrupadoresVisuais(unidadesExibidas.value),
+    ]);
   }
 }, {immediate: true});
 

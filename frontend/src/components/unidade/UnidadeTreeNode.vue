@@ -21,27 +21,27 @@
       <!-- Checkbox com label (Modo seleção) -->
       <BFormCheckbox
           v-if="modoSelecao"
-          :id="`chk-${unidade.sigla}`"
-          :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
+          :id="`chk-${identificadorUnidade}`"
+          :data-testid="`chk-arvore-unidade-${identificadorUnidade}`"
           :disabled="!isHabilitado(unidade)"
           :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
           :model-value="getEstadoSelecao(unidade) === true"
           class="unidade-checkbox"
           @update:model-value="(val) => onToggle(unidade, val as boolean)"
-      >
-        <span
-            v-b-tooltip.hover="!isHabilitado(unidade) ? 'Esta unidade não está disponível para seleção' : ''"
-            :class="{ 'text-muted': !isHabilitado(unidade) }"
-            :style="!isHabilitado(unidade) ? { cursor: 'help' } : {}"
-            class="unidade-label"
         >
-          {{ unidade.sigla }}
+          <span
+             v-b-tooltip.hover="!isHabilitado(unidade) ? 'Esta unidade não está disponível para seleção' : ''"
+             :class="{ 'text-muted': !isHabilitado(unidade) }"
+             :style="!isHabilitado(unidade) ? { cursor: 'help' } : {}"
+             class="unidade-label"
+        >
+          {{ textoPrincipalUnidade }}
         </span>
       </BFormCheckbox>
 
       <!-- Link para Unidade (Modo navegação) -->
       <router-link
-          v-else
+          v-else-if="!ehAgrupadorVisual"
           :data-testid="`link-arvore-unidade-${unidade.sigla}`"
           :to="`/unidade/${unidade.codigo}`"
           class="unidade-link"
@@ -49,6 +49,12 @@
         <span class="sigla">{{ unidade.sigla }}</span>
         <span class="nome ms-2 text-muted small">- {{ unidade.nome }}</span>
       </router-link>
+      <span
+          v-else
+          class="unidade-label unidade-label-agrupador"
+      >
+        {{ unidade.nome }}
+      </span>
     </div>
 
     <!-- Filhas (recursivo) -->
@@ -77,8 +83,12 @@
 import {BButton, BFormCheckbox} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
 
+type UnidadeExibida = Unidade & {
+  agrupadorVisual?: boolean;
+};
+
 interface Props {
-  unidade: Unidade;
+  unidade: UnidadeExibida;
   depth?: number;
   isChecked: (codigo: number) => boolean;
   getEstadoSelecao: (unidade: Unidade) => boolean | "indeterminate";
@@ -96,6 +106,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Desestruturar para uso no template
 const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggleExpand, modoSelecao} = props;
+const ehAgrupadorVisual = props.unidade.agrupadorVisual === true;
+const identificadorUnidade = props.unidade.sigla || String(props.unidade.codigo);
+const textoPrincipalUnidade = ehAgrupadorVisual ? props.unidade.nome : props.unidade.sigla;
 </script>
 
 <style scoped>
@@ -146,6 +159,10 @@ const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggle
   cursor: pointer;
   font-weight: 500;
   user-select: none;
+}
+
+.unidade-label-agrupador {
+  cursor: default;
 }
 
 .unidade-link {

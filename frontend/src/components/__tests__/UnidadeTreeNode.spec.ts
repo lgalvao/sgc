@@ -207,4 +207,44 @@ describe("UnidadeTreeNode.vue", () => {
         expect(link.props().to).toBe("/unidade/1");
         expect(wrapper.findComponent(BFormCheckboxStub).exists()).toBe(false);
     });
+
+    it("deve renderizar agrupador com checkbox em modo selecao", () => {
+        const wrapper = mount(UnidadeTreeNode, {
+            props: {
+                ...defaultProps,
+                unidade: {
+                    codigo: -1,
+                    sigla: "",
+                    nome: "ZONAS ELEITORAIS",
+                    filhas: [{codigo: 2, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: []}],
+                    agrupadorVisual: true,
+                },
+                modoSelecao: true,
+            },
+            ...mountOptions
+        });
+
+        expect(wrapper.findComponent(BFormCheckboxStub).exists()).toBe(true);
+        expect(wrapper.find('.unidade-label').text()).toContain("ZONAS ELEITORAIS");
+    });
+
+    it("deve renderizar no visual sem link para agrupador em modo navegacao", () => {
+        const wrapper = mount(UnidadeTreeNode, {
+            props: {
+                ...defaultProps,
+                unidade: {
+                    codigo: -1,
+                    sigla: "",
+                    nome: "ZONAS ELEITORAIS",
+                    filhas: [{codigo: 2, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: []}],
+                    agrupadorVisual: true,
+                },
+                modoSelecao: false,
+            },
+            ...mountOptions
+        });
+
+        expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false);
+        expect(wrapper.find('.unidade-label-agrupador').text()).toContain("ZONAS ELEITORAIS");
+    });
 });

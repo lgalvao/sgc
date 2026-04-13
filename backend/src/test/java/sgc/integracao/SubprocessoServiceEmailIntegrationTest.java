@@ -6,7 +6,6 @@ import org.springframework.mail.javamail.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
-import sgc.alerta.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
@@ -17,7 +16,6 @@ import sgc.subprocesso.service.*;
 import java.time.*;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Tag("integration")
