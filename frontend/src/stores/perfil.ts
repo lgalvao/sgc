@@ -7,6 +7,8 @@ import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 import {useSessionStorage} from "@/composables/useSessionStorage";
 import {usePainelStore} from "@/stores/painel";
+import {useProcessoStore} from "@/stores/processo";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useUnidadeStore} from "@/stores/unidade";
 
 export const usePerfilStore = defineStore("perfil", () => {
@@ -23,7 +25,9 @@ export const usePerfilStore = defineStore("perfil", () => {
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
     const painelStore = usePainelStore();
+    const processoStore = useProcessoStore();
     const unidadeStore = useUnidadeStore();
+    const subprocessoStore = useSubprocessoStore();
 
     // Map para lookup O(1) de perfil -> unidade
     const perfilUnidadeMap = computed(() =>
@@ -52,6 +56,8 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     function definirPerfilUnidade(dados: DadosSelecaoPerfil) {
+        processoStore.invalidar();
+        subprocessoStore.invalidar();
         perfilSelecionado.value = dados.perfil;
         unidadeSelecionada.value = dados.unidadeCodigo;
         unidadeSelecionadaSigla.value = dados.unidadeSigla;
@@ -137,6 +143,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfisUnidades.value = [];
         perfis.value = [];
         painelStore.invalidar();
+        processoStore.invalidar();
+        subprocessoStore.invalidar();
         unidadeStore.invalidarCache();
     }
 

@@ -105,16 +105,32 @@ describe("subprocesso store", () => {
     });
 
     describe("garantirContextoEdicaoPorProcessoEUnidade", () => {
-        it("deve usar cache se já houver contexto para a mesma unidade", async () => {
-            const mockContexto = {detalhes: {unidade: {sigla: "TEST"}}} as any;
-            context.store.invalido = false;
-            context.store.codSubprocessoCarregado = 10;
-            context.store.contextoEdicao = mockContexto;
+        it("deve reutilizar o cache quando processo e unidade já foram mapeados", async () => {
+            const mockContexto = {detalhes: {codigo: 10, unidade: {sigla: "TEST"}}} as any;
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(mockContexto);
+
+            await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockClear();
 
             const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
 
             expect(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
             expect(result).toEqual({codigo: 10, contexto: mockContexto});
+        });
+
+        it("deve buscar novamente quando for o mesmo sigla mas outro processo", async () => {
+            const contextoAntigo = {detalhes: {codigo: 10, unidade: {sigla: "SESEL"}}} as any;
+            const contextoNovo = {detalhes: {codigo: 20, unidade: {sigla: "SESEL"}}} as any;
+
+            context.store.invalido = false;
+            context.store.codSubprocessoCarregado = 10;
+            context.store.contextoEdicao = contextoAntigo;
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(contextoNovo);
+
+            const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(101, "SESEL");
+
+            expect(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(101, "SESEL");
+            expect(result).toEqual({codigo: 20, contexto: contextoNovo});
         });
 
         it("deve buscar do service se não houver cache para a unidade", async () => {

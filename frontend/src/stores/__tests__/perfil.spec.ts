@@ -8,6 +8,22 @@ import {usePerfilStore} from "../perfil";
 
 vi.mock("@/services/usuarioService");
 
+const subprocessoStoreMock = {
+    invalidar: vi.fn(),
+};
+
+const processoStoreMock = {
+    invalidar: vi.fn(),
+};
+
+vi.mock("@/stores/processo", () => ({
+    useProcessoStore: () => processoStoreMock,
+}));
+
+vi.mock("@/stores/subprocesso", () => ({
+    useSubprocessoStore: () => subprocessoStoreMock,
+}));
+
 const createMockStorage = () => {
     let store: { [key: string]: string } = {};
     return {
@@ -45,6 +61,8 @@ describe("usePerfilStore", () => {
         mockLocalStorage.clear();
         mockSessionStorage.clear();
         mockSessionStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
+        processoStoreMock.invalidar.mockClear();
+        subprocessoStoreMock.invalidar.mockClear();
     });
 
     const context = setupStoreTest(usePerfilStore);
@@ -112,6 +130,8 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
+            expect(processoStoreMock.invalidar).toHaveBeenCalledTimes(1);
+            expect(subprocessoStoreMock.invalidar).toHaveBeenCalledTimes(1);
 
             context.store.definirPerfilUnidade({
                 perfil: Perfil.ADMIN,
@@ -269,6 +289,8 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBeNull();
             expect(context.store.unidadeSelecionada).toBeNull();
             expect(context.store.permissoesSessao).toBeNull();
+            expect(processoStoreMock.invalidar).toHaveBeenCalledTimes(1);
+            expect(subprocessoStoreMock.invalidar).toHaveBeenCalledTimes(1);
         });
 
         it("deve limpar o erro", () => {

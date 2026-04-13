@@ -306,6 +306,30 @@ describe('SubprocessoView.vue', () => {
         expect(subprocessosMock.subprocessoDetalhe?.codigo).toBe(10);
     });
 
+    it('substitui permissões stale de ADMIN por permissões de CHEFE ao abrir o subprocesso na mesma sessão', async () => {
+        subprocessosMock.subprocessoDetalhe = {
+            ...mockSubprocesso,
+            codigo: 999,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+            permissoes: {podeEditarCadastro: false}
+        };
+
+        const {wrapper} = mountComponent({
+            codigo: 10,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            permissoes: {podeEditarCadastro: true}
+        });
+        await flushPromises();
+
+        const cards = wrapper.findComponent(SubprocessoCardsStub);
+        expect(cards.props('subprocesso')).toEqual(expect.objectContaining({
+            codigo: 10,
+            permissoes: expect.objectContaining({
+                podeEditarCadastro: true
+            })
+        }));
+    });
+
     it('renders components when data is available', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();

@@ -82,15 +82,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     ): Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso } | null> {
         const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
 
-        // Reutiliza cache se já temos contexto válido para a mesma unidade
-        if (contextoEdicao.value && !invalido.value && codSubprocessoCarregado.value !== null) {
-            const siglaCarregada = contextoEdicao.value.detalhes?.unidade?.sigla;
-            if (siglaCarregada === siglaUnidade) {
-                mapaProcessoUnidadeParaCodigo.set(chaveProcessoUnidade, codSubprocessoCarregado.value);
-                return {codigo: codSubprocessoCarregado.value, contexto: contextoEdicao.value};
-            }
-        }
-
         const codigoMapeado = mapaProcessoUnidadeParaCodigo.get(chaveProcessoUnidade);
         if (typeof codigoMapeado === "number") {
             const contexto = await garantirContextoEdicao(codigoMapeado);
