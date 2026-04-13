@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.mail.*;
 import org.springframework.mail.javamail.*;
 import sgc.alerta.*;
 import sgc.comum.config.*;
@@ -104,5 +105,16 @@ class EmailServiceTest {
                 .hasCauseInstanceOf(AddressException.class);
 
         verify(enviadorEmail, never()).send(any(MimeMessage.class));
+    }
+
+    @Test
+    @DisplayName("Deve propagar falha de infraestrutura ao enviar email")
+    void devePropagarFalhaDeInfraestruturaAoEnviarEmail() {
+        setupMockEmail();
+        doThrow(new MailSendException("Erro ao enviar email")).when(enviadorEmail).send(any(MimeMessage.class));
+
+        assertThatThrownBy(() -> notificacaoServico.enviarEmailHtml(DESTINATARIO, "Assunto", "<h1>Corpo</h1>"))
+                .isInstanceOf(MailSendException.class)
+                .hasMessageContaining("Erro ao enviar email");
     }
 }

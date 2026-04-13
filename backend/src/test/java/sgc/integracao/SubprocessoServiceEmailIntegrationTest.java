@@ -105,10 +105,8 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("registrarTransicao: Lança exceção ao falhar envio de email (try-catch removido)")
-    void registrarTransicao_LancaExcecaoEmail() {
-        doThrow(new RuntimeException("Erro ao enviar email")).when(javaMailSender).send(any(jakarta.mail.internet.MimeMessage[].class));
-
+    @DisplayName("registrarTransicao: Deve tentar enviar email ao disponibilizar cadastro")
+    void registrarTransicao_TentaEnviarEmailAoDisponibilizarCadastro() {
         RegistrarTransicaoCommand comando = RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
@@ -117,9 +115,9 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
                 .usuario(admin)
                 .build();
 
-        assertThatThrownBy(() -> transicaoService.registrarTransicao(comando))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Erro ao enviar email");
+        transicaoService.registrarTransicao(comando);
+
+        verify(javaMailSender, atLeastOnce()).send(any(jakarta.mail.internet.MimeMessage.class));
     }
 
     @Test
