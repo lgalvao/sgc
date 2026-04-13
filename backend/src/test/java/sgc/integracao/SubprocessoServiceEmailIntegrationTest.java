@@ -103,7 +103,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("registrarTransicao: Lança exceção ao falhar envio de email (try-catch removido)")
     void registrarTransicao_LancaExcecaoEmail() {
-        doThrow(new RuntimeException("Erro ao enviar email")).when(emailService).enviarEmailHtml(anyString(), anyString(), anyString());
+        doThrow(new RuntimeException("Erro ao enviar email")).when(emailService).enviarEmailHtml(anyString(), anyString(), any());
 
         RegistrarTransicaoCommand comando = RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
