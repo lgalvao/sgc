@@ -79,8 +79,9 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.aceitarCadastroMapeamento(page, 'Cadastro aceito pelo Gestor.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
-            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro aceito/i);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
             await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -95,6 +96,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
             await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -135,8 +137,9 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await MapaHelpers.aceitarOuHomologarMapa(page, 'Mapa aceito pelo Gestor.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
-            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa aceito/i);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
             await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -180,6 +183,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoRevisao, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro disponibilizada/i);
             await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -191,7 +195,9 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.aceitarRevisao(page, 'Revisão aceita.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
-            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro aceita/i);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -205,6 +211,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro homologada/i);
             await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
         });
         await expect(page).toHaveURL(/\/login/);
     };

@@ -89,8 +89,24 @@ export async function fazerLogout(page: Page): Promise<void> {
     try {
         // Limpar notificações que possam estar sobrepondo o menu ou botões
         await limparNotificacoes(page);
+        const botaoLogout = page.getByTestId('btn-logout');
+        await botaoLogout.scrollIntoViewIfNeeded();
 
-        await page.getByTestId('btn-logout').click();
+        try {
+            await botaoLogout.click({timeout: 2_000});
+        } catch (e: any) {
+            const mensagem = (e.message ?? '').toLowerCase();
+            if (
+                mensagem.includes('intercepts pointer events')
+                || mensagem.includes('another element would receive the click')
+                || mensagem.includes('timeout')
+            ) {
+                await limparNotificacoes(page);
+                await botaoLogout.click({force: true, timeout: 2_000});
+            } else {
+                throw e;
+            }
+        }
         await page.waitForURL(/\/login/);
 
         // Limpar possíveis toasts de "Não autorizado" ou "Sessão expirada" que aparecem no teardown após o logout

@@ -13,25 +13,18 @@ $COLORS = @{
 
 $SUMMARY = @()
 
-function Show-Spinner {
-    param($Job, $StepName)
-    $spinner = "|", "/", "-", "\"
-    $i = 0
-    
-    # Esconde o cursor se possível (apenas em hosts que suportam)
-    if ($Host.UI.RawUI.CursorSize) { $Host.UI.RawUI.CursorSize = 0 }
+function Obter-UltimaCaptura {
+    param(
+        [object[]]$Linhas,
+        [string]$Padrao
+    )
 
-    Write-Host "$StepName... " -NoNewline -ForegroundColor $COLORS.Warning
-
-    while ($Job.State -eq 'Running') {
-        Write-Host " [$($spinner[$i % 4])] " -NoNewline -ForegroundColor $COLORS.Info
-        Start-Sleep -Milliseconds 100
-        Write-Host "`b`b`b`b`b" -NoNewline
-        $i++
+    $capturas = @($Linhas | Select-String $Padrao | ForEach-Object { $_.Matches.Groups[1].Value })
+    if ($capturas.Count -gt 0) {
+        return $capturas[-1]
     }
-    
-    # Restaura o cursor
-    if ($Host.UI.RawUI.CursorSize) { $Host.UI.RawUI.CursorSize = 25 }
+
+    return $null
 }
 
 function Run-Step {
@@ -43,60 +36,40 @@ function Run-Step {
 
     $logFile = Join-Path $PSScriptRoot ".smoke_test_$($Name -replace ' ', '_').log"
     
-    # Inicia o job em background passando o diretório e o comando (como string)
-    $job = Start-Job -ScriptBlock {
-        param($dir, $commandString)
+    Write-Host "$Name... " -NoNewline -ForegroundColor $COLORS.Warning
 
-        Set-Location $dir
-        $saida = [System.Collections.Generic.List[string]]::new()
-
-        try {
-            $sb = [scriptblock]::Create($commandString)
-            & $sb 2>&1 | ForEach-Object { $saida.Add($_.ToString()) }
-
-            $codigoSaida = if ($null -ne $LASTEXITCODE) { [int]$LASTEXITCODE }
-            elseif ($?) { 0 }
-            else { 1 }
-        }
-        catch {
-            $saida.Add(($_ | Out-String).TrimEnd())
-            $codigoSaida = 1
-        }
-
-        [pscustomobject]@{
-            CodigoSaida = $codigoSaida
-            Saida       = @($saida)
-        }
-    } -ArgumentList $PSScriptRoot, $Script.ToString() -Name $Name
-    
-    # Mostra o spinner enquanto aguarda
-    Show-Spinner -Job $job -StepName $Name
-    
-    # Recebe os resultados
-    $jobResult = Wait-Job $job | Receive-Job
-    $result = @($jobResult.Saida)
-    $exitCode = $jobResult.CodigoSaida
-    Remove-Job $job
-
-    # Salva o output no log para referência se necessário
-    $result | Out-File -FilePath $logFile -Encoding utf8
+    Push-Location $PSScriptRoot
+    try {
+        $result = @(& $Script 2>&1 | Tee-Object -FilePath $logFile)
+        $exitCode = if ($null -ne $LASTEXITCODE) { [int]$LASTEXITCODE }
+        elseif ($?) { 0 }
+        else { 1 }
+    }
+    catch {
+        $_ | Out-File -FilePath $logFile -Encoding utf8
+        $result = @((Get-Content $logFile -ErrorAction SilentlyContinue))
+        $exitCode = 1
+    }
+    finally {
+        Pop-Location
+    }
 
     if ($exitCode -eq 0) {
         Write-Host "OK    " -ForegroundColor $COLORS.Success
         
         # Extração de métricas básicas para o resumo
         if ($Name -eq "junit") {
-            $passed = ($result | Select-String "\+ Passed: (\d+)" | ForEach-Object { $_.Matches.Groups[1].Value })[-1]
-            $total = ($result | Select-String "Total: (\d+)" | ForEach-Object { $_.Matches.Groups[1].Value })[-1]
+            $passed = Obter-UltimaCaptura -Linhas $result -Padrao "\+ Passed: (\d+)"
+            $total = Obter-UltimaCaptura -Linhas $result -Padrao "Total: (\d+)"
             if ($passed -and $total) { $SUMMARY += "  - Backend JUnit: $passed/$total testes OK" }
             else { $SUMMARY += "  - Backend JUnit: Finalizado (Cache ou 0 executados)" }
         }
         elseif ($Name -eq "vitest") {
-            $passed = ($result | Select-String "Tests\s+(\d+)\s+passed" | ForEach-Object { $_.Matches.Groups[1].Value })[-1]
+            $passed = Obter-UltimaCaptura -Linhas $result -Padrao "Tests\s+(\d+)\s+passed"
             if ($passed) { $SUMMARY += "  - Frontend Vitest: $passed testes OK" }
         }
         elseif ($Name -eq "e2e") {
-            $passed = ($result | Select-String "(\d+)\s+passed" | ForEach-Object { $_.Matches.Groups[1].Value })[-1]
+            $passed = Obter-UltimaCaptura -Linhas $result -Padrao "(\d+)\s+passed"
             if ($passed) { $SUMMARY += "  - E2E Playwright: $passed fluxos validados" }
         }
     }
