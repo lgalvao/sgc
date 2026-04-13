@@ -1,44 +1,6 @@
-Error: Cannot find module '@playwright/test'
-Require stack:
-- C:\Users\039703~1\AppData\Local\Temp\playwright.sgc.no-webserver.config.ts
-- C:\sgc\node_modules\playwright\lib\transform\transform.js
-- C:\sgc\node_modules\playwright\lib\common\configLoader.js
-- C:\sgc\node_modules\playwright\lib\testActions.js
-- C:\sgc\node_modules\playwright\lib\program.js
-- C:\sgc\node_modules\@playwright\test\cli.js
-    at Module.<anonymous> (node:internal/modules/cjs/loader:1420:15)
-    at Module.resolveFilename [as _resolveFilename] (C:\sgc\node_modules\playwright\lib\transform\transform.js:240:36)
-    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
-    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
-    at Module._load (node:internal/modules/cjs/loader:1226:37)
-    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
-    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
-    at Module.require (node:internal/modules/cjs/loader:1503:12)
-    at require (node:internal/modules/helpers:152:16)
-    at Object.<anonymous> (C:\Users\039703~1\AppData\Local\Temp\playwright.sgc.no-webserver.config.ts:1:1)
-    at Module._compile (node:internal/modules/cjs/loader:1760:14)
-    at Module.newCompile2 (C:\sgc\node_modules\playwright\lib\third_party\pirates.js:46:29)
-    at Object.<anonymous> (node:internal/modules/cjs/loader:1892:10)
-    at Object.newLoader2 [as .ts] (C:\sgc\node_modules\playwright\lib\third_party\pirates.js:52:22)
-    at Module.load (node:internal/modules/cjs/loader:1480:32)
-    at Module._load (node:internal/modules/cjs/loader:1299:12)
-    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
-    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
-    at Module.require (node:internal/modules/cjs/loader:1503:12)
-    at require (node:internal/modules/helpers:152:16)
-    at requireOrImport (C:\sgc\node_modules\playwright\lib\transform\transform.js:218:18)
-    at loadUserConfig (C:\sgc\node_modules\playwright\lib\common\configLoader.js:107:89)
-    at loadConfig (C:\sgc\node_modules\playwright\lib\common\configLoader.js:119:28)
-    at loadConfigFromFile (C:\sgc\node_modules\playwright\lib\common\configLoader.js:331:10)
-    at runTests (C:\sgc\node_modules\playwright\lib\testActions.js:51:18)
-    at i.<anonymous> (C:\sgc\node_modules\playwright\lib\program.js:56:7) {
-  code: 'MODULE_NOT_FOUND',
-  requireStack: [
-    'C:\\Users\\039703~1\\AppData\\Local\\Temp\\playwright.sgc.no-webserver.config.ts',
-    'C:\\sgc\\node_modules\\playwright\\lib\\transform\\transform.js',
-    'C:\\sgc\\node_modules\\playwright\\lib\\common\\configLoader.js',
-    'C:\\sgc\\node_modules\\playwright\\lib\\testActions.js',
-    'C:\\sgc\\node_modules\\playwright\\lib\\program.js',
-    'C:\\sgc\\node_modules\\@playwright\\test\\cli.js'
-  ]
-}
+
+Running 1 test using 1 worker
+
+  ok 1 [chromium] › e2e\regressao-cache-sessao.spec.ts:7:5 › Regressão - cache de sessão no subprocesso › deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA (4.8s)
+
+  1 passed (7.1s)
