@@ -246,9 +246,8 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
-import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useProcessoStore} from "@/stores/processo";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
@@ -268,9 +267,8 @@ const router = useRouter();
 const subprocessosStore = useSubprocessos();
 const {notify} = useNotification();
 const toastStore = useToastStore();
-const painelStore = usePainelStore();
 const subprocessoStoreCache = useSubprocessoStore();
-const processoStore = useProcessoStore();
+const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const mapa = ref<MapaVisualizacao | null>(null);
 const analisesCadastro = ref<Analise[]>([]);
 
@@ -355,9 +353,7 @@ async function carregarContextoInicial() {
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   fecharModal();
   toastStore.setPending(mensagem);
-  painelStore.invalidar();
-  subprocessoStoreCache.invalidar();
-  processoStore.invalidar();
+  invalidarCachesSubprocesso();
   await router.push({name: "Painel"});
 }
 

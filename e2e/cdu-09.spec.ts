@@ -77,6 +77,16 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);
         await verificarPaginaPainel(page);
 
+        await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
+
+        await navegarParaAtividadesVisualizacao(page);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/vis-cadastro(?:\?.*)?$`));
+        await page.goBack();
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);
 

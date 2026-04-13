@@ -6,6 +6,8 @@ import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
 import * as processoService from '@/services/processoService';
+import {useProcessoStore} from '@/stores/processo';
+import {useSubprocessoStore} from '@/stores/subprocesso';
 import {useUnidadeStore} from '@/stores/unidade';
 
 vi.mock('@/services/processoService', () => ({
@@ -300,5 +302,24 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect((wrapper.vm).unidadesSelecionadas).toEqual([1, 2]);
 
         expect(unidadeStore.garantirArvoreElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', 123);
+    });
+
+    it('invalida caches relacionados ao salvar processo', async () => {
+        const {wrapper} = createWrapper();
+        const processoStore = useProcessoStore();
+        const subprocessoStore = useSubprocessoStore();
+
+        vi.mocked(processoService.criarProcesso).mockResolvedValue({codigo: 321} as any);
+
+        wrapper.vm.descricao = 'Processo novo';
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.unidadesSelecionadas = [1];
+
+        await (wrapper.vm).salvarProcesso();
+        await flushPromises();
+
+        expect(processoStore.invalidar).toHaveBeenCalled();
+        expect(subprocessoStore.invalidar).toHaveBeenCalled();
+        expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 });

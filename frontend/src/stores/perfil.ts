@@ -56,8 +56,10 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     function definirPerfilUnidade(dados: DadosSelecaoPerfil) {
+        painelStore.invalidar();
         processoStore.invalidar();
         subprocessoStore.invalidar();
+        unidadeStore.invalidarCache();
         perfilSelecionado.value = dados.perfil;
         unidadeSelecionada.value = dados.unidadeCodigo;
         unidadeSelecionadaSigla.value = dados.unidadeSigla;

@@ -16,12 +16,28 @@ const processoStoreMock = {
     invalidar: vi.fn(),
 };
 
+const painelStoreMock = {
+    invalidar: vi.fn(),
+};
+
+const unidadeStoreMock = {
+    invalidarCache: vi.fn(),
+};
+
+vi.mock("@/stores/painel", () => ({
+    usePainelStore: () => painelStoreMock,
+}));
+
 vi.mock("@/stores/processo", () => ({
     useProcessoStore: () => processoStoreMock,
 }));
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => subprocessoStoreMock,
+}));
+
+vi.mock("@/stores/unidade", () => ({
+    useUnidadeStore: () => unidadeStoreMock,
 }));
 
 const createMockStorage = () => {
@@ -61,8 +77,10 @@ describe("usePerfilStore", () => {
         mockLocalStorage.clear();
         mockSessionStorage.clear();
         mockSessionStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
+        painelStoreMock.invalidar.mockClear();
         processoStoreMock.invalidar.mockClear();
         subprocessoStoreMock.invalidar.mockClear();
+        unidadeStoreMock.invalidarCache.mockClear();
     });
 
     const context = setupStoreTest(usePerfilStore);
@@ -130,8 +148,10 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
+            expect(painelStoreMock.invalidar).toHaveBeenCalledTimes(1);
             expect(processoStoreMock.invalidar).toHaveBeenCalledTimes(1);
             expect(subprocessoStoreMock.invalidar).toHaveBeenCalledTimes(1);
+            expect(unidadeStoreMock.invalidarCache).toHaveBeenCalledTimes(1);
 
             context.store.definirPerfilUnidade({
                 perfil: Perfil.ADMIN,
@@ -289,8 +309,10 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBeNull();
             expect(context.store.unidadeSelecionada).toBeNull();
             expect(context.store.permissoesSessao).toBeNull();
+            expect(painelStoreMock.invalidar).toHaveBeenCalledTimes(1);
             expect(processoStoreMock.invalidar).toHaveBeenCalledTimes(1);
             expect(subprocessoStoreMock.invalidar).toHaveBeenCalledTimes(1);
+            expect(unidadeStoreMock.invalidarCache).toHaveBeenCalledTimes(1);
         });
 
         it("deve limpar o erro", () => {

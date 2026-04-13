@@ -5,6 +5,8 @@ import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
+import {useProcessoStore} from "@/stores/processo";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {
     ContextoCadastroAtividadesSubprocesso,
@@ -493,6 +495,24 @@ describe("CadastroView coverage", () => {
         expect(vm.errosValidacao).toEqual([]);
         expect(vm.erroGlobal).toBeNull();
         vi.useRealTimers();
+    });
+
+    it("invalida caches de subprocesso ao disponibilizar o cadastro", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const processoStore = useProcessoStore();
+        const subprocessoStore = useSubprocessoStore();
+
+        subprocessosMock.subprocessoDetalhe = {
+            ...criarSubprocessoMinimo(),
+        };
+
+        await vm.confirmarDisponibilizacao();
+
+        expect(subprocessoStore.invalidar).toHaveBeenCalled();
+        expect(processoStore.invalidar).toHaveBeenCalled();
+        expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 
 });

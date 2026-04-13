@@ -165,9 +165,8 @@ import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
-import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useProcessoStore} from "@/stores/processo";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {
   AceitarCadastroRequest,
   Analise,
@@ -192,9 +191,8 @@ const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
-const painelStore = usePainelStore();
 const subprocessoStoreCache = useSubprocessoStore();
-const processoStore = useProcessoStore();
+const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const {impactoMapa: impactos} = mapasStore;
 
 const unidadeId = computed(() => props.sigla);
@@ -297,12 +295,10 @@ async function confirmarValidacao() {
         fecharModalValidar();
         toastStore.setPending(acao.mensagemSucesso);
         if (acao.redirecionarParaPainel) {
-          painelStore.invalidar();
-          subprocessoStoreCache.invalidar();
-          processoStore.invalidar();
+          invalidarCachesSubprocesso();
           await router.push({name: "Painel"});
         } else {
-          subprocessoStoreCache.invalidar();
+          invalidarCachesSubprocesso({incluirPainel: false});
           await router.push({
             name: "Subprocesso",
             params: {
@@ -325,9 +321,7 @@ async function confirmarValidacao() {
       if (sucesso) {
         fecharModalValidar();
         toastStore.setPending(acao.mensagemSucesso);
-        painelStore.invalidar();
-        subprocessoStoreCache.invalidar();
-        processoStore.invalidar();
+        invalidarCachesSubprocesso();
         await router.push({name: "Painel"});
       }
     }
@@ -357,9 +351,7 @@ async function confirmarDevolucao() {
     if (sucesso) {
       fecharModalDevolver();
       toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
-      painelStore.invalidar();
-      subprocessoStoreCache.invalidar();
-      processoStore.invalidar();
+      invalidarCachesSubprocesso();
       await router.push("/painel");
     }
   } finally {

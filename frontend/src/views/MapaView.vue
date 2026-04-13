@@ -132,9 +132,8 @@ import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
-import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useProcessoStore} from "@/stores/processo";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -152,9 +151,8 @@ const fluxoMapa = useFluxoMapa();
 const {mapaCompleto, impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
-const painelStore = usePainelStore();
 const subprocessoStoreCache = useSubprocessoStore();
-const processoStore = useProcessoStore();
+const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 usePerfil();
 
@@ -412,9 +410,7 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
       await fluxoMapa.disponibilizarMapa(codigoSubprocesso, payload);
       fecharModalDisponibilizar();
       toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
-      painelStore.invalidar();
-      subprocessoStoreCache.invalidar();
-      processoStore.invalidar();
+      invalidarCachesSubprocesso();
       await router.push({name: "Painel"});
     } catch {
       handleErrors(fluxoMapa);

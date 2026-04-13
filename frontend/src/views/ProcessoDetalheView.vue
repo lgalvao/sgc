@@ -108,8 +108,8 @@ import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
-import {usePainelStore} from "@/stores/painel";
 import {useProcessoStore} from "@/stores/processo";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
@@ -133,8 +133,8 @@ const route = useRoute();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
-const painelStore = usePainelStore();
 const processoStore = useProcessoStore();
+const {invalidarCachesProcesso, invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
 const lastError = ref<NormalizedError | null>(null);
@@ -249,8 +249,7 @@ async function confirmarFinalizacao() {
     clearError();
     await processoService.finalizarProcesso(codProcesso);
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
-    painelStore.invalidar();
-    processoStore.invalidar();
+    invalidarCachesProcesso();
     await router.push("/painel");
   } catch (error) {
     lastError.value = normalizeError(error);
@@ -290,12 +289,12 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
 
     if (redirecionarPainel) {
       toastStore.setPending(mensagemSucesso);
-      painelStore.invalidar();
+      invalidarCachesProcesso();
       await router.push("/painel");
       return;
     }
     notify(mensagemSucesso, 'success');
-    processoStore.invalidar();
+    invalidarCachesSubprocesso({incluirPainel: false});
     await carregarContextoCompleto();
   } catch (error) {
     lastError.value = normalizeError(error);
