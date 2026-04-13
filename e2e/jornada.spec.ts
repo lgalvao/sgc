@@ -60,8 +60,13 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const preencherAtividadesChefe = async (page: Page) => {
         await AuthHelpers.executarComo(page, CHEFE, async () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividades(page);
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
             await AtividadeHelpers.importarAtividadesVazia(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeEnabled();
             await AtividadeHelpers.disponibilizarCadastro(page);
 
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
@@ -75,7 +80,12 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const realizarAceiteGestor = async (page: Page) => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('btn-vis-atividades-historico')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
             await AnaliseHelpers.aceitarCadastroMapeamento(page, 'Cadastro aceito pelo Gestor.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
@@ -89,7 +99,12 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const homologarMapeamentoAdmin = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('btn-vis-atividades-historico')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
             await AnaliseHelpers.homologarCadastroMapeamento(page);
 
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
@@ -104,8 +119,14 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const criarMapaAdmin = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeHidden();
             await MapaHelpers.navegarParaMapa(page);
+            await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
+            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
+            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
             await MapaHelpers.criarCompetencia(page, 'Competência Técnica Básica', ['Atividade 1']);
+            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
             await MapaHelpers.disponibilizarMapa(page);
 
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
@@ -119,7 +140,13 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const validarMapaChefe = async (page: Page) => {
         await AuthHelpers.executarComo(page, CHEFE, async () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
             await MapaHelpers.navegarParaMapa(page);
+            await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-validar')).toBeEnabled();
+            await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-sugestoes')).toBeEnabled();
             await page.getByTestId('btn-mapa-validar').click();
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await page.waitForURL(/\/painel$/);
@@ -134,6 +161,15 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const aceitarMapaGestor = async (page: Page) => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
+            await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
+            await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeEnabled();
+            await page.goBack();
+            await expect(page.getByTestId('header-subprocesso')).toBeVisible();
             await MapaHelpers.aceitarOuHomologarMapa(page, 'Mapa aceito pelo Gestor.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
@@ -147,6 +183,14 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const homologarMapaEFinalizarAdmin = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
+            await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
+            await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeEnabled();
+            await page.goBack();
+            await expect(page.getByTestId('header-subprocesso')).toBeVisible();
             await MapaHelpers.aceitarOuHomologarMapa(page, 'Mapa homologado pelo Admin. Ciclo base concluído.');
             await ProcessoHelpers.acessarDetalhesProcesso(page, descricaoMapeamento);
             await ProcessoHelpers.finalizarProcesso(page);
@@ -175,9 +219,14 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const realizarRevisaoChefe = async (page: Page) => {
         await AuthHelpers.executarComo(page, CHEFE, async () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoRevisao, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividades(page);
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
             await expect(page.getByText('Atividade 1')).toBeVisible();
             await AtividadeHelpers.adicionarConhecimento(page, 'Atividade 1', 'Conhecimento Revisado');
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeEnabled();
             await AtividadeHelpers.disponibilizarCadastro(page);
 
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoRevisao, siglaUnidade);
@@ -191,7 +240,12 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const realizarAceiteRevisaoGestor = async (page: Page) => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('btn-vis-atividades-historico')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
             await AnaliseHelpers.aceitarRevisao(page, 'Revisão aceita.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
@@ -205,7 +259,12 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const homologarRevisaoAdmin = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoRevisao, siglaUnidade);
+            await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('btn-vis-atividades-historico')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
+            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
             await AnaliseHelpers.homologarCadastroMapeamento(page, 'Revisão homologada. Ciclo de manutenção completo.');
 
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
