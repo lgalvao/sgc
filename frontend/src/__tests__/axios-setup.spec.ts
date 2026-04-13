@@ -129,6 +129,27 @@ describe("axios-setup", () => {
         expect(config.metadadosMonitoramento.monitoramentoAtivo).toBe(true);
     });
 
+    it("interceptor de requisicao deve incluir headers de monitoramento quando ativado por URL", () => {
+        vi.stubGlobal('location', { search: '?monitoramento=1' });
+
+        const config = requestInterceptor({method: 'get', url: '/processos', headers: {}});
+
+        expect(config.headers['X-Monitoramento-Ativo']).toBe('true');
+        expect(config.metadadosMonitoramento.monitoramentoAtivo).toBe(true);
+        vi.unstubAllGlobals(); // Limpa location stub
+    });
+
+    it("definirHeader deve lidar com headers nulos e headers sem metodo set", () => {
+        const config: any = { headers: null };
+        requestInterceptor(config); // Isso chama isMonitoramentoAtivo e gerarCorrelacaoId, e entao definirHeader
+        expect(config.headers).toBeDefined();
+        expect(config.headers['X-Correlacao-Id']).toBe('corr-123');
+
+        const config2: any = { headers: {} }; // Object literal sem .set
+        requestInterceptor(config2);
+        expect(config2.headers['X-Correlacao-Id']).toBe('corr-123');
+    });
+
     it("interceptor de resposta bem-sucedida deve registrar duracao quando monitoramento estiver ativo", () => {
         window.sessionStorage.setItem('sgc.monitoramento.ativo', 'true');
         const config = requestInterceptor({method: 'get', url: '/processos', headers: {}});
@@ -150,6 +171,22 @@ describe("axios-setup", () => {
         const error = {isAxiosError: true, response: {status: 400, data: {}}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(router.push).not.toHaveBeenCalled();
+    });
+
+    it("interceptor de erro de resposta deve registrar erro se monitoramento estiver ativo", async () => {
+        window.sessionStorage.setItem('sgc.monitoramento.ativo', 'true');
+        const config = requestInterceptor({method: 'get', url: '/processos', headers: {}});
+        const error = {
+            isAxiosError: true,
+            config,
+            response: {status: 500}
+        };
+
+        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(logger.error).toHaveBeenCalledWith("[http] erro", expect.objectContaining({
+            status: 500,
+            correlacaoId: 'corr-123'
+        }));
     });
 
     it("interceptor de erro de resposta deve propagar erro 500", async () => {

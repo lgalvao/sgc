@@ -35,5 +35,11 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
         }
     }
 
-    return {diagnostico, erroDiagnostico, carregado, garantirDiagnostico};
+    function $reset() {
+        diagnostico.value = null;
+        erroDiagnostico.value = null;
+        carregado.value = false;
+    }
+
+    return {diagnostico, erroDiagnostico, carregado, garantirDiagnostico, $reset};
 });
