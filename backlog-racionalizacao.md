@@ -1,8 +1,8 @@
-# Backlog de racionalização (somente pendências atuais)
+# Backlog de racionalização (pendências + avanço da rodada atual)
 
 ## Contexto
 
-Este backlog mantém **apenas o que ainda falta executar** após as rodadas iniciadas.
+Este backlog mantém o que ainda falta executar e registra os achados da rodada corrente para orientar a próxima medição.
 
 ## Pendências prioritárias
 
@@ -14,13 +14,24 @@ Este backlog mantém **apenas o que ainda falta executar** após as rodadas inic
 
 Eliminar sobreposição funcional e payload redundante no domínio de processo.
 
+**Achados consolidados (rodada 6)**
+
+- Inventário de consumo por tela (fluxo de processo):
+
+| Tela / fluxo | Endpoint atual | Campos efetivamente usados |
+|---|---|---|
+| `ProcessoCadastroView` (edição de processo em `CRIADO`) | `GET /processos/{codigo}/detalhes` | `codigo`, `descricao`, `tipo`, `situacao`, `dataLimite`, `unidades` |
+| `ProcessoDetalheView` (processo em andamento + ações em bloco) | `GET /processos/{codigo}/contexto-completo` | `codigo`, `descricao`, `tipo`, `situacao`, `unidades`, `podeFinalizar`, `acoesBloco`, `elegiveis` |
+
+- Sobreposição identificada: `detalhes` e `contexto-completo` compartilhavam montagem de elegibilidade/ações em bloco no backend, mesmo quando a tela consumidora não precisava.
+- Refatoração aplicada:
+  - `obterDetalhesCompleto(..., incluirElegiveis=false)` agora **não** calcula `elegiveis` nem `acoesBloco`;
+  - `contexto-completo` segue com cálculo completo (ações + elegíveis) quando `incluirElegiveis=true`.
+
 **Pendências restantes**
 
-- fechar inventário de campos realmente consumidos por tela no fluxo de processo;
-- separar payload de primeira renderização vs. carga sob demanda;
-- propor contrato final:
-  - manter dois endpoints com responsabilidades distintas **ou**
-  - consolidar com DTO enxuto e campos opcionais por caso de uso.
+- coletar ganho real de latência/p95 em homologação para `GET /processos/{codigo}/detalhes`;
+- avaliar se `contexto-completo` deve ser quebrado em carga incremental (`acoes-bloco` sob demanda) na rodada seguinte.
 
 **Saída esperada**
 
@@ -35,11 +46,24 @@ Eliminar sobreposição funcional e payload redundante no domínio de processo.
 
 Isolar com precisão o custo relativo de validações, persistência e notificações no fluxo de disponibilização.
 
+**Achados consolidados (rodada 7)**
+
+- Tracing interno adicionado ao fluxo de disponibilização de mapa com log por etapa:
+  - `carregar-subprocesso`
+  - `validar-situacao`
+  - `validar-regras-mapa`
+  - `validar-associacoes-mapa`
+  - `registrar-transicao`
+- O tracing detalhado respeita o monitoramento por requisição (header `X-Monitoramento-Ativo: true`), evitando ruído fora de sessão investigativa.
+- Simplificações aplicadas no caminho de `acao-em-bloco` (disponibilização):
+  1. reuso dos `Subprocesso` já carregados no `ProcessoService` (remoção de recarga redundante por código);
+  2. preservação de um único `Usuario` para lote inteiro;
+  3. instrumentação pronta para separar custo de validação vs. transição/notificação.
+
 **Pendências restantes**
 
-- detalhar quebra de tempo por etapa interna em ambiente de homologação;
-- identificar 2-3 simplificações de baixa complexidade para remover custo evitável (foco atual: notificação/e-mail no caminho crítico de `acao-em-bloco`);
-- validar impacto após ajuste com novo recorte monitorado.
+- executar coleta em homologação com janela única e comparar antes/depois;
+- validar se `registrar-transicao` concentra custo por efeito colateral (alerta/e-mail) para decisão de desacoplamento.
 
 **Saída esperada**
 
@@ -52,10 +76,19 @@ Isolar com precisão o custo relativo de validações, persistência e notifica�
 
 Comparar custo de `iniciar`, `acao-em-bloco`, `finalizar` e ações de subprocesso para priorização por impacto.
 
+**Achados consolidados (rodada 8 - parcial)**
+
+- Contrato mínimo para medição comparável fechado:
+  - mesma janela temporal;
+  - mesmo perfil de usuário;
+  - monitoramento HTTP + tracing interno ativados;
+  - agrupamento por ação (`iniciar`, `acao-em-bloco`, `finalizar`, ações de subprocesso).
+- Matriz final ainda depende de execução monitorada em homologação.
+
 **Pendências restantes**
 
-- consolidar matriz p50/p95/pico por ação com mesma janela de execução;
-- publicar ordem de ataque da próxima rodada baseada em custo x frequência.
+- consolidar matriz p50/p95/pico por ação com a nova instrumentação;
+- publicar ordem de ataque baseada em custo x frequência observada.
 
 **Saída esperada**
 
@@ -64,14 +97,17 @@ Comparar custo de `iniciar`, `acao-em-bloco`, `finalizar` e ações de subproces
 
 ## Próximas rodadas (remanescente)
 
-### Rodada 6
+### Rodada 6 (executada)
 
-- fechar A.2 (inventário de consumo + proposta de contrato para processo).
+- inventário de consumo por tela consolidado;
+- contrato de `detalhes` enxugado sem cálculo de bloco/elegíveis.
 
-### Rodada 7
+### Rodada 7 (executada)
 
-- executar B.1 com tracing interno por etapa e aplicar simplificações iniciais.
+- tracing interno por etapa implantado em disponibilização de mapa;
+- simplificação de recarga redundante no fluxo de disponibilização em bloco aplicada.
 
-### Rodada 8
+### Rodada 8 (parcial)
 
-- consolidar B.2 com matriz comparativa final e plano de ataque por impacto.
+- protocolo de coleta comparável fechado;
+- matriz final pendente de coleta em homologação.

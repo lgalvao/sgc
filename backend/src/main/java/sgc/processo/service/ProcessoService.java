@@ -319,15 +319,15 @@ public class ProcessoService {
                 : subprocessos.stream()
                 .filter(subprocesso -> unidadesAcesso.contains(subprocesso.getUnidade().getCodigo()))
                 .toList();
-        List<SubprocessoElegivelDto> subprocessosElegiveis = listarSubprocessosElegiveis(
-                subprocessosVisiveis,
-                usuario,
-                localizacoesPorSubprocesso
-        );
         if (incluirElegiveis) {
+            List<SubprocessoElegivelDto> subprocessosElegiveis = listarSubprocessosElegiveis(
+                    subprocessosVisiveis,
+                    usuario,
+                    localizacoesPorSubprocesso
+            );
             dto.getElegiveis().addAll(subprocessosElegiveis);
+            dto.getAcoesBloco().addAll(montarAcoesBloco(processo, subprocessosElegiveis, perfil));
         }
-        dto.getAcoesBloco().addAll(montarAcoesBloco(processo, subprocessosElegiveis, perfil));
 
         return dto;
     }
@@ -875,7 +875,7 @@ public class ProcessoService {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_DISPONIBILIZAR);
         }
         DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(command.dataLimite(), "Disponibilização em bloco");
-        transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq);
+        transicaoService.disponibilizarMapaEmBloco(subprocessos, dispReq, usuario);
     }
 
     private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, List<Subprocesso> list) {

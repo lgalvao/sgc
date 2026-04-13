@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
 import sgc.alerta.*;
 import sgc.comum.*;
+import sgc.comum.util.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -21,6 +22,7 @@ import sgc.subprocesso.model.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.util.function.*;
 
 import static sgc.processo.model.TipoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
@@ -373,21 +375,35 @@ public class SubprocessoTransicaoService {
         subprocessoCodigos.forEach(codSubprocesso -> executarDisponibilizacaoMapa(codSubprocesso, request, usuario));
     }
 
-    private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        log.info("Disponibilizando mapa do subprocesso {}", codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+    @Transactional
+    public void disponibilizarMapaEmBloco(List<Subprocesso> subprocessos, DisponibilizarMapaRequest request, Usuario usuario) {
+        subprocessos.forEach(subprocesso -> executarDisponibilizacaoMapa(subprocesso, request, usuario));
+    }
 
-        validacaoService.validarSituacaoPermitida(sp,
+    private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
+        Subprocesso sp = medirEtapaDisponibilizacao(
+                "carregar-subprocesso",
+                codSubprocesso,
+                () -> consultaService.buscarSubprocesso(codSubprocesso)
+        );
+        executarDisponibilizacaoMapa(sp, request, usuario);
+    }
+
+    private void executarDisponibilizacaoMapa(Subprocesso sp, DisponibilizarMapaRequest request, Usuario usuario) {
+        Long codSubprocesso = sp.getCodigo();
+        log.info("Disponibilizando mapa do subprocesso {}", codSubprocesso);
+
+        medirEtapaDisponibilizacao("validar-situacao", codSubprocesso, () -> validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_CADASTRO_HOMOLOGADO,
                 MAPEAMENTO_MAPA_CRIADO,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
                 REVISAO_CADASTRO_HOMOLOGADA,
                 REVISAO_MAPA_AJUSTADO,
                 REVISAO_MAPA_COM_SUGESTOES
-        );
+        ));
 
 
-        validacaoService.validarMapaParaDisponibilizacao(sp);
+        medirEtapaDisponibilizacao("validar-regras-mapa", codSubprocesso, () -> validacaoService.validarMapaParaDisponibilizacao(sp));
 
         LocalDate ultimaDataLimite = obterUltimaDataLimite(sp);
         if (ultimaDataLimite != null && request.dataLimite().isBefore(ultimaDataLimite)) {
@@ -395,7 +411,7 @@ public class SubprocessoTransicaoService {
         }
 
         Mapa mapa = sp.getMapa();
-        validacaoService.validarAssociacoesMapa(mapa.getCodigo());
+        medirEtapaDisponibilizacao("validar-associacoes-mapa", codSubprocesso, () -> validacaoService.validarAssociacoesMapa(mapa.getCodigo()));
         mapa.setSugestoes(null);
 
         String observacoes = request.observacoes();
@@ -408,7 +424,32 @@ public class SubprocessoTransicaoService {
         sp.setDataLimiteEtapa2(request.dataLimite().atStartOfDay());
         sp.setDataFimEtapa1(LocalDateTime.now());
 
-        registrarTransicaoDoAdminParaUnidade(sp, TipoTransicao.MAPA_DISPONIBILIZADO, usuario, normalizarTexto(observacoes));
+        medirEtapaDisponibilizacao("registrar-transicao", codSubprocesso, () ->
+                registrarTransicaoDoAdminParaUnidade(sp, TipoTransicao.MAPA_DISPONIBILIZADO, usuario, normalizarTexto(observacoes)));
+    }
+
+    private <T> T medirEtapaDisponibilizacao(String etapa, Long codSubprocesso, Supplier<T> fornecedor) {
+        long inicioNs = System.nanoTime();
+        try {
+            return fornecedor.get();
+        } finally {
+            logEtapaDisponibilizacao(etapa, codSubprocesso, inicioNs);
+        }
+    }
+
+    private void medirEtapaDisponibilizacao(String etapa, Long codSubprocesso, Runnable acao) {
+        medirEtapaDisponibilizacao(etapa, codSubprocesso, () -> {
+            acao.run();
+            return null;
+        });
+    }
+
+    private void logEtapaDisponibilizacao(String etapa, Long codSubprocesso, long inicioNs) {
+        if (!FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()) {
+            return;
+        }
+        long duracaoMs = Duration.ofNanos(System.nanoTime() - inicioNs).toMillis();
+        log.info("TRACE-DISPONIBILIZAR-MAPA sp={} etapa={} duracaoMs={}", codSubprocesso, etapa, duracaoMs);
     }
 
     private @Nullable LocalDate obterUltimaDataLimite(Subprocesso sp) {
