@@ -805,8 +805,12 @@ class ProcessoServiceTest {
                 ArgumentCaptor<DisponibilizarMapaRequest> captor =
                         ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
                 verify(transicaoService).disponibilizarMapaEmBloco(
-                        eq(List.of(1001L, 1002L, 1003L)),
-                        captor.capture()
+                        argThat(subprocessos -> subprocessos.stream()
+                                .map(Subprocesso::getCodigo)
+                                .toList()
+                                .equals(List.of(1001L, 1002L, 1003L))),
+                        captor.capture(),
+                        eq(usuario)
                 );
 
                 DisponibilizarMapaRequest captured = captor.getValue();
