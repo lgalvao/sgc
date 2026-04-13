@@ -132,6 +132,17 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await page.getByTestId('btn-devolucao-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
+
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+        await acessarDetalhesProcesso(page, descProcesso);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
+        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
+        await navegarParaMapa(page);
+        await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
+        await page.getByTestId('btn-mapa-sugestoes').click();
+        await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue(TEXTO_SUGESTAO);
+        await page.getByTestId('btn-sugestoes-mapa-cancelar').click();
     });
 
     test('Cenario 3: CHEFE reabre modal com pré-preenchimento das sugestões anteriores', async ({

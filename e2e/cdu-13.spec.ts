@@ -83,6 +83,11 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
         await expect(page).toHaveURL(/\/painel/);
+
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
     });
 
     test('Cenarios CDU-13: Hierarquia aceita e ADMIN homologa', async ({_resetAutomatico, page}) => {

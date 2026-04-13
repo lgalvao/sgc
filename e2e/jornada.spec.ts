@@ -275,4 +275,5 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         });
         await expect(page).toHaveURL(/\/login/);
     };
+
 });

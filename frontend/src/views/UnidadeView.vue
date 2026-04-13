@@ -1,7 +1,7 @@
 <template>
   <LayoutPadrao>
     <BAlert
-        v-if="lastError"
+        v-if="!carregandoPagina && lastError"
         :model-value="true"
         variant="danger"
         dismissible
@@ -13,98 +13,101 @@
       </div>
     </BAlert>
 
-    <div v-if="unidade">
-      <PageHeader :title="`${unidade.sigla} - ${unidade.nome}`">
-        <template #actions>
-          <BButton
-              v-if="mapaVigente"
-              data-testid="btn-mapa-vigente"
-              variant="outline-secondary"
-              @click="visualizarMapa"
-          >
-            <i
-                class="bi bi-file-earmark-spreadsheet me-2"
-            />{{ TEXTOS.unidade.BOTAO_MAPA_VIGENTE }}
-          </BButton>
-          <BButton
-              v-if="mostrarCriarAtribuicaoTemporaria"
-              data-testid="unidade-view__btn-criar-atribuicao"
-              variant="outline-secondary"
-              @click="irParaCriarAtribuicao"
-          >
-            {{ TEXTOS.unidade.BOTAO_CRIAR_ATRIBUICAO }}
-          </BButton>
-        </template>
-      </PageHeader>
+    <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO" />
+    <template v-else>
+      <div v-if="unidade">
+        <PageHeader :title="`${unidade.sigla} - ${unidade.nome}`">
+          <template #actions>
+            <BButton
+                v-if="mapaVigente"
+                data-testid="btn-mapa-vigente"
+                variant="outline-secondary"
+                @click="visualizarMapa"
+            >
+              <i
+                  class="bi bi-file-earmark-spreadsheet me-2"
+              />{{ TEXTOS.unidade.BOTAO_MAPA_VIGENTE }}
+            </BButton>
+            <BButton
+                v-if="mostrarCriarAtribuicaoTemporaria"
+                data-testid="unidade-view__btn-criar-atribuicao"
+                variant="outline-secondary"
+                @click="irParaCriarAtribuicao"
+            >
+              {{ TEXTOS.unidade.BOTAO_CRIAR_ATRIBUICAO }}
+            </BButton>
+          </template>
+        </PageHeader>
 
-      <BCard class="mb-4 shadow-sm" no-body>
-        <BCardBody>
-          <BRow>
-            <BCol md="6">
-              <div data-testid="unidade-titular-info">
-                <h5 class="mb-1">
-                  {{ TEXTOS.unidade.LABEL_TITULAR }} {{ titularDetalhes ? titularDetalhes.nome : TEXTOS.unidade.NAO_INFORMADO }}
-                </h5>
-                <div v-if="titularDetalhes" class="d-flex flex-column">
-                  <span v-if="titularDetalhes.ramal">
-                    {{ TEXTOS.unidade.LABEL_RAMAL }} <a
-                      :aria-label="`Ligar para ${titularDetalhes.ramal}`"
-                      :href="`tel:${titularDetalhes.ramal}`"
-                    >{{ titularDetalhes.ramal }}</a>
-                  </span>
-                  <span v-if="titularDetalhes.email">
-                    {{ TEXTOS.unidade.LABEL_EMAIL }} <a
-                      :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
-                      :href="`mailto:${titularDetalhes.email}`"
-                    >{{ titularDetalhes.email }}</a>
-                  </span>
+        <BCard class="mb-4 shadow-sm" no-body>
+          <BCardBody>
+            <BRow>
+              <BCol md="6">
+                <div data-testid="unidade-titular-info">
+                  <h5 class="mb-1">
+                    {{ TEXTOS.unidade.LABEL_TITULAR }} {{ titularDetalhes ? titularDetalhes.nome : TEXTOS.unidade.NAO_INFORMADO }}
+                  </h5>
+                  <div v-if="titularDetalhes" class="d-flex flex-column">
+                    <span v-if="titularDetalhes.ramal">
+                      {{ TEXTOS.unidade.LABEL_RAMAL }} <a
+                        :aria-label="`Ligar para ${titularDetalhes.ramal}`"
+                        :href="`tel:${titularDetalhes.ramal}`"
+                      >{{ titularDetalhes.ramal }}</a>
+                    </span>
+                    <span v-if="titularDetalhes.email">
+                      {{ TEXTOS.unidade.LABEL_EMAIL }} <a
+                        :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
+                        :href="`mailto:${titularDetalhes.email}`"
+                      >{{ titularDetalhes.email }}</a>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </BCol>
-            <BCol class="border-start" md="6">
-              <div data-testid="unidade-responsavel-info">
-                <h5 class="mb-1">
-                  {{ TEXTOS.unidade.LABEL_RESPONSAVEL }} {{ unidade.responsavel ? unidade.responsavel.nome : TEXTOS.unidade.NAO_INFORMADO }}
-                </h5>
-                <div v-if="unidade.responsavel" class="d-flex flex-column">
-                  <span v-if="unidade.responsavel.ramal">
-                    {{ TEXTOS.unidade.LABEL_RAMAL }} <a
-                      :aria-label="`Ligar para ${unidade.responsavel.ramal}`"
-                      :href="`tel:${unidade.responsavel.ramal}`"
-                    >{{ unidade.responsavel.ramal }}</a>
-                  </span>
-                  <span v-if="unidade.responsavel.email">
-                    {{ TEXTOS.unidade.LABEL_EMAIL }} <a
-                      :aria-label="`Enviar e-mail para ${unidade.responsavel.email}`"
-                      :href="`mailto:${unidade.responsavel.email}`"
-                    >{{ unidade.responsavel.email }}</a>
-                  </span>
+              </BCol>
+              <BCol class="border-start" md="6">
+                <div data-testid="unidade-responsavel-info">
+                  <h5 class="mb-1">
+                    {{ TEXTOS.unidade.LABEL_RESPONSAVEL }} {{ unidade.responsavel ? unidade.responsavel.nome : TEXTOS.unidade.NAO_INFORMADO }}
+                  </h5>
+                  <div v-if="unidade.responsavel" class="d-flex flex-column">
+                    <span v-if="unidade.responsavel.ramal">
+                      {{ TEXTOS.unidade.LABEL_RAMAL }} <a
+                        :aria-label="`Ligar para ${unidade.responsavel.ramal}`"
+                        :href="`tel:${unidade.responsavel.ramal}`"
+                      >{{ unidade.responsavel.ramal }}</a>
+                    </span>
+                    <span v-if="unidade.responsavel.email">
+                      {{ TEXTOS.unidade.LABEL_EMAIL }} <a
+                        :aria-label="`Enviar e-mail para ${unidade.responsavel.email}`"
+                        :href="`mailto:${unidade.responsavel.email}`"
+                      >{{ unidade.responsavel.email }}</a>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </BCol>
-          </BRow>
-        </BCardBody>
-      </BCard>
-    </div>
-    <EmptyState
-        v-else
-        :description="TEXTOS.unidade.EMPTY_DESCRIPTION"
-        icon="bi-building"
-        :title="TEXTOS.unidade.EMPTY_TITLE"
-    />
-
-    <div
-        v-if="unidade && unidade.filhas && unidade.filhas.length > 0"
-        class="mt-5"
-    >
-      <TreeTable
-          :columns="colunasTabela"
-          :data="dadosFormatadosSubordinadas"
-          :hide-headers="true"
-          :title="TEXTOS.unidade.SUBORDINADAS_TITULO"
-          @row-click="navegarParaUnidadeSubordinada"
+              </BCol>
+            </BRow>
+          </BCardBody>
+        </BCard>
+      </div>
+      <EmptyState
+          v-else
+          :description="TEXTOS.unidade.EMPTY_DESCRIPTION"
+          icon="bi-building"
+          :title="TEXTOS.unidade.EMPTY_TITLE"
       />
-    </div>
+
+      <div
+          v-if="unidade && unidade.filhas && unidade.filhas.length > 0"
+          class="mt-5"
+      >
+        <TreeTable
+            :columns="colunasTabela"
+            :data="dadosFormatadosSubordinadas"
+            :hide-headers="true"
+            :title="TEXTOS.unidade.SUBORDINADAS_TITULO"
+            @row-click="navegarParaUnidadeSubordinada"
+        />
+      </div>
+    </template>
   </LayoutPadrao>
 </template>
 
@@ -117,6 +120,7 @@ import type {MapaVigenteReferencia, Unidade, Usuario} from "@/types/tipos";
 import TreeTable, {type TreeItem} from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {
   buscarArvoreUnidade as buscarArvoreUnidadeServico,
   buscarReferenciaMapaVigente as buscarReferenciaMapaVigenteServico
@@ -137,6 +141,7 @@ const unidade = ref<Unidade | null>(null);
 const titularDetalhes = ref<Usuario | null>(null);
 const mapaVigente = ref<MapaVigenteReferencia | null>(null);
 const lastError = ref<{message: string; details?: string} | null>(null);
+const carregandoPagina = ref(true);
 const carregamentoInicialConcluido = ref(false);
 
 function clearError() {
@@ -144,6 +149,11 @@ function clearError() {
 }
 
 async function carregarDados() {
+  carregandoPagina.value = true;
+  clearError();
+  unidade.value = null;
+  titularDetalhes.value = null;
+  mapaVigente.value = null;
   try {
     const [unidadeResp, mapaResp] = await Promise.all([
       buscarArvoreUnidadeServico(props.codUnidade),
@@ -160,6 +170,8 @@ async function carregarDados() {
     const err = error as Error;
     lastError.value = {message: err.message || TEXTOS.unidade.ERRO_CARREGAR};
     logger.error("Erro ao carregar dados da unidade:", error);
+  } finally {
+    carregandoPagina.value = false;
   }
 }
 
@@ -187,13 +199,15 @@ onMounted(async () => {
   await carregarDados();
   carregamentoInicialConcluido.value = true;
 });
-onActivated(() => {
+onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
+  await carregarDados();
+});
+watch(() => props.codUnidade, () => {
   void carregarDados();
 });
-watch(() => props.codUnidade, carregarDados);
 
 const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
 

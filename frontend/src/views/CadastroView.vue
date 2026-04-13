@@ -1,6 +1,8 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.atividades.TITULO">
+    <CarregamentoPagina v-if="carregandoInicial" />
+    <template v-else>
+      <PageHeader :title="TEXTOS.atividades.TITULO">
       <template #default>
         <div class="d-flex align-items-center gap-2">
           <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ unidade.sigla }}</span>
@@ -156,15 +158,15 @@
         @fechar="mostrarModalHistorico = false"
     />
 
-    <ModalConfirmacao
-        v-model="mostrarModalConfirmacaoRemocao"
-        :mensagem="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO"
-        :ok-title="TEXTOS.comum.BOTAO_REMOVER"
-        :titulo="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TITULO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TITULO"
-        variant="danger"
-        @confirmar="confirmarRemocao"
-    />
-
+      <ModalConfirmacao
+          v-model="mostrarModalConfirmacaoRemocao"
+          :mensagem="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO"
+          :ok-title="TEXTOS.comum.BOTAO_REMOVER"
+          :titulo="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TITULO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TITULO"
+          variant="danger"
+          @confirmar="confirmarRemocao"
+      />
+    </template>
   </LayoutPadrao>
 </template>
 
@@ -181,6 +183,7 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
@@ -237,6 +240,7 @@ const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const {impactoMapa: impactos} = mapasStore;
 const codSubprocesso = ref<number | null>(null);
 const codMapa = ref<number | null>(null);
+const carregandoInicial = ref(true);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const acesso = useAcesso(subprocesso);
@@ -642,7 +646,13 @@ async function handleAdicionarAtividade() {
   if (sucesso || erroNovaAtividade.value) atividadeFormRef.value?.inputRef?.$el?.focus();
 }
 
-onMounted(carregarContextoInicial);
+onMounted(async () => {
+  try {
+    await carregarContextoInicial();
+  } finally {
+    carregandoInicial.value = false;
+  }
+});
 
 watch(() => atividades.value?.length, (newLen, oldLen) => {
   if (newLen === 0 && oldLen === undefined) {

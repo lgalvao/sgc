@@ -1,9 +1,11 @@
 <template>
   <LayoutPadrao>
-    <PageHeader
-        :title="TEXTOS.atividades.TITULO"
-        :subtitle="nomeUnidade"
-    >
+    <CarregamentoPagina v-if="carregandoInicial" />
+    <template v-else>
+      <PageHeader
+          :title="TEXTOS.atividades.TITULO"
+          :subtitle="nomeUnidade"
+      >
       <template #default>
         <span class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ siglaUnidade }}</span>
       </template>
@@ -110,36 +112,37 @@
     </ModalConfirmacao>
 
     <!-- Modal de Devolução -->
-    <ModalConfirmacao
-        v-model="mostrarModalDevolver"
-        :auto-close="false"
-        :loading="loadingDevolucao"
-        :ok-disabled="!observacaoDevolucao.trim()"
-        :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
-        :ok-title="TEXTOS.comum.BOTAO_DEVOLVER"
-        test-codigo-confirmar="btn-devolucao-cadastro-confirmar"
-        variant="danger"
-        @confirmar="confirmarDevolucao"
-    >
-      <p>{{
-          isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DEVOLVER_TEXTO
-        }}</p>
-      <BFormGroup class="mb-3" label-for="observacaoDevolucao">
-        <template #label>
-          Observação <span aria-hidden="true" class="text-danger">*</span>
-        </template>
-        <BFormTextarea
-            id="observacaoDevolucao"
-            v-model="observacaoDevolucao"
-            :state="estadoObservacaoDevolucao"
-            data-testid="inp-devolucao-cadastro-obs"
-            rows="3"
-        />
-        <BFormInvalidFeedback :state="estadoObservacaoDevolucao">
-          {{ TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA }}
-        </BFormInvalidFeedback>
-      </BFormGroup>
-    </ModalConfirmacao>
+      <ModalConfirmacao
+          v-model="mostrarModalDevolver"
+          :auto-close="false"
+          :loading="loadingDevolucao"
+          :ok-disabled="!observacaoDevolucao.trim()"
+          :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
+          :ok-title="TEXTOS.comum.BOTAO_DEVOLVER"
+          test-codigo-confirmar="btn-devolucao-cadastro-confirmar"
+          variant="danger"
+          @confirmar="confirmarDevolucao"
+      >
+        <p>{{
+            isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DEVOLVER_TEXTO
+          }}</p>
+        <BFormGroup class="mb-3" label-for="observacaoDevolucao">
+          <template #label>
+            Observação <span aria-hidden="true" class="text-danger">*</span>
+          </template>
+          <BFormTextarea
+              id="observacaoDevolucao"
+              v-model="observacaoDevolucao"
+              :state="estadoObservacaoDevolucao"
+              data-testid="inp-devolucao-cadastro-obs"
+              rows="3"
+          />
+          <BFormInvalidFeedback :state="estadoObservacaoDevolucao">
+            {{ TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA }}
+          </BFormInvalidFeedback>
+        </BFormGroup>
+      </ModalConfirmacao>
+    </template>
   </LayoutPadrao>
 </template>
 
@@ -160,6 +163,7 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
@@ -200,6 +204,7 @@ const codProcesso = computed(() => Number(props.codProcesso));
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
+const carregandoInicial = ref(true);
 
 const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
@@ -360,21 +365,25 @@ async function confirmarDevolucao() {
 }
 
 onMounted(async () => {
-  limparEstadoSubprocessoAtual();
-  const codigoQuery = Number(route.query.codSubprocesso);
-  const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
-      ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
-          .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
-      : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
-          codProcesso.value,
-          unidadeId.value,
-      );
+  try {
+    limparEstadoSubprocessoAtual();
+    const codigoQuery = Number(route.query.codSubprocesso);
+    const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
+        ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
+            .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
+        : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
+            codProcesso.value,
+            unidadeId.value,
+        );
 
-  if (resultado) {
-    codSubprocesso.value = resultado.codigo;
-    subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
-    atividades.value = resultado.contexto.atividadesDisponiveis;
-    unidade.value = resultado.contexto.unidade as Unidade;
+    if (resultado) {
+      codSubprocesso.value = resultado.codigo;
+      subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
+      atividades.value = resultado.contexto.atividadesDisponiveis;
+      unidade.value = resultado.contexto.unidade as Unidade;
+    }
+  } finally {
+    carregandoInicial.value = false;
   }
 });
 

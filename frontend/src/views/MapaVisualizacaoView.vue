@@ -1,135 +1,137 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
-      <template #default>
-        <div class="fs-5" data-testid="subprocesso-header__txt-header-unidade">
-          {{ unidade?.sigla }}
-        </div>
-      </template>
-      <template #actions>
-        <BButton
-            v-if="podeValidar"
-            data-testid="btn-mapa-sugestoes"
-            variant="outline-secondary"
-            @click="abrirModalSugestoes"
-        >
-          {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
-        </BButton>
-
-        <BButton
-            v-if="podeVerSugestoes"
-            data-testid="btn-mapa-ver-sugestoes"
-            variant="outline-secondary"
-            @click="verSugestoes"
-        >
-          {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
-        </BButton>
-
-        <BButton
-            v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
-            data-testid="btn-mapa-historico"
-            variant="outline-secondary"
-            @click="verHistorico"
-        >
-          {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
-        </BButton>
-
-        <BButton
-            v-if="podeAnalisar"
-            data-testid="btn-mapa-devolver"
-            :disabled="!habilitarDevolverMapa"
-            variant="secondary"
-            @click="abrirModalDevolucao"
-        >
-          {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
-        </BButton>
-
-        <BButton
-            v-if="podeValidar"
-            data-testid="btn-mapa-validar"
-            :disabled="!habilitarValidar"
-            variant="success"
-            @click="abrirModalValidar"
-        >
-          {{ TEXTOS.mapa.BOTAO_VALIDAR }}
-        </BButton>
-
-        <BButton
-            v-if="acaoPrincipalMapa?.mostrar"
-            data-testid="btn-mapa-homologar-aceite"
-            :disabled="!acaoPrincipalMapa.habilitar"
-            variant="success"
-            @click="abrirModalAceitar"
-        >
-          {{ acaoPrincipalMapa.rotuloBotao }}
-        </BButton>
-      </template>
-    </PageHeader>
-
-    <div v-if="unidade">
-      <div class="mb-5 d-flex align-items-center">
-        <div class="fs-5" data-testid="txt-header-unidade">
-          {{ unidade.sigla }}
-        </div>
-      </div>
-
-      <div class="mb-4 mt-3">
-        <EmptyState
-            v-if="!mapa || mapa.competencias.length === 0"
-            description="Este mapa ainda não possui competências registradas."
-            icon="bi-journal-x"
-            title="Nenhuma competência cadastrada"
-        />
-        <BCard
-            v-for="comp in mapa?.competencias"
-            :key="comp.codigo"
-            class="mb-3 shadow-sm border-0 border-start border-4 border-primary"
-        >
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="mb-0" data-testid="vis-mapa__txt-competencia-descricao">
-              {{ comp.descricao }}
-            </h5>
+    <CarregamentoPagina v-if="carregandoInicial" />
+    <template v-else>
+      <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
+        <template #default>
+          <div class="fs-5" data-testid="subprocesso-header__txt-header-unidade">
+            {{ unidade?.sigla }}
           </div>
-          <div v-if="comp.atividades && comp.atividades.length > 0" class="mt-3">
-            <div
-                v-for="atividade in comp.atividades"
-                :key="atividade.codigo"
-                class="mb-3 p-2 bg-light rounded"
-            >
-              <div class="d-flex align-items-baseline">
-                <i aria-hidden="true" class="bi bi-gear-fill me-2 text-secondary small"/>
-                <p class="atividade-associada-descricao mb-1 fw-medium">{{ atividade.descricao }}</p>
-              </div>
-              <div v-if="atividade.conhecimentos && atividade.conhecimentos.length > 0" class="ms-4 mt-2">
-                <div class="d-flex flex-wrap gap-2">
-                  <BBadge
-                      v-for="c in atividade.conhecimentos"
-                      :key="c.codigo"
-                      variant="light"
-                      class="bg-white text-dark border fw-normal py-1 px-2"
-                      data-testid="txt-conhecimento-item"
-                  >
-                    <i aria-hidden="true" class="bi bi-book me-1 text-info"/>
-                    {{ c.descricao }}
-                  </BBadge>
+        </template>
+        <template #actions>
+          <BButton
+              v-if="podeValidar"
+              data-testid="btn-mapa-sugestoes"
+              variant="outline-secondary"
+              @click="abrirModalSugestoes"
+          >
+            {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
+          </BButton>
+
+          <BButton
+              v-if="podeVerSugestoes"
+              data-testid="btn-mapa-ver-sugestoes"
+              variant="outline-secondary"
+              @click="verSugestoes"
+          >
+            {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
+          </BButton>
+
+          <BButton
+              v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
+              data-testid="btn-mapa-historico"
+              variant="outline-secondary"
+              @click="verHistorico"
+          >
+            {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
+          </BButton>
+
+          <BButton
+              v-if="podeAnalisar"
+              data-testid="btn-mapa-devolver"
+              :disabled="!habilitarDevolverMapa"
+              variant="secondary"
+              @click="abrirModalDevolucao"
+          >
+            {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
+          </BButton>
+
+          <BButton
+              v-if="podeValidar"
+              data-testid="btn-mapa-validar"
+              :disabled="!habilitarValidar"
+              variant="success"
+              @click="abrirModalValidar"
+          >
+            {{ TEXTOS.mapa.BOTAO_VALIDAR }}
+          </BButton>
+
+          <BButton
+              v-if="acaoPrincipalMapa?.mostrar"
+              data-testid="btn-mapa-homologar-aceite"
+              :disabled="!acaoPrincipalMapa.habilitar"
+              variant="success"
+              @click="abrirModalAceitar"
+          >
+            {{ acaoPrincipalMapa.rotuloBotao }}
+          </BButton>
+        </template>
+      </PageHeader>
+
+      <div v-if="unidade">
+        <div class="mb-5 d-flex align-items-center">
+          <div class="fs-5" data-testid="txt-header-unidade">
+            {{ unidade.sigla }}
+          </div>
+        </div>
+
+        <div class="mb-4 mt-3">
+          <EmptyState
+              v-if="!mapa || mapa.competencias.length === 0"
+              description="Este mapa ainda não possui competências registradas."
+              icon="bi-journal-x"
+              title="Nenhuma competência cadastrada"
+          />
+          <BCard
+              v-for="comp in mapa?.competencias"
+              :key="comp.codigo"
+              class="mb-3 shadow-sm border-0 border-start border-4 border-primary"
+          >
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="mb-0" data-testid="vis-mapa__txt-competencia-descricao">
+                {{ comp.descricao }}
+              </h5>
+            </div>
+            <div v-if="comp.atividades && comp.atividades.length > 0" class="mt-3">
+              <div
+                  v-for="atividade in comp.atividades"
+                  :key="atividade.codigo"
+                  class="mb-3 p-2 bg-light rounded"
+              >
+                <div class="d-flex align-items-baseline">
+                  <i aria-hidden="true" class="bi bi-gear-fill me-2 text-secondary small"/>
+                  <p class="atividade-associada-descricao mb-1 fw-medium">{{ atividade.descricao }}</p>
+                </div>
+                <div v-if="atividade.conhecimentos && atividade.conhecimentos.length > 0" class="ms-4 mt-2">
+                  <div class="d-flex flex-wrap gap-2">
+                    <BBadge
+                        v-for="c in atividade.conhecimentos"
+                        :key="c.codigo"
+                        variant="light"
+                        class="bg-white text-dark border fw-normal py-1 px-2"
+                        data-testid="txt-conhecimento-item"
+                    >
+                      <i aria-hidden="true" class="bi bi-book me-1 text-info"/>
+                      {{ c.descricao }}
+                    </BBadge>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </BCard>
+          </BCard>
+        </div>
       </div>
-    </div>
-    <div v-else>
-      <p>Unidade não encontrada.</p>
-    </div>
+      <div v-else>
+        <p>Unidade não encontrada.</p>
+      </div>
 
-    <AceitarMapaModal
-        :loading="isLoading"
-        :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
-        :mostrar-modal="mostrarModalAceitar"
-        @fechar-modal="fecharModalAceitar"
-        @confirmar-aceitacao="confirmarAceitacao"
-    />
+      <AceitarMapaModal
+          :loading="isLoading"
+          :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
+          :mostrar-modal="mostrarModalAceitar"
+          @fechar-modal="fecharModalAceitar"
+          @confirmar-aceitacao="confirmarAceitacao"
+      />
 
     <ModalConfirmacao
         v-model="mostrarModalSugestoes"
@@ -224,11 +226,12 @@
       </BFormGroup>
     </ModalConfirmacao>
 
-    <HistoricoAnaliseModal
-        :historico="historicoAnalise"
-        :mostrar="mostrarModalHistorico"
-        @fechar="fecharModalHistorico"
-    />
+      <HistoricoAnaliseModal
+          :historico="historicoAnalise"
+          :mostrar="mostrarModalHistorico"
+          @fechar="fecharModalHistorico"
+      />
+    </template>
   </LayoutPadrao>
 </template>
 
@@ -241,6 +244,7 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import {useSubprocessos} from "@/composables/useSubprocessos";
@@ -277,6 +281,7 @@ const codProcesso = computed(() => Number(route.params.codProcesso));
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
+const carregandoInicial = ref(true);
 
 const {
   podeValidarMapa,
@@ -514,10 +519,14 @@ function verHistorico() {
 }
 
 onMounted(async () => {
-  limparEstadoSubprocessoAtual();
-  const resultado = await carregarContextoInicial();
-  if (resultado?.codigo) {
-    mapa.value = await obterMapaVisualizacao(resultado.codigo);
+  try {
+    limparEstadoSubprocessoAtual();
+    const resultado = await carregarContextoInicial();
+    if (resultado?.codigo) {
+      mapa.value = await obterMapaVisualizacao(resultado.codigo);
+    }
+  } finally {
+    carregandoInicial.value = false;
   }
 });
 

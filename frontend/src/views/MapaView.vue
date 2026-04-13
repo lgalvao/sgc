@@ -1,117 +1,120 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
-      <template #default>
-        <div class="fs-5" data-testid="subprocesso-header__txt-header-unidade">
-          {{ unidade?.sigla }}
+    <CarregamentoPagina v-if="carregandoInicial" />
+    <template v-else>
+      <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
+        <template #default>
+          <div class="fs-5" data-testid="subprocesso-header__txt-header-unidade">
+            {{ unidade?.sigla }}
+          </div>
+        </template>
+
+        <template #actions>
+          <LoadingButton
+              v-if="podeVisualizarImpacto"
+              :loading="loadingImpacto"
+              data-testid="cad-mapa__btn-impactos-mapa"
+              icon="arrow-right-circle"
+              :text="TEXTOS.mapa.BOTAO_IMPACTO"
+              variant="outline-secondary"
+              @click="abrirModalImpacto"
+          />
+          <BButton
+              v-if="podeEditarMapa"
+              :disabled="!habilitarEditarMapa"
+              data-testid="btn-abrir-criar-competencia"
+              variant="outline-primary"
+              @click="abrirModalCriarLimpo"
+          >
+            <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
+          </BButton>
+          <BButton
+              v-if="podeDisponibilizarMapa"
+              :disabled="!habilitarDisponibilizarMapa || !podeConfirmarDisponibilizacao"
+              data-testid="btn-cad-mapa-disponibilizar"
+              variant="success"
+              @click="abrirModalDisponibilizar"
+          >
+            {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
+          </BButton>
+        </template>
+      </PageHeader>
+
+      <BAlert
+          v-if="erroMapa"
+          :model-value="true"
+          variant="danger"
+          dismissible
+          @dismissed="erroMapa = null"
+      >
+        {{ erroMapa }}
+      </BAlert>
+
+      <div v-if="unidade">
+        <div v-if="competencias.length === 0" class="mb-4 mt-3">
+          <EmptyState
+              :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
+              icon="bi-journal-plus"
+              :title="TEXTOS.mapa.EMPTY_TITLE"
+          />
         </div>
-      </template>
 
-      <template #actions>
-        <LoadingButton
-            v-if="podeVisualizarImpacto"
-            :loading="loadingImpacto"
-            data-testid="cad-mapa__btn-impactos-mapa"
-            icon="arrow-right-circle"
-            :text="TEXTOS.mapa.BOTAO_IMPACTO"
-            variant="outline-secondary"
-            @click="abrirModalImpacto"
-        />
-        <BButton
-            v-if="podeEditarMapa"
-            :disabled="!habilitarEditarMapa"
-            data-testid="btn-abrir-criar-competencia"
-            variant="outline-primary"
-            @click="abrirModalCriarLimpo"
-        >
-          <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
-        </BButton>
-        <BButton
-            v-if="podeDisponibilizarMapa"
-            :disabled="!habilitarDisponibilizarMapa || !podeConfirmarDisponibilizacao"
-            data-testid="btn-cad-mapa-disponibilizar"
-            variant="success"
-            @click="abrirModalDisponibilizar"
-        >
-          {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
-        </BButton>
-      </template>
-    </PageHeader>
-
-    <BAlert
-        v-if="erroMapa"
-        :model-value="true"
-        variant="danger"
-        dismissible
-        @dismissed="erroMapa = null"
-    >
-      {{ erroMapa }}
-    </BAlert>
-
-    <div v-if="unidade">
-      <div v-if="competencias.length === 0" class="mb-4 mt-3">
-        <EmptyState
-            :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
-            icon="bi-journal-plus"
-            :title="TEXTOS.mapa.EMPTY_TITLE"
-        />
+        <div v-else class="mb-4 mt-3">
+          <CompetenciaCard
+              v-for="comp in competencias"
+              :key="comp.codigo"
+              :atividades="atividades"
+              :competencia="comp"
+              :pode-editar="podeEditarMapa"
+              @editar="iniciarEdicaoCompetencia"
+              @excluir="excluirCompetencia"
+              @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
+          />
+        </div>
       </div>
 
-      <div v-else class="mb-4 mt-3">
-        <CompetenciaCard
-            v-for="comp in competencias"
-            :key="comp.codigo"
-            :atividades="atividades"
-            :competencia="comp"
-            :pode-editar="podeEditarMapa"
-            @editar="iniciarEdicaoCompetencia"
-            @excluir="excluirCompetencia"
-            @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
-        />
+      <div v-else>
+        <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
       </div>
-    </div>
 
-    <div v-else>
-      <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
-    </div>
+      <CriarCompetenciaModal
+          :atividades="atividades"
+          :competencia-para-editar="competenciaSendoEditada"
+          :field-errors="fieldErrors"
+          :mostrar="mostrarModalCriarNovaCompetencia"
+          @fechar="fecharModalCriarNovaCompetencia"
+          @salvar="adicionarCompetenciaEFecharModal"
+      />
 
-    <CriarCompetenciaModal
-        :atividades="atividades"
-        :competencia-para-editar="competenciaSendoEditada"
-        :field-errors="fieldErrors"
-        :mostrar="mostrarModalCriarNovaCompetencia"
-        @fechar="fecharModalCriarNovaCompetencia"
-        @salvar="adicionarCompetenciaEFecharModal"
-    />
+      <DisponibilizarMapaModal
+          :field-errors="fieldErrors"
+          :loading="loadingDisponibilizacao"
+          :mostrar="mostrarModalDisponibilizar"
+          :notificacao="notificacaoDisponibilizacao"
+          :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
+          @disponibilizar="disponibilizarMapa"
+          @fechar="fecharModalDisponibilizar"
+      />
 
-    <DisponibilizarMapaModal
-        :field-errors="fieldErrors"
-        :loading="loadingDisponibilizacao"
-        :mostrar="mostrarModalDisponibilizar"
-        :notificacao="notificacaoDisponibilizacao"
-        :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
-        @disponibilizar="disponibilizarMapa"
-        @fechar="fecharModalDisponibilizar"
-    />
+      <ModalConfirmacao
+          v-model="mostrarModalExcluirCompetencia"
+          :loading="loadingExclusao"
+          :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
+          data-testid="mdl-excluir-competencia"
+          test-codigo-confirmar="btn-confirmar-exclusao-competencia"
+          :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
+          variant="danger"
+          @confirmar="confirmarExclusaoCompetencia"
+      />
 
-    <ModalConfirmacao
-        v-model="mostrarModalExcluirCompetencia"
-        :loading="loadingExclusao"
-        :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
-        data-testid="mdl-excluir-competencia"
-        test-codigo-confirmar="btn-confirmar-exclusao-competencia"
-        :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
-        variant="danger"
-        @confirmar="confirmarExclusaoCompetencia"
-    />
-
-    <ImpactoMapaModal
-        v-if="codSubprocesso"
-        :impacto="impactos"
-        :loading="loadingImpacto"
-        :mostrar="mostrarModalImpacto"
-        @fechar="fecharModalImpacto"
-    />
+      <ImpactoMapaModal
+          v-if="codSubprocesso"
+          :impacto="impactos"
+          :loading="loadingImpacto"
+          :mostrar="mostrarModalImpacto"
+          @fechar="fecharModalImpacto"
+      />
+    </template>
   </LayoutPadrao>
 </template>
 
@@ -122,6 +125,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
@@ -170,6 +174,7 @@ const {
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
+const carregandoInicial = ref(true);
 const {
   mostrarModalImpacto,
   loadingImpacto,
@@ -238,12 +243,16 @@ async function carregarMapaInicial(codigo: number, contextoInicial?: Awaited<Ret
 }
 
 onMounted(async () => {
-  limparEstadoSubprocessoAtual();
-  const contextoInicial = await carregarContextoInicial();
-  if (!codSubprocesso.value) {
-    return;
+  try {
+    limparEstadoSubprocessoAtual();
+    const contextoInicial = await carregarContextoInicial();
+    if (!codSubprocesso.value) {
+      return;
+    }
+    await carregarMapaInicial(codSubprocesso.value, contextoInicial);
+  } finally {
+    carregandoInicial.value = false;
   }
-  await carregarMapaInicial(codSubprocesso.value, contextoInicial);
 });
 
 const atividades = ref<Atividade[]>([]);

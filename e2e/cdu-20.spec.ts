@@ -213,6 +213,8 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
 
         await acessarSubprocessoChefeDireto(page, processo.descricao, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
+        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
         await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Data/hora'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Origem'})).toBeVisible();
@@ -228,6 +230,10 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         validarDataHoraBrasileira(dataHora);
         await expect(linhaMovimentacao.locator('td').nth(1)).toHaveText('SECRETARIA_1');
         await expect(linhaMovimentacao.locator('td').nth(2)).toHaveText(UNIDADE_ALVO);
+
+        await navegarParaMapa(page);
+        await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-validar')).toBeEnabled();
 
     });
 });

@@ -1,6 +1,7 @@
 <template>
   <LayoutPadrao>
-    <div class="col-lg-8 col-md-9 col-12">
+    <CarregamentoPagina v-if="carregandoInicial" />
+    <div v-else class="col-lg-8 col-md-9 col-12">
       <PageHeader :title="TEXTOS.atribuicaoTemporaria.TITULO">
         <template v-if="unidade" #default>
           {{ unidade.sigla }}
@@ -168,6 +169,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import InputData from "@/components/comum/InputData.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/dateUtils";
@@ -192,6 +194,7 @@ const dataInicio = ref("");
 const dataTermino = ref("");
 const justificativa = ref("");
 const isLoading = ref(false);
+const carregandoInicial = ref(true);
 let timeoutPesquisaUsuarios: ReturnType<typeof setTimeout> | null = null;
 let timeoutOcultarResultadosUsuarios: ReturnType<typeof setTimeout> | null = null;
 
@@ -238,6 +241,8 @@ onMounted(async () => {
   } catch (error) {
     erroUsuario.value = TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
     logger.error(error);
+  } finally {
+    carregandoInicial.value = false;
   }
 });
 
