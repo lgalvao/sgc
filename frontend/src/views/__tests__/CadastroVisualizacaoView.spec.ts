@@ -233,10 +233,15 @@ describe("CadastroVisualizacaoView coverage", () => {
 
     function createWrapper(accessOverrides = {}, tipoProcesso: TipoProcesso = TipoProcesso.MAPEAMENTO) {
         const subprocessosStore = useSubprocessosModule.useSubprocessos() as unknown as SubprocessoStoreMock;
+        const contextoEdicao = criarContextoEdicao(tipoProcesso);
         subprocessosStore.subprocessoDetalhe = {
-            ...criarContextoEdicao(tipoProcesso).detalhes,
+            ...contextoEdicao.detalhes,
             tipoProcesso,
         };
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+            codigo: 123,
+            contexto: contextoEdicao,
+        });
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeDevolverCadastro: ref(true),
@@ -291,21 +296,28 @@ describe("CadastroVisualizacaoView coverage", () => {
         await flushPromises();
         expect(fluxoSubprocesso.homologarCadastro).toHaveBeenCalled();
 
-        const wrapperRevisao = createWrapper({}, TipoProcesso.REVISAO);
+        const wrapperRevisaoHomologacao = createWrapper({}, TipoProcesso.REVISAO);
         await flushPromises();
 
-        const vmRevisao = wrapperRevisao.vm as unknown as CadastroVisualizacaoVm;
-        vmRevisao.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('HOMOLOGAR');
-        await vmRevisao.confirmarValidacao();
+        const vmRevisaoHomologacao = wrapperRevisaoHomologacao.vm as unknown as CadastroVisualizacaoVm;
+        vmRevisaoHomologacao.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('HOMOLOGAR');
+        await vmRevisaoHomologacao.confirmarValidacao();
         expect(fluxoSubprocesso.homologarRevisaoCadastro).toHaveBeenCalled();
 
-        // Aceitar Revisão
-        vmRevisao.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('ACEITAR');
-        await vmRevisao.confirmarValidacao();
+        const wrapperRevisaoAceite = createWrapper({}, TipoProcesso.REVISAO);
+        await flushPromises();
+
+        const vmRevisaoAceite = wrapperRevisaoAceite.vm as unknown as CadastroVisualizacaoVm;
+        vmRevisaoAceite.acaoPrincipalCadastro = criarAcaoPrincipalCadastro('ACEITAR');
+        await vmRevisaoAceite.confirmarValidacao();
         expect(fluxoSubprocesso.aceitarRevisaoCadastro).toHaveBeenCalled();
 
-        vmRevisao.observacaoDevolucao = "Rev";
-        await vmRevisao.confirmarDevolucao();
+        const wrapperRevisaoDevolucao = createWrapper({}, TipoProcesso.REVISAO);
+        await flushPromises();
+
+        const vmRevisaoDevolucao = wrapperRevisaoDevolucao.vm as unknown as CadastroVisualizacaoVm;
+        vmRevisaoDevolucao.observacaoDevolucao = "Rev";
+        await vmRevisaoDevolucao.confirmarDevolucao();
         expect(fluxoSubprocesso.devolverRevisaoCadastro).toHaveBeenCalled();
 
         const mapsStore = vm.mapasStore;

@@ -368,6 +368,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
+        await flushPromises();
         await wrapper.vm.$nextTick();
 
         expect(
@@ -405,6 +406,7 @@ describe("VisMapa.vue", () => {
 
     it("opens validar modal and confirms", async () => {
         const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
+        await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -421,6 +423,7 @@ describe("VisMapa.vue", () => {
 
     it("opens sugestoes modal and confirms", async () => {
         const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
+        await flushPromises();
 
         await wrapper
             .find('[data-testid="btn-mapa-sugestoes"]')
@@ -458,6 +461,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
+        await flushPromises();
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
 
@@ -575,6 +579,7 @@ describe("VisMapa.vue", () => {
             podeDevolverMapa: ref(false),
             acaoPrincipalMapa: ref(null),
         });
+        await flushPromises();
         await wrapper.vm.$nextTick();
 
         const btn = wrapper.find('[data-testid="btn-mapa-ver-sugestoes"]');
@@ -692,6 +697,7 @@ describe("VisMapa.vue", () => {
             },
         });
         vi.mocked(processoServiceModule.devolverValidacao).mockRejectedValue(new Error("Fail"));
+        await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -708,6 +714,7 @@ describe("VisMapa.vue", () => {
     it("handles error in confirmarValidacao", async () => {
         const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
         vi.mocked(processoServiceModule.validarMapa).mockRejectedValue(new Error("Fail"));
+        await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -722,6 +729,7 @@ describe("VisMapa.vue", () => {
             perfil: {perfilSelecionado: "CHEFE"}
         }, "TEST", {podeValidarMapa: ref(true)});
         vi.mocked(processoServiceModule.apresentarSugestoes).mockRejectedValue(new Error("Fail"));
+        await flushPromises();
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Sugestão com erro");
@@ -765,6 +773,7 @@ describe("VisMapa.vue", () => {
     });
     it("triggers focus on shown in sugestoes modal", async () => {
         const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: ref(true)});
+        await flushPromises();
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
 
@@ -801,6 +810,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
+        await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();

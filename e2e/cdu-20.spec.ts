@@ -211,6 +211,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.DEVOLUCAO_REALIZADA).first()).toBeVisible();
 
+        await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
         await acessarSubprocessoChefeDireto(page, processo.descricao, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();

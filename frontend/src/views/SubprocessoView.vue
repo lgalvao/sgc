@@ -413,6 +413,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
       fecharModalAlterarDataLimite();
       notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, 'success');
       invalidarCachesSubprocesso({incluirPainel: false});
+      await carregarSubprocesso();
     } catch {
       notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, 'danger');
     }
@@ -460,6 +461,7 @@ async function confirmarReabertura() {
           'success',
       );
       invalidarCachesSubprocesso();
+      await carregarSubprocesso();
     }
   });
 }
