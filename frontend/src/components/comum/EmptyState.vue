@@ -1,10 +1,10 @@
 <template>
   <section
       aria-label="Estado vazio"
-      class="text-center py-5 rounded-4 mb-3 empty-state shadow-sm border-0"
+      class="text-center py-4 rounded-3 mb-3 empty-state"
       data-testid="empty-state"
   >
-    <div class="empty-state-icon-wrapper mb-3">
+    <div class="empty-state-icon-wrapper mb-2">
         <i
             v-if="icon"
             :class="`bi ${icon} d-block`"
@@ -13,14 +13,14 @@
     </div>
     <h2
         v-if="title"
-        class="h4 fw-bold mb-2 empty-state-title"
+        class="h5 fw-semibold mb-2 empty-state-title"
         data-testid="empty-state-title"
     >
       {{ title }}
     </h2>
     <p
         v-if="description"
-        class="mb-4 empty-state-description mx-auto"
+        class="mb-3 empty-state-description mx-auto"
         data-testid="empty-state-description"
         style="max-width: 400px;"
     >
@@ -44,21 +44,16 @@ defineProps<{
 
 <style scoped>
 .empty-state {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: #f8f9fa;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.empty-state:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid var(--bs-border-color-translucent);
 }
 
 .empty-state-icon-wrapper {
-  font-size: 3.5rem;
+  font-size: 2.1rem;
   color: #64748b;
-  opacity: 0.6;
+  opacity: 0.75;
 }
 
 .empty-state-title {
@@ -67,8 +62,8 @@ defineProps<{
 
 .empty-state-description {
   color: #64748b;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 
 :deep(.btn) {

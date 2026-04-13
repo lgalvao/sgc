@@ -11,8 +11,7 @@ export async function navegarParaAtividades(page: Page) {
 
     await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
-    // Aguarda o badge de situação para garantir que os dados do subprocesso foram carregados
-    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toBeVisible();
+    await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
@@ -172,10 +171,6 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
     return atividadeExtraCriada;
 }
 
-export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {
-    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'));
-}
-
 export async function verificarBotaoDisponibilizar(page: Page, habilitado: boolean) {
     const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
     await expect(botao).toBeVisible();
@@ -263,7 +258,7 @@ async function preencherFormularioImportacao(page: Page, processoOrigemDescricao
 export async function selecionarAtividadesParaImportacao(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
     await Promise.all([
         page.waitForResponse(r => r.url().includes('/para-importacao')),
-        page.getByTestId('btn-cad-atividades-importar').click()
+        abrirModalImportacao(page)
     ]);
     await preencherFormularioImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
 }
@@ -271,7 +266,7 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
 export async function selecionarAtividadesParaImportacaoVazia(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
     await Promise.all([
         page.waitForResponse(r => r.url().includes('/para-importacao')),
-        page.getByTestId('btn-empty-state-importar').click()
+        abrirModalImportacao(page)
     ]);
     await preencherFormularioImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
 }
@@ -354,7 +349,7 @@ export async function verificarOpcoesImportacao(
     opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
 ) {
     const respostaProcessos = page.waitForResponse(r => r.url().includes('/para-importacao'));
-    await page.getByTestId('btn-cad-atividades-importar').click();
+    await abrirModalImportacao(page);
     await respostaProcessos;
     await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
 }
@@ -364,7 +359,17 @@ export async function verificarOpcoesImportacaoVazia(
     opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
 ) {
     const respostaProcessos = page.waitForResponse(r => r.url().includes('/para-importacao'));
-    await page.getByTestId('btn-empty-state-importar').click();
+    await abrirModalImportacao(page);
     await respostaProcessos;
     await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
+}
+
+async function abrirModalImportacao(page: Page) {
+    const botaoCabecalho = page.getByTestId('btn-cad-atividades-importar');
+    if (await botaoCabecalho.count()) {
+        await botaoCabecalho.click();
+        return;
+    }
+
+    await page.getByTestId('btn-empty-state-importar').click();
 }

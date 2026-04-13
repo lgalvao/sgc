@@ -289,7 +289,7 @@ export const TEXTOS = {
     MODAL_DISPONIBILIZAR_REVISAO_TEXTO: "Confirma a finalização da revisão e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.",
     BOTAO_HISTORICO_ANALISE: "Histórico de análise",
     MODAL_HISTORICO_TITULO: "Histórico de análise",
-    MODAL_VALIDAR_TITULO: "Validação do cadastro",
+    MODAL_VALIDAR_TITULO: "Aceite do cadastro",
     MODAL_ACEITE_REVISAO_TITULO: "Aceite da revisão do cadastro",
     MODAL_HOMOLOGAR_TITULO: "Homologação do cadastro",
     MODAL_VALIDAR_TEXTO: "Confirma o aceite do cadastro de atividades?",
@@ -303,7 +303,7 @@ export const TEXTOS = {
     MODAL_IMPORTAR_TITULO: "Importação de atividades",
     BOTAO_DEVOLVER: "Devolver para ajustes",
     BOTAO_HOMOLOGAR: "Homologar",
-    BOTAO_ACEITAR: "Registrar aceite",
+    BOTAO_ACEITAR: "Aceitar",
     importacao: {
       NENHUM_PROCESSO: "Nenhum processo disponível para importação.",
       NENHUMA_ATIVIDADE: "Nenhuma atividade encontrada para esta unidade/processo.",
@@ -431,6 +431,6 @@ export const TEXTOS = {
     DESC_DIAS_ALERTA_NOVO: "Dias depois de um alerta ser enviado para que deixe de ser marcado como novo.",
     SUCESSO_SALVAR: "Configurações salvas.",
     ERRO_SALVAR: "Erro ao salvar configurações.",
-    BOTAO_SALVAR: "Salvar configurações",
+    BOTAO_SALVAR: "Salvar",
   },
 } as const;

@@ -161,6 +161,7 @@ describe('ProcessoCadastroView.vue', () => {
         expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
         expect(unidadeStoreMock.garantirArvoreElegibilidade).not.toHaveBeenCalled();
         expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-processo-salvar-rodape"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
     });
 

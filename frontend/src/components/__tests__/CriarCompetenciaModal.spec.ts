@@ -67,6 +67,7 @@ describe("CriarCompetenciaModal.vue", () => {
         const wrapper = createWrapper({mostrar: true, atividades});
 
         expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("");
+        expect(wrapper.find('[data-testid="btn-criar-competencia-salvar"]').text()).toBe("Criar");
         expect(
             wrapper
                 .find('[data-testid="btn-criar-competencia-salvar"]')
@@ -86,6 +87,7 @@ describe("CriarCompetenciaModal.vue", () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("Competência existente");
+        expect(wrapper.find('[data-testid="btn-criar-competencia-salvar"]').text()).toBe("Salvar");
     });
 
     it("deve habilitar o botão de salvar quando a descrição e pelo menos uma atividade forem selecionadas", async () => {

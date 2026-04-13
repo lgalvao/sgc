@@ -62,7 +62,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         await test.step('2.1 Verificar estado inicial do mapeamento', async () => {
             await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();
-            await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Não iniciado');
             await AtividadeHelpers.verificarBotaoDisponibilizar(page, false);
         });
 
@@ -77,8 +76,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
 
-            // A importação deve atualizar imediatamente a situação e habilitar a disponibilização
-            await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
+            // A importação deve habilitar a disponibilização imediatamente
             await AtividadeHelpers.verificarBotaoDisponibilizar(page, true);
 
             // Tentar importar de novo com atividade já existente:
@@ -91,8 +89,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         await test.step('4. Flexibilidade de Fluxo, Cadastro manual e Validar auto-save', async () => {
             await AtividadeHelpers.adicionarAtividade(page, atividadeManual);
-            
-            await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
 
             const atividadeManual2 = `Atividade manual 2 ${timestamp}`;
             await AtividadeHelpers.adicionarAtividade(page, atividadeManual2);

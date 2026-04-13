@@ -54,8 +54,8 @@
         <div v-if="competencias.length === 0" class="mb-4 mt-3">
           <EmptyState
               :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
+              class="border-0 bg-transparent mb-0 px-0"
               icon="bi-journal-plus"
-              :title="TEXTOS.mapa.EMPTY_TITLE"
           />
         </div>
 

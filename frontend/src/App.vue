@@ -84,9 +84,9 @@ const chaveSessao = computed(() =>
 
     <footer
         v-if="route.path !== '/login' && route.path !== '/erro'"
-        class="bg-light text-muted border-top mt-auto"
+        class="footer-app bg-light text-muted border-top mt-auto"
     >
-      <div class="container-fluid py-2 small d-flex justify-content-between align-items-center">
+      <div class="container-fluid footer-app__conteudo small d-flex justify-content-between align-items-center">
         <span>{{ TEXTOS.comum.VERSAO }} {{ version }}</span>
         <span>{{ TEXTOS.comum.RODAPE }}</span>
       </div>
@@ -95,4 +95,26 @@ const chaveSessao = computed(() =>
 </template>
 
 <style>
+.footer-app__conteudo {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+  gap: 0.75rem;
+  line-height: 1.2;
+}
+
+.toast {
+  max-width: 22rem;
+}
+
+.toast .toast-body {
+  padding: 0.75rem 0.9rem;
+  white-space: normal;
+}
+
+@media (max-width: 576px) {
+  .footer-app__conteudo {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+}
 </style>

@@ -219,7 +219,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('btn-painel-criar-processo').click();
         await page.getByTestId('inp-processo-descricao').fill(descricao);
-        await page.getByRole('button', {name: 'Cancelar'}).click();
+        await page.getByTestId('btn-processo-cancelar').click();
         await esperarPaginaPainel(page);
         await expect(page.getByText(descricao)).toBeHidden();
 

@@ -147,7 +147,8 @@ describe('UnidadeView.vue', () => {
         await wrapper.vm.$nextTick();
         await flushPromises();
 
-        expect(wrapper.text()).toContain('TEST - UnidadeView Teste');
+        expect(wrapper.text()).toContain('TEST');
+        expect(wrapper.text()).toContain('UnidadeView Teste');
         expect(wrapper.text()).toContain('Titular: Titular teste');
     });
 
@@ -252,7 +253,7 @@ describe('UnidadeView.vue', () => {
         expect(logger.error).toHaveBeenCalledWith('Erro ao carregar dados da unidade:', expect.any(Error));
     });
 
-    it('renders clickable contact links for titular', async () => {
+    it('renders ramal como texto simples e mantem link de email do titular', async () => {
         const mockUserWithContact = {
             ...mockUsuario,
             ramal: '1234',
@@ -266,9 +267,8 @@ describe('UnidadeView.vue', () => {
         await flushPromises();
 
         const ramalLink = wrapper.find('a[href="tel:1234"]');
-        expect(ramalLink.exists()).toBe(true);
-        expect(ramalLink.text()).toBe('1234');
-        expect(ramalLink.attributes('aria-label')).toBe('Ligar para 1234');
+        expect(ramalLink.exists()).toBe(false);
+        expect(wrapper.text()).toContain('Ramal: 1234');
 
         const emailLink = wrapper.find('a[href="mailto:test@example.com"]');
         expect(emailLink.exists()).toBe(true);

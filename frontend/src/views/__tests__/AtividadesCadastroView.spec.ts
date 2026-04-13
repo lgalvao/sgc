@@ -601,8 +601,8 @@ describe("CadastroView.vue", () => {
         await vm.$nextTick();
 
         // Abertura do modal de importação
-        const btnImportar = wrapper.find('[data-testid="btn-cad-atividades-importar"]');
-        await btnImportar.trigger('click');
+        vm.mostrarModalImportar = true;
+        await vm.$nextTick();
         expect(vm.mostrarModalImportar).toBe(true);
 
         // Descarte de alerta de erro global

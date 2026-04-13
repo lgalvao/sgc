@@ -17,11 +17,12 @@
           >
             {{ TEXTOS.comum.BOTAO_CANCELAR }}
           </BButton>
-          <LoadingButton
-              class="btn-acao-cabecalho"
-              :loading="isLoading"
-              data-testid="cad-atribuicao__btn-criar-atribuicao"
-              :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
+           <LoadingButton
+               class="btn-acao-cabecalho"
+               :disabled="!formularioValido || isLoading"
+               :loading="isLoading"
+               data-testid="cad-atribuicao__btn-criar-atribuicao"
+               :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
               :text="TEXTOS.comum.BOTAO_CRIAR"
               type="button"
               variant="primary"

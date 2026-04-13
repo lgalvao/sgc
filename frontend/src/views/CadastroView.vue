@@ -4,16 +4,7 @@
     <template v-else>
       <PageHeader :title="TEXTOS.atividades.TITULO">
       <template #default>
-        <div class="d-flex align-items-center gap-2">
-          <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ unidade.sigla }}</span>
-          <BBadge
-              v-if="subprocesso"
-              :variant="badgeVariant(subprocesso.situacao)"
-              class="fs-6"
-              data-testid="cad-atividades__txt-badge-situacao"
-          >{{ formatSituacaoSubprocesso(subprocesso.situacao) }}
-          </BBadge>
-        </div>
+        <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ unidade.sigla }}</span>
       </template>
       <template #actions>
         <BButton
@@ -40,9 +31,8 @@
             variant="outline-secondary"
             @click="mostrarModalImportar = true"
         >
-          <i aria-hidden="true" class="bi bi-upload me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
+          <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
         </BButton>
-
         <LoadingButton
             v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
             :disabled="botaoDisponibilizarDesabilitado"
@@ -99,18 +89,7 @@
         data-testid="cad-atividades-empty-state"
         icon="bi-list-check"
         :title="TEXTOS.atividades.EMPTY_TITLE"
-    >
-      <BButton
-          :disabled="!habilitarEditarCadastro"
-          class="mt-2 px-4 shadow-sm"
-          data-testid="btn-empty-state-importar"
-          variant="primary"
-          @click="mostrarModalImportar = true"
-      >
-        <i aria-hidden="true" class="bi bi-upload me-1"/>
-        {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
-      </BButton>
-    </EmptyState>
+    />
 
     <div
         v-for="(atividade, idx) in atividades"
@@ -171,11 +150,10 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BBadge, BButton, BFormCheckbox} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormCheckbox} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
@@ -216,14 +194,6 @@ import {useErrorHandler} from "@/composables/useErrorHandler";
 import {TEXTOS} from "@/constants/textos";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
-type VarianteBadge = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark";
-
-function badgeVariant(situacao: SituacaoSubprocesso): VarianteBadge {
-  const cls = badgeClass(situacao);
-  const match = cls.match(/bg-(\w+)/);
-  return match ? match[1] as VarianteBadge : 'secondary';
-}
-
 const props = defineProps<{
   codProcesso: number | string;
   sigla: string;

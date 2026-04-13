@@ -46,14 +46,13 @@
         :invalid-feedback="fieldErrors?.observacoes"
         class="mb-3"
     >
-      <BFormTextarea
-          id="observacoes"
-          v-model="observacoesDisponibilizacao"
-          :state="fieldErrors?.observacoes ? false : null"
-          data-testid="inp-disponibilizar-mapa-obs"
-          placeholder="Digite observações sobre a disponibilização..."
-          rows="3"
-      />
+        <BFormTextarea
+            id="observacoes"
+            v-model="observacoesDisponibilizacao"
+            :state="fieldErrors?.observacoes ? false : null"
+            data-testid="inp-disponibilizar-mapa-obs"
+            rows="3"
+        />
     </BFormGroup>
     <BAlert
         v-if="notificacao"

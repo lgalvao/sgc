@@ -16,7 +16,7 @@
     <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO" />
     <template v-else>
       <div v-if="unidade">
-        <PageHeader :title="`${unidade.sigla} - ${unidade.nome}`">
+        <PageHeader :subtitle="unidade.nome" :title="unidade.sigla">
           <template #actions>
             <BButton
                 v-if="mapaVigente"
@@ -49,10 +49,7 @@
                   </h5>
                   <div v-if="titularDetalhes" class="d-flex flex-column">
                     <span v-if="titularDetalhes.ramal">
-                      {{ TEXTOS.unidade.LABEL_RAMAL }} <a
-                        :aria-label="`Ligar para ${titularDetalhes.ramal}`"
-                        :href="`tel:${titularDetalhes.ramal}`"
-                      >{{ titularDetalhes.ramal }}</a>
+                      {{ TEXTOS.unidade.LABEL_RAMAL }} {{ titularDetalhes.ramal }}
                     </span>
                     <span v-if="titularDetalhes.email">
                       {{ TEXTOS.unidade.LABEL_EMAIL }} <a
@@ -70,10 +67,7 @@
                   </h5>
                   <div v-if="unidade.responsavel" class="d-flex flex-column">
                     <span v-if="unidade.responsavel.ramal">
-                      {{ TEXTOS.unidade.LABEL_RAMAL }} <a
-                        :aria-label="`Ligar para ${unidade.responsavel.ramal}`"
-                        :href="`tel:${unidade.responsavel.ramal}`"
-                      >{{ unidade.responsavel.ramal }}</a>
+                      {{ TEXTOS.unidade.LABEL_RAMAL }} {{ unidade.responsavel.ramal }}
                     </span>
                     <span v-if="unidade.responsavel.email">
                       {{ TEXTOS.unidade.LABEL_EMAIL }} <a

@@ -6,7 +6,7 @@
       tamanho="lg"
       test-codigo-cancelar="btn-criar-competencia-cancelar"
       test-codigo-confirmar="btn-criar-competencia-salvar"
-      texto-acao="Salvar"
+      :texto-acao="textoAcao"
       :titulo="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
       @confirmar="salvar"
       @fechar="fechar"
@@ -106,6 +106,10 @@ const salvamentoDesabilitado = computed(() => {
   const descricaoVazia = !novaCompetencia.value.descricao.trim();
   const exigeAtividade = !competenciaSendoEditada.value;
   return descricaoVazia || (exigeAtividade && atividadesSelecionadas.value.length === 0);
+});
+
+const textoAcao = computed(() => {
+  return competenciaSendoEditada.value ? "Salvar" : "Criar";
 });
 
 watch(

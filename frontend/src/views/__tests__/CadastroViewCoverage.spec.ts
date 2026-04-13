@@ -298,8 +298,8 @@ describe("CadastroView coverage", () => {
         vm.removerAtividade(0);
         expect(vm.mostrarModalConfirmacaoRemocao).toBe(true);
 
-        // Cobre badgeVariant default
-        expect(vm.badgeVariant("INVALIDO")).toBe("secondary");
+        // O cabecalho nao deve exibir badge de situacao no cadastro
+        expect(wrapper.find('[data-testid="cad-atividades__txt-badge-situacao"]').exists()).toBe(false);
 
         // Cobre disponibilizar com erro de situacao
         store.subprocessoDetalhe = {
@@ -402,8 +402,8 @@ describe("CadastroView coverage", () => {
         vm.fecharModalImpacto();
         expect(vm.mostrarModalImpacto).toBe(false);
 
-        // bad badge situations
-        expect(vm.badgeVariant("MAPEAMENTO_CADASTRO_EM_ANDAMENTO")).toBe("secondary");
+        // O cabecalho segue sem badge mesmo apos interacoes dos modais
+        expect(wrapper.find('[data-testid="cad-atividades__txt-badge-situacao"]').exists()).toBe(false);
     });
 
     it("cobre ramos de erro em confirmarRemocao e salvarEdicao", async () => {

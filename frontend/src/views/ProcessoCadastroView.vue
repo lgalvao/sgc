@@ -48,7 +48,9 @@
       <div v-if="exibirAlertaDiagnostico" class="mb-3 pt-2">
         <BAlert
             :model-value="true"
+            dismissible
             variant="warning"
+            @dismissed="dispensarAlertaDiagnostico"
         >
           <strong>Pendências organizacionais identificadas.</strong>
           <div class="mt-1">{{ resumoDiagnostico }}</div>
@@ -79,6 +81,48 @@
             :is-loading-unidades="isLoadingUnidades"
             :unidades="unidades"
         />
+
+        <div class="d-flex flex-wrap justify-content-end gap-2 mt-4 pt-3 border-top">
+          <BButton
+              :disabled="isLoading"
+              data-testid="btn-processo-cancelar-rodape"
+              to="/painel"
+              variant="outline-secondary"
+          >
+            {{ TEXTOS.processo.cadastro.BOTAO_CANCELAR }}
+          </BButton>
+
+          <LoadingButton
+              v-if="processoEditando"
+              :disabled="isLoading"
+              data-testid="btn-processo-remover-rodape"
+              icon="trash"
+              :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
+              variant="outline-danger"
+              @click="abrirModalRemocao"
+          />
+
+          <LoadingButton
+              :disabled="salvarDesabilitado"
+              :loading="isLoading"
+              data-testid="btn-processo-salvar-rodape"
+              icon="save"
+              loading-text="Salvando..."
+              :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
+              type="button"
+              variant="outline-primary"
+              @click="salvarProcesso"
+          />
+
+          <LoadingButton
+              :disabled="iniciarDesabilitado"
+              data-testid="btn-processo-iniciar-rodape"
+              icon="play-fill"
+              :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
+              variant="success"
+              @click="abrirModalConfirmacao"
+          />
+        </div>
       </BForm>
     </div>
 
@@ -198,10 +242,18 @@ const resumoDiagnostico = computed(() =>
         ?? diagnosticoOrganizacional.value?.resumo
         ?? ""
 );
+const alertaDiagnosticoDispensado = ref(false);
 const exibirAlertaDiagnostico = computed(() =>
     mostrarDiagnosticoOrganizacional.value
     && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
+    && !alertaDiagnosticoDispensado.value
 );
+const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value);
+const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoading.value || isLoadingData.value);
+
+function dispensarAlertaDiagnostico() {
+  alertaDiagnosticoDispensado.value = true;
+}
 
 function extrairErrosGenericos(error: ReturnType<typeof normalizeError>): string[] {
   return error.subErrors

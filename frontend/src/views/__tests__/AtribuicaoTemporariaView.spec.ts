@@ -81,7 +81,8 @@ const mountOptions = {
         props: ['modelValue']
       },
       LoadingButton: {
-        template: '<button @click="$emit(\'click\')">LoadingButton</button>'
+        props: ['disabled'],
+        template: '<button :disabled="disabled" @click="$emit(\'click\')">LoadingButton</button>'
       },
       BFormInput: {
         name: 'BFormInput',
@@ -140,6 +141,23 @@ describe('AtribuicaoTemporariaView', () => {
 
     expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'danger');
     expect(criarAtribuicaoTemporaria).not.toHaveBeenCalled();
+  });
+
+  it('deve manter o botao de criar desabilitado ate o formulario ficar valido', async () => {
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
+    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    await vi.dynamicImportSettled();
+
+    const botaoCriar = wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]');
+    expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(true);
+
+    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo());
+    wrapper.vm.dataInicio = '2025-01-01';
+    wrapper.vm.dataTermino = '2025-12-31';
+    wrapper.vm.justificativa = 'Teste de justificativa';
+    await wrapper.vm.$nextTick();
+
+    expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('deve pesquisar usuarios com debounce', async () => {
