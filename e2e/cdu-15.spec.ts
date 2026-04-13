@@ -55,6 +55,15 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);
         await verificarCompetenciaNoMapa(page, compDesc, [ATIVIDADE_1]);
 
+        // CT-02a: Ao sair do mapa e entrar novamente sem refresh, a competência criada
+        // deve permanecer visível; isso protege contra regressão de cache do contexto.
+        await page.getByRole('link', {name: UNIDADE_ALVO, exact: true}).click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+
+        await navegarParaMapa(page);
+        await verificarCompetenciaNoMapa(page, compDesc, [ATIVIDADE_1]);
+
         // Assert badge in the map main view, not the modal
         const cardCompetencia = page.locator('.competencia-card', {hasText: compDesc});
         const badgeConhecimentos = cardCompetencia
