@@ -9,6 +9,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
 import sgc.comum.*;
+import sgc.comum.util.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.organizacao.*;
@@ -273,17 +274,32 @@ public class ProcessoService {
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoCommand command) {
         Usuario usuario = usuarioService.usuarioAutenticado();
         List<Long> unidadeCodigos = command.unidadeCodigos();
-        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadeCodigos);
+        List<Subprocesso> subprocessos = medirEtapaAcaoBloco(
+                codProcesso,
+                command,
+                "carregar-subprocessos",
+                () -> consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadeCodigos)
+        );
 
         if (unidadeCodigos.isEmpty()) throw new ErroValidacao(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
-        validarSelecaoBloco(unidadeCodigos, subprocessos);
+        medirEtapaAcaoBloco(codProcesso, command, "validar-selecao", () -> validarSelecaoBloco(unidadeCodigos, subprocessos));
 
         if (command instanceof DisponibilizarMapaEmBlocoCommand disponibilizacao) {
-            executarDisponibilizacaoMapaEmBloco(disponibilizacao, usuario, subprocessos);
+            medirEtapaAcaoBloco(
+                    codProcesso,
+                    command,
+                    "executar-disponibilizacao-mapa-bloco",
+                    () -> executarDisponibilizacaoMapaEmBloco(disponibilizacao, usuario, subprocessos)
+            );
             return;
         }
 
-        processarAcoesBlocoAceiteHomologacao((ProcessarAnaliseEmBlocoCommand) command, subprocessos);
+        medirEtapaAcaoBloco(
+                codProcesso,
+                command,
+                "executar-analise-bloco",
+                () -> processarAcoesBlocoAceiteHomologacao((ProcessarAnaliseEmBlocoCommand) command, subprocessos)
+        );
     }
 
 
@@ -917,6 +933,59 @@ public class ProcessoService {
         if (!codigosValidacao.isEmpty()) {
             acaoValidacao.accept(codigosValidacao);
         }
+    }
+
+    private <T> T medirEtapaAcaoBloco(
+            Long codProcesso,
+            AcaoEmBlocoCommand command,
+            String etapa,
+            java.util.function.Supplier<T> fornecedor
+    ) {
+        long inicioNs = System.nanoTime();
+        try {
+            return fornecedor.get();
+        } finally {
+            logEtapaAcaoBloco(codProcesso, command, etapa, inicioNs);
+        }
+    }
+
+    private void medirEtapaAcaoBloco(
+            Long codProcesso,
+            AcaoEmBlocoCommand command,
+            String etapa,
+            Runnable acao
+    ) {
+        medirEtapaAcaoBloco(codProcesso, command, etapa, () -> {
+            acao.run();
+            return null;
+        });
+    }
+
+    private void logEtapaAcaoBloco(
+            Long codProcesso,
+            AcaoEmBlocoCommand command,
+            String etapa,
+            long inicioNs
+    ) {
+        if (!FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()) {
+            return;
+        }
+        long duracaoMs = Duration.ofNanos(System.nanoTime() - inicioNs).toMillis();
+        log.info(
+                "TRACE-ACAO-EM-BLOCO processo={} acao={} unidades={} etapa={} duracaoMs={}",
+                codProcesso,
+                obterTipoAcao(command),
+                command.unidadeCodigos().size(),
+                etapa,
+                duracaoMs
+        );
+    }
+
+    private String obterTipoAcao(AcaoEmBlocoCommand command) {
+        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
+            return analise.acao().name();
+        }
+        return DISPONIBILIZAR.name();
     }
 
     @SuppressWarnings("unused")

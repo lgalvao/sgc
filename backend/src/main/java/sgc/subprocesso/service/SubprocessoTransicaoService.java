@@ -258,8 +258,10 @@ public class SubprocessoTransicaoService {
     }
 
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
-        persistirTransicao(cmd);
-        notificarTransicao(cmd);
+        Long codSubprocesso = cmd.sp().getCodigo();
+        TipoTransicao tipoTransicao = cmd.tipo();
+        medirEtapaWorkflow("persistir-transicao", codSubprocesso, tipoTransicao, () -> persistirTransicao(cmd));
+        medirEtapaWorkflow("notificar-transicao", codSubprocesso, tipoTransicao, () -> notificarTransicao(cmd));
     }
 
     private void persistirTransicao(RegistrarTransicaoCommand cmd) {
@@ -450,6 +452,25 @@ public class SubprocessoTransicaoService {
         }
         long duracaoMs = Duration.ofNanos(System.nanoTime() - inicioNs).toMillis();
         log.info("TRACE-DISPONIBILIZAR-MAPA sp={} etapa={} duracaoMs={}", codSubprocesso, etapa, duracaoMs);
+    }
+
+    private void medirEtapaWorkflow(String etapa, Long codSubprocesso, TipoTransicao tipoTransicao, Runnable acao) {
+        long inicioNs = System.nanoTime();
+        try {
+            acao.run();
+        } finally {
+            if (!FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()) {
+                return;
+            }
+            long duracaoMs = Duration.ofNanos(System.nanoTime() - inicioNs).toMillis();
+            log.info(
+                    "TRACE-WORKFLOW sp={} transicao={} etapa={} duracaoMs={}",
+                    codSubprocesso,
+                    tipoTransicao.name(),
+                    etapa,
+                    duracaoMs
+            );
+        }
     }
 
     private @Nullable LocalDate obterUltimaDataLimite(Subprocesso sp) {
