@@ -313,6 +313,115 @@ class SubprocessoControllerTest {
         }
 
         @Test
+        @DisplayName("deve salvar mapa completo em batch")
+        @WithMockUser(roles = "GESTOR")
+        void deveSalvarMapaCompleto() throws Exception {
+            SalvarMapaRequest request = SalvarMapaRequest.builder().competencias(List.of()).build();
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
+
+            mockMvc.perform(post("/api/subprocessos/1/mapa-completo")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(subprocessoService).salvarMapa(eq(1L), any(SalvarMapaRequest.class));
+            verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
+        }
+
+        @Test
+        @DisplayName("deve disponibilizar mapas em bloco")
+        @WithMockUser(roles = "GESTOR")
+        void deveDisponibilizarMapaEmBloco() throws Exception {
+            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest("DISPONIBILIZAR", List.of(1L, 2L), null);
+
+            mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa-bloco")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).disponibilizarMapaEmBloco(eq(List.of(1L, 2L)), any());
+        }
+
+        @Test
+        @DisplayName("deve obter mapa preparado para ajuste")
+        @WithMockUser(roles = "GESTOR")
+        void deveObterMapaParaAjuste() throws Exception {
+            MapaAjusteDto dto = MapaAjusteDto.builder().codMapa(1L).unidadeNome("MAPA").competencias(List.of()).justificativaDevolucao("Obs").build();
+            when(consultaService.obterMapaParaAjuste(1L)).thenReturn(dto);
+
+            mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste"))
+                    .andExpect(status().isOk());
+
+            verify(consultaService).obterMapaParaAjuste(1L);
+        }
+
+        @Test
+        @DisplayName("deve salvar os ajustes feitos no mapa")
+        @WithMockUser(roles = "GESTOR")
+        void deveSalvarAjustesMapa() throws Exception {
+            SalvarAjustesRequest request = new SalvarAjustesRequest(List.of(CompetenciaAjusteDto.builder().codCompetencia(1L).nome("Comp").atividades(List.of()).build()));
+
+            mockMvc.perform(post("/api/subprocessos/1/mapa-ajuste/atualizar")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(subprocessoService).salvarAjustesMapa(eq(1L), anyList());
+        }
+
+        @Test
+        @DisplayName("deve adicionar uma competência ao mapa")
+        @WithMockUser(roles = "GESTOR")
+        void deveAdicionarCompetencia() throws Exception {
+            CompetenciaRequest request = new CompetenciaRequest("Descricao", List.of());
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
+
+            mockMvc.perform(post("/api/subprocessos/1/competencia")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(subprocessoService).adicionarCompetencia(eq(1L), any(CompetenciaRequest.class));
+        }
+
+        @Test
+        @DisplayName("deve atualizar uma competência do mapa")
+        @WithMockUser(roles = "GESTOR")
+        void deveAtualizarCompetencia() throws Exception {
+            CompetenciaRequest request = new CompetenciaRequest("Descricao", List.of());
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
+
+            mockMvc.perform(post("/api/subprocessos/1/competencia/2")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(subprocessoService).atualizarCompetencia(eq(1L), eq(2L), any(CompetenciaRequest.class));
+        }
+
+        @Test
+        @DisplayName("deve remover uma competência do mapa")
+        @WithMockUser(roles = "GESTOR")
+        void deveRemoverCompetencia() throws Exception {
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
+
+            mockMvc.perform(post("/api/subprocessos/1/competencia/2/remover")
+                            .with(csrf()))
+                    .andExpect(status().isOk());
+
+            verify(subprocessoService).removerCompetencia(1L, 2L);
+        }
+
+        @Test
         @DisplayName("deve obter sugestões consolidadas")
         @WithMockUser
         void deveObterSugestoes() throws Exception {
@@ -377,6 +486,148 @@ class SubprocessoControllerTest {
     @Nested
     @DisplayName("Dado fluxo de validação, quando apresentar sugestões, então delega ao serviço")
     class ValidacaoWorkflowTests {
+        @Test
+        @DisplayName("deve validar o mapa de competências da unidade")
+        @WithMockUser(roles = "CHEFE")
+        void deveValidarMapa() throws Exception {
+            mockMvc.perform(post("/api/subprocessos/1/validar-mapa")
+                            .with(csrf()))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).validarMapa(1L);
+        }
+
+        @Test
+        @DisplayName("deve devolver validação (pelo gestor/chefe)")
+        @WithMockUser(roles = "GESTOR")
+        void deveDevolverValidacao() throws Exception {
+            JustificativaRequest request = new JustificativaRequest("Precisa ajustar algo");
+
+            mockMvc.perform(post("/api/subprocessos/1/devolver-validacao")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).devolverValidacao(eq(1L), eq("Precisa ajustar algo"));
+        }
+
+        @Test
+        @DisplayName("deve aceitar validação (pelo gestor)")
+        @WithMockUser(roles = "GESTOR")
+        void deveAceitarValidacao() throws Exception {
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Tudo certo");
+
+            mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).aceitarValidacao(eq(1L), eq("Tudo certo"));
+        }
+
+        @Test
+        @DisplayName("deve aceitar validação sem observações")
+        @WithMockUser(roles = "GESTOR")
+        void deveAceitarValidacaoSemObservacoes() throws Exception {
+            TextoOpcionalRequest request = new TextoOpcionalRequest(null);
+
+            mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).aceitarValidacao(eq(1L), isNull());
+        }
+
+        @Test
+        @DisplayName("deve homologar validação")
+        @WithMockUser(roles = "ADMIN")
+        void deveHomologarValidacao() throws Exception {
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Homologado");
+
+            mockMvc.perform(post("/api/subprocessos/1/homologar-validacao")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).homologarValidacao(eq(1L), eq("Homologado"));
+        }
+
+        @Test
+        @DisplayName("deve homologar validação sem observações")
+        @WithMockUser(roles = "ADMIN")
+        void deveHomologarValidacaoSemObservacoes() throws Exception {
+            TextoOpcionalRequest request = new TextoOpcionalRequest(null);
+
+            mockMvc.perform(post("/api/subprocessos/1/homologar-validacao")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).homologarValidacao(eq(1L), isNull());
+        }
+
+        @Test
+        @DisplayName("deve homologar validação com request nulo")
+        @WithMockUser(roles = "ADMIN")
+        void deveHomologarValidacaoComRequestNulo() throws Exception {
+            mockMvc.perform(post("/api/subprocessos/1/homologar-validacao")
+                            .with(csrf()))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).homologarValidacao(eq(1L), isNull());
+        }
+
+        @Test
+        @DisplayName("deve submeter o mapa após ajustes")
+        @WithMockUser(roles = "CHEFE")
+        void deveSubmeterMapaAjustado() throws Exception {
+            SubmeterMapaAjustadoRequest request = new SubmeterMapaAjustadoRequest("Ajustes feitos", null, List.of());
+
+            mockMvc.perform(post("/api/subprocessos/1/submeter-mapa-ajustado")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).submeterMapaAjustado(eq(1L), any(SubmeterMapaAjustadoRequest.class));
+        }
+
+        @Test
+        @DisplayName("deve aceitar validação em bloco")
+        @WithMockUser(roles = "GESTOR")
+        void deveAceitarValidacaoEmBloco() throws Exception {
+            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest("ACEITAR", List.of(1L, 2L), null);
+
+            mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao-bloco")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).aceitarValidacaoEmBloco(List.of(1L, 2L));
+        }
+
+        @Test
+        @DisplayName("deve homologar validação em bloco")
+        @WithMockUser(roles = "ADMIN")
+        void deveHomologarValidacaoEmBloco() throws Exception {
+            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest("HOMOLOGAR", List.of(1L, 2L), null);
+
+            mockMvc.perform(post("/api/subprocessos/1/homologar-validacao-bloco")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(transicaoService).homologarValidacaoEmBloco(List.of(1L, 2L));
+        }
+
         @Test
         @DisplayName("deve apresentar sugestões")
         @WithMockUser(roles = "CHEFE")
