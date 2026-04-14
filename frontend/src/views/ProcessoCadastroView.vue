@@ -52,7 +52,7 @@
             variant="warning"
             @dismissed="dispensarAlertaDiagnostico"
         >
-          <strong>Pendências organizacionais identificadas.</strong>
+          <strong>Há unidades sem responsável atual.</strong>
           <div class="mt-1">{{ resumoDiagnostico }}</div>
           <ul class="mb-0 mt-2 ps-3">
             <li v-for="grupo in gruposDiagnostico" :key="grupo.tipo">

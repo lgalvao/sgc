@@ -37,7 +37,7 @@ const PageHeaderStub = {
 const TabelaProcessosStub = {
     name: "TabelaProcessos",
     template: '<div data-testid="tabela-processos"></div>',
-    props: ["processos", "criterioOrdenacao", "direcaoOrdenacaoAsc", "compacto", "showDataFinalizacao"],
+    props: ["processos", "criterioOrdenacao", "direcaoOrdenacaoAsc", "compacto", "showDataFinalizacao", "showSituacao"],
     emits: ["ordenar", "selecionar-processo"],
 };
 
@@ -95,6 +95,7 @@ describe("HistoricoView.vue", () => {
         expect(processos).toHaveLength(2);
         expect(processos[0].descricao).toBe("Proc B");
         expect(processos[1].descricao).toBe("Proc A");
+        expect(tabela.props("showSituacao")).toBe(false);
     });
 
     it("deve repassar lista vazia para a tabela quando não houver processos", async () => {

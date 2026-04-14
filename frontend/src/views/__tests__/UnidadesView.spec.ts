@@ -190,7 +190,7 @@ describe("Unidades.vue", () => {
         await flushPromises();
         const wrapper = context.wrapper;
 
-        expect(wrapper.text()).toContain("Pendências organizacionais identificadas.");
+        expect(wrapper.text()).toContain("Há unidades sem responsável atual.");
         expect(wrapper.text()).toContain("VW_USUARIO com titulo duplicado: 2 ocorrência(s)");
         expect(wrapper.text()).toContain("Unidade sem responsável: 1 ocorrência(s)");
     });

@@ -26,7 +26,7 @@ const PageHeaderStub = {
 
 const TabelaProcessosStub = {
   template: '<div data-testid="tabela-processos" @click="$emit(\'selecionar-processo\', { codigo: 1, linkDestino: \'/test/1\' })" @dblclick="$emit(\'ordenar\', \'descricao\')"></div>',
-  props: ['processos', 'criterioOrdenacao', 'direcaoOrdenacaoAsc', 'compacto', 'showDataFinalizacao']
+  props: ['processos', 'criterioOrdenacao', 'direcaoOrdenacaoAsc', 'compacto', 'showDataFinalizacao', 'showSituacao']
 };
 
 const mockProcessosFinalizados = [
@@ -92,6 +92,15 @@ describe('HistoricoView.vue', () => {
     expect(processos[0].codigo).toBe(1); // 2024-01-02
     expect(processos[1].codigo).toBe(2); // 2024-01-01
     expect(processos[2].codigo).toBe(3); // null
+  });
+
+  it('deve configurar a tabela sem situação no histórico', async () => {
+    wrapper = createWrapper();
+    await flushPromises();
+
+    const tabela = wrapper.findComponent(TabelaProcessosStub);
+    expect(tabela.props('showSituacao')).toBe(false);
+    expect(tabela.props('showDataFinalizacao')).toBe(true);
   });
 
   it('deve ordenar alterando o criterio e direcao', async () => {

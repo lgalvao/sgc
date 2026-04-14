@@ -13,6 +13,7 @@
         :direcao-ordenacao-asc="asc"
         :processos="processosOrdenados"
         :show-data-finalizacao="true"
+        :show-situacao="false"
         @ordenar="ordenarPor"
         @selecionar-processo="verDetalhes"
     />

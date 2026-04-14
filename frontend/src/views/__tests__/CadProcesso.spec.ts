@@ -192,7 +192,7 @@ describe('ProcessoCadastroView.vue', () => {
         });
         await flushPromises();
 
-        expect(wrapper.text()).toContain('Pendências organizacionais identificadas.');
+        expect(wrapper.text()).toContain('Há unidades sem responsável atual.');
         expect(wrapper.text()).toContain('Unidade sem responsável: 2 ocorrência(s)');
     });
 

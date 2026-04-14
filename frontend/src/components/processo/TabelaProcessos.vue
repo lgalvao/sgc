@@ -21,6 +21,7 @@ const props = defineProps<{
   criterioOrdenacao: CampoOrdenacaoProcesso;
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
+  showSituacao?: boolean;
   compacto?: boolean;
   mostrarCtaVazio?: boolean;
   textoCtaVazio?: string;
@@ -49,7 +50,9 @@ const fields = computed(() => {
     });
   }
 
-  baseFields.push({key: "situacao", label: "Situação", sortable: true});
+  if (props.showSituacao !== false) {
+    baseFields.push({key: "situacao", label: "Situação", sortable: true});
+  }
   return baseFields;
 });
 
@@ -116,7 +119,7 @@ defineExpose({fields});
         @update:sort-by="handleSortChange"
     >
       <template #cell(dataFinalizacao)="{ item }">
-        {{ formatDate(item.dataFinalizacao) }}
+        {{ formatDate(item.dataFinalizacao, false) }}
       </template>
 
       <template #cell(situacao)="{ item }">

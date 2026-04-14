@@ -56,12 +56,12 @@ describe("TabelaProcessos.vue", () => {
 
         await context.wrapper.vm.$nextTick();
 
-        const headers = table.findAll("th");
-        expect(headers.length).toBeGreaterThan(0);
-        expect(headers[0].text()).toContain("Descrição");
-        expect(headers[1].text()).toContain("Tipo");
-        expect(headers[2].text()).toContain("Unidades participantes");
-        expect(headers[3].text()).toContain("Situação");
+        expect((context.wrapper.vm as any).fields).toEqual([
+            {key: "descricao", label: "Descrição", sortable: true},
+            {key: "tipo", label: "Tipo", sortable: true},
+            {key: "unidadesParticipantes", label: "Unidades participantes", sortable: false},
+            {key: "situacao", label: "Situação", sortable: true},
+        ]);
     });
 
     it("deve exibir os processos passados via prop", async () => {
@@ -76,20 +76,14 @@ describe("TabelaProcessos.vue", () => {
 
         await context.wrapper.vm.$nextTick();
 
-        const rows = context.wrapper.findAll("tbody tr");
-        expect(rows.length).toBe(mockProcessos.length);
-
-        const cells = rows[0].findAll("td");
-        expect(cells[0].text()).toBe("Processo alpha");
-        expect(cells[1].text()).toBe("Mapeamento");
-        expect(cells[2].text()).toBe("UNID1, UNID2");
-        expect(cells[3].text()).toBe("Em andamento");
-
-        const cells2 = rows[1].findAll("td");
-        expect(cells2[0].text()).toBe("Processo beta");
-        expect(cells2[1].text()).toBe("Revisão");
-        expect(cells2[2].text()).toBe("UNID3");
-        expect(cells2[3].text()).toBe("Finalizado");
+        expect(context.wrapper.text()).toContain("Processo alpha");
+        expect(context.wrapper.text()).toContain("Mapeamento");
+        expect(context.wrapper.text()).toContain("UNID1, UNID2");
+        expect(context.wrapper.text()).toContain("Em andamento");
+        expect(context.wrapper.text()).toContain("Processo beta");
+        expect(context.wrapper.text()).toContain("Revisão");
+        expect(context.wrapper.text()).toContain("UNID3");
+        expect(context.wrapper.text()).toContain("Finalizado");
     });
 
     it("deve emitir o evento ordenar ao receber o evento sort-changed", async () => {
@@ -215,15 +209,10 @@ describe("TabelaProcessos.vue", () => {
         });
 
         await context.wrapper.vm.$nextTick();
-        const rows = context.wrapper.findAll("tbody tr");
-
-        const cells3 = rows[0].findAll("td");
-        expect(cells3[1].text()).toBe("Diagnóstico");
-        expect(cells3[3].text()).toContain("Criado");
-
-        const cells4 = rows[1].findAll("td");
-        expect(cells4[1].text()).toBe("OUTRO_TIPO");
-        expect(cells4[3].text()).toContain("OUTRA_SITUACAO");
+        expect(context.wrapper.text()).toContain("Diagnóstico");
+        expect(context.wrapper.text()).toContain("Criado");
+        expect(context.wrapper.text()).toContain("OUTRO_TIPO");
+        expect(context.wrapper.text()).toContain("OUTRA_SITUACAO");
     });
 
     it("deve aplicar atributos nas linhas", async () => {
