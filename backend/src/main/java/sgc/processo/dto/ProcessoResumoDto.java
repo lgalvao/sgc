@@ -17,6 +17,7 @@ public record ProcessoResumoDto(
         String tipo,
         LocalDateTime dataLimite,
         LocalDateTime dataCriacao,
+        @Nullable LocalDateTime dataFinalizacao,
         @Nullable Long unidadeCodigo,
         @Nullable String unidadeNome,
         String unidadesParticipantes,
@@ -30,6 +31,7 @@ public record ProcessoResumoDto(
                 .tipo(processo.getTipo().name())
                 .dataLimite(processo.getDataLimite())
                 .dataCriacao(processo.getDataCriacao())
+                .dataFinalizacao(processo.getDataFinalizacao())
                 .unidadesParticipantes(processo.getSiglasParticipantes())
                 .build();
     }

@@ -81,7 +81,7 @@ Ator: GESTOR e ADMIN
 
    9.1. Usuário clica em `Registrar aceite`.
 
-   9.2. O sistema abre um modal (título "Aceitar mapa") com o texto "Confirma o aceite da validação do mapa de competências?", um campo de observação opcional e os botões `Confirmar` ou `Aceitar`.
+   9.2. O sistema abre um modal (título "Aceitar mapa") com o texto "Confirma o aceite da validação do mapa?", um campo de observação opcional e os botões `Confirmar` ou `Aceitar`.
 
    9.3. Caso o usuário escolha o `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela `Visualização de mapa`.
 
@@ -127,7 +127,7 @@ Ator: GESTOR e ADMIN
 
     10.1. Usuário escolhe `Homologar`.
 
-    10.2. O sistema abre um diálogo de confirmação (título 'Homologar mapa') com a pergunta 'Confirma a homologação do mapa de competências?' e os botões `Confirmar` ou `Homologar`.
+    10.2. O sistema abre um diálogo de confirmação (título 'Homologar mapa') com a pergunta 'Confirma a homologação do mapa?' e os botões `Confirmar` ou `Homologar`.
 
     10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na mesma tela.
 

@@ -89,6 +89,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(result -> {
                     String content = result.getResponse().getContentAsString();
+                    assertThat(content).contains("\"dataFinalizacao\"");
                     assertThat(content).contains("Processo finalizado 1");
                     assertThat(content).contains("Processo finalizado 2");
                     assertThat(content).contains("Processo finalizado 3");

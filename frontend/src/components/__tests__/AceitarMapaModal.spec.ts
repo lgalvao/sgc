@@ -50,7 +50,7 @@ describe("AceitarMapaModal.vue", () => {
         expect(corpoModal.exists()).toBe(true);
         expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-titulo")).toBe("Aceitar mapa");
         expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-ok-title")).toBe("Aceitar");
-        expect(corpoModal.text()).toContain("Confirma o aceite da validação do mapa de competências?");
+        expect(corpoModal.text()).toContain("Confirma o aceite da validação do mapa?");
     });
 
     it("deve renderizar o modal em modo homologação", () => {
@@ -60,7 +60,7 @@ describe("AceitarMapaModal.vue", () => {
         expect(corpoModal.exists()).toBe(true);
         expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-titulo")).toBe("Homologar mapa");
         expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-ok-title")).toBe("Homologar");
-        expect(corpoModal.text()).toContain("Confirma a homologação do mapa de competências?");
+        expect(corpoModal.text()).toContain("Confirma a homologação do mapa?");
     });
 
     it("deve emitir o evento fecharModal ao clicar no botão de cancelar", async () => {

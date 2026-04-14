@@ -92,14 +92,19 @@ class ProcessoControllerTest {
     }
 
     private Processo criarProcessoResumoValido(String descricao, SituacaoProcesso situacao) {
-        return Processo.builder()
+        var builder = Processo.builder()
                 .codigo(1L)
                 .descricao(descricao)
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(situacao)
                 .dataCriacao(LocalDateTime.now())
-                .dataLimite(LocalDateTime.now().plusDays(30))
-                .build();
+                .dataLimite(LocalDateTime.now().plusDays(30));
+
+        if (situacao == SituacaoProcesso.FINALIZADO) {
+            builder.dataFinalizacao(LocalDateTime.of(2025, 1, 15, 10, 0));
+        }
+
+        return builder.build();
     }
 
     private Subprocesso criarSubprocessoValido(Processo processo, Unidade unidade) {
@@ -395,7 +400,8 @@ class ProcessoControllerTest {
             mockMvc.perform(get("/api/processos/finalizados"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
-                    .andExpect(jsonPath("$[0].codigo").value(1L));
+                    .andExpect(jsonPath("$[0].codigo").value(1L))
+                    .andExpect(jsonPath("$[0].dataFinalizacao").value("2025-01-15T10:00:00"));
         }
 
         @Test

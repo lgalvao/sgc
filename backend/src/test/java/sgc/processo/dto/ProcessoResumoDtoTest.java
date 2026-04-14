@@ -31,6 +31,7 @@ class ProcessoResumoDtoTest {
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .dataCriacao(LocalDateTime.of(2025, 1, 1, 10, 0))
+                .dataFinalizacao(LocalDateTime.of(2025, 2, 1, 15, 30))
                 .dataLimite(LocalDateTime.of(2025, 1, 30, 10, 0))
                 .build();
         processo.setCodigo(5L);
@@ -40,6 +41,7 @@ class ProcessoResumoDtoTest {
 
         assertThat(dto.codigo()).isEqualTo(5L);
         assertThat(dto.tipo()).isEqualTo("MAPEAMENTO");
+        assertThat(dto.dataFinalizacao()).isEqualTo(LocalDateTime.of(2025, 2, 1, 15, 30));
         assertThat(dto.unidadesParticipantes()).isEqualTo("UND");
     }
 }
