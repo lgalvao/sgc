@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import sgc.comum.erros.*;
 import sgc.processo.dto.*;
+import sgc.integracao.mocks.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 
@@ -164,6 +165,35 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
 
             assertThatThrownBy(() -> service.atualizar(p.getCodigo(), request))
                     .isInstanceOf(ErroValidacao.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Início de Processo")
+    class InicioTests {
+
+        @Test
+        @DisplayName("Deve iniciar mapeamento com unidade interoperacional e gerar subprocesso para ela")
+        @WithMockAdmin
+        void deveIniciarMapeamentoComUnidadeInteroperacional() {
+            LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Mapeamento com STIC")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(dataLimite)
+                    .unidades(List.of(2L, 9L))
+                    .build());
+
+            service.iniciar(processo.getCodigo(), List.of(2L, 9L));
+
+            Processo processoIniciado = processoRepo.buscarPorCodigoComParticipantes(processo.getCodigo()).orElseThrow();
+            assertThat(processoIniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+            assertThat(processoIniciado.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).toList())
+                    .containsExactlyInAnyOrder(2L, 9L);
+
+            assertThat(subprocessoRepo.listarPorProcessoComUnidade(processo.getCodigo()).stream()
+                    .map(subprocesso -> subprocesso.getUnidade().getCodigo())
+                    .toList()).containsExactlyInAnyOrder(2L, 9L);
         }
     }
 

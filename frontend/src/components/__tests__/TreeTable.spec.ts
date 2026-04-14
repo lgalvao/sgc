@@ -431,7 +431,7 @@ describe("TreeTable.vue", () => {
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
 
-        expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([2, 3, 4, 1]);
+        expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([3, 2, 4, 1]);
     });
 
     it("deve ordenar em blocos: secretarias, zonas eleitorais e demais em ordem alfabetica", () => {
@@ -452,12 +452,13 @@ describe("TreeTable.vue", () => {
         });
 
         expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([
-            2,
             5,
+            2,
             "raiz-zonas-eleitorais",
             6,
             4,
             1,
         ]);
+        expect((wrapper.vm as any).internalData[2].children.map((item: any) => item.codigo)).toEqual([7, 3]);
     });
 });

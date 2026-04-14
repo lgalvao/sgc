@@ -135,6 +135,48 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         usuarioRepo.saveAndFlush(UsuarioFixture.usuarioComTitulo(tituloUsuario));
     }
 
+    private Unidade criarUnidadeComMapaVigente(
+            String sigla,
+            String nome,
+            TipoUnidade tipo,
+            String tituloUsuario,
+            String matriculaUsuario
+    ) {
+        Unidade unidadeComMapa = UnidadeFixture.unidadePadrao();
+        unidadeComMapa.setCodigo(null);
+        unidadeComMapa.setSigla(sigla);
+        unidadeComMapa.setNome(nome);
+        unidadeComMapa.setTipo(tipo);
+        unidadeComMapa = unidadeRepo.save(unidadeComMapa);
+        registrarUsuarioSeNecessario(tituloUsuario);
+        registrarResponsabilidade(unidadeComMapa.getCodigo(), tituloUsuario, matriculaUsuario);
+
+        Processo processoVigente = ProcessoFixture.processoPadrao();
+        processoVigente.setCodigo(null);
+        processoVigente.setTipo(TipoProcesso.MAPEAMENTO);
+        processoVigente.setSituacao(SituacaoProcesso.FINALIZADO);
+        processoVigente.setDataFinalizacao(LocalDateTime.now().minusDays(1));
+        processoVigente = processoRepo.save(processoVigente);
+
+        Subprocesso subprocessoVigente = SubprocessoFixture.subprocessoPadrao(processoVigente, unidadeComMapa);
+        subprocessoVigente.setCodigo(null);
+        subprocessoVigente.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        subprocessoVigente.setDataFimEtapa1(LocalDateTime.now().minusDays(2));
+        subprocessoVigente.setDataFimEtapa2(LocalDateTime.now().minusDays(1));
+        subprocessoVigente = subprocessoRepo.save(subprocessoVigente);
+
+        Mapa mapaVigente = Mapa.builder().subprocesso(subprocessoVigente).build();
+        mapaVigente = mapaRepo.save(mapaVigente);
+        subprocessoVigente.setMapa(mapaVigente);
+        subprocessoRepo.save(subprocessoVigente);
+
+        unidadeMapaRepo.save(UnidadeMapa.builder()
+                .unidadeCodigo(unidadeComMapa.getCodigo())
+                .mapaVigente(mapaVigente)
+                .build());
+        return unidadeComMapa;
+    }
+
     private CriarProcessoRequest criarCriarProcessoReq(String descricao, List<Long> unidades,
                                                        LocalDateTime dataLimiteEtapa1) {
         return new CriarProcessoRequest(descricao, TipoProcesso.REVISAO, dataLimiteEtapa1, unidades);
@@ -209,6 +251,54 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigo(subprocessoCriado.getCodigo());
         assertThat(movs).hasSize(1);
         assertThat(movs.getFirst().getDescricao()).isEqualTo("Processo iniciado");
+    }
+
+    @Test
+    void testIniciarProcessoRevisao_deveCriarSubprocessoParaInteroperacionalSelecionada() throws Exception {
+        Unidade unidadeInteroperacional = criarUnidadeComMapaVigente(
+                "STIC",
+                "Secretaria de Tecnologia",
+                TipoUnidade.INTEROPERACIONAL,
+                "777777777777",
+                "77777777"
+        );
+
+        jdbcTemplate.update(SQL_ATUALIZAR_UNIDADE_SUPERIOR, unidadeInteroperacional.getCodigo(), unidade.getCodigo());
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Long> unidadesSelecionadas = List.of(unidadeInteroperacional.getCodigo(), unidade.getCodigo());
+        CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq(
+                "Processo de Revisão com unidade interoperacional",
+                unidadesSelecionadas,
+                LocalDateTime.now().plusDays(30)
+        );
+
+        MvcResult result = mockMvc.perform(post("/api/processos")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        Long codProcesso = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo")
+                .asLong();
+        var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidadesSelecionadas);
+
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, codProcesso)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iniciarReq)))
+                .andExpect(status().isOk());
+
+        Processo processo = processoRepo.buscarPorCodigoComParticipantes(codProcesso).orElseThrow();
+        assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).toList())
+                .containsExactlyInAnyOrder(unidadeInteroperacional.getCodigo(), unidade.getCodigo());
+
+        List<Subprocesso> subprocessos = subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
+        assertThat(subprocessos).hasSize(2);
+        assertThat(subprocessos.stream().map(subprocesso -> subprocesso.getUnidade().getCodigo()).toList())
+                .containsExactlyInAnyOrder(unidadeInteroperacional.getCodigo(), unidade.getCodigo());
     }
 
     @Test

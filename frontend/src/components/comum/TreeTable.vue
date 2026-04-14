@@ -92,6 +92,7 @@ import {BButton} from "bootstrap-vue-next";
 import {computed, nextTick, ref, toRaw, watch} from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import {organizarArvoreUnidades, TITULO_GRUPO_ZONAS_ELEITORAIS} from "@/utils/treeUtils";
 
 export interface TreeItem {
   codigo: number | string;
@@ -135,30 +136,6 @@ const emit = defineEmits<{
 }>();
 
 const internalData = ref<TreeItem[]>([]);
-const TIPO_ZONA_ELEITORAL = "ZONA ELEITORAL";
-const TITULO_GRUPO_ZONAS_ELEITORAIS = "ZONAS ELEITORAIS";
-
-const ehTextoZonaEleitoral = (valor: unknown) =>
-    typeof valor === "string"
-    && valor.trim().toUpperCase().includes(TIPO_ZONA_ELEITORAL);
-
-const ehSiglaZonaEleitoral = (valor: unknown) =>
-    typeof valor === "string"
-    && /Z\.?\s*E\.?/i.test(valor.trim());
-
-const ehZonaEleitoral = (item: TreeItem) =>
-    ehTextoZonaEleitoral(item.tipo)
-    || ehSiglaZonaEleitoral(item.sigla)
-    || ehTextoZonaEleitoral(item.unidade)
-    || ehTextoZonaEleitoral(item.nome);
-
-const ehTextoSecretaria = (valor: unknown) =>
-    typeof valor === "string"
-    && valor.trim().toUpperCase().includes("SECRETARIA");
-
-const ehSecretaria = (item: TreeItem) =>
-    ehTextoSecretaria(item.unidade)
-    || ehTextoSecretaria(item.nome);
 
 const criarGrupoZonasEleitorais = (
     children: TreeItem[],
@@ -170,70 +147,6 @@ const criarGrupoZonasEleitorais = (
   expanded: true,
   clickable: false,
 });
-
-const agruparZonasEleitorais = (
-    items: TreeItem[],
-    identificadorGrupo = "raiz",
-): TreeItem[] => {
-  const agrupados: TreeItem[] = [];
-  const zonasEleitorais: TreeItem[] = [];
-
-  for (const item of items) {
-    const children = item.children
-        ? agruparZonasEleitorais(item.children, `unidade-${item.codigo}`)
-        : [];
-    const itemNormalizado: TreeItem = {
-      ...item,
-      children,
-    };
-
-    if (ehZonaEleitoral(itemNormalizado)) {
-      if (zonasEleitorais.length === 0) {
-        agrupados.push(criarGrupoZonasEleitorais(zonasEleitorais, identificadorGrupo));
-      }
-      zonasEleitorais.push(itemNormalizado);
-      continue;
-    }
-
-    agrupados.push(itemNormalizado);
-  }
-
-  return agrupados;
-};
-
-const priorizarSecretarias = (items: TreeItem[]): TreeItem[] => {
-  const secretarias: TreeItem[] = [];
-  const grupoZonasEleitorais: TreeItem[] = [];
-  const demais: TreeItem[] = [];
-
-  for (const item of items) {
-    const children = item.children ? priorizarSecretarias(item.children) : [];
-    const itemNormalizado: TreeItem = {
-      ...item,
-      children,
-    };
-
-    if (ehSecretaria(itemNormalizado)) {
-      secretarias.push(itemNormalizado);
-      continue;
-    }
-
-    if (itemNormalizado.unidade === TITULO_GRUPO_ZONAS_ELEITORAIS) {
-      grupoZonasEleitorais.push(itemNormalizado);
-      continue;
-    }
-
-    demais.push(itemNormalizado);
-  }
-
-  demais.sort((a, b) => {
-    const textoA = typeof a.unidade === "string" ? (a.unidade as string) : "";
-    const textoB = typeof b.unidade === "string" ? (b.unidade as string) : "";
-    return textoA.localeCompare(textoB, "pt-BR", {sensitivity: "base"});
-  });
-
-  return [...secretarias, ...grupoZonasEleitorais, ...demais];
-};
 
 const obterLarguraPadraoColuna = (index: number) => {
   if (props.columns.length <= 1) {
@@ -262,9 +175,24 @@ watch(
     () => props.data,
     (newData) => {
       internalData.value = initializeExpanded(
-          priorizarSecretarias(
-              agruparZonasEleitorais(structuredClone(toRaw(newData))),
-          ),
+          organizarArvoreUnidades(structuredClone(toRaw(newData)), "raiz", {
+            obterCodigo: (item) => item.codigo,
+            obterRotulo: (item) => typeof item.unidade === "string"
+                ? item.unidade as string
+                : typeof item.nome === "string"
+                    ? item.nome as string
+                    : undefined,
+            obterSigla: (item) => typeof item.sigla === "string" ? item.sigla as string : undefined,
+            obterTipo: (item) => typeof item.tipo === "string" ? item.tipo as string : undefined,
+            obterFilhos: (item) => item.children as TreeItem[] | undefined,
+            clonarComFilhos: (item, children) => ({
+              ...item,
+              children,
+            }),
+            criarGrupoZonas: (identificadorGrupo, children) =>
+                criarGrupoZonasEleitorais(children, String(identificadorGrupo)),
+            criarIdentificadorGrupoFilhos: (item) => `unidade-${String(item.codigo)}`,
+          }),
       );
     },
     {immediate: true, deep: true},

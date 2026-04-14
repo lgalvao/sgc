@@ -253,6 +253,7 @@ class ProcessoServiceTest {
             when(repo.buscar(Processo.class, id)).thenReturn(processo);
             when(unidadeHierarquiaService.buscarMapaFilhoPai()).thenReturn(Map.of(20L, 10L));
             when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(10L));
+            when(unidadeService.buscarPorCodigos(List.of(10L, 20L))).thenReturn(List.of(unidadePai, unidadeFilha));
             when(unidadeService.buscarPorCodigos(List.of(20L))).thenReturn(List.of(unidadeFilha));
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(20L));
             when(unidadeService.buscarMapasPorUnidades(List.of(20L))).thenReturn(List.of(
@@ -269,6 +270,52 @@ class ProcessoServiceTest {
             verify(subprocessoService).criarParaRevisao(argThat(command ->
                     command.processo() == processo
                             && command.unidade().getCodigo().equals(20L)
+            ));
+        }
+
+        @Test
+        @DisplayName("Deve iniciar revisao mantendo unidade interoperacional selecionada junto com a descendente")
+        void deveIniciarRevisaoMantendoInteroperacionalSelecionada() {
+            Long id = 102L;
+            Processo processo = new Processo();
+            processo.setCodigo(id);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.REVISAO);
+
+            Unidade unidadePai = criarUnidadeValida(10L);
+            unidadePai.setTipo(TipoUnidade.INTEROPERACIONAL);
+            unidadePai.setSigla("STIC");
+
+            Unidade unidadeFilha = criarUnidadeValida(20L);
+            unidadeFilha.setSigla("SEDIA");
+            processo.adicionarParticipantes(Set.of(unidadePai, unidadeFilha));
+
+            UnidadeMapa mapaPai = UnidadeMapa.builder().unidadeCodigo(10L).build();
+            UnidadeMapa mapaFilha = UnidadeMapa.builder().unidadeCodigo(20L).build();
+
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(unidadeHierarquiaService.buscarMapaFilhoPai()).thenReturn(Map.of(20L, 10L));
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(10L));
+            when(unidadeService.buscarPorCodigos(List.of(10L, 20L))).thenReturn(List.of(unidadePai, unidadeFilha));
+            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidadePai));
+            when(unidadeService.buscarMapasPorUnidades(List.of(10L, 20L))).thenReturn(List.of(mapaPai, mapaFilha));
+            Unidade admin = criarUnidadeValida(999L);
+            when(unidadeService.buscarAdmin()).thenReturn(admin);
+            mockarResponsaveisEfetivos();
+
+            processoService.iniciar(id, List.of(10L, 20L));
+
+            verify(subprocessoService, times(2)).criarParaRevisao(any());
+            verify(subprocessoService).criarParaRevisao(argThat(command ->
+                    command.processo() == processo
+                            && command.unidade().getCodigo().equals(10L)
+                            && command.unidadeMapa() == mapaPai
+            ));
+            verify(subprocessoService).criarParaRevisao(argThat(command ->
+                    command.processo() == processo
+                            && command.unidade().getCodigo().equals(20L)
+                            && command.unidadeMapa() == mapaFilha
             ));
         }
 

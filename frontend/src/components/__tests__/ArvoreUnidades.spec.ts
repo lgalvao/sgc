@@ -101,6 +101,69 @@ describe("ArvoreUnidades.vue", () => {
         ]);
     });
 
+    it("deve ordenar em blocos: secretarias, zonas eleitorais e demais por ordem alfabetica", () => {
+        const unidades: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 1_1, sigla: "GP", nome: "GABINETE DA PRESIDENCIA", filhas: [], tipo: "ADMINISTRATIVA"},
+                    {codigo: 1_2, sigla: "SJ", nome: "SECRETARIA JUDICIARIA", filhas: [], tipo: "ADMINISTRATIVA"},
+                    {codigo: 1_3, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
+                    {codigo: 1_4, sigla: "CAE01", nome: "CENTRAL DE ATENDIMENTO AO ELEITOR DA CAPITAL", filhas: [], tipo: "OPERACIONAL"},
+                    {codigo: 1_5, sigla: "SGP", nome: "SECRETARIA DE GESTAO DE PESSOAS", filhas: [], tipo: "ADMINISTRATIVA"},
+                    {codigo: 1_6, sigla: "AAA", nome: "ASSESSORIA DE APOIO", filhas: [], tipo: "OPERACIONAL"},
+                    {codigo: 1_7, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
+                ],
+            }
+        ];
+        const wrapper = createWrapper({unidades, ocultarRaiz: true});
+
+        expect((wrapper.vm as any).unidadesExibidas.map((item: Unidade) => item.codigo)).toEqual([
+            1_5,
+            1_2,
+            -1999,
+            1_6,
+            1_4,
+            1_1,
+        ]);
+    });
+
+    it("deve aplicar a ordenacao especial tambem nas filhas", () => {
+        const unidades: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {
+                        codigo: 10,
+                        sigla: "SGP",
+                        nome: "SECRETARIA DE GESTAO DE PESSOAS",
+                        tipo: "INTEROPERACIONAL",
+                        filhas: [
+                            {codigo: 101, sigla: "GP", nome: "GABINETE", filhas: [], tipo: "ADMINISTRATIVA"},
+                            {codigo: 102, sigla: "SA", nome: "SECRETARIA ADMINISTRATIVA", filhas: [], tipo: "ADMINISTRATIVA"},
+                            {codigo: 103, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
+                            {codigo: 104, sigla: "AAA", nome: "ASSESSORIA DE APOIO", filhas: [], tipo: "OPERACIONAL"},
+                            {codigo: 105, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
+                        ],
+                    },
+                ],
+            }
+        ];
+        const wrapper = createWrapper({unidades, ocultarRaiz: true});
+        const secretaria = (wrapper.vm as any).unidadesExibidas[0];
+
+        expect(secretaria.filhas.map((item: Unidade) => item.codigo)).toEqual([
+            102,
+            -10999,
+            104,
+            101,
+        ]);
+    });
+
     it("deve marcar o grupo de zonas eleitorais como indeterminado quando apenas parte das zonas estiver selecionada", () => {
         const unidades: Unidade[] = [
             {
@@ -298,6 +361,38 @@ describe("ArvoreUnidades.vue", () => {
 
         expect(lastEmission).not.toContain(201);
         expect(lastEmission).toContain(200);
+    });
+
+    it("deve emitir a unidade INTEROPERACIONAL ao selecionar a secretaria com subordinadas", async () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 700,
+                sigla: "STIC",
+                nome: "Secretaria de Tecnologia",
+                isElegivel: true,
+                tipo: "INTEROPERACIONAL",
+                filhas: [
+                    {codigo: 701, sigla: "COSIS", nome: "Coordenadoria de Sistemas", isElegivel: false, filhas: [
+                        {codigo: 702, sigla: "SEDIA", nome: "Secao de Dados", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
+                    ], tipo: "INTERMEDIARIA"},
+                    {codigo: 703, sigla: "COSINF", nome: "Coordenadoria de Infra", isElegivel: false, filhas: [
+                        {codigo: 704, sigla: "SENIC", nome: "Secao de Infra", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
+                    ], tipo: "INTERMEDIARIA"}
+                ]
+            }
+        ];
+
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [], modoSelecao: true});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+
+        await root.props("onToggle")(unidadesTeste[0], true);
+
+        const emitted = wrapper.emitted("update:modelValue");
+        const lastEmission = emitted![emitted!.length - 1][0] as number[];
+
+        expect(lastEmission).toContain(700);
+        expect(lastEmission).toContain(702);
+        expect(lastEmission).toContain(704);
     });
 
     it("deve atualizar ancestrais: não selecionar pai se não for elegível, mesmo se todos filhos selecionados", async () => {

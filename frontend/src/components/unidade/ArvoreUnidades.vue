@@ -37,6 +37,7 @@
 import {computed, ref, watch} from "vue";
 import {BButton} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
+import {organizarArvoreUnidades, TITULO_GRUPO_ZONAS_ELEITORAIS} from "@/utils/treeUtils";
 import UnidadeTreeNode from "./UnidadeTreeNode.vue";
 
 type UnidadeExibida = Unidade & {
@@ -60,25 +61,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
-const TITULO_GRUPO_ZONAS_ELEITORAIS = "ZONAS ELEITORAIS";
-const TIPO_ZONA_ELEITORAL = "ZONA ELEITORAL";
 
 function criarCodigoGrupoZonasEleitorais(codigoPai: number): number {
   return -((Math.abs(codigoPai) * 1000) + 999);
-}
-
-function ehTextoZonaEleitoral(valor: unknown): boolean {
-  return typeof valor === "string" && valor.trim().toUpperCase().includes(TIPO_ZONA_ELEITORAL);
-}
-
-function ehSiglaZonaEleitoral(valor: unknown): boolean {
-  return typeof valor === "string" && /Z\.?\s*E\.?/i.test(valor.trim());
-}
-
-function ehZonaEleitoral(unidade: Unidade): boolean {
-  return ehTextoZonaEleitoral(unidade.tipo)
-      || ehSiglaZonaEleitoral(unidade.sigla)
-      || ehTextoZonaEleitoral(unidade.nome);
 }
 
 function criarGrupoZonasEleitorais(codigoPai: number, filhas: UnidadeExibida[]): UnidadeExibida {
@@ -93,29 +78,21 @@ function criarGrupoZonasEleitorais(codigoPai: number, filhas: UnidadeExibida[]):
   };
 }
 
-function agruparZonasEleitorais(unidades: Unidade[], codigoPai: number): UnidadeExibida[] {
-  const lista: UnidadeExibida[] = [];
-  const zonasEleitorais: UnidadeExibida[] = [];
-
-  for (const unidade of unidades) {
-    const unidadeAgrupada: UnidadeExibida = {
+function organizarUnidadesParaExibicao(unidades: Unidade[], codigoPai: number): UnidadeExibida[] {
+  return organizarArvoreUnidades(unidades as UnidadeExibida[], codigoPai, {
+    obterCodigo: (unidade) => unidade.codigo,
+    obterRotulo: (unidade) => unidade.nome,
+    obterSigla: (unidade) => unidade.sigla,
+    obterTipo: (unidade) => unidade.tipo,
+    obterFilhos: (unidade) => unidade.filhas as UnidadeExibida[] | undefined,
+    clonarComFilhos: (unidade, filhas) => ({
       ...unidade,
-      filhas: agruparZonasEleitorais(unidade.filhas ?? [], unidade.codigo),
-    };
-
-    if (ehZonaEleitoral(unidadeAgrupada)) {
-      zonasEleitorais.push(unidadeAgrupada);
-      continue;
-    }
-
-    lista.push(unidadeAgrupada);
-  }
-
-  if (zonasEleitorais.length > 0) {
-    lista.push(criarGrupoZonasEleitorais(codigoPai, zonasEleitorais));
-  }
-
-  return lista;
+      filhas,
+    }),
+    criarGrupoZonas: (identificadorGrupo, filhas) =>
+        criarGrupoZonasEleitorais(Number(identificadorGrupo), filhas),
+    criarIdentificadorGrupoFilhos: (unidade) => unidade.codigo,
+  });
 }
 
 function coletarCodigosAgrupadoresVisuais(unidades: UnidadeExibida[]): number[] {
@@ -170,10 +147,10 @@ const unidadesExibidas = computed((): UnidadeExibida[] => {
   for (const u of filtradas) {
     if (props.ocultarRaiz) {
       if (u.filhas) {
-        lista.push(...agruparZonasEleitorais(u.filhas, u.codigo));
+        lista.push(...organizarUnidadesParaExibicao(u.filhas, u.codigo));
       }
     } else {
-      lista.push(...agruparZonasEleitorais([u], u.codigo));
+      lista.push(...organizarUnidadesParaExibicao([u], u.codigo));
     }
   }
   return lista;

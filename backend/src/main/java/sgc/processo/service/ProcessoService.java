@@ -1041,13 +1041,22 @@ public class ProcessoService {
         if (codsUnidadesParam.isEmpty()) {
             throw new ErroValidacao(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
         }
+        Set<Long> codigosInteroperacionaisSelecionados = unidadeService.buscarPorCodigos(codsUnidadesParam).stream()
+                .filter(unidade -> unidade.getTipo() == TipoUnidade.INTEROPERACIONAL)
+                .map(Unidade::getCodigo)
+                .collect(Collectors.toSet());
         // Em revisão, se vierem pai e filho juntos, mantemos apenas os mais específicos (folhas selecionadas).
-        // Isso evita criar subprocessos redundantes em unidades ancestrais que não deveriam participar da execução.
+        // Unidades INTEROPERACIONAIS são exceção: mesmo com descendentes selecionadas, elas também participam
+        // da execução e precisam receber subprocesso próprio.
         Map<Long, Long> mapaFilhoPai = unidadeHierarquiaService.buscarMapaFilhoPai();
-        return removerAncestraisRedundantesRevisao(codsUnidadesParam, mapaFilhoPai);
+        return removerAncestraisRedundantesRevisao(codsUnidadesParam, mapaFilhoPai, codigosInteroperacionaisSelecionados);
     }
 
-    private List<Long> removerAncestraisRedundantesRevisao(List<Long> codigosSelecionados, Map<Long, Long> mapaFilhoPai) {
+    private List<Long> removerAncestraisRedundantesRevisao(
+            List<Long> codigosSelecionados,
+            Map<Long, Long> mapaFilhoPai,
+            Set<Long> codigosInteroperacionaisSelecionados
+    ) {
         LinkedHashSet<Long> codigosUnicos = new LinkedHashSet<>(codigosSelecionados);
         Set<Long> codigosParaRemover = new HashSet<>();
 
@@ -1055,7 +1064,8 @@ public class ProcessoService {
             // Navega pelo mapa filho->pai já carregado para evitar múltiplas leituras de hierarquia.
             Long codigoSuperior = mapaFilhoPai.get(codigoSelecionado);
             while (codigoSuperior != null) {
-                if (codigosUnicos.contains(codigoSuperior)) {
+                if (codigosUnicos.contains(codigoSuperior)
+                        && !codigosInteroperacionaisSelecionados.contains(codigoSuperior)) {
                     codigosParaRemover.add(codigoSuperior);
                 }
                 codigoSuperior = mapaFilhoPai.get(codigoSuperior);
