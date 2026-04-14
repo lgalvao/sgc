@@ -30,10 +30,11 @@
           @update:model-value="(val) => onToggle(unidade, val as boolean)"
         >
           <span
-             v-b-tooltip.hover="!isHabilitado(unidade) ? 'Esta unidade não está disponível para seleção' : ''"
-             :class="{ 'text-muted': !isHabilitado(unidade) }"
-             :style="!isHabilitado(unidade) ? { cursor: 'help' } : {}"
-             class="unidade-label"
+             v-b-tooltip.hover="textoTooltip"
+             :title="textoTooltip"
+              :class="{ 'text-muted': !isHabilitado(unidade) }"
+              :style="textoTooltip ? { cursor: 'help' } : {}"
+              class="unidade-label"
         >
           {{ textoPrincipalUnidade }}
         </span>
@@ -46,7 +47,12 @@
           :to="`/unidade/${unidade.codigo}`"
           class="unidade-link"
       >
-        <span class="sigla">{{ unidade.sigla }}</span>
+        <span
+            v-b-tooltip.hover="textoTooltip"
+            :title="textoTooltip"
+            :style="textoTooltip ? { cursor: 'help' } : {}"
+            class="sigla"
+        >{{ unidade.sigla }}</span>
         <span class="nome ms-2 text-muted small">- {{ unidade.nome }}</span>
       </router-link>
       <span
@@ -109,6 +115,7 @@ const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggle
 const ehAgrupadorVisual = props.unidade.agrupadorVisual === true;
 const identificadorUnidade = props.unidade.sigla || String(props.unidade.codigo);
 const textoPrincipalUnidade = ehAgrupadorVisual ? props.unidade.nome : props.unidade.sigla;
+const textoTooltip = ehAgrupadorVisual ? "" : (props.unidade.nome ?? "");
 </script>
 
 <style scoped>

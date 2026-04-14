@@ -164,6 +164,31 @@ describe("ArvoreUnidades.vue", () => {
         ]);
     });
 
+    it("deve ordenar por sigla dentro dos blocos, e nao pelo nome", () => {
+        const unidades: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 10, sigla: "ZZZ", nome: "SECRETARIA ALFA", filhas: [], tipo: "ADMINISTRATIVA"},
+                    {codigo: 11, sigla: "AAA", nome: "SECRETARIA ZULU", filhas: [], tipo: "ADMINISTRATIVA"},
+                    {codigo: 12, sigla: "ZZ", nome: "ASSESSORIA ALFA", filhas: [], tipo: "OPERACIONAL"},
+                    {codigo: 13, sigla: "AA", nome: "GABINETE ZULU", filhas: [], tipo: "OPERACIONAL"},
+                ],
+            }
+        ];
+
+        const wrapper = createWrapper({unidades, ocultarRaiz: true});
+
+        expect((wrapper.vm as any).unidadesExibidas.map((item: Unidade) => item.codigo)).toEqual([
+            11,
+            10,
+            13,
+            12,
+        ]);
+    });
+
     it("deve marcar o grupo de zonas eleitorais como indeterminado quando apenas parte das zonas estiver selecionada", () => {
         const unidades: Unidade[] = [
             {
@@ -205,10 +230,10 @@ describe("ArvoreUnidades.vue", () => {
         expect(emitted![emitted!.length - 1][0]).toEqual([101, 102]);
     });
 
-    it("deve expandir unidades iniciais", () => {
+    it("deve iniciar com as unidades recolhidas", () => {
         const wrapper = createWrapper();
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
-        expect(root.props("isExpanded")(mockUnidades[0])).toBe(true);
+        expect(root.props("isExpanded")(mockUnidades[0])).toBe(false);
     });
 
     it("deve alternar expansão", async () => {
@@ -216,10 +241,10 @@ describe("ArvoreUnidades.vue", () => {
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         await root.props("onToggleExpand")(mockUnidades[0]);
-        expect(root.props("isExpanded")(mockUnidades[0])).toBe(false);
+        expect(root.props("isExpanded")(mockUnidades[0])).toBe(true);
 
         await root.props("onToggleExpand")(mockUnidades[0]);
-        expect(root.props("isExpanded")(mockUnidades[0])).toBe(true);
+        expect(root.props("isExpanded")(mockUnidades[0])).toBe(false);
     });
 
     it("deve calcular estado de seleção (checked)", async () => {
@@ -480,7 +505,7 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper();
         const novasUnidades = [{codigo: 999, sigla: 'N', nome: 'N'}];
         await wrapper.setProps({unidades: novasUnidades});
-        expect((wrapper.vm as any).isExpanded(novasUnidades[0])).toBe(true);
+        expect((wrapper.vm as any).isExpanded(novasUnidades[0])).toBe(false);
     });
 
     it("deve calcular estado de seleção para INTEROPERACIONAL", () => {

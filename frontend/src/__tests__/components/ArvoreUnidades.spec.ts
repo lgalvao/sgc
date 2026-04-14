@@ -105,7 +105,7 @@ describe('ArvoreUnidades.vue', () => {
         expect(children.length).toBe(1);
     });
 
-    it('deve inicializar expandedUnits com base nas props.unidades', () => {
+    it('deve inicializar expandedUnits recolhido', () => {
         const wrapper = mount(ArvoreUnidades, {
             props: {
                 unidades: mockUnidades,
@@ -121,7 +121,7 @@ describe('ArvoreUnidades.vue', () => {
         });
 
         const rootNode = wrapper.findComponent(UnidadeTreeNodeStub);
-        expect(rootNode.props('isExpanded')(mockUnidades[0])).toBe(true);
+        expect(rootNode.props('isExpanded')(mockUnidades[0])).toBe(false);
     });
 
     it('deve alternar expansão (toggleExpand)', async () => {
@@ -142,13 +142,13 @@ describe('ArvoreUnidades.vue', () => {
         const rootNode = wrapper.findComponent(UnidadeTreeNodeStub);
         const toggleExpand = rootNode.props('onToggleExpand');
 
-        // Inicialmente expandido (pelo teste anterior), toggle deve fechar
-        await toggleExpand(mockUnidades[0]);
-        expect(rootNode.props('isExpanded')(mockUnidades[0])).toBe(false);
-
-        // Toggle novamente deve abrir
+        // Inicialmente recolhido, toggle deve abrir
         await toggleExpand(mockUnidades[0]);
         expect(rootNode.props('isExpanded')(mockUnidades[0])).toBe(true);
+
+        // Toggle novamente deve fechar
+        await toggleExpand(mockUnidades[0]);
+        expect(rootNode.props('isExpanded')(mockUnidades[0])).toBe(false);
     });
 
     it('deve verificar seleção (isChecked)', () => {

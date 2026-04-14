@@ -326,10 +326,7 @@ watch(() => props.unidades, (newUnidades) => {
   }
 
   if (newUnidades && newUnidades.length > 0) {
-    expandedUnits.value = new Set([
-      ...newUnidades.map(u => u.codigo),
-      ...coletarCodigosAgrupadoresVisuais(unidadesExibidas.value),
-    ]);
+    expandedUnits.value = new Set();
   }
 }, {immediate: true});
 

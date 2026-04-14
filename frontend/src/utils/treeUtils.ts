@@ -76,6 +76,10 @@ function compararTextoPtBr(a: string, b: string): number {
     return a.localeCompare(b, "pt-BR", {sensitivity: "base"});
 }
 
+function obterTextoOrdenacao<T extends object>(item: T, config: ConfiguracaoOrganizacaoArvore<T>): string {
+    return config.obterSigla(item) ?? config.obterRotulo(item) ?? "";
+}
+
 export function ehZonaEleitoralPorMetadados(item: {
     tipo?: string;
     sigla?: string;
@@ -129,8 +133,8 @@ export function organizarArvoreUnidades<T extends object>(
     }
 
     const ordenarAlfabeticamente = (grupo: T[]) => grupo.sort((a, b) => compararTextoPtBr(
-        config.obterRotulo(a) ?? "",
-        config.obterRotulo(b) ?? ""
+        obterTextoOrdenacao(a, config),
+        obterTextoOrdenacao(b, config)
     ));
 
     ordenarAlfabeticamente(secretarias);

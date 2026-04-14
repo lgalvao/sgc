@@ -461,4 +461,21 @@ describe("TreeTable.vue", () => {
         ]);
         expect((wrapper.vm as any).internalData[2].children.map((item: any) => item.codigo)).toEqual([7, 3]);
     });
+
+    it("deve ordenar por sigla e nao pelo nome no TreeTable", () => {
+        const wrapper = mount(TreeTable, {
+            props: {
+                data: [
+                    {codigo: 1, unidade: "ZZZ - SECRETARIA ALFA"},
+                    {codigo: 2, unidade: "AAA - SECRETARIA ZULU"},
+                    {codigo: 3, unidade: "ZZ - ASSESSORIA ALFA"},
+                    {codigo: 4, unidade: "AA - GABINETE ZULU"},
+                ],
+                columns: [{key: "unidade", label: "Unidade"}],
+            },
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([2, 1, 4, 3]);
+    });
 });

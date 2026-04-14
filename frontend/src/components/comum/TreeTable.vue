@@ -113,6 +113,25 @@ interface Column {
   width?: string;
 }
 
+function extrairSiglaDeTexto(item: TreeItem): string | undefined {
+  if (typeof item.sigla === "string") {
+    return item.sigla;
+  }
+
+  const texto = typeof item.unidade === "string"
+      ? item.unidade
+      : typeof item.nome === "string"
+          ? item.nome
+          : undefined;
+
+  if (!texto) {
+    return undefined;
+  }
+
+  const [sigla] = texto.split(" - ");
+  return sigla?.trim() || texto;
+}
+
 interface TreeTableProps {
   data: TreeItem[];
   columns: Column[];
@@ -182,7 +201,7 @@ watch(
                 : typeof item.nome === "string"
                     ? item.nome as string
                     : undefined,
-            obterSigla: (item) => typeof item.sigla === "string" ? item.sigla as string : undefined,
+            obterSigla: (item) => extrairSiglaDeTexto(item),
             obterTipo: (item) => typeof item.tipo === "string" ? item.tipo as string : undefined,
             obterFilhos: (item) => item.children as TreeItem[] | undefined,
             clonarComFilhos: (item, children) => ({

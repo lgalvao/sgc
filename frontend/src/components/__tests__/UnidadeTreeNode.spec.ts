@@ -56,6 +56,15 @@ describe("UnidadeTreeNode.vue", () => {
         expect(wrapper.text()).toContain("TESTE");
     });
 
+    it("deve expor o nome da unidade no tooltip em modo selecao", () => {
+        const wrapper = mount(UnidadeTreeNode, {
+            props: defaultProps,
+            ...mountOptions
+        });
+
+        expect(wrapper.find('.unidade-label').attributes('title')).toBe("Unidade teste");
+    });
+
     it("deve renderizar checkbox desmarcado por padrão", () => {
         const wrapper = mount(UnidadeTreeNode, {
             props: defaultProps,
@@ -206,6 +215,7 @@ describe("UnidadeTreeNode.vue", () => {
         expect(link.exists()).toBe(true);
         expect(link.props().to).toBe("/unidade/1");
         expect(wrapper.findComponent(BFormCheckboxStub).exists()).toBe(false);
+        expect(wrapper.find('.sigla').attributes('title')).toBe("Unidade teste");
     });
 
     it("deve renderizar agrupador com checkbox em modo selecao", () => {
