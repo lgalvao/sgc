@@ -16,7 +16,7 @@ function getBadgeVariant(situacao: SituacaoProcesso | string) {
   return "dark";
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   processos: ProcessoResumo[];
   criterioOrdenacao: CampoOrdenacaoProcesso;
   direcaoOrdenacaoAsc: boolean;
@@ -25,7 +25,9 @@ const props = defineProps<{
   compacto?: boolean;
   mostrarCtaVazio?: boolean;
   textoCtaVazio?: string;
-}>();
+}>(), {
+  showSituacao: true,
+});
 
 const emit = defineEmits<{
   (e: "ordenar", campo: CampoOrdenacaoProcesso): void;
