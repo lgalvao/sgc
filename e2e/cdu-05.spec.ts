@@ -282,6 +282,36 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 
+    test('Fase 2.2c: CHEFE da secretaria interoperacional acessa o subprocesso da própria secretaria na Revisão', async ({
+        _resetAutomatico,
+        page
+    }) => {
+        const descricaoRevisaoSecretaria = `Revisão secretaria interoperacional ${Date.now()}`;
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await criarProcesso(page, {
+            descricao: descricaoRevisaoSecretaria,
+            tipo: 'REVISAO',
+            diasLimite: 30,
+            unidade: 'SECRETARIA_1'
+        });
+
+        await acessarDetalhesProcesso(page, descricaoRevisaoSecretaria);
+        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await verificarPaginaPainel(page);
+
+        await loginComPerfil(
+            page,
+            USUARIOS.CHEFE_SECRETARIA_1.titulo,
+            USUARIOS.CHEFE_SECRETARIA_1.senha,
+            USUARIOS.CHEFE_SECRETARIA_1.perfil
+        );
+        await acessarSubprocessoChefeDireto(page, descricaoRevisaoSecretaria, 'SECRETARIA_1');
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
+        await expect(page.getByTestId('tbl-movimentacoes').getByText(/Processo iniciado/i).first()).toBeVisible();
+    });
+
     test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);

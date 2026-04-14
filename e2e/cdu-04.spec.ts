@@ -82,6 +82,10 @@ test.describe('CDU-04 - Iniciar processo', () => {
             situacao: 'Em andamento'
         });
 
+        const linhaSecretaria1 = page.locator('tr', {hasText: 'SECRETARIA_1'}).first();
+        await expect(linhaSecretaria1).toContainText('Não iniciado');
+        await expect(linhaSecretaria1).toContainText(dataLimiteStr.split('-').reverse().join('/'));
+
         const linhaAss11 = page.locator('tr', {hasText: 'ASSESSORIA_11'}).first();
         await expect(linhaAss11).toContainText('Não iniciado');
         await expect(linhaAss11).toContainText(dataLimiteStr.split('-').reverse().join('/'));
@@ -117,6 +121,11 @@ test.describe('CDU-04 - Iniciar processo', () => {
             .filter({hasText: 'Início do processo'})
             .filter({hasNotText: 'subordinada'})
         ).toBeVisible();
+
+        await paginaChefeSec1.getByTestId('tbl-processos').locator('tr', {hasText: descricao}).click();
+        await navegarParaSubprocesso(paginaChefeSec1, 'SECRETARIA_1');
+        await esperarPaginaSubprocesso(paginaChefeSec1, 'SECRETARIA_1');
+        await expect(paginaChefeSec1.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
         await contextoChefeSec1.close();
 
         // 7.2. Como GESTOR (Unidade intermediária) - deve ver alerta sobre subordinada (ASSESSORIA_11)
