@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import sgc.comum.config.CacheConfig;
 import sgc.organizacao.service.CacheViewsOrganizacaoService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 
