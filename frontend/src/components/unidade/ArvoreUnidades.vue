@@ -95,22 +95,6 @@ function organizarUnidadesParaExibicao(unidades: Unidade[], codigoPai: number): 
   });
 }
 
-function coletarCodigosAgrupadoresVisuais(unidades: UnidadeExibida[]): number[] {
-  const codigos: number[] = [];
-
-  for (const unidade of unidades) {
-    if (unidade.agrupadorVisual) {
-      codigos.push(unidade.codigo);
-    }
-
-    if (unidade.filhas && unidade.filhas.length > 0) {
-      codigos.push(...coletarCodigosAgrupadoresVisuais(unidade.filhas as UnidadeExibida[]));
-    }
-  }
-
-  return codigos;
-}
-
 // Mapas para acesso rápido (Pai e Unidade)
 const maps = computed(() => {
   const pMap = new Map<number, Unidade>();

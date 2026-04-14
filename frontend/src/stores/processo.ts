@@ -21,7 +21,7 @@ export const useProcessoStore = defineStore("processo", () => {
     const carregamentosEmAndamento = new Map<number, Promise<Processo>>();
 
     /** Contexto ainda é válido para o processo dado? */
-    function dadosValidos(_codProcesso: number): boolean {
+    function dadosValidos(_: number): boolean {
         return false;
     }
 

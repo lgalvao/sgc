@@ -30,7 +30,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     }
 
     /** Contexto ainda é válido para o subprocesso dado? */
-    function dadosValidos(_codSubprocesso: number): boolean {
+    function dadosValidos(_: number): boolean {
         return false;
     }
 

@@ -104,7 +104,9 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
                     ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TEXTO
                     : TEXTOS.atividades.MODAL_VALIDAR_TEXTO,
                 rotuloBotao: TEXTOS.atividades.BOTAO_ACEITAR,
-                rotuloConfirmacao: TEXTOS.comum.BOTAO_ACEITAR,
+                rotuloConfirmacao: isRevisao.value
+                    ? TEXTOS.comum.BOTAO_ACEITAR
+                    : TEXTOS.comum.BOTAO_VALIDAR,
                 mensagemSucesso: TEXTOS.sucesso.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
             };
