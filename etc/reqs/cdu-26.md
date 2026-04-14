@@ -25,7 +25,7 @@
 6. O sistema abre modal de confirmação, com os elementos a seguir:
 
     - Título "Homologação de mapa em bloco";
-    - Texto "Selecione abaixo as unidades cujos mapas deverão ser homologados:";
+    - Texto "Selecione as unidades cujos mapas deverão ser homologados:";
     - Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser homologados, sendo
       apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome;
     - Botão `Cancelar` e botão `Homologar`.

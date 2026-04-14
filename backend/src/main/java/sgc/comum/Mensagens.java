@@ -139,12 +139,12 @@ public final class Mensagens {
     public static final String OPERACAO_NAO_PERMITIDA           = "Não foi possível concluir a operação.";
 
     // ── Histórico de Movimentações ──────────────────────────────────────────
-    public static final String HIST_CADASTRO_DISPONIBILIZADO     = "Disponibilização do cadastro de atividades";
+    public static final String HIST_CADASTRO_DISPONIBILIZADO     = "Disponibilização do cadastro";
     public static final String HIST_CADASTRO_DEVOLVIDO           = "Devolução do cadastro de atividades para ajustes";
     public static final String HIST_CADASTRO_ACEITO              = "Cadastro aceito";
     public static final String HIST_CADASTRO_HOMOLOGADO          = "Cadastro homologado";
     public static final String HIST_CADASTRO_REABERTO            = "Reabertura de cadastro de atividades";
-    public static final String HIST_REVISAO_DISPONIBILIZADA      = "Disponibilização da revisão do cadastro de atividades";
+    public static final String HIST_REVISAO_DISPONIBILIZADA      = "Disponibilização da revisão do cadastro";
     public static final String HIST_REVISAO_DEVOLVIDA            = "Devolução da revisão do cadastro para ajustes";
     public static final String HIST_REVISAO_ACEITA               = "Revisão do cadastro de atividades e conhecimentos aceita";
     public static final String HIST_REVISAO_HOMOLOGADA           = "Revisão do cadastro homologada";

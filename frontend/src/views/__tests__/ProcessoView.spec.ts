@@ -821,6 +821,24 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).mostrarModalFinalizacao).toBe(true);
     });
 
+    it("deve exibir o texto simples no modal de finalização", async () => {
+        wrapper = createWrapper();
+
+        await nextTick();
+        await flushPromises();
+
+        const btnFinalizar = wrapper.find('[data-testid="btn-processo-finalizar"]');
+        await btnFinalizar.trigger("click");
+        await nextTick();
+
+        const paragrafos = wrapper.findAll('#modal-confirmacao-stub p');
+
+        expect(paragrafos).toHaveLength(2);
+        expect(paragrafos[0].text()).toContain(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO);
+        expect(paragrafos[0].text()).toContain(mockProcesso.descricao);
+        expect(paragrafos[1].text()).toBe(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO);
+    });
+
     it("deve chamar API de finalizar processo com sucesso", async () => {
         wrapper = createWrapper();
         toastStore = useToastStore();

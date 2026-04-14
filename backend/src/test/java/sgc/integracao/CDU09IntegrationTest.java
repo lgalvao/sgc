@@ -110,7 +110,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(spCodigo);
         assertThat(movs).isNotEmpty();
-        assertThat(movs.getFirst().getDescricao()).isEqualTo("Disponibilização do cadastro de atividades");
+        assertThat(movs.getFirst().getDescricao()).isEqualTo("Disponibilização do cadastro");
         assertThat(movs.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDESENV");
         assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("COSIS");
 

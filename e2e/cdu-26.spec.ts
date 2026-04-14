@@ -54,7 +54,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText(/Homologação de mapa em bloco/i)).toBeVisible();
-        await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione as unidades cujos mapas deverão ser homologados/i)).toBeVisible();
         await expect(modal.locator('table')).toBeVisible();
         await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
         await expect(modal.getByRole('button', {name: /^Homologar$/i})).toBeVisible();

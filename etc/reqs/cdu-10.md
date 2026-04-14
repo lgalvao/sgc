@@ -31,7 +31,7 @@ Fluxo principal:
 
 9. O usuário clica no botão `Disponibilizar`.
 
-10. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a finalização da revisão e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores" / Botões `Confirmar` e `Cancelar`.
+10. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores" / Botões `Confirmar` e `Cancelar`.
 
     8.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
 
@@ -44,7 +44,7 @@ Fluxo principal:
     - Data/hora: Data/hora atual
     - Unidade origem: [SIGLA_UNIDADE_SUBPROCESSO]
     - Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
-    - Descrição: 'Disponibilização da revisão do cadastro de atividades'
+    - Descrição: 'Disponibilização da revisão do cadastro'
 
 14. O sistema notifica unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 

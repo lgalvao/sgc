@@ -34,7 +34,7 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         })
 
         expect(wrapper.find('[data-testid="modal-stub"]').attributes('data-titulo')).toBe('Disponibilização do cadastro')
-        expect(wrapper.text()).toContain('Confirma a finalização e a disponibilização do cadastro?')
+        expect(wrapper.text()).toContain('Confirma a disponibilização do cadastro?')
     })
 
     it('renderiza corretamente para revisão (isRevisao=true)', () => {
@@ -44,7 +44,7 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         })
 
         expect(wrapper.find('[data-testid="modal-stub"]').attributes('data-titulo')).toBe('Disponibilização da revisão do cadastro')
-        expect(wrapper.text()).toContain('Confirma a finalização da revisão e a disponibilização do cadastro?')
+        expect(wrapper.text()).toContain('Confirma a disponibilização do cadastro?')
     })
 
     it('emite evento "confirmar" ao clicar no botão confirmar', async () => {

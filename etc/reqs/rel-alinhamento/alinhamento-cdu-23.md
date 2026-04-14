@@ -39,7 +39,7 @@
   - Evidência (score 2): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:34` -> `test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:62` -> `test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({_resetAutomatico, page, _autenticadoComoAd...`
-- ✅ **[COBERTO]** 7. Texto "Selecione abaixo as unidades cujos cadastros deverão ser homologados:";
+- ✅ **[COBERTO]** 7. Texto "Selecione as unidades cujos cadastros deverão ser homologados:";
   - Palavras-chave usadas: `unidades, texto, selecione, abaixo, cujos, cadastros`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:92` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:96` -> `await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);`

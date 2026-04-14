@@ -80,23 +80,17 @@
         :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
         variant="danger"
         @confirmar="confirmarFinalizacao">
-
-      <BAlert
-          :fade="false"
-          :model-value="true"
-          variant="secondary">
-
-        <i aria-hidden="true" class="bi bi-info-circle"/>
+      <p class="mb-2">
         {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO }}
-        <strong>{{ processo?.descricao || '' }}</strong>?<br>
-        {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO }}
-      </BAlert>
+        <strong>{{ processo?.descricao || '' }}</strong>?
+      </p>
+      <p class="mb-0">{{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO }}</p>
     </ModalConfirmacao>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
+import {BButton, BSpinner} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";

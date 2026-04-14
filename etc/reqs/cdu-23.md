@@ -25,7 +25,7 @@
 5. O sistema abre modal de confirmação, com os elementos a seguir:
 
     - Título "Homologação de cadastro em bloco";
-    - Texto "Selecione abaixo as unidades cujos cadastros deverão ser homologados:";
+    - Texto "Selecione as unidades cujos cadastros deverão ser homologados:";
     - Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros poderão ser homologados, sendo
       apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome;
     - Botões `Cancelar` e `Homologar`.

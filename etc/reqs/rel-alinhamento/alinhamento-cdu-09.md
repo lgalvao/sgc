@@ -75,7 +75,7 @@
 - 🟡 **[PARCIAL]** 19. `Unidade destino` da movimentação: [SIGLA_UNIDADE_SUPERIOR].
   - A movimentação é verificada mas sem assertion isolada do campo Unidade destino.
 
-- ✅ **[COBERTO]** 20. `Descrição` da movimentação: 'Disponibilização do cadastro de atividades'.
+- ✅ **[COBERTO]** 20. `Descrição` da movimentação: 'Disponibilização do cadastro'.
   - Evidência: `e2e/cdu-09.spec.ts:85` -> `await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.CADASTRO_DISPONIBILIZADO);`
 
 - ❌ **[NAO_COBERTO]** 21. O sistema notifica a unidade superior hierárquica por e-mail.

@@ -32,7 +32,7 @@ Ator: CHEFE
 
    8.1. Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela.
 
-9. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a finalização e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores", além dos botões `Confirmar` e `Cancelar`.
+9. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores", além dos botões `Confirmar` e `Cancelar`.
 
    9.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
 
@@ -45,7 +45,7 @@ Ator: CHEFE
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: 'Disponibilização do cadastro de atividades'
+    - `Descrição`: 'Disponibilização do cadastro'
 
 13. O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 

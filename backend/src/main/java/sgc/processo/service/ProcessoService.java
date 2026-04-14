@@ -747,7 +747,7 @@ public class ProcessoService {
                         false,
                         "Homologar em bloco",
                         "Homologação de cadastro em bloco",
-                        "Selecione abaixo as unidades cujos cadastros deverão ser homologados:",
+                        "Selecione as unidades cujos cadastros deverão ser homologados:",
                         "Homologar",
                         "Cadastros homologados em bloco",
                         processo.getSituacao() != FINALIZADO
@@ -761,7 +761,7 @@ public class ProcessoService {
                         true,
                         "Homologar mapas em bloco",
                         "Homologação de mapa em bloco",
-                        "Selecione abaixo as unidades cujos mapas deverão ser homologados:",
+                        "Selecione as unidades cujos mapas deverão ser homologados:",
                         "Homologar",
                         "Mapas de competências homologados em bloco",
                         processo.getSituacao() != FINALIZADO
