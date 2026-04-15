@@ -1031,10 +1031,30 @@ public class ProcessoService {
         Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
 
         if (tipo == REVISAO) {
-            processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
+            Set<Unidade> arvoreParticipantes = carregarArvoreUnidades(unidadesParaProcessar);
+            Set<Unidade> interoperacionaisDaHierarquia = listarInteroperacionaisDaHierarquia(arvoreParticipantes);
+            unidadesParaProcessar.addAll(interoperacionaisDaHierarquia);
+            codigosUnidades = adicionarCodigosAusentes(codigosUnidades, interoperacionaisDaHierarquia);
+            processo.sincronizarParticipantes(arvoreParticipantes);
         }
 
         return new ContextoInicioProcesso(tipo, codigosUnidades, unidadesParaProcessar);
+    }
+
+    private Set<Unidade> listarInteroperacionaisDaHierarquia(
+            Set<Unidade> arvoreParticipantes
+    ) {
+        return arvoreParticipantes.stream()
+                .filter(unidade -> unidade.getTipo() == TipoUnidade.INTEROPERACIONAL)
+                .collect(Collectors.toSet());
+    }
+
+    private List<Long> adicionarCodigosAusentes(List<Long> codigosOriginais, Collection<Unidade> unidades) {
+        LinkedHashSet<Long> codigos = new LinkedHashSet<>(codigosOriginais);
+        unidades.stream()
+                .map(Unidade::getCodigo)
+                .forEach(codigos::add);
+        return codigos.stream().toList();
     }
 
     private List<Long> validarCodigosRevisao(List<Long> codsUnidadesParam) {
