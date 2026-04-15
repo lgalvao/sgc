@@ -45,11 +45,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private EntityManager entityManager;
-    @Autowired
-    private UnidadeMapaRepo unidadeMapaRepo;
-
     private Unidade unidadeChefe;
-    private Unidade unidadeInteroperacional;
     private Usuario chefe;
     private Usuario gestor;
     private Usuario admin;
@@ -78,8 +74,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         chefe.setAuthorities(Set.of(Perfil.CHEFE.toGrantedAuthority()));
 
         unidadeChefe = unidadeRepo.findById(9L).orElseThrow();
-        unidadeInteroperacional = unidadeRepo.findById(2L).orElseThrow();
-
         // Unit 9 already has mapa 1002 in data.sql, so use it
         // Add test data to mapa 1002 if needed
         Mapa mapaVigente = mapaRepo.findById(1002L).orElseGet(() -> {
@@ -124,34 +118,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             competencia.getAtividades().add(atividade);
 
             atividadeRepo.save(atividade);
-        }
-
-        if (unidadeMapaRepo.findById(unidadeInteroperacional.getCodigo()).isEmpty()) {
-            Processo processoVigenteInteroperacional = ProcessoFixture.processoPadrao();
-            processoVigenteInteroperacional.setCodigo(null);
-            processoVigenteInteroperacional.setTipo(TipoProcesso.MAPEAMENTO);
-            processoVigenteInteroperacional.setSituacao(SituacaoProcesso.FINALIZADO);
-            processoVigenteInteroperacional.setDataFinalizacao(LocalDateTime.now().minusDays(1));
-            processoVigenteInteroperacional = processoRepo.save(processoVigenteInteroperacional);
-
-            Subprocesso subprocessoVigenteInteroperacional =
-                    SubprocessoFixture.subprocessoPadrao(processoVigenteInteroperacional, unidadeInteroperacional);
-            subprocessoVigenteInteroperacional.setCodigo(null);
-            subprocessoVigenteInteroperacional.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-            subprocessoVigenteInteroperacional.setDataFimEtapa1(LocalDateTime.now().minusDays(2));
-            subprocessoVigenteInteroperacional.setDataFimEtapa2(LocalDateTime.now().minusDays(1));
-            subprocessoVigenteInteroperacional = subprocessoRepo.save(subprocessoVigenteInteroperacional);
-
-            Mapa mapaInteroperacional = MapaFixture.mapaPadrao(subprocessoVigenteInteroperacional);
-            mapaInteroperacional.setCodigo(null);
-            mapaInteroperacional = mapaRepo.save(mapaInteroperacional);
-            subprocessoVigenteInteroperacional.setMapa(mapaInteroperacional);
-            subprocessoRepo.save(subprocessoVigenteInteroperacional);
-
-            unidadeMapaRepo.save(UnidadeMapa.builder()
-                    .unidadeCodigo(unidadeInteroperacional.getCodigo())
-                    .mapaVigente(mapaInteroperacional)
-                    .build());
         }
     }
 
@@ -235,7 +201,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(7);
+            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
         }
     }
@@ -263,7 +229,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(7);
+            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
             // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite

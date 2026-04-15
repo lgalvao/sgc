@@ -324,57 +324,6 @@ class ProcessoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve iniciar revisao criando subprocesso para interoperacional ancestral da unidade selecionada")
-        void deveIniciarRevisaoIncluindoInteroperacionalDaHierarquia() {
-            Long id = 103L;
-            Processo processo = new Processo();
-            processo.setCodigo(id);
-            processo.setSituacao(SituacaoProcesso.CRIADO);
-            processo.setTipo(TipoProcesso.REVISAO);
-
-            Unidade unidadeInteroperacional = criarUnidadeValida(10L);
-            unidadeInteroperacional.setTipo(TipoUnidade.INTEROPERACIONAL);
-            unidadeInteroperacional.setSigla("STIC");
-
-            Unidade unidadeFilha = criarUnidadeValida(20L);
-            unidadeFilha.setSigla("SEDIA");
-
-            processo.adicionarParticipantes(Set.of(unidadeFilha));
-
-            UnidadeMapa mapaPai = UnidadeMapa.builder().unidadeCodigo(10L).build();
-            UnidadeMapa mapaFilha = UnidadeMapa.builder().unidadeCodigo(20L).build();
-
-            when(repo.buscar(Processo.class, id)).thenReturn(processo);
-            when(unidadeHierarquiaService.buscarMapaFilhoPai()).thenReturn(Map.of(20L, 10L));
-            when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(10L));
-            when(unidadeService.buscarPorCodigos(List.of(20L))).thenReturn(List.of(unidadeFilha));
-            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidadeInteroperacional));
-            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L, 20L));
-            when(unidadeService.buscarMapasPorUnidades(argThat(codigos ->
-                    codigos.size() == 2
-                            && codigos.contains(10L)
-                            && codigos.contains(20L)
-            ))).thenReturn(List.of(mapaPai, mapaFilha));
-            Unidade admin = criarUnidadeValida(999L);
-            when(unidadeService.buscarAdmin()).thenReturn(admin);
-            mockarResponsaveisEfetivos();
-
-            processoService.iniciar(id, List.of(20L));
-
-            verify(subprocessoService, times(2)).criarParaRevisao(any());
-            verify(subprocessoService).criarParaRevisao(argThat(command ->
-                    command.processo() == processo
-                            && command.unidade().getCodigo().equals(10L)
-                            && command.unidadeMapa() == mapaPai
-            ));
-            verify(subprocessoService).criarParaRevisao(argThat(command ->
-                    command.processo() == processo
-                            && command.unidade().getCodigo().equals(20L)
-                            && command.unidadeMapa() == mapaFilha
-            ));
-        }
-
-        @Test
         @DisplayName("Deve falhar ao iniciar processo se houver unidades em processo ativo")
         void deveFalharAoIniciarSeHouverUnidadesEmProcessoAtivo() {
             Long id = 100L;

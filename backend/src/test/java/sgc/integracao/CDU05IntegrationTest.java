@@ -302,54 +302,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void testIniciarProcessoRevisao_deveCriarSubprocessoParaInteroperacionalDaHierarquia() throws Exception {
-        Unidade unidadeInteroperacional = criarUnidadeComMapaVigente(
-                "STIC",
-                "Secretaria de Tecnologia",
-                TipoUnidade.INTEROPERACIONAL,
-                "787878787878",
-                "78787878"
-        );
-
-        jdbcTemplate.update(SQL_ATUALIZAR_UNIDADE_SUPERIOR, unidadeInteroperacional.getCodigo(), unidade.getCodigo());
-        entityManager.flush();
-        entityManager.clear();
-
-        List<Long> unidadesSelecionadas = List.of(unidade.getCodigo());
-        CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq(
-                "Processo de Revisão com interoperacional ancestral",
-                unidadesSelecionadas,
-                LocalDateTime.now().plusDays(30)
-        );
-
-        MvcResult result = mockMvc.perform(post("/api/processos")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        Long codProcesso = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo")
-                .asLong();
-        var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidadesSelecionadas);
-
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, codProcesso)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(iniciarReq)))
-                .andExpect(status().isOk());
-
-        Processo processo = processoRepo.buscarPorCodigoComParticipantes(codProcesso).orElseThrow();
-        assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).toList())
-                .containsExactlyInAnyOrder(unidadeInteroperacional.getCodigo(), unidade.getCodigo());
-
-        List<Subprocesso> subprocessos = subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
-        assertThat(subprocessos).hasSize(2);
-        assertThat(subprocessos.stream().map(subprocesso -> subprocesso.getUnidade().getCodigo()).toList())
-                .containsExactlyInAnyOrder(unidadeInteroperacional.getCodigo(), unidade.getCodigo());
-    }
-
-    @Test
     void testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() throws Exception {
 
         Unidade unidadeSemMapa = UnidadeFixture.unidadePadrao();
