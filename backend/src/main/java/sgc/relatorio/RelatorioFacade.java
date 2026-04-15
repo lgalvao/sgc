@@ -34,8 +34,8 @@ public class RelatorioFacade {
 
         return subprocessos.stream().map(sp -> {
             Unidade unidade = sp.getUnidade();
-            UnidadeResponsavelDto respDto = obterResponsavelObrigatorio(unidade.getCodigo(), responsaveisPorUnidade);
-            String responsavel = respDto.titularNome();
+            UnidadeResponsavelDto respDto = responsaveisPorUnidade.get(unidade.getCodigo());
+            String responsavel = respDto != null ? respDto.titularNome() : "Não designado";
 
             java.time.LocalDateTime dataMovimentacao = sp.getDataLimiteEtapa1();
 
@@ -65,8 +65,8 @@ public class RelatorioFacade {
 
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
-                UnidadeResponsavelDto respDto = obterResponsavelObrigatorio(unidade.getCodigo(), responsaveisPorUnidade);
-                String responsavel = respDto.titularNome();
+                UnidadeResponsavelDto respDto = responsaveisPorUnidade.get(unidade.getCodigo());
+                String responsavel = respDto != null ? respDto.titularNome() : "Não designado";
 
                 String texto = String.format(
                         "Unidade: %s - %s%nSituação: %s%nResponsável: %s%n---------------------------",
@@ -83,14 +83,16 @@ public class RelatorioFacade {
         Processo processo = processoService.buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
 
-        subprocessos = subprocessos.stream()
-                .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
-                .toList();
+        if (codUnidade != null) {
+            subprocessos = subprocessos.stream()
+                    .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
+                    .toList();
+        }
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
             document.open();
-            document.add(new Paragraph("Relatório de Mapas - %s".formatted(processo.getDescricao())));
+            document.add(new Paragraph("Relatório de Mapas Vigentes - %s".formatted(processo.getDescricao())));
             document.add(new Paragraph(" "));
 
             for (Subprocesso sp : subprocessos) {
@@ -127,15 +129,6 @@ public class RelatorioFacade {
         }
 
         return new HashMap<>(responsavelService.buscarResponsaveisUnidades(codigosUnidade));
-    }
-
-    private UnidadeResponsavelDto obterResponsavelObrigatorio(
-            Long unidadeCodigo, Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade) {
-        UnidadeResponsavelDto responsavel = responsaveisPorUnidade.get(unidadeCodigo);
-        if (responsavel == null) {
-            throw new IllegalStateException("Responsável ausente para unidade %d".formatted(unidadeCodigo));
-        }
-        return responsavel;
     }
 }
 

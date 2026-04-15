@@ -31,7 +31,7 @@ router.beforeEach((to) => {
         return "/login";
     }
 
-    if (to.path === "/relatorios" && perfilStore.perfilSelecionado !== Perfil.ADMIN && perfilStore.perfilSelecionado !== Perfil.GESTOR) {
+    if (to.path.startsWith("/relatorios") && perfilStore.perfilSelecionado !== Perfil.ADMIN && perfilStore.perfilSelecionado !== Perfil.GESTOR) {
         return "/painel";
     }
 

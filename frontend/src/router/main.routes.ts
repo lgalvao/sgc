@@ -36,6 +36,18 @@ const mainRoutes: RouteRecordRaw[] = [
         meta: {title: "Relatórios", keepAlive: true},
     },
     {
+        path: "/relatorios/andamento",
+        name: "RelatorioAndamento",
+        component: () => import("@/views/RelatorioAndamentoView.vue"),
+        meta: {title: "Relatório de Andamento"},
+    },
+    {
+        path: "/relatorios/mapas-vigentes",
+        name: "RelatorioMapas",
+        component: () => import("@/views/RelatorioMapasView.vue"),
+        meta: {title: "Relatório de Mapas Vigentes"},
+    },
+    {
         path: "/configuracoes",
         name: "Parametros",
         component: () => import("@/views/ParametrosView.vue"),

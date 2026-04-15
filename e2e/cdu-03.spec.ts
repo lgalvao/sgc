@@ -150,7 +150,8 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_113').click();
-        await expect(inputCoord).not.toBeChecked();
+        await expect(inputCoord).toBeChecked();
+        await expect(inputCoord).not.toHaveJSProperty('indeterminate', true);
 
         await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();

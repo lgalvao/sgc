@@ -12,7 +12,17 @@ vi.mock('@/views/ErroGeralView.vue', () => ({ default: { name: 'ErroGeralView' }
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(9);
+        expect(mainRoutes).toHaveLength(11);
+    });
+
+    it("deve conter a rota RelatorioAndamento", async () => {
+        const route = mainRoutes.find((r) => r.name === "RelatorioAndamento");
+        expect(route?.path).toBe("/relatorios/andamento");
+    });
+
+    it("deve conter a rota RelatorioMapas", async () => {
+        const route = mainRoutes.find((r) => r.name === "RelatorioMapas");
+        expect(route?.path).toBe("/relatorios/mapas-vigentes");
     });
 
     it("deve redirecionar da raiz para /login", () => {
