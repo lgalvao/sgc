@@ -33,7 +33,7 @@
              v-b-tooltip.hover="textoTooltip"
              :title="textoTooltip"
               :class="{ 'text-muted': !isHabilitado(unidade) }"
-              :style="textoTooltip ? { cursor: 'help' } : {}"
+              :style="!isHabilitado(unidade) ? { cursor: 'help' } : {}"
               class="unidade-label"
         >
           {{ textoPrincipalUnidade }}

@@ -27,6 +27,7 @@ const props = withDefaults(defineProps<{
   textoCtaVazio?: string;
 }>(), {
   showSituacao: true,
+  textoCtaVazio: "",
 });
 
 const emit = defineEmits<{

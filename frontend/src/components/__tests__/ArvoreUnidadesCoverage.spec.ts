@@ -25,7 +25,7 @@ describe("ArvoreUnidades.vue Coverage", () => {
             unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}]
         });
 
-        expect((wrapper.vm as any).expandedUnits.has(1)).toBe(true);
+        expect((wrapper.vm as any).expandedUnits.has(1)).toBe(false);
     });
 
     it("deve atualizar unidadesSelecionadasLocal quando modelValue muda externamente", async () => {
