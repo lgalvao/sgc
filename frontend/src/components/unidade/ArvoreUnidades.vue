@@ -254,22 +254,16 @@ function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
     return selfSelected;
   }
 
-  const descendentesElegiveis = getTodasSubunidades(unidade).filter(desc => desc.isElegivel);
+  const estadosFilhas = unidade.filhas.map(filha => getEstadoSelecao(filha));
+  const todasFilhasMarcadas = estadosFilhas.every(estado => estado === true);
+  const algumaFilhaSelecionada = estadosFilhas.some(estado => estado !== false);
 
-  if (descendentesElegiveis.length === 0) {
-    return selfSelected;
-  }
-
-  const descendentesSelecionadas = descendentesElegiveis.filter(desc =>
-      isChecked(desc.codigo)
-  ).length;
-
-  if (descendentesSelecionadas === descendentesElegiveis.length) {
+  if (todasFilhasMarcadas) {
     return true;
   }
 
-  if (descendentesSelecionadas === 0) {
-    return unidade.tipo === "INTEROPERACIONAL" && selfSelected;
+  if (!algumaFilhaSelecionada) {
+    return selfSelected;
   }
 
   if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {

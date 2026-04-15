@@ -143,6 +143,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             subprocessoVigenteInteroperacional = subprocessoRepo.save(subprocessoVigenteInteroperacional);
 
             Mapa mapaInteroperacional = MapaFixture.mapaPadrao(subprocessoVigenteInteroperacional);
+            mapaInteroperacional.setCodigo(null);
             mapaInteroperacional = mapaRepo.save(mapaInteroperacional);
             subprocessoVigenteInteroperacional.setMapa(mapaInteroperacional);
             subprocessoRepo.save(subprocessoVigenteInteroperacional);
@@ -234,7 +235,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
+            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(7);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
         }
     }
@@ -262,7 +263,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
+            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(7);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
             // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite

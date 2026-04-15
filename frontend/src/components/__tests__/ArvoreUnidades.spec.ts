@@ -677,6 +677,36 @@ describe("ArvoreUnidades.vue", () => {
         expect(root.props("getEstadoSelecao")(units[0])).toBe(true);
     });
 
+    it("não deve marcar superiores como checked considerando apenas descendentes elegíveis", () => {
+        const units: Unidade[] = [{
+            codigo: 2000,
+            sigla: "STIC",
+            nome: "Secretaria",
+            isElegivel: true,
+            tipo: "INTEROPERACIONAL",
+            filhas: [
+                {
+                    codigo: 2001,
+                    sigla: "COSIS",
+                    nome: "Coordenadoria",
+                    isElegivel: false,
+                    tipo: "INTERMEDIARIA",
+                    filhas: [
+                        {codigo: 2002, sigla: "SEDESEV", nome: "Sede", isElegivel: false, filhas: [], tipo: "OPERACIONAL"},
+                        {codigo: 2003, sigla: "SEDIA", nome: "Dados", isElegivel: false, filhas: [], tipo: "OPERACIONAL"},
+                        {codigo: 2004, sigla: "SESEL", nome: "Selecao", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
+                    ]
+                }
+            ]
+        }];
+
+        const wrapper = createWrapper({unidades: units, modelValue: [2004]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+
+        expect(root.props("getEstadoSelecao")(units[0].filhas![0])).toBe("indeterminate");
+        expect(root.props("getEstadoSelecao")(units[0])).toBe("indeterminate");
+    });
+
     describe("Busca e Filtragem", () => {
         const mockUnidadesBusca: Unidade[] = [
             {
