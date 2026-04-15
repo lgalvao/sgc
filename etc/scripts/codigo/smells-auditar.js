@@ -93,7 +93,7 @@ const PADROES = [
 function ehArquivoTesteOuStory(caminhoRelativo) {
     return caminhoRelativo.includes("/__tests__/")
         || caminhoRelativo.endsWith(".spec.ts")
-        || caminhoRelativo.endsWith(".stories.ts");
+        || caminhoRelativo.endsWith(".stories.ts") || caminhoRelativo.includes("/test-utils/");
 }
 
 function criarEstruturaContagens() {

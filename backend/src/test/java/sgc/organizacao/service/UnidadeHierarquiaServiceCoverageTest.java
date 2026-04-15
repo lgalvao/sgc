@@ -33,11 +33,6 @@ class UnidadeHierarquiaServiceCoverageTest {
     @InjectMocks
     private UnidadeHierarquiaService target;
 
-    @BeforeEach
-    void configurarSelfProvider() {
-        lenient().when(selfProvider.getObject()).thenReturn(target);
-    }
-
     @Test
     @DisplayName("Deve cobrir método buscarArvoreComElegibilidade")
     void deveCobrirBuscarArvoreComElegibilidade() {
@@ -74,6 +69,7 @@ class UnidadeHierarquiaServiceCoverageTest {
     @Test
     @DisplayName("Deve cobrir método buscarNaHierarquiaPorSigla")
     void deveCobrirBuscarNaHierarquiaPorSigla() {
+        when(selfProvider.getObject()).thenReturn(target);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
                 new UnidadeHierarquiaLeitura(1L, "RAIZ", "RAIZ", null, RAIZ, SituacaoUnidade.ATIVA, null),
                 new UnidadeHierarquiaLeitura(2L, "SUB", "SUB", null, OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
