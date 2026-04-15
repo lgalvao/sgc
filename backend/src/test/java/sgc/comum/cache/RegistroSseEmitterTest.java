@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 class RegistroSseEmitterTest {
 
     private RegistroSseEmitter registroSseEmitter;
