@@ -23,8 +23,8 @@ O projeto segue uma arquitetura **Modular monolith** no backend e **Component-Ba
 * **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos (`mapa`, `processo`, `subprocesso`, `organizacao`, `seguranca`, etc) e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-* **[etc/docs/](etc/docs/)**: Guias detalhados sobre [regras de acesso](etc/docs/regras-acesso.md), [E2E](etc/docs/regras-e2e.md), [roteiro de testes](etc/docs/roteiro-testes.md) e mais.
-* **[Princípios de contratos, DTOs e fixtures](etc/docs/principios-contratos-fixtures.md)**: Regras para evitar DTOs frouxos, mocks inválidos e branches defensivos sem cenário real.
+* **[etc/docs/](etc/docs/)**: Guias detalhados sobre [regras de acesso](etc/docs/regras-acesso.md), [E2E](etc/docs/regras-e2e.md) e mais.
+cenário real.
 
 ---
 
@@ -38,8 +38,7 @@ sgc/
 ├── etc/                # Configurações, requisitos e scripts globais.
     ├── reqs/           # Especificações de requisitos (Casos de Uso e Regras de Negócio).
     ├── docs/           # Documentação técnica e guias de processo.
-    ├── scripts/        # Scripts utilitários (.sh e .ps1).
-    └── qa-dashboard/   # Infraestrutura do Dashboard de Saúde de QA.
+    ├── scripts/        # Scripts utilitários (.sh e .ps1).   
 ```
 
 ---
@@ -48,7 +47,7 @@ sgc/
 
 ### Pré-requisitos
 
-* JDK 21+
+* JDK 21+ (Recomendado 25+)
 * Node.js 22+ (Recomendado 25+)
 
 ### Desenvolvimento
@@ -97,48 +96,13 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 | **Type check**          | `npm run typecheck`                  | `npm run typecheck`                  | Verificação de erros de tipos (Vue + TS).         |
 | **Lint (OXC)**          | `npm run lint:ox`                    | `npm run lint:ox`                    | Verificação ultra-rápida com [OXC](https://github.com/oxc-project/oxc). |
 | **Lint (Completo)**     | `npm run lint`                       | `npm run lint`                       | OXC + ESLint (regras complexas e fix).            |
-| **Segurança (SAST)**    | `npm run sast`                       | `npm run sast`                       | Análise estática com Semgrep.                     |
 
 ### Verificação de qualidade (Batch)
-
-Para rodar todas as verificações (Testes, Cobertura, SpotBugs, Lint, Typecheck) de uma só vez:
-
-* **Linux:** `./etc/scripts/quality-check.sh all`
-* **Windows:** `etc/scripts/quality-check.ps1 all`
 
 Para um smoke test mínimo de qualidade na raiz do projeto:
 
 * **Linux/macOS:** `./smoke-test.sh`
-
-Os relatórios são gerados em:
-* Backend: `backend/build/reports/` (PIT em `backend/build/reports/pitest/`)
-* Frontend: `frontend/coverage/`
-
----
-
-## Dashboard de QA
-
-O projeto possui um dashboard de desenvolvimento voltado para **saúde de QA**.
-Ele consolida testes, cobertura, lint, typecheck e E2E em snapshots centralizados.
-
-### Como atualizar
-
-No Windows/PowerShell:
-
-```powershell
-npm run qa:dashboard
-```
-
-Ou diretamente via script:
-```powershell
-powershell -ExecutionPolicy Bypass -File etc/scripts/qa/snapshot-coletar.ps1 -Perfil rapido
-```
-
-Perfis disponíveis: `rapido`, `frontend`, `backend`, `completo`.
-
-### Onde consultar
-
-Os snapshots gerados ficam em `etc/qa-dashboard/runs/` e os mais recentes em `etc/qa-dashboard/latest/ultimo-resumo.md`.
+* **Windows:** `./smoke-test.ps1`
 
 ---
 
@@ -146,9 +110,4 @@ Os snapshots gerados ficam em `etc/qa-dashboard/runs/` e os mais recentes em `et
 
 Os requisitos do sistema estão documentados no diretório `etc/reqs/`.
 
-* **[Regras de Negócio](etc/reqs/regras-negocio.md)**: Definições globais do sistema.
 * **Casos de Uso (CDUs)**: Especificações detalhadas de cada funcionalidade (01 a 36).
-* **Mapeamento**: Criação e definição de mapas de competências (CDU-01 a 10).
-* **Revisão**: Fluxo de aprovação e ajuste de mapas (CDU-11 a 20).
-* **Diagnóstico**: Identificação de gaps (CDUs futuras).
- 

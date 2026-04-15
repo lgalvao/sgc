@@ -126,7 +126,7 @@
       </BForm>
     </div>
 
-    <!-- Modal de confirmação CDU-05 -->
+    <!-- Modal de confirmação cadastro -->
     <ModalConfirmacao
         v-model="mostrarModalConfirmacao"
         :auto-close="false"
@@ -202,7 +202,6 @@ const {
   limpar: limparCampos
 } = useProcessoForm();
 
-// Computed form data for the extracted component
 const formData = computed({
   get: () => ({
     descricao: descricao.value,
@@ -415,7 +414,6 @@ async function salvarProcesso() {
   clearErrors();
   isLoading.value = true;
 
-  // Validações agora são feitas no backend via Bean validation
   try {
     if (processoEditando.value) {
       const request = construirAtualizarRequest(processoEditando.value.codigo);
@@ -435,7 +433,7 @@ async function salvarProcesso() {
     }
     limparCampos();
   } catch (error) {
-    handleApiErrors(error, "Erro ao salvar processo", "Não foi possível salvar o processo. Verifique os dados e tente novamente.");
+    handleApiErrors(error, "Erro ao salvar processo", "Não foi possível salvar o processo.");
   } finally {
     isLoading.value = false;
   }
