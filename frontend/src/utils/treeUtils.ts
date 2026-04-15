@@ -73,7 +73,7 @@ function ehTextoSecretaria(valor: unknown): boolean {
 }
 
 function compararTextoPtBr(a: string, b: string): number {
-    return a.localeCompare(b, "pt-BR", {sensitivity: "base"});
+    return a.localeCompare(b, "pt-BR", {sensitivity: "base", numeric: true});
 }
 
 function obterTextoOrdenacao<T extends object>(item: T, config: ConfiguracaoOrganizacaoArvore<T>): string {

@@ -145,6 +145,36 @@ Quando o formulário é submetido, apenas unidades **não-INTERMEDIARIA** são e
 
 O backend possui validação defensiva que rejeita unidades INTERMEDIARIA. Esta validação nunca deve ser acionada em uso normal, pois o frontend já filtra.
 
+## Organização e Ordenação
+
+Para facilitar a navegação em tribunais com grande número de unidades, a árvore aplica regras especiais de agrupamento e ordenação.
+
+### Agrupamento Visual
+As unidades identificadas como "Zonas Eleitorais" (via metadados de tipo, sigla ou nome) são agrupadas sob um nó virtual intitulado **"ZONAS ELEITORAIS"**. Este nó:
+- Não é uma unidade real no banco de dados.
+- Serve para reduzir a poluição visual na raiz da árvore.
+- Reflete o estado de seleção de suas filhas (marcado, desmarcado ou indeterminado).
+
+### Ordenação por Blocos
+A árvore organiza as unidades em três grandes blocos, nesta ordem:
+1. **Secretarias**: Unidades que contêm "SECRETARIA" no nome.
+2. **Zonas Eleitorais**: O grupo virtual "ZONAS ELEITORAIS".
+3. **Demais unidades**: Todas as outras unidades que não se enquadram nos critérios acima.
+
+### Ordenação Interna e Numérica
+Dentro de cada bloco ou grupo, as unidades são ordenadas alfabeticamente por **sigla**.
+- **Sensibilidade Numérica**: A ordenação utiliza comparação numérica natural (`numeric: true`). Isso garante que siglas como "Z.E. 2" apareçam antes de "Z.E. 10" (diferente da ordenação lexicográfica padrão onde "10" viria antes de "2").
+
+## Busca e Filtragem
+
+A árvore disponibiliza um campo de busca para localização rápida de unidades por sigla ou nome.
+
+### Funcionamento da Busca
+- **Critérios**: A busca filtra por **sigla** ou **nome**, de forma insensível a maiúsculas/minúsculas.
+- **Preservação da Hierarquia**: Ao encontrar um item, todos os seus ancestrais permanecem visíveis para manter o contexto hierárquico, mesmo que os ancestrais não correspondam ao termo de busca.
+- **Auto-Expansão**: Ao digitar um termo de busca, a árvore expande automaticamente os ramos que contêm resultados correspondentes para facilitar a localização visual.
+- **Estado Original**: Ao limpar o campo de busca, a árvore mantém os nós expandidos durante a busca para não perder o foco do que foi localizado.
+
 ## Cenários
 
 ### Cenário 1: Selecionar coordenadoria inteira

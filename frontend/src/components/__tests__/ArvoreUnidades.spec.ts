@@ -676,4 +676,99 @@ describe("ArvoreUnidades.vue", () => {
         // Self selected AND some children selected -> true
         expect(root.props("getEstadoSelecao")(units[0])).toBe(true);
     });
+
+    describe("Busca e Filtragem", () => {
+        const mockUnidadesBusca: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "STI",
+                nome: "Secretaria de TI",
+                isElegivel: true,
+                filhas: [
+                    {
+                        codigo: 11,
+                        sigla: "COSIS",
+                        nome: "Coordenadoria de Sistemas",
+                        isElegivel: true,
+                        filhas: [
+                            {codigo: 111, sigla: "SEDIA", nome: "Seção de Dados", isElegivel: true, filhas: []}
+                        ]
+                    },
+                    {
+                        codigo: 12,
+                        sigla: "COINF",
+                        nome: "Coordenadoria de Infra",
+                        isElegivel: true,
+                        filhas: []
+                    }
+                ]
+            },
+            {
+                codigo: 2,
+                sigla: "SGP",
+                nome: "Secretaria de Pessoas",
+                isElegivel: true,
+                filhas: []
+            }
+        ];
+
+        it("deve renderizar o campo de busca", () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca});
+            expect(wrapper.find('input[type="search"]').exists()).toBe(true);
+        });
+
+        it("deve filtrar unidades por sigla", async () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
+            const input = wrapper.find('input[type="search"]');
+
+            await input.setValue("COSIS");
+
+            const exibidas = (wrapper.vm as any).unidadesExibidas;
+            // Deve mostrar STI (pai) e COSIS
+            expect(exibidas).toHaveLength(1);
+            expect(exibidas[0].sigla).toBe("STI");
+            expect(exibidas[0].filhas).toHaveLength(1);
+            expect(exibidas[0].filhas[0].sigla).toBe("COSIS");
+            // COINF e SGP devem sumir
+            expect(exibidas[0].filhas.find((u: any) => u.sigla === "COINF")).toBeUndefined();
+        });
+
+        it("deve filtrar unidades por nome", async () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
+            const input = wrapper.find('input[type="search"]');
+
+            await input.setValue("Sistemas");
+
+            const exibidas = (wrapper.vm as any).unidadesExibidas;
+            expect(exibidas[0].filhas[0].sigla).toBe("COSIS");
+        });
+
+        it("deve expandir automaticamente as unidades ao pesquisar", async () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
+            const input = wrapper.find('input[type="search"]');
+
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(false);
+
+            await input.setValue("SEDIA");
+
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(true);
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0].filhas![0])).toBe(true);
+        });
+
+        it("deve restaurar a árvore original ao limpar a busca", async () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
+            const input = wrapper.find('input[type="search"]');
+
+            await input.setValue("COSIS");
+            expect((wrapper.vm as any).unidadesExibidas).toHaveLength(1);
+
+            await input.setValue("");
+            expect((wrapper.vm as any).unidadesExibidas).toHaveLength(2);
+        });
+
+        it("não deve renderizar o campo de busca se a árvore estiver vazia", () => {
+            const wrapper = createWrapper({unidades: []});
+            expect(wrapper.find('input[type="search"]').exists()).toBe(false);
+        });
+    });
 });

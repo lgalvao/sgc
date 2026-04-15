@@ -1,21 +1,38 @@
 <template>
   <div class="arvore-unidades">
-    <div v-if="modoSelecao && unidadesExibidas.length > 0" class="d-flex gap-2 mb-2">
-      <BButton
-          aria-label="Selecionar todas as unidades elegíveis"
-          size="sm"
-          variant="outline-primary"
-          @click="selecionarTodas">
-        <i aria-hidden="true" class="bi bi-check-all me-1"/>
-      </BButton>
+    <div v-if="unidadesExibidasOriginais.length > 0" class="d-flex gap-2 mb-2 align-items-center">
+      <template v-if="modoSelecao">
+        <BButton
+            aria-label="Selecionar todas as unidades elegíveis"
+            size="sm"
+            variant="outline-primary"
+            @click="selecionarTodas">
+          <i aria-hidden="true" class="bi bi-check-all me-1"/>
+        </BButton>
 
-      <BButton
-          aria-label="Desmarcar todas as unidades"
-          size="sm"
-          variant="outline-secondary"
-          @click="deselecionarTodas">
-        <i aria-hidden="true" class="bi bi-x-lg me-1"/>
-      </BButton>
+        <BButton
+            aria-label="Desmarcar todas as unidades"
+            size="sm"
+            variant="outline-secondary"
+            @click="deselecionarTodas">
+          <i aria-hidden="true" class="bi bi-x-lg me-1"/>
+        </BButton>
+      </template>
+
+      <div class="flex-grow-1 position-relative">
+        <BFormInput
+            v-model="termoBusca"
+            aria-label="Buscar unidade por sigla"
+            placeholder="Filtrar por sigla..."
+            size="sm"
+            type="search"
+        />
+        <i
+            v-if="!termoBusca"
+            class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted"
+            style="pointer-events: none;"
+        />
+      </div>
     </div>
 
     <UnidadeTreeNode
@@ -35,7 +52,7 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch} from "vue";
-import {BButton} from "bootstrap-vue-next";
+import {BButton, BFormInput} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
 import {organizarArvoreUnidades, TITULO_GRUPO_ZONAS_ELEITORAIS} from "@/utils/treeUtils";
 import UnidadeTreeNode from "./UnidadeTreeNode.vue";
@@ -61,6 +78,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+const termoBusca = ref("");
 
 function criarCodigoGrupoZonasEleitorais(codigoPai: number): number {
   return -((Math.abs(codigoPai) * 1000) + 999);
@@ -124,7 +142,32 @@ const maps = computed(() => {
 
 const parentMap = computed(() => maps.value.parentMap);
 
-const unidadesExibidas = computed((): UnidadeExibida[] => {
+function filtrarUnidadesRecursivo(unidades: Unidade[], termo: string): Unidade[] {
+  if (!termo) return unidades;
+
+  const termoNormalizado = termo.toLowerCase();
+  const resultado: Unidade[] = [];
+
+  for (const unidade of unidades) {
+    const filhasFiltradas = unidade.filhas
+        ? filtrarUnidadesRecursivo(unidade.filhas, termo)
+        : [];
+
+    const matches = unidade.sigla.toLowerCase().includes(termoNormalizado) ||
+        unidade.nome.toLowerCase().includes(termoNormalizado);
+
+    if (matches || filhasFiltradas.length > 0) {
+      resultado.push({
+        ...unidade,
+        filhas: filhasFiltradas
+      });
+    }
+  }
+
+  return resultado;
+}
+
+const unidadesExibidasOriginais = computed((): UnidadeExibida[] => {
   const filtradas = props.unidades.filter(props.filtrarPor);
   const lista: UnidadeExibida[] = [];
 
@@ -138,6 +181,24 @@ const unidadesExibidas = computed((): UnidadeExibida[] => {
     }
   }
   return lista;
+});
+
+const unidadesExibidas = computed((): UnidadeExibida[] => {
+  return filtrarUnidadesRecursivo(unidadesExibidasOriginais.value, termoBusca.value) as UnidadeExibida[];
+});
+
+watch(termoBusca, (novoTermo) => {
+  if (novoTermo) {
+    const expandirMatches = (unidades: Unidade[]) => {
+      unidades.forEach(u => {
+        if (u.filhas && u.filhas.length > 0) {
+          expandedUnits.value.add(u.codigo);
+          expandirMatches(u.filhas);
+        }
+      });
+    };
+    expandirMatches(unidadesExibidas.value);
+  }
 });
 
 function getTodasSubunidades(unidade: Unidade): Unidade[] {
