@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 class RegistroSseEmitterTest {
 
     private RegistroSseEmitter registroSseEmitter;
