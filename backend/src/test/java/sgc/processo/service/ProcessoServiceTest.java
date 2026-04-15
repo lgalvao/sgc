@@ -707,14 +707,23 @@ class ProcessoServiceTest {
             user.setUnidadeAtivaCodigo(10L);
             when(auth.isAuthenticated()).thenReturn(true);
             when(auth.getPrincipal()).thenReturn(user);
-
-            Processo p = new Processo();
-            Unidade u = criarUnidadeValida(10L);
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+            when(consultaService.listarEntidadesPorProcessoEUnidades(1L, List.of(10L))).thenReturn(List.of(new Subprocesso()));
 
             assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve retornar false se unidade nao possui subprocesso acessivel")
+        void deveRetornarFalseSemSubprocessoAcessivel() {
+            Authentication auth = mock(Authentication.class);
+            Usuario user = new Usuario();
+            user.setPerfilAtivo(Perfil.CHEFE);
+            user.setUnidadeAtivaCodigo(10L);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getPrincipal()).thenReturn(user);
+            when(consultaService.listarEntidadesPorProcessoEUnidades(1L, List.of(10L))).thenReturn(List.of());
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
         }
     }
 
@@ -779,6 +788,22 @@ class ProcessoServiceTest {
             Page<Processo> res = processoService.listarIniciadosPorParticipantes(List.of(1L), pageable);
             assertThat(res.getContent()).containsExactly(p);
             verify(processoRepo).listarPorParticipantesESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable);
+        }
+
+        @Test
+        @DisplayName("Deve listar iniciados por subprocessos")
+        void deveListarIniciadosPorSubprocessos() {
+            Pageable pageable = Pageable.unpaged();
+            Processo p = new Processo();
+            p.setCodigo(10L);
+            when(processoRepo.listarCodigosPorSubprocessosESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable))
+                    .thenReturn(new PageImpl<>(List.of(10L), pageable, 1));
+            when(processoRepo.listarPorCodigosComParticipantes(List.of(10L))).thenReturn(List.of(p));
+
+            Page<Processo> res = processoService.listarIniciadosPorSubprocessos(List.of(1L), pageable);
+
+            assertThat(res.getContent()).containsExactly(p);
+            verify(processoRepo).listarCodigosPorSubprocessosESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable);
         }
 
         @Test

@@ -41,6 +41,7 @@ describe("MainNavbar.vue", () => {
             mostrarMenuConfiguracoes: ref(false),
             mostrarMenuAdministradores: ref(false),
             isAdmin: ref(false),
+            podeVerRelatorios: ref(true),
         } as any);
     });
 
@@ -58,6 +59,7 @@ describe("MainNavbar.vue", () => {
             mostrarMenuConfiguracoes: ref(true),
             mostrarMenuAdministradores: ref(true),
             isAdmin: ref(true),
+            podeVerRelatorios: ref(true),
         } as any);
 
         const options = getCommonMountOptions({
@@ -191,6 +193,32 @@ describe("MainNavbar.vue", () => {
         const settingsIcon = ctx.wrapper.find('[data-testid="btn-configuracoes"]');
         expect(settingsIcon.exists()).toBe(false);
         expect(ctx.wrapper.find('[data-testid="btn-administradores"]').exists()).toBe(false);
+    });
+
+    it("NÃO deve exibir o link de Relatórios para perfis diferentes de ADMIN e GESTOR", async () => {
+        vi.mocked(usePerfil).mockReturnValue({
+            perfilSelecionado: ref("CHEFE"),
+            unidadeSelecionada: ref("TRE-PR"),
+            mostrarArvoreCompletaUnidades: ref(false),
+            mostrarMenuConfiguracoes: ref(false),
+            mostrarMenuAdministradores: ref(false),
+            isAdmin: ref(false),
+            podeVerRelatorios: ref(false),
+        } as any);
+
+        const options = getCommonMountOptions({
+            perfil: {
+                perfis: ["CHEFE"],
+                perfilSelecionado: "CHEFE",
+                unidadeSelecionada: 123
+            }
+        });
+
+        ctx.wrapper = mount(NavBar, options);
+
+        const links = ctx.wrapper.findAllComponents(RouterLinkStub);
+        const relatoriosLink = links.find(w => w.text().includes("Relatórios"));
+        expect(relatoriosLink).toBeUndefined();
     });
 
     it("deve chamar router.push ao fazer logout", async () => {

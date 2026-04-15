@@ -184,7 +184,13 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
                     .dataLimite(LocalDateTime.now().plusDays(30))
                     .build();
             processo.adicionarParticipantes(Set.of(unidade));
-            processoRepo.save(processo);
+            processo = processoRepo.save(processo);
+            subprocessoRepo.save(Subprocesso.builder()
+                    .unidade(unidade)
+                    .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                    .processo(processo)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                    .build());
         }
     }
 
@@ -195,6 +201,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(20))
                 .build();
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
 
         Subprocesso novoSubprocesso = Subprocesso.builder()

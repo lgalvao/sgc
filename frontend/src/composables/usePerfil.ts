@@ -9,6 +9,10 @@ export function usePerfil() {
 
     const unidadeSelecionada = computed(() => perfilStore.unidadeSelecionadaSigla);
     const isAdmin = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN);
+    const podeVerRelatorios = computed(() =>
+        perfilStore.perfilSelecionado === Perfil.ADMIN ||
+        perfilStore.perfilSelecionado === Perfil.GESTOR
+    );
     const mostrarCriarProcesso = computed(() => perfilStore.permissoesSessao?.mostrarCriarProcesso === true);
     const mostrarArvoreCompletaUnidades = computed(() => perfilStore.permissoesSessao?.mostrarArvoreCompletaUnidades === true);
     const mostrarCtaPainelVazio = computed(() => perfilStore.permissoesSessao?.mostrarCtaPainelVazio === true);
@@ -21,6 +25,7 @@ export function usePerfil() {
         perfilSelecionado,
         unidadeSelecionada,
         isAdmin,
+        podeVerRelatorios,
         mostrarCriarProcesso,
         mostrarArvoreCompletaUnidades,
         mostrarCtaPainelVazio,

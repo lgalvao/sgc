@@ -65,7 +65,7 @@ class PainelFacadeTest {
         Page<Processo> page = new PageImpl<>(List.of(p));
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(hierarquiaService.buscarDescendentes(eq(100L), anyMap())).thenReturn(List.of(101L));
-        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
+        when(processoService.listarIniciadosPorSubprocessos(anyList(), any(Pageable.class))).thenReturn(page);
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_GESTOR, PageRequest.of(0, 10));
 
@@ -88,7 +88,7 @@ class PainelFacadeTest {
                 .build();
 
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
-        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
+        when(processoService.listarIniciadosPorSubprocessos(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeService.buscarSiglaPorCodigo(100L)).thenReturn(unidade.getSigla());
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_CHEFE, PageRequest.of(0, 10));
@@ -342,7 +342,7 @@ class PainelFacadeTest {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
         Page<Processo> pageProcessos = new PageImpl<>(List.of(p));
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
-        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(pageProcessos);
+        when(processoService.listarIniciadosPorSubprocessos(anyList(), any(Pageable.class))).thenReturn(pageProcessos);
 
         ContextoUsuarioAutenticado contextoChefe = new ContextoUsuarioAutenticado("123", 10L, Perfil.CHEFE);
         doReturn(null).when(unidadeService).buscarSiglaPorCodigo(10L);
@@ -358,7 +358,7 @@ class PainelFacadeTest {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
         Page<Processo> pageProcessos = new PageImpl<>(List.of(p));
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
-        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(pageProcessos);
+        when(processoService.listarIniciadosPorSubprocessos(anyList(), any(Pageable.class))).thenReturn(pageProcessos);
 
         ContextoUsuarioAutenticado contextoChefe = new ContextoUsuarioAutenticado("123", 10L, Perfil.CHEFE);
         when(unidadeService.buscarSiglaPorCodigo(10L)).thenReturn("  ");

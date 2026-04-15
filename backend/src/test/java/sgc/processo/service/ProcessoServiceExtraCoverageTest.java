@@ -689,11 +689,8 @@ class ProcessoServiceExtraCoverageTest {
             uni.setCodigo(1L);
             when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
 
-            Processo p = new Processo();
-            UnidadeProcesso up = new UnidadeProcesso();
-            up.setUnidadeCodigo(1L);
-            p.setParticipantes(new ArrayList<>(List.of(up)));
-            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+            Subprocesso sp = new Subprocesso();
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
 
             assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
         }
@@ -712,11 +709,7 @@ class ProcessoServiceExtraCoverageTest {
             uni.setCodigo(1L);
             when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
 
-            Processo p = new Processo();
-            UnidadeProcesso up = new UnidadeProcesso();
-            up.setUnidadeCodigo(2L);
-            p.setParticipantes(new ArrayList<>(List.of(up)));
-            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of());
 
             assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
         }

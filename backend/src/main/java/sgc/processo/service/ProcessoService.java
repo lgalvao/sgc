@@ -122,6 +122,13 @@ public class ProcessoService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Processo> listarIniciadosPorSubprocessos(List<Long> unidadeCodigos, Pageable pageable) {
+        Page<Long> paginaCodigos = processoRepo.listarCodigosPorSubprocessosESituacaoDiferente(
+                unidadeCodigos, CRIADO, pageable);
+        return carregarPaginaComParticipantes(paginaCodigos, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public List<Long> listarUnidadesBloqueadasPorTipo(TipoProcesso tipo) {
         return processoRepo.listarUnidadesBloqueadasPorSituacaoETipo(EM_ANDAMENTO, tipo);
     }
@@ -1009,10 +1016,7 @@ public class ProcessoService {
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) return true;
 
         List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
-        return processoRepo.buscarPorCodigoComParticipantes(cod)
-                .map(p -> p.getParticipantes().stream()
-                        .anyMatch(part -> unidadesAcesso.contains(part.getUnidadeCodigoPersistido())))
-                .orElse(false);
+        return !consultaService.listarEntidadesPorProcessoEUnidades(cod, unidadesAcesso).isEmpty();
     }
 
     private void validarSelecaoBloco(List<Long> codigos, List<Subprocesso> list) {

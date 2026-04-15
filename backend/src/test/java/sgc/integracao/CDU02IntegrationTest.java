@@ -12,6 +12,7 @@ import sgc.alerta.model.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 
@@ -34,6 +35,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
     @Autowired
     private AlertaRepo alertaRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
 
     private Unidade unidadeRaiz;
     private Unidade unidadeFilha2;
@@ -68,12 +71,14 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         processoRaiz.setDescricao("Processo raiz");
         processoRaiz.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRaiz = processoRepo.save(processoRaiz);
+        subprocessoRepo.save(SubprocessoFixture.novoSubprocesso(processoRaiz, unidadeRaiz));
 
         Processo processoFilha1 = ProcessoFixture.processoEmAndamento();
         processoFilha1.setCodigo(null);
         processoFilha1.setDescricao("Processo filha 1");
         processoFilha1.adicionarParticipantes(Set.of(unidadeFilha1));
-        processoRepo.save(processoFilha1);
+        processoFilha1 = processoRepo.save(processoFilha1);
+        subprocessoRepo.save(SubprocessoFixture.novoSubprocesso(processoFilha1, unidadeFilha1));
 
         Processo processoCriado = ProcessoFixture.processoPadrao(); // Status CRIADO
         processoCriado.setCodigo(null);

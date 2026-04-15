@@ -58,7 +58,7 @@ public class PainelFacade {
                 codigosUnidades.addAll(hierarquiaService.buscarDescendentes(codigoUnidade, mapaPaiFilhos));
             }
             codigosUnidades.add(codigoUnidade);
-            processos = processoService.listarIniciadosPorParticipantes(codigosUnidades, sortedPageable);
+            processos = processoService.listarIniciadosPorSubprocessos(codigosUnidades, sortedPageable);
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, siglaUnidadeUsuario, mapaPaiFilhos));
     }
@@ -103,13 +103,15 @@ public class PainelFacade {
                                                     Map<Long, List<Long>> mapaPaiFilhos) {
 
         var participantes = processo.getParticipantes();
-        var participante = participantes.getFirst();
+        UnidadeProcesso participante = participantes.isEmpty() ? null : participantes.getFirst();
 
-        Long codUnidMapeado = participante.getUnidadeCodigoPersistido();
-        String nomeUnidMapeado = participante.getNome();
+        Long codUnidMapeado = participante != null ? participante.getUnidadeCodigoPersistido() : null;
+        String nomeUnidMapeado = participante != null ? participante.getNome() : null;
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, siglaUnidadeUsuario);
-        String unidadesParticipantes = formatarUnidadesParticipantes(participantes, mapaPaiFilhos);
+        String unidadesParticipantes = participantes.isEmpty()
+                ? ""
+                : formatarUnidadesParticipantes(participantes, mapaPaiFilhos);
 
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())

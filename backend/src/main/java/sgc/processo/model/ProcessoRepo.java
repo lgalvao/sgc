@@ -57,20 +57,34 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     Page<Long> listarCodigos(Pageable pageable);
 
     @Query("""
-            SELECT p.codigo FROM Processo p
-            JOIN p.participantes up
-            WHERE up.codigo.unidadeCodigo IN :codigos
-            AND p.situacao <> :situacao
-            GROUP BY p.codigo, p.dataCriacao
-            """)
+             SELECT p.codigo FROM Processo p
+             JOIN p.participantes up
+             WHERE up.codigo.unidadeCodigo IN :codigos
+             AND p.situacao <> :situacao
+             GROUP BY p.codigo, p.dataCriacao
+             """)
     Page<Long> listarCodigosPorParticipantesESituacaoDiferente(
             @Param("codigos") List<Long> codigos,
             @Param("situacao") SituacaoProcesso situacao,
             Pageable pageable);
 
     @Query("""
-            SELECT DISTINCT p FROM Processo p
-            LEFT JOIN FETCH p.participantes
+            SELECT p.codigo FROM Processo p
+            WHERE p.situacao <> :situacao
+            AND EXISTS (
+                SELECT 1 FROM Subprocesso s
+                WHERE s.processo = p
+                AND s.unidade.codigo IN :codigos
+            )
+            """)
+    Page<Long> listarCodigosPorSubprocessosESituacaoDiferente(
+            @Param("codigos") List<Long> codigos,
+            @Param("situacao") SituacaoProcesso situacao,
+            Pageable pageable);
+
+    @Query("""
+             SELECT DISTINCT p FROM Processo p
+             LEFT JOIN FETCH p.participantes
             WHERE p.codigo IN :codigos
             """)
     List<Processo> listarPorCodigosComParticipantes(@Param("codigos") List<Long> codigos);

@@ -30,6 +30,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     const timestamp = Date.now();
     const descProcMapeamento = `Mapeamento setup ${timestamp}`;
     const descProcRevisao = `Revisão teste ${timestamp}`;
+    const descProcRevisaoHierarquiaInteroperacional = `Revisão hierarquia interoperacional ${timestamp}`;
     const descAtividadePrincipal = `Atividade teste ${timestamp}`;
     let atividadeComplementarCriada: string | null = null;
 
@@ -310,6 +311,45 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoChefeDireto(page, descricaoRevisaoSecretaria, 'SECRETARIA_1');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
         await expect(page.getByTestId('tbl-movimentacoes').getByText(/Processo iniciado/i).first()).toBeVisible();
+    });
+
+    test('Fase 2.2d: Revisão de unidade subordinada sob secretaria interoperacional não aparece para o chefe da secretaria', async ({
+        _resetAutomatico,
+        page
+    }) => {
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await criarProcesso(page, {
+            descricao: descProcRevisaoHierarquiaInteroperacional,
+            tipo: 'REVISAO',
+            diasLimite: 30,
+            unidade: 'ASSESSORIA_12',
+            expandir: ['SECRETARIA_1']
+        });
+
+        await acessarDetalhesProcesso(page, descProcRevisaoHierarquiaInteroperacional);
+        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await verificarPaginaPainel(page);
+        await verificarProcessoNaTabela(page, {
+            descricao: descProcRevisaoHierarquiaInteroperacional,
+            situacao: 'Em andamento',
+            tipo: 'Revisão'
+        });
+
+        await loginComPerfil(
+            page,
+            USUARIOS.CHEFE_SECRETARIA_1.titulo,
+            USUARIOS.CHEFE_SECRETARIA_1.senha,
+            USUARIOS.CHEFE_SECRETARIA_1.perfil
+        );
+        await verificarPaginaPainel(page);
+        await expect(
+            page.getByTestId('tbl-processos').locator('tr').filter({hasText: descProcRevisaoHierarquiaInteroperacional})
+        ).toHaveCount(0);
+
+        await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+        await acessarSubprocessoChefeDireto(page, descProcRevisaoHierarquiaInteroperacional, 'ASSESSORIA_12');
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
     });
 
     test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({_resetAutomatico, page}) => {

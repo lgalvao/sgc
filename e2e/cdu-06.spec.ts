@@ -113,6 +113,43 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
     });
 
+    test('Fase 1c: Deve ocultar detalhes da revisão para chefe de secretaria interoperacional sem subprocesso próprio', async ({
+        _resetAutomatico,
+        page
+    }) => {
+        const timestamp = Date.now();
+        const descricao = `Processo CDU-06 Revisao Hierarquia ${timestamp}`;
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await criarProcesso(page, {
+            descricao,
+            tipo: 'REVISAO',
+            diasLimite: 30,
+            unidade: 'ASSESSORIA_12',
+            expandir: ['SECRETARIA_1'],
+            iniciar: true
+        });
+
+        await acessarDetalhesProcesso(page, descricao);
+        await esperarPaginaDetalhesProcesso(page);
+
+        await loginComPerfil(
+            page,
+            USUARIOS.CHEFE_SECRETARIA_1.titulo,
+            USUARIOS.CHEFE_SECRETARIA_1.senha,
+            USUARIOS.CHEFE_SECRETARIA_1.perfil
+        );
+        await verificarPaginaPainel(page);
+        await expect(
+            page.getByTestId('tbl-processos').locator('tr').filter({hasText: descricao})
+        ).toHaveCount(0);
+
+        await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+        await expect(page.getByTestId('tbl-processos').getByRole('row', {name: descricao})).toBeVisible();
+        await acessarSubprocessoChefeDireto(page, descricao, 'ASSESSORIA_12');
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
+    });
+
     test('Fase 2: Verificar botões de ação em bloco [Step 2.2.2]', async ({_resetAutomatico, page}) => {
         const timestamp = Date.now();
         const descricao = `Bloco CDU-06 ${timestamp}`;

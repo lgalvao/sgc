@@ -14,7 +14,7 @@
         <BNavItem :to="linkUnidade">
           <i :class="iconUnidade" aria-hidden="true"/> {{ labelUnidade }}
         </BNavItem>
-        <BNavItem to="/relatorios">
+        <BNavItem v-if="podeVerRelatorios" to="/relatorios">
           <i aria-hidden="true" class="bi bi-bar-chart-line me-1"/> {{ TEXTOS.comum.MENU_RELATORIOS }}
         </BNavItem>
         <BNavItem to="/historico">
@@ -97,6 +97,7 @@ const {
   perfilSelecionado,
   unidadeSelecionada,
   isAdmin,
+  podeVerRelatorios,
   mostrarArvoreCompletaUnidades,
   mostrarMenuConfiguracoes,
   mostrarMenuAdministradores
