@@ -4,6 +4,9 @@ export interface RelatorioAndamento {
   siglaUnidade: string;
   nomeUnidade: string;
   situacaoAtual: string;
+  dataLimite: string;
+  dataFimEtapa1: string | null;
+  dataFimEtapa2: string | null;
   dataUltimaMovimentacao: string;
   responsavel: string;
   titular: string;

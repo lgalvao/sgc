@@ -58,6 +58,9 @@ class RelatorioFacadeTest {
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
+        sp.setDataFimEtapa1(java.time.LocalDateTime.of(2023, 10, 11, 15, 30));
+        sp.setDataLimiteEtapa2(java.time.LocalDateTime.of(2023, 10, 20, 18, 0));
+        sp.setDataFimEtapa2(java.time.LocalDateTime.of(2023, 10, 21, 9, 45));
 
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(responsavelService.buscarResponsaveisUnidades(List.of(1L)))
@@ -70,9 +73,36 @@ class RelatorioFacadeTest {
         assertThat(dto.siglaUnidade()).isEqualTo("U1");
         assertThat(dto.nomeUnidade()).isEqualTo("Unidade 1");
         assertThat(dto.situacaoAtual()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name());
+        assertThat(dto.dataLimite()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 20, 18, 0));
+        assertThat(dto.dataFimEtapa1()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 11, 15, 30));
+        assertThat(dto.dataFimEtapa2()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 21, 9, 45));
         assertThat(dto.dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
         assertThat(dto.responsavel()).isEqualTo("Resp");
         assertThat(dto.titular()).isEqualTo("Resp");
+    }
+
+    @Test
+    @DisplayName("Deve usar data limite da etapa 1 quando nao houver etapa 2")
+    void deveUsarDataLimiteEtapa1QuandoNaoHouverEtapa2() {
+        Unidade unidade = new Unidade();
+        unidade.setSigla("U1");
+        unidade.setNome("Unidade 1");
+        unidade.setCodigo(1L);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(unidade);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(responsavelService.buscarResponsaveisUnidades(List.of(1L)))
+                .thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularNome("Resp").build()));
+
+        List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
+
+        assertThat(resultado.getFirst().dataLimite()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+        assertThat(resultado.getFirst().dataFimEtapa1()).isNull();
+        assertThat(resultado.getFirst().dataFimEtapa2()).isNull();
     }
 
     @Test
@@ -90,6 +120,10 @@ class RelatorioFacadeTest {
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
+        sp.setDataFimEtapa1(java.time.LocalDateTime.of(2023, 10, 11, 15, 30));
+        sp.setDataLimiteEtapa2(java.time.LocalDateTime.of(2023, 10, 20, 18, 0));
+        sp.setDataFimEtapa2(java.time.LocalDateTime.of(2023, 10, 21, 9, 45));
 
         when(processoService.buscarPorCodigo(1L)).thenReturn(p);
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
@@ -99,6 +133,10 @@ class RelatorioFacadeTest {
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
         verify(document, atLeastOnce()).add(any());
+        verify(document).add(argThat(element -> element instanceof Paragraph paragraph
+                && paragraph.getContent().contains("Data limite: 20/10/2023 18:00")
+                && paragraph.getContent().contains("Data de finalização da etapa 1: 11/10/2023 15:30")
+                && paragraph.getContent().contains("Data de finalização da etapa 2: 21/10/2023 09:45")));
     }
 
     @Test

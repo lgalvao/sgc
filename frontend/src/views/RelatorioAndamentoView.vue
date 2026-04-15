@@ -24,8 +24,8 @@
           <BButton
             :disabled="!processoIdSelecionado || carregando"
             variant="primary"
-            @click="gerarRelatorio"
             data-testid="btn-gerar-andamento"
+            @click="gerarRelatorio"
           >
             <BSpinner v-if="carregando" small class="me-1" />
             <i v-else class="bi bi-search me-1" />
@@ -33,7 +33,7 @@
           </BButton>
         </BCol>
         <BCol v-if="relatorioAndamento.length > 0" md="auto">
-          <BButton variant="outline-success" @click="exportarPdf" data-testid="btn-exportar-andamento">
+          <BButton variant="outline-success" data-testid="btn-exportar-andamento" @click="exportarPdf">
             <i class="bi bi-file-earmark-pdf me-1" />
             {{ TEXTOS.relatorios.BOTAO_PDF }}
           </BButton>
@@ -78,6 +78,7 @@ import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";
 import type {ProcessoResumo} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
+import {formatDateTimeBR} from "@/utils/dateUtils";
 
 const relatoriosStore = useRelatoriosStore();
 const { notify } = useNotification();
@@ -91,6 +92,9 @@ const relatorioAndamento = computed(() => relatoriosStore.relatorioAndamento);
 const campos = [
   { key: 'siglaUnidade', label: 'Unidade', sortable: true },
   { key: 'situacaoAtual', label: 'Situação', sortable: true },
+  { key: 'dataLimite', label: 'Data limite', sortable: true, formatter: (valor: unknown) => formatDateTimeBR(valor as string | null) },
+  { key: 'dataFimEtapa1', label: 'Fim da etapa 1', sortable: true, formatter: (valor: unknown) => formatDateTimeBR(valor as string | null) },
+  { key: 'dataFimEtapa2', label: 'Fim da etapa 2', sortable: true, formatter: (valor: unknown) => formatDateTimeBR(valor as string | null) },
   { key: 'responsavel', label: 'Responsável', sortable: true },
 ];
 
