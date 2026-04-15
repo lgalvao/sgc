@@ -7,7 +7,7 @@ import {
     devolverCadastroMapeamento
 } from './helpers/helpers-analise.js';
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
-import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -62,7 +62,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnHomologar = page.getByRole('button', {name: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO}).first();
+        const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
         await expect(btnHomologar).toBeVisible();
         await expect(btnHomologar).toBeEnabled();
         await btnHomologar.click();
@@ -82,7 +82,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
-        const btnHomologar = page.getByRole('button', {name: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO}).first();
+        const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
 
@@ -165,6 +165,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
 
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        await expect(page.getByRole('button', {name: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO}).first()).toBeDisabled();
+        const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
+        await expect(btnHomologar).toBeDisabled();
     });
 });

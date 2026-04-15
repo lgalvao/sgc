@@ -18,9 +18,9 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @DisplayName("UnidadeHierarquiaService - Cobertura de Testes")
 @SuppressWarnings("NullAway.Init")
 class UnidadeHierarquiaServiceCoverageTest {
-
     @Mock
     private UnidadeRepo unidadeRepo;
+
     @Mock
     private UnidadeService unidadeService;
 
@@ -39,7 +39,7 @@ class UnidadeHierarquiaServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("Deve cobrir as linhas [48, 49, 50, 52, 53, 54, 55] do método buscarArvoreComElegibilidade")
+    @DisplayName("Deve cobrir método buscarArvoreComElegibilidade")
     void deveCobrirBuscarArvoreComElegibilidade() {
         // Mocking para requerMapaVigente = true
         when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L));
@@ -50,6 +50,7 @@ class UnidadeHierarquiaServiceCoverageTest {
                 new UnidadeHierarquiaLeitura(30L, "U3", "U3", null, OPERACIONAL, SituacaoUnidade.ATIVA, null),
                 new UnidadeHierarquiaLeitura(40L, "U4", "U4", null, OPERACIONAL, SituacaoUnidade.ATIVA, null)
         ));
+
         when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(10L, 20L, 30L, 40L))).thenReturn(List.of(
                 new ResponsabilidadeLeitura(10L, "111"),
                 new ResponsabilidadeLeitura(30L, "333"),
@@ -71,7 +72,7 @@ class UnidadeHierarquiaServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("Deve cobrir as linhas [222] do método buscarNaHierarquiaPorSigla")
+    @DisplayName("Deve cobrir método buscarNaHierarquiaPorSigla")
     void deveCobrirBuscarNaHierarquiaPorSigla() {
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
                 new UnidadeHierarquiaLeitura(1L, "RAIZ", "RAIZ", null, RAIZ, SituacaoUnidade.ATIVA, null),
@@ -105,7 +106,6 @@ class UnidadeHierarquiaServiceCoverageTest {
         ));
 
         List<UnidadeDto> resultado = target.buscarArvoreHierarquica();
-
         assertThat(resultado).isEmpty();
     }
 }

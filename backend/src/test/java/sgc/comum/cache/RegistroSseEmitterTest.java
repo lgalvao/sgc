@@ -21,7 +21,6 @@ class RegistroSseEmitterTest {
         registroSseEmitter = new RegistroSseEmitter();
     }
 
-    @SuppressWarnings("unchecked")
     private CopyOnWriteArrayList<SseEmitter> obterEmissores() {
         return (CopyOnWriteArrayList<SseEmitter>) ReflectionTestUtils.getField(registroSseEmitter, "emissores");
     }

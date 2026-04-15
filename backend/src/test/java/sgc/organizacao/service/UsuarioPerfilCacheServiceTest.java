@@ -15,7 +15,6 @@ import static org.mockito.Mockito.*;
 @SpringJUnitConfig(classes = {CacheConfig.class, UsuarioPerfilCacheService.class})
 @DisplayName("UsuarioPerfilCacheService")
 class UsuarioPerfilCacheServiceTest {
-
     @Autowired
     private UsuarioPerfilCacheService usuarioPerfilCacheService;
 

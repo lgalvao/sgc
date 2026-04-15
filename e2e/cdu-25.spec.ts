@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture} from './fixtures/index.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -30,13 +30,13 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         });
 
         await test.step('Cenario 1: GESTOR visualiza botões de ação em bloco', async () => {
-            const btnAceitar = page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO}).first();
+            const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-mapas-bloco');
             await expect(btnAceitar).toBeVisible();
             await expect(btnAceitar).toBeEnabled();
         });
 
         await test.step('Cenario 2: GESTOR abre modal e cancela o aceite', async () => {
-            const btnAceitar = page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO}).first();
+            const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-mapas-bloco');
             await btnAceitar.click();
 
             const modal = page.getByRole('dialog');
@@ -51,7 +51,8 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         });
 
         await test.step('Cenario 3: GESTOR realiza aceite em bloco com sucesso', async () => {
-            await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO}).first().click();
+            const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-mapas-bloco');
+            await btnAceitar.click();
 
             const modal = page.getByRole('dialog');
             await expect(modal).toBeVisible();
@@ -86,7 +87,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarDetalhesProcesso(page, descIsolada);
 
-        const btnAceitar = page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO}).first();
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-mapas-bloco');
         await expect(btnAceitar).toBeVisible();
         await btnAceitar.click();
 
@@ -99,7 +100,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             page,
             USUARIOS.GESTOR_SECRETARIA_2.titulo,
             USUARIOS.GESTOR_SECRETARIA_2.senha,
-            USUARIOS.GESTOR_SECRETARIA_2.perfil!
+            USUARIOS.GESTOR_SECRETARIA_2.perfil
         );
         await page.goto(`/processo/${processoIsolado.codigo}`);
         await navegarParaSubprocesso(page, UNIDADE_1);

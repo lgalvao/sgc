@@ -4,6 +4,7 @@ import {
     acessarDetalhesProcesso,
     criarProcesso,
     extrairProcessoCodigo,
+    obterAcaoBloco,
     verificarDetalhesProcesso,
     verificarUnidadeParticipante
 } from './helpers/helpers-processos.js';
@@ -143,12 +144,14 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page, codProcesso);
-        await expect(page.getByRole('button', {name: 'Homologar em bloco'})).toBeVisible();
+        const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
+        await expect(btnHomologar).toBeVisible();
 
         // John lennon (202020) é Gestor da SECRETARIA_1 (que engloba ASSESSORIA_12)
         await loginComPerfil(page, '202020', 'senha', 'GESTOR - SECRETARIA_1');
         await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page, codProcesso);
-        await expect(page.getByRole('button', {name: 'Aceitar cadastro em bloco'})).toBeVisible();
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
+        await expect(btnAceitar).toBeVisible();
     });
 });

@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -50,7 +50,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     }) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
-        const btnDisponibilizar = page.getByTestId('btn-processo-disponibilizar-bloco');
+        const btnDisponibilizar = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
         await expect(btnDisponibilizar).toBeVisible();
         await expect(btnDisponibilizar).toBeDisabled();
     });
@@ -69,7 +69,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     test('ADMIN abre modal de disponibilização em bloco e cancela operação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
-        const btnDisponibilizar = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO}).first();
+        const btnDisponibilizar = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
         await expect(btnDisponibilizar).toBeEnabled();
         await btnDisponibilizar.click();
 
@@ -96,7 +96,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await acessarDetalhesProcesso(page, descProcesso);
         
         // Validação da UI da ação em bloco
-        const btnDisponibilizar = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO}).first();
+        const btnDisponibilizar = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
         await expect(btnDisponibilizar).toBeEnabled();
         await btnDisponibilizar.click();
 

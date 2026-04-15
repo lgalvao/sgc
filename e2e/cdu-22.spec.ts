@@ -4,7 +4,7 @@ import {
     criarProcessoRevisaoCadastroDisponibilizadoFixture
 } from './fixtures/index.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -46,7 +46,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeEnabled();
         await btnAceitar.click();
@@ -69,7 +69,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeDisabled();
     });
@@ -78,7 +78,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         // autenticadoComoGestorCoord22 já logou como GESTOR COORD_22
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        await page.getByTestId('btn-processo-aceitar-bloco').click();
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
+        await btnAceitar.click();
         await page.locator('#modal-acao-bloco').getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
 
@@ -86,7 +87,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        await expect(page.getByTestId('btn-processo-aceitar-bloco')).toBeEnabled();
+        await expect(await obterAcaoBloco(page, 'btn-processo-aceitar-bloco')).toBeEnabled();
     });
 
     test('Cenario 4: Botão desabilitado para gestor superior quando item está com intermediário', async ({_resetAutomatico, request, page}) => {
@@ -101,7 +102,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await acessarDetalhesProcesso(page, `CDU-22-C4 ${timestamp4}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeDisabled();
     });
@@ -122,7 +123,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarDetalhesProcesso(page, descIsolada);
-        await page.getByTestId('btn-processo-aceitar-bloco').click();
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
+        await btnAceitar.click();
 
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal).toHaveClass(/show/);
@@ -171,7 +173,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
         await acessarDetalhesProcesso(page, descProcessoRevisao);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
+        const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeEnabled();
         await btnAceitar.click();

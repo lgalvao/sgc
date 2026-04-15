@@ -1,6 +1,5 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +11,7 @@ import sgc.organizacao.model.*;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -45,8 +45,7 @@ class CacheViewsOrganizacaoServiceTest {
     @Test
     @DisplayName("deve evictar unidades sem erros")
     void evictarUnidades() {
-        cacheService.evictarUnidades();
-        // Apenas verifica se não lança erro
+        assertDoesNotThrow(() -> cacheService.evictarUnidades());
     }
 
     @Test
@@ -70,8 +69,7 @@ class CacheViewsOrganizacaoServiceTest {
     @Test
     @DisplayName("deve evictar usuários sem erros")
     void evictarUsuarios() {
-        cacheService.evictarUsuarios();
-        // Apenas verifica se não lança erro
+        assertDoesNotThrow(() -> cacheService.evictarUsuarios());
     }
 
     @Test
@@ -93,8 +91,7 @@ class CacheViewsOrganizacaoServiceTest {
     @Test
     @DisplayName("deve evictar responsabilidades sem erros")
     void evictarResponsabilidades() {
-        cacheService.evictarResponsabilidades();
-        // Apenas verifica se não lança erro
+        assertDoesNotThrow(() -> cacheService.evictarResponsabilidades());
     }
 
     @Test
@@ -112,7 +109,6 @@ class CacheViewsOrganizacaoServiceTest {
     @Test
     @DisplayName("deve evictar perfis de unidade sem erros")
     void evictarPerfisUnidade() {
-        cacheService.evictarPerfisUnidade();
-        // Apenas verifica se não lança erro
+        assertDoesNotThrow(() -> cacheService.evictarPerfisUnidade());
     }
 }

@@ -364,6 +364,7 @@ export const TEXTOS = {
   processo: {
     CONCLUIDO: "Processo concluído.",
     FINALIZAR: "Finalizar",
+    ACOES_EM_BLOCO: "Ações em bloco",
     CARREGANDO_DETALHES: "Carregando detalhes do processo...",
     ERRO_PADRAO: "Ocorreu um erro",
     FINALIZACAO_TITULO: "Finalização de processo",

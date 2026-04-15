@@ -18,9 +18,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnidadeService")
-@SuppressWarnings("NullAway.Init")
 class UnidadeServiceTest {
-
     @Mock
     private UnidadeRepo unidadeRepo;
 

@@ -37,15 +37,32 @@
             {{ TEXTOS.processo.FINALIZAR }}
           </BButton>
 
+          <BDropdown
+              v-if="usarMenuAcoesBloco"
+              data-testid="btn-processo-acoes-bloco"
+              :disabled="processandoAcaoBloco"
+              :text="TEXTOS.processo.ACOES_EM_BLOCO"
+              toggle-class="text-nowrap"
+              variant="secondary">
+            <BDropdownItemButton
+                v-for="acao in acoesBlocoVisiveis"
+                :id="obterIdBotaoAcao(acao.codigo)"
+                :key="acao.codigo"
+                :data-testid="obterTestIdBotaoAcao(acao.codigo)"
+                :disabled="!acao.habilitar || processandoAcaoBloco"
+                @click="abrirModalBloco(acao)">
+              {{ acao.rotulo }}
+            </BDropdownItemButton>
+          </BDropdown>
+
           <BButton
-              v-for="acao in acoesBlocoVisiveis"
-              :id="obterIdBotaoAcao(acao.codigo)"
-              :key="acao.codigo"
-              :data-testid="obterTestIdBotaoAcao(acao.codigo)"
-              :disabled="!acao.habilitar || processandoAcaoBloco"
+              v-else-if="acaoBlocoPrincipal"
+              :id="obterIdBotaoAcao(acaoBlocoPrincipal.codigo)"
+              :data-testid="obterTestIdBotaoAcao(acaoBlocoPrincipal.codigo)"
+              :disabled="!acaoBlocoPrincipal.habilitar || processandoAcaoBloco"
               variant="success"
-              @click="abrirModalBloco(acao)">
-            {{ acao.rotulo }}
+              @click="abrirModalBloco(acaoBlocoPrincipal)">
+            {{ acaoBlocoPrincipal.rotulo }}
           </BButton>
         </template>
       </PageHeader>
@@ -90,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BSpinner} from "bootstrap-vue-next";
+import {BButton, BDropdown, BDropdownItemButton, BSpinner} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
@@ -165,6 +182,8 @@ const podeFinalizar = computed(() => {
 });
 
 const acoesBlocoVisiveis = computed(() => (processo.value?.acoesBloco ?? []).filter(acao => acao.mostrar));
+const usarMenuAcoesBloco = computed(() => acoesBlocoVisiveis.value.length > 1);
+const acaoBlocoPrincipal = computed(() => acoesBlocoVisiveis.value[0] ?? null);
 
 const unidadesElegiveis = computed(() => {
   const elegiveis = acaoBlocoAtual.value?.unidades ?? [];

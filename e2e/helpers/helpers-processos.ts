@@ -1,4 +1,4 @@
-import {expect, type Page} from '@playwright/test';
+import {expect, type Locator, type Page} from '@playwright/test';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 const ROTULOS_TIPO_PROCESSO = {
@@ -265,6 +265,19 @@ export async function extrairProcessoCodigo(page: Page): Promise<number> {
     throw new Error(
         `Não foi possível extrair código do processo da URL: ${url}`
     );
+}
+
+export async function obterAcaoBloco(page: Page, testId: string): Promise<Locator> {
+    const acao = page.getByTestId(testId);
+    if (await acao.isVisible().catch(() => false)) {
+        return acao;
+    }
+
+    const botaoMenu = page.getByRole('button', {name: new RegExp(`^${TEXTOS.processo.ACOES_EM_BLOCO}$`, 'i')}).first();
+    await expect(botaoMenu).toBeVisible();
+    await botaoMenu.click();
+    await expect(acao).toBeVisible();
+    return acao;
 }
 
 /**

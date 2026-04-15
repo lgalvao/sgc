@@ -257,6 +257,32 @@ const BSpinnerStub = {
     props: ["label", "variant"]
 };
 
+const BDropdownStub = {
+    name: "BDropdown",
+    template: `
+      <div :data-testid="$attrs['data-testid']">
+        <button type="button">{{ text }}</button>
+        <slot />
+      </div>
+    `,
+    props: ["text", "variant", "disabled", "toggleClass"]
+};
+
+const BDropdownItemButtonStub = {
+    name: "BDropdownItemButton",
+    template: `
+      <button
+        :id="$attrs.id"
+        :data-testid="$attrs['data-testid']"
+        :disabled="disabled"
+        type="button"
+        @click="$emit('click', $event)">
+        <slot />
+      </button>
+    `,
+    props: ["disabled"]
+};
+
 describe("Processo.vue", () => {
     let wrapper: any;
     let perfilStore: any;
@@ -295,7 +321,9 @@ describe("Processo.vue", () => {
                     ProcessoInfo: ProcessoInfoStub,
                     BAlert: BAlertStub,
                     BSpinner: BSpinnerStub,
-                    BButton: {template: '<button @click="$emit(\'click\', $event)"><slot /></button>'}
+                    BButton: {template: '<button @click="$emit(\'click\', $event)"><slot /></button>'},
+                    BDropdown: BDropdownStub,
+                    BDropdownItemButton: BDropdownItemButtonStub
                 }
             }
         });
@@ -350,6 +378,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
+        expect(wrapper.find('[data-testid="btn-processo-acoes-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').text()).toContain(TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO);
         expect(wrapper.find('[data-testid="btn-processo-aceitar-mapas-bloco"]').exists()).toBe(true);
@@ -359,6 +388,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
+        expect(wrapper.find('[data-testid="btn-processo-acoes-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-homologar-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-homologar-mapas-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-disponibilizar-bloco"]').exists()).toBe(true);
@@ -666,6 +696,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
+        expect(wrapper.find('[data-testid="btn-processo-acoes-bloco"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-homologar-bloco"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="btn-processo-disponibilizar-bloco"]').exists()).toBe(false);
@@ -733,6 +764,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
+        expect(wrapper.find('[data-testid="btn-processo-acoes-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-homologar-bloco"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="btn-processo-homologar-mapas-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-disponibilizar-bloco"]').exists()).toBe(true);

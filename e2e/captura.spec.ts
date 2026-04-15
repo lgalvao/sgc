@@ -5,7 +5,8 @@ import {
     confirmarInicioProcessoPeloDialogo,
     criarProcesso,
     extrairProcessoCodigo,
-    iniciarProcessoPeloCadastro
+    iniciarProcessoPeloCadastro,
+    obterAcaoBloco
 } from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
@@ -1166,7 +1167,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             // Capturar botão de aceitar em bloco (se visível)
-            const btnAceitarBloco = page.getByTestId('btn-processo-aceitar-bloco');
+            const btnAceitarBloco = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
             await expect(btnAceitarBloco).toBeVisible();
             await btnAceitarBloco.click();
             await expect(page.getByRole('dialog')).toBeVisible();
@@ -1174,9 +1175,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Executar aceite real para mover subprocesso para Secretaria 2
-            await btnAceitarBloco.click();
+            const btnAceitarBlocoConfirmacao = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
+            await btnAceitarBlocoConfirmacao.click();
             await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
-            await expect(btnAceitarBloco).toBeHidden();
+            await expect(page).toHaveURL(/\/painel/);
 
             // Login como Gestor da SECRETARIA_2 para aceitar e mover para o ADMIN
             await loginComPerfil(
@@ -1188,11 +1190,11 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
             
-            const btnAceitarBlocoSec2 = page.getByTestId('btn-processo-aceitar-bloco');
+            const btnAceitarBlocoSec2 = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
             await expect(btnAceitarBlocoSec2).toBeVisible();
             await btnAceitarBlocoSec2.click();
             await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
-            await expect(btnAceitarBlocoSec2).toBeHidden();
+            await expect(page).toHaveURL(/\/painel/);
 
             // Login como Admin para homologar em bloco
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -1201,7 +1203,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
             // Capturar botão de homologar cadastro em bloco (CDU-23)
-            const btnHomologarBloco = page.getByTestId('btn-processo-homologar-bloco');
+            const btnHomologarBloco = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
             await expect(btnHomologarBloco).toBeVisible();
             await btnHomologarBloco.click();
             await expect(page.getByRole('dialog')).toBeVisible();
@@ -1209,7 +1211,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
-            const btnDisponibilizarMapaBloco = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO});
+            const btnDisponibilizarMapaBloco = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
             await expect(btnDisponibilizarMapaBloco).toBeVisible();
             await expect(btnDisponibilizarMapaBloco).toBeDisabled();
 
@@ -1217,7 +1219,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});
             await expect(btnAceitarMapaBloco).toBeHidden();
 
-            const btnHomologarMapaBloco = page.getByTestId('btn-processo-homologar-mapas-bloco');
+            const btnHomologarMapaBloco = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
             await expect(btnHomologarMapaBloco).toBeVisible();
             await expect(btnHomologarMapaBloco).toBeDisabled();
         });
