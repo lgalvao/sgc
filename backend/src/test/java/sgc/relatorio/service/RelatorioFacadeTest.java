@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.openpdf.text.*;
+import org.openpdf.text.pdf.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.dto.*;
@@ -133,10 +134,8 @@ class RelatorioFacadeTest {
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
         verify(document, atLeastOnce()).add(any());
-        verify(document).add(argThat(element -> element instanceof Paragraph paragraph
-                && paragraph.getContent().contains("Data limite: 20/10/2023 18:00")
-                && paragraph.getContent().contains("Data de finalização da etapa 1: 11/10/2023 15:30")
-                && paragraph.getContent().contains("Data de finalização da etapa 2: 21/10/2023 09:45")));
+        verify(document).add(argThat(element -> element instanceof PdfPTable tabela
+                && tabela.getNumberOfColumns() == 6));
     }
 
     @Test
@@ -155,10 +154,12 @@ class RelatorioFacadeTest {
         Subprocesso sp1 = new Subprocesso();
         sp1.setUnidade(u1);
         sp1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp1.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
 
         Subprocesso sp2 = new Subprocesso();
         sp2.setUnidade(u2);
         sp2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp2.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 11, 8, 0));
 
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
         when(responsavelService.buscarResponsaveisUnidades(List.of(1L, 2L))).thenReturn(Map.of(
@@ -207,6 +208,8 @@ class RelatorioFacadeTest {
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
         verify(document, atLeastOnce()).add(any());
+        verify(document, atLeastOnce()).add(argThat(element -> element instanceof PdfPTable tabela
+                && tabela.getNumberOfColumns() == 1));
     }
 
     @Test

@@ -9,7 +9,7 @@ import java.io.*;
 @Component
 public class PdfFactory {
     public Document createDocument() {
-        return new Document();
+        return new Document(PageSize.A4.rotate(), 36f, 36f, 54f, 42f);
     }
 
     public void createWriter(Document document, OutputStream outputStream) throws DocumentException {
