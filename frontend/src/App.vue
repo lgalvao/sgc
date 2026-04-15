@@ -7,6 +7,7 @@ import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
 import {TEXTOS} from "@/constants/textos";
 import {usePerfilStore} from "@/stores/perfil";
+import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useCacheSync} from "@/composables/useCacheSync";
 
 interface PackageJson {
@@ -17,6 +18,7 @@ interface PackageJson {
 
 const route = useRoute();
 const perfilStore = usePerfilStore();
+const organizacaoStore = useOrganizacaoStore();
 const version = (pkg as PackageJson).version;
 
 watch(
@@ -28,6 +30,22 @@ watch(
 
         const encerrarSincronizacao = useCacheSync();
         aoLimpar(encerrarSincronizacao);
+    },
+    {immediate: true}
+);
+
+const devePrecarregarDiagnostico = computed(
+    () => perfilStore.permissoesSessao?.mostrarDiagnosticoOrganizacional === true
+);
+
+watch(
+    () => [perfilStore.usuarioCodigo, devePrecarregarDiagnostico.value],
+    ([codigo, deveExibir]) => {
+      if (!codigo || !deveExibir) {
+        return;
+      }
+
+      void organizacaoStore.garantirDiagnostico(true);
     },
     {immediate: true}
 );

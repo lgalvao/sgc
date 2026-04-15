@@ -6,10 +6,12 @@
       </template>
     </PageHeader>
 
-    <div v-if="exibirAlertaDiagnostico" class="sticky-top mb-3">
+    <div v-if="exibirAlertaDiagnostico" class="mb-3 pt-2">
       <BAlert
           :model-value="true"
+          dismissible
           variant="warning"
+          @dismissed="dispensarAlertaDiagnostico"
       >
         <strong>Há unidades sem responsável atual.</strong>
         <div class="mt-1">{{ resumoDiagnostico }}</div>
@@ -105,9 +107,11 @@ const resumoDiagnostico = computed(() =>
         ?? diagnosticoOrganizacional.value?.resumo
         ?? ""
 );
+const alertaDiagnosticoDispensado = ref(false);
 const exibirAlertaDiagnostico = computed(() =>
     mostrarDiagnosticoOrganizacional.value
     && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
+    && !alertaDiagnosticoDispensado.value
 );
 
 const colunas = [
@@ -130,6 +134,10 @@ const dadosArvore = computed(() => mapearUnidadesParaLinhas(unidadesExibidas.val
 
 function clearError() {
   erro.value = null;
+}
+
+function dispensarAlertaDiagnostico() {
+  alertaDiagnosticoDispensado.value = true;
 }
 
 async function carregarUnidades() {
