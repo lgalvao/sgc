@@ -372,6 +372,44 @@ describe('SubprocessoView Coverage', () => {
         await vm.enviarLembreteConfirmado();
     });
 
+    it('ignora envios repetidos de lembrete enquanto a operação está em andamento', async () => {
+        const pinia = createTestingPinia({createSpy: vi.fn});
+
+        subprocessosMock.subprocessoDetalhe = {
+            codigo: 123,
+            unidade: {codigo: 1, sigla: 'TEST'},
+            situacao: 'MAPEAMENTO_CADASTRO_DISPONIBILIZADO'
+        };
+
+        const wrapper = mount(SubprocessoView, {
+            global: {
+                plugins: [pinia],
+                stubs
+            },
+            props: {codProcesso: 1, siglaUnidade: 'TEST'}
+        });
+
+        const vm = wrapper.vm as any;
+        vm.codSubprocesso = 123;
+
+        let resolver!: () => void;
+        vi.mocked(processoService.enviarLembrete).mockImplementation(() => new Promise<void>((resolve) => {
+            resolver = resolve;
+        }) as never);
+
+        const primeiraExecucao = vm.enviarLembreteConfirmado();
+        const segundaExecucao = vm.enviarLembreteConfirmado();
+
+        expect(processoService.enviarLembrete).toHaveBeenCalledTimes(1);
+        expect(vm.loadingLembrete).toBe(true);
+
+        resolver();
+        await primeiraExecucao;
+        await segundaExecucao;
+
+        expect(vm.loadingLembrete).toBe(false);
+    });
+
     it('covers miscellaneous UI logic', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
         subprocessosMock.subprocessoDetalhe = {

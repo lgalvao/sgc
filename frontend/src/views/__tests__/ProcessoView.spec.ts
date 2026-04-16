@@ -223,7 +223,7 @@ const ModalAcaoBlocoStub = {
 const ModalConfirmacaoStub = {
     name: "ModalConfirmacao",
     template: '<div v-if="modelValue" id="modal-confirmacao-stub"><slot /></div>',
-    props: ["modelValue", "titulo", "variant", "okTitle"]
+    props: ["modelValue", "titulo", "variant", "okTitle", "loading"]
 };
 
 
@@ -883,6 +883,27 @@ describe("Processo.vue", () => {
         expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
         expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.PROCESSO_FINALIZADO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
+    });
+
+    it("ignora confirmações repetidas enquanto a finalização está em andamento", async () => {
+        wrapper = createWrapper();
+
+        await nextTick();
+        await flushPromises();
+
+        let resolver!: () => void;
+        vi.mocked(processoService.finalizarProcesso).mockImplementation(() => new Promise<void>((resolve) => {
+            resolver = resolve;
+        }) as any);
+
+        const primeiraExecucao = (wrapper.vm as any).confirmarFinalizacao();
+        const segundaExecucao = (wrapper.vm as any).confirmarFinalizacao();
+
+        expect(processoService.finalizarProcesso).toHaveBeenCalledTimes(1);
+
+        resolver();
+        await primeiraExecucao;
+        await segundaExecucao;
     });
 
     it("deve lidar com atualizações de estado do modal, descarte de notificações, erros de navegação e exibição de carregamento", async () => {

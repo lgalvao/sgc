@@ -91,6 +91,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalFinalizacao"
+        :loading="loadingFinalizacao"
         :ok-title="TEXTOS.comum.BOTAO_FINALIZAR"
         test-codigo-cancelar="btn-finalizar-processo-cancelar"
         test-codigo-confirmar="btn-finalizar-processo-confirmar"
@@ -153,6 +154,7 @@ const modalBlocoRef = ref<ModalAcaoBlocoRef | null>(null);
 const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<AcaoBlocoProcesso | null>(null);
 const processandoAcaoBloco = ref(false);
+const loadingFinalizacao = ref(false);
 const carregamentoInicialConcluido = ref(false);
 
 function clearError() {
@@ -258,6 +260,10 @@ function obterTestIdBotaoAcao(codigoAcao: string) {
 }
 
 async function confirmarFinalizacao() {
+  if (loadingFinalizacao.value) {
+    return;
+  }
+  loadingFinalizacao.value = true;
   try {
     clearError();
     await processoService.finalizarProcesso(codProcesso);
@@ -268,6 +274,8 @@ async function confirmarFinalizacao() {
     lastError.value = normalizeError(error);
     const mensagem = lastError.value?.message || TEXTOS.processo.ERRO_PADRAO;
     notify(mensagem, 'danger');
+  } finally {
+    loadingFinalizacao.value = false;
   }
 }
 

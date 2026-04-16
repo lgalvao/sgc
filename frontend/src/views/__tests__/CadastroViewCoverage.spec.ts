@@ -44,6 +44,7 @@ type CadastroViewVm = {
     mostrarModalHistorico: boolean;
     mostrarModalImpacto: boolean;
     loadingDisponibilizacao: boolean;
+    loadingRemocao: boolean;
     errosValidacao: Array<{atividadeCodigo?: number; mensagem: string}>;
     dadosRemocao: {tipo: string; index?: number; conhecimentoCodigo?: number} | null;
     atividadeRefs: Map<number, Element>;
@@ -139,7 +140,7 @@ const stubs = {
     ImpactoMapaModal: {template: '<div></div>', props: ['mostrar']},
     ConfirmacaoDisponibilizacaoModal: {template: '<div></div>', props: ['mostrar']},
     HistoricoAnaliseModal: {template: '<div></div>', props: ['mostrar']},
-    ModalConfirmacao: {template: '<div v-if="modelValue"></div>', props: ['modelValue']},
+    ModalConfirmacao: {template: '<div v-if="modelValue"></div>', props: ['modelValue', 'loading']},
 };
 
 function createWrapper() {
@@ -543,6 +544,39 @@ describe("CadastroView coverage", () => {
         await segundaExecucao;
 
         expect(vm.loadingDisponibilizacao).toBe(false);
+    });
+
+    it("ignora confirmações repetidas enquanto a remoção está em andamento", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+
+        vm.codSubprocesso = 123;
+        vm.atividades = [{codigo: 1, conhecimentos: []}];
+        vm.dadosRemocao = {tipo: "atividade", index: 0};
+
+        const atividadeService = await import("@/services/atividadeService");
+        let resolver!: (valor: unknown) => void;
+        vi.mocked(atividadeService.excluirAtividade).mockImplementation(() => new Promise((resolve) => {
+            resolver = resolve;
+        }) as never);
+
+        const primeiraExecucao = vm.confirmarRemocao();
+        const segundaExecucao = vm.confirmarRemocao();
+
+        expect(atividadeService.excluirAtividade).toHaveBeenCalledTimes(1);
+        expect(vm.loadingRemocao).toBe(true);
+
+        resolver({
+            atividade: null,
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            atividadesAtualizadas: [],
+            permissoes: permissoesPadrao,
+        });
+        await primeiraExecucao;
+        await segundaExecucao;
+
+        expect(vm.loadingRemocao).toBe(false);
     });
 
 });

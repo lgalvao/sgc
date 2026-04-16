@@ -208,6 +208,7 @@
   <ModalConfirmacao
       v-model="modalLembreteAberto"
       :auto-close="false"
+      :loading="loadingLembrete"
       :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
       test-codigo-confirmar="btn-confirmar-enviar-lembrete"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
@@ -283,6 +284,7 @@ const mostrarModalAlterarDataLimite = ref(false);
 const mostrarModalReabrir = ref(false);
 const loadingDataLimite = ref(false);
 const loadingReabertura = ref(false);
+const loadingLembrete = ref(false);
 const carregamentoInicialConcluido = ref(false);
 
 const camposMovimentacoes = [
@@ -475,9 +477,10 @@ async function confirmarEnviarLembrete() {
 }
 
 async function enviarLembreteConfirmado() {
-  if (!subprocesso.value || !codSubprocesso.value) {
+  if (!subprocesso.value || !codSubprocesso.value || loadingLembrete.value) {
     return;
   }
+  loadingLembrete.value = true;
   try {
     await enviarLembreteService(props.codProcesso, subprocesso.value.unidade.codigo);
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
@@ -485,6 +488,8 @@ async function enviarLembreteConfirmado() {
     notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');
   } catch {
     notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, 'danger');
+  } finally {
+    loadingLembrete.value = false;
   }
 }
 
@@ -499,6 +504,7 @@ defineExpose({
   mostrarModalAlterarDataLimite,
   mostrarModalReabrir,
   modalLembreteAberto,
+  loadingLembrete,
   justificativaReabertura
 });
 </script>

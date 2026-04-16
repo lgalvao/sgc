@@ -140,6 +140,7 @@
 
       <ModalConfirmacao
           v-model="mostrarModalConfirmacaoRemocao"
+          :loading="loadingRemocao"
           :mensagem="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO"
           :ok-title="TEXTOS.comum.BOTAO_REMOVER"
           :titulo="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TITULO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TITULO"
@@ -308,6 +309,7 @@ const {
 
 const loadingValidacao = ref(false);
 const loadingDisponibilizacao = ref(false);
+const loadingRemocao = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);
 const atividadeRefs = new Map<number, Element>();
@@ -421,10 +423,11 @@ function removerAtividade(idx: number) {
 }
 
 async function confirmarRemocao() {
-  if (!dadosRemocao.value || !codSubprocesso.value) return;
+  if (!dadosRemocao.value || !codSubprocesso.value || loadingRemocao.value) return;
 
   const {tipo, index, conhecimentoCodigo} = dadosRemocao.value;
 
+  loadingRemocao.value = true;
   try {
     if (tipo === "atividade") {
       const atividadeRemovida = atividades.value[index];
@@ -445,6 +448,8 @@ async function confirmarRemocao() {
     const err = lastError.value?.message || (e as Error).message;
     notify(err || TEXTOS.atividades.ERRO_REMOVER, 'danger');
     mostrarModalConfirmacaoRemocao.value = false;
+  } finally {
+    loadingRemocao.value = false;
   }
 }
 
