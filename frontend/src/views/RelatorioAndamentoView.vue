@@ -13,28 +13,28 @@
         <BCol md="6">
           <BFormGroup :label="TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO" label-for="select-processo">
             <BFormSelect
-              id="select-processo"
-              v-model="processoIdSelecionado"
-              :options="opcoesProcessos"
-              data-testid="select-processo-andamento"
+                id="select-processo"
+                v-model="codPprocessoSelecionado"
+                :options="opcoesProcessos"
+                data-testid="select-processo-andamento"
             />
           </BFormGroup>
         </BCol>
         <BCol md="auto">
           <BButton
-            :disabled="!processoIdSelecionado || carregando"
-            variant="primary"
-            data-testid="btn-gerar-andamento"
-            @click="gerarRelatorio"
+              :disabled="!codPprocessoSelecionado || carregando"
+              variant="primary"
+              data-testid="btn-gerar-andamento"
+              @click="gerarRelatorio"
           >
-            <BSpinner v-if="carregando" small class="me-1" />
-            <i v-else class="bi bi-search me-1" />
+            <BSpinner v-if="carregando" small class="me-1"/>
+            <i v-else class="bi bi-search me-1"/>
             {{ TEXTOS.relatorios.BOTAO_GERAR }}
           </BButton>
         </BCol>
         <BCol v-if="relatorioAndamento.length > 0" md="auto">
           <BButton variant="outline-success" data-testid="btn-exportar-andamento" @click="exportarPdf">
-            <i class="bi bi-file-earmark-pdf me-1" />
+            <i class="bi bi-file-earmark-pdf me-1"/>
             {{ TEXTOS.relatorios.BOTAO_PDF }}
           </BButton>
         </BCol>
@@ -42,26 +42,26 @@
     </BCard>
 
     <div v-if="carregando && relatorioAndamento.length === 0" class="text-center py-5">
-      <BSpinner variant="primary" />
+      <BSpinner variant="primary"/>
     </div>
 
     <template v-else>
       <div v-if="relatorioAndamento.length > 0" class="table-responsive">
         <BTable
-          :fields="campos"
-          :items="relatorioAndamento"
-          hover
-          striped
-          responsive
-          data-testid="tbl-relatorio-andamento"
+            :fields="campos"
+            :items="linhasRelatorioAndamento"
+            hover
+            striped
+            responsive
+            data-testid="tbl-relatorio-andamento"
         />
       </div>
       <EmptyState
-        v-else-if="processoIdSelecionado && !carregando"
-        :title="TEXTOS.relatorios.EMPTY_TITLE"
-        :description="TEXTOS.relatorios.EMPTY_DESCRIPTION"
-        icon="bi-table"
-        data-testid="empty-state-andamento"
+          v-else-if="codPprocessoSelecionado && !carregando"
+          :title="TEXTOS.relatorios.EMPTY_TITLE"
+          :description="TEXTOS.relatorios.EMPTY_DESCRIPTION"
+          icon="bi-table"
+          data-testid="empty-state-andamento"
       />
     </template>
   </LayoutPadrao>
@@ -78,34 +78,40 @@ import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";
 import type {ProcessoResumo} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
-import {formatDateTimeBR} from "@/utils/dateUtils";
+import {formatDateBR} from "@/utils/dateUtils";
 
 const relatoriosStore = useRelatoriosStore();
-const { notify } = useNotification();
+const {notify} = useNotification();
 
-const processoIdSelecionado = ref<number | null>(null);
+const codPprocessoSelecionado = ref<number | null>(null);
 const processosDisponiveis = ref<ProcessoResumo[]>([]);
 const carregando = ref(false);
 
 const relatorioAndamento = computed(() => relatoriosStore.relatorioAndamento);
+const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(item => ({
+  ...item,
+  dataLimite: formatDateBR(item.dataLimite),
+  dataFimEtapa1: formatDateBR(item.dataFimEtapa1),
+  dataFimEtapa2: formatDateBR(item.dataFimEtapa2)
+})));
 
 const campos = [
-  { key: 'siglaUnidade', label: 'Unidade', sortable: true },
-  { key: 'situacaoAtual', label: 'Situação', sortable: true },
-  { key: 'dataLimite', label: 'Data limite', sortable: true, formatter: (valor: unknown) => formatDateTimeBR(valor as string | null) },
-  { key: 'dataFimEtapa1', label: 'Fim da etapa 1', sortable: true, formatter: (valor: unknown) => formatDateTimeBR(valor as string | null) },
-  { key: 'dataFimEtapa2', label: 'Fim da etapa 2', sortable: true, formatter: (valor: unknown) => formatDateTimeBR(valor as string | null) },
-  { key: 'responsavel', label: 'Responsável', sortable: true },
+  {key: 'siglaUnidade', label: 'Unidade', sortable: true},
+  {key: 'situacaoAtual', label: 'Situação', sortable: true},
+  {key: 'dataLimite', label: 'Data limite', sortable: true},
+  {key: 'dataFimEtapa1', label: 'Fim da etapa 1', sortable: true},
+  {key: 'dataFimEtapa2', label: 'Fim da etapa 2', sortable: true},
+  {key: 'responsavel', label: 'Responsável', sortable: true},
 ];
 
 const opcoesProcessos = computed(() => [
-  { value: null, text: TEXTOS.relatorios.SELECIONE },
-  ...processosDisponiveis.value.map(p => ({ value: p.codigo, text: p.descricao }))
+  {value: null, text: TEXTOS.relatorios.SELECIONE},
+  ...processosDisponiveis.value.map(p => ({value: p.codigo, text: p.descricao}))
 ]);
 
 async function carregarProcessos() {
   try {
-    const response = await painelService.listarProcessos({ page: 0, size: 100 });
+    const response = await painelService.listarProcessos({page: 0, size: 100});
     processosDisponiveis.value = response?.content ?? [];
   } catch {
     notify("Erro ao carregar processos", "danger");
@@ -113,9 +119,9 @@ async function carregarProcessos() {
 }
 
 async function gerarRelatorio() {
-  if (!processoIdSelecionado.value) return;
+  if (!codPprocessoSelecionado.value) return;
   carregando.value = true;
-  await relatoriosStore.buscarRelatorioAndamento(processoIdSelecionado.value);
+  await relatoriosStore.buscarRelatorioAndamento(codPprocessoSelecionado.value);
   carregando.value = false;
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
@@ -123,8 +129,8 @@ async function gerarRelatorio() {
 }
 
 async function exportarPdf() {
-  if (!processoIdSelecionado.value) return;
-  await relatoriosStore.exportarAndamentoPdf(processoIdSelecionado.value);
+  if (!codPprocessoSelecionado.value) return;
+  await relatoriosStore.exportarAndamentoPdf(codPprocessoSelecionado.value);
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
   }

@@ -23,6 +23,7 @@ type MapaViewVm = {
     mostrarModalExcluirCompetencia: boolean;
     mostrarModalDisponibilizar: boolean;
     loadingImpacto: boolean;
+    loadingCompetencia: boolean;
     loadingExclusao: boolean;
     loadingDisponibilizacao: boolean;
     notificacaoDisponibilizacao: string;
@@ -198,7 +199,7 @@ const stubs = {
     CompetenciaCard: {template: '<div></div>', props: ['competencia', 'atividades', 'podeEditar']},
     ModalConfirmacao: {template: '<div v-if="modelValue"></div>', props: ['modelValue']},
     ImpactoMapaModal: {template: '<div></div>', props: ['mostrar']},
-    CriarCompetenciaModal: {template: '<div></div>', props: ['mostrar']},
+    CriarCompetenciaModal: {template: '<div></div>', props: ['mostrar', 'loading']},
     DisponibilizarMapaModal: {template: '<div></div>', props: ['mostrar']},
 };
 
@@ -544,5 +545,63 @@ describe("MapaView coverage", () => {
         });
 
         expect(subprocessoStoreCacheMock.invalidar).toHaveBeenCalled();
+    });
+
+    it("ignora submissões repetidas enquanto a criação de competência estiver em andamento", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as MapaViewVm;
+
+        vm.codSubprocesso = 123;
+
+        let resolver!: (valor: MapaCompleto) => void;
+        fluxoMapaMock.adicionarCompetencia = vi.fn().mockImplementation(() => new Promise<MapaCompleto>((resolve) => {
+            resolver = resolve;
+        }));
+
+        const primeiraExecucao = vm.adicionarCompetenciaEFecharModal({
+            descricao: "Competência nova",
+            atividadesSelecionadas: [1]
+        });
+        const segundaExecucao = vm.adicionarCompetenciaEFecharModal({
+            descricao: "Competência nova",
+            atividadesSelecionadas: [1]
+        });
+
+        expect(fluxoMapaMock.adicionarCompetencia).toHaveBeenCalledTimes(1);
+        expect(vm.loadingCompetencia).toBe(true);
+
+        resolver(criarMapaCompleto([{codigo: 1, descricao: "Competência nova", atividades: [{codigo: 1, descricao: "Atividade 1"}]}]));
+        await primeiraExecucao;
+        await segundaExecucao;
+
+        expect(vm.loadingCompetencia).toBe(false);
+    });
+
+    it("não recarrega o contexto após criar competência quando o mapa atualizado já veio na resposta", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as MapaViewVm;
+
+        vm.codSubprocesso = 123;
+        subprocessoStoreCacheMock.garantirContextoEdicao = vi.fn();
+        fluxoMapaMock.adicionarCompetencia = vi.fn().mockResolvedValue(criarMapaCompleto([
+            {
+                codigo: 99,
+                descricao: "Competência nova",
+                atividades: [{codigo: 1, descricao: "Atividade 1"}]
+            }
+        ]));
+
+        await vm.adicionarCompetenciaEFecharModal({
+            descricao: "Competência nova",
+            atividadesSelecionadas: [1]
+        });
+
+        expect(fluxoMapaMock.adicionarCompetencia).toHaveBeenCalledWith(123, {
+            descricao: "Competência nova",
+            atividadesIds: [1]
+        });
+        expect(subprocessoStoreCacheMock.garantirContextoEdicao).not.toHaveBeenCalled();
     });
 });

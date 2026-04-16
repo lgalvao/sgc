@@ -9,10 +9,10 @@ const ModalPadraoStub = {
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
             <button :data-testid="testCodigoCancelar" @click="$emit('fechar')">Cancelar</button>
-            <button :data-testid="testCodigoConfirmar" :disabled="acaoDesabilitada" @click="$emit('confirmar')">{{ textoAcao }}</button>
+            <button :data-testid="testCodigoConfirmar" :disabled="loading || acaoDesabilitada" @click="$emit('confirmar')">{{ textoAcao }}</button>
         </div>
     `,
-    props: ["modelValue", "testCodigoCancelar", "testCodigoConfirmar", "acaoDesabilitada", "textoAcao"],
+    props: ["modelValue", "testCodigoCancelar", "testCodigoConfirmar", "acaoDesabilitada", "textoAcao", "loading"],
     emits: ["update:modelValue", "fechar", "confirmar", "shown"],
 };
 
@@ -159,6 +159,17 @@ describe("CriarCompetenciaModal.vue", () => {
                 atividadesSelecionadas: [atividades[0].codigo],
             },
         ]);
+    });
+
+    it("deve bloquear novo salvamento enquanto estiver carregando", async () => {
+        const wrapper = createWrapper({mostrar: true, atividades, loading: true});
+
+        await wrapper.findComponent(BFormTextarea).setValue("Competência de teste");
+        await wrapper.find('input[type="checkbox"]').setValue(true);
+        await flushPromises();
+        await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
+
+        expect(wrapper.emitted("salvar")).toBeFalsy();
     });
 
 });

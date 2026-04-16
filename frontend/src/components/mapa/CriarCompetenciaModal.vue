@@ -2,6 +2,8 @@
   <ModalPadrao
       v-model="mostrarComputado"
       :acao-desabilitada="salvamentoDesabilitado"
+      :loading="loading"
+      :texto-acao-carregando="textoAcao"
       data-testid="mdl-criar-competencia"
       tamanho="lg"
       test-codigo-cancelar="btn-criar-competencia-cancelar"
@@ -75,6 +77,7 @@ import type {Atividade, Competencia} from "@/types/tipos";
 const props = defineProps<{
   mostrar: boolean;
   atividades: Atividade[];
+  loading?: boolean;
   competenciaParaEditar?: Competencia | null;
   fieldErrors?: {
     descricao?: string;
@@ -143,6 +146,9 @@ function fechar() {
 }
 
 function salvar() {
+  if (props.loading || salvamentoDesabilitado.value) {
+    return;
+  }
   emit("salvar", {
     descricao: novaCompetencia.value.descricao,
     atividadesSelecionadas: atividadesSelecionadas.value,

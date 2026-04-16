@@ -82,6 +82,7 @@
           :atividades="atividades"
           :competencia-para-editar="competenciaSendoEditada"
           :field-errors="fieldErrors"
+          :loading="loadingCompetencia"
           :mostrar="mostrarModalCriarNovaCompetencia"
           @fechar="fecharModalCriarNovaCompetencia"
           @salvar="adicionarCompetenciaEFecharModal"
@@ -295,6 +296,7 @@ const mostrarModalDisponibilizar = ref(false);
 const mostrarModalExcluirCompetencia = ref(false);
 const competenciaParaExcluir = ref<Competencia | null>(null);
 const notificacaoDisponibilizacao = ref("");
+const loadingCompetencia = ref(false);
 const loadingDisponibilizacao = ref(false);
 const loadingExclusao = ref(false);
 
@@ -340,12 +342,15 @@ function abrirModalDisponibilizar() {
 }
 
 async function adicionarCompetenciaEFecharModal(dados: { descricao: string; atividadesSelecionadas: number[] }) {
+  if (loadingCompetencia.value) return;
+
   await executarComSubprocesso(async (codigoSubprocesso) => {
     const request: SalvarCompetenciaRequest = {
       descricao: dados.descricao,
       atividadesIds: dados.atividadesSelecionadas,
     };
 
+    loadingCompetencia.value = true;
     try {
       if (competenciaSendoEditada.value) {
         sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigoSubprocesso, competenciaSendoEditada.value.codigo, request));
@@ -353,10 +358,11 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
         sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigoSubprocesso, request));
       }
 
-      await carregarContextoEdicao(codigoSubprocesso);
       fecharModalCriarNovaCompetencia();
     } catch {
       handleErrors(fluxoMapa);
+    } finally {
+      loadingCompetencia.value = false;
     }
   });
 }
@@ -377,7 +383,6 @@ async function confirmarExclusaoCompetencia() {
     loadingExclusao.value = true;
     try {
       sincronizarMapa(await fluxoMapa.removerCompetencia(codigoSubprocesso, competencia.codigo));
-      await carregarContextoEdicao(codigoSubprocesso);
       fecharModalExcluirCompetencia();
     } catch {
       handleErrors(fluxoMapa);
@@ -454,6 +459,7 @@ defineExpose({
   impactoMapa: impactos,
   mostrarModalImpacto,
   loadingImpacto,
+  loadingCompetencia,
   abrirModalImpacto,
   abrirModalCriarLimpo,
   iniciarEdicaoCompetencia,

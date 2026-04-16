@@ -73,7 +73,7 @@ class RelatorioFacadeTest {
         RelatorioAndamentoDto dto = resultado.getFirst();
         assertThat(dto.siglaUnidade()).isEqualTo("U1");
         assertThat(dto.nomeUnidade()).isEqualTo("Unidade 1");
-        assertThat(dto.situacaoAtual()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name());
+        assertThat(dto.situacaoAtual()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.getDescricao());
         assertThat(dto.dataLimite()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 20, 18, 0));
         assertThat(dto.dataFimEtapa1()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 11, 15, 30));
         assertThat(dto.dataFimEtapa2()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 21, 9, 45));

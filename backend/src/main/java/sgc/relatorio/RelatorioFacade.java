@@ -29,7 +29,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RelatorioFacade {
     private static final String NOME_SISTEMA = "Sistema de Gestão de Conhecimentos";
+    private static final DateTimeFormatter FORMATADOR_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FORMATADOR_DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     private static final Color COR_PRIMARIA = new Color(30, 64, 124);
     private static final Color COR_SECUNDARIA = new Color(86, 108, 141);
     private static final Color COR_TABELA_CABECALHO = new Color(218, 226, 239);
@@ -41,7 +43,6 @@ public class RelatorioFacade {
     private static final Font FONTE_TEXTO = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.DARK_GRAY);
     private static final Font FONTE_TEXTO_NEGRITO = new Font(Font.HELVETICA, 10, Font.BOLD, COR_PRIMARIA);
     private static final Font FONTE_TEXTO_SUAVE = new Font(Font.HELVETICA, 9, Font.NORMAL, COR_SECUNDARIA);
-    private static final Font FONTE_TEXTO_ITALICO = new Font(Font.HELVETICA, 9, Font.ITALIC, COR_SECUNDARIA);
 
     private final ProcessoService processoService;
     private final SubprocessoConsultaService consultaService;
@@ -92,12 +93,6 @@ public class RelatorioFacade {
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
         LocalDateTime dataGeracao = LocalDateTime.now();
 
-        if (codUnidade != null) {
-            subprocessos = subprocessos.stream()
-                    .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
-                    .toList();
-        }
-
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
             document.open();
@@ -125,10 +120,6 @@ public class RelatorioFacade {
                 .distinct()
                 .toList();
 
-        if (codigosUnidade.isEmpty()) {
-            return Map.of();
-        }
-
         return new HashMap<>(responsavelService.buscarResponsaveisUnidades(codigosUnidade));
     }
 
@@ -143,7 +134,7 @@ public class RelatorioFacade {
         return RelatorioAndamentoDto.builder()
                 .siglaUnidade(unidade.getSigla())
                 .nomeUnidade(unidade.getNome())
-                .situacaoAtual(sp.getSituacao().name())
+                .situacaoAtual(sp.getSituacao().getDescricao())
                 .dataLimite(obterDataLimite(sp))
                 .dataFimEtapa1(sp.getDataFimEtapa1())
                 .dataFimEtapa2(sp.getDataFimEtapa2())
@@ -157,18 +148,15 @@ public class RelatorioFacade {
         LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
         LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
 
-        if (dataLimiteEtapa1 == null) {
-            throw new IllegalStateException("Subprocesso %d com data limite da etapa 2 sem data limite da etapa 1"
-                    .formatted(sp.getCodigo()));
-        }
         return Objects.requireNonNullElse(dataLimiteEtapa2, dataLimiteEtapa1);
     }
 
+    private String formatarData(@Nullable LocalDateTime dataHora) {
+        return dataHora == null ? "-" : dataHora.format(FORMATADOR_DATA);
+    }
+
     private String formatarDataHora(@Nullable LocalDateTime dataHora) {
-        if (dataHora == null) {
-            return "Não informado";
-        }
-        return dataHora.format(FORMATADOR_DATA_HORA);
+        return dataHora == null ? "-" : dataHora.format(FORMATADOR_DATA_HORA);
     }
 
     private void adicionarCabecalhoRelatorio(Document document, CabecalhoRelatorio cabecalho) throws DocumentException, IOException {
@@ -238,7 +226,7 @@ public class RelatorioFacade {
     ) {
         LinkedHashMap<String, String> resumo = new LinkedHashMap<>();
         resumo.put("Processo", processo.getDescricao());
-        resumo.put("Unidades no relatório", Integer.toString(subprocessos.size()));
+        resumo.put("Unidades", Integer.toString(subprocessos.size()));
         resumo.put("Gerado em", formatarDataHora(dataGeracao));
         resumo.put("Filtro", codUnidade == null ? "Todas as unidades" : "Unidade %d".formatted(codUnidade));
         return resumo;
@@ -268,9 +256,9 @@ public class RelatorioFacade {
             tabela.addCell(criarCelulaConteudo("%s - %s".formatted(relatorio.siglaUnidade(), relatorio.nomeUnidade()), corFundo));
             tabela.addCell(criarCelulaConteudo(formatarSituacaoPdf(relatorio.situacaoAtual()), corFundo));
             tabela.addCell(criarCelulaConteudo(relatorio.responsavel(), corFundo));
-            tabela.addCell(criarCelulaConteudo(formatarDataHora(relatorio.dataLimite()), corFundo));
-            tabela.addCell(criarCelulaConteudo(formatarDataHora(relatorio.dataFimEtapa1()), corFundo));
-            tabela.addCell(criarCelulaConteudo(formatarDataHora(relatorio.dataFimEtapa2()), corFundo));
+            tabela.addCell(criarCelulaConteudo(formatarData(relatorio.dataLimite()), corFundo));
+            tabela.addCell(criarCelulaConteudo(formatarData(relatorio.dataFimEtapa1()), corFundo));
+            tabela.addCell(criarCelulaConteudo(formatarData(relatorio.dataFimEtapa2()), corFundo));
         }
 
         return tabela;
@@ -290,28 +278,13 @@ public class RelatorioFacade {
         PdfPCell conteudo = new PdfPCell();
         conteudo.setBorderColor(COR_BORDA);
         conteudo.setPadding(10f);
-        conteudo.addElement(criarParagrafo("Competências vigentes: %d".formatted(competencias.size()), FONTE_TEXTO_NEGRITO, 0f));
-
-        if (competencias.isEmpty()) {
-            conteudo.addElement(criarParagrafo("Nenhuma competência vinculada ao mapa vigente.", FONTE_TEXTO_ITALICO, 0f));
-        }
-
+        conteudo.addElement(criarParagrafo("Competências: %d".formatted(competencias.size()), FONTE_TEXTO_NEGRITO, 0f));
         for (Competencia competencia : competencias) {
             conteudo.addElement(criarParagrafo("Competência: %s".formatted(competencia.getDescricao()), FONTE_TEXTO_NEGRITO, 0f));
-            if (competencia.getAtividades().isEmpty()) {
-                conteudo.addElement(criarParagrafo("Nenhuma atividade vinculada.", FONTE_TEXTO_ITALICO, 12f));
-                continue;
-            }
-
             for (Atividade atividade : competencia.getAtividades()) {
                 conteudo.addElement(criarParagrafo("Atividade: %s".formatted(atividade.getDescricao()), FONTE_TEXTO, 12f));
-                if (atividade.getConhecimentos().isEmpty()) {
-                    conteudo.addElement(criarParagrafo("Nenhum conhecimento vinculado.", FONTE_TEXTO_ITALICO, 24f));
-                    continue;
-                }
-
                 for (Conhecimento conhecimento : atividade.getConhecimentos()) {
-                    conteudo.addElement(criarParagrafo("\u2022 %s".formatted(conhecimento.getDescricao()), FONTE_TEXTO_SUAVE, 24f));
+                    conteudo.addElement(criarParagrafo("• %s".formatted(conhecimento.getDescricao()), FONTE_TEXTO_SUAVE, 24f));
                 }
             }
         }

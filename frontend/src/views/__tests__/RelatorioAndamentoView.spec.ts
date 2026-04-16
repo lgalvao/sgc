@@ -66,7 +66,7 @@ describe('RelatorioAndamentoView', () => {
         }];
     });
 
-    it('deve configurar colunas de prazo e finalizacao no relatorio de andamento', async () => {
+    it('deve configurar colunas e entregar datas formatadas para a tabela', async () => {
         const wrapper = mount(RelatorioAndamentoView, {
             global: {
                 stubs: {
@@ -87,7 +87,8 @@ describe('RelatorioAndamentoView', () => {
 
         await flushPromises();
 
-        const campos = wrapper.getComponent({name: 'BTable'}).props('fields') as Array<{ key: string; formatter?: (valor: unknown) => string }>;
+        const campos = wrapper.getComponent({name: 'BTable'}).props('fields') as Array<{ key: string }>;
+        const itens = wrapper.getComponent({name: 'BTable'}).props('items') as Array<Record<string, string>>;
         expect(campos.map(campo => campo.key)).toEqual([
             'siglaUnidade',
             'situacaoAtual',
@@ -97,7 +98,8 @@ describe('RelatorioAndamentoView', () => {
             'responsavel',
         ]);
 
-        expect(campos.find(campo => campo.key === 'dataLimite')?.formatter?.('2026-04-15T10:00:00')).toBe('15/04/2026 10:00');
-        expect(campos.find(campo => campo.key === 'dataFimEtapa2')?.formatter?.(null)).toBe('Não informado');
+        expect(itens[0].dataLimite).toBe('15/04/2026');
+        expect(itens[0].dataFimEtapa1).toBe('16/04/2026');
+        expect(itens[0].dataFimEtapa2).toBe('Não informado');
     });
 });
