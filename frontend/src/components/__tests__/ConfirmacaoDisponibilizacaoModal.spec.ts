@@ -14,10 +14,10 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
             <div v-if="modelValue" :data-titulo="titulo" data-testid="modal-stub">
                 <slot />
                 <button :data-testid="testCodigoCancelar" @click="$emit('update:modelValue', false)">Cancelar</button>
-                <button :data-testid="testCodigoConfirmar" @click="$emit('confirmar')">{{ okTitle }}</button>
+                <button :data-testid="testCodigoConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
             </div>
         `,
-        props: ['titulo', 'modelValue', 'testCodigoCancelar', 'testCodigoConfirmar', 'okTitle'],
+        props: ['titulo', 'modelValue', 'testCodigoCancelar', 'testCodigoConfirmar', 'okTitle', 'loading'],
         emits: ['update:modelValue', 'confirmar']
     }
 
@@ -69,5 +69,14 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         await cancelBtn.trigger('click')
 
         expect(wrapper.emitted('fechar')).toHaveLength(1)
+    })
+
+    it('propaga loading para bloquear o botão confirmar', () => {
+        const wrapper = mount(ConfirmacaoDisponibilizacaoModal, {
+            props: {...defaultProps, loading: true},
+            global: globalOptions
+        })
+
+        expect(wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]').attributes('disabled')).toBeDefined()
     })
 })

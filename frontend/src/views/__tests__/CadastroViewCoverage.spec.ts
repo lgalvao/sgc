@@ -43,6 +43,7 @@ type CadastroViewVm = {
     mostrarModalConfirmacao: boolean;
     mostrarModalHistorico: boolean;
     mostrarModalImpacto: boolean;
+    loadingDisponibilizacao: boolean;
     errosValidacao: Array<{atividadeCodigo?: number; mensagem: string}>;
     dadosRemocao: {tipo: string; index?: number; conhecimentoCodigo?: number} | null;
     atividadeRefs: Map<number, Element>;
@@ -513,6 +514,35 @@ describe("CadastroView coverage", () => {
         expect(subprocessoStore.invalidar).toHaveBeenCalled();
         expect(processoStore.invalidar).toHaveBeenCalled();
         expect(pushMock).toHaveBeenCalledWith("/painel");
+    });
+
+    it("ignora confirmações repetidas enquanto a disponibilização está em andamento", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+
+        subprocessosMock.subprocessoDetalhe = {
+            ...criarSubprocessoMinimo(),
+        };
+        vm.codSubprocesso = 123;
+
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+        let resolver!: (valor: boolean) => void;
+        fluxoSubprocesso.disponibilizarCadastro.mockImplementation(() => new Promise<boolean>((resolve) => {
+            resolver = resolve;
+        }));
+
+        const primeiraExecucao = vm.confirmarDisponibilizacao();
+        const segundaExecucao = vm.confirmarDisponibilizacao();
+
+        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledTimes(1);
+        expect(vm.loadingDisponibilizacao).toBe(true);
+
+        resolver(true);
+        await primeiraExecucao;
+        await segundaExecucao;
+
+        expect(vm.loadingDisponibilizacao).toBe(false);
     });
 
 });

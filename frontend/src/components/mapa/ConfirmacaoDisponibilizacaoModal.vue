@@ -2,6 +2,7 @@
   <ModalConfirmacao
       v-model="mostrarComputado"
       :auto-close="false"
+      :loading="loading"
       :ok-title="TEXTOS.comum.BOTAO_DISPONIBILIZAR"
       :titulo="isRevisao ? TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TITULO : TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO"
       test-codigo-cancelar="btn-disponibilizar-revisao-cancelar"
@@ -25,6 +26,7 @@ import {TEXTOS} from "@/constants/textos";
 const props = defineProps<{
   mostrar: boolean;
   isRevisao: boolean;
+  loading?: boolean;
 }>();
 
 const emit = defineEmits<{

@@ -126,6 +126,7 @@
 
     <ConfirmacaoDisponibilizacaoModal
         :is-revisao="isRevisao"
+        :loading="loadingDisponibilizacao"
         :mostrar="mostrarModalConfirmacao"
         @confirmar="confirmarDisponibilizacao"
         @fechar="mostrarModalConfirmacao = false"
@@ -306,6 +307,7 @@ const {
 } = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
 const loadingValidacao = ref(false);
+const loadingDisponibilizacao = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);
 const atividadeRefs = new Map<number, Element>();
@@ -583,13 +585,18 @@ async function disponibilizarCadastro() {
 }
 
 async function confirmarDisponibilizacao() {
-  if (!codSubprocesso.value) return;
+  if (!codSubprocesso.value || loadingDisponibilizacao.value) return;
 
   let sucesso: boolean;
-  if (isRevisao.value) {
-    sucesso = await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso.value);
-  } else {
-    sucesso = await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value);
+  loadingDisponibilizacao.value = true;
+  try {
+    if (isRevisao.value) {
+      sucesso = await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso.value);
+    } else {
+      sucesso = await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value);
+    }
+  } finally {
+    loadingDisponibilizacao.value = false;
   }
 
   mostrarModalConfirmacao.value = false;
