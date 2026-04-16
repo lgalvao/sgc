@@ -31,8 +31,8 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await page.getByTestId('card-relatorio-andamento').click();
         await expect(page).toHaveURL(/\/relatorios\/andamento/);
 
-        const selectProcesso = page.getByLabel('Selecione o Processo').first();
-        const botaoGerar = page.getByRole('button', {name: 'Gerar relatório'});
+        const selectProcesso = page.getByTestId('select-processo-andamento');
+        const botaoGerar = page.getByTestId('btn-gerar-andamento');
         await expect(selectProcesso).toBeVisible();
         await expect(botaoGerar).toBeDisabled();
 
@@ -48,7 +48,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(primeiroCard).toContainText(/Situação|Localização|Última movimentação/i);
         await expect(primeiroCard).toContainText(/\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}/);
 
-        const botaoPdf = page.getByRole('button', {name: /PDF/i});
+        const botaoPdf = page.getByTestId('btn-exportar-andamento');
         await expect(botaoPdf).toBeVisible();
 
         const downloadPromise = page.waitForEvent('download');

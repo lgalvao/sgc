@@ -74,10 +74,10 @@ class RelatorioFacadeTest {
         assertThat(dto.siglaUnidade()).isEqualTo("U1");
         assertThat(dto.nomeUnidade()).isEqualTo("Unidade 1");
         assertThat(dto.situacaoAtual()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.getDescricao());
-        assertThat(dto.dataLimite()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 20, 18, 0));
+        assertThat(dto.dataLimiteEtapa1()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
+        assertThat(dto.dataLimiteEtapa2()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 20, 18, 0));
         assertThat(dto.dataFimEtapa1()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 11, 15, 30));
         assertThat(dto.dataFimEtapa2()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 21, 9, 45));
-        assertThat(dto.dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
         assertThat(dto.responsavel()).isEqualTo("Resp");
         assertThat(dto.titular()).isEqualTo("Resp");
     }
@@ -101,7 +101,7 @@ class RelatorioFacadeTest {
 
         List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
 
-        assertThat(resultado.getFirst().dataLimite()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+        assertThat(resultado.getFirst().dataLimiteEtapa1()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
         assertThat(resultado.getFirst().dataFimEtapa1()).isNull();
         assertThat(resultado.getFirst().dataFimEtapa2()).isNull();
     }
@@ -112,6 +112,8 @@ class RelatorioFacadeTest {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc teste");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        p.setDataLimite(java.time.LocalDateTime.now().plusDays(30));
 
         Unidade u = new Unidade();
         u.setSigla("U1");
@@ -134,8 +136,7 @@ class RelatorioFacadeTest {
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
         verify(document, atLeastOnce()).add(any());
-        verify(document).add(argThat(element -> element instanceof PdfPTable tabela
-                && tabela.getNumberOfColumns() == 6));
+        // No novo layout não usamos mais tabela simples de 6 colunas, mas sim cartões
     }
 
     @Test

@@ -1338,24 +1338,23 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
             await expect(linkRelatorios).toBeVisible();
             await linkRelatorios.click();
-            await expect(page.getByRole('tab', {name: /Andamento de processo/i})).toBeVisible();
+            await expect(page.getByTestId('card-relatorio-andamento')).toBeVisible();
             await capturarTela(page, '14-relatorios', '01-pagina-relatorios', { fullPage: true });
 
-            const painelAndamento = page.getByRole('tabpanel', {name: /Andamento de processo/i});
-            await expect(page.getByRole('tab', {name: /Andamento de processo/i})).toBeVisible();
-            await expect(painelAndamento.getByLabel(/Selecione o Processo/i)).toBeVisible();
+            await page.getByTestId('card-relatorio-andamento').click();
+            await expect(page.getByTestId('select-processo-andamento')).toBeVisible();
             await capturarTela(page, '14-relatorios', '02-relatorio-andamento', { extra: { relatorio: 'andamento' } });
 
-            await expect(painelAndamento.getByRole('button', {name: /Gerar relatório/i})).toBeVisible();
+            await expect(page.getByTestId('btn-gerar-andamento')).toBeVisible();
             await capturarTela(page, '14-relatorios', '03-botao-gerar-relatorio', { tags: ['ui-element'] });
 
-            await page.getByRole('tab', {name: /^Mapas$/i}).click();
-            const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
-            await expect(painelMapas.getByLabel(/Selecione o Processo/i)).toBeVisible();
-            await expect(painelMapas.getByLabel(/Selecione a unidade/i)).toBeVisible();
+            await page.goto('/relatorios');
+            await page.getByTestId('card-relatorio-mapas').click();
+            await expect(page.getByTestId('select-processo-mapas')).toBeVisible();
+            await expect(page.getByTestId('select-unidade-mapas')).toBeVisible();
             await capturarTela(page, '14-relatorios', '04-relatorio-mapas', { extra: { relatorio: 'mapas' } });
 
-            await expect(painelMapas.getByRole('button', {name: /Gerar PDF/i})).toBeVisible();
+            await expect(page.getByTestId('btn-gerar-mapas')).toBeVisible();
             await capturarTela(page, '14-relatorios', '05-botao-gerar-pdf', { tags: ['ui-element', 'pdf'] });
         });
     });

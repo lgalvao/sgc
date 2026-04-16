@@ -27,12 +27,12 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await expect(page).toHaveURL(/\/relatorios/);
         await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
 
-        await page.getByRole('tab', {name: 'Mapas'}).click();
+        await page.getByTestId('card-relatorio-mapas').click();
+        await expect(page).toHaveURL(/\/relatorios\/mapas-vigentes/);
 
-        const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
-        const selectProcesso = painelMapas.getByLabel('Selecione o Processo');
-        const selectUnidade = painelMapas.getByLabel('Selecione a unidade');
-        const botaoGerar = painelMapas.getByRole('button', {name: 'Gerar PDF'});
+        const selectProcesso = page.getByTestId('select-processo-mapas');
+        const selectUnidade = page.getByTestId('select-unidade-mapas');
+        const botaoGerar = page.getByTestId('btn-gerar-mapas');
 
         await expect(selectProcesso).toBeVisible();
         await expect(selectUnidade).toBeVisible();
@@ -67,12 +67,12 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
 
         await page.getByRole('link', {name: /Relatórios/i}).click();
-        await page.getByRole('tab', {name: 'Mapas'}).click();
+        await page.getByTestId('card-relatorio-mapas').click();
+        await expect(page).toHaveURL(/\/relatorios\/mapas-vigentes/);
 
-        const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
-        const selectProcesso = painelMapas.getByLabel('Selecione o Processo');
-        const selectUnidade = painelMapas.getByLabel('Selecione a unidade');
-        const botaoGerar = painelMapas.getByRole('button', {name: 'Gerar PDF'});
+        const selectProcesso = page.getByTestId('select-processo-mapas');
+        const selectUnidade = page.getByTestId('select-unidade-mapas');
+        const botaoGerar = page.getByTestId('btn-gerar-mapas');
 
         await selectProcesso.selectOption({label: descricaoProcesso});
         await expect(botaoGerar).toBeEnabled();
