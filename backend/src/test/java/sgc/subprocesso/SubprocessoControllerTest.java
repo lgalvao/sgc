@@ -483,7 +483,7 @@ class SubprocessoControllerTest {
             when(consultaService.obterEntidadePorProcessoEUnidade(5L, 10L)).thenReturn(sp);
 
             when(consultaService.obterContextoCadastroAtividades(1L)).thenReturn(
-                    new sgc.subprocesso.dto.ContextoCadastroAtividadesResponse(null, null, null, List.of())
+                    new sgc.subprocesso.dto.ContextoCadastroAtividadesResponse(null, null, null, List.of(), "")
             );
 
             mockMvc.perform(get("/api/subprocessos/contexto-cadastro-atividades/buscar")

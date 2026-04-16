@@ -234,20 +234,21 @@ const atividades = ref<Atividade[]>([]);
 const atividadesSnapshotInicial = ref<string>('[]');
 const disponibilizacaoSemMudancas = ref(false);
 
-function serializarAtividades(lista: Atividade[]): string {
-  const normalizadas = lista
-      .map(atividade => ({
-        descricao: (atividade.descricao || '').trim(),
-        conhecimentos: (atividade.conhecimentos || [])
+function calcularAssinaturaCadastro(lista: Atividade[]): string {
+  return lista
+      .map(atividade => {
+        const descricao = (atividade.descricao || '').trim();
+        const conhecimentos = (atividade.conhecimentos || [])
             .map(conhecimento => (conhecimento.descricao || '').trim())
-            .sort(),
-      }))
-      .sort((a, b) => a.descricao.localeCompare(b.descricao));
-
-  return JSON.stringify(normalizadas);
+            .sort()
+            .join('\u0001');
+        return `${descricao}\u0002${conhecimentos}`;
+      })
+      .sort((a, b) => a.localeCompare(b))
+      .join('\u0003');
 }
 
-const houveAlteracaoCadastro = computed(() => serializarAtividades(atividades.value) !== atividadesSnapshotInicial.value);
+const houveAlteracaoCadastro = computed(() => calcularAssinaturaCadastro(atividades.value) !== atividadesSnapshotInicial.value);
 const checkboxSemMudancasDesabilitado = computed(() => loadingInicioRevisao.value || houveAlteracaoCadastro.value);
 
 const habilitarDisponibilizar = computed(() => {
@@ -262,7 +263,10 @@ const habilitarDisponibilizar = computed(() => {
     return true;
   }
 
-  return houveAlteracaoCadastro.value || disponibilizacaoSemMudancas.value;
+  return houveAlteracaoCadastro.value || (
+      disponibilizacaoSemMudancas.value
+      && situacaoAtual.value === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+  );
 });
 
 const botaoDisponibilizarDesabilitado = computed(() => {
@@ -316,11 +320,13 @@ let ignorarAlteracaoCheckboxSemMudancas = false;
 function atualizarCheckboxSemMudancasSilenciosamente(valor: boolean) {
   ignorarAlteracaoCheckboxSemMudancas = true;
   disponibilizacaoSemMudancas.value = valor;
+  queueMicrotask(() => {
+    ignorarAlteracaoCheckboxSemMudancas = false;
+  });
 }
 
 watch(disponibilizacaoSemMudancas, async (marcado) => {
   if (ignorarAlteracaoCheckboxSemMudancas) {
-    ignorarAlteracaoCheckboxSemMudancas = false;
     return;
   }
 
@@ -342,6 +348,12 @@ watch(disponibilizacaoSemMudancas, async (marcado) => {
   const situacaoAposCancelamento = subprocesso.value?.situacao;
   if (situacaoAposCancelamento !== SituacaoSubprocesso.NAO_INICIADO) {
     atualizarCheckboxSemMudancasSilenciosamente(true);
+  }
+});
+
+watch(houveAlteracaoCadastro, (alterou) => {
+  if (alterou && disponibilizacaoSemMudancas.value) {
+    atualizarCheckboxSemMudancasSilenciosamente(false);
   }
 });
 
@@ -421,8 +433,12 @@ function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubpro
     permissoes: data.detalhes.permissoes,
     atividadesAtualizadas: data.atividadesDisponiveis,
   });
-  atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
-  atualizarCheckboxSemMudancasSilenciosamente(false);
+  atividadesSnapshotInicial.value = data.assinaturaCadastroReferencia ?? calcularAssinaturaCadastro(data.atividadesDisponiveis);
+  atualizarCheckboxSemMudancasSilenciosamente(
+      data.detalhes.tipoProcesso === TipoProcesso.REVISAO
+      && data.detalhes.situacao === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+      && !houveAlteracaoCadastro.value
+  );
   unidade.value = data.unidade;
   codMapa.value = data.mapa.codigo;
 }

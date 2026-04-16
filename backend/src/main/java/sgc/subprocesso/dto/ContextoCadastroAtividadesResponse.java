@@ -13,6 +13,7 @@ public record ContextoCadastroAtividadesResponse(
         @Nullable Unidade unidade,
         @Nullable SubprocessoDetalheResponse detalhes,
         @Nullable MapaResumoDto mapa,
-        List<AtividadeDto> atividadesDisponiveis
+        List<AtividadeDto> atividadesDisponiveis,
+        String assinaturaCadastroReferencia
 ) {
 }

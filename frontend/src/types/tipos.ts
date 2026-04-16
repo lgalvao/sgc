@@ -394,6 +394,7 @@ export interface ContextoCadastroAtividadesSubprocesso {
     detalhes: SubprocessoDetalhe;
     mapa: MapaResumo;
     atividadesDisponiveis: Atividade[];
+    assinaturaCadastroReferencia?: string;
 }
 
 export interface MapaVisualizacao {

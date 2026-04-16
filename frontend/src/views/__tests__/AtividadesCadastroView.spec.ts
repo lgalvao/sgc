@@ -39,6 +39,20 @@ type AtividadeMinima = {
     conhecimentos?: Array<{codigo: number; descricao?: string}>;
 };
 
+function calcularAssinaturaCadastro(lista: AtividadeMinima[]): string {
+    return lista
+        .map((atividade) => {
+            const descricao = (atividade.descricao || '').trim();
+            const conhecimentos = (atividade.conhecimentos || [])
+                .map((conhecimento) => (conhecimento.descricao || '').trim())
+                .sort()
+                .join('\u0001');
+            return `${descricao}\u0002${conhecimentos}`;
+        })
+        .sort((a, b) => a.localeCompare(b))
+        .join('\u0003');
+}
+
 type CadastroViewVm = {
     codSubprocesso: number | null;
     unidade: {sigla: string; nome: string} | null;
@@ -152,6 +166,9 @@ function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
         detalhes,
         mapa,
         atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}],
+        assinaturaCadastroReferencia: calcularAssinaturaCadastro([
+            {codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}
+        ]),
         unidade
     };
 }
@@ -489,7 +506,7 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         await flushPromises();
 
         const checkbox = wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]');
@@ -516,7 +533,7 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         vm.disponibilizacaoSemMudancas = true;
         await flushPromises();
 
@@ -536,7 +553,7 @@ describe("CadastroView.vue", () => {
             unidade: {sigla: "TESTE"},
             permissoes: {}
         };
-        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         vm.atividades = [{
             codigo: 1,
             descricao: "Ativ 1 alterada",
@@ -560,7 +577,7 @@ describe("CadastroView.vue", () => {
             unidade: {sigla: "TESTE"},
             permissoes: {}
         };
-        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         vm.atividades = [{
             codigo: 1,
             descricao: "Ativ 1 alterada",
@@ -598,23 +615,28 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         await flushPromises();
 
         await wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]').setValue(true);
         await flushPromises();
 
         expect(fluxoSubprocesso.iniciarRevisaoCadastro).toHaveBeenCalledWith(123);
-        expect(wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').attributes('disabled')).toBeDefined();
         expect(wrapper.find('[data-testid="cad-atividades__spinner-iniciando-revisao"]').exists()).toBe(true);
 
         if (!resolverDefinido) {
             throw new Error("Resolver não definido");
         }
+        subprocessosStore.subprocessoDetalhe = {
+            ...subprocessosStore.subprocessoDetalhe!,
+            situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+        };
         resolver(true);
         await flushPromises();
 
         expect(wrapper.find('[data-testid="cad-atividades__spinner-iniciando-revisao"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').attributes('disabled')).toBeUndefined();
     });
 
     it("desmarca o checkbox e cancela o início da revisão quando não houver mudanças", async () => {
@@ -635,7 +657,7 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         vm.disponibilizacaoSemMudancas = true;
         await flushPromises();
 

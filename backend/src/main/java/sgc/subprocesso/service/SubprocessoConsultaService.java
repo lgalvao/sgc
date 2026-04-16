@@ -17,6 +17,7 @@ import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
+import java.util.stream.Collectors;
 import java.util.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
@@ -205,13 +206,45 @@ public class SubprocessoConsultaService {
     public ContextoCadastroAtividadesResponse obterContextoCadastroAtividades(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocessoComMapa(codSubprocesso);
         ContextoConsultaSubprocesso contexto = montarContextoConsultaLeve(subprocesso);
+        List<AtividadeDto> atividadesDisponiveis = listarAtividadesSubprocesso(subprocesso);
 
         return new ContextoCadastroAtividadesResponse(
                 subprocesso.getUnidade(),
                 construirDetalheCadastro(contexto),
                 MapaResumoDto.fromEntity(obterMapaObrigatorio(subprocesso)),
-                listarAtividadesSubprocesso(subprocesso)
+                atividadesDisponiveis,
+                obterAssinaturaCadastroReferencia(subprocesso, atividadesDisponiveis)
         );
+    }
+
+    private String obterAssinaturaCadastroReferencia(Subprocesso subprocesso, List<AtividadeDto> atividadesDisponiveis) {
+        List<AtividadeDto> atividadesReferencia = atividadesDisponiveis;
+
+        if (subprocesso.getProcesso().getTipo() == TipoProcesso.REVISAO) {
+            atividadesReferencia = mapaManutencaoService.mapaVigenteUnidade(subprocesso.getUnidade().getCodigo())
+                    .map(Mapa::getCodigo)
+                    .map(mapaManutencaoService::atividadesMapaCodigoComConhecimentos)
+                    .orElseGet(List::of)
+                    .stream()
+                    .map(AtividadeDto::fromEntity)
+                    .toList();
+        }
+
+        return calcularAssinaturaCadastro(atividadesReferencia);
+    }
+
+    private String calcularAssinaturaCadastro(List<AtividadeDto> atividades) {
+        return atividades.stream()
+                .map(atividade -> {
+                    String descricao = Optional.ofNullable(atividade.descricao()).orElse("").trim();
+                    String conhecimentos = Optional.ofNullable(atividade.conhecimentos()).orElse(List.of()).stream()
+                            .map(conhecimento -> Optional.ofNullable(conhecimento.descricao()).orElse("").trim())
+                            .sorted()
+                            .collect(Collectors.joining("\u0001"));
+                    return descricao + "\u0002" + conhecimentos;
+                })
+                .sorted()
+                .collect(Collectors.joining("\u0003"));
     }
 
     public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp) {

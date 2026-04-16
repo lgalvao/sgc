@@ -34,6 +34,11 @@ public class ImpactoMapaService {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         validarPermissaoVisualizacaoImpacto(subprocesso, usuario);
 
+        return calcularImpactos(subprocesso);
+    }
+
+    @Transactional(readOnly = true)
+    public ImpactoMapaResponse calcularImpactos(Subprocesso subprocesso) {
         Optional<Mapa> mapaVigenteOpt = mapaRepo.buscarMapaVigentePorUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");

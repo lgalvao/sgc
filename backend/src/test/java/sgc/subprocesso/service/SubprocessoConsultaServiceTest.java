@@ -127,6 +127,7 @@ class SubprocessoConsultaServiceTest {
 
         assertThat(response).isNotNull();
         assertThat(response.unidade()).isEqualTo(unidade);
+        assertThat(response.assinaturaCadastroReferencia()).isEmpty();
     }
 
     @Test
