@@ -14,7 +14,7 @@
           <BFormGroup :label="TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO" label-for="select-processo">
             <BFormSelect
                 id="select-processo"
-                v-model="codPprocessoSelecionado"
+                v-model="codProcessoSelecionado"
                 :options="opcoesProcessos"
                 data-testid="select-processo-andamento"
             />
@@ -22,7 +22,7 @@
         </BCol>
         <BCol md="auto">
           <BButton
-              :disabled="!codPprocessoSelecionado || carregando"
+              :disabled="!codProcessoSelecionado || carregando"
               variant="primary"
               data-testid="btn-gerar-andamento"
               @click="gerarRelatorio"
@@ -114,7 +114,7 @@
         </BCard>
       </div>
       <EmptyState
-          v-else-if="codPprocessoSelecionado && !carregando"
+          v-else-if="codProcessoSelecionado && !carregando"
           :title="TEXTOS.relatorios.EMPTY_TITLE"
           :description="TEXTOS.relatorios.EMPTY_DESCRIPTION"
           icon="bi-table"
@@ -140,7 +140,7 @@ import {formatDateBR, formatDateTimeBR} from "@/utils/dateUtils";
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
 
-const codPprocessoSelecionado = ref<number | null>(null);
+const codProcessoSelecionado = ref<number | null>(null);
 const processosDisponiveis = ref<ProcessoResumo[]>([]);
 const carregando = ref(false);
 
@@ -180,9 +180,9 @@ async function carregarProcessos() {
 }
 
 async function gerarRelatorio() {
-  if (!codPprocessoSelecionado.value) return;
+  if (!codProcessoSelecionado.value) return;
   carregando.value = true;
-  await relatoriosStore.buscarRelatorioAndamento(codPprocessoSelecionado.value);
+  await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value);
   carregando.value = false;
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
@@ -190,8 +190,8 @@ async function gerarRelatorio() {
 }
 
 async function exportarPdf() {
-  if (!codPprocessoSelecionado.value) return;
-  await relatoriosStore.exportarAndamentoPdf(codPprocessoSelecionado.value);
+  if (!codProcessoSelecionado.value) return;
+  await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value);
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
   }
