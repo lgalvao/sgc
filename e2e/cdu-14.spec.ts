@@ -20,6 +20,7 @@ import {
     devolverRevisao,
     fecharHistoricoAnalise,
 } from './helpers/helpers-analise.js';
+import {verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -63,10 +64,13 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await verificarToast(page, /disponibilizada?|Disponibilizado/i);
+        await verificarPaginaPainel(page);
 
         // Preparacao 5: GESTOR visualiza histórico, impactos e devolve
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão (do cadastro )?disponibilizada/i);
         await navegarParaAtividadesVisualizacao(page);
 
         const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);
@@ -93,9 +97,12 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await expect(modalAnalise.getByTestId('cell-observacao-0')).toHaveText('Favor revisar as competências associadas');
         await fecharHistoricoAnalise(page);
 
-        await page.getByTestId('chk-disponibilizacao-sem-mudancas').check();
+        await expect(page.getByTestId('chk-disponibilizacao-sem-mudancas')).toBeDisabled();
+        await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeEnabled();
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await verificarToast(page, /disponibilizada?|Disponibilizado/i);
+        await verificarPaginaPainel(page);
     });
 
     test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page}) => {
