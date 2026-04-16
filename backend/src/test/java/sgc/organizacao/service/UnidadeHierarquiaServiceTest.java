@@ -44,7 +44,6 @@ class UnidadeHierarquiaServiceTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(selfProvider.getObject()).thenReturn(service);
         unidadeRaiz = UnidadeTestBuilder.raiz().build();
         unidadeRaiz.setCodigo(1L);
         unidadeRaiz.setResponsabilidade(criarResponsabilidade(1L));
@@ -96,6 +95,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar IDs descendentes")
     void deveBuscarIdsDescendentes() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
 
         List<Long> descendentes = service.buscarIdsDescendentes(1L);
@@ -106,6 +106,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar árvore por código (nível profundo)")
     void deveBuscarArvorePorCodigo() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
 
         UnidadeDto resultado = service.buscarArvore(3L);
@@ -116,6 +117,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar siglas subordinadas (a partir da raiz)")
     void deveBuscarSiglasSubordinadas() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
 
         List<String> siglas = service.buscarSiglasSubordinadas(unidadeRaiz.getSigla());
@@ -130,6 +132,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("buscarArvore deve buscar no repo se não encontrar na hierarquia")
     void buscarArvore_DeveBuscarNoRepoSeNaoEncontrarNaHierarquia() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
         Unidade extra = Unidade.builder()
                 .codigo(99L)
@@ -147,6 +150,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("buscarSiglasSubordinadas deve retornar vazio se não encontrar sigla")
     void buscarSiglasSubordinadas_DeveRetornarVazioSeNaoEncontrar() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
         Unidade extra = Unidade.builder()
                 .codigo(999L)
@@ -164,6 +168,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar sigla superior")
     void deveBuscarSiglaSuperior() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeService.buscarPorSigla(unidadeIntermediaria.getSigla())).thenReturn(unidadeIntermediaria);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
         when(unidadeRepo.buscarSiglaPorCodigo(unidadeRaiz.getCodigo()))
@@ -188,6 +193,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("buscarCodigosSuperiores deve usar apenas o mapa filho pai")
     void buscarCodigosSuperiores_DeveUsarApenasMapaFilhoPai() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
 
         List<Long> resultado = service.buscarCodigosSuperiores(3L);
@@ -199,6 +205,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("buscarCodigoPai deve retornar vazio quando relacao nao existe no mapa")
     void buscarCodigoPai_DeveRetornarNullQuandoRelacaoNaoExisteNoMapa() {
+        when(selfProvider.getObject()).thenReturn(service);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
 
         Long resultado = service.buscarCodigoPai(99L);
