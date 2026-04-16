@@ -26,15 +26,19 @@ function atualizarDetalheLocal(detalhe: SubprocessoDetalhe) {
     subprocessoDetalhe.value = detalhe;
 }
 
-async function buscarSubprocessoDetalhe(codigo: number): Promise<SubprocessoDetalhe | null> {
-    subprocessoDetalhe.value = null;
+async function buscarSubprocessoDetalhe(codigo: number, limparAntes = true): Promise<SubprocessoDetalhe | null> {
+    if (limparAntes) {
+        subprocessoDetalhe.value = null;
+    }
 
     await withErrorHandling(async () => {
         const dto = await serviceBuscarSubprocessoDetalhe(codigo);
         atualizarDetalheLocal(mapSubprocessoDetalheResponseParaModel(dto));
     }, (erro) => {
         logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, erro);
-        subprocessoDetalhe.value = null;
+        if (limparAntes) {
+            subprocessoDetalhe.value = null;
+        }
     });
 
     return subprocessoDetalhe.value;

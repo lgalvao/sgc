@@ -47,14 +47,23 @@
       </template>
     </PageHeader>
 
-    <BFormCheckbox
-        v-if="podeEditarCadastro && isRevisao"
-        v-model="disponibilizacaoSemMudancas"
-        class="mt-3 mb-2"
-        data-testid="chk-disponibilizacao-sem-mudancas"
-    >
-      {{ TEXTOS.atividades.CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS }}
-    </BFormCheckbox>
+    <div v-if="podeEditarCadastro && isRevisao" class="mt-3 mb-2">
+      <BFormCheckbox
+          v-model="disponibilizacaoSemMudancas"
+          :disabled="loadingInicioRevisao"
+          data-testid="chk-disponibilizacao-sem-mudancas"
+      >
+        {{ TEXTOS.atividades.CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS }}
+      </BFormCheckbox>
+      <div
+          v-if="loadingInicioRevisao"
+          class="d-inline-flex align-items-center gap-2 small text-body-secondary mt-1"
+          data-testid="cad-atividades__txt-iniciando-revisao"
+      >
+        <BSpinner small />
+        <span>{{ TEXTOS.atividades.INICIANDO_REVISAO_CADASTRO }}</span>
+      </div>
+    </div>
 
     <BAlert
         v-if="erroGlobalFormatado"
@@ -152,7 +161,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormCheckbox} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormCheckbox, BSpinner} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -272,11 +281,16 @@ const precisaIniciarRevisao = computed(() =>
 );
 
 async function iniciarRevisaoSeNecessario() {
-  if (!precisaIniciarRevisao.value || !codSubprocesso.value) return;
+  if (!precisaIniciarRevisao.value || !codSubprocesso.value || loadingInicioRevisao.value) return;
 
-  const sucesso = await fluxoSubprocesso.iniciarRevisaoCadastro(codSubprocesso.value);
-  if (!sucesso) {
-    logger.error('Falha ao iniciar revisão do cadastro');
+  loadingInicioRevisao.value = true;
+  try {
+    const sucesso = await fluxoSubprocesso.iniciarRevisaoCadastro(codSubprocesso.value);
+    if (!sucesso) {
+      logger.error('Falha ao iniciar revisão do cadastro');
+    }
+  } finally {
+    loadingInicioRevisao.value = false;
   }
 }
 
@@ -310,6 +324,7 @@ const {
 const loadingValidacao = ref(false);
 const loadingDisponibilizacao = ref(false);
 const loadingRemocao = ref(false);
+const loadingInicioRevisao = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);
 const atividadeRefs = new Map<number, Element>();

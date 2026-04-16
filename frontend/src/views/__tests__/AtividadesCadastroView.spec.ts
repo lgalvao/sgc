@@ -69,6 +69,7 @@ type FluxoSubprocessoMock = {
     validarCadastro: ReturnType<typeof vi.fn>;
     disponibilizarCadastro: ReturnType<typeof vi.fn>;
     disponibilizarRevisaoCadastro: ReturnType<typeof vi.fn>;
+    iniciarRevisaoCadastro: ReturnType<typeof vi.fn>;
 };
 
 type SubprocessoStoreMock = {
@@ -228,9 +229,10 @@ const stubs = {
     },
     BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
     BFormCheckbox: {
-        props: ['modelValue'],
-        template: '<input type="checkbox" :data-testid="$attrs[\'data-testid\']" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" />'
+        props: ['modelValue', 'disabled'],
+        template: '<input type="checkbox" :data-testid="$attrs[\'data-testid\']" :checked="modelValue" :disabled="disabled" @change="$emit(\'update:modelValue\', $event.target.checked)" />'
     },
+    BSpinner: {template: '<span data-testid="spinner"></span>'},
     BDropdown: {template: '<div><slot /></div>'},
     BDropdownItem: {template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>'},
     BAlert: {template: '<div><slot /><button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>', props: ['modelValue']},
@@ -345,6 +347,7 @@ describe("CadastroView.vue", () => {
             validarCadastro: vi.fn().mockResolvedValue({valido: true}),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            iniciarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
         vi.mocked(subprocessoService.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
@@ -540,6 +543,46 @@ describe("CadastroView.vue", () => {
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(btn.attributes('disabled')).toBeUndefined();
+    });
+
+    it("mantém as ações visíveis e mostra feedback ao iniciar a revisão pelo checkbox", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const subprocessosStore = subprocessosMock;
+        let resolver: ((valor: boolean) => void) | null = null;
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+        fluxoSubprocesso.iniciarRevisaoCadastro.mockImplementation(() =>
+            new Promise((resolve) => {
+                resolver = resolve;
+            })
+        );
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.NAO_INICIADO,
+            tipoProcesso: TipoProcesso.REVISAO,
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
+        };
+        vm.atividades = [{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }];
+        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        await flushPromises();
+
+        await wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]').setValue(true);
+        await flushPromises();
+
+        expect(fluxoSubprocesso.iniciarRevisaoCadastro).toHaveBeenCalledWith(123);
+        expect(wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="cad-atividades__txt-iniciando-revisao"]').exists()).toBe(true);
+
+        resolver?.(true);
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="cad-atividades__txt-iniciando-revisao"]').exists()).toBe(false);
     });
 
     it("mantém botão disponibilizar visível e desabilitado quando o chefe ainda só pode editar", async () => {

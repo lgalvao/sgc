@@ -137,6 +137,49 @@ describe("useSubprocessos", () => {
         expect(store.lastError?.message).toBe("Falha");
     });
 
+    it("preserva o detalhe atual durante uma recarga sem limpeza previa", async () => {
+        const store = useSubprocessos();
+        store.subprocessoDetalhe = criarDetalheMinimo({codigo: 10, situacao: SituacaoSubprocesso.NAO_INICIADO});
+
+        let resolver: ((valor: unknown) => void) | null = null;
+        vi.mocked(service.buscarSubprocessoDetalhe).mockImplementation(() =>
+            new Promise((resolve) => {
+                resolver = resolve;
+            }) as never
+        );
+
+        const requisicao = store.buscarSubprocessoDetalhe(10, false);
+
+        expect(store.subprocessoDetalhe?.codigo).toBe(10);
+        expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.NAO_INICIADO);
+
+        resolver?.({
+            subprocesso: {
+                codigo: 10,
+                situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+                unidade: {sigla: "U1"},
+                dataLimiteEtapa1: "2025-01-01T00:00:00",
+                dataFimEtapa1: null,
+                dataLimiteEtapa2: null,
+                dataFimEtapa2: null,
+                processoDescricao: "Processo",
+                dataCriacaoProcesso: "2024-01-01T00:00:00",
+                tipoProcesso: "REVISAO",
+                isEmAndamento: true,
+                etapaAtual: 1,
+            },
+            titular: null,
+            responsavel: null,
+            localizacaoAtual: "U1",
+            movimentacoes: [],
+            permissoes: permissoesPadrao,
+        });
+
+        await requisicao;
+
+        expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+    });
+
     it("deve retornar null se buscarSubprocessoPorProcessoEUnidade falhar", async () => {
         const store = useSubprocessos();
         vi.mocked(service.buscarSubprocessoPorProcessoEUnidade).mockRejectedValue(new Error("Erro busca ID"));

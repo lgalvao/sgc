@@ -265,6 +265,7 @@ export const TEXTOS = {
   atividades: {
     TITULO: "Atividades e conhecimentos",
     CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS: "Disponibilização sem mudanças",
+    INICIANDO_REVISAO_CADASTRO: "Iniciando revisão...",
     BOTAO_IMPACTO: "Impacto no mapa",
     BOTAO_HISTORICO: "Histórico",
     BOTAO_IMPORTAR: "Importar",

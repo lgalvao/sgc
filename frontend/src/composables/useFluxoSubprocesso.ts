@@ -56,7 +56,10 @@ export function useFluxoSubprocesso() {
     }
 
     async function iniciarRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcao(() => serviceIniciarRevisaoCadastro(codigoSubprocesso), codigoSubprocesso, true);
+        return executarAcao(async () => {
+            await serviceIniciarRevisaoCadastro(codigoSubprocesso);
+            await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso, false);
+        });
     }
 
     async function devolverCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {

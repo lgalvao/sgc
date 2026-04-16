@@ -4,6 +4,7 @@ import {normalizeError} from "@/utils/apiError";
 vi.mock("@/services/cadastroService", () => ({
     disponibilizarCadastro: vi.fn(),
     disponibilizarRevisaoCadastro: vi.fn(),
+    iniciarRevisaoCadastro: vi.fn(),
     devolverCadastro: vi.fn(),
     devolverRevisaoCadastro: vi.fn(),
     aceitarCadastro: vi.fn(),
@@ -99,6 +100,17 @@ describe("useFluxoSubprocesso", () => {
 
         await disponibilizarRevisaoCadastro(10);
         expect(service).toHaveBeenCalledWith(10);
+    });
+
+    it("deve iniciar revisao sem limpar o detalhe atual durante a recarga", async () => {
+        const {iniciarRevisaoCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {iniciarRevisaoCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await iniciarRevisaoCadastro(10);
+
+        expect(service).toHaveBeenCalledWith(10);
+        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10, false);
     });
 
     it("deve devolver cadastro", async () => {
