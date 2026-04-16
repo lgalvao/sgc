@@ -77,11 +77,13 @@ public class RelatorioFacade {
             adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
                     "Relatório de Andamento",
                     processo.getDescricao(),
-                    dataGeracao
+                    dataGeracao,
+                    processo.getTipo().name(),
+                    relatorios.size(),
+                    processo.getDataLimite()
             ));
-            adicionarResumo(document, criarResumoAndamento(processo, relatorios, dataGeracao));
-            document.add(criarTituloSecao("Andamento por unidade"));
-            document.add(criarTabelaAndamento(relatorios));
+            
+            adicionarCartoesAndamento(document, relatorios);
         } catch (DocumentException | IOException e) {
             throw new RuntimeException("Erro ao gerar PDF", e);
         }
@@ -99,7 +101,10 @@ public class RelatorioFacade {
             adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
                     "Relatório de Mapas Vigentes",
                     processo.getDescricao(),
-                    dataGeracao
+                    dataGeracao,
+                    null,
+                    0,
+                    null
             ));
             adicionarResumo(document, criarResumoMapas(processo, subprocessos, codUnidade, dataGeracao));
             document.add(criarTituloSecao("Mapas consolidados"));
@@ -129,26 +134,30 @@ public class RelatorioFacade {
     ) {
         Unidade unidade = sp.getUnidade();
         UnidadeResponsavelDto respDto = responsaveisPorUnidade.get(unidade.getCodigo());
-        String responsavel = respDto != null ? respDto.titularNome() : "Não designado";
+        
+        String titular = respDto != null && respDto.titularNome() != null ? respDto.titularNome() : "Não designado";
+        String responsavel = titular;
+        if (respDto != null && respDto.substitutoNome() != null) {
+            responsavel = respDto.substitutoNome() + " (Substituição)";
+        }
+
+        String localizacao = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getSigla() : "-";
+        
+        LocalDateTime ultimaMov = sp.getDataFimEtapa2() != null ? sp.getDataFimEtapa2() : (sp.getDataFimEtapa1() != null ? sp.getDataFimEtapa1() : sp.getDataLimiteEtapa1());
 
         return RelatorioAndamentoDto.builder()
                 .siglaUnidade(unidade.getSigla())
                 .nomeUnidade(unidade.getNome())
                 .situacaoAtual(sp.getSituacao().getDescricao())
-                .dataLimite(obterDataLimite(sp))
+                .localizacao(localizacao)
+                .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
+                .dataLimiteEtapa2(sp.getDataLimiteEtapa2())
                 .dataFimEtapa1(sp.getDataFimEtapa1())
                 .dataFimEtapa2(sp.getDataFimEtapa2())
-                .dataUltimaMovimentacao(sp.getDataLimiteEtapa1())
+                .dataUltimaMovimentacao(ultimaMov)
                 .responsavel(responsavel)
-                .titular(responsavel)
+                .titular(titular)
                 .build();
-    }
-
-    private LocalDateTime obterDataLimite(Subprocesso sp) {
-        LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
-        LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
-
-        return Objects.requireNonNullElse(dataLimiteEtapa2, dataLimiteEtapa1);
     }
 
     private String formatarData(@Nullable LocalDateTime dataHora) {
@@ -178,12 +187,122 @@ public class RelatorioFacade {
         celulaTexto.addElement(criarParagrafo(NOME_SISTEMA, FONTE_SUBTITULO, 0f));
         celulaTexto.addElement(criarParagrafo(cabecalho.titulo(), FONTE_TITULO, 0f));
         celulaTexto.addElement(criarParagrafo("Processo: %s".formatted(cabecalho.subtitulo()), FONTE_TEXTO, 0f));
+        
+        if (cabecalho.tipoProcesso() != null) {
+            String subtituloDetalhe = "TIPO: %s | UNIDADES: %d | DATA LIMITE GERAL: %s".formatted(
+                cabecalho.tipoProcesso(),
+                cabecalho.quantidadeUnidades(),
+                formatarData(cabecalho.dataLimiteGeral())
+            );
+            celulaTexto.addElement(criarParagrafo(subtituloDetalhe, FONTE_TEXTO_SUAVE, 0f));
+        }
+        
         celulaTexto.addElement(criarParagrafo("Gerado em: %s".formatted(formatarDataHora(cabecalho.dataGeracao())), FONTE_TEXTO_SUAVE, 0f));
         tabelaCabecalho.addCell(celulaTexto);
 
         document.add(tabelaCabecalho);
         document.add(new Chunk(new LineSeparator(1f, 100f, COR_BORDA, Element.ALIGN_CENTER, 0f)));
         document.add(new Paragraph(" "));
+    }
+
+    private void adicionarCartoesAndamento(Document document, List<RelatorioAndamentoDto> relatorios) throws DocumentException {
+        for (RelatorioAndamentoDto relatorio : relatorios) {
+            PdfPTable cartao = new PdfPTable(1);
+            cartao.setWidthPercentage(100f);
+            cartao.setSpacingAfter(20f);
+
+            PdfPCell cardCell = new PdfPCell();
+            cardCell.setBorder(Rectangle.NO_BORDER);
+            cardCell.setBorderWidthLeft(4f);
+            cardCell.setBorderColorLeft(COR_SECUNDARIA);
+            cardCell.setPaddingLeft(10f);
+            cardCell.setPaddingTop(5f);
+            cardCell.setPaddingBottom(10f);
+
+            Paragraph titulo = new Paragraph("▌ " + relatorio.siglaUnidade() + " - " + relatorio.nomeUnidade(), FONTE_SECAO);
+            titulo.setSpacingAfter(4f);
+            cardCell.addElement(titulo);
+            
+            PdfPTable linhaDiv = new PdfPTable(1);
+            linhaDiv.setWidthPercentage(100f);
+            PdfPCell celDiv = new PdfPCell();
+            celDiv.setBorder(Rectangle.BOTTOM);
+            celDiv.setBorderColor(COR_BORDA);
+            linhaDiv.addCell(celDiv);
+            cardCell.addElement(linhaDiv);
+            cardCell.addElement(new Paragraph(" ", new Font(Font.HELVETICA, 4)));
+
+            PdfPTable infoGeral = new PdfPTable(new float[]{2f, 1f});
+            infoGeral.setWidthPercentage(100f);
+            infoGeral.addCell(criarCelulaRotuloValor("Situação:", formatarSituacaoPdf(relatorio.situacaoAtual())));
+            infoGeral.addCell(criarCelulaRotuloValor("Localização:", relatorio.localizacao()));
+            cardCell.addElement(infoGeral);
+            
+            Paragraph ultMov = criarParagrafoRotuloValor("Última movimentação:", formatarDataHora(relatorio.dataUltimaMovimentacao()));
+            ultMov.setSpacingAfter(10f);
+            cardCell.addElement(ultMov);
+
+            PdfPTable etapas = new PdfPTable(new float[]{1f, 1f});
+            etapas.setWidthPercentage(100f);
+            
+            PdfPCell celEtapa1 = new PdfPCell();
+            celEtapa1.setBorder(Rectangle.NO_BORDER);
+            Paragraph tituloEtapa1 = new Paragraph("ETAPA 1: CADASTRO", FONTE_TEXTO_NEGRITO);
+            tituloEtapa1.setSpacingAfter(4f);
+            celEtapa1.addElement(tituloEtapa1);
+            PdfPTable dtEtapa1 = new PdfPTable(new float[]{1f, 1f});
+            dtEtapa1.setWidthPercentage(100f);
+            dtEtapa1.addCell(criarCelulaRotuloValor("Data limite:", formatarData(relatorio.dataLimiteEtapa1())));
+            dtEtapa1.addCell(criarCelulaRotuloValor("Conclusão:", formatarData(relatorio.dataFimEtapa1())));
+            celEtapa1.addElement(dtEtapa1);
+            etapas.addCell(celEtapa1);
+
+            PdfPCell celEtapa2 = new PdfPCell();
+            celEtapa2.setBorder(Rectangle.NO_BORDER);
+            Paragraph tituloEtapa2 = new Paragraph("ETAPA 2: MAPA", FONTE_TEXTO_NEGRITO);
+            tituloEtapa2.setSpacingAfter(4f);
+            celEtapa2.addElement(tituloEtapa2);
+            PdfPTable dtEtapa2 = new PdfPTable(new float[]{1f, 1f});
+            dtEtapa2.setWidthPercentage(100f);
+            String dtLim2 = formatarData(relatorio.dataLimiteEtapa2());
+            if (relatorio.dataLimiteEtapa2() != null && relatorio.dataLimiteEtapa1() != null && !relatorio.dataLimiteEtapa2().equals(relatorio.dataLimiteEtapa1())) {
+                dtLim2 += " (Prazo ajustado)";
+            }
+            dtEtapa2.addCell(criarCelulaRotuloValor("Data limite:", dtLim2));
+            dtEtapa2.addCell(criarCelulaRotuloValor("Conclusão:", formatarData(relatorio.dataFimEtapa2())));
+            celEtapa2.addElement(dtEtapa2);
+            etapas.addCell(celEtapa2);
+
+            cardCell.addElement(etapas);
+            cardCell.addElement(new Paragraph(" ", new Font(Font.HELVETICA, 6)));
+
+            cardCell.addElement(criarParagrafoRotuloValor("Titular:", relatorio.titular()));
+            if (!relatorio.titular().equals(relatorio.responsavel())) {
+                cardCell.addElement(criarParagrafoRotuloValor("Responsável atual:", relatorio.responsavel()));
+            }
+
+            cartao.addCell(cardCell);
+            document.add(cartao);
+        }
+    }
+    
+    private PdfPCell criarCelulaRotuloValor(String rotulo, String valor) {
+        PdfPCell celula = new PdfPCell();
+        celula.setBorder(Rectangle.NO_BORDER);
+        celula.setPadding(2f);
+        Paragraph p = new Paragraph();
+        p.add(new Chunk(rotulo + " ", FONTE_TEXTO_SUAVE));
+        p.add(new Chunk(valor, FONTE_TEXTO_NEGRITO));
+        celula.addElement(p);
+        return celula;
+    }
+    
+    private Paragraph criarParagrafoRotuloValor(String rotulo, String valor) {
+        Paragraph p = new Paragraph();
+        p.setSpacingAfter(4f);
+        p.add(new Chunk(rotulo + " ", FONTE_TEXTO_SUAVE));
+        p.add(new Chunk(valor, FONTE_TEXTO_NEGRITO));
+        return p;
     }
 
     private void adicionarResumo(Document document, LinkedHashMap<String, String> resumo) throws DocumentException {
@@ -205,19 +324,6 @@ public class RelatorioFacade {
         document.add(tabelaResumo);
     }
 
-    private LinkedHashMap<String, String> criarResumoAndamento(
-            Processo processo,
-            List<RelatorioAndamentoDto> relatorios,
-            LocalDateTime dataGeracao
-    ) {
-        LinkedHashMap<String, String> resumo = new LinkedHashMap<>();
-        resumo.put("Processo", processo.getDescricao());
-        resumo.put("Subprocessos", Integer.toString(relatorios.size()));
-        resumo.put("Gerado em", formatarDataHora(dataGeracao));
-        resumo.put("Relatório", "Andamento por unidade");
-        return resumo;
-    }
-
     private LinkedHashMap<String, String> criarResumoMapas(
             Processo processo,
             List<Subprocesso> subprocessos,
@@ -235,33 +341,6 @@ public class RelatorioFacade {
     private void adicionarLinhaResumo(PdfPTable tabelaResumo, Map.Entry<String, String> entrada) {
         tabelaResumo.addCell(criarCelulaResumoRotulo(entrada.getKey()));
         tabelaResumo.addCell(criarCelulaResumoValor(entrada.getValue()));
-    }
-
-    private PdfPTable criarTabelaAndamento(List<RelatorioAndamentoDto> relatorios) throws DocumentException {
-        PdfPTable tabela = new PdfPTable(new float[]{1.3f, 1.8f, 1.8f, 1.5f, 1.5f, 1.8f});
-        tabela.setWidthPercentage(100f);
-        tabela.setHeaderRows(1);
-        tabela.setSpacingAfter(8f);
-
-        tabela.addCell(criarCelulaCabecalho("Unidade"));
-        tabela.addCell(criarCelulaCabecalho("Situação"));
-        tabela.addCell(criarCelulaCabecalho("Responsável"));
-        tabela.addCell(criarCelulaCabecalho("Data limite"));
-        tabela.addCell(criarCelulaCabecalho("Fim etapa 1"));
-        tabela.addCell(criarCelulaCabecalho("Fim etapa 2"));
-
-        for (int i = 0; i < relatorios.size(); i++) {
-            RelatorioAndamentoDto relatorio = relatorios.get(i);
-            Color corFundo = i % 2 == 0 ? Color.WHITE : COR_TABELA_ALTERNADA;
-            tabela.addCell(criarCelulaConteudo("%s - %s".formatted(relatorio.siglaUnidade(), relatorio.nomeUnidade()), corFundo));
-            tabela.addCell(criarCelulaConteudo(formatarSituacaoPdf(relatorio.situacaoAtual()), corFundo));
-            tabela.addCell(criarCelulaConteudo(relatorio.responsavel(), corFundo));
-            tabela.addCell(criarCelulaConteudo(formatarData(relatorio.dataLimite()), corFundo));
-            tabela.addCell(criarCelulaConteudo(formatarData(relatorio.dataFimEtapa1()), corFundo));
-            tabela.addCell(criarCelulaConteudo(formatarData(relatorio.dataFimEtapa2()), corFundo));
-        }
-
-        return tabela;
     }
 
     private void adicionarSecaoMapa(Document document, Unidade unidade, List<Competencia> competencias) throws DocumentException {
@@ -291,25 +370,6 @@ public class RelatorioFacade {
 
         cartao.addCell(conteudo);
         document.add(cartao);
-    }
-
-    private PdfPCell criarCelulaCabecalho(String texto) {
-        PdfPCell celula = new PdfPCell(new Phrase(texto, FONTE_TEXTO_NEGRITO));
-        celula.setBackgroundColor(COR_TABELA_CABECALHO);
-        celula.setBorderColor(COR_BORDA);
-        celula.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celula.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        celula.setPadding(7f);
-        return celula;
-    }
-
-    private PdfPCell criarCelulaConteudo(String texto, Color corFundo) {
-        PdfPCell celula = new PdfPCell(new Phrase(texto, FONTE_TEXTO));
-        celula.setBackgroundColor(corFundo);
-        celula.setBorderColor(COR_BORDA);
-        celula.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        celula.setPadding(7f);
-        return celula;
     }
 
     private PdfPCell criarCelulaResumoRotulo(String texto) {
@@ -364,8 +424,10 @@ public class RelatorioFacade {
     private record CabecalhoRelatorio(
             String titulo,
             String subtitulo,
-            LocalDateTime dataGeracao
+            LocalDateTime dataGeracao,
+            @Nullable String tipoProcesso,
+            int quantidadeUnidades,
+            @Nullable LocalDateTime dataLimiteGeral
     ) {
     }
 }
-

@@ -41,7 +41,8 @@ class RelatorioControllerTest {
                 .siglaUnidade("U1")
                 .nomeUnidade("Unidade 1")
                 .situacaoAtual("EM_ANDAMENTO")
-                .dataLimite(java.time.LocalDateTime.of(2026, 4, 15, 10, 0))
+                .dataLimiteEtapa1(java.time.LocalDateTime.of(2026, 4, 15, 10, 0))
+                .dataLimiteEtapa2(java.time.LocalDateTime.of(2026, 4, 20, 10, 0))
                 .dataFimEtapa1(java.time.LocalDateTime.of(2026, 4, 16, 11, 30))
                 .dataFimEtapa2(java.time.LocalDateTime.of(2026, 4, 17, 14, 45))
                 .responsavel("Responsável")
@@ -53,7 +54,8 @@ class RelatorioControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].siglaUnidade").value("U1"))
                 .andExpect(jsonPath("$[0].nomeUnidade").value("Unidade 1"))
-                .andExpect(jsonPath("$[0].dataLimite").value("2026-04-15T10:00:00"))
+                .andExpect(jsonPath("$[0].dataLimiteEtapa1").value("2026-04-15T10:00:00"))
+                .andExpect(jsonPath("$[0].dataLimiteEtapa2").value("2026-04-20T10:00:00"))
                 .andExpect(jsonPath("$[0].dataFimEtapa1").value("2026-04-16T11:30:00"))
                 .andExpect(jsonPath("$[0].dataFimEtapa2").value("2026-04-17T14:45:00"));
     }

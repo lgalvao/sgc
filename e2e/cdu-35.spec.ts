@@ -28,7 +28,8 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await expect(page).toHaveURL(/\/relatorios/);
         await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
-        await expect(page.getByRole('tab', {name: /Andamento de processo/i})).toBeVisible();
+        await page.getByTestId('card-relatorio-andamento').click();
+        await expect(page).toHaveURL(/\/relatorios\/andamento/);
 
         const selectProcesso = page.getByLabel('Selecione o Processo').first();
         const botaoGerar = page.getByRole('button', {name: 'Gerar relatório'});
@@ -39,20 +40,13 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(botaoGerar).toBeEnabled();
         await botaoGerar.click();
 
-        const tabelaRelatorio = page.locator('table').last();
-        await expect(tabelaRelatorio).toBeVisible();
+        const cardsRelatorio = page.locator('.card-body');
+        await expect(cardsRelatorio.first()).toBeVisible();
 
-        await expect(tabelaRelatorio.locator('th', {hasText: /Sigla/i}).first()).toBeVisible();
-        await expect(tabelaRelatorio.locator('th', {hasText: /Nome/i}).first()).toBeVisible();
-        await expect(tabelaRelatorio.locator('th', {hasText: /Situação|Situacao/i}).first()).toBeVisible();
-        await expect(tabelaRelatorio.locator('th', {hasText: /Data/i}).first()).toBeVisible();
-        await expect(tabelaRelatorio.locator('th', {hasText: /Responsável|Responsavel/i}).first()).toBeVisible();
-        await expect(tabelaRelatorio.locator('th', {hasText: /Titular/i}).first()).toBeVisible();
-
-        const primeiraLinha = tabelaRelatorio.locator('tbody tr').first();
-        await expect(primeiraLinha).toContainText(/ASSESSORIA_12|ASSESSORIA/);
-        await expect(primeiraLinha).toContainText(/NAO_INICIADO|EM_ANDAMENTO|MAPEAMENTO/i);
-        await expect(primeiraLinha).toContainText(/\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}/);
+        const primeiroCard = cardsRelatorio.first();
+        await expect(primeiroCard).toContainText(/ASSESSORIA_12|ASSESSORIA/);
+        await expect(primeiroCard).toContainText(/Situação|Localização|Última movimentação/i);
+        await expect(primeiroCard).toContainText(/\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}/);
 
         const botaoPdf = page.getByRole('button', {name: /PDF/i});
         await expect(botaoPdf).toBeVisible();
