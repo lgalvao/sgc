@@ -8,6 +8,10 @@ export async function iniciarRevisaoCadastro(codSubprocesso: number): Promise<vo
     await apiClient.post(`/subprocessos/${codSubprocesso}/iniciar-revisao-cadastro`);
 }
 
+export async function cancelarInicioRevisaoCadastro(codSubprocesso: number): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/cancelar-inicio-revisao-cadastro`);
+}
+
 export async function disponibilizarRevisaoCadastro(codSubprocesso: number): Promise<void> {
     await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-revisao`);
 }

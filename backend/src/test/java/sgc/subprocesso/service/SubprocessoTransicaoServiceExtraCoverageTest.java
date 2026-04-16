@@ -300,6 +300,25 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     }
 
     @Test
+    @DisplayName("cancelarInicioRevisaoCadastro - com subprocesso em revisão em andamento")
+    void cancelarInicioRevisaoCadastro_ComRevisaoEmAndamento() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        setField(sp, "situacao", SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setMapa(new sgc.mapa.model.Mapa());
+        sp.getMapa().setCodigo(1000L);
+        sp.setUnidade(new Unidade());
+        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+
+        service.cancelarInicioRevisaoCadastro(100L);
+
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @Test
     @DisplayName("executarDevolucao - deve encontrar unidade de devolução subordinada")
     void executarDevolucao_EncontraSubordinada() {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);

@@ -50,7 +50,7 @@
     <div v-if="podeEditarCadastro && isRevisao" class="mt-3 mb-2">
       <BFormCheckbox
           v-model="disponibilizacaoSemMudancas"
-          :disabled="loadingInicioRevisao"
+          :disabled="checkboxSemMudancasDesabilitado"
           data-testid="chk-disponibilizacao-sem-mudancas"
       >
         {{ TEXTOS.atividades.CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS }}
@@ -248,6 +248,7 @@ function serializarAtividades(lista: Atividade[]): string {
 }
 
 const houveAlteracaoCadastro = computed(() => serializarAtividades(atividades.value) !== atividadesSnapshotInicial.value);
+const checkboxSemMudancasDesabilitado = computed(() => loadingInicioRevisao.value || houveAlteracaoCadastro.value);
 
 const habilitarDisponibilizar = computed(() => {
   const cadastroValido = atividades.value.length > 0
@@ -293,9 +294,54 @@ async function iniciarRevisaoSeNecessario() {
   }
 }
 
-watch([disponibilizacaoSemMudancas, houveAlteracaoCadastro], async ([marcado, alterou]) => {
-  if ((marcado || alterou) && precisaIniciarRevisao.value) {
+async function cancelarInicioRevisaoSeNecessario() {
+  if (situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+      || !codSubprocesso.value
+      || loadingInicioRevisao.value
+      || houveAlteracaoCadastro.value) return;
+
+  loadingInicioRevisao.value = true;
+  try {
+    const sucesso = await fluxoSubprocesso.cancelarInicioRevisaoCadastro(codSubprocesso.value);
+    if (!sucesso) {
+      logger.error('Falha ao cancelar início da revisão do cadastro');
+    }
+  } finally {
+    loadingInicioRevisao.value = false;
+  }
+}
+
+let ignorarAlteracaoCheckboxSemMudancas = false;
+
+function atualizarCheckboxSemMudancasSilenciosamente(valor: boolean) {
+  ignorarAlteracaoCheckboxSemMudancas = true;
+  disponibilizacaoSemMudancas.value = valor;
+}
+
+watch(disponibilizacaoSemMudancas, async (marcado) => {
+  if (ignorarAlteracaoCheckboxSemMudancas) {
+    ignorarAlteracaoCheckboxSemMudancas = false;
+    return;
+  }
+
+  if (marcado) {
+    if (!precisaIniciarRevisao.value) return;
+
     await iniciarRevisaoSeNecessario();
+    if (situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
+      atualizarCheckboxSemMudancasSilenciosamente(false);
+    }
+    return;
+  }
+
+  if (houveAlteracaoCadastro.value || situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
+    return;
+  }
+
+  await cancelarInicioRevisaoSeNecessario();
+  const situacaoAposCancelamento = subprocesso.value?.situacao;
+  if (situacaoAposCancelamento !== SituacaoSubprocesso.NAO_INICIADO) {
+    atualizarCheckboxSemMudancasSilenciosamente(true);
   }
 });
 
@@ -376,7 +422,7 @@ function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubpro
     atividadesAtualizadas: data.atividadesDisponiveis,
   });
   atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
-  disponibilizacaoSemMudancas.value = false;
+  atualizarCheckboxSemMudancasSilenciosamente(false);
   unidade.value = data.unidade;
   codMapa.value = data.mapa.codigo;
 }

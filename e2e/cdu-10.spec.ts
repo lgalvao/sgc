@@ -65,7 +65,20 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
     });
 
-    test('1.2 Cenário adicional: disponibilizar revisão sem mudanças usando checkbox', async ({_resetAutomatico, request, page}) => {
+    test('1.2 Cenário adicional: checkbox fica desabilitado quando houver mudanças no cadastro', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
+        await navegarParaAtividades(page);
+
+        const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
+        const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+
+        await expect(checkboxSemMudancas).toBeVisible();
+        await expect(checkboxSemMudancas).toBeDisabled();
+        await expect(botaoDisponibilizar).toBeEnabled();
+    });
+
+    test('1.3 Cenário adicional: disponibilizar revisão sem mudanças usando checkbox', async ({_resetAutomatico, request, page}) => {
         const unidadeSemMudancas = 'SECAO_212';
 
         await criarProcessoFinalizadoFixture(request, {
@@ -92,10 +105,27 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
         await expect(botaoDisponibilizar).toBeDisabled();
 
-        // Ao marcar checkbox, inicia a revisão (NAO_INICIADO → REVISAO_CADASTRO_EM_ANDAMENTO)
         await checkboxSemMudancas.check();
+        await expect(checkboxSemMudancas).toBeChecked();
+        await expect(botaoDisponibilizar).toBeEnabled();
 
-        // Aguardar transição de estado refletida na habilitação da ação principal
+        await page.getByTestId('btn-nav-voltar').click();
+        await verificarPaginaSubprocesso(page, unidadeSemMudancas);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
+
+        await navegarParaAtividades(page);
+        await expect(checkboxSemMudancas).toBeChecked();
+        await checkboxSemMudancas.uncheck();
+        await expect(checkboxSemMudancas).not.toBeChecked();
+        await expect(botaoDisponibilizar).toBeDisabled();
+
+        await page.getByTestId('btn-nav-voltar').click();
+        await verificarPaginaSubprocesso(page, unidadeSemMudancas);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Não iniciado/i);
+
+        await navegarParaAtividades(page);
+        await expect(checkboxSemMudancas).toBeEnabled();
+        await checkboxSemMudancas.check();
         await expect(botaoDisponibilizar).toBeEnabled();
 
         await botaoDisponibilizar.click();

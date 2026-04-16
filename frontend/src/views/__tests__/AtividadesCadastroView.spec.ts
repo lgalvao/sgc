@@ -70,6 +70,7 @@ type FluxoSubprocessoMock = {
     disponibilizarCadastro: ReturnType<typeof vi.fn>;
     disponibilizarRevisaoCadastro: ReturnType<typeof vi.fn>;
     iniciarRevisaoCadastro: ReturnType<typeof vi.fn>;
+    cancelarInicioRevisaoCadastro: ReturnType<typeof vi.fn>;
 };
 
 type SubprocessoStoreMock = {
@@ -348,6 +349,7 @@ describe("CadastroView.vue", () => {
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
             iniciarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            cancelarInicioRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
         vi.mocked(subprocessoService.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
@@ -470,7 +472,7 @@ describe("CadastroView.vue", () => {
         expect(btn.attributes('disabled')).toBeUndefined();
     });
 
-    it("em revisão, mantém botão desabilitado sem mudanças e checkbox desmarcada", async () => {
+    it("em revisão, mantém botão desabilitado sem mudanças e checkbox habilitada", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as unknown as CadastroViewVm;
@@ -493,6 +495,7 @@ describe("CadastroView.vue", () => {
         const checkbox = wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]');
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(checkbox.exists()).toBe(true);
+        expect(checkbox.attributes('disabled')).toBeUndefined();
         expect(btn.attributes('disabled')).toBeDefined();
     });
 
@@ -545,16 +548,42 @@ describe("CadastroView.vue", () => {
         expect(btn.attributes('disabled')).toBeUndefined();
     });
 
+    it("em revisão, desabilita checkbox quando houver alteração no cadastro", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const subprocessosStore = subprocessosMock;
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "REVISAO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
+        };
+        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividades = [{
+            codigo: 1,
+            descricao: "Ativ 1 alterada",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }];
+        await flushPromises();
+
+        const checkbox = wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]');
+        expect(checkbox.attributes('disabled')).toBeDefined();
+    });
+
     it("mantém as ações visíveis e mostra feedback ao iniciar a revisão pelo checkbox", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as unknown as CadastroViewVm;
         const subprocessosStore = subprocessosMock;
-        let resolver: ((valor: boolean) => void) | null = null;
+        let resolver!: (valor: boolean) => void;
+        let resolverDefinido = false;
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         fluxoSubprocesso.iniciarRevisaoCadastro.mockImplementation(() =>
-            new Promise((resolve) => {
-                resolver = resolve;
+            new Promise<boolean>((resolve) => {
+                resolver = resolve as (valor: boolean) => void;
+                resolverDefinido = true;
             })
         );
         subprocessosStore.subprocessoDetalhe = {
@@ -579,12 +608,41 @@ describe("CadastroView.vue", () => {
         expect(wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="cad-atividades__spinner-iniciando-revisao"]').exists()).toBe(true);
 
-        if (resolver) {
-            resolver(true);
+        if (!resolverDefinido) {
+            throw new Error("Resolver não definido");
         }
+        resolver(true);
         await flushPromises();
 
         expect(wrapper.find('[data-testid="cad-atividades__spinner-iniciando-revisao"]').exists()).toBe(false);
+    });
+
+    it("desmarca o checkbox e cancela o início da revisão quando não houver mudanças", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const subprocessosStore = subprocessosMock;
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+            tipoProcesso: TipoProcesso.REVISAO,
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
+        };
+        vm.atividades = [{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }];
+        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.disponibilizacaoSemMudancas = true;
+        await flushPromises();
+
+        await wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]').setValue(false);
+        await flushPromises();
+
+        expect(fluxoSubprocesso.cancelarInicioRevisaoCadastro).toHaveBeenCalledWith(123);
     });
 
     it("mantém botão disponibilizar visível e desabilitado quando o chefe ainda só pode editar", async () => {

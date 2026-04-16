@@ -1,6 +1,7 @@
 import {
     aceitarCadastro as serviceAceitarCadastro,
     aceitarRevisaoCadastro as serviceAceitarRevisaoCadastro,
+    cancelarInicioRevisaoCadastro as serviceCancelarInicioRevisaoCadastro,
     devolverCadastro as serviceDevolverCadastro,
     devolverRevisaoCadastro as serviceDevolverRevisaoCadastro,
     disponibilizarCadastro as serviceDisponibilizarCadastro,
@@ -62,6 +63,13 @@ export function useFluxoSubprocesso() {
         });
     }
 
+    async function cancelarInicioRevisaoCadastro(codigoSubprocesso: number) {
+        return executarAcao(async () => {
+            await serviceCancelarInicioRevisaoCadastro(codigoSubprocesso);
+            await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso, false);
+        });
+    }
+
     async function devolverCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {
         return executarAcao(() => serviceDevolverCadastro(codigoSubprocesso, req));
     }
@@ -108,6 +116,7 @@ export function useFluxoSubprocesso() {
         disponibilizarCadastro,
         disponibilizarRevisaoCadastro,
         iniciarRevisaoCadastro,
+        cancelarInicioRevisaoCadastro,
         devolverCadastro,
         devolverRevisaoCadastro,
         aceitarCadastro,

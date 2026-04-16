@@ -5,6 +5,7 @@ vi.mock("@/services/cadastroService", () => ({
     disponibilizarCadastro: vi.fn(),
     disponibilizarRevisaoCadastro: vi.fn(),
     iniciarRevisaoCadastro: vi.fn(),
+    cancelarInicioRevisaoCadastro: vi.fn(),
     devolverCadastro: vi.fn(),
     devolverRevisaoCadastro: vi.fn(),
     aceitarCadastro: vi.fn(),
@@ -108,6 +109,17 @@ describe("useFluxoSubprocesso", () => {
         (service as any).mockResolvedValue(undefined);
 
         await iniciarRevisaoCadastro(10);
+
+        expect(service).toHaveBeenCalledWith(10);
+        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10, false);
+    });
+
+    it("deve cancelar inicio da revisao sem limpar o detalhe atual durante a recarga", async () => {
+        const {cancelarInicioRevisaoCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {cancelarInicioRevisaoCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await cancelarInicioRevisaoCadastro(10);
 
         expect(service).toHaveBeenCalledWith(10);
         expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10, false);

@@ -139,7 +139,7 @@ class SituacaoSubprocessoTest {
 
             // Transição para NAO_INICIADO
             "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, MAPEAMENTO, false",
-            "REVISAO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, REVISAO, false",
+            "REVISAO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, REVISAO, true",
 
             // Casos para podeIniciar - cobrir combinações de falha
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",

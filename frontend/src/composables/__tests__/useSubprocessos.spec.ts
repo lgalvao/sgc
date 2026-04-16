@@ -141,10 +141,12 @@ describe("useSubprocessos", () => {
         const store = useSubprocessos();
         store.subprocessoDetalhe = criarDetalheMinimo({codigo: 10, situacao: SituacaoSubprocesso.NAO_INICIADO});
 
-        let resolver: ((valor: unknown) => void) | null = null;
+        let resolver!: (valor: unknown) => void;
+        let resolverDefinido = false;
         vi.mocked(service.buscarSubprocessoDetalhe).mockImplementation(() =>
-            new Promise((resolve) => {
-                resolver = resolve;
+            new Promise<unknown>((resolve) => {
+                resolver = resolve as (valor: unknown) => void;
+                resolverDefinido = true;
             }) as never
         );
 
@@ -153,8 +155,10 @@ describe("useSubprocessos", () => {
         expect(store.subprocessoDetalhe?.codigo).toBe(10);
         expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.NAO_INICIADO);
 
-        if (resolver) {
-            resolver({
+        if (!resolverDefinido) {
+            throw new Error("Resolver não definido");
+        }
+        resolver({
             subprocesso: {
                 codigo: 10,
                 situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
@@ -174,8 +178,7 @@ describe("useSubprocessos", () => {
             localizacaoAtual: "U1",
             movimentacoes: [],
             permissoes: permissoesPadrao,
-            });
-        }
+        });
 
         await requisicao;
 

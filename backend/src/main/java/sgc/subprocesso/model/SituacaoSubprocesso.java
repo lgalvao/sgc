@@ -89,7 +89,7 @@ public enum SituacaoSubprocesso {
 
     private boolean transicaoRevisao(SituacaoSubprocesso nova) {
         return switch (this) {
-            case REVISAO_CADASTRO_EM_ANDAMENTO -> nova == REVISAO_CADASTRO_DISPONIBILIZADA;
+            case REVISAO_CADASTRO_EM_ANDAMENTO -> nova == NAO_INICIADO || nova == REVISAO_CADASTRO_DISPONIBILIZADA;
             case REVISAO_CADASTRO_DISPONIBILIZADA ->
                     nova == REVISAO_CADASTRO_EM_ANDAMENTO || nova == REVISAO_CADASTRO_HOMOLOGADA;
             case REVISAO_CADASTRO_HOMOLOGADA ->

@@ -348,6 +348,16 @@ public class SubprocessoTransicaoService {
         log.info("Subprocesso {} transicionado para REVISAO_CADASTRO_EM_ANDAMENTO", codSubprocesso);
     }
 
+    public void cancelarInicioRevisaoCadastro(Long codSubprocesso) {
+        log.info("Cancelando início da revisão do cadastro do subprocesso {}", codSubprocesso);
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
+
+        sp.setSituacao(NAO_INICIADO);
+        subprocessoRepo.save(sp);
+        log.info("Subprocesso {} transicionado para NAO_INICIADO", codSubprocesso);
+    }
+
     public void disponibilizarRevisao(Long codSubprocesso) {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
