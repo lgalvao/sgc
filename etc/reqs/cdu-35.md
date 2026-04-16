@@ -4,30 +4,25 @@
 
 ## Fluxo principal
 
-1. O usuário acessa `Relatórios` na barra principal.
+1. O usuário acessa o menu `Relatórios` na barra de navegação principal.
 
-2. O usuário seleciona a opção `Andamento de processo`.
+2. O sistema exibe cards com os relatórios disponíveis. O usuário clica no card `Andamento de processo`.
 
-3. O sistema mostra uma tela com uma lista de processos. Se o perfil for GESTOR, os processos serão filtrados para apenas os envolvendo a sua unidade ou subordinadas. Para perfil ADMIN, todos os processos são exibidos.
+3. O sistema exibe a tela de geração do relatório. 
+   - Se o perfil for GESTOR, a lista de processos para seleção é filtrada para exibir apenas aqueles que envolvem a sua unidade ou subordinadas. 
+   - Para o perfil ADMIN, todos os processos ativos são exibidos.
 
-4. O usuário seleciona o processo desejado e clica em `Gerar` 
+4. O usuário seleciona o processo desejado no campo de seleção e clica no botão `Gerar relatório`.
 
-4. O sistema exibe o relatório em tela contendo as seguintes informações:
-   - Título do relatório e data/hora de geração 
-   - Detalhes do processo selecionado: Descrição, Data limite,  
-   - Para cada unidade participante do processo:
-         - Sigla da unidade
-         - Nome da unidade
-         - Situação atual do subprocesso da unidade, para o processo selecionado
-         - Data/hora da última movimentação
-         - Localização
-         - Data limite da etapa 1
-         - Data de conclusão da etapa 1
-         - Data limite da etapa 2
-         - Data de conclusão da etapa 2
-         - Nome do titular da unidade
-         - Nome do responsável atual pela unidade (se não for o titular)
+5. O sistema processa os dados e exibe o relatório em tela, organizado em cartões individuais para cada unidade participante, contendo:
+   - **Cabeçalho do relatório:** Título, Processo selecionado, Tipo do processo, Quantidade total de unidades e Data limite geral do processo.
+   - **Cartão da Unidade (Hierarquia Visual):** Cada unidade é apresentada em um bloco com borda lateral distintiva.
+     - **Título:** Sigla e Nome da unidade.
+     - **Informações Gerais:** Situação atual do subprocesso, Localização (Unidade Superior) e Data/hora da última movimentação.
+     - **Etapa 1 (Cadastro):** Data limite e Data de conclusão.
+     - **Etapa 2 (Mapa):** Data limite (com indicação de "Prazo ajustado" se divergir da etapa 1) e Data de conclusão.
+     - **Responsáveis:** Nome do titular da unidade e, se houver substituição vigente, o nome do responsável atual com a indicação "(Substituição)".
 
-5. O usuário pode optar por exportar os dados para PDF clicando no botao `PDF`.
+6. O usuário pode clicar no botão `PDF` para exportar o relatório.
 
-6. O sistema gera o arquivo selecionado e o disponibiliza para download.
+7. O sistema gera um arquivo PDF seguindo o mesmo layout visual (otimizado para impressão em preto e branco) e inicia o download automaticamente com o padrão de nome `relatorio-andamento-[id-processo].pdf`.

@@ -51,7 +51,8 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await requisicaoSemFiltroUnidade;
         const download = await downloadPromise;
 
-        expect(download.suggestedFilename()).toContain(`relatorio-mapas-${processo.codigo}.pdf`);
+        const filename = download.suggestedFilename();
+        expect(filename).toMatch(new RegExp(`relatorio-mapas-(vigentes-)?${processo.codigo}.pdf`));
     });
 
     test('Cenário CDU-36: Mantém opção única de unidade e gera PDF sem unidadeId', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {

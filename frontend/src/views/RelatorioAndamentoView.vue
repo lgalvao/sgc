@@ -47,7 +47,7 @@
 
     <template v-else>
       <div v-if="relatorioAndamento.length > 0" class="d-flex flex-column gap-3">
-        <BCard v-for="(item, index) in linhasRelatorioAndamento" :key="index" no-body class="border-start border-4 border-secondary shadow-sm">
+        <BCard v-for="(item, index) in linhasRelatorioAndamento" :key="index" no-body class="border-start border-4 border-secondary shadow-sm" data-testid="card-resultado-andamento">
           <BCardBody>
             <BCardTitle class="mb-3">
               <span class="fw-bold text-primary">{{ item.siglaUnidade }} - {{ item.nomeUnidade }}</span>

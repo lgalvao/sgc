@@ -40,7 +40,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(botaoGerar).toBeEnabled();
         await botaoGerar.click();
 
-        const cardsRelatorio = page.locator('.card-body');
+        const cardsRelatorio = page.getByTestId('card-resultado-andamento');
         await expect(cardsRelatorio.first()).toBeVisible();
 
         const primeiroCard = cardsRelatorio.first();
