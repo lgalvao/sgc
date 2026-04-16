@@ -46,4 +46,15 @@ describe('RelatoriosView.vue', () => {
         await ctx.wrapper.find('[data-testid="card-relatorio-mapas"]').trigger('click');
         expect(mockPush).toHaveBeenCalledWith('/relatorios/mapas-vigentes');
     });
+
+    it('deve navegar usando teclado', async () => {
+        const mountOptions = getCommonMountOptions({}, stubs);
+        ctx.wrapper = mount(RelatoriosView, mountOptions);
+
+        await ctx.wrapper.find('[data-testid="card-relatorio-andamento"]').trigger('keydown.enter');
+        expect(mockPush).toHaveBeenCalledWith('/relatorios/andamento');
+
+        await ctx.wrapper.find('[data-testid="card-relatorio-andamento"]').trigger('keydown.space');
+        expect(mockPush).toHaveBeenCalledWith('/relatorios/andamento');
+    });
 });

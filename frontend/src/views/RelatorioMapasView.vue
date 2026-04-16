@@ -34,8 +34,8 @@
           <BButton
             :disabled="!processoIdSelecionado || carregando"
             variant="success"
-            @click="exportarPdf"
             data-testid="btn-gerar-mapas"
+            @click="exportarPdf"
           >
             <BSpinner v-if="carregando" small class="me-1" />
             <i v-else class="bi bi-file-earmark-pdf me-1" />
