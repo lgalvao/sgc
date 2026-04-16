@@ -153,7 +153,8 @@ describe("useSubprocessos", () => {
         expect(store.subprocessoDetalhe?.codigo).toBe(10);
         expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.NAO_INICIADO);
 
-        resolver?.({
+        if (resolver) {
+            resolver({
             subprocesso: {
                 codigo: 10,
                 situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
@@ -173,7 +174,8 @@ describe("useSubprocessos", () => {
             localizacaoAtual: "U1",
             movimentacoes: [],
             permissoes: permissoesPadrao,
-        });
+            });
+        }
 
         await requisicao;
 

@@ -577,12 +577,14 @@ describe("CadastroView.vue", () => {
 
         expect(fluxoSubprocesso.iniciarRevisaoCadastro).toHaveBeenCalledWith(123);
         expect(wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="cad-atividades__txt-iniciando-revisao"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="cad-atividades__spinner-iniciando-revisao"]').exists()).toBe(true);
 
-        resolver?.(true);
+        if (resolver) {
+            resolver(true);
+        }
         await flushPromises();
 
-        expect(wrapper.find('[data-testid="cad-atividades__txt-iniciando-revisao"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="cad-atividades__spinner-iniciando-revisao"]').exists()).toBe(false);
     });
 
     it("mantém botão disponibilizar visível e desabilitado quando o chefe ainda só pode editar", async () => {

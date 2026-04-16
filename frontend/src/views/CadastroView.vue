@@ -57,11 +57,10 @@
       </BFormCheckbox>
       <div
           v-if="loadingInicioRevisao"
-          class="d-inline-flex align-items-center gap-2 small text-body-secondary mt-1"
-          data-testid="cad-atividades__txt-iniciando-revisao"
+          class="d-inline-flex align-items-center mt-1"
+          data-testid="cad-atividades__spinner-iniciando-revisao"
       >
         <BSpinner small />
-        <span>{{ TEXTOS.atividades.INICIANDO_REVISAO_CADASTRO }}</span>
       </div>
     </div>
 
