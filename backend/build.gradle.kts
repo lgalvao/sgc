@@ -63,18 +63,22 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("jakarta.servlet:jakarta.servlet-api")
-    implementation("tools.jackson.core:jackson-core:3.1.1")
-    testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.junit.platform:junit-platform-suite-api:6.0.3")
-    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.0.3")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
+
+    implementation("tools.jackson.core:jackson-core:3.1.1")
+
+    testImplementation(platform("org.junit:junit-bom:6.0.3"))
+    testImplementation("org.junit.platform:junit-platform-suite-api:6.0.3")
+    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.0.3")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
     implementation("com.h2database:h2")
-
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
+    implementation("org.thymeleaf:thymeleaf-spring6:3.1.3.RELEASE")
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
     testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
