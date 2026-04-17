@@ -1,9 +1,11 @@
 package sgc.organizacao;
 
+import lombok.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
 
+@Builder
 public record ContextoUsuarioAutenticado(
         String usuarioTitulo,
         Long unidadeAtivaCodigo,

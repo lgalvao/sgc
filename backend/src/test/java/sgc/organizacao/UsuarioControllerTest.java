@@ -45,9 +45,17 @@ class UsuarioControllerTest {
     @DisplayName("GET /api/usuarios/{titulo} - Deve retornar usuário quando encontrado")
     @WithMockUser
     void buscarUsuarioPorTitulo_Sucesso() throws Exception {
-        UsuarioConsultaLeitura entity = new UsuarioConsultaLeitura(
-                "123", "111", "Teste", "teste@x.com", "1234", 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, null
-        );
+        UsuarioConsultaLeitura entity = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("123")
+                .matricula("111")
+                .nome("Teste")
+                .email("teste@x.com")
+                .ramal("1234")
+                .unidadeCodigo(1L)
+                .unidadeNome("Unidade 1")
+                .unidadeSigla("U1")
+                .unidadeTipo(TipoUnidade.OPERACIONAL)
+                .build();
         when(usuarioService.buscarConsultaPorTitulo("123")).thenReturn(Optional.of(entity));
 
         mockMvc.perform(get("/api/usuarios/123"))

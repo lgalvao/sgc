@@ -1,7 +1,9 @@
 package sgc.organizacao.model;
 
+import lombok.*;
 import org.jspecify.annotations.*;
 
+@Builder
 public record ResponsabilidadeUnidadeResumoLeitura(
         Long unidadeCodigo,
         String responsavelTitulo,

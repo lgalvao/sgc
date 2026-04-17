@@ -33,7 +33,14 @@ class CacheViewsOrganizacaoServiceTest {
     @Test
     @DisplayName("deve listar todas as unidades através do repositório")
     void listarTodasUnidades() {
-        UnidadeHierarquiaLeitura uhl = new UnidadeHierarquiaLeitura(1L, "Nome", "SIGLA", "123", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null);
+        UnidadeHierarquiaLeitura uhl = UnidadeHierarquiaLeitura.builder()
+                .codigo(1L)
+                .nome("Nome")
+                .sigla("SIGLA")
+                .tituloTitular("123")
+                .tipo(TipoUnidade.OPERACIONAL)
+                .situacao(SituacaoUnidade.ATIVA)
+                .build();
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(uhl));
 
         List<UnidadeHierarquiaLeitura> result = cacheService.listarTodasUnidades();

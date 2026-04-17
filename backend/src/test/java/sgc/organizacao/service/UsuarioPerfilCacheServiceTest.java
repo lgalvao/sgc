@@ -37,15 +37,13 @@ class UsuarioPerfilCacheServiceTest {
     @Test
     @DisplayName("Deve cachear autorizacoes por titulo eleitoral")
     void deveCachearAutorizacoesPorTituloEleitoral() {
-        UsuarioPerfilAutorizacaoLeitura leitura = new UsuarioPerfilAutorizacaoLeitura(
-                "123",
-                Perfil.ADMIN,
-                1L,
-                "Secretaria",
-                "SEASP",
-                null,
-                null
-        );
+        UsuarioPerfilAutorizacaoLeitura leitura = UsuarioPerfilAutorizacaoLeitura.builder()
+                .usuarioTitulo("123")
+                .perfil(Perfil.ADMIN)
+                .unidadeCodigo(1L)
+                .unidadeNome("Secretaria")
+                .unidadeSigla("SEASP")
+                .build();
         when(usuarioPerfilRepo.listarAutorizacoesPorUsuarioTitulo("123")).thenReturn(List.of(leitura));
 
         List<UsuarioPerfilAutorizacaoLeitura> primeiraConsulta = usuarioPerfilCacheService.buscarAutorizacoesPerfil("123");

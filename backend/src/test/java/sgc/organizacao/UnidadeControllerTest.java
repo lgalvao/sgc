@@ -118,7 +118,7 @@ class UnidadeControllerTest {
     void deveExigirMapaVigenteParaRevisaoAoBuscarArvoreDeElegibilidade() throws Exception {
         when(processoService.buscarIdsUnidadesComProcessosAtivos(10L))
                 .thenReturn(Set.of(1L, 2L));
-        when(hierarquiaService.buscarArvoreComElegibilidade(eq(true), eq(Set.of(1L, 2L))))
+        when(hierarquiaService.buscarArvoreComElegibilidade(true, Set.of(1L, 2L)))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
@@ -135,7 +135,7 @@ class UnidadeControllerTest {
     void deveExigirMapaVigenteParaDiagnosticoAoBuscarArvoreDeElegibilidade() throws Exception {
         when(processoService.buscarIdsUnidadesComProcessosAtivos(any()))
                 .thenReturn(Set.of());
-        when(hierarquiaService.buscarArvoreComElegibilidade(eq(true), eq(Set.of())))
+        when(hierarquiaService.buscarArvoreComElegibilidade(true, Set.of()))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
@@ -184,9 +184,17 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar lista de usuários por unidade")
     @WithMockUser(roles = "CHEFE")
     void deveRetornarListaDeUsuariosPorUnidade() throws Exception {
-        UsuarioConsultaLeitura usuario = new UsuarioConsultaLeitura(
-                "123", "111", "Teste", "teste@x.com", "1234", 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, null
-        );
+        UsuarioConsultaLeitura usuario = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("123")
+                .matricula("111")
+                .nome("Teste")
+                .email("teste@x.com")
+                .ramal("1234")
+                .unidadeCodigo(1L)
+                .unidadeNome("Unidade 1")
+                .unidadeSigla("U1")
+                .unidadeTipo(TipoUnidade.OPERACIONAL)
+                .build();
         when(usuarioServiceBean.buscarConsultasPorUnidadeLotacao(1L)).thenReturn(List.of(usuario));
 
         mockMvc.perform(get("/api/unidades/1/usuarios")).andExpect(status().isOk());
@@ -208,10 +216,9 @@ class UnidadeControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar unidade por ID")
+    @DisplayName("Deve retornar unidade por código")
     @WithMockUser
-    void deveRetornarUnidadePorId() throws Exception {
-
+    void deveRetornarUnidadePorCodigo() throws Exception {
         Unidade un = new Unidade();
         un.setCodigo(1L);
         un.setNome("Unidade 1");
@@ -226,7 +233,6 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar árvore de unidade quando existente")
     @WithMockUser
     void deveRetornarArvoreDeUnidadeExistente() throws Exception {
-
         when(hierarquiaService.buscarArvore(1L)).thenReturn(UnidadeDto.builder().build());
 
         mockMvc.perform(get("/api/unidades/1/arvore"))
@@ -237,7 +243,6 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar siglas subordinadas")
     @WithMockUser
     void deveRetornarSiglasSubordinadas() throws Exception {
-
         when(hierarquiaService.buscarSiglasSubordinadas("SIGLA")).thenReturn(List.of("SIGLA", "FILHA"));
 
         mockMvc.perform(get("/api/unidades/sigla/SIGLA/subordinadas"))
@@ -248,7 +253,6 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar sigla superior")
     @WithMockUser
     void deveRetornarSiglaSuperior() throws Exception {
-
         when(hierarquiaService.buscarSiglaSuperior("FILHA")).thenReturn(Optional.of("SIGLA"));
 
         mockMvc.perform(get("/api/unidades/sigla/FILHA/superior"))
@@ -259,7 +263,6 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar 204 ao buscar sigla superior de raiz")
     @WithMockUser
     void deveRetornar204AoBuscarSiglaSuperiorDeRaiz() throws Exception {
-
         when(hierarquiaService.buscarSiglaSuperior("RAIZ")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/unidades/sigla/RAIZ/superior"))

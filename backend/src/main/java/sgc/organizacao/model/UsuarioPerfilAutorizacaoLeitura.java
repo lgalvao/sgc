@@ -1,7 +1,9 @@
 package sgc.organizacao.model;
 
+import lombok.*;
 import org.jspecify.annotations.*;
 
+@Builder
 public record UsuarioPerfilAutorizacaoLeitura(
         String usuarioTitulo,
         Perfil perfil,
