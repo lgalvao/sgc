@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.*;
 @ConfigurationPropertiesScan
 @EnableConfigurationProperties(sgc.comum.util.MonitoramentoProperties.class)
 @SpringBootApplication(excludeName = {
-        "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
+        "org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration"
 })
 public class Sgc {
     public static void main(String[] args) {

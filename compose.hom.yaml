@@ -1,17 +1,17 @@
 services:
   sgc:
-    image: registry.tre-pe.gov.br/sesel/sgc:1.0.0
+    image: ${SGC_IMAGE:-registry.tre-pe.gov.br/sesel/sgc:latest}
     container_name: sgc
     restart: unless-stopped
     ports:
-      - "8980:10000"
+      - "${PORTA_HOST:-8980}:${PORTA_CONTAINER:-10000}"
     env_file:
       - .env.hom
     environment:
       TZ: America/Recife
       SPRING_PROFILES_ACTIVE: hom
-      SERVER_PORT: "10000"
-      DB_URL: "jdbc:oracle:thin:@desenvolvimentobd.tre-pe.gov.br:1521:admdes2"
+      SERVER_PORT: "${PORTA_CONTAINER:-10000}"
+      DB_URL: "${DB_URL:-jdbc:oracle:thin:@desenvolvimentobd.tre-pe.gov.br:1521:admdes2}"
       LOGGING_FILE_NAME: /var/log/sgc/sgc.log
     volumes:
       - log-data:/var/log/sgc

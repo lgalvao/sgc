@@ -17,7 +17,7 @@ SEM_PULL=false
 TIMEOUT_SUBIDA_SEGUNDOS="${TIMEOUT_SUBIDA_SEGUNDOS:-120}"
 ARQUIVO_JAR_DOCKER="sgc.jar"
 ARQUIVO_ENV=".env.hom"
-ARQUIVO_COMPOSE="compose.yaml"
+ARQUIVO_COMPOSE="compose.hom.yaml"
 
 uso() {
   cat <<EOF_USO
@@ -158,6 +158,10 @@ if [[ ! -f "$ARQUIVO_ENV" ]]; then
   echo "ERRO: arquivo $ARQUIVO_ENV nao encontrado."
   exit 1
 fi
+if [[ ! -f "$ARQUIVO_COMPOSE" ]]; then
+  echo "ERRO: arquivo $ARQUIVO_COMPOSE nao encontrado."
+  exit 1
+fi
 
 if [[ "$SEM_BUILD" == false ]]; then
   echo "==> Executando build do frontend e do backend"
@@ -212,34 +216,15 @@ else
   echo "==> Push ignorado por parametro"
 fi
 
-echo "==> Gerando $ARQUIVO_COMPOSE para homologacao"
-cat > "$ARQUIVO_COMPOSE" <<EOF_COMPOSE
-services:
-  $NOME_SISTEMA:
-    image: $TAG_VERSAO
-    container_name: $NOME_SISTEMA
-    restart: unless-stopped
-    ports:
-      - "$PORTA_HOST:$PORTA_CONTAINER"
-    env_file:
-      - $ARQUIVO_ENV
-    environment:
-      TZ: America/Recife
-      SPRING_PROFILES_ACTIVE: hom
-      SERVER_PORT: "$PORTA_CONTAINER"
-      DB_URL: "$DB_URL"
-      LOGGING_FILE_NAME: /var/log/$NOME_SISTEMA/$NOME_SISTEMA.log
-    volumes:
-      - log-data:/var/log/$NOME_SISTEMA
-
-volumes:
-  log-data:
-EOF_COMPOSE
+export SGC_IMAGE="$TAG_VERSAO"
+export PORTA_HOST
+export PORTA_CONTAINER
+export DB_URL
 
 if [[ "$SEM_DEPLOY" == false ]]; then
   echo "==> Subindo homologacao com a versao $VERSAO"
-  "$CONTAINER_CLI" compose down --remove-orphans
-  "$CONTAINER_CLI" compose up -d --remove-orphans
+  "$CONTAINER_CLI" compose -f "$ARQUIVO_COMPOSE" down --remove-orphans
+  "$CONTAINER_CLI" compose -f "$ARQUIVO_COMPOSE" up --detach --remove-orphans
   aguardar_subida
 else
   echo "==> Deploy do compose ignorado por parametro"

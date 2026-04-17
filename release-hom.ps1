@@ -20,15 +20,15 @@ $ErrorActionPreference = "Stop"
 $NomeSistema = "sgc"
 $ArquivoJarDocker = "sgc.jar"
 $ArquivoEnv = ".env.hom"
-$ArquivoCompose = "compose.yaml"
+$ArquivoCompose = "compose.hom.yaml"
 
-function Remover-ArtefatoTemporario {
+function Remove-ArtefatoTemporario {
     if (Test-Path $ArquivoJarDocker) {
         Remove-Item -LiteralPath $ArquivoJarDocker -Force
     }
 }
 
-function Invocar-Comando {
+function Invoke-Comando {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Comando,
@@ -42,12 +42,12 @@ function Invocar-Comando {
     }
 }
 
-function Obter-VersaoProjeto {
+function Get-VersaoProjeto {
     param([string]$Gradle)
 
-    $SaidaVersao = & $Gradle --no-daemon -q properties --property version
+    $SaidaVersao = & $Gradle -q properties --property version
     if ($LASTEXITCODE -ne 0) {
-        throw "Comando falhou ($LASTEXITCODE): $Gradle --no-daemon -q properties --property version"
+        throw "Comando falhou ($LASTEXITCODE): $Gradle -q properties --property version"
     }
 
     $LinhaVersao = $SaidaVersao | Where-Object { $_ -match "^version:\s*(.+)$" } | Select-Object -First 1
@@ -58,7 +58,7 @@ function Obter-VersaoProjeto {
     return [regex]::Match($LinhaVersao, "^version:\s*(.+)$").Groups[1].Value.Trim()
 }
 
-function Obter-JarBackend {
+function Get-JarBackend {
     $JarOrigem = Get-ChildItem -Path "backend\build\libs" -Filter "*.jar" |
         Where-Object { $_.Name -notlike "*-plain.jar" } |
         Sort-Object Name |
@@ -71,34 +71,7 @@ function Obter-JarBackend {
     return $JarOrigem
 }
 
-function Gerar-Compose {
-    param([string]$Imagem)
-
-    @"
-services:
-  ${NomeSistema}:
-    image: $Imagem
-    container_name: $NomeSistema
-    restart: unless-stopped
-    ports:
-      - "$PortaHost`:$PortaContainer"
-    env_file:
-      - $ArquivoEnv
-    environment:
-      TZ: America/Recife
-      SPRING_PROFILES_ACTIVE: hom
-      SERVER_PORT: "$PortaContainer"
-      DB_URL: "$DbUrl"
-      LOGGING_FILE_NAME: /var/log/$NomeSistema/$NomeSistema.log
-    volumes:
-      - log-data:/var/log/$NomeSistema
-
-volumes:
-  log-data:
-"@ | Set-Content -Path $ArquivoCompose -Encoding UTF8
-}
-
-function Obter-ValorContainer {
+function Get-ValorContainer {
     param(
         [string]$Formato
     )
@@ -111,15 +84,15 @@ function Obter-ValorContainer {
     return ($Valor | Select-Object -First 1)
 }
 
-function Aguardar-Subida {
+function Wait-Subida {
     $Inicio = Get-Date
     $Limite = $Inicio.AddSeconds($TimeoutSubidaSegundos)
     Write-Host "==> Monitorando subida do container por ate $TimeoutSubidaSegundos segundos"
 
     while ((Get-Date) -lt $Limite) {
-        $Status = Obter-ValorContainer "{{.State.Status}}"
-        $Reiniciando = Obter-ValorContainer "{{.State.Restarting}}"
-        $CodigoSaida = Obter-ValorContainer "{{.State.ExitCode}}"
+        $Status = Get-ValorContainer "{{.State.Status}}"
+        $Reiniciando = Get-ValorContainer "{{.State.Restarting}}"
+        $CodigoSaida = Get-ValorContainer "{{.State.ExitCode}}"
 
         if ($Status -in @("exited", "dead") -or $Reiniciando -eq "true") {
             Write-Host "==> Logs recentes do container"
@@ -145,22 +118,25 @@ try {
     if (-not (Test-Path $ArquivoEnv)) {
         throw "Arquivo $ArquivoEnv nao encontrado."
     }
+    if (-not (Test-Path $ArquivoCompose)) {
+        throw "Arquivo $ArquivoCompose nao encontrado."
+    }
 
     $Gradle = if (Test-Path ".\gradlew.bat") { ".\gradlew.bat" } else { "./gradlew" }
 
     if (-not $SemBuild) {
         Write-Host "==> Executando build do frontend e do backend"
-        Invocar-Comando $Gradle --no-daemon clean copyFrontend ":backend:bootJar" -x test
+        Invoke-Comando $Gradle clean copyFrontend ":backend:bootJar" -x test
     } else {
         Write-Host "==> Build Gradle ignorado por parametro"
     }
 
-    $Versao = if ($Tag) { $Tag } else { Obter-VersaoProjeto $Gradle }
+    $Versao = if ($Tag) { $Tag } else { Get-VersaoProjeto $Gradle }
     $TagVersao = "$Registry/${NomeSistema}:$Versao"
     $TagLatest = "$Registry/${NomeSistema}:latest"
 
     if (-not $SemImagem) {
-        $JarOrigem = Obter-JarBackend
+        $JarOrigem = Get-JarBackend
         Write-Host "==> Preparando artefato Docker: $($JarOrigem.FullName)"
         Copy-Item -LiteralPath $JarOrigem.FullName -Destination $ArquivoJarDocker -Force
 
@@ -174,30 +150,32 @@ try {
         $ArgsBuild += "."
 
         Write-Host "==> Construindo imagem com ${ContainerCli}: $TagVersao"
-        Invocar-Comando $ContainerCli @ArgsBuild
+        Invoke-Comando $ContainerCli @ArgsBuild
     } else {
         Write-Host "==> Build da imagem ignorado por parametro"
     }
 
     if (-not $SemPush) {
         Write-Host "==> Enviando imagem para o registry"
-        Invocar-Comando $ContainerCli push $TagVersao
-        Invocar-Comando $ContainerCli push $TagLatest
+        Invoke-Comando $ContainerCli push $TagVersao
+        Invoke-Comando $ContainerCli push $TagLatest
     } else {
         Write-Host "==> Push ignorado por parametro"
     }
 
-    Write-Host "==> Gerando $ArquivoCompose para homologacao"
-    Gerar-Compose $TagVersao
+    $env:SGC_IMAGE = $TagVersao
+    $env:PORTA_HOST = $PortaHost
+    $env:PORTA_CONTAINER = $PortaContainer
+    $env:DB_URL = $DbUrl
 
     if (-not $SemDeploy) {
         Write-Host "==> Subindo homologacao com a versao $Versao"
-        Invocar-Comando $ContainerCli compose down --remove-orphans
-        Invocar-Comando $ContainerCli compose up -d --remove-orphans
-        Aguardar-Subida
+        Invoke-Comando $ContainerCli compose -f $ArquivoCompose down --remove-orphans
+        Invoke-Comando $ContainerCli compose -f $ArquivoCompose up --detach --remove-orphans
+        Wait-Subida
     } else {
         Write-Host "==> Deploy do compose ignorado por parametro"
     }
 } finally {
-    Remover-ArtefatoTemporario
+    Remove-ArtefatoTemporario
 }

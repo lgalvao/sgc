@@ -3,6 +3,11 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import info.solidsoft.gradle.pitest.PitestTask
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.tasks.testing.logging.*
+import org.gradle.internal.classpath.Instrumented.systemProperty
+import org.gradle.internal.component.external.descriptor.MavenScope
+import org.gradle.internal.execution.caching.CachingState.enabled
+import org.gradle.internal.impldep.org.bouncycastle.crypto.CryptoServicesRegistrar.checkConstraints
+import org.gradle.internal.impldep.org.jsoup.nodes.Document
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val argumentosJvmSemAvisoUnsafe = if (JavaVersion.current().majorVersion.toInt() >= 25) {
@@ -78,7 +83,7 @@ dependencies {
     runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
     implementation("com.h2database:h2")
     implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
-    implementation("org.thymeleaf:thymeleaf-spring6:3.1.3.RELEASE")
+    implementation("org.thymeleaf:thymeleaf-spring6:3.1.4.RELEASE")
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
     testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
@@ -250,9 +255,9 @@ tasks.jacocoTestReport {
     executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
 
     reports {
-        xml.required.set(true)
+        Document.OutputSettings.Syntax.xml.required.set(true)
         csv.required.set(true)
-        html.required.set(true) // Ativado para facilitar visualização manual se necessário
+        Document.OutputSettings.Syntax.html.required.set(true) // Ativado para facilitar visualização manual se necessário
     }
 
     classDirectories.setFrom(
@@ -370,7 +375,7 @@ pitest {
     mutators.set(listOf("ALL"))
     outputFormats.set(listOf("CSV"))
     timestampedReports.set(false)
-    threads.set(Runtime.getRuntime().availableProcessors())
+    threads.set(MavenScope.Runtime.getRuntime().availableProcessors())
     timeoutFactor.set(BigDecimal("5.0"))
     verbose.set(true)
     failWhenNoMutations.set(false)
