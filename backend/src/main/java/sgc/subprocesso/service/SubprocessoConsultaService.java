@@ -511,35 +511,36 @@ public class SubprocessoConsultaService {
     private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp, List<Movimentacao> movimentacoes) {
         DadosContextoConsulta dadosContexto = resolverDadosContexto(sp, movimentacoes);
         Long unidadeAtivaCodigo = dadosContexto.unidadeAtivaCodigo();
+
         Unidade unidadeAlvo = dadosContexto.unidadeAlvo();
         boolean mesmaUnidadeAlvo = Objects.equals(unidadeAtivaCodigo, unidadeAlvo.getCodigo());
         boolean mesmaUnidade = mesmaUnidadeLocalizacao(unidadeAtivaCodigo, dadosContexto.localizacaoAtual(), dadosContexto.processoFinalizado());
         boolean unidadeAlvoNaHierarquiaUsuario = isUnidadeAlvoNaHierarquiaUsuario(unidadeAlvo, dadosContexto.unidadeUsuario(), mesmaUnidadeAlvo);
         boolean temMapaVigente = temMapaVigente(unidadeAlvo.getCodigo(), dadosContexto.processoFinalizado());
 
-        return new ContextoConsultaSubprocesso(
-                sp,
-                dadosContexto.perfil(),
-                dadosContexto.localizacaoAtual(),
-                dadosContexto.processoFinalizado(),
-                mesmaUnidade,
-                mesmaUnidadeAlvo,
-                unidadeAlvoNaHierarquiaUsuario,
-                temMapaVigente
-        );
+        return ContextoConsultaSubprocesso.builder()
+                .subprocesso(sp)
+                .perfil(dadosContexto.perfil())
+                .localizacaoAtual(dadosContexto.localizacaoAtual())
+                .processoFinalizado(dadosContexto.processoFinalizado())
+                .mesmaUnidade(mesmaUnidade)
+                .mesmaUnidadeAlvo(mesmaUnidadeAlvo)
+                .unidadeAlvoNaHierarquiaUsuario(unidadeAlvoNaHierarquiaUsuario)
+                .temMapaVigente(temMapaVigente)
+                .build();
     }
 
     private DadosContextoConsulta resolverDadosContexto(Subprocesso sp, List<Movimentacao> movimentacoes) {
         ContextoUsuarioAutenticado contextoUsuario = obterContextoUsuarioAutenticado();
         Long unidadeAtivaCodigo = contextoUsuario.unidadeAtivaCodigo();
-        return new DadosContextoConsulta(
-                contextoUsuario.perfil(),
-                unidadeService.buscarPorCodigoComSuperior(unidadeAtivaCodigo),
-                sp.getUnidade(),
-                unidadeAtivaCodigo,
-                resolverLocalizacaoAtual(sp, movimentacoes),
-                processoFinalizado(sp)
-        );
+        return DadosContextoConsulta.builder()
+                .perfil(contextoUsuario.perfil())
+                .unidadeUsuario(unidadeService.buscarPorCodigoComSuperior(unidadeAtivaCodigo))
+                .unidadeAlvo(sp.getUnidade())
+                .unidadeAtivaCodigo(unidadeAtivaCodigo)
+                .localizacaoAtual(resolverLocalizacaoAtual(sp, movimentacoes))
+                .processoFinalizado(processoFinalizado(sp))
+                .build();
     }
 
     private boolean processoFinalizado(Subprocesso subprocesso) {
@@ -589,6 +590,7 @@ public class SubprocessoConsultaService {
                 .build();
     }
 
+    @Builder
     private record ContextoConsultaSubprocesso(
             Subprocesso subprocesso,
             Perfil perfil,
@@ -633,6 +635,7 @@ public class SubprocessoConsultaService {
         }
     }
 
+    @Builder
     private record DadosContextoConsulta(
             Perfil perfil,
             Unidade unidadeUsuario,
