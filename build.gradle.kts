@@ -2,14 +2,13 @@ plugins {
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.openrewrite.rewrite") version "7.18.0" apply false
+    id("base")
 }
 
 fun detectarWindows(): Boolean {
     val nomeSistemaOperacional: String = System.getProperty("os.name") ?: return false
     return nomeSistemaOperacional.lowercase().contains("win")
 }
-
-apply(plugin = "base")
 
 allprojects {
     group = "sgc"
@@ -45,6 +44,7 @@ subprojects {
 }
 
 tasks.register<Exec>("installFrontend") {
+    description = "Instalar frontend"
     workingDir = file("frontend")
     commandLine = if (detectarWindows()) listOf(
         "cmd",
@@ -55,6 +55,7 @@ tasks.register<Exec>("installFrontend") {
 }
 
 tasks.register<Exec>("buildFrontend") {
+    description = ""
     dependsOn("installFrontend")
     workingDir = file("frontend")
     commandLine = if (detectarWindows()) listOf(
@@ -67,12 +68,14 @@ tasks.register<Exec>("buildFrontend") {
 }
 
 tasks.register<Copy>("copyFrontend") {
+    description = "Copiar frontend para servidor"
     dependsOn("buildFrontend")
     from("frontend/dist")
     into("backend/src/main/resources/static")
 }
 
 tasks.register<Delete>("cleanFrontend") {
+    description = "Limpar build de frontend"
     delete("frontend/dist", "frontend/node_modules")
 }
 

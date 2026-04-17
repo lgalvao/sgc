@@ -66,7 +66,7 @@ class RelatorioFacadeCoverageTest {
 
     @Test
     @DisplayName("gerarRelatorioAndamento - deve cobrir impressão de responsável diferente do titular")
-    void gerarRelatorioAndamento_ComResponsavelDiferente() throws Exception {
+    void gerarRelatorioAndamento_ComResponsavelDiferente() {
         Long cod = 1L;
         Processo p = new Processo(); p.setCodigo(cod); p.setTipo(TipoProcesso.MAPEAMENTO);
         Unidade u = new Unidade(); u.setCodigo(10L); u.setSigla("U1");
@@ -89,7 +89,7 @@ class RelatorioFacadeCoverageTest {
 
     @Test
     @DisplayName("adicionarResumo - deve cobrir número ímpar de entradas")
-    void adicionarResumo_Impar() throws Exception {
+    void adicionarResumo_Impar() {
         Document doc = mock(Document.class);
         LinkedHashMap<String, String> resumo = new LinkedHashMap<>();
         resumo.put("K1", "V1");

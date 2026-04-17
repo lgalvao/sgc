@@ -1298,6 +1298,22 @@
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioPerfilCacheServiceTest usuarioPerfilRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService usuarioRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoSubprocessoPerformanceOracleIntegrationTest usuarioRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacadeCoverageTest alertaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerCoverageTest consultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService entityManager" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacadeCoverageTest hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceEmailIntegrationTest javaMailSender" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerCoverageTest localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioFacadeCoverageTest mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerCoverageTest mockMvc" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerCoverageTest processoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoServiceCoverageTest responsavelService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService selfProvider" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi subErrors" />
+      <entry_point TYPE="field" FQNAME="sgc.integracao.CDU02IntegrationTest subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaServiceCoverageTest unidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacadeCoverageTest unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoServiceCoverageTest unidadeService" />
     </entry_points>
     <list size="3">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
@@ -4439,6 +4455,113 @@
     <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceTest" method="verificarAcessoCadastroHabilitadoAdmin" />
     <pattern value="sgc.integracao.MapaManutencaoServiceIntegrationTest" method="criarSubprocessoSemMapa" />
     <pattern value="sgc.alerta.model.AlertaUsuarioRepo" method="listarPorUsuarioEAlertas" />
+    <pattern value="sgc.processo.service.ProcessoService.AcaoBlocoContexto" />
+    <pattern value="sgc.processo.service.ProcessoService.AcaoBlocoContexto" method="AcaoBlocoContexto" />
+    <pattern value="sgc.relatorio.RelatorioFacadeCoverageTest" method="adicionarResumo_Impar" />
+    <pattern value="sgc.comum.cache.AgendadorRefreshCacheTest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageTest" method="atualizarEntidade_ComandosNulos" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" method="buscarConsultaPorTitulo" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeRepo" method="buscarLeituraDetalhadaPorCodigoUnidade" />
+    <pattern value="sgc.organizacao.service.UnidadeHierarquiaServiceCoverageTest" method="buscarNaHierarquiaPorSigla_Recursivo" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" method="buscarPorTitulo" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" method="buscarPorTituloComUnidadeLotacao" />
+    <pattern value="sgc.organizacao.service.ResponsavelUnidadeServiceCoverageTest" method="buscarResponsabilidadeDetalhadaAtual_Sigla" />
+    <pattern value="sgc.organizacao.service.ResponsavelUnidadeServiceCoverageTest" method="buscarResponsavelUnidade_NaoEncontrado" />
+    <pattern value="sgc.organizacao.service.ResponsavelUnidadeServiceCoverageTest" method="buscarTodasAtribuicoes_SemTitulos" />
+    <pattern value="sgc.organizacao.service.ResponsavelUnidadeServiceCoverageTest" method="buscarTodasAtribuicoes_UsuarioAusente" />
+    <pattern value="sgc.comum.cache.CacheAquecimentoTest" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" />
+    <pattern value="sgc.subprocesso.SubprocessoController" method="cancelarInicioRevisaoCadastro" />
+    <pattern value="sgc.subprocesso.service.SubprocessoTransicaoServiceExtraCoverageTest" method="cancelarInicioRevisaoCadastro_ComRevisaoEmAndamento" />
+    <pattern value="sgc.organizacao.service.UnidadeHierarquiaServiceCoverageTest" method="carregarTitulosResponsavel_ListaVazia" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService.ContextoCriacaoSubprocesso" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService.ContextoCriacaoSubprocesso" method="ContextoCriacaoSubprocesso" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService.ContextoEdicaoMapa" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService.ContextoEdicaoMapa" method="ContextoEdicaoMapa" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest" method="criarMapaParaSubprocesso" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest" method="criarProcessoPersistido" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveAceitarValidacao" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveAceitarValidacaoEmBloco" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveAceitarValidacaoSemObservacoes" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveAdicionarCompetencia" />
+    <pattern value="sgc.comum.cache.CacheAquecimentoTest" method="deveAquecerCachesComSucesso" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveAtualizarCompetencia" />
+    <pattern value="sgc.comum.cache.AgendadorRefreshCacheTest" method="deveAtualizarTudoComSucesso" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.CadastroWorkflowTests" method="deveCancelarInicioRevisaoCadastro" />
+    <pattern value="sgc.comum.cache.CacheAquecimentoTest" method="deveCapturarExcecoes" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveDevolverValidacao" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveDisponibilizarMapaEmBloco" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveHomologarValidacao" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveHomologarValidacaoComRequestNulo" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveHomologarValidacaoEmBloco" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveHomologarValidacaoSemObservacoes" />
+    <pattern value="sgc.integracao.ProcessoServiceIntegrationTest.InicioTests" method="deveIniciarMapeamentoComUnidadeInteroperacional" />
+    <pattern value="sgc.comum.cache.AgendadorRefreshCacheTest" method="deveLidarComExcecoesDuranteAtualizacao" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitterTest" method="deveLimparEmissorNoTimeout" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveObterMapaParaAjuste" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitterTest" method="deveRegistrarEmissor" />
+    <pattern value="sgc.comum.model.TituloEleitoralValidationTest" method="deveRejeitarTitulosEleitoraisInvalidos" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveRemoverCompetencia" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitterTest" method="deveRemoverEmissorNaFalhaDeTransmissao" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveSalvarAjustesMapa" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.MapaWorkflowTests" method="deveSalvarMapaCompleto" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveSubmeterMapaAjustado" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitterTest" method="deveTransmitirComSucesso" />
+    <pattern value="sgc.relatorio.service.RelatorioFacadeTest" method="deveUsarDataLimiteEtapa1QuandoNaoHouverEtapa2" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerTest.ValidacaoWorkflowTests" method="deveValidarMapa" />
+    <pattern value="sgc.subprocesso.service.SubprocessoTransicaoServiceExtraCoverageTest" method="disponibilizarMapaEmBloco_ComListaDeSubprocessos" />
+    <pattern value="sgc.subprocesso.service.SubprocessoNotificacaoServiceCoverageTest" method="enviarNotificacaoSuperior_Duplicatas" />
+    <pattern value="sgc.comum.erros.ErroApi" method="ErroApi" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="evictarPerfisUnidade" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="evictarResponsabilidades" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="evictarUnidades" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="evictarUsuarios" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeRepo" method="findByUsuarioTitulo" />
+    <pattern value="sgc.subprocesso.service.SubprocessoTransicaoService.FluxoCadastroContexto" />
+    <pattern value="sgc.subprocesso.service.SubprocessoTransicaoService.FluxoCadastroContexto" method="FluxoCadastroContexto" />
+    <pattern value="sgc.relatorio.RelatorioFacadeCoverageTest" method="formatarSituacaoPdf_PartesVazias" />
+    <pattern value="sgc.comum.model.TituloEleitoralValidationTest" method="fornecerTitulosInvalidos" />
+    <pattern value="sgc.relatorio.RelatorioFacadeCoverageTest" method="gerarRelatorioAndamento_ComResponsavelDiferente" />
+    <pattern value="sgc.relatorio.RelatorioFacadeCoverageTest" method="gerarRelatorioAndamento_Erro" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService.ImportacaoAtividadesContexto" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService.ImportacaoAtividadesContexto" method="ImportacaoAtividadesContexto" />
+    <pattern value="sgc.integracao.ProcessoServiceIntegrationTest.InicioTests" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" method="listarConsultasPorCodigoUnidadeLotacao" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeRepo" method="listarLeiturasPorCodigosUnidade" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" method="listarPorCodigoUnidadeLotacao" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" method="listarPorTitulosComUnidadeLotacao" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeRepo" method="listarResumosPorCodigosUnidade" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="listarTodasResponsabilidades" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="listarTodasUnidades" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="listarTodosPerfisUnidade" />
+    <pattern value="sgc.organizacao.service.CacheViewsOrganizacaoServiceTest" method="listarTodosUsuarios" />
+    <pattern value="sgc.processo.ProcessoControllerCoverageTest" method="listarUnidadesParaImportacao_FallbackLocalizacao" />
+    <pattern value="sgc.subprocesso.service.LocalizacaoSubprocessoServiceCoverageTest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoTransicaoServiceExtraCoverageTest" method="medirEtapaWorkflow_ComMonitoramento" />
+    <pattern value="sgc.comum.cache.AgendadorRefreshCacheTest" method="naoDeveQuebrarSeCacheDerivadoNaoEncontrado" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageTest" method="obterCodigoMapaObrigatorio_CodigoNulo" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceCoverageTest" method="obterContextoCadastroAtividades_MapaNulo" />
+    <pattern value="sgc.subprocesso.SubprocessoControllerCoverageTest" method="obterContextoCadastroAtividades_Sucesso" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceCoverageTest" method="obterContextoCadastroAtividadesRevisao" />
+    <pattern value="sgc.subprocesso.service.LocalizacaoSubprocessoServiceCoverageTest" method="obterLocalizacoesAtuais_Duplicatas" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageTest" method="obterMapaObrigatorio_MapaNulo" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceCoverageTest" method="obterPermissoesUI_BloqueadoChefeOutraUnidade" />
+    <pattern value="sgc.relatorio.RelatorioFacadeCoverageTest" method="obterRelatorioAndamento_ComSubstituto" />
+    <pattern value="sgc.comum.cache.CacheAquecimento" method="onApplicationEvent" />
+    <pattern value="sgc.processo.painel.PainelFacadeCoverageTest" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" method="pesquisarPorNome" />
+    <pattern value="sgc.processo.ProcessoControllerCoverageTest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest" method="registrarMovimentacaoInicial" />
+    <pattern value="sgc.integracao.SubprocessoServiceEmailIntegrationTest" method="registrarTransicao_TentaEnviarEmailAoDisponibilizarCadastro" />
+    <pattern value="sgc.subprocesso.service.SubprocessoTransicaoService.RegistrarWorkflowInternoCommand" />
+    <pattern value="sgc.subprocesso.service.SubprocessoTransicaoService.RegistrarWorkflowInternoCommand" method="RegistrarWorkflowInternoCommand" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitterTest" />
+    <pattern value="sgc.relatorio.RelatorioFacadeCoverageTest" />
+    <pattern value="sgc.organizacao.service.ResponsavelUnidadeServiceCoverageTest" />
+    <pattern value="sgc.comum.cache.RegistroSseEmitterTest" method="setUp" />
+    <pattern value="sgc.subprocesso.service.SubprocessoNotificacaoServiceCoverageTest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageTest" />
+    <pattern value="sgc.integracao.CDU05IntegrationTest" method="testIniciarProcessoRevisao_deveCriarSubprocessoParaInteroperacionalSelecionada" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
