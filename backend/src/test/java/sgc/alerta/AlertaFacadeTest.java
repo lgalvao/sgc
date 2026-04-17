@@ -128,7 +128,6 @@ class AlertaFacadeTest {
         Method metodo = AlertaFacade.class.getDeclaredMethod("obterUnidadeObrigatoria", Map.class, Long.class);
         metodo.setAccessible(true);
 
-        @SuppressWarnings("unchecked")
         Map<Long, Unidade> unidadesPorCodigo = Collections.emptyMap();
 
         assertThatThrownBy(() -> metodo.invoke(alertaFacade, unidadesPorCodigo, 999L))
@@ -186,8 +185,9 @@ class AlertaFacadeTest {
         when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(interoperacional));
 
-        assertThat(alertas).isNotEmpty();
-        assertThat(alertas).allMatch(a -> a.getProcesso() == processo);
+        assertThat(alertas)
+                .isNotEmpty()
+                .allMatch(a -> a.getProcesso() == processo);
     }
 
     @Test
@@ -289,8 +289,9 @@ class AlertaFacadeTest {
         when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(raiz));
 
-        assertThat(alertas).isNotEmpty();
-        assertThat(alertas).anyMatch(alerta -> alerta.getUnidadeDestino() == raiz);
+        assertThat(alertas)
+                .isNotEmpty()
+                .anyMatch(alerta -> alerta.getUnidadeDestino() == raiz);
     }
 
     @Test
@@ -312,8 +313,9 @@ class AlertaFacadeTest {
 
         Map<Long, LocalDateTime> mapa = alertaFacade.obterMapaDataHoraLeitura(titulo, codigos);
 
-        assertThat(mapa).hasSize(1);
-        assertThat(mapa.get(1L)).isEqualTo(agora);
+        assertThat(mapa)
+                .hasSize(1)
+                .containsEntry(1L, agora);
     }
 
     @Test
@@ -346,9 +348,10 @@ class AlertaFacadeTest {
         verify(alertaService).salvarAlertasUsuarios(alertaUsuarioListCaptor.capture());
         
         List<AlertaUsuario> salvos = alertaUsuarioListCaptor.getValue();
-        assertThat(salvos).hasSize(2); // au1 atualizado e nova entrada para a3
-        assertThat(salvos).anyMatch(au -> au.getCodigo().getAlertaCodigo() == 1L && au.getDataHoraLeitura() != null);
-        assertThat(salvos).anyMatch(au -> au.getCodigo().getAlertaCodigo() == 3L && au.getDataHoraLeitura() != null);
+        assertThat(salvos)
+                .hasSize(2) // au1 atualizado e nova entrada para a3
+                .anyMatch(au -> au.getCodigo().getAlertaCodigo() == 1L && au.getDataHoraLeitura() != null)
+                .anyMatch(au -> au.getCodigo().getAlertaCodigo() == 3L && au.getDataHoraLeitura() != null);
     }
 
     @Test

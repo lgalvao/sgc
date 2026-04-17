@@ -328,6 +328,7 @@ class LoginControllerTest {
 
     @Test
     @DisplayName("deve tratar IP nulo em extrairIp")
+    @SuppressWarnings("DataFlowIssue")
     void deveTratarIpNulo() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr(null);

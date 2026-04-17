@@ -236,9 +236,9 @@ public class SubprocessoConsultaService {
     private String calcularAssinaturaCadastro(List<AtividadeDto> atividades) {
         return atividades.stream()
                 .map(atividade -> {
-                    String descricao = Optional.ofNullable(atividade.descricao()).orElse("").trim();
-                    String conhecimentos = Optional.ofNullable(atividade.conhecimentos()).orElse(List.of()).stream()
-                            .map(conhecimento -> Optional.ofNullable(conhecimento.descricao()).orElse("").trim())
+                    String descricao = atividade.descricao().trim();
+                    String conhecimentos = atividade.conhecimentos().stream()
+                            .map(conhecimento -> conhecimento.descricao().trim())
                             .sorted()
                             .collect(Collectors.joining("\u0001"));
                     return descricao + "\u0002" + conhecimentos;

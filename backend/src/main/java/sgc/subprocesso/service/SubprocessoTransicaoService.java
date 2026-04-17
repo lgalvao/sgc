@@ -450,10 +450,12 @@ public class SubprocessoTransicaoService {
     }
 
     private void medirEtapaDisponibilizacao(String etapa, Long codSubprocesso, Runnable acao) {
-        medirEtapaDisponibilizacao(etapa, codSubprocesso, () -> {
+        long inicioNs = System.nanoTime();
+        try {
             acao.run();
-            return null;
-        });
+        } finally {
+            logEtapaDisponibilizacao(etapa, codSubprocesso, inicioNs);
+        }
     }
 
     private void logEtapaDisponibilizacao(String etapa, Long codSubprocesso, long inicioNs) {

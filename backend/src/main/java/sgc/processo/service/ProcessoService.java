@@ -962,10 +962,12 @@ public class ProcessoService {
             String etapa,
             Runnable acao
     ) {
-        medirEtapaAcaoBloco(codProcesso, command, etapa, () -> {
+        long inicioNs = System.nanoTime();
+        try {
             acao.run();
-            return null;
-        });
+        } finally {
+            logEtapaAcaoBloco(codProcesso, command, etapa, inicioNs);
+        }
     }
 
     private void logEtapaAcaoBloco(

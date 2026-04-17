@@ -43,6 +43,7 @@ class MonitoramentoAspectTest {
 
     @Test
     @DisplayName("Deve logar aviso se for lento")
+    @SuppressWarnings("java:S2925")
     void deveLogarAvisoSeLento() throws Throwable {
         when(joinPoint.getSignature()).thenReturn(signature);
         when(signature.getDeclaringTypeName()).thenReturn("sgc.Classe");

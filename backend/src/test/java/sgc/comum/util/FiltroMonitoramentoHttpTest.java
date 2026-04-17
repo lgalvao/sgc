@@ -43,6 +43,7 @@ class FiltroMonitoramentoHttpTest {
 
     @Test
     @DisplayName("Deve logar erro quando o tempo for muito alto (HTTP LENTO)")
+    @SuppressWarnings("java:S2925")
     void deveLogarErroHTTP() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
         properties.setAtivo(true);
@@ -74,7 +75,8 @@ class FiltroMonitoramentoHttpTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        filtro.doFilter(request, response, (_request, _response) -> {
+        filtro.doFilter(request, response, (req, res) -> {
+            // não faz nada
         });
 
         assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNull();
@@ -152,6 +154,7 @@ class FiltroMonitoramentoHttpTest {
 
     @Test
     @DisplayName("Deve usar HTTP MUITO LENTO")
+    @SuppressWarnings("java:S2925")
     void deveUsarMuitoLento() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
         properties.setAtivo(true);
@@ -201,13 +204,13 @@ class FiltroMonitoramentoHttpTest {
                     @NullUnmarked
                     public Object getAttribute(@NonNull String name, int scope) { return null; }
                     @Override
-                    public void setAttribute(String name, Object value, int scope) {}
+                    public void setAttribute(String name, Object value, int scope) { /* dummy */ }
                     @Override
-                    public void removeAttribute(String name, int scope) {}
+                    public void removeAttribute(String name, int scope) { /* dummy */ }
                     @Override
                     public String[] getAttributeNames(int scope) { return new String[0]; }
                     @Override
-                    public void registerDestructionCallback(String name, Runnable callback, int scope) {}
+                    public void registerDestructionCallback(String name, Runnable callback, int scope) { /* dummy */ }
                     @Override
                     @NullUnmarked
                     public Object resolveReference(@NonNull String key) { return null; }
@@ -229,8 +232,7 @@ class FiltroMonitoramentoHttpTest {
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
         org.slf4j.MDC.clear();
         String id = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
-        assertThat(id).isNotBlank();
-        assertThat(id.length()).isEqualTo(36); // Tamanho padrão do UUID
+        assertThat(id).isNotBlank().hasSize(36);
     }
 
     @Test
@@ -258,8 +260,7 @@ class FiltroMonitoramentoHttpTest {
         );
 
         String id = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
-        assertThat(id).isNotBlank();
-        assertThat(id.length()).isEqualTo(36);
+        assertThat(id).isNotBlank().hasSize(36);
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
@@ -285,13 +286,13 @@ class FiltroMonitoramentoHttpTest {
         );
 
         String id = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
-        assertThat(id).isNotBlank();
-        assertThat(id.length()).isEqualTo(36);
+        assertThat(id).isNotBlank().hasSize(36);
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
     @Test
     @DisplayName("Deve usar HTTP LENTO (entre o alerta e o muito lento)")
+    @SuppressWarnings("java:S2925")
     void deveUsarLento() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
         properties.setAtivo(true);
@@ -337,13 +338,13 @@ class FiltroMonitoramentoHttpTest {
                     @NullUnmarked
                     public Object getAttribute(@NonNull String name, int scope) { return null; }
                     @Override
-                    public void setAttribute(String name, Object value, int scope) {}
+                    public void setAttribute(String name, Object value, int scope) { /* dummy */ }
                     @Override
-                    public void removeAttribute(String name, int scope) {}
+                    public void removeAttribute(String name, int scope) { /* dummy */ }
                     @Override
                     public String[] getAttributeNames(int scope) { return new String[0]; }
                     @Override
-                    public void registerDestructionCallback(String name, Runnable callback, int scope) {}
+                    public void registerDestructionCallback(String name, Runnable callback, int scope) { /* dummy */ }
                     @Override
                     @NullUnmarked
                     public Object resolveReference(@NonNull String key) { return null; }
@@ -356,8 +357,7 @@ class FiltroMonitoramentoHttpTest {
                 }
         );
         String id = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
-        assertThat(id).isNotBlank();
-        assertThat(id.length()).isEqualTo(36);
+        assertThat(id).isNotBlank().hasSize(36);
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
@@ -370,8 +370,7 @@ class FiltroMonitoramentoHttpTest {
                 new org.springframework.web.context.request.ServletRequestAttributes(request)
         );
         String id = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
-        assertThat(id).isNotBlank();
-        assertThat(id.length()).isEqualTo(36);
+        assertThat(id).isNotBlank().hasSize(36);
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
@@ -419,7 +418,8 @@ class FiltroMonitoramentoHttpTest {
         });
 
         String generatedId = response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID);
-        assertThat(generatedId).isNotBlank();
-        assertThat(generatedId).isNotEqualTo("   ");
+        assertThat(generatedId)
+                .isNotBlank()
+                .isNotEqualTo("   ");
     }
 }

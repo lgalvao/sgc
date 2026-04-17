@@ -62,9 +62,11 @@ class RestExceptionHandlerCoverageTest {
         Exception ex = new RuntimeException("Topo", causaMeio);
         WebRequest request = mock(WebRequest.class);
         
-        target.handleHttpMessageNotWritable(
+        ResponseEntity<Object> response = target.handleHttpMessageNotWritable(
                 new HttpMessageNotWritableException("Erro", ex), 
                 null, HttpStatus.INTERNAL_SERVER_ERROR, request);
+                
+        assertThat(response).isNotNull();
     }
 
     @Test

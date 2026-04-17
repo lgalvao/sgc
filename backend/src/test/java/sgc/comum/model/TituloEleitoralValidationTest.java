@@ -2,6 +2,10 @@ package sgc.comum.model;
 
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
+import java.util.stream.Stream;
 
 import java.lang.annotation.*;
 import java.lang.reflect.*;
@@ -38,40 +42,25 @@ class TituloEleitoralValidationTest {
         assertThat(violations).isEmpty();
     }
 
-    @Test
-    @DisplayName("Deve rejeitar título eleitoral nulo")
-    void deveRejeitarTituloEleitoralNulo() {
-        RequisicaoTeste requisicao = new RequisicaoTeste(null);
+    @ParameterizedTest(name = "[{index}] {1}")
+    @MethodSource("fornecerTitulosInvalidos")
+    @DisplayName("Deve rejeitar títulos eleitorais inválidos")
+    void deveRejeitarTitulosEleitoraisInvalidos(String titulo, String mensagemEsperada) {
+        RequisicaoTeste requisicao = new RequisicaoTeste(titulo);
 
         Set<ConstraintViolation<RequisicaoTeste>> violations = validator.validate(requisicao);
 
         assertThat(violations)
                 .extracting(ConstraintViolation::getMessage)
-                .containsExactly("O título eleitoral é obrigatório.");
+                .containsExactly(mensagemEsperada);
     }
 
-    @Test
-    @DisplayName("Deve rejeitar título eleitoral com mais de 12 caracteres")
-    void deveRejeitarTituloEleitoralComMaisDeDozeCaracteres() {
-        RequisicaoTeste requisicao = new RequisicaoTeste("1234567890123");
-
-        Set<ConstraintViolation<RequisicaoTeste>> violations = validator.validate(requisicao);
-
-        assertThat(violations)
-                .extracting(ConstraintViolation::getMessage)
-                .containsExactly("O título eleitoral deve ter no máximo 12 caracteres.");
-    }
-
-    @Test
-    @DisplayName("Deve rejeitar título eleitoral com caracteres não numéricos")
-    void deveRejeitarTituloEleitoralComCaracteresNaoNumericos() {
-        RequisicaoTeste requisicao = new RequisicaoTeste("1234ABCD");
-
-        Set<ConstraintViolation<RequisicaoTeste>> violations = validator.validate(requisicao);
-
-        assertThat(violations)
-                .extracting(ConstraintViolation::getMessage)
-                .containsExactly("O título eleitoral deve conter apenas números.");
+    private static Stream<Arguments> fornecerTitulosInvalidos() {
+        return Stream.of(
+                Arguments.of(null, "O título eleitoral é obrigatório."),
+                Arguments.of("1234567890123", "O título eleitoral deve ter no máximo 12 caracteres."),
+                Arguments.of("1234ABCD", "O título eleitoral deve conter apenas números.")
+        );
     }
 
     @Test

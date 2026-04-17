@@ -74,8 +74,9 @@ class AlertaServiceTest {
 
         Optional<LocalDateTime> data = alertaService.dataHoraLeituraAlertaUsuario(1L, "123");
 
-        assertThat(data).isPresent();
-        assertThat(data).contains(agora);
+        assertThat(data)
+                .isPresent()
+                .contains(agora);
     }
 
     @Test
