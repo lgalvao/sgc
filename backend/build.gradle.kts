@@ -3,11 +3,6 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import info.solidsoft.gradle.pitest.PitestTask
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.tasks.testing.logging.*
-import org.gradle.internal.classpath.Instrumented.systemProperty
-import org.gradle.internal.component.external.descriptor.MavenScope
-import org.gradle.internal.execution.caching.CachingState.enabled
-import org.gradle.internal.impldep.org.bouncycastle.crypto.CryptoServicesRegistrar.checkConstraints
-import org.gradle.internal.impldep.org.jsoup.nodes.Document
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 val argumentosJvmSemAvisoUnsafe = if (JavaVersion.current().majorVersion.toInt() >= 25) {
@@ -55,6 +50,7 @@ tasks.named<JavaCompile>("compileTestJava") {
 extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.44"
 extra["jjwt.version"] = "0.13.0"
+extra["thymeleaf.version"] = "3.1.4.RELEASE"
 
 dependencies {
     implementation(platform("tools.jackson:jackson-bom:3.1.1"))
@@ -255,9 +251,9 @@ tasks.jacocoTestReport {
     executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
 
     reports {
-        Document.OutputSettings.Syntax.xml.required.set(true)
+        xml.required.set(true)
         csv.required.set(true)
-        Document.OutputSettings.Syntax.html.required.set(true) // Ativado para facilitar visualização manual se necessário
+        html.required.set(true) // Ativado para facilitar visualização manual se necessário
     }
 
     classDirectories.setFrom(
@@ -375,7 +371,7 @@ pitest {
     mutators.set(listOf("ALL"))
     outputFormats.set(listOf("CSV"))
     timestampedReports.set(false)
-    threads.set(MavenScope.Runtime.getRuntime().availableProcessors())
+    threads.set(Runtime.getRuntime().availableProcessors())
     timeoutFactor.set(BigDecimal("5.0"))
     verbose.set(true)
     failWhenNoMutations.set(false)

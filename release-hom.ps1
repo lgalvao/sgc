@@ -21,6 +21,11 @@ $NomeSistema = "sgc"
 $ArquivoJarDocker = "sgc.jar"
 $ArquivoEnv = ".env.hom"
 $ArquivoCompose = "compose.hom.yaml"
+$NomeContainerCli = Split-Path -Leaf $ContainerCli
+
+if ($NomeContainerCli -in @("podman", "podman.exe")) {
+    $env:PODMAN_COMPOSE_WARNING_LOGS = "false"
+}
 
 function Remove-ArtefatoTemporario {
     if (Test-Path $ArquivoJarDocker) {

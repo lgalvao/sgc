@@ -107,6 +107,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+CONTAINER_CLI_NOME="$(basename "$CONTAINER_CLI")"
+if [[ "$CONTAINER_CLI_NOME" == "podman" || "$CONTAINER_CLI_NOME" == "podman.exe" ]]; then
+  export PODMAN_COMPOSE_WARNING_LOGS=false
+fi
+
 limpar_artefato_temporario() {
   rm -f "$ARQUIVO_JAR_DOCKER"
 }

@@ -1,4 +1,5 @@
 import vue from "@vitejs/plugin-vue";
+import type {RollupLog} from "rollup";
 import {defineConfig} from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -46,6 +47,12 @@ function construirProxyPorWorker() {
     return proxy;
 }
 
+function deveIgnorarAvisoBootstrapVueNext(warning: RollupLog): boolean {
+    return warning.code === "INVALID_ANNOTATION"
+        && warning.id?.includes("bootstrap-vue-next") === true
+        && warning.message.includes("@__NO_SIDE_EFFECTS__");
+}
+
 export default defineConfig({
     plugins: [
         vue(),
@@ -75,5 +82,13 @@ export default defineConfig({
     preview: {
         port: 4173,
         proxy: construirProxyPorWorker(),
+    },
+    build: {
+        rollupOptions: {
+            onwarn(warning, warn) {
+                if (deveIgnorarAvisoBootstrapVueNext(warning)) return;
+                warn(warning);
+            },
+        },
     },
 });
