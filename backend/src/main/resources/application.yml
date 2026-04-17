@@ -169,7 +169,7 @@ aplicacao:
   acesso-ad:
     base-url: ${AD_BASE_URL:https://sedesenvdev01.tre-pe.gov.br/acessoAD}
   jwt:
-    secret: ${JWT_SECRET:sgc-secret-key-change-this-in-production-minimum-32-chars}
+    secret: ${JWT_SECRET}
 
 springdoc:
   api-docs.enabled: true

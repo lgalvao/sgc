@@ -38,7 +38,7 @@ public class GerenciadorJwt {
 
         if (DEFAULT_SECRET.equals(secret)) {
             // Permite uso da chave padrão em ambientes de desenvolvimento/teste
-            if (environment.acceptsProfiles(Profiles.of("test", "e2e", "local", "hom", "default"))) {
+            if (environment.acceptsProfiles(Profiles.of("test", "e2e", "local", "default"))) {
                 log.debug("ALERTA: Aplicação está usando o segredo JWT padrão.");
             } else {
                 log.error("🚨 ERRO CRÍTICO DE SEGURANÇA: Tentativa de iniciar em ambiente de produção com o segredo JWT padrão.");
