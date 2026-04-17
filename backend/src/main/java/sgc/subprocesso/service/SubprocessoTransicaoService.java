@@ -72,6 +72,7 @@ public class SubprocessoTransicaoService {
             REVISAO, REVISAO_MAPA_HOMOLOGADO
     );
 
+    @Builder
     private record FluxoCadastroContexto(
             String etapa,
             SituacaoSubprocesso situacaoDisponibilizada,
@@ -84,34 +85,35 @@ public class SubprocessoTransicaoService {
             TipoAcaoAnalise acaoAceite
     ) {
         private static FluxoCadastroContexto revisao() {
-            return new FluxoCadastroContexto(
-                    ETAPA_REVISAO,
-                    REVISAO_CADASTRO_DISPONIBILIZADA,
-                    REVISAO_CADASTRO_EM_ANDAMENTO,
-                    REVISAO_CADASTRO_HOMOLOGADA,
-                    REVISAO_CADASTRO_DEVOLVIDA,
-                    REVISAO_CADASTRO_ACEITA,
-                    TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA,
-                    TipoAcaoAnalise.DEVOLUCAO_REVISAO,
-                    TipoAcaoAnalise.ACEITE_REVISAO
-            );
+            return FluxoCadastroContexto.builder()
+                    .etapa(ETAPA_REVISAO)
+                    .situacaoDisponibilizada(REVISAO_CADASTRO_DISPONIBILIZADA)
+                    .situacaoEmAndamento(REVISAO_CADASTRO_EM_ANDAMENTO)
+                    .situacaoHomologada(REVISAO_CADASTRO_HOMOLOGADA)
+                    .transicaoDevolucao(REVISAO_CADASTRO_DEVOLVIDA)
+                    .transicaoAceite(REVISAO_CADASTRO_ACEITA)
+                    .transicaoHomologacao(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA)
+                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
+                    .acaoAceite(TipoAcaoAnalise.ACEITE_REVISAO)
+                    .build();
         }
 
         private static FluxoCadastroContexto mapeamento() {
-            return new FluxoCadastroContexto(
-                    ETAPA_CADASTRO,
-                    MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                    MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                    MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                    CADASTRO_DEVOLVIDO,
-                    CADASTRO_ACEITO,
-                    TipoTransicao.CADASTRO_HOMOLOGADO,
-                    TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
-                    TipoAcaoAnalise.ACEITE_MAPEAMENTO
-            );
+            return FluxoCadastroContexto.builder()
+                    .etapa(ETAPA_CADASTRO)
+                    .situacaoDisponibilizada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                    .situacaoEmAndamento(MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                    .situacaoHomologada(MAPEAMENTO_CADASTRO_HOMOLOGADO)
+                    .transicaoDevolucao(CADASTRO_DEVOLVIDO)
+                    .transicaoAceite(CADASTRO_ACEITO)
+                    .transicaoHomologacao(TipoTransicao.CADASTRO_HOMOLOGADO)
+                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                    .acaoAceite(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .build();
         }
     }
 
+    @Builder
     private record RegistrarWorkflowInternoCommand(
             Subprocesso sp,
             SituacaoSubprocesso novaSituacao,
@@ -132,18 +134,18 @@ public class SubprocessoTransicaoService {
                 Usuario usuario,
                 @Nullable String justificativa
         ) {
-            return new RegistrarWorkflowInternoCommand(
-                    sp,
-                    novaSituacao,
-                    TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
-                    TipoAnalise.VALIDACAO,
-                    TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
-                    unidadeAnalise,
-                    unidadeDevolucao,
-                    usuario,
-                    justificativa,
-                    justificativa
-            );
+            return RegistrarWorkflowInternoCommand.builder()
+                    .sp(sp)
+                    .novaSituacao(novaSituacao)
+                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA)
+                    .tipoAnalise(TipoAnalise.VALIDACAO)
+                    .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                    .unidadeAnalise(unidadeAnalise)
+                    .unidadeDestino(unidadeDevolucao)
+                    .usuario(usuario)
+                    .motivoAnalise(justificativa)
+                    .observacoes(justificativa)
+                    .build();
         }
 
         private static RegistrarWorkflowInternoCommand aceiteValidacao(
@@ -152,18 +154,16 @@ public class SubprocessoTransicaoService {
                 Usuario usuario,
                 @Nullable String observacoes
         ) {
-            return new RegistrarWorkflowInternoCommand(
-                    sp,
-                    novaSituacao,
-                    TipoTransicao.MAPA_VALIDACAO_ACEITA,
-                    TipoAnalise.VALIDACAO,
-                    TipoAcaoAnalise.ACEITE_MAPEAMENTO,
-                    null,
-                    null,
-                    usuario,
-                    "Aceite da validação",
-                    observacoes
-            );
+            return RegistrarWorkflowInternoCommand.builder()
+                    .sp(sp)
+                    .novaSituacao(novaSituacao)
+                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
+                    .tipoAnalise(TipoAnalise.VALIDACAO)
+                    .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .usuario(usuario)
+                    .motivoAnalise("Aceite da validação")
+                    .observacoes(observacoes)
+                    .build();
         }
 
         private static RegistrarWorkflowInternoCommand cadastroComDestino(
@@ -175,18 +175,18 @@ public class SubprocessoTransicaoService {
                 Usuario usuario,
                 @Nullable String observacoes
         ) {
-            return new RegistrarWorkflowInternoCommand(
-                    sp,
-                    novaSituacao,
-                    contexto.transicaoDevolucao(),
-                    TipoAnalise.CADASTRO,
-                    contexto.acaoDevolucao(),
-                    unidadeAnalise,
-                    unidadeDestino,
-                    usuario,
-                    observacoes,
-                    observacoes
-            );
+            return RegistrarWorkflowInternoCommand.builder()
+                    .sp(sp)
+                    .novaSituacao(novaSituacao)
+                    .tipoTransicao(contexto.transicaoDevolucao())
+                    .tipoAnalise(TipoAnalise.CADASTRO)
+                    .tipoAcaoAnalise(contexto.acaoDevolucao())
+                    .unidadeAnalise(unidadeAnalise)
+                    .unidadeDestino(unidadeDestino)
+                    .usuario(usuario)
+                    .motivoAnalise(observacoes)
+                    .observacoes(observacoes)
+                    .build();
         }
 
         private static RegistrarWorkflowInternoCommand cadastroParaSuperiorAtual(
@@ -196,18 +196,16 @@ public class SubprocessoTransicaoService {
                 Usuario usuario,
                 @Nullable String observacoes
         ) {
-            return new RegistrarWorkflowInternoCommand(
-                    sp,
-                    novaSituacao,
-                    contexto.transicaoAceite(),
-                    TipoAnalise.CADASTRO,
-                    contexto.acaoAceite(),
-                    null,
-                    null,
-                    usuario,
-                    observacoes,
-                    observacoes
-            );
+            return RegistrarWorkflowInternoCommand.builder()
+                    .sp(sp)
+                    .novaSituacao(novaSituacao)
+                    .tipoTransicao(contexto.transicaoAceite())
+                    .tipoAnalise(TipoAnalise.CADASTRO)
+                    .tipoAcaoAnalise(contexto.acaoAceite())
+                    .usuario(usuario)
+                    .motivoAnalise(observacoes)
+                    .observacoes(observacoes)
+                    .build();
         }
     }
 
@@ -471,17 +469,16 @@ public class SubprocessoTransicaoService {
         try {
             acao.run();
         } finally {
-            if (!FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()) {
-                return;
+            if (FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()) {
+                long duracaoMs = Duration.ofNanos(System.nanoTime() - inicioNs).toMillis();
+                log.info(
+                        "TRACE-WORKFLOW sp={} transicao={} etapa={} duracaoMs={}",
+                        codSubprocesso,
+                        tipoTransicao.name(),
+                        etapa,
+                        duracaoMs
+                );
             }
-            long duracaoMs = Duration.ofNanos(System.nanoTime() - inicioNs).toMillis();
-            log.info(
-                    "TRACE-WORKFLOW sp={} transicao={} etapa={} duracaoMs={}",
-                    codSubprocesso,
-                    tipoTransicao.name(),
-                    etapa,
-                    duracaoMs
-            );
         }
     }
 
@@ -713,18 +710,18 @@ public class SubprocessoTransicaoService {
         Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(cmd.sp());
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
         if (unidadeDestino != null) {
-            registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
-                    cmd.sp(),
-                    cmd.novaSituacao(),
-                    cmd.tipoTransicao(),
-                    cmd.tipoAnalise(),
-                    cmd.tipoAcaoAnalise(),
-                    unidadeAtual,
-                    unidadeDestino,
-                    cmd.usuario(),
-                    cmd.motivoAnalise(),
-                    cmd.observacoes()
-            ));
+            registrarWorkflowComDestino(RegistrarWorkflowInternoCommand.builder()
+                    .sp(cmd.sp())
+                    .novaSituacao(cmd.novaSituacao())
+                    .tipoTransicao(cmd.tipoTransicao())
+                    .tipoAnalise(cmd.tipoAnalise())
+                    .tipoAcaoAnalise(cmd.tipoAcaoAnalise())
+                    .unidadeAnalise(unidadeAtual)
+                    .unidadeDestino(unidadeDestino)
+                    .usuario(cmd.usuario())
+                    .motivoAnalise(cmd.motivoAnalise())
+                    .observacoes(cmd.observacoes())
+                    .build());
         }
     }
 

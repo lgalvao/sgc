@@ -2,7 +2,8 @@ package sgc.comum.erros;
 
 import jakarta.validation.*;
 import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 import org.springframework.http.*;
 import org.springframework.http.converter.*;
 import org.springframework.security.access.*;
@@ -24,6 +25,7 @@ import sgc.seguranca.sanitizacao.*;
  */
 @Slf4j
 @ControllerAdvice
+@NullUnmarked
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private String sanitizar(@Nullable String texto) {
@@ -75,11 +77,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             log.error("[{}] Erro de negócio crítico ({}): {}", traceId, ex.getCode(), ex.getMessage(), ex);
         }
 
-        ErroApi erroApi = new ErroApi(
-                ex.getStatus(),
-                sanitizar(ex.getMessage()),
-                ex.getCode(),
-                traceId);
+        ErroApi erroApi = ErroApi.builder()
+                .status(ex.getStatus().value())
+                .message(sanitizar(ex.getMessage()))
+                .code(ex.getCode())
+                .traceId(traceId)
+                .build();
 
         if (!ex.getDetails().isEmpty()) {
             erroApi.setDetails(ex.getDetails());
@@ -89,22 +92,25 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected @Nullable ResponseEntity<Object> handleHttpMessageNotReadable(
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex,
-            @Nullable HttpHeaders headers,
+            HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
 
         log.warn("Erro de mensagem HTTP não legível: {}", ex.getMessage());
 
         String error = "Requisição JSON malformada";
-        return buildResponseEntityObject(new ErroApi(HttpStatus.BAD_REQUEST, error));
+        return buildResponseEntityObject(ErroApi.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(error)
+                .build());
     }
 
     @Override
-    protected @Nullable ResponseEntity<Object> handleHttpMessageNotWritable(
+    protected ResponseEntity<Object> handleHttpMessageNotWritable(
             HttpMessageNotWritableException ex,
-            @Nullable HttpHeaders headers,
+            HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
 
@@ -121,18 +127,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 causaRaiz.getMessage(),
                 ex);
 
-        ErroApi erroApi = new ErroApi(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "ERRO INESPERADO: falha ao serializar resposta",
-                "ERRO_SERIALIZACAO",
-                traceId);
+        ErroApi erroApi = ErroApi.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message("ERRO INESPERADO: falha ao serializar resposta")
+                .code("ERRO_SERIALIZACAO")
+                .traceId(traceId)
+                .build();
         return buildResponseEntityObject(erroApi);
     }
 
     @Override
-    protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
-            @Nullable HttpHeaders headers,
+            HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
 
@@ -147,7 +154,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         subErrors.forEach(err -> log.info("Falha de validação: campo '{}' - {}", err.field(), err.message()));
 
-        return buildResponseEntityObject(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
+        return buildResponseEntityObject(ErroApi.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(message)
+                .subErrors(subErrors)
+                .build());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -162,23 +173,34 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                         sanitizar(violation.getMessage())))
                 .toList();
 
-        ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors);
-        erroApi.setTraceId(traceId);
+        ErroApi erroApi = ErroApi.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(message)
+                .subErrors(subErrors)
+                .traceId(traceId)
+                .build();
         return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ErroApi> handleAccessDenied(AccessDeniedException ex) {
         log.debug("Acesso negado via Spring Security: {}", ex.getMessage());
-        ErroApi erroApi = new ErroApi(HttpStatus.FORBIDDEN, "ACESSO NEGADO: " + ex.getMessage());
+        ErroApi erroApi = ErroApi.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .message("ACESSO NEGADO: " + ex.getMessage())
+                .build();
         return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(ErroAutenticacao.class)
     protected ResponseEntity<ErroApi> handleErroAutenticacao(ErroAutenticacao ex) {
         log.warn("Erro de autenticação: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO",
-                gerarTraceId()));
+        return buildResponseEntity(ErroApi.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .message(sanitizar(ex.getMessage()))
+                .code("NAO_AUTORIZADO")
+                .traceId(gerarTraceId())
+                .build());
     }
 
     /**
@@ -194,7 +216,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 traceId, ex.getMessage(), ex);
 
         String mensagemUsuario = "ERRO INTERNO: " + ex.getMessage();
-        ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, mensagemUsuario, "ERRO_INTERNO", traceId);
+        ErroApi erroApi = ErroApi.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(mensagemUsuario)
+                .code("ERRO_INTERNO")
+                .traceId(traceId)
+                .build();
         return buildResponseEntity(erroApi);
     }
 
@@ -203,7 +230,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String traceId = gerarTraceId();
         log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
         String message = "ESTADO ILEGAL: " + ex.getMessage();
-        ErroApi erroApi = new ErroApi(HttpStatus.CONFLICT, message, "ESTADO_ILEGAL", traceId);
+        ErroApi erroApi = ErroApi.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(message)
+                .code("ESTADO_ILEGAL")
+                .traceId(traceId)
+                .build();
         return buildResponseEntity(erroApi);
     }
 
@@ -212,7 +244,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String traceId = gerarTraceId();
         log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
         String message = "ARGUMENTO INVÁLIDO: " + ex.getMessage();
-        ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, "ARGUMENTO_INVALIDO", traceId);
+        ErroApi erroApi = ErroApi.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(message)
+                .code("ARGUMENTO_INVALIDO")
+                .traceId(traceId)
+                .build();
         return buildResponseEntity(erroApi);
     }
 
@@ -222,7 +259,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[{}] ERRO NÃO TRATADO DETECTADO: {}", traceId, ex.getMessage(), ex);
 
         String message = "ERRO INESPERADO: " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName());
-        ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, message, "ERRO_INTERNO", traceId);
+        ErroApi erroApi = ErroApi.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(message)
+                .code("ERRO_INTERNO")
+                .traceId(traceId)
+                .build();
         return buildResponseEntity(erroApi);
     }
 }

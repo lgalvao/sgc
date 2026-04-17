@@ -9,48 +9,41 @@ import java.time.*;
 import java.util.*;
 
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErroApi {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
-    private final LocalDateTime timestamp;
+    @Builder.Default
+    private final LocalDateTime timestamp = LocalDateTime.now();
+
     private int status;
     private String message;
-    private String code;
+
+    @Builder.Default
+    private String code = "";
+
     @Setter
     private @Nullable String traceId;
+
     private @Nullable List<ErroSubApi> subErrors;
 
     @Setter
-    private @Nullable Map<String, ?> details;
-
-    private ErroApi() {
-        this.timestamp = LocalDateTime.now();
-        this.message = "";
-        this.code = "";
-        this.details = new HashMap<>();
-    }
+    @Builder.Default
+    private @Nullable Map<String, ?> details = new HashMap<>();
 
     public ErroApi(HttpStatusCode status, String message) {
-        this();
+        this.timestamp = LocalDateTime.now();
         this.status = status.value();
         this.message = message;
         this.code = "";
+        this.details = new HashMap<>();
     }
 
     public ErroApi(HttpStatusCode status, String message, String code) {
         this(status, message);
         this.code = code;
-    }
-
-    public ErroApi(HttpStatusCode status, String message, String code, String traceId) {
-        this(status, message, code);
-        this.traceId = traceId;
-    }
-
-    public ErroApi(HttpStatusCode status, String message, List<ErroSubApi> subErrors) {
-        this(status, message);
-        this.subErrors = new ArrayList<>(subErrors);
     }
 
     public @Nullable List<ErroSubApi> getSubErrors() {

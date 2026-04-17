@@ -2,6 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
@@ -88,14 +89,8 @@ public class SubprocessoService {
     @Transactional
     public Subprocesso atualizarEntidade(Long codigo, AtualizarSubprocessoCommand command) {
         Subprocesso subprocesso = consultaService.buscarSubprocesso(codigo);
-        processarVinculos(subprocesso, Objects.requireNonNullElseGet(
-                command.vinculos(),
-                () -> AtualizarVinculosSubprocessoCommand.builder().build()
-        ));
-        processarPrazos(subprocesso, Objects.requireNonNullElseGet(
-                command.prazos(),
-                () -> AtualizarPrazosSubprocessoCommand.builder().build()
-        ));
+        processarVinculos(subprocesso, command.vinculos());
+        processarPrazos(subprocesso, command.prazos());
         return subprocessoRepo.save(subprocesso);
     }
 
@@ -105,7 +100,8 @@ public class SubprocessoService {
         subprocessoRepo.deleteById(codigo);
     }
 
-    private void processarVinculos(Subprocesso sp, AtualizarVinculosSubprocessoCommand command) {
+    private void processarVinculos(Subprocesso sp, @Nullable AtualizarVinculosSubprocessoCommand command) {
+        if (command == null) return;
         Optional.ofNullable(command.codUnidade())
                 .map(unidadeService::buscarPorCodigo)
                 .ifPresent(sp::setUnidade);
@@ -120,7 +116,8 @@ public class SubprocessoService {
         });
     }
 
-    private void processarPrazos(Subprocesso sp, AtualizarPrazosSubprocessoCommand command) {
+    private void processarPrazos(Subprocesso sp, @Nullable AtualizarPrazosSubprocessoCommand command) {
+        if (command == null) return;
         Optional.ofNullable(command.dataLimiteEtapa1()).flatMap(Function.identity()).ifPresent(sp::setDataLimiteEtapa1);
         Optional.ofNullable(command.dataFimEtapa1()).flatMap(Function.identity()).ifPresent(sp::setDataFimEtapa1);
         Optional.ofNullable(command.dataLimiteEtapa2()).flatMap(Function.identity()).ifPresent(sp::setDataLimiteEtapa2);
@@ -162,24 +159,35 @@ public class SubprocessoService {
 
     public void criarParaRevisao(CriarSubprocessoComMapaCommand command) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        criarSubprocessoComMapa(command.processo(), command.unidade(), command.unidadeMapa(), command.unidadeOrigem(),
-                usuario, NAO_INICIADO, "Processo iniciado");
+        criarSubprocessoComMapa(ContextoCriacaoSubprocesso.builder()
+                .processo(command.processo())
+                .unidade(command.unidade())
+                .unidadeMapa(command.unidadeMapa())
+                .unidadeOrigem(command.unidadeOrigem())
+                .usuario(usuario)
+                .situacaoInicial(NAO_INICIADO)
+                .descMovimentacao("Processo iniciado")
+                .build());
         log.info("Criado subprocesso para unidade {}", command.unidade().getSigla());
     }
 
     public void criarParaDiagnostico(CriarSubprocessoComMapaCommand command) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Subprocesso subprocessoSalvo = criarSubprocessoComMapa(command.processo(), command.unidade(), command.unidadeMapa(),
-                command.unidadeOrigem(), usuario,
-                DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, "Processo de diagnóstico iniciado");
+        Subprocesso subprocessoSalvo = criarSubprocessoComMapa(ContextoCriacaoSubprocesso.builder()
+                .processo(command.processo())
+                .unidade(command.unidade())
+                .unidadeMapa(command.unidadeMapa())
+                .unidadeOrigem(command.unidadeOrigem())
+                .usuario(usuario)
+                .situacaoInicial(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO)
+                .descMovimentacao("Processo de diagnóstico iniciado")
+                .build());
         log.info("Criado subprocesso {} para unidade {}", subprocessoSalvo.getCodigo(), command.unidade().getSigla());
     }
 
-    private Subprocesso criarSubprocessoComMapa(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa,
-                                                Unidade unidadeOrigem, Usuario usuario,
-                                                SituacaoSubprocesso situacaoInicial, String descMovimentacao) {
-        Long codMapaVigente = obterCodigoMapaVigenteObrigatorio(unidadeMapa, unidade);
-        Subprocesso subprocesso = criarSubprocessoInicial(processo, unidade, situacaoInicial);
+    private Subprocesso criarSubprocessoComMapa(ContextoCriacaoSubprocesso contexto) {
+        Long codMapaVigente = obterCodigoMapaVigenteObrigatorio(contexto.unidadeMapa(), contexto.unidade());
+        Subprocesso subprocesso = criarSubprocessoInicial(contexto.processo(), contexto.unidade(), contexto.situacaoInicial());
 
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
@@ -188,7 +196,7 @@ public class SubprocessoService {
         Mapa mapaSalvo = mapaManutencaoService.salvarMapa(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
 
-        movimentacaoRepo.save(criarMovimentacaoInicial(subprocessoSalvo, unidadeOrigem, usuario, descMovimentacao));
+        movimentacaoRepo.save(criarMovimentacaoInicial(subprocessoSalvo, contexto.unidadeOrigem(), contexto.usuario(), contexto.descMovimentacao()));
 
         return subprocessoSalvo;
     }
@@ -287,7 +295,12 @@ public class SubprocessoService {
         Long codMapa = Optional.ofNullable(mapa.getCodigo())
                 .orElseGet(() -> obterCodigoMapaObrigatorio(subprocesso));
         boolean mapaEstavaVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
-        return new ContextoEdicaoMapa(subprocesso, mapa, codMapa, mapaEstavaVazio);
+        return ContextoEdicaoMapa.builder()
+                .subprocesso(subprocesso)
+                .mapa(mapa)
+                .codMapa(codMapa)
+                .mapaEstavaVazio(mapaEstavaVazio)
+                .build();
     }
 
     private void atualizarSituacaoAposPreenchimentoMapa(Subprocesso subprocesso, boolean deveAtualizarSituacao) {
@@ -435,12 +448,13 @@ public class SubprocessoService {
         Subprocesso subprocessoOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
         validarPermissaoConsultaNaOrigem(usuario, subprocessoOrigem);
 
-        return new ImportacaoAtividadesContexto(
-                subprocessoDestino,
-                subprocessoOrigem,
-                usuario,
-                obterCodigoMapaObrigatorio(subprocessoDestino),
-                obterCodigoMapaObrigatorio(subprocessoOrigem));
+        return ImportacaoAtividadesContexto.builder()
+                .subprocessoDestino(subprocessoDestino)
+                .subprocessoOrigem(subprocessoOrigem)
+                .usuario(usuario)
+                .codMapaDestino(obterCodigoMapaObrigatorio(subprocessoDestino))
+                .codMapaOrigem(obterCodigoMapaObrigatorio(subprocessoOrigem))
+                .build();
     }
 
     private Mapa obterMapaObrigatorio(Subprocesso subprocesso) {
@@ -512,6 +526,7 @@ public class SubprocessoService {
         return totalSolicitado > 0 && totalImportado < totalSolicitado;
     }
 
+    @Builder
     private record ContextoEdicaoMapa(
             Subprocesso subprocesso,
             Mapa mapa,
@@ -520,12 +535,25 @@ public class SubprocessoService {
     ) {
     }
 
+    @Builder
     private record ImportacaoAtividadesContexto(
             Subprocesso subprocessoDestino,
             Subprocesso subprocessoOrigem,
             Usuario usuario,
             Long codMapaDestino,
             Long codMapaOrigem
+    ) {
+    }
+
+    @Builder
+    private record ContextoCriacaoSubprocesso(
+            Processo processo,
+            Unidade unidade,
+            UnidadeMapa unidadeMapa,
+            Unidade unidadeOrigem,
+            Usuario usuario,
+            SituacaoSubprocesso situacaoInicial,
+            String descMovimentacao
     ) {
     }
 }
