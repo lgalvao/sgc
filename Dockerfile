@@ -1,4 +1,4 @@
-FROM docker.io/library/amazoncorretto:21 AS extrator
+FROM docker.io/library/amazoncorretto:25 AS extrator
 WORKDIR /aplicacao
 
 COPY deploy/*.cer /tmp/certs/
@@ -9,7 +9,7 @@ COPY sgc.jar aplicacao.jar
 RUN mkdir extraido && \
     java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
 
-FROM docker.io/library/amazoncorretto:21
+FROM docker.io/library/amazoncorretto:25
 
 LABEL description="Sistema de Gestao de Competencias - SGC" \
       maintainer="SESEL <sesel@tre-pe.jus.br>" \

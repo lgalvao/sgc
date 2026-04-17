@@ -16,7 +16,7 @@ específicas** do projeto que diferem dos padrões genéricos.
     * **Limite de Parâmetros:** Métodos devem ter no máximo **3 parâmetros**. Se ultrapassar, use um objeto de transporte (DTO de 'command').
     * **Código depreciado:** Código marcado como `@Deprecated` deve ser removido sumariamente assim que não houver mais dependências internas (especialmente após consolidações arquiteturais).
 
-### Backend (Java 21 / Spring Boot 4)
+### Backend (Java 25 / Spring Boot 4)
 
 * **REST Não-Padrão:**
     * `GET` para consultas.

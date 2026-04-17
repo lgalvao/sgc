@@ -8,7 +8,7 @@ Este diretório contém o código do backend do SGC. Ele fornece uma API REST ro
 
 A aplicação é um sistema modular construído com:
 
-* **Java 21**: Utilizando as últimas funcionalidades da linguagem (Pattern Matching, Sealed Classes, Record).
+* **Java 25**: Utilizando as últimas funcionalidades da linguagem (Pattern Matching, Sealed Classes, Record).
 * **Spring Boot 4.0.5**: Framework de aplicação moderno.
 * **Hibernate/JPA**: Camada de persistência com validações ricas via Bean Validation.
 * **Oracle JDBC (ojdbc11)**: Driver para banco de dados de produção.
