@@ -8,7 +8,7 @@ public record UnidadeHierarquiaLeitura(
         Long codigo,
         String nome,
         String sigla,
-        String tituloTitular,
+        @Nullable String tituloTitular,
         TipoUnidade tipo,
         SituacaoUnidade situacao,
         @Nullable Long unidadeSuperiorCodigo

@@ -2,6 +2,7 @@ package sgc.comum.cache;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.event.*;
 import org.springframework.context.*;
 import org.springframework.stereotype.*;
@@ -22,7 +23,7 @@ public class CacheAquecimento implements ApplicationListener<ApplicationReadyEve
     private final UnidadeHierarquiaService unidadeHierarquiaService;
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
         try {
             log.info("Iniciando aquecimento dos caches organizacionais...");
             cacheViewsOrganizacaoService.listarTodasUnidades();

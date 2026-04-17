@@ -363,7 +363,6 @@ public class SubprocessoConsultaService {
             case Perfil.ADMIN -> true;
             case Perfil.GESTOR -> contexto.isUnidadeAlvoNaHierarquiaUsuario();
             case Perfil.CHEFE, Perfil.SERVIDOR -> contexto.isMesmaUnidadeAlvo();
-            default -> false;
         };
     }
 

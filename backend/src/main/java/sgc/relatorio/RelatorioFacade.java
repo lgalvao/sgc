@@ -265,7 +265,7 @@ public class RelatorioFacade {
             PdfPTable dtEtapa2 = new PdfPTable(new float[]{1f, 1f});
             dtEtapa2.setWidthPercentage(100f);
             String dtLim2 = formatarData(relatorio.dataLimiteEtapa2());
-            if (relatorio.dataLimiteEtapa2() != null && relatorio.dataLimiteEtapa1() != null && !relatorio.dataLimiteEtapa2().equals(relatorio.dataLimiteEtapa1())) {
+            if (relatorio.dataLimiteEtapa2() != null && !relatorio.dataLimiteEtapa2().equals(relatorio.dataLimiteEtapa1())) {
                 dtLim2 += " (Prazo ajustado)";
             }
             dtEtapa2.addCell(criarCelulaRotuloValor("Data limite:", dtLim2));
