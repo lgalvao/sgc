@@ -14,7 +14,9 @@ const relatorioAndamento = ref([
         siglaUnidade: 'U1',
         nomeUnidade: 'Unidade 1',
         situacaoAtual: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO',
-        dataLimite: '2026-04-15T10:00:00',
+        localizacao: 'Local 1',
+        dataLimiteEtapa1: '2026-04-15T10:00:00',
+        dataLimiteEtapa2: '2026-04-15T10:00:00',
         dataFimEtapa1: '2026-04-16T11:30:00',
         dataFimEtapa2: null,
         dataUltimaMovimentacao: '2026-04-10T08:00:00',
@@ -57,7 +59,9 @@ describe('RelatorioAndamentoView', () => {
             siglaUnidade: 'U1',
             nomeUnidade: 'Unidade 1',
             situacaoAtual: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO',
-            dataLimite: '2026-04-15T10:00:00',
+            localizacao: 'Local 1',
+            dataLimiteEtapa1: '2026-04-15T10:00:00',
+            dataLimiteEtapa2: '2026-04-15T10:00:00',
             dataFimEtapa1: '2026-04-16T11:30:00',
             dataFimEtapa2: null,
             dataUltimaMovimentacao: '2026-04-10T08:00:00',
@@ -66,40 +70,38 @@ describe('RelatorioAndamentoView', () => {
         }];
     });
 
-    it('deve configurar colunas e entregar datas formatadas para a tabela', async () => {
+    it('deve exibir cards com informações formatadas do relatório', async () => {
         const wrapper = mount(RelatorioAndamentoView, {
             global: {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     PageHeader: {template: '<div><slot /><slot name="actions" /></div>', props: ['title']},
                     EmptyState: {template: '<div />'},
-                    BCard: {template: '<div><slot /></div>'},
-                    BRow: {template: '<div><slot /></div>'},
-                    BCol: {template: '<div><slot /></div>'},
+                    BCard: {template: '<div class="card"><slot /></div>'},
+                    BCardBody: {template: '<div class="card-body"><slot /></div>'},
+                    BCardTitle: {template: '<h4 class="card-title"><slot /></h4>'},
+                    BRow: {template: '<div class="row"><slot /></div>'},
+                    BCol: {template: '<div class="col"><slot /></div>'},
                     BFormGroup: {template: '<div><slot /></div>', props: ['label', 'labelFor']},
                     BFormSelect: {template: '<select />', props: ['modelValue', 'options']},
                     BButton: {template: '<button><slot /></button>', props: ['variant', 'disabled', 'to']},
                     BSpinner: {template: '<div />'},
-                    BTable: {name: 'BTable', template: '<div data-testid="tbl-relatorio-andamento"></div>', props: ['items', 'fields']},
                 }
             }
         });
 
         await flushPromises();
 
-        const campos = wrapper.getComponent({name: 'BTable'}).props('fields') as Array<{ key: string }>;
-        const itens = wrapper.getComponent({name: 'BTable'}).props('items') as Array<Record<string, string>>;
-        expect(campos.map(campo => campo.key)).toEqual([
-            'siglaUnidade',
-            'situacaoAtual',
-            'dataLimite',
-            'dataFimEtapa1',
-            'dataFimEtapa2',
-            'responsavel',
-        ]);
+        const cards = wrapper.findAll('[data-testid="card-resultado-andamento"]');
+        expect(cards.length).toBe(1);
 
-        expect(itens[0].dataLimite).toBe('15/04/2026');
-        expect(itens[0].dataFimEtapa1).toBe('16/04/2026');
-        expect(itens[0].dataFimEtapa2).toBe('Não informado');
+        const textoCard = cards[0].text();
+        expect(textoCard).toContain('U1 - Unidade 1');
+        expect(textoCard).toContain('MAPEAMENTO_CADASTRO_EM_ANDAMENTO');
+        expect(textoCard).toContain('Local 1');
+        expect(textoCard).toContain('10/04/2026 08:00');
+        expect(textoCard).toContain('15/04/2026');
+        expect(textoCard).toContain('16/04/2026');
+        expect(textoCard).toContain('Responsavel 1');
     });
 });
