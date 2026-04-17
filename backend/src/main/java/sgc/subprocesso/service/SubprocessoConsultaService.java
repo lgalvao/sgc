@@ -362,7 +362,7 @@ public class SubprocessoConsultaService {
         return switch (contexto.perfil()) {
             case Perfil.ADMIN -> true;
             case Perfil.GESTOR -> contexto.isUnidadeAlvoNaHierarquiaUsuario();
-            case Perfil.SERVIDOR -> contexto.isMesmaUnidadeAlvo();
+            case Perfil.CHEFE, Perfil.SERVIDOR -> contexto.isMesmaUnidadeAlvo();
             default -> false;
         };
     }

@@ -154,22 +154,6 @@ public class AlertaFacade {
     }
 
     @Transactional
-    public void criarAlertaCadastroDisponibilizado(Processo processo, Unidade unidadeOrigem, Unidade unidadeDestino) {
-        String desc = "Cadastro disponibilizado pela unidade %s no processo '%s'."
-                .formatted(unidadeOrigem.getSigla(), processo.getDescricao());
-
-        criarAlerta(processo, unidadeOrigem, unidadeDestino, desc);
-    }
-
-    @Transactional
-    public void criarAlertaCadastroDevolvido(Processo processo, Unidade unidadeDestino, String motivo) {
-        String desc = "Cadastro devolvido no processo '%s'. Motivo: %s."
-                .formatted(processo.getDescricao(), motivo);
-
-        criarAlerta(processo, unidadeRaiz(), unidadeDestino, desc);
-    }
-
-    @Transactional
     public void criarAlertaAlteracaoDataLimite(Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
         String desc = "Data limite da etapa %d alterada para %s".formatted(etapa, novaData);
         criarAlerta(processo, unidadeRaiz(), unidadeDestino, desc);

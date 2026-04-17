@@ -121,10 +121,10 @@ public class SubprocessoService {
     }
 
     private void processarPrazos(Subprocesso sp, AtualizarPrazosSubprocessoCommand command) {
-        command.dataLimiteEtapa1().ifPresent(sp::setDataLimiteEtapa1);
-        command.dataFimEtapa1().ifPresent(sp::setDataFimEtapa1);
-        command.dataLimiteEtapa2().ifPresent(sp::setDataLimiteEtapa2);
-        command.dataFimEtapa2().ifPresent(sp::setDataFimEtapa2);
+        Optional.ofNullable(command.dataLimiteEtapa1()).flatMap(Function.identity()).ifPresent(sp::setDataLimiteEtapa1);
+        Optional.ofNullable(command.dataFimEtapa1()).flatMap(Function.identity()).ifPresent(sp::setDataFimEtapa1);
+        Optional.ofNullable(command.dataLimiteEtapa2()).flatMap(Function.identity()).ifPresent(sp::setDataLimiteEtapa2);
+        Optional.ofNullable(command.dataFimEtapa2()).flatMap(Function.identity()).ifPresent(sp::setDataFimEtapa2);
     }
 
     @Transactional

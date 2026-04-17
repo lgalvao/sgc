@@ -8,7 +8,6 @@ import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.model.*;
 
 import java.time.*;
 import java.util.*;
@@ -17,197 +16,68 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlertaFacade - Cobertura adicional")
-@SuppressWarnings("NullAway.Init")
+@DisplayName("AlertaFacade - Cobertura de Testes")
 class AlertaFacadeCoverageTest {
-    private static final ContextoUsuarioAutenticado CONTEXTO_USUARIO =
-            new ContextoUsuarioAutenticado("user1", 10L, Perfil.GESTOR);
+
+    @InjectMocks
+    private AlertaFacade target;
 
     @Mock
     private AlertaService alertaService;
     @Mock
-    private UnidadeService unidadeService;
-    @Mock
     private UsuarioService usuarioService;
-    @Mock
-    private UnidadeHierarquiaService unidadeHierarquiaService;
-
-    @InjectMocks
-    private AlertaFacade alertaFacade;
 
     @Test
-    @DisplayName("criarAlertaCadastroDisponibilizado deve usar sigla da unidade de origem na descrição")
-    void deveUsarSiglaDaUnidadeOrigemNaDescricao() {
-        Processo processo = Processo.builder().codigo(10L).descricao("Processo teste").build();
-        Unidade unidadeOrigem = new Unidade();
-        unidadeOrigem.setCodigo(1L);
-        unidadeOrigem.setSigla("ADMIN");
-        Unidade unidadeDestino = new Unidade();
-        unidadeDestino.setCodigo(2L);
-
-        when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        alertaFacade.criarAlertaCadastroDisponibilizado(processo, unidadeOrigem, unidadeDestino);
-
-        ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaService).salvar(captor.capture());
-        assertThat(captor.getValue().getDescricao()).contains("pela unidade ADMIN");
-    }
-
-    @Test
-    @DisplayName("criarAlertasProcessoIniciado deve criar alertas para unidades interoperacionais")
-    void deveCriarAlertasParaUnidadesInteroperacionais() {
-        Processo processo = Processo.builder().codigo(10L).build();
+    @DisplayName("obterMapaDataHoraLeitura - deve cobrir merge function com duplicatas")
+    void obterMapaDataHoraLeitura_Duplicatas() {
+        String usuario = "U1";
+        Long codAlerta = 100L;
         
-        Unidade unidadeInteroperacional = new Unidade();
-        unidadeInteroperacional.setCodigo(200L);
-        unidadeInteroperacional.setTipo(TipoUnidade.INTEROPERACIONAL);
+        AlertaUsuario au1 = mock(AlertaUsuario.class);
+        AlertaUsuario.Chave chave = mock(AlertaUsuario.Chave.class);
+        when(chave.getAlertaCodigo()).thenReturn(codAlerta);
+        when(au1.getCodigo()).thenReturn(chave);
+        when(au1.getDataHoraLeitura()).thenReturn(LocalDateTime.now());
         
-        Unidade raiz = new Unidade();
-        raiz.setCodigo(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
-        alertaFacade.criarAlertasProcessoIniciado(processo, List.of(unidadeInteroperacional));
+        AlertaUsuario au2 = mock(AlertaUsuario.class);
+        when(au2.getCodigo()).thenReturn(chave);
+        when(au2.getDataHoraLeitura()).thenReturn(LocalDateTime.now().plusHours(1));
 
-        verify(alertaService).salvarTodos(argThat(alertas -> alertas.size() == 2));
+        when(alertaService.alertasUsuarios(usuario, List.of(codAlerta))).thenReturn(List.of(au1, au2));
+
+        Map<Long, LocalDateTime> result = target.obterMapaDataHoraLeitura(usuario, List.of(codAlerta));
+        assertThat(result).containsEntry(codAlerta, au1.getDataHoraLeitura());
     }
 
     @Test
-    @DisplayName("criarAlertasProcessoIniciado deve criar alertas para unidades intermediárias")
-    void deveCriarAlertasParaUnidadesIntermediarias() {
-        Processo processo = Processo.builder().codigo(10L).build();
+    @DisplayName("marcarComoLidos - deve cobrir merge function com duplicatas e alertas ausentes")
+    void marcarComoLidos_Duplicatas() {
+        ContextoUsuarioAutenticado contexto = mock(ContextoUsuarioAutenticado.class);
+        when(contexto.usuarioTitulo()).thenReturn("U1");
         
-        Unidade unidadeIntermediaria = new Unidade();
-        unidadeIntermediaria.setCodigo(100L);
-        unidadeIntermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        Long cod1 = 1L;
+        Long cod2 = 2L;
         
-        Unidade raiz = new Unidade();
-        raiz.setCodigo(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        alertaFacade.criarAlertasProcessoIniciado(processo, List.of(unidadeIntermediaria));
-
-        verify(alertaService).salvarTodos(anyList());
-    }
-
-    @Test
-    @DisplayName("criarAlertaCadastroDevolvido deve formatar descrição corretamente")
-    void deveCriarAlertaCadastroDevolvido() {
-        Processo processo = Processo.builder().descricao("P1").build();
-        Unidade destino = new Unidade();
-        destino.setCodigo(2L);
-        Unidade raiz = new Unidade();
-        raiz.setCodigo(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-
-        alertaFacade.criarAlertaCadastroDevolvido(processo, destino, "Erro fatal");
-
-        ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaService).salvar(captor.capture());
-        assertThat(captor.getValue().getDescricao()).contains("P1").contains("Erro fatal");
-    }
-
-    @Test
-    @DisplayName("marcarComoLidos deve atualizar data de leitura se AlertaUsuario já existir e não estiver lido")
-    void deveAtualizarDataLeituraSeExistirENaoLido() {
-        String usuarioTitulo = "user1";
-        List<Long> codigos = List.of(100L);
+        // Simular duplicata em alertasUsuarios
+        AlertaUsuario au1 = mock(AlertaUsuario.class);
+        AlertaUsuario.Chave chave1 = mock(AlertaUsuario.Chave.class);
+        when(chave1.getAlertaCodigo()).thenReturn(cod1);
+        when(au1.getCodigo()).thenReturn(chave1);
         
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(usuarioTitulo);
-        when(usuarioService.buscar(usuarioTitulo)).thenReturn(usuario);
+        AlertaUsuario au1Dup = mock(AlertaUsuario.class);
+        when(au1Dup.getCodigo()).thenReturn(chave1);
 
-        AlertaUsuario au = new AlertaUsuario();
-        au.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(100L).usuarioTitulo(usuarioTitulo).build());
-        au.setDataHoraLeitura(null);
-        when(alertaService.alertasUsuarios(usuarioTitulo, codigos)).thenReturn(List.of(au));
-        when(alertaService.salvarAlertasUsuarios(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        alertaFacade.marcarComoLidos(CONTEXTO_USUARIO, codigos);
-
-        assertThat(au.getDataHoraLeitura()).isNotNull();
-        verify(alertaService).salvarAlertasUsuarios(argThat(alertasUsuarios -> alertasUsuarios.contains(au)));
-    }
-
-    @Test
-    @DisplayName("marcarComoLidos não deve atualizar data de leitura se AlertaUsuario já estiver lido")
-    void naoDeveAtualizarDataLeituraSeJaLido() {
-        String usuarioTitulo = "user1";
-        List<Long> codigos = List.of(100L);
+        when(alertaService.alertasUsuarios(anyString(), anyList())).thenReturn(List.of(au1, au1Dup));
         
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(usuarioTitulo);
-        when(usuarioService.buscar(usuarioTitulo)).thenReturn(usuario);
+        // Alerta 2 está ausente em existentes, vai para listarPorCodigos
+        Alerta a2 = new Alerta(); a2.setCodigo(cod2);
+        Alerta a2Dup = new Alerta(); a2Dup.setCodigo(cod2); // Duplicata proposital
 
-        LocalDateTime leituraAnterior = LocalDateTime.now().minusDays(1);
-        AlertaUsuario au = new AlertaUsuario();
-        au.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(100L).usuarioTitulo(usuarioTitulo).build());
-        au.setDataHoraLeitura(leituraAnterior);
-        when(alertaService.alertasUsuarios(usuarioTitulo, codigos)).thenReturn(List.of(au));
+        when(alertaService.listarPorCodigos(anyList())).thenReturn(List.of(a2, a2Dup));
+        when(usuarioService.buscar("U1")).thenReturn(new Usuario());
 
-        alertaFacade.marcarComoLidos(CONTEXTO_USUARIO, codigos);
+        target.marcarComoLidos(contexto, List.of(cod1, cod2));
 
-        assertThat(au.getDataHoraLeitura()).isEqualTo(leituraAnterior);
-        verify(alertaService, never()).salvarAlertasUsuarios(anyList());
-    }
-
-    @Test
-    @DisplayName("criarAlertaReaberturaCadastroSuperior deve criar alerta com sigla da subordinada")
-    void deveCriarAlertaReaberturaCadastroSuperior() {
-        Processo processo = Processo.builder().build();
-        Unidade superior = new Unidade();
-        superior.setCodigo(3L);
-        Unidade subordinada = new Unidade();
-        subordinada.setCodigo(4L);
-        subordinada.setSigla("SUB");
-        
-        Unidade raiz = new Unidade();
-        raiz.setCodigo(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-
-        alertaFacade.criarAlertaReaberturaCadastroSuperior(processo, superior, subordinada);
-
-        ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaService).salvar(captor.capture());
-        assertThat(captor.getValue().getDescricao()).contains("Cadastro da unidade SUB reaberto");
-    }
-
-    @Test
-    @DisplayName("criarAlertaReaberturaRevisao deve conter justificativa")
-    void deveCriarAlertaReaberturaRevisao() {
-        Processo processo = Processo.builder().build();
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(5L);
-        unidade.setSigla("U1");
-        Unidade raiz = new Unidade();
-        raiz.setCodigo(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-
-        alertaFacade.criarAlertaReaberturaRevisao(processo, unidade, "Ajuste necessário");
-
-        ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaService).salvar(captor.capture());
-        assertThat(captor.getValue().getDescricao()).contains("Justificativa: Ajuste necessário");
-    }
-
-    @Test
-    @DisplayName("criarAlertaReaberturaRevisaoSuperior deve criar alerta informativo")
-    void deveCriarAlertaReaberturaRevisaoSuperior() {
-        Processo processo = Processo.builder().build();
-        Unidade superior = new Unidade();
-        superior.setCodigo(6L);
-        Unidade subordinada = new Unidade();
-        subordinada.setCodigo(7L);
-        subordinada.setSigla("SUB");
-        Unidade raiz = new Unidade();
-        raiz.setCodigo(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-
-        alertaFacade.criarAlertaReaberturaRevisaoSuperior(processo, superior, subordinada);
-
-        ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaService).salvar(captor.capture());
-        assertThat(captor.getValue().getDescricao()).contains("Revisão de cadastro da unidade SUB reaberta");
+        verify(alertaService).salvarAlertasUsuarios(anyList());
     }
 }

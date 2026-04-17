@@ -504,25 +504,6 @@ public class ProcessoService {
         }
     }
 
-    @SuppressWarnings("unused")
-    private void efetivarInicioSubprocessos(
-            Processo processo,
-            TipoProcesso tipo,
-            List<Long> cods,
-            Set<Unidade> pars,
-            List<UnidadeMapa> ums,
-            Unidade adm,
-            Usuario user
-    ) {
-        efetivarInicioSubprocessos(new InicioSubprocessosContexto(
-                processo,
-                tipo,
-                cods,
-                pars,
-                ums,
-                adm
-        ));
-    }
 
     private void iniciarSubprocessosMapeamento(InicioSubprocessosContexto contexto) {
         subprocessoService.criarParaMapeamento(new SubprocessoService.CriarSubprocessosMapeamentoCommand(
@@ -716,108 +697,101 @@ public class ProcessoService {
             List<SubprocessoElegivelDto> subprocessosElegiveis,
             Perfil perfil
     ) {
+        boolean processoAtivo = processo.getSituacao() != FINALIZADO;
+
         return List.of(
-                criarAcaoBloco(
-                        "aceitar-cadastro",
-                        ACEITAR,
-                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarCadastroBloco),
-                        AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
-                        false,
-                        true,
-                        "Aceitar cadastro em bloco",
-                        "Aceite de cadastro em bloco",
-                        "Selecione as unidades cujos cadastros deverão ser aceitos:",
-                        "Registrar aceite",
-                        "Cadastros aceitos em bloco",
-                        processo.getSituacao() != FINALIZADO
-                ),
-                criarAcaoBloco(
-                        "aceitar-mapa",
-                        ACEITAR,
-                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarMapaBloco),
-                        perfil == Perfil.GESTOR,
-                        false,
-                        true,
-                        "Aceitar mapas em bloco",
-                        "Aceite de mapas em bloco",
-                        "Selecione as unidades para aceite dos mapas correspondentes",
-                        "Registrar aceite",
-                        "Mapas aceitos em bloco",
-                        processo.getSituacao() != FINALIZADO
-                ),
-                criarAcaoBloco(
-                        "homologar-cadastro",
-                        HOMOLOGAR,
-                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarCadastroBloco),
-                        AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
-                        false,
-                        false,
-                        "Homologar em bloco",
-                        "Homologação de cadastro em bloco",
-                        "Selecione as unidades cujos cadastros deverão ser homologados:",
-                        "Homologar",
-                        "Cadastros homologados em bloco",
-                        processo.getSituacao() != FINALIZADO
-                ),
-                criarAcaoBloco(
-                        "homologar-mapa",
-                        HOMOLOGAR,
-                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarMapaBloco),
-                        AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil),
-                        false,
-                        true,
-                        "Homologar mapas em bloco",
-                        "Homologação de mapa em bloco",
-                        "Selecione as unidades cujos mapas deverão ser homologados:",
-                        "Homologar",
-                        "Mapas de competências homologados em bloco",
-                        processo.getSituacao() != FINALIZADO
-                ),
-                criarAcaoBloco(
-                        "disponibilizar-mapa",
-                        DISPONIBILIZAR,
-                        filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarDisponibilizarMapaBloco),
-                        AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil),
-                        true,
-                        true,
-                        "Disponibilizar em bloco",
-                        "Disponibilização de mapa em bloco",
-                        "Selecione as unidades cujos mapas deverão ser disponibilizados:",
-                        "Disponibilizar",
-                        "Mapas de competências disponibilizados em bloco",
-                        processo.getSituacao() != FINALIZADO
-                )
+                criarAcaoBloco(AcaoBlocoContexto.builder()
+                        .codigo("aceitar-cadastro")
+                        .acao(ACEITAR)
+                        .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarCadastroBloco))
+                        .perfilPermite(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
+                        .requerDataLimite(false)
+                        .redirecionarPainel(true)
+                        .rotulo(Mensagens.LABEL_ACEITAR_CADASTRO_BLOCO)
+                        .titulo(Mensagens.TITULO_ACEITE_CADASTRO_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_ACEITE_CADASTRO)
+                        .rotuloBotao(Mensagens.BOTAO_REGISTRAR_ACEITE)
+                        .mensagemSucesso(Mensagens.SUCESSO_ACEITE_CADASTRO_BLOCO)
+                        .processoAtivo(processoAtivo)
+                        .build()),
+
+                criarAcaoBloco(AcaoBlocoContexto.builder()
+                        .codigo("aceitar-mapa")
+                        .acao(ACEITAR)
+                        .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarMapaBloco))
+                        .perfilPermite(perfil == Perfil.GESTOR)
+                        .requerDataLimite(false)
+                        .redirecionarPainel(true)
+                        .rotulo(Mensagens.LABEL_ACEITAR_MAPA_BLOCO)
+                        .titulo(Mensagens.TITULO_ACEITE_MAPA_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_ACEITE_MAPA)
+                        .rotuloBotao(Mensagens.BOTAO_REGISTRAR_ACEITE)
+                        .mensagemSucesso(Mensagens.SUCESSO_ACEITE_MAPA_BLOCO)
+                        .processoAtivo(processoAtivo)
+                        .build()),
+
+                criarAcaoBloco(AcaoBlocoContexto.builder()
+                        .codigo("homologar-cadastro")
+                        .acao(HOMOLOGAR)
+                        .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarCadastroBloco))
+                        .perfilPermite(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
+                        .requerDataLimite(false)
+                        .redirecionarPainel(false)
+                        .rotulo(Mensagens.LABEL_HOMOLOGAR_EM_BLOCO)
+                        .titulo(Mensagens.TITULO_HOMOLOGACAO_CADASTRO_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_HOMOLOGACAO_CADASTRO)
+                        .rotuloBotao(Mensagens.BOTAO_HOMOLOGAR)
+                        .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_CADASTRO_BLOCO)
+                        .processoAtivo(processoAtivo)
+                        .build()),
+
+                criarAcaoBloco(AcaoBlocoContexto.builder()
+                        .codigo("homologar-mapa")
+                        .acao(HOMOLOGAR)
+                        .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarMapaBloco))
+                        .perfilPermite(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil))
+                        .requerDataLimite(false)
+                        .redirecionarPainel(true)
+                        .rotulo(Mensagens.LABEL_HOMOLOGAR_MAPAS_BLOCO)
+                        .titulo(Mensagens.TITULO_HOMOLOGACAO_MAPA_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_HOMOLOGACAO_MAPA)
+                        .rotuloBotao(Mensagens.BOTAO_HOMOLOGAR)
+                        .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_MAPA_BLOCO)
+                        .processoAtivo(processoAtivo)
+                        .build()),
+
+                criarAcaoBloco(AcaoBlocoContexto.builder()
+                        .codigo("disponibilizar-mapa")
+                        .acao(DISPONIBILIZAR)
+                        .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarDisponibilizarMapaBloco))
+                        .perfilPermite(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil))
+                        .requerDataLimite(true)
+                        .redirecionarPainel(true)
+                        .rotulo(Mensagens.LABEL_DISPONIBILIZAR_EM_BLOCO)
+                        .titulo(Mensagens.TITULO_DISPONIBILIZACAO_MAPA_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_DISPONIBILIZACAO_MAPA)
+                        .rotuloBotao(Mensagens.BOTAO_DISPONIBILIZAR)
+                        .mensagemSucesso(Mensagens.SUCESSO_DISPONIBILIZACAO_MAPA_BLOCO)
+                        .processoAtivo(processoAtivo)
+                        .build())
         );
     }
 
-    private ProcessoDetalheDto.AcaoBlocoDto criarAcaoBloco(
-            String codigo,
-            AcaoProcesso acao,
-            List<SubprocessoElegivelDto> unidades,
-            boolean perfilPermite,
-            boolean requerDataLimite,
-            boolean redirecionarPainel,
-            String rotulo,
-            String titulo,
-            String texto,
-            String rotuloBotao,
-            String mensagemSucesso,
-            boolean processoAtivo
-    ) {
-        boolean habilitar = perfilPermite && processoAtivo && !unidades.isEmpty();
+    private ProcessoDetalheDto.AcaoBlocoDto criarAcaoBloco(AcaoBlocoContexto contexto) {
+        boolean habilitar = contexto.perfilPermite() && contexto.processoAtivo() && !contexto.unidades().isEmpty();
         return ProcessoDetalheDto.AcaoBlocoDto.builder()
-                .codigo(codigo)
-                .acao(acao)
-                .mostrar(perfilPermite)
+                .codigo(contexto.codigo())
+                .acao(contexto.acao())
+                .mostrar(contexto.perfilPermite())
                 .habilitar(habilitar)
-                .requerDataLimite(requerDataLimite)
-                .redirecionarPainel(redirecionarPainel)
-                .rotulo(rotulo)
-                .titulo(titulo)
-                .texto(texto)
-                .rotuloBotao(rotuloBotao)
-                .mensagemSucesso(mensagemSucesso)
-                .unidades(new ArrayList<>(unidades))
+                .requerDataLimite(contexto.requerDataLimite())
+                .redirecionarPainel(contexto.redirecionarPainel())
+                .rotulo(contexto.rotulo())
+                .titulo(contexto.titulo())
+                .texto(contexto.texto())
+                .rotuloBotao(contexto.rotuloBotao())
+                .mensagemSucesso(contexto.mensagemSucesso())
+                .unidades(new ArrayList<>(contexto.unidades()))
                 .build();
     }
 
@@ -1051,9 +1025,7 @@ public class ProcessoService {
                 .filter(unidade -> unidade.getTipo() == TipoUnidade.INTEROPERACIONAL)
                 .map(Unidade::getCodigo)
                 .collect(Collectors.toSet());
-        // Em revisão, se vierem pai e filho juntos, mantemos apenas os mais específicos (folhas selecionadas).
-        // Unidades INTEROPERACIONAIS são exceção: mesmo com descendentes selecionadas, elas também participam
-        // da execução e precisam receber subprocesso próprio.
+
         Map<Long, Long> mapaFilhoPai = unidadeHierarquiaService.buscarMapaFilhoPai();
         return removerAncestraisRedundantesRevisao(codsUnidadesParam, mapaFilhoPai, codigosInteroperacionaisSelecionados);
     }
@@ -1119,5 +1091,21 @@ public class ProcessoService {
             Set<Unidade> unidadesParaProcessar,
             List<UnidadeMapa> unidadesMapas,
             Unidade unidadeAdmin
+    ) {}
+
+    @Builder
+    private record AcaoBlocoContexto(
+            String codigo,
+            AcaoProcesso acao,
+            List<SubprocessoElegivelDto> unidades,
+            boolean perfilPermite,
+            boolean requerDataLimite,
+            boolean redirecionarPainel,
+            String rotulo,
+            String titulo,
+            String texto,
+            String rotuloBotao,
+            String mensagemSucesso,
+            boolean processoAtivo
     ) {}
 }

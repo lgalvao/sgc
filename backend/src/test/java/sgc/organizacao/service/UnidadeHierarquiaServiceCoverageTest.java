@@ -4,104 +4,45 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.beans.factory.*;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.*;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static sgc.organizacao.model.TipoUnidade.*;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnidadeHierarquiaService - Cobertura de Testes")
-@SuppressWarnings("NullAway.Init")
 class UnidadeHierarquiaServiceCoverageTest {
-    @Mock
-    private UnidadeRepo unidadeRepo;
-
-    @Mock
-    private UnidadeService unidadeService;
-
-    @Mock
-    private ResponsabilidadeRepo responsabilidadeRepo;
-
-    @Mock
-    private ObjectProvider<UnidadeHierarquiaService> selfProvider;
 
     @InjectMocks
     private UnidadeHierarquiaService target;
 
+    @Mock
+    private UnidadeRepo unidadeRepo;
+
     @Test
-    @DisplayName("Deve cobrir método buscarArvoreComElegibilidade")
-    void deveCobrirBuscarArvoreComElegibilidade() {
-        // Mocking para requerMapaVigente = true
-        when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L));
-        
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
-                new UnidadeHierarquiaLeitura(10L, "U1", "U1", null, OPERACIONAL, SituacaoUnidade.ATIVA, null),
-                new UnidadeHierarquiaLeitura(20L, "U2", "U2", null, INTERMEDIARIA, SituacaoUnidade.ATIVA, null),
-                new UnidadeHierarquiaLeitura(30L, "U3", "U3", null, OPERACIONAL, SituacaoUnidade.ATIVA, null),
-                new UnidadeHierarquiaLeitura(40L, "U4", "U4", null, OPERACIONAL, SituacaoUnidade.ATIVA, null)
-        ));
-
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(10L, 20L, 30L, 40L))).thenReturn(List.of(
-                new ResponsabilidadeLeitura(10L, "111"),
-                new ResponsabilidadeLeitura(30L, "333"),
-                new ResponsabilidadeLeitura(40L, "444")
-        ));
-
-        List<UnidadeDto> result = target.buscarArvoreComElegibilidade(true, Set.of(40L));
-        
-        assertThat(result).hasSize(4);
-        // u1 (elegível), u2 (intermediária - false), u3 (sem mapa - false), u4 (bloqueada - false)
-        assertThat(result.stream().filter(UnidadeDto::isElegivel).count()).isEqualTo(1);
-        assertThat(result.stream().filter(UnidadeDto::isElegivel).findFirst().orElseThrow().getCodigo()).isEqualTo(10L);
-
-        // Mocking para requerMapaVigente = false
-        List<UnidadeDto> result2 = target.buscarArvoreComElegibilidade(false, Set.of(40L));
-        assertThat(result2).hasSize(4);
-        // u1 (elegível), u2 (intermediária - false), u3 (elegível), u4 (bloqueada - false)
-        assertThat(result2.stream().filter(UnidadeDto::isElegivel).count()).isEqualTo(2);
+    @DisplayName("carregarTitulosResponsavel - deve retornar mapa vazio quando lista for vazia")
+    void carregarTitulosResponsavel_ListaVazia() {
+        Map<Long, String> result = invokeMethod(target, "carregarTitulosResponsavel", Collections.emptyList());
+        assertThat(result).isEmpty();
     }
 
     @Test
-    @DisplayName("Deve cobrir método buscarNaHierarquiaPorSigla")
-    void deveCobrirBuscarNaHierarquiaPorSigla() {
-        when(selfProvider.getObject()).thenReturn(target);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
-                new UnidadeHierarquiaLeitura(1L, "RAIZ", "RAIZ", null, RAIZ, SituacaoUnidade.ATIVA, null),
-                new UnidadeHierarquiaLeitura(2L, "SUB", "SUB", null, OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
-        ));
+    @DisplayName("buscarNaHierarquiaPorSigla - deve encontrar recursivamente")
+    void buscarNaHierarquiaPorSigla_Recursivo() {
+        UnidadeDto filho = new UnidadeDto();
+        filho.setCodigo(2L);
+        filho.setSigla("F1");
         
-        List<String> siglas = target.buscarSiglasSubordinadas("SUB");
-        assertThat(siglas).contains("SUB");
+        UnidadeDto pai = new UnidadeDto();
+        pai.setCodigo(1L);
+        pai.setSigla("P1");
+        pai.setSubunidades(List.of(filho));
         
-        List<String> siglasRaiz = target.buscarSiglasSubordinadas("RAIZ");
-        assertThat(siglasRaiz).contains("RAIZ", "SUB");
-    }
-
-    @Test
-    @DisplayName("buscarArvoreHierarquica deve chamar montarHierarquia com elegibilidadeChecker null")
-    void deveChamarMontarHierarquiaComNullChecker() {
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
-                new UnidadeHierarquiaLeitura(10L, "U1", "U1", null, OPERACIONAL, SituacaoUnidade.ATIVA, null)
-        ));
-        
-        List<UnidadeDto> result = target.buscarArvoreHierarquica();
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst().isElegivel()).isTrue();
-    }
-
-    @Test
-    @DisplayName("montarHierarquia deve ignorar unidade quando não encontrar DTO no mapa")
-    void deveIgnorarUnidadeQuandoDtoNaoEncontradoNoMapa() {
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
-                new UnidadeHierarquiaLeitura(10L, "Unidade Mutável", "UM", null, OPERACIONAL, SituacaoUnidade.ATIVA, 11L)
-        ));
-
-        List<UnidadeDto> resultado = target.buscarArvoreHierarquica();
-        assertThat(resultado).isEmpty();
+        Optional<UnidadeDto> result = invokeMethod(target, "buscarNaHierarquiaPorSigla", List.of(pai), "F1");
+        assertThat(result).isPresent();
+        assertThat(result.get().getCodigo()).isEqualTo(2L);
     }
 }

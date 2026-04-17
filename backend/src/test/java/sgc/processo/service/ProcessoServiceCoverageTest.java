@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.data.domain.*;
 import sgc.alerta.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
@@ -12,6 +13,7 @@ import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
+import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
@@ -22,6 +24,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.processo.model.SituacaoProcesso.*;
 import static sgc.processo.model.TipoProcesso.*;
@@ -587,4 +590,71 @@ class ProcessoServiceCoverageTest {
         LocalDateTime res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "obterUltimaDataLimite", sp);
         assertThat(res).isEqualTo(d1);
     }
+
+    @Test
+    @DisplayName("executarAcaoEmBloco - deve logar etapa quando monitoramento ativo e executar ACEITAR")
+    void executarAcaoEmBloco_LogMonitoramentoAtivo() {
+        Long codProc = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), AcaoProcesso.ACEITAR);
+        
+        Subprocesso spCadastro = new Subprocesso(); spCadastro.setCodigo(100L); spCadastro.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Unidade u1 = new Unidade(); u1.setCodigo(10L); spCadastro.setUnidade(u1);
+        
+        Subprocesso spValidacao = new Subprocesso(); spValidacao.setCodigo(200L); spValidacao.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        Unidade u2 = new Unidade(); u2.setCodigo(20L); spValidacao.setUnidade(u2);
+
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(spCadastro, spValidacao));
+        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+
+        // Ativa filtro para cobrir logEtapaAcaoBloco
+        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                new org.springframework.web.context.request.ServletRequestAttributes(
+                        new org.springframework.mock.web.MockHttpServletRequest()
+                )
+        );
+        org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()
+                .setAttribute(sgc.comum.util.FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO, true, org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST);
+
+        target.executarAcaoEmBloco(codProc, req);
+        
+        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+        verify(transicaoService).aceitarCadastroEmBloco(List.of(100L));
+        verify(transicaoService).aceitarValidacaoEmBloco(List.of(200L));
+    }
+
+    @Test
+    @DisplayName("listarIniciadosPorParticipantes - deve retornar pagina normal")
+    void listarIniciadosPorParticipantes_Sucesso() {
+        when(processoRepo.listarCodigosPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), any()))
+                .thenReturn(new PageImpl<>(List.of(1L)));
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        when(processoRepo.listarPorCodigosComParticipantes(anyList())).thenReturn(List.of(p));
+        
+        Page<Processo> result = target.listarIniciadosPorParticipantes(List.of(10L), PageRequest.of(0, 10));
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("validarDadosBasicosParticipante - deve lancar excecao quando nome ou sigla em branco")
+    void validarDadosBasicosParticipante_Erro() {
+        UnidadeParticipanteDto dto = UnidadeParticipanteDto.builder().codUnidade(10L).nome("").sigla("S").build();
+        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Snapshot inconsistente");
+                
+        UnidadeParticipanteDto dto2 = UnidadeParticipanteDto.builder().codUnidade(10L).nome("N").sigla("").build();
+        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto2))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Snapshot inconsistente");
+    }
+
+    @Test
+    @DisplayName("obterTipoAcao - deve retornar DISPONIBILIZAR para comandos genericos")
+    void obterTipoAcao_Generico() {
+        AcaoEmBlocoCommand cmd = new DisponibilizarMapaEmBlocoCommand(List.of(), java.time.LocalDate.now());
+        String tipo = invokeMethod(target, "obterTipoAcao", cmd);
+        assertThat(tipo).isEqualTo(sgc.processo.model.AcaoProcesso.DISPONIBILIZAR.name());
+    }
 }
+

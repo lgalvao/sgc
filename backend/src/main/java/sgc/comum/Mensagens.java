@@ -82,6 +82,35 @@ public final class Mensagens {
     public static final String PELO_MENOS_UM_SUBPROCESSO        = "Pelo menos um subprocesso deve ser selecionado";
     public static final String PELO_MENOS_UMA_UNIDADE           = "Pelo menos uma unidade deve ser selecionada";
 
+    // ── UI: Ações em bloco ───────────────────────────────────────────────────
+    public static final String LABEL_ACEITAR_CADASTRO_BLOCO    = "Aceitar cadastro em bloco";
+    public static final String TITULO_ACEITE_CADASTRO_BLOCO    = "Aceite de cadastro em bloco";
+    public static final String TEXTO_SELECAO_ACEITE_CADASTRO   = "Selecione as unidades cujos cadastros deverão ser aceitos:";
+    public static final String BOTAO_REGISTRAR_ACEITE          = "Registrar aceite";
+    public static final String SUCESSO_ACEITE_CADASTRO_BLOCO   = "Cadastros aceitos em bloco";
+
+    public static final String LABEL_ACEITAR_MAPA_BLOCO        = "Aceitar mapas em bloco";
+    public static final String TITULO_ACEITE_MAPA_BLOCO        = "Aceite de mapas em bloco";
+    public static final String TEXTO_SELECAO_ACEITE_MAPA       = "Selecione as unidades para aceite dos mapas correspondentes";
+    public static final String SUCESSO_ACEITE_MAPA_BLOCO       = "Mapas aceitos em bloco";
+
+    public static final String LABEL_HOMOLOGAR_EM_BLOCO        = "Homologar em bloco";
+    public static final String TITULO_HOMOLOGACAO_CADASTRO_BLOCO = "Homologação de cadastro em bloco";
+    public static final String TEXTO_SELECAO_HOMOLOGACAO_CADASTRO = "Selecione as unidades cujos cadastros deverão ser homologados:";
+    public static final String BOTAO_HOMOLOGAR                 = "Homologar";
+    public static final String SUCESSO_HOMOLOGACAO_CADASTRO_BLOCO = "Cadastros homologados em bloco";
+
+    public static final String LABEL_HOMOLOGAR_MAPAS_BLOCO     = "Homologar mapas em bloco";
+    public static final String TITULO_HOMOLOGACAO_MAPA_BLOCO   = "Homologação de mapa em bloco";
+    public static final String TEXTO_SELECAO_HOMOLOGACAO_MAPA  = "Selecione as unidades cujos mapas deverão ser homologados:";
+    public static final String SUCESSO_HOMOLOGACAO_MAPA_BLOCO  = "Mapas de competências homologados em bloco";
+
+    public static final String LABEL_DISPONIBILIZAR_EM_BLOCO    = "Disponibilizar em bloco";
+    public static final String TITULO_DISPONIBILIZACAO_MAPA_BLOCO = "Disponibilização de mapa em bloco";
+    public static final String TEXTO_SELECAO_DISPONIBILIZACAO_MAPA = "Selecione as unidades cujos mapas deverão ser disponibilizados:";
+    public static final String BOTAO_DISPONIBILIZAR            = "Disponibilizar";
+    public static final String SUCESSO_DISPONIBILIZACAO_MAPA_BLOCO = "Mapas de competências disponibilizados em bloco";
+
     // ── Regras de Negócio — Validação de Estrutura ───────────────────────────
     public static final String COMPETENCIA_DEVE_TER_ATIVIDADE   = "A competência deve ter pelo menos uma atividade associada";
     public static final String LISTA_COMPETENCIAS_NAO_PODE_SER_VAZIA = "A lista de competências não pode ser vazia";
