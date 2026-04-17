@@ -161,6 +161,10 @@ const textoTooltip = ehAgrupadorVisual ? "" : (props.unidade.nome ?? "");
   margin: 0;
 }
 
+.unidade-checkbox :deep(.form-check-input:disabled ~ .form-check-label) {
+  opacity: 1;
+}
+
 .unidade-label {
   margin: 0;
   cursor: pointer;
