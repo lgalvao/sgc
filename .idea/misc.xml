@@ -4438,6 +4438,7 @@
     <pattern value="sgc.organizacao.service.UsuarioPerfilCacheServiceTest" />
     <pattern value="sgc.subprocesso.service.SubprocessoConsultaServiceTest" method="verificarAcessoCadastroHabilitadoAdmin" />
     <pattern value="sgc.integracao.MapaManutencaoServiceIntegrationTest" method="criarSubprocessoSemMapa" />
+    <pattern value="sgc.alerta.model.AlertaUsuarioRepo" method="listarPorUsuarioEAlertas" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

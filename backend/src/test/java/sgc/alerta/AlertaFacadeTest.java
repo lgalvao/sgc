@@ -129,7 +129,7 @@ class AlertaFacadeTest {
         metodo.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<Long, Unidade> unidadesPorCodigo = Collections.EMPTY_MAP;
+        Map<Long, Unidade> unidadesPorCodigo = Collections.emptyMap();
 
         assertThatThrownBy(() -> metodo.invoke(alertaFacade, unidadesPorCodigo, 999L))
                 .isInstanceOf(InvocationTargetException.class)

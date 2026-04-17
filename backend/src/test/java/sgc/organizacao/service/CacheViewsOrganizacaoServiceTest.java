@@ -39,7 +39,7 @@ class CacheViewsOrganizacaoServiceTest {
         List<UnidadeHierarquiaLeitura> result = cacheService.listarTodasUnidades();
 
         assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).codigo());
+        assertEquals(1L, result.getFirst().codigo());
     }
 
     @Test
@@ -63,7 +63,7 @@ class CacheViewsOrganizacaoServiceTest {
         List<UsuarioResumoDto> result = cacheService.listarTodosUsuarios();
 
         assertEquals(1, result.size());
-        assertEquals("12345", result.get(0).tituloEleitoral());
+        assertEquals("12345", result.getFirst().tituloEleitoral());
     }
 
     @Test
@@ -84,8 +84,8 @@ class CacheViewsOrganizacaoServiceTest {
         List<ResponsabilidadeLeitura> result = cacheService.listarTodasResponsabilidades();
 
         assertEquals(1, result.size());
-        assertEquals(10L, result.get(0).unidadeCodigo());
-        assertEquals("titulo1", result.get(0).usuarioTitulo());
+        assertEquals(10L, result.getFirst().unidadeCodigo());
+        assertEquals("titulo1", result.getFirst().usuarioTitulo());
     }
 
     @Test
@@ -103,7 +103,7 @@ class CacheViewsOrganizacaoServiceTest {
         List<UsuarioPerfil> result = cacheService.listarTodosPerfisUnidade();
 
         assertEquals(1, result.size());
-        assertEquals("titulo", result.get(0).getUsuarioTitulo());
+        assertEquals("titulo", result.getFirst().getUsuarioTitulo());
     }
 
     @Test
