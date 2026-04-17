@@ -570,8 +570,11 @@ public class SubprocessoTransicaoService {
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
         Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
 
-        SituacaoSubprocesso novaSituacao = obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "devolução de validação");
-        sp.setDataFimEtapa2(null);
+        SituacaoSubprocesso novaSituacao = sp.getSituacao();
+        if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
+            novaSituacao = obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "devolução de validação");
+            sp.setDataFimEtapa2(null);
+        }
 
         registrarWorkflowComDestino(RegistrarWorkflowInternoCommand.devolucaoValidacao(
                 sp,

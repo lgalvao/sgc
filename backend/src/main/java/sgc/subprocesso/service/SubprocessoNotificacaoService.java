@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.thymeleaf.context.*;
@@ -19,6 +20,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubprocessoNotificacaoService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -72,7 +74,14 @@ public class SubprocessoNotificacaoService {
     }
 
     private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo) {
-        UnidadeResponsavelDto responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
+        UnidadeResponsavelDto responsavel;
+        try {
+            responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
+        } catch (sgc.comum.erros.ErroEntidadeNaoEncontrada ex) {
+            log.warn("Responsavel nao encontrado para unidade {}; email pessoal nao enviado.", unidade.getCodigo());
+            return;
+        }
+
         if (responsavel.substitutoTitulo() != null) {
             usuarioService.buscarOpt(responsavel.substitutoTitulo()).ifPresent(u -> {
                 if (!u.getEmail().isBlank()) emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);

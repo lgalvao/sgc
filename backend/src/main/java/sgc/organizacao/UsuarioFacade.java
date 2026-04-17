@@ -85,12 +85,12 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
-    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String sigla) {
+    public @Nullable ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String sigla) {
         return responsavelUnidadeService.buscarResponsabilidadeDetalhadaAtual(sigla);
     }
 
     @Transactional(readOnly = true)
-    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long codigoUnidade) {
+    public @Nullable ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long codigoUnidade) {
         return responsavelUnidadeService.buscarResponsabilidadeDetalhadaAtual(codigoUnidade);
     }
 
