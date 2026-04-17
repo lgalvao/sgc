@@ -94,7 +94,15 @@ public class ConfigSeguranca {
                                 .maxAgeInSeconds(31536000))
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives(
-                                        "default-src 'none'; frame-ancestors 'none'; sandbox"))
+                                        "default-src 'self'; " +
+                                                "script-src 'self'; " +
+                                                "style-src 'self' 'unsafe-inline'; " +
+                                                "img-src 'self' data:; " +
+                                                "font-src 'self' data:; " +
+                                                "connect-src 'self'; " +
+                                                "object-src 'none'; " +
+                                                "base-uri 'self'; " +
+                                                "frame-ancestors 'none'"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                         .xssProtection(HeadersConfigurer.XXssConfig::disable))
                 .addFilterAfter(new OncePerRequestFilter() {
