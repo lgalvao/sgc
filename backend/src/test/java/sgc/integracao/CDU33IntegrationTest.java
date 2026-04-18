@@ -136,6 +136,15 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
                     a.getDescricao().contains("Revisão de cadastro da unidade %s reaberta pela ADMIN".formatted(spReaberto.getUnidade().getSigla()));
         });
         assertThat(alertaSuperiorExiste).isTrue();
+
+        List<Long> codigosEsperadosSuperiores = coletarCodigosSuperiores(spReaberto.getUnidade());
+        long quantidadeAlertasSuperiores = alerts.stream()
+                .filter(a -> a.getUnidadeDestino() != null)
+                .filter(a -> codigosEsperadosSuperiores.contains(a.getUnidadeDestino().getCodigo()))
+                .filter(a -> a.getDescricao().contains(
+                        "Revisão de cadastro da unidade %s reaberta pela ADMIN".formatted(spReaberto.getUnidade().getSigla())))
+                .count();
+        assertThat(quantidadeAlertasSuperiores).isEqualTo(codigosEsperadosSuperiores.size());
     }
 
     @Test
@@ -181,5 +190,15 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent());
+    }
+
+    private List<Long> coletarCodigosSuperiores(Unidade unidade) {
+        List<Long> codigos = new ArrayList<>();
+        Unidade superiorAtual = unidade.getUnidadeSuperior();
+        while (superiorAtual != null) {
+            codigos.add(superiorAtual.getCodigo());
+            superiorAtual = superiorAtual.getUnidadeSuperior();
+        }
+        return codigos;
     }
 }
