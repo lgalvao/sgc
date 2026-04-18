@@ -112,6 +112,7 @@ Com isso, o foco sai de "descobrir onde está a duplicação" e volta para "elim
 A rodada 11 consolidou dois ajustes de direção para a Onda 2:
 
 - frontend: modal de sugestões passa a abrir de forma imediata, com carregamento assíncrono em segundo plano;
+- frontend: leitura de sugestões deixa de usar fallback para não mascarar erro de integração;
 - backend: criação de serviço dedicado de contexto para reduzir acoplamento interno de `SubprocessoConsultaService`.
 
 Com isso, fica explícito que simplificação deve reduzir tamanho e responsabilidade de hotspots, sem aliases desnecessários nem camadas de compatibilidade.

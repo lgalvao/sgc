@@ -353,6 +353,7 @@ Validação desta rodada:
 
 * `SubprocessoConsultaService` delegou montagem de contexto para `SubprocessoContextoConsultaService`, reduzindo escopo interno do hotspot;
 * a abertura dos modais de sugestões na `MapaVisualizacaoView.vue` deixou de bloquear a exibição por chamada assíncrona;
+* fallback de leitura de sugestões foi removido para expor falha de integração de forma explícita;
 * o alias de histórico foi removido, mantendo função explícita e direta;
 * testes de consulta foram adaptados para composição com o novo serviço de contexto.
 

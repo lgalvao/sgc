@@ -175,10 +175,10 @@ Enxugar o fluxo de sugestões/histórico e reduzir caminhos duplicados no `<scri
 
 - Os fluxos de abrir e visualizar sugestões repetiam `try/catch` e fallback de texto.
 - Refatoração aplicada:
-  - criação de `carregarSugestoesComFallback(...)` para centralizar leitura + fallback + logging;
+  - remoção do helper com fallback de sugestões e adoção de tratamento explícito de erro;
   - abertura de modal desacoplada da requisição remota, evitando bloquear UX;
   - remoção do alias de histórico e retorno para função explícita.
-- Resultado imediato: menos ramificação incidental, sem prender abertura de modal ao carregamento de sugestões.
+- Resultado imediato: menos ramificação incidental, sem prender abertura de modal ao carregamento de sugestões e sem mascarar falhas de leitura.
 
 **Pendências restantes**
 

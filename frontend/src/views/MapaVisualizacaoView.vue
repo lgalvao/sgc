@@ -456,17 +456,13 @@ function fecharModalAceitar() {
   mostrarModalAceitar.value = false;
 }
 
-async function carregarSugestoesComFallback(fallback: string) {
+async function carregarSugestoesParaEdicao() {
   try {
-    return await sincronizarSugestoesMapa();
+    sugestoes.value = await sincronizarSugestoesMapa();
   } catch (error) {
     logger.error(error);
-    return mapa.value?.sugestoes ?? fallback;
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
   }
-}
-
-async function carregarSugestoesParaEdicao() {
-  sugestoes.value = await carregarSugestoesComFallback("");
 }
 
 function abrirModalSugestoes() {
@@ -480,12 +476,17 @@ function fecharModalSugestoes() {
 }
 
 async function carregarSugestoesParaVisualizacao() {
-  sugestoesVisualizacao.value = (await carregarSugestoesComFallback("Nenhuma sugestão registrada.")) || "Nenhuma sugestão registrada.";
+  try {
+    sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
+  } catch (error) {
+    logger.error(error);
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+  }
 }
 
 function verSugestoes() {
   mostrarModalVerSugestoes.value = true;
-  sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+  sugestoesVisualizacao.value = "";
   void carregarSugestoesParaVisualizacao();
 }
 
