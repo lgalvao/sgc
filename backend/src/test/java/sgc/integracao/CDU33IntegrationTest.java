@@ -55,15 +55,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
             unidadeRepo.save(admin);
         }
 
-        // Obter unidade com cadeia hierárquica conhecida
-        Unidade unidade = unidadeRepo.findBySigla("SEDESENV").orElseGet(() -> {
-            Unidade u = new Unidade();
-            u.setSigla("TESTE");
-            u.setNome("Unidade teste");
-            u.setSituacao(ATIVA);
-            u.setTipo(OPERACIONAL);
-            return unidadeRepo.save(u);
-        });
+        Unidade unidade = buscarOuCriarUnidadeComDoisSuperiores("CDU33");
 
         // Criar processo de REVISAO
         Processo processo = ProcessoFixture.processoPadrao();
@@ -138,6 +130,9 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         assertThat(alertaSuperiorExiste).isTrue();
 
         List<Long> codigosEsperadosSuperiores = coletarCodigosSuperiores(spReaberto.getUnidade());
+        assertThat(codigosEsperadosSuperiores)
+                .as("CDU-33 deve propagar alerta para toda a cadeia hierárquica superior")
+                .hasSizeGreaterThanOrEqualTo(2);
         long quantidadeAlertasSuperiores = alerts.stream()
                 .filter(a -> a.getUnidadeDestino() != null)
                 .filter(a -> codigosEsperadosSuperiores.contains(a.getUnidadeDestino().getCodigo()))
@@ -200,5 +195,36 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
             superiorAtual = superiorAtual.getUnidadeSuperior();
         }
         return codigos;
+    }
+
+    private Unidade buscarOuCriarUnidadeComDoisSuperiores(String sufixo) {
+        String siglaSecao = "SEC_T_%s".formatted(sufixo);
+        Optional<Unidade> secaoExistente = unidadeRepo.findBySigla(siglaSecao);
+        if (secaoExistente.isPresent()) {
+            return secaoExistente.get();
+        }
+
+        Unidade secretaria = new Unidade();
+        secretaria.setSigla("SECRET_T_%s".formatted(sufixo));
+        secretaria.setNome("Secretaria teste %s".formatted(sufixo));
+        secretaria.setSituacao(ATIVA);
+        secretaria.setTipo(INTEROPERACIONAL);
+        secretaria = unidadeRepo.save(secretaria);
+
+        Unidade coordenadoria = new Unidade();
+        coordenadoria.setSigla("COORD_T_%s".formatted(sufixo));
+        coordenadoria.setNome("Coordenadoria teste %s".formatted(sufixo));
+        coordenadoria.setSituacao(ATIVA);
+        coordenadoria.setTipo(INTERMEDIARIA);
+        coordenadoria.setUnidadeSuperior(secretaria);
+        coordenadoria = unidadeRepo.save(coordenadoria);
+
+        Unidade secao = new Unidade();
+        secao.setSigla(siglaSecao);
+        secao.setNome("Seção teste %s".formatted(sufixo));
+        secao.setSituacao(ATIVA);
+        secao.setTipo(OPERACIONAL);
+        secao.setUnidadeSuperior(coordenadoria);
+        return unidadeRepo.save(secao);
     }
 }
