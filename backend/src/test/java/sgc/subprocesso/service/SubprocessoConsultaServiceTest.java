@@ -41,6 +41,11 @@ class SubprocessoConsultaServiceTest {
     @BeforeEach
     void configurarDependenciasAdicionais() {
         ReflectionTestUtils.setField(service, "analiseHistoricoService", new AnaliseHistoricoService(unidadeService));
+        ReflectionTestUtils.setField(
+                service,
+                "contextoConsultaService",
+                new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService)
+        );
     }
 
     @Test

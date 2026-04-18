@@ -456,14 +456,22 @@ function fecharModalAceitar() {
   mostrarModalAceitar.value = false;
 }
 
-async function abrirModalSugestoes() {
+async function carregarSugestoesComFallback(fallback: string) {
   try {
-    sugestoes.value = await sincronizarSugestoesMapa();
+    return await sincronizarSugestoesMapa();
   } catch (error) {
     logger.error(error);
-    sugestoes.value = mapa.value?.sugestoes ?? "";
+    return mapa.value?.sugestoes ?? fallback;
   }
+}
+
+async function carregarSugestoesParaEdicao() {
+  sugestoes.value = await carregarSugestoesComFallback("");
+}
+
+function abrirModalSugestoes() {
   mostrarModalSugestoes.value = true;
+  void carregarSugestoesParaEdicao();
 }
 
 function fecharModalSugestoes() {
@@ -471,14 +479,14 @@ function fecharModalSugestoes() {
   sugestoes.value = "";
 }
 
-async function verSugestoes() {
-  try {
-    sugestoesVisualizacao.value = (await sincronizarSugestoesMapa()) || "Nenhuma sugestão registrada.";
-  } catch (error) {
-    logger.error(error);
-    sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
-  }
+async function carregarSugestoesParaVisualizacao() {
+  sugestoesVisualizacao.value = (await carregarSugestoesComFallback("Nenhuma sugestão registrada.")) || "Nenhuma sugestão registrada.";
+}
+
+function verSugestoes() {
   mostrarModalVerSugestoes.value = true;
+  sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+  void carregarSugestoesParaVisualizacao();
 }
 
 function fecharModalVerSugestoes() {
@@ -515,7 +523,7 @@ function fecharModalHistorico() {
 }
 
 function verHistorico() {
-  abrirModalHistorico();
+  void abrirModalHistorico();
 }
 
 onMounted(async () => {

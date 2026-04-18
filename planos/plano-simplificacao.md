@@ -335,3 +335,28 @@ Validação desta rodada:
   * identificar o que deve migrar para backend;
   * reduzir chamadas e estruturas montadas em etapas;
   * aproveitar melhor recursos do BootstrapVueNext antes de novos recortes locais.
+
+
+### Rodada C — Onda 2 inicial (`SubprocessoConsultaService` + `MapaVisualizacaoView.vue`)
+
+* `SubprocessoConsultaService` passou a separar explicitamente os vínculos de unidade usados na montagem de contexto de consulta;
+* a montagem de `ContextoConsultaSubprocesso` ficou mais linear, com cálculo de vínculo encapsulado em record interno específico;
+* `MapaVisualizacaoView.vue` removeu duplicação de `try/catch` no fluxo de sugestões, concentrando fallback e logging em helper único;
+* a abertura do histórico passou a usar referência direta para reduzir função pass-through sem regra própria.
+
+Validação desta rodada:
+
+* `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceTest" --tests "sgc.subprocesso.service.SubprocessoConsultaServiceCoverageTest" --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest"`;
+* `npm run test:unit -- src/views/__tests__/MapaVisualizacaoView.spec.ts`.
+
+### Rodada D — Onda 2 contínua (`SubprocessoContextoConsultaService` + UX de modal)
+
+* `SubprocessoConsultaService` delegou montagem de contexto para `SubprocessoContextoConsultaService`, reduzindo escopo interno do hotspot;
+* a abertura dos modais de sugestões na `MapaVisualizacaoView.vue` deixou de bloquear a exibição por chamada assíncrona;
+* o alias de histórico foi removido, mantendo função explícita e direta;
+* testes de consulta foram adaptados para composição com o novo serviço de contexto.
+
+Validação desta rodada:
+
+* `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceTest" --tests "sgc.subprocesso.service.SubprocessoConsultaServiceCoverageTest" --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest"`;
+* `npm run test:unit -- src/views/__tests__/MapaVisualizacaoView.spec.ts`.

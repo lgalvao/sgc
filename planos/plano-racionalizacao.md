@@ -30,8 +30,11 @@ O ciclo inicial de investigacao ja produziu evidencias suficientes para encerrar
 ### O que ja ficou claro
 
 - o painel era a principal fonte de repeticao e ja foi tratado no backlog como frente encerrada
-- a sequencia de leitura de subprocesso continua reaparecendo nas jornadas mais representativas
+- a sequencia de leitura de subprocesso continua reaparecendo nas jornadas mais representativas, mas a montagem de contexto começou a ser separada por intenção na rodada 10
+- a rodada 11 iniciou a quebra física de `SubprocessoConsultaService` para reduzir concentração de responsabilidades
 - `processos/{codigo}/contexto-completo` ainda merece revisao de escopo e consumo
+- a tela `MapaVisualizacaoView` reduziu duplicação de fluxo (sugestoes/historico), porém ainda concentra decisões condicionais de ação
+- a abertura de modal na visualização de mapa nao deve depender de round-trip síncrono para preservar fluidez de interação
 - a cadeia de workflow ainda concentra custo sincronico em validacoes, notificacoes e envio de e-mail
 - `diagnostico-organizacional` e `arvore-com-elegibilidade` deixaram de ser suspeitas abertas amplas e agora sao itens localizados, com chamadores conhecidos
 - o monitoramento com `SGC_MONITORAMENTO=on` ja e confiavel o bastante para comparacoes dirigidas
@@ -94,6 +97,24 @@ Quais custos ainda estao no caminho critico das transicoes e deveriam sair do fl
 ### Sinal de conclusao
 
 Essa frente estara madura quando os outliers de workflow deixarem de depender de notificacao ou processamento secundario dentro da mesma requisicao.
+
+## Atualizacao da rodada 10
+
+A rodada 10 confirmou o inicio da Onda 2 prevista no plano:
+
+- backend: montagem de contexto de consulta de subprocesso com vínculos de unidade isolados em bloco dedicado;
+- frontend: desduplicação do fluxo de sugestões/histórico em `MapaVisualizacaoView`.
+
+Com isso, o foco sai de "descobrir onde está a duplicação" e volta para "eliminar o restante da recomposição e da decisão espalhada".
+
+## Atualizacao da rodada 11
+
+A rodada 11 consolidou dois ajustes de direção para a Onda 2:
+
+- frontend: modal de sugestões passa a abrir de forma imediata, com carregamento assíncrono em segundo plano;
+- backend: criação de serviço dedicado de contexto para reduzir acoplamento interno de `SubprocessoConsultaService`.
+
+Com isso, fica explícito que simplificação deve reduzir tamanho e responsabilidade de hotspots, sem aliases desnecessários nem camadas de compatibilidade.
 
 ## Como priorizar daqui para frente
 
