@@ -253,15 +253,13 @@ import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useAcesso} from "@/composables/useAcesso";
+import {useMapaAcoesAnalise} from "@/composables/useMapaAcoesAnalise";
+import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {obterMapaVisualizacao, obterSugestoesMapa} from "@/services/subprocessoService";
 import {
-  aceitarValidacao as aceitarValidacaoService,
   apresentarSugestoes as apresentarSugestoesService,
-  devolverValidacao as devolverValidacaoService,
-  homologarValidacao as homologarValidacaoService,
-  validarMapa as validarMapaService,
 } from "@/services/processoService";
 import type {Analise, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -308,17 +306,30 @@ const historicoAnalise = computed(() => {
 
 const temHistoricoAnalise = computed(() => historicoAnalise.value.length > 0);
 
-const mostrarModalAceitar = ref(false);
 const mostrarModalSugestoes = ref(false);
 const mostrarModalVerSugestoes = ref(false);
-const mostrarModalValidar = ref(false);
-const mostrarModalDevolucao = ref(false);
 const mostrarModalHistorico = ref(false);
 const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
-const observacaoDevolucao = ref("");
-
-const isLoading = ref(false);
+const {
+  mostrarModalAceitar,
+  mostrarModalValidar,
+  mostrarModalDevolucao,
+  observacaoDevolucao,
+  isLoading,
+  confirmarValidacao,
+  confirmarAceitacao,
+  confirmarDevolucao,
+  abrirModalAceitar,
+  fecharModalAceitar,
+  abrirModalValidar,
+  abrirModalDevolucao,
+} = useMapaAcoesAnalise({
+  codSubprocesso,
+  acaoPrincipalMapa,
+  concluirAcaoPainel,
+  notify,
+});
 
 // Refs para foco
 const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
@@ -334,14 +345,12 @@ async function executarComLoading(acao: () => Promise<void>) {
 }
 
 async function carregarContextoInicial() {
-  const codigoQuery = Number(route.query.codSubprocesso);
-  const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
-      ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
-          .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
-      : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
-          codProcesso.value,
-          sigla.value,
-      );
+  const resultado = await carregarContextoSubprocessoInicial({
+    codProcesso: codProcesso.value,
+    siglaUnidade: sigla.value,
+    codSubprocessoQuery: route.query.codSubprocesso,
+    store: subprocessoStoreCache,
+  });
 
   if (!resultado) {
     codSubprocesso.value = null;
@@ -397,65 +406,6 @@ async function confirmarSugestoes() {
   }
 }
 
-async function confirmarValidacao() {
-  if (!codSubprocesso.value) return;
-  try {
-    await executarComLoading(async () => {
-      await validarMapaService(codSubprocesso.value!);
-      await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
-    });
-  } catch {
-    notify(TEXTOS.mapa.ERRO_VALIDAR, 'danger');
-  }
-}
-
-async function confirmarAceitacao(observacao = "") {
-  if (!codSubprocesso.value) return;
-
-  const acao = acaoPrincipalMapa.value;
-  if (!acao) return;
-
-  try {
-    await executarComLoading(async () => {
-      if (acao.codigo === "HOMOLOGAR") {
-        await homologarValidacaoService(codSubprocesso.value!, {texto: observacao});
-      } else {
-        await aceitarValidacaoService(codSubprocesso.value!, {texto: observacao});
-      }
-      await concluirAcaoPainel(
-          acao.mensagemSucesso,
-          fecharModalAceitar,
-      );
-    });
-  } catch (error) {
-    logger.error(error);
-    notify(TEXTOS.comum.ERRO_OPERACAO, 'danger');
-  }
-}
-
-async function confirmarDevolucao() {
-  if (!codSubprocesso.value) return;
-  try {
-    await executarComLoading(async () => {
-      await devolverValidacaoService(codSubprocesso.value!, {
-        justificativa: observacaoDevolucao.value,
-      });
-      await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
-    });
-  } catch (error) {
-    logger.error(error);
-    notify(TEXTOS.mapa.ERRO_DEVOLVER, 'danger');
-  }
-}
-
-function abrirModalAceitar() {
-  mostrarModalAceitar.value = true;
-}
-
-function fecharModalAceitar() {
-  mostrarModalAceitar.value = false;
-}
-
 async function carregarSugestoesParaEdicao() {
   try {
     sugestoes.value = await sincronizarSugestoesMapa();
@@ -493,23 +443,6 @@ function verSugestoes() {
 function fecharModalVerSugestoes() {
   mostrarModalVerSugestoes.value = false;
   sugestoesVisualizacao.value = "";
-}
-
-function abrirModalValidar() {
-  mostrarModalValidar.value = true;
-}
-
-function fecharModalValidar() {
-  mostrarModalValidar.value = false;
-}
-
-function abrirModalDevolucao() {
-  mostrarModalDevolucao.value = true;
-}
-
-function fecharModalDevolucao() {
-  mostrarModalDevolucao.value = false;
-  observacaoDevolucao.value = "";
 }
 
 async function abrirModalHistorico() {
