@@ -171,6 +171,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import type {
   AceitarCadastroRequest,
   Analise,
@@ -367,14 +368,12 @@ async function confirmarDevolucao() {
 onMounted(async () => {
   try {
     limparEstadoSubprocessoAtual();
-    const codigoQuery = Number(route.query.codSubprocesso);
-    const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
-        ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
-            .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
-        : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
-            codProcesso.value,
-            unidadeId.value,
-        );
+    const resultado = await carregarContextoSubprocessoInicial({
+      codProcesso: codProcesso.value,
+      siglaUnidade: unidadeId.value,
+      codSubprocessoQuery: route.query.codSubprocesso,
+      store: subprocessoStoreCache,
+    });
 
     if (resultado) {
       codSubprocesso.value = resultado.codigo;

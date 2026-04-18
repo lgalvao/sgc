@@ -140,6 +140,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -198,14 +199,12 @@ async function carregarContextoEdicao(codigo: number) {
 }
 
 async function carregarContextoInicial() {
-  const codigoQuery = Number(route.query.codSubprocesso);
-  const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
-      ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
-          .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
-      : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
-          codProcesso.value,
-          siglaUnidade.value,
-      );
+  const resultado = await carregarContextoSubprocessoInicial({
+    codProcesso: codProcesso.value,
+    siglaUnidade: siglaUnidade.value,
+    codSubprocessoQuery: route.query.codSubprocesso,
+    store: subprocessoStoreCache,
+  });
 
   if (!resultado) {
     return null;

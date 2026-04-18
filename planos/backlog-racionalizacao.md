@@ -180,7 +180,30 @@ Enxugar o fluxo de sugestões/histórico e reduzir caminhos duplicados no `<scri
   - remoção do alias de histórico e retorno para função explícita.
 - Resultado imediato: menos ramificação incidental, sem prender abertura de modal ao carregamento de sugestões e sem mascarar falhas de leitura.
 
+**Extensão aplicada (rodada 12)**
+
+- Extração do bloco de ações de análise (`validar`, `devolver`, `aceitar/homologar`) para composable dedicado (`useMapaAcoesAnalise`);
+- `MapaVisualizacaoView` passou a manter no arquivo principal apenas coordenação da tela, enquanto regras de loading, execução de ação e fechamento de modal ficaram encapsuladas por intenção;
+- Fluxo de sugestões/histórico permanece desacoplado e agora convive com o novo bloco sem reintroduzir duplicação de tratamento.
+
 **Pendências restantes**
 
-- avaliar extração pontual do bloco de ações de análise (aceitar/homologar/devolver/validar) para reduzir o tamanho do arquivo;
 - verificar se mais decisões de permissão podem vir prontas no backend para simplificar renderização condicional da tela.
+
+### Rodada 12 (executada)
+
+- extração do bloco de ações de análise de `MapaVisualizacaoView` para `useMapaAcoesAnalise`;
+- redução adicional de responsabilidades no `<script setup>` da tela de visualização de mapa;
+- backlog atualizado com novo baseline da Onda 2 para continuidade da simplificação.
+
+### Rodada 13 (executada)
+
+- extração da estratégia de carregamento inicial de contexto de subprocesso para helper compartilhado (`carregarContextoSubprocessoInicial`);
+- remoção de duplicação do fallback por query/processo+unidade em quatro telas (`SubprocessoView`, `CadastroVisualizacaoView`, `MapaView`, `MapaVisualizacaoView`);
+- baseline de testes ampliado com suíte dedicada ao novo helper para preservar o contrato de resolução de contexto.
+
+### Rodada 14 (executada)
+
+- ajuste de semântica no helper de contexto: quando `codSubprocesso` vindo da query não resolve contexto, o fluxo agora recua explicitamente para busca por `processo+unidade` em vez de retornar nulo imediato;
+- suíte unitária do helper expandida para cobrir fallback após falha da query e cenário de ausência total de contexto;
+- validação E2E completa executada em `--workers=1` após o ajuste para confirmar que a correção não introduziu regressão funcional.

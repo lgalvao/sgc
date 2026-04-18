@@ -245,6 +245,7 @@ import {TEXTOS} from "@/constants/textos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -350,14 +351,12 @@ function exibirToastPendente() {
 async function carregarSubprocesso() {
   subprocessosStore.subprocessoDetalhe = null;
 
-  const codigoQuery = Number(route.query.codSubprocesso);
-  const resultado = Number.isFinite(codigoQuery) && codigoQuery > 0
-      ? await subprocessoStoreCache.garantirContextoEdicao(codigoQuery)
-          .then((contexto) => contexto ? {codigo: codigoQuery, contexto} : null)
-      : await subprocessoStoreCache.garantirContextoEdicaoPorProcessoEUnidade(
-          props.codProcesso,
-          props.siglaUnidade,
-      );
+  const resultado = await carregarContextoSubprocessoInicial({
+    codProcesso: props.codProcesso,
+    siglaUnidade: props.siglaUnidade,
+    codSubprocessoQuery: route.query.codSubprocesso,
+    store: subprocessoStoreCache,
+  });
 
   if (resultado) {
     erroNaoEncontrado.value = false;
