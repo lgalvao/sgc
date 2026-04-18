@@ -115,6 +115,20 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descRevisao);
         await expect(tabelaAlertas).toContainText(/Revisão de cadastro da unidade SECAO_212 reaberta/i);
+        await expect(tabelaAlertas).toContainText(/ADMIN/i);
+        await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+    });
+
+    test('Cenário complementar: nível acima da unidade superior visualiza alerta de reabertura de revisão', async ({
+                                                                                                                          _resetAutomatico,
+                                                                                                                          page,
+                                                                                                                          _autenticadoComoGestorSecretaria2
+    }) => {
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertas).toBeVisible();
+        await expect(tabelaAlertas).toContainText(descRevisao);
+        await expect(tabelaAlertas).toContainText(/Revisão de cadastro da unidade SECAO_212 reaberta/i);
+        await expect(tabelaAlertas).toContainText(/ADMIN/i);
         await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });

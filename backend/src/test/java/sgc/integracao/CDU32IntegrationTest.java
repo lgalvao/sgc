@@ -51,15 +51,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
             unidadeRepo.save(admin);
         }
 
-        // Obter unidade com cadeia hierárquica conhecida
-        Unidade unidade = unidadeRepo.findBySigla("SEDESENV").orElseGet(() -> {
-            Unidade u = new Unidade();
-            u.setSigla("TESTE");
-            u.setNome("Unidade teste");
-            u.setSituacao(SituacaoUnidade.ATIVA);
-            u.setTipo(TipoUnidade.OPERACIONAL);
-            return unidadeRepo.save(u);
-        });
+        Unidade unidade = buscarOuCriarUnidadeComDoisSuperiores("CDU32");
 
         // Criar processo
         Processo processo = ProcessoFixture.processoPadrao();
@@ -129,6 +121,17 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                         Objects.equals(a.getUnidadeDestino().getCodigo(), codigoUnidadeSuperior) &&
                         a.getDescricao().contains("Cadastro da unidade %s reaberto".formatted(reaberto.getUnidade().getSigla())));
         assertThat(alertaSuperiorExiste).isTrue();
+
+        List<Long> codigosEsperadosSuperiores = coletarCodigosSuperiores(reaberto.getUnidade());
+        assertThat(codigosEsperadosSuperiores)
+                .as("CDU-32 deve propagar alerta para toda a cadeia hierárquica superior")
+                .hasSizeGreaterThanOrEqualTo(2);
+        long quantidadeAlertasSuperiores = alerts.stream()
+                .filter(a -> a.getUnidadeDestino() != null)
+                .filter(a -> codigosEsperadosSuperiores.contains(a.getUnidadeDestino().getCodigo()))
+                .filter(a -> a.getDescricao().contains("Cadastro da unidade %s reaberto".formatted(reaberto.getUnidade().getSigla())))
+                .count();
+        assertThat(quantidadeAlertasSuperiores).isEqualTo(codigosEsperadosSuperiores.size());
     }
 
     @Test
@@ -174,5 +177,46 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent());
+    }
+
+    private List<Long> coletarCodigosSuperiores(Unidade unidade) {
+        List<Long> codigos = new ArrayList<>();
+        Unidade superiorAtual = unidade.getUnidadeSuperior();
+        while (superiorAtual != null) {
+            codigos.add(superiorAtual.getCodigo());
+            superiorAtual = superiorAtual.getUnidadeSuperior();
+        }
+        return codigos;
+    }
+
+    private Unidade buscarOuCriarUnidadeComDoisSuperiores(String sufixo) {
+        String siglaSecao = "SEC_T_%s".formatted(sufixo);
+        Optional<Unidade> secaoExistente = unidadeRepo.findBySigla(siglaSecao);
+        if (secaoExistente.isPresent()) {
+            return secaoExistente.get();
+        }
+
+        Unidade secretaria = new Unidade();
+        secretaria.setSigla("SECRET_T_%s".formatted(sufixo));
+        secretaria.setNome("Secretaria teste %s".formatted(sufixo));
+        secretaria.setSituacao(SituacaoUnidade.ATIVA);
+        secretaria.setTipo(TipoUnidade.INTEROPERACIONAL);
+        secretaria = unidadeRepo.save(secretaria);
+
+        Unidade coordenadoria = new Unidade();
+        coordenadoria.setSigla("COORD_T_%s".formatted(sufixo));
+        coordenadoria.setNome("Coordenadoria teste %s".formatted(sufixo));
+        coordenadoria.setSituacao(SituacaoUnidade.ATIVA);
+        coordenadoria.setTipo(TipoUnidade.INTERMEDIARIA);
+        coordenadoria.setUnidadeSuperior(secretaria);
+        coordenadoria = unidadeRepo.save(coordenadoria);
+
+        Unidade secao = new Unidade();
+        secao.setSigla(siglaSecao);
+        secao.setNome("Seção teste %s".formatted(sufixo));
+        secao.setSituacao(SituacaoUnidade.ATIVA);
+        secao.setTipo(TipoUnidade.OPERACIONAL);
+        secao.setUnidadeSuperior(coordenadoria);
+        return unidadeRepo.save(secao);
     }
 }
