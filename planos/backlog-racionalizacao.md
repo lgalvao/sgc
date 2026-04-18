@@ -124,3 +124,63 @@ Comparar custo de `iniciar`, `acao-em-bloco`, `finalizar` e ações de subproces
 - tracing de `acao-em-bloco` por etapa instrumentado no backend;
 - tracing de `registrarTransicao` quebrado em persistência vs notificação;
 - backlog atualizado para orientar coleta final p50/p95/pico com segmentação de custo interno.
+
+### Rodada 10 (executada)
+
+- Onda 2 iniciada com simplificação de montagem de contexto em `SubprocessoConsultaService`;
+- `MapaVisualizacaoView` com fluxo de sugestões/histórico desduplicado;
+- backlog e plano sincronizados com os novos achados e pendências remanescentes.
+
+### Rodada 11 (executada)
+
+- abertura de modais de sugestões/visualização ajustada para não bloquear a interação de UI por chamada remota;
+- `SubprocessoConsultaService` começou a ser quebrado com extração do serviço de contexto (`SubprocessoContextoConsultaService`);
+- testes de consulta atualizados para validar a nova composição sem camada de compatibilidade.
+
+
+## Bloco C — simplificação da Onda 2 (consulta + visualização)
+
+### Item C.1 — reduzir acoplamento de contexto em `SubprocessoConsultaService`
+
+**Objetivo**
+
+Diminuir leitura acidental na montagem de contexto de consulta sem alterar contrato externo.
+
+**Achados consolidados (rodada 10 + rodada 11)**
+
+- A montagem de `ContextoConsultaSubprocesso` concentrava cálculo de quatro vínculos de unidade no mesmo método.
+- Refatoração aplicada com `VinculosUnidadeConsulta`, isolando cálculo de:
+  - `mesmaUnidade`;
+  - `mesmaUnidadeAlvo`;
+  - `unidadeAlvoNaHierarquiaUsuario`;
+  - `temMapaVigente`.
+- Resultado imediato: método público de montagem ficou linear, com regra de contexto separada por intenção.
+- Rodada 11 avançou a quebra real do arquivo com extração de `SubprocessoContextoConsultaService` para concentrar:
+  - leitura do contexto autenticado;
+  - resolução de localização;
+  - vínculos de unidade e hierarquia.
+
+**Pendências restantes**
+
+- medir impacto estrutural (linhas, branches e cobertura) após sequência completa da Onda 2;
+- continuar remoção de fallback implícito em consultas de subprocesso.
+
+### Item C.2 — reduzir duplicação de ações em `MapaVisualizacaoView`
+
+**Objetivo**
+
+Enxugar o fluxo de sugestões/histórico e reduzir caminhos duplicados no `<script setup>`.
+
+**Achados consolidados (rodada 10 + rodada 11)**
+
+- Os fluxos de abrir e visualizar sugestões repetiam `try/catch` e fallback de texto.
+- Refatoração aplicada:
+  - remoção do helper com fallback de sugestões e adoção de tratamento explícito de erro;
+  - abertura de modal desacoplada da requisição remota, evitando bloquear UX;
+  - remoção do alias de histórico e retorno para função explícita.
+- Resultado imediato: menos ramificação incidental, sem prender abertura de modal ao carregamento de sugestões e sem mascarar falhas de leitura.
+
+**Pendências restantes**
+
+- avaliar extração pontual do bloco de ações de análise (aceitar/homologar/devolver/validar) para reduzir o tamanho do arquivo;
+- verificar se mais decisões de permissão podem vir prontas no backend para simplificar renderização condicional da tela.

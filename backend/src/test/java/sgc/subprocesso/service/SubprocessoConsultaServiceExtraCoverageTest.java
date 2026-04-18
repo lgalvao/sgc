@@ -53,7 +53,11 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     void setUp() {
         localizacaoSubprocessoService = new LocalizacaoSubprocessoService(movimentacaoRepo);
         ReflectionTestUtils.setField(consultaService, "analiseHistoricoService", new AnaliseHistoricoService(unidadeService));
-        ReflectionTestUtils.setField(consultaService, "localizacaoSubprocessoService", localizacaoSubprocessoService);
+        ReflectionTestUtils.setField(
+                consultaService,
+                "contextoConsultaService",
+                new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService)
+        );
     }
 
     private Subprocesso criarSubprocessoComMapa(@Nullable Long codigo) {

@@ -170,6 +170,7 @@ describe("MapaVisualizacaoView.vue", () => {
         vi.mocked(processoService.apresentarSugestoes).mockResolvedValue(undefined as never);
 
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
+        await flushPromises();
         await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Minhas sugestões");
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.test.util.ReflectionTestUtils;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -61,6 +62,15 @@ class SubprocessoConsultaServiceCoverageTest {
 
     @Mock
     private AnaliseHistoricoService analiseHistoricoService;
+
+    @BeforeEach
+    void configurarContextoConsultaService() {
+        ReflectionTestUtils.setField(
+                target,
+                "contextoConsultaService",
+                new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService)
+        );
+    }
 
     private void stubContextoAutenticado(Usuario usuario) {
         lenient().when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(

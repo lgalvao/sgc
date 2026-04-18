@@ -456,14 +456,18 @@ function fecharModalAceitar() {
   mostrarModalAceitar.value = false;
 }
 
-async function abrirModalSugestoes() {
+async function carregarSugestoesParaEdicao() {
   try {
     sugestoes.value = await sincronizarSugestoesMapa();
   } catch (error) {
     logger.error(error);
-    sugestoes.value = mapa.value?.sugestoes ?? "";
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
   }
+}
+
+function abrirModalSugestoes() {
   mostrarModalSugestoes.value = true;
+  void carregarSugestoesParaEdicao();
 }
 
 function fecharModalSugestoes() {
@@ -471,14 +475,19 @@ function fecharModalSugestoes() {
   sugestoes.value = "";
 }
 
-async function verSugestoes() {
+async function carregarSugestoesParaVisualizacao() {
   try {
-    sugestoesVisualizacao.value = (await sincronizarSugestoesMapa()) || "Nenhuma sugestão registrada.";
+    sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
   } catch (error) {
     logger.error(error);
-    sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
   }
+}
+
+function verSugestoes() {
   mostrarModalVerSugestoes.value = true;
+  sugestoesVisualizacao.value = "";
+  void carregarSugestoesParaVisualizacao();
 }
 
 function fecharModalVerSugestoes() {
@@ -515,7 +524,7 @@ function fecharModalHistorico() {
 }
 
 function verHistorico() {
-  abrirModalHistorico();
+  void abrirModalHistorico();
 }
 
 onMounted(async () => {
