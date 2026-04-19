@@ -13,6 +13,8 @@ import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.organizacao.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -52,6 +54,63 @@ class SubprocessoControllerTest {
     @DisplayName("Dado operação de consulta, quando buscar por processo e unidade, então retorna subprocesso")
     class CrudTests {
         @Test
+        @DisplayName("deve listar todos subprocessos")
+        @WithMockUser(roles = "ADMIN")
+        void deveListarTodos() throws Exception {
+            Processo proc = new Processo();
+            proc.setCodigo(100L);
+            proc.setDescricao("Proc Teste");
+            proc.setDataCriacao(java.time.LocalDateTime.now());
+            proc.setTipo(TipoProcesso.MAPEAMENTO);
+
+            Unidade un = new Unidade();
+            un.setCodigo(200L);
+            un.setSigla("U1");
+            un.setNome("Unidade 1");
+            un.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+            un.setTituloTitular("Diretor");
+
+            Subprocesso sp = Subprocesso.builder()
+                .codigo(1L)
+                .processo(proc)
+                .unidade(un)
+                .build();
+            sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+            when(consultaService.listarTodos()).thenReturn(List.of(sp));
+
+            mockMvc.perform(get("/api/subprocessos"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].codigo").value(1));
+
+            verify(consultaService).listarTodos();
+        }
+
+        @Test
+        @DisplayName("deve excluir subprocesso")
+        @WithMockUser(roles = "ADMIN")
+        void deveExcluirSubprocesso() throws Exception {
+            mockMvc.perform(post("/api/subprocessos/1/excluir")
+                            .with(csrf()))
+                    .andExpect(status().isNoContent());
+
+            verify(subprocessoService).excluir(1L);
+        }
+
+        @Test
+        @DisplayName("deve obter status do subprocesso")
+        @WithMockUser(roles = "GESTOR")
+        void deveObterStatus() throws Exception {
+            SubprocessoSituacaoDto dto = new SubprocessoSituacaoDto(1L, SituacaoSubprocesso.NAO_INICIADO);
+            when(consultaService.obterStatus(1L)).thenReturn(dto);
+
+            mockMvc.perform(get("/api/subprocessos/1/status"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.situacao").value("NAO_INICIADO"));
+
+            verify(consultaService).obterStatus(1L);
+        }
+
+        @Test
         @DisplayName("deve buscar por processo e unidade")
         @WithMockUser
         void buscarPorProcessoEUnidade() throws Exception {
@@ -66,6 +125,35 @@ class SubprocessoControllerTest {
 
             verify(unidadeService).buscarCodigoPorSigla("U1");
             verify(consultaService).obterEntidadePorProcessoEUnidade(1L, 10L);
+        }
+
+        @Test
+        @DisplayName("deve buscar contexto edicao por processo e unidade")
+        @WithMockUser
+        void buscarContextoEdicaoPorProcessoEUnidade() throws Exception {
+            when(unidadeService.buscarCodigoPorSigla("U1")).thenReturn(10L);
+            when(consultaService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
+
+            SubprocessoResumoDto spResumo = SubprocessoResumoDto.builder()
+                .codigo(100L)
+                .build();
+            SubprocessoDetalheResponse spResponse = SubprocessoDetalheResponse.builder()
+                .subprocesso(spResumo)
+                .build();
+            ContextoEdicaoResponse response = ContextoEdicaoResponse.builder()
+                .detalhes(spResponse)
+                .build();
+            when(consultaService.obterContextoEdicao(100L)).thenReturn(response);
+
+            mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")
+                            .param("codProcesso", "1")
+                            .param("siglaUnidade", "U1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.detalhes.subprocesso.codigo").value(100));
+
+            verify(unidadeService).buscarCodigoPorSigla("U1");
+            verify(consultaService).obterEntidadePorProcessoEUnidade(1L, 10L);
+            verify(consultaService).obterContextoEdicao(100L);
         }
 
         @Test
@@ -87,6 +175,34 @@ class SubprocessoControllerTest {
     @Nested
     @DisplayName("Dado fluxo de cadastro, quando executar transições, então responde com sucesso")
     class CadastroWorkflowTests {
+        @Test
+        @DisplayName("deve validar cadastro")
+        @WithMockUser(roles = "GESTOR")
+        void deveValidarCadastro() throws Exception {
+            ValidacaoCadastroDto dto = new ValidacaoCadastroDto(true, List.of());
+            when(consultaService.validarCadastro(1L)).thenReturn(dto);
+
+            mockMvc.perform(get("/api/subprocessos/1/validar-cadastro"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.valido").value(true));
+
+            verify(consultaService).validarCadastro(1L);
+        }
+
+        @Test
+        @DisplayName("deve listar atividades para importacao")
+        @WithMockUser(roles = "GESTOR")
+        void deveListarAtividadesParaImportacao() throws Exception {
+            AtividadeDto dto = new AtividadeDto(10L, "Atividade 1", List.of());
+            when(consultaService.listarAtividadesParaImportacao(1L)).thenReturn(List.of(dto));
+
+            mockMvc.perform(get("/api/subprocessos/1/atividades-importacao"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].codigo").value(10));
+
+            verify(consultaService).listarAtividadesParaImportacao(1L);
+        }
+
         @Test
         @DisplayName("deve disponibilizar cadastro")
         @WithMockUser(roles = "CHEFE")
@@ -282,6 +398,53 @@ class SubprocessoControllerTest {
             mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao"))
                     .andExpect(status().isOk());
             verify(consultaService).mapaParaVisualizacao(1L);
+        }
+
+        @Test
+        @DisplayName("deve obter mapa")
+        @WithMockUser(roles = "GESTOR")
+        void deveObterMapa() throws Exception {
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
+
+            mockMvc.perform(get("/api/subprocessos/1/mapa"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.codigo").value(1));
+
+            verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
+        }
+
+        @Test
+        @DisplayName("deve obter mapa completo")
+        @WithMockUser(roles = "GESTOR")
+        void deveObterMapaCompleto() throws Exception {
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
+
+            mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.codigo").value(1));
+
+            verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
+        }
+
+        @Test
+        @DisplayName("deve salvar mapa")
+        @WithMockUser(roles = "CHEFE")
+        void deveSalvarMapa() throws Exception {
+            SalvarMapaRequest request = SalvarMapaRequest.builder().competencias(List.of()).build();
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
+
+            mockMvc.perform(post("/api/subprocessos/1/mapa")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.codigo").value(1));
+
+            verify(subprocessoService).salvarMapa(eq(1L), any(SalvarMapaRequest.class));
+            verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
         }
 
         @Test
