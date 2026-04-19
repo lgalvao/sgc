@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import sgc.organizacao.service.CacheViewsOrganizacaoService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
 
 import static org.mockito.Mockito.*;
 
@@ -17,9 +16,6 @@ class CacheAquecimentoTest {
 
     @Mock
     private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
-
-    @Mock
-    private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @InjectMocks
     private CacheAquecimento cacheAquecimento;
@@ -35,9 +31,6 @@ class CacheAquecimentoTest {
         verify(cacheViewsOrganizacaoService).listarTodosUsuarios();
         verify(cacheViewsOrganizacaoService).listarTodasResponsabilidades();
         verify(cacheViewsOrganizacaoService).listarTodosPerfisUnidade();
-        verify(unidadeHierarquiaService).buscarArvoreHierarquica();
-        verify(unidadeHierarquiaService).buscarMapaHierarquia();
-        verify(unidadeHierarquiaService).buscarMapaFilhoPai();
     }
 
     @Test

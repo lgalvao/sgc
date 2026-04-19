@@ -6,7 +6,7 @@ import org.springframework.cache.*;
 import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.*;
 import sgc.comum.config.CacheConfig;
-import sgc.organizacao.service.*;
+import sgc.organizacao.service.CacheViewsOrganizacaoService;
 
 /**
  * Agendador responsável por invalidar e recarregar periodicamente os caches das views.
@@ -24,7 +24,6 @@ import sgc.organizacao.service.*;
 public class AgendadorRefreshCache {
 
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
-    private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final CacheManager cacheManager;
     private final RegistroSseEmitter registroSseEmitter;
 
@@ -64,9 +63,6 @@ public class AgendadorRefreshCache {
         cacheViewsOrganizacaoService.listarTodosUsuarios();
         cacheViewsOrganizacaoService.listarTodasResponsabilidades();
         cacheViewsOrganizacaoService.listarTodosPerfisUnidade();
-        unidadeHierarquiaService.buscarArvoreHierarquica();
-        unidadeHierarquiaService.buscarMapaHierarquia();
-        unidadeHierarquiaService.buscarMapaFilhoPai();
     }
 
     private void limparCacheDerivado(String nome) {

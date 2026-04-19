@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import sgc.organizacao.service.CacheViewsOrganizacaoService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
 
 import static org.mockito.Mockito.*;
 
@@ -18,9 +17,6 @@ class AgendadorRefreshCacheTest {
 
     @Mock
     private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
-
-    @Mock
-    private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @Mock
     private CacheManager cacheManager;
@@ -50,9 +46,6 @@ class AgendadorRefreshCacheTest {
         verify(cacheViewsOrganizacaoService).listarTodosUsuarios();
         verify(cacheViewsOrganizacaoService).listarTodasResponsabilidades();
         verify(cacheViewsOrganizacaoService).listarTodosPerfisUnidade();
-        verify(unidadeHierarquiaService).buscarArvoreHierarquica();
-        verify(unidadeHierarquiaService).buscarMapaHierarquia();
-        verify(unidadeHierarquiaService).buscarMapaFilhoPai();
 
         verify(registroSseEmitter).transmitir("org-cache-refreshed");
     }

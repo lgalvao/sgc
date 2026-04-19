@@ -6,7 +6,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.event.*;
 import org.springframework.context.*;
 import org.springframework.stereotype.*;
-import sgc.organizacao.service.*;
+import sgc.organizacao.service.CacheViewsOrganizacaoService;
 
 /**
  * Aquece os caches das views organizacionais ao inicializar a aplicação.
@@ -20,7 +20,6 @@ import sgc.organizacao.service.*;
 public class CacheAquecimento implements ApplicationListener<ApplicationReadyEvent> {
 
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
-    private final UnidadeHierarquiaService unidadeHierarquiaService;
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
@@ -30,9 +29,6 @@ public class CacheAquecimento implements ApplicationListener<ApplicationReadyEve
             cacheViewsOrganizacaoService.listarTodosUsuarios();
             cacheViewsOrganizacaoService.listarTodasResponsabilidades();
             cacheViewsOrganizacaoService.listarTodosPerfisUnidade();
-            unidadeHierarquiaService.buscarArvoreHierarquica();
-            unidadeHierarquiaService.buscarMapaHierarquia();
-            unidadeHierarquiaService.buscarMapaFilhoPai();
             log.info("Caches organizacionais aquecidos com sucesso.");
         } catch (Exception e) {
             log.warn("Falha no aquecimento inicial dos caches", e);
