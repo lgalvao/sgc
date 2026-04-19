@@ -34,48 +34,22 @@ invalidacao clara e testes de budget protegendo regressao.
 9. `CACHE_USUARIO_PERFIS` foi removido.
 10. `CacheAquecimento` e `AgendadorRefreshCache` aquecem apenas snapshots completos; caches derivados sao limpos e
     reconstruidos sob demanda a partir dos snapshots.
+11. `ValidadorDadosOrganizacionais` usa snapshots para leituras estruturais de unidades e responsabilidades, mantendo
+    SQL direto apenas para diagnosticos que precisam inspecionar inconsistencias das views.
+12. Consultas DTO de usuario (`buscarConsultaPorTitulo`, `buscarConsultasPorUnidadeLotacao` e `pesquisarPorNome`)
+    filtram o snapshot completo de usuarios; consultas que precisam de entidade JPA inicializada continuam no repo.
 
-## Ainda falta fazer
+## Verificacoes executadas
 
-## 1. Revisar `ValidadorDadosOrganizacionais`
-
-`ValidadorDadosOrganizacionais` ainda consulta `UnidadeRepo` e `ResponsabilidadeRepo` diretamente. Parte disso e
-aceitavel, porque o diagnostico precisa detectar inconsistencias e duplicidades das views. Mesmo assim, vale separar:
-
-1. leituras estruturais que podem vir do snapshot;
-2. SQL diagnostico que precisa continuar direto na view para detectar duplicidade/inconsistencia.
-
-## 2. Revisar consultas de usuario
-
-`UsuarioService` ainda mantem buscas diretas por titulo, lotacao e pesquisa textual. Isso pode ser correto, mas deve
-ficar explicito:
-
-1. pesquisa textual deve continuar no banco para preservar limite, ordenacao e semantica;
-2. consultas estruturais simples podem ser avaliadas contra o snapshot se isso simplificar o codigo;
-3. nao trocar consulta por filtro em memoria quando o resultado precisa de entidade JPA inicializada.
-
-## 3. Fechar verificacoes
-
-Antes de encerrar a frente:
+Comandos executados nesta rodada:
 
 ```bash
-./gradlew :backend:test --tests sgc.comum.cache.AgendadorRefreshCacheTest
-./gradlew :backend:test --tests sgc.comum.cache.CacheAquecimentoTest
-./gradlew :backend:test --tests sgc.comum.cache.CacheOrganizacaoServiceTest
-./gradlew :backend:test --tests sgc.organizacao.service.CacheViewsOrganizacaoServiceTest
-./gradlew :backend:test --tests sgc.organizacao.service.UsuarioPerfilCacheServiceTest
-./gradlew :backend:test --tests sgc.organizacao.service.UnidadeHierarquiaServiceTest
-./gradlew :backend:test --tests sgc.organizacao.service.ResponsavelUnidadeServiceTest
-./gradlew :backend:test --tests sgc.organizacao.service.UnidadeServiceTest
-./gradlew :backend:test --tests sgc.organizacao.UsuarioServiceTest
-./gradlew :backend:test --tests sgc.integracao.OrganizacaoViewsQueryBudgetIntegrationTest
-./gradlew :backend:test --tests sgc.integracao.ProcessoSubprocessoViewsQueryBudgetIntegrationTest
+./gradlew :backend:test --tests sgc.comum.cache.AgendadorRefreshCacheTest --tests sgc.comum.cache.CacheAquecimentoTest --tests sgc.comum.cache.CacheOrganizacaoServiceTest --tests sgc.organizacao.service.CacheViewsOrganizacaoServiceTest --tests sgc.organizacao.service.UsuarioPerfilCacheServiceTest --tests sgc.organizacao.service.UnidadeHierarquiaServiceTest --tests sgc.organizacao.service.ResponsavelUnidadeServiceTest --tests sgc.organizacao.service.UnidadeServiceTest --tests sgc.organizacao.UsuarioServiceTest --tests sgc.organizacao.ValidadorDadosOrganizacionaisTest --tests sgc.organizacao.ValidadorDadosOrganizacionaisExtraCoverageTest --tests sgc.integracao.OrganizacaoViewsQueryBudgetIntegrationTest --tests sgc.integracao.ProcessoSubprocessoViewsQueryBudgetIntegrationTest --tests sgc.e2e.E2eSecurityConfigTest --tests sgc.organizacao.EventosControllerTest
 npm run test:unit -- useCacheSync
 npm run typecheck
 ```
 
-Rodar comandos Gradle sequencialmente. Nao executar dois `:backend:test` ao mesmo tempo, porque ambos escrevem em
-`backend/build/test-results`.
+Todos passaram. O Gradle foi executado em uma unica invocacao por rodada, sem dois `:backend:test` simultaneos.
 
 ## Definicao de pronto
 

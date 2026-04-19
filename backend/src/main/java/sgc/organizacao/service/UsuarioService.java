@@ -2,7 +2,6 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -24,6 +23,7 @@ public class UsuarioService {
 
     private final UsuarioRepo usuarioRepo;
     private final AdministradorRepo administradorRepo;
+    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final UsuarioPerfilCacheService usuarioPerfilCacheService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
 
@@ -45,11 +45,16 @@ public class UsuarioService {
     }
 
     public Optional<UsuarioConsultaLeitura> buscarConsultaPorTitulo(String titulo) {
-        return usuarioRepo.buscarConsultaPorTitulo(titulo);
+        return cacheViewsOrganizacaoService.listarTodosUsuarios().stream()
+                .filter(usuario -> Objects.equals(usuario.tituloEleitoral(), titulo))
+                .findFirst();
     }
 
     public List<UsuarioConsultaLeitura> buscarConsultasPorUnidadeLotacao(Long codUnidade) {
-        return usuarioRepo.listarConsultasPorCodigoUnidadeLotacao(codUnidade);
+        return cacheViewsOrganizacaoService.listarTodosUsuarios().stream()
+                .filter(usuario -> Objects.equals(usuario.unidadeCodigo(), codUnidade))
+                .sorted(Comparator.comparing(UsuarioConsultaLeitura::nome, Comparator.nullsLast(String::compareTo)))
+                .toList();
     }
 
     public List<Usuario> buscarPorTitulos(List<String> titulos) {
@@ -62,10 +67,14 @@ public class UsuarioService {
             return List.of();
         }
 
-        return usuarioRepo.pesquisarPorNome(
-                termoNormalizado,
-                PageRequest.of(0, LIMITE_PESQUISA_USUARIO)
-        );
+        String termoBusca = termoNormalizado.toLowerCase(Locale.ROOT);
+        return cacheViewsOrganizacaoService.listarTodosUsuarios().stream()
+                .filter(usuario -> iniciaCom(usuario.nome(), termoBusca)
+                        || iniciaCom(usuario.tituloEleitoral(), termoBusca))
+                .sorted(Comparator.comparing(UsuarioConsultaLeitura::nome, Comparator.nullsLast(String::compareTo)))
+                .limit(LIMITE_PESQUISA_USUARIO)
+                .map(usuario -> new UsuarioPesquisaDto(usuario.tituloEleitoral(), usuario.nome()))
+                .toList();
     }
 
     public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {
@@ -118,5 +127,9 @@ public class UsuarioService {
 
     public boolean isAdministrador(String usuarioTitulo) {
         return administradorRepo.existsById(usuarioTitulo);
+    }
+
+    private boolean iniciaCom(String valor, String termoBusca) {
+        return valor != null && valor.toLowerCase(Locale.ROOT).startsWith(termoBusca);
     }
 }

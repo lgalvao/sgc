@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.dto.UsuarioResumoDto;
 import sgc.organizacao.model.*;
 
 import java.util.List;
@@ -56,21 +55,26 @@ class CacheViewsOrganizacaoServiceTest {
     }
 
     @Test
-    @DisplayName("deve listar todos os usuários e mapear para dto")
+    @DisplayName("deve listar todos os usuários através do repositório")
     void listarTodosUsuarios() {
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("12345");
-        usuario.setMatricula("mat1");
-        usuario.setNome("Joao");
-        usuario.setEmail("joao@test.com");
-        usuario.setRamal("1234");
+        UsuarioConsultaLeitura usuario = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("12345")
+                .matricula("mat1")
+                .nome("Joao")
+                .email("joao@test.com")
+                .ramal("1234")
+                .unidadeCodigo(1L)
+                .unidadeNome("Unidade")
+                .unidadeSigla("UNI")
+                .build();
 
-        when(usuarioRepo.findAll()).thenReturn(List.of(usuario));
+        when(usuarioRepo.listarTodasConsultas()).thenReturn(List.of(usuario));
 
-        List<UsuarioResumoDto> result = cacheService.listarTodosUsuarios();
+        List<UsuarioConsultaLeitura> result = cacheService.listarTodosUsuarios();
 
         assertEquals(1, result.size());
         assertEquals("12345", result.getFirst().tituloEleitoral());
+        assertEquals(1L, result.getFirst().unidadeCodigo());
     }
 
     @Test

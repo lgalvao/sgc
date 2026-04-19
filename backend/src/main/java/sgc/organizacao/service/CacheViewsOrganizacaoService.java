@@ -5,7 +5,6 @@ import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.config.CacheConfig;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -41,10 +40,8 @@ public class CacheViewsOrganizacaoService {
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_USUARIO, sync = true)
-    public List<UsuarioResumoDto> listarTodosUsuarios() {
-        return usuarioRepo.findAll().stream()
-                .map(UsuarioResumoDto::fromEntityObrigatorio)
-                .toList();
+    public List<UsuarioConsultaLeitura> listarTodosUsuarios() {
+        return List.copyOf(usuarioRepo.listarTodasConsultas());
     }
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_USUARIO, allEntries = true)

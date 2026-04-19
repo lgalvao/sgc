@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.jdbc.core.namedparam.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 
@@ -17,9 +18,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("ValidadorDadosOrganizacionais - Cobertura Adicional")
 class ValidadorDadosOrganizacionaisExtraCoverageTest {
 
-    @Mock private UnidadeRepo unidadeRepo;
+    @Mock private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     @Mock private UsuarioRepo usuarioRepo;
-    @Mock private ResponsabilidadeRepo responsabilidadeRepo;
     @Mock private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @InjectMocks
@@ -29,11 +29,11 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
     @DisplayName("Deve cobrir merge de responsabilidades duplicadas para mesma unidade")
     void deveCobrirMergeResponsabilidadesDuplicadas() {
         UnidadeHierarquiaLeitura u = new UnidadeHierarquiaLeitura(1L, "Nome", "U1", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(u));
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(u));
         
         ResponsabilidadeLeitura r1 = new ResponsabilidadeLeitura(1L, "T1");
         ResponsabilidadeLeitura r2 = new ResponsabilidadeLeitura(1L, "T2");
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(List.of(r1, r2));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(r1, r2));
         
         when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
         when(namedParameterJdbcTemplate.queryForList(anyString(), ArgumentMatchers.<Map<String, ?>>any())).thenReturn(Collections.emptyList());
@@ -46,8 +46,8 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
     @DisplayName("Deve cobrir extração de sigla em diagnostico resumo")
     void deveCobrirExtracaoSiglaResumo() {
         UnidadeHierarquiaLeitura u = new UnidadeHierarquiaLeitura(1L, "Nome", "U1", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(u));
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(Collections.emptyList());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(u));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(Collections.emptyList());
 
         DiagnosticoOrganizacionalDto res = target.diagnosticar();
         assertThat(res.resumo()).contains("U1");
@@ -59,10 +59,10 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
         UnidadeHierarquiaLeitura u1 = new UnidadeHierarquiaLeitura(1L, "INT", "INT", null, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null);
         UnidadeHierarquiaLeitura u2 = new UnidadeHierarquiaLeitura(2L, "OPE", "OPE", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L);
 
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(u1, u2));
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(u1, u2));
         
         ResponsabilidadeLeitura r1 = new ResponsabilidadeLeitura(1L, "GESTOR1");
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(List.of(r1));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(r1));
         
         when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
         

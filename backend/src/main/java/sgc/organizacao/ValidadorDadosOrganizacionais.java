@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.comum.config.CacheConfig;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -33,9 +34,8 @@ public class ValidadorDadosOrganizacionais {
 
     private static final Set<TipoUnidade> TIPOS_PARTICIPANTES = Set.of(OPERACIONAL, INTERMEDIARIA, INTEROPERACIONAL);
 
-    private final UnidadeRepo unidadeRepo;
+    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final UsuarioRepo usuarioRepo;
-    private final ResponsabilidadeRepo responsabilidadeRepo;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Cacheable(CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL)
@@ -145,22 +145,23 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private List<UnidadeHierarquiaLeitura> carregarUnidadesParticipantes() {
-        return unidadeRepo.listarEstruturasAtivas().stream()
+        return cacheViewsOrganizacaoService.listarTodasUnidades().stream()
                 .filter(unidade -> unidade.situacao() == ATIVA)
                 .filter(unidade -> TIPOS_PARTICIPANTES.contains(unidade.tipo()))
                 .toList();
     }
 
     private Map<Long, ResponsabilidadeLeitura> carregarResponsabilidades(List<UnidadeHierarquiaLeitura> unidades) {
-        List<Long> codigos = unidades.stream()
+        Set<Long> codigos = unidades.stream()
                 .map(UnidadeHierarquiaLeitura::codigo)
-                .toList();
+                .collect(Collectors.toSet());
 
         if (codigos.isEmpty()) {
             return Map.of();
         }
 
-        return responsabilidadeRepo.listarLeiturasPorCodigosUnidade(codigos).stream()
+        return cacheViewsOrganizacaoService.listarTodasResponsabilidades().stream()
+                .filter(responsabilidade -> codigos.contains(responsabilidade.unidadeCodigo()))
                 .collect(Collectors.toMap(
                         ResponsabilidadeLeitura::unidadeCodigo,
                         Function.identity(),

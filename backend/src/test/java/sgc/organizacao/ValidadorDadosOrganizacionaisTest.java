@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.test.util.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -22,13 +23,10 @@ import static sgc.organizacao.model.TipoUnidade.*;
 class ValidadorDadosOrganizacionaisTest {
 
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
 
     @Mock
     private UsuarioRepo usuarioRepo;
-
-    @Mock
-    private ResponsabilidadeRepo responsabilidadeRepo;
 
     @Mock
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -354,7 +352,7 @@ class ValidadorDadosOrganizacionaisTest {
         Unidade operacionalInativa = criarUnidade(2L, "INAT", OPERACIONAL, "TITULO_INAT");
         operacionalInativa.setSituacao(INATIVA);
 
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
                 toLeitura(raiz),
                 toLeitura(operacionalInativa)
         ));
@@ -481,12 +479,12 @@ class ValidadorDadosOrganizacionaisTest {
     @Test
     @DisplayName("deve lidar com lista de unidades vazia ao carregar responsabilidades")
     void deveLidarComListaUnidadesVazia() {
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of());
 
         DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
 
         assertThat(diagnostico.possuiViolacoes()).isFalse();
-        verify(responsabilidadeRepo, never()).listarLeiturasPorCodigosUnidade(anyList());
+        verify(cacheViewsOrganizacaoService, never()).listarTodasResponsabilidades();
     }
 
     @Test
@@ -529,8 +527,8 @@ class ValidadorDadosOrganizacionaisTest {
             List<Map<String, Object>> linhasUsuariosDuplicados,
             List<Map<String, Object>> linhasPerfis
     ) {
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(unidades.stream().map(this::toLeitura).toList());
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(unidades.stream().map(this::toLeitura).toList());
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(
                 responsabilidades.stream()
                         .map(r -> new ResponsabilidadeLeitura(r.getUnidadeCodigo(), r.getUsuarioTitulo()))
                         .toList()

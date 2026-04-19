@@ -4,9 +4,7 @@ import org.hibernate.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
-import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.*;
-import sgc.organizacao.dto.*;
 
 import java.util.*;
 
@@ -44,18 +42,17 @@ class UsuarioRepoTest {
     }
 
     @Test
-    @DisplayName("deve buscar usuarios por prefixo do nome com limite")
-    void deveBuscarUsuariosPorNome() {
-        List<UsuarioPesquisaDto> porNome = usuarioRepo.pesquisarPorNome("Ana", PageRequest.of(0, 20));
+    @DisplayName("deve listar consultas de usuarios com unidade de lotacao")
+    void deveListarConsultasUsuariosComUnidadeDeLotacao() {
+        List<UsuarioConsultaLeitura> usuarios = usuarioRepo.listarTodasConsultas();
 
-        assertThat(porNome).extracting(UsuarioPesquisaDto::tituloEleitoral).contains("1");
-    }
-
-    @Test
-    @DisplayName("deve buscar usuarios por prefixo do titulo eleitoral com limite")
-    void deveBuscarUsuariosPorTituloEleitoral() {
-        List<UsuarioPesquisaDto> porTitulo = usuarioRepo.pesquisarPorNome("17", PageRequest.of(0, 20));
-
-        assertThat(porTitulo).extracting(UsuarioPesquisaDto::tituloEleitoral).contains("17");
+        assertThat(usuarios)
+                .extracting(UsuarioConsultaLeitura::tituloEleitoral)
+                .contains("1");
+        assertThat(usuarios)
+                .filteredOn(usuario -> "1".equals(usuario.tituloEleitoral()))
+                .first()
+                .extracting(UsuarioConsultaLeitura::unidadeCodigo)
+                .isEqualTo(10L);
     }
 }
