@@ -32,7 +32,7 @@ public class CacheViewsOrganizacaoService {
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_UNIDADE, sync = true)
     public List<UnidadeHierarquiaLeitura> listarTodasUnidades() {
-        return unidadeRepo.listarEstruturasAtivas();
+        return List.copyOf(unidadeRepo.listarEstruturasAtivas());
     }
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_UNIDADE, allEntries = true)
@@ -54,9 +54,9 @@ public class CacheViewsOrganizacaoService {
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_RESPONSABILIDADE, sync = true)
     public List<ResponsabilidadeLeitura> listarTodasResponsabilidades() {
-        return responsabilidadeRepo.findAll().stream()
+        return List.copyOf(responsabilidadeRepo.findAll().stream()
                 .map(r -> new ResponsabilidadeLeitura(r.getUnidadeCodigo(), r.getUsuarioTitulo()))
-                .toList();
+                .toList());
     }
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_RESPONSABILIDADE, allEntries = true)
@@ -65,8 +65,14 @@ public class CacheViewsOrganizacaoService {
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_USUARIO_PERFIL, sync = true)
-    public List<UsuarioPerfil> listarTodosPerfisUnidade() {
-        return usuarioPerfilRepo.findAll();
+    public List<UsuarioPerfilLeitura> listarTodosPerfisUnidade() {
+        return List.copyOf(usuarioPerfilRepo.findAll().stream()
+                .map(perfil -> new UsuarioPerfilLeitura(
+                        perfil.getUsuarioTitulo(),
+                        perfil.getUnidadeCodigo(),
+                        perfil.getPerfil()
+                ))
+                .toList());
     }
 
     @CacheEvict(cacheNames = CacheConfig.CACHE_VW_USUARIO_PERFIL, allEntries = true)

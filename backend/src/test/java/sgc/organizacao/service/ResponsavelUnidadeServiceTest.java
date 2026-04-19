@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.comum.cache.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -28,6 +29,12 @@ class ResponsavelUnidadeServiceTest {
 
     @Mock
     private ResponsabilidadeRepo responsabilidadeRepo;
+
+    @Mock
+    private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+
+    @Mock
+    private CacheOrganizacaoService cacheOrganizacaoService;
 
     @InjectMocks
     private ResponsavelUnidadeService service;
@@ -136,6 +143,7 @@ class ResponsavelUnidadeServiceTest {
 
             ArgumentCaptor<AtribuicaoTemporaria> captor = ArgumentCaptor.forClass(AtribuicaoTemporaria.class);
             verify(atribuicaoTemporariaRepo).save(captor.capture());
+            verify(cacheOrganizacaoService).invalidarAposCommit();
 
             AtribuicaoTemporaria atribuicao = captor.getValue();
             assertThat(atribuicao.getUnidade()).isEqualTo(unidade);
@@ -182,6 +190,7 @@ class ResponsavelUnidadeServiceTest {
                     .isInstanceOf(ErroValidacao.class);
 
             verify(atribuicaoTemporariaRepo, never()).save(any());
+            verifyNoInteractions(cacheOrganizacaoService);
         }
     }
 
@@ -346,7 +355,7 @@ class ResponsavelUnidadeServiceTest {
     @Test
     @DisplayName("todasPossuemResponsavelEfetivo deve retornar false para responsável com título em branco")
     void todasPossuemResponsavelEfetivoDeveRetornarFalseComTituloEmBranco() {
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(10L)))
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
                 .thenReturn(List.of(new ResponsabilidadeLeitura(10L, " ")));
 
         boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L));
@@ -357,7 +366,7 @@ class ResponsavelUnidadeServiceTest {
     @Test
     @DisplayName("todasPossuemResponsavelEfetivo deve retornar false quando faltar unidade na resposta")
     void todasPossuemResponsavelEfetivoDeveRetornarFalseQuandoFaltarUnidade() {
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(10L, 11L)))
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
                 .thenReturn(List.of(new ResponsabilidadeLeitura(10L, "RESP")));
 
         boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L, 11L));

@@ -107,10 +107,12 @@ class CacheViewsOrganizacaoServiceTest {
         UsuarioPerfil up = new UsuarioPerfil("titulo", 1L, Perfil.ADMIN);
         when(usuarioPerfilRepo.findAll()).thenReturn(List.of(up));
 
-        List<UsuarioPerfil> result = cacheService.listarTodosPerfisUnidade();
+        List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
 
         assertEquals(1, result.size());
-        assertEquals("titulo", result.getFirst().getUsuarioTitulo());
+        assertEquals("titulo", result.getFirst().usuarioTitulo());
+        assertEquals(1L, result.getFirst().unidadeCodigo());
+        assertEquals(Perfil.ADMIN, result.getFirst().perfil());
     }
 
     @Test

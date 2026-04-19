@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.comum.cache.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.dto.*;
@@ -27,6 +28,9 @@ class UnidadeServiceTest {
 
     @Mock
     private ComumRepo repo;
+
+    @Mock
+    private CacheOrganizacaoService cacheOrganizacaoService;
 
     @InjectMocks
     private UnidadeService service;
@@ -190,6 +194,7 @@ class UnidadeServiceTest {
 
         verify(unidadeMapaRepo).save(argThat(um ->
                 Objects.equals(um.getUnidadeCodigoPersistido(), 1L) && Objects.equals(um.getMapaVigente(), mapa)));
+        verify(cacheOrganizacaoService).invalidarAposCommit();
     }
 
     @Test
@@ -203,5 +208,6 @@ class UnidadeServiceTest {
 
         assertThat(existente.getMapaVigente()).isSameAs(mapa);
         verify(unidadeMapaRepo).save(existente);
+        verify(cacheOrganizacaoService).invalidarAposCommit();
     }
 }

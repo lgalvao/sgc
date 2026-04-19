@@ -6,6 +6,7 @@ import org.springframework.beans.factory.*;
 import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.cache.*;
 import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
@@ -39,6 +40,7 @@ public class UnidadeService {
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final EntityManager entityManager;
     private final ObjectProvider<UnidadeService> selfProvider;
+    private final CacheOrganizacaoService cacheOrganizacaoService;
     public Unidade buscarPorCodigo(Long codigo) {
         return unidadeRepo.buscarPorCodigoComResponsavel(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));
@@ -113,16 +115,13 @@ public class UnidadeService {
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(cacheNames = CacheConfig.CACHE_UNIDADES_COM_MAPA, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
-    })
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
         UnidadeMapa unidadeMapa = buscarRegistroMapaVigente(codigoUnidade).orElse(new UnidadeMapa());
         unidadeMapa.setUnidadeCodigo(codigoUnidade);
         unidadeMapa.setMapaVigente(mapa);
 
         unidadeMapaRepo.save(unidadeMapa);
+        cacheOrganizacaoService.invalidarAposCommit();
     }
 
     private Optional<UnidadeMapa> buscarRegistroMapaVigente(Long codigoUnidade) {

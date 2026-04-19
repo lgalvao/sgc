@@ -23,7 +23,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
 public class UnidadeHierarquiaService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeService unidadeService;
-    private final ResponsabilidadeRepo responsabilidadeRepo;
+    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final ObjectProvider<UnidadeHierarquiaService> selfProvider;
 
     /**
@@ -31,7 +31,7 @@ public class UnidadeHierarquiaService {
      */
     @Cacheable(cacheNames = CacheConfig.CACHE_ARVORE_UNIDADES, sync = true)
     public List<UnidadeDto> buscarArvoreHierarquica() {
-        List<UnidadeHierarquiaLeitura> todasUnidades = unidadeRepo.listarEstruturasAtivas();
+        List<UnidadeHierarquiaLeitura> todasUnidades = cacheViewsOrganizacaoService.listarTodasUnidades();
         return montarHierarquia(todasUnidades, Map.of(), null);
     }
 
@@ -39,7 +39,7 @@ public class UnidadeHierarquiaService {
      * Busca a árvore hierárquica com filtro de elegibilidade.
      */
     public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<UnidadeElegibilidadeInfo> elegibilidadeChecker) {
-        List<UnidadeHierarquiaLeitura> todasUnidades = unidadeRepo.listarEstruturasAtivas();
+        List<UnidadeHierarquiaLeitura> todasUnidades = cacheViewsOrganizacaoService.listarTodasUnidades();
         Map<Long, String> titulosResponsavel = carregarTitulosResponsavel(todasUnidades);
         return montarHierarquia(todasUnidades, titulosResponsavel, elegibilidadeChecker);
     }
@@ -83,7 +83,7 @@ public class UnidadeHierarquiaService {
      */
     @Cacheable(cacheNames = CacheConfig.CACHE_MAPA_FILHO_PAI, sync = true)
     public Map<Long, Long> buscarMapaFilhoPai() {
-        List<UnidadeHierarquiaLeitura> todas = unidadeRepo.listarEstruturasAtivas();
+        List<UnidadeHierarquiaLeitura> todas = cacheViewsOrganizacaoService.listarTodasUnidades();
         Map<Long, Long> mapFilhoPai = new HashMap<>();
         for (UnidadeHierarquiaLeitura u : todas) {
             if (u.unidadeSuperiorCodigo() != null) {
@@ -116,7 +116,7 @@ public class UnidadeHierarquiaService {
      */
     @Cacheable(cacheNames = CacheConfig.CACHE_MAPA_HIERARQUIA_UNIDADES, sync = true)
     public Map<Long, List<Long>> buscarMapaHierarquia() {
-        List<UnidadeHierarquiaLeitura> todas = unidadeRepo.listarEstruturasAtivas();
+        List<UnidadeHierarquiaLeitura> todas = cacheViewsOrganizacaoService.listarTodasUnidades();
 
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
         for (UnidadeHierarquiaLeitura u : todas) {
@@ -193,7 +193,9 @@ public class UnidadeHierarquiaService {
             return Map.of();
         }
 
-        return responsabilidadeRepo.listarLeiturasPorCodigosUnidade(codigos).stream()
+        Set<Long> codigosUnidades = new HashSet<>(codigos);
+        return cacheViewsOrganizacaoService.listarTodasResponsabilidades().stream()
+                .filter(leitura -> codigosUnidades.contains(leitura.unidadeCodigo()))
                 .collect(HashMap::new,
                         (mapa, leitura) -> mapa.put(leitura.unidadeCodigo(), leitura.usuarioTitulo()),
                         HashMap::putAll);

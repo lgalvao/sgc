@@ -2,13 +2,12 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
-import sgc.comum.config.CacheConfig;
+import sgc.comum.cache.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -26,6 +25,7 @@ public class UsuarioService {
     private final UsuarioRepo usuarioRepo;
     private final AdministradorRepo administradorRepo;
     private final UsuarioPerfilCacheService usuarioPerfilCacheService;
+    private final CacheOrganizacaoService cacheOrganizacaoService;
 
     public Usuario buscar(String titulo) {
         return usuarioRepo.buscarPorTitulo(titulo)
@@ -94,11 +94,6 @@ public class UsuarioService {
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo"),
-            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo")
-    })
     public void adicionarAdministrador(String usuarioTitulo) {
         if (isAdministrador(usuarioTitulo)) {
             throw new ErroValidacao(Mensagens.USUARIO_JA_ADMINISTRADOR);
@@ -108,20 +103,17 @@ public class UsuarioService {
                 .build();
 
         administradorRepo.save(administrador);
+        cacheOrganizacaoService.invalidarAposCommit();
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo"),
-            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo")
-    })
     public void removerAdministrador(String usuarioTitulo) {
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {
             throw new ErroValidacao(Mensagens.NAO_REMOVER_UNICO_ADMINISTRADOR);
         }
         administradorRepo.deleteById(usuarioTitulo);
+        cacheOrganizacaoService.invalidarAposCommit();
     }
 
     public boolean isAdministrador(String usuarioTitulo) {

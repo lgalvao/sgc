@@ -12,15 +12,39 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UsuarioPerfilCacheService {
 
-    private final UsuarioPerfilRepo usuarioPerfilRepo;
+    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
 
     @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo", sync = true)
     public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {
-        return usuarioPerfilRepo.listarAutorizacoesPorUsuarioTitulo(usuarioTitulo);
+        Map<Long, UnidadeHierarquiaLeitura> unidadesPorCodigo = cacheViewsOrganizacaoService.listarTodasUnidades().stream()
+                .collect(LinkedHashMap::new,
+                        (mapa, unidade) -> mapa.put(unidade.codigo(), unidade),
+                        LinkedHashMap::putAll);
+
+        return cacheViewsOrganizacaoService.listarTodosPerfisUnidade().stream()
+                .filter(perfil -> perfil.usuarioTitulo().equals(usuarioTitulo))
+                .map(perfil -> toAutorizacao(perfil, unidadesPorCodigo.get(perfil.unidadeCodigo())))
+                .toList();
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo", sync = true)
     public List<Perfil> buscarPerfisPorUsuarioTitulo(String usuarioTitulo) {
-        return usuarioPerfilRepo.listarPerfisPorUsuarioTitulo(usuarioTitulo);
+        return cacheViewsOrganizacaoService.listarTodosPerfisUnidade().stream()
+                .filter(perfil -> perfil.usuarioTitulo().equals(usuarioTitulo))
+                .map(UsuarioPerfilLeitura::perfil)
+                .distinct()
+                .toList();
+    }
+
+    private UsuarioPerfilAutorizacaoLeitura toAutorizacao(UsuarioPerfilLeitura perfil, UnidadeHierarquiaLeitura unidade) {
+        return new UsuarioPerfilAutorizacaoLeitura(
+                perfil.usuarioTitulo(),
+                perfil.perfil(),
+                perfil.unidadeCodigo(),
+                unidade != null ? unidade.nome() : null,
+                unidade != null ? unidade.sigla() : null,
+                unidade != null ? unidade.tipo() : null,
+                unidade != null ? unidade.situacao() : null
+        );
     }
 }

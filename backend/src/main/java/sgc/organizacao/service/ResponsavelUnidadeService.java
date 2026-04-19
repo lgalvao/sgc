@@ -1,11 +1,10 @@
 package sgc.organizacao.service;
 
 import lombok.*;
-import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
-import sgc.comum.config.CacheConfig;
+import sgc.comum.cache.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -33,6 +32,8 @@ public class ResponsavelUnidadeService {
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;
+    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+    private final CacheOrganizacaoService cacheOrganizacaoService;
 
 
     /**
@@ -82,7 +83,7 @@ public class ResponsavelUnidadeService {
      *
      * @throws ErroValidacao se a data de término for anterior à data de início
      */
-    @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
+    @Transactional
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         Unidade unidade = unidadeRepo.findById(codUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
@@ -106,6 +107,7 @@ public class ResponsavelUnidadeService {
                 .setJustificativa(request.justificativa());
 
         atribuicaoTemporariaRepo.save(atribuicao);
+        cacheOrganizacaoService.invalidarAposCommit();
     }
 
     /**
@@ -230,7 +232,9 @@ public class ResponsavelUnidadeService {
             return true;
         }
 
-        Set<Long> unidadesComResponsavelEfetivo = responsabilidadeRepo.listarLeiturasPorCodigosUnidade(unidadesCodigos).stream()
+        Set<Long> codigosSolicitados = new HashSet<>(unidadesCodigos);
+        Set<Long> unidadesComResponsavelEfetivo = cacheViewsOrganizacaoService.listarTodasResponsabilidades().stream()
+                .filter(responsabilidade -> codigosSolicitados.contains(responsabilidade.unidadeCodigo()))
                 .filter(responsabilidade -> !responsabilidade.usuarioTitulo().isBlank())
                 .map(ResponsabilidadeLeitura::unidadeCodigo)
                 .collect(toSet());

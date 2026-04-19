@@ -22,6 +22,9 @@ class UnidadeHierarquiaServiceCoverageTest {
     @Mock
     private UnidadeRepo unidadeRepo;
 
+    @Mock
+    private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+
     @Test
     @DisplayName("carregarTitulosResponsavel - deve retornar mapa vazio quando lista for vazia")
     void carregarTitulosResponsavel_ListaVazia() {

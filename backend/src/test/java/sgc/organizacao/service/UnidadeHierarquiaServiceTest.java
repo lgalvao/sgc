@@ -30,7 +30,7 @@ class UnidadeHierarquiaServiceTest {
     private UnidadeService unidadeService;
 
     @Mock
-    private ResponsabilidadeRepo responsabilidadeRepo;
+    private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
 
     @Mock
     private ObjectProvider<UnidadeHierarquiaService> selfProvider;
@@ -64,7 +64,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar árvore hierárquica completa")
     void deveBuscarArvoreHierarquica() {
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
 
         List<UnidadeDto> resultado = service.buscarArvoreHierarquica();
 
@@ -77,9 +77,8 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar árvore com elegibilidade")
     void deveBuscarComElegibilidade() {
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
-        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(1L, 2L, 3L)))
-                .thenReturn(responsabilidadesBasicas());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(responsabilidadesBasicas());
 
         Predicate<UnidadeElegibilidadeInfo> soOperacional = info -> info.codigo().equals(3L);
         List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(soOperacional);
@@ -96,7 +95,7 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("Deve buscar IDs descendentes")
     void deveBuscarIdsDescendentes() {
         when(selfProvider.getObject()).thenReturn(service);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
 
         List<Long> descendentes = service.buscarIdsDescendentes(1L);
 
@@ -107,7 +106,7 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("Deve buscar árvore por código (nível profundo)")
     void deveBuscarArvorePorCodigo() {
         when(selfProvider.getObject()).thenReturn(service);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
 
         UnidadeDto resultado = service.buscarArvore(3L);
 
@@ -118,7 +117,7 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("Deve buscar siglas subordinadas (a partir da raiz)")
     void deveBuscarSiglasSubordinadas() {
         when(selfProvider.getObject()).thenReturn(service);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
 
         List<String> siglas = service.buscarSiglasSubordinadas(unidadeRaiz.getSigla());
 
@@ -133,7 +132,7 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("buscarArvore deve buscar no repo se não encontrar na hierarquia")
     void buscarArvore_DeveBuscarNoRepoSeNaoEncontrarNaHierarquia() {
         when(selfProvider.getObject()).thenReturn(service);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(toLeitura(unidadeRaiz)));
         Unidade extra = Unidade.builder()
                 .codigo(99L)
                 .nome("Unidade Extra")
@@ -151,7 +150,7 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("buscarSiglasSubordinadas deve retornar vazio se não encontrar sigla")
     void buscarSiglasSubordinadas_DeveRetornarVazioSeNaoEncontrar() {
         when(selfProvider.getObject()).thenReturn(service);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(toLeitura(unidadeRaiz)));
         Unidade extra = Unidade.builder()
                 .codigo(999L)
                 .nome("Unidade Inexistente")
@@ -170,7 +169,7 @@ class UnidadeHierarquiaServiceTest {
     void deveBuscarSiglaSuperior() {
         when(selfProvider.getObject()).thenReturn(service);
         when(unidadeService.buscarPorSigla(unidadeIntermediaria.getSigla())).thenReturn(unidadeIntermediaria);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
         when(unidadeRepo.buscarSiglaPorCodigo(unidadeRaiz.getCodigo()))
                 .thenReturn(Optional.of(unidadeRaiz.getSigla()));
 
@@ -194,7 +193,7 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("buscarCodigosSuperiores deve usar apenas o mapa filho pai")
     void buscarCodigosSuperiores_DeveUsarApenasMapaFilhoPai() {
         when(selfProvider.getObject()).thenReturn(service);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
 
         List<Long> resultado = service.buscarCodigosSuperiores(3L);
 
@@ -206,7 +205,7 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("buscarCodigoPai deve retornar vazio quando relacao nao existe no mapa")
     void buscarCodigoPai_DeveRetornarNullQuandoRelacaoNaoExisteNoMapa() {
         when(selfProvider.getObject()).thenReturn(service);
-        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(toLeitura(unidadeRaiz)));
 
         Long resultado = service.buscarCodigoPai(99L);
 
@@ -248,9 +247,8 @@ class UnidadeHierarquiaServiceTest {
             unidadeIntermediaria.setTipo(TipoUnidade.INTERMEDIARIA); // Deve ser filtrada
             unidadeOperacional.setTipo(TipoUnidade.OPERACIONAL);
 
-            when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
-            when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(1L, 2L, 3L)))
-                    .thenReturn(responsabilidadesBasicas());
+            when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+            when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(responsabilidadesBasicas());
             // Mockar que apenas a raiz tem mapa
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(unidadeRaiz.getCodigo()));
             
@@ -269,8 +267,8 @@ class UnidadeHierarquiaServiceTest {
         @DisplayName("Deve marcar como inelegível unidade sem responsável efetivo")
         void deveMarcarInelegivelSemResponsavelEfetivo() {
             unidadeOperacional.setResponsabilidade(null);
-            when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
-            when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(1L, 2L, 3L)))
+            when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+            when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
                     .thenReturn(List.of(
                             new ResponsabilidadeLeitura(1L, "RESP-1"),
                             new ResponsabilidadeLeitura(2L, "RESP-2")
@@ -289,8 +287,8 @@ class UnidadeHierarquiaServiceTest {
             responsabilidade.setUsuarioTitulo("   ");
             unidadeOperacional.setResponsabilidade(responsabilidade);
 
-            when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
-            when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(1L, 2L, 3L)))
+            when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+            when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
                     .thenReturn(List.of(
                             new ResponsabilidadeLeitura(1L, "RESP-1"),
                             new ResponsabilidadeLeitura(2L, "RESP-2"),

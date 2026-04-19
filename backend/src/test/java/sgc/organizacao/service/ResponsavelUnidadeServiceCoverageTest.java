@@ -32,6 +32,9 @@ class ResponsavelUnidadeServiceCoverageTest {
     @Mock
     private ResponsabilidadeRepo responsabilidadeRepo;
 
+    @Mock
+    private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+
     @Test
     @DisplayName("buscarTodasAtribuicoes - deve retornar lista vazia quando não houver títulos")
     void buscarTodasAtribuicoes_SemTitulos() {
