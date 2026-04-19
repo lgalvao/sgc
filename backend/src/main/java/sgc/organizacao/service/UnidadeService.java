@@ -61,9 +61,9 @@ public class UnidadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
     }
 
+    @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADE_ADMIN, sync = true)
     public Unidade buscarAdmin() {
-        Long codigoAdmin = self().buscarCodigoPorSigla(SIGLA_ADMIN);
-        return buscarPorCodigo(codigoAdmin);
+        return buscarPorSiglaComResponsavel(SIGLA_ADMIN);
     }
 
     public List<Unidade> buscarPorCodigos(List<Long> codigos) {
