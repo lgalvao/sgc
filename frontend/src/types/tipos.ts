@@ -524,6 +524,7 @@ export interface AtividadeOperacaoResponse {
     subprocesso: SubprocessoStatus;
     atividadesAtualizadas: Atividade[];
     permissoes: PermissoesSubprocesso;
+    message?: string | null;
     aviso?: string | null;
 }
 

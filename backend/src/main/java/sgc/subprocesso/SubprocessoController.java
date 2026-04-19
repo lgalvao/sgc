@@ -313,6 +313,7 @@ public class SubprocessoController {
                 .subprocesso(consultaService.obterStatus(subprocessoDestino))
                 .atividadesAtualizadas(consultaService.listarAtividadesSubprocesso(subprocessoDestino))
                 .permissoes(consultaService.obterPermissoesUI(subprocessoDestino))
+                .message("Atividades importadas.")
                 .aviso(resultado.temDuplicatas() ? Mensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS : null)
                 .build();
     }

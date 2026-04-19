@@ -60,24 +60,6 @@ Este arquivo acompanha somente o que ainda falta fazer. Ao concluir um item, rem
 
 - A abertura/retomada de subprocesso usar uma rota canonica sem chamadas equivalentes no mesmo fluxo.
 
-## P2: fragmentacao da visualizacao de mapa
-
-**Confirmado**
-
-- `MapaVisualizacaoView` carrega contexto inicial de subprocesso e depois chama `GET /subprocessos/{codigo}/mapa-visualizacao`.
-- O contexto inicial fornece permissoes e dados do subprocesso; o endpoint de mapa fornece competencias, atividades sem competencia e sugestoes.
-- A tela ainda combina esses contratos para montar a experiencia final.
-
-**Falta fazer**
-
-- Medir a abertura de visualizacao de mapa com monitoramento para quantificar os dois requests.
-- Decidir se a separacao deve continuar por clareza de contrato ou se cabe BFF unico para a tela.
-- Evitar fusao de endpoints se o ganho medido for pequeno ou se aumentar acoplamento do backend.
-
-**Conclui quando**
-
-- A tela tiver contrato de carga inicial justificado por medicao: dois endpoints claros ou um BFF unico com ganho comprovado.
-
 ## P2: acoes em `MapaVisualizacaoView`
 
 **Confirmado**
@@ -95,3 +77,41 @@ Este arquivo acompanha somente o que ainda falta fazer. Ao concluir um item, rem
 **Conclui quando**
 
 - A tela coordenar interacao/estado visual sem reconstruir regra de negocio de acao.
+
+## P2: contratos defensivos e `id` legado
+
+**Confirmado**
+
+- `node etc/scripts/sgc.js codigo smells auditar --json --sem-gravar` apontou pontuacao critica: 103 `@Nullable` em DTOs, 213 checks explicitos de `null` no backend e 417 usos de `any` em testes frontend.
+- Hotspots iniciais: `UnidadeDto`, `ValidadorDadosOrganizacionais`, `ProcessoService`, `AtualizarSubprocessoRequest`, `ProcessoDetalheDto` e `SubprocessoResumoDto`.
+- `node etc/scripts/sgc.js codigo id-legado identificar --output /tmp/sgc-id-legado-report.txt` encontrou 2097 ocorrencias brutas; ha muito ruido por `getByTestId`, DOM e excecoes de framework.
+
+**Falta fazer**
+
+- Separar o relatorio de `id` legado entre ruido aceito, contrato externo e dominio que deve migrar para `codigo`.
+- Escolher uma fatia pequena de DTOs/backend para reduzir `@Nullable` e checks defensivos sem quebrar serializacao nem compatibilidade de API.
+- Reduzir `any` em testes frontend apenas nos arquivos que bloquearem manutencao real ou cobertura, evitando refatoracao cosmetica ampla.
+
+**Conclui quando**
+
+- Houver uma lista curta de migracoes por contrato, com criterio de aceite e sem substituicoes mecanicas em massa.
+
+## P2: dashboard de QA frontend
+
+**Confirmado**
+
+- `npm run qa:dashboard` gerou snapshot em `etc/qa-dashboard/runs/2026-04-19T16-51-22Z/`.
+- O dashboard ficou vermelho somente por `frontend-cobertura`: statements 94,58%, branches 87,57%, functions 94,42%.
+- `node etc/scripts/sgc.js frontend cobertura priorizar-defensivos` apontou lacunas residuais pequenas em `SubprocessoView.vue`, `useAcesso.ts`, `ArvoreUnidades.vue`, `usePerfil.ts` e `DisponibilizarMapaModal.vue`.
+- Apos testes direcionados em `usePerfil`, `useAcesso` e `DisponibilizarMapaModal`, `npm run coverage:unit --prefix frontend` ficou em statements 94,64%, branches 87,73%, functions 94,54%; o bloqueio real continua sendo branch coverage global.
+
+**Falta fazer**
+
+- Atacar primeiro arquivos com alto impacto de branches, nao apenas lacunas residuais pequenas.
+- Manter os testes direcionados ja adicionados, pois removeram parte da fila de defensivos.
+- Atualizar testes sem mascarar comportamento nem relaxar thresholds.
+- Rodar `npm run qa:dashboard` apos a correção para confirmar retorno a verde.
+
+**Conclui quando**
+
+- O snapshot mais recente do dashboard ficar verde sem reaproveitar relatorios antigos manualmente.

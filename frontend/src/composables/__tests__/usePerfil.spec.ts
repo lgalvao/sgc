@@ -73,6 +73,22 @@ describe("usePerfil", () => {
         expect(isAdmin.value).toBe(true);
     });
 
+    it("deve permitir relatorios para admin e gestor", () => {
+        vi.mocked(usePerfilStore).mockReturnValue({
+            perfilSelecionado: Perfil.GESTOR,
+            permissoesSessao: null,
+        } as any);
+
+        expect(usePerfil().podeVerRelatorios.value).toBe(true);
+
+        vi.mocked(usePerfilStore).mockReturnValue({
+            perfilSelecionado: Perfil.CHEFE,
+            permissoesSessao: null,
+        } as any);
+
+        expect(usePerfil().podeVerRelatorios.value).toBe(false);
+    });
+
     it("deve expor permissões de sessão vindas do backend", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
             perfilSelecionado: Perfil.ADMIN,

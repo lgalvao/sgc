@@ -19,5 +19,6 @@ public record AtividadeOperacaoResponse(
         SubprocessoSituacaoDto subprocesso,
         List<AtividadeDto> atividadesAtualizadas,
         PermissoesSubprocessoDto permissoes,
+        @Nullable String message,
         @Nullable String aviso) {
 }

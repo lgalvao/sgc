@@ -291,10 +291,11 @@ describe('useAcesso', () => {
   });
 
   it('deve retornar permissoes adicionais como podeVerSugestoes e habilitarAcessoCadastro', () => {
-    const subprocesso = criarSubprocesso({permissoes: criarPermissoes({podeVerSugestoes: true, habilitarAcessoCadastro: true})});
+    const subprocesso = criarSubprocesso({permissoes: criarPermissoes({podeVerSugestoes: true, habilitarAcessoCadastro: true, mesmaUnidade: true})});
     const acesso = useAcesso(subprocesso);
     expect(acesso.podeVerSugestoes.value).toBe(true);
     expect(acesso.habilitarAcessoCadastro.value).toBe(true);
+    expect(acesso.mesmaUnidade.value).toBe(true);
   });
 
   it('deve usar habilitadores enviados pelo backend', () => {

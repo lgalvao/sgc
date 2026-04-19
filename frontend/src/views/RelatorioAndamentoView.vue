@@ -105,7 +105,10 @@
                 <span class="text-muted d-block small">Titular</span>
                 <span class="fw-bold">{{ item.titular }}</span>
               </div>
-              <div class="col-md-6" v-if="item.titular !== item.responsavel">
+              <div
+                v-if="item.titular !== item.responsavel"
+                class="col-md-6"
+              >
                 <span class="text-muted d-block small">Responsável atual</span>
                 <span class="fw-bold">{{ item.responsavel }}</span>
               </div>

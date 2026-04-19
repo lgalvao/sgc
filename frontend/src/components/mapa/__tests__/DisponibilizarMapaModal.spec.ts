@@ -7,6 +7,7 @@ vi.mock("@/utils/dateUtils", async () => {
     return {
         ...actual,
         obterAmanhaFormatado: () => '2026-03-25',
+        isDateStrictlyFuture: (d: string) => d > '2026-03-24',
         isDateValidAndFuture: (d: string) => d > '2026-03-24'
     };
 });
@@ -40,5 +41,17 @@ describe('DisponibilizarMapaModal.vue', () => {
         });
         const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
         expect(input.attributes('min')).toBe('2026-03-30');
+    });
+
+    it('deve exigir data maior ou igual à última data limite do subprocesso', async () => {
+        const wrapper = mount(DisponibilizarMapaModal, {
+            props: { mostrar: true, ultimaDataLimiteSubprocesso: '2026-03-30T00:00:00' }
+        });
+        const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
+
+        await input.setValue('2026-03-29');
+
+        expect(wrapper.text()).toContain('A data limite deve ser maior ou igual à última data limite do subprocesso.');
+        expect((wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').element as HTMLButtonElement).disabled).toBe(true);
     });
 });

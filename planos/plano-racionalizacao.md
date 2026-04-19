@@ -26,9 +26,11 @@ O foco e jornada real medida, nao micro-otimizacao isolada.
 - O contexto inicial de subprocesso ja tem helper compartilhado no frontend.
 - `SubprocessoConsultaService` ja delega parte da montagem de contexto, mas ainda concentra permissoes e resposta.
 - `MapaVisualizacaoView` ja teve sugestoes/historico e acoes de analise simplificados.
+- A abertura de visualizacao de mapa foi medida em `CDU-18` com `SGC_MONITORAMENTO=on`: o contrato atual em dois endpoints (`contexto-edicao` e `mapa-visualizacao`) custou dezenas de milissegundos por request no cenario E2E, sem evidencia suficiente para criar um BFF unico.
 - O tracing de workflow e acao em bloco ja existe e depende de monitoramento ativo na requisicao.
 - A importacao de atividades passou a retornar resposta incremental e nao precisa mais recompor `contexto-cadastro-atividades` apos o `POST`.
 - As stores de dedupe/cache de processo e subprocesso ja têm cobertura direcionada para dedupe, erro e invalidacao.
+- A varredura por scripts apontou dividas amplas que devem ser tratadas por fatias pequenas: nullability defensiva em DTOs/backend, `id` legado fora das excecoes de framework e `any` em testes frontend.
 
 ## Diretrizes
 
@@ -38,14 +40,18 @@ O foco e jornada real medida, nao micro-otimizacao isolada.
 4. Consolidar contrato somente quando a tela depender de dados estaveis em conjunto.
 5. Evitar cache de contexto quando o dado muda com workflow; usar dedupe concorrente quando bastar.
 6. Medir antes e depois com o mesmo cenario monitorado.
-7. Atualizar este plano apenas quando mudar direcao, prioridade ou criterio de sucesso.
+7. Nao fundir endpoints por conveniencia se a medicao nao demonstrar ganho material.
+8. Tratar dividas transversais por hotspot e contrato, nao por substituicao mecanica em massa.
+9. Atualizar este plano apenas quando mudar direcao, prioridade ou criterio de sucesso.
 
 ## Frentes abertas
 
 - **Processo:** decidir se `contexto-completo` deve continuar carregando acoes em bloco/elegiveis no primeiro load.
 - **Subprocesso:** reduzir recomposicao de `contexto-edicao` e continuar quebrando responsabilidades do hotspot de consulta.
 - **Workflow:** medir p50/p95/pico por acao e remover custo sincronico evitavel.
-- **Mapa visualizacao:** avaliar fragmentacao entre contexto/permissoes e carga do mapa, e se condicionais de acao devem vir prontas do backend.
+- **Mapa visualizacao:** manter dois endpoints por ora; avaliar somente se condicionais de acao devem vir prontas do backend.
+- **Contratos:** reduzir nullability defensiva e nomenclatura `id` legado apenas onde houver contrato de dominio claro para `codigo`.
+- **QA:** recuperar o dashboard para verde atacando lacunas residuais de cobertura frontend com menor risco.
 
 ## Criterio de sucesso
 
