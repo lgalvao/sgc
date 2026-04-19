@@ -163,7 +163,7 @@
 import {BAlert, BButton, BFormCheckbox, BSpinner} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
@@ -210,7 +210,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const route = useRoute();
 const subprocessosStore = useSubprocessos();
 const mapasStore = useMapas();
 const fluxoSubprocesso = useFluxoSubprocesso();
@@ -461,10 +460,7 @@ async function executarAtualizacaoCadastro(
 
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
-  const codigoQuery = Number(route.query.codSubprocesso);
-  const data = Number.isFinite(codigoQuery) && codigoQuery > 0
-      ? await subprocessosStore.buscarContextoCadastroAtividades(codigoQuery)
-      : await subprocessosStore.buscarContextoCadastroAtividadesPorProcessoEUnidade(codProcessoRef, props.sigla);
+  const data = await subprocessosStore.buscarContextoCadastroAtividadesPorProcessoEUnidade(codProcessoRef, props.sigla);
   if (!data) {
     logger.error("ERRO: Subprocesso não encontrado!");
     return;

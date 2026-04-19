@@ -198,9 +198,6 @@ function navegarPara(routeName: string) {
 
   router.push({
     path: `/processo/${props.codProcesso}/${props.siglaUnidade}/${sufixo}`,
-    query: {
-      codSubprocesso: String(props.codSubprocesso),
-    },
   });
 }
 

@@ -211,10 +211,7 @@ async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
       params: {
         codProcesso: codProcesso.toString(),
         siglaUnidade: row.sigla
-      },
-      query: row.codSubprocesso
-          ? {codSubprocesso: String(row.codSubprocesso)}
-          : undefined,
+      }
     });
   } catch (error) {
     logger.error(`Erro ao navegar para detalhes da unidade ${row.sigla}:`, error);

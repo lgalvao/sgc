@@ -348,7 +348,6 @@ async function carregarContextoInicial() {
   const resultado = await carregarContextoSubprocessoInicial({
     codProcesso: codProcesso.value,
     siglaUnidade: sigla.value,
-    codSubprocessoQuery: route.query.codSubprocesso,
     store: subprocessoStoreCache,
   });
 

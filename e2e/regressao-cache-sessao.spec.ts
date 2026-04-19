@@ -26,7 +26,7 @@ test.describe('Regressão - cache de sessão no subprocesso', () => {
 
         // Primeiro acesso como ADMIN para deixar o contexto do subprocesso carregado na SPA.
         await page.goto(`/processo/${codProcesso}/${unidade}`);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}(?:\\?.*)?$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}$`));
         await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 
         // Logout e novo login na mesma aba, sem limpar storage nem reiniciar a aplicação.
@@ -37,13 +37,13 @@ test.describe('Regressão - cache de sessão no subprocesso', () => {
 
         // Acessa o mesmo subprocesso imediatamente após o login do CHEFE.
         await page.goto(`/processo/${codProcesso}/${unidade}`);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}(?:\\?.*)?$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}$`));
 
         const cardCadastro = page.getByTestId('card-subprocesso-atividades');
         await expect(cardCadastro).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
 
         await cardCadastro.click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}/cadastro(?:\\?.*)?$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}/cadastro$`));
     });
 });

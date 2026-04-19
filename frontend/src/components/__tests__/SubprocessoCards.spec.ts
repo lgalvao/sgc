@@ -65,24 +65,21 @@ describe('SubprocessoCards.vue', () => {
         // Click action
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/cadastro',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/cadastro'
         });
 
         // Keydown enter action
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/cadastro',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/cadastro'
         });
 
         // Keydown space action
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/cadastro',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/cadastro'
         });
 
         // Mapa card actions
@@ -90,24 +87,21 @@ describe('SubprocessoCards.vue', () => {
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/mapa',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/mapa'
         });
 
         // Enter
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/mapa',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/mapa'
         });
 
         // Space
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/mapa',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/mapa'
         });
     });
 
@@ -119,44 +113,38 @@ describe('SubprocessoCards.vue', () => {
         // Atividades vis actions
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-cadastro',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/vis-cadastro'
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-cadastro',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/vis-cadastro'
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-cadastro',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/vis-cadastro'
         });
 
         // Mapa vis Actions
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-mapa',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/vis-mapa'
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-mapa',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/vis-mapa'
         });
 
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-mapa',
-            query: {codSubprocesso: '100'}
+            path: '/processo/1/TESTE/vis-mapa'
         });
     });
 

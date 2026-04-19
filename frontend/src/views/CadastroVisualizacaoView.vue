@@ -157,7 +157,7 @@ import {
   BFormTextarea
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
@@ -191,7 +191,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const route = useRoute();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
@@ -371,7 +370,6 @@ onMounted(async () => {
     const resultado = await carregarContextoSubprocessoInicial({
       codProcesso: codProcesso.value,
       siglaUnidade: unidadeId.value,
-      codSubprocessoQuery: route.query.codSubprocesso,
       store: subprocessoStoreCache,
     });
 

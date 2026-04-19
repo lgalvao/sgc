@@ -224,7 +224,6 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable, useToast} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref, type Ref} from "vue";
-import {useRoute} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
@@ -268,7 +267,6 @@ function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
 const subprocessosStore = useSubprocessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const subprocessoStoreCache = useSubprocessoStore();
-const route = useRoute();
 
 const mapaStore = useMapas();
 const {notificacao, notify, clear} = useNotification();
@@ -354,7 +352,6 @@ async function carregarSubprocesso() {
   const resultado = await carregarContextoSubprocessoInicial({
     codProcesso: props.codProcesso,
     siglaUnidade: props.siglaUnidade,
-    codSubprocessoQuery: route.query.codSubprocesso,
     store: subprocessoStoreCache,
   });
 

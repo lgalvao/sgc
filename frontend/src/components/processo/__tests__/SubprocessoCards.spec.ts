@@ -141,8 +141,7 @@ describe("SubprocessoCards.vue", () => {
         await card.trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            path: "/processo/1/U1/cadastro",
-            query: {codSubprocesso: "1"}
+            path: "/processo/1/U1/cadastro"
         }));
     });
 
@@ -162,8 +161,7 @@ describe("SubprocessoCards.vue", () => {
         await card.trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            path: "/processo/1/U1/vis-cadastro",
-            query: {codSubprocesso: "1"}
+            path: "/processo/1/U1/vis-cadastro"
         }));
     });
 
@@ -218,8 +216,7 @@ describe("SubprocessoCards.vue", () => {
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            path: "/processo/401/ASSESSORIA_22/cadastro",
-            query: {codSubprocesso: "1"}
+            path: "/processo/401/ASSESSORIA_22/cadastro"
         }));
     });
 
@@ -239,8 +236,7 @@ describe("SubprocessoCards.vue", () => {
         await card.trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            path: "/processo/1/U1/mapa",
-            query: {codSubprocesso: "1"}
+            path: "/processo/1/U1/mapa"
         }));
     });
 
@@ -260,8 +256,7 @@ describe("SubprocessoCards.vue", () => {
         await card.trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            path: "/processo/1/U1/vis-mapa",
-            query: {codSubprocesso: "1"}
+            path: "/processo/1/U1/vis-mapa"
         }));
     });
 

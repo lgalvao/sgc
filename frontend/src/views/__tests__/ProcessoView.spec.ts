@@ -801,7 +801,6 @@ describe("Processo.vue", () => {
                 codProcesso: "1",
                 siglaUnidade: "UNI1"
             },
-            query: {codSubprocesso: "201"}
         });
     });
 
@@ -837,7 +836,6 @@ describe("Processo.vue", () => {
                 codProcesso: "1",
                 siglaUnidade: "UNI1"
             },
-            query: {codSubprocesso: "201"}
         });
     });
 

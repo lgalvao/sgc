@@ -58,7 +58,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         // CT-02a: Ao sair do mapa e entrar novamente sem refresh, a competência criada
         // deve permanecer visível; isso protege contra regressão de cache do contexto.
         await page.getByRole('link', {name: UNIDADE_ALVO, exact: true}).click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
         await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 
         await navegarParaMapa(page);
