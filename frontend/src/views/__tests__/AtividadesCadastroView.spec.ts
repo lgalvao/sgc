@@ -68,7 +68,7 @@ type CadastroViewVm = {
     novaAtividade: string;
     timeoutLimparErros: ReturnType<typeof setTimeout> | null;
     podeHomologarCadastro?: boolean;
-    handleImportAtividades: () => Promise<void>;
+    handleImportAtividades: (resultado: any) => Promise<void>;
     disponibilizarCadastro: () => Promise<void>;
     adicionarAtividade: () => Promise<void>;
     confirmarRemocao: () => Promise<void>;
@@ -710,9 +710,14 @@ describe("CadastroView.vue", () => {
         });
 
         const vm = wrapper.vm as unknown as CadastroViewVm;
-        await vm.handleImportAtividades();
+        await vm.handleImportAtividades({
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: criarContextoEdicao().detalhes.permissoes,
+            atividadesAtualizadas: [{codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}],
+            aviso: null,
+        });
 
-        expect(subprocessosStore.buscarContextoCadastroAtividades).toHaveBeenCalledWith(123);
+        expect(subprocessosStore.buscarContextoCadastroAtividades).not.toHaveBeenCalled();
         expect(vm.atividades).toEqual([
             {codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}
         ]);

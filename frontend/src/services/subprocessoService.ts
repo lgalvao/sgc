@@ -1,6 +1,7 @@
 import type {
     Analise,
     Atividade,
+    AtividadeOperacaoResponse,
     AtividadeImpactada,
     CompetenciaImpactada,
     ContextoCadastroAtividadesSubprocesso,
@@ -85,16 +86,16 @@ export async function importarAtividades(
     codSubprocessoDestino: number,
     codSubprocessoOrigem: number,
     codigosAtividades?: number[],
-): Promise<{aviso?: string}> {
+): Promise<AtividadeOperacaoResponse> {
     const request: ImportarAtividadesRequest = {
         codSubprocessoOrigem: codSubprocessoOrigem,
         ...(codigosAtividades && codigosAtividades.length > 0 ? {codigosAtividades} : {}),
     };
-    const response = await apiClient.post<{message: string; aviso?: string}>(
+    const response = await apiClient.post<AtividadeOperacaoResponse>(
         `/subprocessos/${codSubprocessoDestino}/importar-atividades`,
         request,
     );
-    return {aviso: response.data.aviso};
+    return response.data;
 }
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {

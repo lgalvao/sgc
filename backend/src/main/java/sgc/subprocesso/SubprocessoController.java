@@ -300,13 +300,21 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'IMPORTAR_ATIVIDADES')")
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")
-    public Map<String, String> importarAtividades(
+    public AtividadeOperacaoResponse importarAtividades(
             @PathVariable Long codSubprocesso, @RequestBody @Valid ImportarAtividadesRequest request) {
-        boolean temDuplicatas = subprocessoService.importarAtividades(codSubprocesso, request.codSubprocessoOrigem(), request.codigosAtividades());
-        if (temDuplicatas) {
-            return Map.of("message", "Atividades importadas.", "aviso", Mensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS);
-        }
-        return Map.of("message", "Atividades importadas.");
+        SubprocessoService.ImportacaoAtividadesResultado resultado = subprocessoService.importarAtividades(
+                codSubprocesso,
+                request.codSubprocessoOrigem(),
+                request.codigosAtividades()
+        );
+        Subprocesso subprocessoDestino = resultado.subprocessoDestino();
+        return AtividadeOperacaoResponse.builder()
+                .atividade(null)
+                .subprocesso(consultaService.obterStatus(subprocessoDestino))
+                .atividadesAtualizadas(consultaService.listarAtividadesSubprocesso(subprocessoDestino))
+                .permissoes(consultaService.obterPermissoesUI(subprocessoDestino))
+                .aviso(resultado.temDuplicatas() ? Mensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS : null)
+                .build();
     }
 
     @PostMapping("/{codSubprocesso}/aceitar-cadastro-bloco")

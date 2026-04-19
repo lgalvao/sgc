@@ -61,7 +61,7 @@ type CadastroViewVm = {
     adicionarConhecimento: (indiceAtividade: number, descricao: string) => Promise<void>;
     removerConhecimento: (indiceAtividade: number, codigoConhecimento: number) => void;
     salvarEdicaoConhecimento: (codigoAtividade: number, codigoConhecimento: number, descricao: string) => Promise<void>;
-    handleImportAtividades: (mensagem?: string) => Promise<void>;
+    handleImportAtividades: (resultado: any) => Promise<void>;
     confirmarDisponibilizacao: () => Promise<void>;
     abrirModalHistorico: () => Promise<void>;
     abrirModalImpacto: () => void;
@@ -372,7 +372,12 @@ describe("CadastroView coverage", () => {
         await vm.salvarEdicaoConhecimento(1, 2, "Desc Atualizada");
         
         // handleImportAtividades
-        await vm.handleImportAtividades("Aviso");
+        await vm.handleImportAtividades({
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: {},
+            atividadesAtualizadas: [],
+            aviso: "Aviso",
+        });
         expect(vm.mostrarModalImportar).toBe(false);
         
         // confirmarDisponibilizacao (Revisao)

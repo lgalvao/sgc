@@ -584,23 +584,15 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
   }
 }
 
-async function handleImportAtividades(aviso?: string) {
+async function handleImportAtividades(resultado: AtividadeOperacaoResponse) {
   mostrarModalImportar.value = false;
   clear();
   await nextTick();
-  if (aviso) {
+  processarRespostaLocal(resultado);
+  if (resultado.aviso) {
     notify(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
   } else {
     notify(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
-  }
-  const codigoSubprocesso = codSubprocesso.value;
-  if (codigoSubprocesso !== null) {
-    await withErrorHandling(async () => {
-      const data = await subprocessosStore.buscarContextoCadastroAtividades(codigoSubprocesso);
-      if (data) {
-        sincronizarEstadoInicialContexto(data);
-      }
-    });
   }
 }
 

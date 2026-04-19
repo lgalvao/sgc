@@ -140,7 +140,7 @@ import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, 
 import {ref, watch} from "vue";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
-import {type Atividade, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
+import {type Atividade, type AtividadeOperacaoResponse, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {normalizeError} from "@/utils/apiError";
 
@@ -151,10 +151,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   fechar: [];
-  importar: [aviso?: string];
+  importar: [resultado: AtividadeOperacaoResponse];
 }>();
 
-const resultadoImportacao = ref<{aviso?: string} | null>(null);
+const resultadoImportacao = ref<AtividadeOperacaoResponse | null>(null);
 const erroImportacao = ref<string | null>(null);
 const importando = ref(false);
 const processosParaImportacao = ref<ProcessoResumo[]>([]);
@@ -268,7 +268,7 @@ async function importar() {
       unidadeSelecionada.value.codSubprocesso,
       idsAtividades,
     );
-    emit("importar", resultadoImportacao.value?.aviso);
+    emit("importar", resultadoImportacao.value);
     fechar();
   } catch (erro) {
     erroImportacao.value = normalizeError(erro).message;

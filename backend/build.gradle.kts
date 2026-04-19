@@ -5,11 +5,7 @@ import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val argumentosJvmSemAvisoUnsafe = if (JavaVersion.current().majorVersion.toInt() >= 25) {
-    listOf("--sun-misc-unsafe-memory-access=allow")
-} else {
-    emptyList()
-}
+val argumentosJvmSemAvisoUnsafe = emptyList<String>()
 
 plugins {
     java
@@ -25,9 +21,6 @@ plugins {
 
 tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
-    options.forkOptions.jvmArgs = (options.forkOptions.jvmArgs ?: mutableListOf()).apply {
-        addAll(argumentosJvmSemAvisoUnsafe)
-    }
     options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation", "-XDaddTypeAnnotationsToSymbol=true"))
     options.errorprone {
         disableAllChecks = true

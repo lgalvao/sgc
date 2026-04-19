@@ -175,7 +175,7 @@ public class AtividadeFacade {
                 .subprocesso(situacaoDto)
                 .atividadesAtualizadas(todasAtividades)
                 .permissoes(permissoes)
+                .aviso(null)
                 .build();
     }
 }
-

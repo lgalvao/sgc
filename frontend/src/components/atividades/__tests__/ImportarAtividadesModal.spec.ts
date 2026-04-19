@@ -139,13 +139,20 @@ describe("ImportarAtividadesModal.vue", () => {
         obterVm(wrapper).atividadesSelecionadas = [mockAtividades[0]];
         await flushPromises();
 
-        vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({aviso: "Importação concluída"});
+        vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({
+            atividade: null,
+            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO"},
+            atividadesAtualizadas: mockAtividades,
+            permissoes: {},
+            aviso: "Importação concluída",
+        } as any);
 
         await wrapper.find('[data-testid="btn-importar"]').trigger("click");
         await flushPromises();
 
         expect(subprocessoService.importarAtividades).toHaveBeenCalledWith(123, 100, [50]);
         expect(wrapper.emitted("importar")).toBeTruthy();
+        expect(wrapper.emitted("importar")?.[0]?.[0]).toMatchObject({aviso: "Importação concluída"});
         expect(wrapper.emitted("fechar")).toBeTruthy();
     });
 

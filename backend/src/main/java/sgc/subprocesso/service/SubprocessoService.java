@@ -422,7 +422,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public boolean importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
+    public ImportacaoAtividadesResultado importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
         ImportacaoAtividadesContexto contexto = montarContextoImportacaoAtividades(codSubprocessoDestino, codSubprocessoOrigem);
         int totalSolicitado = codigosAtividades.size();
 
@@ -435,7 +435,16 @@ public class SubprocessoService {
         atualizarSituacaoDestinoAposImportacao(contexto.subprocessoDestino());
         registrarMovimentacaoImportacao(contexto);
 
-        return houveDuplicidadeNaImportacao(totalSolicitado, totalImportado);
+        return new ImportacaoAtividadesResultado(
+                contexto.subprocessoDestino(),
+                houveDuplicidadeNaImportacao(totalSolicitado, totalImportado)
+        );
+    }
+
+    public record ImportacaoAtividadesResultado(
+            Subprocesso subprocessoDestino,
+            boolean temDuplicatas
+    ) {
     }
 
     private ImportacaoAtividadesContexto montarContextoImportacaoAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {

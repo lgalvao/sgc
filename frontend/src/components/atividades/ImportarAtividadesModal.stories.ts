@@ -51,7 +51,13 @@ export const Default: Story = {
             vi.mocked(processoService.buscarProcessosParaImportacao).mockResolvedValue(mockProcessos as any);
             vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue(mockUnidades as any);
             vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue(mockAtividades as any);
-            vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({aviso: 'Importação concluída'} as any);
+            vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({
+                atividade: null,
+                subprocesso: {codigo: 200, situacao: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO'},
+                atividadesAtualizadas: mockAtividades,
+                permissoes: {},
+                aviso: 'Importação concluída',
+            } as any);
             return {args, show};
         },
         template: `
@@ -75,7 +81,13 @@ export const SemProcessos: Story = {
             vi.mocked(processoService.buscarProcessosParaImportacao).mockResolvedValue([] as any);
             vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([] as any);
             vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue([] as any);
-            vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({} as any);
+            vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({
+                atividade: null,
+                subprocesso: {codigo: 200, situacao: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO'},
+                atividadesAtualizadas: mockAtividades,
+                permissoes: {},
+                aviso: null,
+            } as any);
             return {args, show};
         },
         template: '<ImportarAtividadesModal v-bind="args" :mostrar="show" :cod-subprocesso-destino="args.codSubprocessoDestino" @fechar="show = false" />',
