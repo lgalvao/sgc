@@ -175,6 +175,91 @@ class RelatorioFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve gerar relatorio cobrindo todas as variacoes de nomes de responsaveis e localizacao")
+    void deveCobrirVariacoesNomesResponsaveisELocalizacao() {
+        Unidade u0 = new Unidade();
+        u0.setSigla("U0");
+        u0.setNome("Unidade Raiz");
+        u0.setCodigo(0L);
+
+        Unidade u1 = new Unidade();
+        u1.setSigla("U1");
+        u1.setNome("Unidade 1");
+        u1.setCodigo(1L);
+        // Sem unidade superior, titular nulo
+
+        Unidade u2 = new Unidade();
+        u2.setSigla("U2");
+        u2.setNome("Unidade 2");
+        u2.setCodigo(2L);
+        u2.setUnidadeSuperior(u0);
+        // titular null, sem respDto (fallback)
+
+        Unidade u3 = new Unidade();
+        u3.setSigla("U3");
+        u3.setNome("Unidade 3");
+        u3.setCodigo(3L);
+        u3.setUnidadeSuperior(u0);
+        // titular ok, substituto ok
+
+        Subprocesso sp1 = new Subprocesso();
+        sp1.setUnidade(u1);
+        sp1.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+        sp1.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+        sp1.setDataLimiteEtapa2(java.time.LocalDateTime.of(2023, 10, 10, 8, 0));
+
+        Subprocesso sp2 = new Subprocesso();
+        sp2.setUnidade(u2);
+        sp2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp2.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+        sp2.setDataFimEtapa1(java.time.LocalDateTime.of(2023, 9, 11, 8, 0));
+        sp2.setDataLimiteEtapa2(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+
+        Subprocesso sp3 = new Subprocesso();
+        sp3.setUnidade(u3);
+        sp3.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp3.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+        sp3.setDataFimEtapa1(java.time.LocalDateTime.of(2023, 9, 11, 8, 0));
+        sp3.setDataLimiteEtapa2(java.time.LocalDateTime.of(2023, 10, 10, 8, 0));
+        sp3.setDataFimEtapa2(java.time.LocalDateTime.of(2023, 10, 12, 8, 0));
+
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2, sp3));
+
+        // resp1: dto != null mas titularNome = null e substituto = null
+        UnidadeResponsavelDto resp1 = UnidadeResponsavelDto.builder().titularNome(null).substitutoNome(null).build();
+        // resp3: titular ok, substituto ok
+        UnidadeResponsavelDto resp3 = UnidadeResponsavelDto.builder().titularNome("Titular 3").substitutoNome("Substituto 3").build();
+
+        when(responsavelService.buscarResponsaveisUnidades(List.of(1L, 2L, 3L))).thenReturn(Map.of(
+                1L, resp1,
+                // sem resp para u2 -> map nao tem entry 2L
+                3L, resp3
+        ));
+
+        List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
+
+        assertThat(resultado).hasSize(3);
+
+        // Valida sp1
+        assertThat(resultado.get(0).titular()).isEqualTo("Não designado");
+        assertThat(resultado.get(0).responsavel()).isEqualTo("Não designado");
+        assertThat(resultado.get(0).localizacao()).isEqualTo("-");
+        assertThat(resultado.get(0).dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
+
+        // Valida sp2
+        assertThat(resultado.get(1).titular()).isEqualTo("Não designado");
+        assertThat(resultado.get(1).responsavel()).isEqualTo("Não designado");
+        assertThat(resultado.get(1).localizacao()).isEqualTo("U0");
+        assertThat(resultado.get(1).dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 11, 8, 0));
+
+        // Valida sp3
+        assertThat(resultado.get(2).titular()).isEqualTo("Titular 3");
+        assertThat(resultado.get(2).responsavel()).isEqualTo("Substituto 3 (Substituição)");
+        assertThat(resultado.get(2).localizacao()).isEqualTo("U0");
+        assertThat(resultado.get(2).dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 12, 8, 0));
+    }
+
+    @Test
     @DisplayName("Deve gerar relatório de mapas completo")
     void deveGerarRelatorioMapasCompleto() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
