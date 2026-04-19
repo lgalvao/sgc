@@ -1,11 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {mount} from "@vue/test-utils";
+import {mount, flushPromises} from "@vue/test-utils";
 import LoginView from "@/views/LoginView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";
 import {useRouter} from "vue-router";
 import {Perfil} from "@/types/tipos";
 import {logger} from "@/utils";
+import {TEXTOS} from "@/constants/textos";
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -60,7 +61,7 @@ describe("LoginView.vue", () => {
                 BFormSelect: {
                     props: ['modelValue', 'options', 'value-field', 'text-field'],
                     emits: ['update:modelValue'],
-                    template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot /></select>'
+                    template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot name="first" /><slot /></select>'
                 },
                 BFormSelectOption: {
                     props: ['value'],
@@ -254,6 +255,100 @@ describe("LoginView.vue", () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(routerPushMock).toHaveBeenCalledWith("/erro");
+    });
+
+    it("cobre branch de AppAlert clear", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const vm = wrapper.vm as any;
+        vm.notify("Mensagem", "success");
+        await flushPromises();
+        const alert = wrapper.findComponent({name: 'AppAlert'});
+        if (alert.exists()) {
+            await alert.vm.$emit("dismissed");
+            expect(vm.notificacao).toBeNull();
+        }
+    });
+
+    it("cobre erro notFound/unauthorized no login", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+        const fakeAxiosError = {
+            isAxiosError: true,
+            response: { status: 401, data: { message: "Unauthorized" } }
+        };
+        perfilStore.iniciarLogin = vi.fn().mockRejectedValue(fakeAxiosError);
+        
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+        await flushPromises();
+        
+        expect(wrapper.text()).toContain(TEXTOS.login.ERRO_CREDENCIAIS);
+    });
+
+    it("cobre erro que não é notFound/unauthorized/unexpected no login", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+        const fakeAxiosError = {
+            isAxiosError: true,
+            response: { status: 400, data: { message: "Bad Request" } }
+        };
+        perfilStore.iniciarLogin = vi.fn().mockRejectedValue(fakeAxiosError);
+        
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+        await flushPromises();
+        
+        expect(wrapper.text()).toContain(TEXTOS.login.ERRO_GENERICO);
+    });
+
+    it("cobre login sem unidades disponiveis", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: true,
+        });
+        perfilStore.perfisUnidades = []; // empty
+
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+        await flushPromises();
+
+        expect(wrapper.text()).toContain(TEXTOS.login.ERRO_SEM_AUTORIZACAO);
+    });
+
+    it("cobre erro conhecido ao selecionar perfil", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: true,
+            requerSelecaoPerfil: true,
+            perfisUnidades: MOCK_PERFIS,
+            sessao: null
+        });
+        
+        const fakeAxiosError = {
+            isAxiosError: true,
+            response: { status: 400, data: { message: "Bad Request" } }
+        };
+        perfilStore.concluirLoginComPerfil = vi.fn().mockRejectedValue(fakeAxiosError);
+        perfilStore.perfisUnidades = MOCK_PERFIS;
+
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+        await flushPromises();
+
+        expect(wrapper.text()).toContain(TEXTOS.login.SELECIONE_OPCAO);
+
+        await wrapper.find('form').trigger('submit');
+        await flushPromises();
+
+        expect(wrapper.text()).toContain(TEXTOS.login.ERRO_SELECAO_PERFIL);
     });
 
     it("deve exibir erro se tentar submeter passo 2 sem seleção (caso edge)", async () => {

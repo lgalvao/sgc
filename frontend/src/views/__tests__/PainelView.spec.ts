@@ -3,6 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import PainelView from '../PainelView.vue';
 import {createTestingPinia} from '@pinia/testing';
 import {useToastStore} from '@/stores/toast';
+import {usePainelStore} from '@/stores/painel';
 import * as painelService from '@/services/painelService';
 import {createMemoryHistory, createRouter} from 'vue-router';
 
@@ -185,5 +186,72 @@ describe('PainelView', () => {
 
     // attr id
     expect(vm.rowAttrAlerta({codigo: 99})).toEqual({ 'data-testid': 'row-alerta-99' });
+  });
+
+  it('cobre ordenacao computed localmente', async () => {
+    const options = createMountOptions();
+    const wrapper = mount(PainelView, options);
+    await flushPromises();
+    
+    const pinia = options.global.plugins[1] as any;
+    const painelStore = (wrapper.vm as any).painelStore;
+    
+    painelStore.processos = [
+        {codigo: 1, descricao: 'B'},
+        {codigo: 2, descricao: 'A'},
+        {codigo: 3, descricao: 'B'},
+        {codigo: 4}, // undefined descricao
+    ];
+    
+    const vm = wrapper.vm as any;
+    vm.criterio = 'descricao';
+    vm.asc = true;
+    
+    const ordenadosAsc = vm.processosOrdenados;
+    expect(ordenadosAsc[0].codigo).toBe(4);
+    expect(ordenadosAsc[1].codigo).toBe(2);
+    
+    vm.asc = false;
+    const ordenadosDesc = vm.processosOrdenados;
+    expect(ordenadosDesc[0].descricao).toBe('B');
+  });
+
+  it('cobre onActivated e comportamento de cache', async () => {
+    const options = createMountOptions();
+    
+    // Mock dadosValidos BEFORE mounting so onActivated doesn't trigger a second call
+    const pinia = options.global.plugins[1] as any;
+    const painelStore = usePainelStore(pinia);
+    painelStore.dadosValidos = vi.fn().mockReturnValue(true);
+
+    const KeepAliveWrapper = {
+        template: `<keep-alive><PainelView v-if="show" /></keep-alive>`,
+        components: { PainelView },
+        data() { return { show: true } }
+    };
+    const wrapper = mount(KeepAliveWrapper, options);
+    await flushPromises();
+    
+    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
+
+    // Deactivate
+    wrapper.vm.show = false;
+    await flushPromises();
+
+    // Activate - cache is INVALID
+    painelStore.dadosValidos = vi.fn().mockReturnValue(false);
+    wrapper.vm.show = true;
+    await flushPromises();
+    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
+
+    // Deactivate
+    wrapper.vm.show = false;
+    await flushPromises();
+
+    // Activate - cache is VALID
+    painelStore.dadosValidos = vi.fn().mockReturnValue(true);
+    wrapper.vm.show = true;
+    await flushPromises();
+    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); // Should not increase
   });
 });

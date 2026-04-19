@@ -226,4 +226,89 @@ describe("ImportarAtividadesModal.vue", () => {
 
         expect(vm.atividadesSelecionadas.length).toBe(0);
     });
+
+    it("cobre erro na importacao", async () => {
+        const wrapper = createWrapper();
+        const vm = obterVm(wrapper) as any;
+        await flushPromises();
+        
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+        vm.processoSelecionadoId = 1;
+        await flushPromises();
+
+        const mockAtividades: Atividade[] = [{codigo: 50, descricao: "Ativ 50", conhecimentos: []}];
+        vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue(mockAtividades);
+        vm.unidadeSelecionadaId = 10;
+        await flushPromises();
+
+        vm.atividadesSelecionadas = [mockAtividades[0]];
+        vi.mocked(subprocessoService.importarAtividades).mockRejectedValue(new Error("Erro na importação"));
+
+        await vm.importar();
+        await flushPromises();
+
+        expect(vm.erroImportacao).toBe("Erro na importação");
+    });
+
+    it("cobre selecionar processo nulo", async () => {
+        const wrapper = createWrapper();
+        const vm = obterVm(wrapper) as any;
+        await flushPromises();
+        
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+        vm.processoSelecionadoId = 1;
+        await flushPromises();
+        expect(vm.unidadesParticipantes.length).toBe(1);
+
+        vm.processoSelecionadoId = null;
+        await flushPromises();
+        expect(vm.unidadesParticipantes.length).toBe(0);
+    });
+
+    it("cobre erro ao listar atividades para importacao", async () => {
+        const wrapper = createWrapper();
+        const vm = obterVm(wrapper) as any;
+        await flushPromises();
+        
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+        vm.processoSelecionadoId = 1;
+        await flushPromises();
+
+        vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockRejectedValue(new Error("Erro"));
+        vm.unidadeSelecionadaId = 10;
+        await flushPromises();
+
+        expect(vm.atividadesParaImportar.length).toBe(0);
+    });
+
+    it("cobre tentativa de importacao sem atividades selecionadas", async () => {
+        const wrapper = createWrapper();
+        const vm = obterVm(wrapper) as any;
+        await flushPromises();
+        
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+        vm.processoSelecionadoId = 1;
+        await flushPromises();
+
+        const mockAtividades: Atividade[] = [{codigo: 50, descricao: "Ativ 50", conhecimentos: []}];
+        vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue(mockAtividades);
+        vm.unidadeSelecionadaId = 10;
+        await flushPromises();
+
+        vm.atividadesSelecionadas = []; // empty
+        await vm.importar();
+        await flushPromises();
+
+        expect(vm.erroImportacao).toBe("Selecione ao menos uma atividade para importar.");
+    });
+
+    it("cobre tentativa de importacao com destino nulo", async () => {
+        const wrapper = createWrapper({ codSubprocessoDestino: null });
+        const vm = obterVm(wrapper) as any;
+        
+        vm.unidadeSelecionada = {codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"};
+        
+        await vm.importar();
+        expect(subprocessoService.importarAtividades).not.toHaveBeenCalled();
+    });
 });

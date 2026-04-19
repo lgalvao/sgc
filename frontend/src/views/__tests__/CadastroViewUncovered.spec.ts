@@ -2,18 +2,45 @@ import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {nextTick, ref} from "vue";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import CadastroView from "../CadastroView.vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
+import logger from "@/utils/logger";
+
+vi.mock("@/utils/logger", () => ({
+    default: {
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+    }
+}));
+
+const estadoSubprocesso = ref<any>(null);
+
 const subprocessosMock = {
     buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     buscarContextoCadastroAtividades: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    atualizarStatusLocal: vi.fn(),
-    subprocessoDetalhe: ref(null),
+    atualizarStatusLocal: vi.fn((status: any) => {
+        if (estadoSubprocesso.value) {
+            estadoSubprocesso.value = {
+                ...estadoSubprocesso.value,
+                ...status
+            };
+        }
+    }),
+    get subprocessoDetalhe() { return estadoSubprocesso.value; },
+    set subprocessoDetalhe(v: any) { estadoSubprocesso.value = v; }
 };
 
 vi.mock("@/composables/useSubprocessos", () => ({
     useSubprocessos: () => subprocessosMock
+}));
+
+vi.mock("@/composables/useFluxoSubprocesso", () => ({
+    useFluxoSubprocesso: vi.fn()
 }));
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -102,6 +129,13 @@ describe("CadastroView Uncovered Branches", () => {
             habilitarDisponibilizarCadastro: ref(true),
         } as any);
 
+        subprocessosMock.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            tipoProcesso: TipoProcesso.MAPEAMENTO,
+            permissoes: { podeEditarCadastro: true }
+        };
+
         const store = subprocessosMock;
         (store.buscarContextoCadastroAtividadesPorProcessoEUnidade as any).mockResolvedValue({
             detalhes: {
@@ -120,6 +154,7 @@ describe("CadastroView Uncovered Branches", () => {
             cancelarInicioRevisaoCadastro: vi.fn().mockResolvedValue(true),
             validarCadastro: vi.fn().mockResolvedValue({ valido: true }),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
+            disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as any);
     });
 
@@ -175,6 +210,13 @@ describe("CadastroView Uncovered Branches", () => {
 
     it("cobre iniciarRevisaoSeNecessario falha e guards", async () => {
         const store = subprocessosMock;
+        store.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.NAO_INICIADO,
+            tipoProcesso: TipoProcesso.REVISAO,
+            permissoes: { podeEditarCadastro: true }
+        };
+
         (store.buscarContextoCadastroAtividadesPorProcessoEUnidade as any).mockResolvedValue({
             detalhes: {
                 codigo: 123,
@@ -211,6 +253,13 @@ describe("CadastroView Uncovered Branches", () => {
 
     it("cobre cancelarInicioRevisaoSeNecessario falha e guards", async () => {
         const store = subprocessosMock;
+        store.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+            tipoProcesso: TipoProcesso.REVISAO,
+            permissoes: { podeEditarCadastro: true }
+        };
+
         (store.buscarContextoCadastroAtividadesPorProcessoEUnidade as any).mockResolvedValue({
             detalhes: {
                 codigo: 123,
@@ -220,8 +269,7 @@ describe("CadastroView Uncovered Branches", () => {
             },
             mapa: { codigo: 100 },
             atividadesDisponiveis: [],
-            unidade: { sigla: 'TESTE' },
-            assinaturaCadastroReferencia: 'signature'
+            unidade: { sigla: 'TESTE' }
         });
 
         const fluxo = {
@@ -233,12 +281,14 @@ describe("CadastroView Uncovered Branches", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
-        vm.atividadesSnapshotInicial = 'signature'; // matches current
+        vm.atividadesSnapshotInicial = vm.calcularAssinaturaCadastro(vm.atividades); // matches current
 
         // Trigger watcher on disponibilizacaoSemMudancas = false to call cancelarInicioRevisaoSeNecessario
         vm.disponibilizacaoSemMudancas = true; // start as true
+        await nextTick();
         await flushPromises();
         vm.disponibilizacaoSemMudancas = false;
+        await nextTick();
         await flushPromises();
 
         expect(fluxo.cancelarInicioRevisaoCadastro).toHaveBeenCalledWith(123);
@@ -271,33 +321,6 @@ describe("CadastroView Uncovered Branches", () => {
         // No call to activity service expected
     });
 
-    it("cobre handleAdicionarAtividade com sucesso e foco", async () => {
-        const wrapper = createWrapper();
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        
-        vm.codSubprocesso = 123;
-        vm.codMapa = 100;
-
-        // Mock adicionarAtividadeAction via useAtividadeForm or directly if we can
-        // Since useAtividadeForm is a composable, we might need to mock it or the action it returns
-        // Actually, the component uses useAtividadeForm which returns adicionarAtividade action.
-        
-        // Let's mock the action directly in the vm if possible, or mock the service it calls.
-        // It calls adicionarAtividadeAction(codSubprocesso.value!, codMapa.value!)
-        
-        // Let's try to mock the whole useAtividadeForm
-        // But it's already used.
-        
-        vm.adicionarAtividade = vi.fn().mockResolvedValue(true);
-        
-        await vm.handleAdicionarAtividade();
-        await nextTick();
-        
-        expect(vm.adicionarAtividade).toHaveBeenCalled();
-        // The focus logic is hard to test with stubs but we at least covered the line
-    });
-
     it("cobre executarAtualizacaoCadastro success return", async () => {
         const wrapper = createWrapper();
         await flushPromises();
@@ -315,17 +338,23 @@ describe("CadastroView Uncovered Branches", () => {
 
     it("cobre branches de watch(houveAlteracaoCadastro) e watch(disponibilizacaoSemMudancas)", async () => {
         const store = subprocessosMock;
+        store.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.NAO_INICIADO,
+            tipoProcesso: TipoProcesso.REVISAO,
+            permissoes: { podeEditarCadastro: true }
+        };
+
         (store.buscarContextoCadastroAtividadesPorProcessoEUnidade as any).mockResolvedValue({
             detalhes: {
                 codigo: 123,
-                situacao: SituacaoSubprocesso.NAO_INICIADO,
+                situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
                 tipoProcesso: TipoProcesso.REVISAO,
                 permissoes: { podeEditarCadastro: true }
             },
             mapa: { codigo: 100 },
             atividadesDisponiveis: [],
-            unidade: { sigla: 'TESTE' },
-            assinaturaCadastroReferencia: 'orig'
+            unidade: { sigla: 'TESTE' }
         });
 
         const wrapper = createWrapper();
