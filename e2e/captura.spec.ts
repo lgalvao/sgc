@@ -1,4 +1,4 @@
-import type {APIRequestContext, Locator, Page} from '@playwright/test';
+import type {APIRequestContext, Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {
@@ -32,22 +32,35 @@ import * as fs from 'node:fs';
  * para refinamento de UI. Funciona tambem como um bom teste 'smoke'
  */
 
-interface CaptureMetadata {
-    file: string;
-    url: string;
-    route: string;
-    viewport: { width: number; height: number };
-    timestamp: string;
-    tags: string[];
-    categoria: string;
-    nome: string;
-    titulo: string;
-    isFullPage: boolean;
-    isComponente: boolean;
-    [key: string]: any; // Permite campos extras flexíveis
+type ContextoCaptura = Record<string, unknown>;
+
+interface OpcoesCapturaTela {
+    fullPage?: boolean;
+    extra?: ContextoCaptura;
+    tags?: string[];
 }
 
-const capturasMetadata: CaptureMetadata[] = [];
+interface CapturaMetadata {
+    versaoEsquema: 2;
+    ordem: number;
+    arquivo: string;
+    categoria: string;
+    nome: string;
+    tags: string[];
+    pagina: {
+        url: string;
+        rota: string;
+        titulo: string;
+        viewport: { largura: number; altura: number };
+    };
+    captura: {
+        paginaInteira: boolean;
+        timestamp: string;
+    };
+    contexto: ContextoCaptura;
+}
+
+const capturasMetadata: CapturaMetadata[] = [];
 
 // Diretório onde as screenshots serão salvas
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'screenshots');
@@ -75,147 +88,105 @@ if (!fs.existsSync(SCREENSHOTS_DIR)) {
 /**
  * Helper para capturar screenshot com nome organizado
  */
-async function capturarTela(page: Page, categoria: string, nome: string, opcoes?: { fullPage?: boolean; extra?: any; tags?: string[] }) {
+async function capturarTela(
+    page: Page,
+    categoria: string,
+    nome: string,
+    opcoes?: OpcoesCapturaTela
+) {
     const url = page.url();
     const titulo = await page.title();
     const isFullPage = opcoes?.fullPage ?? true;
     const viewport = page.viewportSize() || { width: 0, height: 0 };
-    
-    // Extrair rota da URL (ex: /painel)
-    let routePath;
-    try {
-        const urlObj = new URL(url);
-        routePath = urlObj.pathname + urlObj.search;
-    } catch {
-        routePath = url;
-    }
-
-    // Injetar banner com a URL no RODAPÉ
-    await page.evaluate(({urlText, fullPage}) => {
-        const id = 'sgc-url-banner';
-        let banner = document.getElementById(id);
-        if (!banner) {
-            banner = document.createElement('div');
-            banner.id = id;
-            document.body.appendChild(banner);
-        }
-
-        Object.assign(banner.style, {
-            position: fullPage ? 'relative' : 'fixed',
-            bottom: '0',
-            left: '0',
-            width: '100%',
-            backgroundColor: '#222',
-            color: '#0f0', // Verde limão para alto contraste
-            fontSize: '11px',
-            padding: '4px 10px',
-            zIndex: '999999',
-            fontFamily: 'monospace',
-            borderTop: '1px solid #444',
-            opacity: '1',
-            textAlign: 'left',
-            boxSizing: 'border-box',
-            marginTop: fullPage ? '10px' : '0'
-        });
-        banner.textContent = `URL: ${urlText}`;
-        
-        if (fullPage) {
-            document.body.appendChild(banner); // Move para o final do body
-        }
-    }, {urlText: url, fullPage: isFullPage});
+    const rota = extrairRota(url);
 
     const nomeArquivo = `${categoria}--${nome}.png`;
     const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
-    
-    await aguardarPinturaEstavel(page);
-    
-    await page.screenshot({
-        path: caminhoCompleto,
-        fullPage: isFullPage
-    });
 
-    // Registrar metadados no formato Captus
+    const scrollOriginal = await prepararPaginaParaCaptura(page, isFullPage);
+    await aguardarInterfaceEstavelParaCaptura(page);
+
+    try {
+        await page.screenshot({
+            path: caminhoCompleto,
+            fullPage: isFullPage
+        });
+    } finally {
+        await restaurarScrollAposCaptura(page, scrollOriginal);
+    }
+
     capturasMetadata.push({
-        file: nomeArquivo,
-        url,
-        route: routePath,
-        viewport,
-        timestamp: new Date().toISOString(),
-        tags: [...(opcoes?.tags ?? []), categoria],
+        versaoEsquema: 2,
+        ordem: capturasMetadata.length + 1,
+        arquivo: nomeArquivo,
         categoria,
         nome,
-        titulo,
-        isFullPage,
-        isComponente: false,
-        ...opcoes?.extra // Espalha campos extras na raiz do objeto
+        tags: [...(opcoes?.tags ?? []), categoria],
+        pagina: {
+            url,
+            rota,
+            titulo,
+            viewport: {
+                largura: viewport.width,
+                altura: viewport.height
+            }
+        },
+        captura: {
+            paginaInteira: isFullPage,
+            timestamp: new Date().toISOString()
+        },
+        contexto: opcoes?.extra ?? {}
     });
 
-    // Remover banner após a captura
-    await page.evaluate(() => {
-        const banner = document.getElementById('sgc-url-banner');
-        if (banner) banner.remove();
+}
+
+function extrairRota(url: string): string {
+    try {
+        const urlObj = new URL(url);
+        return urlObj.pathname + urlObj.search;
+    } catch {
+        return url;
+    }
+}
+
+async function prepararPaginaParaCaptura(
+    page: Page,
+    isFullPage: boolean
+): Promise<{ x: number; y: number } | null> {
+    if (!isFullPage) {
+        return null;
+    }
+
+    return page.evaluate(() => {
+        const estiloId = 'sgc-captura-fullpage-style';
+        if (!document.getElementById(estiloId)) {
+            const estilo = document.createElement('style');
+            estilo.id = estiloId;
+            estilo.textContent = '.navbar.sticky-top { position: static !important; top: auto !important; }';
+            document.head.appendChild(estilo);
+        }
+
+        const scrollOriginal = {x: window.scrollX, y: window.scrollY};
+        window.scrollTo(0, 0);
+        return scrollOriginal;
     });
 }
 
-async function capturarComponente(elemento: Locator, categoria: string, nome: string, extra?: any, tags?: string[]) {
-    const page = elemento.page();
-    const url = page.url();
-    const titulo = await page.title();
-    const viewport = page.viewportSize() || { width: 0, height: 0 };
-    
-    // Extrair rota
-    let routePath;
-    try {
-        const urlObj = new URL(url);
-        routePath = urlObj.pathname + urlObj.search;
-    } catch {
-        routePath = url;
+async function restaurarScrollAposCaptura(
+    page: Page,
+    scrollOriginal: { x: number; y: number } | null
+): Promise<void> {
+    if (!scrollOriginal || (scrollOriginal.x === 0 && scrollOriginal.y === 0)) {
+        await page.evaluate(() => {
+            document.getElementById('sgc-captura-fullpage-style')?.remove();
+        });
+        return;
     }
 
-    // Para componentes, adicionamos um selo discreto no final
-    await elemento.evaluate((el, urlText) => {
-        const banner = document.createElement('div');
-        banner.id = 'sgc-url-banner-comp';
-        Object.assign(banner.style, {
-            backgroundColor: '#222',
-            color: '#0f0',
-            fontSize: '10px',
-            padding: '2px 6px',
-            fontFamily: 'monospace',
-            marginTop: '5px',
-            display: 'block',
-            width: '100%',
-            boxSizing: 'border-box',
-            borderTop: '1px solid #444'
-        });
-        banner.textContent = `URL: ${urlText}`;
-        el.appendChild(banner);
-    }, url);
-
-    const nomeArquivo = `${categoria}--${nome}.png`;
-    const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
-    await elemento.screenshot({path: caminhoCompleto});
-
-    // Registrar metadados no formato Captus
-    capturasMetadata.push({
-        file: nomeArquivo,
-        url,
-        route: routePath,
-        viewport,
-        timestamp: new Date().toISOString(),
-        tags: [...(tags ?? []), categoria, 'componente'],
-        categoria,
-        nome,
-        titulo,
-        isFullPage: false,
-        isComponente: true,
-        ...extra // Espalha campos extras na raiz do objeto
-    });
-
-    await elemento.evaluate((el) => {
-        const banner = el.querySelector('#sgc-url-banner-comp');
-        if (banner) banner.remove();
-    });
+    await page.evaluate(({x, y}) => {
+        document.getElementById('sgc-captura-fullpage-style')?.remove();
+        window.scrollTo(x, y);
+    }, scrollOriginal);
 }
 
 async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
@@ -224,6 +195,68 @@ async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
             globalThis.requestAnimationFrame(() => resolve());
         }));
     }
+}
+
+async function aguardarInterfaceEstavelParaCaptura(page: Page): Promise<void> {
+    await aguardarPinturaEstavel(page);
+    await aguardarModaisEstaveis(page);
+    await aguardarPinturaEstavel(page);
+}
+
+async function aguardarModaisEstaveis(page: Page): Promise<void> {
+    const duracaoMs = await page.evaluate(() => {
+        const seletores = [
+            '.modal.show',
+            '.modal.show .modal-dialog',
+            '.modal-backdrop.show',
+            '[role="dialog"]:not([aria-hidden="true"])',
+        ];
+
+        const elementos = Array.from(document.querySelectorAll<HTMLElement>(seletores.join(',')))
+            .filter((elemento) => {
+                const estilo = window.getComputedStyle(elemento);
+                return estilo.display !== 'none' && estilo.visibility !== 'hidden';
+            });
+
+        if (elementos.length === 0) {
+            return 0;
+        }
+
+        function converterTempoParaMs(valor: string): number {
+            const valorTratado = valor.trim();
+            if (valorTratado.endsWith('ms')) {
+                return Number.parseFloat(valorTratado) || 0;
+            }
+            if (valorTratado.endsWith('s')) {
+                return (Number.parseFloat(valorTratado) || 0) * 1000;
+            }
+            return Number.parseFloat(valorTratado) || 0;
+        }
+
+        function maiorTempo(listaCss: string): number {
+            return Math.max(
+                0,
+                ...listaCss.split(',').map((valor) => converterTempoParaMs(valor))
+            );
+        }
+
+        return Math.max(
+            0,
+            ...elementos.map((elemento) => {
+                const estilo = window.getComputedStyle(elemento);
+                return maiorTempo(estilo.transitionDuration)
+                    + maiorTempo(estilo.transitionDelay)
+                    + maiorTempo(estilo.animationDuration)
+                    + maiorTempo(estilo.animationDelay);
+            })
+        );
+    });
+
+    if (duracaoMs <= 0) {
+        return;
+    }
+
+    await page.waitForTimeout(Math.min(Math.ceil(duracaoMs) + 50, 1000));
 }
 
 function registrarProcessoParaCleanup(cleanup: ProcessoCleanup, codigo: number): void {
@@ -350,23 +383,23 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura telas de login', async ({page}) => {
             await page.goto('/login');
             // Tela de login inicial
-            await capturarTela(page, '01-seguranca', '01-login-inicial', {
+            await capturarTela(page, 'seguranca', 'login-inicial', {
                 tags: ['login', 'inicial']
             });
             await page.getByTestId('inp-login-usuario').click();
-            await capturarTela(page, '01-seguranca', '01b-login-campo-usuario-foco', {
+            await capturarTela(page, 'seguranca', 'login-campo-usuario-foco', {
                 tags: ['login', 'interacao']
             });
 
             // Erro de credenciais inválidas
             await page.getByTestId('inp-login-usuario').fill(USUARIOS.INVALIDO.titulo);
-            await capturarTela(page, '01-seguranca', '01c-login-usuario-preenchido', {
+            await capturarTela(page, 'seguranca', 'login-usuario-preenchido', {
                 tags: ['login', 'preenchimento']
             });
             await page.getByTestId('inp-login-senha').fill(USUARIOS.INVALIDO.senha);
             await page.getByTestId('btn-login-entrar').click();
             await verificarAppAlert(page);
-            await capturarTela(page, '01-seguranca', '02-login-erro-credenciais', {
+            await capturarTela(page, 'seguranca', 'login-erro-credenciais', {
                 tags: ['login', 'erro', 'validacao'],
                 extra: { erro: 'Credenciais inválidas' }
             });
@@ -376,14 +409,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('inp-login-senha').fill(USUARIOS.ADMIN_2_PERFIS.senha);
             await page.getByTestId('btn-login-entrar').click();
             await expect(page.getByTestId('sel-login-perfil')).toBeVisible();
-            await capturarTela(page, '01-seguranca', '03-login-selecao-perfil', {
+            await capturarTela(page, 'seguranca', 'login-selecao-perfil', {
                 tags: ['login', 'multi-perfil'],
                 extra: { usuario: USUARIOS.ADMIN_2_PERFIS.titulo }
             });
 
             // Login com perfil selecionado
             await loginComPerfil(page, USUARIOS.ADMIN_2_PERFIS.titulo, USUARIOS.ADMIN_2_PERFIS.senha, USUARIOS.ADMIN_2_PERFIS.perfil);
-            await capturarTela(page, '01-seguranca', '04-painel-apos-login', {
+            await capturarTela(page, 'seguranca', 'painel-apos-login', {
                 fullPage: true,
                 tags: ['login', 'sucesso', 'dashboard'],
                 extra: { perfil: USUARIOS.ADMIN_2_PERFIS.perfil }
@@ -399,7 +432,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const descricaoProcesso = `Processo captura ${Date.now()}`;
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
-            await capturarTela(page, '02-painel', '02-criar-processo-form-vazio', {
+            await capturarTela(page, 'painel', 'criar-processo-form-vazio', {
                 extra: { perfil: 'ADMIN' },
                 tags: ['form', 'vazio']
             });
@@ -414,7 +447,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByText('Carregando unidades...')).toBeHidden();
             await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
             await expect(page.getByTestId('btn-arvore-expand-COORD_11')).toBeVisible();
-            await capturarTela(page, '02-painel', '04-arvore-unidades-expandida', {
+            await capturarTela(page, 'painel', 'arvore-unidades-expandida', {
                 extra: { perfil: 'ADMIN', acao: 'expandir-arvore' }
             });
 
@@ -426,7 +459,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
             await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
             await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
-            await capturarTela(page, '02-painel', '05-arvore-unidades-selecionada', {
+            await capturarTela(page, 'painel', 'arvore-unidades-selecionada', {
                 tags: ['selecao', 'unidades']
             });
 
@@ -434,7 +467,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/painel/);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
             await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
-            await capturarComponente(page.getByTestId('tbl-processos'), '02-painel', '06a-tabela-processos', { perfil: 'ADMIN' });
 
             // Capturar ID para cleanup
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
@@ -444,14 +476,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.goto('/painel');
 
             // Painel com processo criado
-            await capturarTela(page, '02-painel', '06-painel-admin-com-processo', {
+            await capturarTela(page, 'painel', 'painel-admin-com-processo', {
                 fullPage: true,
                 extra: { perfil: 'ADMIN' }
             });
 
             // Hover em linha da tabela
             await page.getByText(descricaoProcesso).hover();
-            await capturarTela(page, '02-painel', '07-painel-hover-processo', {
+            await capturarTela(page, 'painel', 'painel-hover-processo', {
                 tags: ['interacao', 'hover']
             });
         });
@@ -472,7 +504,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
             await expect(page.getByTestId('tbl-processos').getByText(desc).first()).toBeVisible();
-            await capturarTela(page, '02-painel', '10-painel-gestor', {
+            await capturarTela(page, 'painel', 'painel-gestor', {
                 fullPage: true,
                 extra: { perfil: 'GESTOR', unidade: 'COORD_11' }
             });
@@ -485,7 +517,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
             await expect(page.getByTestId('tbl-processos').getByText(desc).first()).toBeVisible();
-            await capturarTela(page, '02-painel', '11-painel-chefe', {
+            await capturarTela(page, 'painel', 'painel-chefe', {
                 fullPage: true,
                 extra: { perfil: 'CHEFE', unidade: 'SECAO_211' }
             });
@@ -514,14 +546,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             registrarProcessoParaCleanup(cleanup, codProcesso);
 
             // Tela de edição de processo
-            await capturarTela(page, '03-processo', '01-processo-edicao', {
+            await capturarTela(page, 'processo', 'processo-edicao', {
                 extra: { perfil: 'ADMIN', estado: 'CRIADO' }
             });
 
             // Modal de iniciar processo
             await page.getByTestId('btn-processo-iniciar').click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '03-processo', '02-modal-iniciar-processo', {
+            await capturarTela(page, 'processo', 'modal-iniciar-processo', {
                 tags: ['modal', 'confirmacao'],
                 extra: { acao: 'iniciar-processo' }
             });
@@ -533,7 +565,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Acessar detalhes do processo iniciado
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page).toHaveURL(/\/processo\/\d+/);
-            await capturarTela(page, '03-processo', '03-detalhes-processo-iniciado', {
+            await capturarTela(page, 'processo', 'detalhes-processo-iniciado', {
                 fullPage: true,
                 extra: { perfil: 'ADMIN', estado: 'EM_ANDAMENTO' }
             });
@@ -554,7 +586,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaAtividades(page);
             await adicionarAtividade(page, atividade);
             await adicionarConhecimento(page, atividade, conhecimento);
-            await capturarTela(page, '03-processo', '03a-cadastro-chefe', {
+            await capturarTela(page, 'processo', 'cadastro-chefe', {
                 extra: { perfil: 'CHEFE', unidade: unidadeAlvo, acao: 'cadastro-atividades' }
             });
             await disponibilizarCadastro(page);
@@ -563,12 +595,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
             await navegarParaAtividadesVisualizacao(page);
-            await capturarTela(page, '03-processo', '03b-analise-gestor', {
+            await capturarTela(page, 'processo', 'analise-gestor', {
                 extra: { perfil: 'GESTOR', unidade: unidadeAlvo, acao: 'analise-cadastro' }
             });
             await page.getByTestId('btn-acao-analisar-principal').click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '03-processo', '03c-modal-aceite-gestor', {
+            await capturarTela(page, 'processo', 'modal-aceite-gestor', {
                 tags: ['modal', 'aceite']
             });
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para captura de tela');
@@ -581,7 +613,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-analisar-principal').click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '03-processo', '03d-modal-homologacao-admin', {
+            await capturarTela(page, 'processo', 'modal-homologacao-admin', {
                 tags: ['modal', 'homologacao'],
                 extra: { perfil: 'ADMIN' }
             });
@@ -596,7 +628,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.locator('label').filter({hasText: atividade}).click();
             await page.getByTestId('btn-criar-competencia-salvar').click();
             await expect(page.locator('.competencia-card', {has: page.getByText(competencia)})).toBeVisible();
-            await capturarTela(page, '03-processo', '03e-mapa-criado', {
+            await capturarTela(page, 'processo', 'mapa-criado', {
                 extra: { perfil: 'ADMIN', acao: 'edicao-mapa' }
             });
             await disponibilizarMapa(page);
@@ -620,7 +652,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-validar').click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '03-processo', '03f-modal-validar-mapa', {
+            await capturarTela(page, 'processo', 'modal-validar-mapa', {
                 tags: ['modal', 'validacao-mapa'],
                 extra: { perfil: 'CHEFE' }
             });
@@ -643,7 +675,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.goto(`/processo/${processoCodigo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}$`));
-            await capturarTela(page, '03-processo', '03i-detalhes-processo-finalizavel', {
+            await capturarTela(page, 'processo', 'detalhes-processo-finalizavel', {
                 fullPage: true,
                 extra: { perfil: 'ADMIN', acao: 'finalizacao-processo' }
             });
@@ -651,11 +683,11 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Modal de finalizar processo
             await page.getByTestId('btn-processo-finalizar').click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '03-processo', '04-modal-finalizar-processo', {
+            await capturarTela(page, 'processo', 'modal-finalizar-processo', {
                 tags: ['modal', 'finalizar']
             });
             await page.getByRole('button', {name: 'Cancelar'}).click();
-            await capturarTela(page, '03-processo', '05-detalhes-processo-apos-cancelar-finalizacao', {
+            await capturarTela(page, 'processo', 'detalhes-processo-apos-cancelar-finalizacao', {
                 fullPage: true
             });
         });
@@ -672,14 +704,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Estado inicial vazio
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
-            await capturarTela(page, '03-processo', '10-botoes-desativados-form-vazio', {
+            await capturarTela(page, 'processo', 'botoes-desativados-form-vazio', {
                 tags: ['validacao', 'form'],
                 extra: { motivo: 'falta-campos-obrigatorios' }
             });
 
             await page.getByTestId('inp-processo-descricao').fill(descricao);
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
-            await capturarTela(page, '03-processo', '11-botoes-desativados-falta-data-unidade', {
+            await capturarTela(page, 'processo', 'botoes-desativados-falta-data-unidade', {
                 extra: { preenchido: 'descricao' }
             });
 
@@ -689,7 +721,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
-            await capturarTela(page, '03-processo', '12-botoes-desativados-falta-unidade', {
+            await capturarTela(page, 'processo', 'botoes-desativados-falta-unidade', {
                 extra: { preenchido: ['descricao', 'tipo', 'data'] }
             });
 
@@ -701,7 +733,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByTestId('chk-arvore-unidade-SECAO_211')).toBeVisible();
             await page.getByTestId('chk-arvore-unidade-SECAO_211').click();
             await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
-            await capturarTela(page, '03-processo', '13-botoes-ativados-form-completo', {
+            await capturarTela(page, 'processo', 'botoes-ativados-form-completo', {
                 tags: ['validacao', 'sucesso']
             });
 
@@ -721,39 +753,39 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
-            await capturarTela(page, '04-subprocesso', '01-dashboard-subprocesso', {
+            await capturarTela(page, 'subprocesso', 'dashboard-subprocesso', {
                 fullPage: true,
                 extra: { perfil: 'CHEFE', unidade: UNIDADE_ALVO }
             });
 
             // Entrar em atividades
             await navegarParaAtividades(page);
-            await capturarTela(page, '04-subprocesso', '02-cadastro-atividades-vazio', {
+            await capturarTela(page, 'subprocesso', 'cadastro-atividades-vazio', {
                 fullPage: true,
                 tags: ['atividades', 'vazio']
             });
 
             const atividadeDesc = `Atividade teste ${Date.now()}`;
             await page.getByTestId('inp-nova-atividade').fill(atividadeDesc);
-            await capturarTela(page, '04-subprocesso', '03-cadastro-atividades-preenchendo', {
+            await capturarTela(page, 'subprocesso', 'cadastro-atividades-preenchendo', {
                 tags: ['interacao']
             });
             await page.getByTestId('btn-adicionar-atividade').click();
             await expect(page.getByText(atividadeDesc, {exact: true})).toBeVisible();
-            await capturarTela(page, '04-subprocesso', '04-cadastro-atividades-com-uma', {
+            await capturarTela(page, 'subprocesso', 'cadastro-atividades-com-uma', {
                 fullPage: true,
                 extra: { atividade: atividadeDesc }
             });
 
             const card = page.locator('.atividade-card', {has: page.getByText(atividadeDesc)});
             await card.getByTestId('inp-novo-conhecimento').fill('Java');
-            await capturarTela(page, '04-subprocesso', '05-cadastro-conhecimento-preenchendo', {
+            await capturarTela(page, 'subprocesso', 'cadastro-conhecimento-preenchendo', {
                 tags: ['conhecimento', 'edicao']
             });
             await adicionarConhecimento(page, atividadeDesc, 'Java');
             await adicionarConhecimento(page, atividadeDesc, 'Spring Boot');
             await adicionarConhecimento(page, atividadeDesc, 'Oracle');
-            await capturarTela(page, '04-subprocesso', '06-cadastro-atividade-completa', {
+            await capturarTela(page, 'subprocesso', 'cadastro-atividade-completa', {
                 fullPage: true,
                 extra: { conhecimentos: ['Java', 'Spring Boot', 'Oracle'] }
             });
@@ -761,19 +793,19 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Hover na atividade para ver ações
             await card.locator('.atividade-hover-row').hover();
             await aguardarPinturaEstavel(page);
-            await capturarTela(page, '04-subprocesso', '07-cadastro-atividade-hover', {
+            await capturarTela(page, 'subprocesso', 'cadastro-atividade-hover', {
                 tags: ['interacao', 'hover']
             });
 
             // Tentar disponibilizar sem data
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '04-subprocesso', '08-modal-disponibilizar-atividades', {
+            await capturarTela(page, 'subprocesso', 'modal-disponibilizar-atividades', {
                 tags: ['modal', 'disponibilizar']
             });
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await verificarPaginaPainel(page);
-            await capturarTela(page, '04-subprocesso', '09-cadastro-atividades-disponibilizado', {
+            await capturarTela(page, 'subprocesso', 'cadastro-atividades-disponibilizado', {
                 fullPage: true,
                 extra: { estado: 'DISPONIBILIZADO' }
             });
@@ -810,7 +842,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaAtividades(page);
 
             // Capturar tela inicial vazia com label "Conhecimentos *"
-            await capturarTela(page, '04-subprocesso', '20-cadastro-vazio-com-label-obrigatorio', {
+            await capturarTela(page, 'subprocesso', 'cadastro-vazio-com-label-obrigatorio', {
                 fullPage: true,
                 tags: ['ui-clue', 'obrigatorio']
             });
@@ -819,7 +851,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const atividade1 = `Atividade sem conhecimento 1 ${Date.now()}`;
             await adicionarAtividade(page, atividade1);
             await expect(page.locator('.atividade-card', {has: page.getByText(atividade1)})).toBeVisible();
-            await capturarTela(page, '04-subprocesso', '21-atividade-sem-conhecimento', {
+            await capturarTela(page, 'subprocesso', 'atividade-sem-conhecimento', {
                 fullPage: true,
                 extra: { erro: 'falta-conhecimento' }
             });
@@ -834,14 +866,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await adicionarAtividade(page, atividade3);
             await adicionarConhecimento(page, atividade3, 'Java');
             await expect(page.locator('.atividade-card', {has: page.getByText(atividade3)})).toContainText('Java');
-            await capturarTela(page, '04-subprocesso', '22-mix-atividades-com-sem-conhecimento', {
+            await capturarTela(page, 'subprocesso', 'mix-atividades-com-sem-conhecimento', {
                 fullPage: true,
                 tags: ['validacao', 'visual']
             });
 
             // Sem conhecimento em todas as atividades, o botão deve permanecer desabilitado
             await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
-            await capturarTela(page, '04-subprocesso', '23-botao-disponibilizar-desabilitado-sem-conhecimento', {
+            await capturarTela(page, 'subprocesso', 'botao-disponibilizar-desabilitado-sem-conhecimento', {
                 fullPage: true,
                 tags: ['validacao', 'bloqueio']
             });
@@ -850,46 +882,21 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const card2 = page.locator('.atividade-card', {has: page.getByText(atividade2)});
             await card2.scrollIntoViewIfNeeded();
             await aguardarPinturaEstavel(page);
-            await capturarTela(page, '04-subprocesso', '24-segunda-atividade-sem-conhecimento', {
+            await capturarTela(page, 'subprocesso', 'segunda-atividade-sem-conhecimento', {
                 tags: ['scroll', 'validacao']
-            });
-
-            // Capturar detalhe do card sem conhecimento
-            const primeiroCard = page.locator('.atividade-card', {has: page.getByText(atividade1)});
-            await primeiroCard.scrollIntoViewIfNeeded();
-            await aguardarPinturaEstavel(page);
-
-            // Capturar apenas o card para detalhe
-            await primeiroCard.screenshot({
-                path: path.join(SCREENSHOTS_DIR, '04-subprocesso--25-detalhe-card-sem-conhecimento.png')
-            });
-            // Registrar manualmente no array pois não usamos capturarTela
-            capturasMetadata.push({
-                file: '04-subprocesso--25-detalhe-card-sem-conhecimento.png',
-                url: page.url(),
-                route: new URL(page.url()).pathname,
-                viewport: page.viewportSize() || { width: 0, height: 0 },
-                timestamp: new Date().toISOString(),
-                tags: ['04-subprocesso', 'detalhe', 'erro'],
-                categoria: '04-subprocesso',
-                nome: '25-detalhe-card-sem-conhecimento',
-                titulo: await page.title(),
-                isFullPage: false,
-                isComponente: true,
-                motivo: 'visualizar erro no card'
             });
 
             // Corrigir primeira atividade adicionando conhecimento
             await adicionarConhecimento(page, atividade1, 'Python');
             await expect(page.locator('.atividade-card', {has: page.getByText(atividade1)})).toContainText('Python');
-            await capturarTela(page, '04-subprocesso', '26-erro-desaparece-apos-correcao', {
+            await capturarTela(page, 'subprocesso', 'erro-desaparece-apos-correcao', {
                 fullPage: true,
                 extra: { atividadeCorrigida: atividade1 }
             });
 
             // Ainda deve permanecer bloqueado porque a atividade 2 continua sem conhecimento
             await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
-            await capturarTela(page, '04-subprocesso', '27-botao-ainda-desabilitado-com-atividade-restante', {
+            await capturarTela(page, 'subprocesso', 'botao-ainda-desabilitado-com-atividade-restante', {
                 extra: { pendente: atividade2 }
             });
 
@@ -905,7 +912,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Garantir que a modal está visível antes de capturar
             await expect(modalConfirmacao).toBeVisible();
-            await capturarTela(page, '04-subprocesso', '28-modal-confirmacao-disponibilizacao', {
+            await capturarTela(page, 'subprocesso', 'modal-confirmacao-disponibilizacao', {
                 tags: ['modal', 'sucesso']
             });
         });
@@ -959,7 +966,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
-            await capturarTela(page, '05-mapa', '00a-analise-gestor-coordenadoria', {
+            await capturarTela(page, 'mapa', 'analise-gestor-coordenadoria', {
                 fullPage: true,
                 extra: { perfil: 'GESTOR_COORD', acao: 'aceite-1' }
             });
@@ -971,7 +978,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
-            await capturarTela(page, '05-mapa', '00b-analise-chefe-secretaria', {
+            await capturarTela(page, 'mapa', 'analise-chefe-secretaria', {
                 fullPage: true,
                 extra: { perfil: 'GESTOR_SEC', acao: 'aceite-2' }
             });
@@ -994,7 +1001,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Agora o Mapa deve estar habilitado para edição pelo Admin
             // Navegar para mapa
             await navegarParaMapa(page);
-            await capturarTela(page, '05-mapa', '01-mapa-vazio', {
+            await capturarTela(page, 'mapa', 'mapa-vazio', {
                 fullPage: true,
                 tags: ['mapa', 'vazio'],
                 extra: { perfil: 'ADMIN' }
@@ -1002,26 +1009,26 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await abrirModalCriarCompetencia(page);
             await expect(page.getByTestId('mdl-criar-competencia')).toBeVisible();
-            await capturarTela(page, '05-mapa', '02-modal-criar-competencia', {
+            await capturarTela(page, 'mapa', 'modal-criar-competencia', {
                 tags: ['modal', 'criacao-competencia']
             });
 
             const competenciaDesc = 'Desenvolvimento de Software';
             await page.getByTestId('inp-criar-competencia-descricao').fill(competenciaDesc);
-            await capturarTela(page, '05-mapa', '03-modal-criar-competencia-preenchida', {
+            await capturarTela(page, 'mapa', 'modal-criar-competencia-preenchida', {
                 extra: { competencia: competenciaDesc }
             });
 
             const modal = page.getByTestId('mdl-criar-competencia');
             await modal.locator('label').filter({hasText: 'Desenvolvimento web'}).click();
             await modal.locator('label').filter({hasText: 'Desenvolvimento backend'}).click();
-            await capturarTela(page, '05-mapa', '04-modal-criar-competencia-atividades-selecionadas', {
+            await capturarTela(page, 'mapa', 'modal-criar-competencia-atividades-selecionadas', {
                 tags: ['selecao', 'atividades']
             });
 
             await page.getByTestId('btn-criar-competencia-salvar').click();
             await expect(modal).toBeHidden();
-            await capturarTela(page, '05-mapa', '05-mapa-com-competencia', {
+            await capturarTela(page, 'mapa', 'mapa-com-competencia', {
                 fullPage: true,
                 extra: { competenciaCriada: competenciaDesc }
             });
@@ -1030,14 +1037,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const card = page.locator('.competencia-card', {has: page.getByText(competenciaDesc)});
             await card.hover();
             await aguardarPinturaEstavel(page);
-            await capturarTela(page, '05-mapa', '06-mapa-competencia-hover', {
+            await capturarTela(page, 'mapa', 'mapa-competencia-hover', {
                 tags: ['interacao', 'hover']
             });
 
             await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
             await page.getByTestId('btn-cad-mapa-disponibilizar').click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '05-mapa', '07-modal-disponibilizar-mapa', {
+            await capturarTela(page, 'mapa', 'modal-disponibilizar-mapa', {
                 tags: ['modal', 'disponibilizar-mapa']
             });
 
@@ -1046,7 +1053,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('inp-disponibilizar-mapa-data').fill(dataLimite.toISOString().split('T')[0]);
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
             await verificarPaginaPainel(page);
-            await capturarTela(page, '05-mapa', '08-mapa-disponibilizado', {
+            await capturarTela(page, 'mapa', 'mapa-disponibilizado', {
                 fullPage: true,
                 extra: { estado: 'MAPA_DISPONIBILIZADO' }
             });
@@ -1057,31 +1064,30 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura elementos de navegação', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            await capturarTela(page, '06-navegacao', '01-menu-principal', { tags: ['layout', 'menu'] });
+            await capturarTela(page, 'navegacao', 'menu-principal', { tags: ['layout', 'menu'] });
 
             // Configs (se admin)
             await page.getByTestId('btn-configuracoes').click();
             await expect(page).toHaveURL(/\/config/);
-            await capturarTela(page, '06-navegacao', '02-menu-configs', { extra: { secao: 'configuracoes' } });
+            await capturarTela(page, 'navegacao', 'menu-configs', { extra: { secao: 'configuracoes' } });
             await page.goto('/painel');
 
             // Seção unidades (para ADMIN)
             await page.getByText('Unidades').first().click();
             await expect(page).toHaveURL(/\/unidades/);
-            await capturarTela(page, '06-navegacao', '03-unidades', { fullPage: true });
+            await capturarTela(page, 'navegacao', 'unidades', { fullPage: true });
 
             await page.getByText('Relatórios').click();
             await expect(page).toHaveURL(/\/relatorios/);
-            await capturarTela(page, '06-navegacao', '04-relatorios', { fullPage: true });
+            await capturarTela(page, 'navegacao', 'relatorios', { fullPage: true });
 
             await page.getByText('Histórico').click();
             await expect(page).toHaveURL(/\/historico/);
-            await capturarTela(page, '06-navegacao', '05-historico', { fullPage: true });
-            await capturarComponente(page.getByRole('navigation').first(), '06-navegacao', '05a-barra-lateral', { parte: 'sidebar' });
+            await capturarTela(page, 'navegacao', 'historico', { fullPage: true });
 
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
             await aguardarPinturaEstavel(page);
-            await capturarTela(page, '06-navegacao', '06-rodape', { tags: ['layout', 'footer'] });
+            await capturarTela(page, 'navegacao', 'rodape', { tags: ['layout', 'footer'] });
         });
     });
 
@@ -1104,7 +1110,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             registrarProcessoParaCleanup(cleanup, codProcesso1);
             await page.goto('/painel');
 
-            await capturarTela(page, '07-estados', '01-processo-criado', { extra: { estado: 'CRIADO' } });
+            await capturarTela(page, 'estados', 'processo-criado', { extra: { estado: 'CRIADO' } });
 
             const processosAndamento = `Proc ANDAMENTO ${Date.now()}`;
             await criarProcesso(page, {
@@ -1117,8 +1123,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
 
-            await capturarTela(page, '07-estados', '02-processo-em-andamento', { extra: { estado: 'EM_ANDAMENTO' } });
-            await capturarComponente(page.getByTestId('tbl-processos'), '07-estados', '03-tabela-com-multiplos-estados', { contexto: 'painel-admin' });
+            await capturarTela(page, 'estados', 'processo-em-andamento', { extra: { estado: 'EM_ANDAMENTO' } });
         });
     });
 
@@ -1128,17 +1133,17 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Desktop padrão (1920x1080)
             await page.setViewportSize({width: 1920, height: 1080});
-            await capturarTela(page, '08-responsividade', '01-desktop-1920x1080', { fullPage: true, tags: ['res-high'] });
+            await capturarTela(page, 'responsividade', 'desktop-1920x1080', { fullPage: true, tags: ['res-high'] });
 
             // Desktop médio (1366x768)
             await page.setViewportSize({width: 1366, height: 768});
-            await capturarTela(page, '08-responsividade', '02-desktop-1366x768', { fullPage: true, tags: ['res-medium'] });
+            await capturarTela(page, 'responsividade', 'desktop-1366x768', { fullPage: true, tags: ['res-medium'] });
 
             await page.setViewportSize({width: 768, height: 1024});
-            await capturarTela(page, '08-responsividade', '03-tablet-768x1024', { fullPage: true, tags: ['res-tablet'] });
+            await capturarTela(page, 'responsividade', 'tablet-768x1024', { fullPage: true, tags: ['res-tablet'] });
 
             await page.setViewportSize({width: 375, height: 667});
-            await capturarTela(page, '08-responsividade', '04-mobile-375x667', { fullPage: true, tags: ['res-mobile'] });
+            await capturarTela(page, 'responsividade', 'mobile-375x667', { fullPage: true, tags: ['res-mobile'] });
         });
     });
 
@@ -1161,7 +1166,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.goto(`/processo/${codProcesso}`);
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-            await capturarTela(page, '09-operacoes-bloco', '01-detalhes-processo-gestor', { 
+            await capturarTela(page, 'operacoes-bloco', 'detalhes-processo-gestor', { 
                 fullPage: true, 
                 extra: { perfil: 'GESTOR', acao: 'ver-bloco' } 
             });
@@ -1171,7 +1176,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(btnAceitarBloco).toBeVisible();
             await btnAceitarBloco.click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '09-operacoes-bloco', '02-modal-aceitar-cadastro-bloco', { tags: ['modal', 'bloco'] });
+            await capturarTela(page, 'operacoes-bloco', 'modal-aceitar-cadastro-bloco', { tags: ['modal', 'bloco'] });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Executar aceite real para mover subprocesso para Secretaria 2
@@ -1207,7 +1212,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(btnHomologarBloco).toBeVisible();
             await btnHomologarBloco.click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '09-operacoes-bloco', '03-modal-homologar-cadastro-bloco', { extra: { perfil: 'ADMIN' } });
+            await capturarTela(page, 'operacoes-bloco', 'modal-homologar-cadastro-bloco', { extra: { perfil: 'ADMIN' } });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
@@ -1250,14 +1255,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByRole('row', {name: /SECAO_121/i}).click();
             await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121/);
-            await capturarTela(page, '10-gestao-subprocessos', '01-detalhes-subprocesso-admin', { fullPage: true, extra: { perfil: 'ADMIN' } });
+            await capturarTela(page, 'gestao-subprocessos', 'detalhes-subprocesso-admin', { fullPage: true, extra: { perfil: 'ADMIN' } });
 
             // Modal de alterar data limite (CDU-27)
             const btnAlterarData = page.getByRole('button', {name: /Alterar.*data.*limite/i});
             await expect(btnAlterarData).toBeVisible();
             await btnAlterarData.click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '10-gestao-subprocessos', '02-modal-alterar-data-limite', { tags: ['modal', 'gestao'] });
+            await capturarTela(page, 'gestao-subprocessos', 'modal-alterar-data-limite', { tags: ['modal', 'gestao'] });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Modal de reabrir cadastro (CDU-32)
@@ -1267,7 +1272,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // CDU-34: Botão de enviar lembrete (ação direta, sem modal)
             const btnEnviarLembrete = page.getByRole('button', {name: /Enviar.*lembrete/i});
             await expect(btnEnviarLembrete).toBeVisible();
-            await capturarTela(page, '10-gestao-subprocessos', '04-botao-enviar-lembrete', { tags: ['acao-direta'] });
+            await capturarTela(page, 'gestao-subprocessos', 'botao-enviar-lembrete', { tags: ['acao-direta'] });
         });
     });
 
@@ -1280,20 +1285,20 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(linkUnidades).toBeVisible();
             await linkUnidades.click();
             await expect(page).toHaveURL(/\/unidades/);
-            await capturarTela(page, '11-unidades', '01-arvore-unidades', { fullPage: true });
+            await capturarTela(page, 'unidades', 'arvore-unidades', { fullPage: true });
 
             // A árvore de unidades agora vem expandida por padrão
             await expect(page.getByText('SECRETARIA_1').first()).toBeVisible();
             await expect(page.getByText('COORD_12').first()).toBeVisible();
             await expect(page.getByText('SECAO_121').first()).toBeVisible();
             
-            await capturarTela(page, '11-unidades', '02-arvore-unidades-expandida', { fullPage: true });
+            await capturarTela(page, 'unidades', 'arvore-unidades-expandida', { fullPage: true });
 
             const unidade = page.getByText('SECAO_121').first();
             await expect(unidade).toBeVisible();
             await unidade.click();
             await expect(page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i})).toBeVisible();
-            await capturarTela(page, '11-unidades', '03-detalhes-unidade', { fullPage: true, extra: { unidade: 'SECAO_121' } });
+            await capturarTela(page, 'unidades', 'detalhes-unidade', { fullPage: true, extra: { unidade: 'SECAO_121' } });
 
             const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
             await expect(btnCriarAtribuicao).toBeVisible();
@@ -1301,7 +1306,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
             await expect(page.getByRole('heading', {name: TEXTOS.atribuicaoTemporaria.TITULO})).toBeVisible();
             await expect(page.getByTestId('input-busca-usuario')).toBeVisible();
-            await capturarTela(page, '11-unidades', '04-tela-criar-atribuicao', { tags: ['tela', 'atribuicao'] });
+            await capturarTela(page, 'unidades', 'tela-criar-atribuicao', { tags: ['tela', 'atribuicao'] });
             await page.getByTestId('btn-cancelar-atribuicao').click();
             await expect(page).toHaveURL(/\/unidade\/\d+$/);
 
@@ -1309,53 +1314,52 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(linkHistorico).toBeVisible();
             await linkHistorico.click();
             await expect(page.locator('table').first()).toBeVisible();
-            await capturarTela(page, '12-historico', '01-pagina-historico', { fullPage: true });
+            await capturarTela(page, 'historico', 'pagina-historico', { fullPage: true });
 
             const tabela = page.locator('table');
             await expect(tabela).toBeVisible();
-            await capturarTela(page, '12-historico', '02-tabela-processos-finalizados', { fullPage: true });
-            await capturarComponente(tabela.first(), '12-historico', '03-tabela-processos-finalizados-detalhe', { contexto: 'historico' });
+            await capturarTela(page, 'historico', 'tabela-processos-finalizados', { fullPage: true });
 
             await page.getByTestId('btn-configuracoes').click();
             await expect(page.getByLabel(/Dias para inativação de processos/i)).toBeVisible();
-            await capturarTela(page, '13-configuracoes', '01-pagina-configuracoes', { fullPage: true });
+            await capturarTela(page, 'configuracoes', 'pagina-configuracoes', { fullPage: true });
 
             const inputDiasInativacao = page.getByLabel(/Dias para inativação de processos/i);
             await expect(inputDiasInativacao).toBeVisible();
-            await capturarTela(page, '13-configuracoes', '02-config-sistema', { tags: ['config'] });
+            await capturarTela(page, 'configuracoes', 'config-sistema', { tags: ['config'] });
 
             await page.getByTestId('btn-administradores').click();
             await expect(page.getByRole('button', {name: /Adicionar|Novo/i})).toBeVisible();
-            await capturarTela(page, '13-configuracoes', '03-lista-administradores', { fullPage: true });
+            await capturarTela(page, 'configuracoes', 'lista-administradores', { fullPage: true });
 
             const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
             await expect(btnAdicionar).toBeVisible();
             await btnAdicionar.click();
             await expect(page.getByRole('dialog')).toBeVisible();
-            await capturarTela(page, '13-configuracoes', '04-modal-adicionar-administrador', { tags: ['modal', 'admin'] });
+            await capturarTela(page, 'configuracoes', 'modal-adicionar-administrador', { tags: ['modal', 'admin'] });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
             await expect(linkRelatorios).toBeVisible();
             await linkRelatorios.click();
             await expect(page.getByTestId('card-relatorio-andamento')).toBeVisible();
-            await capturarTela(page, '14-relatorios', '01-pagina-relatorios', { fullPage: true });
+            await capturarTela(page, 'relatorios', 'pagina-relatorios', { fullPage: true });
 
             await page.getByTestId('card-relatorio-andamento').click();
             await expect(page.getByTestId('select-processo-andamento')).toBeVisible();
-            await capturarTela(page, '14-relatorios', '02-relatorio-andamento', { extra: { relatorio: 'andamento' } });
+            await capturarTela(page, 'relatorios', 'relatorio-andamento', { extra: { relatorio: 'andamento' } });
 
             await expect(page.getByTestId('btn-gerar-andamento')).toBeVisible();
-            await capturarTela(page, '14-relatorios', '03-botao-gerar-relatorio', { tags: ['ui-element'] });
+            await capturarTela(page, 'relatorios', 'botao-gerar-relatorio', { tags: ['ui-element'] });
 
             await page.goto('/relatorios');
             await page.getByTestId('card-relatorio-mapas').click();
             await expect(page.getByTestId('select-processo-mapas')).toBeVisible();
             await expect(page.getByTestId('select-unidade-mapas')).toBeVisible();
-            await capturarTela(page, '14-relatorios', '04-relatorio-mapas', { extra: { relatorio: 'mapas' } });
+            await capturarTela(page, 'relatorios', 'relatorio-mapas', { extra: { relatorio: 'mapas' } });
 
             await expect(page.getByTestId('btn-gerar-mapas')).toBeVisible();
-            await capturarTela(page, '14-relatorios', '05-botao-gerar-pdf', { tags: ['ui-element', 'pdf'] });
+            await capturarTela(page, 'relatorios', 'botao-gerar-pdf', { tags: ['ui-element', 'pdf'] });
         });
     });
 });
