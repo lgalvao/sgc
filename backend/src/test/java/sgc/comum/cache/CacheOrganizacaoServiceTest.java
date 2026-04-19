@@ -4,14 +4,20 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.cache.*;
 import org.springframework.transaction.support.*;
+
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CacheOrganizacaoServiceTest {
     @Mock
-    private AgendadorRefreshCache agendadorRefreshCache;
+    private CacheManager cacheManager;
+
+    @Mock
+    private Cache cacheOrganizacao;
 
     @Mock
     private RegistroSseEmitter registroSseEmitter;
@@ -29,9 +35,11 @@ class CacheOrganizacaoServiceTest {
     @Test
     @DisplayName("deve invalidar imediatamente quando não houver transação ativa")
     void deveInvalidarImediatamenteSemTransacaoAtiva() {
+        configurarCaches();
+
         cacheOrganizacaoService.invalidarAposCommit();
 
-        verify(agendadorRefreshCache).evictarTodosCaches();
+        verify(cacheOrganizacao).clear();
         verify(registroSseEmitter).transmitir("org-cache-refreshed");
     }
 
@@ -39,14 +47,20 @@ class CacheOrganizacaoServiceTest {
     @DisplayName("deve aguardar afterCommit quando houver sincronização ativa")
     void deveAguardarAfterCommitComSincronizacaoAtiva() {
         TransactionSynchronizationManager.initSynchronization();
+        configurarCaches();
 
         cacheOrganizacaoService.invalidarAposCommit();
 
-        verifyNoInteractions(agendadorRefreshCache, registroSseEmitter);
+        verifyNoInteractions(cacheOrganizacao, registroSseEmitter);
 
         TransactionSynchronizationManager.getSynchronizations().forEach(TransactionSynchronization::afterCommit);
 
-        verify(agendadorRefreshCache).evictarTodosCaches();
+        verify(cacheOrganizacao).clear();
         verify(registroSseEmitter).transmitir("org-cache-refreshed");
+    }
+
+    private void configurarCaches() {
+        when(cacheManager.getCacheNames()).thenReturn(List.of("organizacao"));
+        when(cacheManager.getCache("organizacao")).thenReturn(cacheOrganizacao);
     }
 }
