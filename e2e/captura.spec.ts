@@ -41,26 +41,28 @@ interface OpcoesCapturaTela {
 }
 
 interface CapturaMetadata {
-    versaoEsquema: 2;
     ordem: number;
     arquivo: string;
     categoria: string;
     nome: string;
-    tags: string[];
-    pagina: {
-        url: string;
-        rota: string;
-        titulo: string;
-        viewport: { largura: number; altura: number };
-    };
-    captura: {
-        paginaInteira: boolean;
-        timestamp: string;
-    };
-    contexto: ContextoCaptura;
+    rota: string;
+    titulo: string;
+    tags?: string[];
+    viewport?: { largura: number; altura: number };
+    contexto?: ContextoCaptura;
+}
+
+interface DocumentoCapturasMetadata {
+    versaoEsquema: 1;
+    geradoEm: string;
+    baseUrl: string;
+    viewportPadrao: { largura: number; altura: number };
+    capturas: CapturaMetadata[];
 }
 
 const capturasMetadata: CapturaMetadata[] = [];
+let baseUrlMetadata = '';
+let viewportPadraoMetadata: { largura: number; altura: number } | null = null;
 
 // Diretório onde as screenshots serão salvas
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'screenshots');
@@ -99,6 +101,14 @@ async function capturarTela(
     const isFullPage = opcoes?.fullPage ?? true;
     const viewport = page.viewportSize() || { width: 0, height: 0 };
     const rota = extrairRota(url);
+    const viewportAtual = {largura: viewport.width, altura: viewport.height};
+
+    if (!baseUrlMetadata) {
+        baseUrlMetadata = extrairBaseUrl(url);
+    }
+    if (!viewportPadraoMetadata) {
+        viewportPadraoMetadata = viewportAtual;
+    }
 
     const nomeArquivo = `${categoria}--${nome}.png`;
     const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
@@ -115,28 +125,26 @@ async function capturarTela(
         await restaurarScrollAposCaptura(page, scrollOriginal);
     }
 
-    capturasMetadata.push({
-        versaoEsquema: 2,
+    const metadata: CapturaMetadata = {
         ordem: capturasMetadata.length + 1,
         arquivo: nomeArquivo,
         categoria,
         nome,
-        tags: [...(opcoes?.tags ?? []), categoria],
-        pagina: {
-            url,
-            rota,
-            titulo,
-            viewport: {
-                largura: viewport.width,
-                altura: viewport.height
-            }
-        },
-        captura: {
-            paginaInteira: isFullPage,
-            timestamp: new Date().toISOString()
-        },
-        contexto: opcoes?.extra ?? {}
-    });
+        rota,
+        titulo
+    };
+
+    if (opcoes?.tags && opcoes.tags.length > 0) {
+        metadata.tags = opcoes.tags;
+    }
+    if (viewportPadraoMetadata.largura !== viewportAtual.largura || viewportPadraoMetadata.altura !== viewportAtual.altura) {
+        metadata.viewport = viewportAtual;
+    }
+    if (opcoes?.extra && Object.keys(opcoes.extra).length > 0) {
+        metadata.contexto = opcoes.extra;
+    }
+
+    capturasMetadata.push(metadata);
 
 }
 
@@ -147,6 +155,24 @@ function extrairRota(url: string): string {
     } catch {
         return url;
     }
+}
+
+function extrairBaseUrl(url: string): string {
+    try {
+        return new URL(url).origin;
+    } catch {
+        return '';
+    }
+}
+
+function montarDocumentoCapturasMetadata(): DocumentoCapturasMetadata {
+    return {
+        versaoEsquema: 1,
+        geradoEm: new Date().toISOString(),
+        baseUrl: baseUrlMetadata,
+        viewportPadrao: viewportPadraoMetadata ?? {largura: 0, altura: 0},
+        capturas: capturasMetadata
+    };
 }
 
 async function prepararPaginaParaCaptura(
@@ -375,7 +401,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.afterAll(async () => {
         if (capturasMetadata.length > 0) {
-            fs.writeFileSync(METADATA_PATH, JSON.stringify(capturasMetadata, null, 2));
+            fs.writeFileSync(METADATA_PATH, JSON.stringify(montarDocumentoCapturasMetadata(), null, 2));
         }
     });
 
