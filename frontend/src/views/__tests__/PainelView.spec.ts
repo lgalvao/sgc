@@ -193,7 +193,6 @@ describe('PainelView', () => {
     const wrapper = mount(PainelView, options);
     await flushPromises();
     
-    const pinia = options.global.plugins[1] as any;
     const painelStore = (wrapper.vm as any).painelStore;
     
     painelStore.processos = [

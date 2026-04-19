@@ -5,7 +5,6 @@ import {createTestingPinia} from "@pinia/testing";
 import * as processoService from "@/services/processoService";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useProcessoForm} from "@/composables/useProcessoForm";
-import {useNotification} from "@/composables/useNotification";
 import {ref} from "vue";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";

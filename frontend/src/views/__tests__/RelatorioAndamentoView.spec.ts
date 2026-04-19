@@ -100,7 +100,7 @@ describe('RelatorioAndamentoView', () => {
 
     it('cobre falha em carregarProcessos', async () => {
         vi.mocked(painelService.listarProcessos).mockRejectedValue(new Error("Erro simulado"));
-        const wrapper = mount(RelatorioAndamentoView, { global: { stubs } });
+        mount(RelatorioAndamentoView, { global: { stubs } });
         await flushPromises();
         expect(notify).toHaveBeenCalledWith("Erro ao carregar processos", "danger");
     });
