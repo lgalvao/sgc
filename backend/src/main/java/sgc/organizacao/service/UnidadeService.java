@@ -1,6 +1,5 @@
 package sgc.organizacao.service;
 
-import jakarta.persistence.EntityManager;
 import lombok.*;
 import org.springframework.beans.factory.*;
 import org.springframework.cache.annotation.*;
@@ -38,7 +37,6 @@ public class UnidadeService {
 
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
-    private final EntityManager entityManager;
     private final ObjectProvider<UnidadeService> selfProvider;
     private final CacheOrganizacaoService cacheOrganizacaoService;
     public Unidade buscarPorCodigo(Long codigo) {
@@ -63,10 +61,9 @@ public class UnidadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
     }
 
-    @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADE_ADMIN, sync = true)
     public Unidade buscarAdmin() {
         Long codigoAdmin = self().buscarCodigoPorSigla(SIGLA_ADMIN);
-        return entityManager.getReference(Unidade.class, codigoAdmin);
+        return buscarPorCodigo(codigoAdmin);
     }
 
     public List<Unidade> buscarPorCodigos(List<Long> codigos) {
