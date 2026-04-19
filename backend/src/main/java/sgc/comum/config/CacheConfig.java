@@ -18,7 +18,6 @@ public class CacheConfig {
     public static final String CACHE_UNIDADE_POR_SIGLA = "unidadePorSigla";
     public static final String CACHE_UNIDADE_CODIGO_POR_SIGLA = "unidadeCodigoPorSigla";
     public static final String CACHE_MAPA_FILHO_PAI = "mapaFilhoPai";
-    public static final String CACHE_USUARIO_PERFIS = "usuarioPerfis";
     public static final String CACHE_USUARIO_AUTORIZACOES = "usuarioAutorizacoes";
     public static final String CACHE_VW_UNIDADE = "vwUnidade";
     public static final String CACHE_VW_USUARIO = "vwUsuario";
@@ -35,7 +34,6 @@ public class CacheConfig {
                 CACHE_UNIDADE_ADMIN,
                 CACHE_UNIDADE_POR_SIGLA,
                 CACHE_UNIDADE_CODIGO_POR_SIGLA,
-                CACHE_USUARIO_PERFIS,
                 CACHE_USUARIO_AUTORIZACOES
         );
         cacheManager.setCaffeine(Caffeine.newBuilder()
@@ -61,11 +59,6 @@ public class CacheConfig {
                 .recordStats()
                 .maximumSize(1)
                 .expireAfterWrite(java.time.Duration.ofHours(12))
-                .build());
-        cacheManager.registerCustomCache(CACHE_USUARIO_PERFIS, Caffeine.newBuilder()
-                .recordStats()
-                .maximumSize(1000)
-                .expireAfterWrite(java.time.Duration.ofHours(2))
                 .build());
         cacheManager.registerCustomCache(CACHE_USUARIO_AUTORIZACOES, Caffeine.newBuilder()
                 .recordStats()

@@ -55,7 +55,6 @@ public class AgendadorRefreshCache {
         limparCacheDerivado(CacheConfig.CACHE_UNIDADE_POR_SIGLA);
         limparCacheDerivado(CacheConfig.CACHE_UNIDADE_CODIGO_POR_SIGLA);
         limparCacheDerivado(CacheConfig.CACHE_UNIDADES_COM_MAPA);
-        limparCacheDerivado(CacheConfig.CACHE_USUARIO_PERFIS);
         limparCacheDerivado(CacheConfig.CACHE_USUARIO_AUTORIZACOES);
         limparCacheDerivado(CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL);
     }

@@ -27,15 +27,6 @@ public class UsuarioPerfilCacheService {
                 .toList();
     }
 
-    @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo", sync = true)
-    public List<Perfil> buscarPerfisPorUsuarioTitulo(String usuarioTitulo) {
-        return cacheViewsOrganizacaoService.listarTodosPerfisUnidade().stream()
-                .filter(perfil -> perfil.usuarioTitulo().equals(usuarioTitulo))
-                .map(UsuarioPerfilLeitura::perfil)
-                .distinct()
-                .toList();
-    }
-
     private UsuarioPerfilAutorizacaoLeitura toAutorizacao(UsuarioPerfilLeitura perfil, UnidadeHierarquiaLeitura unidade) {
         return new UsuarioPerfilAutorizacaoLeitura(
                 perfil.usuarioTitulo(),

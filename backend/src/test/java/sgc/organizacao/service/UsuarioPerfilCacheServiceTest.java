@@ -22,20 +22,6 @@ class UsuarioPerfilCacheServiceTest {
     private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
 
     @Test
-    @DisplayName("Deve cachear perfis por titulo eleitoral")
-    void deveCachearPerfisPorTituloEleitoral() {
-        when(cacheViewsOrganizacaoService.listarTodosPerfisUnidade())
-                .thenReturn(List.of(new UsuarioPerfilLeitura("123", 1L, Perfil.ADMIN)));
-
-        List<Perfil> primeiraConsulta = usuarioPerfilCacheService.buscarPerfisPorUsuarioTitulo("123");
-        List<Perfil> segundaConsulta = usuarioPerfilCacheService.buscarPerfisPorUsuarioTitulo("123");
-
-        assertThat(primeiraConsulta).containsExactly(Perfil.ADMIN);
-        assertThat(segundaConsulta).containsExactly(Perfil.ADMIN);
-        verify(cacheViewsOrganizacaoService, times(1)).listarTodosPerfisUnidade();
-    }
-
-    @Test
     @DisplayName("Deve cachear autorizacoes por titulo eleitoral")
     void deveCachearAutorizacoesPorTituloEleitoral() {
         UsuarioPerfilAutorizacaoLeitura leitura = new UsuarioPerfilAutorizacaoLeitura(
@@ -69,14 +55,17 @@ class UsuarioPerfilCacheServiceTest {
     @Test
     @DisplayName("Deve ignorar perfis de outros usuarios")
     void deveIgnorarPerfisDeOutrosUsuarios() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of());
         when(cacheViewsOrganizacaoService.listarTodosPerfisUnidade())
                 .thenReturn(List.of(
                         new UsuarioPerfilLeitura("999", 1L, Perfil.ADMIN),
                         new UsuarioPerfilLeitura("456", 1L, Perfil.GESTOR)
                 ));
 
-        List<Perfil> perfis = usuarioPerfilCacheService.buscarPerfisPorUsuarioTitulo("999");
+        List<UsuarioPerfilAutorizacaoLeitura> perfis = usuarioPerfilCacheService.buscarAutorizacoesPerfil("999");
 
-        assertThat(perfis).containsExactly(Perfil.ADMIN);
+        assertThat(perfis)
+                .extracting(UsuarioPerfilAutorizacaoLeitura::perfil)
+                .containsExactly(Perfil.ADMIN);
     }
 }

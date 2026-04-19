@@ -122,19 +122,20 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
                 stubs
             }
         });
+        const vm = wrapper.vm as unknown as { show: boolean };
         await flushPromises();
 
         const processoView = wrapper.findComponent(ProcessoView);
 
         // Deactivate
-        wrapper.vm.show = false;
+        vm.show = false;
         await flushPromises();
 
         // Activate - cache valid
         store.dadosValidos = vi.fn().mockReturnValue(true);
         store.contextoCompleto = { codigo: 1, descricao: "Cached" } as any;
         
-        wrapper.vm.show = true;
+        vm.show = true;
         await flushPromises();
 
         expect((processoView.vm as any).processo.descricao).toBe("Cached");

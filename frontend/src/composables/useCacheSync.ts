@@ -23,10 +23,6 @@ export function useCacheSync() {
         organizacaoStore.$reset();
     });
 
-    source.onerror = () => {
-        source.close();
-    };
-
     return () => {
         source.close();
     };

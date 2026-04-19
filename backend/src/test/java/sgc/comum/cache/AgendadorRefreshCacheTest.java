@@ -44,7 +44,7 @@ class AgendadorRefreshCacheTest {
         verify(cacheViewsOrganizacaoService).evictarResponsabilidades();
         verify(cacheViewsOrganizacaoService).evictarPerfisUnidade();
 
-        verify(cacheMock, times(10)).clear(); // 10 derived caches are cleared
+        verify(cacheMock, times(9)).clear(); // 9 derived caches are cleared
 
         verify(cacheViewsOrganizacaoService).listarTodasUnidades();
         verify(cacheViewsOrganizacaoService).listarTodosUsuarios();
@@ -64,7 +64,7 @@ class AgendadorRefreshCacheTest {
 
         agendadorRefreshCache.evictarTodosCaches();
 
-        verify(cacheManager, times(10)).getCache(anyString());
+        verify(cacheManager, times(9)).getCache(anyString());
     }
 
     @Test

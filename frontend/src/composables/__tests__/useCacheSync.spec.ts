@@ -70,14 +70,14 @@ describe('useCacheSync', () => {
     expect(organizacaoStore.$reset).toHaveBeenCalled();
   });
 
-  it('deve fechar a conexao em caso de erro', () => {
+  it('não deve fechar a conexão em caso de erro transitório', () => {
     useCacheSync();
 
     if (lastInstance?.onerror) {
       lastInstance.onerror();
     }
 
-    expect(lastInstance?.close).toHaveBeenCalled();
+    expect(lastInstance?.close).not.toHaveBeenCalled();
   });
 
   it('deve fechar a conexao ao chamar a funcao de retorno', () => {

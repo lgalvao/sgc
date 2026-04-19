@@ -230,27 +230,28 @@ describe('PainelView', () => {
         data() { return { show: true } }
     };
     const wrapper = mount(KeepAliveWrapper, options);
+    const vm = wrapper.vm as unknown as { show: boolean };
     await flushPromises();
     
     expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
 
     // Deactivate
-    wrapper.vm.show = false;
+    vm.show = false;
     await flushPromises();
 
     // Activate - cache is INVALID
     painelStore.dadosValidos = vi.fn().mockReturnValue(false);
-    wrapper.vm.show = true;
+    vm.show = true;
     await flushPromises();
     expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
 
     // Deactivate
-    wrapper.vm.show = false;
+    vm.show = false;
     await flushPromises();
 
     // Activate - cache is VALID
     painelStore.dadosValidos = vi.fn().mockReturnValue(true);
-    wrapper.vm.show = true;
+    vm.show = true;
     await flushPromises();
     expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); // Should not increase
   });
