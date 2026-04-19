@@ -1,4 +1,4 @@
-package sgc.comum.cache;
+package sgc.organizacao.service;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;

@@ -1,4 +1,4 @@
-package sgc.comum.cache;
+package sgc.organizacao.service;
 
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;

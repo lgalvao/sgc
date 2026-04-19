@@ -10,7 +10,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import sgc.comum.cache.RegistroSseEmitter;
+import sgc.organizacao.service.RegistroSseEmitter;
 import sgc.seguranca.config.ConfigSeguranca;
 
 import static org.mockito.Mockito.verify;

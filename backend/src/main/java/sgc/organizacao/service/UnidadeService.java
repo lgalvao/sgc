@@ -5,7 +5,6 @@ import org.springframework.beans.factory.*;
 import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.cache.*;
 import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;

@@ -1,4 +1,4 @@
-package sgc.comum.cache;
+package sgc.organizacao.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
@@ -6,7 +6,6 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.event.*;
 import org.springframework.context.*;
 import org.springframework.stereotype.*;
-import sgc.organizacao.service.CacheViewsOrganizacaoService;
 
 /**
  * Aquece os caches das views organizacionais ao inicializar a aplicação.

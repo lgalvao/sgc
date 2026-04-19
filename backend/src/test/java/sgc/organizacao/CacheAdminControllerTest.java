@@ -8,8 +8,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import sgc.comum.cache.AgendadorRefreshCache;
-import sgc.comum.cache.RegistroSseEmitter;
+import sgc.organizacao.service.AgendadorRefreshCache;
+import sgc.organizacao.service.RegistroSseEmitter;
 import sgc.seguranca.SgcPermissionEvaluator;
 
 import static org.mockito.Mockito.verify;
