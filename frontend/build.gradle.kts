@@ -13,7 +13,6 @@ tasks.register<Exec>("install") {
     workingDir = projectDir
     inputs.file("package.json")
     inputs.file("package-lock.json")
-    outputs.dir("node_modules")
     commandLine = npmCommand("install")
 }
 
@@ -62,7 +61,7 @@ tasks.register<Exec>("test") {
 
 // Estende a task padrão 'clean' do Gradle (se o plugin base/java estiver aplicado)
 tasks.named<Delete>("clean") {
-    delete("dist", "node_modules", "coverage")
+    delete("dist", "coverage")
 }
 
 // Faz com que o 'build' padrão do Gradle execute o 'buildVue'

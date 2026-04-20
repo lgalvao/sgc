@@ -131,7 +131,7 @@ try {
 
     if (-not $SemBuild) {
         Write-Host "==> Executando build do frontend e do backend"
-        Invoke-Comando $Gradle clean copyFrontend ":backend:bootJar" -x ":backend:test"
+        Invoke-Comando $Gradle copyFrontend ":backend:bootJar" -x ":backend:test"
     } else {
         Write-Host "==> Build Gradle ignorado por parametro"
     }
