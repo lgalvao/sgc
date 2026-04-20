@@ -29,6 +29,7 @@ public class CacheViewsOrganizacaoService {
     private final UsuarioRepo usuarioRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final AdministradorRepo administradorRepo;
+    private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final ObjectProvider<CacheViewsOrganizacaoService> selfProvider;
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_UNIDADE, sync = true)
@@ -108,6 +109,17 @@ public class CacheViewsOrganizacaoService {
                 perfis.add(new UsuarioPerfilLeitura(usuario.tituloEleitoral(), codigoUnidadeCompetencia, Perfil.SERVIDOR));
             }
         });
+
+        if (perfis.isEmpty()) {
+            usuarioPerfilRepo.findAll().stream()
+                    .filter(Objects::nonNull)
+                    .map(perfil -> new UsuarioPerfilLeitura(
+                            perfil.getUsuarioTitulo(),
+                            perfil.getUnidadeCodigo(),
+                            perfil.getPerfil()
+                    ))
+                    .forEach(perfis::add);
+        }
 
         return List.copyOf(perfis);
     }

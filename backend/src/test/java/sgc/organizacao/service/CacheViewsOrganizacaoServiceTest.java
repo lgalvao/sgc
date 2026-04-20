@@ -27,6 +27,8 @@ class CacheViewsOrganizacaoServiceTest {
     @Mock
     private AdministradorRepo administradorRepo;
     @Mock
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+    @Mock
     private ObjectProvider<CacheViewsOrganizacaoService> selfProvider;
 
     @InjectMocks
@@ -164,6 +166,25 @@ class CacheViewsOrganizacaoServiceTest {
                         new UsuarioPerfilLeitura("gestor-chefe", 20L, Perfil.CHEFE),
                         new UsuarioPerfilLeitura("servidor", 10L, Perfil.SERVIDOR)
                 );
+    }
+
+    @Test
+    @DisplayName("deve usar view de perfis como compatibilidade se bases nao gerarem perfis")
+    void listarTodosPerfisUnidadeFallbackCompatibilidade() {
+        UsuarioPerfil perfil = new UsuarioPerfil("titulo", 1L, Perfil.ADMIN);
+        when(selfProvider.getIfAvailable(org.mockito.ArgumentMatchers.any())).thenReturn(cacheService);
+        when(usuarioRepo.listarTodasConsultas()).thenReturn(List.of());
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of());
+        when(responsabilidadeRepo.findAll()).thenReturn(List.of());
+        when(administradorRepo.findAll()).thenReturn(List.of());
+        when(usuarioPerfilRepo.findAll()).thenReturn(List.of(perfil));
+
+        List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
+
+        assertEquals(1, result.size());
+        assertEquals("titulo", result.getFirst().usuarioTitulo());
+        assertEquals(1L, result.getFirst().unidadeCodigo());
+        assertEquals(Perfil.ADMIN, result.getFirst().perfil());
     }
 
     @Test
