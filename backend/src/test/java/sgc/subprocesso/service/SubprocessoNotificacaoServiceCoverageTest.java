@@ -34,33 +34,30 @@ class SubprocessoNotificacaoServiceCoverageTest {
     private org.thymeleaf.spring6.SpringTemplateEngine templateEngine;
 
     @Test
-    @DisplayName("enviarNotificacaoSuperior - deve cobrir merge function com duplicatas")
-    void enviarNotificacaoSuperior_Duplicatas() {
+    @DisplayName("enviarNotificacaoSuperior - deve enviar apenas ao superior imediato")
+    void enviarNotificacaoSuperior_ApenasSuperiorImediato() {
         Processo p = new Processo(); p.setDescricao("P"); p.setTipo(TipoProcesso.MAPEAMENTO);
         Subprocesso sp = new Subprocesso(); sp.setProcesso(p);
         Unidade u = new Unidade(); u.setCodigo(10L); u.setSigla("U");
         sp.setUnidade(u);
+        Unidade destino = new Unidade(); destino.setCodigo(99L);
         
         NotificacaoCommand cmd = NotificacaoCommand.builder()
                 .subprocesso(sp)
                 .unidadeOrigem(u)
-                .unidadeDestino(new Unidade())
+                .unidadeDestino(destino)
                 .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
                 .build();
         
-        when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of(20L));
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
         
         UnidadeResumoLeitura rl1 = mock(UnidadeResumoLeitura.class);
         when(rl1.codigo()).thenReturn(20L);
         when(rl1.sigla()).thenReturn("S1");
-        
-        UnidadeResumoLeitura rl2 = mock(UnidadeResumoLeitura.class);
-        when(rl2.codigo()).thenReturn(20L);
-        
-        when(unidadeService.buscarResumosPorCodigos(anyList())).thenReturn(List.of(rl1, rl2));
+
+        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(rl1));
         when(templateEngine.process(anyString(), any())).thenReturn("corpo");
         
-        // Chamar o método privado via reflection para atingir linha 92
         org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "enviarNotificacaoSuperior", cmd, new HashMap<>());
         
         verify(emailService).enviarEmailHtml(eq("s1@tre-pe.jus.br"), anyString(), anyString());

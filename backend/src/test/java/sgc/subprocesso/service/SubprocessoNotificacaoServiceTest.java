@@ -102,14 +102,53 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("deve notificar superiores ignorando destino repetido na hierarquia")
-    void deveNotificarSuperioresIgnorandoDestinoRepetidoNaHierarquia() {
+    @DisplayName("deve notificar apenas o superior imediato quando diferente do destino")
+    void deveNotificarApenasSuperiorImediatoQuandoDiferenteDoDestino() {
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
 
-        Unidade superiorFinal = criarUnidade(30L, "SUP2", "Superior final");
-        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
-        destino.setUnidadeSuperior(superiorFinal);
+        Unidade superiorImediato = criarUnidade(20L, "SUP1", "Superior imediato");
+        Unidade destino = criarUnidade(30L, "DEST", "Unidade destino");
+        destino.setUnidadeSuperior(superiorImediato);
 
+        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
+        origem.setUnidadeSuperior(superiorImediato);
+
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(destino.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
+        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(
+                new UnidadeResumoLeitura(20L, "Superior imediato", "SUP1", TipoUnidade.INTERMEDIARIA)
+        ));
+
+        service.notificarTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .build());
+
+        verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), startsWith("SGC: "), eq("<html>corpo</html>"));
+        verify(emailService).enviarEmailHtml(eq("sup1@tre-pe.jus.br"), contains(" - ORIG"), eq("<html>corpo</html>"));
+        verify(emailService, times(2)).enviarEmailHtml(anyString(), anyString(), anyString());
+
+        verify(templateEngine, times(2)).process(templateCaptor.capture(), contextCaptor.capture());
+        assertThat(templateCaptor.getAllValues()).containsExactly("cadastro-devolvido", "cadastro-devolvido-superior");
+        assertThat(contextCaptor.getAllValues().get(1).getVariable("siglaUnidadeSuperior")).isEqualTo("SUP1");
+    }
+
+    @Test
+    @DisplayName("nao deve reenviar email superior quando o destino ja for o superior imediato")
+    void naoDeveReenviarEmailSuperiorQuandoDestinoJaForSuperiorImediato() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
         origem.setUnidadeSuperior(destino);
 
@@ -122,11 +161,7 @@ class SubprocessoNotificacaoServiceTest {
                         .titularTitulo("titular")
                         .titularNome("Titular")
                         .build());
-        when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of(20L, 30L));
-        when(unidadeService.buscarResumosPorCodigos(List.of(20L, 30L))).thenReturn(List.of(
-                new UnidadeResumoLeitura(20L, "Unidade destino", "DEST", TipoUnidade.OPERACIONAL),
-                new UnidadeResumoLeitura(30L, "Superior final", "SUP2", TipoUnidade.INTERMEDIARIA)
-        ));
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
 
         service.notificarTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
@@ -135,13 +170,8 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), startsWith("SGC: "), eq("<html>corpo</html>"));
-        verify(emailService).enviarEmailHtml(eq("sup2@tre-pe.jus.br"), contains(" - ORIG"), eq("<html>corpo</html>"));
-        verify(emailService, times(2)).enviarEmailHtml(anyString(), anyString(), anyString());
-
-        verify(templateEngine, times(2)).process(templateCaptor.capture(), contextCaptor.capture());
-        assertThat(templateCaptor.getAllValues()).containsExactly("cadastro-devolvido", "cadastro-devolvido-superior");
-        assertThat(contextCaptor.getAllValues().get(1).getVariable("siglaUnidadeSuperior")).isEqualTo("SUP2");
+        verify(emailService, times(1)).enviarEmailHtml(eq("dest@tre-pe.jus.br"), startsWith("SGC: "), eq("<html>corpo</html>"));
+        verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
     }
 
     @Test

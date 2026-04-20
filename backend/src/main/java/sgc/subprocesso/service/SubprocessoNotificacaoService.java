@@ -91,34 +91,22 @@ public class SubprocessoNotificacaoService {
 
     private void enviarNotificacaoSuperior(NotificacaoCommand cmd, Map<String, Object> variaveisBase) {
         String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), true);
-        List<Long> codigosSuperiores = unidadeHierarquiaService.buscarCodigosSuperiores(cmd.unidadeOrigem().getCodigo());
-        if (codigosSuperiores.isEmpty()) return;
+        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(cmd.unidadeOrigem().getCodigo());
+        if (codigoPai == null || Objects.equals(codigoPai, cmd.unidadeDestino().getCodigo())) return;
 
-        Map<Long, UnidadeResumoLeitura> mapaUnidades = unidadeService.buscarResumosPorCodigos(codigosSuperiores).stream()
-                .collect(java.util.stream.Collectors.toMap(
-                        UnidadeResumoLeitura::codigo,
-                        unidade -> unidade,
-                        (primeira, ignorada) -> primeira,
-                        HashMap::new
-                ));
+        UnidadeResumoLeitura superior = unidadeService.buscarResumosPorCodigos(List.of(codigoPai)).stream()
+                .findFirst()
+                .orElse(null);
+        if (superior == null) return;
 
-        for (Long codigoSuperior : codigosSuperiores) {
-            if (Objects.equals(codigoSuperior, cmd.unidadeDestino().getCodigo())) {
-                continue;
-            }
+        Map<String, Object> variaveis = new HashMap<>(variaveisBase);
+        variaveis.put("siglaUnidadeSuperior", superior.sigla());
 
-            UnidadeResumoLeitura superior = mapaUnidades.get(codigoSuperior);
-            if (superior == null) continue;
+        String templateEmailSuperior = obterTemplateObrigatorio(cmd.tipoTransicao().getTemplateEmailSuperior(), "e-mail superior");
+        String corpo = processarTemplate(templateEmailSuperior, variaveis);
+        String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());
 
-            Map<String, Object> variaveis = new HashMap<>(variaveisBase);
-            variaveis.put("siglaUnidadeSuperior", superior.sigla());
-
-            String templateEmailSuperior = obterTemplateObrigatorio(cmd.tipoTransicao().getTemplateEmailSuperior(), "e-mail superior");
-            String corpo = processarTemplate(templateEmailSuperior, variaveis);
-            String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());
-
-            emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
-        }
+        emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
     }
 
     private Map<String, Object> criarVariaveisTemplateDireto(NotificacaoCommand cmd) {
