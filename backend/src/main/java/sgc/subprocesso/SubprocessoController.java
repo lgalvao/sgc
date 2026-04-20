@@ -8,13 +8,12 @@ import lombok.extern.slf4j.*;
 import org.springframework.http.*;
 import org.springframework.security.access.*;
 import org.springframework.security.access.prepost.*;
-import org.springframework.security.core.*;
-import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.*;
 import sgc.comum.*;
 import sgc.mapa.dto.*;
+import sgc.organizacao.*;
 import sgc.organizacao.service.*;
 import sgc.seguranca.*;
 import sgc.seguranca.sanitizacao.*;
@@ -38,6 +37,7 @@ public class SubprocessoController {
     private final SubprocessoService subprocessoService;
     private final SubprocessoTransicaoService transicaoService;
     private final UnidadeService unidadeService;
+    private final UsuarioFacade usuarioService;
     private final SgcPermissionEvaluator permissionEvaluator;
 
     @GetMapping
@@ -532,8 +532,11 @@ public class SubprocessoController {
     }
 
     private void verificarPermissaoVisualizacao(Subprocesso subprocesso) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!permissionEvaluator.hasPermission(authentication, subprocesso, "VISUALIZAR_SUBPROCESSO")) {
+        if (!permissionEvaluator.verificarPermissao(
+                usuarioService.usuarioAutenticado(),
+                subprocesso,
+                AcaoPermissao.VISUALIZAR_SUBPROCESSO
+        )) {
             throw new AccessDeniedException("Acesso negado ao subprocesso");
         }
     }
