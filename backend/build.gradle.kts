@@ -240,7 +240,7 @@ jacoco {
 }
 
 tasks.jacocoTestReport {
-    dependsOn(tasks.named("test"))
+    dependsOn(tasks.named("test"), tasks.compileJava)
     executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
 
     reports {
@@ -291,6 +291,7 @@ tasks.jacocoTestReport {
 }
 
 tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
     violationRules {
         rule {
             element = "CLASS"
