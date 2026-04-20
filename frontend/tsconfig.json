@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "./src",
     "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
@@ -20,15 +21,14 @@
     ],
     "jsx": "preserve",
     "types": [
-      "vitest/globals",
       "node",
+      "vitest/globals",
       "vite/client",
       "@vitest/browser/matchers"
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     },
     "forceConsistentCasingInFileNames": true

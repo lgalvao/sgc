@@ -45,6 +45,9 @@ class SubprocessoControllerCoverageExtraTest {
     private UnidadeService unidadeService;
 
     @MockitoBean
+    private sgc.organizacao.UsuarioFacade usuarioService;
+
+    @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
     @Autowired
     private MockMvc mockMvc;

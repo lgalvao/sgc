@@ -14,9 +14,9 @@ O projeto segue uma arquitetura **Modular monolith** no backend e **Component-Ba
 
 | Camada       | Tecnologias principais                                                  |
 |--------------|-------------------------------------------------------------------------|
-| **Backend**  | Java 25, Spring Boot 4.0.5, Hibernate 7, H2 (testes)/Oracle (produção)  |
-| **Frontend** | Vue.js 3.5.28, TypeScript 5.9.3, Vite 7.3.1, Pinia 3.0.4, BootstrapVueNext 0.44.0 |
-| **Testes**   | JUnit 5, Mockito, Vitest 4.0, Playwright 1.58.2, Storybook 10.3.3       |
+| **Backend**  | Java 25, Spring Boot 4, Hibernate 7, H2 (testes)/Oracle (produção)      |
+| **Frontend** | Vue.js 3.5, TypeScript 5.9, Vite 7.3, Pinia 3, BootstrapVueNext 0.44    |
+| **Testes**   | JUnit 6, Mockito, Vitest 4, Playwright 1.58, Storybook 10               |
 
 **Documentação essencial:**
 
@@ -47,7 +47,7 @@ sgc/
 
 ### Pré-requisitos
 
-* JDK 21+ (Recomendado 25+)
+* JDK 25+ 
 * Node.js 22+ (Recomendado 25+)
 
 ### Desenvolvimento
@@ -90,7 +90,6 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 | **Todos backend**       | `./gradlew :backend:test`            | `./gradlew :backend:test`            | Suite completa (Unitários + Integração).          |
 | **Unitários backend**   | `./gradlew :backend:unitTest`        | `./gradlew :backend:unitTest`        | Apenas testes isolados (Rápido).                  |
 | **Integração backend**  | `./gradlew :backend:integrationTest` | `./gradlew :backend:integrationTest` | Apenas fluxos completos (Mais lento).             |
-| **Mutação (PIT)**       | `./gradlew :backend:mutationTest`    | `./gradlew :backend:mutationTest`    | Valida qualidade dos testes (PITest).             |
 | **Unitários frontend**  | `npm run test:unit --prefix frontend`| `npm run test:unit --prefix frontend`| Vitest para componentes e lógica.                 |
 | **End-to-End (E2E)**    | `npm run test:e2e`                   | `npm run test:e2e`                   | Playwright simulando fluxos reais.                |
 | **Type check**          | `npm run typecheck`                  | `npm run typecheck`                  | Verificação de erros de tipos (Vue + TS).         |

@@ -31,6 +31,8 @@ class SubprocessoControllerCoverageTest {
     @MockitoBean
     private sgc.organizacao.service.UnidadeService unidadeService;
     @MockitoBean
+    private sgc.organizacao.UsuarioFacade usuarioService;
+    @MockitoBean
     private sgc.seguranca.SgcPermissionEvaluator permissionEvaluator;
 
     @Test
