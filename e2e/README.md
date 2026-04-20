@@ -105,7 +105,7 @@ npx playwright test --ui
 npx playwright test e2e/cdu-01.spec.ts
 
 # Subir frontend + backend em modo homologação (sem reset/seed)
-$env:SGC_LIFECYCLE_PROFILE='hom'; node e2e/lifecycle.js
+$env:SGC_PERFIL='hom'; node e2e/lifecycle.js
 ```
 
 ## 🛠️ Suporte no Backend
@@ -121,7 +121,7 @@ Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
 
 Se precisar usar o mesmo script para subir a aplicação contra homologação:
 
-* Use `SGC_LIFECYCLE_PROFILE=hom`.
+* Use `SGC_PERFIL=hom`.
 * Nesse modo, o backend sobe com `-PENV=hom`.
 * O script não reutiliza backend existente.
 * O script não depende de `/e2e/reset-database`.

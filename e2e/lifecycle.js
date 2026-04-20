@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 
-const PERFIL_LIFECYCLE = process.env.SGC_LIFECYCLE_PROFILE || 'e2e';
+const PERFIL_LIFECYCLE = process.env.SGC_PERFIL || 'e2e';
 const BACKEND_BASE_PORT = Number.parseInt(process.env.E2E_BACKEND_BASE_PORT || '10000', 10);
 const FRONTEND_PORT = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
 const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
@@ -221,7 +221,7 @@ function validarPerfilLifecycle() {
     if (!perfisSuportados.has(PERFIL_LIFECYCLE)) {
         throw new Error(
             `Perfil de lifecycle inválido: ${PERFIL_LIFECYCLE}. ` +
-            'Use SGC_LIFECYCLE_PROFILE=e2e ou SGC_LIFECYCLE_PROFILE=hom.'
+            'Use SGC_PERFIL=e2e ou SGC_PERFIL=hom.'
         );
     }
 }

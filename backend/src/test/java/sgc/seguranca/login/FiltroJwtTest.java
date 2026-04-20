@@ -12,6 +12,7 @@ import sgc.organizacao.model.*;
 import java.io.*;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,11 +60,20 @@ class FiltroJwtTest {
         GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("12345", Perfil.SERVIDOR, 10L);
         when(jwtService.validarToken(token)).thenReturn(Optional.of(claims));
 
-        when(usuarioService.carregarUsuarioParaAutenticacao("12345")).thenReturn(null);
+        when(usuarioService.buscarUsuarioSemAtribuicoes("12345")).thenReturn(null);
 
         filtro.doFilterInternal(request, response, filterChain);
 
         verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    @DisplayName("Deve ignorar endpoint de eventos SSE")
+    void deveIgnorarEndpointEventos() throws ServletException, IOException {
+        when(request.getRequestURI()).thenReturn("/api/eventos");
+
+        assertThat(filtro.shouldNotFilter(request)).isTrue();
+        verifyNoInteractions(jwtService, usuarioService);
     }
 
     @Test
@@ -97,7 +107,7 @@ class FiltroJwtTest {
         String token = "short-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
         when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", Perfil.SERVIDOR, 10L)));
-        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
+        when(usuarioService.buscarUsuarioSemAtribuicoes("123")).thenReturn(null);
 
         filtro.doFilterInternal(request, response, filterChain);
         verify(filterChain).doFilter(request, response);

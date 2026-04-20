@@ -24,6 +24,11 @@ public class FiltroJwt extends OncePerRequestFilter {
     private final UsuarioFacade usuarioService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "/api/eventos".equals(request.getRequestURI());
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -51,7 +56,7 @@ public class FiltroJwt extends OncePerRequestFilter {
         if (jwtToken != null) {
 
             gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
-                Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());
+                Usuario usuario = usuarioService.buscarUsuarioSemAtribuicoes(claims.tituloEleitoral());
 
                 if (usuario != null) {
                     usuario.setPerfilAtivo(claims.perfil());

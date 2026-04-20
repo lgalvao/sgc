@@ -19,7 +19,7 @@ class UsuarioPerfilCacheServiceTest {
     private UsuarioPerfilCacheService usuarioPerfilCacheService;
 
     @MockitoBean
-    private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Test
     @DisplayName("Deve cachear autorizacoes por titulo eleitoral")
@@ -33,39 +33,28 @@ class UsuarioPerfilCacheServiceTest {
                 TipoUnidade.OPERACIONAL,
                 SituacaoUnidade.ATIVA
         );
-        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(UnidadeHierarquiaLeitura.builder()
-                .codigo(1L)
-                .nome("Secretaria")
-                .sigla("SEASP")
-                .tipo(TipoUnidade.OPERACIONAL)
-                .situacao(SituacaoUnidade.ATIVA)
-                .build()));
-        when(cacheViewsOrganizacaoService.listarTodosPerfisUnidade())
-                .thenReturn(List.of(new UsuarioPerfilLeitura("123", 1L, Perfil.ADMIN)));
+        when(usuarioPerfilRepo.listarAutorizacoesPorTitulo("123")).thenReturn(List.of(leitura));
 
         List<UsuarioPerfilAutorizacaoLeitura> primeiraConsulta = usuarioPerfilCacheService.buscarAutorizacoesPerfil("123");
         List<UsuarioPerfilAutorizacaoLeitura> segundaConsulta = usuarioPerfilCacheService.buscarAutorizacoesPerfil("123");
 
         assertThat(primeiraConsulta).containsExactly(leitura);
         assertThat(segundaConsulta).containsExactly(leitura);
-        verify(cacheViewsOrganizacaoService, times(1)).listarTodasUnidades();
-        verify(cacheViewsOrganizacaoService, times(1)).listarTodosPerfisUnidade();
+        verify(usuarioPerfilRepo, times(1)).listarAutorizacoesPorTitulo("123");
     }
 
     @Test
     @DisplayName("Deve ignorar perfis de outros usuarios")
     void deveIgnorarPerfisDeOutrosUsuarios() {
-        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of());
-        when(cacheViewsOrganizacaoService.listarTodosPerfisUnidade())
-                .thenReturn(List.of(
-                        new UsuarioPerfilLeitura("999", 1L, Perfil.ADMIN),
-                        new UsuarioPerfilLeitura("456", 1L, Perfil.GESTOR)
-                ));
+        when(usuarioPerfilRepo.listarAutorizacoesPorTitulo("999")).thenReturn(List.of(
+                new UsuarioPerfilAutorizacaoLeitura("999", Perfil.ADMIN, 1L, null, null, null, null)
+        ));
 
         List<UsuarioPerfilAutorizacaoLeitura> perfis = usuarioPerfilCacheService.buscarAutorizacoesPerfil("999");
 
         assertThat(perfis)
                 .extracting(UsuarioPerfilAutorizacaoLeitura::perfil)
                 .containsExactly(Perfil.ADMIN);
+        verify(usuarioPerfilRepo).listarAutorizacoesPorTitulo("999");
     }
 }

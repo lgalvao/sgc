@@ -12,30 +12,10 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UsuarioPerfilCacheService {
 
-    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+    private final UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo", sync = true)
     public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {
-        Map<Long, UnidadeHierarquiaLeitura> unidadesPorCodigo = cacheViewsOrganizacaoService.listarTodasUnidades().stream()
-                .collect(LinkedHashMap::new,
-                        (mapa, unidade) -> mapa.put(unidade.codigo(), unidade),
-                        LinkedHashMap::putAll);
-
-        return cacheViewsOrganizacaoService.listarTodosPerfisUnidade().stream()
-                .filter(perfil -> perfil.usuarioTitulo().equals(usuarioTitulo))
-                .map(perfil -> toAutorizacao(perfil, unidadesPorCodigo.get(perfil.unidadeCodigo())))
-                .toList();
-    }
-
-    private UsuarioPerfilAutorizacaoLeitura toAutorizacao(UsuarioPerfilLeitura perfil, UnidadeHierarquiaLeitura unidade) {
-        return new UsuarioPerfilAutorizacaoLeitura(
-                perfil.usuarioTitulo(),
-                perfil.perfil(),
-                perfil.unidadeCodigo(),
-                unidade != null ? unidade.nome() : null,
-                unidade != null ? unidade.sigla() : null,
-                unidade != null ? unidade.tipo() : null,
-                unidade != null ? unidade.situacao() : null
-        );
+        return usuarioPerfilRepo.listarAutorizacoesPorTitulo(usuarioTitulo);
     }
 }

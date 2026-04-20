@@ -29,32 +29,27 @@ public class MonitoramentoAspect {
     }
 
     @Autowired
-    public MonitoramentoAspect(MonitoramentoProperties monitoramentoProperties) {
-        this(
-                monitoramentoProperties.isAtivo(),
-                monitoramentoProperties.isTraceCompleto(),
-                monitoramentoProperties.getLimiteAlertaMs()
-        );
+    public MonitoramentoAspect(MonitoramentoProperties props) {
+        this(props.isAtivo(), props.isTraceCompleto(), props.getLimiteAlertaMs());
     }
 
-    @Around(
-            "execution(* sgc..*Service.*(..))" +
-                    " || execution(* sgc..*Repo.*(..))" +
-                    " || execution(* sgc..*Facade.*(..))"
+    @Around("execution(* sgc..*Service.*(..))" +
+            " || execution(* sgc..*Repo.*(..))" +
+            " || execution(* sgc..*Facade.*(..))"
     )
+
     public Object monitorarExecucao(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (!ativo) {
-            return joinPoint.proceed();
-        }
+        if (!ativo) return joinPoint.proceed();
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-
         try {
             return joinPoint.proceed();
         } finally {
             stopWatch.stop();
-            long tempoTotal = stopWatch.getTotalTimeNanos();
+            double tempoTotal = stopWatch.getTotalTimeNanos()/1_000_000d;
+            String tempoTotalStr = "%.2f".formatted(tempoTotal);
+
             long numeroChamada = contadorChamadas.incrementAndGet();
             Signature assinatura = joinPoint.getSignature();
             String classe = assinatura != null ? assinatura.getDeclaringTypeName() : joinPoint.getClass().getName();
@@ -63,18 +58,16 @@ public class MonitoramentoAspect {
             boolean monitoramentoDetalhado = traceCompleto || FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao();
 
             if (monitoramentoDetalhado) {
-                log.info("TRACE #{} [{}] {}.{} {}ns",
+                log.info("TRACE #{} {}.{} {}ms",
                         numeroChamada,
-                        correlacaoId,
                         classe,
                         metodo,
-                        tempoTotal);
+                        tempoTotalStr);
             } else if (tempoTotal > limiteAlertaMs) {
-                log.warn("TRACE-LENTO [{}] {}.{} {}ns",
-                        correlacaoId,
+                log.warn("TRACE-LENTO {}.{} {}ms",
                         classe,
                         metodo,
-                        tempoTotal);
+                        tempoTotalStr);
             }
         }
     }

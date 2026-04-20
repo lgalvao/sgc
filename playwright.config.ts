@@ -22,7 +22,7 @@ export default defineConfig({
         command: `node e2e/lifecycle.js`,
         env: {
             ...process.env,
-            SGC_LIFECYCLE_PROFILE: 'e2e',
+            SGC_PERFIL: 'e2e',
             SGC_LIFECYCLE_REUTILIZAR_EXISTENTE: 'off'
         },
         url: `http://localhost:${frontendPort}`,

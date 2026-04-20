@@ -20,10 +20,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GerenciadorJwt - Testes unitários")
 class GerenciadorJwtTest {
-
     private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
     private static final String DEFAULT_SECRET_SHORT = "short";
     private static final String SECURE_SECRET = "secure-secret-key-minimum-32-chars-length-xyz-123";
+
     @Mock
     private JwtProperties jwtProperties;
     @Mock

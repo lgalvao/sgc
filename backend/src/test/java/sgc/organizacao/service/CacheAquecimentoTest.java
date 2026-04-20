@@ -29,7 +29,7 @@ class CacheAquecimentoTest {
         verify(cacheViewsOrganizacaoService).listarTodasUnidades();
         verify(cacheViewsOrganizacaoService).listarTodosUsuarios();
         verify(cacheViewsOrganizacaoService).listarTodasResponsabilidades();
-        verify(cacheViewsOrganizacaoService).listarTodosPerfisUnidade();
+        verify(cacheViewsOrganizacaoService, never()).listarTodosPerfisUnidade();
     }
 
     @Test

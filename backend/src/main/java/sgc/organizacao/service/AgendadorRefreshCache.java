@@ -15,7 +15,7 @@ import sgc.comum.config.CacheConfig;
  * para que os clientes Vue atualizem seus stores.
  *
  * <p>A ordem de recarga segue a dependência entre as views:
- * VW_UNIDADE → VW_RESPONSABILIDADE → VW_USUARIO_PERFIL_UNIDADE (por último).
+ * VW_UNIDADE → VW_RESPONSABILIDADE. Perfis de usuários são carregados sob demanda por título.
  */
 @Component
 @RequiredArgsConstructor
@@ -61,7 +61,6 @@ public class AgendadorRefreshCache {
         cacheViewsOrganizacaoService.listarTodasUnidades();
         cacheViewsOrganizacaoService.listarTodosUsuarios();
         cacheViewsOrganizacaoService.listarTodasResponsabilidades();
-        cacheViewsOrganizacaoService.listarTodosPerfisUnidade();
     }
 
     private void limparCacheDerivado(String nome) {
