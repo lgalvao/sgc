@@ -30,14 +30,16 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "java")
+    apply(plugin = "base")
 
-    configure<JavaPluginExtension> {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(25))
+    plugins.withId("java") {
+        configure<JavaPluginExtension> {
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(25))
+            }
+            sourceCompatibility = JavaVersion.VERSION_25
+            targetCompatibility = JavaVersion.VERSION_25
         }
-        sourceCompatibility = JavaVersion.VERSION_25
-        targetCompatibility = JavaVersion.VERSION_25
     }
 }
 
@@ -93,7 +95,6 @@ tasks.register("qualityCheckAll") {
 }
 
 tasks.register("qualityCheckFast") {
-    group = "quality"
     group = "quality"
     description = "Executa verificações de qualidade rápidas (testes + cobertura) para frontend e backend"
     dependsOn("backendQualityCheckFast", ":frontend:test")
