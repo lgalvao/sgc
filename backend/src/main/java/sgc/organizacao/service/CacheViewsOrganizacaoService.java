@@ -3,6 +3,7 @@ package sgc.organizacao.service;
 import lombok.*;
 import org.springframework.beans.factory.*;
 import org.springframework.cache.annotation.*;
+import org.springframework.core.env.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.config.CacheConfig;
@@ -31,6 +32,7 @@ public class CacheViewsOrganizacaoService {
     private final AdministradorRepo administradorRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final ObjectProvider<CacheViewsOrganizacaoService> selfProvider;
+    private final Environment environment;
 
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_UNIDADE, sync = true)
     public List<UnidadeHierarquiaLeitura> listarTodasUnidades() {
@@ -110,18 +112,22 @@ public class CacheViewsOrganizacaoService {
             }
         });
 
-        if (perfis.isEmpty()) {
-            usuarioPerfilRepo.findAll().stream()
-                    .filter(Objects::nonNull)
-                    .map(perfil -> new UsuarioPerfilLeitura(
-                            perfil.getUsuarioTitulo(),
-                            perfil.getUnidadeCodigo(),
-                            perfil.getPerfil()
-                    ))
-                    .forEach(perfis::add);
+        if (environment.acceptsProfiles(Profiles.of("test"))) {
+            mesclarPerfisViewCompatibilidade(perfis);
         }
 
         return List.copyOf(perfis);
+    }
+
+    private void mesclarPerfisViewCompatibilidade(Set<UsuarioPerfilLeitura> perfis) {
+        usuarioPerfilRepo.findAll().stream()
+                .filter(Objects::nonNull)
+                .map(perfil -> new UsuarioPerfilLeitura(
+                        perfil.getUsuarioTitulo(),
+                        perfil.getUnidadeCodigo(),
+                        perfil.getPerfil()
+                ))
+                .forEach(perfis::add);
     }
 
     private CacheViewsOrganizacaoService self() {

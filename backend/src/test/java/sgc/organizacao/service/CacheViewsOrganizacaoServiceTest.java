@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import sgc.organizacao.model.*;
 
 import java.util.List;
@@ -30,6 +32,8 @@ class CacheViewsOrganizacaoServiceTest {
     private UsuarioPerfilRepo usuarioPerfilRepo;
     @Mock
     private ObjectProvider<CacheViewsOrganizacaoService> selfProvider;
+    @Mock
+    private Environment environment;
 
     @InjectMocks
     private CacheViewsOrganizacaoService cacheService;
@@ -153,6 +157,7 @@ class CacheViewsOrganizacaoServiceTest {
         registroAdmin.setUsuarioTitulo("admin");
         when(administradorRepo.findAll()).thenReturn(List.of(registroAdmin));
         when(selfProvider.getIfAvailable(org.mockito.ArgumentMatchers.any())).thenReturn(cacheService);
+        when(environment.acceptsProfiles(Profiles.of("test"))).thenReturn(false);
 
         List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
 
@@ -177,6 +182,7 @@ class CacheViewsOrganizacaoServiceTest {
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of());
         when(responsabilidadeRepo.findAll()).thenReturn(List.of());
         when(administradorRepo.findAll()).thenReturn(List.of());
+        when(environment.acceptsProfiles(Profiles.of("test"))).thenReturn(true);
         when(usuarioPerfilRepo.findAll()).thenReturn(List.of(perfil));
 
         List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
