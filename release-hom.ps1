@@ -50,9 +50,9 @@ function Invoke-Comando {
 function Get-VersaoProjeto {
     param([string]$Gradle)
 
-    $SaidaVersao = & $Gradle -q properties --property version
+    $SaidaVersao = & $Gradle --quiet properties --property version
     if ($LASTEXITCODE -ne 0) {
-        throw "Comando falhou ($LASTEXITCODE): $Gradle -q properties --property version"
+        throw "Comando falhou ($LASTEXITCODE): $Gradle --quiet properties --property version"
     }
 
     $LinhaVersao = $SaidaVersao | Where-Object { $_ -match "^version:\s*(.+)$" } | Select-Object -First 1
