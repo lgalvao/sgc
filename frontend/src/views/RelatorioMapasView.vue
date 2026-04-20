@@ -48,7 +48,7 @@
     <EmptyState
       v-if="!processoIdSelecionado"
       title="Selecione um processo"
-      description="Para gerar o relatório de mapas vigentes, selecione um processo e opcionalmente uma unidade."
+      description="Para gerar este relatório, escolha um processo e opcionalmente uma unidade."
       icon="bi-file-earmark-pdf"
       data-testid="empty-state-mapas"
     />

@@ -107,10 +107,24 @@ class UnidadeHierarquiaServiceTest {
     void deveBuscarArvorePorCodigo() {
         when(selfProvider.getObject()).thenReturn(service);
         when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+        when(unidadeService.buscarPorCodigo(3L)).thenReturn(unidadeOperacional);
 
         UnidadeDto resultado = service.buscarArvore(3L);
 
         assertThat(resultado.getSigla()).isEqualTo(unidadeOperacional.getSigla());
+    }
+
+    @Test
+    @DisplayName("Deve enriquecer unidade da árvore com responsável atual")
+    void deveEnriquecerUnidadeDaArvoreComResponsavelAtual() {
+        when(selfProvider.getObject()).thenReturn(service);
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+        when(unidadeService.buscarPorCodigo(3L)).thenReturn(unidadeOperacional);
+
+        UnidadeDto resultado = service.buscarArvore(3L);
+
+        assertThat(resultado.getResponsavel()).isNotNull();
+        assertThat(resultado.getResponsavel().nome()).isEqualTo("Responsável 3");
     }
 
     @Test

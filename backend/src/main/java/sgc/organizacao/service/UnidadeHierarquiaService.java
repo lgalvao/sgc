@@ -136,7 +136,7 @@ public class UnidadeHierarquiaService {
         List<UnidadeDto> todas = self().buscarArvoreHierarquica();
         Optional<UnidadeDto> found = buscarNaHierarquia(todas, codigo);
         if (found.isPresent()) {
-            return found.get();
+            return copiarComResponsavelAtual(found.get(), codigo);
         }
         Unidade u = unidadeService.buscarPorCodigo(codigo);
         return toUnidadeDtoObrigatoria(u);
@@ -257,6 +257,33 @@ public class UnidadeHierarquiaService {
         dto.setSubunidades(subunidadesCompletas);
 
         return dto;
+    }
+
+    private UnidadeDto copiarComResponsavelAtual(UnidadeDto dto, Long codigo) {
+        UnidadeDto copia = copiarArvore(dto);
+        Unidade unidadeComResponsavel = unidadeService.buscarPorCodigo(codigo);
+        copia.setResponsavel(UnidadeDto.fromEntityObrigatoria(unidadeComResponsavel).getResponsavel());
+        return copia;
+    }
+
+    private UnidadeDto copiarArvore(UnidadeDto dto) {
+        List<UnidadeDto> subunidades = dto.getSubunidades() == null
+                ? new ArrayList<>()
+                : dto.getSubunidades().stream()
+                .map(this::copiarArvore)
+                .toList();
+
+        return UnidadeDto.builder()
+                .codigo(dto.getCodigo())
+                .nome(dto.getNome())
+                .sigla(dto.getSigla())
+                .codigoPai(dto.getCodigoPai())
+                .tipo(dto.getTipo())
+                .subunidades(subunidades)
+                .tituloTitular(dto.getTituloTitular())
+                .isElegivel(dto.isElegivel())
+                .responsavel(dto.getResponsavel())
+                .build();
     }
 
     private void coletarDescendentes(Long atual, Map<Long, List<Long>> map, List<Long> resultado) {
