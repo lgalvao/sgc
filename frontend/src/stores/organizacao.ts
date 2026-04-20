@@ -13,6 +13,7 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
     const diagnostico = ref<DiagnosticoOrganizacional | null>(null);
     const erroDiagnostico = ref<string | null>(null);
     const carregado = ref(false);
+    let carregamentoEmAndamento: Promise<void> | null = null;
 
     /**
      * Carrega o diagnóstico organizacional somente se ainda não foi carregado nesta sessão.
@@ -23,6 +24,14 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
             return;
         }
 
+        if (!carregamentoEmAndamento) {
+            carregamentoEmAndamento = carregarDiagnostico();
+        }
+
+        await carregamentoEmAndamento;
+    }
+
+    async function carregarDiagnostico(): Promise<void> {
         try {
             diagnostico.value = await buscarDiagnosticoOrganizacional();
             erroDiagnostico.value = null;
@@ -32,6 +41,7 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
             logger.error("Erro ao carregar diagnóstico organizacional:", err);
         } finally {
             carregado.value = true;
+            carregamentoEmAndamento = null;
         }
     }
 
@@ -39,6 +49,7 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
         diagnostico.value = null;
         erroDiagnostico.value = null;
         carregado.value = false;
+        carregamentoEmAndamento = null;
     }
 
     return {diagnostico, erroDiagnostico, carregado, garantirDiagnostico, $reset};

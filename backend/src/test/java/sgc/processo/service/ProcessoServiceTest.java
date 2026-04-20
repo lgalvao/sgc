@@ -1205,7 +1205,7 @@ class ProcessoServiceTest {
         void deveNaoFazerNadaQuandoAcaoNaoForAceitarOuHomologar() {
             ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(), AcaoProcesso.DISPONIBILIZAR);
             
-            assertThatCode(() -> invokeMethod(processoService, "processarAcoesBlocoAceiteHomologacao", req, new Usuario(), List.of()))
+            assertThatCode(() -> invokeMethod(processoService, "processarAcoesBlocoAceiteHomologacao", req, List.of()))
                 .doesNotThrowAnyException();
         }
     }

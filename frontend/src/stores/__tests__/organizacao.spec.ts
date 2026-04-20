@@ -55,6 +55,41 @@ describe("organizacao store", () => {
             expect(unidadeService.buscarDiagnosticoOrganizacional).not.toHaveBeenCalled();
         });
 
+        it("deve reutilizar carregamento em andamento para chamadas concorrentes", async () => {
+            const mockDiagnostico = {
+                possuiViolacoes: false,
+                resumo: "OK",
+                grupos: [],
+                quantidadeTiposViolacao: 0,
+                quantidadeOcorrencias: 0
+            };
+            vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue(mockDiagnostico);
+
+            await Promise.all([
+                context.store.garantirDiagnostico(true),
+                context.store.garantirDiagnostico(true),
+            ]);
+
+            expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalledTimes(1);
+            expect(context.store.diagnostico).toEqual(mockDiagnostico);
+        });
+
+        it("deve limpar carregamento em andamento no reset", async () => {
+            vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
+                possuiViolacoes: false,
+                resumo: "OK",
+                grupos: [],
+                quantidadeTiposViolacao: 0,
+                quantidadeOcorrencias: 0
+            });
+
+            await context.store.garantirDiagnostico(true);
+            context.store.$reset();
+            await context.store.garantirDiagnostico(true);
+
+            expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalledTimes(2);
+        });
+
         it("deve lidar com erro ao buscar diagnóstico", async () => {
             vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockRejectedValue(new Error("Erro de rede"));
 

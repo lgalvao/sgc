@@ -118,7 +118,6 @@ class ProcessoServiceCoverageTest {
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(subprocesso));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(subprocesso.getCodigo(), unidade));
         when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
-        when(permissionEvaluator.verificarPermissaoSilenciosa(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class))).thenReturn(true);
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
         ProcessoDetalheDto resultado = target.obterDetalhesCompleto(cod, true);
@@ -126,6 +125,7 @@ class ProcessoServiceCoverageTest {
         assertThat(resultado.getElegiveis()).hasSize(1);
         verify(consultaService, times(1)).listarEntidadesPorProcesso(cod);
         verify(localizacaoSubprocessoService, times(1)).obterLocalizacoesAtuais(anyCollection());
+        verify(permissionEvaluator, never()).verificarPermissaoSilenciosa(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class));
     }
 
     @Test

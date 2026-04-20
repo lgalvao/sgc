@@ -38,7 +38,7 @@ public class ValidadorDadosOrganizacionais {
     private final UsuarioRepo usuarioRepo;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    @Cacheable(CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL)
+    @Cacheable(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, sync = true)
     @Transactional(readOnly = true)
     public DiagnosticoOrganizacionalDto diagnosticar() {
         List<UnidadeHierarquiaLeitura> unidadesParticipantes = carregarUnidadesParticipantes();
