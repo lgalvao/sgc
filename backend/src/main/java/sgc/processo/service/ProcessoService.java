@@ -971,15 +971,6 @@ public class ProcessoService {
         return DISPONIBILIZAR.name();
     }
 
-    @SuppressWarnings("unused")
-    private void processarAcoesBlocoAceiteHomologacao(
-            ProcessarAnaliseEmBlocoCommand req,
-            Usuario user,
-            List<Subprocesso> list
-    ) {
-        processarAcoesBlocoAceiteHomologacao(req, list);
-    }
-
     private boolean isSituacaoCadastro(SituacaoSubprocesso s) {
         return s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
                s == REVISAO_CADASTRO_DISPONIBILIZADA ||

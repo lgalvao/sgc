@@ -250,6 +250,11 @@ public class SubprocessoConsultaService {
         return resolverPermissoes(montarContextoConsultaLeve(sp));
     }
 
+    public PermissoesSubprocessoDto obterPermissoesUI(Long codSubprocesso) {
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        return obterPermissoesUI(subprocesso);
+    }
+
     private PermissoesSubprocessoDto construirPermissoes(ContextoConsultaSubprocesso contexto) {
         PermissoesFluxo permissoesFluxo = calcularPermissoesFluxo(contexto);
         boolean mesmaUnidade = contexto.mesmaUnidade();

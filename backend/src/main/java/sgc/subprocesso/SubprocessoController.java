@@ -307,12 +307,12 @@ public class SubprocessoController {
                 request.codSubprocessoOrigem(),
                 request.codigosAtividades()
         );
-        Subprocesso subprocessoDestino = resultado.subprocessoDestino();
+        Long codigoSubprocessoDestino = resultado.codigoSubprocessoDestino();
         return AtividadeOperacaoResponse.builder()
                 .atividade(null)
-                .subprocesso(consultaService.obterStatus(subprocessoDestino))
-                .atividadesAtualizadas(consultaService.listarAtividadesSubprocesso(subprocessoDestino))
-                .permissoes(consultaService.obterPermissoesUI(subprocessoDestino))
+                .subprocesso(consultaService.obterStatus(codigoSubprocessoDestino))
+                .atividadesAtualizadas(consultaService.listarAtividadesSubprocesso(codigoSubprocessoDestino))
+                .permissoes(consultaService.obterPermissoesUI(codigoSubprocessoDestino))
                 .message("Atividades importadas.")
                 .aviso(resultado.temDuplicatas() ? Mensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS : null)
                 .build();

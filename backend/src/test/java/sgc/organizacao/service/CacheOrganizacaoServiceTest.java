@@ -59,6 +59,17 @@ class CacheOrganizacaoServiceTest {
         verify(registroSseEmitter).transmitir("org-cache-refreshed");
     }
 
+    @Test
+    @DisplayName("deve ignorar cache nulo durante a invalidação")
+    void deveIgnorarCacheNuloDuranteInvalidacao() {
+        when(cacheManager.getCacheNames()).thenReturn(List.of("inexistente"));
+        when(cacheManager.getCache("inexistente")).thenReturn(null);
+
+        cacheOrganizacaoService.invalidarAposCommit();
+
+        verify(registroSseEmitter).transmitir("org-cache-refreshed");
+    }
+
     private void configurarCaches() {
         when(cacheManager.getCacheNames()).thenReturn(List.of("organizacao"));
         when(cacheManager.getCache("organizacao")).thenReturn(cacheOrganizacao);

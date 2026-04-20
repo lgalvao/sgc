@@ -1,4 +1,3 @@
-
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import info.solidsoft.gradle.pitest.PitestTask
 import net.ltgt.gradle.errorprone.errorprone
@@ -26,17 +25,17 @@ tasks.withType<JavaCompile>().configureEach {
         disableAllChecks = true
         disableWarningsInGeneratedCode = true
         excludedPaths = listOf(
-            """.*[\\/](build[\\/]generated)[\\/].*""",
-            """.*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*"""
+            ".*[\\/](build[\\/]generated)[\\/].*",
+            ".*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*"
         ).joinToString("|")
     }
 }
 
 tasks.named<JavaCompile>("compileTestJava") {
     options.errorprone.excludedPaths = listOf(
-        """.*[\\/](build[\\/]generated)[\\/].*""",
-        """.*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*""",
-        """.*[\\/]src[\\/]test[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]).*"""
+        ".*[\\/](build[\\/]generated)[\\/].*",
+        ".*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*",
+        ".*[\\/]src[\\/]test[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]).*"
     ).joinToString("|")
 }
 
@@ -115,9 +114,6 @@ tasks.withType<BootJar> {
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     mainClass.set("sgc.Sgc")
 
-    // Carregar variáveis do arquivo .env apropriado baseado na variável ENV
-    // Uso: ./gradlew bootRun -PENV=hom (ou e2e, test)
-    // Também aceita -Dspring.profiles.active=hom
     val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "e2e"
     val envFile = rootProject.file(".env.$env")
 
@@ -246,7 +242,7 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
         csv.required.set(true)
-        html.required.set(true) // Ativado para facilitar visualização manual se necessário
+        html.required.set(true)
     }
 
     classDirectories.setFrom(
@@ -268,7 +264,6 @@ tasks.jacocoTestReport {
                     "sgc/**/model/*Id.class",
                     "sgc/**/*Repo.class",
                     
-                    // Entidades simples
                     "sgc/**/model/Usuario.class",
                     "sgc/**/model/Unidade*.class",
                     "sgc/**/model/Administrador.class",
@@ -342,18 +337,17 @@ pitest {
 
     excludedClasses.set(
         listOf(
-            "sgc.*Erro*",                // Todas as classes de erro
-            "sgc.*Request",              // Request DTOs
-            "sgc.*Response",             // Response DTOs
-            "sgc.*Query",                // Query objects
-            "sgc.*Config*",              // Command objects
-            "sgc.*Command",              // Command objects
-            "sgc.*View",                 // View objects
-            "sgc.Sgc",                   // Classe main
+            "sgc.*Erro*",
+            "sgc.*Request",
+            "sgc.*Response",
+            "sgc.*Query",
+            "sgc.*Config*",
+            "sgc.*Command",
+            "sgc.*View",
+            "sgc.Sgc",
         )
     )
 
-    // Métodos ignorados (getters/setters já são excluídos por padrão)
     excludedMethods.set(
         listOf(
             "hashCode",
@@ -366,7 +360,7 @@ pitest {
     outputFormats.set(listOf("CSV"))
     timestampedReports.set(false)
     threads.set(Runtime.getRuntime().availableProcessors())
-    timeoutFactor.set(BigDecimal("5.0"))
+    timeoutFactor.set("5.0".toBigDecimal())
     verbose.set(true)
     failWhenNoMutations.set(false)
 
@@ -404,7 +398,6 @@ fun isNonStable(version: String): Boolean {
     return hasNonStableKeyword || (!stableKeyword && !regex.matches(version))
 }
 
-// Tarefa customizada para mutation testing completo
 tasks.register("mutationTest") {
     group = "quality"
     description = "Executa mutation testing completo com PIT (gera relatório em build/reports/pitest)"
@@ -416,13 +409,11 @@ tasks.register("mutationTest") {
     }
 }
 
-// Tarefa para mutation testing incremental (apenas mudanças recentes)
 tasks.register("mutationTestIncremental") {
     group = "quality"
     description = "Mutation testing incremental (apenas classes modificadas recentemente)"
 
     doFirst {
-        // Detectar classes modificadas via git
         val gitDiff = providers.exec {
             commandLine("git", "diff", "--name-only", "HEAD~1", "HEAD")
         }.standardOutput.asText.get()
@@ -441,7 +432,6 @@ tasks.register("mutationTestIncremental") {
             println("🎯 Analisando ${modifiedClasses.size} classe(s) modificada(s):")
             modifiedClasses.forEach { println("   - $it") }
 
-            // Configurar PIT para analisar apenas classes modificadas
             tasks.named<PitestTask>("pitest") {
                 targetClasses.set(modifiedClasses)
             }
@@ -451,7 +441,6 @@ tasks.register("mutationTestIncremental") {
     finalizedBy("pitest")
 }
 
-// Tarefa para análise de mutantes por módulo
 tasks.register("mutationTestModulo") {
     group = "quality"
     description = "Mutation testing de um módulo específico (use -PtargetModule=processo)"

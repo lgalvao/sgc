@@ -52,6 +52,14 @@ public class SubprocessoService {
             Collection<Unidade> unidades,
             Unidade unidadeOrigem
     ) {
+        public CriarSubprocessosMapeamentoCommand {
+            unidades = List.copyOf(unidades);
+        }
+
+        @Override
+        public Collection<Unidade> unidades() {
+            return List.copyOf(unidades);
+        }
     }
 
     public record CriarSubprocessoComMapaCommand(
@@ -436,13 +444,13 @@ public class SubprocessoService {
         registrarMovimentacaoImportacao(contexto);
 
         return new ImportacaoAtividadesResultado(
-                contexto.subprocessoDestino(),
+                contexto.subprocessoDestino().getCodigo(),
                 houveDuplicidadeNaImportacao(totalSolicitado, totalImportado)
         );
     }
 
     public record ImportacaoAtividadesResultado(
-            Subprocesso subprocessoDestino,
+            Long codigoSubprocessoDestino,
             boolean temDuplicatas
     ) {
     }
