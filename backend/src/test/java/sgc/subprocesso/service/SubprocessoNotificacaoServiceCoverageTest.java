@@ -52,7 +52,6 @@ class SubprocessoNotificacaoServiceCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
         
         UnidadeResumoLeitura rl1 = mock(UnidadeResumoLeitura.class);
-        when(rl1.codigo()).thenReturn(20L);
         when(rl1.sigla()).thenReturn("S1");
 
         when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(rl1));
