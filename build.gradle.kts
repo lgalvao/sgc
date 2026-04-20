@@ -1,13 +1,8 @@
 plugins {
-    id("org.springframework.boot") version "4.0.5"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("org.openrewrite.rewrite") version "7.18.0" apply false
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.open.rewrite) apply false
     id("base")
-}
-
-fun detectarWindows(): Boolean {
-    val nomeSistemaOperacional: String = System.getProperty("os.name") ?: return false
-    return nomeSistemaOperacional.lowercase().contains("win")
 }
 
 allprojects {
@@ -46,56 +41,37 @@ subprojects {
     }
 }
 
-tasks.register<Exec>("installFrontend") {
-    description = "Instalar frontend"
-    workingDir = file("frontend")
-    commandLine = if (detectarWindows()) listOf(
-        "cmd",
-        "/c",
-        "npm",
-        "install"
-    ) else listOf("npm", "install")
+// Delegation tasks for convenience
+tasks.register("installFrontend") {
+    group = "setup"
+    description = "Instala as dependências do frontend (NPM)"
+    dependsOn(":frontend:install")
 }
 
-tasks.register<Exec>("buildFrontend") {
-    description = ""
-    dependsOn("installFrontend")
-    workingDir = file("frontend")
-    commandLine = if (detectarWindows()) listOf(
-        "cmd",
-        "/c",
-        "npm",
-        "run",
-        "build"
-    ) else listOf("npm", "run", "build")
+tasks.register("buildFrontend") {
+    group = "build"
+    description = "Gera o build de produção do frontend (Vite)"
+    dependsOn(":frontend:buildVue")
 }
 
 tasks.register<Copy>("copyFrontend") {
-    description = "Copiar frontend para servidor"
+    group = "build"
+    description = "Copia o frontend gerado para os recursos estáticos do backend"
     dependsOn("buildFrontend")
     from("frontend/dist")
     into("backend/src/main/resources/static")
 }
 
 tasks.register<Delete>("cleanFrontend") {
-    description = "Limpar build de frontend"
-    delete("frontend/dist", "frontend/node_modules")
+    group = "build"
+    description = "Limpa o build do frontend"
+    dependsOn(":frontend:clean")
 }
 
-tasks.register<Exec>("frontendQualityCheck") {
+tasks.register("frontendQualityCheck") {
     group = "quality"
-    description = "Executa verificações de qualidade do frontend (testes, lint, typecheck)"
-    dependsOn("installFrontend")
-    workingDir = file("frontend")
-    commandLine = if (detectarWindows()) listOf(
-        "cmd",
-        "/c",
-        "npm",
-        "run",
-        "quality:all"
-    ) else listOf("npm", "run", "quality:all")
-
-    isIgnoreExitValue = true
+    description = "Executa verificações de qualidade do frontend"
+    dependsOn(":frontend:quality")
 }
 
 tasks.register("backendQualityCheck") {
@@ -116,16 +92,9 @@ tasks.register("qualityCheckAll") {
     dependsOn("backendQualityCheck", "frontendQualityCheck")
 }
 
-tasks.register<Exec>("qualityCheckFast") {
+tasks.register("qualityCheckFast") {
+    group = "quality"
     group = "quality"
     description = "Executa verificações de qualidade rápidas (testes + cobertura) para frontend e backend"
-    dependsOn("backendQualityCheckFast")
-
-    workingDir = file("frontend")
-    val isWindows: Boolean = detectarWindows()
-    commandLine =
-        if (isWindows) listOf("cmd", "/c", "npm", "run", "quality:test")
-        else listOf("npm", "run", "quality:test")
-
-    isIgnoreExitValue = true
+    dependsOn("backendQualityCheckFast", ":frontend:test")
 }

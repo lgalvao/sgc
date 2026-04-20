@@ -1,0 +1,97 @@
+[versions]
+# Spring & Frameworks
+springBoot = "4.0.5"
+springDependencyManagement = "1.1.7"
+springDoc = "3.0.2"
+jakartaServlet = "6.1.0" # Spring Boot 4 uses Jakarta EE 11
+
+# Tools & Plugins
+jacoco = "0.8.14"
+spotbugs = "4.9.8"
+spotbugsPlugin = "6.4.8"
+openRewrite = "7.18.0"
+
+# Security & Core Overrides (User requested newer versions)
+jackson = "3.1.1"
+tomcat = "11.0.21"
+thymeleaf = "3.1.4.RELEASE"
+jjwt = "0.13.0"
+owaspSanitizer = "20260313.1"
+
+# Libs
+lombok = "1.18.44"
+openpdf = "3.0.3"
+rhino = "1.9.1"
+caffeine = "3.1.8"
+h2 = "2.3.232"
+ojdbc = "23.26.1.0.0"
+
+# Test
+junit = "6.0.3"
+archunit = "1.4.1"
+jqwik = "1.9.3"
+equalsverifier = "4.4.2"
+groovy = "5.0.4"
+greenmail = "2.1.8"
+swaggerParser = "2.1.39"
+swaggerValidator = "2.46.1"
+
+[libraries]
+# Spring Boot Starters
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-aspectj = { module = "org.springframework.boot:spring-boot-starter-aspectj" }
+spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
+spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
+spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
+
+# Security & Core Overrides
+jackson-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson" }
+jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
+tomcat-embed-core = { module = "org.apache.tomcat.embed:tomcat-embed-core", version.ref = "tomcat" }
+thymeleaf-spring6 = { module = "org.thymeleaf:thymeleaf-spring6", version.ref = "thymeleaf" }
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
+owasp-java-html-sanitizer = { module = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer", version.ref = "owaspSanitizer" }
+
+# General Libs
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api" }
+openpdf = { module = "com.github.librepdf:openpdf", version.ref = "openpdf" }
+rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
+ojdbc11 = { module = "com.oracle.database.jdbc:ojdbc11", version.ref = "ojdbc" }
+springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
+hibernate-validator-processor = { module = "org.hibernate.validator:hibernate-validator-annotation-processor", version = "9.1.0.Final" }
+
+# Test Libs
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-test-autoconfigure = { module = "org.springframework.boot:spring-boot-test-autoconfigure" }
+junit-platform-suite-api = { module = "org.junit.platform:junit-platform-suite-api", version.ref = "junit" }
+junit-platform-suite-engine = { module = "org.junit.platform:junit-platform-suite-engine", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
+awaitility = { module = "org.awaitility:awaitility" }
+archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
+archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
+equalsverifier = { module = "nl.jqno.equalsverifier:equalsverifier", version.ref = "equalsverifier" }
+groovy-all = { module = "org.apache.groovy:groovy-all", version.ref = "groovy" }
+greenmail-junit5 = { module = "com.icegreen:greenmail-junit5", version.ref = "greenmail" }
+swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version.ref = "swaggerParser" }
+swagger-request-validator = { module = "com.atlassian.oai:swagger-request-validator-mockmvc", version.ref = "swaggerValidator" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugsPlugin" }
+open-rewrite = { id = "org.openrewrite.rewrite", version.ref = "openRewrite" }

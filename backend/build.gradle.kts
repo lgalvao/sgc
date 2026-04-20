@@ -8,73 +8,75 @@ val argumentosJvmSemAvisoUnsafe = emptyList<String>()
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.5"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("com.github.spotbugs") version "6.4.8"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.spotbugs)
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
-    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation", "-XDaddTypeAnnotationsToSymbol=true"))
+    options.compilerArgs.addAll(
+        listOf(
+            "-Xlint:unchecked",
+            "-Xlint:deprecation",
+            "-XDaddTypeAnnotationsToSymbol=true",
+            "-parameters"
+        )
+    )
 }
 
-extra["lombok.version"] = "1.18.44"
-extra["jjwt.version"] = "0.13.0"
-extra["thymeleaf.version"] = "3.1.4.RELEASE"
-
 dependencies {
-    implementation(platform("tools.jackson:jackson-bom:3.1.1"))
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-aspectj")
-    implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("jakarta.servlet:jakarta.servlet-api")
-    implementation("tools.jackson.core:jackson-core:3.1.1")
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
-    implementation("org.thymeleaf:thymeleaf-spring6:3.1.4.RELEASE")
-    implementation("com.github.librepdf:openpdf:3.0.3")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
-    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
-    implementation("org.mozilla:rhino:1.9.1")
-    implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("com.h2database:h2")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
+    implementation(platform(libs.jackson.bom))
+    implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.aspectj)
+    implementation(libs.spring.boot.starter.cache)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.webmvc)
+    implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.mail)
+    implementation(libs.spring.boot.starter.thymeleaf)
+    implementation(libs.jakarta.servlet.api)
+    implementation(libs.jackson.core)
+    implementation(libs.tomcat.embed.core)
+    implementation(libs.thymeleaf.spring6)
+    implementation(libs.openpdf)
+    implementation(libs.owasp.java.html.sanitizer)
+    implementation(libs.jjwt.api)
+    implementation(libs.rhino)
+    implementation(libs.caffeine)
+    implementation(libs.h2)
+    implementation(libs.springdoc.openapi)
 
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
+    developmentOnly(libs.spring.boot.devtools)
 
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
-    annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:9.1.0.Final")
+    annotationProcessor(libs.spring.boot.configuration.processor)
+    annotationProcessor(libs.lombok)
+    annotationProcessor(libs.hibernate.validator.processor)
 
-    runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
+    runtimeOnly(libs.ojdbc11)
+    runtimeOnly(libs.jjwt.impl)
+    runtimeOnly(libs.jjwt.jackson)
 
-    testImplementation(platform("org.junit:junit-bom:6.0.3"))
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
-    testImplementation("org.junit.platform:junit-platform-suite-api:6.0.3")
-    testImplementation("org.awaitility:awaitility")
-    testImplementation("com.tngtech.archunit:archunit:1.4.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
-    testImplementation("net.jqwik:jqwik:1.9.3")
-    testImplementation("nl.jqno.equalsverifier:equalsverifier:4.4.2")
-    testImplementation("org.apache.groovy:groovy-all:5.0.4")
-    testImplementation("com.icegreen:greenmail-junit5:2.1.8")
-    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.39")
-    testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.1")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.security.test)
+    testImplementation(libs.spring.boot.starter.webmvc.test)
+    testImplementation(libs.spring.boot.test.autoconfigure)
+    testImplementation(libs.junit.platform.suite.api)
+    testImplementation(libs.awaitility)
+    testImplementation(libs.archunit)
+    testImplementation(libs.archunit.junit5)
+    testImplementation(libs.jqwik)
+    testImplementation(libs.equalsverifier)
+    testImplementation(libs.groovy.all)
+    testImplementation(libs.greenmail.junit5)
+    testImplementation(libs.swagger.parser)
+    testImplementation(libs.swagger.request.validator)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.0.3")
-    testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
+    testRuntimeOnly(libs.junit.platform.suite.engine)
+    testCompileOnly(libs.lombok)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.withType<BootJar> {
@@ -91,14 +93,15 @@ tasks.named<BootRun>("bootRun") {
 
     if (envFile.exists()) {
         println("Carregando configurações de: .env.$env")
-        envFile.readLines()
-            .filter { it.isNotBlank() && !it.trim().startsWith("#") }
-            .forEach { line ->
-                val parts = line.split("=", limit = 2)
-                if (parts.size == 2) {
-                    environment(parts[0].trim(), parts[1].trim())
+        envFile.useLines { lines ->
+            lines.filter { it.isNotBlank() && !it.trim().startsWith("#") }
+                .forEach { line ->
+                    val parts = line.split("=", limit = 2)
+                    if (parts.size == 2) {
+                        environment(parts[0].trim(), parts[1].trim())
+                    }
                 }
-            }
+        }
     } else {
         println("Arquivo .env.$env não encontrado, usando configurações padrão do application.yml")
     }
@@ -199,12 +202,12 @@ tasks.register<Test>("integrationTest") {
 }
 
 jacoco {
-    toolVersion = "0.8.14"
+    toolVersion = libs.versions.jacoco.get()
 }
 
 spotbugs {
-    toolVersion = "4.9.8"
-    ignoreFailures.set(true)
+    toolVersion = libs.versions.spotbugs.get()
+    ignoreFailures.set(false) // Alterado para false para garantir qualidade no build
     excludeFilter.set(file("etc/config/spotbugs/exclude.xml"))
 }
 

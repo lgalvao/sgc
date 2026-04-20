@@ -18,9 +18,9 @@
   <component name="JavacSettings">
     <option name="GENERATE_NO_WARNINGS" value="true" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="sgc.backend" options="-parameters -Xlint:unchecked -Xlint:deprecation -XDaddTypeAnnotationsToSymbol=true" />
-      <module name="sgc.backend.main" options="-parameters -Xlint:unchecked -Xlint:deprecation -XDaddTypeAnnotationsToSymbol=true" />
-      <module name="sgc.backend.test" options="-parameters -Xlint:unchecked -Xlint:deprecation -XDaddTypeAnnotationsToSymbol=true" />
+      <module name="sgc.backend" options="-parameters -Xlint:unchecked -Xlint:deprecation -XDaddTypeAnnotationsToSymbol=true -parameters" />
+      <module name="sgc.backend.main" options="-parameters -Xlint:unchecked -Xlint:deprecation -XDaddTypeAnnotationsToSymbol=true -parameters" />
+      <module name="sgc.backend.test" options="-parameters -Xlint:unchecked -Xlint:deprecation -XDaddTypeAnnotationsToSymbol=true -parameters" />
     </option>
   </component>
 </project>
