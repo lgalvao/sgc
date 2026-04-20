@@ -12,7 +12,6 @@ import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -59,7 +58,6 @@ public class SubprocessoConsultaService {
             DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
     private final SubprocessoRepo subprocessoRepo;
     private final AnaliseRepo analiseRepo;
-    private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioFacade;
     private final ImpactoMapaService impactoMapaService;
     private final MapaVisualizacaoService mapaVisualizacaoService;

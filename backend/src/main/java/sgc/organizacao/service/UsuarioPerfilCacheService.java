@@ -13,6 +13,7 @@ import java.util.*;
 public class UsuarioPerfilCacheService {
 
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+    private final UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo", sync = true)
     public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {
@@ -23,8 +24,12 @@ public class UsuarioPerfilCacheService {
                         (primeira, segunda) -> primeira
                 ));
 
-        return cacheViewsOrganizacaoService.listarTodosPerfisUnidade().stream()
-                .filter(perfil -> Objects.equals(perfil.usuarioTitulo(), usuarioTitulo))
+        return usuarioPerfilRepo.findByUsuarioTitulo(usuarioTitulo).stream()
+                .map(perfil -> new UsuarioPerfilLeitura(
+                        perfil.getUsuarioTitulo(),
+                        perfil.getUnidadeCodigo(),
+                        perfil.getPerfil()
+                ))
                 .map(perfil -> paraAutorizacao(perfil, unidadesPorCodigo.get(perfil.unidadeCodigo())))
                 .toList();
     }

@@ -40,7 +40,6 @@ dependencies {
     implementation(libs.jakarta.servlet.api)
     implementation(libs.jackson.core)
     implementation(libs.tomcat.embed.core)
-    implementation(libs.thymeleaf.spring6)
     implementation(libs.openpdf)
     implementation(libs.owasp.java.html.sanitizer)
     implementation(libs.jjwt.api)

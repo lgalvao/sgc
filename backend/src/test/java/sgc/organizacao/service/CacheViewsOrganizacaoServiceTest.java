@@ -99,7 +99,9 @@ class CacheViewsOrganizacaoServiceTest {
         r.setUnidadeCodigo(10L);
         r.setUsuarioTitulo("titulo1");
 
-        when(responsabilidadeRepo.findAll()).thenReturn(List.of(r));
+        when(responsabilidadeRepo.listarTodasLeituras()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(r.getUnidadeCodigo(), r.getUsuarioTitulo())
+        ));
 
         List<ResponsabilidadeLeitura> result = cacheService.listarTodasResponsabilidades();
 
@@ -151,7 +153,10 @@ class CacheViewsOrganizacaoServiceTest {
         Responsabilidade responsabilidadeInteroperacional = new Responsabilidade();
         responsabilidadeInteroperacional.setUnidadeCodigo(20L);
         responsabilidadeInteroperacional.setUsuarioTitulo("gestor-chefe");
-        when(responsabilidadeRepo.findAll()).thenReturn(List.of(responsabilidadeOperacional, responsabilidadeInteroperacional));
+        when(responsabilidadeRepo.listarTodasLeituras()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(responsabilidadeOperacional.getUnidadeCodigo(), responsabilidadeOperacional.getUsuarioTitulo()),
+                new ResponsabilidadeLeitura(responsabilidadeInteroperacional.getUnidadeCodigo(), responsabilidadeInteroperacional.getUsuarioTitulo())
+        ));
 
         Administrador registroAdmin = new Administrador();
         registroAdmin.setUsuarioTitulo("admin");
@@ -180,7 +185,7 @@ class CacheViewsOrganizacaoServiceTest {
         when(selfProvider.getIfAvailable(org.mockito.ArgumentMatchers.any())).thenReturn(cacheService);
         when(usuarioRepo.listarTodasConsultas()).thenReturn(List.of());
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of());
-        when(responsabilidadeRepo.findAll()).thenReturn(List.of());
+        when(responsabilidadeRepo.listarTodasLeituras()).thenReturn(List.of());
         when(administradorRepo.findAll()).thenReturn(List.of());
         when(environment.acceptsProfiles(Profiles.of("test"))).thenReturn(true);
         when(usuarioPerfilRepo.findAll()).thenReturn(List.of(perfil));

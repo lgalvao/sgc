@@ -247,12 +247,15 @@ class ProcessoServiceCoverageTest {
             p.setTipo(MAPEAMENTO);
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
             
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
+            uni.setNome("Unidade 10");
+            uni.setSigla("U10");
             sp.setUnidade(uni);
             sp.setDataLimiteEtapa2(java.time.LocalDateTime.now());
             
@@ -261,7 +264,6 @@ class ProcessoServiceCoverageTest {
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-            when(permissionEvaluator.verificarPermissaoSilenciosa(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, true))
@@ -278,12 +280,15 @@ class ProcessoServiceCoverageTest {
             p.setTipo(MAPEAMENTO);
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
             
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
+            uni.setNome("Unidade 10");
+            uni.setSigla("U10");
             sp.setUnidade(uni);
             java.time.LocalDateTime now = java.time.LocalDateTime.now();
             sp.setDataLimiteEtapa1(now.plusDays(2));
@@ -294,11 +299,11 @@ class ProcessoServiceCoverageTest {
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-            when(permissionEvaluator.verificarPermissaoSilenciosa(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            assertThatCode(() -> target.obterDetalhesCompleto(cod, true))
-                    .doesNotThrowAnyException();
+            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);
+            assertThat(res.getElegiveis()).isNotEmpty();
+            assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(sp.getDataLimiteEtapa2());
         }
         
         @Test
@@ -310,12 +315,15 @@ class ProcessoServiceCoverageTest {
             p.setTipo(MAPEAMENTO);
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
             
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
+            uni.setNome("Unidade 10");
+            uni.setSigla("U10");
             sp.setUnidade(uni);
             java.time.LocalDateTime d1 = java.time.LocalDateTime.now().plusDays(1);
             java.time.LocalDateTime d2 = java.time.LocalDateTime.now().plusDays(2);
@@ -327,7 +335,6 @@ class ProcessoServiceCoverageTest {
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-            when(permissionEvaluator.verificarPermissaoSilenciosa(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);

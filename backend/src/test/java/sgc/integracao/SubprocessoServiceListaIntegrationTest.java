@@ -107,13 +107,14 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
 
         LocalDateTime dataLimiteEtapa1 = LocalDateTime.now();
         LocalDateTime dataLimiteEtapa2 = dataLimiteEtapa1.plusDays(5);
-        CriarSubprocessoRequest request = objectMapper.readValue(
-                "{%n" +
-                "  \"codProcesso\": %d,%n" +
-                "  \"codUnidade\": %d,%n" +
-                "  \"dataLimiteEtapa1\": \"%s\",%n" +
-                "  \"dataLimiteEtapa2\": \"%s\"%n" +
-                "}%n".formatted(
+        CriarSubprocessoRequest request = objectMapper.readValue("""
+                {
+                  "codProcesso": %d,
+                  "codUnidade": %d,
+                  "dataLimiteEtapa1": "%s",
+                  "dataLimiteEtapa2": "%s"
+                }
+                """.formatted(
                 processo.getCodigo(),
                 unidade2.getCodigo(),
                 dataLimiteEtapa1,

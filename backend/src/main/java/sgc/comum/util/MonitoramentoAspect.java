@@ -54,7 +54,6 @@ public class MonitoramentoAspect {
             Signature assinatura = joinPoint.getSignature();
             String classe = assinatura != null ? assinatura.getDeclaringTypeName() : joinPoint.getClass().getName();
             String metodo = assinatura != null ? assinatura.getName() : "desconhecido";
-            String correlacaoId = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();
             boolean monitoramentoDetalhado = traceCompleto || FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao();
 
             if (monitoramentoDetalhado) {

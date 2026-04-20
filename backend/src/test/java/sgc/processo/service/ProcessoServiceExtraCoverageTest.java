@@ -553,7 +553,8 @@ class ProcessoServiceExtraCoverageTest {
 
         verify(subprocessoService).criarParaMapeamento(argThat(command ->
                 command.processo() == processo
-                        && command.unidades().equals(Set.of(unidade))
+                        && command.unidades().size() == 1
+                        && command.unidades().contains(unidade)
                         && command.unidadeOrigem() == unidadeAdmin));
     }
 

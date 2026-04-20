@@ -21,6 +21,9 @@ class UsuarioPerfilCacheServiceTest {
     @MockitoBean
     private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
 
+    @MockitoBean
+    private UsuarioPerfilRepo usuarioPerfilRepo;
+
     @Test
     @DisplayName("Deve cachear autorizacoes por titulo eleitoral")
     void deveCachearAutorizacoesPorTituloEleitoral() {
@@ -35,8 +38,8 @@ class UsuarioPerfilCacheServiceTest {
                         null
                 )
         ));
-        when(cacheViewsOrganizacaoService.listarTodosPerfisUnidade()).thenReturn(List.of(
-                new UsuarioPerfilLeitura("123", 1L, Perfil.ADMIN)
+        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(
+                new UsuarioPerfil("123", 1L, Perfil.ADMIN)
         ));
 
         UsuarioPerfilAutorizacaoLeitura leituraEsperada = new UsuarioPerfilAutorizacaoLeitura(
@@ -54,16 +57,15 @@ class UsuarioPerfilCacheServiceTest {
         assertThat(primeiraConsulta).containsExactly(leituraEsperada);
         assertThat(segundaConsulta).containsExactly(leituraEsperada);
         verify(cacheViewsOrganizacaoService, times(1)).listarTodasUnidades();
-        verify(cacheViewsOrganizacaoService, times(1)).listarTodosPerfisUnidade();
+        verify(usuarioPerfilRepo, times(1)).findByUsuarioTitulo("123");
     }
 
     @Test
     @DisplayName("Deve ignorar perfis de outros usuarios")
     void deveIgnorarPerfisDeOutrosUsuarios() {
         when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of());
-        when(cacheViewsOrganizacaoService.listarTodosPerfisUnidade()).thenReturn(List.of(
-                new UsuarioPerfilLeitura("123", 1L, Perfil.CHEFE),
-                new UsuarioPerfilLeitura("999", 1L, Perfil.ADMIN)
+        when(usuarioPerfilRepo.findByUsuarioTitulo("999")).thenReturn(List.of(
+                new UsuarioPerfil("999", 1L, Perfil.ADMIN)
         ));
 
         List<UsuarioPerfilAutorizacaoLeitura> perfis = usuarioPerfilCacheService.buscarAutorizacoesPerfil("999");
@@ -71,6 +73,6 @@ class UsuarioPerfilCacheServiceTest {
         assertThat(perfis)
                 .extracting(UsuarioPerfilAutorizacaoLeitura::perfil)
                 .containsExactly(Perfil.ADMIN);
-        verify(cacheViewsOrganizacaoService).listarTodosPerfisUnidade();
+        verify(usuarioPerfilRepo).findByUsuarioTitulo("999");
     }
 }
