@@ -6,13 +6,17 @@ import jakarta.validation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.http.*;
+import org.springframework.security.access.*;
 import org.springframework.security.access.prepost.*;
+import org.springframework.security.core.*;
+import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.*;
 import sgc.comum.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.service.*;
+import sgc.seguranca.*;
 import sgc.seguranca.sanitizacao.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -34,6 +38,7 @@ public class SubprocessoController {
     private final SubprocessoService subprocessoService;
     private final SubprocessoTransicaoService transicaoService;
     private final UnidadeService unidadeService;
+    private final SgcPermissionEvaluator permissionEvaluator;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -139,24 +144,26 @@ public class SubprocessoController {
     }
 
     @GetMapping("/contexto-edicao/buscar")
-    @PostAuthorize("hasPermission(returnObject.body.detalhes.subprocesso.codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicaoPorProcessoEUnidade(
             @RequestParam Long codProcesso,
             @RequestParam String siglaUnidade
     ) {
         Long codUnidade = unidadeService.buscarCodigoPorSigla(siglaUnidade);
         Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
-        return ResponseEntity.ok(consultaService.obterContextoEdicao(subprocesso.getCodigo()));
+        verificarPermissaoVisualizacao(subprocesso);
+        return ResponseEntity.ok(consultaService.obterContextoEdicao(subprocesso));
     }
 
     @GetMapping("/contexto-cadastro-atividades/buscar")
-    @PostAuthorize("hasPermission(returnObject.body.detalhes.subprocesso.codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ContextoCadastroAtividadesResponse> obterContextoCadastroAtividadesPorProcessoEUnidade(
             @RequestParam Long codProcesso,
             @RequestParam String siglaUnidade
     ) {
         Long codUnidade = unidadeService.buscarCodigoPorSigla(siglaUnidade);
         Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
+        verificarPermissaoVisualizacao(subprocesso);
         return ResponseEntity.ok(consultaService.obterContextoCadastroAtividades(subprocesso.getCodigo()));
     }
 
@@ -522,6 +529,13 @@ public class SubprocessoController {
             return null;
         }
         return UtilSanitizacao.sanitizar(request.texto());
+    }
+
+    private void verificarPermissaoVisualizacao(Subprocesso subprocesso) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!permissionEvaluator.hasPermission(authentication, subprocesso, "VISUALIZAR_SUBPROCESSO")) {
+            throw new AccessDeniedException("Acesso negado ao subprocesso");
+        }
     }
 
     @PostMapping("/{codSubprocesso}/submeter-mapa-ajustado")

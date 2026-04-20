@@ -187,6 +187,10 @@ public class SubprocessoConsultaService {
 
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocessoComMapa(codSubprocesso);
+        return obterContextoEdicao(subprocesso);
+    }
+
+    public ContextoEdicaoResponse obterContextoEdicao(Subprocesso subprocesso) {
         Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
         List<Atividade> atividadesComConhecimentos = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
         Mapa mapaCompleto = mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(subprocesso.getCodigo());

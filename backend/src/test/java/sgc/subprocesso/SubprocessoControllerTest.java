@@ -131,8 +131,10 @@ class SubprocessoControllerTest {
         @DisplayName("deve buscar contexto edicao por processo e unidade")
         @WithMockUser
         void buscarContextoEdicaoPorProcessoEUnidade() throws Exception {
+            Subprocesso subprocesso = Subprocesso.builder().codigo(100L).build();
             when(unidadeService.buscarCodigoPorSigla("U1")).thenReturn(10L);
-            when(consultaService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
+            when(consultaService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
+            when(permissionEvaluator.hasPermission(any(), eq(subprocesso), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
 
             SubprocessoResumoDto spResumo = SubprocessoResumoDto.builder()
                 .codigo(100L)
@@ -143,7 +145,7 @@ class SubprocessoControllerTest {
             ContextoEdicaoResponse response = ContextoEdicaoResponse.builder()
                 .detalhes(spResponse)
                 .build();
-            when(consultaService.obterContextoEdicao(100L)).thenReturn(response);
+            when(consultaService.obterContextoEdicao(subprocesso)).thenReturn(response);
 
             mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")
                             .param("codProcesso", "1")
@@ -153,7 +155,26 @@ class SubprocessoControllerTest {
 
             verify(unidadeService).buscarCodigoPorSigla("U1");
             verify(consultaService).obterEntidadePorProcessoEUnidade(1L, 10L);
-            verify(consultaService).obterContextoEdicao(100L);
+            verify(permissionEvaluator).hasPermission(any(), eq(subprocesso), eq("VISUALIZAR_SUBPROCESSO"));
+            verify(consultaService).obterContextoEdicao(subprocesso);
+            verify(consultaService, never()).obterContextoEdicao(100L);
+        }
+
+        @Test
+        @DisplayName("deve negar contexto edicao por processo e unidade sem permissao")
+        @WithMockUser
+        void buscarContextoEdicaoPorProcessoEUnidadeSemPermissao() throws Exception {
+            Subprocesso subprocesso = Subprocesso.builder().codigo(100L).build();
+            when(unidadeService.buscarCodigoPorSigla("U1")).thenReturn(10L);
+            when(consultaService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
+            when(permissionEvaluator.hasPermission(any(), eq(subprocesso), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(false);
+
+            mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")
+                            .param("codProcesso", "1")
+                            .param("siglaUnidade", "U1"))
+                    .andExpect(status().isForbidden());
+
+            verify(consultaService, never()).obterContextoEdicao(any(Subprocesso.class));
         }
 
         @Test
@@ -644,6 +665,7 @@ class SubprocessoControllerTest {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
             when(consultaService.obterEntidadePorProcessoEUnidade(5L, 10L)).thenReturn(sp);
+            when(permissionEvaluator.hasPermission(any(), eq(sp), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
 
             when(consultaService.obterContextoCadastroAtividades(1L)).thenReturn(
                     new sgc.subprocesso.dto.ContextoCadastroAtividadesResponse(null, null, null, List.of(), "")
@@ -654,6 +676,7 @@ class SubprocessoControllerTest {
                             .param("siglaUnidade", "U10"))
                     .andExpect(status().isOk());
 
+            verify(permissionEvaluator).hasPermission(any(), eq(sp), eq("VISUALIZAR_SUBPROCESSO"));
             verify(consultaService).obterContextoCadastroAtividades(1L);
         }
     }

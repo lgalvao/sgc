@@ -27,6 +27,7 @@ public class CacheAquecimento implements ApplicationListener<ApplicationReadyEve
             cacheViewsOrganizacaoService.listarTodasUnidades();
             cacheViewsOrganizacaoService.listarTodosUsuarios();
             cacheViewsOrganizacaoService.listarTodasResponsabilidades();
+            cacheViewsOrganizacaoService.listarTodosPerfisUnidade();
             log.info("Caches organizacionais aquecidos com sucesso.");
         } catch (Exception e) {
             log.warn("Falha no aquecimento inicial dos caches", e);

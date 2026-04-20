@@ -159,6 +159,51 @@ class SubprocessoConsultaServiceCoverageTest {
     }
 
     @Test
+    @DisplayName("obterContextoEdicao deve reaproveitar subprocesso ja carregado")
+    void obterContextoEdicaoDeveReaproveitarSubprocessoCarregado() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("U10");
+        unidade.setNome("Unidade 10");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(100L);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setProcesso(processo);
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(300L);
+        mapa.setSubprocesso(subprocesso);
+        mapa.setCompetencias(Set.of());
+        subprocesso.setMapa(mapa);
+
+        Usuario usuario = Usuario.builder()
+                .tituloEleitoral("123456789012")
+                .perfilAtivo(Perfil.ADMIN)
+                .unidadeAtivaCodigo(10L)
+                .build();
+
+        stubContextoAutenticado(usuario);
+        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of());
+        when(unidadeService.temMapaVigente(10L)).thenReturn(false);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of());
+        when(mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(100L)).thenReturn(mapa);
+
+        ContextoEdicaoResponse contexto = target.obterContextoEdicao(subprocesso);
+
+        assertThat(contexto.detalhes().subprocesso().codigo()).isEqualTo(100L);
+        verify(subprocessoRepo, never()).buscarPorCodigoComMapa(anyLong());
+        verify(subprocessoRepo, never()).buscarPorCodigoComMapaEAtividades(anyLong());
+    }
+
+    @Test
     @DisplayName("obterContextoCadastroAtividades para REVISAO deve gerar assinatura baseada no mapa vigente")
     void obterContextoCadastroAtividadesRevisao() {
         Processo processo = new Processo();

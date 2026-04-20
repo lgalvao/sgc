@@ -44,7 +44,7 @@ class AgendadorRefreshCacheTest {
         verify(cacheViewsOrganizacaoService).listarTodasUnidades();
         verify(cacheViewsOrganizacaoService).listarTodosUsuarios();
         verify(cacheViewsOrganizacaoService).listarTodasResponsabilidades();
-        verify(cacheViewsOrganizacaoService, never()).listarTodosPerfisUnidade();
+        verify(cacheViewsOrganizacaoService).listarTodosPerfisUnidade();
 
         verify(registroSseEmitter).transmitir("org-cache-refreshed");
     }
