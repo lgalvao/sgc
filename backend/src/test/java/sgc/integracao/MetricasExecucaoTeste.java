@@ -13,15 +13,14 @@ import static org.assertj.core.api.Assertions.*;
 
 public class MetricasExecucaoTeste {
     public static final String PROPRIEDADE_ORCAMENTO_TEMPO_ESTRITO = "sgc.performance.strict-time-budgets";
-    private final EntityManager entityManager;
-    private final EntityManagerFactory entityManagerFactory;
 
-    public MetricasExecucaoTeste(EntityManager entityManager, EntityManagerFactory entityManagerFactory) {
-        this.entityManager = entityManager;
-        this.entityManagerFactory = entityManagerFactory;
-    }
-
-    public <T> ResultadoMedicao medir(String nome, Supplier<T> acao, String... trechosSql) {
+    public static <T> ResultadoMedicao medir(
+            EntityManager entityManager,
+            EntityManagerFactory entityManagerFactory,
+            String nome,
+            Supplier<T> acao,
+            String... trechosSql
+    ) {
         Statistics estatisticas = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
         estatisticas.setStatisticsEnabled(true);
 
@@ -59,6 +58,15 @@ public class MetricasExecucaoTeste {
             long preparedStatements,
             Map<String, Long> contagensPorTrecho
     ) {
+        public ResultadoMedicao {
+            contagensPorTrecho = Map.copyOf(contagensPorTrecho);
+        }
+
+        @Override
+        public Map<String, Long> contagensPorTrecho() {
+            return Map.copyOf(contagensPorTrecho);
+        }
+
         public void validarTempoSeEstrito(long limiteMs) {
             if (Boolean.getBoolean(PROPRIEDADE_ORCAMENTO_TEMPO_ESTRITO)) {
                 assertThat(duracaoMs)

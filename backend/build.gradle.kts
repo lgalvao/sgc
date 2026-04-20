@@ -123,12 +123,12 @@ tasks.withType<Test> {
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
             if (suite.parent == null) {
                 val output = """
-                    |  Result: ${result.resultType}
+                    |  Result:    ${result.resultType}
                     |  Total:     ${result.testCount} tests run
-                    |  + Passed:   ${result.successfulTestCount}
-                    |  - Failed:   ${result.failedTestCount}
+                    |  + Passed:  ${result.successfulTestCount}
+                    |  - Failed:  ${result.failedTestCount}
                     |  ^ Ignored: ${result.skippedTestCount}
-                    |  Time:     ${(result.endTime - result.startTime) / 1000.0}s
+                    |  Time:      ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()
                 println(output)
 
@@ -181,8 +181,7 @@ tasks.named<Test>("test") {
 }
 
 tasks.register<Test>("unitTest") {
-    description = "Executa APENAS testes unitários (exclui 'integration')."
-    group = "verification"
+    description = "Executa apenas testes unitários (exclui 'integration')."
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform {
@@ -191,8 +190,7 @@ tasks.register<Test>("unitTest") {
 }
 
 tasks.register<Test>("integrationTest") {
-    description = "Executa APENAS testes de integração."
-    group = "verification"
+    description = "Executa apenas testes de integração."
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform {

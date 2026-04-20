@@ -13,9 +13,10 @@ public class TestSecurityController {
         // Implementação vazia pois a validação ocorre antes da execução do método
     }
 
-    static class TestDto {
-        @Size(min = 5)
-        @JsonProperty("dadoSensivel")
-        public String dadoSensivel = "";
+    record TestDto(
+            @Size(min = 5)
+            @JsonProperty("dadoSensivel")
+            String dadoSensivel
+    ) {
     }
 }

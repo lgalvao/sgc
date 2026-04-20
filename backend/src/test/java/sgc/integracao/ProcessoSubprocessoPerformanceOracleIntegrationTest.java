@@ -73,7 +73,6 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
         assumeTrue(estaUsandoOracle(), "Benchmark real deve rodar somente quando a datasource atual aponta para Oracle.");
 
         AmostrasBenchmark amostras = carregarAmostras();
-        MetricasExecucaoTeste medidor = new MetricasExecucaoTeste(entityManager, entityManagerFactory);
         Usuario usuarioAdmin = criarUsuarioAdmin(amostras.usuarioBase());
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
@@ -84,7 +83,9 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
         );
 
         List<MetricasExecucaoTeste.ResultadoMedicao> resultados = new ArrayList<>();
-        resultados.add(medidor.medir(
+        resultados.add(MetricasExecucaoTeste.medir(
+                entityManager,
+                entityManagerFactory,
                 "painel.listarProcessos.gestor",
                 () -> painelFacade.listarProcessos(
                         new ContextoUsuarioAutenticado(
@@ -95,7 +96,9 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
                         PageRequest.of(0, 20)),
                 "VW_UNIDADE", "PROCESSO"
         ));
-        resultados.add(medidor.medir(
+        resultados.add(MetricasExecucaoTeste.medir(
+                entityManager,
+                entityManagerFactory,
                 "painel.listarAlertas.gestor",
                 () -> painelFacade.listarAlertas(
                         new ContextoUsuarioAutenticado(
@@ -106,12 +109,16 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
                         PageRequest.of(0, 20)),
                 "ALERTA", "ALERTA_USUARIO"
         ));
-        resultados.add(medidor.medir(
+        resultados.add(MetricasExecucaoTeste.medir(
+                entityManager,
+                entityManagerFactory,
                 "subprocesso.obterDetalhes",
                 () -> subprocessoConsultaService.obterDetalhes(amostras.codigoSubprocessoDetalhe()),
                 "SUBPROCESSO", "MOVIMENTACAO", "VW_UNIDADE"
         ));
-        resultados.add(medidor.medir(
+        resultados.add(MetricasExecucaoTeste.medir(
+                entityManager,
+                entityManagerFactory,
                 "subprocesso.listarHistoricoValidacao",
                 () -> subprocessoConsultaService.listarHistoricoValidacao(amostras.codigoSubprocessoHistorico()),
                 "ANALISE", "VW_UNIDADE"

@@ -51,8 +51,6 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     private Usuario usuarioAdmin;
     private Usuario usuarioChefe;
     private Subprocesso subprocesso;
-    private MetricasExecucaoTeste medidor;
-
     @BeforeEach
     void setUp() {
         Unidade unidadeRaiz = criarUnidade("UNR", "Unidade raiz budget", null);
@@ -79,7 +77,6 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
 
         entityManager.flush();
         entityManager.clear();
-        medidor = new MetricasExecucaoTeste(entityManager, entityManagerFactory);
     }
 
     @Test
@@ -158,7 +155,13 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     }
 
     private <T> MetricasExecucaoTeste.ResultadoMedicao medir(String nome, java.util.function.Supplier<T> acao, String... trechosSql) {
-        MetricasExecucaoTeste.ResultadoMedicao medicao = medidor.medir(nome, acao, trechosSql);
+        MetricasExecucaoTeste.ResultadoMedicao medicao = MetricasExecucaoTeste.medir(
+                entityManager,
+                entityManagerFactory,
+                nome,
+                acao,
+                trechosSql
+        );
         logger.info("Medicao budget: {}", medicao.resumo());
         return medicao;
     }
