@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import sgc.organizacao.model.*;
 
 import java.util.List;
@@ -24,7 +25,9 @@ class CacheViewsOrganizacaoServiceTest {
     @Mock
     private ResponsabilidadeRepo responsabilidadeRepo;
     @Mock
-    private UsuarioPerfilRepo usuarioPerfilRepo;
+    private AdministradorRepo administradorRepo;
+    @Mock
+    private ObjectProvider<CacheViewsOrganizacaoService> selfProvider;
 
     @InjectMocks
     private CacheViewsOrganizacaoService cacheService;
@@ -108,15 +111,59 @@ class CacheViewsOrganizacaoServiceTest {
     @Test
     @DisplayName("deve listar todos perfis de unidade")
     void listarTodosPerfisUnidade() {
-        UsuarioPerfil up = new UsuarioPerfil("titulo", 1L, Perfil.ADMIN);
-        when(usuarioPerfilRepo.findAll()).thenReturn(List.of(up));
+        UsuarioConsultaLeitura administrador = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("admin")
+                .unidadeCompetenciaCodigo(10L)
+                .build();
+        UsuarioConsultaLeitura servidor = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("servidor")
+                .unidadeCompetenciaCodigo(10L)
+                .build();
+        when(usuarioRepo.listarTodasConsultas()).thenReturn(List.of(administrador, servidor));
+
+        UnidadeHierarquiaLeitura unidadeAdmin = UnidadeHierarquiaLeitura.builder()
+                .codigo(1L)
+                .tipo(TipoUnidade.RAIZ)
+                .situacao(SituacaoUnidade.ATIVA)
+                .build();
+        UnidadeHierarquiaLeitura unidadeOperacional = UnidadeHierarquiaLeitura.builder()
+                .codigo(10L)
+                .tipo(TipoUnidade.OPERACIONAL)
+                .tituloTitular("chefe")
+                .situacao(SituacaoUnidade.ATIVA)
+                .build();
+        UnidadeHierarquiaLeitura unidadeInteroperacional = UnidadeHierarquiaLeitura.builder()
+                .codigo(20L)
+                .tipo(TipoUnidade.INTEROPERACIONAL)
+                .situacao(SituacaoUnidade.ATIVA)
+                .build();
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(unidadeAdmin, unidadeOperacional, unidadeInteroperacional));
+
+        Responsabilidade responsabilidadeOperacional = new Responsabilidade();
+        responsabilidadeOperacional.setUnidadeCodigo(10L);
+        responsabilidadeOperacional.setUsuarioTitulo("chefe");
+        Responsabilidade responsabilidadeInteroperacional = new Responsabilidade();
+        responsabilidadeInteroperacional.setUnidadeCodigo(20L);
+        responsabilidadeInteroperacional.setUsuarioTitulo("gestor-chefe");
+        when(responsabilidadeRepo.findAll()).thenReturn(List.of(responsabilidadeOperacional, responsabilidadeInteroperacional));
+
+        Administrador registroAdmin = new Administrador();
+        registroAdmin.setUsuarioTitulo("admin");
+        when(administradorRepo.findAll()).thenReturn(List.of(registroAdmin));
+        when(selfProvider.getIfAvailable(org.mockito.ArgumentMatchers.any())).thenReturn(cacheService);
 
         List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
 
-        assertEquals(1, result.size());
-        assertEquals("titulo", result.getFirst().usuarioTitulo());
-        assertEquals(1L, result.getFirst().unidadeCodigo());
-        assertEquals(Perfil.ADMIN, result.getFirst().perfil());
+        assertEquals(6, result.size());
+        org.assertj.core.api.Assertions.assertThat(result)
+                .contains(
+                        new UsuarioPerfilLeitura("admin", 1L, Perfil.ADMIN),
+                        new UsuarioPerfilLeitura("admin", 10L, Perfil.SERVIDOR),
+                        new UsuarioPerfilLeitura("chefe", 10L, Perfil.CHEFE),
+                        new UsuarioPerfilLeitura("gestor-chefe", 20L, Perfil.GESTOR),
+                        new UsuarioPerfilLeitura("gestor-chefe", 20L, Perfil.CHEFE),
+                        new UsuarioPerfilLeitura("servidor", 10L, Perfil.SERVIDOR)
+                );
     }
 
     @Test

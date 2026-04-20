@@ -21,7 +21,8 @@ class UsuarioConsultaDtoTest {
                 "Unidade",
                 "UND",
                 TipoUnidade.OPERACIONAL,
-                "999");
+                "999",
+                10L);
 
         UsuarioConsultaDto dto = UsuarioConsultaDto.fromLeitura(usuario);
 

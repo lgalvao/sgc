@@ -57,6 +57,10 @@ public class Usuario implements UserDetails {
     @JsonIgnore
     private Unidade unidadeLotacao;
 
+    @Column(name = "unidade_comp_codigo")
+    @JsonIgnore
+    private Long unidadeCompetenciaCodigo;
+
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("unidadeCodigo")
     public Long getUnidadeCodigo() {

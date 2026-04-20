@@ -39,7 +39,8 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
                 unidade.nome,
                 unidade.sigla,
                 unidade.tipo,
-                unidade.tituloTitular
+                unidade.tituloTitular,
+                u.unidadeCompetenciaCodigo
             )
             FROM Usuario u
             JOIN u.unidadeLotacao unidade
