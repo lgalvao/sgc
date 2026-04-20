@@ -50,6 +50,7 @@ dependencies {
 
     developmentOnly(libs.spring.boot.devtools)
 
+    compileOnly(libs.lombok)
     annotationProcessor(libs.spring.boot.configuration.processor)
     annotationProcessor(libs.lombok)
     annotationProcessor(libs.hibernate.validator.processor)
@@ -76,6 +77,7 @@ dependencies {
 
     testRuntimeOnly(libs.junit.platform.suite.engine)
     testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
