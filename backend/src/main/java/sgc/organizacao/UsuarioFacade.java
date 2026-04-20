@@ -46,6 +46,11 @@ public class UsuarioFacade {
         return usuarioService.buscar(titulo);
     }
 
+    @Transactional(readOnly = true)
+    public @Nullable Usuario carregarUsuarioSemAtribuicoesParaAutenticacao(String titulo) {
+        return usuarioService.buscarOpt(titulo).orElse(null);
+    }
+
     private Optional<String> tituloUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {

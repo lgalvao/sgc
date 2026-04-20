@@ -169,6 +169,29 @@ class UsuarioFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve carregar usuário sem atribuições para autenticação leve")
+        void deveCarregarUsuarioSemAtribuicoesParaAutenticacao() {
+            String titulo = "123456";
+            Usuario usuario = criarUsuario(titulo);
+
+            when(usuarioService.buscarOpt(titulo)).thenReturn(Optional.of(usuario));
+
+            Usuario resultado = facade.carregarUsuarioSemAtribuicoesParaAutenticacao(titulo);
+
+            assertThat(resultado).isSameAs(usuario);
+            verify(usuarioService, never()).buscarPerfisPorUsuarioTitulo(any());
+        }
+
+        @Test
+        @DisplayName("Deve retornar null na autenticação leve se usuário não encontrado")
+        void deveRetornarNullNaAutenticacaoLeveSeNaoEncontrado() {
+            when(usuarioService.buscarOpt("1")).thenReturn(Optional.empty());
+
+            assertThat(facade.carregarUsuarioSemAtribuicoesParaAutenticacao("1")).isNull();
+            verify(usuarioService, never()).buscarPerfisPorUsuarioTitulo(any());
+        }
+
+        @Test
         @DisplayName("Deve buscar usuário por login com sucesso")
         void deveBuscarPorLogin() {
             String login = "user123";

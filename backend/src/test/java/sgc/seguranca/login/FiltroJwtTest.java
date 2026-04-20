@@ -60,7 +60,7 @@ class FiltroJwtTest {
         GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("12345", Perfil.SERVIDOR, 10L);
         when(jwtService.validarToken(token)).thenReturn(Optional.of(claims));
 
-        when(usuarioService.buscarUsuarioSemAtribuicoes("12345")).thenReturn(null);
+        when(usuarioService.carregarUsuarioSemAtribuicoesParaAutenticacao("12345")).thenReturn(null);
 
         filtro.doFilterInternal(request, response, filterChain);
 
@@ -107,7 +107,7 @@ class FiltroJwtTest {
         String token = "short-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
         when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", Perfil.SERVIDOR, 10L)));
-        when(usuarioService.buscarUsuarioSemAtribuicoes("123")).thenReturn(null);
+        when(usuarioService.carregarUsuarioSemAtribuicoesParaAutenticacao("123")).thenReturn(null);
 
         filtro.doFilterInternal(request, response, filterChain);
         verify(filterChain).doFilter(request, response);

@@ -56,7 +56,7 @@ public class FiltroJwt extends OncePerRequestFilter {
         if (jwtToken != null) {
 
             gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
-                Usuario usuario = usuarioService.buscarUsuarioSemAtribuicoes(claims.tituloEleitoral());
+                Usuario usuario = usuarioService.carregarUsuarioSemAtribuicoesParaAutenticacao(claims.tituloEleitoral());
 
                 if (usuario != null) {
                     usuario.setPerfilAtivo(claims.perfil());
