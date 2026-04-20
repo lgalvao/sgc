@@ -39,46 +39,42 @@
           </template>
         </PageHeader>
 
-        <BCard class="mb-4 shadow-sm" no-body>
+        <BCard class="mb-4" no-body>
           <BCardBody>
-            <BRow>
-              <BCol md="6">
-                <div data-testid="unidade-titular-info">
-                  <h5 class="mb-1">
-                    {{ TEXTOS.unidade.LABEL_TITULAR }} {{ titularDetalhes ? titularDetalhes.nome : TEXTOS.unidade.NAO_INFORMADO }}
-                  </h5>
-                  <div v-if="titularDetalhes" class="d-flex flex-column">
-                    <span v-if="titularDetalhes.ramal">
-                      {{ TEXTOS.unidade.LABEL_RAMAL }} {{ titularDetalhes.ramal }}
-                    </span>
-                    <span v-if="titularDetalhes.email">
-                      {{ TEXTOS.unidade.LABEL_EMAIL }} <a
-                        :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
-                        :href="`mailto:${titularDetalhes.email}`"
-                      >{{ titularDetalhes.email }}</a>
-                    </span>
-                  </div>
-                </div>
-              </BCol>
-              <BCol class="border-start" md="6">
-                <div data-testid="unidade-responsavel-info">
-                  <h5 class="mb-1">
-                    {{ TEXTOS.unidade.LABEL_RESPONSAVEL }} {{ unidade.responsavel ? unidade.responsavel.nome : TEXTOS.unidade.NAO_INFORMADO }}
-                  </h5>
-                  <div v-if="unidade.responsavel" class="d-flex flex-column">
-                    <span v-if="unidade.responsavel.ramal">
-                      {{ TEXTOS.unidade.LABEL_RAMAL }} {{ unidade.responsavel.ramal }}
-                    </span>
-                    <span v-if="unidade.responsavel.email">
-                      {{ TEXTOS.unidade.LABEL_EMAIL }} <a
-                        :aria-label="`Enviar e-mail para ${unidade.responsavel.email}`"
-                        :href="`mailto:${unidade.responsavel.email}`"
-                      >{{ unidade.responsavel.email }}</a>
-                    </span>
-                  </div>
-                </div>
-              </BCol>
-            </BRow>
+            <p class="mt-2" data-testid="unidade-titular-info">
+              <strong>{{ TEXTOS.unidade.LABEL_TITULAR }}</strong> {{ titularDetalhes ? titularDetalhes.nome : TEXTOS.unidade.NAO_INFORMADO }}
+            </p>
+            <p v-if="titularDetalhes" class="ms-3 mb-2">
+              <span v-if="titularDetalhes.ramal" class="me-3">
+                <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
+                {{ titularDetalhes.ramal }}
+              </span>
+              <span v-if="titularDetalhes.email">
+                <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
+                <a
+                    :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
+                    :href="`mailto:${titularDetalhes.email}`"
+                >{{ titularDetalhes.email }}</a>
+              </span>
+            </p>
+            <template v-if="responsavelExibivel">
+              <p class="mt-2" data-testid="unidade-responsavel-info">
+                <strong>{{ TEXTOS.unidade.LABEL_RESPONSAVEL }}</strong> {{ responsavelExibivel.nome }}
+              </p>
+              <p class="ms-3 mb-0">
+                <span v-if="responsavelExibivel.ramal" class="me-3">
+                  <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
+                  {{ responsavelExibivel.ramal }}
+                </span>
+                <span v-if="responsavelExibivel.email">
+                  <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
+                  <a
+                      :aria-label="`Enviar e-mail para ${responsavelExibivel.email}`"
+                      :href="`mailto:${responsavelExibivel.email}`"
+                  >{{ responsavelExibivel.email }}</a>
+                </span>
+              </p>
+            </template>
           </BCardBody>
         </BCard>
       </div>
@@ -106,7 +102,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BCol, BRow} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, onActivated, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
@@ -211,6 +207,14 @@ const dadosFormatadosSubordinadas = computed(() => {
   return formatarDadosParaArvore(unidade.value.filhas);
 });
 
+const responsavelExibivel = computed(() => {
+  const responsavel = unidade.value?.responsavel;
+  if (!responsavel || responsavelEhTitular(responsavel, titularDetalhes.value, unidade.value?.tituloTitular)) {
+    return null;
+  }
+  return responsavel;
+});
+
 interface UnidadeFormatada {
   codigo: number;
   nome: string;
@@ -231,5 +235,15 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
       ...(children.length > 0 && {children})
     };
   });
+}
+
+function responsavelEhTitular(responsavel: Usuario, titular: Usuario | null, tituloTitular?: string): boolean {
+  if (responsavel.tituloEleitoral && tituloTitular && responsavel.tituloEleitoral === tituloTitular) {
+    return true;
+  }
+  if (responsavel.tituloEleitoral && titular?.tituloEleitoral) {
+    return responsavel.tituloEleitoral === titular.tituloEleitoral;
+  }
+  return Boolean(responsavel.nome && titular?.nome && responsavel.nome === titular.nome);
 }
 </script>

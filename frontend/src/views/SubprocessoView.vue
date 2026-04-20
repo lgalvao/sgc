@@ -75,7 +75,7 @@
             <p class="ms-3 mb-2">
               <span v-if="subprocesso.titular?.ramal" class="me-3">
                 <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-                <a :href="`tel:${subprocesso.titular.ramal}`">{{ subprocesso.titular.ramal }}</a>
+                {{ subprocesso.titular.ramal }}
               </span>
               <span v-if="subprocesso.titular?.email">
                 <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
@@ -92,7 +92,7 @@
               <p class="ms-3 mb-0">
                 <span v-if="subprocesso.responsavel.usuario.ramal" class="me-3">
                   <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-                  <a :href="`tel:${subprocesso.responsavel.usuario.ramal}`">{{ subprocesso.responsavel.usuario.ramal }}</a>
+                  {{ subprocesso.responsavel.usuario.ramal }}
                 </span>
                 <span v-if="subprocesso.responsavel.usuario.email">
                   <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>

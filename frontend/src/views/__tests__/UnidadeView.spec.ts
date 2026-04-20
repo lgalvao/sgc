@@ -13,11 +13,13 @@ const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hois
     const u = {
         codigo: 10,
         nome: 'Titular teste',
+        tituloEleitoral: '123456',
         unidade: {codigo: 1, sigla: 'TEST'}
     };
     const ur = {
         codigo: 20,
         nome: 'Responsavel teste',
+        tituloEleitoral: '654321',
         unidade: {codigo: 1, sigla: 'TEST'}
     };
     return {
@@ -192,6 +194,26 @@ describe('UnidadeView.vue', () => {
         expect(wrapper.text()).toContain('Responsável: Responsavel teste');
     });
 
+    it('não exibe responsável quando for o mesmo usuário titular', async () => {
+        const unidadeComMesmoResponsavel = {
+            ...mockUnidade,
+            responsavel: {
+                ...mockUsuario,
+                ramal: '1234',
+                email: 'titular@example.com'
+            }
+        };
+        (buscarArvoreUnidade as any).mockResolvedValueOnce(unidadeComMesmoResponsavel);
+
+        const {wrapper} = createWrapper();
+
+        await wrapper.vm.$nextTick();
+        await flushPromises();
+
+        expect(wrapper.text()).toContain('Titular: Titular teste');
+        expect(wrapper.find('[data-testid="unidade-responsavel-info"]').exists()).toBe(false);
+    });
+
     it('renders subordinate units tree table', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
@@ -253,7 +275,7 @@ describe('UnidadeView.vue', () => {
         expect(logger.error).toHaveBeenCalledWith('Erro ao carregar dados da unidade:', expect.any(Error));
     });
 
-    it('renders ramal como texto simples e mantem link de email do titular', async () => {
+    it('renderiza contatos do titular com ícones e links', async () => {
         const mockUserWithContact = {
             ...mockUsuario,
             ramal: '1234',
@@ -268,12 +290,14 @@ describe('UnidadeView.vue', () => {
 
         const ramalLink = wrapper.find('a[href="tel:1234"]');
         expect(ramalLink.exists()).toBe(false);
-        expect(wrapper.text()).toContain('Ramal: 1234');
+        expect(wrapper.text()).toContain('1234');
+        expect(wrapper.find('.bi-telephone-fill').exists()).toBe(true);
 
         const emailLink = wrapper.find('a[href="mailto:test@example.com"]');
         expect(emailLink.exists()).toBe(true);
         expect(emailLink.text()).toBe('test@example.com');
         expect(emailLink.attributes('aria-label')).toBe('Enviar e-mail para test@example.com');
+        expect(wrapper.find('.bi-envelope-fill').exists()).toBe(true);
     });
 
     it('handles unit with no children safely', async () => {
