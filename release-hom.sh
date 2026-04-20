@@ -170,7 +170,7 @@ fi
 
 if [[ "$SEM_BUILD" == false ]]; then
   echo "==> Executando build do frontend e do backend"
-  ./gradlew --no-daemon clean copyFrontend :backend:bootJar -x :backend:test
+  ./gradlew --no-daemon copyFrontend :backend:bootJar -x :backend:test
 else
   echo "==> Build Gradle ignorado por parametro"
 fi
