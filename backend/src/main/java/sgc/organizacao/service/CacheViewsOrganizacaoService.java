@@ -52,6 +52,7 @@ public class CacheViewsOrganizacaoService {
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_RESPONSABILIDADE, sync = true)
     public List<ResponsabilidadeLeitura> listarTodasResponsabilidades() {
         return List.copyOf(responsabilidadeRepo.findAll().stream()
+                .filter(Objects::nonNull)
                 .map(r -> new ResponsabilidadeLeitura(r.getUnidadeCodigo(), r.getUsuarioTitulo()))
                 .toList());
     }
@@ -64,6 +65,7 @@ public class CacheViewsOrganizacaoService {
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_USUARIO_PERFIL, sync = true)
     public List<UsuarioPerfilLeitura> listarTodosPerfisUnidade() {
         return List.copyOf(usuarioPerfilRepo.findAll().stream()
+                .filter(Objects::nonNull)
                 .map(perfil -> new UsuarioPerfilLeitura(
                         perfil.getUsuarioTitulo(),
                         perfil.getUnidadeCodigo(),
