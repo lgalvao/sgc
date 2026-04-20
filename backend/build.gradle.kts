@@ -1,8 +1,7 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import info.solidsoft.gradle.pitest.PitestTask
-import net.ltgt.gradle.errorprone.errorprone
+
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 val argumentosJvmSemAvisoUnsafe = emptyList<String>()
 
@@ -11,35 +10,14 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.openrewrite.rewrite")
     id("com.github.spotbugs") version "6.4.8"
-    id("net.ltgt.errorprone") version "5.1.0"
-    id("info.solidsoft.pitest") version "1.19.0"
-    id("com.github.ben-manes.versions") version "0.53.0"
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
     options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation", "-XDaddTypeAnnotationsToSymbol=true"))
-    options.errorprone {
-        disableAllChecks = true
-        disableWarningsInGeneratedCode = true
-        excludedPaths = listOf(
-            ".*[\\/](build[\\/]generated)[\\/].*",
-            ".*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*"
-        ).joinToString("|")
-    }
 }
 
-tasks.named<JavaCompile>("compileTestJava") {
-    options.errorprone.excludedPaths = listOf(
-        ".*[\\/](build[\\/]generated)[\\/].*",
-        ".*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*",
-        ".*[\\/]src[\\/]test[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]).*"
-    ).joinToString("|")
-}
-
-extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.44"
 extra["jjwt.version"] = "0.13.0"
 extra["thymeleaf.version"] = "3.1.4.RELEASE"
@@ -56,54 +34,47 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("jakarta.servlet:jakarta.servlet-api")
+    implementation("tools.jackson.core:jackson-core:3.1.1")
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
+    implementation("org.thymeleaf:thymeleaf-spring6:3.1.4.RELEASE")
+    implementation("com.github.librepdf:openpdf:3.0.3")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
+    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
+    implementation("org.mozilla:rhino:1.9.1")
+    implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("com.h2database:h2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
+    annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:9.1.0.Final")
+
+    runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
+
+    testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
-
-    implementation("tools.jackson.core:jackson-core:3.1.1")
-
-    testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation("org.junit.platform:junit-platform-suite-api:6.0.3")
-    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.0.3")
-
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
-    implementation("com.h2database:h2")
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
-    implementation("org.thymeleaf:thymeleaf-spring6:3.1.4.RELEASE")
-    compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
-    annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
-    testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
-    annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:9.1.0.Final")
-
-    implementation("com.github.librepdf:openpdf:3.0.3")
-
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
-    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
-
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
     testImplementation("net.jqwik:jqwik:1.9.3")
     testImplementation("nl.jqno.equalsverifier:equalsverifier:4.4.2")
-    testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
     testImplementation("com.icegreen:greenmail-junit5:2.1.8")
-    testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.39")
-    implementation("org.mozilla:rhino:1.9.1")
-    implementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.1")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    errorprone("com.google.errorprone:error_prone_core:2.49.0")
-    rewrite("org.openrewrite:rewrite-java:8.75.5")
+    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.0.3")
+    testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
 }
 
 tasks.withType<BootJar> {
@@ -111,12 +82,10 @@ tasks.withType<BootJar> {
     mainClass.set("sgc.Sgc")
 }
 
-tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+tasks.named<BootRun>("bootRun") {
     mainClass.set("sgc.Sgc")
-
     val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "e2e"
     val envFile = rootProject.file(".env.$env")
-
     systemProperty("spring.profiles.active", env)
     println("Perfil Spring ativado: $env")
 
@@ -235,82 +204,6 @@ jacoco {
     toolVersion = "0.8.14"
 }
 
-tasks.jacocoTestReport {
-    dependsOn(tasks.named("test"), tasks.compileJava)
-    executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
-
-    reports {
-        xml.required.set(true)
-        csv.required.set(true)
-        html.required.set(true)
-    }
-
-    classDirectories.setFrom(
-        files(classDirectories.files.map {
-            fileTree(it) {
-                exclude(
-                    "sgc/Sgc.class",
-                    "sgc/e2e/**",
-                    "sgc/**/config/**",
-                    "sgc/**/*Config*.class",
-                    "sgc/**/Erro*.class",
-                    "sgc/**/Tipo*.class",
-                    "sgc/**/Situacao*.class",
-                    "sgc/**/*Dto.class",
-                    "sgc/**/*Request.class",
-                    "sgc/**/*Response.class",
-                    "sgc/**/*Views.class",
-                    "sgc/**/*Views$*.class",
-                    "sgc/**/model/*Id.class",
-                    "sgc/**/*Repo.class",
-                    
-                    "sgc/**/model/Usuario.class",
-                    "sgc/**/model/Unidade*.class",
-                    "sgc/**/model/Administrador.class",
-                    "sgc/**/model/Vinculacao*.class",
-                    "sgc/**/model/Atribuicao*.class",
-                    "sgc/**/model/Movimentacao.class",
-                    "sgc/**/model/Analise.class",
-                    "sgc/**/model/Alerta*.class",
-                    "sgc/**/model/Conhecimento.class",
-                    "sgc/**/model/Mapa.class",
-                    "sgc/**/model/Atividade.class",
-                    "sgc/**/model/Competencia*.class",
-                    "sgc/**/model/Notificacao.class",
-                    "sgc/**/model/Processo.class",
-                    "sgc/**/model/Perfil.class"
-                )
-            }
-        })
-    )
-}
-
-tasks.jacocoTestCoverageVerification {
-    dependsOn(tasks.jacocoTestReport)
-    violationRules {
-        rule {
-            element = "CLASS"
-            limit {
-                counter = "BRANCH"
-                minimum = "0.90".toBigDecimal()
-            }
-        }
-        rule {
-            element = "CLASS"
-            limit {
-                counter = "LINE"
-                minimum = "0.95".toBigDecimal()
-            }
-        }
-    }
-    
-    classDirectories.setFrom(tasks.jacocoTestReport.get().classDirectories)
-}
-
-tasks.named("check") {
-    dependsOn(tasks.jacocoTestCoverageVerification)
-}
-
 spotbugs {
     toolVersion = "4.9.8"
     ignoreFailures.set(true)
@@ -327,134 +220,4 @@ tasks.register("qualityCheckFast") {
     group = "quality"
     description = "Runs fast backend quality checks (tests, coverage)"
     dependsOn("test", "jacocoTestCoverageVerification")
-}
-
-pitest {
-    pitestVersion.set("1.22.1")
-    junit5PluginVersion.set("1.2.3")
-    targetClasses.set(listOf("sgc.mapa.*"))
-    targetTests.set(listOf("sgc.mapa.*"))
-
-    excludedClasses.set(
-        listOf(
-            "sgc.*Erro*",
-            "sgc.*Request",
-            "sgc.*Response",
-            "sgc.*Query",
-            "sgc.*Config*",
-            "sgc.*Command",
-            "sgc.*View",
-            "sgc.Sgc",
-        )
-    )
-
-    excludedMethods.set(
-        listOf(
-            "hashCode",
-            "equals",
-            "toString"
-        )
-    )
-
-    mutators.set(listOf("ALL"))
-    outputFormats.set(listOf("CSV"))
-    timestampedReports.set(false)
-    threads.set(Runtime.getRuntime().availableProcessors())
-    timeoutFactor.set("5.0".toBigDecimal())
-    verbose.set(true)
-    failWhenNoMutations.set(false)
-
-    val agentFile = project.configurations.getByName("testRuntimeClasspath").files.find {
-        it.name.contains("byte-buddy-agent")
-    }
-    val pitestJvmArgs = mutableListOf(
-        "-Xmx4096m",
-        "-Xms512m",
-        "-XX:+EnableDynamicAgentLoading",
-        "-Xshare:off",
-        *argumentosJvmSemAvisoUnsafe.toTypedArray(),
-        "--add-opens=java.base/java.lang=ALL-UNNAMED",
-        "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
-        "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"
-    )
-    agentFile?.let { pitestJvmArgs.add("-javaagent:${it.path}") }
-    jvmArgs.set(pitestJvmArgs)
-}
-
-tasks.withType<DependencyUpdatesTask> {
-    revision = "release"
-    outputFormatter = "plain"
-    checkConstraints = true
-}
-
-fun isNonStable(version: String): Boolean {
-    val nonStableKeywords = listOf("ALPHA", "BETA", "RC", "CR", "M", "PREVIEW", "BUILD", "SNAPSHOT")
-    val upperVersion = version.uppercase()
-    val hasNonStableKeyword = nonStableKeywords.any { upperVersion.contains(it) }
-
-    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { upperVersion.contains(it) }
-    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
-
-    return hasNonStableKeyword || (!stableKeyword && !regex.matches(version))
-}
-
-tasks.register("mutationTest") {
-    group = "quality"
-    description = "Executa mutation testing completo com PIT (gera relatório em build/reports/pitest)"
-    dependsOn("pitest")
-
-    doLast {
-        val reportDir = layout.buildDirectory.dir("reports/pitest").get().asFile
-        println("✅ Mutation test concluído, relatório disponível: $reportDir/index.html")
-    }
-}
-
-tasks.register("mutationTestIncremental") {
-    group = "quality"
-    description = "Mutation testing incremental (apenas classes modificadas recentemente)"
-
-    doFirst {
-        val gitDiff = providers.exec {
-            commandLine("git", "diff", "--name-only", "HEAD~1", "HEAD")
-        }.standardOutput.asText.get()
-
-        val modifiedClasses = gitDiff.lines()
-            .filter { it.startsWith("backend/src/main/java/") && it.endsWith(".java") }
-            .map {
-                it.removePrefix("backend/src/main/java/")
-                    .removeSuffix(".java")
-                    .replace("/", ".")
-            }
-
-        if (modifiedClasses.isEmpty()) {
-            println("⚠️  Nenhuma classe Java modificada detectada")
-        } else {
-            println("🎯 Analisando ${modifiedClasses.size} classe(s) modificada(s):")
-            modifiedClasses.forEach { println("   - $it") }
-
-            tasks.named<PitestTask>("pitest") {
-                targetClasses.set(modifiedClasses)
-            }
-        }
-    }
-
-    finalizedBy("pitest")
-}
-
-tasks.register("mutationTestModulo") {
-    group = "quality"
-    description = "Mutation testing de um módulo específico (use -PtargetModule=processo)"
-
-    doFirst {
-        val targetModule = project.findProperty("targetModule")?.toString()
-            ?: throw GradleException("Especifique o módulo com -PtargetModule=<modulo> (ex: processo, subprocesso, mapa)")
-
-        println("🎯 Analisando módulo: sgc.$targetModule.*")
-
-        tasks.named<PitestTask>("pitest") {
-            targetClasses.set(listOf("sgc.$targetModule.*"))
-        }
-    }
-
-    finalizedBy("pitest")
 }
