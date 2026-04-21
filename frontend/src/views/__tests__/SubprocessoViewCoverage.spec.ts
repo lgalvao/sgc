@@ -273,9 +273,9 @@ describe('SubprocessoView Coverage', () => {
 
     it('confirmarAlteracaoDataLimite returns early if novaData is empty', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
-        subprocessosMock.subprocessoDetalhe = {
+        subprocessosMock.subprocessoDetalhe = criarSubprocessoDetalhe({
             unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'}
-        } as SubprocessoDetalhe;
+        });
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue(criarAcessoMock({
             podeAlterarDataLimite: computedMutavel(true),
         }));
@@ -295,10 +295,10 @@ describe('SubprocessoView Coverage', () => {
 
     it('confirmarReabertura coverage', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
-        subprocessosMock.subprocessoDetalhe = {
+        subprocessosMock.subprocessoDetalhe = criarSubprocessoDetalhe({
             unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
             movimentacoes: [],
-        } as SubprocessoDetalhe;
+        });
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue(criarAcessoMock({
             podeReabrirCadastro: computedMutavel(true),
@@ -487,17 +487,48 @@ describe('SubprocessoView Coverage', () => {
 
     it('covers miscellaneous UI logic', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
-        subprocessosMock.subprocessoDetalhe = {
+        subprocessosMock.subprocessoDetalhe = criarSubprocessoDetalhe({
             codigo: 123,
             unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade'},
-            situacao: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO',
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
             processoDescricao: 'Processo X',
             prazoEtapaAtual: '2025-01-01',
-            titular: { nome: 'Titular', ramal: '123', email: 't@t.com' },
-            responsavel: { usuario: { nome: 'Resp', ramal: '456', email: 'r@r.com' }, tipo: 'Substituição', dataFim: '2025-12-31' },
-            movimentacoes: [{ codigo: 1, dataHora: '2025-01-01T10:00:00', unidadeOrigemSigla: 'O', unidadeDestinoSigla: 'D', descricao: 'M' }]
-        } as SubprocessoDetalhe;
-        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue(criarAcessoMock({ podeVisualizarMapa: ref(true) as Ref<boolean> }));
+            titular: {
+                codigo: 1,
+                nome: 'Titular',
+                tituloEleitoral: '1111',
+                unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade'},
+                email: 't@t.com',
+                ramal: '123'
+            },
+            responsavel: {
+                usuario: {
+                    codigo: 2,
+                    nome: 'Resp',
+                    tituloEleitoral: '2222',
+                    unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade'},
+                    email: 'r@r.com',
+                    ramal: '456'
+                },
+                tipo: 'Substituição',
+                dataInicio: '2025-01-01',
+                dataFim: '2025-12-31'
+            },
+            movimentacoes: [{
+                codigo: 1,
+                dataHora: '2025-01-01T10:00:00',
+                unidadeOrigemCodigo: 1,
+                unidadeOrigemSigla: 'O',
+                unidadeOrigemNome: 'Origem',
+                unidadeDestinoCodigo: 2,
+                unidadeDestinoSigla: 'D',
+                unidadeDestinoNome: 'Destino',
+                usuarioTitulo: '1111',
+                usuarioNome: 'Usuario',
+                descricao: 'M'
+            }]
+        });
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue(criarAcessoMock({habilitarAcessoMapa: computedMutavel(true)}));
 
         const wrapper = mount(SubprocessoView, {
             global: { plugins: [pinia], stubs },
