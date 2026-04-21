@@ -11,13 +11,11 @@ import org.springframework.web.filter.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 @Component
 @Slf4j
 public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
     public static final String HEADER_CORRELACAO_ID = "X-Correlacao-Id";
-    public static final String HEADER_MONITORAMENTO_ATIVO = "X-Monitoramento-Ativo";
     public static final String HEADER_TEMPO_SERVIDOR_MS = "X-Tempo-Servidor-Ms";
     public static final String ATRIBUTO_CORRELACAO_ID = "sgc.monitoramento.correlacaoId";
     public static final String ATRIBUTO_MONITORAMENTO_ATIVO = "sgc.monitoramento.ativo";
@@ -40,17 +38,16 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (!monitoramentoProperties.isAtivo()) {
+        if (!monitoramentoProperties.isMonitoramentoHttpAtivo()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         long inicioNs = System.nanoTime();
         String correlacaoId = obterOuGerarCorrelacaoId(request);
-        boolean monitoramentoAtivoNaRequisicao = deveMonitorarDetalhado(request);
 
         request.setAttribute(ATRIBUTO_CORRELACAO_ID, correlacaoId);
-        request.setAttribute(ATRIBUTO_MONITORAMENTO_ATIVO, monitoramentoAtivoNaRequisicao);
+        request.setAttribute(ATRIBUTO_MONITORAMENTO_ATIVO, monitoramentoProperties.isMonitoramentoJavaCompletoAtivo());
         request.setAttribute(ATRIBUTO_HTTP_METODO, request.getMethod());
         request.setAttribute(ATRIBUTO_HTTP_CAMINHO, obterCaminhoComQueryString(request));
         response.setHeader(HEADER_CORRELACAO_ID, correlacaoId);
@@ -60,7 +57,7 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } finally {
-            long duracaoMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - inicioNs);
+            long duracaoMs = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - inicioNs);
 
             response.setHeader(HEADER_TEMPO_SERVIDOR_MS, String.valueOf(duracaoMs));
             response.setHeader("Server-Timing", "app;dur=" + duracaoMs);
@@ -72,11 +69,11 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
     }
 
     private String definirTagHttp(long duracaoMs) {
-        if (duracaoMs >= monitoramentoProperties.getLimiteMuitoLentoMs()) {
+        if (duracaoMs >= monitoramentoProperties.getTempoHttpMuitoLentoMs()) {
             return "HTTP-MUITO-LENTO";
         }
 
-        if (duracaoMs >= monitoramentoProperties.getLimiteLentoMs()) {
+        if (duracaoMs >= monitoramentoProperties.getTempoHttpLentoMs()) {
             return "HTTP-LENTO";
         }
 
@@ -138,20 +135,6 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             }
         }
         return "sem-http";
-    }
-
-    private boolean deveMonitorarDetalhado(HttpServletRequest request) {
-        if (monitoramentoProperties.isTraceCompleto()) {
-            return true;
-        }
-
-        if (monitoramentoProperties.isPermitirAtivacaoPorHeader()
-                && "true".equalsIgnoreCase(request.getHeader(HEADER_MONITORAMENTO_ATIVO))) {
-            return true;
-        }
-
-        double taxaAmostragem = monitoramentoProperties.getTaxaAmostragem();
-        return taxaAmostragem > 0 && ThreadLocalRandom.current().nextDouble() < taxaAmostragem;
     }
 
     private String obterOuGerarCorrelacaoId(HttpServletRequest request) {

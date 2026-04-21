@@ -210,7 +210,7 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
         await expect(page.getByText(`Titular: ${dados.titular}`).first()).toBeVisible();
     }
     if (dados.ramalTitular) {
-        await expect(header.getByRole('link', {name: dados.ramalTitular})).toBeVisible();
+        await expect(header.getByText(dados.ramalTitular)).toBeVisible();
     }
     if (dados.emailTitular) {
         await expect(header.getByRole('link', {name: dados.emailTitular})).toBeVisible();
@@ -222,7 +222,7 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
         await expect(page.getByText(`- ${dados.tipoResponsabilidade}`).first()).toBeVisible();
     }
     if (dados.ramalResponsavel) {
-        await expect(header.getByRole('link', {name: dados.ramalResponsavel})).toBeVisible();
+        await expect(header.getByText(dados.ramalResponsavel)).toBeVisible();
     }
     if (dados.emailResponsavel) {
         await expect(header.getByRole('link', {name: dados.emailResponsavel})).toBeVisible();

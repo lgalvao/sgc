@@ -119,22 +119,20 @@ describe("axios-setup", () => {
         expect(responseSuccessInterceptor(response)).toBe(response);
     });
 
-    it("interceptor de requisicao deve incluir headers de monitoramento quando ativado por sessao", () => {
+    it("interceptor de requisicao deve marcar monitoramento quando ativado por sessao", () => {
         window.sessionStorage.setItem('sgc.monitoramento.ativo', 'true');
 
         const config = requestInterceptor({method: 'get', url: '/processos', headers: {}});
 
         expect(config.headers['X-Correlacao-Id']).toBe('corr-123');
-        expect(config.headers['X-Monitoramento-Ativo']).toBe('true');
         expect(config.metadadosMonitoramento.monitoramentoAtivo).toBe(true);
     });
 
-    it("interceptor de requisicao deve incluir headers de monitoramento quando ativado por URL", () => {
+    it("interceptor de requisicao deve marcar monitoramento quando ativado por URL", () => {
         vi.stubGlobal('location', { search: '?monitoramento=1' });
 
         const config = requestInterceptor({method: 'get', url: '/processos', headers: {}});
 
-        expect(config.headers['X-Monitoramento-Ativo']).toBe('true');
         expect(config.metadadosMonitoramento.monitoramentoAtivo).toBe(true);
         vi.unstubAllGlobals(); // Limpa location stub
     });

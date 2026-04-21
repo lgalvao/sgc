@@ -7,11 +7,27 @@ import org.springframework.boot.context.properties.*;
 @Getter
 @Setter
 public class MonitoramentoProperties {
-    private boolean ativo = false;
-    private boolean traceCompleto = false;
-    private long limiteAlertaMs = 500;
-    private long limiteLentoMs = 100;
-    private long limiteMuitoLentoMs = 300;
-    private boolean permitirAtivacaoPorHeader = false;
-    private double taxaAmostragem = 0.0;
+    public enum Modo {
+        OFF,
+        HTTP,
+        LENTO,
+        COMPLETO
+    }
+
+    private Modo modo = Modo.OFF;
+    private long tempoMinimoJavaMs = 500;
+    private long tempoHttpLentoMs = 100;
+    private long tempoHttpMuitoLentoMs = 300;
+
+    public boolean isMonitoramentoHttpAtivo() {
+        return modo != Modo.OFF;
+    }
+
+    public boolean isMonitoramentoJavaLentoAtivo() {
+        return modo == Modo.LENTO || modo == Modo.COMPLETO;
+    }
+
+    public boolean isMonitoramentoJavaCompletoAtivo() {
+        return modo == Modo.COMPLETO;
+    }
 }

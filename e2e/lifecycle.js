@@ -19,12 +19,10 @@ const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
 const DB_NAME_PREFIX = process.env.E2E_DB_NAME_PREFIX || 'sgc-e2e-w';
 const MAX_BACKEND_PORT_SCAN = Number.parseInt(process.env.E2E_BACKEND_PORT_SCAN_LIMIT || '20', 10);
 const MODO_MONITORAMENTO = process.env.SGC_MONITORAMENTO || 'off';
-const MODO_MONITORAMENTO_DETALHADO = process.env.SGC_MONITORAMENTO_DETALHADO || 'off';
 const REUTILIZAR_EXISTENTE = process.env.SGC_LIFECYCLE_REUTILIZAR_EXISTENTE || 'on';
-const LIMITE_MONITORAMENTO_ALERTA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_ALERTA_MS || '500', 10);
-const LIMITE_MONITORAMENTO_LENTO_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_LENTO_MS || '100', 10);
-const LIMITE_MONITORAMENTO_MUITO_LENTO_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_MUITO_LENTO_MS || '300', 10);
-const TAXA_AMOSTRAGEM_MONITORAMENTO = process.env.SGC_MONITORAMENTO_AMOSTRAGEM || '0.0';
+const TEMPO_MINIMO_JAVA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_TEMPO_MINIMO_JAVA_MS || '500', 10);
+const TEMPO_HTTP_LENTO_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_HTTP_LENTO_MS || '100', 10);
+const TEMPO_HTTP_MUITO_LENTO_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_HTTP_MUITO_LENTO_MS || '300', 10);
 const SILENT_LOGS = process.env.SGC_SILENT_LIFECYCLE === 'true';
 const ANSI_RESET = '\u001b[0m';
 const ANSI_AMARELO = '\u001b[33m';
@@ -230,18 +228,11 @@ function validarPerfilLifecycle() {
 }
 
 function validarModoMonitoramento() {
-    const modosSuportados = new Set(['off', 'on']);
+    const modosSuportados = new Set(['off', 'http', 'lento', 'completo']);
     if (!modosSuportados.has(MODO_MONITORAMENTO)) {
         throw new Error(
             `Modo de monitoramento inválido: ${MODO_MONITORAMENTO}. ` +
-            'Use SGC_MONITORAMENTO=off ou on.'
-        );
-    }
-
-    if (!modosSuportados.has(MODO_MONITORAMENTO_DETALHADO)) {
-        throw new Error(
-            `Modo de monitoramento detalhado inválido: ${MODO_MONITORAMENTO_DETALHADO}. ` +
-            'Use SGC_MONITORAMENTO_DETALHADO=off ou on.'
+            'Use SGC_MONITORAMENTO=off, http, lento ou completo.'
         );
     }
 }
@@ -256,24 +247,8 @@ function validarReutilizacaoExistente() {
     }
 }
 
-function monitoramentoAtivo() {
-    return MODO_MONITORAMENTO !== 'off' || monitoramentoDetalhado();
-}
-
-function monitoramentoDetalhado() {
-    return MODO_MONITORAMENTO_DETALHADO === 'on';
-}
-
-function monitoramentoTraceCompleto() {
-    return monitoramentoDetalhado();
-}
-
-function monitoramentoPermiteHeader() {
-    return monitoramentoDetalhado();
-}
-
 function modoMonitoramentoFrontend() {
-    return monitoramentoDetalhado() ? 'on' : 'off';
+    return MODO_MONITORAMENTO === 'completo' ? 'on' : 'off';
 }
 
 function requestStatus(url, method = 'GET') {
@@ -341,25 +316,19 @@ function startBackend() {
         ? [
             `--server.port=${backendPort}`,
             `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`,
-            `--sgc.monitoramento.ativo=${monitoramentoAtivo()}`,
-            `--sgc.monitoramento.trace-completo=${monitoramentoTraceCompleto()}`,
-            `--sgc.monitoramento.limite-alerta-ms=${LIMITE_MONITORAMENTO_ALERTA_MS}`,
-            `--sgc.monitoramento.limite-lento-ms=${LIMITE_MONITORAMENTO_LENTO_MS}`,
-            `--sgc.monitoramento.limite-muito-lento-ms=${LIMITE_MONITORAMENTO_MUITO_LENTO_MS}`,
-            `--sgc.monitoramento.permitir-ativacao-por-header=${monitoramentoPermiteHeader()}`,
-            `--sgc.monitoramento.taxa-amostragem=${TAXA_AMOSTRAGEM_MONITORAMENTO}`
+            `--sgc.monitoramento.modo=${MODO_MONITORAMENTO}`,
+            `--sgc.monitoramento.tempo-minimo-java-ms=${TEMPO_MINIMO_JAVA_MS}`,
+            `--sgc.monitoramento.tempo-http-lento-ms=${TEMPO_HTTP_LENTO_MS}`,
+            `--sgc.monitoramento.tempo-http-muito-lento-ms=${TEMPO_HTTP_MUITO_LENTO_MS}`
         ].join(' ')
         : [
             `--server.port=${backendPort}`,
             `--spring.datasource.url=${dbUrl()}`,
             `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`,
-            `--sgc.monitoramento.ativo=${monitoramentoAtivo()}`,
-            `--sgc.monitoramento.trace-completo=${monitoramentoTraceCompleto()}`,
-            `--sgc.monitoramento.limite-alerta-ms=${LIMITE_MONITORAMENTO_ALERTA_MS}`,
-            `--sgc.monitoramento.limite-lento-ms=${LIMITE_MONITORAMENTO_LENTO_MS}`,
-            `--sgc.monitoramento.limite-muito-lento-ms=${LIMITE_MONITORAMENTO_MUITO_LENTO_MS}`,
-            `--sgc.monitoramento.permitir-ativacao-por-header=${monitoramentoPermiteHeader()}`,
-            `--sgc.monitoramento.taxa-amostragem=${TAXA_AMOSTRAGEM_MONITORAMENTO}`
+            `--sgc.monitoramento.modo=${MODO_MONITORAMENTO}`,
+            `--sgc.monitoramento.tempo-minimo-java-ms=${TEMPO_MINIMO_JAVA_MS}`,
+            `--sgc.monitoramento.tempo-http-lento-ms=${TEMPO_HTTP_LENTO_MS}`,
+            `--sgc.monitoramento.tempo-http-muito-lento-ms=${TEMPO_HTTP_MUITO_LENTO_MS}`
         ].join(' ');
     const argsGradle = isWindows ? `--args="${argsAplicacao}"` : `--args=${argsAplicacao}`;
 
@@ -556,7 +525,7 @@ try {
     await subirInfra();
     lifecycleLogger.info(
         `>>> Infra ${PERFIL_LIFECYCLE.toUpperCase()} no ar. Frontend: ${FRONTEND_PORT}. ` +
-        `${descreverBackends()}. Monitoramento: ${MODO_MONITORAMENTO}. Detalhado: ${MODO_MONITORAMENTO_DETALHADO}.`
+        `${descreverBackends()}. Monitoramento: ${MODO_MONITORAMENTO}.`
     );
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);

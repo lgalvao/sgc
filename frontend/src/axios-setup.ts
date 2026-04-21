@@ -126,7 +126,6 @@ apiClient.interceptors.request.use((config: ConfiguracaoMonitorada) => {
     definirHeader(config, "X-Correlacao-Id", correlacaoId);
 
     if (monitoramentoAtivo) {
-        definirHeader(config, "X-Monitoramento-Ativo", "true");
         logger.info("[http] inicio", {
             metodo: config.method?.toUpperCase(),
             url: config.url,

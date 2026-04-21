@@ -6,11 +6,11 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 function monitoramentoAtivoNoPlaywright(): boolean {
-    return process.env.SGC_MONITORAMENTO === 'on' || monitoramentoDetalhadoNoPlaywright();
+    return process.env.SGC_MONITORAMENTO !== 'off' && process.env.SGC_MONITORAMENTO !== undefined;
 }
 
-function monitoramentoDetalhadoNoPlaywright(): boolean {
-    return process.env.SGC_MONITORAMENTO_DETALHADO === 'on';
+function monitoramentoCompletoNoPlaywright(): boolean {
+    return process.env.SGC_MONITORAMENTO === 'completo';
 }
 
 function obterBaseUrlWorker(_workerIndex: number): string {
@@ -58,8 +58,7 @@ export const test = base.extend<{
         const context = await browser.newContext({
             baseURL,
             extraHTTPHeaders: {
-                'x-e2e-worker': String(testInfo.parallelIndex),
-                ...(monitoramentoDetalhadoNoPlaywright() ? {'X-Monitoramento-Ativo': 'true'} : {})
+                'x-e2e-worker': String(testInfo.parallelIndex)
             }
         });
         await use(context);
@@ -71,8 +70,7 @@ export const test = base.extend<{
         const request = await playwright.request.newContext({
             baseURL,
             extraHTTPHeaders: {
-                'x-e2e-worker': String(testInfo.parallelIndex),
-                ...(monitoramentoDetalhadoNoPlaywright() ? {'X-Monitoramento-Ativo': 'true'} : {})
+                'x-e2e-worker': String(testInfo.parallelIndex)
             }
         });
         await use(request);
@@ -83,7 +81,7 @@ export const test = base.extend<{
         let ultimoRuidoAutenticacaoDetalhesEm = 0;
         const logs: string[] = [];
 
-        if (monitoramentoDetalhadoNoPlaywright()) {
+        if (monitoramentoCompletoNoPlaywright()) {
             await page.addInitScript(() => {
                 window.sessionStorage.setItem('sgc.monitoramento.ativo', 'true');
             });

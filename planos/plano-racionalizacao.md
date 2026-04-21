@@ -26,7 +26,7 @@ O foco e jornada real medida, nao micro-otimizacao isolada.
 - O contexto inicial de subprocesso ja tem helper compartilhado no frontend.
 - `SubprocessoConsultaService` ja delega parte da montagem de contexto, mas ainda concentra permissoes e resposta.
 - `MapaVisualizacaoView` ja teve sugestoes/historico e acoes de analise simplificados.
-- A abertura de visualizacao de mapa foi medida em `CDU-18` com `SGC_MONITORAMENTO=on`: o contrato atual em dois endpoints (`contexto-edicao` e `mapa-visualizacao`) custou dezenas de milissegundos por request no cenario E2E, sem evidencia suficiente para criar um BFF unico.
+- A abertura de visualizacao de mapa foi medida em `CDU-18` com `SGC_MONITORAMENTO=lento`: o contrato atual em dois endpoints (`contexto-edicao` e `mapa-visualizacao`) custou dezenas de milissegundos por request no cenario E2E, sem evidencia suficiente para criar um BFF unico.
 - O tracing de workflow e acao em bloco ja existe e depende de monitoramento ativo na requisicao.
 - A importacao de atividades passou a retornar resposta incremental e nao precisa mais recompor `contexto-cadastro-atividades` apos o `POST`.
 - As stores de dedupe/cache de processo e subprocesso ja têm cobertura direcionada para dedupe, erro e invalidacao.
