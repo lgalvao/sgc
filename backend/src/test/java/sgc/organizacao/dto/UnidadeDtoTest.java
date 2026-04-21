@@ -94,7 +94,7 @@ class UnidadeDtoTest {
         Method metodo = UnidadeDto.class.getDeclaredMethod("fromEntityResumoObrigatoria", Unidade.class);
         assertThatThrownBy(() -> metodo.invoke(null, new Object[]{null}))
                 .isInstanceOf(InvocationTargetException.class)
-                .hasCauseInstanceOf(IllegalStateException.class)
+                .hasCauseInstanceOf(NullPointerException.class)
                 .rootCause()
                 .hasMessage("Unidade obrigatoria para resumo");
     }

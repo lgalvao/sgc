@@ -361,9 +361,15 @@ async function carregarSubprocesso() {
     subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
     mapaStore.mapaCompleto.value = resultado.contexto.mapa;
   } else {
+    if (subprocessoStoreCache.erroIntegracaoContexto) {
+      codSubprocesso.value = null;
+      erroNaoEncontrado.value = true;
+      notify(subprocessoStoreCache.erroIntegracaoContexto.message, 'danger');
+      return;
+    }
     codSubprocesso.value = null;
     erroNaoEncontrado.value = true;
-    logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
+    logger.error(`Falha grave: contexto de subprocesso ausente sem erro normalizado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
   }
 }
 

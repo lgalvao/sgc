@@ -167,6 +167,7 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
+import {useNotification} from "@/composables/useNotification";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -184,6 +185,7 @@ import {TipoProcesso} from "@/types/tipos";
 import {useAcesso} from "@/composables/useAcesso";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
+import {normalizeError} from "@/utils/apiError";
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -194,6 +196,7 @@ const router = useRouter();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
+const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStoreCache = useSubprocessoStore();
 const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
@@ -378,7 +381,11 @@ onMounted(async () => {
       subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
       atividades.value = resultado.contexto.atividadesDisponiveis;
       unidade.value = resultado.contexto.unidade as Unidade;
+    } else if (subprocessoStoreCache.erroIntegracaoContexto) {
+      notify(subprocessoStoreCache.erroIntegracaoContexto.message, 'danger');
     }
+  } catch (erro) {
+    notify(normalizeError(erro).message, 'danger');
   } finally {
     carregandoInicial.value = false;
   }

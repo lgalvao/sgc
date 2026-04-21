@@ -262,6 +262,7 @@ import {
   apresentarSugestoes as apresentarSugestoesService,
 } from "@/services/processoService";
 import type {Analise, MapaVisualizacao, Unidade} from "@/types/tipos";
+import {normalizeError} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
 
 const route = useRoute();
@@ -352,6 +353,9 @@ async function carregarContextoInicial() {
   });
 
   if (!resultado) {
+    if (subprocessoStoreCache.erroIntegracaoContexto) {
+      notify(subprocessoStoreCache.erroIntegracaoContexto.message, 'danger');
+    }
     codSubprocesso.value = null;
     return null;
   }
@@ -466,6 +470,8 @@ onMounted(async () => {
     if (resultado?.codigo) {
       mapa.value = await obterMapaVisualizacao(resultado.codigo);
     }
+  } catch (erro) {
+    notify(normalizeError(erro).message, 'danger');
   } finally {
     carregandoInicial.value = false;
   }

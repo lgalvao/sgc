@@ -48,13 +48,14 @@ Este arquivo acompanha somente o que ainda falta fazer. Ao concluir um item, rem
 - `carregarContextoSubprocessoInicial` centraliza query e fallback por `processo+unidade`.
 - Stores fazem dedupe de chamadas concorrentes, mas nao reutilizam contexto entre ativacoes.
 - `SubprocessoContextoConsultaService` ja absorveu parte da montagem de contexto.
+- Store de subprocesso passou a tratar `404` como falha grave de consistencia/acesso (nao como ausencia normal), propagando erro explicito para tratamento nas views de subprocesso/mapa.
 
 **Falta fazer**
 
 - Medir quais telas ainda repetem `contexto-edicao` e busca por `processo+unidade`.
 - Decidir se ha reuso seguro dentro de uma unica ativacao de tela.
 - Continuar reduzindo permissoes e montagem de resposta dentro de `SubprocessoConsultaService`.
-- Remover fallback implicito que esconda erro de integracao.
+- Validar se ainda restam pontos de fallback implicito fora do fluxo principal de subprocesso/mapa.
 
 **Conclui quando**
 
@@ -104,6 +105,7 @@ Este arquivo acompanha somente o que ainda falta fazer. Ao concluir um item, rem
 - O dashboard ficou vermelho somente por `frontend-cobertura`: statements 94,58%, branches 87,57%, functions 94,42%.
 - `node etc/scripts/sgc.js frontend cobertura priorizar-defensivos` apontou lacunas residuais pequenas em `SubprocessoView.vue`, `useAcesso.ts`, `ArvoreUnidades.vue`, `usePerfil.ts` e `DisponibilizarMapaModal.vue`.
 - Apos testes direcionados em `usePerfil`, `useAcesso` e `DisponibilizarMapaModal`, `npm run coverage:unit --prefix frontend` ficou em statements 94,64%, branches 87,73%, functions 94,54%; o bloqueio real continua sendo branch coverage global.
+- Rodada ampla de racionalizacao de testes reduziu `any` em `usePerfil.spec.ts`, `ArvoreUnidadesCoverage.spec.ts`, `SubprocessoViewCoverage.spec.ts` e no mock tipado de `DisponibilizarMapaModal.spec.ts`, mantendo foco em hotspots de manutencao/cobertura.
 
 **Falta fazer**
 

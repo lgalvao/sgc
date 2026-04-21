@@ -6,29 +6,40 @@ import {usePerfil} from "../usePerfil";
 
 vi.mock("@/stores/perfil");
 
-describe("usePerfil", () => {
-    const permissoesAdmin = {
-        mostrarCriarProcesso: true,
-        mostrarArvoreCompletaUnidades: true,
-        mostrarCtaPainelVazio: true,
-        mostrarDiagnosticoOrganizacional: true,
-        mostrarMenuConfiguracoes: true,
-        mostrarMenuAdministradores: true,
-        mostrarCriarAtribuicaoTemporaria: true,
-    };
+type PerfilStore = ReturnType<typeof usePerfilStore>;
 
+const permissoesAdmin = {
+    mostrarCriarProcesso: true,
+    mostrarArvoreCompletaUnidades: true,
+    mostrarCtaPainelVazio: true,
+    mostrarDiagnosticoOrganizacional: true,
+    mostrarMenuConfiguracoes: true,
+    mostrarMenuAdministradores: true,
+    mostrarCriarAtribuicaoTemporaria: true,
+};
+
+function criarStoreMock(parcial: Partial<PerfilStore>): PerfilStore {
+    return {
+        perfilSelecionado: null,
+        unidadeSelecionada: null,
+        unidadeSelecionadaSigla: null,
+        permissoesSessao: null,
+        ...parcial,
+    } as PerfilStore;
+}
+
+describe("usePerfil", () => {
     beforeEach(() => {
         initPinia();
         vi.clearAllMocks();
     });
 
     it("deve retornar o perfil e a unidade selecionada corretamente", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             perfilSelecionado: Perfil.CHEFE,
             unidadeSelecionada: 123,
             unidadeSelecionadaSigla: "TESTE",
-            permissoesSessao: null,
-        } as any);
+        }));
 
         const {perfilSelecionado, unidadeSelecionada} = usePerfil();
 
@@ -37,11 +48,9 @@ describe("usePerfil", () => {
     });
 
     it("deve retornar nulo se sigla não estiver disponível", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
-            unidadeSelecionadaSigla: null,
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             unidadeSelecionada: 123,
-            permissoesSessao: null,
-        } as any);
+        }));
 
         const {unidadeSelecionada} = usePerfil();
 
@@ -49,11 +58,10 @@ describe("usePerfil", () => {
     });
 
     it("deve usar unidadeSelecionadaSigla se disponível", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             unidadeSelecionadaSigla: "SIGLA_EXISTENTE",
             unidadeSelecionada: 123,
-            permissoesSessao: null,
-        } as any);
+        }));
 
         const {unidadeSelecionada} = usePerfil();
 
@@ -61,12 +69,11 @@ describe("usePerfil", () => {
     });
 
     it("deve identificar corretamente o perfil admin para exibição", () => {
-        const mockStore = {
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             perfilSelecionado: Perfil.ADMIN,
             unidadeSelecionada: 1,
             permissoesSessao: permissoesAdmin,
-        };
-        vi.mocked(usePerfilStore).mockReturnValue(mockStore as any);
+        }));
 
         const {isAdmin} = usePerfil();
 
@@ -74,26 +81,24 @@ describe("usePerfil", () => {
     });
 
     it("deve permitir relatorios para admin e gestor", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             perfilSelecionado: Perfil.GESTOR,
-            permissoesSessao: null,
-        } as any);
+        }));
 
         expect(usePerfil().podeVerRelatorios.value).toBe(true);
 
-        vi.mocked(usePerfilStore).mockReturnValue({
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             perfilSelecionado: Perfil.CHEFE,
-            permissoesSessao: null,
-        } as any);
+        }));
 
         expect(usePerfil().podeVerRelatorios.value).toBe(false);
     });
 
     it("deve expor permissões de sessão vindas do backend", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             perfilSelecionado: Perfil.ADMIN,
             permissoesSessao: permissoesAdmin,
-        } as any);
+        }));
         const {
             mostrarCriarProcesso,
             mostrarArvoreCompletaUnidades,
@@ -114,11 +119,10 @@ describe("usePerfil", () => {
     });
 
     it("deve retornar nulo se unidadeSelecionada e sigla forem nulas", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
-            unidadeSelecionadaSigla: null,
+        vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             unidadeSelecionada: null,
-            permissoesSessao: null,
-        } as any);
+            unidadeSelecionadaSigla: null,
+        }));
 
         const {unidadeSelecionada} = usePerfil();
 

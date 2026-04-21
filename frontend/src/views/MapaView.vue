@@ -136,6 +136,7 @@ import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
+import {useNotification} from "@/composables/useNotification";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -143,6 +144,7 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
+import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
 
@@ -156,6 +158,7 @@ const router = useRouter();
 const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
 const {mapaCompleto, impactoMapa: impactos, erro: erroMapa} = mapasStore;
+const {notify} = useNotification();
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const subprocessoStoreCache = useSubprocessoStore();
@@ -206,6 +209,9 @@ async function carregarContextoInicial() {
   });
 
   if (!resultado) {
+    if (subprocessoStoreCache.erroIntegracaoContexto) {
+      notify(subprocessoStoreCache.erroIntegracaoContexto.message, 'danger');
+    }
     return null;
   }
 
@@ -250,6 +256,8 @@ onMounted(async () => {
       return;
     }
     await carregarMapaInicial(codSubprocesso.value, contextoInicial);
+  } catch (erro) {
+    notify(normalizeError(erro).message, 'danger');
   } finally {
     carregandoInicial.value = false;
   }
