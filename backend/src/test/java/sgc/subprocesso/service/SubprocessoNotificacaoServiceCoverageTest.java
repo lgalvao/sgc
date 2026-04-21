@@ -29,8 +29,6 @@ class SubprocessoNotificacaoServiceCoverageTest {
     @Mock
     private NotificacaoEmailService notificacaoEmailService;
     @Mock
-    private ResponsavelUnidadeService responsavelService;
-    @Mock
     private org.thymeleaf.spring6.SpringTemplateEngine templateEngine;
 
     @Test

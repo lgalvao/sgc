@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.context.properties.*;
 import org.springframework.scheduling.annotation.*;
 
+@SuppressWarnings("UnnecessaryModifier")
 @EnableAsync
 @EnableScheduling
 @ConfigurationPropertiesScan
