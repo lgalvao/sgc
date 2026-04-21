@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.*;
+import sgc.organizacao.model.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -17,6 +18,9 @@ class AlertaRepoTest {
 
     @Autowired
     private AlertaRepo alertaRepo;
+
+    @Autowired
+    private UnidadeRepo unidadeRepo;
 
     @Test
     @DisplayName("deve buscar alertas por processo")
@@ -45,5 +49,21 @@ class AlertaRepoTest {
         assertThat(pagina.getContent())
                 .extracting(Alerta::getCodigo)
                 .contains(70002L, 70003L);
+    }
+
+    @Test
+    @DisplayName("deve buscar alerta pessoal sem processo e sem unidade destino")
+    void deveBuscarAlertaPessoalSemProcessoESemUnidadeDestino() {
+        Alerta alerta = Alerta.builder()
+                .unidadeOrigem(unidadeRepo.findById(1L).orElseThrow())
+                .usuarioDestinoTitulo("8")
+                .descricao("Alerta pessoal")
+                .dataHora(java.time.LocalDateTime.now())
+                .build();
+        Alerta salvo = alertaRepo.save(alerta);
+
+        assertThat(alertaRepo.buscarAlertasExclusivosDoUsuario("8"))
+                .extracting(Alerta::getCodigo)
+                .contains(salvo.getCodigo());
     }
 }

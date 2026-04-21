@@ -28,6 +28,30 @@ class AlertaDtoTest {
         assertThat(dto.dataHoraLeitura()).isEqualTo(LocalDateTime.of(2025, 1, 1, 11, 0));
     }
 
+    @Test
+    @DisplayName("deve mapear alerta pessoal sem processo e sem unidade destino")
+    void deveMapearAlertaPessoalSemProcessoESemUnidadeDestino() {
+        Unidade origem = new Unidade();
+        origem.setSigla("ADM");
+
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(6L);
+        alerta.setUnidadeOrigem(origem);
+        alerta.setUsuarioDestinoTitulo("123");
+        alerta.setDescricao("Alerta pessoal");
+        alerta.setDataHora(LocalDateTime.of(2025, 1, 1, 10, 0));
+
+        AlertaDto dto = AlertaDto.fromEntity(alerta);
+
+        assertThat(dto.codigo()).isEqualTo(6L);
+        assertThat(dto.codProcesso()).isNull();
+        assertThat(dto.processo()).isNull();
+        assertThat(dto.origem()).isEqualTo("ADM");
+        assertThat(dto.unidadeDestino()).isNull();
+        assertThat(dto.mensagem()).isEqualTo("Alerta pessoal");
+    }
+
+
     private Alerta criarAlerta() {
         Processo processo = new Processo();
         processo.setCodigo(10L);

@@ -108,6 +108,17 @@ public class AlertaFacade {
     }
 
     @Transactional
+    public Alerta criarAlertaPessoal(String usuarioTitulo, String descricao) {
+        Alerta alerta = Alerta.builder()
+                .dataHora(LocalDateTime.now())
+                .unidadeOrigem(unidadeRaiz())
+                .usuarioDestinoTitulo(usuarioTitulo)
+                .descricao(descricao)
+                .build();
+        return alertaService.salvar(alerta);
+    }
+
+    @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Unidade> unidadesParticipantes) {
         Set<Long> codsOperacionais = new HashSet<>();
         Set<Long> codsIntermediarias = new HashSet<>();

@@ -9,8 +9,10 @@ import java.time.*;
 @Builder
 public record NotificacaoEmailDto(
         Long codigo,
-        Long subprocessoCodigo,
-        @Nullable String tipoTransicao,
+        @Nullable Long alertaCodigo,
+        @Nullable Long subprocessoCodigo,
+        @Nullable String tipoNotificacao,
+        @Nullable String usuarioDestinoTitulo,
         String destinatario,
         String assunto,
         SituacaoNotificacaoEmail situacao,
@@ -20,10 +22,13 @@ public record NotificacaoEmailDto(
         @Nullable LocalDateTime proximaTentativaEm
 ) {
     public static NotificacaoEmailDto fromEntity(NotificacaoEmail notificacao, Long subprocessoCodigo) {
+        Alerta alerta = notificacao.getAlerta();
         return NotificacaoEmailDto.builder()
                 .codigo(notificacao.getCodigo())
+                .alertaCodigo(alerta == null ? null : alerta.getCodigo())
                 .subprocessoCodigo(subprocessoCodigo)
-                .tipoTransicao(notificacao.getTipoTransicao())
+                .tipoNotificacao(notificacao.getTipoNotificacao())
+                .usuarioDestinoTitulo(notificacao.getUsuarioDestinoTitulo())
                 .destinatario(notificacao.getDestinatario())
                 .assunto(notificacao.getAssunto())
                 .situacao(notificacao.getSituacao())

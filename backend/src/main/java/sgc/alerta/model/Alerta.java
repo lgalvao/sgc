@@ -19,9 +19,9 @@ import java.time.*;
 @SuppressWarnings("NullAway.Init")
 public class Alerta extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "processo_codigo", nullable = false)
+    @JoinColumn(name = "processo_codigo")
     @JsonIgnore
-    private Processo processo;
+    private @Nullable Processo processo;
 
     @JsonView(ComumViews.Publica.class)
     @Column(name = "data_hora", nullable = false)
@@ -33,13 +33,13 @@ public class Alerta extends EntidadeBase {
     private Unidade unidadeOrigem;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unidade_destino_codigo", nullable = false)
+    @JoinColumn(name = "unidade_destino_codigo")
     @JsonIgnore
-    private Unidade unidadeDestino;
+    private @Nullable Unidade unidadeDestino;
 
     @Column(name = "usuario_destino_titulo", length = 12)
     @JsonIgnore
-    private String usuarioDestinoTitulo;
+    private @Nullable String usuarioDestinoTitulo;
 
     @JsonView(ComumViews.Publica.class)
     @Column(name = "descricao", nullable = false)
@@ -51,14 +51,14 @@ public class Alerta extends EntidadeBase {
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codProcesso")
-    public Long getCodProcessoSintetico() {
-        return processo.getCodigo();
+    public @Nullable Long getCodProcessoSintetico() {
+        return processo == null ? null : processo.getCodigo();
     }
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("processo")
-    public String getProcessoDescricaoSintetica() {
-        return processo.getDescricao();
+    public @Nullable String getProcessoDescricaoSintetica() {
+        return processo == null ? null : processo.getDescricao();
     }
 
     @JsonView(ComumViews.Publica.class)
@@ -69,8 +69,8 @@ public class Alerta extends EntidadeBase {
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("unidadeDestino")
-    public String getUnidadeDestinoSigla() {
-        return unidadeDestino.getSigla();
+    public @Nullable String getUnidadeDestinoSigla() {
+        return unidadeDestino == null ? null : unidadeDestino.getSigla();
     }
 
     @JsonView(ComumViews.Publica.class)

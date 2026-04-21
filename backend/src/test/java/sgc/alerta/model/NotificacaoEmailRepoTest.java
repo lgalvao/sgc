@@ -82,7 +82,7 @@ class NotificacaoEmailRepoTest {
     private NotificacaoEmail criarNotificacao(String chaveIdempotencia) {
         return NotificacaoEmail.builder()
                 .subprocesso(subprocessoRepo.findById(60000L).orElseThrow())
-                .tipoTransicao("PROCESSO_INICIADO")
+                .tipoNotificacao("PROCESSO_INICIADO")
                 .destinatario("destino@tre-pe.jus.br")
                 .assunto("Assunto")
                 .corpoHtml("<p>corpo</p>")

@@ -96,7 +96,7 @@ class SubprocessoNotificacaoServiceTest {
                 .allSatisfy(cmd -> {
                     assertThat(cmd.assunto()).startsWith("SGC: ");
                     assertThat(cmd.corpoHtml()).isEqualTo("<html>corpo</html>");
-                    assertThat(cmd.tipoTransicao()).isEqualTo(TipoTransicao.PROCESSO_INICIADO.name());
+                    assertThat(cmd.tipoNotificacao()).isEqualTo(TipoTransicao.PROCESSO_INICIADO.name());
                     assertThat(cmd.chaveIdempotencia()).contains("transicao:PROCESSO_INICIADO");
                 });
         verify(templateEngine).process(templateCaptor.capture(), contextCaptor.capture());

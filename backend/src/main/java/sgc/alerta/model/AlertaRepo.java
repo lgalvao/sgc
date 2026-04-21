@@ -60,7 +60,6 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
                     SELECT COUNT(a) FROM Alerta a
                     WHERE a.usuarioDestinoTitulo = :usuarioTitulo
                        OR (a.unidadeDestino.codigo = :codUnidade AND a.usuarioDestinoTitulo IS NULL)
-                    AND a.processo IS NOT NULL
                     """)
     Page<Alerta> buscarAlertasDaUnidadeEIndividuais(
             @Param("codUnidade") Long codUnidade, 
@@ -81,7 +80,6 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
             countQuery = """
                     SELECT COUNT(a) FROM Alerta a
                     WHERE a.usuarioDestinoTitulo = :usuarioTitulo
-                    AND a.processo IS NOT NULL
                     """)
     Page<Alerta> buscarAlertasExclusivosDoUsuario(
             @Param("usuarioTitulo") String usuarioTitulo, 

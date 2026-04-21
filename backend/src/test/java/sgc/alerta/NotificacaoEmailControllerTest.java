@@ -48,7 +48,7 @@ class NotificacaoEmailControllerTest {
     private NotificacaoEmail notificacao() {
         return NotificacaoEmail.builder()
                 .codigo(10L)
-                .tipoTransicao("PROCESSO_INICIADO")
+                .tipoNotificacao("PROCESSO_INICIADO")
                 .destinatario("destino@tre-pe.jus.br")
                 .assunto("Assunto")
                 .corpoHtml("<p>corpo</p>")

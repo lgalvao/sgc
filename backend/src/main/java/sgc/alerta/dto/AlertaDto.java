@@ -9,10 +9,10 @@ import java.time.*;
 @Builder
 public record AlertaDto(
         @Nullable Long codigo,
-        Long codProcesso,
-        String processo,
+        @Nullable Long codProcesso,
+        @Nullable String processo,
         String origem,
-        String unidadeDestino,
+        @Nullable String unidadeDestino,
         String descricao,
         String mensagem,
         LocalDateTime dataHora,

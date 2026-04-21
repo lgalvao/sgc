@@ -18,11 +18,18 @@ import java.time.*;
 @SuppressWarnings("NullAway.Init")
 public class NotificacaoEmail extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "alerta_codigo")
+    private @Nullable Alerta alerta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subprocesso_codigo")
     private @Nullable Subprocesso subprocesso;
 
-    @Column(name = "tipo_transicao", length = 80)
-    private @Nullable String tipoTransicao;
+    @Column(name = "tipo_notificacao", length = 80)
+    private @Nullable String tipoNotificacao;
+
+    @Column(name = "usuario_destino_titulo", length = 12)
+    private @Nullable String usuarioDestinoTitulo;
 
     @Column(name = "destinatario", nullable = false)
     private String destinatario;

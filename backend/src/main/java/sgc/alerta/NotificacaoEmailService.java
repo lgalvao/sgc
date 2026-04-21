@@ -28,8 +28,10 @@ public class NotificacaoEmailService {
         }
 
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .alerta(cmd.alerta())
                 .subprocesso(cmd.subprocesso())
-                .tipoTransicao(cmd.tipoTransicao())
+                .tipoNotificacao(cmd.tipoNotificacao())
+                .usuarioDestinoTitulo(cmd.usuarioDestinoTitulo())
                 .destinatario(cmd.destinatario())
                 .assunto(cmd.assunto())
                 .corpoHtml(cmd.corpoHtml())

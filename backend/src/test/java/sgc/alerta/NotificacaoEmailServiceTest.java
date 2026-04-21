@@ -41,7 +41,9 @@ class NotificacaoEmailServiceTest {
 
         service.enfileirar(new EnfileirarNotificacaoEmailCommand(
                 null,
+                null,
                 "PROCESSO_INICIADO",
+                null,
                 "destino@tre-pe.jus.br",
                 "Assunto",
                 "<p>corpo</p>",
@@ -70,7 +72,9 @@ class NotificacaoEmailServiceTest {
 
         NotificacaoEmail resultado = service.enfileirar(new EnfileirarNotificacaoEmailCommand(
                 null,
+                null,
                 "PROCESSO_INICIADO",
+                null,
                 "destino@tre-pe.jus.br",
                 "Assunto",
                 "<p>corpo</p>",
@@ -94,7 +98,9 @@ class NotificacaoEmailServiceTest {
 
         NotificacaoEmail resultado = service.enfileirar(new EnfileirarNotificacaoEmailCommand(
                 null,
+                null,
                 "PROCESSO_INICIADO",
+                null,
                 "destino@tre-pe.jus.br",
                 "Assunto",
                 "<p>corpo</p>",

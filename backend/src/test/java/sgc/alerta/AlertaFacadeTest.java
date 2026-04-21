@@ -202,6 +202,26 @@ class AlertaFacadeTest {
         verify(alertaService).dataHoraLeituraAlertaUsuario(1L, "123");
     }
 
+    @Test
+    @DisplayName("Deve criar alerta pessoal sem processo e sem unidade destino")
+    void deveCriarAlertaPessoal() {
+        Unidade raiz = new Unidade();
+        raiz.setCodigo(1L);
+        raiz.setSigla("ADMIN");
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(alertaService.salvar(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Alerta alerta = alertaFacade.criarAlertaPessoal("123", "Atribuição temporária para unidade X");
+
+        assertThat(alerta.getProcesso()).isNull();
+        assertThat(alerta.getUnidadeDestino()).isNull();
+        assertThat(alerta.getUnidadeOrigem()).isSameAs(raiz);
+        assertThat(alerta.getUsuarioDestinoTitulo()).isEqualTo("123");
+        assertThat(alerta.getDescricao()).isEqualTo("Atribuição temporária para unidade X");
+        verify(alertaService).salvar(alerta);
+    }
+
     @Nested
     @DisplayName("Marcação de Lidos")
     class MarcacaoLidos {

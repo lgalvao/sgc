@@ -114,8 +114,10 @@ public class SubprocessoNotificacaoService {
 
     private void enfileirarEmail(NotificacaoCommand cmd, EmailGerado email) {
         notificacaoEmailService.enfileirar(new EnfileirarNotificacaoEmailCommand(
+                null,
                 cmd.subprocesso(),
                 cmd.tipoTransicao().name(),
+                null,
                 email.destinatario(),
                 email.assunto(),
                 email.corpo(),
