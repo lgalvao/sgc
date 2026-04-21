@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.setup.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.context.*;
+import sgc.alerta.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -59,6 +60,8 @@ public abstract class BaseIntegrationTest {
     private WebApplicationContext context;
     @Autowired
     private CacheManager cacheManager;
+    @Autowired(required = false)
+    private NotificacaoEmailWorker notificacaoEmailWorker;
 
     @BeforeEach
     void setupMockMvc() {
@@ -84,9 +87,17 @@ public abstract class BaseIntegrationTest {
         Awaitility.await()
                 .atMost(Duration.ofSeconds(5))
                 .pollInterval(Duration.ofMillis(100))
-                .untilAsserted(() ->
-                        assertThat(greenMail.getReceivedMessages()).hasSizeGreaterThanOrEqualTo(quantidade)
-                );
+                .pollInSameThread()
+                .untilAsserted(() -> {
+                    processarEmailsPendentes();
+                    assertThat(greenMail.getReceivedMessages()).hasSizeGreaterThanOrEqualTo(quantidade);
+                });
+    }
+
+    protected void processarEmailsPendentes() {
+        if (notificacaoEmailWorker != null) {
+            notificacaoEmailWorker.processarPendentes();
+        }
     }
 
     protected boolean algumEmailContem(String busca) throws Exception {

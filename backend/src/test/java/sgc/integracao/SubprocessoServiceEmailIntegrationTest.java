@@ -98,6 +98,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         transicaoService.registrarTransicao(comando);
+        processarEmailsPendentes();
 
         verify(javaMailSender, atLeastOnce()).send(any(jakarta.mail.internet.MimeMessage.class));
     }
@@ -114,6 +115,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         transicaoService.registrarTransicao(comando);
+        processarEmailsPendentes();
 
         verify(javaMailSender, atLeastOnce()).send(any(jakarta.mail.internet.MimeMessage.class));
     }
