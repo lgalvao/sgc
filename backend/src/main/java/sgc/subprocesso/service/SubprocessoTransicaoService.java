@@ -46,7 +46,6 @@ public class SubprocessoTransicaoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UsuarioFacade usuarioFacade;
     private final MapaManutencaoService mapaManutencaoService;
-    private final EmailService emailService;
     private final AlertaFacade alertaService;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -910,22 +909,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
-        String assunto = Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA;
-        String corpo = Mensagens.CORPO_DATA_LIMITE_ALTERADA
-                .formatted(
-                        sp.getUnidade().getSigla(),
-                        sp.getProcesso().getDescricao(),
-                        novaDataFormatada
-                );
-        String emailDestino = notificacaoService.getEmailUnidade(sp.getUnidade());
-
-        emailService.enviarEmail(emailDestino, assunto, corpo);
-        alertaService.criarAlertaAlteracaoDataLimite(
-                sp.getProcesso(),
-                sp.getUnidade(),
-                novaDataFormatada,
-                etapa
-        );
+        notificacaoService.notificarAlteracaoDataLimite(sp, novaDataFormatada, etapa);
     }
 
 

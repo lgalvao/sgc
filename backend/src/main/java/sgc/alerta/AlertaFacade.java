@@ -165,9 +165,9 @@ public class AlertaFacade {
     }
 
     @Transactional
-    public void criarAlertaAlteracaoDataLimite(Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
+    public Alerta criarAlertaAlteracaoDataLimite(Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
         String desc = "Data limite da etapa %d alterada para %s".formatted(etapa, novaData);
-        criarAlerta(processo, unidadeRaiz(), unidadeDestino, desc);
+        return criarAlerta(processo, unidadeRaiz(), unidadeDestino, desc);
     }
 
     private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {

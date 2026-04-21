@@ -7,6 +7,7 @@ import org.springframework.stereotype.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
+import sgc.alerta.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -59,6 +60,27 @@ public class SubprocessoNotificacaoService {
 
     public String getEmailUnidade(Unidade unidade) {
         return "%s@tre-pe.jus.br".formatted(unidade.getSigla().toLowerCase());
+    }
+
+    public void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
+        Alerta alerta = alertaService.criarAlertaAlteracaoDataLimite(
+                sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa);
+
+        Map<String, Object> variaveis = new HashMap<>();
+        variaveis.put("titulo", sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA);
+        variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
+        variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
+        variaveis.put("novaData", novaDataFormatada);
+        variaveis.put("etapa", etapa);
+
+        String corpo = processarTemplate("data-limite-alterada", variaveis);
+        String emailDestino = getEmailUnidade(sp.getUnidade());
+        String chave = "subprocesso:%d:data-limite-alterada:etapa:%d:data:%s"
+                .formatted(sp.getCodigo(), etapa, novaDataFormatada);
+
+        notificacaoEmailService.enfileirar(new EnfileirarNotificacaoEmailCommand(
+                alerta, sp, "DATA_LIMITE_ALTERADA", null,
+                emailDestino, sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA, corpo, chave));
     }
 
     private void enviarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {

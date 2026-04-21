@@ -47,7 +47,7 @@ class ProcessoServiceCoverageTest {
     @Mock private AlertaFacade servicoAlertas;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
 
-    @Mock private EmailService emailService;
+    @Mock private NotificacaoEmailService notificacaoEmailService;
     @Mock private EmailModelosService emailModelosService;
     @Mock private SubprocessoTransicaoService transicaoService;
 
@@ -582,7 +582,8 @@ class ProcessoServiceCoverageTest {
 
         target.enviarLembrete(1L, 10L);
 
-        verify(emailService).enviarEmailHtml(eq("teste@teste.com"), anyString(), anyString());
+        verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
+        verify(notificacaoEmailService).enfileirar(argThat(cmd -> "teste@teste.com".equals(cmd.destinatario())));
     }
 
     @Test

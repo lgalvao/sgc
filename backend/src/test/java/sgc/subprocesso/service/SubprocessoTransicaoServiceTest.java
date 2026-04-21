@@ -56,8 +56,6 @@ class SubprocessoTransicaoServiceTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private EmailService emailService;
-    @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
     @Mock
     private AlertaFacade alertaService;
@@ -133,8 +131,8 @@ class SubprocessoTransicaoServiceTest {
     }
 
     @Test
-    @DisplayName("alterarDataLimite deve atualizar etapa 2 e enviar email e alerta")
-    void alterarDataLimiteDeveAtualizarEtapa2EEnviarEmailEAlerta() {
+    @DisplayName("alterarDataLimite deve atualizar etapa 2 e enfileirar notificação")
+    void alterarDataLimiteDeveAtualizarEtapa2EEnfileirarNotificacao() {
         Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
         Processo processo = criarProcesso(MAPEAMENTO);
         Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
@@ -143,17 +141,12 @@ class SubprocessoTransicaoServiceTest {
         subprocesso.setDataLimiteEtapa2(LocalDateTime.of(2026, 4, 20, 0, 0));
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
-        when(notificacaoService.getEmailUnidade(unidade)).thenReturn("orig@tre-pe.jus.br");
 
         service.alterarDataLimite(1L, LocalDate.of(2026, 4, 25));
 
         assertThat(subprocesso.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 4, 25, 0, 0));
         verify(subprocessoRepo).save(subprocesso);
-        verify(emailService).enviarEmail(
-                eq("orig@tre-pe.jus.br"),
-                anyString(),
-                contains("25/04/2026"));
-        verify(alertaService).criarAlertaAlteracaoDataLimite(eq(processo), eq(unidade), eq("25/04/2026"), eq(2));
+        verify(notificacaoService).notificarAlteracaoDataLimite(eq(subprocesso), eq("25/04/2026"), eq(2));
     }
 
     @Nested
@@ -315,7 +308,6 @@ class SubprocessoTransicaoServiceTest {
             sp.setDataLimiteEtapa2(null);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(notificacaoService.getEmailUnidade(any())).thenReturn("email@test.com");
 
             service.alterarDataLimite(1L, LocalDate.now().plusDays(5));
 

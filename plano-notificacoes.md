@@ -27,21 +27,20 @@ Situação: parcialmente concluído.
 
 ## 2. Consolidar o backend de email
 
-Situação: em andamento.
+Situação: concluído.
 
-- Manter `EmailService` como adaptador baixo nível de SMTP.
-- Manter `NotificacaoEmailService` como entrada oficial para enfileirar, consultar e atualizar situação de emails.
-- Impedir que services de domínio chamem `EmailService` diretamente, exceto no worker.
-- Migrar os pontos ainda síncronos:
-  - `ProcessoService.enviarLembrete`;
-  - `SubprocessoTransicaoService.notificarAlteracaoDataLimite`.
-- Garantir que cada tipo de email tenha:
-  - `tipo_notificacao`;
-  - chave idempotente estável;
-  - assunto claro;
-  - template próprio ou modelo reaproveitado conscientemente;
-  - vínculo com alerta quando o caso de uso também registrar alerta.
-- Decidir como tratar destinatário inválido ou vazio: preferencialmente registrar `FALHA_DEFINITIVA`, em vez de considerar enviado sem envio real.
+- Mantido `EmailService` como adaptador baixo nível de SMTP.
+- Mantido `NotificacaoEmailService` como entrada oficial para enfileirar, consultar e atualizar situação de emails.
+- Removida dependência de `EmailService` de `SubprocessoTransicaoService` e `ProcessoService`.
+- Migrado `SubprocessoTransicaoService.notificarAlteracaoDataLimite`: delegado a novo método `notificacaoService.notificarAlteracaoDataLimite()` que cria alerta, renderiza template HTML e enfileira no outbox.
+- Migrado `ProcessoService.enviarLembrete`: cria alerta, gera HTML via `emailModelosService` e enfileira no outbox com `tipo_notificacao = LEMBRETE_PRAZO`.
+- Cada tipo de email tem tipo, chave idempotente, assunto, template e vínculo com alerta.
+- Template `data-limite-alterada.html` criado.
+- Testes unitários e de integração atualizados.
+  - `SubprocessoTransicaoServiceTest`: verifica `notificacaoService.notificarAlteracaoDataLimite`
+  - `SubprocessoNotificacaoServiceTest`: dois novos testes para `notificarAlteracaoDataLimite`
+  - `ProcessoServiceCoverageTest`, `ProcessoServiceExtraCoverageTest`, `ProcessoServiceTest`: usam `NotificacaoEmailService`
+  - `CDU27IntegrationTest`: verifica outbox em vez de SMTP direto
 
 ## 3. CDU-28 e novo modelo de email
 
@@ -129,4 +128,4 @@ Situação: pendente.
 
 ## Próxima etapa recomendada
 
-Migrar os envios diretos restantes para o outbox, começando por `SubprocessoTransicaoService.notificarAlteracaoDataLimite`, porque ele ainda mistura alteração de data limite, envio direto de email e criação de alerta no mesmo caminho síncrono.
+Revisar o processamento do outbox (etapa 4), confirmar que o worker trata concorrência de forma adequada para o volume atual e definir a política de limpeza/retenção. Em seguida, expor as APIs de consulta operacional (etapa 5) e só então iniciar o frontend (etapa 6).
