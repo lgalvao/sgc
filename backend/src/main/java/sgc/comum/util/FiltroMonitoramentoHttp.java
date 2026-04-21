@@ -18,9 +18,9 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
     public static final String HEADER_CORRELACAO_ID = "X-Correlacao-Id";
     public static final String HEADER_TEMPO_SERVIDOR_MS = "X-Tempo-Servidor-Ms";
     public static final String ATRIBUTO_CORRELACAO_ID = "sgc.monitoramento.correlacaoId";
-    public static final String ATRIBUTO_MONITORAMENTO_ATIVO = "sgc.monitoramento.ativo";
     public static final String ATRIBUTO_HTTP_METODO = "sgc.monitoramento.httpMetodo";
     public static final String ATRIBUTO_HTTP_CAMINHO = "sgc.monitoramento.httpCaminho";
+    public static final String ATRIBUTO_JAVA_LENTOS = "sgc.monitoramento.javaLentos";
     public static final String MDC_CORRELACAO_ID = "correlacaoId";
 
     private final MonitoramentoProperties monitoramentoProperties;
@@ -47,9 +47,9 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
         String correlacaoId = obterOuGerarCorrelacaoId(request);
 
         request.setAttribute(ATRIBUTO_CORRELACAO_ID, correlacaoId);
-        request.setAttribute(ATRIBUTO_MONITORAMENTO_ATIVO, monitoramentoProperties.isMonitoramentoJavaCompletoAtivo());
         request.setAttribute(ATRIBUTO_HTTP_METODO, request.getMethod());
         request.setAttribute(ATRIBUTO_HTTP_CAMINHO, obterCaminhoComQueryString(request));
+        request.setAttribute(ATRIBUTO_JAVA_LENTOS, new ArrayList<String>());
         response.setHeader(HEADER_CORRELACAO_ID, correlacaoId);
 
         MDC.put(MDC_CORRELACAO_ID, correlacaoId);
@@ -62,46 +62,30 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             response.setHeader(HEADER_TEMPO_SERVIDOR_MS, String.valueOf(duracaoMs));
             response.setHeader("Server-Timing", "app;dur=" + duracaoMs);
 
-            log.info(formatarLinhaHttp(definirTagHttp(duracaoMs), request, response, duracaoMs));
+            if (deveLogarHttp(duracaoMs)) {
+                log.info(formatarLinhaHttp(request, response, duracaoMs));
+            }
+            logarJavaLento(request);
 
             MDC.remove(MDC_CORRELACAO_ID);
         }
     }
 
-    private String definirTagHttp(long duracaoMs) {
-        if (duracaoMs >= monitoramentoProperties.getTempoHttpMuitoLentoMs()) {
-            return "HTTP-MUITO-LENTO";
-        }
-
-        if (duracaoMs >= monitoramentoProperties.getTempoHttpLentoMs()) {
-            return "HTTP-LENTO";
-        }
-
-        return "HTTP";
+    private boolean deveLogarHttp(long duracaoMs) {
+        return duracaoMs >= monitoramentoProperties.getTempoHttpLentoMs();
     }
 
-    private String formatarLinhaHttp(String tag,
-                                     HttpServletRequest request,
+    private String formatarLinhaHttp(HttpServletRequest request,
                                      HttpServletResponse response,
                                      long duracaoMs) {
         String caminho = obterCaminhoComQueryString(request);
         int status = response.getStatus();
 
         if (status == HttpServletResponse.SC_OK) {
-            return String.format("%s %s %s %dms", tag, request.getMethod(), caminho, duracaoMs);
+            return String.format("%s %s %dms", request.getMethod(), caminho, duracaoMs);
         }
 
-        return String.format("%s %s %s %d %dms", tag, request.getMethod(), caminho, status, duracaoMs);
-    }
-
-    public static boolean isMonitoramentoAtivoNaRequisicao() {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
-            return Boolean.TRUE.equals(
-                    servletRequestAttributes.getRequest().getAttribute(ATRIBUTO_MONITORAMENTO_ATIVO)
-            );
-        }
-        return false;
+        return String.format("%s %s %d %dms", request.getMethod(), caminho, status, duracaoMs);
     }
 
     public static String obterCorrelacaoIdAtual() {
@@ -135,6 +119,37 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             }
         }
         return "sem-http";
+    }
+
+    public static void registrarJavaLento(String classe, String metodo, double duracaoMs) {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
+            Object javaLentos = servletRequestAttributes.getRequest().getAttribute(ATRIBUTO_JAVA_LENTOS);
+            if (javaLentos instanceof List<?> lista) {
+                @SuppressWarnings("unchecked")
+                List<String> entradas = (List<String>) lista;
+                entradas.add("%s.%s %.2fms".formatted(obterNomeSimples(classe), metodo, duracaoMs));
+            }
+        }
+    }
+
+    private void logarJavaLento(HttpServletRequest request) {
+        Object javaLentos = request.getAttribute(ATRIBUTO_JAVA_LENTOS);
+        if (!(javaLentos instanceof List<?> entradas) || entradas.isEmpty()) {
+            return;
+        }
+
+        entradas.stream()
+                .map(String.class::cast)
+                .forEach(log::info);
+    }
+
+    private static String obterNomeSimples(String classe) {
+        int indice = classe.lastIndexOf('.');
+        if (indice < 0 || indice == classe.length() - 1) {
+            return classe;
+        }
+        return classe.substring(indice + 1);
     }
 
     private String obterOuGerarCorrelacaoId(HttpServletRequest request) {

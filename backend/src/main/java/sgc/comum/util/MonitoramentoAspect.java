@@ -14,26 +14,20 @@ import java.util.concurrent.atomic.*;
 @Slf4j
 public class MonitoramentoAspect {
     private final boolean monitoramentoJavaLentoAtivo;
-    private final boolean monitoramentoJavaCompletoAtivo;
     private final long tempoMinimoJavaMs;
-    private final AtomicLong contadorChamadas = new AtomicLong();
 
     public MonitoramentoAspect() {
-        this(false, false, 500);
+        this(false, 500);
     }
 
-    public MonitoramentoAspect(boolean monitoramentoJavaLentoAtivo,
-                               boolean monitoramentoJavaCompletoAtivo,
-                               long tempoMinimoJavaMs) {
+    public MonitoramentoAspect(boolean monitoramentoJavaLentoAtivo, long tempoMinimoJavaMs) {
         this.monitoramentoJavaLentoAtivo = monitoramentoJavaLentoAtivo;
-        this.monitoramentoJavaCompletoAtivo = monitoramentoJavaCompletoAtivo;
         this.tempoMinimoJavaMs = tempoMinimoJavaMs;
     }
 
     @Autowired
     public MonitoramentoAspect(MonitoramentoProperties props) {
         this.monitoramentoJavaLentoAtivo = props.isMonitoramentoJavaLentoAtivo();
-        this.monitoramentoJavaCompletoAtivo = props.isMonitoramentoJavaCompletoAtivo();
         this.tempoMinimoJavaMs = props.getTempoMinimoJavaMs();
     }
 
@@ -43,7 +37,7 @@ public class MonitoramentoAspect {
     )
 
     public Object monitorarExecucao(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (!monitoramentoJavaLentoAtivo && !monitoramentoJavaCompletoAtivo) return joinPoint.proceed();
+        if (!monitoramentoJavaLentoAtivo) return joinPoint.proceed();
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -52,28 +46,12 @@ public class MonitoramentoAspect {
         } finally {
             stopWatch.stop();
             double tempoTotal = stopWatch.getTotalTimeNanos()/1_000_000d;
-            String tempoTotalStr = "%.2f".formatted(tempoTotal);
-
-            long numeroChamada = contadorChamadas.incrementAndGet();
             Signature assinatura = joinPoint.getSignature();
             String classe = assinatura != null ? assinatura.getDeclaringTypeName() : joinPoint.getClass().getName();
             String metodo = assinatura != null ? assinatura.getName() : "desconhecido";
-            boolean monitoramentoDetalhado = monitoramentoJavaCompletoAtivo || FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao();
-            String http = FiltroMonitoramentoHttp.obterDescricaoHttpAtual();
 
-            if (monitoramentoDetalhado) {
-                log.info("TRACE #{} http=\"{}\" {}.{} {}ms",
-                        numeroChamada,
-                        http,
-                        classe,
-                        metodo,
-                        tempoTotalStr);
-            } else if (tempoTotal > tempoMinimoJavaMs) {
-                log.warn("TRACE-LENTO http=\"{}\" {}.{} {}ms",
-                        http,
-                        classe,
-                        metodo,
-                        tempoTotalStr);
+            if (tempoTotal > tempoMinimoJavaMs) {
+                FiltroMonitoramentoHttp.registrarJavaLento(classe, metodo, tempoTotal);
             }
         }
     }

@@ -10,7 +10,7 @@ Este arquivo acompanha somente o que ainda falta fazer. Ao concluir um item, rem
 
 - Ha tracing para `registrarTransicao`: `persistir-transicao` e `notificar-transicao`.
 - Ha tracing por etapa para disponibilizacao de mapa e `acao-em-bloco`.
-- Os traces completos dependem de `SGC_MONITORAMENTO=completo`.
+- Os traces de performance dependem de `SGC_MONITORAMENTO=sim`.
 
 **Falta fazer**
 

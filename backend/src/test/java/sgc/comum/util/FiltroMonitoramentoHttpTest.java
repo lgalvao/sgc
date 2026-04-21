@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.*;
 class FiltroMonitoramentoHttpTest {
 
     @Test
-    @DisplayName("Deve propagar correlacao e marcar monitoramento detalhado no modo completo")
-    void devePropagarCorrelacaoEAtivarMonitoramentoCompleto() throws ServletException, IOException {
+    @DisplayName("Deve propagar correlacao")
+    void devePropagarCorrelacao() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.COMPLETO);
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
 
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/processos");
@@ -29,7 +29,7 @@ class FiltroMonitoramentoHttpTest {
             assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_CORRELACAO_ID))
                     .isEqualTo("corr-123");
             assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO))
-                    .isEqualTo(true);
+                    .isEqualTo(false);
         };
 
         filtro.doFilter(request, response, filterChain);
@@ -43,7 +43,7 @@ class FiltroMonitoramentoHttpTest {
     @DisplayName("Deve expor descricao HTTP atual durante a requisicao")
     void deveExporDescricaoHttpAtualDuranteRequisicao() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.HTTP);
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
 
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/processos");
@@ -69,11 +69,11 @@ class FiltroMonitoramentoHttpTest {
     }
 
     @Test
-    @DisplayName("Deve logar erro quando o tempo for muito alto (HTTP LENTO)")
+    @DisplayName("Deve registrar HTTP quando passar do tempo minimo")
     @SuppressWarnings("java:S2925")
     void deveLogarErroHTTP() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.HTTP);
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
         properties.setTempoHttpLentoMs(1);
 
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
@@ -96,7 +96,7 @@ class FiltroMonitoramentoHttpTest {
     @DisplayName("Deve ignorar requisicao fora de /api quando o filtro decidir nao aplicar")
     void deveIgnorarRequisicaoForaDeApi() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.HTTP);
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
 
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
@@ -110,24 +110,10 @@ class FiltroMonitoramentoHttpTest {
     }
 
     @Test
-    @DisplayName("Deve manter monitoramento detalhado inativo no modo HTTP")
-    void deveManterMonitoramentoDetalhadoInativoNoModoHttp() throws ServletException, IOException {
+    @DisplayName("Deve manter monitoramento detalhado inativo")
+    void deveManterMonitoramentoDetalhadoInativo() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.HTTP);
-
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        filtro.doFilter(request, response, (req, res) ->
-                assertThat(req.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO)).isEqualTo(false));
-    }
-
-    @Test
-    @DisplayName("Deve manter monitoramento detalhado inativo no modo lento")
-    void deveManterMonitoramentoDetalhadoInativoNoModoLento() throws ServletException, IOException {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.LENTO);
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
 
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");
@@ -140,25 +126,10 @@ class FiltroMonitoramentoHttpTest {
     @Test
     @DisplayName("Deve formatar linha com erro 500 sem amostragem")
     void deveFormatarErro500SemAmostragem() throws ServletException, IOException {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.COMPLETO);
-
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/erro");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        response.setStatus(500);
-
-        filtro.doFilter(request, response, (req, res) -> {
-        });
-
-        assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNotBlank();
-    }
-
-    @Test
     @DisplayName("Deve ser inativo")
     void deveSerInativo() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.OFF);
+        properties.setModo(MonitoramentoProperties.Modo.NAO);
 
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/inativo");
@@ -168,29 +139,6 @@ class FiltroMonitoramentoHttpTest {
         });
 
         assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNull();
-    }
-
-    @Test
-    @DisplayName("Deve usar HTTP MUITO LENTO")
-    @SuppressWarnings("java:S2925")
-    void deveUsarMuitoLento() throws ServletException, IOException {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.HTTP);
-        properties.setTempoHttpMuitoLentoMs(1);
-
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/muito-lento");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        filtro.doFilter(request, response, (req, res) -> {
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        });
-
-        assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNotBlank();
     }
 
     @Test
@@ -308,12 +256,11 @@ class FiltroMonitoramentoHttpTest {
     }
 
     @Test
-    @DisplayName("Deve usar HTTP LENTO (entre o alerta e o muito lento)")
+    @DisplayName("Deve registrar HTTP acima do limite configurado")
     @SuppressWarnings("java:S2925")
     void deveUsarLento() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.HTTP);
-        properties.setTempoHttpMuitoLentoMs(100);
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
         properties.setTempoHttpLentoMs(1);
 
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
@@ -390,24 +337,10 @@ class FiltroMonitoramentoHttpTest {
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
-    @Test
-    @DisplayName("Deve usar trace completo da properties")
-    void deveUsarTraceCompletoDaProperties() throws ServletException, IOException {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.COMPLETO);
-
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        filtro.doFilter(request, response, (req, res) -> assertThat((Boolean) req.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO)).isTrue());
-    }
-
-    @Test
     @DisplayName("obterOuGerarCorrelacaoId deve gerar novo ID quando string for vazia")
     void obterCorrelacaoIdDeveGerarNovoQuandoVazia() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.HTTP);
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
         FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");

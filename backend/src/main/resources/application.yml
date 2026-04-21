@@ -72,9 +72,8 @@ aplicacao:
 
 sgc:
   monitoramento:
-    modo: off
+    modo: nao
     tempo-http-lento-ms: 100
-    tempo-http-muito-lento-ms: 300
     tempo-minimo-java-ms: 500
 
 ---

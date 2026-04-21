@@ -8,26 +8,20 @@ import org.springframework.boot.context.properties.*;
 @Setter
 public class MonitoramentoProperties {
     public enum Modo {
-        OFF,
-        HTTP,
-        LENTO,
-        COMPLETO
+        SIM,
+        NAO
     }
 
-    private Modo modo = Modo.OFF;
+    private Modo modo = Modo.NAO;
     private long tempoMinimoJavaMs = 500;
     private long tempoHttpLentoMs = 100;
-    private long tempoHttpMuitoLentoMs = 300;
 
     public boolean isMonitoramentoHttpAtivo() {
-        return modo != Modo.OFF;
+        return modo == Modo.SIM;
     }
 
     public boolean isMonitoramentoJavaLentoAtivo() {
-        return modo == Modo.LENTO || modo == Modo.COMPLETO;
+        return modo == Modo.SIM;
     }
 
-    public boolean isMonitoramentoJavaCompletoAtivo() {
-        return modo == Modo.COMPLETO;
-    }
 }

@@ -6,11 +6,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 function monitoramentoAtivoNoPlaywright(): boolean {
-    return process.env.SGC_MONITORAMENTO !== 'off' && process.env.SGC_MONITORAMENTO !== undefined;
-}
-
-function monitoramentoCompletoNoPlaywright(): boolean {
-    return process.env.SGC_MONITORAMENTO === 'completo';
+    return process.env.SGC_MONITORAMENTO === 'sim';
 }
 
 function obterBaseUrlWorker(_workerIndex: number): string {
@@ -80,12 +76,6 @@ export const test = base.extend<{
     page: async ({page}, use, testInfo) => {
         let ultimoRuidoAutenticacaoDetalhesEm = 0;
         const logs: string[] = [];
-
-        if (monitoramentoCompletoNoPlaywright()) {
-            await page.addInitScript(() => {
-                window.sessionStorage.setItem('sgc.monitoramento.ativo', 'true');
-            });
-        }
 
         // Listener para logs do console
         page.on('console', async msg => {

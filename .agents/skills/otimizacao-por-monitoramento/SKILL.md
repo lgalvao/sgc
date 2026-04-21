@@ -1,6 +1,6 @@
 ---
 name: otimizacao-por-monitoramento
-description: Use quando o objetivo for identificar e reduzir gargalos reais no SGC a partir de um cenário monitorado. Indicado para fluxos E2E com `SGC_MONITORAMENTO=lento`, análise por arquivo único de log, comparação antes/depois e otimizações incrementais em backend Java/Spring e frontend Vue/TypeScript.
+description: Use quando o objetivo for identificar e reduzir gargalos reais no SGC a partir de um cenário monitorado. Indicado para fluxos E2E com `SGC_MONITORAMENTO=sim`, análise por arquivo único de log, comparação antes/depois e otimizações incrementais em backend Java/Spring e frontend Vue/TypeScript.
 ---
 
 # Otimização por Monitoramento no SGC
@@ -55,7 +55,7 @@ Preserve:
 Rode o cenário com monitoramento ligado e saída redirecionada para um único arquivo:
 
 ```bash
-SGC_MONITORAMENTO=lento npx playwright test e2e/arquivo.spec.ts > /tmp/arquivo-monitorado.log 2>&1
+SGC_MONITORAMENTO=sim npx playwright test e2e/arquivo.spec.ts > /tmp/arquivo-monitorado.log 2>&1
 ```
 
 Se o caso de uso depender de preparação serial, rode o arquivo inteiro. Se houver um cenário isolável sem perder fidelidade, rode o recorte mínimo suficiente.
@@ -75,8 +75,8 @@ Filtre com `rg`.
 Exemplos:
 
 ```bash
-rg "HTTP (GET|POST)" /tmp/arquivo-monitorado.log
-rg "HTTP-LENTO|TRACE-LENTO" /tmp/arquivo-monitorado.log
+rg "^(GET|POST) " /tmp/arquivo-monitorado.log
+rg "^(GET|POST|[A-Z][A-Za-z]+\\.[a-zA-Z])" /tmp/arquivo-monitorado.log
 rg "subprocessos/buscar|contexto-edicao|contexto-cadastro-atividades|mapa-visualizacao" /tmp/arquivo-monitorado.log
 rg "processos/401|subprocessos/401" /tmp/arquivo-monitorado.log
 ```
