@@ -74,10 +74,8 @@ public class UnidadeDto {
         return dto;
     }
 
-    public static UnidadeDto fromEntityResumoObrigatoria(@Nullable Unidade entity) {
-        if (entity == null) {
-            throw new IllegalStateException("Unidade obrigatoria para resumo");
-        }
+    public static UnidadeDto fromEntityResumoObrigatoria(Unidade entity) {
+        Objects.requireNonNull(entity, "Unidade obrigatoria para resumo");
 
         return fromResumoObrigatorio(
                 entity.getCodigo(),

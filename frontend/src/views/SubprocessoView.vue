@@ -244,7 +244,7 @@ import {TEXTOS} from "@/constants/textos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -349,21 +349,32 @@ function exibirToastPendente() {
 async function carregarSubprocesso() {
   subprocessosStore.subprocessoDetalhe = null;
 
-  const resultado = await carregarContextoSubprocessoInicial({
+  const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
     codProcesso: props.codProcesso,
     siglaUnidade: props.siglaUnidade,
     store: subprocessoStoreCache,
   });
 
-  if (resultado) {
+  if (diagnostico.tipo === 'sucesso') {
     erroNaoEncontrado.value = false;
-    codSubprocesso.value = resultado.codigo;
-    subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
-    mapaStore.mapaCompleto.value = resultado.contexto.mapa;
-  } else {
+    codSubprocesso.value = diagnostico.resultado.codigo;
+    subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
+    mapaStore.mapaCompleto.value = diagnostico.resultado.contexto.mapa;
+    return;
+  }
+
+  if (diagnostico.tipo === 'erroIntegracao') {
     codSubprocesso.value = null;
     erroNaoEncontrado.value = true;
-    logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
+    notify(diagnostico.erro.message, 'danger');
+    return;
+  }
+
+  if (diagnostico.tipo === 'ausencia') {
+    codSubprocesso.value = null;
+    erroNaoEncontrado.value = true;
+    logger.error(`Falha grave: contexto de subprocesso ausente sem erro normalizado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
+    return;
   }
 }
 

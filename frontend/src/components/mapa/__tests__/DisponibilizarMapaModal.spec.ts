@@ -3,7 +3,7 @@ import {mount} from '@vue/test-utils';
 import DisponibilizarMapaModal from '../DisponibilizarMapaModal.vue';
 
 vi.mock("@/utils/dateUtils", async () => {
-    const actual = await vi.importActual("@/utils/dateUtils") as any;
+    const actual = await vi.importActual<typeof import("@/utils/dateUtils")>("@/utils/dateUtils");
     return {
         ...actual,
         obterAmanhaFormatado: () => '2026-03-25',

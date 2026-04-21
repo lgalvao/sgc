@@ -167,11 +167,12 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
+import {useNotification} from "@/composables/useNotification";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import type {
   AceitarCadastroRequest,
   Analise,
@@ -184,6 +185,7 @@ import {TipoProcesso} from "@/types/tipos";
 import {useAcesso} from "@/composables/useAcesso";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
+import {normalizeError} from "@/utils/apiError";
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -194,6 +196,7 @@ const router = useRouter();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
+const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStoreCache = useSubprocessoStore();
 const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
@@ -367,18 +370,24 @@ async function confirmarDevolucao() {
 onMounted(async () => {
   try {
     limparEstadoSubprocessoAtual();
-    const resultado = await carregarContextoSubprocessoInicial({
+    const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
       codProcesso: codProcesso.value,
       siglaUnidade: unidadeId.value,
       store: subprocessoStoreCache,
     });
 
-    if (resultado) {
-      codSubprocesso.value = resultado.codigo;
-      subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
-      atividades.value = resultado.contexto.atividadesDisponiveis;
-      unidade.value = resultado.contexto.unidade as Unidade;
+    if (diagnostico.tipo === 'sucesso') {
+      codSubprocesso.value = diagnostico.resultado.codigo;
+      subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
+      atividades.value = diagnostico.resultado.contexto.atividadesDisponiveis;
+      unidade.value = diagnostico.resultado.contexto.unidade as Unidade;
+    } else if (diagnostico.tipo === 'erroIntegracao') {
+      notify(diagnostico.erro.message, 'danger');
+    } else {
+      notify('Falha grave ao resolver subprocesso para validação de cadastro. A ocorrência deve ser auditada.', 'danger');
     }
+  } catch (erro) {
+    notify(normalizeError(erro).message, 'danger');
   } finally {
     carregandoInicial.value = false;
   }

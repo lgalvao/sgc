@@ -6,6 +6,7 @@ import {
     buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
 import {logger} from "@/utils";
+import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
 /**
  * Dedupe de sessão para contexto de edição de subprocesso.
@@ -19,6 +20,7 @@ import {logger} from "@/utils";
  */
 export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
+    const erroIntegracaoContexto = ref<NormalizedError | null>(null);
     const codSubprocessoCarregado = ref<number | null>(null);
     const invalido = ref(true);
     const carregamentosPorCodigo = new Map<number, Promise<ContextoEdicaoSubprocesso>>();
@@ -27,6 +29,15 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
     function gerarChaveProcessoUnidade(codProcesso: number, siglaUnidade: string): string {
         return `${codProcesso}:${siglaUnidade}`;
+    }
+
+    function criarErroSubprocessoNaoEncontrado(mensagemBase: string, erroNormalizado: NormalizedError): NormalizedError {
+        return {
+            ...erroNormalizado,
+            kind: "unexpected",
+            message: `${mensagemBase} Isso indica inconsistência interna ou tentativa inválida de acesso.`,
+            code: erroNormalizado.code ?? "SUBPROCESSO_NAO_ENCONTRADO_INESPERADO",
+        };
     }
 
     /** Contexto ainda é válido para o subprocesso dado? */
@@ -40,6 +51,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         carregamentosPorCodigo.clear();
         carregamentosPorProcessoUnidade.clear();
         mapaProcessoUnidadeParaCodigo.clear();
+        erroIntegracaoContexto.value = null;
     }
 
     /**
@@ -61,11 +73,21 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             carregamentosPorCodigo.set(codSubprocesso, promessaCarregamento);
             const data = await promessaCarregamento;
             contextoEdicao.value = data;
+            erroIntegracaoContexto.value = null;
             codSubprocessoCarregado.value = codSubprocesso;
             invalido.value = true;
             return data;
         } catch (err) {
+            const erroNormalizado = normalizeError(err);
             logger.error(`Erro ao buscar contexto de edição do subprocesso ${codSubprocesso}:`, err);
+            if (erroNormalizado.kind === "notFound") {
+                erroIntegracaoContexto.value = criarErroSubprocessoNaoEncontrado(
+                        "Falha grave ao localizar o subprocesso solicitado.",
+                        erroNormalizado
+                );
+                return null;
+            }
+            erroIntegracaoContexto.value = erroNormalizado;
             return null;
         } finally {
             carregamentosPorCodigo.delete(codSubprocesso);
@@ -101,6 +123,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
                 const codigo = data.detalhes.codigo;
                 mapaProcessoUnidadeParaCodigo.set(chaveProcessoUnidade, codigo);
                 contextoEdicao.value = data;
+                erroIntegracaoContexto.value = null;
                 codSubprocessoCarregado.value = codigo;
                 invalido.value = true;
                 return {codigo, contexto: data};
@@ -112,7 +135,16 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             invalido.value = true;
             return {codigo, contexto};
         } catch (err) {
+            const erroNormalizado = normalizeError(err);
             logger.error(`Erro ao buscar contexto de subprocesso para processo ${codProcesso} unidade ${siglaUnidade}:`, err);
+            if (erroNormalizado.kind === "notFound") {
+                erroIntegracaoContexto.value = criarErroSubprocessoNaoEncontrado(
+                        "Falha grave ao resolver subprocesso por processo e unidade.",
+                        erroNormalizado
+                );
+                return null;
+            }
+            erroIntegracaoContexto.value = erroNormalizado;
             return null;
         } finally {
             carregamentosPorProcessoUnidade.delete(chaveProcessoUnidade);
@@ -121,6 +153,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
     return {
         contextoEdicao,
+        erroIntegracaoContexto,
         codSubprocessoCarregado,
         invalido,
         dadosValidos,

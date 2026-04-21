@@ -2,6 +2,11 @@ import {describe, expect, it} from "vitest";
 import {mount, RouterLinkStub} from "@vue/test-utils";
 import ArvoreUnidades from "../unidade/ArvoreUnidades.vue";
 
+type ArvoreUnidadesVm = {
+    expandedUnits: Set<number>;
+    unidadesSelecionadasLocal: number[];
+};
+
 describe("ArvoreUnidades.vue Coverage", () => {
     it("deve atualizar unidades expandidas quando a prop unidades muda", async () => {
         const wrapper = mount(ArvoreUnidades, {
@@ -17,15 +22,14 @@ describe("ArvoreUnidades.vue Coverage", () => {
             }
         });
 
-        // Initial state
-        expect((wrapper.vm as any).expandedUnits.size).toBe(0);
+        const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
+        expect(vm.expandedUnits.size).toBe(0);
 
-        // Update prop
         await wrapper.setProps({
             unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}]
         });
 
-        expect((wrapper.vm as any).expandedUnits.has(1)).toBe(false);
+        expect(vm.expandedUnits.has(1)).toBe(false);
     });
 
     it("deve atualizar unidadesSelecionadasLocal quando modelValue muda externamente", async () => {
@@ -42,12 +46,12 @@ describe("ArvoreUnidades.vue Coverage", () => {
             }
         });
 
-        expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([]);
+        const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
+        expect(vm.unidadesSelecionadasLocal).toEqual([]);
 
-        // Update modelValue prop
         await wrapper.setProps({modelValue: [1]});
 
-        expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([1]);
+        expect(vm.unidadesSelecionadasLocal).toEqual([1]);
     });
 
     it("não deve atualizar unidadesSelecionadasLocal se modelValue for igual (evitar loop)", async () => {
@@ -64,7 +68,6 @@ describe("ArvoreUnidades.vue Coverage", () => {
             }
         });
 
-        // Update modelValue with same values (different reference)
         await wrapper.setProps({modelValue: [1]});
 
     });

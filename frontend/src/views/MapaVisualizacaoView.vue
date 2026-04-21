@@ -254,7 +254,7 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useAcesso} from "@/composables/useAcesso";
 import {useMapaAcoesAnalise} from "@/composables/useMapaAcoesAnalise";
-import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {obterMapaVisualizacao, obterSugestoesMapa} from "@/services/subprocessoService";
@@ -262,6 +262,7 @@ import {
   apresentarSugestoes as apresentarSugestoesService,
 } from "@/services/processoService";
 import type {Analise, MapaVisualizacao, Unidade} from "@/types/tipos";
+import {normalizeError} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
 
 const route = useRoute();
@@ -345,22 +346,29 @@ async function executarComLoading(acao: () => Promise<void>) {
 }
 
 async function carregarContextoInicial() {
-  const resultado = await carregarContextoSubprocessoInicial({
+  const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
     codProcesso: codProcesso.value,
     siglaUnidade: sigla.value,
     store: subprocessoStoreCache,
   });
 
-  if (!resultado) {
+  if (diagnostico.tipo === 'erroIntegracao') {
+    notify(diagnostico.erro.message, 'danger');
     codSubprocesso.value = null;
     return null;
   }
 
-  codSubprocesso.value = resultado.codigo;
-  subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
-  unidade.value = resultado.contexto.unidade;
+  if (diagnostico.tipo === 'ausencia') {
+    notify('Falha grave ao resolver subprocesso para visualização de mapa. A ocorrência deve ser auditada.', 'danger');
+    codSubprocesso.value = null;
+    return null;
+  }
 
-  return resultado;
+  codSubprocesso.value = diagnostico.resultado.codigo;
+  subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
+  unidade.value = diagnostico.resultado.contexto.unidade;
+
+  return diagnostico.resultado;
 }
 
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
@@ -466,6 +474,8 @@ onMounted(async () => {
     if (resultado?.codigo) {
       mapa.value = await obterMapaVisualizacao(resultado.codigo);
     }
+  } catch (erro) {
+    notify(normalizeError(erro).message, 'danger');
   } finally {
     carregandoInicial.value = false;
   }
