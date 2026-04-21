@@ -172,7 +172,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import type {
   AceitarCadastroRequest,
   Analise,
@@ -370,19 +370,21 @@ async function confirmarDevolucao() {
 onMounted(async () => {
   try {
     limparEstadoSubprocessoAtual();
-    const resultado = await carregarContextoSubprocessoInicial({
+    const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
       codProcesso: codProcesso.value,
       siglaUnidade: unidadeId.value,
       store: subprocessoStoreCache,
     });
 
-    if (resultado) {
-      codSubprocesso.value = resultado.codigo;
-      subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
-      atividades.value = resultado.contexto.atividadesDisponiveis;
-      unidade.value = resultado.contexto.unidade as Unidade;
-    } else if (subprocessoStoreCache.erroIntegracaoContexto) {
-      notify(subprocessoStoreCache.erroIntegracaoContexto.message, 'danger');
+    if (diagnostico.tipo === 'sucesso') {
+      codSubprocesso.value = diagnostico.resultado.codigo;
+      subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
+      atividades.value = diagnostico.resultado.contexto.atividadesDisponiveis;
+      unidade.value = diagnostico.resultado.contexto.unidade as Unidade;
+    } else if (diagnostico.tipo === 'erroIntegracao') {
+      notify(diagnostico.erro.message, 'danger');
+    } else {
+      notify('Falha grave ao resolver subprocesso para validação de cadastro. A ocorrência deve ser auditada.', 'danger');
     }
   } catch (erro) {
     notify(normalizeError(erro).message, 'danger');

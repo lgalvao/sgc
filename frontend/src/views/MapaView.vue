@@ -141,7 +141,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {carregarContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
@@ -202,25 +202,28 @@ async function carregarContextoEdicao(codigo: number) {
 }
 
 async function carregarContextoInicial() {
-  const resultado = await carregarContextoSubprocessoInicial({
+  const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
     codProcesso: codProcesso.value,
     siglaUnidade: siglaUnidade.value,
     store: subprocessoStoreCache,
   });
 
-  if (!resultado) {
-    if (subprocessoStoreCache.erroIntegracaoContexto) {
-      notify(subprocessoStoreCache.erroIntegracaoContexto.message, 'danger');
-    }
+  if (diagnostico.tipo === 'erroIntegracao') {
+    notify(diagnostico.erro.message, 'danger');
     return null;
   }
 
-  codSubprocesso.value = resultado.codigo;
-  subprocessosStore.subprocessoDetalhe = resultado.contexto.detalhes;
-  atividades.value = resultado.contexto.atividadesDisponiveis;
-  unidade.value = resultado.contexto.unidade;
+  if (diagnostico.tipo === 'ausencia') {
+    notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
+    return null;
+  }
 
-  return resultado.contexto;
+  codSubprocesso.value = diagnostico.resultado.codigo;
+  subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
+  atividades.value = diagnostico.resultado.contexto.atividadesDisponiveis;
+  unidade.value = diagnostico.resultado.contexto.unidade;
+
+  return diagnostico.resultado.contexto;
 }
 
 async function executarComSubprocesso(

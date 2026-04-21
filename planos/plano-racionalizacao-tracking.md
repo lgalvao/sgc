@@ -46,6 +46,7 @@ Este arquivo acompanha somente o que ainda falta fazer. Ao concluir um item, rem
 **Confirmado**
 
 - `carregarContextoSubprocessoInicial` centraliza query e fallback por `processo+unidade`.
+- Diagnostico de carregamento (`sucesso`, `erroIntegracao`, `ausencia`) foi centralizado no composable de contexto para remover ramificacao duplicada nas views.
 - Stores fazem dedupe de chamadas concorrentes, mas nao reutilizam contexto entre ativacoes.
 - `SubprocessoContextoConsultaService` ja absorveu parte da montagem de contexto.
 - Store de subprocesso passou a tratar `404` como falha grave de consistencia/acesso (nao como ausencia normal), propagando erro explicito para tratamento nas views de subprocesso/mapa.
