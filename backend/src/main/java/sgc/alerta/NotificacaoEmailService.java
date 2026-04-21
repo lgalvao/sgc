@@ -16,6 +16,7 @@ import java.util.*;
 public class NotificacaoEmailService {
     private static final int LIMITE_ERRO = 2000;
     private static final int MAX_TENTATIVAS = 5;
+    private static final int LIMITE_CONSULTA_MAXIMO = 100;
 
     private final NotificacaoEmailRepo notificacaoEmailRepo;
     private final Clock clock;
@@ -53,6 +54,15 @@ public class NotificacaoEmailService {
                 List.of(SituacaoNotificacaoEmail.PENDENTE, SituacaoNotificacaoEmail.FALHA_TEMPORARIA),
                 agora(),
                 PageRequest.of(0, limite)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<NotificacaoEmail> listarPorSubprocesso(Long subprocessoCodigo, int limite) {
+        int tamanho = Math.max(1, Math.min(limite, LIMITE_CONSULTA_MAXIMO));
+        return notificacaoEmailRepo.findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(
+                subprocessoCodigo,
+                PageRequest.of(0, tamanho)
         );
     }
 

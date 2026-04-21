@@ -18,4 +18,6 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
             LocalDateTime agora,
             Pageable pageable
     );
+
+    List<NotificacaoEmail> findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(Long subprocessoCodigo, Pageable pageable);
 }
