@@ -69,9 +69,6 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
     private MapaManutencaoService mapaManutencaoService;
 
     @MockitoBean
-    private EmailService emailService;
-
-    @MockitoBean
     private AlertaFacade alertaService;
 
     private Processo criarProcessoPersistido(TipoProcesso tipo) {

@@ -8,6 +8,7 @@ import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
+import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.util.*;
 import sgc.comum.erros.*;
@@ -55,7 +56,7 @@ public class ProcessoService {
     private final SubprocessoValidacaoService validacaoService;
     private final UsuarioFacade usuarioService;
     private final AlertaFacade servicoAlertas;
-    private final EmailService emailService;
+    private final NotificacaoEmailService notificacaoEmailService;
     private final EmailModelosService emailModelosService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoTransicaoService transicaoService;
@@ -358,9 +359,15 @@ public class ProcessoService {
         String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
         Usuario titular = buscarTitularObrigatorio(unidade, unidadeCodigo);
-        emailService.enviarEmailHtml(titular.getEmail(), "SGC: Lembrete - " + processo.getDescricao(), corpoHtml);
-        servicoAlertas.criarAlertaAdmin(processo, unidade,
+        Alerta alerta = servicoAlertas.criarAlertaAdmin(processo, unidade,
                 "Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em " + dataLimiteText);
+
+        String assunto = "SGC: Lembrete - " + processo.getDescricao();
+        String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
+                .formatted(codProcesso, unidadeCodigo, LocalDate.now());
+        notificacaoEmailService.enfileirar(new sgc.alerta.EnfileirarNotificacaoEmailCommand(
+                alerta, null, "LEMBRETE_PRAZO", null,
+                titular.getEmail(), assunto, corpoHtml, chave));
     }
 
 

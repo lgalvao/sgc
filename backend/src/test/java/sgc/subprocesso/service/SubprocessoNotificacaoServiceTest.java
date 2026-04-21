@@ -282,6 +282,54 @@ class SubprocessoNotificacaoServiceTest {
         assertThat(service.getEmailUnidade(criarUnidade(1L, "ABC", "Unidade"))).isEqualTo("abc@tre-pe.jus.br");
     }
 
+    @Test
+    @DisplayName("notificarAlteracaoDataLimite deve criar alerta e enfileirar email no outbox")
+    void notificarAlteracaoDataLimiteDeveCriarAlertaEEnfileirarEmailNoOutbox() {
+        Unidade unidade = criarUnidade(10L, "ORIG", "Unidade origem");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
+        alerta.setCodigo(99L);
+
+        when(alertaService.criarAlertaAlteracaoDataLimite(processo, unidade, "25/04/2026", 1))
+                .thenReturn(alerta);
+        when(templateEngine.process(eq("data-limite-alterada"), any(IContext.class)))
+                .thenReturn("<html>data-limite</html>");
+
+        service.notificarAlteracaoDataLimite(subprocesso, "25/04/2026", 1);
+
+        verify(alertaService).criarAlertaAlteracaoDataLimite(processo, unidade, "25/04/2026", 1);
+        verify(notificacaoEmailService).enfileirar(notificacaoEmailCaptor.capture());
+
+        EnfileirarNotificacaoEmailCommand cmd = notificacaoEmailCaptor.getValue();
+        assertThat(cmd.destinatario()).isEqualTo("orig@tre-pe.jus.br");
+        assertThat(cmd.assunto()).isEqualTo("SGC: Data limite alterada");
+        assertThat(cmd.corpoHtml()).isEqualTo("<html>data-limite</html>");
+        assertThat(cmd.tipoNotificacao()).isEqualTo("DATA_LIMITE_ALTERADA");
+        assertThat(cmd.alerta()).isSameAs(alerta);
+        assertThat(cmd.subprocesso()).isSameAs(subprocesso);
+        assertThat(cmd.chaveIdempotencia()).contains("data-limite-alterada").contains("etapa:1").contains("25/04/2026");
+    }
+
+    @Test
+    @DisplayName("notificarAlteracaoDataLimite deve usar etapa 2 para subprocessos de mapa")
+    void notificarAlteracaoDataLimiteDeveUsarEtapa2() {
+        Unidade unidade = criarUnidade(10L, "ORIG", "Unidade origem");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+        sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
+
+        when(alertaService.criarAlertaAlteracaoDataLimite(processo, unidade, "30/04/2026", 2))
+                .thenReturn(alerta);
+        when(templateEngine.process(eq("data-limite-alterada"), any(IContext.class)))
+                .thenReturn("<html>corpo</html>");
+
+        service.notificarAlteracaoDataLimite(subprocesso, "30/04/2026", 2);
+
+        verify(notificacaoEmailService).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().chaveIdempotencia()).contains("etapa:2");
+    }
+
     private Processo criarProcesso() {
         Processo processo = new Processo();
         processo.setDescricao("Processo teste");

@@ -66,7 +66,7 @@ class ProcessoServiceExtraCoverageTest {
     private AlertaFacade servicoAlertas;
 
     @Mock
-    private EmailService emailService;
+    private NotificacaoEmailService notificacaoEmailService;
 
     @Mock
     private EmailModelosService emailModelosService;
@@ -616,8 +616,8 @@ class ProcessoServiceExtraCoverageTest {
 
             processoService.enviarLembrete(1L, 1L);
 
-            verify(emailService).enviarEmailHtml(eq("titular@teste.com"), anyString(), eq("html"));
             verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
+            verify(notificacaoEmailService).enfileirar(argThat(cmd -> "titular@teste.com".equals(cmd.destinatario())));
         }
     }
 

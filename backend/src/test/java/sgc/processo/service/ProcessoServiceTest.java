@@ -63,6 +63,10 @@ class ProcessoServiceTest {
     @Mock
     private AlertaFacade servicoAlertas;
     @Mock
+    private NotificacaoEmailService notificacaoEmailService;
+    @Mock
+    private EmailModelosService emailModelosService;
+    @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
     private SubprocessoTransicaoService transicaoService;
@@ -1198,6 +1202,46 @@ class ProcessoServiceTest {
             assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, codUnidade))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("sem data limite");
+        }
+
+        @Test
+        @DisplayName("Deve enfileirar email e criar alerta ao enviar lembrete com sucesso")
+        void deveEnfileirarEmailECriarAlertaAoEnviarLembrete() {
+            Long codProcesso = 1L;
+            Long codUnidade = 10L;
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setDescricao("Processo teste");
+            Unidade u = criarUnidadeValida(codUnidade);
+            u.setTituloTitular("TITULAR");
+            p.adicionarParticipantes(Set.of(u));
+            p.setDataLimite(LocalDateTime.of(2026, 6, 30, 0, 0));
+
+            Usuario titular = new Usuario();
+            titular.setTituloEleitoral("TITULAR");
+            titular.setEmail("titular@tre-pe.jus.br");
+
+            sgc.alerta.model.Alerta alerta = new sgc.alerta.model.Alerta();
+            alerta.setCodigo(55L);
+
+            when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
+            when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
+            when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(titular);
+            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
+            when(servicoAlertas.criarAlertaAdmin(eq(p), eq(u), anyString())).thenReturn(alerta);
+
+            processoService.enviarLembrete(codProcesso, codUnidade);
+
+            verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), contains("Lembrete"));
+            verify(notificacaoEmailService).enfileirar(argThat(cmd ->
+                    "titular@tre-pe.jus.br".equals(cmd.destinatario())
+                            && cmd.assunto().contains("Processo teste")
+                            && "LEMBRETE_PRAZO".equals(cmd.tipoNotificacao())
+                            && cmd.alerta() == alerta
+                            && cmd.subprocesso() == null
+                            && cmd.chaveIdempotencia().contains("processo:1:lembrete:unidade:10")
+            ));
         }
 
         @Test

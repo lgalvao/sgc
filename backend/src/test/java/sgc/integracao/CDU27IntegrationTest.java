@@ -32,6 +32,9 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
 
     @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
+
+    @Autowired
     private EntityManager entityManager;
 
     private Subprocesso subprocesso;
@@ -91,9 +94,15 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(atualizado.getUnidade().getCodigo());
         assertThat(alerta.getProcesso().getCodigo()).isEqualTo(subprocesso.getProcesso().getCodigo());
 
-        // 2. Verificar E-mail
-        aguardarEmail(1);
-        assertThat(algumEmailContem("A data limite da etapa atual no processo Processo CDU-27 foi alterada")).isTrue();
+        // 2. Verificar E-mail no outbox
+        NotificacaoEmail notificacao = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> "DATA_LIMITE_ALTERADA".equals(n.getTipoNotificacao()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Notificação de data limite não encontrada no outbox"));
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Data limite alterada");
+        assertThat(notificacao.getCorpoHtml()).contains("Processo CDU-27");
+        assertThat(notificacao.getAlerta().getCodigo()).isEqualTo(alerta.getCodigo());
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
     }
 
     @Test
