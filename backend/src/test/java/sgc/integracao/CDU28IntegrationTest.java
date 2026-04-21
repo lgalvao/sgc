@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.dto.*;
@@ -26,6 +27,12 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
+    private AlertaRepo alertaRepo;
+
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
+
+    @Autowired
     private EntityManager entityManager;
 
     private Unidade unidade;
@@ -38,6 +45,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
         usuario = UsuarioFixture.usuarioPadrao();
         usuario.setTituloEleitoral("999988887777");
         usuario.setNome("Usuario temporario");
+        usuario.setEmail("usuario.temporario@tre-pe.jus.br");
         usuarioRepo.save(usuario);
 
         entityManager.flush();
@@ -76,6 +84,28 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                     assertThat(content).contains("Férias do titular");
                     assertThat(content).contains(usuario.getNome());
                 });
+
+        Alerta alerta = alertaRepo.buscarAlertasExclusivosDoUsuario(usuario.getTituloEleitoral()).getFirst();
+        assertThat(alerta.getDescricao()).isEqualTo("Atribuição temporária para unidade %s".formatted(unidade.getSigla()));
+        assertThat(alerta.getProcesso()).isNull();
+        assertThat(alerta.getUnidadeDestino()).isNull();
+        assertThat(alerta.getUsuarioDestinoTitulo()).isEqualTo(usuario.getTituloEleitoral());
+
+        NotificacaoEmail notificacao = notificacaoEmailRepo.findAll().stream()
+                .filter(item -> usuario.getTituloEleitoral().equals(item.getUsuarioDestinoTitulo()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(notificacao.getAlerta().getCodigo()).isEqualTo(alerta.getCodigo());
+        assertThat(notificacao.getSubprocesso()).isNull();
+        assertThat(notificacao.getTipoNotificacao()).isEqualTo("ATRIBUICAO_TEMPORARIA");
+        assertThat(notificacao.getDestinatario()).isEqualTo(usuario.getEmail());
+        assertThat(notificacao.getAssunto()).isEqualTo(
+                "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(unidade.getSigla()));
+        assertThat(notificacao.getCorpoHtml())
+                .contains("Usuario temporario")
+                .contains(unidade.getSigla())
+                .contains("Férias do titular")
+                .contains("http://localhost:5173");
     }
 
     @Test

@@ -3,7 +3,10 @@ package sgc.organizacao.service;
 import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
 import sgc.comum.*;
+import sgc.comum.config.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -33,6 +36,10 @@ public class ResponsavelUnidadeService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
+    private final AlertaFacade alertaFacade;
+    private final NotificacaoEmailService notificacaoEmailService;
+    private final EmailModelosService emailModelosService;
+    private final ConfigAplicacao configAplicacao;
 
 
     /**
@@ -105,8 +112,60 @@ public class ResponsavelUnidadeService {
                 .setDataTermino(request.dataTermino().atTime(23, 59, 59))
                 .setJustificativa(request.justificativa());
 
-        atribuicaoTemporariaRepo.save(atribuicao);
+        AtribuicaoTemporaria atribuicaoSalva = atribuicaoTemporariaRepo.save(atribuicao);
+        criarNotificacoesAtribuicaoTemporaria(atribuicaoSalva, usuario);
         cacheOrganizacaoService.invalidarAposCommit();
+    }
+
+    private void criarNotificacoesAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao, Usuario usuario) {
+        String siglaUnidade = atribuicao.getUnidade().getSigla();
+        String assunto = "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(siglaUnidade);
+        Alerta alerta = alertaFacade.criarAlertaPessoal(
+                usuario.getTituloEleitoral(),
+                "Atribuição temporária para unidade %s".formatted(siglaUnidade)
+        );
+
+        String corpoHtml = emailModelosService.criarEmailAtribuicaoTemporaria(
+                new EmailModelosService.EmailAtribuicaoTemporariaCommand(
+                        assunto,
+                        usuario.getNome(),
+                        siglaUnidade,
+                        atribuicao.getDataInicio(),
+                        atribuicao.getDataTermino(),
+                        atribuicao.getJustificativa(),
+                        urlSistema()
+                )
+        );
+
+        notificacaoEmailService.enfileirar(new EnfileirarNotificacaoEmailCommand(
+                alerta,
+                null,
+                "ATRIBUICAO_TEMPORARIA",
+                usuario.getTituloEleitoral(),
+                usuario.getEmail(),
+                assunto,
+                corpoHtml,
+                chaveIdempotenciaAtribuicaoTemporaria(atribuicao)
+        ));
+    }
+
+    private String chaveIdempotenciaAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao) {
+        if (atribuicao.getCodigo() != null) {
+            return "atribuicao-temporaria:%d".formatted(atribuicao.getCodigo());
+        }
+        return "atribuicao-temporaria:unidade:%d:usuario:%s:inicio:%s:termino:%s".formatted(
+                atribuicao.getUnidade().getCodigo(),
+                atribuicao.getUsuarioTitulo(),
+                atribuicao.getDataInicio(),
+                atribuicao.getDataTermino()
+        );
+    }
+
+    private String urlSistema() {
+        String url = configAplicacao.isAmbienteTestes()
+                ? configAplicacao.getUrlAcessoHom()
+                : configAplicacao.getUrlAcessoProd();
+        return url == null || url.isBlank() ? "http://localhost:5173" : url;
     }
 
     /**

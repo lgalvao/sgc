@@ -57,6 +57,8 @@ aplicacao:
     version: v1
     description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
   ambiente-testes: false
+  url-acesso-hom: ${URL_ACESSO_HOM:http://localhost:5173}
+  url-acesso-prod: ${URL_ACESSO_PROD:http://localhost:5173}
   acesso-ad:
     base-url: https://sedesenvdev01.tre-pe.gov.br/acessoAD
     codigo-sistema: SGC

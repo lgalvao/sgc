@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${titulo}">SGC: Atribuição temporária</title>
+</head>
+<body>
+<p th:text="'Prezado(a) ' + ${nomeServidor} + ','">Prezado(a),</p>
+
+<p>
+    Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade
+    <strong th:text="${siglaUnidade}">UNIDADE</strong>.
+</p>
+
+<p>
+    Período:
+    <span th:text="${dataInicio}">01/01/2026</span>
+    a
+    <span th:text="${dataTermino}">31/01/2026</span>.
+</p>
+
+<p>
+    Justificativa:
+    <span th:text="${justificativa}">Justificativa</span>.
+</p>
+
+<p>
+    Acesse o sistema em
+    <a th:href="${urlSistema}" th:text="${urlSistema}">URL_SISTEMA</a>
+    e escolha o perfil 'CHEFE' para a unidade da atribuição.
+</p>
+</body>
+</html>

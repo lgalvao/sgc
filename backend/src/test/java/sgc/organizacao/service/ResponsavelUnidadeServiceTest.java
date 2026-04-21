@@ -4,6 +4,9 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
+import sgc.comum.config.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -34,6 +37,18 @@ class ResponsavelUnidadeServiceTest {
 
     @Mock
     private CacheOrganizacaoService cacheOrganizacaoService;
+
+    @Mock
+    private AlertaFacade alertaFacade;
+
+    @Mock
+    private NotificacaoEmailService notificacaoEmailService;
+
+    @Mock
+    private EmailModelosService emailModelosService;
+
+    @Mock
+    private ConfigAplicacao configAplicacao;
 
     @InjectMocks
     private ResponsavelUnidadeService service;
@@ -130,13 +145,27 @@ class ResponsavelUnidadeServiceTest {
 
             Unidade unidade = new Unidade();
             unidade.setCodigo(codUnidade);
+            unidade.setSigla("UNIT");
 
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral("123456789012");
             usuario.setMatricula("12345678");
+            usuario.setNome("Usuario Teste");
+            usuario.setEmail("usuario@tre-pe.jus.br");
 
             when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
             when(usuarioRepo.findById("123456789012")).thenReturn(Optional.of(usuario));
+            when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            Alerta alerta = Alerta.builder().codigo(10L).usuarioDestinoTitulo(usuario.getTituloEleitoral()).build();
+            when(alertaFacade.criarAlertaPessoal(
+                    usuario.getTituloEleitoral(),
+                    "Atribuição temporária para unidade UNIT"
+            )).thenReturn(alerta);
+            when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
+                    .thenReturn("<html>email</html>");
+            when(configAplicacao.isAmbienteTestes()).thenReturn(true);
+            when(configAplicacao.getUrlAcessoHom()).thenReturn("http://localhost:5173");
 
             service.criarAtribuicaoTemporaria(codUnidade, request);
 
@@ -151,6 +180,30 @@ class ResponsavelUnidadeServiceTest {
             assertThat(atribuicao.getDataInicio()).isEqualTo(dataInicio.atStartOfDay());
             assertThat(atribuicao.getDataTermino()).isEqualTo(dataTermino.atTime(23, 59, 59));
             assertThat(atribuicao.getJustificativa()).isEqualTo("Cobertura de férias");
+
+            ArgumentCaptor<EmailModelosService.EmailAtribuicaoTemporariaCommand> emailCaptor =
+                    ArgumentCaptor.forClass(EmailModelosService.EmailAtribuicaoTemporariaCommand.class);
+            verify(emailModelosService).criarEmailAtribuicaoTemporaria(emailCaptor.capture());
+            assertThat(emailCaptor.getValue().assunto()).isEqualTo("SGC: Atribuição de perfil CHEFE na unidade UNIT");
+            assertThat(emailCaptor.getValue().nomeServidor()).isEqualTo("Usuario Teste");
+            assertThat(emailCaptor.getValue().siglaUnidade()).isEqualTo("UNIT");
+            assertThat(emailCaptor.getValue().dataInicio()).isEqualTo(dataInicio.atStartOfDay());
+            assertThat(emailCaptor.getValue().dataTermino()).isEqualTo(dataTermino.atTime(23, 59, 59));
+            assertThat(emailCaptor.getValue().justificativa()).isEqualTo("Cobertura de férias");
+            assertThat(emailCaptor.getValue().urlSistema()).isEqualTo("http://localhost:5173");
+
+            ArgumentCaptor<EnfileirarNotificacaoEmailCommand> commandCaptor =
+                    ArgumentCaptor.forClass(EnfileirarNotificacaoEmailCommand.class);
+            verify(notificacaoEmailService).enfileirar(commandCaptor.capture());
+            EnfileirarNotificacaoEmailCommand command = commandCaptor.getValue();
+            assertThat(command.alerta()).isSameAs(alerta);
+            assertThat(command.subprocesso()).isNull();
+            assertThat(command.tipoNotificacao()).isEqualTo("ATRIBUICAO_TEMPORARIA");
+            assertThat(command.usuarioDestinoTitulo()).isEqualTo("123456789012");
+            assertThat(command.destinatario()).isEqualTo("usuario@tre-pe.jus.br");
+            assertThat(command.assunto()).isEqualTo("SGC: Atribuição de perfil CHEFE na unidade UNIT");
+            assertThat(command.corpoHtml()).isEqualTo("<html>email</html>");
+            assertThat(command.chaveIdempotencia()).contains("atribuicao-temporaria:unidade:1:usuario:123456789012");
         }
 
         @Test
@@ -161,17 +214,28 @@ class ResponsavelUnidadeServiceTest {
             CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", null, dataTermino, "Justificativa");
 
             Unidade unidade = new Unidade();
+            unidade.setCodigo(codUnidade);
+            unidade.setSigla("UNIT");
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral("123");
+            usuario.setNome("Usuario Teste");
+            usuario.setEmail("usuario@tre-pe.jus.br");
 
             when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
             when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+                    .thenReturn(Alerta.builder().codigo(10L).build());
+            when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
+                    .thenReturn("<html>email</html>");
 
             service.criarAtribuicaoTemporaria(codUnidade, request);
 
             ArgumentCaptor<AtribuicaoTemporaria> captor = ArgumentCaptor.forClass(AtribuicaoTemporaria.class);
             verify(atribuicaoTemporariaRepo).save(captor.capture());
             assertThat(captor.getValue().getDataInicio()).isNotNull();
+            verify(notificacaoEmailService).enfileirar(any());
         }
 
         @Test
@@ -190,6 +254,8 @@ class ResponsavelUnidadeServiceTest {
 
             verify(atribuicaoTemporariaRepo, never()).save(any());
             verifyNoInteractions(cacheOrganizacaoService);
+            verifyNoInteractions(alertaFacade);
+            verifyNoInteractions(notificacaoEmailService);
         }
     }
 

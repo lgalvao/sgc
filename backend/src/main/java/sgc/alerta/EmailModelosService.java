@@ -94,4 +94,28 @@ public class EmailModelosService {
 
         return templateEngine.process("lembrete-prazo", ctx);
     }
+
+    public String criarEmailAtribuicaoTemporaria(EmailAtribuicaoTemporariaCommand cmd) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, cmd.assunto());
+        ctx.setVariable("nomeServidor", cmd.nomeServidor());
+        ctx.setVariable(VAR_SIGLA_UNIDADE, cmd.siglaUnidade());
+        ctx.setVariable("dataInicio", cmd.dataInicio().format(FORMATADOR));
+        ctx.setVariable("dataTermino", cmd.dataTermino().format(FORMATADOR));
+        ctx.setVariable("justificativa", cmd.justificativa());
+        ctx.setVariable("urlSistema", cmd.urlSistema());
+
+        return templateEngine.process("atribuicao-temporaria", ctx);
+    }
+
+    public record EmailAtribuicaoTemporariaCommand(
+            String assunto,
+            String nomeServidor,
+            String siglaUnidade,
+            LocalDateTime dataInicio,
+            LocalDateTime dataTermino,
+            String justificativa,
+            String urlSistema
+    ) {
+    }
 }
