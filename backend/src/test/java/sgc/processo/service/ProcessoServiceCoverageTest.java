@@ -599,8 +599,8 @@ class ProcessoServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("executarAcaoEmBloco - deve logar etapa quando monitoramento ativo e executar ACEITAR")
-    void executarAcaoEmBloco_LogMonitoramentoAtivo() {
+    @DisplayName("executarAcaoEmBloco - deve executar ACEITAR")
+    void executarAcaoEmBloco_DeveExecutarAceitar() {
         Long codProc = 1L;
         ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), AcaoProcesso.ACEITAR);
         
@@ -613,18 +613,8 @@ class ProcessoServiceCoverageTest {
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(spCadastro, spValidacao));
         when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-        // Ativa filtro para cobrir logEtapaAcaoBloco
-        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
-                new org.springframework.web.context.request.ServletRequestAttributes(
-                        new org.springframework.mock.web.MockHttpServletRequest()
-                )
-        );
-        org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()
-                .setAttribute(sgc.comum.util.FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO, true, org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST);
-
         target.executarAcaoEmBloco(codProc, req);
-        
-        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+
         verify(transicaoService).aceitarCadastroEmBloco(List.of(100L));
         verify(transicaoService).aceitarValidacaoEmBloco(List.of(200L));
     }
@@ -656,12 +646,4 @@ class ProcessoServiceCoverageTest {
                 .hasMessageContaining("Snapshot inconsistente");
     }
 
-    @Test
-    @DisplayName("obterTipoAcao - deve retornar DISPONIBILIZAR para comandos genericos")
-    void obterTipoAcao_Generico() {
-        AcaoEmBlocoCommand cmd = new DisponibilizarMapaEmBlocoCommand(List.of(), java.time.LocalDate.now());
-        String tipo = invokeMethod(target, "obterTipoAcao", cmd);
-        assertThat(tipo).isEqualTo(sgc.processo.model.AcaoProcesso.DISPONIBILIZAR.name());
-    }
 }
-

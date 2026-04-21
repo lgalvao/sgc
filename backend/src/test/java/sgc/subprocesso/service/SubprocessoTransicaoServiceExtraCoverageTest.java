@@ -448,24 +448,4 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
     }
 
-    @Test
-    @DisplayName("medirEtapaWorkflow - deve logar quando monitoramento ativo")
-    void medirEtapaWorkflow_ComMonitoramento() {
-        // Ativa filtro para cobrir logEtapaDisponibilizacao e medirEtapaWorkflow
-        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
-                new org.springframework.web.context.request.ServletRequestAttributes(
-                        new org.springframework.mock.web.MockHttpServletRequest()
-                )
-        );
-        org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()
-                .setAttribute(sgc.comum.util.FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO, true, org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST);
-
-        try {
-            invokeMethod(service, "logEtapaDisponibilizacao", "etapa-teste", 1L, System.nanoTime());
-            invokeMethod(service, "medirEtapaWorkflow", "etapa-wf", 1L, TipoTransicao.CADASTRO_DISPONIBILIZADO, (Runnable) () -> {});
-        } finally {
-            org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
-        }
-        // Apenas para garantir que não crashou e passou pelas linhas de log
-    }
 }
