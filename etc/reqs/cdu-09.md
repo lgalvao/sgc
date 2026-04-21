@@ -17,10 +17,9 @@ Ator: CHEFE
 
 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos`, preenchida com os dados cadastrados até o momento.
 
-5. Se o subprocesso já tiver sido disponibilizado anteriormente e estiver localizado em unidade diferente da unidade ativa do usuário, o sistema mostra um alerta fixo no topo da tela com o texto: "Cadastro disponibilizado para análise pelas unidades superiores.", não permitindo edição ou disponibilização.
+5. Se o subprocesso já tiver sido disponibilizado anteriormente e estiver localizado em unidade diferente da unidade ativa do usuário, o sistema mostra uma mensagem no topo da tela com o texto "Cadastro disponibilizado para análise pelas unidades superiores." e não permite edição ou disponibilização.
 
-6. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da
-   tela, o botão `Histórico de análise`.
+6. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da tela, o botão `Histórico de análise`.
 
    6.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do cadastro realizadas pelas unidades superiores desde a última disponibilização.
 

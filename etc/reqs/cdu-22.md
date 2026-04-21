@@ -63,4 +63,4 @@
     As análises já podem ser realizadas no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-9. O sistema redireciona para `Painel` e mostra a notificação "Cadastros aceitos em bloco".
+9. O sistema redireciona para `Painel` e mostra a mensagem "Cadastros aceitos em bloco".

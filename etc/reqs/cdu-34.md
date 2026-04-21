@@ -8,7 +8,7 @@
 
 2. O usuário entra em um processo em andamento e escolhe uma unidade participante.
 
-3. O sistema mostra a tela `Detalhes do subprocesso` com as informações do subrocesso e unidade. 
+3. O sistema mostra a tela `Detalhes do subprocesso` com as informações do subrocesso da unidade. 
  
 4. O usuário clica em `Enviar lembrete`.
 
@@ -16,7 +16,7 @@
 
 6. O usuário confirma.
 
-7. O sistema envia e-mail para o responsável pela unidade.
+7. O sistema envia uma notificação por e-mail para o responsável pela unidade, com este modelo:
 
     ```text
     Assunto: SGC: Lembrete de prazo - [DESCRICAO_PROCESSO]
@@ -25,15 +25,15 @@
 
     Este é um lembrete de que o prazo para a conclusão da etapa atual do processo [DESCRICAO_PROCESSO] encerra em [DATA_LIMITE].
 
-    Por favor, acesse o sistema para concluir suas pendências: [URL_SISTEMA].
+    Por favor, acesse o sistema para concluir essas pendências: [URL_SISTEMA].
     ```
 
 8. O sistema cria internamente um alerta para a unidade:
 
     - `Descrição`: "Lembrete: Prazo do processo [DESCRICAO_PROCESSO] encerra em [DATA_LIMITE]"
     - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: Data/hora atual
+    - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
-9. O sistema exibe mensagem de sucesso "Lembrete enviado".
+9. O sistema mostra a mensagem "Lembrete enviado" e permanece na mesma tela.

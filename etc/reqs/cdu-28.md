@@ -8,29 +8,29 @@
 
 ## Fluxo principal
 
-1. ADMIN clica em `Unidades` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis).
+1. O usuário clica em `Unidades` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis).
 
-2. Sistema mostra a árvore de unidades.
+2. O sistema mostra a árvore completa de unidades.
 
-3. ADMIN clica em uma das unidades.
+3. Usuário clica em uma das unidades.
 
-4. Sistema mostra a página `Detalhes da unidade`
+4. O sistema mostra a tela `Detalhes da unidade` para a unidade selecionada.
 
-5. ADMIN clica no botão `Criar atribuição`.
+5. O usuário clica no botão `Criar atribuição`.
 
-6. Sistema apresenta um modal com estes campos:
+6. O sistema apresenta uma tela com estes campos:
 
     - Dropdown pesquisável `Servidores` com os nomes dos servidores da unidade
     - `Data de início`
     - `Data de término`
-    - `Justificativa`
-    - Botões `Confirmar` e `Cancelar`
+    - `Justificativa` 
+    - Botões `Criar` e `Cancelar`
 
-7. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos são obrigatórios.
+7. O usuário seleciona o servidor, define as datas e inclui uma justificativa (todos os campos são obrigatórios); depois clica em `Criar`.
 
-8. Sistema registra internamente a atribuição temporária e mostra uma confirmação "Atribuição criada".
+8. O sistema registra internamente a atribuição temporária e mostra uma mensagem "Atribuição criada".
 
-9. O sistema envia notificação por e-mail para o usuário que recebeu a atribuição temporária:
+9. O sistema envia uma notificação por e-mail para o usuário que recebeu a atribuição temporária (não para unidade!), com este modelo:
 
    ```text
    Assunto: SGC: Atribuição de perfil CHEFE na unidade [SIGLA_UNIDADE]
@@ -43,7 +43,14 @@
 
    Justificativa: [JUSTIFICATIVA].
 
-   Acesse o sistema em: [URL_SISTEMA].
+   Acesse o sistema em [URL_SISTEMA] e escolha o perfil 'CHEFE' para a unidade da atribuição.
    ```
+10.  O sistema registra internamente um alerta:
 
-10. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária será calculada de forma transparente pelas views e banco de dados e já refletida ao acessar perfis e unidades.
+- `Data/hora`: [Data/hora atual]
+- `Descrição`: "Atribuição temporária para unidade [SIGLA_UNIDADE]"
+- `Unidade de origem`: ADMIN
+- `Usuário de destino`: [Usuário destinatário da atribuição]
+
+11. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE durante o período especificado, para a unidade especificada na atribuição. Em um próximo login, o novo par "CHEFE-[UNIDADE_ATRIBUICAO]" será mostrado entre as opções de login.
+    10.1. *IMPORTANTE*: O novo perfil será incluído automaticamente através de cálculos das views no banco de dados. O sistema atual nao precisa realizar nenhuma operação, além das especificadas neste caso de uso, para que o novo perfil se torne disponível ao usuário.
