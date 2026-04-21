@@ -2,7 +2,6 @@ package sgc.comum.util;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import lombok.extern.slf4j.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.util.*;
@@ -13,7 +12,6 @@ import java.io.*;
 import java.util.*;
 
 @Component
-@Slf4j
 public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
     public static final String HEADER_CORRELACAO_ID = "X-Correlacao-Id";
     public static final String HEADER_TEMPO_SERVIDOR_MS = "X-Tempo-Servidor-Ms";
@@ -22,6 +20,7 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
     public static final String ATRIBUTO_HTTP_CAMINHO = "sgc.monitoramento.httpCaminho";
     public static final String ATRIBUTO_JAVA_LENTOS = "sgc.monitoramento.javaLentos";
     public static final String MDC_CORRELACAO_ID = "correlacaoId";
+    private static final Logger LOG_MONITORAMENTO = LoggerFactory.getLogger("sgc.monitoramento");
 
     private final MonitoramentoProperties monitoramentoProperties;
 
@@ -63,7 +62,7 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             response.setHeader("Server-Timing", "app;dur=" + duracaoMs);
 
             if (deveLogarHttp(duracaoMs)) {
-                log.info(formatarLinhaHttp(request, response, duracaoMs));
+                LOG_MONITORAMENTO.info(formatarLinhaHttp(request, response, duracaoMs));
             }
             logarJavaLento(request);
 
@@ -141,7 +140,7 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
 
         entradas.stream()
                 .map(String.class::cast)
-                .forEach(log::info);
+                .forEach(LOG_MONITORAMENTO::info);
     }
 
     private static String obterNomeSimples(String classe) {

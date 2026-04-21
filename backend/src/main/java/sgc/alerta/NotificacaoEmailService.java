@@ -1,0 +1,101 @@
+package sgc.alerta;
+
+import lombok.*;
+import org.springframework.dao.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
+
+import java.time.*;
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class NotificacaoEmailService {
+    private static final int LIMITE_ERRO = 2000;
+    private static final int MAX_TENTATIVAS = 5;
+
+    private final NotificacaoEmailRepo notificacaoEmailRepo;
+    private final Clock clock;
+
+    public NotificacaoEmail enfileirar(EnfileirarNotificacaoEmailCommand cmd) {
+        if (notificacaoEmailRepo.existsByChaveIdempotencia(cmd.chaveIdempotencia())) {
+            return notificacaoEmailRepo.findByChaveIdempotencia(cmd.chaveIdempotencia())
+                    .orElseThrow();
+        }
+
+        NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .subprocesso(cmd.subprocesso())
+                .tipoTransicao(cmd.tipoTransicao())
+                .destinatario(cmd.destinatario())
+                .assunto(cmd.assunto())
+                .corpoHtml(cmd.corpoHtml())
+                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .tentativas(0)
+                .proximaTentativaEm(agora())
+                .dataHoraCriacao(agora())
+                .chaveIdempotencia(cmd.chaveIdempotencia())
+                .build();
+
+        try {
+            return notificacaoEmailRepo.save(notificacao);
+        } catch (DataIntegrityViolationException ex) {
+            return notificacaoEmailRepo.findByChaveIdempotencia(cmd.chaveIdempotencia())
+                    .orElseThrow(() -> ex);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<NotificacaoEmail> listarPendentes(int limite) {
+        return notificacaoEmailRepo.findBySituacaoInAndProximaTentativaEmLessThanEqualOrderByDataHoraCriacaoAsc(
+                List.of(SituacaoNotificacaoEmail.PENDENTE, SituacaoNotificacaoEmail.FALHA_TEMPORARIA),
+                agora(),
+                PageRequest.of(0, limite)
+        );
+    }
+
+    public void marcarEnviando(NotificacaoEmail notificacao) {
+        notificacao.setSituacao(SituacaoNotificacaoEmail.ENVIANDO);
+        notificacaoEmailRepo.save(notificacao);
+    }
+
+    public void marcarEnviado(NotificacaoEmail notificacao) {
+        notificacao.setSituacao(SituacaoNotificacaoEmail.ENVIADO);
+        notificacao.setDataHoraEnvio(agora());
+        notificacao.setUltimoErro(null);
+        notificacaoEmailRepo.save(notificacao);
+    }
+
+    public void marcarFalha(NotificacaoEmail notificacao, Exception erro) {
+        int tentativas = notificacao.getTentativas() + 1;
+        notificacao.setTentativas(tentativas);
+        notificacao.setUltimoErro(resumirErro(erro));
+        if (tentativas >= MAX_TENTATIVAS) {
+            notificacao.setSituacao(SituacaoNotificacaoEmail.FALHA_DEFINITIVA);
+            notificacao.setProximaTentativaEm(null);
+        } else {
+            notificacao.setSituacao(SituacaoNotificacaoEmail.FALHA_TEMPORARIA);
+            notificacao.setProximaTentativaEm(agora().plusSeconds(atrasoRetrySegundos(tentativas)));
+        }
+        notificacaoEmailRepo.save(notificacao);
+    }
+
+    private LocalDateTime agora() {
+        return LocalDateTime.now(clock);
+    }
+
+    private long atrasoRetrySegundos(int tentativas) {
+        return Math.min(300, (long) Math.pow(2, tentativas) * 10);
+    }
+
+    private String resumirErro(Exception erro) {
+        String mensagem = erro.getMessage();
+        String texto = mensagem == null || mensagem.isBlank() ? erro.getClass().getName() : mensagem;
+        if (texto.length() <= LIMITE_ERRO) {
+            return texto;
+        }
+        return texto.substring(0, LIMITE_ERRO);
+    }
+}

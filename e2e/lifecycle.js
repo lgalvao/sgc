@@ -22,6 +22,7 @@ const MODO_MONITORAMENTO = process.env.SGC_MONITORAMENTO || 'nao';
 const REUTILIZAR_EXISTENTE = process.env.SGC_LIFECYCLE_REUTILIZAR_EXISTENTE || 'on';
 const TEMPO_MINIMO_JAVA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_TEMPO_MINIMO_JAVA_MS || '500', 10);
 const TEMPO_MINIMO_HTTP_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_TEMPO_MINIMO_HTTP_MS || '100', 10);
+const NIVEL_LOG_MONITORAMENTO = (process.env.SGC_MONITORAMENTO_NIVEL_LOG || 'INFO').toUpperCase();
 const SILENT_LOGS = process.env.SGC_SILENT_LIFECYCLE === 'true';
 const ANSI_RESET = '\u001b[0m';
 const ANSI_AMARELO = '\u001b[33m';
@@ -225,6 +226,14 @@ function validarModoMonitoramento() {
             'Use SGC_MONITORAMENTO=sim ou nao.'
         );
     }
+
+    const niveisLogSuportados = new Set(['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'OFF']);
+    if (!niveisLogSuportados.has(NIVEL_LOG_MONITORAMENTO)) {
+        throw new Error(
+            `Nível de log da aplicação durante monitoramento inválido: ${NIVEL_LOG_MONITORAMENTO}. ` +
+            'Use SGC_MONITORAMENTO_NIVEL_LOG=info, warn, error ou off.'
+        );
+    }
 }
 
 function validarReutilizacaoExistente() {
@@ -304,7 +313,9 @@ function startBackend() {
             `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`,
             `--sgc.monitoramento.modo=${MODO_MONITORAMENTO}`,
             `--sgc.monitoramento.tempo-minimo-java-ms=${TEMPO_MINIMO_JAVA_MS}`,
-            `--sgc.monitoramento.tempo-http-lento-ms=${TEMPO_MINIMO_HTTP_MS}`
+            `--sgc.monitoramento.tempo-http-lento-ms=${TEMPO_MINIMO_HTTP_MS}`,
+            `--logging.level.sgc=${NIVEL_LOG_MONITORAMENTO}`,
+            `--logging.level.sgc.monitoramento=INFO`
         ].join(' ')
         : [
             `--server.port=${backendPort}`,
@@ -312,7 +323,9 @@ function startBackend() {
             `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`,
             `--sgc.monitoramento.modo=${MODO_MONITORAMENTO}`,
             `--sgc.monitoramento.tempo-minimo-java-ms=${TEMPO_MINIMO_JAVA_MS}`,
-            `--sgc.monitoramento.tempo-http-lento-ms=${TEMPO_MINIMO_HTTP_MS}`
+            `--sgc.monitoramento.tempo-http-lento-ms=${TEMPO_MINIMO_HTTP_MS}`,
+            `--logging.level.sgc=${NIVEL_LOG_MONITORAMENTO}`,
+            `--logging.level.sgc.monitoramento=INFO`
         ].join(' ');
     const argsGradle = isWindows ? `--args="${argsAplicacao}"` : `--args=${argsAplicacao}`;
 

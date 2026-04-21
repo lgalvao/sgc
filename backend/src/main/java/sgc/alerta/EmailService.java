@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.mail.javamail.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.*;
 import sgc.comum.config.*;
 
 import java.io.*;
@@ -21,12 +20,10 @@ public class EmailService {
     private final JavaMailSender enviadorEmail;
     private final ConfigAplicacao config;
 
-    @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
         processarEnvioEmail(para, assunto, corpo, false);
     }
 
-    @Transactional
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
         processarEnvioEmail(para, assunto, corpoHtml, true);
     }

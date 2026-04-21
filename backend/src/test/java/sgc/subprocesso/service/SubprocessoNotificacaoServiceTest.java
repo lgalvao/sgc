@@ -30,7 +30,7 @@ class SubprocessoNotificacaoServiceTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
-    private EmailService emailService;
+    private NotificacaoEmailService notificacaoEmailService;
     @Mock
     private ResponsavelUnidadeService responsavelService;
     @Mock
@@ -49,6 +49,8 @@ class SubprocessoNotificacaoServiceTest {
     private ArgumentCaptor<String> templateCaptor;
     @Captor
     private ArgumentCaptor<IContext> contextCaptor;
+    @Captor
+    private ArgumentCaptor<EnfileirarNotificacaoEmailCommand> notificacaoEmailCaptor;
 
     @Test
     @DisplayName("deve criar alerta e enviar email direto e para substituto")
@@ -86,8 +88,17 @@ class SubprocessoNotificacaoServiceTest {
                 eq(TipoTransicao.PROCESSO_INICIADO.formatarAlerta("ORIG")),
                 eq(origem),
                 eq(destino));
-        verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), startsWith("SGC: "), eq("<html>corpo</html>"));
-        verify(emailService).enviarEmailHtml(eq("substituto@tre-pe.jus.br"), startsWith("SGC: "), eq("<html>corpo</html>"));
+        verify(notificacaoEmailService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getAllValues())
+                .extracting(EnfileirarNotificacaoEmailCommand::destinatario)
+                .containsExactly("dest@tre-pe.jus.br", "substituto@tre-pe.jus.br");
+        assertThat(notificacaoEmailCaptor.getAllValues())
+                .allSatisfy(cmd -> {
+                    assertThat(cmd.assunto()).startsWith("SGC: ");
+                    assertThat(cmd.corpoHtml()).isEqualTo("<html>corpo</html>");
+                    assertThat(cmd.tipoTransicao()).isEqualTo(TipoTransicao.PROCESSO_INICIADO.name());
+                    assertThat(cmd.chaveIdempotencia()).contains("transicao:PROCESSO_INICIADO");
+                });
         verify(templateEngine).process(templateCaptor.capture(), contextCaptor.capture());
 
         assertThat(templateCaptor.getValue()).isEqualTo("processo-iniciado");
@@ -134,9 +145,11 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), startsWith("SGC: "), eq("<html>corpo</html>"));
-        verify(emailService).enviarEmailHtml(eq("sup1@tre-pe.jus.br"), contains(" - ORIG"), eq("<html>corpo</html>"));
-        verify(emailService, times(2)).enviarEmailHtml(anyString(), anyString(), anyString());
+        verify(notificacaoEmailService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getAllValues())
+                .extracting(EnfileirarNotificacaoEmailCommand::destinatario)
+                .containsExactly("dest@tre-pe.jus.br", "sup1@tre-pe.jus.br");
+        assertThat(notificacaoEmailCaptor.getAllValues().get(1).assunto()).contains(" - ORIG");
 
         verify(templateEngine, times(2)).process(templateCaptor.capture(), contextCaptor.capture());
         assertThat(templateCaptor.getAllValues()).containsExactly("cadastro-devolvido", "cadastro-devolvido-superior");
@@ -170,7 +183,8 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(emailService, times(1)).enviarEmailHtml(eq("dest@tre-pe.jus.br"), startsWith("SGC: "), eq("<html>corpo</html>"));
+        verify(notificacaoEmailService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("dest@tre-pe.jus.br");
         verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
     }
 
@@ -202,8 +216,8 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(emailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
-        verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), anyString());
+        verify(notificacaoEmailService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("dest@tre-pe.jus.br");
     }
 
     @Test
@@ -221,7 +235,7 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verifyNoInteractions(alertaService, emailService, responsavelService, usuarioService, templateEngine);
+        verifyNoInteractions(alertaService, notificacaoEmailService, responsavelService, usuarioService, templateEngine);
     }
 
     @Test
@@ -239,7 +253,7 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verifyNoInteractions(emailService, responsavelService, usuarioService, templateEngine);
+        verifyNoInteractions(notificacaoEmailService, responsavelService, usuarioService, templateEngine);
     }
 
     @Test

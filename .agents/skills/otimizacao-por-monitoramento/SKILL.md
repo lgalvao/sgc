@@ -55,7 +55,7 @@ Preserve:
 Rode o cenário com monitoramento ligado e saída redirecionada para um único arquivo:
 
 ```bash
-SGC_MONITORAMENTO=sim npx playwright test e2e/arquivo.spec.ts > /tmp/arquivo-monitorado.log 2>&1
+SGC_MONITORAMENTO=sim SGC_MONITORAMENTO_NIVEL_LOG=warn npx playwright test e2e/arquivo.spec.ts > /tmp/arquivo-monitorado.log 2>&1
 ```
 
 Se o caso de uso depender de preparação serial, rode o arquivo inteiro. Se houver um cenário isolável sem perder fidelidade, rode o recorte mínimo suficiente.

@@ -25,7 +25,7 @@ public class SubprocessoNotificacaoService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final AlertaFacade alertaService;
-    private final EmailService emailService;
+    private final NotificacaoEmailService notificacaoEmailService;
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
     private final SpringTemplateEngine templateEngine;
@@ -69,11 +69,11 @@ public class SubprocessoNotificacaoService {
         String corpo = processarTemplate(templateEmail, variaveis);
         String emailUnidade = getEmailUnidade(cmd.unidadeDestino());
 
-        emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
-        notificarResponsavelPessoal(cmd.unidadeDestino(), assunto, corpo);
+        enfileirarEmail(cmd, new EmailGerado(emailUnidade, assunto, corpo, "direto"));
+        notificarResponsavelPessoal(cmd, cmd.unidadeDestino(), assunto, corpo);
     }
 
-    private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo) {
+    private void notificarResponsavelPessoal(NotificacaoCommand cmd, Unidade unidade, String assunto, String corpo) {
         UnidadeResponsavelDto responsavel;
         try {
             responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
@@ -84,7 +84,9 @@ public class SubprocessoNotificacaoService {
 
         if (responsavel.substitutoTitulo() != null) {
             usuarioService.buscarOpt(responsavel.substitutoTitulo()).ifPresent(u -> {
-                if (!u.getEmail().isBlank()) emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
+                if (!u.getEmail().isBlank()) {
+                    enfileirarEmail(cmd, new EmailGerado(u.getEmail(), assunto, corpo, "responsavel"));
+                }
             });
         }
     }
@@ -106,7 +108,29 @@ public class SubprocessoNotificacaoService {
         String corpo = processarTemplate(templateEmailSuperior, variaveis);
         String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());
 
-        emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
+        enfileirarEmail(cmd, new EmailGerado(emailSuperior, assunto, corpo, "superior"));
+    }
+
+    private void enfileirarEmail(NotificacaoCommand cmd, EmailGerado email) {
+        notificacaoEmailService.enfileirar(new EnfileirarNotificacaoEmailCommand(
+                cmd.subprocesso(),
+                cmd.tipoTransicao().name(),
+                email.destinatario(),
+                email.assunto(),
+                email.corpo(),
+                chaveIdempotencia(cmd, email)
+        ));
+    }
+
+    private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {
+        Long codSubprocesso = cmd.subprocesso() != null ? cmd.subprocesso().getCodigo() : null;
+        String destinatario = email.destinatario().trim().toLowerCase(Locale.ROOT);
+        return "subprocesso:%s:transicao:%s:destinatario:%s:tipo:%s".formatted(
+                codSubprocesso,
+                cmd.tipoTransicao().name(),
+                destinatario,
+                email.tipo()
+        );
     }
 
     private Map<String, Object> criarVariaveisTemplateDireto(NotificacaoCommand cmd) {
@@ -166,5 +190,8 @@ public class SubprocessoNotificacaoService {
             throw new IllegalStateException("Template ausente para %s".formatted(contexto));
         }
         return template;
+    }
+
+    private record EmailGerado(String destinatario, String assunto, String corpo, String tipo) {
     }
 }

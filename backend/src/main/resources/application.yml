@@ -45,6 +45,7 @@ logging:
     console: "%-5level %logger{0}: %msg%n"
   level:
     sgc: INFO
+    sgc.monitoramento: INFO
     org:
       hibernate: ERROR
       springframework: ERROR
@@ -117,6 +118,7 @@ logging:
     console: "%-5level %logger{0}.%M:%L: %msg%n"
   level:
     sgc: INFO
+    sgc.monitoramento: INFO
     org:
       hibernate: ERROR
       springframework: ERROR

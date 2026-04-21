@@ -50,6 +50,8 @@ A API estará disponível em `http://localhost:10000`.
 
 Para rodar o benchmark de desempenho contra homologacao usando as variaveis de `.env.hom`, use `..\benchmark-hom.ps1` no Windows ou `../benchmark-hom.sh` no shell.
 
+Para rodar um teste end-to-end com monitoramento e log reduzido, use `../e2e-monitorado.sh <spec_playwright>`.
+
 No profile `hom`, administradores tambem podem remover um processo inteiro para limpar dados de teste via `POST /api/processos/{codigo}/excluir-completo`.
 
 ## 🧪 Estratégia de Testes
