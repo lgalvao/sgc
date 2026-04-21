@@ -21,6 +21,8 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
     public static final String HEADER_TEMPO_SERVIDOR_MS = "X-Tempo-Servidor-Ms";
     public static final String ATRIBUTO_CORRELACAO_ID = "sgc.monitoramento.correlacaoId";
     public static final String ATRIBUTO_MONITORAMENTO_ATIVO = "sgc.monitoramento.ativo";
+    public static final String ATRIBUTO_HTTP_METODO = "sgc.monitoramento.httpMetodo";
+    public static final String ATRIBUTO_HTTP_CAMINHO = "sgc.monitoramento.httpCaminho";
     public static final String MDC_CORRELACAO_ID = "correlacaoId";
 
     private final MonitoramentoProperties monitoramentoProperties;
@@ -49,6 +51,8 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
 
         request.setAttribute(ATRIBUTO_CORRELACAO_ID, correlacaoId);
         request.setAttribute(ATRIBUTO_MONITORAMENTO_ATIVO, monitoramentoAtivoNaRequisicao);
+        request.setAttribute(ATRIBUTO_HTTP_METODO, request.getMethod());
+        request.setAttribute(ATRIBUTO_HTTP_CAMINHO, obterCaminhoComQueryString(request));
         response.setHeader(HEADER_CORRELACAO_ID, correlacaoId);
 
         MDC.put(MDC_CORRELACAO_ID, correlacaoId);
@@ -61,15 +65,7 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             response.setHeader(HEADER_TEMPO_SERVIDOR_MS, String.valueOf(duracaoMs));
             response.setHeader("Server-Timing", "app;dur=" + duracaoMs);
 
-            if (monitoramentoAtivoNaRequisicao) {
-                log.info(formatarLinhaHttp(definirTagHttp(duracaoMs), request, response, duracaoMs));
-            } else if (duracaoMs > monitoramentoProperties.getLimiteAlertaMs()) {
-                log.warn("HTTP LENTO {} {} {} {}ms",
-                        request.getMethod(),
-                        obterCaminhoComQueryString(request),
-                        response.getStatus(),
-                        duracaoMs);
-            }
+            log.info(formatarLinhaHttp(definirTagHttp(duracaoMs), request, response, duracaoMs));
 
             MDC.remove(MDC_CORRELACAO_ID);
         }
@@ -126,6 +122,22 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
         }
 
         return UUID.randomUUID().toString();
+    }
+
+    public static String obterDescricaoHttpAtual() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            Object metodo = request.getAttribute(ATRIBUTO_HTTP_METODO);
+            Object caminho = request.getAttribute(ATRIBUTO_HTTP_CAMINHO);
+            if (metodo instanceof String metodoAtual
+                    && StringUtils.hasText(metodoAtual)
+                    && caminho instanceof String caminhoAtual
+                    && StringUtils.hasText(caminhoAtual)) {
+                return metodoAtual + " " + caminhoAtual;
+            }
+        }
+        return "sem-http";
     }
 
     private boolean deveMonitorarDetalhado(HttpServletRequest request) {

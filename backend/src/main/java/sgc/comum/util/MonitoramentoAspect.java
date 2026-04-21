@@ -55,15 +55,18 @@ public class MonitoramentoAspect {
             String classe = assinatura != null ? assinatura.getDeclaringTypeName() : joinPoint.getClass().getName();
             String metodo = assinatura != null ? assinatura.getName() : "desconhecido";
             boolean monitoramentoDetalhado = traceCompleto || FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao();
+            String http = FiltroMonitoramentoHttp.obterDescricaoHttpAtual();
 
             if (monitoramentoDetalhado) {
-                log.info("TRACE #{} {}.{} {}ms",
+                log.info("TRACE #{} http=\"{}\" {}.{} {}ms",
                         numeroChamada,
+                        http,
                         classe,
                         metodo,
                         tempoTotalStr);
             } else if (tempoTotal > limiteAlertaMs) {
-                log.warn("TRACE-LENTO {}.{} {}ms",
+                log.warn("TRACE-LENTO http=\"{}\" {}.{} {}ms",
+                        http,
                         classe,
                         metodo,
                         tempoTotalStr);

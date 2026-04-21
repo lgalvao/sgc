@@ -77,7 +77,7 @@ sgc:
     limite-alerta-ms: 500
     limite-lento-ms: 100
     limite-muito-lento-ms: 300
-    permitir-ativacao-por-header: true
+    permitir-ativacao-por-header: false
     taxa-amostragem: 0.0
 
 ---

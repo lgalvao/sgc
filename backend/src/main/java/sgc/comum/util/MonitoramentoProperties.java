@@ -12,6 +12,6 @@ public class MonitoramentoProperties {
     private long limiteAlertaMs = 500;
     private long limiteLentoMs = 100;
     private long limiteMuitoLentoMs = 300;
-    private boolean permitirAtivacaoPorHeader = true;
+    private boolean permitirAtivacaoPorHeader = false;
     private double taxaAmostragem = 0.0;
 }

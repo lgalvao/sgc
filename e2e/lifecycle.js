@@ -19,8 +19,11 @@ const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
 const DB_NAME_PREFIX = process.env.E2E_DB_NAME_PREFIX || 'sgc-e2e-w';
 const MAX_BACKEND_PORT_SCAN = Number.parseInt(process.env.E2E_BACKEND_PORT_SCAN_LIMIT || '20', 10);
 const MODO_MONITORAMENTO = process.env.SGC_MONITORAMENTO || 'off';
+const MODO_MONITORAMENTO_DETALHADO = process.env.SGC_MONITORAMENTO_DETALHADO || 'off';
 const REUTILIZAR_EXISTENTE = process.env.SGC_LIFECYCLE_REUTILIZAR_EXISTENTE || 'on';
 const LIMITE_MONITORAMENTO_ALERTA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_ALERTA_MS || '500', 10);
+const LIMITE_MONITORAMENTO_LENTO_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_LENTO_MS || '100', 10);
+const LIMITE_MONITORAMENTO_MUITO_LENTO_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_MUITO_LENTO_MS || '300', 10);
 const TAXA_AMOSTRAGEM_MONITORAMENTO = process.env.SGC_MONITORAMENTO_AMOSTRAGEM || '0.0';
 const SILENT_LOGS = process.env.SGC_SILENT_LIFECYCLE === 'true';
 const ANSI_RESET = '\u001b[0m';
@@ -234,6 +237,13 @@ function validarModoMonitoramento() {
             'Use SGC_MONITORAMENTO=off ou on.'
         );
     }
+
+    if (!modosSuportados.has(MODO_MONITORAMENTO_DETALHADO)) {
+        throw new Error(
+            `Modo de monitoramento detalhado inválido: ${MODO_MONITORAMENTO_DETALHADO}. ` +
+            'Use SGC_MONITORAMENTO_DETALHADO=off ou on.'
+        );
+    }
 }
 
 function validarReutilizacaoExistente() {
@@ -247,15 +257,23 @@ function validarReutilizacaoExistente() {
 }
 
 function monitoramentoAtivo() {
-    return MODO_MONITORAMENTO !== 'off';
+    return MODO_MONITORAMENTO !== 'off' || monitoramentoDetalhado();
+}
+
+function monitoramentoDetalhado() {
+    return MODO_MONITORAMENTO_DETALHADO === 'on';
 }
 
 function monitoramentoTraceCompleto() {
-    return MODO_MONITORAMENTO === 'on';
+    return monitoramentoDetalhado();
 }
 
 function monitoramentoPermiteHeader() {
-    return MODO_MONITORAMENTO === 'on';
+    return monitoramentoDetalhado();
+}
+
+function modoMonitoramentoFrontend() {
+    return monitoramentoDetalhado() ? 'on' : 'off';
 }
 
 function requestStatus(url, method = 'GET') {
@@ -326,6 +344,8 @@ function startBackend() {
             `--sgc.monitoramento.ativo=${monitoramentoAtivo()}`,
             `--sgc.monitoramento.trace-completo=${monitoramentoTraceCompleto()}`,
             `--sgc.monitoramento.limite-alerta-ms=${LIMITE_MONITORAMENTO_ALERTA_MS}`,
+            `--sgc.monitoramento.limite-lento-ms=${LIMITE_MONITORAMENTO_LENTO_MS}`,
+            `--sgc.monitoramento.limite-muito-lento-ms=${LIMITE_MONITORAMENTO_MUITO_LENTO_MS}`,
             `--sgc.monitoramento.permitir-ativacao-por-header=${monitoramentoPermiteHeader()}`,
             `--sgc.monitoramento.taxa-amostragem=${TAXA_AMOSTRAGEM_MONITORAMENTO}`
         ].join(' ')
@@ -336,6 +356,8 @@ function startBackend() {
             `--sgc.monitoramento.ativo=${monitoramentoAtivo()}`,
             `--sgc.monitoramento.trace-completo=${monitoramentoTraceCompleto()}`,
             `--sgc.monitoramento.limite-alerta-ms=${LIMITE_MONITORAMENTO_ALERTA_MS}`,
+            `--sgc.monitoramento.limite-lento-ms=${LIMITE_MONITORAMENTO_LENTO_MS}`,
+            `--sgc.monitoramento.limite-muito-lento-ms=${LIMITE_MONITORAMENTO_MUITO_LENTO_MS}`,
             `--sgc.monitoramento.permitir-ativacao-por-header=${monitoramentoPermiteHeader()}`,
             `--sgc.monitoramento.taxa-amostragem=${TAXA_AMOSTRAGEM_MONITORAMENTO}`
         ].join(' ');
@@ -373,7 +395,7 @@ function startFrontend() {
             ...normalizarEnv(),
             E2E_BACKEND_BASE_PORT: String(BACKEND_BASE_PORT),
             E2E_WORKER_COUNT: '1',
-            VITE_MONITORAMENTO_MODO: MODO_MONITORAMENTO
+            VITE_MONITORAMENTO_MODO: modoMonitoramentoFrontend()
         }
     };
 
@@ -534,7 +556,7 @@ try {
     await subirInfra();
     lifecycleLogger.info(
         `>>> Infra ${PERFIL_LIFECYCLE.toUpperCase()} no ar. Frontend: ${FRONTEND_PORT}. ` +
-        `${descreverBackends()}. Monitoramento: ${MODO_MONITORAMENTO}.`
+        `${descreverBackends()}. Monitoramento: ${MODO_MONITORAMENTO}. Detalhado: ${MODO_MONITORAMENTO_DETALHADO}.`
     );
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);

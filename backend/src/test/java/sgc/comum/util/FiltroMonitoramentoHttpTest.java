@@ -42,6 +42,35 @@ class FiltroMonitoramentoHttpTest {
     }
 
     @Test
+    @DisplayName("Deve expor descricao HTTP atual durante a requisicao")
+    void deveExporDescricaoHttpAtualDuranteRequisicao() throws ServletException, IOException {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        properties.setAtivo(true);
+
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/processos");
+        request.setQueryString("pagina=1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filtro.doFilter(request, response, (req, res) -> {
+            org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                    new org.springframework.web.context.request.ServletRequestAttributes((HttpServletRequest) req)
+            );
+            assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual())
+                    .isEqualTo("GET /api/processos?pagina=1");
+            org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+        });
+    }
+
+    @Test
+    @DisplayName("obterDescricaoHttpAtual deve retornar sem-http quando nao houver contexto")
+    void obterDescricaoHttpAtualDeveRetornarSemHttpQuandoSemContexto() {
+        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+
+        assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("sem-http");
+    }
+
+    @Test
     @DisplayName("Deve logar erro quando o tempo for muito alto (HTTP LENTO)")
     @SuppressWarnings("java:S2925")
     void deveLogarErroHTTP() throws ServletException, IOException {
