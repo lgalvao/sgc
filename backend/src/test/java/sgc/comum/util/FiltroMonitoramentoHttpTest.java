@@ -28,8 +28,6 @@ class FiltroMonitoramentoHttpTest {
             HttpServletRequest requestHttp = (HttpServletRequest) servletRequest;
             assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_CORRELACAO_ID))
                     .isEqualTo("corr-123");
-            assertThat(requestHttp.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO))
-                    .isEqualTo(false);
         };
 
         filtro.doFilter(request, response, filterChain);
@@ -110,22 +108,6 @@ class FiltroMonitoramentoHttpTest {
     }
 
     @Test
-    @DisplayName("Deve manter monitoramento detalhado inativo")
-    void deveManterMonitoramentoDetalhadoInativo() throws ServletException, IOException {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        properties.setModo(MonitoramentoProperties.Modo.SIM);
-
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        filtro.doFilter(request, response, (req, res) ->
-                assertThat(req.getAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO)).isEqualTo(false));
-    }
-
-    @Test
-    @DisplayName("Deve formatar linha com erro 500 sem amostragem")
-    void deveFormatarErro500SemAmostragem() throws ServletException, IOException {
     @DisplayName("Deve ser inativo")
     void deveSerInativo() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
@@ -139,56 +121,6 @@ class FiltroMonitoramentoHttpTest {
         });
 
         assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNull();
-    }
-
-    @Test
-    @DisplayName("isMonitoramentoAtivoNaRequisicao deve retornar false quando não houver contexto")
-    void isMonitoramentoAtivoNaRequisicaoDeveRetornarFalseQuandoSemContexto() {
-        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
-        assertThat(FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()).isFalse();
-    }
-
-    @Test
-    @DisplayName("isMonitoramentoAtivoNaRequisicao deve retornar false quando atributo for null")
-    void isMonitoramentoAtivoNaRequisicaoDeveRetornarFalseQuandoNull() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        // Não seta o atributo
-        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
-                new org.springframework.web.context.request.ServletRequestAttributes(request)
-        );
-        assertThat(FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()).isFalse();
-        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
-    }
-
-    @Test
-    @DisplayName("isMonitoramentoAtivoNaRequisicao deve retornar false quando context for invalido")
-    void isMonitoramentoAtivoNaRequisicaoDeveRetornarFalseQuandoContextInvalido() {
-        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
-                new org.springframework.web.context.request.RequestAttributes() {
-                    @Override
-                    @NullUnmarked
-                    public Object getAttribute(@NonNull String name, int scope) { return null; }
-                    @Override
-                    public void setAttribute(String name, Object value, int scope) { /* dummy */ }
-                    @Override
-                    public void removeAttribute(String name, int scope) { /* dummy */ }
-                    @Override
-                    public String[] getAttributeNames(int scope) { return new String[0]; }
-                    @Override
-                    public void registerDestructionCallback(String name, Runnable callback, int scope) { /* dummy */ }
-                    @Override
-                    @NullUnmarked
-                    public Object resolveReference(@NonNull String key) { return null; }
-                    @Override
-                    @NullUnmarked
-                    public String getSessionId() { return null; }
-                    @Override
-                    @NullUnmarked
-                    public Object getSessionMutex() { return null; }
-                }
-        );
-        assertThat(FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()).isFalse();
-        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
     @Test
@@ -279,19 +211,6 @@ class FiltroMonitoramentoHttpTest {
     }
 
     @Test
-    @DisplayName("isMonitoramentoAtivoNaRequisicao deve retornar verdadeiro do request")
-    void isMonitoramentoAtivoNaRequisicaoDeveRetornarDoRequest() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_MONITORAMENTO_ATIVO, Boolean.TRUE);
-        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
-                new org.springframework.web.context.request.ServletRequestAttributes(request)
-        );
-
-        assertThat(FiltroMonitoramentoHttp.isMonitoramentoAtivoNaRequisicao()).isTrue();
-        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
-    }
-
-    @Test
     @DisplayName("obterCorrelacaoIdAtual deve retornar UUID quando context for invalido")
     void obterCorrelacaoIdDeveRetornarUUIDQuandoContextInvalido() {
         org.slf4j.MDC.clear();
@@ -337,6 +256,7 @@ class FiltroMonitoramentoHttpTest {
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
+    @Test
     @DisplayName("obterOuGerarCorrelacaoId deve gerar novo ID quando string for vazia")
     void obterCorrelacaoIdDeveGerarNovoQuandoVazia() throws ServletException, IOException {
         MonitoramentoProperties properties = new MonitoramentoProperties();
