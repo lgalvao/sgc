@@ -123,6 +123,19 @@ class NotificacaoEmailServiceTest {
     }
 
     @Test
+    @DisplayName("listarPorSubprocesso deve limitar tamanho da consulta")
+    void listarPorSubprocessoDeveLimitarTamanhoDaConsulta() {
+        when(notificacaoEmailRepo.findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(eq(60000L), any()))
+                .thenReturn(List.of());
+
+        service.listarPorSubprocesso(60000L, 500);
+
+        verify(notificacaoEmailRepo).findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(eq(60000L), argThat(pageable ->
+                pageable.getPageNumber() == 0 && pageable.getPageSize() == 100
+        ));
+    }
+
+    @Test
     @DisplayName("marcarFalha deve agendar retry antes do limite")
     void marcarFalhaDeveAgendarRetryAntesDoLimite() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
