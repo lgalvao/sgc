@@ -5,8 +5,10 @@ import jakarta.servlet.http.*;
 import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.springframework.mock.web.*;
+import org.springframework.test.util.*;
 
 import java.io.*;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -88,6 +90,39 @@ class FiltroMonitoramentoHttpTest {
         });
 
         assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("Deve formatar linha HTTP com prefixo")
+    void deveFormatarLinhaHttpComPrefixo() {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/processos/1/iniciar");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        response.setStatus(204);
+
+        String linha = ReflectionTestUtils.invokeMethod(filtro, "formatarLinhaHttp", request, response, 12L);
+
+        assertThat(linha).isEqualTo("http POST /api/processos/1/iniciar 204 12ms");
+    }
+
+    @Test
+    @DisplayName("Deve registrar metodo Java com prefixo")
+    void deveRegistrarMetodoJavaComPrefixo() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        List<String> entradas = new ArrayList<>();
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, entradas);
+        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                new org.springframework.web.context.request.ServletRequestAttributes(request)
+        );
+
+        try {
+            FiltroMonitoramentoHttp.registrarJavaLento("sgc.processo.service.ProcessoService", "iniciar", 30.41);
+        } finally {
+            org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+        }
+
+        assertThat(entradas).containsExactly("java ProcessoService.iniciar 30.41ms");
     }
 
     @Test

@@ -82,10 +82,10 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
         int status = response.getStatus();
 
         if (status == HttpServletResponse.SC_OK) {
-            return String.format("%s %s %dms", request.getMethod(), caminho, duracaoMs);
+            return String.format("http %s %s %dms", request.getMethod(), caminho, duracaoMs);
         }
 
-        return String.format("%s %s %d %dms", request.getMethod(), caminho, status, duracaoMs);
+        return String.format("http %s %s %d %dms", request.getMethod(), caminho, status, duracaoMs);
     }
 
     public static String obterCorrelacaoIdAtual() {
@@ -128,7 +128,7 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             if (javaLentos instanceof List<?> lista) {
                 @SuppressWarnings("unchecked")
                 List<String> entradas = (List<String>) lista;
-                entradas.add("%s.%s %.2fms".formatted(obterNomeSimples(classe), metodo, duracaoMs));
+                entradas.add("java %s.%s %.2fms".formatted(obterNomeSimples(classe), metodo, duracaoMs));
             }
         }
     }

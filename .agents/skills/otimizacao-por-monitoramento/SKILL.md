@@ -75,8 +75,9 @@ Filtre com `rg`.
 Exemplos:
 
 ```bash
-rg "^(GET|POST) " /tmp/arquivo-monitorado.log
-rg "^(GET|POST|[A-Z][A-Za-z]+\\.[a-zA-Z])" /tmp/arquivo-monitorado.log
+rg "^http " /tmp/arquivo-monitorado.log
+rg "^java " /tmp/arquivo-monitorado.log
+rg "^(http|java) " /tmp/arquivo-monitorado.log
 rg "subprocessos/buscar|contexto-edicao|contexto-cadastro-atividades|mapa-visualizacao" /tmp/arquivo-monitorado.log
 rg "processos/401|subprocessos/401" /tmp/arquivo-monitorado.log
 ```
