@@ -69,11 +69,12 @@ public class SubprocessoNotificacaoService {
         String corpo = processarTemplate(templateEmail, variaveis);
         String emailUnidade = getEmailUnidade(cmd.unidadeDestino());
 
-        enfileirarEmail(cmd, new EmailGerado(emailUnidade, assunto, corpo, "direto"));
-        notificarResponsavelPessoal(cmd, cmd.unidadeDestino(), assunto, corpo);
+        EmailGerado emailDireto = new EmailGerado(emailUnidade, assunto, corpo, "direto");
+        enfileirarEmail(cmd, emailDireto);
+        notificarResponsavelPessoal(cmd, cmd.unidadeDestino(), emailDireto);
     }
 
-    private void notificarResponsavelPessoal(NotificacaoCommand cmd, Unidade unidade, String assunto, String corpo) {
+    private void notificarResponsavelPessoal(NotificacaoCommand cmd, Unidade unidade, EmailGerado emailDireto) {
         UnidadeResponsavelDto responsavel;
         try {
             responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
@@ -85,7 +86,7 @@ public class SubprocessoNotificacaoService {
         if (responsavel.substitutoTitulo() != null) {
             usuarioService.buscarOpt(responsavel.substitutoTitulo()).ifPresent(u -> {
                 if (!u.getEmail().isBlank()) {
-                    enfileirarEmail(cmd, new EmailGerado(u.getEmail(), assunto, corpo, "responsavel"));
+                    enfileirarEmail(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), "responsavel"));
                 }
             });
         }
@@ -123,10 +124,9 @@ public class SubprocessoNotificacaoService {
     }
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {
-        Long codSubprocesso = cmd.subprocesso() != null ? cmd.subprocesso().getCodigo() : null;
         String destinatario = email.destinatario().trim().toLowerCase(Locale.ROOT);
         return "subprocesso:%s:transicao:%s:destinatario:%s:tipo:%s".formatted(
-                codSubprocesso,
+                cmd.subprocesso().getCodigo(),
                 cmd.tipoTransicao().name(),
                 destinatario,
                 email.tipo()

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.alerta.EmailService;
+import sgc.alerta.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -27,7 +27,7 @@ class SubprocessoNotificacaoServiceCoverageTest {
     @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
     @Mock
-    private EmailService emailService;
+    private NotificacaoEmailService notificacaoEmailService;
     @Mock
     private ResponsavelUnidadeService responsavelService;
     @Mock
@@ -59,6 +59,8 @@ class SubprocessoNotificacaoServiceCoverageTest {
         
         org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "enviarNotificacaoSuperior", cmd, new HashMap<>());
         
-        verify(emailService).enviarEmailHtml(eq("s1@tre-pe.jus.br"), anyString(), anyString());
+        verify(notificacaoEmailService).enfileirar(argThat(cmdEmail ->
+                "s1@tre-pe.jus.br".equals(cmdEmail.destinatario())
+        ));
     }
 }
