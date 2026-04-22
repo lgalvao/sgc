@@ -33,10 +33,11 @@ class NotificacaoEmailWorkerTest {
     void processarPendentesDeveEnviarEMarcarSucesso() {
         NotificacaoEmail notificacao = notificacao();
         when(notificacaoEmailService.listarPendentes(20)).thenReturn(List.of(notificacao));
+        when(notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(true);
 
         worker.processarPendentes();
 
-        verify(notificacaoEmailService).marcarEnviando(notificacao);
+        verify(notificacaoEmailService).marcarEnviandoSeDisponivel(notificacao);
         verify(emailService).enviarEmailHtml("destino@tre-pe.jus.br", "Assunto", "<p>corpo</p>");
         verify(notificacaoEmailService).marcarEnviado(notificacao);
         verify(notificacaoEmailService, never()).marcarFalha(any(), any());
@@ -48,17 +49,33 @@ class NotificacaoEmailWorkerTest {
         NotificacaoEmail notificacao = notificacao();
         RuntimeException erro = new RuntimeException("SMTP fora");
         when(notificacaoEmailService.listarPendentes(20)).thenReturn(List.of(notificacao));
+        when(notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(true);
         doThrow(erro).when(emailService).enviarEmailHtml("destino@tre-pe.jus.br", "Assunto", "<p>corpo</p>");
 
         worker.processarPendentes();
 
-        verify(notificacaoEmailService).marcarEnviando(notificacao);
+        verify(notificacaoEmailService).marcarEnviandoSeDisponivel(notificacao);
         verify(notificacaoEmailService).marcarFalha(notificacao, erro);
         verify(notificacaoEmailService, never()).marcarEnviado(any());
     }
 
+    @Test
+    @DisplayName("processarPendentes deve ignorar notificacao ja capturada por outro worker")
+    void processarPendentesDeveIgnorarNotificacaoJaCapturadaPorOutroWorker() {
+        NotificacaoEmail notificacao = notificacao();
+        when(notificacaoEmailService.listarPendentes(20)).thenReturn(List.of(notificacao));
+        when(notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(false);
+
+        worker.processarPendentes();
+
+        verify(emailService, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoEmailService, never()).marcarEnviado(any());
+        verify(notificacaoEmailService, never()).marcarFalha(any(), any());
+    }
+
     private NotificacaoEmail notificacao() {
         return NotificacaoEmail.builder()
+                .codigo(10L)
                 .destinatario("destino@tre-pe.jus.br")
                 .assunto("Assunto")
                 .corpoHtml("<p>corpo</p>")

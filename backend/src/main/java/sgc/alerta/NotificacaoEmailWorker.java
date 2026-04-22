@@ -25,7 +25,9 @@ public class NotificacaoEmailWorker {
     }
 
     private void processar(NotificacaoEmail notificacao) {
-        notificacaoEmailService.marcarEnviando(notificacao);
+        if (!notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)) {
+            return;
+        }
         try {
             emailService.enviarEmailHtml(
                     notificacao.getDestinatario(),

@@ -68,9 +68,13 @@ public class NotificacaoEmailService {
         );
     }
 
-    public void marcarEnviando(NotificacaoEmail notificacao) {
+    public boolean marcarEnviandoSeDisponivel(NotificacaoEmail notificacao) {
+        int atualizados = notificacaoEmailRepo.marcarEnviandoSeDisponivel(notificacao.getCodigo(), agora());
+        if (atualizados == 0) {
+            return false;
+        }
         notificacao.setSituacao(SituacaoNotificacaoEmail.ENVIANDO);
-        notificacaoEmailRepo.save(notificacao);
+        return true;
     }
 
     public void marcarEnviado(NotificacaoEmail notificacao) {

@@ -142,6 +142,38 @@ class NotificacaoEmailServiceTest {
     }
 
     @Test
+    @DisplayName("marcarEnviandoSeDisponivel deve capturar notificacao pendente")
+    void marcarEnviandoSeDisponivelDeveCapturarNotificacaoPendente() {
+        NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(10L)
+                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .build();
+        when(notificacaoEmailRepo.marcarEnviandoSeDisponivel(10L, LocalDateTime.of(2026, 4, 21, 9, 0)))
+                .thenReturn(1);
+
+        boolean capturada = service.marcarEnviandoSeDisponivel(notificacao);
+
+        assertThat(capturada).isTrue();
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.ENVIANDO);
+    }
+
+    @Test
+    @DisplayName("marcarEnviandoSeDisponivel deve rejeitar notificacao ja capturada")
+    void marcarEnviandoSeDisponivelDeveRejeitarNotificacaoJaCapturada() {
+        NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(10L)
+                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .build();
+        when(notificacaoEmailRepo.marcarEnviandoSeDisponivel(10L, LocalDateTime.of(2026, 4, 21, 9, 0)))
+                .thenReturn(0);
+
+        boolean capturada = service.marcarEnviandoSeDisponivel(notificacao);
+
+        assertThat(capturada).isFalse();
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
+    }
+
+    @Test
     @DisplayName("marcarFalha deve agendar retry antes do limite")
     void marcarFalhaDeveAgendarRetryAntesDoLimite() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()

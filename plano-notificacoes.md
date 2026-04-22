@@ -1,114 +1,72 @@
 # Plano de notificações, emails e alertas
 
-## Contexto
+## Diretrizes gerais
 
 - No SGC, "notificação" significa notificação por email.
-- O envio de email deve passar pelo outbox `NOTIFICACAO_EMAIL`.
-- "Alerta" é uma mensagem interna do sistema (representada por `Alerta.java`), relacionada à notificação em vários casos de uso, mas com ciclo próprio.
-- Alertas devem continuar sendo registrado na tabela `ALERTA`.
-- O script incremental para DBA deve ficar separado dos DDLs oficiais (que estao em backend/etc/sql)
-- O frontend fica para o final.
+- "Alerta" é uma mensagem interna do sistema, representada por `Alerta.java`, relacionada à notificação em vários casos de uso, mas com ciclo próprio.
+- Todo envio de email deve passar pelo outbox `NOTIFICACAO_EMAIL`; não criar novos envios SMTP diretos em services de negócio.
+- Alertas devem continuar sendo registrados na tabela `ALERTA`.
+- O script incremental para DBA deve ficar separado dos DDLs oficiais, em `backend/etc/sql`.
+- `backend/src/main/resources/db/schema.sql` deve continuar alinhado ao modelo usado nos testes.
+- Não alterar `backend/etc/sql/ddl_tabelas.sql` nem `backend/etc/sql/ddl_views.sql` neste trabalho.
+- O frontend fica para o final e deve expor estado técnico de email apenas onde isso ajudar o usuário ou o suporte.
 
-## 1. Fechar o modelo de dados incremental
+## Estado atual
 
-Situação: parcialmente concluído.
+- O backend já possui outbox de email com `NotificacaoEmailService`, `NotificacaoEmailWorker`, entidade `NotificacaoEmail` e endpoint de consulta por subprocesso.
+- `EmailService` permanece como adaptador baixo nível de SMTP.
+- Fluxos já migrados para o outbox:
+  - alteração de data limite de subprocesso;
+  - lembrete de prazo;
+  - atribuição temporária do CDU-28.
+- CDU-27 e CDU-28 possuem cobertura integrada confirmando uso do outbox.
+- Testes focados de alerta/email/outbox e CDU-27/CDU-28 passaram em 2026-04-22.
 
-- Manter um único script incremental para DBA com:
-  - criação da tabela `NOTIFICACAO_EMAIL`;
-  - `situacao`, tentativas, próxima tentativa e último erro;
-  - vínculo opcional com `ALERTA`;
-  - vínculo opcional com `SUBPROCESSO`;
-  - destino pessoal por `usuario_destino_titulo`;
-  - ajuste de `ALERTA` para aceitar alerta pessoal sem processo e sem unidade de destino;
-  - `CHECK` que exige unidade de destino ou usuário de destino.
-- Manter `backend/src/main/resources/db/schema.sql` alinhado para que os testes exercitem o modelo novo.
-- Não alterar `backend/etc/sql/ddl_tabelas.sql` nem `backend/etc/sql/ddl_views.sql`.
-- Revisar o script final com o DBA antes de aplicar em ambiente compartilhado.
+## Pendências
 
-## 2. Consolidar o backend de email
+### 1. Revisar processamento do outbox
 
-Situação: concluído.
-
-- Mantido `EmailService` como adaptador baixo nível de SMTP.
-- Mantido `NotificacaoEmailService` como entrada oficial para enfileirar, consultar e atualizar situação de emails.
-- Removida dependência de `EmailService` de `SubprocessoTransicaoService` e `ProcessoService`.
-- Migrado `SubprocessoTransicaoService.notificarAlteracaoDataLimite`: delegado a novo método `notificacaoService.notificarAlteracaoDataLimite()` que cria alerta, renderiza template HTML e enfileira no outbox.
-- Migrado `ProcessoService.enviarLembrete`: cria alerta, gera HTML via `emailModelosService` e enfileira no outbox com `tipo_notificacao = LEMBRETE_PRAZO`.
-- Cada tipo de email tem tipo, chave idempotente, assunto, template e vínculo com alerta.
-- Template `data-limite-alterada.html` criado.
-- Testes unitários e de integração atualizados.
-  - `SubprocessoTransicaoServiceTest`: verifica `notificacaoService.notificarAlteracaoDataLimite`
-  - `SubprocessoNotificacaoServiceTest`: dois novos testes para `notificarAlteracaoDataLimite`
-  - `ProcessoServiceCoverageTest`, `ProcessoServiceExtraCoverageTest`, `ProcessoServiceTest`: usam `NotificacaoEmailService`
-  - `CDU27IntegrationTest`: verifica outbox em vez de SMTP direto
-
-## 3. CDU-28 e novo modelo de email
-
-Situação: concluído no backend nesta rodada.
-
-- Ao criar atribuição temporária, o sistema agora deve:
-  - registrar a atribuição;
-  - criar alerta pessoal para o usuário da atribuição;
-  - enfileirar email pessoal no outbox;
-  - usar `tipo_notificacao = ATRIBUICAO_TEMPORARIA`;
-  - vincular a notificação ao alerta criado;
-  - não vincular a processo nem subprocesso;
-  - preencher `usuario_destino_titulo`;
-  - usar o modelo de email especificado no CDU-28.
-- O modelo de email de CDU-28 deve conter:
-  - assunto `SGC: Atribuição de perfil CHEFE na unidade [SIGLA_UNIDADE]`;
-  - nome do servidor;
-  - sigla da unidade;
-  - período da atribuição;
-  - justificativa;
-  - URL do sistema.
-- A URL do sistema deve vir de configuração, com fallback local para testes.
-- Testes esperados:
-  - unitário do serviço de atribuição;
-  - unitário do modelo de email;
-  - integração CDU-28 confirmando atribuição, alerta pessoal e email no outbox.
-
-## 4. Processamento do outbox
-
-Situação: base existente, ainda precisa revisão final.
-
-- Confirmar que o worker:
-  - busca apenas `PENDENTE` e `FALHA_TEMPORARIA` vencidas;
-  - marca `ENVIANDO` antes de chamar SMTP;
-  - marca `ENVIADO` somente após envio real;
-  - registra erro resumido em falha;
-  - calcula próxima tentativa com backoff;
-  - encerra em `FALHA_DEFINITIVA` após o limite.
-- Avaliar concorrência:
-  - para monolito e baixo volume, um worker simples é suficiente;
-  - ainda assim, evitar reprocessar a mesma linha em execuções simultâneas.
+- Confirmar que o worker processa apenas notificações `PENDENTE` e `FALHA_TEMPORARIA` com `proxima_tentativa_em` vencida.
+- Garantir que a notificação seja marcada como `ENVIANDO` antes da chamada SMTP.
+- Marcar `ENVIADO` somente após envio real.
+- Registrar erro resumido quando houver falha.
+- Manter retry com backoff e encerrar em `FALHA_DEFINITIVA` após o limite de tentativas.
+- Revisar concorrência para evitar que execuções simultâneas processem a mesma linha.
 - Definir política operacional:
-  - frequência do worker;
-  - quantidade máxima por lote;
-  - limpeza ou retenção histórica.
+  - intervalo do worker;
+  - tamanho máximo do lote;
+  - retenção ou limpeza histórica;
+  - ação manual esperada para `FALHA_DEFINITIVA`.
 
-## 5. APIs de consulta e suporte operacional
-
-Situação: parcial.
+### 2. Fechar suporte operacional
 
 - Manter consulta de emails por subprocesso para casos ligados ao fluxo de subprocesso.
-- Criar consulta por alerta ou por usuário apenas se o frontend realmente precisar.
-- Expor informação suficiente para suporte:
+- Criar consulta por alerta ou por usuário apenas se houver necessidade real do frontend ou do suporte.
+- Garantir que as consultas exponham:
   - situação;
   - tentativas;
   - data de criação;
   - data de envio;
+  - próximo reprocessamento;
   - último erro resumido.
-- Avaliar endpoint administrativo para reprocessar falhas definitivas somente se houver necessidade real.
+- Avaliar endpoint administrativo para reprocessar falhas definitivas somente se a operação pedir isso.
 
-## 6. Frontend
+### 3. Revisar modelo incremental com DBA
 
-Situação: pendente e deixado para o final.
+- Validar o script `backend/etc/sql/notificacao-email-outbox.sql` antes de aplicar em ambiente compartilhado.
+- Confirmar:
+  - criação de `NOTIFICACAO_EMAIL`;
+  - vínculos opcionais com `ALERTA` e `SUBPROCESSO`;
+  - destino pessoal por `usuario_destino_titulo`;
+  - ajuste de `ALERTA` para alerta pessoal sem processo e sem unidade de destino;
+  - `CHECK` que exige unidade de destino ou usuário de destino;
+  - índices necessários para worker e consultas.
 
-- Mostrar ao usuário a situação dos envios onde isso for útil, sem misturar com alertas normais.
-- Para telas de subprocesso, exibir histórico de emails relacionados ao subprocesso.
+### 4. Implementar frontend somente depois
+
+- Para telas de subprocesso, exibir histórico de emails relacionados ao subprocesso se isso for útil no fluxo.
 - Para alertas pessoais, decidir se a situação do email aparece no detalhe do alerta ou em área administrativa.
-- Evitar poluir a navegação principal com estado técnico de email.
+- Evitar misturar alertas normais com estado técnico de envio.
 - Usar mensagens simples:
   - pendente;
   - enviando;
@@ -116,16 +74,14 @@ Situação: pendente e deixado para o final.
   - falha temporária;
   - falha definitiva.
 
-## 7. Validação final
-
-Situação: pendente.
+### 5. Validação final
 
 - Rodar testes focados de alerta/email/outbox.
-- Rodar CDU-28 integrado.
-- Rodar os testes dos fluxos migrados quando `ProcessoService` e `SubprocessoTransicaoService` forem ajustados.
-- Fazer um dogfooding com monitoramento ligado em um fluxo real.
-- Confirmar que a request crítica não depende mais de SMTP direto nos casos migrados.
+- Rodar integrações de CDU-27 e CDU-28.
+- Rodar testes dos fluxos migrados em `ProcessoService` e `SubprocessoTransicaoService`.
+- Fazer dogfooding com monitoramento ligado em um fluxo real.
+- Confirmar que requests críticas não dependem mais de SMTP direto nos casos migrados.
 
-## Próxima etapa recomendada
+## Próxima etapa
 
-Revisar o processamento do outbox (etapa 4), confirmar que o worker trata concorrência de forma adequada para o volume atual e definir a política de limpeza/retenção. Em seguida, expor as APIs de consulta operacional (etapa 5) e só então iniciar o frontend (etapa 6).
+Fechar a revisão do processamento do outbox, principalmente concorrência do worker e política operacional. Depois disso, completar apenas as APIs de suporte que forem necessárias e iniciar o frontend.
