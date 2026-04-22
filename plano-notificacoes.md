@@ -3,10 +3,10 @@
 ## Contexto
 
 - No SGC, "notificação" significa notificação por email.
-- "Alerta" é uma mensagem interna do sistema, relacionada à notificação em vários casos de uso, mas com ciclo próprio.
 - O envio de email deve passar pelo outbox `NOTIFICACAO_EMAIL`.
-- O alerta deve continuar sendo registrado na tabela `ALERTA`.
-- O script incremental para DBA deve ficar separado dos DDLs oficiais.
+- "Alerta" é uma mensagem interna do sistema (representada por `Alerta.java`), relacionada à notificação em vários casos de uso, mas com ciclo próprio.
+- Alertas devem continuar sendo registrado na tabela `ALERTA`.
+- O script incremental para DBA deve ficar separado dos DDLs oficiais (que estao em backend/etc/sql)
 - O frontend fica para o final.
 
 ## 1. Fechar o modelo de dados incremental
