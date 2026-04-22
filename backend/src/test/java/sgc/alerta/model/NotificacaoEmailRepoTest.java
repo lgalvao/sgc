@@ -141,6 +141,17 @@ class NotificacaoEmailRepoTest {
     }
 
     @Test
+    @DisplayName("nao deve listar subprocessos ativos sem notificacao")
+    void naoDeveListarSubprocessosAtivosSemNotificacao() {
+        List<sgc.alerta.dto.NotificacaoSubprocessoResumoQuery> resumos =
+                notificacaoEmailRepo.resumirPorSubprocessosDeProcessosAtivos();
+
+        assertThat(resumos)
+                .extracting(sgc.alerta.dto.NotificacaoSubprocessoResumoQuery::subprocessoCodigo)
+                .doesNotContain(1700L);
+    }
+
+    @Test
     @DisplayName("deve reenfileirar falhas definitivas por subprocesso")
     void deveReenfileirarFalhasDefinitivasPorSubprocesso() {
         NotificacaoEmail falha = criarNotificacao("chave-repo-reenviar");

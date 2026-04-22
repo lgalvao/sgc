@@ -64,7 +64,7 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
               from Subprocesso subprocesso
               join subprocesso.processo processo
               join subprocesso.unidade unidade
-              left join NotificacaoEmail notificacao on notificacao.subprocesso = subprocesso
+              join NotificacaoEmail notificacao on notificacao.subprocesso = subprocesso
              where processo.situacao = sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO
              group by subprocesso.codigo, processo.codigo, processo.descricao, unidade.sigla, subprocesso.situacao
              order by processo.descricao asc, unidade.sigla asc
