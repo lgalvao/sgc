@@ -5,7 +5,6 @@ import org.springframework.dao.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.alerta.dto.EnfileirarNotificacaoCommand;
 import sgc.alerta.dto.NotificacaoSubprocessoResumoDto;
 import sgc.alerta.model.NotificacaoEmail;
 import sgc.alerta.model.NotificacaoEmailRepo;
