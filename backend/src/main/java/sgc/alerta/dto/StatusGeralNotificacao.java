@@ -1,7 +1,7 @@
 package sgc.alerta.dto;
 
 public enum StatusGeralNotificacao {
-    SEM_NOTIFICACAO,
+    INCONSISTENTE,
     OK,
     PENDENTE,
     FALHA_TEMPORARIA,

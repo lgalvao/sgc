@@ -57,7 +57,7 @@ public record NotificacaoSubprocessoResumoDto(
             return StatusGeralNotificacao.PENDENTE;
         }
         if (query.totalNotificacoes() == 0) {
-            return StatusGeralNotificacao.SEM_NOTIFICACAO;
+            return StatusGeralNotificacao.INCONSISTENTE;
         }
         return StatusGeralNotificacao.OK;
     }

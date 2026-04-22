@@ -1,19 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.administracao.NOTIFICACOES_TITULO">
-      <template #actions>
-        <BButton
-            data-testid="btn-notificacoes-atualizar"
-            :disabled="carregando"
-            size="sm"
-            variant="outline-primary"
-            @click="carregar"
-        >
-          <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
-          {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
-        </BButton>
-      </template>
-    </PageHeader>
+    <h1 class="visually-hidden">{{ TEXTOS.comum.MENU_NOTIFICACOES }}</h1>
 
     <div v-if="carregando" class="text-center py-5" data-testid="notificacoes-carregando">
       <BSpinner :label="TEXTOS.comum.CARREGANDO_DADOS" variant="primary"/>
@@ -24,73 +11,114 @@
       {{ erro }}
     </BAlert>
 
-    <EmptyState
-        v-else-if="linhasOrdenadas.length === 0"
-        :description="TEXTOS.administracao.NOTIFICACOES_EMPTY_DESCRIPTION"
-        icon="bi-envelope-check"
-        :title="TEXTOS.administracao.NOTIFICACOES_EMPTY_TITLE"
-    />
+    <template v-else>
+      <section class="mb-5">
+        <PageHeader :title="TEXTOS.administracao.NOTIFICACOES_PENDENTES_TITULO">
+          <template #actions>
+            <BButton
+                data-testid="btn-notificacoes-atualizar"
+                :disabled="carregando"
+                size="sm"
+                variant="outline-primary"
+                @click="carregar"
+            >
+              <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
+              {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
+            </BButton>
+          </template>
+        </PageHeader>
+        <BAlert
+            v-if="notificacoesPendentes.length === 0"
+            :model-value="true"
+            variant="success"
+        >
+          {{ TEXTOS.administracao.NOTIFICACOES_SEM_PENDENCIAS }}
+        </BAlert>
+        <BTable
+            v-else
+            :fields="camposPendentes"
+            :items="notificacoesPendentes"
+            :tbody-tr-class="rowClass"
+            data-testid="tbl-notificacoes-pendentes"
+            hover
+            responsive
+            small
+        >
+          <template #cell(unidadeSigla)="{ item }">
+            <UnidadeLink :item="item"/>
+          </template>
 
-    <div v-else class="table-responsive">
-      <BTable
-          :fields="campos"
-          :items="linhasOrdenadas"
-          :tbody-tr-class="rowClass"
-          data-testid="tbl-notificacoes"
-          hover
-          responsive
-          small
-      >
-        <template #cell(processoDescricao)="{ item }">
-          <div class="fw-semibold">{{ item.processoDescricao }}</div>
-        </template>
+          <template #cell(statusGeral)="{ item }">
+            <BBadge :variant="statusVariant(item.statusGeral)">
+              {{ statusLabel(item.statusGeral) }}
+            </BBadge>
+            <div v-if="item.maiorTentativas > 0" class="text-muted small mt-1">
+              {{ item.maiorTentativas }} tentativa(s)
+            </div>
+          </template>
 
-        <template #cell(unidadeSigla)="{ item }">
-          <RouterLink
-              :to="{ name: 'Subprocesso', params: { codProcesso: item.processoCodigo, siglaUnidade: item.unidadeSigla } }"
-              class="fw-semibold"
-          >
-            {{ item.unidadeSigla }}
-          </RouterLink>
-          <div class="text-muted small">{{ formatSituacaoSubprocesso(item.situacaoSubprocesso) }}</div>
-        </template>
-
-        <template #cell(situacaoSubprocesso)="{ item }">
-          {{ formatSituacaoSubprocesso(item.situacaoSubprocesso) }}
-        </template>
-
-        <template #cell(statusGeral)="{ item }">
-          <BBadge :variant="statusVariant(item.statusGeral)">
-            {{ statusLabel(item.statusGeral) }}
-          </BBadge>
-          <div v-if="item.totalNotificacoes > 0" class="text-muted small mt-1">
-            <span v-if="item.maiorTentativas > 0">{{ item.maiorTentativas }} tentativa(s)</span>
-            <span v-if="item.ultimoErro" class="d-block text-danger text-truncate erro-notificacao" :title="item.ultimoErro">
+          <template #cell(ultimoErro)="{ item }">
+            <span v-if="item.ultimoErro" class="text-danger text-truncate d-inline-block erro-notificacao" :title="item.ultimoErro">
               {{ item.ultimoErro }}
             </span>
-          </div>
-        </template>
+            <span v-else>-</span>
+          </template>
 
-        <template #cell(proximaTentativaEm)="{ item }">
-          {{ formatarDataOuHifen(item.proximaTentativaEm) }}
-        </template>
+          <template #cell(proximaTentativaEm)="{ item }">
+            {{ formatarDataOuHifen(item.proximaTentativaEm) }}
+          </template>
 
-        <template #cell(acoes)="{ item }">
-          <div class="text-end">
-            <BButton
-                v-if="item.podeReenviar"
-                data-testid="btn-notificacoes-reenviar"
-                size="sm"
-                variant="outline-danger"
-                @click="confirmarReenvio(item)"
-            >
-              <i aria-hidden="true" class="bi bi-send"></i>
-              {{ TEXTOS.administracao.NOTIFICACOES_REENVIAR }}
-            </BButton>
-          </div>
-        </template>
-      </BTable>
-    </div>
+          <template #cell(acoes)="{ item }">
+            <div class="text-end">
+              <BButton
+                  v-if="item.podeReenviar"
+                  data-testid="btn-notificacoes-reenviar"
+                  size="sm"
+                  variant="outline-danger"
+                  @click="confirmarReenvio(item)"
+              >
+                <i aria-hidden="true" class="bi bi-send"></i>
+                {{ TEXTOS.administracao.NOTIFICACOES_REENVIAR }}
+              </BButton>
+            </div>
+          </template>
+        </BTable>
+      </section>
+
+      <section>
+        <PageHeader :title="TEXTOS.administracao.NOTIFICACOES_CONCLUIDAS_TITULO"/>
+        <BAlert
+            v-if="notificacoesConcluidas.length === 0"
+            :model-value="true"
+            variant="secondary"
+        >
+          {{ TEXTOS.administracao.NOTIFICACOES_SEM_CONCLUIDAS }}
+        </BAlert>
+        <BTable
+            v-else
+            :fields="camposConcluidas"
+            :items="notificacoesConcluidas"
+            data-testid="tbl-notificacoes-concluidas"
+            hover
+            responsive
+            small
+        >
+          <template #cell(unidadeSigla)="{ item }">
+            <UnidadeLink :item="item"/>
+          </template>
+
+          <template #cell(statusGeral)="{ item }">
+            <BBadge :variant="statusVariant(item.statusGeral)">
+              {{ statusLabel(item.statusGeral) }}
+            </BBadge>
+          </template>
+
+          <template #cell(dataHoraEnvio)="{ item }">
+            {{ formatarDataOuHifen(item.ultimaNotificacaoEm) }}
+          </template>
+        </BTable>
+      </section>
+    </template>
 
     <ModalConfirmacao
         v-model="mostrarModalReenvio"
@@ -109,12 +137,11 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, defineComponent, h, onMounted, ref} from "vue";
 import {RouterLink} from "vue-router";
 import {BAlert, BBadge, BButton, BSpinner, BTable} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import EmptyState from "@/components/comum/EmptyState.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
 import {
@@ -136,26 +163,70 @@ const linhaSelecionada = ref<NotificacaoSubprocessoResumo | null>(null);
 const mostrarModalReenvio = ref(false);
 const reenviando = ref(false);
 
-const campos = [
+const camposBase = [
   {key: "unidadeSigla", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.UNIDADE},
   {key: "processoDescricao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROCESSO},
   {key: "statusGeral", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS},
+];
+
+const camposPendentes = [
+  ...camposBase,
+  {key: "ultimoErro", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ERRO},
   {key: "proximaTentativaEm", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROXIMA_TENTATIVA},
   {key: "acoes", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ACOES, thClass: "text-end", tdClass: "text-end"},
 ];
 
-const linhasOrdenadas = computed(() => [...linhas.value].sort((a, b) => {
-  const prioridade = pesoStatus(b.statusGeral) - pesoStatus(a.statusGeral);
-  if (prioridade !== 0) return prioridade;
-  return a.processoDescricao.localeCompare(b.processoDescricao) || a.unidadeSigla.localeCompare(b.unidadeSigla);
-}));
+const camposConcluidas = [
+  ...camposBase,
+  {key: "dataHoraEnvio", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.CONCLUSAO},
+];
+
+const notificacoesPendentes = computed(() => ordenarLinhas(
+    linhas.value.filter(item => item.statusGeral !== "OK")
+));
+
+const notificacoesConcluidas = computed(() => ordenarLinhas(
+    linhas.value.filter(item => item.statusGeral === "OK")
+));
+
+const UnidadeLink = defineComponent({
+  props: {
+    item: {
+      type: Object as () => NotificacaoSubprocessoResumo,
+      required: true,
+    },
+  },
+  setup(props) {
+    return () => h("div", [
+      h(RouterLink, {
+        to: {
+          name: "Subprocesso",
+          params: {
+            codProcesso: props.item.processoCodigo,
+            siglaUnidade: props.item.unidadeSigla,
+          },
+        },
+        class: "fw-semibold",
+      }, () => props.item.unidadeSigla),
+      h("div", {class: "text-muted small"}, formatSituacaoSubprocesso(props.item.situacaoSubprocesso)),
+    ]);
+  },
+});
+
+function ordenarLinhas(lista: NotificacaoSubprocessoResumo[]) {
+  return [...lista].sort((a, b) => {
+    const prioridade = pesoStatus(b.statusGeral) - pesoStatus(a.statusGeral);
+    if (prioridade !== 0) return prioridade;
+    return a.unidadeSigla.localeCompare(b.unidadeSigla) || a.processoDescricao.localeCompare(b.processoDescricao);
+  });
+}
 
 function pesoStatus(status: StatusGeralNotificacao): number {
   const pesos: Record<StatusGeralNotificacao, number> = {
-    FALHA_DEFINITIVA: 5,
-    FALHA_TEMPORARIA: 4,
-    PENDENTE: 3,
-    SEM_NOTIFICACAO: 2,
+    INCONSISTENTE: 5,
+    FALHA_DEFINITIVA: 4,
+    FALHA_TEMPORARIA: 3,
+    PENDENTE: 2,
     OK: 1,
   };
   return pesos[status];
@@ -163,8 +234,8 @@ function pesoStatus(status: StatusGeralNotificacao): number {
 
 function statusLabel(status: StatusGeralNotificacao): string {
   const labels: Record<StatusGeralNotificacao, string> = {
-    SEM_NOTIFICACAO: "-",
-    OK: "Enviado",
+    INCONSISTENTE: "Inconsistente",
+    OK: "Enviada",
     PENDENTE: "Pendente",
     FALHA_TEMPORARIA: "Falha temporária",
     FALHA_DEFINITIVA: "Falha definitiva",
@@ -174,12 +245,12 @@ function statusLabel(status: StatusGeralNotificacao): string {
 
 function statusVariant(status: StatusGeralNotificacao) {
   const variants = {
-    SEM_NOTIFICACAO: "secondary",
+    INCONSISTENTE: "danger",
     OK: "success",
     PENDENTE: "primary",
     FALHA_TEMPORARIA: "warning",
     FALHA_DEFINITIVA: "danger",
-  } as const satisfies Record<StatusGeralNotificacao, "secondary" | "success" | "primary" | "warning" | "danger">;
+  } as const satisfies Record<StatusGeralNotificacao, "success" | "primary" | "warning" | "danger">;
   return variants[status];
 }
 
@@ -191,7 +262,7 @@ function formatarDataOuHifen(valor: string | null): string {
 
 function rowClass(item: NotificacaoSubprocessoResumo | null, type = "row") {
   if (!item || type !== "row") return "";
-  if (item.statusGeral === "FALHA_DEFINITIVA") return "table-danger";
+  if (item.statusGeral === "FALHA_DEFINITIVA" || item.statusGeral === "INCONSISTENTE") return "table-danger";
   if (item.statusGeral === "FALHA_TEMPORARIA") return "table-warning";
   if (item.statusGeral === "PENDENTE") return "table-primary";
   return "";
@@ -235,6 +306,6 @@ onMounted(carregar);
 
 <style scoped>
 .erro-notificacao {
-  max-width: 24rem;
+  max-width: 28rem;
 }
 </style>

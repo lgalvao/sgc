@@ -2,7 +2,7 @@ import apiClient from "@/axios-setup";
 import type {SituacaoSubprocesso} from "@/types/tipos";
 
 export type StatusGeralNotificacao =
-    "SEM_NOTIFICACAO"
+    "INCONSISTENTE"
     | "OK"
     | "PENDENTE"
     | "FALHA_TEMPORARIA"
