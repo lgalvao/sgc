@@ -26,8 +26,8 @@ public class NotificacaoAdminController {
 
     @PostMapping("/subprocessos/{codSubprocesso}/reenviar")
     @Operation(summary = "Recoloca na fila notificações com falha definitiva de um subprocesso")
-    public ResponseEntity<ReenvioNotificacaoDto> reenviarFalhasDefinitivas(@PathVariable Long codSubprocesso) {
+    public ResponseEntity<NotificacaoReenvioDto> reenviarFalhasDefinitivas(@PathVariable Long codSubprocesso) {
         int reenfileiradas = notificacaoService.reenfileirarFalhasDefinitivasPorSubprocesso(codSubprocesso);
-        return ResponseEntity.ok(new ReenvioNotificacaoDto(codSubprocesso, reenfileiradas));
+        return ResponseEntity.ok(new NotificacaoReenvioDto(codSubprocesso, reenfileiradas));
     }
 }

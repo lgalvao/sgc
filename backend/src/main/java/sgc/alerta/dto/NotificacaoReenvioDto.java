@@ -1,6 +1,6 @@
 package sgc.alerta.dto;
 
-public record ReenvioNotificacaoDto(
+public record NotificacaoReenvioDto(
         Long subprocessoCodigo,
         int reenfileiradas
 ) {

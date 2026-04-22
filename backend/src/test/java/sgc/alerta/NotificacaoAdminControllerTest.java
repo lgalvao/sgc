@@ -65,7 +65,7 @@ class NotificacaoAdminControllerTest {
                 1,
                 0,
                 2,
-                StatusGeralNotificacao.FALHA_DEFINITIVA,
+                SituacaoNotificacao.FALHA_DEFINITIVA,
                 LocalDateTime.of(2026, 4, 22, 9, 0),
                 null,
                 5,

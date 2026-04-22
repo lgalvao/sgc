@@ -1,6 +1,6 @@
 package sgc.alerta.dto;
 
-public enum StatusGeralNotificacao {
+public enum SituacaoNotificacao {
     INCONSISTENTE,
     OK,
     PENDENTE,

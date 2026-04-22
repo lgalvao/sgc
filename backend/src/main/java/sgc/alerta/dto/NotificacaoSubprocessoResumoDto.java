@@ -16,7 +16,7 @@ public record NotificacaoSubprocessoResumoDto(
         long enviadas,
         long falhasTemporarias,
         long falhasDefinitivas,
-        StatusGeralNotificacao statusGeral,
+        SituacaoNotificacao statusGeral,
         LocalDateTime ultimaNotificacaoEm,
         LocalDateTime proximaTentativaEm,
         int maiorTentativas,
@@ -24,7 +24,7 @@ public record NotificacaoSubprocessoResumoDto(
         boolean podeReenviar
 ) {
     public static NotificacaoSubprocessoResumoDto fromQuery(NotificacaoSubprocessoResumoQuery query) {
-        StatusGeralNotificacao status = calcularStatus(query);
+        SituacaoNotificacao status = calcularStatus(query);
         return new NotificacaoSubprocessoResumoDto(
                 query.subprocessoCodigo(),
                 query.processoCodigo(),
@@ -46,19 +46,19 @@ public record NotificacaoSubprocessoResumoDto(
         );
     }
 
-    private static StatusGeralNotificacao calcularStatus(NotificacaoSubprocessoResumoQuery query) {
+    private static SituacaoNotificacao calcularStatus(NotificacaoSubprocessoResumoQuery query) {
         if (query.falhasDefinitivas() > 0) {
-            return StatusGeralNotificacao.FALHA_DEFINITIVA;
+            return SituacaoNotificacao.FALHA_DEFINITIVA;
         }
         if (query.falhasTemporarias() > 0) {
-            return StatusGeralNotificacao.FALHA_TEMPORARIA;
+            return SituacaoNotificacao.FALHA_TEMPORARIA;
         }
         if (query.pendentes() > 0 || query.enviando() > 0) {
-            return StatusGeralNotificacao.PENDENTE;
+            return SituacaoNotificacao.PENDENTE;
         }
         if (query.totalNotificacoes() == 0) {
-            return StatusGeralNotificacao.INCONSISTENTE;
+            return SituacaoNotificacao.INCONSISTENTE;
         }
-        return StatusGeralNotificacao.OK;
+        return SituacaoNotificacao.OK;
     }
 }
