@@ -86,7 +86,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        invokeMethod(service, "disponibilizar", sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Usuario());
+        invokeMethod(service, "disponibilizar", sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Usuario(), null);
 
         verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), admin)));
     }
@@ -102,7 +102,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         doThrow(new sgc.comum.erros.ErroValidacao("erro"))
             .when(validacaoService).validarSituacaoPermitida(any(Subprocesso.class), eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO));
         
-        assertThatThrownBy(() -> service.disponibilizarRevisao(100L))
+        assertThatThrownBy(() -> service.disponibilizarRevisao(100L, null))
                 .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
     }
 
