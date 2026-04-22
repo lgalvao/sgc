@@ -95,9 +95,8 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                 .filter(item -> usuario.getTituloEleitoral().equals(item.getUsuarioDestinoTitulo()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(notificacao.getAlerta().getCodigo()).isEqualTo(alerta.getCodigo());
         assertThat(notificacao.getSubprocesso()).isNull();
-        assertThat(notificacao.getTipoNotificacao()).isEqualTo("ATRIBUICAO_TEMPORARIA");
+        assertThat(notificacao.getTipoNotificacao()).isEqualTo(TipoNotificacao.ATRIBUICAO_TEMPORARIA);
         assertThat(notificacao.getDestinatario()).isEqualTo(usuario.getEmail());
         assertThat(notificacao.getAssunto()).isEqualTo(
                 "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(unidade.getSigla()));

@@ -47,7 +47,7 @@ class ProcessoServiceCoverageTest {
     @Mock private AlertaFacade servicoAlertas;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
 
-    @Mock private NotificacaoEmailService notificacaoEmailService;
+    @Mock private NotificacaoService notificacaoService;
     @Mock private EmailModelosService emailModelosService;
     @Mock private SubprocessoTransicaoService transicaoService;
 
@@ -376,6 +376,7 @@ class ProcessoServiceCoverageTest {
     void iniciarDiagnostico() {
         Long cod = 1L;
         Processo p = new Processo(); p.setCodigo(cod); p.setTipo(DIAGNOSTICO); p.setSituacao(CRIADO);
+        p.setDataLimite(LocalDateTime.now().plusDays(30));
         Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
         u.setSigla("U10"); u.setSituacao(SituacaoUnidade.ATIVA);
         p.adicionarParticipantes(Set.of(u));
@@ -583,7 +584,7 @@ class ProcessoServiceCoverageTest {
         target.enviarLembrete(1L, 10L);
 
         verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
-        verify(notificacaoEmailService).enfileirar(argThat(cmd -> "teste@teste.com".equals(cmd.destinatario())));
+        verify(notificacaoService).enfileirar(argThat(cmd -> "teste@teste.com".equals(cmd.destinatario())));
     }
 
     @Test

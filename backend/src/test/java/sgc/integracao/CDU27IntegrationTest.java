@@ -96,13 +96,12 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // 2. Verificar E-mail no outbox
         NotificacaoEmail notificacao = notificacaoEmailRepo.findAll().stream()
-                .filter(n -> "DATA_LIMITE_ALTERADA".equals(n.getTipoNotificacao()))
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.DATA_LIMITE_ALTERADA)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Notificação de data limite não encontrada no outbox"));
         assertThat(notificacao.getAssunto()).isEqualTo("SGC: Data limite alterada");
         assertThat(notificacao.getCorpoHtml()).contains("Processo CDU-27");
-        assertThat(notificacao.getAlerta().getCodigo()).isEqualTo(alerta.getCodigo());
-        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
     }
 
     @Test

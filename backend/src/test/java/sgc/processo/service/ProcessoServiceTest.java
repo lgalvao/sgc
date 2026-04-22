@@ -9,6 +9,8 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import sgc.alerta.*;
+import sgc.alerta.NotificacaoService;
+import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
@@ -63,7 +65,7 @@ class ProcessoServiceTest {
     @Mock
     private AlertaFacade servicoAlertas;
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
     @Mock
     private EmailModelosService emailModelosService;
     @Mock
@@ -192,6 +194,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setDataLimite(LocalDateTime.now().plusDays(30));
             Unidade uni = criarUnidadeValida(10L);
             p.adicionarParticipantes(Set.of(uni));
             
@@ -215,6 +218,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.REVISAO);
+            p.setDataLimite(LocalDateTime.now().plusDays(30));
             Unidade uni = criarUnidadeValida(1L);
             p.adicionarParticipantes(Set.of(uni));
 
@@ -249,6 +253,7 @@ class ProcessoServiceTest {
             processo.setCodigo(id);
             processo.setSituacao(SituacaoProcesso.CRIADO);
             processo.setTipo(TipoProcesso.REVISAO);
+            processo.setDataLimite(LocalDateTime.now().plusDays(30));
 
             Unidade unidadePai = criarUnidadeValida(10L);
             Unidade unidadeFilha = criarUnidadeValida(20L);
@@ -285,6 +290,7 @@ class ProcessoServiceTest {
             processo.setCodigo(id);
             processo.setSituacao(SituacaoProcesso.CRIADO);
             processo.setTipo(TipoProcesso.REVISAO);
+            processo.setDataLimite(LocalDateTime.now().plusDays(30));
 
             Unidade unidadePai = criarUnidadeValida(10L);
             unidadePai.setTipo(TipoUnidade.INTEROPERACIONAL);
@@ -360,6 +366,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.REVISAO);
+            p.setDataLimite(LocalDateTime.now().plusDays(30));
             Unidade uni = criarUnidadeValida(1L);
             p.adicionarParticipantes(Set.of(uni));
 
@@ -1025,6 +1032,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.DIAGNOSTICO);
+            p.setDataLimite(LocalDateTime.now().plusDays(30));
             Unidade uni = criarUnidadeValida(1L);
             p.adicionarParticipantes(Set.of(uni));
 
@@ -1234,11 +1242,10 @@ class ProcessoServiceTest {
             processoService.enviarLembrete(codProcesso, codUnidade);
 
             verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), contains("Lembrete"));
-            verify(notificacaoEmailService).enfileirar(argThat(cmd ->
+            verify(notificacaoService).enfileirar(argThat(cmd ->
                     "titular@tre-pe.jus.br".equals(cmd.destinatario())
                             && cmd.assunto().contains("Processo teste")
-                            && "LEMBRETE_PRAZO".equals(cmd.tipoNotificacao())
-                            && cmd.alerta() == alerta
+                            && cmd.tipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO
                             && cmd.subprocesso() == null
                             && cmd.chaveIdempotencia().contains("processo:1:lembrete:unidade:10")
             ));

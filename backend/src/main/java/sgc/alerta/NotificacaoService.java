@@ -14,7 +14,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class NotificacaoEmailService {
+public class NotificacaoService {
     private static final int LIMITE_ERRO = 2000;
     private static final int MAX_TENTATIVAS = 5;
     private static final int LIMITE_CONSULTA_MAXIMO = 100;
@@ -22,21 +22,20 @@ public class NotificacaoEmailService {
     private final NotificacaoEmailRepo notificacaoEmailRepo;
     private final Clock clock;
 
-    public NotificacaoEmail enfileirar(EnfileirarNotificacaoEmailCommand cmd) {
+    public NotificacaoEmail enfileirar(EnfileirarNotificacaoCommand cmd) {
         if (notificacaoEmailRepo.existsByChaveIdempotencia(cmd.chaveIdempotencia())) {
             return notificacaoEmailRepo.findByChaveIdempotencia(cmd.chaveIdempotencia())
                     .orElseThrow();
         }
 
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
-                .alerta(cmd.alerta())
                 .subprocesso(cmd.subprocesso())
                 .tipoNotificacao(cmd.tipoNotificacao())
                 .usuarioDestinoTitulo(cmd.usuarioDestinoTitulo())
                 .destinatario(cmd.destinatario())
                 .assunto(cmd.assunto())
                 .corpoHtml(cmd.corpoHtml())
-                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .situacao(SituacaoNotificacao.PENDENTE)
                 .tentativas(0)
                 .proximaTentativaEm(agora())
                 .dataHoraCriacao(agora())
@@ -54,7 +53,7 @@ public class NotificacaoEmailService {
     @Transactional(readOnly = true)
     public List<NotificacaoEmail> listarPendentes(int limite) {
         return notificacaoEmailRepo.findBySituacaoInAndProximaTentativaEmLessThanEqualOrderByDataHoraCriacaoAsc(
-                List.of(SituacaoNotificacaoEmail.PENDENTE, SituacaoNotificacaoEmail.FALHA_TEMPORARIA),
+                List.of(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.FALHA_TEMPORARIA),
                 agora(),
                 PageRequest.of(0, limite)
         );
@@ -86,12 +85,12 @@ public class NotificacaoEmailService {
         if (atualizados == 0) {
             return false;
         }
-        notificacao.setSituacao(SituacaoNotificacaoEmail.ENVIANDO);
+        notificacao.setSituacao(SituacaoNotificacao.ENVIANDO);
         return true;
     }
 
     public void marcarEnviado(NotificacaoEmail notificacao) {
-        notificacao.setSituacao(SituacaoNotificacaoEmail.ENVIADO);
+        notificacao.setSituacao(SituacaoNotificacao.ENVIADO);
         notificacao.setDataHoraEnvio(agora());
         notificacao.setUltimoErro(null);
         notificacaoEmailRepo.save(notificacao);
@@ -102,10 +101,10 @@ public class NotificacaoEmailService {
         notificacao.setTentativas(tentativas);
         notificacao.setUltimoErro(resumirErro(erro));
         if (tentativas >= MAX_TENTATIVAS) {
-            notificacao.setSituacao(SituacaoNotificacaoEmail.FALHA_DEFINITIVA);
+            notificacao.setSituacao(SituacaoNotificacao.FALHA_DEFINITIVA);
             notificacao.setProximaTentativaEm(null);
         } else {
-            notificacao.setSituacao(SituacaoNotificacaoEmail.FALHA_TEMPORARIA);
+            notificacao.setSituacao(SituacaoNotificacao.FALHA_TEMPORARIA);
             notificacao.setProximaTentativaEm(agora().plusSeconds(atrasoRetrySegundos(tentativas)));
         }
         notificacaoEmailRepo.save(notificacao);

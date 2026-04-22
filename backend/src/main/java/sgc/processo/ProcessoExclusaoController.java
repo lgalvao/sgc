@@ -15,7 +15,7 @@ import sgc.processo.service.*;
 @RequiredArgsConstructor
 @Tag(name = "Processos", description = "Operacoes administrativas de processo em homologacao")
 @PreAuthorize("isAuthenticated()")
-public class ProcessoHomologacaoController {
+public class ProcessoExclusaoController {
     private final ProcessoExclusaoCompletaService processoExclusaoCompletaService;
 
     @PostMapping("/{codigo}/excluir-completo")

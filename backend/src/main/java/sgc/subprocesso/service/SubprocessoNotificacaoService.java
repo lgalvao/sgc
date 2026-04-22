@@ -26,7 +26,7 @@ public class SubprocessoNotificacaoService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final AlertaFacade alertaService;
-    private final NotificacaoEmailService notificacaoEmailService;
+    private final NotificacaoService notificacaoService;
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
     private final SpringTemplateEngine templateEngine;
@@ -78,9 +78,14 @@ public class SubprocessoNotificacaoService {
         String chave = "subprocesso:%d:data-limite-alterada:etapa:%d:data:%s"
                 .formatted(sp.getCodigo(), etapa, novaDataFormatada);
 
-        notificacaoEmailService.enfileirar(new EnfileirarNotificacaoEmailCommand(
-                alerta, sp, "DATA_LIMITE_ALTERADA", null,
-                emailDestino, sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA, corpo, chave));
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(sp)
+                .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
+                .destinatario(emailDestino)
+                .assunto(sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA)
+                .corpoHtml(corpo)
+                .chaveIdempotencia(chave)
+                .build());
     }
 
     private void enviarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {
@@ -135,16 +140,14 @@ public class SubprocessoNotificacaoService {
     }
 
     private void enfileirarEmail(NotificacaoCommand cmd, EmailGerado email) {
-        notificacaoEmailService.enfileirar(new EnfileirarNotificacaoEmailCommand(
-                null,
-                cmd.subprocesso(),
-                cmd.tipoTransicao().name(),
-                null,
-                email.destinatario(),
-                email.assunto(),
-                email.corpo(),
-                chaveIdempotencia(cmd, email)
-        ));
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(cmd.subprocesso())
+                .tipoNotificacao(TipoNotificacao.valueOf(cmd.tipoTransicao().name()))
+                .destinatario(email.destinatario())
+                .assunto(email.assunto())
+                .corpoHtml(email.corpo())
+                .chaveIdempotencia(chaveIdempotencia(cmd, email))
+                .build());
     }
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {

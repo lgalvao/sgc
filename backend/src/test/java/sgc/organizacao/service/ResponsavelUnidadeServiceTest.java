@@ -42,7 +42,7 @@ class ResponsavelUnidadeServiceTest {
     private AlertaFacade alertaFacade;
 
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
 
     @Mock
     private EmailModelosService emailModelosService;
@@ -192,13 +192,12 @@ class ResponsavelUnidadeServiceTest {
             assertThat(emailCaptor.getValue().justificativa()).isEqualTo("Cobertura de férias");
             assertThat(emailCaptor.getValue().urlSistema()).isEqualTo("http://localhost:5173");
 
-            ArgumentCaptor<EnfileirarNotificacaoEmailCommand> commandCaptor =
-                    ArgumentCaptor.forClass(EnfileirarNotificacaoEmailCommand.class);
-            verify(notificacaoEmailService).enfileirar(commandCaptor.capture());
-            EnfileirarNotificacaoEmailCommand command = commandCaptor.getValue();
-            assertThat(command.alerta()).isSameAs(alerta);
+            ArgumentCaptor<EnfileirarNotificacaoCommand> commandCaptor =
+                    ArgumentCaptor.forClass(EnfileirarNotificacaoCommand.class);
+            verify(notificacaoService).enfileirar(commandCaptor.capture());
+            EnfileirarNotificacaoCommand command = commandCaptor.getValue();
             assertThat(command.subprocesso()).isNull();
-            assertThat(command.tipoNotificacao()).isEqualTo("ATRIBUICAO_TEMPORARIA");
+            assertThat(command.tipoNotificacao()).isEqualTo(TipoNotificacao.ATRIBUICAO_TEMPORARIA);
             assertThat(command.usuarioDestinoTitulo()).isEqualTo("123456789012");
             assertThat(command.destinatario()).isEqualTo("usuario@tre-pe.jus.br");
             assertThat(command.assunto()).isEqualTo("SGC: Atribuição de perfil CHEFE na unidade UNIT");
@@ -235,7 +234,7 @@ class ResponsavelUnidadeServiceTest {
             ArgumentCaptor<AtribuicaoTemporaria> captor = ArgumentCaptor.forClass(AtribuicaoTemporaria.class);
             verify(atribuicaoTemporariaRepo).save(captor.capture());
             assertThat(captor.getValue().getDataInicio()).isNotNull();
-            verify(notificacaoEmailService).enfileirar(any());
+            verify(notificacaoService).enfileirar(any());
         }
 
         @Test
@@ -255,7 +254,7 @@ class ResponsavelUnidadeServiceTest {
             verify(atribuicaoTemporariaRepo, never()).save(any());
             verifyNoInteractions(cacheOrganizacaoService);
             verifyNoInteractions(alertaFacade);
-            verifyNoInteractions(notificacaoEmailService);
+            verifyNoInteractions(notificacaoService);
         }
     }
 

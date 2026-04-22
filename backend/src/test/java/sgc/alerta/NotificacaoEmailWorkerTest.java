@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("NullAway.Init")
 class NotificacaoEmailWorkerTest {
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
     @Mock
     private EmailService emailService;
 
@@ -32,15 +32,15 @@ class NotificacaoEmailWorkerTest {
     @DisplayName("processarPendentes deve enviar e marcar sucesso")
     void processarPendentesDeveEnviarEMarcarSucesso() {
         NotificacaoEmail notificacao = notificacao();
-        when(notificacaoEmailService.listarPendentes(20)).thenReturn(List.of(notificacao));
-        when(notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(true);
+        when(notificacaoService.listarPendentes(20)).thenReturn(List.of(notificacao));
+        when(notificacaoService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(true);
 
         worker.processarPendentes();
 
-        verify(notificacaoEmailService).marcarEnviandoSeDisponivel(notificacao);
+        verify(notificacaoService).marcarEnviandoSeDisponivel(notificacao);
         verify(emailService).enviarEmailHtml("destino@tre-pe.jus.br", "Assunto", "<p>corpo</p>");
-        verify(notificacaoEmailService).marcarEnviado(notificacao);
-        verify(notificacaoEmailService, never()).marcarFalha(any(), any());
+        verify(notificacaoService).marcarEnviado(notificacao);
+        verify(notificacaoService, never()).marcarFalha(any(), any());
     }
 
     @Test
@@ -48,29 +48,29 @@ class NotificacaoEmailWorkerTest {
     void processarPendentesDeveMarcarFalhaQuandoSmtpFalhar() {
         NotificacaoEmail notificacao = notificacao();
         RuntimeException erro = new RuntimeException("SMTP fora");
-        when(notificacaoEmailService.listarPendentes(20)).thenReturn(List.of(notificacao));
-        when(notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(true);
+        when(notificacaoService.listarPendentes(20)).thenReturn(List.of(notificacao));
+        when(notificacaoService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(true);
         doThrow(erro).when(emailService).enviarEmailHtml("destino@tre-pe.jus.br", "Assunto", "<p>corpo</p>");
 
         worker.processarPendentes();
 
-        verify(notificacaoEmailService).marcarEnviandoSeDisponivel(notificacao);
-        verify(notificacaoEmailService).marcarFalha(notificacao, erro);
-        verify(notificacaoEmailService, never()).marcarEnviado(any());
+        verify(notificacaoService).marcarEnviandoSeDisponivel(notificacao);
+        verify(notificacaoService).marcarFalha(notificacao, erro);
+        verify(notificacaoService, never()).marcarEnviado(any());
     }
 
     @Test
     @DisplayName("processarPendentes deve ignorar notificacao ja capturada por outro worker")
     void processarPendentesDeveIgnorarNotificacaoJaCapturadaPorOutroWorker() {
         NotificacaoEmail notificacao = notificacao();
-        when(notificacaoEmailService.listarPendentes(20)).thenReturn(List.of(notificacao));
-        when(notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(false);
+        when(notificacaoService.listarPendentes(20)).thenReturn(List.of(notificacao));
+        when(notificacaoService.marcarEnviandoSeDisponivel(notificacao)).thenReturn(false);
 
         worker.processarPendentes();
 
         verify(emailService, never()).enviarEmailHtml(any(), any(), any());
-        verify(notificacaoEmailService, never()).marcarEnviado(any());
-        verify(notificacaoEmailService, never()).marcarFalha(any(), any());
+        verify(notificacaoService, never()).marcarEnviado(any());
+        verify(notificacaoService, never()).marcarFalha(any(), any());
     }
 
     private NotificacaoEmail notificacao() {

@@ -608,11 +608,11 @@ INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura
 -- -------------------------------------------------------------------------------------------------
 -- Subprocesso 301: notificação enviada para validar o estado regular.
 INSERT INTO sgc.notificacao_email
-    (codigo, alerta_codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, destinatario, assunto,
+    (codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, destinatario, assunto,
      corpo_html, situacao, tentativas, proxima_tentativa_em, data_hora_criacao, data_hora_envio, ultimo_erro,
      chave_idempotencia)
 VALUES
-    (1, 3, 301, 'CADASTRO_HOMOLOGADO', NULL, 'chefe_sec311@tre-pe.jus.br',
+    (1, 301, 'CADASTRO_HOMOLOGADO', NULL, 'chefe_sec311@tre-pe.jus.br',
      'SGC: Cadastro de atividades homologado',
      '<p>Cadastro homologado.</p>',
      'ENVIADO', 1, NULL, CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '16' HOUR,
@@ -621,11 +621,11 @@ VALUES
 
 -- Subprocesso 302: falha definitiva para validar destaque e reenvio.
 INSERT INTO sgc.notificacao_email
-    (codigo, alerta_codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, destinatario, assunto,
+    (codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, destinatario, assunto,
      corpo_html, situacao, tentativas, proxima_tentativa_em, data_hora_criacao, data_hora_envio, ultimo_erro,
      chave_idempotencia)
 VALUES
-    (2, 4, 302, 'MAPA_DISPONIBILIZADO_SUPERIOR', NULL, 'chefe_sec3@tre-pe.jus.br',
+    (2, 302, 'MAPA_DISPONIBILIZADO_SUPERIOR', NULL, 'chefe_sec3@tre-pe.jus.br',
      'SGC: Mapa de competências disponibilizado - SECAO_321',
      '<p>Mapa disponibilizado para unidade superior.</p>',
      'FALHA_DEFINITIVA', 5, NULL, CURRENT_TIMESTAMP - INTERVAL '45' MINUTE, NULL,

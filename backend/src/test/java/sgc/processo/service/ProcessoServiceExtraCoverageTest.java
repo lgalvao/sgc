@@ -66,7 +66,7 @@ class ProcessoServiceExtraCoverageTest {
     private AlertaFacade servicoAlertas;
 
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
 
     @Mock
     private EmailModelosService emailModelosService;
@@ -617,7 +617,7 @@ class ProcessoServiceExtraCoverageTest {
             processoService.enviarLembrete(1L, 1L);
 
             verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
-            verify(notificacaoEmailService).enfileirar(argThat(cmd -> "titular@teste.com".equals(cmd.destinatario())));
+            verify(notificacaoService).enfileirar(argThat(cmd -> "titular@teste.com".equals(cmd.destinatario())));
         }
     }
 
@@ -755,6 +755,7 @@ class ProcessoServiceExtraCoverageTest {
             p.setCodigo(1L);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.DIAGNOSTICO);
+            p.setDataLimite(LocalDateTime.now().plusDays(30));
             
             UnidadeProcesso up = new UnidadeProcesso();
             up.setUnidadeCodigo(10L);

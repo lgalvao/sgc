@@ -17,16 +17,14 @@ import java.time.*;
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
 public class NotificacaoEmail extends EntidadeBase {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "alerta_codigo")
-    private @Nullable Alerta alerta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subprocesso_codigo")
     private @Nullable Subprocesso subprocesso;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_notificacao", length = 80)
-    private @Nullable String tipoNotificacao;
+    private @Nullable TipoNotificacao tipoNotificacao;
 
     @Column(name = "usuario_destino_titulo", length = 12)
     private @Nullable String usuarioDestinoTitulo;
@@ -43,7 +41,7 @@ public class NotificacaoEmail extends EntidadeBase {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", nullable = false, length = 30)
-    private SituacaoNotificacaoEmail situacao;
+    private SituacaoNotificacao situacao;
 
     @Column(name = "tentativas", nullable = false)
     private int tentativas;

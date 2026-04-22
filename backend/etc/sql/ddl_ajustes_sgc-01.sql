@@ -7,7 +7,6 @@
 --
 -- Observacao:
 --   Este script usa blocos condicionais para tolerar bancos parcialmente ajustados.
---   No Oracle, tentar modificar para NULL uma coluna que ja permite NULL gera ORA-01451.
 
 DECLARE
     v_nullable USER_TAB_COLUMNS.NULLABLE%TYPE;
@@ -68,7 +67,6 @@ BEGIN
             CREATE TABLE NOTIFICACAO_EMAIL
             (
                 codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-                alerta_codigo          NUMBER                            NULL,
                 subprocesso_codigo     NUMBER                            NULL,
                 tipo_notificacao       VARCHAR2(80)                      NULL,
                 usuario_destino_titulo VARCHAR2(12)                      NULL,
@@ -94,17 +92,29 @@ BEGIN
                     )
                 ),
                 CONSTRAINT ck_notif_email_tentativas CHECK (tentativas >= 0),
-                CONSTRAINT fk_notif_email_alerta FOREIGN KEY (alerta_codigo) REFERENCES ALERTA (codigo),
                 CONSTRAINT fk_notif_email_subproc FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
             )
         ]';
+    ELSE
+        -- Se a tabela ja existe, garante que a coluna alerta_codigo foi removida (caso tenha sido criada anteriormente)
+        DECLARE
+            v_col_count NUMBER;
+        BEGIN
+            SELECT COUNT(*) INTO v_col_count FROM user_tab_columns WHERE table_name = 'NOTIFICACAO_EMAIL' AND column_name = 'ALERTA_CODIGO';
+            IF v_col_count > 0 THEN
+                -- Remove constraint se existir antes de dropar coluna
+                FOR r IN (SELECT constraint_name FROM user_constraints WHERE table_name = 'NOTIFICACAO_EMAIL' AND constraint_name = 'FK_NOTIF_EMAIL_ALERTA') LOOP
+                    EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL DROP CONSTRAINT ' || r.constraint_name;
+                END LOOP;
+                EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL DROP COLUMN alerta_codigo';
+            END IF;
+        END;
     END IF;
 END;
 /
 
 COMMENT ON TABLE NOTIFICACAO_EMAIL IS 'Caixa de saida de e-mails, para envio assincrono com retry e auditoria.';
 COMMENT ON COLUMN NOTIFICACAO_EMAIL.codigo IS 'Identificador unico do e-mail.';
-COMMENT ON COLUMN NOTIFICACAO_EMAIL.alerta_codigo IS 'Alerta interno associado ao e-mail.';
 COMMENT ON COLUMN NOTIFICACAO_EMAIL.subprocesso_codigo IS 'Subprocesso associado ao evento que gerou o e-mail.';
 COMMENT ON COLUMN NOTIFICACAO_EMAIL.tipo_notificacao IS 'Tipo de notificacao que originou o e-mail.';
 COMMENT ON COLUMN NOTIFICACAO_EMAIL.usuario_destino_titulo IS 'Usuario destinatario quando a notificacao for pessoal.';
@@ -143,8 +153,8 @@ DECLARE
     v_count NUMBER;
 BEGIN
     SELECT COUNT(*) INTO v_count FROM user_indexes WHERE index_name = 'IX_NOTIF_EMAIL_ALERTA';
-    IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE INDEX ix_notif_email_alerta ON NOTIFICACAO_EMAIL (alerta_codigo)';
+    IF v_count > 0 THEN
+        EXECUTE IMMEDIATE 'DROP INDEX ix_notif_email_alerta';
     END IF;
 END;
 /

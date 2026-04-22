@@ -11,7 +11,7 @@ import sgc.alerta.model.*;
 @RequiredArgsConstructor
 @Slf4j
 public class NotificacaoEmailWorker {
-    private final NotificacaoEmailService notificacaoEmailService;
+    private final NotificacaoService notificacaoService;
     private final EmailService emailService;
 
     @Value("${sgc.notificacao-email.lote-worker:20}")
@@ -19,13 +19,13 @@ public class NotificacaoEmailWorker {
 
     @Scheduled(fixedDelayString = "${sgc.notificacao-email.intervalo-worker-ms:30000}")
     public void processarPendentes() {
-        for (NotificacaoEmail notificacao : notificacaoEmailService.listarPendentes(loteWorker)) {
+        for (NotificacaoEmail notificacao : notificacaoService.listarPendentes(loteWorker)) {
             processar(notificacao);
         }
     }
 
     private void processar(NotificacaoEmail notificacao) {
-        if (!notificacaoEmailService.marcarEnviandoSeDisponivel(notificacao)) {
+        if (!notificacaoService.marcarEnviandoSeDisponivel(notificacao)) {
             return;
         }
         try {
@@ -34,10 +34,10 @@ public class NotificacaoEmailWorker {
                     notificacao.getAssunto(),
                     notificacao.getCorpoHtml()
             );
-            notificacaoEmailService.marcarEnviado(notificacao);
+            notificacaoService.marcarEnviado(notificacao);
         } catch (Exception ex) {
             log.warn("Falha ao enviar notificacao de email {}", notificacao.getCodigo(), ex);
-            notificacaoEmailService.marcarFalha(notificacao, ex);
+            notificacaoService.marcarFalha(notificacao, ex);
         }
     }
 }

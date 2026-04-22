@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
 import sgc.comum.*;
-import sgc.comum.util.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.organizacao.*;
@@ -56,7 +55,7 @@ public class ProcessoService {
     private final SubprocessoValidacaoService validacaoService;
     private final UsuarioFacade usuarioService;
     private final AlertaFacade servicoAlertas;
-    private final NotificacaoEmailService notificacaoEmailService;
+    private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoTransicaoService transicaoService;
@@ -365,9 +364,13 @@ public class ProcessoService {
         String assunto = "SGC: Lembrete - " + processo.getDescricao();
         String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
                 .formatted(codProcesso, unidadeCodigo, LocalDate.now());
-        notificacaoEmailService.enfileirar(new sgc.alerta.EnfileirarNotificacaoEmailCommand(
-                alerta, null, "LEMBRETE_PRAZO", null,
-                titular.getEmail(), assunto, corpoHtml, chave));
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.LEMBRETE_PRAZO)
+                .destinatario(titular.getEmail())
+                .assunto(assunto)
+                .corpoHtml(corpoHtml)
+                .chaveIdempotencia(chave)
+                .build());
     }
 
 
@@ -915,6 +918,103 @@ public class ProcessoService {
     private void notificarInicioProcesso(Processo p, List<Unidade> participantes) {
         log.info("Notificando início do processo {}", p.getCodigo());
         servicoAlertas.criarAlertasProcessoIniciado(p, participantes);
+        enfileirarEmailsInicioProcesso(p, participantes);
+    }
+
+    private void enfileirarEmailsInicioProcesso(Processo processo, List<Unidade> participantes) {
+        Set<Long> codsOperacionais = new HashSet<>();
+        Set<Long> codsIntermediarias = new HashSet<>();
+        Map<Long, Unidade> todasUnidadesMap = new HashMap<>();
+
+        for (Unidade unidade : participantes) {
+            Long codigoUnidade = unidade.getCodigo();
+            todasUnidadesMap.put(codigoUnidade, unidade);
+            TipoUnidade tipo = unidade.getTipo();
+
+            if (tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL || tipo == TipoUnidade.RAIZ) {
+                codsOperacionais.add(codigoUnidade);
+            }
+
+            if (tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL) {
+                codsIntermediarias.add(codigoUnidade);
+            }
+        }
+
+        Set<Long> codigosSuperiores = new HashSet<>();
+        for (Unidade unidade : participantes) {
+            codigosSuperiores.addAll(unidadeHierarquiaService.buscarCodigosSuperiores(unidade.getCodigo()));
+        }
+        if (!codigosSuperiores.isEmpty()) {
+            List<Unidade> unidadesSuperiores = unidadeService.buscarPorCodigos(new ArrayList<>(codigosSuperiores));
+            unidadesSuperiores.forEach(u -> {
+                todasUnidadesMap.put(u.getCodigo(), u);
+                codsIntermediarias.add(u.getCodigo());
+            });
+        }
+
+        Map<Long, List<String>> subordinadasPorSuperior = mapearSiglasSubordinadasPorSuperior(participantes);
+        LocalDateTime dataLimite = obterDataLimiteObrigatoria(processo, processo.getCodigo());
+
+        for (Long cod : codsOperacionais) {
+            Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
+            enfileirarEmailInicio(processo, unidadeDestino, true, subordinadasPorSuperior, dataLimite);
+        }
+
+        for (Long cod : codsIntermediarias) {
+            // Se já foi notificada como operacional, não notifica como intermediária
+            if (codsOperacionais.contains(cod)) continue;
+            Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
+            enfileirarEmailInicio(processo, unidadeDestino, false, subordinadasPorSuperior, dataLimite);
+        }
+    }
+
+    private void enfileirarEmailInicio(Processo processo, Unidade unidadeDestino, boolean participante,
+                                       Map<Long, List<String>> subordinadasPorSuperior, LocalDateTime dataLimite) {
+        List<String> subordinadas = subordinadasPorSuperior.getOrDefault(unidadeDestino.getCodigo(), List.of());
+        String corpoHtml = emailModelosService.criarEmailInicioProcessoConsolidado(
+                unidadeDestino.getSigla(),
+                processo.getDescricao(),
+                dataLimite,
+                participante,
+                subordinadas
+        );
+        String assunto = participante
+                ? "SGC: Início do processo " + processo.getDescricao()
+                : "SGC: Início do processo " + processo.getDescricao() + " em unidades subordinadas";
+
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
+                .destinatario(emailUnidade(unidadeDestino))
+                .assunto(assunto)
+                .corpoHtml(corpoHtml)
+                .chaveIdempotencia(chaveInicioProcesso(processo, unidadeDestino, participante))
+                .build());
+    }
+
+    private Map<Long, List<String>> mapearSiglasSubordinadasPorSuperior(List<Unidade> participantes) {
+        Map<Long, List<String>> subordinadasPorSuperior = new HashMap<>();
+        for (Unidade participante : participantes) {
+            for (Long codigoSuperior : unidadeHierarquiaService.buscarCodigosSuperiores(participante.getCodigo())) {
+                subordinadasPorSuperior
+                        .computeIfAbsent(codigoSuperior, ignored -> new ArrayList<>())
+                        .add(participante.getSigla());
+            }
+        }
+        subordinadasPorSuperior.values().forEach(Collections::sort);
+        return subordinadasPorSuperior;
+    }
+
+    private String emailUnidade(Unidade unidade) {
+        return "%s@tre-pe.jus.br".formatted(unidade.getSigla().toLowerCase(Locale.ROOT));
+    }
+
+    private String chaveInicioProcesso(Processo processo, Unidade unidadeDestino, boolean participante) {
+        String sufixo = participante ? "direto" : "subordinada";
+        return "processo:%d:inicio:unidade:%d:%s".formatted(
+                processo.getCodigo(),
+                unidadeDestino.getCodigo(),
+                sufixo
+        );
     }
 
     private void notificarFinalizacaoProcesso(Processo p) {

@@ -38,7 +38,7 @@ class NotificacaoEmailRepoTest {
             assertThat(notificacao.getCodigo()).isEqualTo(salva.getCodigo());
             assertThat(notificacao.getSubprocesso()).isNotNull();
             assertThat(notificacao.getSubprocesso().getCodigo()).isEqualTo(60000L);
-            assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
+            assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
         });
     }
 
@@ -53,7 +53,7 @@ class NotificacaoEmailRepoTest {
 
         List<NotificacaoEmail> pendentes = notificacaoEmailRepo
                 .findBySituacaoInAndProximaTentativaEmLessThanEqualOrderByDataHoraCriacaoAsc(
-                        List.of(SituacaoNotificacaoEmail.PENDENTE, SituacaoNotificacaoEmail.FALHA_TEMPORARIA),
+                        List.of(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.FALHA_TEMPORARIA),
                         agora,
                         PageRequest.of(0, 10)
                 );
@@ -92,7 +92,7 @@ class NotificacaoEmailRepoTest {
         assertThat(capturadas).isOne();
         assertThat(notificacaoEmailRepo.findById(notificacao.getCodigo())).get()
                 .extracting(NotificacaoEmail::getSituacao)
-                .isEqualTo(SituacaoNotificacaoEmail.ENVIANDO);
+                .isEqualTo(SituacaoNotificacao.ENVIANDO);
     }
 
     @Test
@@ -102,7 +102,7 @@ class NotificacaoEmailRepoTest {
         futura.setProximaTentativaEm(LocalDateTime.of(2026, 4, 21, 10, 0));
         notificacaoEmailRepo.save(futura);
         NotificacaoEmail enviando = criarNotificacao("chave-repo-enviando-claim");
-        enviando.setSituacao(SituacaoNotificacaoEmail.ENVIANDO);
+        enviando.setSituacao(SituacaoNotificacao.ENVIANDO);
         notificacaoEmailRepo.save(enviando);
 
         int futurasCapturadas = notificacaoEmailRepo.marcarEnviandoSeDisponivel(
@@ -122,7 +122,7 @@ class NotificacaoEmailRepoTest {
     @DisplayName("deve resumir notificacoes por subprocessos de processos ativos")
     void deveResumirNotificacoesPorSubprocessosDeProcessosAtivos() {
         NotificacaoEmail falha = criarNotificacao("chave-repo-resumo-falha");
-        falha.setSituacao(SituacaoNotificacaoEmail.FALHA_DEFINITIVA);
+        falha.setSituacao(SituacaoNotificacao.FALHA_DEFINITIVA);
         falha.setTentativas(5);
         falha.setUltimoErro("SMTP fora");
         notificacaoEmailRepo.save(falha);
@@ -155,7 +155,7 @@ class NotificacaoEmailRepoTest {
     @DisplayName("deve reenfileirar falhas definitivas por subprocesso")
     void deveReenfileirarFalhasDefinitivasPorSubprocesso() {
         NotificacaoEmail falha = criarNotificacao("chave-repo-reenviar");
-        falha.setSituacao(SituacaoNotificacaoEmail.FALHA_DEFINITIVA);
+        falha.setSituacao(SituacaoNotificacao.FALHA_DEFINITIVA);
         falha.setTentativas(5);
         falha.setProximaTentativaEm(null);
         falha.setUltimoErro("SMTP fora");
@@ -169,7 +169,7 @@ class NotificacaoEmailRepoTest {
         assertThat(reenfileiradas).isOne();
         assertThat(notificacaoEmailRepo.findByChaveIdempotencia("chave-repo-reenviar")).get()
                 .satisfies(notificacao -> {
-                    assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
+                    assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
                     assertThat(notificacao.getTentativas()).isZero();
                     assertThat(notificacao.getProximaTentativaEm()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0));
                     assertThat(notificacao.getUltimoErro()).isNull();
@@ -179,11 +179,11 @@ class NotificacaoEmailRepoTest {
     private NotificacaoEmail criarNotificacao(String chaveIdempotencia) {
         return NotificacaoEmail.builder()
                 .subprocesso(subprocessoRepo.findById(60000L).orElseThrow())
-                .tipoNotificacao("PROCESSO_INICIADO")
+                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
                 .destinatario("destino@tre-pe.jus.br")
                 .assunto("Assunto")
                 .corpoHtml("<p>corpo</p>")
-                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .situacao(SituacaoNotificacao.PENDENTE)
                 .tentativas(0)
                 .proximaTentativaEm(LocalDateTime.of(2026, 4, 21, 8, 0))
                 .dataHoraCriacao(LocalDateTime.of(2026, 4, 21, 8, 0))

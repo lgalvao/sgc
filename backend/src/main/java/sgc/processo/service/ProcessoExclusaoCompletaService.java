@@ -33,9 +33,6 @@ public class ProcessoExclusaoCompletaService {
             throw new ErroEntidadeNaoEncontrada("Processo", codigo);
         }
 
-        jdbcTemplate.update("""
-                DELETE FROM sgc.notificacao_email
-                WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)""", codigo);
         jdbcTemplate.update("DELETE FROM sgc.notificacao_email WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
 
         jdbcTemplate.update("""

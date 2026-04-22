@@ -27,7 +27,7 @@ class SubprocessoNotificacaoServiceCoverageTest {
     @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
     @Mock
     private org.thymeleaf.spring6.SpringTemplateEngine templateEngine;
 
@@ -57,7 +57,7 @@ class SubprocessoNotificacaoServiceCoverageTest {
         
         org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "enviarNotificacaoSuperior", cmd, new HashMap<>());
         
-        verify(notificacaoEmailService).enfileirar(argThat(cmdEmail ->
+        verify(notificacaoService).enfileirar(argThat(cmdEmail ->
                 "s1@tre-pe.jus.br".equals(cmdEmail.destinatario())
         ));
     }

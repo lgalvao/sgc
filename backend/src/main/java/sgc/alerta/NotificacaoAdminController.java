@@ -16,18 +16,18 @@ import java.util.*;
 @Tag(name = "Notificações", description = "Acompanhamento administrativo de notificações")
 @PreAuthorize("hasRole('ADMIN')")
 public class NotificacaoAdminController {
-    private final NotificacaoEmailService notificacaoEmailService;
+    private final NotificacaoService notificacaoService;
 
     @GetMapping("/subprocessos-ativos")
     @Operation(summary = "Lista o resumo administrativo de notificações por subprocesso ativo")
     public ResponseEntity<List<NotificacaoSubprocessoResumoDto>> listarResumoSubprocessosAtivos() {
-        return ResponseEntity.ok(notificacaoEmailService.listarResumoSubprocessosAtivos());
+        return ResponseEntity.ok(notificacaoService.listarResumoSubprocessosAtivos());
     }
 
     @PostMapping("/subprocessos/{codSubprocesso}/reenviar")
     @Operation(summary = "Recoloca na fila notificações com falha definitiva de um subprocesso")
     public ResponseEntity<ReenvioNotificacaoDto> reenviarFalhasDefinitivas(@PathVariable Long codSubprocesso) {
-        int reenfileiradas = notificacaoEmailService.reenfileirarFalhasDefinitivasPorSubprocesso(codSubprocesso);
+        int reenfileiradas = notificacaoService.reenfileirarFalhasDefinitivasPorSubprocesso(codSubprocesso);
         return ResponseEntity.ok(new ReenvioNotificacaoDto(codSubprocesso, reenfileiradas));
     }
 }

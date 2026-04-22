@@ -14,9 +14,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("NotificacaoEmailService")
+@DisplayName("NotificacaoService")
 @SuppressWarnings("NullAway.Init")
-class NotificacaoEmailServiceTest {
+class NotificacaoServiceTest {
     private static final Instant INSTANTE_FIXO = Instant.parse("2026-04-21T12:00:00Z");
     private static final ZoneId ZONA = ZoneId.of("America/Recife");
 
@@ -26,11 +26,11 @@ class NotificacaoEmailServiceTest {
     @Captor
     private ArgumentCaptor<NotificacaoEmail> notificacaoCaptor;
 
-    private NotificacaoEmailService service;
+    private NotificacaoService service;
 
     @BeforeEach
     void setUp() {
-        service = new NotificacaoEmailService(notificacaoEmailRepo, Clock.fixed(INSTANTE_FIXO, ZONA));
+        service = new NotificacaoService(notificacaoEmailRepo, Clock.fixed(INSTANTE_FIXO, ZONA));
     }
 
     @Test
@@ -39,20 +39,17 @@ class NotificacaoEmailServiceTest {
         when(notificacaoEmailRepo.existsByChaveIdempotencia("chave-1")).thenReturn(false);
         when(notificacaoEmailRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        service.enfileirar(new EnfileirarNotificacaoEmailCommand(
-                null,
-                null,
-                "PROCESSO_INICIADO",
-                null,
-                "destino@tre-pe.jus.br",
-                "Assunto",
-                "<p>corpo</p>",
-                "chave-1"
-        ));
+        service.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
+                .destinatario("destino@tre-pe.jus.br")
+                .assunto("Assunto")
+                .corpoHtml("<p>corpo</p>")
+                .chaveIdempotencia("chave-1")
+                .build());
 
         verify(notificacaoEmailRepo).save(notificacaoCaptor.capture());
         assertThat(notificacaoCaptor.getValue()).satisfies(notificacao -> {
-            assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
+            assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
             assertThat(notificacao.getTentativas()).isZero();
             assertThat(notificacao.getProximaTentativaEm()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0));
             assertThat(notificacao.getDataHoraCriacao()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0));
@@ -70,16 +67,13 @@ class NotificacaoEmailServiceTest {
         when(notificacaoEmailRepo.existsByChaveIdempotencia("chave-1")).thenReturn(true);
         when(notificacaoEmailRepo.findByChaveIdempotencia("chave-1")).thenReturn(Optional.of(existente));
 
-        NotificacaoEmail resultado = service.enfileirar(new EnfileirarNotificacaoEmailCommand(
-                null,
-                null,
-                "PROCESSO_INICIADO",
-                null,
-                "destino@tre-pe.jus.br",
-                "Assunto",
-                "<p>corpo</p>",
-                "chave-1"
-        ));
+        NotificacaoEmail resultado = service.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
+                .destinatario("destino@tre-pe.jus.br")
+                .assunto("Assunto")
+                .corpoHtml("<p>corpo</p>")
+                .chaveIdempotencia("chave-1")
+                .build());
 
         assertThat(resultado).isSameAs(existente);
         verify(notificacaoEmailRepo, never()).save(any());
@@ -96,16 +90,13 @@ class NotificacaoEmailServiceTest {
         when(notificacaoEmailRepo.save(any())).thenThrow(new DataIntegrityViolationException("duplicado"));
         when(notificacaoEmailRepo.findByChaveIdempotencia("chave-1")).thenReturn(Optional.of(existente));
 
-        NotificacaoEmail resultado = service.enfileirar(new EnfileirarNotificacaoEmailCommand(
-                null,
-                null,
-                "PROCESSO_INICIADO",
-                null,
-                "destino@tre-pe.jus.br",
-                "Assunto",
-                "<p>corpo</p>",
-                "chave-1"
-        ));
+        NotificacaoEmail resultado = service.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
+                .destinatario("destino@tre-pe.jus.br")
+                .assunto("Assunto")
+                .corpoHtml("<p>corpo</p>")
+                .chaveIdempotencia("chave-1")
+                .build());
 
         assertThat(resultado).isSameAs(existente);
     }
@@ -122,7 +113,7 @@ class NotificacaoEmailServiceTest {
         service.listarPendentes(10);
 
         verify(notificacaoEmailRepo).findBySituacaoInAndProximaTentativaEmLessThanEqualOrderByDataHoraCriacaoAsc(
-                eq(List.of(SituacaoNotificacaoEmail.PENDENTE, SituacaoNotificacaoEmail.FALHA_TEMPORARIA)),
+                eq(List.of(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.FALHA_TEMPORARIA)),
                 eq(LocalDateTime.of(2026, 4, 21, 9, 0)),
                 any()
         );
@@ -146,7 +137,7 @@ class NotificacaoEmailServiceTest {
     void marcarEnviandoSeDisponivelDeveCapturarNotificacaoPendente() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
                 .codigo(10L)
-                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .situacao(SituacaoNotificacao.PENDENTE)
                 .build();
         when(notificacaoEmailRepo.marcarEnviandoSeDisponivel(10L, LocalDateTime.of(2026, 4, 21, 9, 0)))
                 .thenReturn(1);
@@ -154,7 +145,7 @@ class NotificacaoEmailServiceTest {
         boolean capturada = service.marcarEnviandoSeDisponivel(notificacao);
 
         assertThat(capturada).isTrue();
-        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.ENVIANDO);
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.ENVIANDO);
     }
 
     @Test
@@ -162,7 +153,7 @@ class NotificacaoEmailServiceTest {
     void marcarEnviandoSeDisponivelDeveRejeitarNotificacaoJaCapturada() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
                 .codigo(10L)
-                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .situacao(SituacaoNotificacao.PENDENTE)
                 .build();
         when(notificacaoEmailRepo.marcarEnviandoSeDisponivel(10L, LocalDateTime.of(2026, 4, 21, 9, 0)))
                 .thenReturn(0);
@@ -170,7 +161,7 @@ class NotificacaoEmailServiceTest {
         boolean capturada = service.marcarEnviandoSeDisponivel(notificacao);
 
         assertThat(capturada).isFalse();
-        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
     }
 
     @Test
@@ -195,7 +186,7 @@ class NotificacaoEmailServiceTest {
 
         service.marcarFalha(notificacao, new RuntimeException("SMTP indisponivel"));
 
-        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.FALHA_TEMPORARIA);
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.FALHA_TEMPORARIA);
         assertThat(notificacao.getTentativas()).isEqualTo(1);
         assertThat(notificacao.getUltimoErro()).isEqualTo("SMTP indisponivel");
         assertThat(notificacao.getProximaTentativaEm()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0, 20));
@@ -211,7 +202,7 @@ class NotificacaoEmailServiceTest {
 
         service.marcarFalha(notificacao, new RuntimeException("erro definitivo"));
 
-        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.FALHA_DEFINITIVA);
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.FALHA_DEFINITIVA);
         assertThat(notificacao.getTentativas()).isEqualTo(5);
         assertThat(notificacao.getProximaTentativaEm()).isNull();
         verify(notificacaoEmailRepo).save(notificacao);

@@ -15,18 +15,18 @@ import java.util.*;
 @RequiredArgsConstructor
 @Tag(name = "Notificações de e-mail", description = "Endpoints para acompanhamento do envio de e-mails")
 @PreAuthorize("isAuthenticated()")
-public class NotificacaoEmailController {
-    private final NotificacaoEmailService notificacaoEmailService;
+public class NotificacaoController {
+    private final NotificacaoService notificacaoService;
 
     @GetMapping
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Lista as notificações de e-mail geradas para um subprocesso")
-    public ResponseEntity<List<NotificacaoEmailDto>> listarPorSubprocesso(
+    public ResponseEntity<List<NotificacaoDto>> listarPorSubprocesso(
             @PathVariable Long codSubprocesso,
             @RequestParam(defaultValue = "20") int limite) {
-        List<NotificacaoEmailDto> notificacoes = notificacaoEmailService.listarPorSubprocesso(codSubprocesso, limite)
+        List<NotificacaoDto> notificacoes = notificacaoService.listarPorSubprocesso(codSubprocesso, limite)
                 .stream()
-                .map(notificacao -> NotificacaoEmailDto.fromEntity(notificacao, codSubprocesso))
+                .map(notificacao -> NotificacaoDto.fromEntity(notificacao, codSubprocesso))
                 .toList();
 
         return ResponseEntity.ok(notificacoes);

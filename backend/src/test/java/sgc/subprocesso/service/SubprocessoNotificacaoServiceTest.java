@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
+import sgc.alerta.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -30,7 +31,7 @@ class SubprocessoNotificacaoServiceTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
     @Mock
     private ResponsavelUnidadeService responsavelService;
     @Mock
@@ -50,7 +51,7 @@ class SubprocessoNotificacaoServiceTest {
     @Captor
     private ArgumentCaptor<IContext> contextCaptor;
     @Captor
-    private ArgumentCaptor<EnfileirarNotificacaoEmailCommand> notificacaoEmailCaptor;
+    private ArgumentCaptor<EnfileirarNotificacaoCommand> notificacaoEmailCaptor;
 
     @Test
     @DisplayName("deve criar alerta e enviar email direto e para substituto")
@@ -88,15 +89,15 @@ class SubprocessoNotificacaoServiceTest {
                 eq(TipoTransicao.PROCESSO_INICIADO.formatarAlerta("ORIG")),
                 eq(origem),
                 eq(destino));
-        verify(notificacaoEmailService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getAllValues())
-                .extracting(EnfileirarNotificacaoEmailCommand::destinatario)
+                .extracting(EnfileirarNotificacaoCommand::destinatario)
                 .containsExactly("dest@tre-pe.jus.br", "substituto@tre-pe.jus.br");
         assertThat(notificacaoEmailCaptor.getAllValues())
                 .allSatisfy(cmd -> {
                     assertThat(cmd.assunto()).startsWith("SGC: ");
                     assertThat(cmd.corpoHtml()).isEqualTo("<html>corpo</html>");
-                    assertThat(cmd.tipoNotificacao()).isEqualTo(TipoTransicao.PROCESSO_INICIADO.name());
+                    assertThat(cmd.tipoNotificacao()).isEqualTo(TipoNotificacao.PROCESSO_INICIADO);
                     assertThat(cmd.chaveIdempotencia()).contains("transicao:PROCESSO_INICIADO");
                 });
         verify(templateEngine).process(templateCaptor.capture(), contextCaptor.capture());
@@ -145,9 +146,9 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(notificacaoEmailService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getAllValues())
-                .extracting(EnfileirarNotificacaoEmailCommand::destinatario)
+                .extracting(EnfileirarNotificacaoCommand::destinatario)
                 .containsExactly("dest@tre-pe.jus.br", "sup1@tre-pe.jus.br");
         assertThat(notificacaoEmailCaptor.getAllValues().get(1).assunto()).contains(" - ORIG");
 
@@ -183,7 +184,7 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(notificacaoEmailService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("dest@tre-pe.jus.br");
         verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
     }
@@ -216,7 +217,7 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(notificacaoEmailService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("dest@tre-pe.jus.br");
     }
 
@@ -235,7 +236,7 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verifyNoInteractions(alertaService, notificacaoEmailService, responsavelService, usuarioService, templateEngine);
+        verifyNoInteractions(alertaService, notificacaoService, responsavelService, usuarioService, templateEngine);
     }
 
     @Test
@@ -253,7 +254,7 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verifyNoInteractions(notificacaoEmailService, responsavelService, usuarioService, templateEngine);
+        verifyNoInteractions(notificacaoService, responsavelService, usuarioService, templateEngine);
     }
 
     @Test
@@ -299,14 +300,13 @@ class SubprocessoNotificacaoServiceTest {
         service.notificarAlteracaoDataLimite(subprocesso, "25/04/2026", 1);
 
         verify(alertaService).criarAlertaAlteracaoDataLimite(processo, unidade, "25/04/2026", 1);
-        verify(notificacaoEmailService).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
 
-        EnfileirarNotificacaoEmailCommand cmd = notificacaoEmailCaptor.getValue();
+        EnfileirarNotificacaoCommand cmd = notificacaoEmailCaptor.getValue();
         assertThat(cmd.destinatario()).isEqualTo("orig@tre-pe.jus.br");
         assertThat(cmd.assunto()).isEqualTo("SGC: Data limite alterada");
         assertThat(cmd.corpoHtml()).isEqualTo("<html>data-limite</html>");
-        assertThat(cmd.tipoNotificacao()).isEqualTo("DATA_LIMITE_ALTERADA");
-        assertThat(cmd.alerta()).isSameAs(alerta);
+        assertThat(cmd.tipoNotificacao()).isEqualTo(TipoNotificacao.DATA_LIMITE_ALTERADA);
         assertThat(cmd.subprocesso()).isSameAs(subprocesso);
         assertThat(cmd.chaveIdempotencia()).contains("data-limite-alterada").contains("etapa:1").contains("25/04/2026");
     }
@@ -326,7 +326,7 @@ class SubprocessoNotificacaoServiceTest {
 
         service.notificarAlteracaoDataLimite(subprocesso, "30/04/2026", 2);
 
-        verify(notificacaoEmailService).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getValue().chaveIdempotencia()).contains("etapa:2");
     }
 

@@ -37,7 +37,7 @@ public class ResponsavelUnidadeService {
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
     private final AlertaFacade alertaFacade;
-    private final NotificacaoEmailService notificacaoEmailService;
+    private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final ConfigAplicacao configAplicacao;
 
@@ -137,16 +137,14 @@ public class ResponsavelUnidadeService {
                 )
         );
 
-        notificacaoEmailService.enfileirar(new EnfileirarNotificacaoEmailCommand(
-                alerta,
-                null,
-                "ATRIBUICAO_TEMPORARIA",
-                usuario.getTituloEleitoral(),
-                usuario.getEmail(),
-                assunto,
-                corpoHtml,
-                chaveIdempotenciaAtribuicaoTemporaria(atribuicao)
-        ));
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.ATRIBUICAO_TEMPORARIA)
+                .usuarioDestinoTitulo(usuario.getTituloEleitoral())
+                .destinatario(usuario.getEmail())
+                .assunto(assunto)
+                .corpoHtml(corpoHtml)
+                .chaveIdempotencia(chaveIdempotenciaAtribuicaoTemporaria(atribuicao))
+                .build());
     }
 
     private String chaveIdempotenciaAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao) {

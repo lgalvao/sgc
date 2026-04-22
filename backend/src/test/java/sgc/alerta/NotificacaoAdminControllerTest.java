@@ -24,13 +24,13 @@ class NotificacaoAdminControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
 
     @Test
     @WithMockUser(roles = "ADMIN")
     @DisplayName("listarResumoSubprocessosAtivos deve retornar resumo para admin")
     void listarResumoSubprocessosAtivosDeveRetornarResumoParaAdmin() throws Exception {
-        when(notificacaoEmailService.listarResumoSubprocessosAtivos()).thenReturn(List.of(resumo()));
+        when(notificacaoService.listarResumoSubprocessosAtivos()).thenReturn(List.of(resumo()));
 
         mockMvc.perform(get("/api/admin/notificacoes/subprocessos-ativos"))
                 .andExpect(status().isOk())
@@ -44,7 +44,7 @@ class NotificacaoAdminControllerTest {
     @WithMockUser(roles = "ADMIN")
     @DisplayName("reenviarFalhasDefinitivas deve reenfileirar para admin")
     void reenviarFalhasDefinitivasDeveReenfileirarParaAdmin() throws Exception {
-        when(notificacaoEmailService.reenfileirarFalhasDefinitivasPorSubprocesso(60000L)).thenReturn(2);
+        when(notificacaoService.reenfileirarFalhasDefinitivasPorSubprocesso(60000L)).thenReturn(2);
 
         mockMvc.perform(post("/api/admin/notificacoes/subprocessos/60000/reenviar"))
                 .andExpect(status().isOk())

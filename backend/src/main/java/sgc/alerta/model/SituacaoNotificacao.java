@@ -1,6 +1,6 @@
 package sgc.alerta.model;
 
-public enum SituacaoNotificacaoEmail {
+public enum SituacaoNotificacao {
     PENDENTE,
     ENVIANDO,
     ENVIADO,

@@ -16,15 +16,15 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(NotificacaoEmailController.class)
-@DisplayName("NotificacaoEmailController")
+@WebMvcTest(NotificacaoController.class)
+@DisplayName("NotificacaoController")
 @SuppressWarnings("NullAway.Init")
-class NotificacaoEmailControllerTest {
+class NotificacaoControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoService notificacaoService;
 
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
@@ -35,7 +35,7 @@ class NotificacaoEmailControllerTest {
     void listarPorSubprocessoDeveRetornarNotificacoesAutorizadas() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(60000L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO")))
                 .thenReturn(true);
-        when(notificacaoEmailService.listarPorSubprocesso(60000L, 5)).thenReturn(List.of(notificacao()));
+        when(notificacaoService.listarPorSubprocesso(60000L, 5)).thenReturn(List.of(notificacao()));
 
         mockMvc.perform(get("/api/subprocessos/60000/notificacoes-email?limite=5"))
                 .andExpect(status().isOk())
@@ -48,11 +48,11 @@ class NotificacaoEmailControllerTest {
     private NotificacaoEmail notificacao() {
         return NotificacaoEmail.builder()
                 .codigo(10L)
-                .tipoNotificacao("PROCESSO_INICIADO")
+                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
                 .destinatario("destino@tre-pe.jus.br")
                 .assunto("Assunto")
                 .corpoHtml("<p>corpo</p>")
-                .situacao(SituacaoNotificacaoEmail.PENDENTE)
+                .situacao(SituacaoNotificacao.PENDENTE)
                 .tentativas(0)
                 .dataHoraCriacao(LocalDateTime.of(2026, 4, 21, 9, 0))
                 .build();

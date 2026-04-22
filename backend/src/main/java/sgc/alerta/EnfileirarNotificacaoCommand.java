@@ -1,13 +1,14 @@
 package sgc.alerta;
 
+import lombok.*;
 import org.jspecify.annotations.*;
 import sgc.alerta.model.*;
 import sgc.subprocesso.model.*;
 
-public record EnfileirarNotificacaoEmailCommand(
-        @Nullable Alerta alerta,
+@Builder
+public record EnfileirarNotificacaoCommand(
         @Nullable Subprocesso subprocesso,
-        @Nullable String tipoNotificacao,
+        @Nullable TipoNotificacao tipoNotificacao,
         @Nullable String usuarioDestinoTitulo,
         String destinatario,
         String assunto,

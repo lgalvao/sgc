@@ -16,7 +16,7 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
     Optional<NotificacaoEmail> findByChaveIdempotencia(String chaveIdempotencia);
 
     List<NotificacaoEmail> findBySituacaoInAndProximaTentativaEmLessThanEqualOrderByDataHoraCriacaoAsc(
-            Collection<SituacaoNotificacaoEmail> situacoes,
+            Collection<SituacaoNotificacao> situacoes,
             LocalDateTime agora,
             Pageable pageable
     );
@@ -24,11 +24,11 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             update NotificacaoEmail notificacao
-               set notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.ENVIANDO
+               set notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIANDO
              where notificacao.codigo = :codigo
                and notificacao.situacao in (
-                    sgc.alerta.model.SituacaoNotificacaoEmail.PENDENTE,
-                    sgc.alerta.model.SituacaoNotificacaoEmail.FALHA_TEMPORARIA
+                    sgc.alerta.model.SituacaoNotificacao.PENDENTE,
+                    sgc.alerta.model.SituacaoNotificacao.FALHA_TEMPORARIA
                )
                and notificacao.proximaTentativaEm <= :agora
             """)
@@ -44,16 +44,16 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
                 unidade.sigla,
                 subprocesso.situacao,
                 count(notificacao.codigo),
-                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.PENDENTE then 1 else 0 end), 0),
-                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.ENVIANDO then 1 else 0 end), 0),
-                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.ENVIADO then 1 else 0 end), 0),
-                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.FALHA_TEMPORARIA then 1 else 0 end), 0),
-                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.FALHA_DEFINITIVA then 1 else 0 end), 0),
+                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.PENDENTE then 1 else 0 end), 0),
+                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIANDO then 1 else 0 end), 0),
+                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIADO then 1 else 0 end), 0),
+                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.FALHA_TEMPORARIA then 1 else 0 end), 0),
+                coalesce(sum(case when notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.FALHA_DEFINITIVA then 1 else 0 end), 0),
                 max(notificacao.dataHoraCriacao),
                 min(case
                     when notificacao.situacao in (
-                        sgc.alerta.model.SituacaoNotificacaoEmail.PENDENTE,
-                        sgc.alerta.model.SituacaoNotificacaoEmail.FALHA_TEMPORARIA
+                        sgc.alerta.model.SituacaoNotificacao.PENDENTE,
+                        sgc.alerta.model.SituacaoNotificacao.FALHA_TEMPORARIA
                     )
                     then notificacao.proximaTentativaEm
                     else null
@@ -74,13 +74,13 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             update NotificacaoEmail notificacao
-               set notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.PENDENTE,
+               set notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.PENDENTE,
                    notificacao.tentativas = 0,
                    notificacao.proximaTentativaEm = :agora,
                    notificacao.dataHoraEnvio = null,
                    notificacao.ultimoErro = null
              where notificacao.subprocesso.codigo = :subprocessoCodigo
-               and notificacao.situacao = sgc.alerta.model.SituacaoNotificacaoEmail.FALHA_DEFINITIVA
+               and notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.FALHA_DEFINITIVA
             """)
     int reenfileirarFalhasDefinitivasPorSubprocesso(
             @Param("subprocessoCodigo") Long subprocessoCodigo,

@@ -22,11 +22,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ProcessoHomologacaoController.class)
+@WebMvcTest(ProcessoExclusaoController.class)
 @Import({RestExceptionHandler.class, TestSecurityConfig.class})
 @ActiveProfiles({"test", "hom"})
-@DisplayName("ProcessoHomologacaoController")
-class ProcessoHomologacaoControllerTest {
+@DisplayName("ProcessoExclusaoController")
+class ProcessoExclusaoControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
