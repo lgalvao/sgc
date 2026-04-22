@@ -43,7 +43,7 @@ export const TEXTOS = {
     VERSAO: "Versão",
     PULAR_CONTEUDO: "Pular para o conteúdo principal",
     BOTAO_FECHAR: "Fechar",
-    OBSERVACAO: "Observação",
+    OBSERVACAO: "Observações",
   },
   login: {
     TITULO: "SGC",

@@ -323,12 +323,12 @@ public class SubprocessoTransicaoService {
     }
 
     @Transactional
-    public void disponibilizarCadastro(Long codSubprocesso, @Nullable String observacoes) {
+    public void disponibilizarCadastro(Long codSubprocesso) {
         log.info("Disponibilizando cadastro do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario, observacoes);
+        disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario);
     }
 
     public void iniciarRevisaoCadastro(Long codSubprocesso) {
@@ -351,35 +351,21 @@ public class SubprocessoTransicaoService {
         log.info("Subprocesso {} transicionado para NAO_INICIADO", codSubprocesso);
     }
 
-    public void disponibilizarRevisao(Long codSubprocesso, @Nullable String observacoes) {
+    public void disponibilizarRevisao(Long codSubprocesso) {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario, observacoes);
+        disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario);
     }
 
     private void disponibilizar(Subprocesso sp, SituacaoSubprocesso novaSituacao,
-                                TipoTransicao transicao, Usuario usuario, @Nullable String observacoes) {
+                                TipoTransicao transicao, Usuario usuario) {
         validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp);
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(LocalDateTime.now());
-        String observacoesNormalizadas = normalizarTexto(observacoes);
-        if (observacoesNormalizadas != null) {
-            registrarAnaliseDisponibilizacao(sp, observacoesNormalizadas);
-        }
-        registrarTransicaoParaSuperiorDaUnidade(sp, transicao, usuario, observacoesNormalizadas);
-    }
-
-    private void registrarAnaliseDisponibilizacao(Subprocesso sp, String observacoes) {
-        boolean isRevisao = sp.getProcesso().getTipo() == REVISAO;
-        FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
-        CriarAnaliseRequest request = CriarAnaliseRequest.builder()
-                .observacoes(observacoes)
-                .acao(contexto.acaoAceite())
-                .build();
-        criarAnalise(sp, request, TipoAnalise.CADASTRO);
+        registrarTransicaoParaSuperiorDaUnidade(sp, transicao, usuario, null);
     }
 
     @Transactional
