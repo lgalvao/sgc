@@ -75,6 +75,16 @@ describe("unidade store", () => {
             expect(result).toEqual([]);
             expect(logger.error).toHaveBeenCalled();
         });
+
+        it("deve lidar com caso onde response não é array", async () => {
+            vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue(null as any);
+            vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr as any[]);
+
+            const result = await context.store.garantirArvoreElegibilidade("MAPEAMENTO");
+
+            expect(result).toEqual([]);
+            expect(unidadeService.mapUnidadesArray).toHaveBeenCalledWith([]);
+        });
     });
 
     it("invalidarCache deve limpar o cache", () => {

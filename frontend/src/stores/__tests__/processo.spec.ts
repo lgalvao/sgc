@@ -92,5 +92,6 @@ describe("processo store", () => {
             await expect(context.store.garantirContextoCompleto(1)).rejects.toThrow("Erro API");
             expect(logger.error).toHaveBeenCalled();
         });
+
     });
 });

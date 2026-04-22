@@ -318,4 +318,36 @@ describe('subprocessoService', () => {
     await subprocessoService.listarAnalisesValidacao(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/historico-validacao');
   });
+
+  it('obterSugestoesMapa deve retornar string vazia se sugestoes for null', async () => {
+    getMock.mockResolvedValueOnce({ data: { sugestoes: null } } as never);
+    const resultado = await subprocessoService.obterSugestoesMapa(1);
+    expect(resultado).toBe('');
+  });
+
+  describe('mapSubprocessoDetalheResponseParaModel', () => {
+    it('deve usar dataLimiteEtapa1 se dataLimiteEtapa1 for maior que dataLimiteEtapa2', () => {
+      const dto = {
+        subprocesso: {
+          codigo: 1,
+          unidade: { codigo: 1, nome: 'U', sigla: 'U' },
+          situacao: SituacaoSubprocesso.NAO_INICIADO,
+          dataLimiteEtapa1: '2025-02-01T00:00:00',
+          dataLimiteEtapa2: '2025-01-01T00:00:00',
+          processoDescricao: 'P',
+          dataCriacaoProcesso: '2024-01-01',
+          tipoProcesso: TipoProcesso.MAPEAMENTO,
+          isEmAndamento: true,
+          etapaAtual: 1,
+        },
+        titular: null,
+        responsavel: null,
+        movimentacoes: [],
+        localizacaoAtual: 'L',
+        permissoes: {} as any,
+      };
+      const model = subprocessoService.mapSubprocessoDetalheResponseParaModel(dto as any);
+      expect(model.ultimaDataLimiteSubprocesso).toBe('2025-02-01T00:00:00');
+    });
+  });
 });
