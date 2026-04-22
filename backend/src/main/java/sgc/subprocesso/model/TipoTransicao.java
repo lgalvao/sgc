@@ -40,7 +40,7 @@ public enum TipoTransicao {
 
     CADASTRO_REABERTO(
             Mensagens.HIST_CADASTRO_REABERTO,
-            Mensagens.ALERTA_CADASTRO_REABERTO,
+            null,
             "cadastro-reaberto",
             "cadastro-reaberto-superior"
     ),
@@ -75,7 +75,7 @@ public enum TipoTransicao {
 
     REVISAO_CADASTRO_REABERTA(
             Mensagens.HIST_REVISAO_REABERTA,
-            Mensagens.ALERTA_REVISAO_REABERTA,
+            null,
             "revisao-cadastro-reaberta",
             "revisao-cadastro-reaberta-superior"
     ),

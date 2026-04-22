@@ -125,17 +125,17 @@ public class SubprocessoNotificacaoService {
 
     private void criarNotificacaoSuperior(NotificacaoCommand cmd, Map<String, Object> variaveisBase) {
         String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), true);
-        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(cmd.unidadeOrigem().getCodigo());
-        if (codigoPai == null || Objects.equals(codigoPai, cmd.unidadeDestino().getCodigo())) return;
+        Long codigoUnidade = cmd.subprocesso().getUnidade().getCodigo();
+        Long codigoSuperior = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
+        if (codigoSuperior == null || Objects.equals(codigoSuperior, cmd.unidadeDestino().getCodigo())) return;
 
-        UnidadeResumoLeitura superior = unidadeService.buscarResumosPorCodigos(List.of(codigoPai)).stream()
+        UnidadeResumoLeitura superior = unidadeService.buscarResumosPorCodigos(List.of(codigoSuperior)).stream()
                 .findFirst()
                 .orElse(null);
         if (superior == null) return;
 
         Map<String, Object> variaveis = new HashMap<>(variaveisBase);
         variaveis.put("siglaUnidadeSuperior", superior.sigla());
-
         String templateEmailSuperior = obterTemplateObrigatorio(cmd.tipoTransicao().getTemplateEmailSuperior(), "e-mail superior");
         String corpo = processarTemplate(templateEmailSuperior, variaveis);
         String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());

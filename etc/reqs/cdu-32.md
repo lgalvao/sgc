@@ -22,12 +22,12 @@
 
 6. sistema registra uma movimentação para o subprocesso com os campos:
 
-- `Data/hora`: Data/hora atual
-- `Unidade origem`: ADMIN
-- `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-- `Descrição`: 'Reabertura de cadastro'
+   - `Data/hora`: Data/hora atual
+   - `Unidade origem`: ADMIN
+   - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+   - `Descrição`: 'Reabertura de cadastro'
 
-1. O sistema envia notificações por e-mail para a unidade do subprocesso e para as suas unidades superiores na hierarquia.
+1. O sistema envia notificações por e-mail para a unidade do subprocesso e para a sua unidade superior na hierarquia.
 
    8.1. Para a unidade do subprocesso:
 
@@ -40,10 +40,10 @@
 
     Justificativa: [JUSTIFICATIVA]
 
-    Acesse o sistema para realizar as alterações necessárias: [URL_SISTEMA].
+    Acesse o sistema SGC para realizar as alterações necessárias: [URL_SISTEMA].
     ```
 
-   8.2. Para as unidades superiores:
+   8.2. Para a unidade superior:
 
     ```text
     Assunto: SGC: Reabertura de cadastro de atividades - [SIGLA_UNIDADE_SUBORDINADA]
@@ -66,11 +66,11 @@
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
-   9.2. Para as unidades superiores:
+   9.2. Para a unidade superior:
     - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberto"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-3. O sistema exibe mensagem de sucesso "Cadastro reaberto".
+3. O sistema mostra  mensagem de sucesso "Cadastro reaberto".

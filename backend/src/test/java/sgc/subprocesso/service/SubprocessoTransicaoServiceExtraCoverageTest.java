@@ -216,8 +216,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     }
 
     @Test
-    @DisplayName("enviarAlertasReabertura - loop superiores")
-    void enviarAlertasReabertura_Loop() {
+    @DisplayName("criarAlertasReabertura - superior direto")
+    void criarAlertasReabertura_SuperiorDireto() {
         Processo p = new Processo();
         Unidade u = new Unidade();
         u.setCodigo(20L);
@@ -240,19 +240,19 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(30L, 40L));
-        when(unidadeService.buscarPorCodigos(List.of(30L, 40L))).thenReturn(List.of(sup1, sup2));
+        when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(30L);
+        when(unidadeService.buscarPorCodigo(30L)).thenReturn(sup1);
 
         service.reabrirCadastro(100L, "justificativa");
 
         verify(alertaService, times(1)).criarAlertaReaberturaCadastro(p, u);
         verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup1, u);
-        verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup2, u);
+        verify(alertaService, never()).criarAlertaReaberturaCadastroSuperior(p, sup2, u);
     }
 
     @Test
-    @DisplayName("enviarAlertasReabertura - revisao loop")
-    void enviarAlertasReabertura_RevisaoLoop() {
+    @DisplayName("criarAlertasReabertura - revisao para superior direto")
+    void criarAlertasReabertura_RevisaoSuperiorDireto() {
         Processo p = new Processo();
         Unidade u = new Unidade();
         u.setCodigo(20L);
@@ -272,8 +272,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(30L));
-        when(unidadeService.buscarPorCodigos(List.of(30L))).thenReturn(List.of(sup));
+        when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(30L);
+        when(unidadeService.buscarPorCodigo(30L)).thenReturn(sup);
 
         service.reabrirRevisaoCadastro(100L, "justificativa");
 

@@ -385,21 +385,36 @@ class ProcessoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve finalizar processo delegando para repo")
+        @DisplayName("Deve finalizar processo criando notificacao por email")
         void deveFinalizarProcessoQuandoTudoHomologado() {
             Long id = 100L;
             Processo p = new Processo();
             p.setCodigo(id);
+            p.setDescricao("Mapeamento 2026");
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(TipoProcesso.DIAGNOSTICO);
+            Unidade unidade = criarUnidadeValida(10L);
+            unidade.setSigla("SECAO");
+            p.adicionarParticipantes(Set.of(unidade));
             
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of());
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidade));
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
+            when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SECAO", "Mapeamento 2026"))
+                    .thenReturn("<html>finalizado</html>");
             when(validacaoService.validarSubprocessosParaFinalizacao(id))
                     .thenReturn(ValidationResult.ofValido());
             
             processoService.finalizar(id);
+
             verify(processoRepo).save(p);
+            verify(notificacaoService).enfileirar(argThat(command ->
+                    command.tipoNotificacao() == TipoNotificacao.PROCESSO_FINALIZADO
+                            && command.destinatario().equals("secao@tre-pe.jus.br")
+                            && command.assunto().equals("SGC: Finalização do processo Mapeamento 2026")
+                            && command.corpoHtml().equals("<html>finalizado</html>")
+                            && command.chaveIdempotencia().equals("processo:100:finalizacao:unidade:10:direto")
+            ));
             assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         }
 

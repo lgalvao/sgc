@@ -32,8 +32,8 @@ class SubprocessoNotificacaoServiceCoverageTest {
     private org.thymeleaf.spring6.SpringTemplateEngine templateEngine;
 
     @Test
-    @DisplayName("criarNotificacaoSuperior - deve enviar apenas ao superior imediato")
-    void criarNotificacaoSuperior_ApenasSuperiorImediato() {
+    @DisplayName("criarNotificacaoSuperior - deve enviar apenas ao superior direto")
+    void criarNotificacaoSuperior_ApenasSuperiorDireto() {
         Processo p = new Processo(); p.setDescricao("P"); p.setTipo(TipoProcesso.MAPEAMENTO);
         Subprocesso sp = new Subprocesso(); sp.setProcesso(p);
         Unidade u = new Unidade(); u.setCodigo(10L); u.setSigla("U");

@@ -190,6 +190,43 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
+    @DisplayName("deve notificar superior direto da unidade do subprocesso na reabertura")
+    void deveNotificarSuperiorDiretoDaUnidadeDoSubprocessoNaReabertura() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade admin = criarUnidade(1L, "ADMIN", "Administracao");
+        Unidade unidade = criarUnidade(10L, "ORIG", "Unidade origem");
+        Unidade destino = criarUnidade(10L, "ORIG", "Unidade origem");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+
+        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(destino.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
+        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(
+                new UnidadeResumoLeitura(20L, "Superior direto", "SUP", TipoUnidade.INTERMEDIARIA)
+        ));
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_REABERTO)
+                .unidadeOrigem(admin)
+                .unidadeDestino(destino)
+                .observacoes("Ajustar cadastro")
+                .build());
+
+        verify(alertaService, never()).criarAlertaTransicao(any(), anyString(), any(), any());
+        verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getAllValues())
+                .extracting(EnfileirarNotificacaoCommand::destinatario)
+                .containsExactly("orig@tre-pe.jus.br", "sup@tre-pe.jus.br");
+    }
+
+    @Test
     @DisplayName("nao deve enviar email pessoal quando substituto nao possuir email")
     void naoDeveEnviarEmailPessoalQuandoSubstitutoNaoPossuirEmail() {
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");

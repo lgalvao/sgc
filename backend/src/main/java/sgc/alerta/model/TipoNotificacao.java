@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TipoNotificacao {
     PROCESSO_INICIADO("Início de processo"),
+    PROCESSO_FINALIZADO("Finalização de processo"),
     DATA_LIMITE_ALTERADA("Alteração de data limite"),
     LEMBRETE_PRAZO("Lembrete de prazo"),
     ATRIBUICAO_TEMPORARIA("Atribuição temporária de responsável"),

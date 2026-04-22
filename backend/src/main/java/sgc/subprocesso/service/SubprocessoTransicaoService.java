@@ -826,26 +826,18 @@ public class SubprocessoTransicaoService {
 
         registrarTransicaoDoAdminParaUnidade(sp, cmd.tipoTransicao(), usuario, cmd.justificativa());
 
-        enviarAlertasReabertura(new AlertaReaberturaContexto(sp.getProcesso(), sp.getUnidade(), cmd.justificativa(), cmd.revisao()));
+        criarAlertasReabertura(new AlertaReaberturaContexto(sp.getProcesso(), sp.getUnidade(), cmd.justificativa(), cmd.revisao()));
         log.info("Reaberto {} do SP {}", cmd.revisao() ? ETAPA_REVISAO : ETAPA_CADASTRO, cmd.codigo());
     }
 
-    private void enviarAlertasReabertura(AlertaReaberturaContexto contexto) {
+    private void criarAlertasReabertura(AlertaReaberturaContexto contexto) {
         Unidade unidade = contexto.unidadeOrigem();
 
         criarAlertaReaberturaUnidade(contexto);
 
-        List<Long> codigosSuperiores = unidadeHierarquiaService.buscarCodigosSuperiores(unidade.getCodigo());
-        if (!codigosSuperiores.isEmpty()) {
-            Map<Long, Unidade> mapaUnidades = new HashMap<>();
-            List<Unidade> superioresCarregados = unidadeService.buscarPorCodigos(codigosSuperiores);
-            superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
-            for (Long codigoAncestor : codigosSuperiores) {
-                Unidade superior = mapaUnidades.get(codigoAncestor);
-                if (superior != null) {
-                    criarAlertaReaberturaSuperior(contexto, superior);
-                }
-            }
+        Unidade superior = buscarSuperiorImediato(unidade.getCodigo());
+        if (superior != null) {
+            criarAlertaReaberturaSuperior(contexto, superior);
         }
     }
 

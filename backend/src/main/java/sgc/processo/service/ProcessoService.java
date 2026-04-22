@@ -274,6 +274,7 @@ public class ProcessoService {
             tornarMapasVigentes(codigo);
         }
         criarAlertasFinalizacaoProcesso(processo);
+        criarNotificacoesFinalizacaoProcesso(processo);
 
         processo.setSituacao(FINALIZADO);
         processo.setDataFinalizacao(LocalDateTime.now());
@@ -1029,6 +1030,97 @@ public class ProcessoService {
         for (Unidade u : participantes) {
             servicoAlertas.criarAlertaAdmin(p, u, "Processo finalizado: " + p.getDescricao());
         }
+    }
+
+    private void criarNotificacoesFinalizacaoProcesso(Processo processo) {
+        log.info("Criando notificações de finalização do processo {}", processo.getCodigo());
+        List<Unidade> participantes = buscarParticipantes(processo);
+        Set<Long> codigosDiretos = new HashSet<>();
+        Set<Long> codigosConsolidados = new HashSet<>();
+        Map<Long, Unidade> unidades = new HashMap<>();
+
+        for (Unidade participante : participantes) {
+            unidades.put(participante.getCodigo(), participante);
+            TipoUnidade tipo = participante.getTipo();
+            if (tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL) {
+                codigosDiretos.add(participante.getCodigo());
+            }
+            if (tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL) {
+                codigosConsolidados.add(participante.getCodigo());
+            }
+        }
+
+        Map<Long, List<String>> subordinadasPorSuperior = mapearSiglasSubordinadasPorSuperior(participantes);
+        carregarUnidadesConsolidadas(codigosConsolidados, subordinadasPorSuperior, unidades);
+
+        for (Long codigoUnidade : codigosDiretos) {
+            criarNotificacaoFinalizacaoDireta(processo, obterUnidadeObrigatoria(unidades, codigoUnidade));
+        }
+        for (Long codigoUnidade : codigosConsolidados) {
+            List<String> subordinadas = subordinadasPorSuperior.getOrDefault(codigoUnidade, List.of());
+            if (subordinadas.isEmpty()) continue;
+            criarNotificacaoFinalizacaoConsolidada(processo, obterUnidadeObrigatoria(unidades, codigoUnidade), subordinadas);
+        }
+    }
+
+    private List<Unidade> buscarParticipantes(Processo processo) {
+        List<Long> codigosUnidades = processo.getParticipantes().stream()
+                .map(UnidadeProcesso::getUnidadeCodigoPersistido)
+                .toList();
+        return unidadeService.buscarPorCodigos(codigosUnidades);
+    }
+
+    private void carregarUnidadesConsolidadas(
+            Set<Long> codigosConsolidados,
+            Map<Long, List<String>> subordinadasPorSuperior,
+            Map<Long, Unidade> unidades
+    ) {
+        codigosConsolidados.addAll(subordinadasPorSuperior.keySet());
+        List<Long> codigosFaltantes = codigosConsolidados.stream()
+                .filter(codigo -> !unidades.containsKey(codigo))
+                .toList();
+        if (codigosFaltantes.isEmpty()) return;
+
+        unidadeService.buscarPorCodigos(codigosFaltantes)
+                .forEach(unidade -> unidades.put(unidade.getCodigo(), unidade));
+    }
+
+    private void criarNotificacaoFinalizacaoDireta(Processo processo, Unidade unidade) {
+        String corpo = emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                unidade.getSigla(),
+                processo.getDescricao()
+        );
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
+                .destinatario(emailUnidade(unidade))
+                .assunto("SGC: Finalização do processo " + processo.getDescricao())
+                .corpoHtml(corpo)
+                .chaveIdempotencia(chaveFinalizacaoProcesso(processo, unidade, true))
+                .build());
+    }
+
+    private void criarNotificacaoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
+        String corpo = emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
+                unidade.getSigla(),
+                processo.getDescricao(),
+                subordinadas
+        );
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
+                .destinatario(emailUnidade(unidade))
+                .assunto("SGC: Finalização do processo " + processo.getDescricao() + " em unidades subordinadas")
+                .corpoHtml(corpo)
+                .chaveIdempotencia(chaveFinalizacaoProcesso(processo, unidade, false))
+                .build());
+    }
+
+    private String chaveFinalizacaoProcesso(Processo processo, Unidade unidade, boolean direto) {
+        String sufixo = direto ? "direto" : "subordinada";
+        return "processo:%d:finalizacao:unidade:%d:%s".formatted(
+                processo.getCodigo(),
+                unidade.getCodigo(),
+                sufixo
+        );
     }
 
     private void executarDisponibilizacaoMapaEmBloco(
