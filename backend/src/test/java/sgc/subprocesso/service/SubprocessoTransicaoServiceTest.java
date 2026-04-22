@@ -87,7 +87,7 @@ class SubprocessoTransicaoServiceTest {
                         && mov.getDescricao().equals(CADASTRO_DISPONIBILIZADO.getDescMovimentacao())
                         && mov.getUsuario().equals(usuario)));
         verify(subprocessoRepo).save(subprocesso);
-        verify(notificacaoService).notificarTransicao(argThat(cmd ->
+        verify(notificacaoService).registrarComunicacoesTransicao(argThat(cmd ->
                 cmd.subprocesso().equals(subprocesso)
                         && cmd.tipoTransicao() == CADASTRO_DISPONIBILIZADO
                         && cmd.unidadeOrigem().equals(origem)
@@ -121,7 +121,7 @@ class SubprocessoTransicaoServiceTest {
                         && analise.getAcao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO
                         && "Aceite final".equals(analise.getObservacoes())
                         && "Aceite da validação".equals(analise.getMotivo())));
-        verify(notificacaoService).notificarTransicao(argThat(cmd ->
+        verify(notificacaoService).registrarComunicacoesTransicao(argThat(cmd ->
                 cmd.subprocesso().equals(subprocesso)
                         && cmd.tipoTransicao() == MAPA_VALIDACAO_ACEITA
                         && cmd.unidadeOrigem().equals(unidade)
@@ -331,7 +331,7 @@ class SubprocessoTransicaoServiceTest {
             service.aceitarValidacao(1L, "Obs");
 
             verify(analiseRepo, never()).save(any());
-            verify(notificacaoService, never()).notificarTransicao(any());
+            verify(notificacaoService, never()).registrarComunicacoesTransicao(any());
         }
 
         @Nested

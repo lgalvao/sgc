@@ -76,7 +76,7 @@ class SubprocessoNotificacaoServiceTest {
         when(usuarioService.buscarOpt("substituto"))
                 .thenReturn(Optional.of(criarUsuario("substituto@tre-pe.jus.br")));
 
-        service.notificarTransicao(NotificacaoCommand.builder()
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.PROCESSO_INICIADO)
                 .unidadeOrigem(origem)
@@ -139,7 +139,7 @@ class SubprocessoNotificacaoServiceTest {
                 new UnidadeResumoLeitura(20L, "Superior imediato", "SUP1", TipoUnidade.INTERMEDIARIA)
         ));
 
-        service.notificarTransicao(NotificacaoCommand.builder()
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
                 .unidadeOrigem(origem)
@@ -177,7 +177,7 @@ class SubprocessoNotificacaoServiceTest {
                         .build());
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
 
-        service.notificarTransicao(NotificacaoCommand.builder()
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
                 .unidadeOrigem(origem)
@@ -210,7 +210,7 @@ class SubprocessoNotificacaoServiceTest {
         when(usuarioService.buscarOpt("substituto"))
                 .thenReturn(Optional.of(criarUsuario("")));
 
-        service.notificarTransicao(NotificacaoCommand.builder()
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.PROCESSO_INICIADO)
                 .unidadeOrigem(origem)
@@ -229,7 +229,7 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        service.notificarTransicao(NotificacaoCommand.builder()
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_HOMOLOGADO)
                 .unidadeOrigem(origem)
@@ -247,7 +247,7 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        invokeMethod(service, "notificarMovimentacaoEmail", NotificacaoCommand.builder()
+        invokeMethod(service, "criarNotificacoesTransicao", NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_HOMOLOGADO)
                 .unidadeOrigem(origem)

@@ -259,7 +259,9 @@ public class ProcessoService {
         ));
 
         persistirProcessoIniciado(processo);
-        notificarInicioProcesso(processo, new ArrayList<>(contexto.unidadesParaProcessar()));
+        List<Unidade> participantes = new ArrayList<>(contexto.unidadesParaProcessar());
+        criarAlertasInicioProcesso(processo, participantes);
+        criarNotificacoesInicioProcesso(processo, participantes);
 
         log.info("Processo {} iniciado para {} unidades.", codigo, contexto.codigosUnidades().size());
     }
@@ -271,7 +273,7 @@ public class ProcessoService {
         if (processo.getTipo() != DIAGNOSTICO) {
             tornarMapasVigentes(codigo);
         }
-        notificarFinalizacaoProcesso(processo);
+        criarAlertasFinalizacaoProcesso(processo);
 
         processo.setSituacao(FINALIZADO);
         processo.setDataFinalizacao(LocalDateTime.now());
@@ -358,8 +360,7 @@ public class ProcessoService {
         String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
         Usuario titular = buscarTitularObrigatorio(unidade, unidadeCodigo);
-        Alerta alerta = servicoAlertas.criarAlertaAdmin(processo, unidade,
-                "Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em " + dataLimiteText);
+        criarAlertaLembretePrazo(processo, unidade, dataLimiteText);
 
         String assunto = "SGC: Lembrete - " + processo.getDescricao();
         String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
@@ -915,13 +916,12 @@ public class ProcessoService {
         return Objects.requireNonNullElse(dataLimiteEtapa2, dataLimiteEtapa1);
     }
 
-    private void notificarInicioProcesso(Processo p, List<Unidade> participantes) {
-        log.info("Notificando início do processo {}", p.getCodigo());
-        servicoAlertas.criarAlertasProcessoIniciado(p, participantes);
-        enfileirarEmailsInicioProcesso(p, participantes);
+    private void criarAlertasInicioProcesso(Processo processo, List<Unidade> participantes) {
+        log.info("Criando alertas de início do processo {}", processo.getCodigo());
+        servicoAlertas.criarAlertasProcessoIniciado(processo, participantes);
     }
 
-    private void enfileirarEmailsInicioProcesso(Processo processo, List<Unidade> participantes) {
+    private void criarNotificacoesInicioProcesso(Processo processo, List<Unidade> participantes) {
         Set<Long> codsOperacionais = new HashSet<>();
         Set<Long> codsIntermediarias = new HashSet<>();
         Map<Long, Unidade> todasUnidadesMap = new HashMap<>();
@@ -957,19 +957,19 @@ public class ProcessoService {
 
         for (Long cod : codsOperacionais) {
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            enfileirarEmailInicio(processo, unidadeDestino, true, subordinadasPorSuperior, dataLimite);
+            criarNotificacaoInicio(processo, unidadeDestino, true, subordinadasPorSuperior, dataLimite);
         }
 
         for (Long cod : codsIntermediarias) {
             // Se já foi notificada como operacional, não notifica como intermediária
             if (codsOperacionais.contains(cod)) continue;
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            enfileirarEmailInicio(processo, unidadeDestino, false, subordinadasPorSuperior, dataLimite);
+            criarNotificacaoInicio(processo, unidadeDestino, false, subordinadasPorSuperior, dataLimite);
         }
     }
 
-    private void enfileirarEmailInicio(Processo processo, Unidade unidadeDestino, boolean participante,
-                                       Map<Long, List<String>> subordinadasPorSuperior, LocalDateTime dataLimite) {
+    private void criarNotificacaoInicio(Processo processo, Unidade unidadeDestino, boolean participante,
+                                        Map<Long, List<String>> subordinadasPorSuperior, LocalDateTime dataLimite) {
         List<String> subordinadas = subordinadasPorSuperior.getOrDefault(unidadeDestino.getCodigo(), List.of());
         String corpoHtml = emailModelosService.criarEmailInicioProcessoConsolidado(
                 unidadeDestino.getSigla(),
@@ -1017,8 +1017,13 @@ public class ProcessoService {
         );
     }
 
-    private void notificarFinalizacaoProcesso(Processo p) {
-        log.info("Notificando finalização do processo {}", p.getCodigo());
+    private void criarAlertaLembretePrazo(Processo processo, Unidade unidade, String dataLimiteText) {
+        servicoAlertas.criarAlertaAdmin(processo, unidade,
+                "Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em " + dataLimiteText);
+    }
+
+    private void criarAlertasFinalizacaoProcesso(Processo p) {
+        log.info("Criando alertas de finalização do processo {}", p.getCodigo());
         List<Long> unidadesCods = p.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigoPersistido).toList();
         List<Unidade> participantes = unidadeService.buscarPorCodigos(unidadesCods);
         for (Unidade u : participantes) {

@@ -254,7 +254,7 @@ public class SubprocessoTransicaoService {
 
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
         persistirTransicao(cmd);
-        notificarTransicao(cmd);
+        registrarComunicacoesTransicao(cmd);
     }
 
     private void persistirTransicao(RegistrarTransicaoCommand cmd) {
@@ -271,9 +271,9 @@ public class SubprocessoTransicaoService {
         subprocessoRepo.save(sp);
     }
 
-    private void notificarTransicao(RegistrarTransicaoCommand cmd) {
+    private void registrarComunicacoesTransicao(RegistrarTransicaoCommand cmd) {
         Subprocesso sp = cmd.sp();
-        notificacaoService.notificarTransicao(NotificacaoCommand.builder()
+        notificacaoService.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(sp)
                 .tipoTransicao(cmd.tipo())
                 .unidadeOrigem(cmd.origem())

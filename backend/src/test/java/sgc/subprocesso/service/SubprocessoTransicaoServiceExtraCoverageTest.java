@@ -212,7 +212,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         verify(analiseRepo).save(any());
-        verify(notificacaoService).notificarTransicao(argThat(cmd -> Objects.equals(cmd.unidadeDestino(), admin)));
+        verify(notificacaoService).registrarComunicacoesTransicao(argThat(cmd -> Objects.equals(cmd.unidadeDestino(), admin)));
     }
 
     @Test
@@ -343,7 +343,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         service.devolverCadastro(1L, "Obs");
 
         // Deve ter devolvido para uOrigem (destino da transicao)
-        verify(notificacaoService).notificarTransicao(argThat(cmd -> cmd.unidadeDestino().equals(uOrigem)));
+        verify(notificacaoService).registrarComunicacoesTransicao(argThat(cmd -> cmd.unidadeDestino().equals(uOrigem)));
     }
 
     @Test

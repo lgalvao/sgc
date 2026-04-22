@@ -25,7 +25,7 @@ import java.util.*;
 public class SubprocessoNotificacaoService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final AlertaFacade alertaService;
+    private final AlertaFacade alertaFacade;
     private final NotificacaoService notificacaoService;
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
@@ -33,28 +33,32 @@ public class SubprocessoNotificacaoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UnidadeService unidadeService;
 
-    public void notificarTransicao(NotificacaoCommand cmd) {
+    public void registrarComunicacoesTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
         if (tipoTransicao.geraAlerta()) {
-            Subprocesso subprocesso = cmd.subprocesso();
-            String sigla = subprocesso.getUnidade().getSigla();
-            String descricao = tipoTransicao.formatarAlerta(sigla);
-            alertaService.criarAlertaTransicao(subprocesso.getProcesso(), descricao, cmd.unidadeOrigem(), cmd.unidadeDestino());
+            criarAlertaTransicao(cmd);
         }
         if (tipoTransicao.enviaEmail()) {
-            notificarMovimentacaoEmail(cmd);
+            criarNotificacoesTransicao(cmd);
         }
     }
 
-    private void notificarMovimentacaoEmail(NotificacaoCommand cmd) {
+    private void criarAlertaTransicao(NotificacaoCommand cmd) {
+        Subprocesso subprocesso = cmd.subprocesso();
+        String sigla = subprocesso.getUnidade().getSigla();
+        String descricao = cmd.tipoTransicao().formatarAlerta(sigla);
+        alertaFacade.criarAlertaTransicao(subprocesso.getProcesso(), descricao, cmd.unidadeOrigem(), cmd.unidadeDestino());
+    }
+
+    private void criarNotificacoesTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
         if (!tipoTransicao.enviaEmail()) return;
 
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
-        enviarNotificacaoDireta(cmd, variaveis);
+        criarNotificacaoDireta(cmd, variaveis);
 
         if (tipoTransicao.notificacaoSuperior()) {
-            enviarNotificacaoSuperior(cmd, variaveis);
+            criarNotificacaoSuperior(cmd, variaveis);
         }
     }
 
@@ -63,7 +67,7 @@ public class SubprocessoNotificacaoService {
     }
 
     public void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
-        Alerta alerta = alertaService.criarAlertaAlteracaoDataLimite(
+        alertaFacade.criarAlertaAlteracaoDataLimite(
                 sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa);
 
         Map<String, Object> variaveis = new HashMap<>();
@@ -88,7 +92,7 @@ public class SubprocessoNotificacaoService {
                 .build());
     }
 
-    private void enviarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {
+    private void criarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {
         TipoTransicao tipo = cmd.tipoTransicao();
         String templateEmail = obterTemplateObrigatorio(tipo.getTemplateEmail(), "e-mail direto");
 
@@ -97,7 +101,7 @@ public class SubprocessoNotificacaoService {
         String emailUnidade = getEmailUnidade(cmd.unidadeDestino());
 
         EmailGerado emailDireto = new EmailGerado(emailUnidade, assunto, corpo, "direto");
-        enfileirarEmail(cmd, emailDireto);
+        criarNotificacao(cmd, emailDireto);
         notificarResponsavelPessoal(cmd, cmd.unidadeDestino(), emailDireto);
     }
 
@@ -113,13 +117,13 @@ public class SubprocessoNotificacaoService {
         if (responsavel.substitutoTitulo() != null) {
             usuarioService.buscarOpt(responsavel.substitutoTitulo()).ifPresent(u -> {
                 if (!u.getEmail().isBlank()) {
-                    enfileirarEmail(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), "responsavel"));
+                    criarNotificacao(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), "responsavel"));
                 }
             });
         }
     }
 
-    private void enviarNotificacaoSuperior(NotificacaoCommand cmd, Map<String, Object> variaveisBase) {
+    private void criarNotificacaoSuperior(NotificacaoCommand cmd, Map<String, Object> variaveisBase) {
         String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), true);
         Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(cmd.unidadeOrigem().getCodigo());
         if (codigoPai == null || Objects.equals(codigoPai, cmd.unidadeDestino().getCodigo())) return;
@@ -136,10 +140,10 @@ public class SubprocessoNotificacaoService {
         String corpo = processarTemplate(templateEmailSuperior, variaveis);
         String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());
 
-        enfileirarEmail(cmd, new EmailGerado(emailSuperior, assunto, corpo, "superior"));
+        criarNotificacao(cmd, new EmailGerado(emailSuperior, assunto, corpo, "superior"));
     }
 
-    private void enfileirarEmail(NotificacaoCommand cmd, EmailGerado email) {
+    private void criarNotificacao(NotificacaoCommand cmd, EmailGerado email) {
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(cmd.subprocesso())
                 .tipoNotificacao(TipoNotificacao.valueOf(cmd.tipoTransicao().name()))
