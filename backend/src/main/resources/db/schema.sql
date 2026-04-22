@@ -1008,6 +1008,6 @@ create index if not exists idx_alerta_processo on sgc.alerta (processo_codigo);
 create index if not exists idx_alerta_usuario_usuario on sgc.alerta_usuario (usuario_titulo);
 create index if not exists idx_unidade_processo_unidade on sgc.unidade_processo (unidade_codigo);
 create index if not exists idx_notif_email_fila on sgc.notificacao_email (situacao, proxima_tentativa_em, data_hora_criacao);
-create index if not exists idx_notif_email_subprocesso on sgc.notificacao_email (subprocesso_codigo);
+create index if not exists idx_notif_email_subproc_sit on sgc.notificacao_email (subprocesso_codigo, situacao);
 create index if not exists idx_notif_email_alerta on sgc.notificacao_email (alerta_codigo);
 create index if not exists idx_notif_email_usuario on sgc.notificacao_email (usuario_destino_titulo);

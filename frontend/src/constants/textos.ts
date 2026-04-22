@@ -280,7 +280,7 @@ export const TEXTOS = {
       UNIDADE: "Unidade",
       STATUS: "Situação",
       ERRO: "Erro",
-      PROXIMA_TENTATIVA: "Próxima tentativa",
+      PROXIMA_TENTATIVA: "Próxima",
       CONCLUSAO: "Conclusão",
       ACOES: "Ações",
     },

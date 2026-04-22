@@ -1,31 +1,9 @@
 -- #################################################################
--- SCRIPT DDL ORACLE PARA ALERTAS PESSOAIS E OUTBOX DE E-MAILS
+-- CRIA TABELA DE OUTBOX DE E-MAILS E FLEXIBILIZA NULOS EM ALERTAS
 -- #################################################################
---
 -- Objetivo:
 --   1. Corrigir ALERTA para permitir alertas destinados a usuarios.
---   2. Persistir a intencao de envio de e-mail na mesma transacao do
---      workflow, permitindo envio posterior com retry e auditoria.
---
--- Escopo:
---   Script unico para aplicar sobre o baseline oficial do SGC.
---   Os DDLs baseline em ddl_tabelas.sql e ddl_views.sql permanecem
---   inalterados.
---
--- Situacoes previstas:
---   PENDENTE
---   ENVIANDO
---   ENVIADO
---   FALHA_TEMPORARIA
---   FALHA_DEFINITIVA
-
--- #################################################################
--- AJUSTE DO MODELO DE ALERTAS
--- #################################################################
---
--- ALERTA pode ser destinado a uma unidade ou a um usuario especifico.
--- Por isso, processo_codigo e unidade_destino_codigo precisam ser opcionais.
--- A constraint abaixo garante que todo alerta tenha ao menos um destino.
+--   2. Persistir a intencao de envio de e-mail na mesma transacao, permitindo envio posterior com retry e auditoria.
 
 ALTER TABLE ALERTA MODIFY (processo_codigo NULL);
 ALTER TABLE ALERTA MODIFY (unidade_destino_codigo NULL);
@@ -90,8 +68,8 @@ COMMENT ON COLUMN NOTIFICACAO_EMAIL.chave_idempotencia IS 'Chave unica para evit
 CREATE INDEX ix_notif_email_fila
     ON NOTIFICACAO_EMAIL (situacao, proxima_tentativa_em, data_hora_criacao);
 
-CREATE INDEX ix_notif_email_subproc
-    ON NOTIFICACAO_EMAIL (subprocesso_codigo);
+CREATE INDEX ix_notif_email_subproc_sit
+    ON NOTIFICACAO_EMAIL (subprocesso_codigo, situacao);
 
 CREATE INDEX ix_notif_email_alerta
     ON NOTIFICACAO_EMAIL (alerta_codigo);
