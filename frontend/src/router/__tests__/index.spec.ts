@@ -30,6 +30,7 @@ describe("Router", () => {
 
     it("permite rota administrativa quando autenticado", async () => {
         perfilStore.usuarioCodigo = "123";
+        perfilStore.perfilSelecionado = Perfil.ADMIN;
         await router.push("/administracao/limpeza-processos");
         expect(router.currentRoute.value.path).toBe("/administracao/limpeza-processos");
     });

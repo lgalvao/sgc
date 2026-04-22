@@ -421,10 +421,10 @@ describe("CadastroView.vue", () => {
         await flushPromises();
 
         const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModal);
-        modal.vm.$emit('confirmar');
+        modal.vm.$emit('confirmar', "Observação teste");
         await flushPromises();
 
-        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123);
+        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123, { observacoes: "Observação teste" });
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 

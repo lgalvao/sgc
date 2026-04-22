@@ -653,16 +653,17 @@ async function disponibilizarCadastro() {
   }
 }
 
-async function confirmarDisponibilizacao() {
+async function confirmarDisponibilizacao(observacoes: string) {
   if (!codSubprocesso.value || loadingDisponibilizacao.value) return;
 
   let sucesso: boolean;
   loadingDisponibilizacao.value = true;
   try {
+    const req = { observacoes };
     if (isRevisao.value) {
-      sucesso = await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso.value);
+      sucesso = await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso.value, req);
     } else {
-      sucesso = await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value);
+      sucesso = await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value, req);
     }
   } finally {
     loadingDisponibilizacao.value = false;
