@@ -2,7 +2,8 @@ package sgc.alerta.dto;
 
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.alerta.model.*;
+import sgc.alerta.model.NotificacaoEmail;
+import sgc.alerta.model.TipoNotificacao;
 
 import java.time.*;
 
@@ -14,7 +15,7 @@ public record NotificacaoDto(
         @Nullable String usuarioDestinoTitulo,
         String destinatario,
         String assunto,
-        SituacaoNotificacao situacao,
+        sgc.alerta.model.SituacaoNotificacao situacao,
         int tentativas,
         LocalDateTime dataHoraCriacao,
         @Nullable LocalDateTime dataHoraEnvio,
