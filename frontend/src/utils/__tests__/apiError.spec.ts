@@ -103,5 +103,10 @@ describe('apiError utils', () => {
             const res = await getOrNull(call);
             expect(res).toBeNull();
         });
+
+        it('getOrNull propaga outros erros', async () => {
+            const call = vi.fn().mockRejectedValue(new Error('Other'));
+            await expect(getOrNull(call)).rejects.toThrow('Other');
+        });
     });
 });

@@ -65,5 +65,20 @@ describe('csv utils', () => {
       expect(mockLink.click).toHaveBeenCalled();
       expect(mockLink.remove).toHaveBeenCalled();
     });
+
+    it('não deve fazer download se link.download não for suportado', () => {
+      const mockLink = {
+        setAttribute: vi.fn(),
+        style: { visibility: '' }
+      } as unknown as any;
+      // Removendo explicitamente a propriedade download
+      delete mockLink.download;
+
+      vi.spyOn(document, 'createElement').mockReturnValue(mockLink as HTMLAnchorElement);
+
+      downloadCSV('a,b', 'teste.csv');
+
+      expect(mockLink.setAttribute).not.toHaveBeenCalled();
+    });
   });
 });

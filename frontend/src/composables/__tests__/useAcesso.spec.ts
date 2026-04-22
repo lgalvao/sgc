@@ -290,6 +290,28 @@ describe('useAcesso', () => {
     expect(acesso.acaoPrincipalMapa.value).toBeNull();
   });
 
+  it('deve expor ação principal de cadastro quando pode aceitar mas não pode homologar', () => {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeHomologarCadastro: false,
+        podeAceitarCadastro: true,
+      }),
+    });
+    const acesso = useAcesso(subprocesso);
+    expect(acesso.acaoPrincipalCadastro.value?.codigo).toBe('ACEITAR');
+  });
+
+  it('deve expor ação principal de mapa quando pode aceitar mas não pode homologar', () => {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeHomologarMapa: false,
+        podeAceitarMapa: true,
+      }),
+    });
+    const acesso = useAcesso(subprocesso);
+    expect(acesso.acaoPrincipalMapa.value?.codigo).toBe('ACEITAR');
+  });
+
   it('deve retornar permissoes adicionais como podeVerSugestoes e habilitarAcessoCadastro', () => {
     const subprocesso = criarSubprocesso({permissoes: criarPermissoes({podeVerSugestoes: true, habilitarAcessoCadastro: true, mesmaUnidade: true})});
     const acesso = useAcesso(subprocesso);

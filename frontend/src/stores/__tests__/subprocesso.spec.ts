@@ -93,6 +93,23 @@ describe("subprocesso store", () => {
             expect(result).toBeNull();
             expect(logger.error).toHaveBeenCalled();
         });
+
+        it("deve tratar erro 404 (notFound) especificamente", async () => {
+            const error404 = {
+                isAxiosError: true,
+                response: {
+                    status: 404,
+                    data: {message: "Não encontrado"}
+                }
+            };
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue(error404);
+
+            const result = await context.store.garantirContextoEdicao(1);
+
+            expect(result).toBeNull();
+            expect(context.store.erroIntegracaoContexto?.kind).toBe("unexpected");
+            expect(context.store.erroIntegracaoContexto?.message).toContain("Falha grave ao localizar o subprocesso");
+        });
     });
 
     describe("garantirContextoEdicaoPorProcessoEUnidade", () => {
@@ -170,6 +187,23 @@ describe("subprocesso store", () => {
 
             expect(result).toBeNull();
             expect(logger.error).toHaveBeenCalled();
+        });
+
+        it("deve tratar erro 404 (notFound) especificamente", async () => {
+            const error404 = {
+                isAxiosError: true,
+                response: {
+                    status: 404,
+                    data: {message: "Não encontrado"}
+                }
+            };
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockRejectedValue(error404);
+
+            const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+
+            expect(result).toBeNull();
+            expect(context.store.erroIntegracaoContexto?.kind).toBe("unexpected");
+            expect(context.store.erroIntegracaoContexto?.message).toContain("Falha grave ao resolver subprocesso");
         });
     });
 });

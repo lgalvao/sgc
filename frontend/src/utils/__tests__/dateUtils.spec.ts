@@ -155,4 +155,12 @@ describe('dateUtils', () => {
     it('parseDate deve retornar null para tipos não suportados', () => {
         expect(parseDate(true)).toBeNull();
     });
+
+    it('formatDateBR deve retornar "Data inválida" em caso de erro no format', () => {
+        // Forçar um erro no format passando um Date objeto mas que por algum motivo o parseDate aceita mas o format falha
+        // Na prática isValid protege, mas vamos testar o catch
+        const mockDate = new Date();
+        // @ts-expect-error - invalid pattern to trigger error
+        expect(formatDateBR(mockDate, { invalid: 'pattern' })).toBe('Data inválida');
+    });
 });
