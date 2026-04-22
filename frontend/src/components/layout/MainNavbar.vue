@@ -121,9 +121,9 @@ const labelUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? TEXTOS
 const iconUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
 const linkUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
 
-function handleLogout() {
-  perfilStore.logout();
-  router.push("/login");
+async function handleLogout() {
+  await perfilStore.logout();
+  await router.push("/login");
 }
 </script>
 

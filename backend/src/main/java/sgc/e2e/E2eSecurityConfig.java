@@ -68,6 +68,7 @@ public class E2eSecurityConfig {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/login",
                                 "/api/usuarios/entrar",
+                                "/api/usuarios/logout",
                                 "/api/eventos",
                                 "/actuator/**",
                                 "/e2e/**")

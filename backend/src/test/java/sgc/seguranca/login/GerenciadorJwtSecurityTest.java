@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("GerenciadorJwt - Segurança")
 class GerenciadorJwtSecurityTest {
 
-    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
+    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-64-chars-for-hs512";
     @Mock
     private JwtProperties jwtProperties;
     @Mock

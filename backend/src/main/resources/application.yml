@@ -136,7 +136,7 @@ springdoc:
 aplicacao:
   ambiente-testes: true
   jwt:
-    secret: sgc-secret-key-change-this-in-production-minimum-32-chars
+    secret: sgc-secret-key-change-this-in-production-minimum-64-chars-for-hs512
 
 ---
 spring:

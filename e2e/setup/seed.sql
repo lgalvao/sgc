@@ -625,7 +625,7 @@ INSERT INTO sgc.notificacao_email
      corpo_html, situacao, tentativas, proxima_tentativa_em, data_hora_criacao, data_hora_envio, ultimo_erro,
      chave_idempotencia)
 VALUES
-    (2, 302, 'MAPA_DISPONIBILIZADO_SUPERIOR', NULL, 'chefe_sec3@tre-pe.jus.br',
+    (2, 302, 'MAPA_DISPONIBILIZADO', NULL, 'chefe_sec3@tre-pe.jus.br',
      'SGC: Mapa de competências disponibilizado - SECAO_321',
      '<p>Mapa disponibilizado para unidade superior.</p>',
      'FALHA_DEFINITIVA', 5, NULL, CURRENT_TIMESTAMP - INTERVAL '45' MINUTE, NULL,

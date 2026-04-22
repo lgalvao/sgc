@@ -48,6 +48,12 @@ describe('usuarioService', () => {
       expect(result).toEqual(mockData);
     });
 
+    it('logout', async () => {
+      (apiClient.post as any).mockResolvedValueOnce({});
+      await usuarioService.logout();
+      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/logout');
+    });
+
     it('buscarUsuariosPorUnidade', async () => {
       (apiClient.get as any).mockResolvedValueOnce({ data: [] });
       await usuarioService.buscarUsuariosPorUnidade(1);

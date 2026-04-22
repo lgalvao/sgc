@@ -191,6 +191,10 @@ export async function entrar(request: EntrarRequest): Promise<SessaoLogin> {
     return mapSessaoLoginToFrontend(response.data);
 }
 
+export async function logout(): Promise<void> {
+    await apiClient.post("/usuarios/logout");
+}
+
 export async function buscarUsuariosPorUnidade(
     codigoUnidade: number,
 ): Promise<Usuario[]> {

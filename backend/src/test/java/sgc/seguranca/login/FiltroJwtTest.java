@@ -77,6 +77,17 @@ class FiltroJwtTest {
     }
 
     @Test
+    @DisplayName("Deve ignorar endpoints públicos de autenticação")
+    void deveIgnorarEndpointsPublicosAutenticacao() {
+        for (String uri : List.of("/api/usuarios/login", "/api/usuarios/entrar", "/api/usuarios/logout")) {
+            when(request.getRequestURI()).thenReturn(uri);
+            assertThat(filtro.shouldNotFilter(request)).isTrue();
+        }
+
+        verifyNoInteractions(jwtService, usuarioService);
+    }
+
+    @Test
     @DisplayName("Deve processar JWT via Cookie")
     void deveProcessarJwtViaCookie() throws ServletException, IOException {
         Cookie cookie = new Cookie("jwtToken", "token-cookie");

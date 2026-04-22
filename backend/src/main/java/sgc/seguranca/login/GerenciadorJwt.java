@@ -24,7 +24,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class GerenciadorJwt {
-    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
+    private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-64-chars-for-hs512";
     private final JwtProperties jwtProperties;
     private final Environment environment;
 

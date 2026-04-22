@@ -40,7 +40,7 @@ public class TestSecurityConfig {
     public SecurityFilterChain testFilterChain(HttpSecurity http, ObjectProvider<FiltroJwt> filtroJwtProvider) {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/usuarios/login", "/api/usuarios/entrar").permitAll()
+                        .requestMatchers("/api/usuarios/login", "/api/usuarios/entrar", "/api/usuarios/logout").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));

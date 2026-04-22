@@ -126,6 +126,14 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/logout")
+    @Operation(summary = "Encerra a sessão e remove os cookies de autenticação")
+    public ResponseEntity<Void> logout(HttpServletResponse httpResponse) {
+        limparCookieJwt(httpResponse);
+        limparCookiePreAuth(httpResponse);
+        return ResponseEntity.noContent().build();
+    }
+
     private void adicionarCookiePreAuth(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("SGC_PRE_AUTH", token);
         cookie.setHttpOnly(true);
@@ -146,6 +154,15 @@ public class LoginController {
 
     private void limparCookiePreAuth(HttpServletResponse response) {
         Cookie cookie = new Cookie("SGC_PRE_AUTH", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(!ambienteTestes);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
+    private void limparCookieJwt(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwtToken", "");
         cookie.setHttpOnly(true);
         cookie.setSecure(!ambienteTestes);
         cookie.setPath("/");

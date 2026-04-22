@@ -275,6 +275,17 @@ class LoginControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/usuarios/logout - Deve limpar cookies de autenticação")
+    @WithMockUser
+    void logout_DeveLimparCookiesAutenticacao() throws Exception {
+        mockMvc.perform(post("/api/usuarios/logout")
+                        .with(csrf()))
+                .andExpect(status().isNoContent())
+                .andExpect(cookie().maxAge("jwtToken", 0))
+                .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));
+    }
+
+    @Test
     @DisplayName("entrar deve aceitar cookie de pré-auth após cookies irrelevantes")
     void entrar_ComCookiePreAuthAposCookiesIrrelevantes() {
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));

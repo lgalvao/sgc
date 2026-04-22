@@ -303,8 +303,10 @@ describe("usePerfilStore", () => {
             expect(result.sessao).toBeNull();
         });
 
-        it("deve fazer logout corretamente", () => {
-            context.store.logout();
+        it("deve fazer logout corretamente", async () => {
+            mockUsuarioService.logout.mockResolvedValue();
+            await context.store.logout();
+            expect(mockUsuarioService.logout).toHaveBeenCalledTimes(1);
             expect(context.store.usuarioCodigo).toBeNull();
             expect(context.store.perfilSelecionado).toBeNull();
             expect(context.store.unidadeSelecionada).toBeNull();
@@ -313,6 +315,13 @@ describe("usePerfilStore", () => {
             expect(processoStoreMock.invalidar).toHaveBeenCalledTimes(1);
             expect(subprocessoStoreMock.invalidar).toHaveBeenCalledTimes(1);
             expect(unidadeStoreMock.invalidarCache).toHaveBeenCalledTimes(1);
+        });
+
+        it("deve limpar estado local mesmo se logout remoto falhar", async () => {
+            mockUsuarioService.logout.mockRejectedValue(new Error("Falha"));
+            await context.store.logout();
+            expect(context.store.usuarioCodigo).toBeNull();
+            expect(context.store.perfilSelecionado).toBeNull();
         });
 
         it("deve limpar o erro", () => {

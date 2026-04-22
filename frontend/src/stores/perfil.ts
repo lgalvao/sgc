@@ -134,7 +134,13 @@ export const usePerfilStore = defineStore("perfil", () => {
         });
     }
 
-    function logout() {
+    async function logout() {
+        try {
+            await usuarioService.logout();
+        } catch {
+            // A sessão local deve ser limpa mesmo se o backend já estiver indisponível.
+        }
+
         // Limpa estados - remoção do localStorage é automática
         usuarioCodigo.value = null;
         perfilSelecionado.value = null;

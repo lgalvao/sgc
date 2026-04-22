@@ -6,6 +6,9 @@ import NavBar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
 
 vi.mock("@/composables/usePerfil");
+vi.mock("@/services/usuarioService", () => ({
+    logout: vi.fn().mockResolvedValue(undefined),
+}));
 
 const {mockPush} = vi.hoisted(() => ({
     mockPush: vi.fn()

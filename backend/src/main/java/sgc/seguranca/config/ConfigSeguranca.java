@@ -69,6 +69,7 @@ public class ConfigSeguranca {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/login",
                                 "/api/usuarios/entrar",
+                                "/api/usuarios/logout",
                                 "/api/eventos")
                         .permitAll()
                         .requestMatchers("/actuator/**")
@@ -82,7 +83,7 @@ public class ConfigSeguranca {
                 // Habilita CSRF usando cookies (padrão para SPAs como Vue/React)
                 // O cliente deve ler o cookie XSRF-TOKEN e enviar no header X-XSRF-TOKEN
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/usuarios/login", "/api/usuarios/entrar")
+                        .ignoringRequestMatchers("/api/usuarios/login", "/api/usuarios/entrar", "/api/usuarios/logout")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .httpBasic(AbstractHttpConfigurer::disable)

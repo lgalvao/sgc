@@ -25,7 +25,11 @@ public class FiltroJwt extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return "/api/eventos".equals(request.getRequestURI());
+        String uri = request.getRequestURI();
+        return "/api/eventos".equals(uri)
+                || "/api/usuarios/login".equals(uri)
+                || "/api/usuarios/entrar".equals(uri)
+                || "/api/usuarios/logout".equals(uri);
     }
 
     @Override
