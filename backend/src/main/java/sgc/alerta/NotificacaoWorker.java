@@ -10,7 +10,7 @@ import sgc.alerta.model.*;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class NotificacaoEmailWorker {
+public class NotificacaoWorker {
     private final NotificacaoService notificacaoService;
     private final EmailService emailService;
 

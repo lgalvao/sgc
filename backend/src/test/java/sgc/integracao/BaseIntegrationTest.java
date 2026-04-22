@@ -61,7 +61,7 @@ public abstract class BaseIntegrationTest {
     @Autowired
     private CacheManager cacheManager;
     @Autowired(required = false)
-    private NotificacaoEmailWorker notificacaoEmailWorker;
+    private NotificacaoWorker notificacaoWorker;
 
     @BeforeEach
     void setupMockMvc() {
@@ -95,8 +95,8 @@ public abstract class BaseIntegrationTest {
     }
 
     protected void processarEmailsPendentes() {
-        if (notificacaoEmailWorker != null) {
-            notificacaoEmailWorker.processarPendentes();
+        if (notificacaoWorker != null) {
+            notificacaoWorker.processarPendentes();
         }
     }
 

@@ -12,16 +12,16 @@ import java.util.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("NotificacaoEmailWorker")
+@DisplayName("NotificacaoWorker")
 @SuppressWarnings("NullAway.Init")
-class NotificacaoEmailWorkerTest {
+class NotificacaoWorkerTest {
     @Mock
     private NotificacaoService notificacaoService;
     @Mock
     private EmailService emailService;
 
     @InjectMocks
-    private NotificacaoEmailWorker worker;
+    private NotificacaoWorker worker;
 
     @BeforeEach
     void setUp() {
