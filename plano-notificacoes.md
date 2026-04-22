@@ -15,28 +15,23 @@
 
 - O backend já possui outbox de email com `NotificacaoEmailService`, `NotificacaoEmailWorker`, entidade `NotificacaoEmail` e endpoint de consulta por subprocesso.
 - `EmailService` permanece como adaptador baixo nível de SMTP.
+- O worker captura notificações por update condicionado antes do envio, evitando reprocessamento simultâneo da mesma linha.
 - Fluxos já migrados para o outbox:
   - alteração de data limite de subprocesso;
   - lembrete de prazo;
   - atribuição temporária do CDU-28.
 - CDU-27 e CDU-28 possuem cobertura integrada confirmando uso do outbox.
-- Testes focados de alerta/email/outbox e CDU-27/CDU-28 passaram em 2026-04-22.
+- Testes focados de alerta/email/outbox passaram em 2026-04-22.
 
 ## Pendências
 
-### 1. Revisar processamento do outbox
+### 1. Fechar política operacional do outbox
 
-- Confirmar que o worker processa apenas notificações `PENDENTE` e `FALHA_TEMPORARIA` com `proxima_tentativa_em` vencida.
-- Garantir que a notificação seja marcada como `ENVIANDO` antes da chamada SMTP.
-- Marcar `ENVIADO` somente após envio real.
-- Registrar erro resumido quando houver falha.
-- Manter retry com backoff e encerrar em `FALHA_DEFINITIVA` após o limite de tentativas.
-- Revisar concorrência para evitar que execuções simultâneas processem a mesma linha.
-- Definir política operacional:
-  - intervalo do worker;
-  - tamanho máximo do lote;
-  - retenção ou limpeza histórica;
-  - ação manual esperada para `FALHA_DEFINITIVA`.
+- Confirmar intervalo do worker.
+- Confirmar tamanho máximo do lote.
+- Definir retenção ou limpeza histórica.
+- Definir ação manual esperada para `FALHA_DEFINITIVA`.
+- Documentar como suporte deve investigar `ultimo_erro`, `tentativas` e `proxima_tentativa_em`.
 
 ### 2. Fechar suporte operacional
 
@@ -84,4 +79,4 @@
 
 ## Próxima etapa
 
-Fechar a revisão do processamento do outbox, principalmente concorrência do worker e política operacional. Depois disso, completar apenas as APIs de suporte que forem necessárias e iniciar o frontend.
+Fechar a política operacional do outbox. Depois disso, completar apenas as APIs de suporte que forem necessárias e iniciar o frontend.
