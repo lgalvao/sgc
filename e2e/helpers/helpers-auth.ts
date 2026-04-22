@@ -61,13 +61,17 @@ export async function autenticar(page: Page, usuario: string, senha: string) {
     await page.getByTestId('btn-login-entrar').click();
 }
 
-export async function login(page: Page, usuario: string, senha: string) {
+async function limparSessaoNavegador(page: Page) {
+    await page.context().clearCookies();
     await page.goto('/login');
-    // Se ainda não estiver na página de login (redirecionado para /painel por sessão ativa), força logout
-    if (page.url().includes('/painel')) {
-        await page.getByTestId('btn-logout').click();
-        await page.waitForURL(/\/login/);
-    }
+    await page.evaluate(() => {
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+    });
+}
+
+export async function login(page: Page, usuario: string, senha: string) {
+    await limparSessaoNavegador(page);
 
     await autenticar(page, usuario, senha);
     await page.waitForURL(/\/painel(?:\?|$)/);
@@ -75,12 +79,7 @@ export async function login(page: Page, usuario: string, senha: string) {
 }
 
 export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
-    await page.goto('/login');
-    // Se ainda não estiver na página de login (redirecionado para /painel por sessão ativa), força logout
-    if (page.url().includes('/painel')) {
-        await page.getByTestId('btn-logout').click();
-        await page.waitForURL(/\/login/);
-    }
+    await limparSessaoNavegador(page);
 
     await autenticar(page, usuario, senha);
     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});

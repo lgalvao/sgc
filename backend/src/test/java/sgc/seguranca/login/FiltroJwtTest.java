@@ -79,7 +79,7 @@ class FiltroJwtTest {
     @Test
     @DisplayName("Deve ignorar endpoints públicos de autenticação")
     void deveIgnorarEndpointsPublicosAutenticacao() {
-        for (String uri : List.of("/api/usuarios/login", "/api/usuarios/entrar", "/api/usuarios/logout")) {
+        for (String uri : List.of("/api/usuarios/login", "/api/usuarios/entrar", "/api/usuarios/logout", "/e2e/reset-database")) {
             when(request.getRequestURI()).thenReturn(uri);
             assertThat(filtro.shouldNotFilter(request)).isTrue();
         }

@@ -29,7 +29,8 @@ public class FiltroJwt extends OncePerRequestFilter {
         return "/api/eventos".equals(uri)
                 || "/api/usuarios/login".equals(uri)
                 || "/api/usuarios/entrar".equals(uri)
-                || "/api/usuarios/logout".equals(uri);
+                || "/api/usuarios/logout".equals(uri)
+                || uri.startsWith("/e2e/");
     }
 
     @Override
