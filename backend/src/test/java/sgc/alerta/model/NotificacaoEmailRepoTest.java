@@ -118,6 +118,53 @@ class NotificacaoEmailRepoTest {
         assertThat(enviandoCapturadas).isZero();
     }
 
+    @Test
+    @DisplayName("deve resumir notificacoes por subprocessos de processos ativos")
+    void deveResumirNotificacoesPorSubprocessosDeProcessosAtivos() {
+        NotificacaoEmail falha = criarNotificacao("chave-repo-resumo-falha");
+        falha.setSituacao(SituacaoNotificacaoEmail.FALHA_DEFINITIVA);
+        falha.setTentativas(5);
+        falha.setUltimoErro("SMTP fora");
+        notificacaoEmailRepo.save(falha);
+
+        List<sgc.alerta.dto.NotificacaoSubprocessoResumoQuery> resumos =
+                notificacaoEmailRepo.resumirPorSubprocessosDeProcessosAtivos();
+
+        assertThat(resumos)
+                .filteredOn(resumo -> Objects.equals(resumo.subprocessoCodigo(), 60000L))
+                .first()
+                .satisfies(resumo -> {
+                    assertThat(resumo.totalNotificacoes()).isGreaterThanOrEqualTo(1);
+                    assertThat(resumo.falhasDefinitivas()).isGreaterThanOrEqualTo(1);
+                    assertThat(resumo.maiorTentativas()).isGreaterThanOrEqualTo(5);
+                });
+    }
+
+    @Test
+    @DisplayName("deve reenfileirar falhas definitivas por subprocesso")
+    void deveReenfileirarFalhasDefinitivasPorSubprocesso() {
+        NotificacaoEmail falha = criarNotificacao("chave-repo-reenviar");
+        falha.setSituacao(SituacaoNotificacaoEmail.FALHA_DEFINITIVA);
+        falha.setTentativas(5);
+        falha.setProximaTentativaEm(null);
+        falha.setUltimoErro("SMTP fora");
+        notificacaoEmailRepo.save(falha);
+
+        int reenfileiradas = notificacaoEmailRepo.reenfileirarFalhasDefinitivasPorSubprocesso(
+                60000L,
+                LocalDateTime.of(2026, 4, 21, 9, 0)
+        );
+
+        assertThat(reenfileiradas).isOne();
+        assertThat(notificacaoEmailRepo.findByChaveIdempotencia("chave-repo-reenviar")).get()
+                .satisfies(notificacao -> {
+                    assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacaoEmail.PENDENTE);
+                    assertThat(notificacao.getTentativas()).isZero();
+                    assertThat(notificacao.getProximaTentativaEm()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0));
+                    assertThat(notificacao.getUltimoErro()).isNull();
+                });
+    }
+
     private NotificacaoEmail criarNotificacao(String chaveIdempotencia) {
         return NotificacaoEmail.builder()
                 .subprocesso(subprocessoRepo.findById(60000L).orElseThrow())

@@ -5,6 +5,7 @@ import org.springframework.dao.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 
 import java.time.*;
@@ -66,6 +67,18 @@ public class NotificacaoEmailService {
                 subprocessoCodigo,
                 PageRequest.of(0, tamanho)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<NotificacaoSubprocessoResumoDto> listarResumoSubprocessosAtivos() {
+        return notificacaoEmailRepo.resumirPorSubprocessosDeProcessosAtivos()
+                .stream()
+                .map(NotificacaoSubprocessoResumoDto::fromQuery)
+                .toList();
+    }
+
+    public int reenfileirarFalhasDefinitivasPorSubprocesso(Long subprocessoCodigo) {
+        return notificacaoEmailRepo.reenfileirarFalhasDefinitivasPorSubprocesso(subprocessoCodigo, agora());
     }
 
     public boolean marcarEnviandoSeDisponivel(NotificacaoEmail notificacao) {

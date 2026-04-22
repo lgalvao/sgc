@@ -174,6 +174,19 @@ class NotificacaoEmailServiceTest {
     }
 
     @Test
+    @DisplayName("reenfileirarFalhasDefinitivasPorSubprocesso deve delegar com data atual")
+    void reenfileirarFalhasDefinitivasPorSubprocessoDeveDelegarComDataAtual() {
+        when(notificacaoEmailRepo.reenfileirarFalhasDefinitivasPorSubprocesso(
+                60000L,
+                LocalDateTime.of(2026, 4, 21, 9, 0)
+        )).thenReturn(2);
+
+        int reenfileiradas = service.reenfileirarFalhasDefinitivasPorSubprocesso(60000L);
+
+        assertThat(reenfileiradas).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("marcarFalha deve agendar retry antes do limite")
     void marcarFalhaDeveAgendarRetryAntesDoLimite() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()

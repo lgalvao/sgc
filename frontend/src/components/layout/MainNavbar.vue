@@ -20,6 +20,9 @@
         <BNavItem to="/historico">
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.comum.MENU_HISTORICO }}
         </BNavItem>
+        <BNavItem v-if="isAdmin" to="/administracao/notificacoes" data-testid="nav-link-notificacoes">
+          <i aria-hidden="true" class="bi bi-envelope-exclamation me-1"/> {{ TEXTOS.comum.MENU_NOTIFICACOES }}
+        </BNavItem>
       </BNavbarNav>
 
       <!-- Right aligned nav items -->

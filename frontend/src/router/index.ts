@@ -35,6 +35,10 @@ router.beforeEach((to) => {
         return "/painel";
     }
 
+    if (to.path.startsWith("/administracao") && perfilStore.perfilSelecionado !== Perfil.ADMIN) {
+        return "/painel";
+    }
+
     return true;
 });
 

@@ -60,6 +60,12 @@ const mainRoutes: RouteRecordRaw[] = [
         meta: {title: "Administradores"},
     },
     {
+        path: "/administracao/notificacoes",
+        name: "NotificacoesAdmin",
+        component: () => import("@/views/NotificacoesAdminView.vue"),
+        meta: {title: "Notificações"},
+    },
+    {
         path: "/administracao/limpeza-processos",
         name: "LimpezaProcessos",
         component: () => import("@/views/LimpezaProcessosView.vue"),

@@ -603,6 +603,48 @@ INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura
 -- Para o alerta da Unidade 36 (Usuário 360001)
 INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura) VALUES (4, '360001', NULL);
 
+-- -------------------------------------------------------------------------------------------------
+-- OUTBOX DE NOTIFICAÇÕES (dados para validação manual da view administrativa)
+-- -------------------------------------------------------------------------------------------------
+-- O subprocesso 301 fica sem registros no outbox para validar exibição neutra com hífen.
+
+-- Subprocesso 302: mistura de enviada, pendente e falha definitiva para validar destaque e reenvio.
+INSERT INTO sgc.notificacao_email
+    (codigo, alerta_codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, destinatario, assunto,
+     corpo_html, situacao, tentativas, proxima_tentativa_em, data_hora_criacao, data_hora_envio, ultimo_erro,
+     chave_idempotencia)
+VALUES
+    (1, 4, 302, 'MAPA_DISPONIBILIZADO', NULL, 'chefe_sec321@tre-pe.jus.br',
+     'SGC: Mapa de competências disponibilizado',
+     '<p>Mapa disponibilizado para validação.</p>',
+     'ENVIADO', 1, NULL, CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '9' HOUR,
+     CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '8' HOUR, NULL,
+     'seed-302-mapa-disponibilizado-enviado');
+
+INSERT INTO sgc.notificacao_email
+    (codigo, alerta_codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, destinatario, assunto,
+     corpo_html, situacao, tentativas, proxima_tentativa_em, data_hora_criacao, data_hora_envio, ultimo_erro,
+     chave_idempotencia)
+VALUES
+    (2, 4, 302, 'MAPA_DISPONIBILIZADO_SUPERIOR', NULL, 'gestor_coord32@tre-pe.jus.br',
+     'SGC: Mapa de competências disponibilizado - SECAO_321',
+     '<p>Mapa disponibilizado para unidade subordinada.</p>',
+     'PENDENTE', 0, CURRENT_TIMESTAMP + INTERVAL '1' HOUR,
+     CURRENT_TIMESTAMP - INTERVAL '30' MINUTE, NULL, NULL,
+     'seed-302-mapa-disponibilizado-pendente');
+
+INSERT INTO sgc.notificacao_email
+    (codigo, alerta_codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, destinatario, assunto,
+     corpo_html, situacao, tentativas, proxima_tentativa_em, data_hora_criacao, data_hora_envio, ultimo_erro,
+     chave_idempotencia)
+VALUES
+    (3, 4, 302, 'MAPA_DISPONIBILIZADO_SUPERIOR', NULL, 'chefe_sec3@tre-pe.jus.br',
+     'SGC: Mapa de competências disponibilizado - SECAO_321',
+     '<p>Mapa disponibilizado para unidade superior.</p>',
+     'FALHA_DEFINITIVA', 5, NULL, CURRENT_TIMESTAMP - INTERVAL '45' MINUTE, NULL,
+     'Falha simulada no seed: caixa postal indisponível',
+     'seed-302-mapa-disponibilizado-falha-definitiva');
+
 
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
@@ -621,4 +663,6 @@ ALTER TABLE sgc.competencia
 ALTER TABLE sgc.movimentacao
     ALTER COLUMN codigo RESTART WITH 50;
 ALTER TABLE sgc.alerta
+    ALTER COLUMN codigo RESTART WITH 10;
+ALTER TABLE sgc.notificacao_email
     ALTER COLUMN codigo RESTART WITH 10;

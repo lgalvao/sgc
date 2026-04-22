@@ -16,6 +16,13 @@
 - O backend já possui outbox de email com `NotificacaoEmailService`, `NotificacaoEmailWorker`, entidade `NotificacaoEmail` e endpoint de consulta por subprocesso.
 - `EmailService` permanece como adaptador baixo nível de SMTP.
 - O worker captura notificações por update condicionado antes do envio, evitando reprocessamento simultâneo da mesma linha.
+- Há uma view administrativa independente, acessível apenas para `ADMIN`, para acompanhar notificações por subprocesso ativo.
+- A view administrativa permite `Reenviar` notificações em `FALHA_DEFINITIVA`, recolocando-as na fila para o worker processar.
+- Política operacional inicial:
+  - intervalo do worker: 30 segundos, configurável por `SGC_NOTIFICACAO_EMAIL_INTERVALO_WORKER_MS`;
+  - tamanho do lote: 20 notificações por execução, configurável por `SGC_NOTIFICACAO_EMAIL_LOTE_WORKER`;
+  - sem limpeza automática nesta etapa;
+  - `FALHA_DEFINITIVA` deve ser investigada manualmente pelo suporte antes de eventual reprocessamento.
 - Fluxos já migrados para o outbox:
   - alteração de data limite de subprocesso;
   - lembrete de prazo;
@@ -25,26 +32,17 @@
 
 ## Pendências
 
-### 1. Fechar política operacional do outbox
+### 1. Acompanhar política operacional do outbox
 
-- Confirmar intervalo do worker.
-- Confirmar tamanho máximo do lote.
-- Definir retenção ou limpeza histórica.
-- Definir ação manual esperada para `FALHA_DEFINITIVA`.
-- Documentar como suporte deve investigar `ultimo_erro`, `tentativas` e `proxima_tentativa_em`.
+- Validar com operação se intervalo de 30 segundos e lote 20 atendem ao volume real.
+- Definir retenção ou limpeza histórica após observar uso em ambiente compartilhado.
+- Documentar procedimento de suporte para investigar `ultimo_erro`, `tentativas` e `proxima_tentativa_em`.
 
-### 2. Fechar suporte operacional
+### 2. Evoluir suporte operacional quando houver necessidade real
 
-- Manter consulta de emails por subprocesso para casos ligados ao fluxo de subprocesso.
-- Criar consulta por alerta ou por usuário apenas se houver necessidade real do frontend ou do suporte.
-- Garantir que as consultas exponham:
-  - situação;
-  - tentativas;
-  - data de criação;
-  - data de envio;
-  - próximo reprocessamento;
-  - último erro resumido.
-- Avaliar endpoint administrativo para reprocessar falhas definitivas somente se a operação pedir isso.
+- Avaliar detalhe/modal com histórico completo por subprocesso.
+- Criar consulta por alerta ou por usuário apenas se houver necessidade real futura.
+- Avaliar auditoria explícita de reenvios manuais se a operação passar a usar a ação com frequência.
 
 ### 3. Revisar modelo incremental com DBA
 
@@ -57,17 +55,11 @@
   - `CHECK` que exige unidade de destino ou usuário de destino;
   - índices necessários para worker e consultas.
 
-### 4. Implementar frontend somente depois
+### 4. Evoluir frontend administrativo
 
-- Para telas de subprocesso, exibir histórico de emails relacionados ao subprocesso se isso for útil no fluxo.
-- Para alertas pessoais, decidir se a situação do email aparece no detalhe do alerta ou em área administrativa.
+- Avaliar filtros por status depois do uso real da tela.
+- Avaliar detalhe/modal com histórico completo das notificações do subprocesso.
 - Evitar misturar alertas normais com estado técnico de envio.
-- Usar mensagens simples:
-  - pendente;
-  - enviando;
-  - enviado;
-  - falha temporária;
-  - falha definitiva.
 
 ### 5. Validação final
 
@@ -79,4 +71,4 @@
 
 ## Próxima etapa
 
-Fechar a política operacional do outbox. Depois disso, completar apenas as APIs de suporte que forem necessárias e iniciar o frontend.
+Validar a política operacional inicial em ambiente compartilhado. Depois disso, completar apenas as APIs de suporte que forem necessárias e iniciar o frontend.

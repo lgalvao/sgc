@@ -19,7 +19,8 @@ public record NotificacaoEmailDto(
         int tentativas,
         LocalDateTime dataHoraCriacao,
         @Nullable LocalDateTime dataHoraEnvio,
-        @Nullable LocalDateTime proximaTentativaEm
+        @Nullable LocalDateTime proximaTentativaEm,
+        @Nullable String ultimoErro
 ) {
     public static NotificacaoEmailDto fromEntity(NotificacaoEmail notificacao, Long subprocessoCodigo) {
         Alerta alerta = notificacao.getAlerta();
@@ -36,6 +37,7 @@ public record NotificacaoEmailDto(
                 .dataHoraCriacao(notificacao.getDataHoraCriacao())
                 .dataHoraEnvio(notificacao.getDataHoraEnvio())
                 .proximaTentativaEm(notificacao.getProximaTentativaEm())
+                .ultimoErro(notificacao.getUltimoErro())
                 .build();
     }
 }

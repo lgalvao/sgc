@@ -74,6 +74,9 @@ aplicacao:
     assunto-prefixo: "[SGC]"
 
 sgc:
+  notificacao-email:
+    intervalo-worker-ms: ${SGC_NOTIFICACAO_EMAIL_INTERVALO_WORKER_MS:30000}
+    lote-worker: ${SGC_NOTIFICACAO_EMAIL_LOTE_WORKER:20}
   monitoramento:
     modo: nao
     tempo-http-lento-ms: 100
