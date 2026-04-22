@@ -47,16 +47,17 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         expect(wrapper.text()).toContain('Confirma a disponibilização do cadastro?')
     })
 
-    it('emite evento "confirmar" ao clicar no botão confirmar', async () => {
+    it('emite evento "confirmar" com observação ao clicar no botão confirmar', async () => {
         const wrapper = mount(ConfirmacaoDisponibilizacaoModal, {
             props: defaultProps,
             global: globalOptions
         })
 
+        await wrapper.find('[data-testid="inp-disponibilizar-cadastro-obs"]').setValue("Observação teste")
         const confirmBtn = wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]')
         await confirmBtn.trigger('click')
 
-        expect(wrapper.emitted('confirmar')).toHaveLength(1)
+        expect(wrapper.emitted('confirmar')).toEqual([["Observação teste"]])
     })
 
     it('emite evento "fechar" ao clicar em cancelar', async () => {
