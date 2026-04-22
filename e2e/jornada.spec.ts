@@ -5,12 +5,18 @@ import * as ProcessoHelpers from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
+import {verificarAppAlert} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     test.beforeAll(async ({request}) => {
         // Reset do banco de dados UMA VEZ para iniciar a jornada
         const response = await request.post('/e2e/reset-database');
         expect(response.ok()).toBeTruthy();
+    });
+
+    test('Fase 0: Administração de Notificações', async ({page}) => {
+        await validarAcessoRestritoNotificacoes(page);
+        await validarPainelNotificacoesAdmin(page);
     });
 
     test('Fase 1: Mapeamento Inicial - Cadastro de Atividades', async ({page}) => {
@@ -43,6 +49,49 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const CHEFE = AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11;
     const GESTOR = AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1;
 
+    const validarAcessoRestritoNotificacoes = async (page: Page) => {
+        await AuthHelpers.executarComo(page, CHEFE, async () => {
+            await expect(page.getByTestId('nav-link-notificacoes')).toBeHidden();
+            await page.goto('/administracao/notificacoes');
+            await expect(page).toHaveURL(/\/painel/);
+        });
+        await expect(page).toHaveURL(/\/login/);
+    };
+
+    const validarPainelNotificacoesAdmin = async (page: Page) => {
+        await AuthHelpers.executarComo(page, ADMIN, async () => {
+            await expect(page.getByTestId('nav-link-notificacoes')).toBeVisible();
+            await page.getByTestId('nav-link-notificacoes').click();
+            await expect(page).toHaveURL(/\/administracao\/notificacoes/);
+
+            await expect(page.getByRole('heading', {name: 'Notificações pendentes'})).toBeVisible();
+            await expect(page.getByRole('heading', {name: 'Notificações concluídas'})).toBeVisible();
+
+            const tabelaPendentes = page.getByTestId('tbl-notificacoes-pendentes');
+            await expect(tabelaPendentes).toBeVisible();
+            await expect(tabelaPendentes.getByTestId('notificacao-unidade-SECAO_321')).toBeVisible();
+            await expect(tabelaPendentes.getByTestId('notificacao-processo-SECAO_321')).toHaveText('Mapeamento Secão 321');
+            await expect(tabelaPendentes.getByTestId('notificacao-status-SECAO_321')).toHaveText('Falha definitiva');
+            await expect(tabelaPendentes.getByTestId('notificacao-erro-SECAO_321')).toContainText(/Falha simulada no seed/i);
+            await expect(tabelaPendentes.getByTestId('btn-notificacoes-reenviar-SECAO_321')).toBeVisible();
+
+            const tabelaConcluidas = page.getByTestId('tbl-notificacoes-concluidas');
+            await expect(tabelaConcluidas).toBeVisible();
+            await expect(tabelaConcluidas.getByTestId('notificacao-unidade-SECAO_311')).toBeVisible();
+            await expect(tabelaConcluidas.getByTestId('notificacao-processo-SECAO_311')).toHaveText('Mapeamento Secão 311');
+            await expect(tabelaConcluidas.getByTestId('notificacao-status-SECAO_311')).toHaveText('Enviada');
+            await expect(tabelaConcluidas.getByTestId('btn-notificacoes-reenviar-SECAO_311')).toBeHidden();
+
+            await tabelaPendentes.getByTestId('btn-notificacoes-reenviar-SECAO_321').click();
+            await expect(page.getByTestId('txt-notificacoes-reenviar-confirmacao')).toContainText(/Recolocar .* fila .*SECAO_321/i);
+            await page.getByTestId('btn-notificacoes-reenviar-confirmar').click();
+
+            await verificarAppAlert(page, /recolocada/i);
+            await expect(tabelaPendentes.getByTestId('notificacao-status-SECAO_321')).toHaveText('Pendente');
+            await expect(tabelaPendentes.getByTestId('btn-notificacoes-reenviar-SECAO_321')).toBeHidden();
+        });
+        await expect(page).toHaveURL(/\/login/);
+    };
 
     const criarProcessoMapeamento = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {

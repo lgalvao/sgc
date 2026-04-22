@@ -278,7 +278,7 @@ export const TEXTOS = {
     NOTIFICACOES_CAMPOS: {
       PROCESSO: "Processo",
       UNIDADE: "Unidade",
-      STATUS: "Status",
+      STATUS: "Situação",
       ERRO: "Erro",
       PROXIMA_TENTATIVA: "Próxima tentativa",
       CONCLUSAO: "Conclusão",
