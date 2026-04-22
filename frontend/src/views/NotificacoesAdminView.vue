@@ -198,16 +198,16 @@ const mostrarModalReenvio = ref(false);
 const reenviando = ref(false);
 
 const camposBase = [
-  {key: "unidadeSigla", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.UNIDADE},
-  {key: "statusGeral", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS},
+  {key: "unidadeSigla", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.UNIDADE, thClass: "col-notificacao-unidade", tdClass: "col-notificacao-unidade"},
+  {key: "statusGeral", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS, thClass: "col-notificacao-situacao", tdClass: "col-notificacao-situacao"},
   {key: "processoDescricao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROCESSO},
 ];
 
 const camposPendentes = [
   ...camposBase,
-  {key: "ultimoErro", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ERRO},
-  {key: "proximaTentativaEm", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROXIMA_TENTATIVA},
-  {key: "acoes", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ACOES, thClass: "text-end", tdClass: "text-end"},
+  {key: "ultimoErro", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ERRO, thClass: "col-notificacao-erro", tdClass: "col-notificacao-erro"},
+  {key: "proximaTentativaEm", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROXIMA_TENTATIVA, thClass: "col-notificacao-proxima", tdClass: "col-notificacao-proxima"},
+  {key: "acoes", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ACOES, thClass: "text-end col-notificacao-acoes", tdClass: "text-end col-notificacao-acoes"},
 ];
 
 const camposConcluidas = [
@@ -333,6 +333,35 @@ onMounted(carregar);
 
 <style scoped>
 .erro-notificacao {
+  max-width: 100%;
+}
+
+:deep(.col-notificacao-unidade) {
+  width: 12rem;
+}
+
+:deep(.col-notificacao-situacao) {
+  width: 9rem;
+}
+
+:deep(.col-notificacao-erro) {
   max-width: 28rem;
+}
+
+:deep(.col-notificacao-proxima) {
+  width: 7rem;
+}
+
+:deep(.col-notificacao-acoes) {
+  width: 7rem;
+}
+
+@media (max-width: 992px) {
+  :deep(.col-notificacao-unidade),
+  :deep(.col-notificacao-situacao),
+  :deep(.col-notificacao-proxima),
+  :deep(.col-notificacao-acoes) {
+    width: auto;
+  }
 }
 </style>
