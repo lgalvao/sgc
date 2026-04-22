@@ -51,7 +51,6 @@ public class ProcessoExclusaoCompletaService {
         jdbcTemplate.update("DELETE FROM sgc.mapa WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
 
         jdbcTemplate.update("DELETE FROM sgc.analise WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
-        jdbcTemplate.update("DELETE FROM sgc.notificacao WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
         jdbcTemplate.update("DELETE FROM sgc.movimentacao WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
         jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
         jdbcTemplate.update("DELETE FROM sgc.unidade_processo WHERE processo_codigo = ?", codigo);

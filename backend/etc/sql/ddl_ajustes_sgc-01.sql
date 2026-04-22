@@ -1,9 +1,10 @@
 -- #################################################################
--- CRIA TABELA DE OUTBOX DE E-MAILS E FLEXIBILIZA NULOS EM ALERTAS
+-- CRIA TABELA DE OUTBOX DE E-MAILS, FLEXIBILIZA ALERTAS E REMOVE NOTIFICACAO LEGADA
 -- #################################################################
 -- Objetivo:
 --   1. Corrigir ALERTA para permitir alertas destinados a usuarios.
 --   2. Persistir a intencao de envio de e-mail na mesma transacao, permitindo envio posterior com retry e auditoria.
+--   3. Remover a tabela NOTIFICACAO, substituida por ALERTA e NOTIFICACAO_EMAIL.
 --
 -- Observacao:
 --   Este script usa blocos condicionais para tolerar bancos parcialmente ajustados.
@@ -19,6 +20,20 @@ BEGIN
 
     IF v_nullable = 'N' THEN
         EXECUTE IMMEDIATE 'ALTER TABLE ALERTA MODIFY (processo_codigo NULL)';
+    END IF;
+END;
+/
+
+DECLARE
+    v_count NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO v_count
+      FROM user_tables
+     WHERE table_name = 'NOTIFICACAO';
+
+    IF v_count > 0 THEN
+        EXECUTE IMMEDIATE 'DROP TABLE NOTIFICACAO CASCADE CONSTRAINTS';
     END IF;
 END;
 /

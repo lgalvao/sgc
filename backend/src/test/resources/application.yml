@@ -57,5 +57,4 @@ logging:
     "[org.springframework]": WARN
     "[org.hibernate.tool.schema.internal.SchemaDropperImpl]": WARN
     sgc: INFO
-    "[sgc.notificacao]": DEBUG
     "[sgc.infraestrutura.monitoramento]": WARN

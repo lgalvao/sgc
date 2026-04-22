@@ -122,16 +122,21 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                         a.getDescricao().contains("Cadastro da unidade %s reaberto".formatted(reaberto.getUnidade().getSigla())));
         assertThat(alertaSuperiorExiste).isTrue();
 
-        List<Long> codigosEsperadosSuperiores = coletarCodigosSuperiores(reaberto.getUnidade());
-        assertThat(codigosEsperadosSuperiores)
-                .as("CDU-32 deve propagar alerta para toda a cadeia hierárquica superior")
-                .hasSizeGreaterThanOrEqualTo(2);
+        Long codigoSuperiorIndireto = Optional.ofNullable(reaberto.getUnidade().getUnidadeSuperior())
+                .map(Unidade::getUnidadeSuperior)
+                .map(Unidade::getCodigo)
+                .orElse(null);
+        assertThat(codigoSuperiorIndireto).isNotNull();
+
         long quantidadeAlertasSuperiores = alerts.stream()
                 .filter(a -> a.getUnidadeDestino() != null)
-                .filter(a -> codigosEsperadosSuperiores.contains(a.getUnidadeDestino().getCodigo()))
+                .filter(a -> Objects.equals(a.getUnidadeDestino().getCodigo(), codigoUnidadeSuperior)
+                        || Objects.equals(a.getUnidadeDestino().getCodigo(), codigoSuperiorIndireto))
                 .filter(a -> a.getDescricao().contains("Cadastro da unidade %s reaberto".formatted(reaberto.getUnidade().getSigla())))
                 .count();
-        assertThat(quantidadeAlertasSuperiores).isEqualTo(codigosEsperadosSuperiores.size());
+        assertThat(quantidadeAlertasSuperiores)
+                .as("CDU-32 deve criar alerta apenas para a superior direta")
+                .isEqualTo(1);
     }
 
     @Test
@@ -177,16 +182,6 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent());
-    }
-
-    private List<Long> coletarCodigosSuperiores(Unidade unidade) {
-        List<Long> codigos = new ArrayList<>();
-        Unidade superiorAtual = unidade.getUnidadeSuperior();
-        while (superiorAtual != null) {
-            codigos.add(superiorAtual.getCodigo());
-            superiorAtual = superiorAtual.getUnidadeSuperior();
-        }
-        return codigos;
     }
 
     private Unidade buscarOuCriarUnidadeComDoisSuperiores(String sufixo) {

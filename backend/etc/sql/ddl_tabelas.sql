@@ -356,36 +356,7 @@ ON COLUMN MOVIMENTACAO.usuario_titulo IS 'TE do usuário que originou a moviment
 COMMENT
 ON COLUMN MOVIMENTACAO.descricao IS 'Descrição da movimentação.';
 
-
--- 15. Tabela NOTIFICACAO
-CREATE TABLE NOTIFICACAO
-(
-    codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    subprocesso_codigo     NUMBER    NOT NULL,
-    data_hora              TIMESTAMP NOT NULL,
-    unidade_origem_codigo  NUMBER    NOT NULL,
-    unidade_destino_codigo NUMBER    NOT NULL,
-    conteudo               VARCHAR2(500) NOT NULL,
-    CONSTRAINT pk_notificacao PRIMARY KEY (codigo),
-    CONSTRAINT fk_notif_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
-    -- FKs implícitas para VW_UNIDADE.codigo
-);
-
-COMMENT
-ON COLUMN NOTIFICACAO.codigo IS 'Identificador único da notificação.';
-COMMENT
-ON COLUMN NOTIFICACAO.subprocesso_codigo IS 'Subprocesso ao qual pertence a notificação (ref SUBPROCESSO).';
-COMMENT
-ON COLUMN NOTIFICACAO.data_hora IS 'Data e hora da notificação.';
-COMMENT
-ON COLUMN NOTIFICACAO.unidade_origem_codigo IS 'Unidade de origem.';
-COMMENT
-ON COLUMN NOTIFICACAO.unidade_destino_codigo IS 'Unidade de destino.';
-COMMENT
-ON COLUMN NOTIFICACAO.conteudo IS 'Conteúdo da notificação.';
-
-
--- 16. Tabela PARAMETRO
+-- 15. Tabela PARAMETRO
 CREATE TABLE PARAMETRO
 (
     codigo    NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
