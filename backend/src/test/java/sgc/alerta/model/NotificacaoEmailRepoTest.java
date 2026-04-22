@@ -79,6 +79,45 @@ class NotificacaoEmailRepoTest {
                 .contains("chave-repo-subprocesso");
     }
 
+    @Test
+    @DisplayName("deve capturar notificacao disponivel de forma atomica")
+    void deveCapturarNotificacaoDisponivelDeFormaAtomica() {
+        NotificacaoEmail notificacao = notificacaoEmailRepo.save(criarNotificacao("chave-repo-claim"));
+
+        int capturadas = notificacaoEmailRepo.marcarEnviandoSeDisponivel(
+                notificacao.getCodigo(),
+                LocalDateTime.of(2026, 4, 21, 9, 0)
+        );
+
+        assertThat(capturadas).isOne();
+        assertThat(notificacaoEmailRepo.findById(notificacao.getCodigo())).get()
+                .extracting(NotificacaoEmail::getSituacao)
+                .isEqualTo(SituacaoNotificacaoEmail.ENVIANDO);
+    }
+
+    @Test
+    @DisplayName("nao deve capturar notificacao futura ou ja capturada")
+    void naoDeveCapturarNotificacaoFuturaOuJaCapturada() {
+        NotificacaoEmail futura = criarNotificacao("chave-repo-futura-claim");
+        futura.setProximaTentativaEm(LocalDateTime.of(2026, 4, 21, 10, 0));
+        notificacaoEmailRepo.save(futura);
+        NotificacaoEmail enviando = criarNotificacao("chave-repo-enviando-claim");
+        enviando.setSituacao(SituacaoNotificacaoEmail.ENVIANDO);
+        notificacaoEmailRepo.save(enviando);
+
+        int futurasCapturadas = notificacaoEmailRepo.marcarEnviandoSeDisponivel(
+                futura.getCodigo(),
+                LocalDateTime.of(2026, 4, 21, 9, 0)
+        );
+        int enviandoCapturadas = notificacaoEmailRepo.marcarEnviandoSeDisponivel(
+                enviando.getCodigo(),
+                LocalDateTime.of(2026, 4, 21, 9, 0)
+        );
+
+        assertThat(futurasCapturadas).isZero();
+        assertThat(enviandoCapturadas).isZero();
+    }
+
     private NotificacaoEmail criarNotificacao(String chaveIdempotencia) {
         return NotificacaoEmail.builder()
                 .subprocesso(subprocessoRepo.findById(60000L).orElseThrow())
