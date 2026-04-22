@@ -409,6 +409,10 @@ export interface AceitarCadastroRequest {
     observacoes: string;
 }
 
+export interface DisponibilizarCadastroRequest {
+    observacoes: string;
+}
+
 export interface DevolverCadastroRequest {
     observacoes: string;
 }

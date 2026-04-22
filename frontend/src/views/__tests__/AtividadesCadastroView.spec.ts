@@ -424,7 +424,7 @@ describe("CadastroView.vue", () => {
         modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123);
+        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123, {observacoes: ""});
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 

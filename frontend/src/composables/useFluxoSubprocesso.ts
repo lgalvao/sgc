@@ -18,7 +18,12 @@ import {
 } from "@/services/processoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useSubprocessos} from "@/composables/useSubprocessos";
-import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
+import type {
+    AceitarCadastroRequest,
+    DevolverCadastroRequest,
+    DisponibilizarCadastroRequest,
+    HomologarCadastroRequest,
+} from "@/types/tipos";
 
 export function useFluxoSubprocesso() {
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
@@ -48,12 +53,12 @@ export function useFluxoSubprocesso() {
         return withErrorHandling(async () => serviceValidarCadastro(codigoSubprocesso));
     }
 
-    async function disponibilizarCadastro(codigoSubprocesso: number) {
-        return executarAcao(() => serviceDisponibilizarCadastro(codigoSubprocesso));
+    async function disponibilizarCadastro(codigoSubprocesso: number, req: DisponibilizarCadastroRequest) {
+        return executarAcao(() => serviceDisponibilizarCadastro(codigoSubprocesso, req));
     }
 
-    async function disponibilizarRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcao(() => serviceDisponibilizarRevisaoCadastro(codigoSubprocesso));
+    async function disponibilizarRevisaoCadastro(codigoSubprocesso: number, req: DisponibilizarCadastroRequest) {
+        return executarAcao(() => serviceDisponibilizarRevisaoCadastro(codigoSubprocesso, req));
     }
 
     async function iniciarRevisaoCadastro(codigoSubprocesso: number) {

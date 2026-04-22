@@ -235,12 +235,15 @@ class SubprocessoControllerTest {
         @DisplayName("deve disponibilizar cadastro")
         @WithMockUser(roles = "CHEFE")
         void deveDisponibilizarCadastro() throws Exception {
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Observacao");
             mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar")
-                            .with(csrf()))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Cadastro de atividades disponibilizado"));
 
-            verify(transicaoService).disponibilizarCadastro(1L);
+            verify(transicaoService).disponibilizarCadastro(1L, "Observacao");
         }
 
         @Test
@@ -248,14 +251,17 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "CHEFE")
         void deveDisponibilizarCadastroComErroValidacao() throws Exception {
             doThrow(new ErroValidacao("Cadastro incompleto."))
-                    .when(transicaoService).disponibilizarCadastro(1L);
+                    .when(transicaoService).disponibilizarCadastro(1L, "Observacao");
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Observacao");
 
             mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar")
-                            .with(csrf()))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Cadastro incompleto."));
 
-            verify(transicaoService).disponibilizarCadastro(1L);
+            verify(transicaoService).disponibilizarCadastro(1L, "Observacao");
         }
 
         @Test
@@ -323,12 +329,15 @@ class SubprocessoControllerTest {
         @DisplayName("deve disponibilizar revisão de cadastro")
         @WithMockUser(roles = "CHEFE")
         void deveDisponibilizarRevisaoCadastro() throws Exception {
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Observacao");
             mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao")
-                            .with(csrf()))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Revisão do cadastro disponibilizada"));
 
-            verify(transicaoService).disponibilizarRevisao(1L);
+            verify(transicaoService).disponibilizarRevisao(1L, "Observacao");
         }
 
         @Test
