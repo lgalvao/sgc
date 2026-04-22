@@ -160,6 +160,8 @@ public class E2eController {
             String subquerySubprocessos = "(SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ?)";
             String subqueryMapas = "(SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos + ")";
 
+            jdbcTemplate.update("DELETE FROM sgc.notificacao_email WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)", codigo);
+            jdbcTemplate.update("DELETE FROM sgc.notificacao_email WHERE subprocesso_codigo IN " + subquerySubprocessos, codigo);
             jdbcTemplate.update("DELETE FROM sgc.alerta_usuario WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)", codigo);
             jdbcTemplate.update("DELETE FROM sgc.alerta WHERE processo_codigo = ?", codigo);
 
@@ -203,6 +205,10 @@ public class E2eController {
                         + SQL_SUBPROCESSO_POR_PROCESSO,
                 codigo);
         jdbcTemplate.update(
+                "DELETE FROM sgc.notificacao_email WHERE subprocesso_codigo IN (SELECT codigo FROM"
+                        + SQL_SUBPROCESSO_POR_PROCESSO,
+                codigo);
+        jdbcTemplate.update(
                 "DELETE FROM sgc.notificacao WHERE subprocesso_codigo IN (SELECT codigo FROM"
                         + SQL_SUBPROCESSO_POR_PROCESSO,
                 codigo);
@@ -228,6 +234,9 @@ public class E2eController {
             namedJdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN (:ids)", params);
             namedJdbcTemplate.update("DELETE FROM sgc.mapa WHERE codigo IN (:ids)", params);
         }
+        jdbcTemplate.update("""
+                DELETE FROM sgc.notificacao_email
+                WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)""", codigo);
         jdbcTemplate.update("""
                 DELETE FROM sgc.alerta_usuario
                 WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)""", codigo);
