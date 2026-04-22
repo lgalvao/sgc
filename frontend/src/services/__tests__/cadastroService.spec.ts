@@ -6,23 +6,19 @@ describe("cadastroService", () => {
     setupServiceTest();
 
     describe("disponibilizarCadastro", () => {
-        const input = {observacoes: "teste"};
         testPostEndpoint(
-            () => cadastroService.disponibilizarCadastro(1, input),
-            "/subprocessos/1/cadastro/disponibilizar",
-            {texto: "teste"}
+            () => cadastroService.disponibilizarCadastro(1),
+            "/subprocessos/1/cadastro/disponibilizar"
         );
-        testErrorHandling(() => cadastroService.disponibilizarCadastro(1, input), 'post');
+        testErrorHandling(() => cadastroService.disponibilizarCadastro(1), 'post');
     });
 
     describe("disponibilizarRevisaoCadastro", () => {
-        const input = {observacoes: "teste"};
         testPostEndpoint(
-            () => cadastroService.disponibilizarRevisaoCadastro(1, input),
-            "/subprocessos/1/disponibilizar-revisao",
-            {texto: "teste"}
+            () => cadastroService.disponibilizarRevisaoCadastro(1),
+            "/subprocessos/1/disponibilizar-revisao"
         );
-        testErrorHandling(() => cadastroService.disponibilizarRevisaoCadastro(1, input), 'post');
+        testErrorHandling(() => cadastroService.disponibilizarRevisaoCadastro(1), 'post');
     });
 
     describe("devolverCadastro", () => {

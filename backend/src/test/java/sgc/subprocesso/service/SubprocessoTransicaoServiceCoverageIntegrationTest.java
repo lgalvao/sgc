@@ -268,54 +268,13 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
 
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
 
-            transicaoService.disponibilizarCadastro(sp.getCodigo(), null);
+            transicaoService.disponibilizarCadastro(sp.getCodigo());
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         }
 
-        @Test
-        @DisplayName("deve registrar analise ao disponibilizar cadastro com observacao")
-        void comObservacao() {
-            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
-            Unidade uSup = new Unidade();
-            uSup.setSigla("ADMIN");
-            uSup = unidadeRepo.save(uSup);
-
-            Unidade uSp = new Unidade();
-            uSp.setSigla("U4");
-            uSp.setUnidadeSuperior(uSup);
-            uSp = unidadeRepo.save(uSp);
-
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(proc);
-            sp.setUnidade(uSp);
-            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
-            sp = subprocessoRepo.saveAndFlush(sp);
-            registrarMovimentacaoInicial(sp);
-
-            Mapa mapa = new Mapa();
-            mapa.setSubprocesso(sp);
-            mapa = mapaRepo.saveAndFlush(mapa);
-
-            sp.setMapa(mapa);
-            subprocessoRepo.saveAndFlush(sp);
-
-            Usuario user = criarUsuarioPersistido(uSp);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
-
-            transicaoService.disponibilizarCadastro(sp.getCodigo(), "Observacao de disponibilizacao");
-
-            Analise analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo()).stream()
-                    .filter(registro -> registro.getTipo() == TipoAnalise.CADASTRO)
-                    .findFirst()
-                    .orElseThrow();
-
-            assertThat(analise.getObservacoes()).isEqualTo("Observacao de disponibilizacao");
-            assertThat(analise.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-        }
     }
 
     @Nested

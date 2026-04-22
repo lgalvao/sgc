@@ -243,7 +243,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Cadastro de atividades disponibilizado"));
 
-            verify(transicaoService).disponibilizarCadastro(1L, "Observacao");
+            verify(transicaoService).disponibilizarCadastro(1L);
         }
 
         @Test
@@ -251,7 +251,7 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "CHEFE")
         void deveDisponibilizarCadastroComErroValidacao() throws Exception {
             doThrow(new ErroValidacao("Cadastro incompleto."))
-                    .when(transicaoService).disponibilizarCadastro(1L, "Observacao");
+                    .when(transicaoService).disponibilizarCadastro(1L);
             TextoOpcionalRequest request = new TextoOpcionalRequest("Observacao");
 
             mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar")
@@ -261,7 +261,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Cadastro incompleto."));
 
-            verify(transicaoService).disponibilizarCadastro(1L, "Observacao");
+            verify(transicaoService).disponibilizarCadastro(1L);
         }
 
         @Test
@@ -337,7 +337,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Revisão do cadastro disponibilizada"));
 
-            verify(transicaoService).disponibilizarRevisao(1L, "Observacao");
+            verify(transicaoService).disponibilizarRevisao(1L);
         }
 
         @Test
