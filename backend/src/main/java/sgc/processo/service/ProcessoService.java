@@ -923,6 +923,18 @@ public class ProcessoService {
     }
 
     private void criarNotificacoesInicioProcesso(Processo processo, List<Unidade> participantes) {
+        List<Subprocesso> subprocessos = Objects.requireNonNullElse(
+                consultaService.listarEntidadesPorProcesso(processo.getCodigo()),
+                List.of()
+        );
+        Map<Long, Subprocesso> subprocessoPorUnidade = subprocessos
+                .stream()
+                .collect(Collectors.toMap(
+                        subprocesso -> subprocesso.getUnidade().getCodigo(),
+                        subprocesso -> subprocesso,
+                        (atual, ignorar) -> atual
+                ));
+
         Set<Long> codsOperacionais = new HashSet<>();
         Set<Long> codsIntermediarias = new HashSet<>();
         Map<Long, Unidade> todasUnidadesMap = new HashMap<>();
@@ -958,19 +970,34 @@ public class ProcessoService {
 
         for (Long cod : codsOperacionais) {
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            criarNotificacaoInicio(processo, unidadeDestino, true, subordinadasPorSuperior, dataLimite);
+            criarNotificacaoInicio(
+                    processo,
+                    unidadeDestino,
+                    true,
+                    subordinadasPorSuperior,
+                    dataLimite,
+                    subprocessoPorUnidade.get(unidadeDestino.getCodigo())
+            );
         }
 
         for (Long cod : codsIntermediarias) {
             // Se já foi notificada como operacional, não notifica como intermediária
             if (codsOperacionais.contains(cod)) continue;
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            criarNotificacaoInicio(processo, unidadeDestino, false, subordinadasPorSuperior, dataLimite);
+            criarNotificacaoInicio(
+                    processo,
+                    unidadeDestino,
+                    false,
+                    subordinadasPorSuperior,
+                    dataLimite,
+                    subprocessoPorUnidade.get(unidadeDestino.getCodigo())
+            );
         }
     }
 
     private void criarNotificacaoInicio(Processo processo, Unidade unidadeDestino, boolean participante,
-                                        Map<Long, List<String>> subordinadasPorSuperior, LocalDateTime dataLimite) {
+                                        Map<Long, List<String>> subordinadasPorSuperior, LocalDateTime dataLimite,
+                                        @Nullable Subprocesso subprocessoDestino) {
         List<String> subordinadas = subordinadasPorSuperior.getOrDefault(unidadeDestino.getCodigo(), List.of());
         String corpoHtml = emailModelosService.criarEmailInicioProcessoConsolidado(
                 unidadeDestino.getSigla(),
@@ -984,6 +1011,7 @@ public class ProcessoService {
                 : "SGC: Início do processo " + processo.getDescricao() + " em unidades subordinadas";
 
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(subprocessoDestino)
                 .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
                 .destinatario(emailUnidade(unidadeDestino))
                 .assunto(assunto)

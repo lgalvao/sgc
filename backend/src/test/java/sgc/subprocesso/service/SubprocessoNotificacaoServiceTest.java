@@ -259,6 +259,36 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
+    @DisplayName("deve manter envio de email quando criacao de alerta falhar")
+    void deveManterEnvioDeEmailQuandoCriacaoDeAlertaFalhar() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
+        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(destino.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+        doThrow(new IllegalStateException("falha alerta"))
+                .when(alertaService).criarAlertaTransicao(any(), anyString(), any(), any());
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.PROCESSO_INICIADO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .build());
+
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("dest@tre-pe.jus.br");
+    }
+
+    @Test
     @DisplayName("nao deve acionar alerta ou email quando a transicao nao exigir notificacao")
     void naoDeveAcionarAlertaOuEmailQuandoATransicaoNaoExigirNotificacao() {
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
@@ -365,6 +395,24 @@ class SubprocessoNotificacaoServiceTest {
 
         verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getValue().chaveIdempotencia()).contains("etapa:2");
+    }
+
+    @Test
+    @DisplayName("notificarAlteracaoDataLimite deve enfileirar email mesmo com falha de alerta")
+    void notificarAlteracaoDataLimiteDeveEnfileirarEmailMesmoComFalhaDeAlerta() {
+        Unidade unidade = criarUnidade(10L, "ORIG", "Unidade origem");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+
+        doThrow(new IllegalStateException("falha alerta"))
+                .when(alertaService).criarAlertaAlteracaoDataLimite(processo, unidade, "25/04/2026", 1);
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>data</html>");
+
+        service.notificarAlteracaoDataLimite(subprocesso, "25/04/2026", 1);
+
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("orig@tre-pe.jus.br");
+        assertThat(notificacaoEmailCaptor.getValue().tipoNotificacao()).isEqualTo(TipoNotificacao.DATA_LIMITE_ALTERADA);
     }
 
     private Processo criarProcesso() {

@@ -1,6 +1,7 @@
 package sgc.organizacao.service;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
@@ -29,6 +30,7 @@ import static java.util.stream.Collectors.*;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ResponsavelUnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
@@ -120,10 +122,7 @@ public class ResponsavelUnidadeService {
     private void criarNotificacoesAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao, Usuario usuario) {
         String siglaUnidade = atribuicao.getUnidade().getSigla();
         String assunto = "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(siglaUnidade);
-        Alerta alerta = alertaFacade.criarAlertaPessoal(
-                usuario.getTituloEleitoral(),
-                "Atribuição temporária para unidade %s".formatted(siglaUnidade)
-        );
+        criarAlertaSemInterromperNotificacao(usuario, siglaUnidade);
 
         String corpoHtml = emailModelosService.criarEmailAtribuicaoTemporaria(
                 new EmailModelosService.EmailAtribuicaoTemporariaCommand(
@@ -145,6 +144,21 @@ public class ResponsavelUnidadeService {
                 .corpoHtml(corpoHtml)
                 .chaveIdempotencia(chaveIdempotenciaAtribuicaoTemporaria(atribuicao))
                 .build());
+    }
+
+    private void criarAlertaSemInterromperNotificacao(Usuario usuario, String siglaUnidade) {
+        try {
+            alertaFacade.criarAlertaPessoal(
+                    usuario.getTituloEleitoral(),
+                    "Atribuição temporária para unidade %s".formatted(siglaUnidade)
+            );
+        } catch (RuntimeException ex) {
+            log.warn(
+                    "Falha ao criar alerta pessoal de atribuicao temporaria para usuario {}. Fluxo de e-mail sera mantido.",
+                    usuario.getTituloEleitoral(),
+                    ex
+            );
+        }
     }
 
     private String chaveIdempotenciaAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao) {

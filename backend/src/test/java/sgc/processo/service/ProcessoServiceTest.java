@@ -334,6 +334,46 @@ class ProcessoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve vincular subprocesso nas notificacoes de inicio para exibir no painel de notificacoes")
+        void deveVincularSubprocessoNasNotificacoesDeInicio() {
+            Long id = 103L;
+            Processo processo = new Processo();
+            processo.setCodigo(id);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.REVISAO);
+            processo.setDescricao("Processo notificacoes");
+            processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+            Unidade unidade = criarUnidadeValida(10L);
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(501L);
+            subprocesso.setProcesso(processo);
+            subprocesso.setUnidade(unidade);
+
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(unidadeService.buscarAdmin()).thenReturn(criarUnidadeValida(999L));
+            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L));
+            when(unidadeService.buscarMapasPorUnidades(List.of(10L))).thenReturn(List.of(
+                    UnidadeMapa.builder().unidadeCodigo(10L).build()
+            ));
+            when(consultaService.listarEntidadesPorProcesso(id)).thenReturn(List.of(subprocesso));
+            when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyBoolean(), anyList()))
+                    .thenReturn("<html>inicio</html>");
+            mockarResponsaveisEfetivos();
+
+            processoService.iniciar(id, List.of(10L));
+
+            verify(notificacaoService).enfileirar(argThat(cmd ->
+                    cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
+                            && cmd.subprocesso() != null
+                            && Objects.equals(cmd.subprocesso().getCodigo(), 501L)
+            ));
+        }
+
+        @Test
         @DisplayName("Deve falhar ao iniciar processo se houver unidades em processo ativo")
         void deveFalharAoIniciarSeHouverUnidadesEmProcessoAtivo() {
             Long id = 100L;
