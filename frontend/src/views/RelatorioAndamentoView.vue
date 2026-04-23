@@ -116,13 +116,6 @@
           </BCardBody>
         </BCard>
       </div>
-      <EmptyState
-          v-else-if="codProcessoSelecionado && !carregando"
-          :title="TEXTOS.relatorios.EMPTY_TITLE"
-          :description="TEXTOS.relatorios.EMPTY_DESCRIPTION"
-          icon="bi-table"
-          data-testid="empty-state-andamento"
-      />
     </template>
   </LayoutPadrao>
 </template>
@@ -132,7 +125,6 @@ import {computed, onMounted, ref} from "vue";
 import {BButton, BCard, BCardBody, BCardTitle, BCol, BFormGroup, BFormSelect, BRow, BSpinner} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import EmptyState from "@/components/comum/EmptyState.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";

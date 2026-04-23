@@ -3,6 +3,7 @@ import type {BTableSortBy} from "bootstrap-vue-next";
 import {BBadge, BButton, BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import {TEXTOS} from "@/constants/textos";
 import {type ProcessoResumo, SituacaoProcesso} from "@/types/tipos";
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/formatters";
 
@@ -138,10 +139,11 @@ defineExpose({fields});
   </div>
   <EmptyState
       v-else
-      class="border-0 bg-transparent mb-0"
+      class="mb-0"
       data-testid="empty-state-processos"
       icon="bi-folder2-open"
-      title="Nenhum processo"
+      :description="TEXTOS.tabelaProcessos.EMPTY_DESCRIPTION"
+      :title="TEXTOS.tabelaProcessos.EMPTY_TITLE"
   >
     <BButton
         v-if="mostrarCtaVazio"

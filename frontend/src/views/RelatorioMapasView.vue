@@ -44,14 +44,6 @@
         </BCol>
       </BRow>
     </BCard>
-
-    <EmptyState
-      v-if="!processoIdSelecionado"
-      title="Selecione um processo"
-      description="Para gerar este relatório, escolha um processo e opcionalmente uma unidade."
-      icon="bi-file-earmark-pdf"
-      data-testid="empty-state-mapas"
-    />
   </LayoutPadrao>
 </template>
 
@@ -60,7 +52,6 @@ import {computed, onMounted, ref} from "vue";
 import {BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import EmptyState from "@/components/comum/EmptyState.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {usePerfilStore} from "@/stores/perfil";
 import {TEXTOS} from "@/constants/textos";

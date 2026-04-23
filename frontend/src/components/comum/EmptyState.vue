@@ -51,9 +51,9 @@ defineProps<{
 }
 
 .empty-state-icon-wrapper {
-  font-size: 2.1rem;
+  font-size: 1.5rem;
   color: #64748b;
-  opacity: 0.75;
+  opacity: 0.7;
 }
 
 .empty-state-title {
@@ -84,4 +84,3 @@ defineProps<{
   transform: scale(1.02);
 }
 </style>
-
