@@ -617,7 +617,7 @@ describe("VisMapa.vue", () => {
             }
         });
         await flushPromises();
-        expect(wrapper.text()).toContain("Nenhuma competência cadastrada");
+        expect(wrapper.text()).toContain("Mapa sem competências");
     });
 
     it("confirms homologacao (ADMIN) for Mapeamento", async () => {

@@ -77,7 +77,7 @@
                 :description="emptyDescription"
                 :icon="emptyIcon"
                 :title="emptyTitle"
-                class="border-0 bg-transparent mb-0"
+                class="mb-0"
             />
           </td>
         </tr>
@@ -92,6 +92,7 @@ import {BButton} from "bootstrap-vue-next";
 import {computed, nextTick, ref, toRaw, watch} from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import {TEXTOS} from "@/constants/textos";
 import {organizarArvoreUnidades, TITULO_GRUPO_ZONAS_ELEITORAIS} from "@/utils/treeUtils";
 
 export interface TreeItem {
@@ -145,8 +146,8 @@ interface TreeTableProps {
 const props = withDefaults(defineProps<TreeTableProps>(), {
   title: undefined,
   hideHeaders: false,
-  emptyTitle: "Nenhum registro encontrado",
-  emptyDescription: "Não há dados para exibir.",
+  emptyTitle: TEXTOS.treeTable.EMPTY_TITLE,
+  emptyDescription: TEXTOS.treeTable.EMPTY_DESCRIPTION,
   emptyIcon: "bi-folder2-open",
 });
 

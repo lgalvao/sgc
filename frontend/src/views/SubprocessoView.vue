@@ -129,11 +129,13 @@
             stacked="md"
         >
           <template #empty>
-            <div class="text-center text-muted py-5" data-testid="empty-state-movimentacoes">
-              <i aria-hidden="true" class="bi bi-arrow-left-right display-4 d-block mb-3"></i>
-              <p class="h5">{{ TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TITULO }}</p>
-              <p class="small">{{ TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TEXTO }}</p>
-            </div>
+            <EmptyState
+                class="mb-0"
+                data-testid="empty-state-movimentacoes"
+                :description="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TEXTO"
+                icon="bi-arrow-left-right"
+                :title="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TITULO"
+            />
           </template>
           <template #cell(dataHora)="data">
             {{ formatDateTimeBR(data.item.dataHora) }}
@@ -229,6 +231,7 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";

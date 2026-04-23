@@ -244,7 +244,7 @@ describe("TabelaProcessos.vue", () => {
 
         expect(context.wrapper.find('[data-testid="empty-state-processos"]').exists()).toBe(true);
         expect(context.wrapper.find('[data-testid="tbl-processos"]').exists()).toBe(false);
-        expect(context.wrapper.text()).toContain("Nenhum processo");
+        expect(context.wrapper.text()).toContain("Painel sem processos");
     });
 
     it("deve exibir CTA no estado vazio e emitir evento ao clicar", async () => {

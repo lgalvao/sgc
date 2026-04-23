@@ -29,7 +29,6 @@ describe("RelatorioMapasView.vue", () => {
         template: "<button :disabled='disabled' @click='$emit(\"click\")'><slot /></button>"
     },
     BSpinner: { template: "<span>loading...</span>" },
-    EmptyState: { template: "<div>Empty State</div>" },
   };
 
   beforeEach(() => {
@@ -47,10 +46,10 @@ describe("RelatorioMapasView.vue", () => {
     expect(painelService.listarProcessos).toHaveBeenCalled();
   });
 
-  it("deve mostrar empty state quando nenhum processo está selecionado", async () => {
+  it("não deve renderizar empty state na tela de mapas", async () => {
     ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
 
-    expect(ctx.wrapper.text()).toContain("Empty State");
+    expect(ctx.wrapper.find("[data-testid='empty-state-mapas']").exists()).toBe(false);
   });
 
   it("deve chamar exportarMapasPdf ao clicar no botão gerar", async () => {

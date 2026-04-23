@@ -282,7 +282,7 @@ describe("TreeTable.vue", () => {
 
         const emptyState = wrapper.findComponent(EmptyState);
         expect(emptyState.exists()).toBe(true);
-        expect(emptyState.props('title')).toBe("Nenhum registro encontrado");
+        expect(emptyState.props('title')).toBe("Nada por aqui");
 
         expect(wrapper.findComponent(TreeRowItem).exists()).toBe(false);
     });

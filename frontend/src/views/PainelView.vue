@@ -54,10 +54,11 @@
         </div>
         <EmptyState
             v-else
-            class="border-0 bg-transparent mb-0"
+            class="mb-0"
             data-testid="empty-state-alertas"
             icon="bi-bell-slash"
-            :title="TEXTOS.painel.NENHUM_ALERTA"
+            :description="TEXTOS.painel.ALERTAS_VAZIO_DESCRICAO"
+            :title="TEXTOS.painel.ALERTAS_VAZIO_TITULO"
         />
       </div>
     </template>

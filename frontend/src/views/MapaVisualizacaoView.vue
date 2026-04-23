@@ -78,8 +78,8 @@
         <div class="mb-4 mt-3">
           <EmptyState
               v-if="!mapa || mapa.competencias.length === 0"
-              title="Nenhuma competência cadastrada"
-              description="Este mapa ainda não possui competências registradas."
+              :title="TEXTOS.mapaVisualizacao.EMPTY_TITLE"
+              :description="TEXTOS.mapaVisualizacao.EMPTY_DESCRIPTION"
               icon="bi-journal-x"
           />
           <BCard

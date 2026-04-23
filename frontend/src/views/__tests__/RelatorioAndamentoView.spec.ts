@@ -44,7 +44,6 @@ vi.mock('@/composables/useNotification', () => ({
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
     PageHeader: {template: '<div><slot /><slot name="actions" /></div>', props: ['title']},
-    EmptyState: {template: '<div />'},
     BCard: {template: '<div class="card"><slot /></div>'},
     BCardBody: {template: '<div class="card-body"><slot /></div>'},
     BCardTitle: {template: '<h4 class="card-title"><slot /></h4>'},

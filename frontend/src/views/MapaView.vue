@@ -53,9 +53,9 @@
       <div v-if="unidade">
         <div v-if="competencias.length === 0" class="mb-4 mt-3">
           <EmptyState
-              title="Lista de competências"
+              :title="TEXTOS.mapa.EMPTY_TITLE"
               :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
-              class="border-0 bg-transparent mb-0 px-0"
+              class="mb-0"
               icon="bi-journal-plus"
           />
         </div>
