@@ -21,7 +21,6 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
-    DisponibilizarCadastroRequest,
     HomologarCadastroRequest,
 } from "@/types/tipos";
 
