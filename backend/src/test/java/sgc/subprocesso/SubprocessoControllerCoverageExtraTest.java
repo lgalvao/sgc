@@ -57,14 +57,14 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void disponibilizarCadastroErro() throws Exception {
         doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
-                .when(transicaoService).disponibilizarCadastro(1L);
+                .when(transicaoService).disponibilizarCadastro(1L, null);
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar").with(csrf()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value("Existem atividades sem conhecimentos associados."));
 
-        verify(transicaoService).disponibilizarCadastro(1L);
+        verify(transicaoService).disponibilizarCadastro(1L, null);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -73,14 +73,14 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void disponibilizarRevisaoErro() throws Exception {
         doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
-                .when(transicaoService).disponibilizarRevisao(1L);
+                .when(transicaoService).disponibilizarRevisao(1L, null);
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_REVISAO_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao").with(csrf()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value("Existem atividades sem conhecimentos associados."));
 
-        verify(transicaoService).disponibilizarRevisao(1L);
+        verify(transicaoService).disponibilizarRevisao(1L, null);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
