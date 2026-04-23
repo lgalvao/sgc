@@ -36,7 +36,7 @@ public class SubprocessoNotificacaoService {
     public void registrarComunicacoesTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
         if (tipoTransicao.geraAlerta()) {
-            criarAlertaTransicao(cmd);
+            executarAlertaSemInterromperEmail(() -> criarAlertaTransicao(cmd), "transicao", cmd.subprocesso().getCodigo());
         }
         if (tipoTransicao.enviaEmail()) {
             criarNotificacoesTransicao(cmd);
@@ -67,8 +67,12 @@ public class SubprocessoNotificacaoService {
     }
 
     public void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
-        alertaFacade.criarAlertaAlteracaoDataLimite(
-                sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa);
+        executarAlertaSemInterromperEmail(
+                () -> alertaFacade.criarAlertaAlteracaoDataLimite(
+                        sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa),
+                "alteracao-data-limite",
+                sp.getCodigo()
+        );
 
         Map<String, Object> variaveis = new HashMap<>();
         variaveis.put("titulo", sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA);
@@ -221,6 +225,19 @@ public class SubprocessoNotificacaoService {
             throw new IllegalStateException("Template ausente para %s".formatted(contexto));
         }
         return template;
+    }
+
+    private void executarAlertaSemInterromperEmail(Runnable acaoAlerta, String contexto, Long codigoSubprocesso) {
+        try {
+            acaoAlerta.run();
+        } catch (RuntimeException ex) {
+            log.warn(
+                    "Falha ao criar alerta ({}) para subprocesso {}. Fluxo de e-mail sera mantido.",
+                    contexto,
+                    codigoSubprocesso,
+                    ex
+            );
+        }
     }
 
     private record EmailGerado(String destinatario, String assunto, String corpo, String tipo) {

@@ -238,6 +238,37 @@ class ResponsavelUnidadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve enfileirar email mesmo quando criacao de alerta falhar")
+        void deveEnfileirarEmailMesmoQuandoCriacaoDeAlertaFalhar() {
+            Long codUnidade = 1L;
+            LocalDate dataTermino = LocalDate.now().plusDays(5);
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", null, dataTermino, "Justificativa");
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(codUnidade);
+            unidade.setSigla("UNIT");
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+            usuario.setNome("Usuario Teste");
+            usuario.setEmail("usuario@tre-pe.jus.br");
+
+            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            doThrow(new IllegalStateException("falha alerta"))
+                    .when(alertaFacade).criarAlertaPessoal(eq("123"), anyString());
+            when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
+                    .thenReturn("<html>email</html>");
+
+            service.criarAtribuicaoTemporaria(codUnidade, request);
+
+            verify(notificacaoService).enfileirar(any());
+            verify(cacheOrganizacaoService).invalidarAposCommit();
+        }
+
+        @Test
         @DisplayName("Deve rejeitar atribuição quando dataTermino for anterior ao inicio")
         void deveRejeitarAtribuicaoComDataTerminoAnteriorAoInicio() {
             Long codUnidade = 1L;
