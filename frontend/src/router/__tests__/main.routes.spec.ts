@@ -12,7 +12,7 @@ vi.mock('@/views/ErroGeralView.vue', () => ({ default: { name: 'ErroGeralView' }
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(11);
+        expect(mainRoutes).toHaveLength(12);
     });
 
     it("deve conter a rota RelatorioAndamento", async () => {

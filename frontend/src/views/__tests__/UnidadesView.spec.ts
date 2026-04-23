@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import Unidades from "@/views/UnidadesView.vue";
 import * as unidadeService from "@/services/unidadeService";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {TEXTOS} from "@/constants/textos";
 
 const mockPush = vi.fn();
 
@@ -246,7 +247,7 @@ describe("Unidades.vue", () => {
     it("deve exibir mensagem quando não houver unidades", async () => {
         const wrapper = createWrapper({unidades: []});
         await flushPromises();
-        expect(wrapper.text()).toContain("Nenhuma unidade encontrada.");
+        expect(wrapper.text()).toContain(TEXTOS.unidades.EMPTY_TITLE);
         expect(wrapper.findComponent({name: 'TreeTable'}).exists()).toBe(false);
     });
 
