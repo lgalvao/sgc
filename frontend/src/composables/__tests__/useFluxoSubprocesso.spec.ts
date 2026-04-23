@@ -48,15 +48,15 @@ describe("useFluxoSubprocesso", () => {
         expect(resultado).toEqual({valido: true});
     });
 
-    it("deve disponibilizar cadastro sem recarga implícita de processo", async () => {
+    it("deve disponibilizar cadastro com observações sem recarga implícita de processo", async () => {
         const {disponibilizarCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
         const {disponibilizarCadastro: serviceDisponibilizarCadastro} = await import("@/services/cadastroService");
         (serviceDisponibilizarCadastro as any).mockResolvedValue(undefined);
 
-        const resultado = await disponibilizarCadastro(10);
+        const resultado = await disponibilizarCadastro(10, {observacoes: "Observação de disponibilização"});
 
         expect(resultado).toBe(true);
-        expect(serviceDisponibilizarCadastro).toHaveBeenCalledWith(10);
+        expect(serviceDisponibilizarCadastro).toHaveBeenCalledWith(10, {observacoes: "Observação de disponibilização"});
     });
 
     it("deve homologar cadastro e recarregar subprocesso", async () => {
@@ -99,8 +99,8 @@ describe("useFluxoSubprocesso", () => {
         const {disponibilizarRevisaoCadastro: service} = await import("@/services/cadastroService");
         (service as any).mockResolvedValue(undefined);
 
-        await disponibilizarRevisaoCadastro(10);
-        expect(service).toHaveBeenCalledWith(10);
+        await disponibilizarRevisaoCadastro(10, {observacoes: "Observação da revisão"});
+        expect(service).toHaveBeenCalledWith(10, {observacoes: "Observação da revisão"});
     });
 
     it("deve iniciar revisao sem limpar o detalhe atual durante a recarga", async () => {

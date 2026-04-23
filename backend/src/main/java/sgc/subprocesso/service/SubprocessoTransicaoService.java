@@ -324,11 +324,16 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void disponibilizarCadastro(Long codSubprocesso) {
+        disponibilizarCadastro(codSubprocesso, null);
+    }
+
+    @Transactional
+    public void disponibilizarCadastro(Long codSubprocesso, @Nullable String observacoes) {
         log.info("Disponibilizando cadastro do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario);
+        disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario, observacoes);
     }
 
     public void iniciarRevisaoCadastro(Long codSubprocesso) {
@@ -352,20 +357,24 @@ public class SubprocessoTransicaoService {
     }
 
     public void disponibilizarRevisao(Long codSubprocesso) {
+        disponibilizarRevisao(codSubprocesso, null);
+    }
+
+    public void disponibilizarRevisao(Long codSubprocesso, @Nullable String observacoes) {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario);
+        disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario, observacoes);
     }
 
     private void disponibilizar(Subprocesso sp, SituacaoSubprocesso novaSituacao,
-                                TipoTransicao transicao, Usuario usuario) {
+                                TipoTransicao transicao, Usuario usuario, @Nullable String observacoes) {
         validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp);
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(LocalDateTime.now());
-        registrarTransicaoParaSuperiorDaUnidade(sp, transicao, usuario, null);
+        registrarTransicaoParaSuperiorDaUnidade(sp, transicao, usuario, normalizarTexto(observacoes));
     }
 
     @Transactional

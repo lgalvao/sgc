@@ -1,14 +1,15 @@
-import {describe} from "vitest";
+import {describe, expect, it} from "vitest";
 import {setupServiceTest, testErrorHandling, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
 import * as cadastroService from "@/services/cadastroService";
 
 describe("cadastroService", () => {
-    setupServiceTest();
+    const {mockApi} = setupServiceTest();
 
     describe("disponibilizarCadastro", () => {
         testPostEndpoint(
             () => cadastroService.disponibilizarCadastro(1),
-            "/subprocessos/1/cadastro/disponibilizar"
+            "/subprocessos/1/cadastro/disponibilizar",
+            {observacoes: ""}
         );
         testErrorHandling(() => cadastroService.disponibilizarCadastro(1), 'post');
     });
@@ -16,9 +17,32 @@ describe("cadastroService", () => {
     describe("disponibilizarRevisaoCadastro", () => {
         testPostEndpoint(
             () => cadastroService.disponibilizarRevisaoCadastro(1),
-            "/subprocessos/1/disponibilizar-revisao"
+            "/subprocessos/1/disponibilizar-revisao",
+            {observacoes: ""}
         );
         testErrorHandling(() => cadastroService.disponibilizarRevisaoCadastro(1), 'post');
+    });
+
+    describe("issue #1553 - observações na disponibilização", () => {
+        it("deve enviar observações em disponibilizarCadastro", async () => {
+            mockApi.post.mockResolvedValue({data: {}});
+
+            await cadastroService.disponibilizarCadastro(1, {observacoes: "observação de teste"});
+
+            expect(mockApi.post).toHaveBeenCalledWith("/subprocessos/1/cadastro/disponibilizar", {
+                observacoes: "observação de teste"
+            });
+        });
+
+        it("deve enviar observações em disponibilizarRevisaoCadastro", async () => {
+            mockApi.post.mockResolvedValue({data: {}});
+
+            await cadastroService.disponibilizarRevisaoCadastro(1, {observacoes: "observação de revisão"});
+
+            expect(mockApi.post).toHaveBeenCalledWith("/subprocessos/1/disponibilizar-revisao", {
+                observacoes: "observação de revisão"
+            });
+        });
     });
 
     describe("devolverCadastro", () => {
