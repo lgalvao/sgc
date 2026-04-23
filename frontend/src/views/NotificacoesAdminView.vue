@@ -54,51 +54,51 @@
             responsive
             small
         >
-          <template #cell(unidadeSigla)="{ item }">
-            <UnidadeLink :item="item"/>
+          <template #cell(unidadeSigla)="{ item: linha }">
+            <UnidadeLink :item="linha"/>
           </template>
 
-          <template #cell(processoDescricao)="{ item }">
-            <span :data-testid="`notificacao-processo-${item.unidadeSigla}`">
-              {{ item.processoDescricao }}
+          <template #cell(processoDescricao)="{ item: linha }">
+            <span :data-testid="`notificacao-processo-${linha.unidadeSigla}`">
+              {{ linha.processoDescricao }}
             </span>
           </template>
 
-          <template #cell(statusGeral)="{ item }">
-            <BBadge :data-testid="`notificacao-status-${item.unidadeSigla}`" :variant="statusVariant(item.statusGeral)">
-              {{ statusLabel(item.statusGeral) }}
+          <template #cell(statusGeral)="{ item: linha }">
+            <BBadge :data-testid="`notificacao-status-${linha.unidadeSigla}`" :variant="statusVariant(linha.statusGeral)">
+              {{ statusLabel(linha.statusGeral) }}
             </BBadge>
-            <div v-if="item.maiorTentativas > 0" class="text-muted small mt-1">
-              {{ item.maiorTentativas }} tentativa(s)
+            <div v-if="linha.maiorTentativas > 0" class="text-muted small mt-1">
+              {{ linha.maiorTentativas }} tentativa(s)
             </div>
           </template>
 
-          <template #cell(ultimoErro)="{ item }">
+          <template #cell(ultimoErro)="{ item: linha }">
             <span
-                v-if="item.ultimoErro"
-                :data-testid="`notificacao-erro-${item.unidadeSigla}`"
-                :title="item.ultimoErro"
+                v-if="linha.ultimoErro"
+                :data-testid="`notificacao-erro-${linha.unidadeSigla}`"
+                :title="linha.ultimoErro"
                 class="text-muted text-truncate d-inline-block erro-notificacao"
             >
-              {{ item.ultimoErro }}
+              {{ linha.ultimoErro }}
             </span>
-            <span v-else :data-testid="`notificacao-erro-${item.unidadeSigla}`">-</span>
+            <span v-else :data-testid="`notificacao-erro-${linha.unidadeSigla}`">-</span>
           </template>
 
-          <template #cell(proximaTentativaEm)="{ item }">
-            <span :data-testid="`notificacao-proxima-tentativa-${item.unidadeSigla}`">
-              {{ formatarDataOuHifen(item.proximaTentativaEm) }}
+          <template #cell(proximaTentativaEm)="{ item: linha }">
+            <span :data-testid="`notificacao-proxima-tentativa-${linha.unidadeSigla}`">
+              {{ formatarDataOuHifen(linha.proximaTentativaEm) }}
             </span>
           </template>
 
-          <template #cell(acoes)="{ item }">
+          <template #cell(acoes)="{ item: linha }">
             <div class="text-end">
               <BButton
-                  v-if="item.podeReenviar"
-                  :data-testid="`btn-notificacoes-reenviar-${item.unidadeSigla}`"
+                  v-if="linha.podeReenviar"
+                  :data-testid="`btn-notificacoes-reenviar-${linha.unidadeSigla}`"
                   size="sm"
                   variant="outline-dark"
-                  @click="confirmarReenvio(item)"
+                  @click="confirmarReenvio(linha)"
               >
                 <i aria-hidden="true" class="bi bi-send"></i>
                 {{ TEXTOS.administracao.NOTIFICACOES_REENVIAR }}
@@ -127,25 +127,25 @@
             responsive
             small
         >
-          <template #cell(unidadeSigla)="{ item }">
-            <UnidadeLink :item="item"/>
+          <template #cell(unidadeSigla)="{ item: linha }">
+            <UnidadeLink :item="linha"/>
           </template>
 
-          <template #cell(processoDescricao)="{ item }">
-            <span :data-testid="`notificacao-processo-${item.unidadeSigla}`">
-              {{ item.processoDescricao }}
+          <template #cell(processoDescricao)="{ item: linha }">
+            <span :data-testid="`notificacao-processo-${linha.unidadeSigla}`">
+              {{ linha.processoDescricao }}
             </span>
           </template>
 
-          <template #cell(statusGeral)="{ item }">
-            <BBadge :data-testid="`notificacao-status-${item.unidadeSigla}`" :variant="statusVariant(item.statusGeral)">
-              {{ statusLabel(item.statusGeral) }}
+          <template #cell(statusGeral)="{ item: linha }">
+            <BBadge :data-testid="`notificacao-status-${linha.unidadeSigla}`" :variant="statusVariant(linha.statusGeral)">
+              {{ statusLabel(linha.statusGeral) }}
             </BBadge>
           </template>
 
-          <template #cell(dataHoraEnvio)="{ item }">
-            <span :data-testid="`notificacao-conclusao-${item.unidadeSigla}`">
-              {{ formatarDataOuHifen(item.ultimaNotificacaoEm) }}
+          <template #cell(dataHoraEnvio)="{ item: linha }">
+            <span :data-testid="`notificacao-conclusao-${linha.unidadeSigla}`">
+              {{ formatarDataOuHifen(linha.ultimaNotificacaoEm) }}
             </span>
           </template>
         </BTable>
