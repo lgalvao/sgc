@@ -50,9 +50,13 @@
                    inputmode="numeric"
                    name="titulo"
                    :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
+                   :state="mensagemErroTitulo ? false : null"
                    type="text"
                />
               <!-- eslint-enable vuejs-accessibility/no-autofocus -->
+              <BFormInvalidFeedback :state="mensagemErroTitulo ? false : null">
+                {{ mensagemErroTitulo }}
+              </BFormInvalidFeedback>
             </BFormGroup>
             <BFormGroup
                 label-for="senha"
@@ -72,6 +76,7 @@
                     aria-required="true"
                     :autocomplete="showPassword ? 'off' : 'current-password'"
                     :disabled="loginStep > 1"
+                    :state="mensagemErroSenha ? false : null"
                     :type="showPassword ? 'text' : 'password'"
                     data-testid="inp-login-senha"
                     name="senha"
@@ -94,6 +99,9 @@
                   </BButton>
                 </template>
               </BInputGroup>
+              <BFormInvalidFeedback :state="mensagemErroSenha ? false : null">
+                {{ mensagemErroSenha }}
+              </BFormInvalidFeedback>
               <BAlert
                   v-if="capsLockAtivado"
                   :model-value="true"
@@ -120,9 +128,11 @@
                   id="par"
                   v-model="parSelecionado"
                   :options="perfisUnidadesOptions"
+                  :state="erroSelecaoPerfil ? false : null"
                   data-testid="sel-login-perfil"
                   text-field="text"
                   value-field="value"
+                  @change="erroSelecaoPerfil = ''"
               >
                 <template #first>
                   <BFormSelectOption
@@ -133,6 +143,9 @@
                   </BFormSelectOption>
                 </template>
               </BFormSelect>
+              <BFormInvalidFeedback :state="erroSelecaoPerfil ? false : null">
+                {{ erroSelecaoPerfil }}
+              </BFormInvalidFeedback>
             </BFormGroup>
 
           <LoadingButton
@@ -171,6 +184,7 @@ import {
   BForm,
   BFormGroup,
   BFormInput,
+  BFormInvalidFeedback,
   BFormSelect,
   BFormSelectOption,
   BInputGroup,
@@ -187,6 +201,7 @@ import {TEXTOS} from "@/constants/textos";
 
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
@@ -199,6 +214,19 @@ const parSelecionado = ref<PerfilUnidade | null>(null);
 const isLoading = ref(false);
 const showPassword = ref(false);
 const capsLockAtivado = ref(false);
+
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
+const credenciaisPreenchidas = computed(() => Boolean(titulo.value && senha.value));
+const mensagemErroTitulo = computed(() => deveExibirErro(!titulo.value) ? TEXTOS.login.ERRO_CAMPO_TITULO : "");
+const mensagemErroSenha = computed(() => deveExibirErro(!senha.value) ? TEXTOS.login.ERRO_CAMPO_SENHA : "");
+const erroSelecaoPerfil = ref("");
 
 const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
 
@@ -230,8 +258,8 @@ const handleLogin = async () => {
 };
 
 const performInitialLogin = async () => {
-  if (!titulo.value || !senha.value) {
-    notify(TEXTOS.login.ERRO_PREENCHIMENTO, 'danger');
+  if (!validarSubmissao(credenciaisPreenchidas.value)) {
+    await focarPrimeiroErroInvalido();
     return;
   }
 
@@ -240,6 +268,7 @@ const performInitialLogin = async () => {
     const fluxoLogin = await perfilStore.iniciarLogin(titulo.value, senha.value);
 
     if (fluxoLogin.autenticado) {
+      resetarValidacao();
       await handlePostAuth();
       } else {
         notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
@@ -276,25 +305,26 @@ const handlePostAuth = async () => {
 };
 
 const performProfileSelection = async () => {
-  if (parSelecionado.value) {
-    isLoading.value = true;
-    try {
-      await perfilStore.concluirLoginComPerfil(parSelecionado.value);
-      await router.push("/painel");
-    } catch (error) {
-      const erroNormalizado = normalizeError(error);
-      if (erroNormalizado.kind === 'unexpected') {
-        logger.error("Erro interno ao selecionar perfil:", erroNormalizado.message);
-        await router.push("/erro");
-        return;
-      }
-      logger.error("Erro ao selecionar perfil:", error);
-      notify(TEXTOS.login.ERRO_SELECAO_PERFIL, 'danger');
-    } finally {
-      isLoading.value = false;
+  if (!parSelecionado.value) {
+    erroSelecaoPerfil.value = TEXTOS.login.ERRO_POR_FAVOR_SELECIONE;
+    return;
+  }
+  erroSelecaoPerfil.value = '';
+  isLoading.value = true;
+  try {
+    await perfilStore.concluirLoginComPerfil(parSelecionado.value);
+    await router.push("/painel");
+  } catch (error) {
+    const erroNormalizado = normalizeError(error);
+    if (erroNormalizado.kind === 'unexpected') {
+      logger.error("Erro interno ao selecionar perfil:", erroNormalizado.message);
+      await router.push("/erro");
+      return;
     }
-  } else {
-    notify(TEXTOS.login.ERRO_POR_FAVOR_SELECIONE, 'danger');
+    logger.error("Erro ao selecionar perfil:", error);
+    notify(TEXTOS.login.ERRO_SELECAO_PERFIL, 'danger');
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>

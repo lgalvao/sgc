@@ -25,7 +25,7 @@
 
     Este é um lembrete de que o prazo para a conclusão da etapa atual do processo [DESCRICAO_PROCESSO] encerra em [DATA_LIMITE].
 
-    Por favor, acesse o sistema para concluir essas pendências: [URL_SISTEMA].
+    Acesse o sistema para concluir essas pendências: [URL_SISTEMA].
     ```
 
 8. O sistema cria internamente um alerta para a unidade:

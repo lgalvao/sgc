@@ -89,6 +89,7 @@ import AppAlert from '@/components/comum/AppAlert.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {type Parametro, useConfiguracoes} from '@/composables/useConfiguracoes';
 import {useNotification} from '@/composables/useNotification';
+import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
 import {TEXTOS} from '@/constants/textos';
 
 const {
@@ -102,22 +103,29 @@ const {
 } = useConfiguracoes();
 const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
-const validacaoSubmetida = ref(false);
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  resetarValidacao,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
 
 const form = reactive({
   diasInativacao: 30,
   diasAlertaNovo: 3
 });
 
-const mensagemErroDiasInativacao = computed(() => {
-  if (!validacaoSubmetida.value) return "";
-  return Number(form.diasInativacao) >= 1 ? "" : "Informe um valor maior ou igual a 1.";
-});
+const diasInativacaoInvalido = computed(() => Number(form.diasInativacao) < 1);
+const diasAlertaNovoInvalido = computed(() => Number(form.diasAlertaNovo) < 1);
+const formularioValido = computed(() => !diasInativacaoInvalido.value && !diasAlertaNovoInvalido.value);
 
-const mensagemErroDiasAlertaNovo = computed(() => {
-  if (!validacaoSubmetida.value) return "";
-  return Number(form.diasAlertaNovo) >= 1 ? "" : "Informe um valor maior ou igual a 1.";
-});
+const mensagemErroDiasInativacao = computed(() =>
+    validacaoSubmetida.value && diasInativacaoInvalido.value ? "Informe um valor maior ou igual a 1." : ""
+);
+
+const mensagemErroDiasAlertaNovo = computed(() =>
+    validacaoSubmetida.value && diasAlertaNovoInvalido.value ? "Informe um valor maior ou igual a 1." : ""
+);
 
 function atualizarFormulario() {
   form.diasInativacao = getDiasInativacaoProcesso();
@@ -130,8 +138,8 @@ async function carregar() {
 }
 
 async function salvar() {
-  validacaoSubmetida.value = true;
-  if (mensagemErroDiasInativacao.value || mensagemErroDiasAlertaNovo.value) {
+  if (!validarSubmissao(formularioValido.value)) {
+    await focarPrimeiroErroInvalido();
     return;
   }
 
@@ -156,7 +164,7 @@ async function salvar() {
   const sucesso = await salvarConfiguracoes(paramsToSave);
 
   if (sucesso) {
-    validacaoSubmetida.value = false;
+    resetarValidacao();
     notify(TEXTOS.configuracoes.SUCESSO_SALVAR, 'success');
   } else {
     notify(TEXTOS.configuracoes.ERRO_SALVAR, 'danger');

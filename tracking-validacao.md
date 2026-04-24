@@ -28,12 +28,21 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
   automaticamente o primeiro campo com classe `.is-invalid`, usando `nextTick` para aguardar o DOM.
   Aplicado em `AtribuicaoTemporariaView`. Consistente com o padrão já existente em `ProcessoCadastroView`
   para erros de backend.
+- Migrado `ParametrosView` para `useValidacaoFormulario`: eliminou `validacaoSubmetida` local (ref próprio),
+  extraiu computed `formularioValido` e aplica `focarPrimeiroErroInvalido` no submit inválido.
+- Consolidado `ProcessoCadastroView`: substituiu `document.querySelector('.is-invalid')` + `nextTick` inline
+  por `focarPrimeiroErroInvalido()` do composable — foco no backend agora reutiliza o mesmo utilitário.
+- `LoginView` mantida sem alteração: exceção saudável documentada no `ux.md` (segurança/autenticação).
+- **Revisão da exceção do Login (por decisão do usuário):** adicionado feedback inline por campo para
+  título e senha vazios (`BFormInvalidFeedback` com `ERRO_CAMPO_TITULO` e `ERRO_CAMPO_SENHA`), usando
+  `useValidacaoFormulario`. Erros de credenciais, rede e autorização permanecem como alerta global
+  (exceção de segurança preservada). Removidas constantes `ERRO_PREENCHIMENTO` (código morto).
 
 ## Em aberto
 
-- Revisar fluxos ainda fora da primeira fatia: login, relatórios, limpeza e modais de visualização.
-- **Sprint 2 (frontend base):** criar composable padrão de validação reutilizável (em andamento via
-  `useValidacaoFormulario`); expandir uso de `focarPrimeiroErroInvalido` para outros formulários.
+- Revisar fluxos ainda fora da primeira fatia: relatórios, limpeza e modais de visualização.
+- **Sprint 2 (frontend base):** expandir uso do composable para modais (`DisponibilizarMapaModal`,
+  `CriarCompetenciaModal`) e `SubprocessoView` (reabertura).
 
 ## Validações executadas
 
@@ -48,9 +57,11 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 - `npm run typecheck` após criação de `useValidacaoFormulario`.
 - `npx vitest run useValidacaoFormulario.spec.ts AtribuicaoTemporariaView.spec.ts CadAtribuicao.spec.ts`: 25 testes passaram.
 - `npm run typecheck` após adição de `focarPrimeiroErroInvalido`: sem erros.
+- `npx vitest run ParametrosView.spec.ts CadProcesso.spec.ts CadProcessoCoverage.spec.ts useValidacaoFormulario.spec.ts`: 49 testes passaram.
+- `npm run typecheck` após migração de ParametrosView e ProcessoCadastroView: sem erros.
 
 ## Próximo passo recomendado
 
-Iniciar Sprint 2: expandir `focarPrimeiroErroInvalido` para `ParametrosView` e `LoginView` (formulários
-simples), e revisar se o `ProcessoCadastroView` pode delegar o foco para o composable em vez de usar
-`document.querySelector('.is-invalid')` diretamente.
+Sprint 2 — modais com campos obrigatórios: aplicar `useValidacaoFormulario` em `DisponibilizarMapaModal`,
+`CriarCompetenciaModal` e no modal de reabertura em `SubprocessoView` (caso mais claro de bloqueio sem
+mensagem inline — identificado no `plano-validacao.md` seção 11.2 item 5).

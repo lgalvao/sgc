@@ -1,6 +1,5 @@
 <template>
   <ModalPadrao
-      :acao-desabilitada="!dataLimiteValidacao || !!erroLocalDataLimite"
       :loading="loading"
       :model-value="mostrar"
       data-testid="mdl-disponibilizar-mapa"
@@ -66,7 +65,6 @@
     </BAlert>
     <template #acao>
       <LoadingButton
-          :disabled="!dataLimiteValidacao || !!erroLocalDataLimite"
           :loading="loading"
           data-testid="btn-disponibilizar-mapa-confirmar"
           loading-text="Disponibilizando..."
@@ -85,6 +83,7 @@ import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";
 import {computed, ref, watch} from "vue";
 import {isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -107,8 +106,19 @@ const dataLimiteValidacao = ref("");
 const observacoesDisponibilizacao = ref("");
 const erroLocalDataLimite = ref("");
 
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
 const ultimaDataLimiteFormatada = computed(() => extrairData(props.ultimaDataLimiteSubprocesso));
-const mensagemErroDataLimite = computed(() => props.fieldErrors?.dataLimite ?? erroLocalDataLimite.value);
+const mensagemErroDataLimite = computed(() => {
+  if (props.fieldErrors?.dataLimite) return props.fieldErrors.dataLimite;
+  if (erroLocalDataLimite.value) return erroLocalDataLimite.value;
+  return deveExibirErro(!dataLimiteValidacao.value) ? "A data limite é obrigatória." : "";
+});
 const dataMinimaPermitida = computed(() => {
   const amanha = obterAmanhaFormatado();
   const ultimaDataLimite = ultimaDataLimiteFormatada.value;
@@ -146,6 +156,13 @@ function fechar() {
 }
 
 function disponibilizar() {
+  const formularioValido = Boolean(dataLimiteValidacao.value) && !erroLocalDataLimite.value;
+  
+  if (!validarSubmissao(formularioValido)) {
+    void focarPrimeiroErroInvalido();
+    return;
+  }
+
   emit("disponibilizar", {
     dataLimite: dataLimiteValidacao.value,
     observacoes: observacoesDisponibilizacao.value

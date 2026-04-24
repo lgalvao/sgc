@@ -178,6 +178,7 @@ import {isAxiosError, normalizeError, shouldNotifyGlobally} from "@/utils/apiErr
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 import {useToastStore} from "@/stores/toast";
 import {useOrganizacaoStore} from "@/stores/organizacao";
@@ -228,6 +229,7 @@ const unidadeStore = useUnidadeStore();
 const {invalidarCachesProcesso} = useInvalidacaoNavegacao();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
+const {focarPrimeiroErroInvalido} = useValidacaoFormulario();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
@@ -394,12 +396,7 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
       );
       window.scrollTo(0, 0);
     } else if (hasFieldErrors) {
-      nextTick(() => {
-        const firstInvalid = document.querySelector('.is-invalid') as HTMLElement;
-        if (firstInvalid) {
-          firstInvalid.focus();
-        }
-      });
+      void focarPrimeiroErroInvalido();
     }
   } else {
     notify(defaultMsg, 'danger');

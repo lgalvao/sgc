@@ -48,15 +48,17 @@ describe("LoginView.vue", () => {
                     stubActions: false,
                 }),
             ],
-            // Stubs for bootstrap components to simplify testing
             stubs: {
                 BCard: {template: "<div><slot /></div>"},
                 BForm: {template: '<form @submit.prevent><slot /></form>'},
-                // Simple input stubs that support v-model
                 BFormInput: {
                     props: ['modelValue'],
                     emits: ['update:modelValue'],
                     template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+                },
+                BFormInvalidFeedback: {
+                    props: ['state'],
+                    template: '<div class="invalid-feedback-stub"><slot /></div>'
                 },
                 BFormSelect: {
                     props: ['modelValue', 'options', 'value-field', 'text-field'],
@@ -91,15 +93,36 @@ describe("LoginView.vue", () => {
         expect(senhaInput.element.value).toBe("");
     });
 
-    it("deve mostrar erro se campos estiverem vazios", async () => {
+    it("deve mostrar erro inline por campo se campos estiverem vazios", async () => {
         const wrapper = mount(LoginView, mountOptions());
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("");
 
         await wrapper.find('form').trigger('submit');
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.text()).toContain("Por favor, preencha título e senha.");
+        expect(wrapper.text()).toContain("Informe o título eleitoral.");
+        expect(wrapper.text()).toContain("Informe a senha.");
+    });
+
+    it("não deve usar notify global para campos vazios", async () => {
+        const mockNotify = vi.fn();
+        const wrapper = mount(LoginView, {
+            ...mountOptions(),
+            global: {
+                ...mountOptions().global,
+                provide: {useNotification: () => ({notify: mockNotify, notificacao: {value: null}, clear: vi.fn()})},
+            }
+        });
+
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("");
+        await wrapper.find('form').trigger('submit');
+        await wrapper.vm.$nextTick();
+
+        // O notify NÃO deve ser chamado com erro de preenchimento — erro deve ser inline
+        expect(wrapper.text()).toContain("Informe o título eleitoral.");
     });
 
     const MOCK_PERFIS = [
@@ -355,7 +378,9 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({autenticado: true, requerSelecaoPerfil: true, perfisUnidades: MOCK_PERFIS, sessao: null});
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue(
+            {autenticado: true, requerSelecaoPerfil: true, perfisUnidades: MOCK_PERFIS, sessao: null}
+        );
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -373,7 +398,7 @@ describe("LoginView.vue", () => {
 
         await wrapper.find('form').trigger('submit');
 
-        expect(wrapper.text()).toContain("Por favor, selecione um perfil.");
+        expect(wrapper.text()).toContain(TEXTOS.login.ERRO_POR_FAVOR_SELECIONE);
     });
 
     it("deve exibir aviso de caps lock ativado", async () => {
@@ -410,9 +435,6 @@ describe("LoginView.vue", () => {
         const inputSenha = wrapper.find('[data-testid="inp-login-senha"]');
         expect(inputSenha.attributes("type")).toBe("password"); // Default
 
-        // Encontra o botão de toggle. Como está dentro de um slot e BInputGroup não está stubbed,
-        // precisamos garantir que conseguimos encontrá-lo.
-        // O botão tem aria-label 'Mostrar senha' inicialmente.
         const toggleBtn = wrapper.find('[aria-label="Mostrar senha"]');
         expect(toggleBtn.exists()).toBe(true);
 
