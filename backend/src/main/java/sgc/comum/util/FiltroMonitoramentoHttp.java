@@ -127,7 +127,7 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
             if (javaLentos instanceof List<?> lista) {
                 @SuppressWarnings("unchecked")
                 List<String> entradas = (List<String>) lista;
-                entradas.add("java %s.%s %.2fms".formatted(obterNomeSimples(classe), metodo, duracaoMs));
+                entradas.add(String.format(Locale.US, "java %s.%s %.2fms", obterNomeSimples(classe), metodo, duracaoMs));
             }
         }
     }

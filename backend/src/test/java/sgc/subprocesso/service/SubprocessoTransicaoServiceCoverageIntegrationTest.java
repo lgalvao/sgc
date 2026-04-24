@@ -47,9 +47,6 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
-    @Autowired
-    private AnaliseRepo analiseRepo;
-
     @MockitoBean
     private SubprocessoValidacaoService validacaoService;
 

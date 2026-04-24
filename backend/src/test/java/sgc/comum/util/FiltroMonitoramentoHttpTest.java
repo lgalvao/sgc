@@ -122,7 +122,7 @@ class FiltroMonitoramentoHttpTest {
             org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
         }
 
-        assertThat(entradas).containsExactly("java ProcessoService.iniciar 30,41ms");
+        assertThat(entradas).containsExactly("java ProcessoService.iniciar 30.41ms");
     }
 
     @Test
