@@ -248,7 +248,7 @@ import {enviarLembrete as enviarLembreteService} from "@/services/processoServic
 
 import {useAcesso} from "@/composables/useAcesso";
 import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
-import {formatDateTimeBR, logger, parseDate} from "@/utils";
+import {formatDateTimeBR, parseDate} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useToastStore} from "@/stores/toast";

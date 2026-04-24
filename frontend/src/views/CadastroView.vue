@@ -229,7 +229,6 @@ const {
   podeVisualizarImpacto,
   habilitarEditarCadastro,
   podeDisponibilizarCadastro,
-  habilitarDisponibilizarCadastro
 } = acesso;
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 

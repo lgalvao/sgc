@@ -56,7 +56,8 @@ const {mockApiClient} = vi.hoisted(() => ({
 
 vi.mock('@/axios-setup', () => ({
     default: mockApiClient,
-    apiClient: mockApiClient
+    apiClient: mockApiClient,
+    isErroCanceladoHttp: vi.fn(() => false)
 }));
 
 function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {

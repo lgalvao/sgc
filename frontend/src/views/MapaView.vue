@@ -279,7 +279,6 @@ const {
   podeEditarMapa,
   podeDisponibilizarMapa,
   habilitarEditarMapa,
-  habilitarDisponibilizarMapa,
   podeAnalisarMapa,
   podeVerSugestoes: podeMostrarVerSugestoes,
   habilitarDevolverMapa,
