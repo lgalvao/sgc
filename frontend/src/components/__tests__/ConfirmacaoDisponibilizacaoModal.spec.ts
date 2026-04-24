@@ -47,18 +47,17 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         expect(wrapper.text()).toContain('Confirma a disponibilização do cadastro?')
     })
 
-    it('emite evento "confirmar" ao clicar no botão confirmar com observações', async () => {
+    it('emite evento "confirmar" ao clicar no botão confirmar', async () => {
         const wrapper = mount(ConfirmacaoDisponibilizacaoModal, {
             props: defaultProps,
             global: globalOptions
         })
 
-        await wrapper.find('[data-testid="inp-disponibilizacao-observacoes"]').setValue('observação enviada')
         const confirmBtn = wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]')
         await confirmBtn.trigger('click')
 
         expect(wrapper.emitted('confirmar')).toHaveLength(1)
-        expect(wrapper.emitted('confirmar')?.[0]).toEqual(['observação enviada'])
+        expect(wrapper.emitted('confirmar')?.[0]).toEqual([])
     })
 
     it('emite evento "fechar" ao clicar em cancelar', async () => {
@@ -82,20 +81,4 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         expect(wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]').attributes('disabled')).toBeDefined()
     })
 
-    it('limpa observações ao reabrir o modal', async () => {
-        const wrapper = mount(ConfirmacaoDisponibilizacaoModal, {
-            props: defaultProps,
-            global: globalOptions
-        })
-
-        const input = wrapper.find('[data-testid="inp-disponibilizacao-observacoes"]')
-        await input.setValue('texto antigo')
-        expect((input.element as HTMLTextAreaElement).value).toBe('texto antigo')
-
-        await wrapper.setProps({mostrar: false})
-        await wrapper.setProps({mostrar: true})
-
-        const inputAtualizado = wrapper.find('[data-testid="inp-disponibilizacao-observacoes"]')
-        expect((inputAtualizado.element as HTMLTextAreaElement).value).toBe('')
-    })
 })
