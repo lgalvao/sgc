@@ -30,9 +30,6 @@ describe('DisponibilizarMapaModal.vue', () => {
         await input.setValue('2026-03-24'); // hoje no mock
         
         expect(wrapper.text()).toContain('A data limite para validação deve ser uma data futura.');
-        
-        const btn = wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]');
-        expect((btn.element as HTMLButtonElement).disabled).toBe(true);
     });
 
     it('deve usar a última data limite do subprocesso como mínimo quando ela for maior que amanhã', () => {
@@ -52,6 +49,17 @@ describe('DisponibilizarMapaModal.vue', () => {
         await input.setValue('2026-03-29');
 
         expect(wrapper.text()).toContain('A data limite deve ser maior ou igual à última data limite do subprocesso.');
-        expect((wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').element as HTMLButtonElement).disabled).toBe(true);
+    });
+
+    it('deve exigir data limite obrigatória no submit e focar o input', async () => {
+        const wrapper = mount(DisponibilizarMapaModal, {
+            props: { mostrar: true }
+        });
+        
+        const btn = wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]');
+        await btn.trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.text()).toContain('A data limite é obrigatória.');
     });
 });

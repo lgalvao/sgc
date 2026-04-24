@@ -10,7 +10,7 @@ import sgc.comum.config.CacheConfig;
 /**
  * Agendador responsável por invalidar e recarregar periodicamente os caches das views.
  *
- * <p>Executa a cada 10 minutos, evitando miss frios e limitando a staleness máxima
+ * <p>Executa a cada 10 minutos, evitando "misses" frios e limitando a staleness máxima
  * independentemente do TTL configurado. Após a recarga, transmite um evento SSE
  * para que os clientes Vue atualizem seus stores.
  *

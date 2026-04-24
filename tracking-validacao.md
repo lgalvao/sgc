@@ -38,11 +38,20 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
   `useValidacaoFormulario`. Erros de credenciais, rede e autorização permanecem como alerta global
   (exceção de segurança preservada). Removidas constantes `ERRO_PREENCHIMENTO` (código morto).
 
+- Implementado erro inline no dropdown de perfil (passo 2 do Login) em substituição ao toast.
+
+### Sprint 2: Modais com Campos Obrigatórios (Concluída)
+- `DisponibilizarMapaModal`: removido o bloqueio silencioso do botão (`acao-desabilitada`), implementado `useValidacaoFormulario` para exibir a obrigatoriedade da data apenas no submit, com foco na origem do erro.
+- `CriarCompetenciaModal`: removido `salvamentoDesabilitado` silencioso, convertidas validações textuais para computadas via `deveExibirErro` do composable, adicionado `.is-invalid` na caixa de listagem de atividades e focado o primeiro erro no clique do botão Salvar.
+- `SubprocessoView` (Modal de Reabertura): convertido aviso genérico de "Informe a justificativa" que era renderizado indiscriminadamente para `BFormInvalidFeedback` reativo a submit, integrado com validação global usando `useValidacaoFormulario`.
+
 ## Em aberto
 
 - Revisar fluxos ainda fora da primeira fatia: relatórios, limpeza e modais de visualização.
-- **Sprint 2 (frontend base):** expandir uso do composable para modais (`DisponibilizarMapaModal`,
-  `CriarCompetenciaModal`) e `SubprocessoView` (reabertura).
+
+### Sprint 3: Administração e Configuração
+- Consolidar formulários que têm validações customizadas em `ParametrosView` e `ConfiguracoesView` (se existirem, além do que já foi migrado).
+- Revisar views baseadas em tabela editável ou ações em lote para garantir que o padrão é mantido.
 
 ## Validações executadas
 
@@ -60,8 +69,8 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 - `npx vitest run ParametrosView.spec.ts CadProcesso.spec.ts CadProcessoCoverage.spec.ts useValidacaoFormulario.spec.ts`: 49 testes passaram.
 - `npm run typecheck` após migração de ParametrosView e ProcessoCadastroView: sem erros.
 
+- `npx vitest run DisponibilizarMapaModal.spec.ts CriarCompetenciaModal.spec.ts SubprocessoView.spec.ts`: Testes atualizados e passando sem regressões.
+
 ## Próximo passo recomendado
 
-Sprint 2 — modais com campos obrigatórios: aplicar `useValidacaoFormulario` em `DisponibilizarMapaModal`,
-`CriarCompetenciaModal` e no modal de reabertura em `SubprocessoView` (caso mais claro de bloqueio sem
-mensagem inline — identificado no `plano-validacao.md` seção 11.2 item 5).
+Sprint 3 — Administração e Configuração: revisar `ConfiguracoesView` (se aplicável), consolidando lógica de view focada em listas e ações rápidas.

@@ -1,7 +1,6 @@
 <template>
   <ModalPadrao
       v-model="mostrarComputado"
-      :acao-desabilitada="salvamentoDesabilitado"
       :loading="loading"
       :texto-acao-carregando="textoAcao"
       data-testid="mdl-criar-competencia"
@@ -22,15 +21,16 @@
       <h5>Descrição</h5>
       <div class="mb-2">
         <BFormTextarea
+            id="descricao"
             ref="inputDescricaoRef"
             v-model="novaCompetencia.descricao"
-            :state="fieldErrors?.descricao ? false : null"
+            :state="mensagemErroDescricao ? false : null"
             data-testid="inp-criar-competencia-descricao"
             placeholder="Descreva a competência"
             rows="3"
         />
-        <BFormInvalidFeedback :state="fieldErrors?.descricao ? false : null">
-          {{ fieldErrors?.descricao }}
+        <BFormInvalidFeedback :state="mensagemErroDescricao ? false : null">
+          {{ mensagemErroDescricao }}
         </BFormInvalidFeedback>
       </div>
     </div>
@@ -38,8 +38,9 @@
     <div class="mb-4">
       <h5>Atividades</h5>
       <div
-          :class="{ 'border-danger': fieldErrors?.atividades }"
-          class="d-flex flex-wrap gap-2 p-2 border rounded"
+          id="atividades"
+          :class="['d-flex flex-wrap gap-2 p-2 border rounded', { 'border-danger is-invalid': mensagemErroAtividades }]"
+          tabindex="-1"
       >
         <BCard
             v-for="atividade in atividades"
@@ -60,15 +61,8 @@
           </BCardBody>
         </BCard>
       </div>
-      <div v-if="fieldErrors?.atividades" class="text-danger small mt-1">
-        {{ fieldErrors.atividades }}
-      </div>
-      <div
-          v-else-if="mensagemPendenciaAtividades"
-          class="form-text"
-          data-testid="txt-criar-competencia-pendencia-atividades"
-      >
-        {{ mensagemPendenciaAtividades }}
+      <div v-if="mensagemErroAtividades" class="text-danger small mt-1" data-testid="txt-criar-competencia-pendencia-atividades">
+        {{ mensagemErroAtividades }}
       </div>
     </div>
 
@@ -80,6 +74,7 @@ import {BAlert, BCard, BCardBody, BFormCheckbox, BFormInvalidFeedback, BFormText
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import type {Atividade, Competencia} from "@/types/tipos";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -105,6 +100,13 @@ const atividadesSelecionadas = ref<number[]>([]);
 const competenciaSendoEditada = ref<Competencia | null>(null);
 const inputDescricaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
 const mostrarComputado = computed({
   get: () => props.mostrar,
   set: (mostrar: boolean) => {
@@ -118,9 +120,17 @@ const salvamentoDesabilitado = computed(() => {
   return descricaoVazia || (exigeAtividade && atividadesSelecionadas.value.length === 0);
 });
 
-const mensagemPendenciaAtividades = computed(() => {
-  if (competenciaSendoEditada.value || atividadesSelecionadas.value.length > 0) return "";
-  return "Selecione ao menos uma atividade para criar a competência.";
+const mensagemErroDescricao = computed(() => {
+  if (props.fieldErrors?.descricao) return props.fieldErrors.descricao;
+  const descricaoVazia = !novaCompetencia.value.descricao.trim();
+  return deveExibirErro(descricaoVazia) ? "A descrição da competência é obrigatória." : "";
+});
+
+const mensagemErroAtividades = computed(() => {
+  if (props.fieldErrors?.atividades) return props.fieldErrors.atividades;
+  const exigeAtividade = !competenciaSendoEditada.value;
+  const semAtividades = atividadesSelecionadas.value.length === 0;
+  return deveExibirErro(exigeAtividade && semAtividades) ? "Selecione ao menos uma atividade para criar a competência." : "";
 });
 
 const textoAcao = computed(() => {
@@ -158,7 +168,11 @@ function fechar() {
 }
 
 function salvar() {
-  if (props.loading || salvamentoDesabilitado.value) {
+  if (props.loading) {
+    return;
+  }
+  if (!validarSubmissao(!salvamentoDesabilitado.value)) {
+    void focarPrimeiroErroInvalido();
     return;
   }
   emit("salvar", {

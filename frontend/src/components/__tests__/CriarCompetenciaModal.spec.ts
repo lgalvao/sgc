@@ -9,10 +9,10 @@ const ModalPadraoStub = {
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
             <button :data-testid="testCodigoCancelar" @click="$emit('fechar')">Cancelar</button>
-            <button :data-testid="testCodigoConfirmar" :disabled="loading || acaoDesabilitada" @click="$emit('confirmar')">{{ textoAcao }}</button>
+            <button :data-testid="testCodigoConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ textoAcao }}</button>
         </div>
     `,
-    props: ["modelValue", "testCodigoCancelar", "testCodigoConfirmar", "acaoDesabilitada", "textoAcao", "loading"],
+    props: ["modelValue", "testCodigoCancelar", "testCodigoConfirmar", "textoAcao", "loading"],
     emits: ["update:modelValue", "fechar", "confirmar", "shown"],
 };
 
@@ -68,11 +68,6 @@ describe("CriarCompetenciaModal.vue", () => {
 
         expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("");
         expect(wrapper.find('[data-testid="btn-criar-competencia-salvar"]').text()).toBe("Criar");
-        expect(
-            wrapper
-                .find('[data-testid="btn-criar-competencia-salvar"]')
-                .attributes("disabled"),
-        ).toBeDefined();
     });
 
     it("deve renderizar o modal no modo de edição", async () => {
@@ -90,17 +85,15 @@ describe("CriarCompetenciaModal.vue", () => {
         expect(wrapper.find('[data-testid="btn-criar-competencia-salvar"]').text()).toBe("Salvar");
     });
 
-    it("deve habilitar o botão de salvar quando a descrição e pelo menos uma atividade forem selecionadas", async () => {
+    it("deve emitir o evento salvar quando a descrição e pelo menos uma atividade forem preenchidas", async () => {
         const wrapper = createWrapper({mostrar: true, atividades});
 
         await wrapper.findComponent(BFormTextarea).setValue("Nova competência");
-        await wrapper.find('input[type="checkbox"]').trigger("click");
+        await wrapper.find('input[type="checkbox"]').setValue(true);
+        await flushPromises();
+        await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
 
-        expect(
-            wrapper
-                .find('[data-testid="btn-criar-competencia-salvar"]')
-                .attributes("disabled"),
-        ).toBeFalsy();
+        expect(wrapper.emitted("salvar")).toBeTruthy();
     });
 
     it("deve permitir salvar edicao sem atividades associadas", async () => {
@@ -123,16 +116,15 @@ describe("CriarCompetenciaModal.vue", () => {
         ).toBeFalsy();
     });
 
-    it("deve manter criacao desabilitada sem atividades mesmo com descricao preenchida", async () => {
+    it("deve exigir campos obrigatorios e exibir erros inline ao salvar", async () => {
         const wrapper = createWrapper({mostrar: true, atividades});
 
-        await wrapper.findComponent(BFormTextarea).setValue("Nova competência");
+        await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger('click');
+        await wrapper.vm.$nextTick();
 
-        expect(
-            wrapper
-                .find('[data-testid="btn-criar-competencia-salvar"]')
-                .attributes("disabled"),
-        ).toBeDefined();
+        expect(wrapper.text()).toContain('A descrição da competência é obrigatória.');
+        expect(wrapper.text()).toContain('Selecione ao menos uma atividade para criar a competência.');
+        expect(wrapper.emitted('salvar')).toBeFalsy();
     });
 
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {

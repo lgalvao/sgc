@@ -199,18 +199,20 @@
         tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.CADASTRO : TEXTOS.subprocesso.REVISAO_CADASTRO
       }}:</p>
     <BFormTextarea
+        id="justificativaReabertura"
         v-model="justificativaReabertura"
+        :state="mensagemErroJustificativa ? false : null"
         data-testid="inp-justificativa-reabrir"
         :placeholder="TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PLACEHOLDER"
         rows="3"
     />
-    <div
-        v-if="!justificativaReabertura.trim()"
-        class="form-text"
+    <BFormInvalidFeedback
+        :state="mensagemErroJustificativa ? false : null"
+        class="d-block"
         data-testid="txt-reabertura-pendencia-justificativa"
     >
-      Informe a justificativa para reabrir.
-    </div>
+      {{ mensagemErroJustificativa }}
+    </BFormInvalidFeedback>
   </ModalConfirmacao>
 
   <ModalConfirmacao
@@ -230,7 +232,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable, useToast} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BFormInvalidFeedback, BFormTextarea, BSpinner, BTable, useToast} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref, type Ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -254,6 +256,7 @@ import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -282,6 +285,13 @@ const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const toast = useToast();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
 
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
@@ -329,6 +339,10 @@ const dataLimite = computed(() => {
   }
   const ultimaDataLimite = subprocesso.value?.ultimaDataLimiteSubprocesso;
   return ultimaDataLimite ? parseDate(ultimaDataLimite) : null;
+});
+
+const mensagemErroJustificativa = computed(() => {
+  return deveExibirErro(!justificativaReabertura.value.trim()) ? "Informe a justificativa para reabrir." : "";
 });
 
 async function executarComCarregamento(loading: Ref<boolean>, acao: () => Promise<void>) {
@@ -440,12 +454,14 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 
 // CDU-32/33: Reabrir cadastro/revisão
 function abrirModalReabrirCadastro() {
+  resetarValidacao();
   tipoReabertura.value = 'cadastro';
   justificativaReabertura.value = '';
   mostrarModalReabrir.value = true;
 }
 
 function abrirModalReabrirRevisao() {
+  resetarValidacao();
   tipoReabertura.value = 'revisao';
   justificativaReabertura.value = '';
   mostrarModalReabrir.value = true;
@@ -457,7 +473,10 @@ function fecharModalReabrir() {
 }
 
 async function confirmarReabertura() {
-  if (!codSubprocesso.value || !justificativaReabertura.value.trim()) {
+  if (!codSubprocesso.value) return;
+
+  if (!validarSubmissao(Boolean(justificativaReabertura.value.trim()))) {
+    void focarPrimeiroErroInvalido();
     return;
   }
 
