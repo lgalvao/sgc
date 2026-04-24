@@ -184,6 +184,7 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import InputData from "@/components/comum/InputData.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useNotification} from "@/composables/useNotification";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/dateUtils";
 import {buscarUnidadePorCodigo as buscarUnidadeServico} from "@/services/unidadeService";
@@ -213,7 +214,12 @@ let timeoutOcultarResultadosUsuarios: ReturnType<typeof setTimeout> | null = nul
 
 const erroUsuario = ref("");
 const erroFormulario = ref("");
-const validacaoSubmetida = ref(false);
+const {
+  validacaoSubmetida,
+  resetarValidacao,
+  deveExibirErro,
+  validarSubmissao
+} = useValidacaoFormulario();
 const termoPesquisaMinimaAtingida = computed(() => termoUsuario.value.trim().length >= 2);
 const formularioValido = computed(() => {
   return Boolean(
@@ -230,22 +236,22 @@ watch(usuariosEncontrados, (usuarios) => {
 
 const mensagemErroUsuario = computed(() => {
   if (erroUsuario.value) return erroUsuario.value;
-  if (validacaoSubmetida.value && !usuarioSelecionado.value) {
+  if (deveExibirErro(!usuarioSelecionado.value)) {
     return TEXTOS.atribuicaoTemporaria.ERRO_SELECIONE_USUARIO;
   }
   return "";
 });
 
 const mensagemErroDataInicio = computed(() =>
-    validacaoSubmetida.value && !dataInicio.value ? "Informe a data de início." : "",
+    deveExibirErro(!dataInicio.value) ? "Informe a data de início." : "",
 );
 
 const mensagemErroDataTermino = computed(() =>
-    validacaoSubmetida.value && !dataTermino.value ? "Informe a data de término." : "",
+    deveExibirErro(!dataTermino.value) ? "Informe a data de término." : "",
 );
 
 const mensagemErroJustificativa = computed(() =>
-    validacaoSubmetida.value && !justificativa.value.trim() ? "Informe a justificativa." : "",
+    deveExibirErro(!justificativa.value.trim()) ? "Informe a justificativa." : "",
 );
 
 onMounted(async () => {
@@ -341,11 +347,10 @@ async function aoPressionarTeclaUsuario(evento: KeyboardEvent) {
 async function criarAtribuicao() {
   const unidadeAtual = unidade.value;
   if (!unidadeAtual) throw new Error('Invariante violada: unidade não carregada');
-  validacaoSubmetida.value = true;
   erroUsuario.value = "";
   erroFormulario.value = "";
 
-  if (!formularioValido.value) {
+  if (!validarSubmissao(formularioValido.value)) {
     return;
   }
 
@@ -455,7 +460,7 @@ function resetarFormularioAtribuicao() {
   dataInicio.value = "";
   dataTermino.value = "";
   justificativa.value = "";
-  validacaoSubmetida.value = false;
+  resetarValidacao();
   erroFormulario.value = "";
 }
 
@@ -474,6 +479,7 @@ defineExpose({
   isLoading,
   erroUsuario,
   erroFormulario,
+  validacaoSubmetida,
   atualizarUsuarioSelecionadoPorNome,
   selecionarUsuario,
   agendarOcultacaoResultadosUsuarios,

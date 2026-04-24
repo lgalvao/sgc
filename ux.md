@@ -44,11 +44,9 @@ Este guia registra decisões de produto e engenharia para manter a experiência 
 
 - Preferir DTOs com Bean Validation para entrada de formulário.
 - Usar nomes de campos em português e alinhados ao domínio do SGC.
-- Usar `codigo` em vez de `id` em contratos novos.
-- Evitar aceitar nomes antigos em paralelo quando o contrato correto puder ser ajustado.
+- Usar `codigo` em vez de `id`.
 - Erros de entrada devem retornar campos estáveis em português quando houver campo corrigível.
 - O contrato alvo para erros estruturados é `erros` com itens contendo `campo` e `mensagem`.
-- O contrato legado `subErrors` não deve ser usado em código novo nem aceito como alias permanente.
 
 ## Exceções saudáveis
 
