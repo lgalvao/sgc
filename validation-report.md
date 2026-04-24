@@ -83,10 +83,12 @@ Reduz chamadas inválidas, mas sem uma regra única de feedback pode gerar “bo
 
 - `watch` limpa erro ao editar;
 - em alguns casos aplica regra de domínio imediatamente (ex.: data futura).
+- também aparece de forma simples para limpar estado de erro após correção de campo curto.
 
 ### Onde ocorre
 
 - `useProcessoForm` (data inválida/futura + limpeza de erros ao mudar campos);
+- `CadAtividadeForm` (limpa a tentativa inválida quando o texto passa a ter conteúdo);
 - `DisponibilizarMapaModal` (data futura e comparação com última data limite).
 
 ### Observação de UX
@@ -126,6 +128,7 @@ Este é o padrão tecnicamente mais robusto, mas ainda não está generalizado p
 - `LoginView` (faltou preencher -> notificação global);
 - `CadastroView` (erro global de validação e alerta por atividade);
 - `DisponibilizarMapaModal` e `CriarCompetenciaModal` (campo + `generic`);
+- `SubprocessoView` no modal de reabertura (justificativa obrigatória bloqueia a ação e ainda usa notificação, sem feedback inline no campo);
 - vários views administrativos com erros de carregamento.
 
 ### Observação de UX
@@ -164,7 +167,14 @@ Impacto: inconsistência entre telas que parecem equivalentes.
 
 Impacto: UX excelente em um fluxo e mediana em outro parecido.
 
-5. **Padrão “blur para validar” praticamente ausente**
+5. **Bloqueio preventivo sem explicação contextual**
+
+- Há botões principais/modal que ficam desabilitados por pré-condições locais sem resumo visível da pendência;
+- exemplos confirmados: disponibilização de cadastro/mapa, criação de competência e reabertura de subprocesso.
+
+Impacto: reduz envio inválido, mas pode deixar a pessoa inferir o motivo do bloqueio pela tela.
+
+6. **Padrão “blur para validar” praticamente ausente**
 
 - não há validação de campo orientada a `blur` como padrão do sistema;
 - o `blur` encontrado em atribuição temporária é para comportamento de busca/autocomplete, não para validar domínio.
@@ -371,7 +381,7 @@ Legenda rápida:
 |---|---|---|
 | `CadAtividadeForm` | `validacaoSubmetida` + inline + botão desabilitado por vazio | Padrão reaproveitável para formulários curtos. |
 | `ProcessoFormFields` | Erro por `fieldErrors` (backend/local), foco no primeiro erro | Bom núcleo para extrair padrão de foco/acessibilidade. |
-| `DisponibilizarMapaModal` | Regras reativas de data + erro de backend por campo + `generic` | Forte candidato a template de validação em modal. |
+| `DisponibilizarMapaModal` | Regras reativas de data + erro de backend por campo + `generic`; data usa `invalid-feedback d-block`, não `BFormInvalidFeedback` | Forte candidato a template de validação em modal, mas precisa alinhar a técnica visual ao padrão de campo. |
 | `CriarCompetenciaModal` | Pré-bloqueio + inline por campo + `generic` | Consistente, mas sem objeto comum de “estado de validação”. |
 | `InputData` | Componente neutro, recebe `state` externo | Facilita padronização central se houver composable comum. |
 
@@ -384,6 +394,7 @@ Legenda rápida:
    - validar reativamente por `watch`;
    - só bloquear ação sem expor claramente a causa.
 4. Em telas de operação administrativa, a validação ainda tende a ficar **mais manual/ad hoc**.
+5. Alguns modais bloqueiam confirmação por campo obrigatório sem exibir mensagem inline da pendência; `SubprocessoView`/reabertura é o caso mais claro.
 
 ---
 
@@ -406,7 +417,7 @@ Abaixo, uma visão de “entrada da API” para os fluxos de formulário do fron
 | Endpoint | DTO/entrada | Tipo de validação no backend | Observação UX/refatoração |
 |---|---|---|---|
 | `GET /api/subprocessos/{cod}/validar-cadastro` | sem body | Validação de negócio estruturada (`ValidacaoCadastroDto` com erros por atividade e globais) | Excelente contrato para erro por item no frontend. |
-| `POST /api/subprocessos/{cod}/cadastro/disponibilizar` | `DisponibilizarCadastroRequest` opcional | Regras de transição/situação no serviço | Poderia evoluir para retornar pendências estruturadas quando inválido. |
+| `POST /api/subprocessos/{cod}/cadastro/disponibilizar` | sem body | Regras de transição/situação no serviço | Poderia evoluir para retornar pendências estruturadas quando inválido; hoje o pré-check estruturado é o `GET validar-cadastro`. |
 | `POST /api/subprocessos/{cod}/devolver-cadastro` | `JustificativaRequest` | `@NotBlank` + regras de workflow | Alinha com modal de justificativa obrigatória. |
 | `POST /api/subprocessos/{cod}/aceitar-cadastro` e `/homologar-cadastro` | `TextoOpcionalRequest` | texto opcional + regras de transição | Sem erro de campo típico; foco em regra de estado. |
 | `POST /api/subprocessos/{cod}/importar-atividades` | `ImportarAtividadesRequest` | `@NotNull` origem + validações de permissão/situação | Retorna aviso de duplicidade (já aproveitado no frontend). |
@@ -417,7 +428,7 @@ Abaixo, uma visão de “entrada da API” para os fluxos de formulário do fron
 |---|---|---|---|
 | `POST /api/subprocessos/{cod}/disponibilizar-mapa` | `DisponibilizarMapaRequest` | `@NotNull` + `@Future` para data + regras de situação | Combina bem com validação local de data no modal. |
 | `POST /api/subprocessos/{cod}/mapa-completo` | `SalvarMapaRequest` | validação de campos + `@Valid` aninhado + integridade no serviço | Forte para consolidar padrão de erro por campo/lista. |
-| `POST /api/subprocessos/{cod}/competencia` e `.../{codCompetencia}` | `CompetenciaRequest` | `@NotBlank` descrição + regra de negócio (competência deve ter atividade na criação) | Divergência entre criação/edição precisa ficar explícita no frontend. |
+| `POST /api/subprocessos/{cod}/competencia` e `.../{codCompetencia}` | `CompetenciaRequest` | `@NotBlank` descrição + regra de negócio manual no serviço (competência deve ter atividade na criação) | Divergência entre criação/edição precisa ficar explícita no frontend; `atividadesIds` não tem Bean Validation próprio. |
 | `POST /api/subprocessos/{cod}/submeter-mapa-ajustado` | `SubmeterMapaAjustadoRequest` | `@NotBlank`, `@Size`, nested `@Valid` | Bom para fluxo de justificativa de ajuste. |
 | `POST /api/subprocessos/{cod}/validar-mapa`, `.../devolver-validacao`, `.../aceitar-validacao`, `.../homologar-validacao` | `JustificativaRequest`/`TextoOpcionalRequest`/sem body | Regras de transição por situação | Erros predominantemente de negócio/estado. |
 
@@ -434,7 +445,7 @@ Abaixo, uma visão de “entrada da API” para os fluxos de formulário do fron
 
 | Endpoint | DTO/entrada | Tipo de validação no backend | Observação UX/refatoração |
 |---|---|---|---|
-| `POST /api/unidades/{cod}/atribuicoes-temporarias` | `CriarAtribuicaoRequest` | parcial (`@TituloEleitoral`, `@Size` justificativa) + regra de datas no serviço | Falta fortalecer obrigatoriedade via Bean Validation. |
+| `POST /api/unidades/{cod}/atribuicoes-temporarias` | `CriarAtribuicaoRequest` | parcial (`@TituloEleitoral`, `@Size` justificativa) + regra de datas no serviço | Falta fortalecer obrigatoriedade via Bean Validation para datas e justificativa; `@TituloEleitoral` já cobre nulo/formato/tamanho. |
 | `POST /api/configuracoes` | `List<ParametroRequest>` | Bean Validation por item (`codigo`, `chave`, `valor`) | Bom backend para exibir erros por índice/campo no frontend. |
 | `POST /api/usuarios/login` | `AutenticarRequest` | validação de título/senha + regras de autenticação | Deve seguir política de erro não enumerável. |
 | `POST /api/usuarios/entrar` | `EntrarRequest` | `@NotNull` + `@Size` | Consistente. |
@@ -461,7 +472,8 @@ Para a consistência completa de validação/UX no frontend, os principais ajust
 
 Em especial para entradas hoje frouxas em relação ao comportamento esperado do frontend:
 
-- atribuição temporária (`tituloEleitoralUsuario`, datas e regras mínimas de presença/coerência);
+- atribuição temporária (datas e justificativa; `tituloEleitoralUsuario` já é coberto por `@TituloEleitoral`);
+- criação de competência (`atividadesIds` hoje é exigido por regra manual de criação, não por anotação no DTO);
 - campos textuais opcionais que em certos fluxos são funcionalmente obrigatórios (decidir por endpoint/ação).
 
 ### 13.4 Diferenciar melhor erro de entrada x erro de workflow
