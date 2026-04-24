@@ -101,7 +101,6 @@ const competenciaSendoEditada = ref<Competencia | null>(null);
 const inputDescricaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 const {
-  validacaoSubmetida,
   validarSubmissao,
   deveExibirErro,
   focarPrimeiroErroInvalido

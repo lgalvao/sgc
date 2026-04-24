@@ -286,7 +286,6 @@ const toastStore = useToastStore();
 const toast = useToast();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const {
-  validacaoSubmetida,
   validarSubmissao,
   resetarValidacao,
   deveExibirErro,

@@ -222,7 +222,6 @@ const unidade = ref<Unidade | null>(null);
 const acesso = useAcesso(subprocesso);
 const {podeEditarCadastro, podeVisualizarImpacto, habilitarEditarCadastro} = acesso;
 const podeDisponibilizarCadastro = computed(() => acesso.podeDisponibilizarCadastro?.value ?? false);
-const habilitarDisponibilizarCadastro = computed(() => acesso.habilitarDisponibilizarCadastro?.value ?? false);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 
 
@@ -265,12 +264,7 @@ const habilitarDisponibilizar = computed(() => {
   );
 });
 
-const botaoDisponibilizarDesabilitado = computed(() => {
-  if (isRevisao.value) {
-    return !habilitarDisponibilizar.value;
-  }
-  return !habilitarDisponibilizarCadastro.value || !habilitarDisponibilizar.value;
-});
+
 
 const analisesCadastro = ref<Analise[]>([]);
 

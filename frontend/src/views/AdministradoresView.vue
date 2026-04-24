@@ -151,7 +151,6 @@ const mostrarModalRemoverAdmin = ref(false);
 const adminParaRemover = ref<AdministradorDto | null>(null);
 const novoAdminTitulo = ref('');
 const {
-  validacaoSubmetida,
   validarSubmissao,
   resetarValidacao,
   deveExibirErro,

@@ -219,7 +219,6 @@ const showPassword = ref(false);
 const capsLockAtivado = ref(false);
 
 const {
-  validacaoSubmetida,
   validarSubmissao,
   resetarValidacao,
   deveExibirErro,

@@ -83,7 +83,6 @@ const relatoriosStore = useRelatoriosStore();
 const perfilStore = usePerfilStore();
 const { notify } = useNotification();
 const {
-  validacaoSubmetida,
   validarSubmissao,
   deveExibirErro,
   focarPrimeiroErroInvalido

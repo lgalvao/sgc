@@ -1,9 +1,9 @@
-import {describe, expect, it} from "vitest";
+import {describe} from "vitest";
 import {setupServiceTest, testErrorHandling, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
 import * as cadastroService from "@/services/cadastroService";
 
 describe("cadastroService", () => {
-    const {mockApi} = setupServiceTest();
+    setupServiceTest();
 
     describe("disponibilizarCadastro", () => {
         testPostEndpoint(

@@ -109,7 +109,6 @@ const observacoesDisponibilizacao = ref("");
 const erroLocalDataLimite = ref("");
 
 const {
-  validacaoSubmetida,
   validarSubmissao,
   deveExibirErro,
   focarPrimeiroErroInvalido

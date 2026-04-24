@@ -85,7 +85,6 @@ import {excluirProcessoCompleto} from '@/services/processoService';
 
 const {notificacao, notify, clear} = useNotification();
 const {
-  validacaoSubmetida,
   validarSubmissao,
   deveExibirErro,
   focarPrimeiroErroInvalido

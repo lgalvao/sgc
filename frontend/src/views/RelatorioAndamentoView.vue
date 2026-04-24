@@ -157,7 +157,6 @@ import {formatDateBR, formatDateTimeBR} from "@/utils/dateUtils";
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
 const {
-  validacaoSubmetida,
   validarSubmissao,
   deveExibirErro,
   focarPrimeiroErroInvalido
