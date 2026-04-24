@@ -10,7 +10,6 @@
           class="me-2 flex-grow-1"
           @keydown.enter="save"
           @keydown.esc="cancel"
-          @vue:mounted="(el: unknown) => { const node = el as { focus?: () => void; $el?: { focus?: () => void } }; if(node?.focus) node.focus(); else if(node?.$el?.focus) node.$el.focus(); }"
       />
       <BButton
           :aria-label="ariaLabelSave"
@@ -57,7 +56,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {nextTick, ref} from 'vue';
 import {BButton, BFormInput} from 'bootstrap-vue-next';
 
 interface Props {
@@ -99,6 +98,7 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const editValue = ref('');
+const inputRef = ref<InstanceType<typeof BFormInput> | null>(null);
 
 function startEdit() {
   if (!props.editEnabled) {
@@ -107,6 +107,14 @@ function startEdit() {
   editValue.value = props.modelValue;
   isEditing.value = true;
   emit('edit-start');
+
+  nextTick(() => {
+    if (inputRef.value?.focus) {
+      inputRef.value.focus();
+    } else if (inputRef.value?.$el?.focus) {
+      inputRef.value.$el.focus();
+    }
+  });
 }
 
 function save() {

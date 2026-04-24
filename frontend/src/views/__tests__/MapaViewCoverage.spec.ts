@@ -208,6 +208,10 @@ function createWrapper(initialMapaCompleto: MapaCompleto = criarMapaCompleto()) 
         podeVisualizarImpacto: ref(true),
         podeEditarMapa: ref(true),
         podeDisponibilizarMapa: ref(true),
+        podeVerSugestoes: ref(true),
+        acaoPrincipalMapa: ref({mostrar: true, rotuloBotao: 'Aceitar', habilitar: true, rotuloConfirmacao: 'Confirmar', tituloModal: 'Modal', textoModal: 'Texto'}),
+        habilitarDevolverMapa: ref(true),
+        podeAnalisarMapa: ref(true),
     } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
     const mapas = useMapas();

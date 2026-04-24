@@ -316,8 +316,13 @@ const performProfileSelection = async () => {
 
   isLoading.value = true;
   try {
-    await perfilStore.concluirLoginComPerfil(parSelecionado.value);
-    await router.push("/painel");
+    if (parSelecionado.value) {
+      await perfilStore.concluirLoginComPerfil(parSelecionado.value);
+      await router.push("/painel");
+    } else {
+      logger.error("Erro interno ao selecionar perfil: Perfil não selecionado");
+      notify(TEXTOS.login.ERRO_GENERICO, 'danger');
+    }
   } catch (error) {
     const erroNormalizado = normalizeError(error);
     if (erroNormalizado.kind === 'unexpected') {
