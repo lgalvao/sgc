@@ -111,7 +111,7 @@ class SubprocessoServiceExtraCoverageTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
 
-            subprocessoService.adicionarCompetencia(1L, new CompetenciaRequest("Desc", List.of(10L)));
+            subprocessoService.adicionarCompetencia(1L, new CriarCompetenciaRequest("Desc", List.of(10L)));
 
             assertThat(sp.getSituacao()).isEqualTo(REVISAO_MAPA_AJUSTADO); // Mudou situacao
         }
@@ -209,7 +209,7 @@ class SubprocessoServiceExtraCoverageTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // eraVazio = false
 
-            subprocessoService.adicionarCompetencia(1L, new CompetenciaRequest("Desc", List.of(10L)));
+            subprocessoService.adicionarCompetencia(1L, new CriarCompetenciaRequest("Desc", List.of(10L)));
 
             assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_HOMOLOGADA); // Nao mudou
         }

@@ -1,8 +1,10 @@
-# Relatório de consistência de validação e UX (frontend)
+# Plano de validação e UX
 
 ## 1) Contexto e objetivo
 
-Este documento consolida os padrões de validação hoje existentes no frontend do SGC, destaca inconsistências de experiência e propõe um plano prático para atingir consistência geral sem perder ergonomia em fluxos específicos.
+Este documento consolida os padrões de validação hoje existentes no SGC, destaca inconsistências de experiência e propõe um plano prático para atingir consistência geral sem perder ergonomia em fluxos específicos.
+
+O acompanhamento operacional da execução fica em [`tracking-validacao.md`](tracking-validacao.md).
 
 Objetivo central:
 
@@ -286,9 +288,9 @@ Estas exceções são saudáveis quando documentadas:
 ## Fase 1 — Base compartilhada
 
 1. Evoluir `useFormErrors` para suportar:
-   - alias de campo,
    - erro global padronizado (`generic`),
    - utilitário de “primeiro erro”.
+   - contrato direto em português, sem aliases permanentes.
 2. Criar um pequeno composable de orquestração para formulários (`useValidacaoFormulario`) com:
    - `validacaoSubmetida`,
    - `podeSubmeter`,
@@ -428,7 +430,8 @@ Abaixo, uma visão de “entrada da API” para os fluxos de formulário do fron
 |---|---|---|---|
 | `POST /api/subprocessos/{cod}/disponibilizar-mapa` | `DisponibilizarMapaRequest` | `@NotNull` + `@Future` para data + regras de situação | Combina bem com validação local de data no modal. |
 | `POST /api/subprocessos/{cod}/mapa-completo` | `SalvarMapaRequest` | validação de campos + `@Valid` aninhado + integridade no serviço | Forte para consolidar padrão de erro por campo/lista. |
-| `POST /api/subprocessos/{cod}/competencia` e `.../{codCompetencia}` | `CompetenciaRequest` | `@NotBlank` descrição + regra de negócio manual no serviço (competência deve ter atividade na criação) | Divergência entre criação/edição precisa ficar explícita no frontend; `atividadesIds` não tem Bean Validation próprio. |
+| `POST /api/subprocessos/{cod}/competencia` | `CriarCompetenciaRequest` | `@NotBlank` descrição + `@NotEmpty` em `atividadesCodigos` + regra de serviço equivalente | Criação agora tem contrato explícito para a coleção obrigatória. |
+| `POST /api/subprocessos/{cod}/competencia/{codCompetencia}` | `AtualizarCompetenciaRequest` | `@NotBlank` descrição; `atividadesCodigos` opcional | Divergência criação/edição fica explícita: edição pode manter a lista vazia conforme regra atual. |
 | `POST /api/subprocessos/{cod}/submeter-mapa-ajustado` | `SubmeterMapaAjustadoRequest` | `@NotBlank`, `@Size`, nested `@Valid` | Bom para fluxo de justificativa de ajuste. |
 | `POST /api/subprocessos/{cod}/validar-mapa`, `.../devolver-validacao`, `.../aceitar-validacao`, `.../homologar-validacao` | `JustificativaRequest`/`TextoOpcionalRequest`/sem body | Regras de transição por situação | Erros predominantemente de negócio/estado. |
 
@@ -445,11 +448,11 @@ Abaixo, uma visão de “entrada da API” para os fluxos de formulário do fron
 
 | Endpoint | DTO/entrada | Tipo de validação no backend | Observação UX/refatoração |
 |---|---|---|---|
-| `POST /api/unidades/{cod}/atribuicoes-temporarias` | `CriarAtribuicaoRequest` | parcial (`@TituloEleitoral`, `@Size` justificativa) + regra de datas no serviço | Falta fortalecer obrigatoriedade via Bean Validation para datas e justificativa; `@TituloEleitoral` já cobre nulo/formato/tamanho. |
+| `POST /api/unidades/{cod}/atribuicoes-temporarias` | `CriarAtribuicaoRequest` | `@TituloEleitoral`, `@NotNull` nas datas, `@NotBlank`/`@Size` na justificativa + regra de coerência de datas no serviço | Contrato de entrada fortalecido; regra cruzada continua no serviço. |
 | `POST /api/configuracoes` | `List<ParametroRequest>` | Bean Validation por item (`codigo`, `chave`, `valor`) | Bom backend para exibir erros por índice/campo no frontend. |
 | `POST /api/usuarios/login` | `AutenticarRequest` | validação de título/senha + regras de autenticação | Deve seguir política de erro não enumerável. |
 | `POST /api/usuarios/entrar` | `EntrarRequest` | `@NotNull` + `@Size` | Consistente. |
-| `POST /api/usuarios/administradores` | `Map<String,String>` manual | validação manual (`isBlank`) com `ErroValidacao` | Ponto de inconsistência técnica (sem DTO + `@Valid`). |
+| `POST /api/usuarios/administradores` | `AdicionarAdministradorRequest` | `@TituloEleitoral` | Payload saiu de `Map<String,String>` manual e passou a DTO validado. |
 
 ---
 
@@ -459,9 +462,12 @@ Para a consistência completa de validação/UX no frontend, os principais ajust
 
 ### 13.1 Unificar contrato de erro de validação por campo
 
-1. Garantir que todo endpoint de formulário relevante retorne **`subErrors` com `field` estável** quando houver erro de entrada.
-2. Evitar mensagens agregadas em string única quando existirem múltiplas pendências corrigíveis.
-3. Padronizar aliases de campo de backend para frontend (ex.: manter consistência entre `dataLimiteEtapa1` e `dataLimite`).
+1. Planejar a migração de **`subErrors`/`field`/`message`** para um contrato em português, por exemplo **`erros`/`campo`/`mensagem`**, sem camada permanente de aliases.
+2. Garantir que todo endpoint de formulário relevante retorne campos estáveis quando houver erro de entrada.
+3. Atualizar `RestExceptionHandler`, tipos do frontend e `useFormErrors` no mesmo corte de contrato.
+4. Manter `subErrors` apenas durante uma janela curta e controlada de migração, se necessário.
+5. Remover aliases e traduções silenciosas ao final da migração.
+6. Evitar mensagens agregadas em string única quando existirem múltiplas pendências corrigíveis.
 
 ### 13.2 Reduzir validação manual ad hoc em controllers
 
@@ -472,13 +478,12 @@ Para a consistência completa de validação/UX no frontend, os principais ajust
 
 Em especial para entradas hoje frouxas em relação ao comportamento esperado do frontend:
 
-- atribuição temporária (datas e justificativa; `tituloEleitoralUsuario` já é coberto por `@TituloEleitoral`);
-- criação de competência (`atividadesIds` hoje é exigido por regra manual de criação, não por anotação no DTO);
+- campos já fortalecidos nesta etapa: atribuição temporária, criação de competência e adição de administrador;
 - campos textuais opcionais que em certos fluxos são funcionalmente obrigatórios (decidir por endpoint/ação).
 
 ### 13.4 Diferenciar melhor erro de entrada x erro de workflow
 
-1. **Erro de entrada do formulário**: `400` com `subErrors` e mapeamento de campo.
+1. **Erro de entrada do formulário**: `400` com lista estruturada de erros de campo (`erros`/`campo`/`mensagem`, após a migração).
 2. **Erro de situação/workflow/permissão de ação**: `400/409/403` com código semântico estável (`code`) para microcopy consistente no frontend.
 
 ### 13.5 Expor validações de “pré-check” estruturadas para ações complexas
@@ -498,7 +503,7 @@ Manter sanitização, mas garantir que ela não substitua validação semântica
 
 ## 14) Backlog sugerido (frontend + backend) para execução incremental
 
-1. **Sprint 1 (contrato de erro):** estabilizar `subErrors.field` e DTOs faltantes.
+1. **Sprint 1 (contrato de erro):** migrar `subErrors.field` para contrato em português (`erros.campo`) e concluir DTOs faltantes.
 2. **Sprint 2 (frontend base):** criar composable padrão de validação (`validacaoSubmetida`, resumo de pendências, foco primeiro erro).
 3. **Sprint 3 (fluxos críticos):** processo, cadastro de atividades e mapa.
 4. **Sprint 4 (admin e auxiliares):** administradores, atribuição temporária, limpeza e relatórios.

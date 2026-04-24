@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
 import sgc.integracao.mocks.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -79,7 +80,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve adicionar um novo administrador")
     @WithMockAdmin
     void adicionarAdministrador_sucesso() throws Exception {
-        Map<String, String> request = Map.of("usuarioTitulo", usuario2.getTituloEleitoral());
+        AdicionarAdministradorRequest request = new AdicionarAdministradorRequest(usuario2.getTituloEleitoral());
 
         mockMvc.perform(post("/api/usuarios/administradores")
                         .with(csrf())

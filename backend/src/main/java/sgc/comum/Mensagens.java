@@ -14,6 +14,8 @@ public final class Mensagens {
     // ── Validações Genéricas ────────────────────────────────────────────────
     public static final String CAMPO_TEXTO_OBRIGATORIO          = "O campo texto é obrigatório";
     public static final String DATA_OBRIGATORIA                 = "A data é obrigatória";
+    public static final String DATA_INICIO_OBRIGATORIA          = "A data de início é obrigatória";
+    public static final String DATA_TERMINO_OBRIGATORIA         = "A data de término é obrigatória";
 
     // ── Chave de parâmetro ───────────────────────────────────────────────────
     public static final String CHAVE_OBRIGATORIA                = "A chave não pode estar vazia";

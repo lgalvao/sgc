@@ -74,9 +74,9 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("ADMIN cria competência e subprocesso muda para MAPA_CRIADO")
     void deveCriarCompetenciaEAlterarSituacaoParaMapaCriado() {
-        CompetenciaRequest request = CompetenciaRequest.builder()
+        CriarCompetenciaRequest request = CriarCompetenciaRequest.builder()
                 .descricao("Competência CDU-15")
-                .atividadesIds(List.of(atividade1.getCodigo(), atividade2.getCodigo()))
+                .atividadesCodigos(List.of(atividade1.getCodigo(), atividade2.getCodigo()))
                 .build();
 
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), request);
@@ -93,9 +93,9 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("ADMIN remove última competência e subprocesso volta para CADASTRO_HOMOLOGADO")
     void deveRemoverUltimaCompetenciaEVoltarSituacaoCadastroHomologado() {
-        CompetenciaRequest criarReq = CompetenciaRequest.builder()
+        CriarCompetenciaRequest criarReq = CriarCompetenciaRequest.builder()
                 .descricao("Competência temporária")
-                .atividadesIds(List.of(atividade1.getCodigo()))
+                .atividadesCodigos(List.of(atividade1.getCodigo()))
                 .build();
 
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), criarReq);
@@ -111,9 +111,9 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Não deve criar competência sem atividades")
     void naoDeveCriarCompetenciaSemAtividades() {
-        CompetenciaRequest request = CompetenciaRequest.builder()
+        CriarCompetenciaRequest request = CriarCompetenciaRequest.builder()
                 .descricao("Competência inválida")
-                .atividadesIds(List.of())
+                .atividadesCodigos(List.of())
                 .build();
 
         assertThatThrownBy(() -> subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), request))

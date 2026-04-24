@@ -112,7 +112,7 @@ class UsuarioControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"usuarioTitulo\": \"123\"}"))
+                        .content("{\"tituloEleitoral\": \"123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tituloEleitoral").value("123"));
     }
@@ -125,7 +125,7 @@ class UsuarioControllerTest {
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-                .andExpect(status().is(422));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -135,8 +135,8 @@ class UsuarioControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"usuarioTitulo\": \"   \"}"))
-                .andExpect(status().is(422));
+                        .content("{\"tituloEleitoral\": \"   \"}"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

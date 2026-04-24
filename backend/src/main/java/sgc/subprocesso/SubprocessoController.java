@@ -436,7 +436,7 @@ public class SubprocessoController {
     @Operation(summary = "Adiciona uma competência ao mapa")
     public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
             @PathVariable Long codSubprocesso,
-            @Valid @RequestBody CompetenciaRequest request) {
+            @Valid @RequestBody CriarCompetenciaRequest request) {
         subprocessoService.adicionarCompetencia(codSubprocesso, request);
         return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
@@ -447,7 +447,7 @@ public class SubprocessoController {
     public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
             @PathVariable Long codSubprocesso,
             @PathVariable Long codCompetencia,
-            @Valid @RequestBody CompetenciaRequest request) {
+            @Valid @RequestBody AtualizarCompetenciaRequest request) {
         subprocessoService.atualizarCompetencia(codSubprocesso, codCompetencia, request);
         return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }

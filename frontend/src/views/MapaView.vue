@@ -312,8 +312,7 @@ const loadingExclusao = ref(false);
 const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
   'descricao',
   'atividades',
-  'atividadesIds',
-  'atividadesAssociadas',
+  'atividadesCodigos',
   'dataLimite',
   'observacoes',
   'generic'
@@ -321,8 +320,7 @@ const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors
 
 function handleErrors(store: { lastError: unknown }) {
   setFromNormalizedError(store.lastError as NormalizedError | null);
-  if (fieldErrors.value.atividadesAssociadas) fieldErrors.value.atividades = fieldErrors.value.atividadesAssociadas;
-  if (fieldErrors.value.atividadesIds) fieldErrors.value.atividades = fieldErrors.value.atividadesIds;
+  if (fieldErrors.value.atividadesCodigos) fieldErrors.value.atividades = fieldErrors.value.atividadesCodigos;
 }
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar: Competencia | null = null) {
@@ -356,7 +354,7 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
   await executarComSubprocesso(async (codigoSubprocesso) => {
     const request: SalvarCompetenciaRequest = {
       descricao: dados.descricao,
-      atividadesIds: dados.atividadesSelecionadas,
+      atividadesCodigos: dados.atividadesSelecionadas,
     };
 
     loadingCompetencia.value = true;
@@ -411,11 +409,11 @@ async function removerAtividadeAssociada(competenciaId: number, codAtividade: nu
   if (!competencia) return;
 
   await executarComSubprocesso(async (codigoSubprocesso) => {
-    const atividadesIds = (competencia.atividades || []).map((atividade) => atividade.codigo)
+    const atividadesCodigos = (competencia.atividades || []).map((atividade) => atividade.codigo)
         .filter((codigoAtividade) => codigoAtividade !== codAtividade);
     const request: SalvarCompetenciaRequest = {
       descricao: competencia.descricao,
-      atividadesIds: atividadesIds,
+      atividadesCodigos,
     };
 
     sincronizarMapa(await fluxoMapa.atualizarCompetencia(

@@ -87,7 +87,7 @@ describe("AdministradoresView.vue", () => {
         const addButton = wrapper.find('button[data-testid="btn-abrir-modal-add-admin"]');
         await addButton.trigger("click");
 
-        const input = wrapper.find('input#usuarioTitulo');
+        const input = wrapper.find('input#tituloEleitoral');
         await input.setValue("333");
 
         vi.mocked(administradorService.adicionarAdministrador).mockResolvedValue({} as any);

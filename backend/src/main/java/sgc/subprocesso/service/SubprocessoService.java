@@ -264,24 +264,24 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public void adicionarCompetencia(Long codSubprocesso, CompetenciaRequest request) {
+    public void adicionarCompetencia(Long codSubprocesso, CriarCompetenciaRequest request) {
         ContextoEdicaoMapa contexto = carregarContextoEdicaoMapa(codSubprocesso);
         validarCompetenciaParaCriacao(request);
         mapaManutencaoService.criarCompetenciaComAtividades(
-                contexto.mapa(), request.descricao(), request.atividadesIds());
+                contexto.mapa(), request.descricao(), request.atividadesCodigos());
         atualizarSituacaoAposPreenchimentoMapa(contexto.subprocesso(), contexto.mapaEstavaVazio());
     }
 
-    public void atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaRequest request) {
+    public void atualizarCompetencia(Long codSubprocesso, Long codCompetencia, AtualizarCompetenciaRequest request) {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
-        mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
+        mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesCodigos());
 
         Mapa mapa = obterMapaObrigatorio(sp);
         mapaManutencaoService.mapaCodigo(mapa.getCodigo());
     }
 
-    private void validarCompetenciaParaCriacao(CompetenciaRequest request) {
-        if (request.atividadesIds().isEmpty()) {
+    private void validarCompetenciaParaCriacao(CriarCompetenciaRequest request) {
+        if (request.atividadesCodigos() == null || request.atividadesCodigos().isEmpty()) {
             throw new ErroValidacao(Mensagens.COMPETENCIA_DEVE_TER_ATIVIDADE);
         }
     }

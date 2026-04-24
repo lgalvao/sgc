@@ -58,6 +58,7 @@ class UnidadeControllerTest {
         String conteudo = """
                 {
                     "tituloEleitoralUsuario":"123",
+                    "dataInicio":"2025-01-01",
                     "dataTermino":"2025-12-31",
                     "justificativa":"teste"
                 }""";

@@ -205,7 +205,7 @@ describe('MapaView Coverage', () => {
 
         expect(fluxoMapa.atualizarCompetencia).toHaveBeenCalledWith(456, 1, {
             descricao: 'Comp 1',
-            atividadesIds: [20]
+            atividadesCodigos: [20]
         });
     });
 
@@ -267,13 +267,13 @@ describe('MapaView Coverage', () => {
 
         const store = {
             lastError: {
-                subErrors: [{field: 'atividadesIds', message: 'Erro ID'}]
+                subErrors: [{field: 'atividadesCodigos', message: 'Erro em atividade'}]
             }
         };
 
         const vm = wrapper.vm as unknown as MapaViewVm;
         await vm.handleErrors(store);
-        expect(vm.fieldErrors.atividades).toBe('Erro ID');
+        expect(vm.fieldErrors.atividades).toBe('Erro em atividade');
     });
 
     it('disponibilizarMapa returns early if codSubprocesso is null', async () => {

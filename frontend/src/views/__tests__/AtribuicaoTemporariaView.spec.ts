@@ -11,6 +11,7 @@ import type {Unidade, UsuarioPesquisa} from '@/types/tipos';
 type AtribuicaoTemporariaVm = {
   unidade: Unidade | null;
   erroUsuario: string;
+  erroFormulario: string;
   criarAtribuicao: () => Promise<void>;
   aoAlterarTermoUsuario: (termo: string) => void;
   selecionarUsuario: (usuario: UsuarioPesquisa) => void;
@@ -139,17 +140,17 @@ describe('AtribuicaoTemporariaView', () => {
 
     await wrapper.vm.criarAtribuicao();
 
-    expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'danger');
+    expect(mockNotify).not.toHaveBeenCalledWith(expect.any(String), 'danger');
     expect(criarAtribuicaoTemporaria).not.toHaveBeenCalled();
   });
 
-  it('deve manter o botao de criar desabilitado ate o formulario ficar valido', async () => {
+  it('deve manter o botão de criar habilitado para permitir validação contextual', async () => {
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
 
     const botaoCriar = wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]');
-    expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(true);
+    expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
 
     (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo());
     wrapper.vm.dataInicio = '2025-01-01';
@@ -251,7 +252,8 @@ describe('AtribuicaoTemporariaView', () => {
     await wrapper.vm.criarAtribuicao();
 
     expect(criarAtribuicaoTemporaria).toHaveBeenCalled();
-    expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'danger');
+    expect((wrapper.vm as unknown as AtribuicaoTemporariaVm).erroFormulario).toContain('Erro no servidor');
+    expect(mockNotify).not.toHaveBeenCalledWith(expect.any(String), 'danger');
   });
 
   it('deve esconder resultados após blur', async () => {

@@ -189,7 +189,6 @@
       v-model="mostrarModalReabrir"
       :auto-close="false"
       :loading="loadingReabertura"
-      :ok-disabled="!justificativaReabertura.trim()"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
       :ok-title="TEXTOS.comum.BOTAO_REABRIR"
       test-codigo-confirmar="btn-confirmar-reabrir"
@@ -205,6 +204,13 @@
         :placeholder="TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PLACEHOLDER"
         rows="3"
     />
+    <div
+        v-if="!justificativaReabertura.trim()"
+        class="form-text"
+        data-testid="txt-reabertura-pendencia-justificativa"
+    >
+      Informe a justificativa para reabrir.
+    </div>
   </ModalConfirmacao>
 
   <ModalConfirmacao
@@ -452,7 +458,6 @@ function fecharModalReabrir() {
 
 async function confirmarReabertura() {
   if (!codSubprocesso.value || !justificativaReabertura.value.trim()) {
-    notify(TEXTOS.subprocesso.ERRO_JUSTIFICATIVA_OBRIGATORIA, 'danger');
     return;
   }
 

@@ -175,9 +175,9 @@ class SubprocessoServiceTest {
     void adicionarCompetenciaDeveAtualizarSituacaoQuandoMapaDeixaDeSerVazio(SituacaoSubprocesso situacaoInicial, SituacaoSubprocesso situacaoFinal) {
         Long codSubprocesso = 1L;
         Long codMapa = 100L;
-        CompetenciaRequest request = CompetenciaRequest.builder()
+        CriarCompetenciaRequest request = CriarCompetenciaRequest.builder()
                 .descricao("Nova Comp")
-                .atividadesIds(List.of(10L))
+                .atividadesCodigos(List.of(10L))
                 .build();
 
         Subprocesso sp = new Subprocesso();

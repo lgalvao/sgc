@@ -13,9 +13,9 @@ export async function listarAdministradores(): Promise<AdministradorDto[]> {
     return response.data;
 }
 
-export async function adicionarAdministrador(usuarioTitulo: string): Promise<AdministradorDto> {
+export async function adicionarAdministrador(tituloEleitoral: string): Promise<AdministradorDto> {
     const response = await apiClient.post<AdministradorDto>("/usuarios/administradores", {
-        usuarioTitulo
+        tituloEleitoral
     });
     return response.data;
 }

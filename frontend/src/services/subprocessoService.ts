@@ -265,7 +265,7 @@ export async function adicionarCompetencia(
 ): Promise<MapaCompleto> {
     const requestBody = {
         descricao: competencia.descricao,
-        atividadesIds: competencia.atividadesIds,
+        atividadesCodigos: competencia.atividadesCodigos,
     };
     const response = await apiClient.post(
         `/subprocessos/${codSubprocesso}/competencia`,
@@ -281,7 +281,7 @@ export async function atualizarCompetencia(
 ): Promise<MapaCompleto> {
     const requestBody = {
         descricao: competencia.descricao,
-        atividadesIds: competencia.atividadesIds,
+        atividadesCodigos: competencia.atividadesCodigos,
     };
     const response = await apiClient.post(
         `/subprocessos/${codSubprocesso}/competencia/${codCompetencia}`,

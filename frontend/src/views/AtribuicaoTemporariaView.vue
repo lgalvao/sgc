@@ -19,7 +19,7 @@
           </BButton>
            <LoadingButton
                class="btn-acao-cabecalho"
-               :disabled="!formularioValido || isLoading"
+               :disabled="isLoading"
                :loading="isLoading"
                data-testid="cad-atribuicao__btn-criar-atribuicao"
                :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
@@ -37,6 +37,16 @@
           :variant="notificacao.variant"
           @dismissed="clear()"
       />
+      <BAlert
+          v-if="erroFormulario"
+          :model-value="true"
+          class="mt-3"
+          dismissible
+          variant="danger"
+          @dismissed="erroFormulario = ''"
+      >
+        {{ erroFormulario }}
+      </BAlert>
       <BForm class="mt-4" @submit.prevent="criarAtribuicao">
         <BFormGroup
             :label="TEXTOS.atribuicaoTemporaria.LABEL_USUARIO"
@@ -150,6 +160,7 @@
 
 <script lang="ts" setup>
 import {
+  BAlert,
   BButton,
   BCol,
   BForm,
@@ -165,6 +176,7 @@ import {
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
+import {normalizeError} from "@/utils/apiError";
 import type {Unidade, UsuarioPesquisa} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
@@ -200,6 +212,7 @@ let timeoutPesquisaUsuarios: ReturnType<typeof setTimeout> | null = null;
 let timeoutOcultarResultadosUsuarios: ReturnType<typeof setTimeout> | null = null;
 
 const erroUsuario = ref("");
+const erroFormulario = ref("");
 const validacaoSubmetida = ref(false);
 const termoPesquisaMinimaAtingida = computed(() => termoUsuario.value.trim().length >= 2);
 const formularioValido = computed(() => {
@@ -330,15 +343,14 @@ async function criarAtribuicao() {
   if (!unidadeAtual) throw new Error('Invariante violada: unidade não carregada');
   validacaoSubmetida.value = true;
   erroUsuario.value = "";
+  erroFormulario.value = "";
 
   if (!formularioValido.value) {
-    notify(TEXTOS.atribuicaoTemporaria.ERRO_PREENCHIMENTO, 'danger');
     return;
   }
 
   const tituloEleitoralUsuario = usuarioSelecionado.value;
   if (!tituloEleitoralUsuario) {
-    notify(TEXTOS.atribuicaoTemporaria.ERRO_PREENCHIMENTO, 'danger');
     return;
   }
 
@@ -356,7 +368,7 @@ async function criarAtribuicao() {
     resetarFormularioAtribuicao();
   } catch (error) {
     logger.error(error);
-    notify(TEXTOS.atribuicaoTemporaria.ERRO_CRIAR, 'danger');
+    erroFormulario.value = normalizeError(error).message || TEXTOS.atribuicaoTemporaria.ERRO_CRIAR;
   } finally {
     isLoading.value = false;
   }
@@ -444,6 +456,7 @@ function resetarFormularioAtribuicao() {
   dataTermino.value = "";
   justificativa.value = "";
   validacaoSubmetida.value = false;
+  erroFormulario.value = "";
 }
 
 defineExpose({
@@ -460,6 +473,7 @@ defineExpose({
   justificativa,
   isLoading,
   erroUsuario,
+  erroFormulario,
   atualizarUsuarioSelecionadoPorNome,
   selecionarUsuario,
   agendarOcultacaoResultadosUsuarios,

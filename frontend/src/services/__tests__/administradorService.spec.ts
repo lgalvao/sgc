@@ -22,7 +22,7 @@ describe('AdministradorService', () => {
     });
 
     it('adicionarAdministrador deve fazer uma requisição POST para /usuarios/administradores', async () => {
-        const usuarioTitulo = '123456789012';
+        const tituloEleitoral = '123456789012';
         const mockResponse = {
             tituloEleitoral: '123456789012',
             nome: 'Admin 1',
@@ -32,9 +32,9 @@ describe('AdministradorService', () => {
         };
         vi.mocked(apiClient.post).mockResolvedValue({data: mockResponse});
 
-        const result = await AdministradorService.adicionarAdministrador(usuarioTitulo);
+        const result = await AdministradorService.adicionarAdministrador(tituloEleitoral);
 
-        expect(apiClient.post).toHaveBeenCalledWith('/usuarios/administradores', {usuarioTitulo});
+        expect(apiClient.post).toHaveBeenCalledWith('/usuarios/administradores', {tituloEleitoral});
         expect(result).toEqual(mockResponse);
     });
 

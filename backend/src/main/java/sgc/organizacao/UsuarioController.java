@@ -7,7 +7,6 @@ import lombok.extern.slf4j.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.service.*;
 
@@ -48,13 +47,9 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adiciona um administrador")
     public ResponseEntity<AdministradorDto> adicionarAdministrador(
-            @RequestBody Map<String, String> request) {
+            @jakarta.validation.Valid @RequestBody AdicionarAdministradorRequest request) {
 
-        String usuarioTitulo = request.get("usuarioTitulo");
-        if (usuarioTitulo == null || usuarioTitulo.isBlank()) {
-            throw new ErroValidacao("Campo usuarioTitulo é obrigatório.");
-        }
-        AdministradorDto administrador = usuarioFacade.adicionarAdministrador(usuarioTitulo);
+        AdministradorDto administrador = usuarioFacade.adicionarAdministrador(request.tituloEleitoral());
         return ResponseEntity.ok(administrador);
     }
 

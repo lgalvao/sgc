@@ -102,7 +102,7 @@ describe("MapaView Uncovered Branches", () => {
         }
     });
 
-    it("cobre handleErrors branch atividadesAssociadas", async () => {
+    it("cobre handleErrors branch atividadesCodigos", async () => {
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
@@ -116,23 +116,12 @@ describe("MapaView Uncovered Branches", () => {
             lastError: {
                 message: "Erro",
                 subErrors: [
-                    { field: "atividadesIds", message: "Erro id" }
+                    { field: "atividadesCodigos", message: "Erro em atividade" }
                 ]
             }
         };
         vm.handleErrors(erroId);
-        expect(vm.fieldErrors.atividades).toEqual("Erro id");
-        
-        const erroAssoc = {
-            lastError: {
-                message: "Erro",
-                subErrors: [
-                    { field: "atividadesAssociadas", message: "Erro assoc" }
-                ]
-            }
-        };
-        vm.handleErrors(erroAssoc);
-        expect(vm.fieldErrors.atividades).toEqual("Erro assoc");
+        expect(vm.fieldErrors.atividades).toEqual("Erro em atividade");
     });
 
     it("cobre v-model de ModalConfirmacao e lazy load de componentes", async () => {

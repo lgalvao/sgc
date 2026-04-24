@@ -116,7 +116,7 @@ export interface Competencia {
 
 export interface SalvarCompetenciaRequest {
     descricao: string;
-    atividadesIds: number[];
+    atividadesCodigos: number[];
 }
 
 

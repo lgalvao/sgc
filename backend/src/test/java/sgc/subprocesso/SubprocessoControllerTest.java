@@ -580,7 +580,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve adicionar uma competência ao mapa")
         @WithMockUser(roles = "GESTOR")
         void deveAdicionarCompetencia() throws Exception {
-            CompetenciaRequest request = new CompetenciaRequest("Descricao", List.of());
+            CriarCompetenciaRequest request = new CriarCompetenciaRequest("Descricao", List.of(10L));
             MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
@@ -590,14 +590,14 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoService).adicionarCompetencia(eq(1L), any(CompetenciaRequest.class));
+            verify(subprocessoService).adicionarCompetencia(eq(1L), any(CriarCompetenciaRequest.class));
         }
 
         @Test
         @DisplayName("deve atualizar uma competência do mapa")
         @WithMockUser(roles = "GESTOR")
         void deveAtualizarCompetencia() throws Exception {
-            CompetenciaRequest request = new CompetenciaRequest("Descricao", List.of());
+            AtualizarCompetenciaRequest request = new AtualizarCompetenciaRequest("Descricao", List.of());
             MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
@@ -607,7 +607,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoService).atualizarCompetencia(eq(1L), eq(2L), any(CompetenciaRequest.class));
+            verify(subprocessoService).atualizarCompetencia(eq(1L), eq(2L), any(AtualizarCompetenciaRequest.class));
         }
 
         @Test

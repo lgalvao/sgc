@@ -430,8 +430,8 @@ describe("MapaView coverage", () => {
         vm.codSubprocesso = 123;
         vm.removerAtividadeAssociada(999, 10);
         
-        // Cobre handleError com fieldErrors.atividadesIds
-        fluxoMapaMock.lastError = { message: "Erro", details: { atividadesIds: "Erro ID" } };
+        // Cobre handleError com fieldErrors.atividadesCodigos
+        fluxoMapaMock.lastError = { message: "Erro", details: { atividadesCodigos: "Erro em atividade" } };
         vm.competenciaSendoEditada = null; // Simula erro no adicionarCompetencia
         fluxoMapaMock.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
         await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [] });
@@ -474,8 +474,8 @@ describe("MapaView coverage", () => {
         vm.abrirModalDisponibilizar();
         expect(vm.mostrarModalDisponibilizar).toBe(true);
 
-        // Cobre fecharModalCriarNovaCompetencia e handleError atividadesAssociadas
-        vm.fieldErrors.atividadesAssociadas = "erro";
+        // Cobre fecharModalCriarNovaCompetencia com erro estruturado de atividades
+        vm.fieldErrors.atividadesCodigos = "erro";
         vm.fecharModalCriarNovaCompetencia();
         expect(vm.mostrarModalCriarNovaCompetencia).toBe(false);
 
@@ -600,7 +600,7 @@ describe("MapaView coverage", () => {
 
         expect(fluxoMapaMock.adicionarCompetencia).toHaveBeenCalledWith(123, {
             descricao: "Competência nova",
-            atividadesIds: [1]
+            atividadesCodigos: [1]
         });
         expect(subprocessoStoreCacheMock.garantirContextoEdicao).not.toHaveBeenCalled();
     });

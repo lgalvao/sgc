@@ -206,7 +206,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        CompetenciaRequest req = new CompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
+        CriarCompetenciaRequest req = new CriarCompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), req);
 
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
@@ -222,7 +222,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        CompetenciaRequest req = new CompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
+        CriarCompetenciaRequest req = new CriarCompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), req);
 
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
@@ -241,7 +241,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Comp velha").build();
         comp = competenciaRepo.save(comp);
 
-        CompetenciaRequest req = new CompetenciaRequest("Comp atualizada", List.of(a1.getCodigo()));
+        AtualizarCompetenciaRequest req = new AtualizarCompetenciaRequest("Comp atualizada", List.of(a1.getCodigo()));
         subprocessoService.atualizarCompetencia(subprocesso.getCodigo(), comp.getCodigo(), req);
 
         Competencia atualizada = competenciaRepo.findById(comp.getCodigo()).orElseThrow();

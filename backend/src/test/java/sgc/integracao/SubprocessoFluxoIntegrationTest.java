@@ -145,9 +145,9 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         List<Atividade> atividades = atividadeRepo.findByMapa_Codigo(mapaId);
         Long codAtividade = atividades.getFirst().getCodigo();
 
-        CompetenciaRequest compReq = CompetenciaRequest.builder()
+        CriarCompetenciaRequest compReq = CriarCompetenciaRequest.builder()
                 .descricao("Competência 1")
-                .atividadesIds(List.of(codAtividade))
+                .atividadesCodigos(List.of(codAtividade))
                 .build();
 
         mockMvc.perform(post("/api/subprocessos/{codigo}/competencia", spId)
@@ -222,9 +222,9 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         atividade.getCompetencias().add(competencia);
         atividadeRepo.saveAndFlush(atividade);
 
-        CompetenciaRequest request = CompetenciaRequest.builder()
+        CriarCompetenciaRequest request = CriarCompetenciaRequest.builder()
                 .descricao("Competência existente")
-                .atividadesIds(List.of())
+                .atividadesCodigos(List.of())
                 .build();
 
         mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/competencia/{codCompetencia}",

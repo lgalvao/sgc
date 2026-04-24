@@ -21,9 +21,9 @@ describe("useFluxoMapa", () => {
         const resposta = {codigo: 1, competencias: [{codigo: 2}]} as any;
         vi.mocked(service.adicionarCompetencia).mockResolvedValue(resposta);
 
-        const resultado = await fluxoMapa.adicionarCompetencia(10, {descricao: "Comp", atividadesIds: []});
+        const resultado = await fluxoMapa.adicionarCompetencia(10, {descricao: "Comp", atividadesCodigos: []});
 
-        expect(service.adicionarCompetencia).toHaveBeenCalledWith(10, {descricao: "Comp", atividadesIds: []});
+        expect(service.adicionarCompetencia).toHaveBeenCalledWith(10, {descricao: "Comp", atividadesCodigos: []});
         expect(resultado).toEqual(resposta);
     });
 
@@ -34,9 +34,9 @@ describe("useFluxoMapa", () => {
         const resposta = {codigo: 1, competencias: [{codigo: 3}]} as any;
         vi.mocked(service.atualizarCompetencia).mockResolvedValue(resposta);
 
-        const resultado = await fluxoMapa.atualizarCompetencia(10, 20, {descricao: "Comp", atividadesIds: [1]});
+        const resultado = await fluxoMapa.atualizarCompetencia(10, 20, {descricao: "Comp", atividadesCodigos: [1]});
 
-        expect(service.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {descricao: "Comp", atividadesIds: [1]});
+        expect(service.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {descricao: "Comp", atividadesCodigos: [1]});
         expect(resultado).toEqual(resposta);
     });
 

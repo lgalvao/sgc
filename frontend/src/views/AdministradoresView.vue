@@ -66,30 +66,36 @@
         v-model="mostrarModalAdicionarAdmin"
         :auto-close="false"
         :loading="adicionandoAdmin"
-        :ok-disabled="!novoAdminTitulo"
         :ok-title="TEXTOS.comum.BOTAO_CRIAR"
         :titulo="TEXTOS.administracao.MODAL_ADICIONAR_TITULO"
         variant="success"
         @confirmar="adicionarAdmin"
         @shown="() => inputTituloRef?.focus()"
     >
+      <BAlert v-if="erroAdicionarAdmin" :model-value="true" class="mb-3" variant="danger">
+        {{ erroAdicionarAdmin }}
+      </BAlert>
       <BFormGroup
-          label-for="usuarioTitulo"
+          label-for="tituloEleitoral"
           class="mb-3"
       >
         <template #label>
           {{ TEXTOS.administracao.LABEL_TITULO }} <span aria-hidden="true" class="text-danger">*</span>
         </template>
         <BFormInput
-            id="usuarioTitulo"
+            id="tituloEleitoral"
             ref="inputTituloRef"
             v-model="novoAdminTitulo"
             aria-required="true"
             maxlength="12"
+            :state="mensagemErroNovoAdmin ? false : null"
             :placeholder="TEXTOS.administracao.PLACEHOLDER_TITULO"
             type="text"
             @keydown.enter.prevent="adicionarAdmin"
         />
+        <BFormInvalidFeedback :state="mensagemErroNovoAdmin ? false : null">
+          {{ mensagemErroNovoAdmin }}
+        </BFormInvalidFeedback>
       </BFormGroup>
     </ModalConfirmacao>
 
@@ -103,6 +109,9 @@
         variant="danger"
         @confirmar="removerAdmin"
     >
+      <BAlert v-if="erroRemoverAdmin" :model-value="true" class="mb-3" variant="danger">
+        {{ erroRemoverAdmin }}
+      </BAlert>
       <p v-if="adminParaRemover">
         {{ TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(adminParaRemover.nome) }}
       </p>
@@ -111,8 +120,8 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
-import {BAlert, BButton, BFormGroup, BFormInput, BSpinner, BTable} from 'bootstrap-vue-next';
+import {computed, onMounted, ref} from 'vue';
+import {BAlert, BButton, BFormGroup, BFormInput, BFormInvalidFeedback, BSpinner, BTable} from 'bootstrap-vue-next';
 import {useRouter} from 'vue-router';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
@@ -140,6 +149,9 @@ const mostrarModalAdicionarAdmin = ref(false);
 const mostrarModalRemoverAdmin = ref(false);
 const adminParaRemover = ref<AdministradorDto | null>(null);
 const novoAdminTitulo = ref('');
+const validacaoNovoAdminSubmetida = ref(false);
+const erroAdicionarAdmin = ref('');
+const erroRemoverAdmin = ref('');
 const adicionandoAdmin = ref(false);
 const inputTituloRef = ref<InstanceType<typeof BFormInput> | null>(null);
 
@@ -151,9 +163,10 @@ const camposAdmins = [
   {key: 'acoes', label: TEXTOS.administracao.CAMPO_ACOES, thClass: 'text-end'},
 ];
 
-function notificarErro(error: unknown) {
-  notify(normalizeError(error).message, 'danger');
-}
+const mensagemErroNovoAdmin = computed(() => {
+  if (!validacaoNovoAdminSubmetida.value || novoAdminTitulo.value.trim()) return '';
+  return TEXTOS.administracao.ERRO_TITULO_INVALIDO;
+});
 
 async function carregarAdministradores() {
   await executarSilencioso(async () => {
@@ -163,6 +176,8 @@ async function carregarAdministradores() {
 
 function abrirModalAdicionarAdmin() {
   novoAdminTitulo.value = '';
+  validacaoNovoAdminSubmetida.value = false;
+  erroAdicionarAdmin.value = '';
   mostrarModalAdicionarAdmin.value = true;
 }
 
@@ -173,11 +188,14 @@ function abrirLimpezaProcessos() {
 function fecharModalAdicionarAdmin() {
   mostrarModalAdicionarAdmin.value = false;
   novoAdminTitulo.value = '';
+  validacaoNovoAdminSubmetida.value = false;
+  erroAdicionarAdmin.value = '';
 }
 
 async function adicionarAdmin() {
+  validacaoNovoAdminSubmetida.value = true;
+  erroAdicionarAdmin.value = '';
   if (!novoAdminTitulo.value.trim()) {
-    notify(TEXTOS.administracao.ERRO_TITULO_INVALIDO, 'warning');
     return;
   }
 
@@ -188,7 +206,7 @@ async function adicionarAdmin() {
     notify(TEXTOS.administracao.SUCESSO_ADICIONADO, 'success');
     await carregarAdministradores();
   } catch (error) {
-    notificarErro(error);
+    erroAdicionarAdmin.value = normalizeError(error).message;
   } finally {
     adicionandoAdmin.value = false;
   }
@@ -196,12 +214,14 @@ async function adicionarAdmin() {
 
 async function confirmarRemocao(admin: AdministradorDto) {
   adminParaRemover.value = admin;
+  erroRemoverAdmin.value = '';
   mostrarModalRemoverAdmin.value = true;
 }
 
 async function removerAdmin() {
   if (!adminParaRemover.value) return;
 
+  erroRemoverAdmin.value = '';
   removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
   try {
     await removerAdministrador(adminParaRemover.value.tituloEleitoral);
@@ -210,7 +230,7 @@ async function removerAdmin() {
     mostrarModalRemoverAdmin.value = false;
     adminParaRemover.value = null;
   } catch (error) {
-    notificarErro(error);
+    erroRemoverAdmin.value = normalizeError(error).message;
   } finally {
     removendoAdmin.value = null;
   }

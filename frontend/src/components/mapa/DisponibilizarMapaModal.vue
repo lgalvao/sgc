@@ -30,13 +30,13 @@
           max="2099-12-31"
           :min="dataMinimaPermitida"
       />
-      <div
-          v-if="mensagemErroDataLimite"
-          class="invalid-feedback d-block"
+      <BFormInvalidFeedback
+          :state="mensagemErroDataLimite ? false : null"
+          class="d-block"
           data-testid="txt-disponibilizar-mapa-erro-data"
       >
         {{ mensagemErroDataLimite }}
-      </div>
+      </BFormInvalidFeedback>
     </BFormGroup>
 
     <BFormGroup
@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";

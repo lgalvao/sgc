@@ -63,6 +63,13 @@
       <div v-if="fieldErrors?.atividades" class="text-danger small mt-1">
         {{ fieldErrors.atividades }}
       </div>
+      <div
+          v-else-if="mensagemPendenciaAtividades"
+          class="form-text"
+          data-testid="txt-criar-competencia-pendencia-atividades"
+      >
+        {{ mensagemPendenciaAtividades }}
+      </div>
     </div>
 
   </ModalPadrao>
@@ -109,6 +116,11 @@ const salvamentoDesabilitado = computed(() => {
   const descricaoVazia = !novaCompetencia.value.descricao.trim();
   const exigeAtividade = !competenciaSendoEditada.value;
   return descricaoVazia || (exigeAtividade && atividadesSelecionadas.value.length === 0);
+});
+
+const mensagemPendenciaAtividades = computed(() => {
+  if (competenciaSendoEditada.value || atividadesSelecionadas.value.length > 0) return "";
+  return "Selecione ao menos uma atividade para criar a competência.";
 });
 
 const textoAcao = computed(() => {
