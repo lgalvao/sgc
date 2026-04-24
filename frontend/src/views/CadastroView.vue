@@ -613,7 +613,9 @@ async function disponibilizarCadastro() {
       ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
       : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
-  if (!situacaoAtualCadastro || situacaoAtualCadastro !== situacaoReferencia) {
+  const isNaoIniciado = situacaoAtualCadastro === SituacaoSubprocesso.NAO_INICIADO;
+
+  if (!situacaoAtualCadastro || (situacaoAtualCadastro !== situacaoReferencia && !isNaoIniciado)) {
     notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
     return;
   }
