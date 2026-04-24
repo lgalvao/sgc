@@ -116,7 +116,6 @@
           v-model="mostrarModalDevolver"
           :auto-close="false"
           :loading="loadingDevolucao"
-          :ok-disabled="!observacaoDevolucao.trim()"
           :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
           :ok-title="TEXTOS.comum.BOTAO_DEVOLVER"
           test-codigo-confirmar="btn-devolucao-cadastro-confirmar"
@@ -172,6 +171,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import type {
   AceitarCadastroRequest,
@@ -231,12 +231,18 @@ const historicoAnalises = computed(() => {
 const mostrarModalValidar = ref(false);
 const mostrarModalDevolver = ref(false);
 const mostrarModalHistoricoAnalise = ref(false);
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
 const observacaoValidacao = ref("");
 const observacaoDevolucao = ref("");
-const validacaoDevolucaoSubmetida = ref(false);
 
 const estadoObservacaoDevolucao = computed(() => {
-  return validacaoDevolucaoSubmetida.value && !observacaoDevolucao.value.trim() ? false : null;
+  return deveExibirErro(!observacaoDevolucao.value.trim()) ? false : null;
 });
 
 // Ações de validação/devolução
@@ -265,6 +271,7 @@ function validarCadastro() {
 }
 
 function devolverCadastro() {
+  resetarValidacao();
   mostrarModalDevolver.value = true;
 }
 
@@ -276,7 +283,7 @@ function fecharModalValidar() {
 function fecharModalDevolver() {
   mostrarModalDevolver.value = false;
   observacaoDevolucao.value = "";
-  validacaoDevolucaoSubmetida.value = false;
+  resetarValidacao();
 }
 
 async function confirmarValidacao() {
@@ -339,8 +346,12 @@ async function confirmarValidacao() {
 }
 
 async function confirmarDevolucao() {
-  validacaoDevolucaoSubmetida.value = true;
-  if (!codSubprocesso.value || !observacaoDevolucao.value.trim()) return;
+  if (!validarSubmissao(!!observacaoDevolucao.value.trim())) {
+    void focarPrimeiroErroInvalido();
+    return;
+  }
+
+  if (!codSubprocesso.value) return;
 
   loadingDevolucao.value = true;
 

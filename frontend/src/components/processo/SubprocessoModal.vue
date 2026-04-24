@@ -1,72 +1,54 @@
 <template>
-  <BModal
-      :fade="false"
+  <ModalPadrao
+      :loading="loading"
       :model-value="mostrarModal"
-      centered
-      title="Alterar data limite"
-      @hide="$emit('fecharModal')"
+      data-testid="mdl-alterar-data-limite"
+      test-codigo-cancelar="subprocesso-modal__btn-modal-cancelar"
+      test-codigo-confirmar="btn-modal-confirmar"
+      titulo="Alterar data limite"
+      @confirmar="confirmar"
+      @fechar="$emit('fecharModal')"
   >
     <BFormGroup
         description="Selecione uma data futura"
-        label="Nova data limite"
-        :state="erroLocalDataLimite ? false : null"
-        :invalid-feedback="erroLocalDataLimite"
+        label-for="novaDataLimite"
+        :state="mensagemErroDataLimite ? false : null"
+        :invalid-feedback="mensagemErroDataLimite"
+        class="mb-3"
     >
+      <template #label>
+        Nova data limite <span aria-hidden="true" class="text-danger">*</span>
+      </template>
       <InputData
+          id="novaDataLimite"
           v-model="novaDataLimite"
           :min="dataLimiteMinima"
-          :state="erroLocalDataLimite ? false : null"
+          :state="mensagemErroDataLimite ? false : null"
           data-testid="input-nova-data-limite"
           max="2099-12-31"
       />
       <template #description>
-        Data limite atual: {{ dataLimiteAtualFormatada }}
+        <div class="mt-1">
+          Data limite atual: {{ dataLimiteAtualFormatada }}
+        </div>
       </template>
     </BFormGroup>
-
-    <template #footer>
-      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
-        <BButton
-            :disabled="loading"
-            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
-            data-testid="subprocesso-modal__btn-modal-cancelar"
-            variant="link"
-            @click="$emit('fecharModal')"
-        >
-          <i aria-hidden="true" class="bi bi-x-circle me-1"/>
-          Cancelar
-        </BButton>
-        <BButton
-            :disabled="!novaDataLimite || !isDataValida || loading"
-            data-testid="btn-modal-confirmar"
-            variant="primary"
-            @click="$emit('confirmarAlteracao', novaDataLimite)"
-        >
-          <output
-              v-if="loading"
-              aria-hidden="true"
-              class="spinner-border spinner-border-sm me-1"
-          />
-          <i v-else aria-hidden="true" class="bi bi-check-circle me-1"/>
-          {{ loading ? 'Processando...' : 'Confirmar' }}
-        </BButton>
-      </div>
-    </template>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormGroup, BModal} from "bootstrap-vue-next";
+import {BFormGroup} from "bootstrap-vue-next";
 import InputData from "@/components/comum/InputData.vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {computed, ref, watch} from "vue";
 import {
   formatDateBR,
   formatDateForInput,
   isDateStrictlyFuture,
-  isDateValidAndFuture,
   obterAmanhaFormatado,
   parseDate,
 } from "@/utils";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 
 interface Props {
@@ -81,13 +63,23 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false
 });
 
-defineEmits<{
+const emit = defineEmits<{
   fecharModal: [];
   confirmarAlteracao: [novaData: string];
 }>();
 
 const novaDataLimite = ref("");
 const erroLocalDataLimite = ref("");
+const {
+  validarSubmissao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
+const mensagemErroDataLimite = computed(() => {
+  if (erroLocalDataLimite.value) return erroLocalDataLimite.value;
+  return deveExibirErro(!novaDataLimite.value) ? "A data limite é obrigatória." : "";
+});
 
 watch(novaDataLimite, (novaData) => {
   erroLocalDataLimite.value = "";
@@ -121,7 +113,7 @@ const dataLimiteAtualFormatada = computed(() => {
 
 const isDataValida = computed(() => {
   if (!novaDataLimite.value) return false;
-  if (!isDateValidAndFuture(parseDate(novaDataLimite.value))) return false;
+  if (!isDateStrictlyFuture(parseDate(novaDataLimite.value))) return false;
   return !dataLimiteMinimaPorUltimaData.value || novaDataLimite.value >= dataLimiteMinimaPorUltimaData.value;
 });
 
@@ -136,17 +128,12 @@ watch(
     },
     {immediate: true},
 );
+
+function confirmar() {
+  if (!validarSubmissao(isDataValida.value)) {
+    void focarPrimeiroErroInvalido();
+    return;
+  }
+  emit('confirmarAlteracao', novaDataLimite.value);
+}
 </script>
-
-<style scoped>
-.btn-cancelar-link {
-  padding: 0.375rem 0.75rem;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-}
-
-.btn-cancelar-link:hover {
-  color: var(--bs-emphasis-color) !important;
-  background-color: var(--bs-secondary-bg);
-}
-</style>

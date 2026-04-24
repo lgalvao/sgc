@@ -1,10 +1,16 @@
 <template>
-  <BModal
+  <ModalPadrao
       :id="id"
       v-model="mostrar"
-      :title="titulo"
-      size="lg"
-      @hide="fechar"
+      :loading="processando"
+      :titulo="titulo"
+      data-testid="mdl-acao-bloco"
+      tamanho="lg"
+      test-codigo-cancelar="btn-acao-bloco-cancelar"
+      test-codigo-confirmar="btn-acao-bloco-confirmar"
+      :texto-acao="rotuloBotao"
+      @confirmar="confirmar"
+      @fechar="fechar"
   >
     <p class="mb-3">{{ texto }}</p>
 
@@ -14,21 +20,26 @@
 
     <div v-if="mostrarDataLimite" class="mb-3">
       <BFormGroup
-          label="Data limite"
           label-for="dataLimiteBloco"
-          label-class="required"
-          :state="erroLocalDataLimite ? false : null"
-          :invalid-feedback="erroLocalDataLimite"
+          :state="mensagemErroDataLimite ? false : null"
+          :invalid-feedback="mensagemErroDataLimite"
       >
+        <template #label>
+          Data limite <span aria-hidden="true" class="text-danger">*</span>
+        </template>
         <InputData
             id="dataLimiteBloco"
             v-model="dataLimite"
             data-testid="inp-data-limite-bloco"
             max="2099-12-31"
             :min="dataMinimaPermitida"
-            :state="erroLocalDataLimite ? false : null"
-            required
+            :state="mensagemErroDataLimite ? false : null"
         />
+        <template #description>
+          <div class="mt-1">
+            Data limite mínima baseada nas unidades selecionadas: {{ dataMinimaPermitidaFormatada }}
+          </div>
+        </template>
       </BFormGroup>
     </div>
 
@@ -39,6 +50,7 @@
         hover
         responsive
         sticky-header="300px"
+        :class="{ 'border border-danger rounded': mensagemErroSelecao }"
     >
       <template #head(selecao)>
         <BFormCheckbox
@@ -54,35 +66,20 @@
         />
       </template>
     </BTable>
-
-    <template #footer>
-      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
-        <BButton
-            :disabled="processando"
-            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
-            variant="link"
-            @click="fechar"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            :disabled="processando || selecionadosLocal.length === 0 || (mostrarDataLimite && (!!erroLocalDataLimite || !dataLimite))"
-            variant="success"
-            @click="confirmar"
-        >
-          <BSpinner v-if="processando" aria-hidden="true" class="me-2" small />
-          {{ rotuloBotao }}
-        </BButton>
-      </div>
-    </template>
-  </BModal>
+    <div v-if="mensagemErroSelecao" class="text-danger small mt-1">
+      {{ mensagemErroSelecao }}
+    </div>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
-import {BAlert, BButton, BFormCheckbox, BFormGroup, BModal, BSpinner, BTable} from 'bootstrap-vue-next';
+import {BAlert, BFormCheckbox, BFormGroup, BTable} from 'bootstrap-vue-next';
 import InputData from '@/components/comum/InputData.vue';
+import ModalPadrao from '@/components/comum/ModalPadrao.vue';
 import {isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
+import {formatDateBR} from "@/utils/dateUtils";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 export interface UnidadeSelecao {
   codigo: number;
@@ -113,6 +110,22 @@ const erro = ref<string | null>(null);
 const dataLimite = ref<string>('');
 const erroLocalDataLimite = ref('');
 
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
+const mensagemErroDataLimite = computed(() => {
+  if (erroLocalDataLimite.value) return erroLocalDataLimite.value;
+  return deveExibirErro(props.mostrarDataLimite && !dataLimite.value) ? "A data limite é obrigatória." : "";
+});
+
+const mensagemErroSelecao = computed(() => {
+  return deveExibirErro(selecionadosLocal.value.length === 0) ? "Selecione ao menos uma unidade." : "";
+});
+
 const ultimaDataLimiteSelecionada = computed(() => {
   return props.unidades
       .filter(unidade => selecionadosLocal.value.includes(unidade.codigo))
@@ -128,9 +141,13 @@ const dataMinimaPermitida = computed(() => {
   return ultimaDataLimite > amanha ? ultimaDataLimite : amanha;
 });
 
+const dataMinimaPermitidaFormatada = computed(() => {
+  return dataMinimaPermitida.value ? formatDateBR(dataMinimaPermitida.value) : "";
+});
+
 watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) => {
   erroLocalDataLimite.value = "";
-  if (novaData?.length !== 10 || !props.mostrarDataLimite) {
+  if (!novaData || novaData.length !== 10 || !props.mostrarDataLimite) {
     return;
   }
   if (!isDateStrictlyFuture(novaData)) {
@@ -138,7 +155,7 @@ watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) 
     return;
   }
   if (ultimaDataLimite && novaData < ultimaDataLimite) {
-    erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite do subprocesso.";
+    erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite das unidades selecionadas.";
   }
 });
 
@@ -162,15 +179,16 @@ const todosSelecionados = computed({
   }
 });
 
-function confirmar() {
-  if (props.mostrarDataLimite) {
-    if (!dataLimite.value) {
-      erro.value = "A data limite é obrigatória.";
-      return;
-    }
-    if (erroLocalDataLimite.value) {
-      return;
-    }
+const isFormularioValido = computed(() => {
+  const selecaoValida = selecionadosLocal.value.length > 0;
+  if (!props.mostrarDataLimite) return selecaoValida;
+  return selecaoValida && !!dataLimite.value && !erroLocalDataLimite.value;
+});
+
+async function confirmar() {
+  if (!validarSubmissao(isFormularioValido.value)) {
+    await focarPrimeiroErroInvalido();
+    return;
   }
 
   processando.value = true;
@@ -183,6 +201,7 @@ function confirmar() {
 }
 
 function abrir() {
+  resetarValidacao();
   mostrar.value = true;
 }
 
@@ -192,6 +211,7 @@ function fechar() {
   erro.value = null;
   dataLimite.value = '';
   erroLocalDataLimite.value = '';
+  resetarValidacao();
 }
 
 function setProcessando(val: boolean) {
@@ -219,21 +239,3 @@ watch(() => props.unidadesPreSelecionadas, (newVal) => {
   selecionadosLocal.value = [...newVal];
 }, { immediate: true });
 </script>
-
-<style scoped>
-:deep(.required:after) {
-  content: " *";
-  color: red;
-}
-
-.btn-cancelar-link {
-  padding: 0.375rem 0.75rem;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-}
-
-.btn-cancelar-link:hover {
-  color: var(--bs-emphasis-color) !important;
-  background-color: var(--bs-secondary-bg);
-}
-</style>

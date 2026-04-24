@@ -39,9 +39,9 @@ const devePrecarregarDiagnostico = computed(
 );
 
 watch(
-    () => [perfilStore.usuarioCodigo, devePrecarregarDiagnostico.value],
-    ([codigo, deveExibir]) => {
-      if (!codigo || !deveExibir) {
+    () => [perfilStore.usuarioCodigo, devePrecarregarDiagnostico.value, route.path],
+    ([codigo, deveExibir, path]) => {
+      if (!codigo || !deveExibir || path === "/login") {
         return;
       }
 

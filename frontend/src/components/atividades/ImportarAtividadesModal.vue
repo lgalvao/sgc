@@ -1,11 +1,16 @@
 <template>
-  <BModal
-      :fade="false"
-      :model-value="mostrar"
-      centered
+  <ModalPadrao
+      v-model="mostrarComputado"
+      :loading="importando"
+      data-testid="mdl-importacao-atividades"
       size="lg"
-      title="Importação de atividades"
-      @hide="fechar"
+      test-codigo-cancelar="importar-atividades-modal__btn-modal-cancelar"
+      test-codigo-confirmar="btn-importar"
+      texto-acao="Importar"
+      texto-acao-carregando="Importando..."
+      titulo="Importação de atividades"
+      @confirmar="importar"
+      @fechar="fechar"
   >
     <BAlert
         v-if="erroImportacao"
@@ -27,6 +32,7 @@
             id="processo-select"
             v-model="processoSelecionadoId"
             :options="processosParaImportacao"
+            :state="mensagemErroProcesso ? false : null"
             data-testid="select-processo"
             text-field="descricao"
             value-field="codigo"
@@ -34,12 +40,15 @@
           <template #first>
             <BFormSelectOption
                 disabled
-                value=""
+                :value="null"
             >
               Selecione
             </BFormSelectOption>
           </template>
         </BFormSelect>
+        <BFormInvalidFeedback :state="mensagemErroProcesso ? false : null">
+          {{ mensagemErroProcesso }}
+        </BFormInvalidFeedback>
         <div
             v-if="!processosParaImportacao.length"
             class="text-center text-muted mt-3"
@@ -58,6 +67,7 @@
             v-model="unidadeSelecionadaId"
             :disabled="!processoSelecionado"
             :options="unidadesParticipantes"
+            :state="mensagemErroUnidade ? false : null"
             data-testid="select-unidade"
             text-field="sigla"
             value-field="codUnidade"
@@ -65,84 +75,78 @@
           <template #first>
             <BFormSelectOption
                 disabled
-                value=""
+                :value="null"
             >
               Selecione
             </BFormSelectOption>
           </template>
         </BFormSelect>
+        <BFormInvalidFeedback :state="mensagemErroUnidade ? false : null">
+          {{ mensagemErroUnidade }}
+        </BFormInvalidFeedback>
       </div>
 
       <div v-if="unidadeSelecionada">
         <h6>Atividades para importar</h6>
         <div
-            v-if="atividadesParaImportar.length"
-            class="atividades-container border rounded p-2"
+            id="atividades-container"
+            :class="['atividades-container border rounded p-2', { 'border-danger is-invalid': mensagemErroAtividades }]"
+            tabindex="-1"
         >
           <div
-              v-for="ativ in atividadesParaImportar"
-              :key="ativ.codigo"
-              class="form-check"
+              v-if="atividadesParaImportar.length"
           >
-            <BFormCheckbox
-                :id="`ativ-check-${ativ.codigo}`"
-                v-model="atividadesSelecionadas"
-                :data-testid="`checkbox-atividade-${ativ.codigo}`"
-                :value="ativ"
+            <div
+                v-for="ativ in atividadesParaImportar"
+                :key="ativ.codigo"
+                class="form-check"
             >
-              {{ ativ.descricao }}
-            </BFormCheckbox>
+              <BFormCheckbox
+                  :id="`ativ-check-${ativ.codigo}`"
+                  v-model="atividadesSelecionadas"
+                  :data-testid="`checkbox-atividade-${ativ.codigo}`"
+                  :value="ativ"
+              >
+                {{ ativ.descricao }}
+              </BFormCheckbox>
+            </div>
+          </div>
+          <div
+              v-else
+              class="text-center text-muted mt-3"
+          >
+            {{ TEXTOS.atividades.importacao.NENHUMA_ATIVIDADE }}
           </div>
         </div>
-        <div
-            v-else
-            class="text-center text-muted mt-3"
-        >
-          {{ TEXTOS.atividades.importacao.NENHUMA_ATIVIDADE }}
+        <div v-if="mensagemErroAtividades" class="text-danger small mt-1">
+          {{ mensagemErroAtividades }}
         </div>
       </div>
     </fieldset>
-    <template #footer>
-      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
-        <BButton
-            :disabled="importando"
-            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
-            data-testid="importar-atividades-modal__btn-modal-cancelar"
-            type="button"
-            variant="link"
-            @click="fechar"
-        >
-          <i aria-hidden="true" class="bi bi-x-circle me-1"/>
-          Cancelar
-        </BButton>
-        <BButton
-            :disabled="!atividadesSelecionadas.length || importando"
-            data-testid="btn-importar"
-            type="button"
-            variant="primary"
-            @click="importar"
-        >
-          <BSpinner
-              v-if="importando"
-              class="me-1"
-              small
-          />
-          <i v-else aria-hidden="true" class="bi bi-box-arrow-in-down me-1"/>
-          {{ importando ? 'Importando...' : 'Importar' }}
-        </BButton>
-      </div>
-    </template>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, BSpinner} from "bootstrap-vue-next";
-import {ref, watch} from "vue";
+import {
+  BAlert,
+  BFormCheckbox,
+  BFormInvalidFeedback,
+  BFormSelect,
+  BFormSelectOption,
+} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
-import {type Atividade, type AtividadeOperacaoResponse, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
+import {
+  type Atividade,
+  type AtividadeOperacaoResponse,
+  type ProcessoResumo,
+  type UnidadeImportacao,
+} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {normalizeError} from "@/utils/apiError";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -153,6 +157,13 @@ const emit = defineEmits<{
   fechar: [];
   importar: [resultado: AtividadeOperacaoResponse];
 }>();
+
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
 
 const resultadoImportacao = ref<AtividadeOperacaoResponse | null>(null);
 const erroImportacao = ref<string | null>(null);
@@ -166,6 +177,33 @@ const unidadeSelecionada = ref<UnidadeImportacao | null>(null);
 const unidadeSelecionadaId = ref<number | null>(null);
 const atividadesParaImportar = ref<Atividade[]>([]);
 const atividadesSelecionadas = ref<Atividade[]>([]);
+
+const mostrarComputado = computed({
+  get: () => props.mostrar,
+  set: (mostrar: boolean) => {
+    if (!mostrar) emit("fechar");
+  }
+});
+
+const mensagemErroProcesso = computed(() => {
+  return deveExibirErro(!processoSelecionadoId.value) ? "Selecione o processo de origem." : "";
+});
+
+const mensagemErroUnidade = computed(() => {
+  return deveExibirErro(!unidadeSelecionadaId.value) ? "Selecione a unidade de origem." : "";
+});
+
+const mensagemErroAtividades = computed(() => {
+  return deveExibirErro(atividadesSelecionadas.value.length === 0) ? TEXTOS.atividades.importacao.SELECIONE_ATIVIDADE : "";
+});
+
+const isFormularioValido = computed(() => {
+  return Boolean(
+      processoSelecionadoId.value &&
+      unidadeSelecionadaId.value &&
+      atividadesSelecionadas.value.length > 0
+  );
+});
 
 watch(
     () => props.mostrar,
@@ -212,6 +250,7 @@ function resetModal() {
   unidadeSelecionadaId.value = null;
   atividadesParaImportar.value = [];
   atividadesSelecionadas.value = [];
+  resetarValidacao();
 }
 
 function limparErroImportacao() {
@@ -250,12 +289,13 @@ function fechar() {
 }
 
 async function importar() {
-  limparErroImportacao();
-  if (!props.codSubprocessoDestino || !unidadeSelecionada.value) {
+  if (!validarSubmissao(isFormularioValido.value)) {
+    await focarPrimeiroErroInvalido();
     return;
   }
-  if (atividadesSelecionadas.value.length === 0) {
-    erroImportacao.value = TEXTOS.atividades.importacao.SELECIONE_ATIVIDADE;
+
+  limparErroImportacao();
+  if (!props.codSubprocessoDestino || !unidadeSelecionada.value) {
     return;
   }
 
@@ -282,16 +322,5 @@ async function importar() {
 .atividades-container {
   max-height: 250px;
   overflow-y: auto;
-}
-
-.btn-cancelar-link {
-  padding: 0.375rem 0.75rem;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-}
-
-.btn-cancelar-link:hover {
-  color: var(--bs-emphasis-color) !important;
-  background-color: var(--bs-secondary-bg);
 }
 </style>

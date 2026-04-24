@@ -136,17 +136,17 @@
     <ModalConfirmacao
         v-model="mostrarModalSugestoes"
         :loading="isLoading"
-        :ok-disabled="!sugestoes.trim()"
         :ok-title="TEXTOS.comum.BOTAO_APRESENTAR"
         test-codigo-cancelar="btn-sugestoes-mapa-cancelar"
         test-codigo-confirmar="btn-sugestoes-mapa-confirmar"
         titulo="Apresentar sugestões"
         variant="success"
-        @confirmar="confirmarSugestoes"
+        @confirmar="handleConfirmarSugestoes"
         @shown="() => sugestoesTextareaRef?.$el?.focus()"
     >
       <BFormGroup
           label-for="sugestoesTextarea"
+          :state="mensagemErroSugestoes ? false : null"
           class="mb-3"
       >
         <template #label>
@@ -157,9 +157,13 @@
             ref="sugestoesTextareaRef"
             v-model="sugestoes"
             aria-required="true"
+            :state="mensagemErroSugestoes ? false : null"
             data-testid="inp-sugestoes-mapa-texto"
             rows="5"
         />
+        <BFormInvalidFeedback :state="mensagemErroSugestoes ? false : null">
+          {{ mensagemErroSugestoes }}
+        </BFormInvalidFeedback>
       </BFormGroup>
     </ModalConfirmacao>
 
@@ -202,18 +206,18 @@
     <ModalConfirmacao
         v-model="mostrarModalDevolucao"
         :loading="isLoading"
-        :ok-disabled="!observacaoDevolucao.trim()"
         :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
         test-codigo-cancelar="btn-devolucao-mapa-cancelar"
         test-codigo-confirmar="btn-devolucao-mapa-confirmar"
         titulo="Devolver mapa"
         variant="danger"
-        @confirmar="confirmarDevolucao"
+        @confirmar="handleConfirmarDevolucao"
         @shown="() => observacaoDevolucaoRef?.$el?.focus()"
     >
       <p>Confirma a devolução da validação do mapa para ajustes?</p>
       <BFormGroup
           label-for="observacaoDevolucao"
+          :state="mensagemErroDevolucao ? false : null"
           class="mb-3"
       >
         <template #label>
@@ -223,10 +227,14 @@
             id="observacaoDevolucao"
             ref="observacaoDevolucaoRef"
             v-model="observacaoDevolucao"
+            :state="mensagemErroDevolucao ? false : null"
             data-testid="inp-devolucao-mapa-obs"
             placeholder="Digite observações sobre a devolução..."
             rows="3"
         />
+        <BFormInvalidFeedback :state="mensagemErroDevolucao ? false : null">
+          {{ mensagemErroDevolucao }}
+        </BFormInvalidFeedback>
       </BFormGroup>
     </ModalConfirmacao>
 
@@ -259,6 +267,7 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useAcesso} from "@/composables/useAcesso";
 import {useMapaAcoesAnalise} from "@/composables/useMapaAcoesAnalise";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {obterMapaVisualizacao, obterSugestoesMapa} from "@/services/subprocessoService";
@@ -316,6 +325,22 @@ const mostrarModalVerSugestoes = ref(false);
 const mostrarModalHistorico = ref(false);
 const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
+
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
+const mensagemErroSugestoes = computed(() => {
+  return deveExibirErro(!sugestoes.value.trim()) ? "As sugestões são obrigatórias." : "";
+});
+
+const mensagemErroDevolucao = computed(() => {
+  return deveExibirErro(!observacaoDevolucao.value.trim()) ? "A justificativa é obrigatória para a devolução." : "";
+});
+
 const {
   mostrarModalAceitar,
   mostrarModalValidar,
@@ -328,13 +353,26 @@ const {
   abrirModalAceitar,
   fecharModalAceitar,
   abrirModalValidar,
-  abrirModalDevolucao,
+  abrirModalDevolucao: abrirModalDevolucaoBase,
 } = useMapaAcoesAnalise({
   codSubprocesso,
   acaoPrincipalMapa,
   concluirAcaoPainel,
   notify,
 });
+
+function abrirModalDevolucao() {
+  resetarValidacao();
+  abrirModalDevolucaoBase();
+}
+
+async function handleConfirmarDevolucao() {
+  if (!validarSubmissao(!!observacaoDevolucao.value.trim())) {
+    await focarPrimeiroErroInvalido();
+    return;
+  }
+  await confirmarDevolucao();
+}
 
 // Refs para foco
 const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
@@ -398,23 +436,26 @@ async function sincronizarSugestoesMapa(): Promise<string> {
 }
 
 async function confirmarSugestoes() {
-  if (!codSubprocesso.value || !sugestoes.value.trim()) return;
-  try {
-    await executarComLoading(async () => {
-      await apresentarSugestoesService(codSubprocesso.value!, {
-        sugestoes: sugestoes.value,
-      });
-      if (mapa.value) {
-        mapa.value = {
-          ...mapa.value,
-          sugestoes: sugestoes.value,
-        };
-      }
-      await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+  await executarComLoading(async () => {
+    await apresentarSugestoesService(codSubprocesso.value!, {
+      sugestoes: sugestoes.value,
     });
-  } catch {
-    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+    if (mapa.value) {
+      mapa.value = {
+        ...mapa.value,
+        sugestoes: sugestoes.value,
+      };
+    }
+    await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+  });
+}
+
+async function handleConfirmarSugestoes() {
+  if (!validarSubmissao(!!sugestoes.value.trim())) {
+    await focarPrimeiroErroInvalido();
+    return;
   }
+  await confirmarSugestoes();
 }
 
 async function carregarSugestoesParaEdicao() {
@@ -427,6 +468,7 @@ async function carregarSugestoesParaEdicao() {
 }
 
 function abrirModalSugestoes() {
+  resetarValidacao();
   mostrarModalSugestoes.value = true;
   void carregarSugestoesParaEdicao();
 }
@@ -434,6 +476,7 @@ function abrirModalSugestoes() {
 function fecharModalSugestoes() {
   mostrarModalSugestoes.value = false;
   sugestoes.value = "";
+  resetarValidacao();
 }
 
 async function carregarSugestoesParaVisualizacao() {

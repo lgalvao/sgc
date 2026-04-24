@@ -62,8 +62,24 @@ export async function autenticar(page: Page, usuario: string, senha: string) {
 }
 
 async function limparSessaoNavegador(page: Page) {
+    // 1. Tenta limpar o storage se já estivermos no domínio do app,
+    // antes de limpar cookies e navegar (evita race conditions)
+    try {
+        await page.evaluate(() => {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+        });
+    } catch {
+        // Ignora erros se não estiver em uma página do domínio (ex: about:blank)
+    }
+
+    // 2. Limpa cookies de autenticação
     await page.context().clearCookies();
+
+    // 3. Navega para a página de login
     await page.goto('/login');
+
+    // 4. Garante a limpeza após o carregamento para total isolamento
     await page.evaluate(() => {
         window.localStorage.clear();
         window.sessionStorage.clear();

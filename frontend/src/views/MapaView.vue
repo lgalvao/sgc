@@ -172,18 +172,18 @@
       <ModalConfirmacao
           v-model="mostrarModalDevolucao"
           :loading="isLoading"
-          :ok-disabled="!observacaoDevolucao.trim()"
           :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
           test-codigo-cancelar="btn-devolucao-mapa-cancelar"
           test-codigo-confirmar="btn-devolucao-mapa-confirmar"
           titulo="Devolver mapa"
           variant="danger"
-          @confirmar="confirmarDevolucao"
+          @confirmar="handleConfirmarDevolucao"
           @shown="() => observacaoDevolucaoRef?.$el?.focus()"
       >
         <p>Confirma a devolução da validação do mapa para ajustes?</p>
         <BFormGroup
             label-for="observacaoDevolucao"
+            :state="mensagemErroDevolucao ? false : null"
             class="mb-3"
         >
           <template #label>
@@ -193,10 +193,14 @@
               id="observacaoDevolucao"
               ref="observacaoDevolucaoRef"
               v-model="observacaoDevolucao"
+              :state="mensagemErroDevolucao ? false : null"
               data-testid="inp-devolucao-mapa-obs"
               placeholder="Digite observações sobre a devolução..."
               rows="3"
           />
+          <BFormInvalidFeedback :state="mensagemErroDevolucao ? false : null">
+            {{ mensagemErroDevolucao }}
+          </BFormInvalidFeedback>
         </BFormGroup>
       </ModalConfirmacao>
 
@@ -237,6 +241,7 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import {obterSugestoesMapa} from "@/services/subprocessoService";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import logger from "@/utils/logger";
 import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
@@ -294,6 +299,17 @@ const sugestoesVisualizacao = ref("");
 
 const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
+const mensagemErroDevolucao = computed(() => {
+  return deveExibirErro(!observacaoDevolucao.value.trim()) ? "A justificativa é obrigatória para a devolução." : "";
+});
+
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   fecharModal();
   toastStore.setPending(mensagem);
@@ -310,13 +326,26 @@ const {
   confirmarDevolucao,
   abrirModalAceitar,
   fecharModalAceitar,
-  abrirModalDevolucao,
+  abrirModalDevolucao: abrirModalDevolucaoBase,
 } = useMapaAcoesAnalise({
   codSubprocesso,
   acaoPrincipalMapa,
   concluirAcaoPainel,
   notify,
 });
+
+function abrirModalDevolucao() {
+  resetarValidacao();
+  abrirModalDevolucaoBase();
+}
+
+async function handleConfirmarDevolucao() {
+  if (!validarSubmissao(!!observacaoDevolucao.value.trim())) {
+    await focarPrimeiroErroInvalido();
+    return;
+  }
+  await confirmarDevolucao();
+}
 
 async function sincronizarSugestoesMapa(): Promise<string> {
   if (!codSubprocesso.value) {

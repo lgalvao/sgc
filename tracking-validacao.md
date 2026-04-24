@@ -49,12 +49,20 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 
 - Revisar fluxos ainda fora da primeira fatia: relatórios, limpeza e modais de visualização.
 
-### Sprint 3: Acessibilidade e Clareza (Em andamento)
-- [x] Indicação visual de campos obrigatórios (asterisco) em todos os formulários e modais (Sprint 3)
-- [x] Consolidação de formulários remanescentes com validações customizadas para o padrão `useValidacaoFormulario`.
-- [ ] Revisão de tabelas editáveis e ações em lote para garantir feedback inline e acessibilidade.
+### Sprint 3: Acessibilidade e Clareza (Concluída)
+- [x] Indicação visual de campos obrigatórios (asterisco) em todos os formulários e modais.
+- [x] Consolidação de formulários remanescentes com validações customizadas para o padrão `useValidacaoFormulario`:
+    - `CadastroVisualizacaoView`: modal de devolução.
+    - `SubprocessoModal`: modal de alteração de data limite (migrado para `ModalPadrao`).
+    - `MapaView`: modal de devolução.
+    - `MapaVisualizacaoView`: modais de sugestões e devolução.
+    - `ModalAcaoBloco`: modal de ações em bloco (migrado para `ModalPadrao`).
+    - `ImportarAtividadesModal`: modal de importação (migrado para `ModalPadrao`).
+- [x] Remoção de bloqueios preventivos (`ok-disabled`, `acao-desabilitada`) permitindo validação no clique em todos os modais refatorados.
 
 ## Validações executadas
+...
+- `npm run typecheck` e `npm run lint` após refatoração da Sprint 3: aprovados.
 
 - `npm run typecheck`
 - `./gradlew :backend:compileTestJava`
