@@ -246,7 +246,8 @@ describe("Unidades.vue", () => {
     it("deve exibir mensagem quando não houver unidades", async () => {
         const wrapper = createWrapper({unidades: []});
         await flushPromises();
-        expect(wrapper.text()).toContain("Nenhuma unidade encontrada.");
+        expect(wrapper.text()).toContain("Sem unidades por enquanto");
+        expect(wrapper.text()).toContain("Não encontramos unidades nesta consulta.");
         expect(wrapper.findComponent({name: 'TreeTable'}).exists()).toBe(false);
     });
 

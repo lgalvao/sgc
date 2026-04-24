@@ -12,7 +12,7 @@ vi.mock('@/views/ErroGeralView.vue', () => ({ default: { name: 'ErroGeralView' }
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(11);
+        expect(mainRoutes).toHaveLength(12);
     });
 
     it("deve conter a rota RelatorioAndamento", async () => {
@@ -123,6 +123,18 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/administracao/limpeza-processos");
         expect(route?.meta?.title).toBe("Limpeza de processos");
+
+        if (typeof route?.component === "function") {
+            const component = await (route.component as () => Promise<any>)();
+            expect(component.default).toBeDefined();
+        }
+    }, 30000);
+
+    it("deve conter a rota NotificacoesAdmin", async () => {
+        const route = mainRoutes.find((r) => r.name === "NotificacoesAdmin");
+        expect(route).toBeDefined();
+        expect(route?.path).toBe("/administracao/notificacoes");
+        expect(route?.meta?.title).toBe("Notificações");
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();

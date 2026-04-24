@@ -30,8 +30,16 @@ describe("Router", () => {
 
     it("permite rota administrativa quando autenticado", async () => {
         perfilStore.usuarioCodigo = "123";
+        perfilStore.perfilSelecionado = Perfil.ADMIN;
         await router.push("/administracao/limpeza-processos");
         expect(router.currentRoute.value.path).toBe("/administracao/limpeza-processos");
+    });
+
+    it("redireciona rota administrativa para painel se perfil não for ADMIN", async () => {
+        perfilStore.usuarioCodigo = "123";
+        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        await router.push("/administracao/limpeza-processos");
+        expect(router.currentRoute.value.path).toBe("/painel");
     });
 
     it("permite acesso a páginas públicas sem autenticação", async () => {

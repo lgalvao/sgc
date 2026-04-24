@@ -449,15 +449,16 @@ describe('SubprocessoView.vue', () => {
         expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
     });
 
-    it('impede reabertura se justificativa vazia (botão desabilitado)', async () => {
+    it('impede reabertura se justificativa vazia e exibe pendência contextual', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
 
-        // O botão deve estar desabilitado se a justificativa for vazia
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
-        expect(btn.attributes('disabled')).toBeDefined();
+        await btn.trigger('click');
+        expect(wrapper.find('[data-testid="txt-reabertura-pendencia-justificativa"]').text())
+            .toContain('Informe a justificativa para reabrir.');
         expect(fluxoSubprocessoMock.reabrirCadastro).not.toHaveBeenCalled();
     });
 
