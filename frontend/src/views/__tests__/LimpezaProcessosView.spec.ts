@@ -39,6 +39,7 @@ describe("LimpezaProcessosView.vue", () => {
                     template: '<button @click="$emit(\'click\')">{{ text }}</button>',
                     emits: ['click']
                 },
+                BFormInvalidFeedback: {template: '<div><slot /></div>'},
                 ModalConfirmacao: {
                     name: 'ModalConfirmacao',
                     props: ['modelValue'],

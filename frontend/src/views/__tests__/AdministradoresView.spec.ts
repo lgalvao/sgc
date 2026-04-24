@@ -56,6 +56,18 @@ describe("AdministradoresView.vue", () => {
                         props: ['loading', 'text'],
                         template: `<button @click="$emit('click')">{{ text }}<slot /></button>`,
                         emits: ['click']
+                    },
+                    BFormInvalidFeedback: {template: '<div><slot /></div>'},
+                    BFormGroup: {template: '<div><slot /><slot name="label" /></div>'},
+                    BRow: {template: '<div><slot /></div>'},
+                    BCol: {template: '<div><slot /></div>'},
+                    BFormInput: {
+                        props: ['modelValue'],
+                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+                        emits: ['update:modelValue'],
+                        methods: {
+                            focus() {}
+                        }
                     }
                 }
             }

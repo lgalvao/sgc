@@ -4,7 +4,7 @@ import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpe
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 
-export async function navegarParaMapa(page: Page) {
+export async function navegarParaMapa(page: Page, preferencia: 'edicao' | 'visualizacao' = 'visualizacao') {
     // Aguardar o carregamento do subprocesso antes de verificar os cards
     await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 
@@ -13,10 +13,12 @@ export async function navegarParaMapa(page: Page) {
 
     await expect(cardEdicao.or(cardVisualizacao)).toBeVisible();
 
-    if (await cardEdicao.isVisible()) {
+    if (preferencia === 'edicao' && await cardEdicao.isVisible()) {
         await cardEdicao.click();
-    } else {
+    } else if (await cardVisualizacao.isVisible()) {
         await cardVisualizacao.click();
+    } else {
+        await cardEdicao.click();
     }
 
     await page.waitForURL(/\/(mapa|vis-mapa)$/);

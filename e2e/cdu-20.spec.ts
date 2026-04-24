@@ -259,7 +259,11 @@ test.describe.serial('CDU-20 - ADMIN deve ver botões de edição com mapa com s
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
 
         await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+
+        // Garante que consegue navegar para edição
+        await navegarParaMapa(page, 'edicao');
+        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
     });
 });
 
