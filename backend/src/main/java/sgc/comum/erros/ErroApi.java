@@ -27,7 +27,7 @@ public class ErroApi {
     @Setter
     private @Nullable String traceId;
 
-    private @Nullable List<ErroSubApi> subErrors;
+    private @Nullable List<ErroSubApi> erros;
 
     @Setter
     @Builder.Default
@@ -46,7 +46,7 @@ public class ErroApi {
         this.code = code;
     }
 
-    public @Nullable List<ErroSubApi> getSubErrors() {
-        return subErrors != null ? new ArrayList<>(subErrors) : null;
+    public @Nullable List<ErroSubApi> getErros() {
+        return erros != null ? new ArrayList<>(erros) : null;
     }
 }

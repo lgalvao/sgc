@@ -115,8 +115,8 @@ describe("MapaView Uncovered Branches", () => {
         const erroId = {
             lastError: {
                 message: "Erro",
-                subErrors: [
-                    { field: "atividadesCodigos", message: "Erro em atividade" }
+                erros: [
+                    { campo: "atividadesCodigos", mensagem: "Erro em atividade" }
                 ]
             }
         };

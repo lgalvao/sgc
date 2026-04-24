@@ -16,7 +16,7 @@ type MapaViewVm = {
     abrirModalImpacto: () => Promise<void>;
     fecharModalImpacto: () => void;
     removerAtividadeAssociada: (codigoCompetencia: number, codigoAtividade: number) => Promise<void> | void;
-    handleErrors: (store: {lastError?: {subErrors?: Array<{field?: string; message?: string}>}}) => Promise<void>;
+    handleErrors: (store: {lastError?: {erros?: Array<{campo?: string; mensagem?: string}>}}) => Promise<void>;
     disponibilizarMapa: (payload: Record<string, unknown>) => Promise<void>;
     fecharModalDisponibilizar: () => void;
 };
@@ -63,7 +63,7 @@ describe('MapaView Coverage', () => {
     };
     const fluxoMapaMock = {
         erro: null as {message: string} | null,
-        lastError: null as {message?: string; subErrors?: Array<{field?: string; message?: string}>} | null,
+        lastError: null as {message?: string; erros?: Array<{campo?: string; mensagem?: string}>} | null,
         clearError: vi.fn(),
         adicionarCompetencia: vi.fn(),
         atualizarCompetencia: vi.fn(),
@@ -267,7 +267,7 @@ describe('MapaView Coverage', () => {
 
         const store = {
             lastError: {
-                subErrors: [{field: 'atividadesCodigos', message: 'Erro em atividade'}]
+                erros: [{campo: 'atividadesCodigos', mensagem: 'Erro em atividade'}]
             }
         };
 

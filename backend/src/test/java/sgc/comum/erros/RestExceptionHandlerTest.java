@@ -225,8 +225,8 @@ class RestExceptionHandlerTest {
 
         assertThat(Objects.requireNonNull(response).getBody())
                 .isInstanceOfSatisfying(ErroApi.class, erroApi -> {
-                    assertThat(erroApi.getSubErrors()).hasSize(1);
-                    assertThat(Objects.requireNonNull(erroApi.getSubErrors()).getFirst().message()).isEqualTo("mensagem");
+                    assertThat(erroApi.getErros()).hasSize(1);
+                    assertThat(Objects.requireNonNull(erroApi.getErros()).getFirst().mensagem()).isEqualTo("mensagem");
                 });
     }
 

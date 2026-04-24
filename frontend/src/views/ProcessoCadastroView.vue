@@ -255,9 +255,9 @@ function dispensarAlertaDiagnostico() {
 }
 
 function extrairErrosGenericos(error: ReturnType<typeof normalizeError>): string[] {
-  return error.subErrors
-      ?.filter(subError => !subError.field)
-      .map(subError => subError.message ?? "")
+  return error.erros
+      ?.filter(erro => !erro.campo)
+      .map(erro => erro.mensagem ?? "")
       .filter(Boolean) ?? [];
 }
 
@@ -374,7 +374,7 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
   clear();
 
   const erroNormalizado = normalizeError(error);
-  const usarErroEstruturado = isAxiosError(error) || (erroNormalizado.subErrors?.length ?? 0) > 0;
+  const usarErroEstruturado = isAxiosError(error) || (erroNormalizado.erros?.length ?? 0) > 0;
 
   if (usarErroEstruturado) {
     setFromNormalizedError(erroNormalizado);

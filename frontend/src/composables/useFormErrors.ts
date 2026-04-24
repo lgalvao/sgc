@@ -15,12 +15,12 @@ export function useFormErrors(initialFields: string[] = []) {
     function setFromNormalizedError(normalizedError: NormalizedError | null) {
         clearErrors();
 
-        if (!normalizedError?.subErrors) return;
+        if (!normalizedError?.erros) return;
 
-        normalizedError.subErrors.forEach(subError => {
-            const field = subError.field;
-            if (field && field in errors.value) {
-                errors.value[field] = subError.message || 'Campo inválido';
+        normalizedError.erros.forEach(erro => {
+            const campo = erro.campo;
+            if (campo && campo in errors.value) {
+                errors.value[campo] = erro.mensagem || 'Campo inválido';
             }
         });
     }

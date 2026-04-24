@@ -12,7 +12,7 @@ describe('useFormErrors', () => {
         const normalizedError = {
             kind: 'validation' as const,
             message: 'Global error',
-            subErrors: [{field: 'field1', message: 'Error 1'}]
+            erros: [{campo: 'field1', mensagem: 'Error 1'}]
         };
 
         setFromNormalizedError(normalizedError);
@@ -39,7 +39,7 @@ describe('useFormErrors', () => {
         expect(errors.value.field1).toBe('');
     });
 
-    it('handles normalized error without subErrors', () => {
+    it('handles normalized error without erros', () => {
         const {errors, setFromNormalizedError} = useFormErrors(['field1']);
         const normalizedError = {
             kind: 'validation' as const,
@@ -49,35 +49,35 @@ describe('useFormErrors', () => {
         expect(errors.value.field1).toBe('');
     });
 
-    it('ignores subErrors with missing fields', () => {
+    it('ignores erros with missing fields', () => {
         const {errors, setFromNormalizedError} = useFormErrors(['field1']);
         const normalizedError = {
             kind: 'validation' as const,
             message: 'Global error',
-            subErrors: [{message: 'Error 1'}] // Missing field
+            erros: [{mensagem: 'Error 1'}] // Missing campo
         };
         setFromNormalizedError(normalizedError);
         expect(errors.value.field1).toBe('');
     });
 
-    it('ignores subErrors for fields not in tracking list', () => {
+    it('ignores erros for fields not in tracking list', () => {
         const {errors, setFromNormalizedError} = useFormErrors(['field1']);
         const normalizedError = {
             kind: 'validation' as const,
             message: 'Global error',
-            subErrors: [{field: 'otherField', message: 'Error 1'}]
+            erros: [{campo: 'otherField', mensagem: 'Error 1'}]
         };
         setFromNormalizedError(normalizedError);
         expect(errors.value.field1).toBe('');
         expect(errors.value).not.toHaveProperty('otherField');
     });
 
-    it('uses default message if subError message is missing', () => {
+    it('uses default message if erro message is missing', () => {
         const {errors, setFromNormalizedError} = useFormErrors(['field1']);
         const normalizedError = {
             kind: 'validation' as const,
             message: 'Global error',
-            subErrors: [{field: 'field1'}] // Missing message
+            erros: [{campo: 'field1'}] // Missing message
         };
         setFromNormalizedError(normalizedError);
         expect(errors.value.field1).toBe('Campo inválido');

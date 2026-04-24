@@ -127,7 +127,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(
-                        jsonPath("$.subErrors[0].message")
+                        jsonPath("$.erros[0].mensagem")
                                 .value("Preencha a descrição")); // Mensagem de
         // validação
     }
@@ -162,7 +162,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(
-                        jsonPath("$.subErrors[0].message")
+                        jsonPath("$.erros[0].mensagem")
                                 .value("Pelo menos uma unidade participante deve ser incluída."));
     }
 

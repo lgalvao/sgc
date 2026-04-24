@@ -66,12 +66,12 @@ const ArvoreUnidadesStub = {
     emits: ['update:modelValue']
 };
 
-function criarErroApi(message: string, subErrors: Array<{field?: string | null; message?: string}> = []) {
+function criarErroApi(mensagem: string, erros: Array<{campo?: string | null; mensagem?: string}> = []) {
     return {
         isAxiosError: true,
         response: {
             status: 400,
-            data: {message, subErrors}
+            data: {message: mensagem, erros}
         }
     } as any;
 }
@@ -492,17 +492,17 @@ describe('ProcessoCadastroView.vue', () => {
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(false);
     });
 
-    it('maps field-specific validation errors from subErrors', async () => {
+    it('maps campo-specific validation errors from erros', async () => {
         const {wrapper} = createWrapper();
 
         vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi(
             'Erro de validação',
             [
-                {field: 'descricao', message: 'Descrição é obrigatória'},
-                {field: 'tipo', message: 'Tipo inválido'},
-                {field: 'dataLimiteEtapa1', message: 'Data inválida'},
-                {field: 'unidades', message: 'Selecione ao menos uma unidade'},
-                {field: null, message: 'Erro genérico'}
+                {campo: 'descricao', mensagem: 'Descrição é obrigatória'},
+                {campo: 'tipo', mensagem: 'Tipo inválido'},
+                {campo: 'dataLimiteEtapa1', mensagem: 'Data inválida'},
+                {campo: 'unidades', mensagem: 'Selecione ao menos uma unidade'},
+                {campo: null, mensagem: 'Erro genérico'}
             ],
         ));
 
@@ -557,7 +557,7 @@ describe('ProcessoCadastroView.vue', () => {
         expect(wrapper.vm.mostrarModalRemocao).toBe(false);
     });
 
-    it('clears field errors when fields are updated', async () => {
+    it('clears campo errors when fields are updated', async () => {
         const {wrapper} = createWrapper();
 
         wrapper.vm.fieldErrors.descricao = 'Erro';
@@ -643,7 +643,7 @@ describe('ProcessoCadastroView.vue', () => {
         expect((wrapper.vm as any).notificacao?.message).toContain('Não foi possível carregar');
     });
 
-    it('focuses on the first invalid field when validation errors occur', async () => {
+    it('focuses on the first invalid campo when validation errors occur', async () => {
         const {wrapper} = createWrapper();
 
         const focusMock = vi.fn();
@@ -652,7 +652,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi(
             'Erro de validação',
-            [{field: 'descricao', message: 'Descrição é obrigatória'}],
+            [{campo: 'descricao', mensagem: 'Descrição é obrigatória'}],
         ));
 
         wrapper.vm.descricao = 'Teste';

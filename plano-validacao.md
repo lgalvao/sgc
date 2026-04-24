@@ -104,7 +104,7 @@ Bom para regras objetivas de formato/faixa, desde que mensagem seja específica.
 ### Como aparece
 
 - normalização de erro (`normalizeError`);
-- suberros por campo (`subErrors`) mapeados com `useFormErrors`;
+- erros por campo (`erros`) mapeados com `useFormErrors`;
 - erros sem campo exibidos em alerta global do formulário (`AppAlert`/`BAlert`).
 
 ### Onde ocorre
@@ -157,7 +157,7 @@ Impacto: a mesma classe de problema aparece em lugares diferentes.
 
 3. **Semântica distinta para erros de validação de backend**
 
-- em processo existe tratamento forte de `subErrors`;
+- em processo existe tratamento forte de `erros`;
 - em outros fluxos a mensagem volta mais global ou específica por domínio (atividade) sem contrato visual padronizado.
 
 Impacto: inconsistência entre telas que parecem equivalentes.
@@ -359,7 +359,7 @@ Legenda rápida:
 | View / Formulário | Gatilho de validação predominante | Feedback de erro | Bloqueio preventivo | Risco de inconsistência |
 |---|---|---|---|---|
 | `LoginView` | Submit (checagem local de vazio) + resposta de backend | `notify`/`AppAlert` + alerta contextual de Caps Lock | Não bloqueia por vazio; apenas por etapa/loading | **Médio** |
-| `ProcessoCadastroView` + `ProcessoFormFields` + `useProcessoForm` | Reativo (`watch` p/ data) + backend (`subErrors`) + submit | Inline por campo + `AppAlert` para erro global estruturado + foco no inválido | Sim (`isFormInvalid`) | **Baixo** (referência atual) |
+| `ProcessoCadastroView` + `ProcessoFormFields` + `useProcessoForm` | Reativo (`watch` p/ data) + backend (`erros`) + submit | Inline por campo + `AppAlert` para erro global estruturado + foco no inválido | Sim (`isFormInvalid`) | **Baixo** (referência atual) |
 | `CadastroView` + `CadAtividadeForm` + `AtividadeItem` | Submit (adicionar), validação de domínio via endpoint (`validar-cadastro`) | Erro por item (card), erro global (`BAlert`), notificações | Sim (disponibilizar condicionado a estado e conteúdo) | **Médio** |
 | `CadastroVisualizacaoView` (modais de validar/devolver) | Submit no modal (devolução exige texto) | Inline em `BFormInvalidFeedback` (devolução) + `notify` para fluxo | Sim (`ok-disabled` na devolução) | **Médio** |
 | `MapaView` (edição mapa) | Ações de workflow (submit implícito por botões/modais) + validação backend | `BAlert` local + `notify` | Sim em ações de topo | **Médio** |
@@ -408,7 +408,7 @@ Abaixo, uma visão de “entrada da API” para os fluxos de formulário do fron
 
 | Endpoint | DTO/entrada | Tipo de validação no backend | Observação UX/refatoração |
 |---|---|---|---|
-| `POST /api/processos` | `CriarProcessoRequest` | Bean Validation (`@NotBlank`, `@NotNull`, `@Future`, `@NotEmpty`) + regras de negócio em `ProcessoService` | Base robusta; já alinhada ao frontend com `subErrors`. |
+| `POST /api/processos` | `CriarProcessoRequest` | Bean Validation (`@NotBlank`, `@NotNull`, `@Future`, `@NotEmpty`) + regras de negócio em `ProcessoService` | Base robusta; já alinhada ao frontend com `erros`. |
 | `POST /api/processos/{codigo}/atualizar` | `AtualizarProcessoRequest` | Bean Validation + regras de situação (`CRIADO`) + elegibilidade de unidades | Consistente com criação. |
 | `POST /api/processos/{codigo}/iniciar` | `IniciarProcessoRequest` | Bean Validation parcial + regras de negócio (situação, unidades, mapa vigente, conflitos) | Endpoint crítico para mensagens de domínio agregadas. |
 | `POST /api/processos/{codigo}/acao-em-bloco` | `AcaoEmBlocoRequest` | Bean Validation + validação condicional (`dataLimite` obrigatória para disponibilizar) | Bom exemplo de validação condicional server-side. |
@@ -462,12 +462,10 @@ Para a consistência completa de validação/UX no frontend, os principais ajust
 
 ### 13.1 Unificar contrato de erro de validação por campo
 
-1. Planejar a migração de **`subErrors`/`field`/`message`** para um contrato em português, por exemplo **`erros`/`campo`/`mensagem`**, sem camada permanente de aliases.
+1. Manter o contrato em português **`erros`/`campo`/`mensagem`**, sem camada permanente de aliases.
 2. Garantir que todo endpoint de formulário relevante retorne campos estáveis quando houver erro de entrada.
 3. Atualizar `RestExceptionHandler`, tipos do frontend e `useFormErrors` no mesmo corte de contrato.
-4. Manter `subErrors` apenas durante uma janela curta e controlada de migração, se necessário.
-5. Remover aliases e traduções silenciosas ao final da migração.
-6. Evitar mensagens agregadas em string única quando existirem múltiplas pendências corrigíveis.
+4. Evitar mensagens agregadas em string única quando existirem múltiplas pendências corrigíveis.
 
 ### 13.2 Reduzir validação manual ad hoc em controllers
 
@@ -503,7 +501,7 @@ Manter sanitização, mas garantir que ela não substitua validação semântica
 
 ## 14) Backlog sugerido (frontend + backend) para execução incremental
 
-1. **Sprint 1 (contrato de erro):** migrar `subErrors.field` para contrato em português (`erros.campo`) e concluir DTOs faltantes.
+1. **Sprint 1 (contrato de erro):** manter contrato em português (`erros.campo`) e concluir DTOs faltantes.
 2. **Sprint 2 (frontend base):** criar composable padrão de validação (`validacaoSubmetida`, resumo de pendências, foco primeiro erro).
 3. **Sprint 3 (fluxos críticos):** processo, cadastro de atividades e mapa.
 4. **Sprint 4 (admin e auxiliares):** administradores, atribuição temporária, limpeza e relatórios.

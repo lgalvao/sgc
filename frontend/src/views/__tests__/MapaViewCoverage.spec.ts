@@ -53,7 +53,7 @@ type MapaViewVm = {
 
 type FluxoMapaMock = {
     erro: {message: string} | null;
-    lastError: {message?: string; details?: Record<string, string>; subErrors?: Array<{field?: string; message?: string}>} | null;
+    lastError: {message?: string; details?: Record<string, string>; erros?: Array<{campo?: string; mensagem?: string}>} | null;
     clearError: ReturnType<typeof vi.fn>;
     adicionarCompetencia: ReturnType<typeof vi.fn>;
     atualizarCompetencia: ReturnType<typeof vi.fn>;

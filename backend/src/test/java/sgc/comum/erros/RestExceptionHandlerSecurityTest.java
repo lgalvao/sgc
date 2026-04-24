@@ -33,6 +33,6 @@ class RestExceptionHandlerSecurityTest {
                         .content(payload)
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.subErrors[0].rejectedValue").doesNotExist());
+                .andExpect(jsonPath("$.erros[0].rejectedValue").doesNotExist());
     }
 }

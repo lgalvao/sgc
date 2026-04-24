@@ -48,7 +48,7 @@ Este guia registra decisões de produto e engenharia para manter a experiência 
 - Evitar aceitar nomes antigos em paralelo quando o contrato correto puder ser ajustado.
 - Erros de entrada devem retornar campos estáveis em português quando houver campo corrigível.
 - O contrato alvo para erros estruturados é `erros` com itens contendo `campo` e `mensagem`.
-- Enquanto o contrato legado `subErrors` existir, ele deve ser tratado como migração controlada, não como padrão novo.
+- O contrato legado `subErrors` não deve ser usado em código novo nem aceito como alias permanente.
 
 ## Exceções saudáveis
 

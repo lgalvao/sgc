@@ -325,7 +325,7 @@ describe("usePerfilStore", () => {
         });
 
         it("deve limpar o erro", () => {
-            context.store.lastError = {kind: "unexpected", message: "Error", subErrors: []};
+            context.store.lastError = {kind: "unexpected", message: "Error", erros: []};
             context.store.clearError();
             expect(context.store.lastError).toBeNull();
         });

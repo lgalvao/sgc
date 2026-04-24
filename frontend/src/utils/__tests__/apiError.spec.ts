@@ -33,6 +33,25 @@ describe('apiError utils', () => {
             expect(normalized.status).toBe(404);
         });
 
+        it('deve preservar erros estruturados em português sem alias legado', () => {
+            const err = {
+                isAxiosError: true,
+                response: {
+                    status: 400,
+                    data: {
+                        message: 'Dados inválidos',
+                        erros: [{campo: 'descricao', mensagem: 'Descrição obrigatória'}],
+                        subErrors: [{field: 'descricao', message: 'Alias legado'}]
+                    }
+                }
+            };
+
+            const normalized = normalizeError(err);
+
+            expect(normalized.erros).toEqual([{campo: 'descricao', mensagem: 'Descrição obrigatória'}]);
+            expect(normalized).not.toHaveProperty('subErrors');
+        });
+
         it('deve lidar com resposta sem dados', () => {
             const err = {
                 isAxiosError: true,

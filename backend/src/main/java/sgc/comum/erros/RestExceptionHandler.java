@@ -145,18 +145,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn("Erro de validação de argumento: {}", ex.getMessage());
 
         String message = "A requisição contém dados de entrada inválidos.";
-        var subErrors = ex.getBindingResult().getFieldErrors().stream().map(
+        var erros = ex.getBindingResult().getFieldErrors().stream().map(
                         error -> new ErroSubApi(error.getObjectName(),
                                 error.getField(),
                                 sanitizar(error.getDefaultMessage())))
                 .toList();
 
-        subErrors.forEach(err -> log.info("Falha de validação: campo '{}' - {}", err.field(), err.message()));
+        erros.forEach(err -> log.info("Falha de validação: campo '{}' - {}", err.campo(), err.mensagem()));
 
         return buildResponseEntityObject(ErroApi.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(message)
-                .subErrors(subErrors)
+                .erros(erros)
                 .build());
     }
 
@@ -166,7 +166,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String traceId = gerarTraceId();
         log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém dados inválidos.";
-        var subErrors = ex.getConstraintViolations().stream().map(violation -> new ErroSubApi(
+        var erros = ex.getConstraintViolations().stream().map(violation -> new ErroSubApi(
                         violation.getRootBeanClass().getSimpleName(),
                         violation.getPropertyPath().toString(),
                         sanitizar(violation.getMessage())))
@@ -175,7 +175,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(message)
-                .subErrors(subErrors)
+                .erros(erros)
                 .traceId(traceId)
                 .build();
         return buildResponseEntity(erroApi);

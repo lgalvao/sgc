@@ -21,12 +21,11 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
   - criar atribuição temporária;
   - reabrir cadastro/revisão.
 - Adicionados feedbacks inline/contextuais nos pontos ajustados.
+- Migrado contrato estruturado de erros de `subErrors`/`field`/`message` para `erros`/`campo`/`mensagem`.
+- Atualizados `RestExceptionHandler`, `normalizeError`, `useFormErrors` e testes relacionados.
 
 ## Em aberto
 
-- Migrar contrato legado `subErrors`/`field`/`message` para `erros`/`campo`/`mensagem`.
-- Atualizar `RestExceptionHandler`, `normalizeError` e `useFormErrors` no mesmo corte.
-- Remover aliases e traduções silenciosas remanescentes após a migração.
 - Criar composable padrão de validação de formulário.
 - Padronizar foco/rolagem para o primeiro erro relevante.
 - Revisar fluxos ainda fora da primeira fatia, especialmente login, relatórios, limpeza e modais de visualização.
@@ -38,11 +37,10 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 - `./gradlew :backend:test --tests ...` nos testes backend focados: 108 testes passaram.
 - `npm run test:unit -- ...` nos testes frontend focados: 98 testes passaram.
 - `npm run test:unit -- --run src/views/__tests__/MapaViewCoverage.spec.ts`: 8 testes passaram.
+- `./gradlew :backend:test --tests ...` para contrato de erro: 24 testes passaram.
+- `npm run test:unit -- ...` para contrato de erro no frontend: 79 testes passaram.
+- `npm run test:unit -- --run src/utils/__tests__/apiError.spec.ts src/composables/__tests__/useFormErrors.spec.ts`: 24 testes passaram.
 
 ## Próximo passo recomendado
 
-Migrar o contrato estruturado de erros para português em um único corte controlado:
-
-1. Backend: `ErroApi`, `ErroSubApi` e `RestExceptionHandler`.
-2. Frontend: `apiError.ts`, `useFormErrors` e tipos relacionados.
-3. Testes: cobrir erro por campo, erro global e rejeição de aliases antigos.
+Criar o composable padrão de validação de formulário e aplicar primeiro em um fluxo pequeno para validar a ergonomia antes de expandir.

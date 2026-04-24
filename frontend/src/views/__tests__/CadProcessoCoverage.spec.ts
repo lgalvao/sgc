@@ -61,12 +61,12 @@ const ModalConfirmacaoStub = {
     emits: ['update:modelValue', 'confirmar']
 };
 
-function criarErroApi(message: string, subErrors: Array<{field?: string | null; message?: string}> = []) {
+function criarErroApi(mensagem: string, erros: Array<{campo?: string | null; mensagem?: string}> = []) {
     return {
         isAxiosError: true,
         response: {
             status: 400,
-            data: {message, subErrors}
+            data: {message: mensagem, erros}
         }
     } as any;
 }
@@ -129,14 +129,14 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         vi.restoreAllMocks();
     });
 
-    it('handles mixed errors (field + generic) correctly in handleApiErrors', async () => {
+    it('handles mixed errors (campo + generic) correctly in handleApiErrors', async () => {
         const {wrapper} = createWrapper();
 
         vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi(
             'Erro misto',
             [
-                {field: 'descricao', message: 'Descrição inválida'},
-                {field: null, message: 'Erro genérico de regra de negócio'}
+                {campo: 'descricao', mensagem: 'Descrição inválida'},
+                {campo: null, mensagem: 'Erro genérico de regra de negócio'}
             ],
         ));
 
