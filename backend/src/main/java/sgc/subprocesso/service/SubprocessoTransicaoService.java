@@ -607,7 +607,6 @@ public class SubprocessoTransicaoService {
 
     private void executarDevolucao(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
         FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
-        log.info("Devolvendo {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
@@ -628,6 +627,8 @@ public class SubprocessoTransicaoService {
                 usuario,
                 normalizarTexto(observacoes)
         ));
+
+        log.info("Devolvido {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
     }
 
     private Unidade obterUnidadeDevolucao(Subprocesso sp, Unidade unidadeAnalise) {

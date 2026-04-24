@@ -239,7 +239,7 @@ public class MapaManutencaoService {
         competenciaRepo.save(competencia);
         atividadeRepo.saveAll(competencia.getAtividades());
 
-        log.info("Competência criada");
+        log.info("Competência criada no mapa {}", mapa.getCodigo());
     }
 
     @Transactional
@@ -257,7 +257,7 @@ public class MapaManutencaoService {
 
         atividadeRepo.saveAll(competencia.getAtividades());
 
-        log.info("Competência atualizada");
+        log.info("Competência atualizada no mapa {}", competencia.getMapa().getCodigo());
     }
 
     @Transactional
@@ -269,7 +269,7 @@ public class MapaManutencaoService {
 
         atividadeRepo.saveAll(atividadesAssociadas);
         competenciaRepo.delete(competencia);
-        log.info("Competência excluída");
+        log.info("Competência excluída de mapa {}", competencia.getMapa().getCodigo());
     }
 
     @Transactional
@@ -293,7 +293,10 @@ public class MapaManutencaoService {
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         String descricao = request.descricao();
 
-        Conhecimento existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
+        Conhecimento existente = repo.buscar(Conhecimento.class,
+                Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade)
+        );
+
         if (!existente.getDescricao().equalsIgnoreCase(descricao)) {
             validarDescricaoConhecimentoUnica(codAtividade, descricao);
         }
@@ -304,7 +307,7 @@ public class MapaManutencaoService {
         conhecimentoRepo.save(existente);
         reconciliarSituacaoSubprocesso(mapa.getCodigo());
 
-        log.info("Conhecimento atualizado na atividade {}",codAtividade);
+        log.info("Conhecimento atualizado na atividade {}", codAtividade);
     }
 
     @Transactional

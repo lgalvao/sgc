@@ -261,7 +261,7 @@ describe("VisMapa.vue", () => {
                     },
                     ModalConfirmacao: {
                         name: 'ModalConfirmacao',
-                        props: ['modelValue', 'titulo', 'okDisabled'],
+                        props: ['modelValue', 'titulo', 'okDisabled', 'autoClose'],
                         template: '<div v-if="modelValue"><h3>{{ titulo }}</h3><slot /> <button data-testid="btn-validar-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-sugestoes-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-devolucao-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>'
                     },
                     ModalPadrao: {
@@ -798,6 +798,19 @@ describe("VisMapa.vue", () => {
         await modal?.vm.$emit('shown');
     });
 
+    it("configura autoClose=false nos modais obrigatórios", async () => {
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"}
+        }, "TEST", {podeDevolverMapa: ref(true), podeValidarMapa: ref(true)});
+        await flushPromises();
+
+        const modalSugestoes = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Apresentar sugestões');
+        const modalDevolucao = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Devolver mapa');
+
+        expect(modalSugestoes?.props('autoClose')).toBe(false);
+        expect(modalDevolucao?.props('autoClose')).toBe(false);
+    });
+
     it("mostra erro de validação ao confirmar devolução com observação vazia", async () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"},
@@ -825,6 +838,7 @@ describe("VisMapa.vue", () => {
         await flushPromises();
 
         expect(wrapper.text()).toContain("A justificativa é obrigatória para a devolução.");
+        expect(wrapper.vm.mostrarModalDevolucao).toBe(true);
         expect(processoServiceModule.devolverValidacao).not.toHaveBeenCalled();
 
         await wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').setValue("Motivo de devolução");

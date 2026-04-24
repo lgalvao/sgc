@@ -86,7 +86,8 @@ const stubs = {
     BFormInvalidFeedback: {template: '<div><slot /></div>'},
     EmptyState: {template: '<div></div>'},
     ModalConfirmacao: {
-        props: ['modelValue', 'okDisabled'],
+        name: 'ModalConfirmacao',
+        props: ['modelValue', 'okDisabled', 'autoClose', 'titulo'],
         template: '<div v-if="modelValue"><slot /> <button data-testid="btn-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">Confirmar</button></div>'
     },
     ModalPadrao: {
@@ -194,7 +195,21 @@ describe("MapaVisualizacaoView.vue", () => {
         await flushPromises();
 
         expect(wrapper.text()).toContain("As sugestões são obrigatórias.");
+        expect((wrapper.vm as unknown as {mostrarModalSugestoes: boolean}).mostrarModalSugestoes).toBe(true);
         expect(processoService.apresentarSugestoes).not.toHaveBeenCalled();
+    });
+
+    it("mantém autoClose desabilitado nos modais com campo obrigatório", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        const modalSugestoes = wrapper.findAllComponents({name: 'ModalConfirmacao'})
+            .find((componente) => componente.props('titulo') === 'Apresentar sugestões');
+        const modalDevolucao = wrapper.findAllComponents({name: 'ModalConfirmacao'})
+            .find((componente) => componente.props('titulo') === 'Devolver mapa');
+
+        expect(modalSugestoes?.props('autoClose')).toBe(false);
+        expect(modalDevolucao?.props('autoClose')).toBe(false);
     });
 
     it("abre modal e confirma validação", async () => {
@@ -249,6 +264,19 @@ describe("MapaVisualizacaoView.vue", () => {
         await flushPromises();
 
         expect(processoService.devolverValidacao).toHaveBeenCalledWith(123, {justificativa: "Justificativa"});
+    });
+
+    it("mantém o modal de devolução aberto em submit inválido", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
+        await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("A justificativa é obrigatória para a devolução.");
+        expect((wrapper.vm as unknown as {mostrarModalDevolucao: boolean}).mostrarModalDevolucao).toBe(true);
+        expect(processoService.devolverValidacao).not.toHaveBeenCalled();
     });
 
     it("carrega histórico ao clicar no botão", async () => {
