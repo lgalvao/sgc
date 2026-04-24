@@ -18,6 +18,8 @@ import type {
 } from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {logger} from "@/utils";
+import {normalizeError} from "@/utils/apiError";
+import {isErroCanceladoHttp} from "@/axios-setup";
 
 const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
 const {lastError, clearError, withErrorHandling} = useErrorHandler();
@@ -51,6 +53,10 @@ async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUn
             return dto.codigo;
         });
     } catch (error: unknown) {
+        const erroNormalizado = normalizeError(error);
+        if (isErroCanceladoHttp(error) || erroNormalizado.code === "REQUEST_CANCELADA") {
+            return null;
+        }
         logger.error("Erro ao buscar ID do subprocesso:", error);
         return null;
     }

@@ -3,6 +3,8 @@ import {ref} from "vue";
 import type {Processo} from "@/types/tipos";
 import {buscarContextoCompleto as serviceBuscarContextoCompleto} from "@/services/processoService";
 import {logger} from "@/utils";
+import {normalizeError} from "@/utils/apiError";
+import {isErroCanceladoHttp} from "@/axios-setup";
 
 /**
  * Dedupe de sessão para contexto completo de processo.
@@ -54,6 +56,10 @@ export const useProcessoStore = defineStore("processo", () => {
             invalido.value = true;
             return data;
         } catch (err) {
+            const erroNormalizado = normalizeError(err);
+            if (isErroCanceladoHttp(err) || erroNormalizado.code === "REQUEST_CANCELADA") {
+                return null;
+            }
             logger.error(`Erro ao buscar contexto completo do processo ${codProcesso}:`, err);
             throw err; // relança para que a view possa exibir erro inline
         } finally {

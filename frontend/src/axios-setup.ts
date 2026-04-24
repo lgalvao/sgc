@@ -25,6 +25,7 @@ type ErroCanceladoHttp = {
 };
 
 const controladoresPendentes = new Set<AbortController>();
+let sessaoEmTransicao = false;
 
 export function setRouter(router: Router) {
     routerInstance = router;
@@ -109,6 +110,15 @@ export function cancelarRequisicoesPendentes() {
     controladoresPendentes.clear();
 }
 
+export function iniciarTransicaoSessao() {
+    sessaoEmTransicao = true;
+    cancelarRequisicoesPendentes();
+}
+
+export function finalizarTransicaoSessao() {
+    sessaoEmTransicao = false;
+}
+
 export function isErroCanceladoHttp(error: unknown): boolean {
     if (typeof error !== "object" || error === null) {
         return false;
@@ -116,6 +126,16 @@ export function isErroCanceladoHttp(error: unknown): boolean {
 
     const erroCancelado = error as ErroCanceladoHttp;
     return erroCancelado.code === "ERR_CANCELED" || erroCancelado.name === "CanceledError";
+}
+
+function isRequisicaoPermitidaDuranteTransicao(url?: string): boolean {
+    if (!url) {
+        return false;
+    }
+
+    return url.includes("/usuarios/login")
+        || url.includes("/usuarios/entrar")
+        || url.includes("/usuarios/logout");
 }
 
 function calcularDuracao(inicioMs?: number): number {
@@ -158,6 +178,15 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config: ConfiguracaoMonitorada) => {
+    if (sessaoEmTransicao && !isRequisicaoPermitidaDuranteTransicao(config.url)) {
+        return Promise.reject({
+            isAxiosError: true,
+            code: "ERR_CANCELED",
+            name: "CanceledError",
+            config,
+        });
+    }
+
     const monitoramentoAtivo = isMonitoramentoAtivo();
     const correlacaoId = gerarCorrelacaoId();
     registrarControleCancelamento(config);

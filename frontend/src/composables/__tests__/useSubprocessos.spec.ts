@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import type {SubprocessoDetalhe} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
+import {logger} from "@/utils";
 
 vi.mock("@/services/subprocessoService");
 vi.mock("@/utils", () => ({
@@ -192,6 +193,20 @@ describe("useSubprocessos", () => {
         const id = await store.buscarSubprocessoPorProcessoEUnidade(1, "U1");
 
         expect(id).toBeNull();
+    });
+
+    it("não deve logar erro quando buscarSubprocessoPorProcessoEUnidade for cancelada", async () => {
+        const store = useSubprocessos();
+        const erroCancelado = Object.assign(new Error("cancelado"), {
+            code: "ERR_CANCELED",
+            name: "CanceledError",
+        });
+        vi.mocked(service.buscarSubprocessoPorProcessoEUnidade).mockRejectedValue(erroCancelado);
+
+        const id = await store.buscarSubprocessoPorProcessoEUnidade(1, "U1");
+
+        expect(id).toBeNull();
+        expect(logger.error).not.toHaveBeenCalledWith("Erro ao buscar ID do subprocesso:", expect.anything());
     });
 
     it("não deve atualizar status local se não houver detalhe", () => {

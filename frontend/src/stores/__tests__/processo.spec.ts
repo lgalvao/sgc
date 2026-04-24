@@ -93,5 +93,16 @@ describe("processo store", () => {
             expect(logger.error).toHaveBeenCalled();
         });
 
+        it("deve retornar null sem logar erro quando o carregamento for cancelado", async () => {
+            const error = Object.assign(new Error("cancelado"), {
+                code: "ERR_CANCELED",
+                name: "CanceledError",
+            });
+            vi.mocked(processoService.buscarContextoCompleto).mockRejectedValue(error);
+
+            await expect(context.store.garantirContextoCompleto(1)).resolves.toBeNull();
+            expect(logger.error).not.toHaveBeenCalled();
+        });
+
     });
 });

@@ -68,11 +68,15 @@ describe("axios-setup", () => {
     let responseSuccessInterceptor: (response: any) => any;
     let responseErrorInterceptor: (error: any) => any;
     let cancelarRequisicoesPendentes: () => void;
+    let iniciarTransicaoSessao: () => void;
+    let finalizarTransicaoSessao: () => void;
 
     beforeAll(async () => {
         const modulo = await import("../axios-setup"); // Use dynamic import
         const {setRouter} = modulo;
         cancelarRequisicoesPendentes = modulo.cancelarRequisicoesPendentes;
+        iniciarTransicaoSessao = modulo.iniciarTransicaoSessao;
+        finalizarTransicaoSessao = modulo.finalizarTransicaoSessao;
         setRouter(router as any);
 
         const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
@@ -92,6 +96,7 @@ describe("axios-setup", () => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
         window.sessionStorage.clear();
+        finalizarTransicaoSessao();
         vi.spyOn(performance, 'now')
             .mockReturnValueOnce(100)
             .mockReturnValue(250);
@@ -223,5 +228,21 @@ describe("axios-setup", () => {
 
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(router.push).not.toHaveBeenCalled();
+    });
+
+    it("deve bloquear requisicoes autenticadas durante transicao de sessao", async () => {
+        iniciarTransicaoSessao();
+
+        await expect(requestInterceptor({method: 'get', url: '/subprocessos/contexto-edicao/buscar', headers: {}}))
+            .rejects.toMatchObject({code: 'ERR_CANCELED'});
+    });
+
+    it("deve permitir requisicoes de autenticacao durante transicao de sessao", async () => {
+        iniciarTransicaoSessao();
+
+        const config = await requestInterceptor({method: 'post', url: '/usuarios/login', headers: {}});
+
+        expect(config.url).toBe('/usuarios/login');
+        expect(config.signal).toBeDefined();
     });
 });

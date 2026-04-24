@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import {useMapas} from '@/composables/useMapas';
 import {reactive} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
@@ -80,7 +79,6 @@ const subprocessosMock = reactive({
     subprocessoDetalhe: null as SubprocessoDetalheMock | null,
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
-    buscarContextoEdicao: vi.fn(),
     atualizarStatusLocal: vi.fn(),
     lastError: null as {message: string} | null,
     clearError: vi.fn(),
@@ -90,17 +88,6 @@ vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
 vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: () => subprocessosMock}));
-
-// Mock da store de cache de subprocesso (Rodada 2)
-const subprocessoStoreCacheMock = {
-    garantirContextoEdicao: vi.fn(),
-    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
-    dadosValidos: vi.fn().mockReturnValue(false),
-    invalidar: vi.fn(),
-};
-vi.mock('@/stores/subprocesso', () => ({
-    useSubprocessoStore: () => subprocessoStoreCacheMock,
-}));
 
 describe('SubprocessoView.vue', () => {
     const mockSubprocesso: SubprocessoDetalheMock = {
@@ -178,14 +165,12 @@ describe('SubprocessoView.vue', () => {
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
         subprocessosMock.subprocessoDetalhe = null;
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(10);
-        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
-        subprocessosMock.buscarContextoEdicao = vi.fn();
+        subprocessosMock.buscarSubprocessoDetalhe = vi.fn().mockImplementation(async () => {
+            subprocessosMock.subprocessoDetalhe = mockSubprocesso;
+            return mockSubprocesso;
+        });
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
-        // Configura o mock da store de cache
-        subprocessoStoreCacheMock.dadosValidos.mockReturnValue(false);
-        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade = vi.fn();
-        subprocessoStoreCacheMock.invalidar = vi.fn();
     });
 
     // Helper to mount component with specific setup
@@ -218,22 +203,10 @@ describe('SubprocessoView.vue', () => {
             stubActions: true,
         });
 
-        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
+        subprocessosMock.buscarSubprocessoDetalhe.mockImplementation(async () => {
             subprocessosMock.subprocessoDetalhe = subprocessoToUse;
-            return {
-                codigo: 10,
-                contexto: {
-                    detalhes: subprocessoToUse,
-                    mapa: {codigo: 100},
-                    unidade: subprocessoToUse.unidade,
-                    atividadesDisponiveis: [],
-                    subprocesso: null,
-                },
-            };
+            return subprocessoToUse;
         });
-        const mapaStore = useMapas();
-        mapaStore.buscarMapaCompleto = vi.fn().mockResolvedValue({});
-        mapaStore.mapaCompleto.value = null;
 
         const wrapper = mount(SubprocessoView, {
             global: {
@@ -250,23 +223,22 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        return {wrapper, store: subprocessosMock, mapaStore};
+        return {wrapper, store: subprocessosMock};
     };
 
     it('fetches data on mount', async () => {
-        const {mapaStore} = mountComponent();
+        mountComponent();
         await flushPromises();
 
-        expect(subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
-        expect(mapaStore.mapaCompleto.value).toEqual({codigo: 100});
+        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
+        expect(subprocessosMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
     });
 
     it('recarrega dados ao reativar a view em keepAlive', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
-        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
-        // Simula cache inválido para que o onActivated recarregue
-        subprocessoStoreCacheMock.dadosValidos.mockReturnValue(false);
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockClear();
+        subprocessosMock.buscarSubprocessoDetalhe.mockClear();
 
         const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
         for (const hook of hooks) {
@@ -274,16 +246,16 @@ describe('SubprocessoView.vue', () => {
         }
         await flushPromises();
 
-        expect(subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
+        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
+        expect(subprocessosMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
     });
 
-    it('mantem orçamento enxuto de chamadas no carregamento inicial quando o contexto já traz mapa', async () => {
-        const {mapaStore} = mountComponent();
+    it('mantem orçamento enxuto de chamadas no carregamento inicial do detalhe', async () => {
+        mountComponent();
         await flushPromises();
 
-        // Apenas 1 chamada ao cache (que resolve buscar+contexto internamente)
-        expect(subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
-        expect(mapaStore.buscarMapaCompleto).not.toHaveBeenCalled();
+        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
+        expect(subprocessosMock.buscarSubprocessoDetalhe).toHaveBeenCalledTimes(1);
     });
 
     it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {

@@ -108,7 +108,7 @@
           v-if="codSubprocesso"
           :cod-processo="props.codProcesso"
           :cod-subprocesso="codSubprocesso"
-          :mapa="mapa"
+          :mapa="null"
           :sigla-unidade="props.siglaUnidade"
           :situacao="subprocesso.situacao"
           :subprocesso="subprocesso"
@@ -241,7 +241,6 @@ import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useSubprocessos} from "@/composables/useSubprocessos";
@@ -253,9 +252,7 @@ import {formatDateTimeBR, logger, parseDate} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useToastStore} from "@/stores/toast";
-import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
@@ -278,9 +275,6 @@ function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
 
 const subprocessosStore = useSubprocessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
-const subprocessoStoreCache = useSubprocessoStore();
-
-const mapaStore = useMapas();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const toast = useToast();
@@ -328,7 +322,6 @@ const {
   podeEnviarLembrete
 } = useAcesso(subprocesso);
 
-const mapa = computed(() => mapaStore.mapaCompleto.value);
 const movimentacoes = computed<Movimentacao[]>(
     () => subprocesso.value?.movimentacoes ?? [],
 );
@@ -370,38 +363,26 @@ function exibirToastPendente() {
 
 async function carregarSubprocesso() {
   subprocessosStore.subprocessoDetalhe = null;
+  const codigoResolvido = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+      props.codProcesso,
+      props.siglaUnidade
+  );
 
-  const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
-    codProcesso: props.codProcesso,
-    siglaUnidade: props.siglaUnidade,
-    store: subprocessoStoreCache,
-  });
+  if (!codigoResolvido) {
+    codSubprocesso.value = null;
+    erroNaoEncontrado.value = !subprocessosStore.lastError;
+    return;
+  }
 
-  if (diagnostico.tipo === 'sucesso') {
+  codSubprocesso.value = codigoResolvido;
+  const detalhe = await subprocessosStore.buscarSubprocessoDetalhe(codigoResolvido);
+
+  if (detalhe) {
     erroNaoEncontrado.value = false;
-    codSubprocesso.value = diagnostico.resultado.codigo;
-    subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
-    mapaStore.mapaCompleto.value = diagnostico.resultado.contexto.mapa;
     return;
   }
 
-  if (diagnostico.tipo === 'erroIntegracao') {
-    codSubprocesso.value = null;
-    erroNaoEncontrado.value = true;
-    notify(diagnostico.erro.message, 'danger');
-    return;
-  }
-
-  if (diagnostico.tipo === 'cancelado') {
-    return;
-  }
-
-  if (diagnostico.tipo === 'ausencia') {
-    codSubprocesso.value = null;
-    erroNaoEncontrado.value = true;
-    logger.error(`Falha grave: contexto de subprocesso ausente sem erro normalizado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
-    return;
-  }
+  erroNaoEncontrado.value = !subprocessosStore.lastError;
 }
 
 onMounted(async () => {
@@ -413,10 +394,6 @@ onMounted(async () => {
 onActivated(async () => {
   exibirToastPendente();
   if (!carregamentoInicialConcluido.value) {
-    return;
-  }
-  // Só recarrega se o cache tiver sido invalidado por ação de workflow
-  if (codSubprocesso.value && subprocessoStoreCache.dadosValidos(codSubprocesso.value)) {
     return;
   }
   await carregarSubprocesso();

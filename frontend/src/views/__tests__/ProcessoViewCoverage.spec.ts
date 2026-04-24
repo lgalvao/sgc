@@ -190,6 +190,15 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         await flushPromises();
     });
 
+    it("não deve exibir erro quando o carregamento inicial for cancelado", async () => {
+        vi.mocked(processoService.buscarContextoCompleto).mockResolvedValueOnce(null as never);
+
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        expect((wrapper.vm as any).lastError).toBeNull();
+    });
+
     it("deve abrir detalhes da unidade (navegação) para ADMIN", async () => {
         const wrapper = createWrapper({
             perfil: {

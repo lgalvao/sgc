@@ -6,12 +6,20 @@ import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import {Perfil} from "@/types/tipos";
 import {usePerfilStore} from "../perfil";
 
-const {cancelarRequisicoesPendentesMock} = vi.hoisted(() => ({
+const {
+    cancelarRequisicoesPendentesMock,
+    iniciarTransicaoSessaoMock,
+    finalizarTransicaoSessaoMock,
+} = vi.hoisted(() => ({
     cancelarRequisicoesPendentesMock: vi.fn(),
+    iniciarTransicaoSessaoMock: vi.fn(),
+    finalizarTransicaoSessaoMock: vi.fn(),
 }));
 
 vi.mock("@/axios-setup", () => ({
     cancelarRequisicoesPendentes: cancelarRequisicoesPendentesMock,
+    iniciarTransicaoSessao: iniciarTransicaoSessaoMock,
+    finalizarTransicaoSessao: finalizarTransicaoSessaoMock,
 }));
 
 vi.mock("@/services/usuarioService");
@@ -89,6 +97,9 @@ describe("usePerfilStore", () => {
         processoStoreMock.invalidar.mockClear();
         subprocessoStoreMock.invalidar.mockClear();
         unidadeStoreMock.invalidarCache.mockClear();
+        cancelarRequisicoesPendentesMock.mockClear();
+        iniciarTransicaoSessaoMock.mockClear();
+        finalizarTransicaoSessaoMock.mockClear();
     });
 
     const context = setupStoreTest(usePerfilStore);
