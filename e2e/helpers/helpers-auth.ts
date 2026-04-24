@@ -73,13 +73,16 @@ async function limparSessaoNavegador(page: Page) {
         // Ignora erros se não estiver em uma página do domínio (ex: about:blank)
     }
 
-    // 2. Limpa cookies de autenticação
+    // 2. Desmonta a página atual para abortar requests pendentes antes de trocar a sessão.
+    await page.goto('about:blank');
+
+    // 3. Limpa cookies de autenticação
     await page.context().clearCookies();
 
-    // 3. Navega para a página de login
+    // 4. Navega para a página de login
     await page.goto('/login');
 
-    // 4. Garante a limpeza após o carregamento para total isolamento
+    // 5. Garante a limpeza após o carregamento para total isolamento
     await page.evaluate(() => {
         window.localStorage.clear();
         window.sessionStorage.clear();
