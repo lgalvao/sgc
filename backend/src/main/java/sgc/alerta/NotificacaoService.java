@@ -95,7 +95,10 @@ public class NotificacaoService {
         notificacao.setSituacao(SituacaoNotificacao.ENVIADO);
         notificacao.setDataHoraEnvio(agora());
         notificacao.setUltimoErro(null);
-        notificacaoEmailRepo.save(notificacao);
+        notificacaoEmailRepo.marcarEnviado(new NotificacaoEmailRepo.MarcarEnviadoCommand(
+                notificacao.getCodigo(),
+                notificacao.getDataHoraEnvio()
+        ));
     }
 
     public void marcarFalha(NotificacaoEmail notificacao, Exception erro) {
@@ -109,7 +112,13 @@ public class NotificacaoService {
             notificacao.setSituacao(SituacaoNotificacao.FALHA_TEMPORARIA);
             notificacao.setProximaTentativaEm(agora().plusSeconds(atrasoRetrySegundos(tentativas)));
         }
-        notificacaoEmailRepo.save(notificacao);
+        notificacaoEmailRepo.marcarFalha(new NotificacaoEmailRepo.MarcarFalhaCommand(
+                notificacao.getCodigo(),
+                notificacao.getSituacao(),
+                notificacao.getTentativas(),
+                notificacao.getUltimoErro(),
+                notificacao.getProximaTentativaEm()
+        ));
     }
 
     private LocalDateTime agora() {

@@ -34,6 +34,29 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
             """)
     int marcarEnviandoSeDisponivel(@Param("codigo") Long codigo, @Param("agora") LocalDateTime agora);
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update NotificacaoEmail notificacao
+               set notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIADO,
+                   notificacao.dataHoraEnvio = :#{#cmd.agora},
+                   notificacao.ultimoErro = null
+             where notificacao.codigo = :#{#cmd.codigo}
+               and notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIANDO
+            """)
+    int marcarEnviado(@Param("cmd") MarcarEnviadoCommand cmd);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update NotificacaoEmail notificacao
+               set notificacao.situacao = :#{#cmd.situacao},
+                   notificacao.tentativas = :#{#cmd.tentativas},
+                   notificacao.ultimoErro = :#{#cmd.ultimoErro},
+                   notificacao.proximaTentativaEm = :#{#cmd.proximaTentativaEm}
+             where notificacao.codigo = :#{#cmd.codigo}
+               and notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIANDO
+            """)
+    int marcarFalha(@Param("cmd") MarcarFalhaCommand cmd);
+
     List<NotificacaoEmail> findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(Long subprocessoCodigo, Pageable pageable);
 
     @Query("""
@@ -86,4 +109,16 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
             @Param("subprocessoCodigo") Long subprocessoCodigo,
             @Param("agora") LocalDateTime agora
     );
+
+    record MarcarEnviadoCommand(Long codigo, LocalDateTime agora) {
+    }
+
+    record MarcarFalhaCommand(
+            Long codigo,
+            SituacaoNotificacao situacao,
+            int tentativas,
+            String ultimoErro,
+            LocalDateTime proximaTentativaEm
+    ) {
+    }
 }

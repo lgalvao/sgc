@@ -59,7 +59,7 @@
           </BButton>
           <BButton
               v-if="podeDisponibilizarMapa"
-              :disabled="!habilitarDisponibilizarMapa"
+              :disabled="loadingDisponibilizacao"
               data-testid="btn-cad-mapa-disponibilizar"
               variant="success"
               @click="abrirModalDisponibilizar"
@@ -70,13 +70,14 @@
       </PageHeader>
 
       <BAlert
-          v-if="erroMapa"
+          v-if="erroMapaExibido"
           :model-value="true"
+          no-fade
           variant="danger"
           dismissible
-          @dismissed="erroMapa = null"
+          @dismissed="limparErroMapa"
       >
-        {{ erroMapa }}
+        {{ erroMapaExibido }}
       </BAlert>
 
       <div v-if="unidade">
@@ -498,6 +499,7 @@ const mostrarModalDisponibilizar = ref(false);
 const mostrarModalExcluirCompetencia = ref(false);
 const competenciaParaExcluir = ref<Competencia | null>(null);
 const notificacaoDisponibilizacao = ref("");
+const erroValidacaoMapa = ref("");
 const loadingCompetencia = ref(false);
 const loadingDisponibilizacao = ref(false);
 const loadingExclusao = ref(false);
@@ -510,6 +512,12 @@ const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors
   'observacoes',
   'generic'
 ]);
+const erroMapaExibido = computed(() => erroValidacaoMapa.value || erroMapa.value);
+
+function limparErroMapa() {
+  erroValidacaoMapa.value = "";
+  erroMapa.value = null;
+}
 
 function handleErrors(store: { lastError: unknown }) {
   setFromNormalizedError(store.lastError as NormalizedError | null);
@@ -537,13 +545,14 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 }
 
 function abrirModalDisponibilizar() {
+  erroValidacaoMapa.value = "";
   if (!podeConfirmarDisponibilizacao.value) {
     if (competencias.value.length === 0) {
-      notify(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS, 'warning');
+      erroValidacaoMapa.value = TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS;
     } else if (existeCompetenciaSemAtividade.value) {
-      notify(TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE, 'warning');
+      erroValidacaoMapa.value = TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE;
     } else if (atividadesSemCompetencia.value.length > 0) {
-      notify(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA, 'warning');
+      erroValidacaoMapa.value = TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA;
     }
     return;
   }

@@ -844,10 +844,15 @@ public class SubprocessoTransicaoService {
 
         criarAlertaReaberturaUnidade(contexto);
 
-        Unidade superior = buscarSuperiorImediato(unidade.getCodigo());
-        if (superior != null) {
+        for (Unidade superior : buscarSuperiores(unidade.getCodigo())) {
             criarAlertaReaberturaSuperior(contexto, superior);
         }
+    }
+
+    private List<Unidade> buscarSuperiores(Long codigoUnidade) {
+        return unidadeHierarquiaService.buscarCodigosSuperiores(codigoUnidade).stream()
+                .map(unidadeService::buscarPorCodigo)
+                .toList();
     }
 
     private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {

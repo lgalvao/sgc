@@ -33,7 +33,7 @@
         </BButton>
         <LoadingButton
             v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
-            :disabled="!habilitarDisponibilizarCadastro"
+            :disabled="loadingValidacao"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
@@ -65,6 +65,7 @@
     <BAlert
         v-if="erroGlobalFormatado"
         :model-value="true"
+        no-fade
         variant="danger"
         dismissible
         @dismissed="erroGlobal = null"
@@ -627,9 +628,9 @@ async function disponibilizarCadastro() {
   if (!habilitarDisponibilizar.value) {
     const cadastroIncompleto = atividades.value.length === 0 || atividades.value.some(a => !a.conhecimentos || a.conhecimentos.length === 0);
     if (cadastroIncompleto) {
-      notify(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO, 'warning');
+      erroGlobal.value = TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO;
     } else if (isRevisao.value && !houveAlteracaoCadastro.value && !disponibilizacaoSemMudancas.value) {
-      notify(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO, 'warning');
+      erroGlobal.value = TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO;
     }
     return;
   }

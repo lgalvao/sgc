@@ -5,7 +5,7 @@ import * as ProcessoHelpers from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
-import {verificarAppAlert} from './helpers/helpers-navegacao.js';
+import {limparNotificacoes, verificarAppAlert} from './helpers/helpers-navegacao.js';
 import { TEXTOS } from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
@@ -117,7 +117,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(btnDisponibilizar).toBeVisible();
             await btnDisponibilizar.click();
             await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
-            await AuthHelpers.limparNotificacoes(page);
+            await limparNotificacoes(page);
 
             await AtividadeHelpers.importarAtividadesVazia(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
             await AtividadeHelpers.disponibilizarCadastro(page);
@@ -180,7 +180,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(btnDisponibilizar).toBeVisible();
             await btnDisponibilizar.click();
             await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
-            await AuthHelpers.limparNotificacoes(page);
+            await limparNotificacoes(page);
 
             await MapaHelpers.criarCompetencia(page, 'Competência Técnica Básica', ['Atividade 1']);
             await MapaHelpers.disponibilizarMapa(page);
@@ -282,7 +282,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(btnDisponibilizar).toBeVisible();
             await btnDisponibilizar.click();
             await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();
-            await AuthHelpers.limparNotificacoes(page);
+            await limparNotificacoes(page);
 
             await expect(page.getByText('Atividade 1')).toBeVisible();
             await AtividadeHelpers.adicionarConhecimento(page, 'Atividade 1', 'Conhecimento Revisado');

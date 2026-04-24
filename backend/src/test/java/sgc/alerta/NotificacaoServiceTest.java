@@ -181,6 +181,7 @@ class NotificacaoServiceTest {
     @DisplayName("marcarFalha deve agendar retry antes do limite")
     void marcarFalhaDeveAgendarRetryAntesDoLimite() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(10L)
                 .tentativas(0)
                 .build();
 
@@ -190,13 +191,20 @@ class NotificacaoServiceTest {
         assertThat(notificacao.getTentativas()).isEqualTo(1);
         assertThat(notificacao.getUltimoErro()).isEqualTo("SMTP indisponivel");
         assertThat(notificacao.getProximaTentativaEm()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0, 20));
-        verify(notificacaoEmailRepo).save(notificacao);
+        verify(notificacaoEmailRepo).marcarFalha(argThat(cmd ->
+                cmd.codigo().equals(10L)
+                        && cmd.situacao() == SituacaoNotificacao.FALHA_TEMPORARIA
+                        && cmd.tentativas() == 1
+                        && cmd.ultimoErro().equals("SMTP indisponivel")
+                        && cmd.proximaTentativaEm().equals(LocalDateTime.of(2026, 4, 21, 9, 0, 20))
+        ));
     }
 
     @Test
     @DisplayName("marcarFalha deve encerrar apos limite de tentativas")
     void marcarFalhaDeveEncerrarAposLimiteDeTentativas() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(10L)
                 .tentativas(4)
                 .build();
 
@@ -205,6 +213,12 @@ class NotificacaoServiceTest {
         assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.FALHA_DEFINITIVA);
         assertThat(notificacao.getTentativas()).isEqualTo(5);
         assertThat(notificacao.getProximaTentativaEm()).isNull();
-        verify(notificacaoEmailRepo).save(notificacao);
+        verify(notificacaoEmailRepo).marcarFalha(argThat(cmd ->
+                cmd.codigo().equals(10L)
+                        && cmd.situacao() == SituacaoNotificacao.FALHA_DEFINITIVA
+                        && cmd.tentativas() == 5
+                        && cmd.ultimoErro().equals("erro definitivo")
+                        && cmd.proximaTentativaEm() == null
+        ));
     }
 }

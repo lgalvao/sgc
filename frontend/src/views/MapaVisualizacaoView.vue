@@ -436,18 +436,23 @@ async function sincronizarSugestoesMapa(): Promise<string> {
 }
 
 async function confirmarSugestoes() {
-  await executarComLoading(async () => {
-    await apresentarSugestoesService(codSubprocesso.value!, {
-      sugestoes: sugestoes.value,
-    });
-    if (mapa.value) {
-      mapa.value = {
-        ...mapa.value,
+  try {
+    await executarComLoading(async () => {
+      await apresentarSugestoesService(codSubprocesso.value!, {
         sugestoes: sugestoes.value,
-      };
-    }
-    await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
-  });
+      });
+      if (mapa.value) {
+        mapa.value = {
+          ...mapa.value,
+          sugestoes: sugestoes.value,
+        };
+      }
+      await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+    });
+  } catch (error) {
+    logger.error(error);
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+  }
 }
 
 async function handleConfirmarSugestoes() {

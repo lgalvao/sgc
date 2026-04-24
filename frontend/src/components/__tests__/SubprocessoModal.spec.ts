@@ -30,14 +30,18 @@ describe("SubprocessoModal", () => {
         expect((input.element as HTMLInputElement).value).toBe("2024-10-10");
     });
 
-    it("deve desabilitar o botão de confirmar se a data for inválida", async () => {
+    it("deve mostrar erro ao confirmar se a data for inválida", async () => {
         vi.spyOn(utils, "isDateStrictlyFuture").mockReturnValue(false);
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
         });
 
         const confirmButton = context.wrapper.find('[data-testid="btn-modal-confirmar"]');
-        expect(confirmButton.attributes("disabled")).toBeDefined();
+        expect(confirmButton.attributes("disabled")).toBeUndefined();
+        await confirmButton.trigger("click");
+
+        expect(context.wrapper.emitted("confirmarAlteracao")).toBeFalsy();
+        expect(context.wrapper.text()).toContain("A data limite para validação deve ser uma data futura.");
     });
 
     it("deve habilitar o botão de confirmar se a data for válida", async () => {

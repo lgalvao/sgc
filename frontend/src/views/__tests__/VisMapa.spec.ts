@@ -242,6 +242,10 @@ describe("VisMapa.vue", () => {
                         props: ['modelValue'],
                         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
                     },
+                    BFormInvalidFeedback: {
+                        name: 'BFormInvalidFeedback',
+                        template: '<div><slot /></div>',
+                    },
                     BModal: {
                         name: 'BModal',
                         props: ["modelValue", "title"],
@@ -794,7 +798,7 @@ describe("VisMapa.vue", () => {
         await modal?.vm.$emit('shown');
     });
 
-    it("botão de confirmar devolução deve estar desabilitado quando observação está vazia", async () => {
+    it("mostra erro de validação ao confirmar devolução com observação vazia", async () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"},
             processos: {
@@ -816,12 +820,22 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         const confirmBtn = wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]');
-        expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(true);
+        expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(false);
+        await confirmBtn.trigger("click");
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("A justificativa é obrigatória para a devolução.");
+        expect(processoServiceModule.devolverValidacao).not.toHaveBeenCalled();
 
         await wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').setValue("Motivo de devolução");
         await wrapper.vm.$nextTick();
 
-        expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(false);
+        await confirmBtn.trigger("click");
+        await flushPromises();
+
+        expect(processoServiceModule.devolverValidacao).toHaveBeenCalledWith(10, {
+            justificativa: "Motivo de devolução",
+        });
     });
 
     it("deve gerenciar visualização de sugestões e estados nulos do subprocesso", async () => {

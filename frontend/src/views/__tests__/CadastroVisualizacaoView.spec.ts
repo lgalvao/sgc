@@ -346,8 +346,8 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(vm.nomeUnidade).toBe("");
 
         // Testar computed estadoObservacaoDevolucao
-        vm.validacaoDevolucaoSubmetida = true;
         vm.observacaoDevolucao = "   ";
+        await vm.confirmarDevolucao();
         expect(vm.estadoObservacaoDevolucao).toBe(false);
         vm.observacaoDevolucao = "texto";
         expect(vm.estadoObservacaoDevolucao).toBeNull();

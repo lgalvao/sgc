@@ -38,6 +38,7 @@ type ImportarAtividadesModalVm = {
     unidadesParticipantes: UnidadeImportacao[];
     atividadesParaImportar: Atividade[];
     atividadesSelecionadas: Atividade[];
+    mensagemErroAtividades: string;
 };
 
 describe("ImportarAtividadesModal.vue", () => {
@@ -299,7 +300,8 @@ describe("ImportarAtividadesModal.vue", () => {
         await vm.importar();
         await flushPromises();
 
-        expect(vm.erroImportacao).toBe("Selecione ao menos uma atividade para importar.");
+        expect(vm.mensagemErroAtividades).toBe("Selecione ao menos uma atividade para importar.");
+        expect(wrapper.text()).toContain("Selecione ao menos uma atividade para importar.");
     });
 
     it("cobre tentativa de importacao com destino nulo", async () => {

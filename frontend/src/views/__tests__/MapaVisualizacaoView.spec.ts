@@ -83,6 +83,7 @@ const stubs = {
         props: ['modelValue'],
         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
     },
+    BFormInvalidFeedback: {template: '<div><slot /></div>'},
     EmptyState: {template: '<div></div>'},
     ModalConfirmacao: {
         props: ['modelValue', 'okDisabled'],
@@ -179,7 +180,7 @@ describe("MapaVisualizacaoView.vue", () => {
         expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
     });
 
-    it("deve manter confirmar desabilitado enquanto as sugestões estiverem vazias", async () => {
+    it("deve mostrar erro ao confirmar sugestões vazias", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         vi.mocked(processoService.apresentarSugestoes).mockResolvedValue(undefined as never);
@@ -187,11 +188,12 @@ describe("MapaVisualizacaoView.vue", () => {
 
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await flushPromises();
-        expect(wrapper.find('[data-testid="btn-confirmar"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('[data-testid="btn-confirmar"]').attributes('disabled')).toBeUndefined();
 
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();
 
+        expect(wrapper.text()).toContain("As sugestões são obrigatórias.");
         expect(processoService.apresentarSugestoes).not.toHaveBeenCalled();
     });
 

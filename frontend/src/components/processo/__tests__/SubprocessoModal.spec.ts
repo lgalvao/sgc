@@ -44,7 +44,10 @@ describe('SubprocessoModal.vue', () => {
         expect(wrapper.text()).toContain('A data limite para validação deve ser uma data futura.');
         
         const btn = wrapper.find('[data-testid="btn-modal-confirmar"]');
-        expect((btn.element as HTMLButtonElement).disabled).toBe(true);
+        expect((btn.element as HTMLButtonElement).disabled).toBe(false);
+        await btn.trigger('click');
+
+        expect(wrapper.emitted('confirmarAlteracao')).toBeFalsy();
     });
 
     it('deve usar a última data limite do subprocesso como mínimo quando ela for maior que amanhã', () => {

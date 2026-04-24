@@ -9,6 +9,7 @@ type ModalAcaoBlocoVm = {
     mostrar: boolean;
     processando: boolean;
     erro: string | null;
+    mensagemErroDataLimite: string;
     dataLimite: string;
     abrir: () => void;
     fechar: () => void;
@@ -131,12 +132,12 @@ describe("ModalAcaoBloco.vue", () => {
         vm.abrir();
         await wrapper.vm.$nextTick();
 
-        // Chamar confirmar diretamente pois o botão está desabilitado via :disabled
         await vm.confirmar();
         await wrapper.vm.$nextTick();
         
         expect(wrapper.emitted('confirmar')).toBeFalsy();
-        expect(vm.erro).toBe("A data limite é obrigatória.");
+        expect(vm.mensagemErroDataLimite).toBe("A data limite é obrigatória.");
+        expect(wrapper.text()).toContain("A data limite é obrigatória.");
 
         const amanha = obterAmanhaFormatado();
         vm.dataLimite = amanha;
