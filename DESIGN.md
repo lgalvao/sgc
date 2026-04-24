@@ -389,7 +389,7 @@ O sistema permite que ADMIN e GESTOR executem ações sobre múltiplos subproces
 - **[README.md](README.md)** — Visão geral, stack, como executar e sumário de testes.
 - **[AGENTS.md](AGENTS.md)** — Convenções de código e regras para desenvolvedores e agentes de IA.
 - **[backend/README.md](backend/README.md)** — Arquitetura detalhada do backend.
-- **[frontend/README.md](frontend/README.md)** — Arquitetura do frontend e estrutura de pastas.
+- **[frontend/README.md](frontend/README.md)** — Arquitetura do frontend.
 - **[etc/docs/regras-acesso.md](etc/docs/regras-acesso.md)** — Especificação completa do controle de acesso.
 - **[etc/docs/regras-e2e.md](etc/docs/regras-e2e.md)** — Guia para testes E2E com Playwright.
 - **[etc/reqs/_intro.md](etc/reqs/_intro.md)** — Informações gerais, atores, perfis e situações dos processos.
