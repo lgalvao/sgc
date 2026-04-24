@@ -11,7 +11,7 @@ export async function navegarParaMapa(page: Page, preferencia: 'edicao' | 'visua
     const cardEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
     const cardVisualizacao = page.getByTestId('card-subprocesso-mapa-visualizacao');
 
-    await expect(cardEdicao.or(cardVisualizacao)).toBeVisible();
+    await expect(cardEdicao.or(cardVisualizacao).first()).toBeVisible();
 
     if (preferencia === 'edicao' && await cardEdicao.isVisible()) {
         await cardEdicao.click();
