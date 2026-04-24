@@ -23,6 +23,7 @@ export interface ResultadoContextoSubprocesso {
 
 export type DiagnosticoCarregamentoContextoSubprocesso =
   | { tipo: 'sucesso'; resultado: ResultadoContextoSubprocesso }
+  | { tipo: 'cancelado' }
   | { tipo: 'erroIntegracao'; erro: NormalizedError }
   | { tipo: 'ausencia' };
 
@@ -47,6 +48,10 @@ export async function diagnosticarCarregamentoContextoSubprocessoInicial({
 
   if (resultado) {
     return {tipo: 'sucesso', resultado};
+  }
+
+  if (store.erroIntegracaoContexto?.code === 'REQUEST_CANCELADA') {
+    return {tipo: 'cancelado'};
   }
 
   if (store.erroIntegracaoContexto) {

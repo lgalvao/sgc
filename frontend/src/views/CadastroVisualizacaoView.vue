@@ -392,6 +392,8 @@ onMounted(async () => {
       subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
       atividades.value = diagnostico.resultado.contexto.atividadesDisponiveis;
       unidade.value = diagnostico.resultado.contexto.unidade as Unidade;
+    } else if (diagnostico.tipo === 'cancelado') {
+      return;
     } else if (diagnostico.tipo === 'erroIntegracao') {
       notify(diagnostico.erro.message, 'danger');
     } else {

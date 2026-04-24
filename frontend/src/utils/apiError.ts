@@ -3,6 +3,8 @@ import logger from '@/utils/logger';
 type ErrorLike = {
     stack?: string;
     isAxiosError?: boolean;
+    code?: string;
+    name?: string;
 };
 
 function obterStack(erro: unknown): string | undefined {
@@ -52,6 +54,16 @@ export interface NormalizedError {
 }
 
 export function normalizeError(err: unknown): NormalizedError {
+    if (isAxiosError(err) && ((err.code === 'ERR_CANCELED') || err.name === 'CanceledError')) {
+        return {
+            kind: 'network',
+            message: 'Requisição cancelada.',
+            code: 'REQUEST_CANCELADA',
+            stackTrace: obterStack(err),
+            originalError: err
+        };
+    }
+
     // Erro de rede (sem response)
     if (isAxiosError(err) && !err.response) {
         return {

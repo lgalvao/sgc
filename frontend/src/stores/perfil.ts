@@ -10,6 +10,7 @@ import {usePainelStore} from "@/stores/painel";
 import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useUnidadeStore} from "@/stores/unidade";
+import {cancelarRequisicoesPendentes} from "@/axios-setup";
 
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage/sessionStorage usando composable
@@ -135,6 +136,8 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     async function logout() {
+        cancelarRequisicoesPendentes();
+
         try {
             await usuarioService.logout();
         } catch {

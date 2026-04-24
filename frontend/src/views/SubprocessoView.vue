@@ -392,6 +392,10 @@ async function carregarSubprocesso() {
     return;
   }
 
+  if (diagnostico.tipo === 'cancelado') {
+    return;
+  }
+
   if (diagnostico.tipo === 'ausencia') {
     codSubprocesso.value = null;
     erroNaoEncontrado.value = true;

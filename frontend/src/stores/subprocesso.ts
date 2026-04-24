@@ -79,6 +79,10 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             return data;
         } catch (err) {
             const erroNormalizado = normalizeError(err);
+            if (erroNormalizado.code === "REQUEST_CANCELADA") {
+                erroIntegracaoContexto.value = erroNormalizado;
+                return null;
+            }
             logger.error(`Erro ao buscar contexto de edição do subprocesso ${codSubprocesso}:`, err);
             if (erroNormalizado.kind === "notFound") {
                 erroIntegracaoContexto.value = criarErroSubprocessoNaoEncontrado(
@@ -136,6 +140,10 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             return {codigo, contexto};
         } catch (err) {
             const erroNormalizado = normalizeError(err);
+            if (erroNormalizado.code === "REQUEST_CANCELADA") {
+                erroIntegracaoContexto.value = erroNormalizado;
+                return null;
+            }
             logger.error(`Erro ao buscar contexto de subprocesso para processo ${codProcesso} unidade ${siglaUnidade}:`, err);
             if (erroNormalizado.kind === "notFound") {
                 erroIntegracaoContexto.value = criarErroSubprocessoNaoEncontrado(

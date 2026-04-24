@@ -16,7 +16,15 @@ type MetadadosMonitoramento = {
 
 type ConfiguracaoMonitorada = InternalAxiosRequestConfig & {
     metadadosMonitoramento?: MetadadosMonitoramento;
+    controladorCancelamento?: AbortController;
 };
+
+type ErroCanceladoHttp = {
+    code?: string;
+    name?: string;
+};
+
+const controladoresPendentes = new Set<AbortController>();
 
 export function setRouter(router: Router) {
     routerInstance = router;
@@ -75,6 +83,41 @@ function definirHeader(config: ConfiguracaoMonitorada, nome: string, valor: stri
     config.headers.set(nome, valor);
 }
 
+function registrarControleCancelamento(config: ConfiguracaoMonitorada) {
+    if (config.signal) {
+        return;
+    }
+
+    const controlador = new AbortController();
+    config.signal = controlador.signal;
+    config.controladorCancelamento = controlador;
+    controladoresPendentes.add(controlador);
+}
+
+function limparControleCancelamento(config?: ConfiguracaoMonitorada) {
+    const controlador = config?.controladorCancelamento;
+    if (!controlador) {
+        return;
+    }
+
+    controladoresPendentes.delete(controlador);
+    delete config.controladorCancelamento;
+}
+
+export function cancelarRequisicoesPendentes() {
+    controladoresPendentes.forEach((controlador) => controlador.abort());
+    controladoresPendentes.clear();
+}
+
+export function isErroCanceladoHttp(error: unknown): boolean {
+    if (typeof error !== "object" || error === null) {
+        return false;
+    }
+
+    const erroCancelado = error as ErroCanceladoHttp;
+    return erroCancelado.code === "ERR_CANCELED" || erroCancelado.name === "CanceledError";
+}
+
 function calcularDuracao(inicioMs?: number): number {
     if (inicioMs === undefined) {
         return 0;
@@ -85,6 +128,7 @@ function calcularDuracao(inicioMs?: number): number {
 function registrarConclusaoResposta(response: AxiosResponse) {
     const config = (response.config || {}) as ConfiguracaoMonitorada;
     const metadados = config.metadadosMonitoramento;
+    limparControleCancelamento(config);
 
     if (!metadados?.monitoramentoAtivo) {
         return response;
@@ -116,6 +160,7 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use((config: ConfiguracaoMonitorada) => {
     const monitoramentoAtivo = isMonitoramentoAtivo();
     const correlacaoId = gerarCorrelacaoId();
+    registrarControleCancelamento(config);
 
     config.metadadosMonitoramento = {
         correlacaoId,
@@ -139,6 +184,11 @@ apiClient.interceptors.request.use((config: ConfiguracaoMonitorada) => {
 const handleResponseError = (error: unknown) => {
     const config = (error as {config?: ConfiguracaoMonitorada})?.config;
     const metadados = config?.metadadosMonitoramento;
+    limparControleCancelamento(config);
+
+    if (isErroCanceladoHttp(error)) {
+        return Promise.reject(error);
+    }
 
     if (metadados?.monitoramentoAtivo) {
         logger.error("[http] erro", {
