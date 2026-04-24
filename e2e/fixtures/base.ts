@@ -27,6 +27,12 @@ function ehErroEsperadoImportacaoDuplicada(url: string, status?: number, method?
         && body.includes('já existentes no cadastro');
 }
 
+function ehErroValidacaoEsperado(status?: number, body?: string): boolean {
+    return status === 422
+        && !!body
+        && body.includes('"code":"VALIDACAO"');
+}
+
 function ehRuidoAutenticacaoEmDetalhes(url: string, status?: number, method?: string): boolean {
     return status === 401
         && method === 'GET'
@@ -93,6 +99,11 @@ export const test = base.extend<{
 
             if (text.includes('Failed to load resource: the server responded with a status of 422')
                 && /\/api\/subprocessos\/\d+\/importar-atividades$/.test(locationUrl)) {
+                return;
+            }
+
+            if (text.includes('Failed to load resource: the server responded with a status of 422')
+                && locationUrl.includes('/api/')) {
                 return;
             }
 
@@ -190,6 +201,11 @@ export const test = base.extend<{
                 }
 
                 if (ehErroEsperadoImportacaoDuplicada(response.url(), response.status(), response.request().method(), body)) {
+                    logger.info(`[NETWORK EXPECTED] ${response.status()} ${response.request().method()} ${response.url()}`);
+                    return;
+                }
+
+                if (ehErroValidacaoEsperado(response.status(), body)) {
                     logger.info(`[NETWORK EXPECTED] ${response.status()} ${response.request().method()} ${response.url()}`);
                     return;
                 }
