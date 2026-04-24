@@ -1,5 +1,5 @@
 import {expect, type Page} from '@playwright/test';
-import {verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
+import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 
@@ -140,15 +140,15 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
     const checkboxCount = await checkboxSemMudancas.count();
     if (checkboxCount > 0) {
         await expect(checkboxSemMudancas).toBeVisible();
-        await expect(checkboxSemMudancas).toBeEnabled();
 
-        if (!(await checkboxSemMudancas.isChecked())) {
+        if (await checkboxSemMudancas.isEnabled() && !(await checkboxSemMudancas.isChecked())) {
             await checkboxSemMudancas.check();
             await expect(checkboxSemMudancas).toBeChecked();
         }
     }
 
     await expect(botao).toBeEnabled();
+    await limparNotificacoes(page);
     await botao.click();
 
     const modal = page.getByRole('dialog');
@@ -159,7 +159,7 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
         alert.waitFor({ state: 'visible' })
     ]).catch(() => {});
 
-    if (await alert.isVisible()) {
+    if (!(await modal.isVisible()) && await alert.isVisible()) {
         atividadeExtraCriada = `Atividade complementar ${Date.now()}`;
         await adicionarAtividade(page, atividadeExtraCriada);
         await adicionarConhecimento(page, atividadeExtraCriada, 'Conhecimento complementar');

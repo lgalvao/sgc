@@ -71,8 +71,10 @@
 
       <BAlert
           v-if="erroMapaExibido"
+          :key="erroMapaExibido"
           :model-value="true"
           no-fade
+          show
           variant="danger"
           dismissible
           @dismissed="limparErroMapa"

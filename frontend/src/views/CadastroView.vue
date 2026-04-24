@@ -64,8 +64,10 @@
 
     <BAlert
         v-if="erroGlobalFormatado"
+        :key="erroGlobalFormatado.message"
         :model-value="true"
         no-fade
+        show
         variant="danger"
         dismissible
         @dismissed="erroGlobal = null"
@@ -620,11 +622,6 @@ async function disponibilizarCadastro() {
       ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
       : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
-  if (!situacaoAtualCadastro || situacaoAtualCadastro !== situacaoReferencia) {
-    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
-    return;
-  }
-
   if (!habilitarDisponibilizar.value) {
     const cadastroIncompleto = atividades.value.length === 0 || atividades.value.some(a => !a.conhecimentos || a.conhecimentos.length === 0);
     if (cadastroIncompleto) {
@@ -632,6 +629,11 @@ async function disponibilizarCadastro() {
     } else if (isRevisao.value && !houveAlteracaoCadastro.value && !disponibilizacaoSemMudancas.value) {
       erroGlobal.value = TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO;
     }
+    return;
+  }
+
+  if (!situacaoAtualCadastro || situacaoAtualCadastro !== situacaoReferencia) {
+    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
     return;
   }
 
