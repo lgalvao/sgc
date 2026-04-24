@@ -22,7 +22,7 @@
     </BCol>
     <BCol cols="auto">
       <LoadingButton
-          :disabled="disabled || !modelValue.trim()"
+          :disabled="disabled || loading"
           :loading="loading"
           aria-label="Adicionar atividade"
           data-testid="btn-adicionar-atividade"
@@ -39,6 +39,7 @@
 import {BCol, BForm, BFormInput, BFormInvalidFeedback} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const modelValue = defineModel<string>({default: ''});
 
@@ -53,28 +54,31 @@ const emit = defineEmits<{
 }>();
 
 const inputRef = ref<InstanceType<typeof BFormInput> | null>(null);
-const validacaoSubmetida = ref(false);
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+} = useValidacaoFormulario();
 
 const mensagemErro = computed(() => {
   if (props.erro) return props.erro;
-  if (validacaoSubmetida.value && !modelValue.value.trim()) return "Informe a atividade.";
+  if (deveExibirErro(!modelValue.value.trim())) return "Informe a atividade.";
   return "";
 });
 
 const estadoInput = computed(() => (mensagemErro.value ? false : null));
 
 function onSubmit() {
-  validacaoSubmetida.value = true;
-  if (!modelValue.value.trim()) return;
+  if (!validarSubmissao(!!modelValue.value.trim())) return;
   emit('submit');
-  validacaoSubmetida.value = false;
+  resetarValidacao();
 }
 
 watch(
     () => modelValue.value,
     (valor) => {
       if (valor.trim()) {
-        validacaoSubmetida.value = false;
+        resetarValidacao();
       }
     }
 );

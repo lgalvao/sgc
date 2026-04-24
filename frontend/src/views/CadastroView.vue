@@ -252,7 +252,8 @@ function calcularAssinaturaCadastro(lista: Atividade[]): string {
       .join('\u0003');
 }
 
-const houveAlteracaoCadastro = computed(() => calcularAssinaturaCadastro(atividades.value) !== atividadesSnapshotInicial.value);
+const assinaturaCadastroAtual = computed(() => calcularAssinaturaCadastro(atividades.value));
+const houveAlteracaoCadastro = computed(() => assinaturaCadastroAtual.value !== atividadesSnapshotInicial.value);
 const checkboxSemMudancasDesabilitado = computed(() => loadingInicioRevisao.value || houveAlteracaoCadastro.value);
 
 const habilitarDisponibilizar = computed(() => {
@@ -365,6 +366,18 @@ const historicoAnalises = computed(() => {
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
 const erroNovaAtividade = ref<string | null>(null);
 
+watch(novaAtividade, (valorAtual, valorAnterior) => {
+  if (valorAtual !== valorAnterior && erroNovaAtividade.value) {
+    erroNovaAtividade.value = null;
+  }
+});
+
+watch(assinaturaCadastroAtual, (valorAtual, valorAnterior) => {
+  if (valorAtual !== valorAnterior && (errosValidacao.value.length > 0 || erroGlobal.value)) {
+    limparErrosValidacaoCadastro();
+  }
+});
+
 const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalHistorico = ref(false);
@@ -387,11 +400,62 @@ const atividadeRefs = new Map<number, Element>();
 let timeoutLimparErros: ReturnType<typeof setTimeout> | null = null;
 
 function timeoutLimpezaErros() {
-  if (timeoutLimparErros) clearTimeout(timeoutLimparErros);
+  limparTimeoutErrosCadastro();
   timeoutLimparErros = setTimeout(() => {
-    errosValidacao.value = [];
-    erroGlobal.value = null;
+    limparErrosValidacaoCadastro();
   }, 6000);
+}
+
+function limparTimeoutErrosCadastro() {
+  if (timeoutLimparErros) {
+    clearTimeout(timeoutLimparErros);
+    timeoutLimparErros = null;
+  }
+}
+
+function limparErrosValidacaoCadastro() {
+  limparTimeoutErrosCadastro();
+  errosValidacao.value = [];
+  erroGlobal.value = null;
+}
+
+function registrarErrosValidacaoCadastro(erros: ErroValidacao[]) {
+  errosValidacao.value = erros;
+  erroGlobal.value = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
+}
+
+function obterSituacaoReferenciaDisponibilizacao(): SituacaoSubprocesso {
+  return isRevisao.value
+      ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+      : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+}
+
+function obterErroPreValidacaoDisponibilizacao(): string | null {
+  if (habilitarDisponibilizar.value) {
+    return null;
+  }
+
+  const cadastroIncompleto = atividades.value.length === 0
+      || atividades.value.some((atividade) => !atividade.conhecimentos || atividade.conhecimentos.length === 0);
+
+  if (cadastroIncompleto) {
+    return TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO;
+  }
+
+  if (isRevisao.value && !houveAlteracaoCadastro.value && !disponibilizacaoSemMudancas.value) {
+    return TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO;
+  }
+
+  return null;
+}
+
+function aplicarResultadoValidacaoCadastro(valido: boolean, erros: ErroValidacao[]) {
+  if (valido) {
+    mostrarModalConfirmacao.value = true;
+    return;
+  }
+
+  registrarErrosValidacaoCadastro(erros);
 }
 
 const mapaErros = computed(() => {
@@ -618,17 +682,12 @@ async function disponibilizarCadastro() {
   if (loadingValidacao.value) return;
 
   const situacaoAtualCadastro = subprocesso.value?.situacao;
-  const situacaoReferencia = isRevisao.value
-      ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-      : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+  const situacaoReferencia = obterSituacaoReferenciaDisponibilizacao();
+  const erroPreValidacao = obterErroPreValidacaoDisponibilizacao();
 
-  if (!habilitarDisponibilizar.value) {
-    const cadastroIncompleto = atividades.value.length === 0 || atividades.value.some(a => !a.conhecimentos || a.conhecimentos.length === 0);
-    if (cadastroIncompleto) {
-      erroGlobal.value = TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO;
-    } else if (isRevisao.value && !houveAlteracaoCadastro.value && !disponibilizacaoSemMudancas.value) {
-      erroGlobal.value = TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO;
-    }
+  if (erroPreValidacao) {
+    limparErrosValidacaoCadastro();
+    erroGlobal.value = erroPreValidacao;
     return;
   }
 
@@ -639,23 +698,16 @@ async function disponibilizarCadastro() {
 
   if (codSubprocesso.value) {
     loadingValidacao.value = true;
-    errosValidacao.value = [];
-    erroGlobal.value = null;
+    limparErrosValidacaoCadastro();
     try {
       const resultado = await fluxoSubprocesso.validarCadastro(codSubprocesso.value);
-      if (resultado?.valido) {
-        mostrarModalConfirmacao.value = true;
-      } else if (resultado) {
-        errosValidacao.value = resultado.erros;
-
-        const erroSemAtividade = resultado.erros.find((e) => !e.atividadeCodigo);
-        if (erroSemAtividade) {
-          erroGlobal.value = erroSemAtividade.mensagem;
+      if (resultado) {
+        aplicarResultadoValidacaoCadastro(resultado.valido, resultado.erros);
+        if (!resultado.valido) {
+          await nextTick();
+          scrollParaPrimeiroErro();
+          timeoutLimpezaErros();
         }
-
-        await nextTick();
-        scrollParaPrimeiroErro();
-        timeoutLimpezaErros();
       }
     } catch {
       // O withErrorHandling já notificou o erro se necessário ou ele será exibido via erroGlobal

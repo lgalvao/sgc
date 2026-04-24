@@ -135,6 +135,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalSugestoes"
+        :auto-close="false"
         :loading="isLoading"
         :ok-title="TEXTOS.comum.BOTAO_APRESENTAR"
         test-codigo-cancelar="btn-sugestoes-mapa-cancelar"
@@ -205,6 +206,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalDevolucao"
+        :auto-close="false"
         :loading="isLoading"
         :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
         test-codigo-cancelar="btn-devolucao-mapa-cancelar"

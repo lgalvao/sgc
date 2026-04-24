@@ -174,6 +174,7 @@
 
       <ModalConfirmacao
           v-model="mostrarModalDevolucao"
+          :auto-close="false"
           :loading="isLoading"
           :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
           test-codigo-cancelar="btn-devolucao-mapa-cancelar"

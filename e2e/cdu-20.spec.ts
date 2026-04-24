@@ -64,16 +64,21 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         // Verifica que o botão "Ver sugestões" NÃO aparece (situação é "Mapa validado", não "Mapa com sugestões")
         await expect(page.getByTestId('btn-mapa-ver-sugestoes')).toBeHidden();
 
-        // Verifica que o botão de confirmar devolução está desabilitado sem observação
+        // Validação inline: submit vazio não prossegue e exibe erro local
         await page.getByTestId('btn-mapa-devolver').click();
-        await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeDisabled();
+        const modalDevolucao = page.locator('.modal.show').filter({hasText: 'Devolver mapa'});
+        await expect(modalDevolucao).toBeVisible();
+        await expect(modalDevolucao.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
+        await modalDevolucao.getByTestId('btn-devolucao-mapa-confirmar').click();
+        await expect(page.getByText('A justificativa é obrigatória para a devolução.')).toBeVisible();
 
-        // Verifica que o botão habilita após preencher a observação
+        // Após corrigir, o erro some e a ação volta a prosseguir normalmente
         await page.getByTestId('inp-devolucao-mapa-obs').fill('Observação de devolução');
-        await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
+        await expect(modalDevolucao.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
+        await expect(page.getByText('A justificativa é obrigatória para a devolução.')).toBeHidden();
 
         // Cancela a devolução (passo CDU)
-        await page.getByTestId('btn-devolucao-mapa-cancelar').click();
+        await modalDevolucao.getByTestId('btn-devolucao-mapa-cancelar').click();
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
@@ -199,14 +204,18 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-devolver').click();
-        const modal = page.getByRole('dialog');
+        const modal = page.locator('.modal.show').filter({hasText: 'Devolver mapa'});
+        await expect(modal).toBeVisible();
         await expect(modal).toContainText('Devolver mapa');
         await expect(modal).toContainText('Confirma a devolução da validação do mapa para ajustes?');
-        await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeDisabled();
+        await expect(modal.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
+        await modal.getByTestId('btn-devolucao-mapa-confirmar').click();
+        await expect(page.getByText('A justificativa é obrigatória para a devolução.')).toBeVisible();
 
         await page.getByTestId('inp-devolucao-mapa-obs').fill('Necessário rever competências');
-        await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
-        await page.getByTestId('btn-devolucao-mapa-confirmar').click();
+        await expect(modal.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
+        await expect(page.getByText('A justificativa é obrigatória para a devolução.')).toBeHidden();
+        await modal.getByTestId('btn-devolucao-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.DEVOLUCAO_REALIZADA).first()).toBeVisible();

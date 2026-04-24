@@ -4,7 +4,7 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 
 ## Estado geral
 
-- **Fase atual:** Sprint 1 — contrato de erro e DTOs faltantes (concluída); iniciando Sprint 2.
+- **Fase atual:** convergência fina dos fluxos restantes; base compartilhada, modais críticos, administração, limpeza e relatórios já estão alinhados ao padrão.
 - **Última atualização:** 2026-04-24.
 - **Diretriz vigente:** validação não usa toast; erros corrigíveis aparecem inline ou em `BAlert` contextual.
 
@@ -45,9 +45,22 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 - `CriarCompetenciaModal`: removido `salvamentoDesabilitado` silencioso, convertidas validações textuais para computadas via `deveExibirErro` do composable, adicionado `.is-invalid` na caixa de listagem de atividades e focado o primeiro erro no clique do botão Salvar.
 - `SubprocessoView` (Modal de Reabertura): convertido aviso genérico de "Informe a justificativa" que era renderizado indiscriminadamente para `BFormInvalidFeedback` reativo a submit, integrado com validação global usando `useValidacaoFormulario`.
 
+### Sprint 4: Administração, Limpeza e Relatórios (Concluída)
+- `AdministradoresView`: modal de adição migrado para `useValidacaoFormulario`, com obrigatoriedade inline do título, foco no primeiro erro e sem validação solta fora do contexto do campo.
+- `LimpezaProcessosView`: código do processo passou a validar no clique da ação, com `BFormInvalidFeedback` inline e foco antes da abertura da confirmação.
+- `RelatorioAndamentoView`: seleção obrigatória do processo agora usa validação inline no submit, com foco automático no primeiro erro.
+- `RelatorioMapasView`: seleção obrigatória do processo agora usa validação inline no submit, preservando bloqueio apenas para carregamento.
+
+### Cadastro de atividades (Concluída)
+- `CadAtividadeForm`: migrado para `useValidacaoFormulario`, removendo o pré-bloqueio do botão "adicionar atividade" por campo vazio. A obrigatoriedade agora valida no submit com erro inline e limpeza após correção.
+- `CadastroView`: limpeza de erros estruturados (globais e por item) centralizada em helpers privados. Quando o cadastro muda após uma validação inválida, o feedback anterior é descartado para evitar erro stale durante a correção.
+- `CadastroView`: fluxo de disponibilização simplificado com helpers privados para pré-validação e aplicação do resultado de `validarCadastro`, preservando erro global, erro por item, scroll e abertura do modal de confirmação.
+- `AtividadeItem`: formulário de novo conhecimento alinhado ao padrão de validação inline no submit. O componente deixou de falhar silenciosamente em campo vazio e passou a limpar o erro local após a correção.
+- `InlineEditor` + `AtividadeItem`: edição inline de atividade e conhecimento agora mostra erro local quando o save é tentado com texto vazio, mantendo a edição aberta até a correção. A falha silenciosa do save vazio foi removida sem mudar os eventos externos.
+
 ## Em aberto
 
-- Revisar fluxos ainda fora da primeira fatia: relatórios, limpeza e modais de visualização.
+- Hardening final da refatoração: consolidar a atualização do plano macro, revisar microcopy residual e ampliar a leitura de cobertura/regressão dos fluxos já convergidos.
 
 ### Sprint 3: Acessibilidade e Clareza (Concluída)
 - [x] Indicação visual de campos obrigatórios (asterisco) em todos os formulários e modais.
@@ -79,7 +92,9 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 - `npm run typecheck` após migração de ParametrosView e ProcessoCadastroView: sem erros.
 
 - `npx vitest run DisponibilizarMapaModal.spec.ts CriarCompetenciaModal.spec.ts SubprocessoView.spec.ts`: Testes atualizados e passando sem regressões.
+- `npm run test:unit --prefix frontend -- src/components/__tests__/AtividadeItem.spec.ts src/components/atividades/__tests__/CadAtividadeForm.spec.ts src/views/__tests__/AtividadesCadastroView.spec.ts`: 39 testes passaram após a convergência do cadastro de atividades.
+- `npm run typecheck`: aprovado após a convergência do cadastro de atividades.
 
 ## Próximo passo recomendado
 
-Sprint 3 — Administração e Configuração: revisar `ConfiguracoesView` (se aplicável), consolidando lógica de view focada em listas e ações rápidas.
+Sprint 5 — hardening: atualizar o plano macro para refletir a convergência do cadastro de atividades e seguir com a auditoria final de regressão de UX e acessibilidade.

@@ -98,7 +98,9 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
         await inputData.fill(obterDataAnterior(dataMinima!));
         await expect(page.getByText('A data limite deve ser maior ou igual à última data limite do subprocesso.')).toBeVisible();
-        await expect(page.getByTestId('btn-modal-confirmar')).toBeDisabled();
+        await expect(modal.getByTestId('btn-modal-confirmar')).toBeEnabled();
+        await modal.getByTestId('btn-modal-confirmar').click();
+        await expect(modal).toBeVisible();
 
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).toBeHidden();

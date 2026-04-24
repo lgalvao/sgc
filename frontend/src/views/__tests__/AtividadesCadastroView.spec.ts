@@ -64,6 +64,8 @@ type CadastroViewVm = {
     mostrarModalConfirmacaoRemocao: boolean;
     dadosRemocao: {tipo: string; index?: number; conhecimentoCodigo?: number} | null;
     erroGlobal: string | null;
+    erroNovaAtividade?: string | null;
+    errosValidacao?: Array<{atividadeCodigo?: number; mensagem: string}>;
     notificacao: unknown;
     novaAtividade: string;
     timeoutLimparErros: ReturnType<typeof setTimeout> | null;
@@ -399,6 +401,48 @@ describe("CadastroView.vue", () => {
 
         expect(fluxoSubprocesso.validarCadastro).toHaveBeenCalledWith(123);
         expect(vm.mostrarModalConfirmacao).toBe(true);
+    });
+
+    it("não chama validação quando o cadastro está incompleto e exibe erro global", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        vm.atividades = [{codigo: 1, conhecimentos: []}];
+        await wrapper.vm.$nextTick();
+
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+
+        await vm.disponibilizarCadastro();
+
+        expect(fluxoSubprocesso.validarCadastro).not.toHaveBeenCalled();
+        expect(vm.erroGlobal).toBe("O cadastro está incompleto. Certifique-se de que há pelo menos uma atividade e que todas possuem conhecimentos associados.");
+        expect(vm.mostrarModalConfirmacao).toBe(false);
+    });
+
+    it("em revisão sem mudanças, exibe erro específico sem chamar validação", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const subprocessosStore = subprocessosMock;
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "REVISAO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
+        };
+        vm.atividades = [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}];
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.disponibilizacaoSemMudancas = false;
+        await wrapper.vm.$nextTick();
+
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+
+        await vm.disponibilizarCadastro();
+
+        expect(fluxoSubprocesso.validarCadastro).not.toHaveBeenCalled();
+        expect(vm.erroGlobal).toBe("Não foram detectadas alterações no cadastro para disponibilizar. Se não houver mudanças, marque a opção 'Disponibilização sem mudanças'.");
+        expect(vm.mostrarModalConfirmacao).toBe(false);
     });
 
     it("confirma disponibilização e redireciona", async () => {
@@ -807,5 +851,45 @@ describe("CadastroView.vue", () => {
         
         // 291 (processarRespostaLocal branch)
         vm.processarRespostaLocal({atividadesAtualizadas: [{codigo: 1}]});
+    });
+
+    it("deve limpar erro da nova atividade quando o texto for alterado", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+
+        vm.erroNovaAtividade = "Atividade já cadastrada.";
+        vm.novaAtividade = "Nova atividade";
+        await vm.$nextTick();
+
+        expect(vm.erroNovaAtividade).toBeNull();
+    });
+
+    it("deve limpar erros estruturados ao alterar o cadastro apos uma validacao invalida", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+
+        vm.atividades = [{codigo: 1, descricao: "A1", conhecimentos: [{codigo: 1, descricao: "C1"}]}];
+        await vm.$nextTick();
+
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+        fluxoSubprocesso.validarCadastro.mockResolvedValueOnce({
+            valido: false,
+            erros: [
+                {atividadeCodigo: 1, mensagem: "Informe ao menos um conhecimento."},
+                {mensagem: "Cadastro inconsistente."}
+            ]
+        });
+
+        await vm.disponibilizarCadastro();
+        expect(vm.erroGlobal).toBe("Cadastro inconsistente.");
+        expect(vm.errosValidacao).toHaveLength(2);
+
+        vm.atividades = [{codigo: 1, descricao: "A1 ajustada", conhecimentos: [{codigo: 1, descricao: "C1"}]}];
+        await vm.$nextTick();
+
+        expect(vm.erroGlobal).toBeNull();
+        expect(vm.errosValidacao).toEqual([]);
     });
 });

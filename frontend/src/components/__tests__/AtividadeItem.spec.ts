@@ -25,6 +25,7 @@ describe("AtividadeItem.vue", () => {
             template: '<input class="form-control" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
             props: ['modelValue', 'size']
         },
+        BFormInvalidFeedback: {template: '<div class="invalid-feedback d-block"><slot /></div>'},
         BForm: {template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>'},
         BCol: {template: '<div class="col"><slot /></div>'},
     };
@@ -81,6 +82,8 @@ describe("AtividadeItem.vue", () => {
         await input.setValue('');
         await context.wrapper.find('[data-testid="btn-salvar-edicao-atividade"]').trigger('click');
         expect(context.wrapper.emitted('atualizar-atividade')).toBeFalsy();
+        expect(context.wrapper.text()).toContain('Informe a atividade.');
+        expect(context.wrapper.find('[data-testid="inp-editar-atividade"]').exists()).toBe(true);
     });
 
     it("não deve salvar edição de atividade se descrição igual", async () => {
@@ -110,6 +113,23 @@ describe("AtividadeItem.vue", () => {
         await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
 
         expect(context.wrapper.emitted('adicionar-conhecimento')).toBeFalsy();
+        expect(context.wrapper.text()).toContain('Informe o conhecimento.');
+    });
+
+    it("remove erro local do conhecimento após correção", async () => {
+        const mountOptions = getCommonMountOptions({}, commonStubs);
+        context.wrapper = mount(AtividadeItem, {
+            ...mountOptions,
+            props: {atividade: atividadeMock, podeEditar: true},
+        });
+
+        await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
+        expect(context.wrapper.text()).toContain('Informe o conhecimento.');
+
+        const input = context.wrapper.find('[data-testid="inp-novo-conhecimento"]');
+        await input.setValue('Conhecimento novo');
+
+        expect(context.wrapper.text()).not.toContain('Informe o conhecimento.');
     });
 
     it("deve emitir 'remover-atividade'", async () => {
@@ -164,6 +184,25 @@ describe("AtividadeItem.vue", () => {
         await context.wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]').trigger('click');
 
         expect(context.wrapper.emitted('atualizar-conhecimento')).toBeFalsy();
+        expect(context.wrapper.text()).toContain('Informe o conhecimento.');
+        expect(context.wrapper.find('[data-testid="inp-editar-conhecimento"]').exists()).toBe(true);
+    });
+
+    it("remove erro da edição inline de atividade após correção", async () => {
+        const mountOptions = getCommonMountOptions({}, commonStubs);
+        context.wrapper = mount(AtividadeItem, {
+            ...mountOptions,
+            props: {atividade: atividadeMock, podeEditar: true},
+        });
+
+        await context.wrapper.find('[data-testid="btn-editar-atividade"]').trigger('click');
+        const input = context.wrapper.find('[data-testid="inp-editar-atividade"]');
+        await input.setValue('');
+        await context.wrapper.find('[data-testid="btn-salvar-edicao-atividade"]').trigger('click');
+        expect(context.wrapper.text()).toContain('Informe a atividade.');
+
+        await input.setValue('Atividade corrigida');
+        expect(context.wrapper.text()).not.toContain('Informe a atividade.');
     });
 
     it("deve cancelar edição de conhecimento", async () => {

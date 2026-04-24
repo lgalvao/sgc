@@ -27,6 +27,18 @@ describe("CadAtividadeForm.vue", () => {
         expect(wrapper.emitted("submit")).toBeFalsy();
     });
 
+    it("mantém o botão habilitado com campo vazio e valida no submit", async () => {
+        const wrapper = criarWrapper({}, "");
+        const botao = wrapper.find('[aria-label="Adicionar atividade"]');
+
+        expect(botao.attributes("disabled")).toBeUndefined();
+
+        await wrapper.find("form").trigger("submit.prevent");
+
+        expect(wrapper.text()).toContain("Informe a atividade.");
+        expect(wrapper.emitted("submit")).toBeFalsy();
+    });
+
     it("exibe erro recebido via prop", () => {
         const wrapper = criarWrapper({erro: "Atividade já cadastrada."}, "Atividade X");
         expect(wrapper.text()).toContain("Atividade já cadastrada.");
@@ -36,5 +48,15 @@ describe("CadAtividadeForm.vue", () => {
         const wrapper = criarWrapper({}, "Nova atividade");
         await wrapper.find("form").trigger("submit.prevent");
         expect(wrapper.emitted("submit")).toBeTruthy();
+    });
+
+    it("remove o erro local após correção depois da primeira tentativa", async () => {
+        const wrapper = criarWrapper({}, "");
+
+        await wrapper.find("form").trigger("submit.prevent");
+        expect(wrapper.text()).toContain("Informe a atividade.");
+
+        await wrapper.setProps({modelValue: "Nova atividade"});
+        expect(wrapper.text()).not.toContain("Informe a atividade.");
     });
 });

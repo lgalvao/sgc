@@ -14,6 +14,7 @@
         <InlineEditor
             :can-edit="podeEditar"
             :edit-enabled="habilitarEdicao"
+            mensagem-erro-obrigatoria="Informe a atividade."
             :model-value="atividade.descricao"
             aria-label="Editar atividade"
             test-codigo-cancelar="btn-cancelar-edicao-atividade"
@@ -73,6 +74,7 @@
           <InlineEditor
               :can-edit="podeEditar"
               :edit-enabled="habilitarEdicao"
+              mensagem-erro-obrigatoria="Informe o conhecimento."
               :model-value="conhecimento.descricao"
               aria-label="Editar conhecimento"
               size="sm"
@@ -109,14 +111,17 @@
           <BCol>
             <BFormInput
                 v-model="novoConhecimento"
-                :class="{ 'border-danger': !!erroValidacao }"
                 aria-label="Novo conhecimento"
                 :disabled="!habilitarEdicao"
                 data-testid="inp-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 size="sm"
+                :state="mensagemErroNovoConhecimento ? false : null"
                 type="text"
             />
+            <BFormInvalidFeedback :state="mensagemErroNovoConhecimento ? false : null">
+              {{ mensagemErroNovoConhecimento }}
+            </BFormInvalidFeedback>
           </BCol>
           <BCol cols="auto">
             <BButton
@@ -142,10 +147,11 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BCardTitle, BCol, BForm, BFormInput, BRow} from "bootstrap-vue-next";
-import {ref} from "vue";
+import {BAlert, BButton, BCard, BCardBody, BCardTitle, BCol, BForm, BFormInput, BFormInvalidFeedback, BRow} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
 import type {Atividade} from "@/types/tipos";
 import InlineEditor from "@/components/comum/InlineEditor.vue";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 interface Props {
   atividade: Atividade;
@@ -170,17 +176,36 @@ const emit = defineEmits<{
 const emEdicao = ref(false);
 
 const novoConhecimento = ref("");
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro
+} = useValidacaoFormulario();
+
+const mensagemErroNovoConhecimento = computed(() => {
+  return deveExibirErro(!novoConhecimento.value.trim()) ? "Informe o conhecimento." : "";
+});
 
 function adicionarConhecimento() {
   if (!props.habilitarEdicao) {
     return;
   }
-  const descricao = novoConhecimento.value.trim();
-  if (descricao) {
-    emit("adicionar-conhecimento", descricao);
-    novoConhecimento.value = "";
+
+  if (!validarSubmissao(!!novoConhecimento.value.trim())) {
+    return;
   }
+
+  const descricao = novoConhecimento.value.trim();
+  emit("adicionar-conhecimento", descricao);
+  novoConhecimento.value = "";
+  resetarValidacao();
 }
+
+watch(novoConhecimento, (valorAtual, valorAnterior) => {
+  if (valorAtual !== valorAnterior && valorAtual.trim()) {
+    resetarValidacao();
+  }
+});
 </script>
 
 <style scoped>

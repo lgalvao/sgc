@@ -285,7 +285,7 @@ Estas exceções são saudáveis quando documentadas:
    - bloco (`AppAlert`),
    - toast (`notify`) apenas sistêmico.
 
-## Fase 1 — Base compartilhada
+## Fase 1 — Base compartilhada (concluída)
 
 1. Evoluir `useFormErrors` para suportar:
    - erro global padronizado (`generic`),
@@ -296,21 +296,21 @@ Estas exceções são saudáveis quando documentadas:
    - `podeSubmeter`,
    - `resumoPendencias` opcional.
 
-## Fase 2 — Padronização por módulo
+## Fase 2 — Padronização por módulo (concluída)
 
 1. **Processo**: manter como referência e extrair padrão reutilizável.
-2. **Atribuição/Parâmetros/Login**: alinhar para mesma hierarquia visual de erro (campo > bloco > toast).
-3. **Cadastro de atividades**: consolidar contrato entre erro global e erro por item (tempo de exibição, limpeza, foco).
-4. **Modais de mapa**: unificar estrutura de erro inline e `generic`.
+2. **Atribuição/Parâmetros/Login**: alinhados à mesma hierarquia visual de erro (campo > bloco > toast), preservando a exceção saudável de autenticação.
+3. **Cadastro de atividades**: convergido para o mesmo padrão-base, combinando erro local inline, erro global contextual e erro por item sem falhas silenciosas relevantes.
+4. **Modais de mapa**: estrutura de erro inline e `generic` já convergida; manter como referência para os fluxos restantes.
 
-## Fase 3 — Acessibilidade e microcopy
+## Fase 3 — Acessibilidade e microcopy (majoritariamente concluída)
 
 1. Garantir que todos os campos obrigatórios tenham um indicador visual claro (asterisco `*` ou equivalente) no label, antes mesmo da submissão.
 2. Garantir foco no primeiro erro em todos os formulários principais.
 3. Revisar linguagem das mensagens para padrão único (tom e ação esperada).
-4. Garantir que campos inválidos tenham associação semântica com mensagem (ARIA/feedback).
+4. Garantir que campos inválidos tenham associação semântica com mensagem (ARIA/feedback), fechando os pontos residuais de componentes reutilizáveis.
 
-## Fase 4 — Testes de regressão de UX
+## Fase 4 — Testes de regressão de UX (em andamento)
 
 1. Criar suíte mínima de testes de comportamento de validação:
    - submit com campos vazios;
@@ -336,7 +336,7 @@ Antes de concluir qualquer ajuste de formulário, validar:
 
 ## 10) Conclusão objetiva
 
-O frontend já tem bons blocos (especialmente em `ProcessoCadastroView` e no fluxo de atividades), mas ainda opera com convenções múltiplas de momento de validação e canal de feedback. A convergência deve priorizar:
+O frontend já convergiu os principais formulários e modais para uma base compartilhada de validação (`useValidacaoFormulario`, foco no primeiro erro e feedback inline/contextual). O fluxo de cadastro de atividades, antes o principal hotspot remanescente, também já foi alinhado ao padrão-base. A convergência agora deve priorizar:
 
 1. uma hierarquia fixa de exibição de erro;
 2. um contrato comum de estado de validação;
@@ -361,18 +361,18 @@ Legenda rápida:
 |---|---|---|---|---|
 | `LoginView` | Submit (checagem local de vazio) + resposta de backend | `notify`/`AppAlert` + alerta contextual de Caps Lock | Não bloqueia por vazio; apenas por etapa/loading | **Médio** |
 | `ProcessoCadastroView` + `ProcessoFormFields` + `useProcessoForm` | Reativo (`watch` p/ data) + backend (`erros`) + submit | Inline por campo + `AppAlert` para erro global estruturado + foco no inválido | Sim (`isFormInvalid`) | **Baixo** (referência atual) |
-| `CadastroView` + `CadAtividadeForm` + `AtividadeItem` | Submit (adicionar), validação de domínio via endpoint (`validar-cadastro`) | Erro por item (card), erro global (`BAlert`), notificações | Sim (disponibilizar condicionado a estado e conteúdo) | **Médio** |
-| `CadastroVisualizacaoView` (modais de validar/devolver) | Submit no modal (devolução exige texto) | Inline em `BFormInvalidFeedback` (devolução) + `notify` para fluxo | Sim (`ok-disabled` na devolução) | **Médio** |
-| `MapaView` (edição mapa) | Ações de workflow (submit implícito por botões/modais) + validação backend | `BAlert` local + `notify` | Sim em ações de topo | **Médio** |
-| `MapaVisualizacaoView` (sugestões/validação/devolução) | Submit em modais + regras por estado de workflow | `notify`, modais com campo obrigatório implícito | Sim em botões principais e `ok-disabled` de devolução | **Médio** |
-| `SubprocessoView` (alterar prazo/reabrir/lembrete) | Submit em modais + validação backend | `AppAlert` + `BAlert` + `notify` | Sim em modais (`ok-disabled` em reabertura) | **Médio** |
-| `AtribuicaoTemporariaView` | Submit com `validacaoSubmetida` + preenchimento mínimo | Inline por campo + `notify`/`AppAlert` | Sim (`formularioValido`) | **Médio** |
-| `ParametrosView` | Submit com `validacaoSubmetida` | Inline por campo + `AppAlert`/`notify` | Não bloqueia por inválido antes do submit (valida ao salvar) | **Médio** |
-| `AdministradoresView` | Submit/ação com validação manual (título) | `notify` + `BAlert` de carregamento | Parcial (depende da ação) | **Médio/Alto** |
+| `CadastroView` + `CadAtividadeForm` + `AtividadeItem` | Submit (adicionar), validação de domínio via endpoint (`validar-cadastro`) e regras locais por item/edição inline | Erro por item (card), erro global (`BAlert`), erros inline locais e notificações sistêmicas | Sim apenas por estado de workflow, loading e elegibilidade real da disponibilização | **Baixo/Médio** |
+| `CadastroVisualizacaoView` (modais de validar/devolver) | Submit no modal (devolução exige texto) | Inline em `BFormInvalidFeedback` + `notify` apenas para falhas sistêmicas/fluxo | Não depende mais de bloqueio preventivo do confirmar para a obrigatoriedade do campo | **Baixo/Médio** |
+| `MapaView` (edição mapa) | Ações de workflow + submit em modais com `useValidacaoFormulario` + validação backend | Inline nos modais, `BAlert` local e `notify` sistêmico | Sim em ações de topo por loading/estado de workflow | **Baixo/Médio** |
+| `MapaVisualizacaoView` (sugestões/validação/devolução) | Submit em modais + regras por estado de workflow | Inline/contextual nos modais + `notify` sistêmico | Sem `ok-disabled` residual para obrigatoriedade dos campos migrados | **Baixo/Médio** |
+| `SubprocessoView` (alterar prazo/reabrir/lembrete) | Submit em modais + validação backend | `AppAlert` + `BAlert` + feedback inline nos campos obrigatórios | Sim em modais por loading/estado, sem bloqueio silencioso para justificativa | **Baixo/Médio** |
+| `AtribuicaoTemporariaView` | Submit com `useValidacaoFormulario` + preenchimento mínimo | Inline por campo + `notify`/`AppAlert` | Sim (`formularioValido`) | **Baixo** |
+| `ParametrosView` | Submit com `useValidacaoFormulario` | Inline por campo + `AppAlert`/`notify` | Não bloqueia por inválido antes do submit (valida ao salvar) | **Baixo** |
+| `AdministradoresView` | Submit em modal com `useValidacaoFormulario` | Inline por campo no modal + `BAlert` contextual + `notify` de sucesso | Não bloqueia por vazio; valida no clique da ação | **Baixo** |
 | `NotificacoesAdminView` | Ações explícitas (reenvio) | `BAlert` + `AppAlert` + `notify` | Sim (carregamento) | **Baixo** |
-| `LimpezaProcessosView` | Ação explícita + parse local de código | `notify`/`AppAlert` + alerta fixo informativo | Não desabilita por valor inválido; valida ao abrir confirmação | **Médio** |
-| `RelatorioAndamentoView` | Pré-condição de seleção (sem submit formal) | `notify` | Sim (`!codProcessoSelecionado`) | **Baixo** |
-| `RelatorioMapasView` | Pré-condição de seleção | `notify` | Sim (`!processoIdSelecionado`) | **Baixo** |
+| `LimpezaProcessosView` | Submit local antes da confirmação | Inline por campo + `AppAlert`/`notify` para operação sistêmica + alerta fixo informativo | Não desabilita por valor inválido; valida no clique e só então abre confirmação | **Baixo** |
+| `RelatorioAndamentoView` | Submit com seleção obrigatória do processo | Inline por campo + `notify` sistêmico | Sim apenas durante carregamento | **Baixo** |
+| `RelatorioMapasView` | Submit com seleção obrigatória do processo | Inline por campo + `notify` sistêmico | Sim apenas durante carregamento | **Baixo** |
 | `HistoricoView` | Sem formulário de entrada | Log local em falha de carga | N/A | **Baixo** |
 | `PainelView` | Sem formulário clássico | Toast/empty state/lista | N/A | **Baixo** |
 | `RelatoriosView` | Navegação por cards, sem formulário | N/A | N/A | **Baixo** |
@@ -382,22 +382,21 @@ Legenda rápida:
 
 | Componente | Técnica de validação | Observação para refatoração |
 |---|---|---|
-| `CadAtividadeForm` | `validacaoSubmetida` + inline + botão desabilitado por vazio | Padrão reaproveitável para formulários curtos. |
+| `CadAtividadeForm` | `useValidacaoFormulario` + inline no submit | Já alinhado ao padrão compartilhado; referência para formulários curtos sem pré-bloqueio por erro corrigível. |
 | `ProcessoFormFields` | Erro por `fieldErrors` (backend/local), foco no primeiro erro | Bom núcleo para extrair padrão de foco/acessibilidade. |
-| `DisponibilizarMapaModal` | Regras reativas de data + erro de backend por campo + `generic`; data usa `invalid-feedback d-block`, não `BFormInvalidFeedback` | Forte candidato a template de validação em modal, mas precisa alinhar a técnica visual ao padrão de campo. |
-| `CriarCompetenciaModal` | Pré-bloqueio + inline por campo + `generic` | Consistente, mas sem objeto comum de “estado de validação”. |
+| `DisponibilizarMapaModal` | `useValidacaoFormulario` + regra reativa de data + erro de backend por campo + `generic` | Virou boa referência de validação em modal com foco na origem do erro. |
+| `CriarCompetenciaModal` | `useValidacaoFormulario` + inline por campo + `generic` | Já alinhado ao padrão compartilhado; manter como referência para listas obrigatórias em modal. |
 | `InputData` | Componente neutro, recebe `state` externo | Facilita padronização central se houver composable comum. |
 
 ### 11.2 Inconsistências adicionais observadas nesta rodada
 
-1. Existem views com **pré-condição por botão desabilitado** e nenhuma explicação inline da pendência.
-2. Alguns fluxos utilizam **toast para erro corrigível na própria tela** (menos ideal para usabilidade).
-3. Há variação entre:
-   - validar no submit com `validacaoSubmetida`;
-   - validar reativamente por `watch`;
-   - só bloquear ação sem expor claramente a causa.
-4. Em telas de operação administrativa, a validação ainda tende a ficar **mais manual/ad hoc**.
-5. Alguns modais bloqueiam confirmação por campo obrigatório sem exibir mensagem inline da pendência; `SubprocessoView`/reabertura é o caso mais claro.
+1. O fluxo de **cadastro de atividades** ainda combina erro por item, erro global e notificações de forma mais rica que formulários simples, mas agora sem falhas silenciosas relevantes.
+2. Há variação controlada entre:
+   - validar no submit com `useValidacaoFormulario`;
+   - validar reativamente por `watch` para regras objetivas (especialmente datas);
+   - bloquear ação por loading/estado de workflow, não por erro simples de preenchimento.
+3. Telas administrativas, relatórios e cadastro de atividades já migraram para uma base mais uniforme; o trabalho restante está mais ligado a hardening, cobertura e refinamentos visuais.
+4. Os modais críticos antes citados como inconsistentes já foram convergidos; o foco agora é reduzir microdiferenças residuais fora do composable compartilhado quando houver ganho claro.
 
 ---
 
@@ -502,8 +501,8 @@ Manter sanitização, mas garantir que ela não substitua validação semântica
 
 ## 14) Backlog sugerido (frontend + backend) para execução incremental
 
-1. **Sprint 1 (contrato de erro):** manter contrato em português (`erros.campo`) e concluir DTOs faltantes.
-2. **Sprint 2 (frontend base):** criar composable padrão de validação (`validacaoSubmetida`, resumo de pendências, foco primeiro erro).
-3. **Sprint 3 (fluxos críticos):** processo, cadastro de atividades e mapa.
-4. **Sprint 4 (admin e auxiliares):** administradores, atribuição temporária, limpeza e relatórios.
-5. **Sprint 5 (hardening):** testes de regressão de UX + auditoria de acessibilidade.
+1. **Sprint 1 (contrato de erro):** concluída — contrato em português (`erros.campo`) e DTOs priorizados foram entregues.
+2. **Sprint 2 (frontend base):** concluída — `useValidacaoFormulario` e foco no primeiro erro já sustentam a maior parte dos fluxos migrados.
+3. **Sprint 3 (fluxos críticos):** concluída — processo, mapa e cadastro de atividades convergiram para o padrão-base.
+4. **Sprint 4 (admin e auxiliares):** concluída para os fluxos já mapeados — administradores, atribuição temporária, limpeza e relatórios.
+5. **Sprint 5 (hardening):** consolidar regressão de UX, revisar microdiferenças residuais e concluir a auditoria de acessibilidade.
