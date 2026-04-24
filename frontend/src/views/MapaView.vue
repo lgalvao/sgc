@@ -30,7 +30,7 @@
           </BButton>
           <BButton
               v-if="podeDisponibilizarMapa"
-              :disabled="!habilitarDisponibilizarMapa || !podeConfirmarDisponibilizacao"
+              :disabled="!habilitarDisponibilizarMapa"
               data-testid="btn-cad-mapa-disponibilizar"
               variant="success"
               @click="abrirModalDisponibilizar"
@@ -344,6 +344,17 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 }
 
 function abrirModalDisponibilizar() {
+  if (!podeConfirmarDisponibilizacao.value) {
+    if (competencias.value.length === 0) {
+      notify(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS, 'warning');
+    } else if (existeCompetenciaSemAtividade.value) {
+      notify(TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE, 'warning');
+    } else if (atividadesSemCompetencia.value.length > 0) {
+      notify(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA, 'warning');
+    }
+    return;
+  }
+
   mostrarModalDisponibilizar.value = true;
   clearErrors();
 }

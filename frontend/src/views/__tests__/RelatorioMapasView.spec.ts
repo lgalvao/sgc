@@ -59,7 +59,7 @@ describe("RelatorioMapasView.vue", () => {
     const relatoriosStore = useRelatoriosStore();
     const exportarSpy = vi.spyOn(relatoriosStore, "exportarMapasPdf").mockResolvedValue(undefined as any);
 
-    const vm = ctx.wrapper.vm as any;
+    const vm = ctx.wrapper.vm;
     vm.processoIdSelecionado = 1;
     await ctx.wrapper.vm.$nextTick();
 
@@ -80,7 +80,7 @@ describe("RelatorioMapasView.vue", () => {
     const relatoriosStore = useRelatoriosStore();
     const exportarSpy = vi.spyOn(relatoriosStore, "exportarMapasPdf").mockResolvedValue(undefined as any);
 
-    const vm = ctx.wrapper.vm as any;
+    const vm = ctx.wrapper.vm;
     vm.processoIdSelecionado = 1;
     vm.unidadeIdSelecionada = 99;
     await ctx.wrapper.vm.$nextTick();

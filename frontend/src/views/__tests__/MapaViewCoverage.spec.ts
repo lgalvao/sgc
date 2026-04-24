@@ -352,7 +352,6 @@ describe("MapaView coverage", () => {
         ]);
 
         expect(vm.atividadesSemCompetencia).toHaveLength(1);
-        expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 
     it("mantem o botao disponibilizar desabilitado se existir competencia sem atividade", async () => {
@@ -378,7 +377,6 @@ describe("MapaView coverage", () => {
 
         expect(vm.existeCompetenciaSemAtividade).toBe(true);
         expect(vm.associacoesMapaValidas).toBe(false);
-        expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 
     it("cobre early returns e funções de fechar modal", async () => {
@@ -466,6 +464,13 @@ describe("MapaView coverage", () => {
         // E injetamos os mocks na instância diretamente
         vm.atividades = [{codigo: 1, descricao: "Ativ"}];
         vm.unidade = {codigo: 1, sigla: "TESTE", nome: "Teste"};
+        store.mapaCompleto.value = criarMapaCompleto([
+            {
+                codigo: 1,
+                descricao: "C1",
+                atividades: [{codigo: 1, descricao: "Ativ"}]
+            }
+        ]);
 
         expect(vm.atividades).toHaveLength(1);
         expect(vm.unidade?.sigla).toBe("TESTE");

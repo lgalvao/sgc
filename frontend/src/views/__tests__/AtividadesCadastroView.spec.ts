@@ -510,7 +510,6 @@ describe("CadastroView.vue", () => {
         await flushPromises();
 
         const checkbox = wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]');
-        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(checkbox.exists()).toBe(true);
         expect(checkbox.attributes('disabled')).toBeUndefined();
     });
@@ -627,7 +626,7 @@ describe("CadastroView.vue", () => {
             throw new Error("Resolver não definido");
         }
         subprocessosStore.subprocessoDetalhe = {
-            ...subprocessosStore.subprocessoDetalhe!,
+            ...subprocessosStore.subprocessoDetalhe,
             situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
         };
         resolver(true);
