@@ -94,6 +94,19 @@ describe("subprocesso store", () => {
             expect(logger.error).toHaveBeenCalled();
         });
 
+        it("deve tratar requisicao cancelada sem logar erro", async () => {
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue({
+                isAxiosError: true,
+                code: "ERR_CANCELED"
+            });
+
+            const result = await context.store.garantirContextoEdicao(1);
+
+            expect(result).toBeNull();
+            expect(context.store.erroIntegracaoContexto?.code).toBe("REQUEST_CANCELADA");
+            expect(logger.error).not.toHaveBeenCalled();
+        });
+
         it("deve tratar erro 404 (notFound) especificamente", async () => {
             const error404 = {
                 isAxiosError: true,
@@ -187,6 +200,19 @@ describe("subprocesso store", () => {
 
             expect(result).toBeNull();
             expect(logger.error).toHaveBeenCalled();
+        });
+
+        it("deve tratar requisicao cancelada por processo e unidade sem logar erro", async () => {
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockRejectedValue({
+                isAxiosError: true,
+                code: "ERR_CANCELED"
+            });
+
+            const result = await context.store.garantirContextoEdicaoPorProcessoEUnidade(1, "TEST");
+
+            expect(result).toBeNull();
+            expect(context.store.erroIntegracaoContexto?.code).toBe("REQUEST_CANCELADA");
+            expect(logger.error).not.toHaveBeenCalled();
         });
 
         it("deve tratar erro 404 (notFound) especificamente", async () => {

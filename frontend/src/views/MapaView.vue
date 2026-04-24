@@ -410,6 +410,10 @@ async function carregarContextoInicial() {
     return null;
   }
 
+  if (diagnostico.tipo === 'cancelado') {
+    return null;
+  }
+
   if (diagnostico.tipo === 'ausencia') {
     notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
     return null;

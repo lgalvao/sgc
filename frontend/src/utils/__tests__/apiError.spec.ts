@@ -18,6 +18,14 @@ describe('apiError utils', () => {
             expect(normalized.message).toContain('conexão');
         });
 
+        it('deve normalizar requisicao cancelada', () => {
+            const err = {isAxiosError: true, code: 'ERR_CANCELED', response: undefined};
+            const normalized = normalizeError(err);
+            expect(normalized.kind).toBe('network');
+            expect(normalized.code).toBe('REQUEST_CANCELADA');
+            expect(normalized.message).toBe('Requisição cancelada.');
+        });
+
         it('deve normalizar erro HTTP com resposta', () => {
             const err = {
                 isAxiosError: true,

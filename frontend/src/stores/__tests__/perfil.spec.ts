@@ -6,6 +6,14 @@ import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import {Perfil} from "@/types/tipos";
 import {usePerfilStore} from "../perfil";
 
+const {cancelarRequisicoesPendentesMock} = vi.hoisted(() => ({
+    cancelarRequisicoesPendentesMock: vi.fn(),
+}));
+
+vi.mock("@/axios-setup", () => ({
+    cancelarRequisicoesPendentes: cancelarRequisicoesPendentesMock,
+}));
+
 vi.mock("@/services/usuarioService");
 
 const subprocessoStoreMock = {
@@ -306,6 +314,7 @@ describe("usePerfilStore", () => {
         it("deve fazer logout corretamente", async () => {
             mockUsuarioService.logout.mockResolvedValue();
             await context.store.logout();
+            expect(cancelarRequisicoesPendentesMock).toHaveBeenCalledTimes(1);
             expect(mockUsuarioService.logout).toHaveBeenCalledTimes(1);
             expect(context.store.usuarioCodigo).toBeNull();
             expect(context.store.perfilSelecionado).toBeNull();
@@ -320,6 +329,7 @@ describe("usePerfilStore", () => {
         it("deve limpar estado local mesmo se logout remoto falhar", async () => {
             mockUsuarioService.logout.mockRejectedValue(new Error("Falha"));
             await context.store.logout();
+            expect(cancelarRequisicoesPendentesMock).toHaveBeenCalledTimes(1);
             expect(context.store.usuarioCodigo).toBeNull();
             expect(context.store.perfilSelecionado).toBeNull();
         });

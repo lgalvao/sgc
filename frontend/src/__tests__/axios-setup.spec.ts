@@ -67,9 +67,12 @@ describe("axios-setup", () => {
     let requestInterceptor: (config: any) => any;
     let responseSuccessInterceptor: (response: any) => any;
     let responseErrorInterceptor: (error: any) => any;
+    let cancelarRequisicoesPendentes: () => void;
 
     beforeAll(async () => {
-        const {setRouter} = await import("../axios-setup"); // Use dynamic import
+        const modulo = await import("../axios-setup"); // Use dynamic import
+        const {setRouter} = modulo;
+        cancelarRequisicoesPendentes = modulo.cancelarRequisicoesPendentes;
         setRouter(router as any);
 
         const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
@@ -204,5 +207,21 @@ describe("axios-setup", () => {
     it("interceptor de erro de resposta deve propagar erro genérico", async () => {
         const error = new Error("Generic failure");
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+    });
+
+    it("cancelarRequisicoesPendentes deve abortar requisicoes em andamento", () => {
+        const config = requestInterceptor({method: 'get', url: '/processos', headers: {}});
+
+        cancelarRequisicoesPendentes();
+
+        expect(config.signal.aborted).toBe(true);
+    });
+
+    it("interceptor de erro cancelado nao deve redirecionar para login", async () => {
+        const config = requestInterceptor({method: 'get', url: '/subprocessos/contexto-edicao/buscar', headers: {}});
+        const error = {isAxiosError: true, code: 'ERR_CANCELED', config};
+
+        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(router.push).not.toHaveBeenCalled();
     });
 });
