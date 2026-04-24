@@ -136,6 +136,7 @@ import {
 } from '@/services/administradorService';
 import {normalizeError} from '@/utils/apiError';
 import {useNotification} from '@/composables/useNotification';
+import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
 import {TEXTOS} from '@/constants/textos';
 import {useAsyncAction} from '@/composables/useAsyncAction';
 
@@ -149,7 +150,14 @@ const mostrarModalAdicionarAdmin = ref(false);
 const mostrarModalRemoverAdmin = ref(false);
 const adminParaRemover = ref<AdministradorDto | null>(null);
 const novoAdminTitulo = ref('');
-const validacaoNovoAdminSubmetida = ref(false);
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
+
 const erroAdicionarAdmin = ref('');
 const erroRemoverAdmin = ref('');
 const adicionandoAdmin = ref(false);
@@ -164,8 +172,7 @@ const camposAdmins = [
 ];
 
 const mensagemErroNovoAdmin = computed(() => {
-  if (!validacaoNovoAdminSubmetida.value || novoAdminTitulo.value.trim()) return '';
-  return TEXTOS.administracao.ERRO_TITULO_INVALIDO;
+  return deveExibirErro(!novoAdminTitulo.value.trim()) ? TEXTOS.administracao.ERRO_TITULO_INVALIDO : '';
 });
 
 async function carregarAdministradores() {
@@ -176,7 +183,7 @@ async function carregarAdministradores() {
 
 function abrirModalAdicionarAdmin() {
   novoAdminTitulo.value = '';
-  validacaoNovoAdminSubmetida.value = false;
+  resetarValidacao();
   erroAdicionarAdmin.value = '';
   mostrarModalAdicionarAdmin.value = true;
 }
@@ -188,17 +195,17 @@ function abrirLimpezaProcessos() {
 function fecharModalAdicionarAdmin() {
   mostrarModalAdicionarAdmin.value = false;
   novoAdminTitulo.value = '';
-  validacaoNovoAdminSubmetida.value = false;
+  resetarValidacao();
   erroAdicionarAdmin.value = '';
 }
 
 async function adicionarAdmin() {
-  validacaoNovoAdminSubmetida.value = true;
-  erroAdicionarAdmin.value = '';
-  if (!novoAdminTitulo.value.trim()) {
+  if (!validarSubmissao(!!novoAdminTitulo.value.trim())) {
+    await focarPrimeiroErroInvalido();
     return;
   }
 
+  erroAdicionarAdmin.value = '';
   adicionandoAdmin.value = true;
   try {
     await adicionarAdministrador(novoAdminTitulo.value.trim());

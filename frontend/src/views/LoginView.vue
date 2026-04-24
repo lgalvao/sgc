@@ -43,7 +43,8 @@
                    id="titulo"
                    v-model="titulo"
                    aria-required="true"
-                   :disabled="loginStep > 1"
+                   :readonly="loginStep > 1"
+                   :disabled="isLoading"
                    autocomplete="username"
                    autofocus
                    data-testid="inp-login-usuario"
@@ -75,7 +76,8 @@
                     v-model="senha"
                     aria-required="true"
                     :autocomplete="showPassword ? 'off' : 'current-password'"
-                    :disabled="loginStep > 1"
+                    :readonly="loginStep > 1"
+                    :disabled="isLoading"
                     :state="mensagemErroSenha ? false : null"
                     :type="showPassword ? 'text' : 'password'"
                     data-testid="inp-login-senha"
@@ -87,7 +89,7 @@
                 <template #append>
                   <BButton
                       :aria-label="showPassword ? TEXTOS.login.OCULTAR_SENHA : TEXTOS.login.MOSTRAR_SENHA"
-                      :disabled="loginStep > 1"
+                      :disabled="isLoading"
                       class="text-secondary border-0"
                       variant="link"
                       @click="showPassword = !showPassword"
@@ -130,11 +132,10 @@
                   id="par"
                   v-model="parSelecionado"
                   :options="perfisUnidadesOptions"
-                  :state="erroSelecaoPerfil ? false : null"
+                  :state="mensagemErroPerfil ? false : null"
                   data-testid="sel-login-perfil"
                   text-field="text"
                   value-field="value"
-                  @change="erroSelecaoPerfil = ''"
               >
                 <template #first>
                   <BFormSelectOption
@@ -145,8 +146,8 @@
                   </BFormSelectOption>
                 </template>
               </BFormSelect>
-              <BFormInvalidFeedback :state="erroSelecaoPerfil ? false : null">
-                {{ erroSelecaoPerfil }}
+              <BFormInvalidFeedback :state="mensagemErroPerfil ? false : null">
+                {{ mensagemErroPerfil }}
               </BFormInvalidFeedback>
             </BFormGroup>
 
@@ -228,7 +229,9 @@ const {
 const credenciaisPreenchidas = computed(() => Boolean(titulo.value && senha.value));
 const mensagemErroTitulo = computed(() => deveExibirErro(!titulo.value) ? TEXTOS.login.ERRO_CAMPO_TITULO : "");
 const mensagemErroSenha = computed(() => deveExibirErro(!senha.value) ? TEXTOS.login.ERRO_CAMPO_SENHA : "");
-const erroSelecaoPerfil = ref("");
+const mensagemErroPerfil = computed(() =>
+    deveExibirErro(!parSelecionado.value) ? TEXTOS.login.ERRO_POR_FAVOR_SELECIONE : ""
+);
 
 const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
 
@@ -307,11 +310,11 @@ const handlePostAuth = async () => {
 };
 
 const performProfileSelection = async () => {
-  if (!parSelecionado.value) {
-    erroSelecaoPerfil.value = TEXTOS.login.ERRO_POR_FAVOR_SELECIONE;
+  if (!validarSubmissao(!!parSelecionado.value)) {
+    await focarPrimeiroErroInvalido();
     return;
   }
-  erroSelecaoPerfil.value = '';
+
   isLoading.value = true;
   try {
     await perfilStore.concluirLoginComPerfil(parSelecionado.value);

@@ -617,10 +617,6 @@ public class ProcessoService {
                 .collect(Collectors.toSet());
     }
 
-    private boolean podeAceitarCadastroEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return podeAceitarCadastroEmBloco(subprocesso, usuario, null);
-    }
-
     private boolean podeAceitarCadastroEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
@@ -628,10 +624,6 @@ public class ProcessoService {
     ) {
         return isSituacaoCadastroDisponibilizado(subprocesso.getSituacao())
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, ACEITAR_CADASTRO, localizacoesPrecarregadas);
-    }
-
-    private boolean podeAceitarMapaEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return podeAceitarMapaEmBloco(subprocesso, usuario, null);
     }
 
     private boolean podeAceitarMapaEmBloco(
@@ -643,10 +635,6 @@ public class ProcessoService {
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, ACEITAR_MAPA, localizacoesPrecarregadas);
     }
 
-    private boolean podeHomologarCadastroEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return podeHomologarCadastroEmBloco(subprocesso, usuario, null);
-    }
-
     private boolean podeHomologarCadastroEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
@@ -656,10 +644,6 @@ public class ProcessoService {
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, HOMOLOGAR_CADASTRO, localizacoesPrecarregadas);
     }
 
-    private boolean podeHomologarMapaEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return podeHomologarMapaEmBloco(subprocesso, usuario, null);
-    }
-
     private boolean podeHomologarMapaEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
@@ -667,10 +651,6 @@ public class ProcessoService {
     ) {
         return isSituacaoMapaAnaliseConcluida(subprocesso.getSituacao())
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, HOMOLOGAR_MAPA, localizacoesPrecarregadas);
-    }
-
-    private boolean podeDisponibilizarEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return podeDisponibilizarEmBloco(subprocesso, usuario, null);
     }
 
     private boolean podeDisponibilizarEmBloco(

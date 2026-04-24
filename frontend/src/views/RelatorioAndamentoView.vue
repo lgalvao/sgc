@@ -11,7 +11,10 @@
     <BCard class="mb-4">
       <BRow class="align-items-end">
         <BCol md="6">
-          <BFormGroup label-for="select-processo">
+          <BFormGroup
+              label-for="select-processo"
+              :state="mensagemErroProcesso ? false : null"
+          >
             <template #label>
               {{ TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO }} <span aria-hidden="true" class="text-danger">*</span>
             </template>
@@ -19,13 +22,17 @@
                 id="select-processo"
                 v-model="codProcessoSelecionado"
                 :options="opcoesProcessos"
+                :state="mensagemErroProcesso ? false : null"
                 data-testid="select-processo-andamento"
             />
+            <BFormInvalidFeedback :state="mensagemErroProcesso ? false : null">
+              {{ mensagemErroProcesso }}
+            </BFormInvalidFeedback>
           </BFormGroup>
         </BCol>
         <BCol md="auto">
           <BButton
-              :disabled="!codProcessoSelecionado || carregando"
+              :disabled="carregando"
               variant="primary"
               data-testid="btn-gerar-andamento"
               @click="gerarRelatorio"
@@ -125,7 +132,18 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BCard, BCardBody, BCardTitle, BCol, BFormGroup, BFormSelect, BRow, BSpinner} from "bootstrap-vue-next";
+import {
+  BButton,
+  BCard,
+  BCardBody,
+  BCardTitle,
+  BCol,
+  BFormGroup,
+  BFormInvalidFeedback,
+  BFormSelect,
+  BRow,
+  BSpinner
+} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
@@ -133,16 +151,27 @@ import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";
 import type {ProcessoResumo} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {formatDateBR, formatDateTimeBR} from "@/utils/dateUtils";
 
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
 
 const codProcessoSelecionado = ref<number | null>(null);
 const processosDisponiveis = ref<ProcessoResumo[]>([]);
 const carregando = ref(false);
 
 const relatorioAndamento = computed(() => relatoriosStore.relatorioAndamento);
+
+const mensagemErroProcesso = computed(() => {
+  return deveExibirErro(!codProcessoSelecionado.value) ? "Selecione um processo." : "";
+});
 
 const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(item => {
   const dt1 = item.dataLimiteEtapa1;
@@ -178,9 +207,13 @@ async function carregarProcessos() {
 }
 
 async function gerarRelatorio() {
-  if (!codProcessoSelecionado.value) return;
+  if (!validarSubmissao(!!codProcessoSelecionado.value)) {
+    await focarPrimeiroErroInvalido();
+    return;
+  }
+
   carregando.value = true;
-  await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value);
+  await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value!);
   carregando.value = false;
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");

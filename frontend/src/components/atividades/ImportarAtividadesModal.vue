@@ -270,8 +270,8 @@ async function importar() {
     );
     emit("importar", resultadoImportacao.value);
     fechar();
-  } catch (erro) {
-    erroImportacao.value = normalizeError(erro).message;
+  } catch (error_) {
+    erroImportacao.value = normalizeError(error_).message;
   } finally {
     importando.value = false;
   }

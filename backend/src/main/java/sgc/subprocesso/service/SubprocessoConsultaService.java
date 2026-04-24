@@ -53,8 +53,12 @@ public class SubprocessoConsultaService {
     private static final Set<SituacaoSubprocesso> SITUACOES_EDICAO_MAPA = Set.of(
             MAPEAMENTO_CADASTRO_HOMOLOGADO,
             MAPEAMENTO_MAPA_CRIADO,
+            MAPEAMENTO_MAPA_COM_SUGESTOES,
+            MAPEAMENTO_MAPA_VALIDADO,
             REVISAO_CADASTRO_HOMOLOGADA,
             REVISAO_MAPA_AJUSTADO,
+            REVISAO_MAPA_COM_SUGESTOES,
+            REVISAO_MAPA_VALIDADO,
             DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
     private final SubprocessoRepo subprocessoRepo;
     private final AnaliseRepo analiseRepo;

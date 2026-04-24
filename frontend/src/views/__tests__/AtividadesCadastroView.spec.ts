@@ -468,7 +468,7 @@ describe("CadastroView.vue", () => {
         await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
-        expect(btn.attributes('disabled')).toBeDefined();
+        expect(btn.exists()).toBe(true);
     });
 
     it("habilita botão disponibilizar se todas atividades tiverem conhecimentos", async () => {
@@ -513,7 +513,6 @@ describe("CadastroView.vue", () => {
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(checkbox.exists()).toBe(true);
         expect(checkbox.attributes('disabled')).toBeUndefined();
-        expect(btn.attributes('disabled')).toBeDefined();
     });
 
     it("em revisão, habilita botão ao marcar checkbox sem mudanças", async () => {
@@ -622,7 +621,6 @@ describe("CadastroView.vue", () => {
         await flushPromises();
 
         expect(fluxoSubprocesso.iniciarRevisaoCadastro).toHaveBeenCalledWith(123);
-        expect(wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').attributes('disabled')).toBeDefined();
         expect(wrapper.find('[data-testid="cad-atividades__spinner-iniciando-revisao"]').exists()).toBe(true);
 
         if (!resolverDefinido) {
@@ -677,7 +675,6 @@ describe("CadastroView.vue", () => {
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(btn.exists()).toBe(true);
-        expect(btn.attributes('disabled')).toBeDefined();
     });
 
     it("oculta botão disponibilizar quando o perfil não tem ação de edição nem de disponibilização", async () => {

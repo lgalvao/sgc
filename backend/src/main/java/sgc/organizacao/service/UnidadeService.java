@@ -1,7 +1,6 @@
 package sgc.organizacao.service;
 
 import lombok.*;
-import org.springframework.beans.factory.*;
 import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -13,21 +12,6 @@ import sgc.organizacao.model.*;
 
 import java.util.*;
 
-/**
- * Serviço consolidado para operações de Unidade.
- *
- * <p>Responsabilidades:
- * <ul>
- *   <li>Consultas básicas de unidades (por ID, sigla, lista)</li>
- *   <li>Gerenciamento de mapas vigentes de unidades</li>
- * </ul>
- *
- * <p>Este serviço consolida:
- * <ul>
- *   <li>UnidadeConsultaService (wrapper eliminado)</li>
- *   <li>UnidadeMapaService (lógica de mapas vigentes)</li>
- * </ul>
- */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,7 +20,6 @@ public class UnidadeService {
 
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
-    private final ObjectProvider<UnidadeService> selfProvider;
     private final CacheOrganizacaoService cacheOrganizacaoService;
     public Unidade buscarPorCodigo(Long codigo) {
         return unidadeRepo.buscarPorCodigoComResponsavel(codigo)
@@ -122,9 +105,5 @@ public class UnidadeService {
 
     private Optional<UnidadeMapa> buscarRegistroMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.findById(codigoUnidade);
-    }
-
-    private UnidadeService self() {
-        return selfProvider.getObject();
     }
 }

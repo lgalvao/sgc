@@ -319,6 +319,8 @@ export const TEXTOS = {
     ERRO_SALVAR_ATIVIDADE: "Falha ao salvar edição da atividade.",
     ERRO_ADICIONAR_CONHECIMENTO: "Falha ao adicionar conhecimento.",
     ERRO_ATUALIZAR_CONHECIMENTO: "Falha ao atualizar conhecimento.",
+    ERRO_CADASTRO_INCOMPLETO: "O cadastro está incompleto. Certifique-se de que há pelo menos uma atividade e que todas possuem conhecimentos associados.",
+    ERRO_REVISAO_SEM_ALTERACAO: "Não foram detectadas alterações no cadastro para disponibilizar. Se não houver mudanças, marque a opção 'Disponibilização sem mudanças'.",
     SUCESSO_IMPORTACAO: "Atividades importadas",
     AVISO_IMPORTACAO_DUPLICATAS: "Uma ou mais atividades selecionadas já existem no cadastro e não foram importadas.",
     MODAL_DISPONIBILIZAR_TITULO: "Disponibilização do cadastro",

@@ -239,7 +239,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
     });
 });
 
-test.describe.serial('CDU-20 - ADMIN não deve ver botões de edição com mapa com sugestões (Bug #1376)', () => {
+test.describe.serial('CDU-20 - ADMIN deve ver botões de edição com mapa com sugestões (Bug #1376)', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
 
     const timestamp = Date.now();
@@ -254,12 +254,12 @@ test.describe.serial('CDU-20 - ADMIN não deve ver botões de edição com mapa 
         validarProcessoFixture(processo, descProcesso);
     });
 
-    test('ADMIN não vê card de edição de mapa quando situação é Mapa com sugestões', async ({_resetAutomatico, page}) => {
+    test('ADMIN vê card de edição de mapa quando situação é Mapa com sugestões', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
 
-        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
-        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeHidden();
     });
 });
 

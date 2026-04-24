@@ -17,7 +17,6 @@
         </BButton>
         <BButton
             v-if="codSubprocesso && podeEditarCadastro"
-            :disabled="!habilitarEditarCadastro"
             data-testid="btn-cad-atividades-historico"
             variant="outline-secondary"
             @click="abrirModalHistorico"
@@ -26,7 +25,6 @@
         </BButton>
         <BButton
             v-if="codSubprocesso && podeEditarCadastro"
-            :disabled="!habilitarEditarCadastro"
             data-testid="btn-cad-atividades-importar"
             variant="outline-secondary"
             @click="mostrarModalImportar = true"
@@ -35,7 +33,6 @@
         </BButton>
         <LoadingButton
             v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
-            :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
@@ -615,6 +612,8 @@ function scrollParaPrimeiroErro() {
 }
 
 async function disponibilizarCadastro() {
+  if (loadingValidacao.value) return;
+
   const situacaoAtualCadastro = subprocesso.value?.situacao;
   const situacaoReferencia = isRevisao.value
       ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
@@ -622,6 +621,16 @@ async function disponibilizarCadastro() {
 
   if (!situacaoAtualCadastro || situacaoAtualCadastro !== situacaoReferencia) {
     notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
+    return;
+  }
+
+  if (!habilitarDisponibilizar.value) {
+    const cadastroIncompleto = atividades.value.length === 0 || atividades.value.some(a => !a.conhecimentos || a.conhecimentos.length === 0);
+    if (cadastroIncompleto) {
+      notify(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO, 'warning');
+    } else if (isRevisao.value && !houveAlteracaoCadastro.value && !disponibilizacaoSemMudancas.value) {
+      notify(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO, 'warning');
+    }
     return;
   }
 

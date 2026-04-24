@@ -19,7 +19,10 @@
         {{ TEXTOS.administracao.LIMPEZA_DESCRICAO }}
       </p>
 
-      <BFormGroup label-for="codigoProcesso">
+      <BFormGroup
+          label-for="codigoProcesso"
+          :state="mensagemErroCodigo ? false : null"
+      >
         <template #label>
           {{ TEXTOS.administracao.LIMPEZA_LABEL_CODIGO }} <span aria-hidden="true" class="text-danger">*</span>
         </template>
@@ -29,9 +32,13 @@
             data-testid="input-codigo-processo"
             min="1"
             :placeholder="TEXTOS.administracao.LIMPEZA_PLACEHOLDER_CODIGO"
+            :state="mensagemErroCodigo ? false : null"
             type="number"
             @keydown.enter.prevent="abrirConfirmacao"
         />
+        <BFormInvalidFeedback :state="mensagemErroCodigo ? false : null">
+          {{ mensagemErroCodigo }}
+        </BFormInvalidFeedback>
       </BFormGroup>
 
       <div class="d-flex justify-content-end mt-3">
@@ -72,10 +79,17 @@ import LoadingButton from '@/components/comum/LoadingButton.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useNotification} from '@/composables/useNotification';
+import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
 import {normalizeError} from '@/utils/apiError';
 import {excluirProcessoCompleto} from '@/services/processoService';
 
 const {notificacao, notify, clear} = useNotification();
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
 
 const codigoProcesso = ref('');
 const excluindo = ref(false);
@@ -86,9 +100,13 @@ const codigoConfirmacao = computed(() => {
   return Number.isInteger(codigo) && codigo > 0 ? codigo : null;
 });
 
-function abrirConfirmacao() {
-  if (codigoConfirmacao.value === null) {
-    notify(TEXTOS.administracao.LIMPEZA_ERRO_CODIGO, 'warning');
+const mensagemErroCodigo = computed(() => {
+  return deveExibirErro(codigoConfirmacao.value === null) ? TEXTOS.administracao.LIMPEZA_ERRO_CODIGO : '';
+});
+
+async function abrirConfirmacao() {
+  if (!validarSubmissao(codigoConfirmacao.value !== null)) {
+    await focarPrimeiroErroInvalido();
     return;
   }
 
@@ -97,7 +115,6 @@ function abrirConfirmacao() {
 
 async function confirmarExclusao() {
   if (codigoConfirmacao.value === null) {
-    notify(TEXTOS.administracao.LIMPEZA_ERRO_CODIGO, 'warning');
     return;
   }
 

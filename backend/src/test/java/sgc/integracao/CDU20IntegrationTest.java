@@ -401,9 +401,9 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("ADMIN não deve poder editar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
+    @DisplayName("ADMIN deve poder editar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
     @WithMockAdmin
-    void testPodeEditarMapa_FalsoQuandoMapaComSugestoes() throws Exception {
+    void testPodeEditarMapa_VerdadeiroQuandoMapaComSugestoes() throws Exception {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
         subprocessoRepo.saveAndFlush(subprocesso);
 
@@ -413,7 +413,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
-        assertThat(json.at("/permissoes/podeEditarMapa").asBoolean()).isFalse();
+        assertThat(json.at("/permissoes/podeEditarMapa").asBoolean()).isTrue();
         assertThat(json.at("/permissoes/podeDisponibilizarMapa").asBoolean()).isTrue();
     }
 }

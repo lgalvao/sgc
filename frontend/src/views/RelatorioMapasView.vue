@@ -11,7 +11,10 @@
     <BCard class="mb-4">
       <BRow class="align-items-end">
         <BCol md="5">
-          <BFormGroup label-for="select-processo-mapas">
+          <BFormGroup
+              label-for="select-processo-mapas"
+              :state="mensagemErroProcesso ? false : null"
+          >
             <template #label>
               {{ TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO }} <span aria-hidden="true" class="text-danger">*</span>
             </template>
@@ -19,8 +22,12 @@
               id="select-processo-mapas"
               v-model="processoIdSelecionado"
               :options="opcoesProcessos"
+              :state="mensagemErroProcesso ? false : null"
               data-testid="select-processo-mapas"
             />
+            <BFormInvalidFeedback :state="mensagemErroProcesso ? false : null">
+              {{ mensagemErroProcesso }}
+            </BFormInvalidFeedback>
           </BFormGroup>
         </BCol>
         <BCol md="4">
@@ -35,7 +42,7 @@
         </BCol>
         <BCol md="auto">
           <BButton
-            :disabled="!processoIdSelecionado || carregando"
+            :disabled="carregando"
             variant="success"
             data-testid="btn-gerar-mapas"
             @click="exportarPdf"
@@ -52,7 +59,16 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner} from "bootstrap-vue-next";
+import {
+  BButton,
+  BCard,
+  BCol,
+  BFormGroup,
+  BFormInvalidFeedback,
+  BFormSelect,
+  BRow,
+  BSpinner
+} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
@@ -61,15 +77,26 @@ import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";
 import type {ProcessoResumo} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const relatoriosStore = useRelatoriosStore();
 const perfilStore = usePerfilStore();
 const { notify } = useNotification();
+const {
+  validacaoSubmetida,
+  validarSubmissao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
 
 const processoIdSelecionado = ref<number | null>(null);
 const unidadeIdSelecionada = ref<number | null>(null);
 const processosDisponiveis = ref<ProcessoResumo[]>([]);
 const carregando = ref(false);
+
+const mensagemErroProcesso = computed(() => {
+  return deveExibirErro(!processoIdSelecionado.value) ? "Selecione um processo." : "";
+});
 
 const opcoesProcessos = computed(() => [
   { value: null, text: TEXTOS.relatorios.SELECIONE },
@@ -93,9 +120,13 @@ async function carregarProcessos() {
 }
 
 async function exportarPdf() {
-  if (!processoIdSelecionado.value) return;
+  if (!validarSubmissao(!!processoIdSelecionado.value)) {
+    await focarPrimeiroErroInvalido();
+    return;
+  }
+
   carregando.value = true;
-  await relatoriosStore.exportarMapasPdf(processoIdSelecionado.value, unidadeIdSelecionada.value || undefined);
+  await relatoriosStore.exportarMapasPdf(processoIdSelecionado.value!, unidadeIdSelecionada.value || undefined);
   carregando.value = false;
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_GERAR, "danger");

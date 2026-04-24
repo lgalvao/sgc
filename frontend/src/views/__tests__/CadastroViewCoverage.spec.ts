@@ -316,6 +316,7 @@ describe("CadastroView coverage", () => {
             situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
         };
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+        vm.atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         fluxoSubprocesso.validarCadastro.mockResolvedValue({
             valido: false,
             erros: [{mensagem: "Erro genérico"}, {atividadeCodigo: 1, mensagem: "Erro na atividade"}]
@@ -453,6 +454,7 @@ describe("CadastroView coverage", () => {
             ...criarSubprocessoMinimo(),
         };
 
+        vm.atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         fluxoSubprocesso.validarCadastro.mockResolvedValue({
             valido: false,

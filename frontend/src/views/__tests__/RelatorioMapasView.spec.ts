@@ -59,15 +59,11 @@ describe("RelatorioMapasView.vue", () => {
     const relatoriosStore = useRelatoriosStore();
     const exportarSpy = vi.spyOn(relatoriosStore, "exportarMapasPdf").mockResolvedValue(undefined as any);
 
-    const btn = ctx.wrapper.find("[data-testid='btn-gerar-mapas']");
-    expect((btn.element as HTMLButtonElement).disabled).toBe(true);
-
     const vm = ctx.wrapper.vm as any;
     vm.processoIdSelecionado = 1;
     await ctx.wrapper.vm.$nextTick();
 
-    expect((btn.element as HTMLButtonElement).disabled).toBe(false);
-
+    const btn = ctx.wrapper.find("[data-testid='btn-gerar-mapas']");
     await btn.trigger("click");
 
     expect(exportarSpy).toHaveBeenCalledWith(1, undefined);

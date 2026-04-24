@@ -281,27 +281,27 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("obterPermissoesUI: ADMIN não deve poder editar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
-    void obterPermissoesUI_AdminNaoPodeEditarMapaComSugestoes() {
+    @DisplayName("obterPermissoesUI: ADMIN deve poder editar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
+    void obterPermissoesUI_AdminPodeEditarMapaComSugestoes() {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
-        assertThat(permissoes.podeEditarMapa()).isFalse();
+        assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
         assertThat(permissoes.podeHomologarMapa()).isTrue();
     }
 
     @Test
-    @DisplayName("obterPermissoesUI: ADMIN não deve poder editar mapa em situação REVISAO_MAPA_COM_SUGESTOES")
-    void obterPermissoesUI_AdminNaoPodeEditarRevisaoMapaComSugestoes() {
+    @DisplayName("obterPermissoesUI: ADMIN deve poder editar mapa em situação REVISAO_MAPA_COM_SUGESTOES")
+    void obterPermissoesUI_AdminPodeEditarRevisaoMapaComSugestoes() {
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
-        assertThat(permissoes.podeEditarMapa()).isFalse();
+        assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
         assertThat(permissoes.podeHomologarMapa()).isTrue();
     }
