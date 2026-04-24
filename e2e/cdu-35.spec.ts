@@ -34,10 +34,12 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         const selectProcesso = page.getByTestId('select-processo-andamento');
         const botaoGerar = page.getByTestId('btn-gerar-andamento');
         await expect(selectProcesso).toBeVisible();
-        await expect(botaoGerar).toBeDisabled();
+
+        await botaoGerar.click();
+        await expect(page.getByText('Selecione um processo.')).toBeVisible();
 
         await selectProcesso.selectOption({label: descricaoProcesso});
-        await expect(botaoGerar).toBeEnabled();
+        await expect(page.getByText('Selecione um processo.')).toBeHidden();
         await botaoGerar.click();
 
         const cardsRelatorio = page.getByTestId('card-resultado-andamento');

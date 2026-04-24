@@ -82,7 +82,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         expect(dataMinima).toBeTruthy();
         const dataInvalida = obterDataAnterior(dataMinima!);
         await campoData.fill(dataInvalida);
-        await expect(page.getByTestId('btn-disponibilizar-mapa-confirmar')).toBeDisabled();
+        await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
+        await expect(page.getByTestId('txt-disponibilizar-mapa-erro-data')).toBeVisible();
 
         await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();
 

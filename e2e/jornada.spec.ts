@@ -112,10 +112,12 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividades(page);
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
+            const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+            await expect(btnDisponibilizar).toBeVisible();
+            await btnDisponibilizar.click();
+            await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
+
             await AtividadeHelpers.importarAtividadesVazia(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeEnabled();
             await AtividadeHelpers.disponibilizarCadastro(page);
 
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
@@ -172,10 +174,12 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeHidden();
             await MapaHelpers.navegarParaMapa(page);
             await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
-            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
-            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
+            const btnDisponibilizar = page.getByTestId('btn-cad-mapa-disponibilizar');
+            await expect(btnDisponibilizar).toBeVisible();
+            await btnDisponibilizar.click();
+            await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
+
             await MapaHelpers.criarCompetencia(page, 'Competência Técnica Básica', ['Atividade 1']);
-            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
             await MapaHelpers.disponibilizarMapa(page);
 
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
@@ -271,11 +275,13 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
             await AtividadeHelpers.navegarParaAtividades(page);
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
+            const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+            await expect(btnDisponibilizar).toBeVisible();
+            await btnDisponibilizar.click();
+            await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();
+
             await expect(page.getByText('Atividade 1')).toBeVisible();
             await AtividadeHelpers.adicionarConhecimento(page, 'Atividade 1', 'Conhecimento Revisado');
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeEnabled();
             await AtividadeHelpers.disponibilizarCadastro(page);
 
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoRevisao, siglaUnidade);

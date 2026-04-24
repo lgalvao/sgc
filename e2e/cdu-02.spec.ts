@@ -240,7 +240,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
 
             await test.step('Verificar tabela de alertas vazia', async () => {
                 await expect(page.getByTestId('empty-state-alertas')).toBeVisible();
-                await expect(page.getByTestId('empty-state-alertas')).toContainText(/Nenhum alerta/i);
+                await expect(page.getByTestId('empty-state-alertas')).toContainText(/Sem pendências/i);
             });
         });
     });

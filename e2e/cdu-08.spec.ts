@@ -62,7 +62,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         await test.step('2.1 Verificar estado inicial do mapeamento', async () => {
             await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();
-            await AtividadeHelpers.verificarBotaoDisponibilizar(page, false);
+            const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+            await expect(btnDisponibilizar).toBeVisible();
+            await btnDisponibilizar.click();
+            await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
         });
 
         await test.step('3. Importar atividades (Fluxo múltiplo e Negativo)', async () => {
@@ -239,8 +242,13 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await modal.getByTestId('select-processo').selectOption({ label: descOrigemB });
 
             // Ao trocar de processo, as seleções anteriores devem ser limpas.
-            // Sem atividade selecionada no processo B, o botão fica desabilitado.
-            await expect(modal.getByTestId('btn-importar')).toBeDisabled();
+            // Sem unidade selecionada no novo processo, o clique exibe erro de unidade.
+            await modal.getByTestId('btn-importar').click();
+            await expect(page.getByText("Selecione a unidade de origem.")).toBeVisible();
+
+            // Cancela e fecha o modal
+            await modal.getByRole('button', { name: /Cancelar/i }).click();
+            await expect(modal).toBeHidden();
 
             // Verificar que nenhuma atividade foi importada (seleções do processo A foram descartadas)
             await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();

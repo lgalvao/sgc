@@ -55,15 +55,19 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await expect(btnDisponibilizar).toBeDisabled();
     });
 
-    test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('ADMIN visualiza erro ao tentar disponibilizar mapa com atividade sem competência', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
 
         const btnDisponibilizarMapa = page.getByTestId('btn-cad-mapa-disponibilizar');
-        await expect(btnDisponibilizarMapa).toBeDisabled();
+        await btnDisponibilizarMapa.click();
+        await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
+
         await criarCompetencia(page, competencia1, [atividade1, atividade2]);
-        await expect(btnDisponibilizarMapa).toBeDisabled();
+        
+        await btnDisponibilizarMapa.click();
+        await expect(page.getByText(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA)).toBeVisible();
     });
 
     test('ADMIN abre modal de disponibilização em bloco e cancela operação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

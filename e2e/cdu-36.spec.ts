@@ -37,10 +37,12 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await expect(selectProcesso).toBeVisible();
         await expect(selectUnidade).toBeVisible();
         await expect(selectUnidade).toContainText(/Todas as unidades/i);
-        await expect(botaoGerar).toBeDisabled();
+
+        await botaoGerar.click();
+        await expect(page.getByText('Selecione um processo.')).toBeVisible();
 
         await selectProcesso.selectOption({label: descricaoProcesso});
-        await expect(botaoGerar).toBeEnabled();
+        await expect(page.getByText('Selecione um processo.')).toBeHidden();
 
         const requisicaoSemFiltroUnidade = page.waitForRequest((req) => {
             return req.url().includes(`/relatorios/mapas/${processo.codigo}/exportar`) && !req.url().includes('unidadeId=');
@@ -76,7 +78,6 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         const botaoGerar = page.getByTestId('btn-gerar-mapas');
 
         await selectProcesso.selectOption({label: descricaoProcesso});
-        await expect(botaoGerar).toBeEnabled();
 
         await expect(selectUnidade).toContainText(/Todas as unidades/i);
 

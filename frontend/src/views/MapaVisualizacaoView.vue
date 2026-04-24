@@ -248,7 +248,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BBadge, BButton, BCard, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
+import {BBadge, BButton, BCard, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';

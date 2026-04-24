@@ -39,7 +39,10 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
         await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
+
+        const btnDisponibilizar = page.getByTestId('btn-cad-mapa-disponibilizar');
+        await btnDisponibilizar.click();
+        await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
 
         // CT-01b: Verificar botões do modal de criação de competência (CDU-15 item 14)
         await page.getByTestId('btn-abrir-criar-competencia').click();
@@ -74,7 +77,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(badgeConhecimentos).not.toContainText('<div');
         await expect(badgeConhecimentos).not.toContainText('<strong>');
 
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
+        await btnDisponibilizar.click();
+        await expect(page.getByText(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA)).toBeVisible();
 
         // CT-02b: Remover a última atividade diretamente no card e manter disponibilização bloqueada
         await removerAtividadeAssociada(page, compDesc, ATIVIDADE_1);
@@ -83,7 +87,9 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         });
         await expect(cardSemAtividades).toBeVisible();
         await expect(cardSemAtividades.locator('.atividade-associada-card-item')).toHaveCount(0);
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
+
+        await btnDisponibilizar.click();
+        await expect(page.getByText(TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE)).toBeVisible();
 
         // CT-02c: Reassociar atividade via edição para continuar o fluxo
         await editarCompetencia(page, compDesc, compDesc, [ATIVIDADE_1]);
@@ -100,7 +106,8 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         // CT-04: Excluir competência com Confirmação
         await excluirCompetenciaConfirmando(page, newDesc);
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
+        await btnDisponibilizar.click();
+        await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
 
         // CT-06: Navegar para Disponibilização
         const compFinal = `Competência final ${timestamp}`;

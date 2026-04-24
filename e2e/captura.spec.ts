@@ -897,11 +897,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['validacao', 'visual']
             });
 
-            // Sem conhecimento em todas as atividades, o botão deve permanecer desabilitado
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
-            await capturarTela(page, 'subprocesso', 'botao-disponibilizar-desabilitado-sem-conhecimento', {
+            // Sem conhecimento em todas as atividades, o clique deve mostrar erro de validação
+            const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+            await btnDisponibilizar.click();
+            await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
+
+            await capturarTela(page, 'subprocesso', 'validacao-ativa-sem-conhecimento', {
                 fullPage: true,
-                tags: ['validacao', 'bloqueio']
+                tags: ['validacao', 'notificacao']
             });
 
             // Scroll para segunda atividade sem conhecimento
@@ -920,9 +923,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 extra: { atividadeCorrigida: atividade1 }
             });
 
-            // Ainda deve permanecer bloqueado porque a atividade 2 continua sem conhecimento
-            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
-            await capturarTela(page, 'subprocesso', 'botao-ainda-desabilitado-com-atividade-restante', {
+            // Ainda deve mostrar erro de validação porque a atividade 2 continua sem conhecimento
+            await btnDisponibilizar.click();
+            await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
+            await capturarTela(page, 'subprocesso', 'botao-disponibilizar-erro-atividade-restante', {
                 extra: { pendente: atividade2 }
             });
 

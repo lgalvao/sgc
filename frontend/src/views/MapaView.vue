@@ -59,7 +59,6 @@
           </BButton>
           <BButton
               v-if="podeDisponibilizarMapa"
-              :disabled="!habilitarDisponibilizarMapa"
               data-testid="btn-cad-mapa-disponibilizar"
               variant="success"
               @click="abrirModalDisponibilizar"
@@ -216,7 +215,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";

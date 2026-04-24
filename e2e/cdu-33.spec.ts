@@ -69,19 +69,21 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(modal.getByRole('heading', {name: /Reabrir revisão/i})).toBeVisible();
         await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
         await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
-        await expect(page.getByTestId('btn-confirmar-reabrir')).toHaveText(/Reabrir/i);
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeVisible();
+        await page.getByTestId('btn-confirmar-reabrir').click();
+        await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeVisible();
 
-        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).toBeHidden();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
         await btnReabrir.click();
-        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
+        await page.getByTestId('btn-confirmar-reabrir').click();
+        await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeVisible();
 
         // Cenario 4: Confirmar reabertura
         await page.getByTestId('inp-justificativa-reabrir').fill(textoJustificativa);
-        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeEnabled();
+        await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeHidden();
         await page.getByTestId('btn-confirmar-reabrir').click();
 
         await verificarAppAlert(page, /Revisão reaberta/i);

@@ -103,7 +103,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(checkboxSemMudancas).toBeEnabled();
 
         const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
-        await expect(botaoDisponibilizar).toBeDisabled();
+        await botaoDisponibilizar.click();
+        await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();
 
         await checkboxSemMudancas.check();
         await expect(checkboxSemMudancas).toBeChecked();
@@ -117,7 +118,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(checkboxSemMudancas).toBeChecked();
         await checkboxSemMudancas.uncheck();
         await expect(checkboxSemMudancas).not.toBeChecked();
-        await expect(botaoDisponibilizar).toBeDisabled();
+        await botaoDisponibilizar.click();
+        await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();
 
         await page.getByTestId('btn-nav-voltar').click();
         await verificarPaginaSubprocesso(page, unidadeSemMudancas);
@@ -143,11 +145,14 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         const atividadeIncompleta = `Atividade incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeIncompleta);
-        await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
+
+        const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+        await btnDisponibilizar.click();
+        await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
 
         await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento corretivo');
         await limparNotificacoes(page);
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await btnDisponibilizar.click();
         await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
         await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();
     });

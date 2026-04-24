@@ -106,10 +106,16 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByTestId('cad-atribuicao__btn-criar-atribuicao')).toBeVisible();
     });
 
-    test('Cenario 3: o botão de criar fica desabilitado enquanto o formulário estiver incompleto', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+    test('Cenario 3: o formulário exibe erros de validação ao tentar criar incompleto', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await abrirTelaCriacaoAtribuicao(page);
 
-        await expect(page.getByTestId('cad-atribuicao__btn-criar-atribuicao')).toBeDisabled();
+        const btnCriar = page.getByTestId('cad-atribuicao__btn-criar-atribuicao');
+        await btnCriar.click();
+
+        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.ERRO_SELECIONE_USUARIO)).toBeVisible();
+        await expect(page.getByText('Informe a data de início.')).toBeVisible();
+        await expect(page.getByText('Informe a data de término.')).toBeVisible();
+        await expect(page.getByText('Informe a justificativa.')).toBeVisible();
     });
 
     test('Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {

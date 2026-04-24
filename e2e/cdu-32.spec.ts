@@ -41,11 +41,12 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).toBeHidden();
 
-        // Cenario 4: Botão confirmar desabilitado sem justificativa
+        // Cenario 4: Validação sem justificativa
         await btnReabrir.click();
-        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
+        await page.getByTestId('btn-confirmar-reabrir').click();
+        await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeVisible();
         await page.getByTestId('inp-justificativa-reabrir').fill('Justificativa de teste');
-        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeEnabled();
+        await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeHidden();
 
         // Cenario 5: Confirmar reabertura
         await page.getByTestId('btn-confirmar-reabrir').click();
