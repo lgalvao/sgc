@@ -154,10 +154,7 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
     const modal = page.getByRole('dialog');
     const alert = page.getByTestId('app-alert');
 
-    await Promise.race([
-        modal.waitFor({ state: 'visible' }),
-        alert.waitFor({ state: 'visible' })
-    ]).catch(() => {});
+    await modal.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
 
     if (!(await modal.isVisible()) && await alert.isVisible()) {
         atividadeExtraCriada = `Atividade complementar ${Date.now()}`;
