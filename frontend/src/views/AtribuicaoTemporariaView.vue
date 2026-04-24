@@ -218,7 +218,8 @@ const {
   validacaoSubmetida,
   resetarValidacao,
   deveExibirErro,
-  validarSubmissao
+  validarSubmissao,
+  focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 const termoPesquisaMinimaAtingida = computed(() => termoUsuario.value.trim().length >= 2);
 const formularioValido = computed(() => {
@@ -351,6 +352,7 @@ async function criarAtribuicao() {
   erroFormulario.value = "";
 
   if (!validarSubmissao(formularioValido.value)) {
+    await focarPrimeiroErroInvalido();
     return;
   }
 

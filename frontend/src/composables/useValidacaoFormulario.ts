@@ -1,4 +1,4 @@
-import {ref} from "vue";
+import {nextTick, ref} from "vue";
 
 export function useValidacaoFormulario() {
     const validacaoSubmetida = ref(false);
@@ -20,11 +20,18 @@ export function useValidacaoFormulario() {
         return formularioValido;
     }
 
+    async function focarPrimeiroErroInvalido(): Promise<void> {
+        await nextTick();
+        const primeiroInvalido = document.querySelector('.is-invalid') as HTMLElement | null;
+        primeiroInvalido?.focus();
+    }
+
     return {
         validacaoSubmetida,
         registrarTentativaSubmissao,
         resetarValidacao,
         deveExibirErro,
-        validarSubmissao
+        validarSubmissao,
+        focarPrimeiroErroInvalido
     };
 }

@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import {useValidacaoFormulario} from "../useValidacaoFormulario";
 
 describe("useValidacaoFormulario", () => {
@@ -42,5 +42,24 @@ describe("useValidacaoFormulario", () => {
         expect(validarSubmissao(false)).toBe(false);
         expect(validacaoSubmetida.value).toBe(true);
         expect(validarSubmissao(true)).toBe(true);
+    });
+
+    it("foca o primeiro elemento inválido quando existe", async () => {
+        const elemento = document.createElement("input");
+        elemento.classList.add("is-invalid");
+        elemento.focus = vi.fn();
+        document.body.appendChild(elemento);
+
+        const {focarPrimeiroErroInvalido} = useValidacaoFormulario();
+        await focarPrimeiroErroInvalido();
+
+        expect(elemento.focus).toHaveBeenCalled();
+        document.body.removeChild(elemento);
+    });
+
+    it("não lança erro quando não há elemento inválido", async () => {
+        const {focarPrimeiroErroInvalido} = useValidacaoFormulario();
+
+        await expect(focarPrimeiroErroInvalido()).resolves.toBeUndefined();
     });
 });

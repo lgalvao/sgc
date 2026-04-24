@@ -209,7 +209,7 @@ jacoco {
 
 spotbugs {
     toolVersion = libs.versions.spotbugs.get()
-    ignoreFailures.set(false) // Alterado para false para garantir qualidade no build
+    ignoreFailures.set(false) 
     excludeFilter.set(file("etc/config/spotbugs/exclude.xml"))
 }
 

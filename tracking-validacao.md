@@ -4,7 +4,7 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 
 ## Estado geral
 
-- **Fase atual:** Sprint 1 — contrato de erro e DTOs faltantes.
+- **Fase atual:** Sprint 1 — contrato de erro e DTOs faltantes (concluída); iniciando Sprint 2.
 - **Última atualização:** 2026-04-24.
 - **Diretriz vigente:** validação não usa toast; erros corrigíveis aparecem inline ou em `BAlert` contextual.
 
@@ -24,11 +24,16 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 - Migrado contrato estruturado de erros de `subErrors`/`field`/`message` para `erros`/`campo`/`mensagem`.
 - Atualizados `RestExceptionHandler`, `normalizeError`, `useFormErrors` e testes relacionados.
 - Criado `useValidacaoFormulario` e aplicado primeiro em `AtribuicaoTemporariaView`.
+- Adicionado `focarPrimeiroErroInvalido()` em `useValidacaoFormulario`: após validação falhar, foca
+  automaticamente o primeiro campo com classe `.is-invalid`, usando `nextTick` para aguardar o DOM.
+  Aplicado em `AtribuicaoTemporariaView`. Consistente com o padrão já existente em `ProcessoCadastroView`
+  para erros de backend.
 
 ## Em aberto
 
-- Padronizar foco/rolagem para o primeiro erro relevante.
-- Revisar fluxos ainda fora da primeira fatia, especialmente login, relatórios, limpeza e modais de visualização.
+- Revisar fluxos ainda fora da primeira fatia: login, relatórios, limpeza e modais de visualização.
+- **Sprint 2 (frontend base):** criar composable padrão de validação reutilizável (em andamento via
+  `useValidacaoFormulario`); expandir uso de `focarPrimeiroErroInvalido` para outros formulários.
 
 ## Validações executadas
 
@@ -41,8 +46,11 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 - `npm run test:unit -- ...` para contrato de erro no frontend: 79 testes passaram.
 - `npm run test:unit -- --run src/utils/__tests__/apiError.spec.ts src/composables/__tests__/useFormErrors.spec.ts`: 24 testes passaram.
 - `npm run typecheck` após criação de `useValidacaoFormulario`.
-- `npm run test:unit -- --run src/composables/__tests__/useValidacaoFormulario.spec.ts src/views/__tests__/AtribuicaoTemporariaView.spec.ts src/views/__tests__/CadAtribuicao.spec.ts src/views/__tests__/CadAtribuicaoCoverage.spec.ts`: 26 testes passaram.
+- `npx vitest run useValidacaoFormulario.spec.ts AtribuicaoTemporariaView.spec.ts CadAtribuicao.spec.ts`: 25 testes passaram.
+- `npm run typecheck` após adição de `focarPrimeiroErroInvalido`: sem erros.
 
 ## Próximo passo recomendado
 
-Padronizar foco/rolagem para o primeiro erro relevante em um fluxo simples antes de expandir para telas maiores.
+Iniciar Sprint 2: expandir `focarPrimeiroErroInvalido` para `ParametrosView` e `LoginView` (formulários
+simples), e revisar se o `ProcessoCadastroView` pode delegar o foco para o composable em vez de usar
+`document.querySelector('.is-invalid')` diretamente.
