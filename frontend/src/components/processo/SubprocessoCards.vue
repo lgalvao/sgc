@@ -44,11 +44,11 @@
       </BCol>
 
       <BCol
-          v-if="podeEditarMapa"
           class="mb-3"
           md="4"
       >
         <BCard
+            v-if="podeEditarMapa"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa-edicao"
             role="button"
@@ -58,20 +58,15 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }} (Edição)
+              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
               {{ TEXTOS.subprocesso.cards.MAPA_TEXTO }}
             </BCardText>
           </div>
         </BCard>
-      </BCol>
-
-      <BCol
-          class="mb-3"
-          md="4"
-      >
         <BCard
+            v-else
             :class="['h-100', mapaHabilitado ? 'card-actionable' : 'card-disabled']"
             :data-testid="mapaHabilitado ? 'card-subprocesso-mapa-visualizacao' : 'card-subprocesso-mapa-desabilitado'"
             :role="mapaHabilitado ? 'button' : undefined"
@@ -81,7 +76,7 @@
         >
           <div class="card-click-area">
             <BCardTitle :class="mapaHabilitado ? undefined : 'text-muted'">
-              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }} {{ podeEditarMapa ? '(Visualização)' : '' }}
+              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
               {{ mapaHabilitado ? TEXTOS.subprocesso.cards.MAPA_VISUALIZACAO_TEXTO : TEXTOS.subprocesso.cards.MAPA_TEXTO }}

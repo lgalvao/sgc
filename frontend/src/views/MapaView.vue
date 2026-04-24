@@ -10,6 +10,35 @@
         </template>
 
         <template #actions>
+          <BButton
+              v-if="podeVerSugestoes"
+              data-testid="btn-mapa-ver-sugestoes"
+              variant="outline-secondary"
+              @click="verSugestoes"
+          >
+            {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
+          </BButton>
+
+          <BButton
+              v-if="podeAnalisar"
+              data-testid="btn-mapa-devolver"
+              :disabled="!habilitarDevolverMapa"
+              variant="secondary"
+              @click="abrirModalDevolucao"
+          >
+            {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
+          </BButton>
+
+          <BButton
+              v-if="acaoPrincipalMapa?.mostrar"
+              data-testid="btn-mapa-homologar-aceite"
+              :disabled="!acaoPrincipalMapa.habilitar"
+              variant="success"
+              @click="abrirModalAceitar"
+          >
+            {{ acaoPrincipalMapa.rotuloBotao }}
+          </BButton>
+
           <LoadingButton
               v-if="podeVisualizarImpacto"
               :loading="loadingImpacto"
@@ -109,6 +138,68 @@
           @confirmar="confirmarExclusaoCompetencia"
       />
 
+      <AceitarMapaModal
+          :loading="isLoading"
+          :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
+          :mostrar-modal="mostrarModalAceitar"
+          @fechar-modal="fecharModalAceitar"
+          @confirmar-aceitacao="confirmarAceitacao"
+      />
+
+      <ModalPadrao
+          v-model="mostrarModalVerSugestoes"
+          :mostrar-botao-acao="false"
+          test-codigo-cancelar="btn-ver-sugestoes-mapa-fechar"
+          texto-cancelar="Fechar"
+          titulo="Sugestões"
+          @fechar="fecharModalVerSugestoes"
+      >
+        <BFormGroup
+            label="Sugestões registradas para o mapa de competências:"
+            label-for="sugestoesVisualizacao"
+            class="mb-3"
+        >
+          <BFormTextarea
+              id="sugestoesVisualizacao"
+              v-model="sugestoesVisualizacao"
+              data-testid="txt-ver-sugestoes-mapa"
+              readonly
+              rows="5"
+          />
+        </BFormGroup>
+      </ModalPadrao>
+
+      <ModalConfirmacao
+          v-model="mostrarModalDevolucao"
+          :loading="isLoading"
+          :ok-disabled="!observacaoDevolucao.trim()"
+          :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
+          test-codigo-cancelar="btn-devolucao-mapa-cancelar"
+          test-codigo-confirmar="btn-devolucao-mapa-confirmar"
+          titulo="Devolver mapa"
+          variant="danger"
+          @confirmar="confirmarDevolucao"
+          @shown="() => observacaoDevolucaoRef?.$el?.focus()"
+      >
+        <p>Confirma a devolução da validação do mapa para ajustes?</p>
+        <BFormGroup
+            label-for="observacaoDevolucao"
+            class="mb-3"
+        >
+          <template #label>
+            Observação: <span aria-hidden="true" class="text-danger">*</span>
+          </template>
+          <BFormTextarea
+              id="observacaoDevolucao"
+              ref="observacaoDevolucaoRef"
+              v-model="observacaoDevolucao"
+              data-testid="inp-devolucao-mapa-obs"
+              placeholder="Digite observações sobre a devolução..."
+              rows="3"
+          />
+        </BFormGroup>
+      </ModalConfirmacao>
+
       <ImpactoMapaModal
           v-if="codSubprocesso"
           :impacto="impactos"
@@ -121,13 +212,15 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
+import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
@@ -135,6 +228,7 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
+import {useMapaAcoesAnalise} from "@/composables/useMapaAcoesAnalise";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useSubprocessos} from "@/composables/useSubprocessos";
@@ -142,6 +236,8 @@ import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
+import {obterSugestoesMapa} from "@/services/subprocessoService";
+import logger from "@/utils/logger";
 import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
@@ -174,13 +270,81 @@ const {
   podeEditarMapa,
   podeDisponibilizarMapa,
   habilitarEditarMapa,
-  habilitarDisponibilizarMapa
+  habilitarDisponibilizarMapa,
+  podeAnalisarMapa,
+  podeVerSugestoes: podeMostrarVerSugestoes,
+  habilitarDevolverMapa,
+  acaoPrincipalMapa
 } = useAcesso(subprocesso);
 
+const podeAnalisar = computed(() => {
+  return (
+      Boolean(acaoPrincipalMapa.value?.mostrar) ||
+      podeAnalisarMapa.value
+  );
+});
+const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
 const carregandoInicial = ref(true);
+
+const mostrarModalVerSugestoes = ref(false);
+const sugestoesVisualizacao = ref("");
+
+const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
+
+async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
+  fecharModal();
+  toastStore.setPending(mensagem);
+  invalidarCachesSubprocesso();
+  await router.push({name: "Painel"});
+}
+
+const {
+  mostrarModalAceitar,
+  mostrarModalDevolucao,
+  observacaoDevolucao,
+  isLoading,
+  confirmarAceitacao,
+  confirmarDevolucao,
+  abrirModalAceitar,
+  fecharModalAceitar,
+  abrirModalDevolucao,
+} = useMapaAcoesAnalise({
+  codSubprocesso,
+  acaoPrincipalMapa,
+  concluirAcaoPainel,
+  notify,
+});
+
+async function sincronizarSugestoesMapa(): Promise<string> {
+  if (!codSubprocesso.value) {
+    return "";
+  }
+  return await obterSugestoesMapa(codSubprocesso.value);
+}
+
+async function carregarSugestoesParaVisualizacao() {
+  try {
+    sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
+  } catch (error) {
+    logger.error(error);
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+  }
+}
+
+function verSugestoes() {
+  mostrarModalVerSugestoes.value = true;
+  sugestoesVisualizacao.value = "";
+  void carregarSugestoesParaVisualizacao();
+}
+
+function fecharModalVerSugestoes() {
+  mostrarModalVerSugestoes.value = false;
+  sugestoesVisualizacao.value = "";
+}
+
 const {
   mostrarModalImpacto,
   loadingImpacto,
