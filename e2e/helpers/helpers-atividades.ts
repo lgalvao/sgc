@@ -151,12 +151,15 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
     await expect(botao).toBeEnabled();
     await botao.click();
 
-    // Se após o clique ainda estamos na mesma URL e não abriu modal, pode ser que faltem dados
-    // e o sistema exibiu um aviso (toast/alerta). O helper tenta corrigir isso se necessário para o fluxo seguir.
     const modal = page.getByRole('dialog');
-    const modalVisivel = await modal.isVisible().catch(() => false);
+    const alert = page.getByTestId('app-alert');
 
-    if (!modalVisivel) {
+    await Promise.race([
+        modal.waitFor({ state: 'visible' }),
+        alert.waitFor({ state: 'visible' })
+    ]).catch(() => {});
+
+    if (await alert.isVisible()) {
         atividadeExtraCriada = `Atividade complementar ${Date.now()}`;
         await adicionarAtividade(page, atividadeExtraCriada);
         await adicionarConhecimento(page, atividadeExtraCriada, 'Conhecimento complementar');

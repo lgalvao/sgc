@@ -33,6 +33,7 @@
         </BButton>
         <LoadingButton
             v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
+            :disabled="!habilitarDisponibilizarCadastro"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
@@ -220,8 +221,13 @@ const carregandoInicial = ref(true);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const acesso = useAcesso(subprocesso);
-const {podeEditarCadastro, podeVisualizarImpacto, habilitarEditarCadastro} = acesso;
-const podeDisponibilizarCadastro = computed(() => acesso.podeDisponibilizarCadastro?.value ?? false);
+const {
+  podeEditarCadastro,
+  podeVisualizarImpacto,
+  habilitarEditarCadastro,
+  podeDisponibilizarCadastro,
+  habilitarDisponibilizarCadastro
+} = acesso;
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 
 
@@ -613,9 +619,7 @@ async function disponibilizarCadastro() {
       ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
       : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
-  const isNaoIniciado = situacaoAtualCadastro === SituacaoSubprocesso.NAO_INICIADO;
-
-  if (!situacaoAtualCadastro || (situacaoAtualCadastro !== situacaoReferencia && !isNaoIniciado)) {
+  if (!situacaoAtualCadastro || situacaoAtualCadastro !== situacaoReferencia) {
     notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
     return;
   }

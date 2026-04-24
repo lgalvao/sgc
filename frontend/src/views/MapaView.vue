@@ -59,6 +59,7 @@
           </BButton>
           <BButton
               v-if="podeDisponibilizarMapa"
+              :disabled="!habilitarDisponibilizarMapa"
               data-testid="btn-cad-mapa-disponibilizar"
               variant="success"
               @click="abrirModalDisponibilizar"
@@ -274,6 +275,7 @@ const {
   podeEditarMapa,
   podeDisponibilizarMapa,
   habilitarEditarMapa,
+  habilitarDisponibilizarMapa,
   podeAnalisarMapa,
   podeVerSugestoes: podeMostrarVerSugestoes,
   habilitarDevolverMapa,
