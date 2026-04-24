@@ -1,13 +1,9 @@
 import apiClient from "../axios-setup";
-import type {DisponibilizarCadastroRequest} from "@/types/tipos";
 
 export async function disponibilizarCadastro(
-    codSubprocesso: number,
-    dados?: DisponibilizarCadastroRequest
+    codSubprocesso: number
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/cadastro/disponibilizar`, {
-        observacoes: dados?.observacoes ?? ""
-    });
+    await apiClient.post(`/subprocessos/${codSubprocesso}/cadastro/disponibilizar`);
 }
 
 export async function iniciarRevisaoCadastro(codSubprocesso: number): Promise<void> {
@@ -19,12 +15,9 @@ export async function cancelarInicioRevisaoCadastro(codSubprocesso: number): Pro
 }
 
 export async function disponibilizarRevisaoCadastro(
-    codSubprocesso: number,
-    dados?: DisponibilizarCadastroRequest
+    codSubprocesso: number
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-revisao`, {
-        observacoes: dados?.observacoes ?? ""
-    });
+    await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-revisao`);
 }
 
 export async function devolverCadastro(

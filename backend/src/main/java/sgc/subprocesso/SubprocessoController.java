@@ -192,13 +192,8 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_CADASTRO')")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarCadastro(
-            @PathVariable Long codSubprocesso,
-            @RequestBody(required = false) DisponibilizarCadastroRequest request) {
-        String observacoes = Optional.ofNullable(request)
-                .map(DisponibilizarCadastroRequest::observacoes)
-                .map(UtilSanitizacao::sanitizar)
-                .orElse(null);
-        transicaoService.disponibilizarCadastro(codSubprocesso, observacoes);
+            @PathVariable Long codSubprocesso) {
+        transicaoService.disponibilizarCadastro(codSubprocesso);
         return ResponseEntity.ok(new MensagemResponse("Cadastro de atividades disponibilizado"));
     }
 
@@ -222,13 +217,8 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_REVISAO_CADASTRO')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
-            @PathVariable Long codSubprocesso,
-            @RequestBody(required = false) DisponibilizarCadastroRequest request) {
-        String observacoes = Optional.ofNullable(request)
-                .map(DisponibilizarCadastroRequest::observacoes)
-                .map(UtilSanitizacao::sanitizar)
-                .orElse(null);
-        transicaoService.disponibilizarRevisao(codSubprocesso, observacoes);
+            @PathVariable Long codSubprocesso) {
+        transicaoService.disponibilizarRevisao(codSubprocesso);
 
         return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro disponibilizada"));
     }
