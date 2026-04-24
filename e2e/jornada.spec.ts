@@ -5,7 +5,7 @@ import * as ProcessoHelpers from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
-import {limparNotificacoes, verificarAppAlert} from './helpers/helpers-navegacao.js';
+import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
 import { TEXTOS } from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
@@ -239,15 +239,16 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const homologarMapaEFinalizarAdmin = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
-            await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
-            await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
-            await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
+            await MapaHelpers.navegarParaMapa(page);
             await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
             await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeEnabled();
-            await page.goBack();
-            await expect(page.getByTestId('header-subprocesso')).toBeVisible();
-            await MapaHelpers.aceitarOuHomologarMapa(page, 'Mapa homologado pelo Admin. Ciclo base concluído.');
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            const modal = page.getByTestId('body-aceite-mapa');
+            await expect(modal).toBeVisible();
+            await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa homologado pelo Admin. Ciclo base concluído.');
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await expect(modal).toBeHidden();
+            await verificarToast(page, new RegExp(`${TEXTOS.sucesso.ACEITE_REGISTRADO}|${TEXTOS.mapa.SUCESSO_HOMOLOGACAO}`, 'i'));
             await ProcessoHelpers.acessarDetalhesProcesso(page, descricaoMapeamento);
             await ProcessoHelpers.finalizarProcesso(page);
             await ProcessoHelpers.verificarProcessoNaTabela(page, {
