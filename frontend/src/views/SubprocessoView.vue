@@ -197,7 +197,7 @@
   >
     <p>{{ TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PREFIXO }} {{
         tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.CADASTRO : TEXTOS.subprocesso.REVISAO_CADASTRO
-      }}:</p>
+      }} <span aria-hidden="true" class="text-danger">*</span>:</p>
     <BFormTextarea
         id="justificativaReabertura"
         v-model="justificativaReabertura"

@@ -18,7 +18,7 @@
     </BAlert>
 
     <div class="mb-4">
-      <h5>Descrição</h5>
+      <h5>Descrição <span aria-hidden="true" class="text-danger">*</span></h5>
       <div class="mb-2">
         <BFormTextarea
             id="descricao"
@@ -36,7 +36,7 @@
     </div>
 
     <div class="mb-4">
-      <h5>Atividades</h5>
+      <h5>Atividades <span aria-hidden="true" class="text-danger">*</span></h5>
       <div
           id="atividades"
           :class="['d-flex flex-wrap gap-2 p-2 border rounded', { 'border-danger is-invalid': mensagemErroAtividades }]"

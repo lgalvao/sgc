@@ -119,11 +119,13 @@
 
             <BFormGroup
                 v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
-                :label="TEXTOS.login.SELECAO_PERFIL"
                 label-for="par"
                 class="mb-3"
                 data-testid="sec-login-perfil"
             >
+              <template #label>
+                {{ TEXTOS.login.SELECAO_PERFIL }} <span aria-hidden="true" class="text-danger">*</span>
+              </template>
               <BFormSelect
                   id="par"
                   v-model="parSelecionado"

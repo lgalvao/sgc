@@ -22,7 +22,7 @@
         <label
             class="form-label"
             for="processo-select"
-        >Processo</label>
+        >Processo <span aria-hidden="true" class="text-danger">*</span></label>
         <BFormSelect
             id="processo-select"
             v-model="processoSelecionadoId"
@@ -52,7 +52,7 @@
         <label
             class="form-label"
             for="unidade-select"
-        >Unidade</label>
+        >Unidade <span aria-hidden="true" class="text-danger">*</span></label>
         <BFormSelect
             id="unidade-select"
             v-model="unidadeSelecionadaId"

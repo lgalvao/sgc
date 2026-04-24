@@ -49,10 +49,12 @@
       </BAlert>
       <BForm class="mt-4" @submit.prevent="criarAtribuicao">
         <BFormGroup
-            :label="TEXTOS.atribuicaoTemporaria.LABEL_USUARIO"
             label-for="usuario"
             class="mb-3"
         >
+          <template #label>
+            {{ TEXTOS.atribuicaoTemporaria.LABEL_USUARIO }} <span aria-hidden="true" class="text-danger">*</span>
+          </template>
           <template #description>
             {{ TEXTOS.atribuicaoTemporaria.AJUDA_PESQUISA_USUARIO }}
           </template>
@@ -106,7 +108,10 @@
 
         <BRow>
           <BCol md="6" class="mb-3">
-            <BFormGroup :label="TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO" label-for="dataInicio">
+            <BFormGroup label-for="dataInicio">
+              <template #label>
+                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO }} <span aria-hidden="true" class="text-danger">*</span>
+              </template>
               <InputData
                   id="dataInicio"
                   v-model="dataInicio"
@@ -122,7 +127,10 @@
           </BCol>
 
           <BCol md="6" class="mb-3">
-            <BFormGroup :label="TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO" label-for="dataTermino">
+            <BFormGroup label-for="dataTermino">
+              <template #label>
+                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO }} <span aria-hidden="true" class="text-danger">*</span>
+              </template>
               <InputData
                   id="dataTermino"
                   v-model="dataTermino"
@@ -139,10 +147,12 @@
         </BRow>
 
         <BFormGroup
-            :label="TEXTOS.atribuicaoTemporaria.LABEL_JUSTIFICATIVA"
             label-for="justificativa"
             class="mb-3"
         >
+          <template #label>
+            {{ TEXTOS.atribuicaoTemporaria.LABEL_JUSTIFICATIVA }} <span aria-hidden="true" class="text-danger">*</span>
+          </template>
           <BFormTextarea
               id="justificativa"
               v-model="justificativa"

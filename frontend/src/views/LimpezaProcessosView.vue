@@ -21,7 +21,7 @@
 
       <BFormGroup label-for="codigoProcesso">
         <template #label>
-          {{ TEXTOS.administracao.LIMPEZA_LABEL_CODIGO }}
+          {{ TEXTOS.administracao.LIMPEZA_LABEL_CODIGO }} <span aria-hidden="true" class="text-danger">*</span>
         </template>
         <BFormInput
             id="codigoProcesso"

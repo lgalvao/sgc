@@ -305,9 +305,10 @@ Estas exceções são saudáveis quando documentadas:
 
 ## Fase 3 — Acessibilidade e microcopy
 
-1. Garantir foco no primeiro erro em todos os formulários principais.
-2. Revisar linguagem das mensagens para padrão único (tom e ação esperada).
-3. Garantir que campos inválidos tenham associação semântica com mensagem (ARIA/feedback).
+1. Garantir que todos os campos obrigatórios tenham um indicador visual claro (asterisco `*` ou equivalente) no label, antes mesmo da submissão.
+2. Garantir foco no primeiro erro em todos os formulários principais.
+3. Revisar linguagem das mensagens para padrão único (tom e ação esperada).
+4. Garantir que campos inválidos tenham associação semântica com mensagem (ARIA/feedback).
 
 ## Fase 4 — Testes de regressão de UX
 

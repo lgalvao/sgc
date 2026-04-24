@@ -15,12 +15,14 @@
       {{ fieldErrors.generic }}
     </BAlert>
     <BFormGroup
-        label="Data limite para validação"
         label-for="dataLimite"
         :state="mensagemErroDataLimite ? false : null"
         :invalid-feedback="mensagemErroDataLimite"
         class="mb-3"
     >
+      <template #label>
+        Data limite para validação <span aria-hidden="true" class="text-danger">*</span>
+      </template>
       <InputData
           id="dataLimite"
           v-model="dataLimiteValidacao"

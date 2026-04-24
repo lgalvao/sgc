@@ -11,7 +11,10 @@
     <BCard class="mb-4">
       <BRow class="align-items-end">
         <BCol md="5">
-          <BFormGroup :label="TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO" label-for="select-processo-mapas">
+          <BFormGroup label-for="select-processo-mapas">
+            <template #label>
+              {{ TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO }} <span aria-hidden="true" class="text-danger">*</span>
+            </template>
             <BFormSelect
               id="select-processo-mapas"
               v-model="processoIdSelecionado"

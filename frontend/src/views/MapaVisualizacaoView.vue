@@ -146,10 +146,12 @@
         @shown="() => sugestoesTextareaRef?.$el?.focus()"
     >
       <BFormGroup
-          label="Sugestões para o mapa de competências:"
           label-for="sugestoesTextarea"
           class="mb-3"
       >
+        <template #label>
+          Sugestões para o mapa de competências: <span aria-hidden="true" class="text-danger">*</span>
+        </template>
         <BFormTextarea
             id="sugestoesTextarea"
             ref="sugestoesTextareaRef"
@@ -211,10 +213,12 @@
     >
       <p>Confirma a devolução da validação do mapa para ajustes?</p>
       <BFormGroup
-          label="Observação:"
           label-for="observacaoDevolucao"
           class="mb-3"
       >
+        <template #label>
+          Observação: <span aria-hidden="true" class="text-danger">*</span>
+        </template>
         <BFormTextarea
             id="observacaoDevolucao"
             ref="observacaoDevolucaoRef"

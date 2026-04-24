@@ -49,9 +49,10 @@ Este documento acompanha a execução incremental do plano definido em [`plano-v
 
 - Revisar fluxos ainda fora da primeira fatia: relatórios, limpeza e modais de visualização.
 
-### Sprint 3: Administração e Configuração
-- Consolidar formulários que têm validações customizadas em `ParametrosView` e `ConfiguracoesView` (se existirem, além do que já foi migrado).
-- Revisar views baseadas em tabela editável ou ações em lote para garantir que o padrão é mantido.
+### Sprint 3: Acessibilidade e Clareza (Em andamento)
+- [x] Garantir que todos os campos obrigatórios em formulários (inputs, selects, textareas) estejam visualmente indicados com um 'asterisco' (*).
+- [ ] Consolidar formulários que têm validações customizadas em `ParametrosView` e `ConfiguracoesView` (se existirem, além do que já foi migrado).
+- [ ] Revisar views baseadas em tabela editável ou ações em lote para garantir que o padrão é mantido.
 
 ## Validações executadas
 

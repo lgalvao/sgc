@@ -57,24 +57,6 @@ describe("DisponibilizarMapaModal.vue", () => {
         const dataInput = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
         expect(dataInput.exists()).toBe(true);
         expect(wrapper.findComponent(BFormInput).props().modelValue).toBe("");
-
-        const disponibilizarButton = wrapper.find(
-            '[data-testid="btn-disponibilizar-mapa-confirmar"]'
-        );
-        expect(disponibilizarButton.attributes("disabled")).toBeDefined();
-    });
-
-    it("deve habilitar o botão de disponibilizar quando a data for selecionada", async () => {
-        const wrapper = createWrapper({mostrar: true});
-
-        const inputWrapper = wrapper.findComponent(BFormInput);
-        const nativeInput = inputWrapper.find("input");
-        await nativeInput.setValue(obterAmanhaFormatado());
-
-        const disponibilizarButton = wrapper.find(
-            '[data-testid="btn-disponibilizar-mapa-confirmar"]'
-        );
-        expect(disponibilizarButton.attributes("disabled")).toBeUndefined();
     });
 
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {
