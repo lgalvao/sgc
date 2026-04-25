@@ -148,7 +148,7 @@ class ProcessoServiceCoverageTest {
 
         when(repo.buscar(Processo.class, codigo)).thenReturn(p);
 
-        SubprocessoValidacaoService.ValidationResult v = SubprocessoValidacaoService.ValidationResult.ofValido();
+        SubprocessoValidacaoService.ResultadoValidacao v = SubprocessoValidacaoService.ResultadoValidacao.ofValido();
         when(validacaoService.validarSubprocessosParaFinalizacao(codigo)).thenReturn(v);
 
         target.finalizar(codigo);
@@ -263,7 +263,7 @@ class ProcessoServiceCoverageTest {
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, true))
@@ -298,7 +298,7 @@ class ProcessoServiceCoverageTest {
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);
@@ -334,7 +334,7 @@ class ProcessoServiceCoverageTest {
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);
@@ -362,7 +362,7 @@ class ProcessoServiceCoverageTest {
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class))).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, false);

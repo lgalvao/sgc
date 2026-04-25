@@ -97,13 +97,12 @@ class MapaVisualizacaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar vazio se subprocesso sem mapa e com situacao null")
-    void deveTratarSubprocessoComSituacaoNula() {
+    @DisplayName("Deve retornar vazio se subprocesso sem mapa e com situacao de cadastro")
+    void deveTratarSubprocessoComSituacaoDeCadastro() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
         sub.setUnidade(new Unidade());
-        // situacao null
-        sub.setSituacaoForcada(null);
+        sub.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
 

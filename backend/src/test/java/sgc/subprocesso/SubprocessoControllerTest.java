@@ -628,11 +628,11 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter sugestões consolidadas")
         @WithMockUser
         void deveObterSugestoes() throws Exception {
-            when(consultaService.obterSugestoes(1L)).thenReturn(Map.of("total", 1, "itens", List.of("SUG1")));
+            when(consultaService.obterSugestoes(1L)).thenReturn(new SugestoesDto("Sugestão teste"));
 
             mockMvc.perform(get("/api/subprocessos/1/sugestoes"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.total").value(1));
+                    .andExpect(jsonPath("$.sugestoes").value("Sugestão teste"));
 
             verify(consultaService).obterSugestoes(1L);
         }

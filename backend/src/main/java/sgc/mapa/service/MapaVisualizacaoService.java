@@ -24,18 +24,20 @@ public class MapaVisualizacaoService {
     private final CompetenciaRepo competenciaRepo;
 
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
-        Mapa mapa = mapaRepo.buscarCompletoPorSubprocesso(subprocesso.getCodigo()).orElse(null);
+        return mapaRepo.buscarCompletoPorSubprocesso(subprocesso.getCodigo())
+                .map(mapa -> montarRespostaComMapa(subprocesso, mapa))
+                .orElseGet(() -> {
+                    if (subprocesso.getSituacao().ehEtapaMapa()) {
+                        throw new ErroInconsistenciaInterna(
+                                "Subprocesso %s em etapa de mapa sem mapa vinculado para visualizacao"
+                                        .formatted(subprocesso.getCodigo())
+                        );
+                    }
+                    return criarRespostaVazia(subprocesso);
+                });
+    }
 
-        if (mapa == null) {
-            if (subprocesso.getSituacao() != null && subprocesso.getSituacao().name().contains("MAPA")) {
-                throw new ErroInconsistenciaInterna(
-                        "Subprocesso %s em etapa de mapa sem mapa vinculado para visualizacao"
-                                .formatted(subprocesso.getCodigo())
-                );
-            }
-            return criarRespostaVazia(subprocesso);
-        }
-
+    private MapaVisualizacaoResponse montarRespostaComMapa(Subprocesso subprocesso, Mapa mapa) {
         List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo());
         Set<Long> codAtividadesComCompetencia = new HashSet<>();
         competencias.forEach(comp -> comp.getAtividades().stream()

@@ -69,7 +69,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("ACESSO NEGADO: Acesso negado"));
+                .andExpect(jsonPath("$.message").value("Acesso negado."));
     }
 
     @Test
@@ -108,7 +108,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("ESTADO ILEGAL: Estado inválido"));
+                .andExpect(jsonPath("$.message").value("Operação inválida para o estado atual."));
     }
 
     @Test
@@ -122,7 +122,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("ERRO INTERNO: Falha interna"))
+                .andExpect(jsonPath("$.message").value("Erro interno do sistema."))
                 .andExpect(jsonPath("$.code").value("ERRO_INTERNO"));
     }
 
@@ -136,7 +136,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("ARGUMENTO INVÁLIDO: Argumento inválido"));
+                .andExpect(jsonPath("$.message").value("Dados inválidos fornecidos na requisição."));
     }
 
     @Test
@@ -149,7 +149,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("ERRO INESPERADO: Erro inesperado"));
+                .andExpect(jsonPath("$.message").value("Erro inesperado. Consulte o suporte com o código de rastreamento."));
     }
 
     @Test

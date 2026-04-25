@@ -103,7 +103,10 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean verificarPermissao(@Nullable Usuario usuario, @Nullable Object alvo, AcaoPermissao acao, boolean logarNegacao) {
-        if (usuario == null) return false;
+        if (usuario == null) {
+            log.debug("Permissão negada: nenhum usuário autenticado para a ação {}", acao);
+            return false;
+        }
 
         return switch (alvo) {
             case Collection<?> colecao -> colecao.stream().allMatch(item -> verificarPermissao(usuario, item, acao, logarNegacao));

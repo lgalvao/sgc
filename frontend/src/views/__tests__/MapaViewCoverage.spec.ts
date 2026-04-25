@@ -146,7 +146,6 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 const subprocessoStoreCacheMock = {
-    dadosValidos: vi.fn(),
     invalidar: vi.fn(),
     garantirContextoEdicao: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),

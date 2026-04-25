@@ -33,7 +33,13 @@ public enum SituacaoSubprocesso {
     private static final String PREFIXO_MAPEAMENTO = "MAPEAMENTO";
     private static final String PREFIXO_REVISAO = "REVISAO";
     private static final String PREFIXO_DIAGNOSTICO = "DIAGNOSTICO";
+    private static final String SEGMENTO_MAPA = "_MAPA_";
     private final String descricao;
+
+    /** Retorna {@code true} se este estado pertence à etapa de mapa (mapeamento ou revisão). */
+    public boolean ehEtapaMapa() {
+        return name().contains(SEGMENTO_MAPA);
+    }
 
     public boolean podeTransicionarPara(SituacaoSubprocesso nova, TipoProcesso tipo) {
         if (this == nova) return true;

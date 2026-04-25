@@ -219,8 +219,7 @@ class SubprocessoTransicaoServiceTest {
             Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
             Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
 
-            when(consultaService.buscarSubprocesso(10L)).thenReturn(spMap);
-            when(consultaService.buscarSubprocesso(20L)).thenReturn(spRev);
+            when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(spMap)).thenReturn(spMap.getUnidade());
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(spRev)).thenReturn(spRev.getUnidade());
 
@@ -238,8 +237,7 @@ class SubprocessoTransicaoServiceTest {
             Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
             Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
 
-            when(consultaService.buscarSubprocesso(10L)).thenReturn(spMap);
-            when(consultaService.buscarSubprocesso(20L)).thenReturn(spRev);
+            when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
             when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
             when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());

@@ -67,22 +67,22 @@ public class CacheConfig {
                 .build());
         cacheManager.registerCustomCache(CACHE_VW_UNIDADE, Caffeine.newBuilder()
                 .recordStats()
-                .maximumSize(1)
+                .maximumSize(1000)
                 .expireAfterWrite(java.time.Duration.ofMinutes(15))
                 .build());
         cacheManager.registerCustomCache(CACHE_VW_USUARIO, Caffeine.newBuilder()
                 .recordStats()
-                .maximumSize(1)
+                .maximumSize(5000)
                 .expireAfterWrite(java.time.Duration.ofMinutes(15))
                 .build());
         cacheManager.registerCustomCache(CACHE_VW_RESPONSABILIDADE, Caffeine.newBuilder()
                 .recordStats()
-                .maximumSize(1)
+                .maximumSize(5000)
                 .expireAfterWrite(java.time.Duration.ofMinutes(15))
                 .build());
         cacheManager.registerCustomCache(CACHE_VW_USUARIO_PERFIL, Caffeine.newBuilder()
                 .recordStats()
-                .maximumSize(1)
+                .maximumSize(5000)
                 .expireAfterWrite(java.time.Duration.ofMinutes(15))
                 .build());
         return cacheManager;

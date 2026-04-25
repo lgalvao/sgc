@@ -217,10 +217,10 @@ public class SubprocessoValidacaoService {
         return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidadeCodigos);
     }
 
-    public ValidationResult validarSubprocessosParaFinalizacao(Long codProcesso) {
+    public ResultadoValidacao validarSubprocessosParaFinalizacao(Long codProcesso) {
         long total = subprocessoRepo.countByProcessoCodigo(codProcesso);
 
-        if (total == 0) return ValidationResult.ofInvalido("O processo não possui subprocessos para finalizar");
+        if (total == 0) return ResultadoValidacao.ofInvalido("O processo não possui subprocessos para finalizar");
 
         long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(codProcesso,
                 List.of(
@@ -231,23 +231,23 @@ public class SubprocessoValidacaoService {
         );
 
         if (total != homologados) {
-            return ValidationResult.ofInvalido(
+            return ResultadoValidacao.ofInvalido(
                     ("Apenas %d de %d subprocessos foram homologados. " +
                             "Todos os subprocessos devem estar homologados para finalizar o processo.")
                             .formatted(homologados, total)
             );
         }
 
-        return ValidationResult.ofValido();
+        return ResultadoValidacao.ofValido();
     }
 
-    public record ValidationResult(boolean valido, @Nullable String mensagem) {
-        public static ValidationResult ofValido() {
-            return new ValidationResult(true, null);
+    public record ResultadoValidacao(boolean valido, @Nullable String mensagem) {
+        public static ResultadoValidacao ofValido() {
+            return new ResultadoValidacao(true, null);
         }
 
-        public static ValidationResult ofInvalido(String mensagem) {
-            return new ValidationResult(false, mensagem);
+        public static ResultadoValidacao ofInvalido(String mensagem) {
+            return new ResultadoValidacao(false, mensagem);
         }
     }
 }

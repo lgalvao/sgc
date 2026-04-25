@@ -69,13 +69,9 @@ public class LimitadorTentativasLogin {
                 .filter(e -> !e.getValue().isEmpty())
                 .min(Comparator.comparing(e -> e.getValue().peekFirst()))
                 .map(Map.Entry::getKey)
-                .orElseGet(() -> {
-                    String firstKey = tentativasPorIp.keySet().stream().findFirst().orElse(null);
-                    if (firstKey == null) {
-                        throw new ErroConfiguracao("Limitador de login inconsistente: cache vazio ao tentar remover.");
-                    }
-                    return firstKey;
-                });
+                .orElseGet(() -> tentativasPorIp.keySet().stream()
+                        .findFirst()
+                        .orElseThrow(() -> new ErroConfiguracao("Limitador de login inconsistente: cache vazio ao tentar remover.")));
     }
 
     private boolean isLimiterDesabilitado() {
@@ -106,16 +102,7 @@ public class LimitadorTentativasLogin {
 
     @Scheduled(fixedRate = 600000)
     public void limparCachePeriodico() {
-        LocalDateTime limite = LocalDateTime.now(clock).minusMinutes(JANELA_MINUTOS);
-
-        tentativasPorIp.entrySet().removeIf(entry -> {
-            Deque<LocalDateTime> tentativas = entry.getValue();
-            LocalDateTime tentativaAntiga;
-            while ((tentativaAntiga = tentativas.peekFirst()) != null && tentativaAntiga.isBefore(limite)) {
-                tentativas.pollFirst();
-            }
-            return tentativas.isEmpty();
-        });
+        new ArrayList<>(tentativasPorIp.keySet()).forEach(this::limparTentativasAntigas);
     }
 
     int getCacheSize() {

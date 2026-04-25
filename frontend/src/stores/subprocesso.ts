@@ -22,7 +22,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
     const erroIntegracaoContexto = ref<NormalizedError | null>(null);
     const codSubprocessoCarregado = ref<number | null>(null);
-    const invalido = ref(true);
     const carregamentosPorCodigo = new Map<number, Promise<ContextoEdicaoSubprocesso>>();
     const carregamentosPorProcessoUnidade = new Map<string, Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso }>>();
     const mapaProcessoUnidadeParaCodigo = new Map<string, number>();
@@ -40,29 +39,25 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         };
     }
 
-    /** Contexto ainda é válido para o subprocesso dado? */
-    function dadosValidos(_: number): boolean {
-        return false;
-    }
-
     /** Invalida o cache — deve ser chamado após qualquer ação de workflow. */
     function invalidar(): void {
-        invalido.value = true;
         carregamentosPorCodigo.clear();
         carregamentosPorProcessoUnidade.clear();
         mapaProcessoUnidadeParaCodigo.clear();
         erroIntegracaoContexto.value = null;
     }
 
+    function _registrarContexto(codigo: number, contexto: ContextoEdicaoSubprocesso): void {
+        contextoEdicao.value = contexto;
+        erroIntegracaoContexto.value = null;
+        codSubprocessoCarregado.value = codigo;
+    }
+
     /**
-     * Retorna o contexto de edição do subprocesso, usando cache quando disponível.
-     * @returns o contexto (potencialmente do cache) ou null em caso de erro
+     * Retorna o contexto de edição do subprocesso, usando deduplicação de requisições concorrentes.
+     * @returns o contexto ou null em caso de erro
      */
     async function garantirContextoEdicao(codSubprocesso: number): Promise<ContextoEdicaoSubprocesso | null> {
-        if (dadosValidos(codSubprocesso)) {
-            return contextoEdicao.value;
-        }
-
         const carregamentoExistente = carregamentosPorCodigo.get(codSubprocesso);
         if (carregamentoExistente) {
             return carregamentoExistente;
@@ -72,10 +67,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             const promessaCarregamento = serviceBuscarContextoEdicao(codSubprocesso);
             carregamentosPorCodigo.set(codSubprocesso, promessaCarregamento);
             const data = await promessaCarregamento;
-            contextoEdicao.value = data;
-            erroIntegracaoContexto.value = null;
-            codSubprocessoCarregado.value = codSubprocesso;
-            invalido.value = true;
+            _registrarContexto(codSubprocesso, data);
             return data;
         } catch (err) {
             const erroNormalizado = normalizeError(err);
@@ -100,7 +92,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
     /**
      * Resolve o código de subprocesso por processo+unidade e retorna seu contexto,
-     * usando cache quando disponível.
+     * usando deduplicação de requisições concorrentes.
      */
     async function garantirContextoEdicaoPorProcessoEUnidade(
         codProcesso: number,
@@ -126,18 +118,11 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
                 const data = await serviceBuscarContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade);
                 const codigo = data.detalhes.codigo;
                 mapaProcessoUnidadeParaCodigo.set(chaveProcessoUnidade, codigo);
-                contextoEdicao.value = data;
-                erroIntegracaoContexto.value = null;
-                codSubprocessoCarregado.value = codigo;
-                invalido.value = true;
+                _registrarContexto(codigo, data);
                 return {codigo, contexto: data};
             })();
             carregamentosPorProcessoUnidade.set(chaveProcessoUnidade, promessaCarregamento);
-            const {codigo, contexto} = await promessaCarregamento;
-            contextoEdicao.value = contexto;
-            codSubprocessoCarregado.value = codigo;
-            invalido.value = true;
-            return {codigo, contexto};
+            return await promessaCarregamento;
         } catch (err) {
             const erroNormalizado = normalizeError(err);
             if (erroNormalizado.code === "REQUEST_CANCELADA") {
@@ -163,8 +148,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         contextoEdicao,
         erroIntegracaoContexto,
         codSubprocessoCarregado,
-        invalido,
-        dadosValidos,
         invalidar,
         garantirContextoEdicao,
         garantirContextoEdicaoPorProcessoEUnidade,

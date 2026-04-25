@@ -19,29 +19,18 @@ import {isErroCanceladoHttp} from "@/axios-setup";
 export const useProcessoStore = defineStore("processo", () => {
     const contextoCompleto = ref<Processo | null>(null);
     const codProcessoCarregado = ref<number | null>(null);
-    const invalido = ref(true);
     const carregamentosEmAndamento = new Map<number, Promise<Processo>>();
-
-    /** Contexto ainda é válido para o processo dado? */
-    function dadosValidos(_: number): boolean {
-        return false;
-    }
 
     /** Invalida o cache — deve ser chamado após qualquer ação de workflow que altera o processo. */
     function invalidar(): void {
-        invalido.value = true;
         carregamentosEmAndamento.clear();
     }
 
     /**
-     * Retorna o contexto completo do processo, usando cache quando disponível.
-     * @returns o contexto (potencialmente do cache) ou null em caso de erro
+     * Retorna o contexto completo do processo, usando deduplicação de requisições concorrentes.
+     * @returns o contexto ou null em caso de erro
      */
     async function garantirContextoCompleto(codProcesso: number): Promise<Processo | null> {
-        if (dadosValidos(codProcesso)) {
-            return contextoCompleto.value;
-        }
-
         const carregamentoExistente = carregamentosEmAndamento.get(codProcesso);
         if (carregamentoExistente) {
             return carregamentoExistente;
@@ -53,7 +42,6 @@ export const useProcessoStore = defineStore("processo", () => {
             const data = await promessaCarregamento;
             contextoCompleto.value = data;
             codProcessoCarregado.value = codProcesso;
-            invalido.value = true;
             return data;
         } catch (err) {
             const erroNormalizado = normalizeError(err);
@@ -70,8 +58,6 @@ export const useProcessoStore = defineStore("processo", () => {
     return {
         contextoCompleto,
         codProcessoCarregado,
-        invalido,
-        dadosValidos,
         invalidar,
         garantirContextoCompleto,
     };
