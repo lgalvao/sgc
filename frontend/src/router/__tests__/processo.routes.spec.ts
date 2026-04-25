@@ -7,7 +7,6 @@ vi.mock('@/views/SubprocessoView.vue', () => ({ default: { name: 'SubprocessoVie
 vi.mock('@/views/MapaView.vue', () => ({ default: { name: 'MapaView' } }));
 vi.mock('@/views/MapaVisualizacaoView.vue', () => ({ default: { name: 'MapaVisualizacaoView' } }));
 vi.mock('@/views/CadastroView.vue', () => ({ default: { name: 'CadastroView' } }));
-vi.mock('@/views/CadastroVisualizacaoView.vue', () => ({ default: { name: 'CadastroVisualizacaoView' } }));
 describe('processo.routes.ts', () => {
     it('deve definir as rotas corretamente', () => {
         expect(processoRoutes).toHaveLength(7);

@@ -65,7 +65,7 @@ const processoRoutes: RouteRecordRaw[] = [
     {
         path: "/processo/:codProcesso/:siglaUnidade/vis-cadastro",
         name: "SubprocessoVisCadastro",
-        component: () => import("@/views/CadastroVisualizacaoView.vue"),
+        component: () => import("@/views/CadastroView.vue"),
         props: (route: RouteLocationNormalized) => ({
             codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade,

@@ -31,19 +31,19 @@ Objetivo rastreado por este arquivo: acompanhar a execução do `plano-juncao-vi
 
 ### Implementação
 
-- [ ] Mover ações de análise de cadastro para `CadastroView.vue`.
+- [x] Mover ações de análise de cadastro para `CadastroView.vue`.
 - [ ] Renderizar formulário de nova atividade apenas quando edição estiver permitida.
 - [ ] Renderizar lista editável quando edição estiver permitida.
 - [ ] Renderizar lista somente leitura quando edição não estiver permitida.
 - [ ] Separar visualmente comandos de edição e ações de análise.
-- [ ] Garantir histórico em um único ponto.
+- [x] Garantir histórico em um único ponto.
 - [ ] Garantir impacto no mapa em um único ponto.
-- [ ] Garantir devolução em um único ponto.
-- [ ] Garantir aceite/homologação em um único ponto.
-- [ ] Apontar `SubprocessoCadastro` e `SubprocessoVisCadastro` para `CadastroView.vue`.
-- [ ] Atualizar mocks/testes de rota.
-- [ ] Atualizar/remover testes diretos de `CadastroVisualizacaoView.vue`.
-- [ ] Remover `CadastroVisualizacaoView.vue` se ficar sem uso.
+- [x] Garantir devolução em um único ponto.
+- [x] Garantir aceite/homologação em um único ponto.
+- [x] Apontar `SubprocessoCadastro` e `SubprocessoVisCadastro` para `CadastroView.vue`.
+- [x] Atualizar mocks/testes de rota.
+- [x] Atualizar/remover testes diretos de `CadastroVisualizacaoView.vue`.
+- [x] Remover `CadastroVisualizacaoView.vue` se ficar sem uso.
 
 ### Validação
 
@@ -56,7 +56,7 @@ Objetivo rastreado por este arquivo: acompanhar a execução do `plano-juncao-vi
 
 ### Resultado
 
-- [ ] Cadastro tem uma única view de rota.
+- [x] Cadastro tem uma única view de rota.
 - [ ] Botões de cadastro não estão duplicados entre duas views.
 - [ ] Visual de edição e leitura está coerente.
 - [ ] Rotas antigas continuam funcionais.
@@ -121,6 +121,46 @@ Objetivo rastreado por este arquivo: acompanhar a execução do `plano-juncao-vi
 - [ ] Decidir se `/vis-cadastro` redireciona para `/cadastro`.
 - [ ] Decidir se `/vis-mapa` redireciona para `/mapa`.
 
+## E2E
+
+### Achados
+
+- [x] Confirmado que os E2E estão fortemente acoplados aos cards separados de edição/visualização.
+- [x] Confirmado uso amplo de `card-subprocesso-atividades-vis`.
+- [x] Confirmado uso amplo de `card-subprocesso-mapa-visualizacao`.
+- [x] Confirmado uso de `waitForURL(/\/vis-cadastro$/)` em helper.
+- [x] Confirmado uso de `/vis-cadastro` e `/vis-mapa` como prova de modo em specs.
+
+### Helpers a revisar
+
+- [ ] `e2e/helpers/helpers-atividades.ts`: aceitar `/cadastro` e `/vis-cadastro` no estado intermediário.
+- [ ] `e2e/helpers/helpers-atividades.ts`: criar helper semântico para tela de atividades.
+- [ ] `e2e/helpers/helpers-atividades.ts`: criar helper para modo editável.
+- [ ] `e2e/helpers/helpers-atividades.ts`: criar helper para modo somente leitura/análise.
+- [ ] `e2e/helpers/helpers-mapas.ts`: manter aceitação de `/mapa` e `/vis-mapa` durante compatibilidade.
+- [ ] `e2e/helpers/helpers-mapas.ts`: criar helper semântico para tela de mapa.
+- [ ] `e2e/helpers/helpers-mapas.ts`: criar helper para modo editável.
+- [ ] `e2e/helpers/helpers-mapas.ts`: criar helper para modo somente leitura/análise.
+
+### Specs a revisar
+
+- [ ] `e2e/cdu-05.spec.ts`
+- [ ] `e2e/cdu-07.spec.ts`
+- [ ] `e2e/cdu-09.spec.ts`
+- [ ] `e2e/cdu-13.spec.ts`
+- [ ] `e2e/cdu-19.spec.ts`
+- [ ] `e2e/cdu-20.spec.ts`
+- [ ] `e2e/cdu-21.spec.ts`
+- [ ] `e2e/jornada.spec.ts`
+- [ ] `e2e/regressao-cache-sessao.spec.ts`
+
+### Novo contrato de teste
+
+- [ ] Trocar asserts de "view editável vs view visualização" por "ações disponíveis vs ausentes".
+- [ ] Manter poucos testes de compatibilidade das rotas `vis-*`.
+- [ ] Atualizar comentários que falam em `vis-cadastro` como tela separada.
+- [ ] Evitar remover cobertura de regra de acesso: botões de mutação devem continuar ausentes quando não permitidos.
+
 ## Validações executadas
 
 ```text
@@ -128,6 +168,27 @@ Data: 2026-04-25
 Comando: npm run test:unit --prefix frontend -- src/views/__tests__/CadastroVisualizacaoView.spec.ts
 Resultado: passou, 7 testes
 Observações: valida o primeiro corte de extração de AtividadesSomenteLeitura.
+```
+
+```text
+Data: 2026-04-25
+Comando: npm run test:unit --prefix frontend -- src/views/__tests__/VisMapa.spec.ts
+Resultado: passou, 25 testes
+Observações: valida a extração de MapaSomenteLeitura sem usar o estilo divergente de MapaVisualizacaoView como referência.
+```
+
+```text
+Data: 2026-04-25
+Comando: npm run test:unit --prefix frontend -- src/views/__tests__/AtividadesCadastroView.spec.ts src/views/__tests__/CadastroViewPermissoes.spec.ts src/views/__tests__/CadastroViewCoverage.spec.ts src/router/__tests__/processo.routes.spec.ts
+Resultado: passou, 41 testes
+Observações: valida a primeira fusão de rota de cadastro, com vis-cadastro apontando para CadastroView.
+```
+
+```text
+Data: 2026-04-25
+Comando: npm run typecheck --prefix frontend
+Resultado: passou
+Observações: executado após adicionar ações de análise em CadastroView.
 ```
 
 ```text
@@ -147,7 +208,11 @@ Observações:
 
 ## Falhas e achados
 
-Nenhum ainda.
+```text
+Achado: E2E usa cards e URLs vis-* como contrato de modo.
+Impacto: a junção das views vai exigir revisão forte dos helpers e specs, mesmo que as rotas antigas sejam preservadas.
+Decisão: migrar E2E para asserts semânticos de ações disponíveis/ausentes e manter poucos testes de compatibilidade de rota.
+```
 
 Use este formato ao registrar:
 

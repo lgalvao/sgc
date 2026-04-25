@@ -12,7 +12,6 @@ vi.mock('@/views/SubprocessoView.vue', () => ({default: {name: 'SubprocessoView'
 vi.mock('@/views/MapaView.vue', () => ({default: {name: 'MapaView'}}));
 vi.mock('@/views/MapaVisualizacaoView.vue', () => ({default: {name: 'MapaVisualizacaoView'}}));
 vi.mock('@/views/CadastroView.vue', () => ({default: {name: 'CadastroView'}}));
-vi.mock('@/views/CadastroVisualizacaoView.vue', () => ({default: {name: 'CadastroVisualizacaoView'}}));
 vi.mock('@/views/LoginView.vue', () => ({default: {name: 'LoginView'}}));
 vi.mock('@/views/PainelView.vue', () => ({default: {name: 'PainelView'}}));
 vi.mock('@/views/HistoricoView.vue', () => ({default: {name: 'HistoricoView'}}));

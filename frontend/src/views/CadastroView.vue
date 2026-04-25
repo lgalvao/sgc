@@ -16,7 +16,7 @@
           <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
         </BButton>
         <BButton
-            v-if="codSubprocesso && podeEditarCadastro"
+            v-if="codSubprocesso && (podeEditarCadastro || podeDevolverCadastro || acaoPrincipalCadastro?.mostrar)"
             data-testid="btn-cad-atividades-historico"
             variant="outline-secondary"
             @click="abrirModalHistorico"
@@ -42,6 +42,26 @@
             variant="success"
             @click="disponibilizarCadastro"
         />
+        <BButton
+            v-if="codSubprocesso && podeDevolverCadastro"
+            data-testid="btn-acao-devolver"
+            :disabled="!habilitarDevolverCadastro"
+            :title="TEXTOS.atividades.BOTAO_DEVOLVER"
+            variant="secondary"
+            @click="abrirModalDevolverAnalise"
+        >
+          {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
+        </BButton>
+        <BButton
+            v-if="codSubprocesso && acaoPrincipalCadastro?.mostrar"
+            data-testid="btn-acao-analisar-principal"
+            :disabled="!acaoPrincipalCadastro.habilitar"
+            :title="acaoPrincipalCadastro.rotuloBotao"
+            variant="success"
+            @click="abrirModalValidarAnalise"
+        >
+          {{ acaoPrincipalCadastro.rotuloBotao }}
+        </BButton>
       </template>
     </PageHeader>
 
@@ -156,12 +176,61 @@
           variant="danger"
           @confirmar="confirmarRemocao"
       />
+
+      <ModalConfirmacao
+          v-model="mostrarModalValidarAnalise"
+          :auto-close="false"
+          :loading="loadingAnaliseCadastro"
+          :titulo="acaoPrincipalCadastro?.tituloModal ?? ''"
+          :ok-title="acaoPrincipalCadastro?.rotuloConfirmacao ?? ''"
+          test-codigo-confirmar="btn-aceite-cadastro-confirmar"
+          variant="success"
+          @confirmar="confirmarValidacaoAnalise"
+      >
+        <p>{{ acaoPrincipalCadastro?.textoModal }}</p>
+        <BFormGroup class="mb-3" :label="TEXTOS.comum.OBSERVACAO" label-for="observacaoValidacao">
+          <BFormTextarea
+              id="observacaoValidacao"
+              v-model="observacaoValidacao"
+              data-testid="inp-aceite-cadastro-obs"
+              rows="3"
+          />
+        </BFormGroup>
+      </ModalConfirmacao>
+
+      <ModalConfirmacao
+          v-model="mostrarModalDevolverAnalise"
+          :auto-close="false"
+          :loading="loadingDevolucaoAnalise"
+          :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
+          :ok-title="TEXTOS.comum.BOTAO_DEVOLVER"
+          test-codigo-confirmar="btn-devolucao-cadastro-confirmar"
+          variant="danger"
+          @confirmar="confirmarDevolucaoAnalise"
+      >
+        <p>{{ isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DEVOLVER_TEXTO }}</p>
+        <BFormGroup class="mb-3" label-for="observacaoDevolucao">
+          <template #label>
+            Observação <span aria-hidden="true" class="text-danger">*</span>
+          </template>
+          <BFormTextarea
+              id="observacaoDevolucao"
+              v-model="observacaoDevolucao"
+              :state="estadoObservacaoDevolucao"
+              data-testid="inp-devolucao-cadastro-obs"
+              rows="3"
+          />
+          <BFormInvalidFeedback :state="estadoObservacaoDevolucao">
+            {{ TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA }}
+          </BFormInvalidFeedback>
+        </BFormGroup>
+      </ModalConfirmacao>
     </template>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormCheckbox, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormCheckbox, BFormGroup, BFormInvalidFeedback, BFormTextarea, BSpinner} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
@@ -186,13 +255,17 @@ import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useAcesso} from "@/composables/useAcesso";
+import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {
   type Analise,
   type Atividade,
   type AtividadeOperacaoResponse,
+  type AceitarCadastroRequest,
   type ContextoCadastroAtividadesSubprocesso,
   type CriarConhecimentoRequest,
+  type DevolverCadastroRequest,
   type ErroValidacao,
+  type HomologarCadastroRequest,
   SituacaoSubprocesso,
   TipoProcesso,
   type Unidade
@@ -217,6 +290,12 @@ const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+const {
+  validarSubmissao,
+  resetarValidacao,
+  deveExibirErro,
+  focarPrimeiroErroInvalido
+} = useValidacaoFormulario();
 const {impactoMapa: impactos} = mapasStore;
 const codSubprocesso = ref<number | null>(null);
 const codMapa = ref<number | null>(null);
@@ -227,9 +306,12 @@ const acesso = useAcesso(subprocesso);
 const {
   podeEditarCadastro,
   podeVisualizarImpacto,
+  podeDevolverCadastro,
   habilitarEditarCadastro,
+  habilitarDevolverCadastro,
   podeDisponibilizarCadastro,
-  habilitarDisponibilizarCadastro
+  habilitarDisponibilizarCadastro,
+  acaoPrincipalCadastro
 } = acesso;
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 
@@ -382,6 +464,8 @@ const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalHistorico = ref(false);
 const mostrarModalConfirmacaoRemocao = ref(false);
+const mostrarModalValidarAnalise = ref(false);
+const mostrarModalDevolverAnalise = ref(false);
 const dadosRemocao = ref<DadosRemocao>(null);
 const {
   mostrarModalImpacto,
@@ -394,10 +478,18 @@ const loadingValidacao = ref(false);
 const loadingDisponibilizacao = ref(false);
 const loadingRemocao = ref(false);
 const loadingInicioRevisao = ref(false);
+const loadingAnaliseCadastro = ref(false);
+const loadingDevolucaoAnalise = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);
+const observacaoValidacao = ref("");
+const observacaoDevolucao = ref("");
 const atividadeRefs = new Map<number, Element>();
 let timeoutLimparErros: ReturnType<typeof setTimeout> | null = null;
+
+const estadoObservacaoDevolucao = computed(() => {
+  return deveExibirErro(!observacaoDevolucao.value.trim()) ? false : null;
+});
 
 function timeoutLimpezaErros() {
   limparTimeoutErrosCadastro();
@@ -748,6 +840,101 @@ async function abrirModalHistorico() {
     analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
+}
+
+function abrirModalValidarAnalise() {
+  mostrarModalValidarAnalise.value = true;
+}
+
+function fecharModalValidarAnalise() {
+  mostrarModalValidarAnalise.value = false;
+  observacaoValidacao.value = "";
+}
+
+function abrirModalDevolverAnalise() {
+  resetarValidacao();
+  mostrarModalDevolverAnalise.value = true;
+}
+
+function fecharModalDevolverAnalise() {
+  mostrarModalDevolverAnalise.value = false;
+  observacaoDevolucao.value = "";
+  resetarValidacao();
+}
+
+async function confirmarValidacaoAnalise() {
+  if (!codSubprocesso.value) return;
+
+  const acao = acaoPrincipalCadastro.value;
+  if (!acao) return;
+
+  loadingAnaliseCadastro.value = true;
+  try {
+    let sucesso: boolean;
+
+    if (acao.codigo === "HOMOLOGAR") {
+      const req: HomologarCadastroRequest = {observacoes: observacaoValidacao.value};
+      sucesso = isRevisao.value
+          ? await fluxoSubprocesso.homologarRevisaoCadastro(codSubprocesso.value, req)
+          : await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req);
+
+      if (sucesso) {
+        fecharModalValidarAnalise();
+        toastStore.setPending(acao.mensagemSucesso);
+        if (acao.redirecionarParaPainel) {
+          invalidarCachesSubprocesso();
+          await router.push({name: "Painel"});
+        } else {
+          invalidarCachesSubprocesso({incluirPainel: false});
+          await router.push({
+            name: "Subprocesso",
+            params: {codProcesso: props.codProcesso, siglaUnidade: props.sigla},
+          });
+        }
+      }
+      return;
+    }
+
+    const req: AceitarCadastroRequest = {observacoes: observacaoValidacao.value};
+    sucesso = isRevisao.value
+        ? await fluxoSubprocesso.aceitarRevisaoCadastro(codSubprocesso.value, req)
+        : await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req);
+
+    if (sucesso) {
+      fecharModalValidarAnalise();
+      toastStore.setPending(acao.mensagemSucesso);
+      invalidarCachesSubprocesso();
+      await router.push({name: "Painel"});
+    }
+  } finally {
+    loadingAnaliseCadastro.value = false;
+  }
+}
+
+async function confirmarDevolucaoAnalise() {
+  if (!validarSubmissao(!!observacaoDevolucao.value.trim())) {
+    void focarPrimeiroErroInvalido();
+    return;
+  }
+
+  if (!codSubprocesso.value) return;
+
+  loadingDevolucaoAnalise.value = true;
+  try {
+    const req: DevolverCadastroRequest = {observacoes: observacaoDevolucao.value};
+    const sucesso = isRevisao.value
+        ? await fluxoSubprocesso.devolverRevisaoCadastro(codSubprocesso.value, req)
+        : await fluxoSubprocesso.devolverCadastro(codSubprocesso.value, req);
+
+    if (sucesso) {
+      fecharModalDevolverAnalise();
+      toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
+      invalidarCachesSubprocesso();
+      await router.push("/painel");
+    }
+  } finally {
+    loadingDevolucaoAnalise.value = false;
+  }
 }
 
 async function handleAdicionarAtividade() {

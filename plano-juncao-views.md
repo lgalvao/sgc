@@ -329,6 +329,126 @@ Geral:
 - E2E principais de cadastro e mapa passam ou têm falha analisada com causa clara.
 - `CadastroVisualizacaoView.vue` e `MapaVisualizacaoView.vue` não ficam como shells vazios permanentes.
 
+## Achados recentes da implementação
+
+### Cadastro
+
+- `SubprocessoVisCadastro` já pode apontar para `CadastroView.vue` sem quebrar as specs unitárias focadas.
+- `CadastroView.vue` passou a concentrar ações de análise que antes existiam apenas em `CadastroVisualizacaoView.vue`: devolução, aceite/homologação, observações e validação de justificativa.
+- A rota antiga `/vis-cadastro` ainda deve existir por enquanto, mas deixou de significar "view separada".
+- `CadastroVisualizacaoView.vue` ainda existe porque seus testes diretos precisam ser migrados ou removidos antes da exclusão.
+
+### Mapa
+
+- `MapaSomenteLeitura.vue` foi extraído, mas não deve copiar o estilo antigo de `MapaVisualizacaoView.vue`.
+- A referência visual correta para o corpo somente leitura do mapa deve ser o padrão já usado por `CompetenciaCard`: cards simples, BootstrapVueNext, densidade parecida com a edição e sem bordas coloridas/estética isolada.
+- `MapaVisualizacaoView.vue` ainda é a rota ativa de `SubprocessoVisMapa`; a fusão real de Mapa ainda não foi feita.
+
+## Impacto nos E2E
+
+A suíte E2E vai precisar de revisão forte. Ela hoje testa a separação antiga como se fosse regra de negócio, principalmente por três tipos de acoplamento:
+
+1. Cards distintos como contrato primário.
+   Muitos testes verificam `card-subprocesso-atividades` versus `card-subprocesso-atividades-vis`, e `card-subprocesso-mapa-edicao` versus `card-subprocesso-mapa-visualizacao`.
+
+2. URLs `vis-*` como prova de modo.
+   Helpers e specs usam `waitForURL(/\/vis-cadastro$/)` ou esperam explicitamente `/vis-mapa`.
+
+3. Comentários/cenários descrevendo "view de visualização" como destino separado.
+   Isso ficará desatualizado quando a tela for única e o modo vier de permissão/situação.
+
+### Arquivos E2E mais afetados
+
+- `e2e/helpers/helpers-atividades.ts`
+- `e2e/helpers/helpers-mapas.ts`
+- `e2e/jornada.spec.ts`
+- `e2e/cdu-05.spec.ts`
+- `e2e/cdu-07.spec.ts`
+- `e2e/cdu-09.spec.ts`
+- `e2e/cdu-13.spec.ts`
+- `e2e/cdu-19.spec.ts`
+- `e2e/cdu-20.spec.ts`
+- `e2e/cdu-21.spec.ts`
+- `e2e/regressao-cache-sessao.spec.ts`
+
+### Nova regra para E2E
+
+Os E2E não devem mais afirmar "qual view" abriu. Devem afirmar:
+
+- o usuário consegue acessar a tela do domínio correto;
+- os dados aparecem;
+- ações de edição aparecem ou ficam ausentes conforme permissão/situação;
+- ações de análise aparecem ou ficam ausentes conforme permissão/situação;
+- mutações esperadas funcionam;
+- rotas antigas continuam aceitas enquanto existirem.
+
+Ou seja, a distinção relevante passa a ser capacidade operacional, não sufixo de rota.
+
+### Adaptação recomendada dos helpers
+
+`helpers-atividades.ts`:
+
+- trocar `navegarParaAtividadesVisualizacao` para aceitar `/cadastro` ou `/vis-cadastro` enquanto a compatibilidade existir;
+- preferir assertar o heading e os botões esperados, não o sufixo da URL;
+- criar helpers semânticos:
+  - `esperarTelaAtividades`;
+  - `esperarAtividadesEditaveis`;
+  - `esperarAtividadesSomenteLeitura`;
+  - `esperarAcoesAnaliseCadastro`;
+  - `esperarSemAcoesEdicaoCadastro`.
+
+`helpers-mapas.ts`:
+
+- manter `waitForURL(/\/(mapa|vis-mapa)$/)` no estado intermediário;
+- depois da fusão, evitar depender de card de edição versus visualização;
+- criar helpers semânticos:
+  - `esperarTelaMapa`;
+  - `esperarMapaEditavel`;
+  - `esperarMapaSomenteLeitura`;
+  - `esperarAcoesAnaliseMapa`;
+  - `esperarSemAcoesManutencaoMapa`.
+
+### Adaptação recomendada das specs
+
+1. Substituir asserts de presença/ausência dos cards por asserts de permissões efetivas.
+   Exemplo: em vez de "card visualização visível e card edição oculto", testar "card do domínio acessível" e, após abrir a tela, "botão de edição ausente / botão de análise presente".
+
+2. Manter poucos testes de compatibilidade de rota.
+   Deve haver teste explícito para garantir que `/vis-cadastro` e `/vis-mapa` ainda abrem, mas isso não deve aparecer em todos os fluxos.
+
+3. Atualizar `jornada.spec.ts` por fases.
+   Esse arquivo é serial e muito acoplado aos estados intermediários. Deve ser revisado depois dos helpers, não antes.
+
+4. Atualizar comentários dos testes.
+   Comentários como "card vis-cadastro" e "view de visualização" devem virar "modo somente leitura" ou "ações de análise".
+
+5. Evitar enfraquecer regra de acesso.
+   A remoção da distinção de view não significa que edição fica disponível. E2E deve continuar verificando ausência de botões de mutação quando o perfil/situação não permite.
+
+## Plano específico para E2E
+
+### Fase E2E 1: compatibilidade durante a fusão
+
+- Ajustar helpers para aceitar rotas antigas e novas.
+- Trocar `waitForURL(/\/vis-cadastro$/)` por aceitação de `/cadastro` ou `/vis-cadastro` onde a rota exata não for o comportamento testado.
+- Trocar asserts repetidos de cards separados por helpers semânticos.
+- Manter `data-testid` antigos nos cards enquanto os testes forem migrados.
+
+### Fase E2E 2: contrato novo
+
+- Fazer os testes navegarem pelo card de domínio, não pelo card de modo.
+- Centralizar expectativa de modo em botões e campos:
+  - edição de atividades: `inp-nova-atividade`, `btn-adicionar-atividade`, botões de editar/remover;
+  - análise de cadastro: `btn-acao-devolver`, `btn-acao-analisar-principal`;
+  - edição de mapa: `btn-abrir-criar-competencia`, `btn-cad-mapa-disponibilizar`;
+  - análise de mapa: `btn-mapa-validar`, `btn-mapa-devolver`, `btn-mapa-homologar-aceite`, `btn-mapa-sugestoes`.
+
+### Fase E2E 3: limpeza final
+
+- Remover dependência ampla de `card-subprocesso-atividades-vis` e `card-subprocesso-mapa-visualizacao`.
+- Se as rotas `vis-*` forem redirecionadas no futuro, manter apenas testes pequenos de redirecionamento/compatibilidade.
+- Atualizar `etc/reqs/design/breadcrumbs.md` para refletir o contrato final de navegação.
+
 ## Riscos
 
 1. Arquivo grande demais.

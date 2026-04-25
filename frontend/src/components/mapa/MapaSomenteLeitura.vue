@@ -30,16 +30,14 @@
               no-body
           >
             <BCardBody>
-              <span class="atividade-associada-descricao">
-                {{ atividade.descricao }}
-                <BBadge
-                    v-if="(atividade.conhecimentos?.length ?? 0) > 0"
-                    variant="secondary"
-                    class="ms-2"
-                >
-                  {{ atividade.conhecimentos.length }}
-                </BBadge>
-              </span>
+              <span class="atividade-associada-descricao">{{ atividade.descricao }}</span>
+              <BBadge
+                  v-if="(atividade.conhecimentos?.length ?? 0) > 0"
+                  variant="secondary"
+                  class="ms-2"
+              >
+                {{ atividade.conhecimentos.length }}
+              </BBadge>
               <ul v-if="(atividade.conhecimentos?.length ?? 0) > 0" class="mb-0 mt-2 ps-3">
                 <li
                     v-for="conhecimento in atividade.conhecimentos"
