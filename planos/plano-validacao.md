@@ -2,7 +2,7 @@
 
 Este documento e um guia vivo das diretrizes de validacao/feedback do SGC e do que ainda falta convergir.
 
-O historico operacional fica resumido em [`tracking-validacao.md`](tracking-validacao.md). As diretrizes de UX complementares seguem em [`ux.md`](ux.md).
+O historico operacional fica resumido em [`tracking-validacao.md`](tracking-validacao.md). As diretrizes de UX complementares seguem em [`ux.md`](../ux.md).
 
 ## Objetivo
 
