@@ -996,9 +996,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
-            await capturarTela(page, 'mapa', 'analise-gestor-coordenadoria', {
+            await capturarTela(page, 'processo', 'cadastro-analise-gestor-coordenadoria', {
                 fullPage: true,
-                extra: { perfil: 'GESTOR_COORD', acao: 'aceite-1' }
+                tags: ['cadastro', 'analise', 'somente-leitura'],
+                extra: { perfil: 'GESTOR_COORD', acao: 'aceite-cadastro-1' }
             });
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro muito bem detalhado. Seguindo para a Secretaria.');
@@ -1008,9 +1009,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
-            await capturarTela(page, 'mapa', 'analise-chefe-secretaria', {
+            await capturarTela(page, 'processo', 'cadastro-analise-gestor-secretaria', {
                 fullPage: true,
-                extra: { perfil: 'GESTOR_SEC', acao: 'aceite-2' }
+                tags: ['cadastro', 'analise', 'somente-leitura'],
+                extra: { perfil: 'GESTOR_SEC', acao: 'aceite-cadastro-2' }
             });
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Ok. Para homologação do ADMIN.');
@@ -1083,9 +1085,42 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('inp-disponibilizar-mapa-data').fill(dataLimite.toISOString().split('T')[0]);
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
             await verificarPaginaPainel(page);
+
+            await login(page, USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
             await capturarTela(page, 'mapa', 'mapa-disponibilizado', {
                 fullPage: true,
-                extra: { estado: 'MAPA_DISPONIBILIZADO' }
+                tags: ['mapa', 'analise', 'validacao', 'somente-leitura'],
+                extra: { estado: 'MAPA_DISPONIBILIZADO', perfil: 'CHEFE', acao: 'validacao-mapa' }
+            });
+
+            await page.getByTestId('btn-mapa-validar').click();
+            await expect(page.getByRole('dialog')).toContainText('Confirma a validação do mapa de competências?');
+            await page.getByTestId('btn-validar-mapa-confirmar').click();
+            await verificarPaginaPainel(page);
+
+            await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await capturarTela(page, 'mapa', 'analise-gestor-coordenadoria', {
+                fullPage: true,
+                tags: ['mapa', 'analise', 'somente-leitura'],
+                extra: { perfil: 'GESTOR_COORD', acao: 'aceite-mapa-1' }
+            });
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await expect(page.getByTestId('body-aceite-mapa')).toBeVisible();
+            await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa consistente para seguir à Secretaria.');
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await verificarPaginaPainel(page);
+
+            await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await capturarTela(page, 'mapa', 'analise-gestor-secretaria', {
+                fullPage: true,
+                tags: ['mapa', 'analise', 'somente-leitura'],
+                extra: { perfil: 'GESTOR_SEC', acao: 'aceite-mapa-2' }
             });
         });
     });
