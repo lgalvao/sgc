@@ -53,9 +53,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
 
             const pageTitles: Record<string, string> = {
                 SubprocessoMapa: "Mapa de competências",
-                SubprocessoVisMapa: "Visualizar mapa",
                 SubprocessoCadastro: "Atividades e conhecimentos",
-                SubprocessoVisCadastro: "Atividades e conhecimentos",
             };
 
             const pageTitle = pageTitles[routeName];
@@ -122,7 +120,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
         const codUnidade = route.params.codUnidade as string;
 
         const isProcessoRoute = routeName === "Processo";
-        const isSubprocessoRoute = ["Subprocesso", "SubprocessoMapa", "SubprocessoVisMapa", "SubprocessoCadastro", "SubprocessoVisCadastro"].includes(routeName);
+        const isSubprocessoRoute = ["Subprocesso", "SubprocessoMapa", "SubprocessoCadastro"].includes(routeName);
         const isUnidadeRoute = ["Unidade", "Mapa", "AtribuicaoTemporariaForm"].includes(routeName);
 
         breadcrumbs.push(

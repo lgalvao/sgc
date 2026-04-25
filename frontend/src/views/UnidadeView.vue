@@ -176,7 +176,7 @@ function navegarParaUnidadeSubordinada(row: TreeItem) {
 function visualizarMapa() {
   if (mapaVigente.value) {
     router.push({
-      name: "SubprocessoVisMapa",
+      name: "SubprocessoMapa",
       params: {
         codProcesso: mapaVigente.value.codProcesso,
         siglaUnidade: unidade.value?.sigla

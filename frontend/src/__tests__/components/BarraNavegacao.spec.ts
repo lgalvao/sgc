@@ -209,8 +209,8 @@ describe('BarraNavegacao.vue', () => {
             expect(items[1].text()).toBe('Rota dinâmica');
         });
 
-        it('deve adicionar breadcrumb final para SubprocessoVisMapa', () => {
-            mockRoute.name = 'SubprocessoVisMapa';
+        it('deve adicionar breadcrumb final para SubprocessoMapa', () => {
+            mockRoute.name = 'SubprocessoMapa';
             mockRoute.params = {codProcesso: '123', siglaUnidade: 'UNIDADE'};
             const wrapper = mountComponent({
                 perfil: {perfilSelecionado: Perfil.GESTOR}

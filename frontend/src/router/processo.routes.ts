@@ -43,16 +43,6 @@ const processoRoutes: RouteRecordRaw[] = [
         meta: {title: "Mapa"},
     },
     {
-        path: "/processo/:codProcesso/:siglaUnidade/vis-mapa",
-        name: "SubprocessoVisMapa",
-        component: () => import("@/views/MapaView.vue"),
-        props: (route: RouteLocationNormalized) => ({
-            codProcesso: Number(route.params.codProcesso),
-            sigla: route.params.siglaUnidade,
-        }),
-        meta: {title: "Visualização de Mapa"},
-    },
-    {
         path: "/processo/:codProcesso/:siglaUnidade/cadastro",
         name: "SubprocessoCadastro",
         component: () => import("@/views/CadastroView.vue"),
@@ -62,17 +52,6 @@ const processoRoutes: RouteRecordRaw[] = [
         }),
         meta: {title: "Cadastro"},
     },
-    {
-        path: "/processo/:codProcesso/:siglaUnidade/vis-cadastro",
-        name: "SubprocessoVisCadastro",
-        component: () => import("@/views/CadastroView.vue"),
-        props: (route: RouteLocationNormalized) => ({
-            codProcesso: Number(route.params.codProcesso),
-            sigla: route.params.siglaUnidade,
-        }),
-        meta: {title: "Visualização de Atividades"},
-    },
-
 ];
 
 export default processoRoutes;

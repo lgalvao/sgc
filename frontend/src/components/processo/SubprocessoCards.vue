@@ -6,7 +6,6 @@
           md="4"
       >
         <BCard
-            v-if="podeEditarCadastro"
             :class="['h-100', habilitarAcessoCadastro ? 'card-actionable' : 'card-disabled']"
             data-testid="card-subprocesso-atividades"
             :role="habilitarAcessoCadastro ? 'button' : undefined"
@@ -19,25 +18,7 @@
               {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TEXTO }}
-            </BCardText>
-          </div>
-        </BCard>
-        <BCard
-            v-else
-            :class="['h-100', habilitarAcessoCadastro ? 'card-actionable' : 'card-disabled']"
-            data-testid="card-subprocesso-atividades-vis"
-            :role="habilitarAcessoCadastro ? 'button' : undefined"
-            :tabindex="habilitarAcessoCadastro ? 0 : undefined"
-            @click="habilitarAcessoCadastro && navegarPara('SubprocessoVisCadastro')"
-            @keydown="habilitarAcessoCadastro && handleKeyDown($event, 'SubprocessoVisCadastro')"
-        >
-          <div class="card-click-area">
-            <BCardTitle :class="habilitarAcessoCadastro ? undefined : 'text-muted'">
-              {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}
-            </BCardTitle>
-            <BCardText class="text-muted">
-              {{ habilitarAcessoCadastro ? TEXTOS.subprocesso.cards.VISUALIZACAO_CADASTRO_TEXTO : TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TEXTO }}
+              {{ podeEditarCadastro ? TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TEXTO : TEXTOS.subprocesso.cards.VISUALIZACAO_CADASTRO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -48,38 +29,19 @@
           md="4"
       >
         <BCard
-            v-if="podeEditarMapa"
-            class="h-100 card-actionable"
-            data-testid="card-subprocesso-mapa-edicao"
-            role="button"
-            tabindex="0"
-            @click="navegarPara('SubprocessoMapa')"
-            @keydown="handleKeyDown($event, 'SubprocessoMapa')"
-        >
-          <div class="card-click-area">
-            <BCardTitle>
-              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
-            </BCardTitle>
-            <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.MAPA_TEXTO }}
-            </BCardText>
-          </div>
-        </BCard>
-        <BCard
-            v-else
             :class="['h-100', mapaHabilitado ? 'card-actionable' : 'card-disabled']"
-            :data-testid="mapaHabilitado ? 'card-subprocesso-mapa-visualizacao' : 'card-subprocesso-mapa-desabilitado'"
+            :data-testid="mapaHabilitado ? 'card-subprocesso-mapa' : 'card-subprocesso-mapa-desabilitado'"
             :role="mapaHabilitado ? 'button' : undefined"
             :tabindex="mapaHabilitado ? 0 : undefined"
-            @click="mapaHabilitado && navegarPara('SubprocessoVisMapa')"
-            @keydown="mapaHabilitado && handleKeyDown($event, 'SubprocessoVisMapa')"
+            @click="mapaHabilitado && navegarPara('SubprocessoMapa')"
+            @keydown="mapaHabilitado && handleKeyDown($event, 'SubprocessoMapa')"
         >
           <div class="card-click-area">
             <BCardTitle :class="mapaHabilitado ? undefined : 'text-muted'">
               {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              {{ mapaHabilitado ? TEXTOS.subprocesso.cards.MAPA_VISUALIZACAO_TEXTO : TEXTOS.subprocesso.cards.MAPA_TEXTO }}
+              {{ podeEditarMapa ? TEXTOS.subprocesso.cards.MAPA_TEXTO : TEXTOS.subprocesso.cards.MAPA_VISUALIZACAO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -190,11 +152,7 @@ const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 function navegarPara(routeName: string) {
   const sufixo = routeName === "SubprocessoCadastro"
       ? "cadastro"
-      : routeName === "SubprocessoVisCadastro"
-          ? "vis-cadastro"
-          : routeName === "SubprocessoMapa"
-              ? "mapa"
-              : "vis-mapa";
+      : "mapa";
 
   router.push({
     path: `/processo/${props.codProcesso}/${props.siglaUnidade}/${sufixo}`,

@@ -8,7 +8,7 @@ vi.mock('@/views/MapaView.vue', () => ({ default: { name: 'MapaView' } }));
 vi.mock('@/views/CadastroView.vue', () => ({ default: { name: 'CadastroView' } }));
 describe('processo.routes.ts', () => {
     it('deve definir as rotas corretamente', () => {
-        expect(processoRoutes).toHaveLength(7);
+        expect(processoRoutes).toHaveLength(5);
         const paths = processoRoutes.map(r => r.path);
         expect(paths).toContain('/processo/cadastro');
         expect(paths).toContain('/processo/:codProcesso');
@@ -51,8 +51,8 @@ describe('processo.routes.ts', () => {
         expect(subprocesso?.meta?.keepAlive).toBe(true);
     });
 
-    it('deve tratar corretamente as props da rota para SubprocessoVisMapa', () => {
-        const route = processoRoutes.find(r => r.name === 'SubprocessoVisMapa');
+    it('deve tratar corretamente as props da rota para SubprocessoMapa', () => {
+        const route = processoRoutes.find(r => r.name === 'SubprocessoMapa');
         if (route && typeof route.props === 'function') {
             const props = route.props({
                 params: {codProcesso: '789', siglaUnidade: 'XYZ'}
@@ -75,8 +75,8 @@ describe('processo.routes.ts', () => {
         }
     });
 
-    it('deve tratar corretamente as props da rota para SubprocessoVisCadastro', () => {
-        const route = processoRoutes.find(r => r.name === 'SubprocessoVisCadastro');
+    it('deve tratar corretamente as props da rota para SubprocessoCadastro', () => {
+        const route = processoRoutes.find(r => r.name === 'SubprocessoCadastro');
         if (route && typeof route.props === 'function') {
             const props = route.props({
                 params: {codProcesso: '102', siglaUnidade: 'VIS'}

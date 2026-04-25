@@ -121,7 +121,7 @@ describe("SubprocessoCards.vue", () => {
             siglaUnidade: "U1"
         });
 
-        expect(wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-atividades"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-mapa-desabilitado"]').exists()).toBe(true);
     });
 
@@ -145,7 +145,7 @@ describe("SubprocessoCards.vue", () => {
         }));
     });
 
-    it("navega para visualização de cadastro se não pode editar", async () => {
+    it("navega para cadastro se não pode editar", async () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.MAPEAMENTO,
             mapa: null,
@@ -157,11 +157,11 @@ describe("SubprocessoCards.vue", () => {
             podeEditarCadastro: false
         });
 
-        const card = wrapper.find('[data-testid="card-subprocesso-atividades-vis"]');
+        const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
         await card.trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            path: "/processo/1/U1/vis-cadastro"
+            path: "/processo/1/U1/cadastro"
         }));
     });
 
@@ -232,7 +232,7 @@ describe("SubprocessoCards.vue", () => {
             habilitarAcessoMapa: true
         });
 
-        const card = wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]');
+        const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
         await card.trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
@@ -240,7 +240,7 @@ describe("SubprocessoCards.vue", () => {
         }));
     });
 
-    it("navega para visualização de mapa se habilitado mas não pode editar", async () => {
+    it("navega para mapa se habilitado mas não pode editar", async () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.MAPEAMENTO,
             mapa: null,
@@ -252,11 +252,11 @@ describe("SubprocessoCards.vue", () => {
             habilitarAcessoMapa: true
         });
 
-        const card = wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]');
+        const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
         await card.trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            path: "/processo/1/U1/vis-mapa"
+            path: "/processo/1/U1/mapa"
         }));
     });
 
@@ -298,7 +298,7 @@ describe("SubprocessoCards.vue", () => {
             habilitarAcessoCadastro: true
         });
 
-        const card = wrapper.find('[data-testid="card-subprocesso-atividades-vis"]');
+        const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
         await card.trigger("keydown", { key: "Enter" });
         expect(pushMock).toHaveBeenCalled();
 

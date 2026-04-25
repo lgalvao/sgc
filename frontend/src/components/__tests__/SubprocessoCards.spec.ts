@@ -60,7 +60,7 @@ describe('SubprocessoCards.vue', () => {
         const wrapper = mountComponent();
 
         expect(wrapper.find('[data-testid="card-subprocesso-atividades"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(true);
 
         // Click action
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('click');
@@ -85,21 +85,21 @@ describe('SubprocessoCards.vue', () => {
         // Mapa card actions
         // Click
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('click');
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
             path: '/processo/1/TESTE/mapa'
         });
 
         // Enter
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', {key: 'Enter'});
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
             path: '/processo/1/TESTE/mapa'
         });
 
         // Space
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', {key: ' '});
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
             path: '/processo/1/TESTE/mapa'
         });
@@ -108,43 +108,43 @@ describe('SubprocessoCards.vue', () => {
     it('renderiza cards de visualização se não puder editar', async () => {
         const wrapper = mountComponent({}, {podeEditarMapa: false, podeEditarCadastro: false, podeVerPagina: true});
 
-        expect(wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-atividades"]').exists()).toBe(true);
 
         // Atividades vis actions
-        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('click');
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-cadastro'
+            path: '/processo/1/TESTE/cadastro'
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', {key: 'Enter'});
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-cadastro'
+            path: '/processo/1/TESTE/cadastro'
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', {key: ' '});
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-cadastro'
+            path: '/processo/1/TESTE/cadastro'
         });
 
         // Mapa vis Actions
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('click');
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-mapa'
+            path: '/processo/1/TESTE/mapa'
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', {key: 'Enter'});
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-mapa'
+            path: '/processo/1/TESTE/mapa'
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', {key: ' '});
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
-            path: '/processo/1/TESTE/vis-mapa'
+            path: '/processo/1/TESTE/mapa'
         });
     });
 
@@ -153,8 +153,8 @@ describe('SubprocessoCards.vue', () => {
         const wrapper = mountComponent({}, {podeEditarMapa: false, habilitarAcessoMapa: false});
 
         expect(wrapper.find('[data-testid="card-subprocesso-mapa-desabilitado"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').exists()).toBe(false);
-        expect(wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(false);
 
         // Card desabilitado não deve navegar ao clicar
         await wrapper.find('[data-testid="card-subprocesso-mapa-desabilitado"]').trigger('click');

@@ -244,7 +244,7 @@ describe('UnidadeView.vue', () => {
 
         await btn.trigger('click');
         expect(mockPush).toHaveBeenCalledWith({
-            name: 'SubprocessoVisMapa',
+            name: 'SubprocessoMapa',
             params: {codProcesso: 99, siglaUnidade: 'TEST'}
         });
     });

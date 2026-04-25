@@ -137,15 +137,15 @@ describe("Router", () => {
         }
     });
 
-    it("deve resolver a rota de SubprocessoVisMapa com props dinâmicos", async () => {
+    it("deve resolver a rota de SubprocessoMapa com props dinâmicos", async () => {
         const perfilStore = usePerfilStore();
         perfilStore.usuarioCodigo = "123";
 
-        await router.push("/processo/123/DTI/vis-mapa");
+        await router.push("/processo/123/DTI/mapa");
         const route = router.currentRoute.value;
-        expect(route.name).toBe("SubprocessoVisMapa");
+        expect(route.name).toBe("SubprocessoMapa");
 
-        const matched = route.matched.find((m) => m.name === "SubprocessoVisMapa");
+        const matched = route.matched.find((m) => m.name === "SubprocessoMapa");
         if (matched && typeof matched.props.default === "function") {
             const props = matched.props.default(route);
             expect(props).toEqual({
@@ -173,16 +173,16 @@ describe("Router", () => {
         }
     });
 
-    it("deve resolver a rota de SubprocessoVisCadastro com props dinâmicos", async () => {
+    it("deve resolver a rota de SubprocessoCadastro com props dinâmicos", async () => {
         const perfilStore = usePerfilStore();
         perfilStore.usuarioCodigo = "123";
 
-        await router.push("/processo/123/DTI/vis-cadastro");
+        await router.push("/processo/123/DTI/cadastro");
         const route = router.currentRoute.value;
-        expect(route.name).toBe("SubprocessoVisCadastro");
+        expect(route.name).toBe("SubprocessoCadastro");
 
         const matched = route.matched.find(
-            (m) => m.name === "SubprocessoVisCadastro",
+            (m) => m.name === "SubprocessoCadastro",
         );
         if (matched && typeof matched.props.default === "function") {
             const props = matched.props.default(route);
