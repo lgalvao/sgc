@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
-val argumentosJvmSemAvisoUnsafe = listOf("--sun-misc-unsafe-memory-access=allow")
+val argumentosJvmSemAvisoUnsafe = listOf("")
 
 plugins {
     java
@@ -161,7 +161,7 @@ tasks.withType<Test> {
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
         "-XX:+EnableDynamicAgentLoading",
-        *argumentosJvmSemAvisoUnsafe.toTypedArray(),
+
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
         "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"

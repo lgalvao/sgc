@@ -448,7 +448,7 @@ public class ValidadorDadosOrganizacionais {
             contexto.contagemPorChave().merge(chave, 1, Integer::sum);
             contexto.perfisPorUnidade().computeIfAbsent(dados.codigo(), c -> new LinkedHashSet<>())
                     .add(new PerfilUsuarioUnidade(dados.titulo(), perfil));
-        } catch (IllegalArgumentException _) {
+        } catch (IllegalArgumentException e) {
             contexto.perfisInvalidos().add(new PerfilInvalido(
                     "VW_USUARIO_PERFIL_UNIDADE com perfil invalido",
                     "usuario_titulo=%s, perfil=%s, unidade_codigo=%s".formatted(dados.titulo(), dados.perfilBruto(), dados.codigo()),
