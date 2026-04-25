@@ -380,8 +380,8 @@ const podeAnalisar = computed(() => {
   );
 });
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
-const podeValidar = computed(() => podeValidarMapa.value);
-const habilitarValidar = computed(() => habilitarValidarMapa.value);
+const podeValidar = computed(() => podeValidarMapa?.value ?? false);
+const habilitarValidar = computed(() => habilitarValidarMapa?.value ?? false);
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
@@ -422,6 +422,7 @@ async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
 
 const {
   mostrarModalAceitar,
+  mostrarModalValidar,
   mostrarModalDevolucao,
   observacaoDevolucao,
   isLoading,

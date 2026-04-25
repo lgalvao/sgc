@@ -207,6 +207,13 @@ Observações: executado após remover CadastroVisualizacaoView.
 
 ```text
 Data: 2026-04-25
+Comando: npm run typecheck --prefix frontend && npm run test:unit --prefix frontend -- src/views/__tests__/MapaViewCoverage.spec.ts src/views/__tests__/MapaViewUncovered.spec.ts src/views/__tests__/CadMapaCoverage.spec.ts src/router/__tests__/processo.routes.spec.ts src/router/__tests__/router.spec.ts
+Resultado: passou, 34 testes
+Observações: valida fusão funcional de SubprocessoVisMapa em MapaView e ações de análise de mapa na view unificada.
+```
+
+```text
+Data: 2026-04-25
 Comando: npx vitest run frontend/src/views/__tests__/CadastroVisualizacaoView.spec.ts --reporter=dot --no-color
 Resultado: falhou antes dos testes por resolução do alias @ fora do cwd/config do frontend
 Observações: usar o script com --prefix frontend e caminho relativo a frontend.
