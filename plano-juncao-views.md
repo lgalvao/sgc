@@ -26,7 +26,7 @@ Não fazer no primeiro corte:
 
 - fundir endpoints backend de edição e visualização;
 - criar um BFF amplo para retornar todos os dados de `contexto-edicao`, `contexto-cadastro-atividades` e `mapa-visualizacao`;
-- remover imediatamente as rotas públicas `/vis-cadastro` e `/vis-mapa`;
+ - remover imediatamente as rotas públicas `/vis-cadastro` e `/vis-mapa` antes de ajustar navegação, docs e testes;
 - reescrever regras de acesso;
 - alterar textos de negócio sem necessidade;
 - trocar o desenho dos componentes de edição por uma nova biblioteca ou novo padrão visual sem relação direta com a clareza da tela mesclada.
@@ -47,8 +47,8 @@ Os contratos HTTP atuais ainda têm valor:
 2. Permissão decide ação; rota decide destino.
    A view deve renderizar ações conforme `useAcesso`, situação e disponibilidade dos dados.
 
-3. Rotas antigas viram compatibilidade temporária.
-   `/cadastro` e `/vis-cadastro` devem carregar a mesma view. O mesmo vale para `/mapa` e `/vis-mapa`.
+3. Sem camada de compatibilidade.
+   O alvo final não mantém rotas, aliases, cards, shells ou nomes `vis-*`. A tela única de cada domínio deve ser acessada por `/cadastro` e `/mapa`.
 
 4. Botões compartilhados têm um único ponto de manutenção.
    Histórico, impacto, sugestões, aceite, homologação, devolução e ações equivalentes não devem ficar duplicados em templates paralelos.
@@ -477,12 +477,12 @@ Ou seja, a distinção relevante passa a ser capacidade operacional, não sufixo
 4. Mapa: extrair corpo somente leitura.
 5. Mapa: apontar as duas rotas para `MapaView.vue`.
 6. Mapa: remover `MapaVisualizacaoView.vue`.
-7. Navegação: simplificar cards e, se desejado, redirecionar rotas `vis-*`.
+7. Navegação: simplificar cards e remover rotas `vis-*`, sem redirects permanentes.
 8. Docs/E2E: alinhar breadcrumbs e helpers ao contrato final.
 
 ## Observação sobre nomenclatura
 
-Mesmo preservando rotas antigas no começo, o código novo deve evitar reforçar a separação "vis" versus "edição" como se fossem telas diferentes. A nomenclatura interna deve favorecer:
+Com as rotas antigas removidas, o código novo deve evitar reintroduzir a separação "vis" versus "edição" como se fossem telas diferentes. A nomenclatura interna deve favorecer:
 
 - `modoSomenteLeitura`;
 - `podeEditar`;
@@ -491,3 +491,12 @@ Mesmo preservando rotas antigas no começo, o código novo deve evitar reforçar
 - `corpoLeitura`.
 
 Isso reduz a chance de novos botões serem adicionados no lugar errado.
+
+## Estado Atual Sem Compatibilidade
+
+- `SubprocessoVisCadastro` e o path `/vis-cadastro` foram removidos do roteador.
+- `SubprocessoVisMapa` e o path `/vis-mapa` foram removidos do roteador.
+- `SubprocessoCards.vue` navega diretamente para `SubprocessoCadastro` e `SubprocessoMapa`.
+- Os `data-testid` legados `card-subprocesso-atividades-vis`, `card-subprocesso-mapa-edicao` e `card-subprocesso-mapa-visualizacao` foram removidos dos cards.
+- `UnidadeView.vue` navega para `SubprocessoMapa` ao abrir o mapa vigente.
+- Não há intenção de manter redirects permanentes para rotas `vis-*`.

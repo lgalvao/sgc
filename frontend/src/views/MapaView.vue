@@ -111,63 +111,71 @@
       </BAlert>
 
       <div v-if="unidade">
-        <div v-if="competencias.length === 0" class="mb-4 mt-3">
-          <EmptyState
-              :title="TEXTOS.mapa.EMPTY_TITLE"
-              :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
-              class="mb-0"
-              icon="bi-journal-plus"
-          />
+        <div v-if="modoSomenteLeitura" class="mb-4 mt-3">
+          <MapaSomenteLeitura :mapa="mapaSomenteLeitura" />
         </div>
 
-        <div v-else class="mb-4 mt-3">
-          <CompetenciaCard
-              v-for="comp in competencias"
-              :key="comp.codigo"
-              :atividades="atividades"
-              :competencia="comp"
-              :pode-editar="podeEditarMapa"
-              @editar="iniciarEdicaoCompetencia"
-              @excluir="excluirCompetencia"
-              @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
-          />
-        </div>
+        <template v-else>
+          <div v-if="competencias.length === 0" class="mb-4 mt-3">
+            <EmptyState
+                :title="TEXTOS.mapa.EMPTY_TITLE"
+                :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
+                class="mb-0"
+                icon="bi-journal-plus"
+            />
+          </div>
+
+          <div v-else class="mb-4 mt-3">
+            <CompetenciaCard
+                v-for="comp in competencias"
+                :key="comp.codigo"
+                :atividades="atividades"
+                :competencia="comp"
+                :pode-editar="podeEditarMapa"
+                @editar="iniciarEdicaoCompetencia"
+                @excluir="excluirCompetencia"
+                @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
+            />
+          </div>
+        </template>
       </div>
 
       <div v-else>
         <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
       </div>
 
-      <CriarCompetenciaModal
-          :atividades="atividades"
-          :competencia-para-editar="competenciaSendoEditada"
-          :field-errors="fieldErrors"
-          :loading="loadingCompetencia"
-          :mostrar="mostrarModalCriarNovaCompetencia"
-          @fechar="fecharModalCriarNovaCompetencia"
-          @salvar="adicionarCompetenciaEFecharModal"
-      />
+      <template v-if="!modoSomenteLeitura">
+        <CriarCompetenciaModal
+            :atividades="atividades"
+            :competencia-para-editar="competenciaSendoEditada"
+            :field-errors="fieldErrors"
+            :loading="loadingCompetencia"
+            :mostrar="mostrarModalCriarNovaCompetencia"
+            @fechar="fecharModalCriarNovaCompetencia"
+            @salvar="adicionarCompetenciaEFecharModal"
+        />
 
-      <DisponibilizarMapaModal
-          :field-errors="fieldErrors"
-          :loading="loadingDisponibilizacao"
-          :mostrar="mostrarModalDisponibilizar"
-          :notificacao="notificacaoDisponibilizacao"
-          :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
-          @disponibilizar="disponibilizarMapa"
-          @fechar="fecharModalDisponibilizar"
-      />
+        <DisponibilizarMapaModal
+            :field-errors="fieldErrors"
+            :loading="loadingDisponibilizacao"
+            :mostrar="mostrarModalDisponibilizar"
+            :notificacao="notificacaoDisponibilizacao"
+            :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
+            @disponibilizar="disponibilizarMapa"
+            @fechar="fecharModalDisponibilizar"
+        />
 
-      <ModalConfirmacao
-          v-model="mostrarModalExcluirCompetencia"
-          :loading="loadingExclusao"
-          :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
-          data-testid="mdl-excluir-competencia"
-          test-codigo-confirmar="btn-confirmar-exclusao-competencia"
-          :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
-          variant="danger"
-          @confirmar="confirmarExclusaoCompetencia"
-      />
+        <ModalConfirmacao
+            v-model="mostrarModalExcluirCompetencia"
+            :loading="loadingExclusao"
+            :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
+            data-testid="mdl-excluir-competencia"
+            test-codigo-confirmar="btn-confirmar-exclusao-competencia"
+            :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
+            variant="danger"
+            @confirmar="confirmarExclusaoCompetencia"
+        />
+      </template>
 
       <AceitarMapaModal
           :loading="isLoading"
@@ -308,6 +316,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
+import MapaSomenteLeitura from "@/components/mapa/MapaSomenteLeitura.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
@@ -327,12 +336,12 @@ import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
-import {obterSugestoesMapa} from "@/services/subprocessoService";
+import {obterMapaVisualizacao, obterSugestoesMapa} from "@/services/subprocessoService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {apresentarSugestoes as apresentarSugestoesService} from "@/services/processoService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import logger from "@/utils/logger";
-import type {Analise, Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
+import type {Analise, Atividade, Competencia, MapaCompleto, MapaVisualizacao, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -382,10 +391,12 @@ const podeAnalisar = computed(() => {
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
 const podeValidar = computed(() => podeValidarMapa?.value ?? false);
 const habilitarValidar = computed(() => habilitarValidarMapa?.value ?? false);
+const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
 const carregandoInicial = ref(true);
+const mapaSomenteLeitura = ref<MapaVisualizacao | null>(null);
 
 const analisesCadastro = ref<Analise[]>([]);
 const historicoAnalise = computed(() => analisesCadastro.value || []);
@@ -600,7 +611,19 @@ function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   }
 }
 
+async function carregarMapaSomenteLeitura(codigo: number) {
+  mapaSomenteLeitura.value = await obterMapaVisualizacao(codigo);
+  mapasStore.mapaCompleto.value = null;
+  atividades.value = [];
+}
+
 async function carregarMapaInicial(codigo: number, contextoInicial?: Awaited<ReturnType<typeof carregarContextoEdicao>> | null) {
+  if (modoSomenteLeitura.value) {
+    await carregarMapaSomenteLeitura(codigo);
+    return;
+  }
+
+  mapaSomenteLeitura.value = null;
   const data = contextoInicial ?? await carregarContextoEdicao(codigo);
   if (data?.mapa) {
     sincronizarMapa(data.mapa);
@@ -839,6 +862,8 @@ defineExpose({
   associacoesMapaValidas,
   unidade,
   competencias,
+  mapaSomenteLeitura,
+  modoSomenteLeitura,
   atividades,
   atividadesSemCompetencia,
   impactoMapa: impactos,

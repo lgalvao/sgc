@@ -216,7 +216,7 @@ describe('BarraNavegacao.vue', () => {
                 perfil: {perfilSelecionado: Perfil.GESTOR}
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
-            expect(items[3].text()).toBe('Visualizar mapa');
+            expect(items[3].text()).toBe('Mapa de competências');
         });
 
         it('deve adicionar breadcrumb final para SubprocessoCadastro', () => {

@@ -112,14 +112,14 @@ Objetivo rastreado por este arquivo: acompanhar a execução do `plano-juncao-vi
 
 ## Navegação e documentação
 
-- [ ] Revisar `SubprocessoCards.vue`.
-- [ ] Decidir se os cards continuam usando sufixos `vis-*` temporariamente.
+- [x] Revisar `SubprocessoCards.vue`.
+- [x] Decidir se os cards continuam usando sufixos `vis-*` temporariamente: não continuam.
 - [ ] Revisar breadcrumbs.
 - [ ] Atualizar `etc/reqs/design/breadcrumbs.md` se as rotas finais mudarem.
 - [ ] Atualizar `e2e/helpers/helpers-atividades.ts`.
 - [ ] Atualizar `e2e/helpers/helpers-mapas.ts`.
-- [ ] Decidir se `/vis-cadastro` redireciona para `/cadastro`.
-- [ ] Decidir se `/vis-mapa` redireciona para `/mapa`.
+- [x] Decidir se `/vis-cadastro` redireciona para `/cadastro`: não há redirect permanente.
+- [x] Decidir se `/vis-mapa` redireciona para `/mapa`: não há redirect permanente.
 
 ## E2E
 
@@ -157,7 +157,7 @@ Objetivo rastreado por este arquivo: acompanhar a execução do `plano-juncao-vi
 ### Novo contrato de teste
 
 - [ ] Trocar asserts de "view editável vs view visualização" por "ações disponíveis vs ausentes".
-- [ ] Manter poucos testes de compatibilidade das rotas `vis-*`.
+- [x] Remover testes de compatibilidade das rotas `vis-*` do contrato unitário.
 - [ ] Atualizar comentários que falam em `vis-cadastro` como tela separada.
 - [ ] Evitar remover cobertura de regra de acesso: botões de mutação devem continuar ausentes quando não permitidos.
 
@@ -245,7 +245,20 @@ Decisão:
 
 ## Pendências abertas
 
-- [ ] Implementar etapa de Cadastro.
+- [x] Implementar etapa de Cadastro.
 - [ ] Implementar etapa de Mapa.
-- [ ] Revisar navegação final.
+- [x] Revisar navegação final no frontend unitário.
 - [ ] Revisar documentação final.
+
+```text
+Data: 2026-04-25
+Comando: npm run typecheck --prefix frontend && npm run test:unit --prefix frontend -- src/router/__tests__/processo.routes.spec.ts src/router/__tests__/router.spec.ts src/components/processo/__tests__/SubprocessoCards.spec.ts src/components/__tests__/SubprocessoCards.spec.ts src/views/__tests__/UnidadeView.spec.ts src/views/__tests__/MapaViewCoverage.spec.ts src/views/__tests__/MapaViewUncovered.spec.ts src/views/__tests__/CadMapaCoverage.spec.ts
+Resultado: passou, 63 testes
+Observações: valida remoção das rotas/cards vis-* no contrato frontend unitário.
+```
+
+```text
+Achado: o alvo final não deve manter compatibilidade com rotas e nomes vis-*.
+Impacto: a limpeza removeu rotas, cards e navegação unitária associados a vis-*; E2E ainda precisa ser migrado para o novo contrato.
+Decisão: não criar redirects permanentes; adaptar E2E para /cadastro e /mapa.
+```
