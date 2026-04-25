@@ -391,7 +391,7 @@ class SubprocessoValidacaoServiceTest {
         @Test
         @DisplayName("valido() deve criar resultado válido sem mensagem")
         void validoDeveCriarResultadoValidoSemMensagem() {
-            var resultado = SubprocessoValidacaoService.ValidationResult.ofValido();
+            var resultado = SubprocessoValidacaoService.ResultadoValidacao.ofValido();
             assertThat(resultado.valido()).isTrue();
             assertThat(resultado.mensagem()).isNull();
         }
@@ -400,7 +400,7 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("invalido() deve criar resultado inválido com mensagem")
         void invalidoDeveCriarResultadoInvalidoComMensagem() {
             String mensagem = "Erro de validação";
-            var resultado = SubprocessoValidacaoService.ValidationResult.ofInvalido(mensagem);
+            var resultado = SubprocessoValidacaoService.ResultadoValidacao.ofInvalido(mensagem);
             assertThat(resultado.valido()).isFalse();
             assertThat(resultado.mensagem()).isEqualTo(mensagem);
         }

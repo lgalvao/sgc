@@ -128,7 +128,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("ERRO INESPERADO: falha ao serializar resposta")
+                .message("Erro inesperado ao processar a resposta.")
                 .code("ERRO_SERIALIZACAO")
                 .traceId(traceId)
                 .build();
@@ -186,7 +186,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.debug("Acesso negado via Spring Security: {}", ex.getMessage());
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.FORBIDDEN.value())
-                .message("ACESSO NEGADO: " + ex.getMessage())
+                .message("Acesso negado.")
                 .build();
         return buildResponseEntity(erroApi);
     }
@@ -214,10 +214,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[{}] ERRO INTERNO DO SISTEMA - BUG DETECTADO: {}",
                 traceId, ex.getMessage(), ex);
 
-        String mensagemUsuario = "ERRO INTERNO: " + ex.getMessage();
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message(mensagemUsuario)
+                .message("Erro interno do sistema.")
                 .code("ERRO_INTERNO")
                 .traceId(traceId)
                 .build();
@@ -228,10 +227,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<@NonNull ErroApi> handleIllegalStateException(IllegalStateException ex) {
         String traceId = gerarTraceId();
         log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
-        String message = "ESTADO ILEGAL: " + ex.getMessage();
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.CONFLICT.value())
-                .message(message)
+                .message("Operação inválida para o estado atual.")
                 .code("ESTADO_ILEGAL")
                 .traceId(traceId)
                 .build();
@@ -242,10 +240,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<@NonNull ErroApi> handleIllegalArgumentException(IllegalArgumentException ex) {
         String traceId = gerarTraceId();
         log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
-        String message = "ARGUMENTO INVÁLIDO: " + ex.getMessage();
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message(message)
+                .message("Dados inválidos fornecidos na requisição.")
                 .code("ARGUMENTO_INVALIDO")
                 .traceId(traceId)
                 .build();
@@ -257,10 +254,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String traceId = gerarTraceId();
         log.error("[{}] ERRO NÃO TRATADO DETECTADO: {}", traceId, ex.getMessage(), ex);
 
-        String message = "ERRO INESPERADO: " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName());
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message(message)
+                .message("Erro inesperado. Consulte o suporte com o código de rastreamento.")
                 .code("ERRO_INTERNO")
                 .traceId(traceId)
                 .build();

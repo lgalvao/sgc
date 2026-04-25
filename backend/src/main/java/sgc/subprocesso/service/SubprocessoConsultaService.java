@@ -85,20 +85,19 @@ public class SubprocessoConsultaService {
         return MapaCompletoDto.fromEntity(mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso));
     }
 
-    public Map<String, Object> obterSugestoes(Long codSubprocesso) {
+    public SugestoesDto obterSugestoes(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         Mapa mapa = subprocesso.getMapa();
         if (mapa == null) {
-            if (subprocesso.getSituacao() != null && subprocesso.getSituacao().name().contains("MAPA")) {
+            if (subprocesso.getSituacao().ehEtapaMapa()) {
                 throw new ErroInconsistenciaInterna(
                         "Subprocesso %s em etapa de mapa sem mapa vinculado para leitura de sugestoes"
                                 .formatted(codSubprocesso)
                 );
             }
-            return Map.of("sugestoes", "");
+            return SugestoesDto.vazia();
         }
-        String sugestoes = Optional.ofNullable(mapa.getSugestoes()).orElse("");
-        return Map.of("sugestoes", sugestoes);
+        return SugestoesDto.de(mapa.getSugestoes());
     }
 
     public Subprocesso buscarSubprocesso(Long codigo) {

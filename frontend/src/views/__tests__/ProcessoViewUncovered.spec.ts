@@ -131,13 +131,13 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
         vm.show = false;
         await flushPromises();
 
-        // Activate - cache valid
-        store.dadosValidos = vi.fn().mockReturnValue(true);
-        store.contextoCompleto = { codigo: 1, descricao: "Cached" } as any;
+        // Activate - always reloads (no caching)
+        const contextoAtualizado = { codigo: 1, descricao: "Atualizado" } as any;
+        store.garantirContextoCompleto = vi.fn().mockResolvedValue(contextoAtualizado);
         
         vm.show = true;
         await flushPromises();
 
-        expect((processoView.vm as any).processo.descricao).toBe("Cached");
+        expect((processoView.vm as any).processo.descricao).toBe("Atualizado");
     });
 });

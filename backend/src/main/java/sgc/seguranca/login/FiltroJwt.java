@@ -52,6 +52,8 @@ public class FiltroJwt extends OncePerRequestFilter {
         }
 
         if (jwtToken == null) {
+            // Suporte a Bearer token para integrações com clientes não-browser (ex: API clients, testes E2E).
+            // Em produção, o uso padrão é via cookie HttpOnly.
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 jwtToken = authHeader.substring(7);

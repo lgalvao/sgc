@@ -68,7 +68,7 @@ class SubprocessoConsultaServiceTest {
 
         when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(subprocesso));
 
-        assertThat(service.obterSugestoes(1L)).containsEntry("sugestoes", "");
+        assertThat(service.obterSugestoes(1L).sugestoes()).isEmpty();
     }
 
     @Test

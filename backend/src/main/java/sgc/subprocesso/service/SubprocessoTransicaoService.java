@@ -544,16 +544,17 @@ public class SubprocessoTransicaoService {
 
     public void aceitarValidacao(Long codSubprocesso, @Nullable String observacoes) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceiteValidacao(codSubprocesso, observacoes, usuario);
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        executarAceiteValidacao(sp, observacoes, usuario);
     }
 
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        subprocessoCodigos.forEach(codSubprocesso -> executarAceiteValidacao(codSubprocesso, null, usuario));
+        List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
+        subprocessos.forEach(sp -> executarAceiteValidacao(sp, null, usuario));
     }
 
-    private void executarAceiteValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+    private void executarAceiteValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
                 MAPEAMENTO_MAPA_VALIDADO,
@@ -568,22 +569,23 @@ public class SubprocessoTransicaoService {
                 normalizarTexto(observacoes)
         ));
 
-        log.info("Validação aceita para mapa do SP {}", codSubprocesso);
+        log.info("Validação aceita para mapa do SP {}", sp.getCodigo());
     }
 
     public void homologarValidacao(Long codSubprocesso, @Nullable String observacoes) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacaoValidacao(codSubprocesso, observacoes, usuario);
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        executarHomologacaoValidacao(sp, observacoes, usuario);
     }
 
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacaoValidacao(codSubprocesso, null, usuario));
+        List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
+        subprocessos.forEach(sp -> executarHomologacaoValidacao(sp, null, usuario));
     }
 
-    private void executarHomologacaoValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
-        log.info("Homologando validação do mapa do subprocesso {}", codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+    private void executarHomologacaoValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
+        log.info("Homologando validação do mapa do subprocesso {}", sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                 REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
@@ -596,17 +598,17 @@ public class SubprocessoTransicaoService {
     public void devolverCadastro(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarDevolucao(sp, usuario, observacoes, false);
+        executarDevolucao(sp, usuario, observacoes);
     }
 
     public void devolverRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarDevolucao(sp, usuario, observacoes, true);
+        executarDevolucao(sp, usuario, observacoes);
     }
 
-    private void executarDevolucao(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
+    private void executarDevolucao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
+        FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
@@ -742,26 +744,24 @@ public class SubprocessoTransicaoService {
     public void aceitarCadastro(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceite(sp, usuario, observacoes, false);
+        executarAceite(sp, usuario, observacoes);
     }
 
     public void aceitarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceite(sp, usuario, observacoes, true);
+        executarAceite(sp, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        subprocessoCodigos.forEach(codSubprocesso -> {
-            Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-            executarAceite(sp, usuario, "Avaliação em bloco", REVISAO == sp.getProcesso().getTipo());
-        });
+        List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
+        subprocessos.forEach(sp -> executarAceite(sp, usuario, "Avaliação em bloco"));
     }
 
-    private void executarAceite(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
+    private void executarAceite(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
+        FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         log.info("Aceitando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
@@ -777,25 +777,23 @@ public class SubprocessoTransicaoService {
     public void homologarCadastro(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacao(sp, usuario, observacoes, false);
+        executarHomologacao(sp, usuario, observacoes);
     }
 
     public void homologarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacao(sp, usuario, observacoes, true);
+        executarHomologacao(sp, usuario, observacoes);
     }
 
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        subprocessoCodigos.forEach(codSubprocesso -> {
-            Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-            executarHomologacao(sp, usuario, "Homologação em bloco", REVISAO == sp.getProcesso().getTipo());
-        });
+        List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
+        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco"));
     }
 
-    private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
+    private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
+        FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         log.info("Homologando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
@@ -803,11 +801,11 @@ public class SubprocessoTransicaoService {
 
         registrarTransicaoDentroDoAdmin(sp, contexto.transicaoHomologacao(), usuario, normalizarTexto(observacoes));
 
-        executarEfeitosDerivadosHomologacaoCadastro(sp, isRevisao);
+        executarEfeitosDerivadosHomologacaoCadastro(sp);
     }
 
-    private void executarEfeitosDerivadosHomologacaoCadastro(Subprocesso sp, boolean isRevisao) {
-        String descAlerta = isRevisao
+    private void executarEfeitosDerivadosHomologacaoCadastro(Subprocesso sp) {
+        String descAlerta = REVISAO == sp.getProcesso().getTipo()
                 ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
                 : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
         alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, obterUnidadeAdmin(), sp.getUnidade());
@@ -877,7 +875,7 @@ public class SubprocessoTransicaoService {
 
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        String situacaoSp = sp.getSituacao().name();
+        SituacaoSubprocesso situacaoSp = sp.getSituacao();
         LocalDate ultimaDataLimite = obterUltimaDataLimite(sp);
 
         if (ultimaDataLimite != null && novaDataLimite.isBefore(ultimaDataLimite)) {
@@ -891,22 +889,22 @@ public class SubprocessoTransicaoService {
         executarEfeitosDerivadosAlteracaoDataLimite(sp, novaDataLimite, situacaoSp);
     }
 
-    private void atualizarDataLimitePorSituacao(Subprocesso sp, String situacaoSp, LocalDateTime novaDataLimiteInicioDoDia) {
-        if (situacaoSp.contains("MAPA")) {
+    private void atualizarDataLimitePorSituacao(Subprocesso sp, SituacaoSubprocesso situacaoSp, LocalDateTime novaDataLimiteInicioDoDia) {
+        if (situacaoSp.ehEtapaMapa()) {
             sp.setDataLimiteEtapa2(novaDataLimiteInicioDoDia);
             return;
         }
         sp.setDataLimiteEtapa1(novaDataLimiteInicioDoDia);
     }
 
-    private void executarEfeitosDerivadosAlteracaoDataLimite(Subprocesso sp, LocalDate novaDataLimite, String situacaoSp) {
+    private void executarEfeitosDerivadosAlteracaoDataLimite(Subprocesso sp, LocalDate novaDataLimite, SituacaoSubprocesso situacaoSp) {
         String novaDataFormatada = novaDataLimite.format(DATE_FORMATTER);
         int etapa = obterEtapaPorSituacao(situacaoSp);
         notificarAlteracaoDataLimite(sp, novaDataFormatada, etapa);
     }
 
-    private int obterEtapaPorSituacao(String situacaoSp) {
-        return situacaoSp.contains("MAPA") ? 2 : 1;
+    private int obterEtapaPorSituacao(SituacaoSubprocesso situacaoSp) {
+        return situacaoSp.ehEtapaMapa() ? 2 : 1;
     }
 
     private void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
@@ -923,11 +921,13 @@ public class SubprocessoTransicaoService {
         return situacao;
     }
 
-    private FluxoCadastroContexto obterContextoCadastro(boolean isRevisao) {
-        if (isRevisao) {
-            return FluxoCadastroContexto.revisao();
-        }
-        return FluxoCadastroContexto.mapeamento();
+    private FluxoCadastroContexto obterContextoCadastro(Subprocesso sp) {
+        return switch (sp.getProcesso().getTipo()) {
+            case REVISAO -> FluxoCadastroContexto.revisao();
+            case MAPEAMENTO -> FluxoCadastroContexto.mapeamento();
+            default -> throw new IllegalStateException(
+                    "Tipo %s sem fluxo de cadastro definido".formatted(sp.getProcesso().getTipo()));
+        };
     }
 
 }

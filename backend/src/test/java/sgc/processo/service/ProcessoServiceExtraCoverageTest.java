@@ -299,7 +299,7 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
-            when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofInvalido("Erro de validacao"));
+            when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofInvalido("Erro de validacao"));
 
             assertThrows(ErroValidacao.class, () -> processoService.finalizar(1L));
         }
@@ -729,7 +729,7 @@ class ProcessoServiceExtraCoverageTest {
             p.setParticipantes(new ArrayList<>());
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
-            when(validacaoService.validarSubprocessosParaFinalizacao(1L)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(1L)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             Subprocesso sp = new Subprocesso();
             Unidade uni = new Unidade();
@@ -741,7 +741,7 @@ class ProcessoServiceExtraCoverageTest {
 
             processoService.finalizar(1L);
 
-            verify(unidadeService).definirMapaVigente(10L, mapa);
+            verify(unidadeService).definirMapasVigentesEmBloco(argThat(m -> m.containsKey(10L) && m.get(10L) == mapa));
         }
     }
 

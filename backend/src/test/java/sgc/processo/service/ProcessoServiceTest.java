@@ -443,7 +443,7 @@ class ProcessoServiceTest {
             when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SECAO", "Mapeamento 2026"))
                     .thenReturn("<html>finalizado</html>");
             when(validacaoService.validarSubprocessosParaFinalizacao(id))
-                    .thenReturn(ValidationResult.ofValido());
+                    .thenReturn(ResultadoValidacao.ofValido());
             
             processoService.finalizar(id);
 
@@ -508,7 +508,7 @@ class ProcessoServiceTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
-            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
@@ -848,12 +848,14 @@ class ProcessoServiceTest {
         void deveListarIniciadosPorParticipantes() {
             Pageable pageable = Pageable.unpaged();
             Processo p = new Processo();
-            when(processoRepo.listarPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), eq(pageable)))
-                    .thenReturn(new PageImpl<>(List.of(p)));
+            p.setCodigo(5L);
+            when(processoRepo.listarCodigosPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), eq(pageable)))
+                    .thenReturn(new PageImpl<>(List.of(5L), pageable, 1));
+            when(processoRepo.listarPorCodigosComParticipantes(List.of(5L))).thenReturn(List.of(p));
 
             Page<Processo> res = processoService.listarIniciadosPorParticipantes(List.of(1L), pageable);
             assertThat(res.getContent()).containsExactly(p);
-            verify(processoRepo).listarPorParticipantesESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable);
+            verify(processoRepo).listarCodigosPorParticipantesESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable);
         }
 
         @Test
@@ -909,7 +911,7 @@ class ProcessoServiceTest {
         @DisplayName("Deve listar todos com paginação")
         void deveListarTodosPaginado() {
             Pageable pageable = Pageable.unpaged();
-            when(processoRepo.findAll(pageable)).thenReturn(Page.empty());
+            when(processoRepo.listarCodigos(pageable)).thenReturn(Page.empty());
 
             var res = processoService.listarTodos(pageable);
             assertThat(res).isEmpty();

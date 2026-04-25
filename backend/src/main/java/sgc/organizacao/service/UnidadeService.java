@@ -103,6 +103,28 @@ public class UnidadeService {
         cacheOrganizacaoService.invalidarAposCommit();
     }
 
+    @Transactional
+    public void definirMapasVigentesEmBloco(Map<Long, Mapa> mapasPorUnidade) {
+        if (mapasPorUnidade.isEmpty()) {
+            return;
+        }
+        List<UnidadeMapa> existentes = unidadeMapaRepo.findAllById(mapasPorUnidade.keySet());
+        Map<Long, UnidadeMapa> existentesPorCodigo = existentes.stream()
+                .collect(java.util.stream.Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, um -> um));
+
+        List<UnidadeMapa> paraAtualizar = mapasPorUnidade.entrySet().stream()
+                .map(entry -> {
+                    UnidadeMapa um = existentesPorCodigo.getOrDefault(entry.getKey(), new UnidadeMapa());
+                    um.setUnidadeCodigo(entry.getKey());
+                    um.setMapaVigente(entry.getValue());
+                    return um;
+                })
+                .toList();
+
+        unidadeMapaRepo.saveAll(paraAtualizar);
+        cacheOrganizacaoService.invalidarAposCommit();
+    }
+
     private Optional<UnidadeMapa> buscarRegistroMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.findById(codigoUnidade);
     }

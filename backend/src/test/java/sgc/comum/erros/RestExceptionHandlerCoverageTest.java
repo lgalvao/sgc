@@ -107,6 +107,6 @@ class RestExceptionHandlerCoverageTest {
         ErroApi corpo = Objects.requireNonNull(response.getBody());
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(corpo.getMessage()).contains("NullPointerException");
+        assertThat(corpo.getMessage()).isEqualTo("Erro inesperado. Consulte o suporte com o código de rastreamento.");
     }
 }

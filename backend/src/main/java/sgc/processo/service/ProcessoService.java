@@ -22,6 +22,7 @@ import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
+import sgc.mapa.model.*;
 
 import java.time.*;
 import java.time.format.*;
@@ -105,9 +106,6 @@ public class ProcessoService {
     @Transactional(readOnly = true)
     public Page<Processo> listarTodos(Pageable pageable) {
         Page<Long> paginaCodigos = processoRepo.listarCodigos(pageable);
-        if (paginaCodigos == null) {
-            return processoRepo.findAll(pageable);
-        }
         return carregarPaginaComParticipantes(paginaCodigos, pageable);
     }
 
@@ -115,9 +113,6 @@ public class ProcessoService {
     public Page<Processo> listarIniciadosPorParticipantes(List<Long> unidadeCodigos, Pageable pageable) {
         Page<Long> paginaCodigos = processoRepo.listarCodigosPorParticipantesESituacaoDiferente(
                 unidadeCodigos, CRIADO, pageable);
-        if (paginaCodigos == null) {
-            return processoRepo.listarPorParticipantesESituacaoDiferente(unidadeCodigos, CRIADO, pageable);
-        }
         return carregarPaginaComParticipantes(paginaCodigos, pageable);
     }
 
@@ -479,8 +474,15 @@ public class ProcessoService {
     }
 
     private void tornarMapasVigentes(Long codProcesso) {
-        consultaService.listarEntidadesPorProcesso(codProcesso)
-                .forEach(sp -> unidadeService.definirMapaVigente(sp.getUnidade().getCodigo(), sp.getMapa()));
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
+        Map<Long, Mapa> mapasPorUnidade = subprocessos.stream()
+                .filter(sp -> sp.getMapa() != null)
+                .collect(java.util.stream.Collectors.toMap(
+                        sp -> sp.getUnidade().getCodigo(),
+                        Subprocesso::getMapa,
+                        (a, b) -> a
+                ));
+        unidadeService.definirMapasVigentesEmBloco(mapasPorUnidade);
     }
 
     private Set<Unidade> carregarArvoreUnidades(Set<Unidade> participantes) {

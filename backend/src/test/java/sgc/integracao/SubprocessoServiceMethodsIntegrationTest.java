@@ -99,8 +99,8 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
         subprocesso.getMapa().setSugestoes("Sugestão de integração");
         mapaRepo.saveAndFlush(subprocesso.getMapa());
 
-        Map<String, Object> result = consultaService.obterSugestoes(subprocesso.getCodigo());
-        assertThat(result).containsEntry("sugestoes", "Sugestão de integração");
+        SugestoesDto result = consultaService.obterSugestoes(subprocesso.getCodigo());
+        assertThat(result.sugestoes()).isEqualTo("Sugestão de integração");
     }
 
     @Test

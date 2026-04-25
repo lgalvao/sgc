@@ -473,7 +473,7 @@ public class SubprocessoController {
 
     @GetMapping("/{codSubprocesso}/sugestoes")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public Map<String, Object> obterSugestoes(@PathVariable Long codSubprocesso) {
+    public SugestoesDto obterSugestoes(@PathVariable Long codSubprocesso) {
         return consultaService.obterSugestoes(codSubprocesso);
     }
 

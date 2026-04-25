@@ -338,11 +338,7 @@ onActivated(async () => {
   if (!codProcesso || !carregamentoInicialConcluido.value) {
     return;
   }
-  // Só recarrega se o cache tiver sido invalidado por ação de workflow
-  if (processoStore.dadosValidos(codProcesso)) {
-    processo.value = processoStore.contextoCompleto;
-    return;
-  }
+  // Recarrega sempre ao ativar — contexto muda ao longo do workflow
   try {
     await carregarContextoCompleto();
   } catch {
