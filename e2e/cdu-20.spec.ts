@@ -5,7 +5,7 @@ import {
     criarProcessoMapaValidadoFixture,
     validarProcessoFixture
 } from './fixtures/index.js';
-import {navegarParaMapa} from './helpers/helpers-mapas.js';
+import {esperarMapaEditavel, esperarMapaSomenteLeitura, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {
     acessarSubprocessoAdmin,
@@ -223,8 +223,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
         await acessarSubprocessoChefeDireto(page, processo.descricao, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
-        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Data/hora'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Origem'})).toBeVisible();
@@ -242,6 +241,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await expect(linhaMovimentacao.locator('td').nth(2)).toHaveText(UNIDADE_ALVO);
 
         await navegarParaMapa(page);
+        await esperarMapaSomenteLeitura(page);
         await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
         await expect(page.getByTestId('btn-mapa-validar')).toBeEnabled();
 
@@ -267,8 +267,9 @@ test.describe.serial('CDU-20 - ADMIN deve ver botões de edição com mapa com s
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
 
-        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
+        await navegarParaMapa(page);
+        await esperarMapaEditavel(page);
     });
 });
 

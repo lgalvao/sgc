@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/index.js';
-import {navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
+import {esperarAtividadesSomenteLeitura, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
     abrirHistoricoAnaliseVisualizacao,
@@ -86,8 +86,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
-        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
     });
 
     test('Cenarios CDU-13: Hierarquia aceita e ADMIN homologa', async ({_resetAutomatico, page}) => {
@@ -105,6 +104,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
+        await esperarAtividadesSomenteLeitura(page);
         await verificarAcoesAnaliseCadastroVisualizacao(page, {
             rotuloPrincipal: 'Homologar',
             principalHabilitado: false,

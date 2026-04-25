@@ -57,10 +57,10 @@ export async function abrirHistoricoAnalise(page: Page) {
 }
 
 /**
- * Abre modal de histórico de análise (tela de visualização - VisAtividades)
+ * Abre modal de histórico de análise na tela unificada de atividades
  */
 export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
-    await page.getByTestId('btn-vis-atividades-historico').click();
+    await page.getByTestId('btn-cad-atividades-historico').click();
     const modal = page.getByTestId('mdl-historico-analise');
     await expect(modal).toBeVisible();
     return modal;
@@ -71,7 +71,7 @@ export async function verificarAcoesAnaliseCadastroVisualizacao(page: Page, opti
     principalHabilitado: boolean;
     devolverHabilitado: boolean;
 }) {
-    const botaoHistorico = page.getByTestId('btn-vis-atividades-historico');
+    const botaoHistorico = page.getByTestId('btn-cad-atividades-historico');
     const botaoDevolver = page.getByTestId('btn-acao-devolver');
     const botaoPrincipal = page.getByTestId('btn-acao-analisar-principal');
 

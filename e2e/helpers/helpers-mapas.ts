@@ -4,23 +4,33 @@ import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpe
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 
-export async function navegarParaMapa(page: Page) {
-    // Aguardar o carregamento do subprocesso antes de verificar os cards
-    await expect(page.getByTestId('header-subprocesso')).toBeVisible();
-
-    const cardEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
-    const cardVisualizacao = page.getByTestId('card-subprocesso-mapa-visualizacao');
-
-    await expect(cardEdicao.or(cardVisualizacao)).toBeVisible();
-
-    if (await cardEdicao.isVisible()) {
-        await cardEdicao.click();
-    } else {
-        await cardVisualizacao.click();
-    }
-
-    await page.waitForURL(/\/(mapa|vis-mapa)$/);
+export async function esperarTelaMapa(page: Page) {
     await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
+}
+
+export async function esperarMapaEditavel(page: Page) {
+    await esperarTelaMapa(page);
+    await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
+    await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
+}
+
+export async function esperarSemAcoesManutencaoMapa(page: Page) {
+    await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeHidden();
+    await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeHidden();
+}
+
+export async function esperarMapaSomenteLeitura(page: Page) {
+    await esperarTelaMapa(page);
+    await esperarSemAcoesManutencaoMapa(page);
+}
+
+export async function navegarParaMapa(page: Page) {
+    await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+    const card = page.getByTestId('card-subprocesso-mapa');
+    await expect(card).toBeVisible();
+    await card.click();
+    await page.waitForURL(/\/mapa$/);
+    await esperarTelaMapa(page);
 }
 
 export async function abrirModalCriarCompetencia(page: Page) {
@@ -175,7 +185,7 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
  * Realiza o aceite ou homologação do mapa a partir da visualização do subprocesso.
  */
 export async function aceitarOuHomologarMapa(page: Page, observacao: string) {
-    await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
+    await navegarParaMapa(page);
     await page.getByTestId('btn-mapa-homologar-aceite').click();
     const modal = page.getByTestId('body-aceite-mapa');
     await expect(modal).toBeVisible();

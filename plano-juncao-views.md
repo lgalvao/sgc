@@ -17,7 +17,8 @@ O modo da tela deve ser definido por permissao, situacao do subprocesso e dados 
 - `SubprocessoCards.vue` navega pelos cards de dominio, sem separar modo de edicao e visualizacao.
 - `processo.routes.ts` trabalha com `/cadastro` e `/mapa`.
 - O contrato unitario do frontend ja foi ajustado para o modelo sem `vis-*`.
-- O maior bloco pendente esta nos helpers e specs E2E, que ainda carregam premissas antigas.
+- Os helpers e as principais specs E2E ja foram migrados para cards unificados e validacoes semanticas.
+- O maior bloco pendente agora esta na regressao E2E mais ampla e em textos/comentarios residuais.
 
 ## Diretrizes
 
@@ -54,18 +55,18 @@ O modo da tela deve ser definido por permissao, situacao do subprocesso e dados 
 
 ### 1. Fechar o contrato E2E de Cadastro
 
-- atualizar `e2e/helpers/helpers-atividades.ts` para usar helpers semanticos;
-- remover dependencia de `card-subprocesso-atividades-vis`;
-- trocar asserts de URL/modo por asserts de acoes e campos;
-- revisar pelo menos `e2e/cdu-05.spec.ts`, `e2e/cdu-09.spec.ts`, `e2e/cdu-13.spec.ts` e `e2e/jornada.spec.ts`.
+- manter `e2e/helpers/helpers-atividades.ts` orientado a acoes disponiveis/ausentes;
+- evitar reintroduzir `card-subprocesso-atividades-vis`;
+- ao tocar em novas specs, preferir asserts de capacidade operacional em vez de "modo";
+- usar `e2e/cdu-05.spec.ts`, `e2e/cdu-09.spec.ts`, `e2e/cdu-13.spec.ts`, `e2e/cdu-07.spec.ts` e `e2e/jornada.spec.ts` como referencia do contrato atualizado.
 
 ### 2. Fechar o contrato E2E de Mapa
 
-- atualizar `e2e/helpers/helpers-mapas.ts` para trabalhar com a tela unica;
-- remover dependencia de `card-subprocesso-mapa-visualizacao`;
+- manter `e2e/helpers/helpers-mapas.ts` orientado a manutencao x leitura na mesma tela;
+- evitar reintroduzir `card-subprocesso-mapa-visualizacao` e `card-subprocesso-mapa-edicao`;
 - validar modo editavel por botoes de manutencao;
 - validar modo somente leitura por ausencia de mutacoes e presenca de acoes de analise;
-- revisar pelo menos `e2e/cdu-19.spec.ts`, `e2e/cdu-20.spec.ts`, `e2e/cdu-21.spec.ts` e `e2e/jornada.spec.ts`.
+- usar `e2e/cdu-19.spec.ts`, `e2e/cdu-20.spec.ts`, `e2e/cdu-21.spec.ts` e `e2e/jornada.spec.ts` como referencia do contrato atualizado.
 
 ### 3. Revisar pontos de clareza visual ainda em aberto
 
@@ -77,6 +78,12 @@ O modo da tela deve ser definido por permissao, situacao do subprocesso e dados 
 
 - manter `etc/reqs/design/breadcrumbs.md` coerente com o contrato atual;
 - atualizar comentarios e descricoes de testes que ainda falem em "view de visualizacao".
+
+### 5. Executar regressao E2E ampla
+
+- rerodar um lote mais amplo alem dos arquivos ja migrados;
+- priorizar specs nao exercitadas nesta rodada de migracao;
+- tratar novas falhas como divergencia semantica, fixture/estado ou permissao, nunca como "falta de timeout".
 
 ## Riscos ativos
 

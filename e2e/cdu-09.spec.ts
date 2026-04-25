@@ -6,6 +6,7 @@ import {
     adicionarConhecimento,
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao,
+    esperarAtividadesSomenteLeitura,
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
@@ -82,11 +83,11 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
-        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
 
         await navegarParaAtividadesVisualizacao(page);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/vis-cadastro$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await esperarAtividadesSomenteLeitura(page);
         await page.goBack();
         await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 

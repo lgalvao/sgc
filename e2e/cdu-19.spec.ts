@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {navegarParaMapa} from './helpers/helpers-mapas.js';
+import {esperarMapaSomenteLeitura, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -136,9 +136,9 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
-        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         await navegarParaMapa(page);
+        await esperarMapaSomenteLeitura(page);
         await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
         await page.getByTestId('btn-mapa-sugestoes').click();
         await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue(TEXTO_SUGESTAO);

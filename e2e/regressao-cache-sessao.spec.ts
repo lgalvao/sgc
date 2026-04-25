@@ -41,7 +41,6 @@ test.describe('Regressão - cache de sessão no subprocesso', () => {
 
         const cardCadastro = page.getByTestId('card-subprocesso-atividades');
         await expect(cardCadastro).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
 
         await cardCadastro.click();
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}/cadastro$`));

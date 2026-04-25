@@ -16,15 +16,15 @@ Foco atual: consolidar o contrato E2E e encerrar ajustes de clareza visual e doc
 - [x] Navegacao principal sem cards/rotas separados por modo.
 - [x] Breadcrumbs alinhados ao contrato atual.
 - [x] Frontend unitario ajustado ao modelo sem `vis-*`.
+- [x] Helpers E2E de cadastro e mapa migrados para o contrato semantico.
+- [x] Specs E2E principais migradas para cards unificados e acoes disponiveis/ausentes.
 
 ### Em aberto
 
-- [ ] Migrar helpers E2E de atividades para o contrato semantico.
-- [ ] Migrar helpers E2E de mapa para o contrato semantico.
-- [ ] Revisar specs E2E ainda acopladas a `vis-*` e cards antigos.
 - [ ] Confirmar se cadastro precisa de mais separacao visual entre edicao e analise.
 - [ ] Confirmar se mapa precisa de mais separacao visual entre manutencao e analise.
 - [ ] Limpar comentarios e textos residuais que ainda descrevem "view de visualizacao".
+- [ ] Rodar regressao E2E mais ampla fora do lote principal da migracao.
 
 ## Diretrizes para o proximo ciclo
 
@@ -44,22 +44,25 @@ Foco atual: consolidar o contrato E2E e encerrar ajustes de clareza visual e doc
 
 ### E2E de Cadastro
 
-- [ ] Atualizar `e2e/helpers/helpers-atividades.ts`.
-- [ ] Revisar `e2e/cdu-05.spec.ts`.
-- [ ] Revisar `e2e/cdu-09.spec.ts`.
-- [ ] Revisar `e2e/cdu-13.spec.ts`.
+- [x] Atualizar `e2e/helpers/helpers-atividades.ts`.
+- [x] Revisar `e2e/cdu-05.spec.ts`.
+- [x] Revisar `e2e/cdu-09.spec.ts`.
+- [x] Revisar `e2e/cdu-13.spec.ts`.
+- [x] Revisar `e2e/cdu-07.spec.ts`.
+- [x] Revisar `e2e/jornada.spec.ts` no fluxo de cadastro.
 
 ### E2E de Mapa
 
-- [ ] Atualizar `e2e/helpers/helpers-mapas.ts`.
-- [ ] Revisar `e2e/cdu-19.spec.ts`.
-- [ ] Revisar `e2e/cdu-20.spec.ts`.
-- [ ] Revisar `e2e/cdu-21.spec.ts`.
+- [x] Atualizar `e2e/helpers/helpers-mapas.ts`.
+- [x] Revisar `e2e/cdu-19.spec.ts`.
+- [x] Revisar `e2e/cdu-20.spec.ts`.
+- [x] Revisar `e2e/cdu-21.spec.ts`.
+- [x] Revisar `e2e/jornada.spec.ts` no fluxo de mapa.
 
 ### Regressao ampla
 
-- [ ] Revisar `e2e/jornada.spec.ts`.
 - [ ] Revisar `e2e/regressao-cache-sessao.spec.ts`.
+- [ ] Rodar um lote E2E mais amplo cobrindo specs ainda nao exercitadas nesta migracao.
 
 ### Fechamento
 

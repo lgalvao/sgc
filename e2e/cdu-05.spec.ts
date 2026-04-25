@@ -258,7 +258,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
 
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
 
         await page.getByTestId('card-subprocesso-atividades').click();
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
@@ -269,17 +268,14 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
-        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
 
         await page.goto('/painel');
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
 
         await page.getByTestId('card-subprocesso-atividades').click();
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
-        await expect(page).not.toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/vis-cadastro$`));
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 

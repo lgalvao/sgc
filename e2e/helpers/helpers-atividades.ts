@@ -3,23 +3,43 @@ import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpe
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 
+export async function esperarTelaAtividades(page: Page) {
+    await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
+}
+
+export async function esperarAtividadesEditaveis(page: Page) {
+    await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+    await expect(page.getByTestId('btn-adicionar-atividade')).toBeVisible();
+    await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
+}
+
+export async function esperarSemAcoesEdicaoCadastro(page: Page) {
+    await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+    await expect(page.getByTestId('btn-adicionar-atividade')).toBeDisabled();
+    await expect(page.getByTestId('btn-cad-atividades-importar')).toBeHidden();
+}
+
+export async function esperarAtividadesSomenteLeitura(page: Page) {
+    await esperarTelaAtividades(page);
+    await esperarSemAcoesEdicaoCadastro(page);
+}
+
 export async function navegarParaAtividades(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();
     await card.click();
     await page.waitForURL(/\/cadastro$/);
 
-    await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
-    await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
-    await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
+    await esperarTelaAtividades(page);
+    await esperarAtividadesEditaveis(page);
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
-    const card = page.getByTestId('card-subprocesso-atividades-vis');
+    const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();
     await card.click();
-    await page.waitForURL(/\/vis-cadastro$/);
-    await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
+    await page.waitForURL(/\/cadastro$/);
+    await esperarAtividadesSomenteLeitura(page);
 }
 
 
@@ -194,7 +214,7 @@ export async function verificarBotaoHistoricoAnalise(page: Page) {
 }
 
 export async function verificarBotaoImpactoDireto(page: Page) {
-    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao')).toBeVisible();
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
 }
 
 export async function verificarBotaoImpactoAusenteEdicao(page: Page) {
@@ -202,7 +222,7 @@ export async function verificarBotaoImpactoAusenteEdicao(page: Page) {
 }
 
 export async function verificarBotaoImpactoAusenteDireto(page: Page) {
-    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao')).toBeHidden();
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeHidden();
 }
 
 export async function abrirModalImpactoEdicao(page: Page) {
@@ -211,7 +231,7 @@ export async function abrirModalImpactoEdicao(page: Page) {
 }
 
 export async function abrirModalImpactoVisualizacao(page: Page) {
-    await page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao').click();
+    await page.getByTestId('cad-atividades__btn-impactos-mapa-edicao').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 }
 
