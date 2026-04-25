@@ -43,16 +43,14 @@ Rotas que pertencem a um subprocesso específico de uma unidade.
 |-----------------------------------------------------|------------------------|------------------------------------------------------------------|
 | `/processo/:codProcesso/:siglaUnidade`              | Subprocesso            | 🏠 > Detalhes do processo > [SIGLA]                              |
 | `/processo/:codProcesso/:siglaUnidade/mapa`         | SubprocessoMapa        | 🏠 > Detalhes do processo > [SIGLA] > Mapa de competências       |
-| `/processo/:codProcesso/:siglaUnidade/vis-mapa`     | SubprocessoVisMapa     | 🏠 > Detalhes do processo > [SIGLA] > Visualizar mapa            |
 | `/processo/:codProcesso/:siglaUnidade/cadastro`     | SubprocessoCadastro    | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
-| `/processo/:codProcesso/:siglaUnidade/vis-cadastro` | SubprocessoVisCadastro | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
 
 Para CHEFE e SERVIDOR, o "Detalhes do processo" é omitido:
 
 | Rota                                                | Breadcrumbs (CHEFE/SERVIDOR)              |
 |-----------------------------------------------------|-------------------------------------------|
 | `/processo/:codProcesso/:siglaUnidade`              | 🏠 > [SIGLA]                              |
-| `/processo/:codProcesso/:siglaUnidade/vis-cadastro` | 🏠 > [SIGLA] > Atividades e conhecimentos |
+| `/processo/:codProcesso/:siglaUnidade/cadastro`     | 🏠 > [SIGLA] > Atividades e conhecimentos |
 
 ### Rotas de Unidade
 
@@ -114,14 +112,14 @@ Para rotas de unidade, a hierarquia é:
 
 ### Cenário 1: ADMIN Visualizando atividades
 
-1. ADMIN navega para `/processo/99/ASSESSORIA_12/vis-cadastro`
+1. ADMIN navega para `/processo/99/ASSESSORIA_12/cadastro`
 2. Breadcrumbs exibidos: 🏠 > Detalhes do processo > ASSESSORIA_12 > Atividades e conhecimentos
 3. Clicar em "ASSESSORIA_12" leva para `/processo/99/ASSESSORIA_12`
 4. Clicar em "Detalhes do processo" leva para `/processo/99`
 
 ### Cenário 2: CHEFE Visualizando atividades
 
-1. CHEFE navega para `/processo/99/ASSESSORIA_12/vis-cadastro`
+1. CHEFE navega para `/processo/99/ASSESSORIA_12/cadastro`
 2. Breadcrumbs exibidos: 🏠 > ASSESSORIA_12 > Atividades e conhecimentos
 3. "Detalhes do processo" não aparece (CHEFE só vê sua unidade)
 
