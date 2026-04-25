@@ -193,6 +193,20 @@ Observações: executado após adicionar ações de análise em CadastroView.
 
 ```text
 Data: 2026-04-25
+Comando: npm run test:unit --prefix frontend -- src/views/__tests__/AtividadesCadastroView.spec.ts src/views/__tests__/CadastroViewPermissoes.spec.ts src/views/__tests__/CadastroViewCoverage.spec.ts src/router/__tests__/processo.routes.spec.ts src/router/__tests__/router.spec.ts
+Resultado: passou, 47 testes
+Observações: executado após remover CadastroVisualizacaoView e seu teste legado.
+```
+
+```text
+Data: 2026-04-25
+Comando: npm run typecheck --prefix frontend
+Resultado: passou
+Observações: executado após remover CadastroVisualizacaoView.
+```
+
+```text
+Data: 2026-04-25
 Comando: npx vitest run frontend/src/views/__tests__/CadastroVisualizacaoView.spec.ts --reporter=dot --no-color
 Resultado: falhou antes dos testes por resolução do alias @ fora do cwd/config do frontend
 Observações: usar o script com --prefix frontend e caminho relativo a frontend.
