@@ -78,18 +78,18 @@ Objetivo rastreado por este arquivo: acompanhar a execução do `plano-juncao-vi
 
 ### Implementação
 
-- [ ] Mover ações faltantes de análise de mapa para `MapaView.vue`.
+- [x] Mover ações faltantes de análise de mapa para `MapaView.vue`.
 - [ ] Renderizar corpo editável quando edição estiver permitida.
 - [ ] Renderizar corpo somente leitura quando edição não estiver permitida.
 - [ ] Separar visualmente comandos de manutenção e ações de análise.
-- [ ] Garantir sugestões em um único ponto.
-- [ ] Garantir ver sugestões em um único ponto.
-- [ ] Garantir histórico em um único ponto.
-- [ ] Garantir validação em um único ponto.
-- [ ] Garantir devolução em um único ponto.
-- [ ] Garantir aceite/homologação em um único ponto.
-- [ ] Apontar `SubprocessoMapa` e `SubprocessoVisMapa` para `MapaView.vue`.
-- [ ] Atualizar mocks/testes de rota.
+- [x] Garantir sugestões em um único ponto.
+- [x] Garantir ver sugestões em um único ponto.
+- [x] Garantir histórico em um único ponto.
+- [x] Garantir validação em um único ponto.
+- [x] Garantir devolução em um único ponto.
+- [x] Garantir aceite/homologação em um único ponto.
+- [x] Apontar `SubprocessoMapa` e `SubprocessoVisMapa` para `MapaView.vue`.
+- [x] Atualizar mocks/testes de rota.
 - [ ] Atualizar/remover testes diretos de `MapaVisualizacaoView.vue`.
 - [ ] Remover `MapaVisualizacaoView.vue` se ficar sem uso.
 

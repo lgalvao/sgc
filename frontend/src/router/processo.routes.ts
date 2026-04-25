@@ -45,7 +45,7 @@ const processoRoutes: RouteRecordRaw[] = [
     {
         path: "/processo/:codProcesso/:siglaUnidade/vis-mapa",
         name: "SubprocessoVisMapa",
-        component: () => import("@/views/MapaVisualizacaoView.vue"),
+        component: () => import("@/views/MapaView.vue"),
         props: (route: RouteLocationNormalized) => ({
             codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade,

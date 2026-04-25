@@ -11,12 +11,30 @@
 
         <template #actions>
           <BButton
+              v-if="podeValidar"
+              data-testid="btn-mapa-sugestoes"
+              variant="outline-secondary"
+              @click="abrirModalSugestoes"
+          >
+            {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
+          </BButton>
+
+          <BButton
               v-if="podeVerSugestoes"
               data-testid="btn-mapa-ver-sugestoes"
               variant="outline-secondary"
               @click="verSugestoes"
           >
             {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
+          </BButton>
+
+          <BButton
+              v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
+              data-testid="btn-mapa-historico"
+              variant="outline-secondary"
+              @click="verHistorico"
+          >
+            {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
           </BButton>
 
           <BButton
@@ -27,6 +45,16 @@
               @click="abrirModalDevolucao"
           >
             {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
+          </BButton>
+
+          <BButton
+              v-if="podeValidar"
+              data-testid="btn-mapa-validar"
+              :disabled="!habilitarValidar"
+              variant="success"
+              @click="abrirModalValidar"
+          >
+            {{ TEXTOS.mapa.BOTAO_VALIDAR }}
           </BButton>
 
           <BButton
@@ -173,6 +201,54 @@
       </ModalPadrao>
 
       <ModalConfirmacao
+          v-model="mostrarModalSugestoes"
+          :auto-close="false"
+          :loading="isLoading"
+          :ok-title="TEXTOS.comum.BOTAO_APRESENTAR"
+          test-codigo-cancelar="btn-sugestoes-mapa-cancelar"
+          test-codigo-confirmar="btn-sugestoes-mapa-confirmar"
+          titulo="Apresentar sugestões"
+          variant="success"
+          @confirmar="handleConfirmarSugestoes"
+          @shown="() => sugestoesTextareaRef?.$el?.focus()"
+      >
+        <BFormGroup
+            label-for="sugestoesTextarea"
+            :state="mensagemErroSugestoes ? false : null"
+            class="mb-3"
+        >
+          <template #label>
+            Sugestões para o mapa de competências: <span aria-hidden="true" class="text-danger">*</span>
+          </template>
+          <BFormTextarea
+              id="sugestoesTextarea"
+              ref="sugestoesTextareaRef"
+              v-model="sugestoes"
+              aria-required="true"
+              :state="mensagemErroSugestoes ? false : null"
+              data-testid="inp-sugestoes-mapa-texto"
+              rows="5"
+          />
+          <BFormInvalidFeedback :state="mensagemErroSugestoes ? false : null">
+            {{ mensagemErroSugestoes }}
+          </BFormInvalidFeedback>
+        </BFormGroup>
+      </ModalConfirmacao>
+
+      <ModalConfirmacao
+          v-model="mostrarModalValidar"
+          :loading="isLoading"
+          :ok-title="TEXTOS.comum.BOTAO_VALIDAR"
+          test-codigo-cancelar="btn-validar-mapa-cancelar"
+          test-codigo-confirmar="btn-validar-mapa-confirmar"
+          titulo="Validação de mapa"
+          variant="success"
+          @confirmar="confirmarValidacao"
+      >
+        <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
+      </ModalConfirmacao>
+
+      <ModalConfirmacao
           v-model="mostrarModalDevolucao"
           :auto-close="false"
           :loading="isLoading"
@@ -215,6 +291,12 @@
           :mostrar="mostrarModalImpacto"
           @fechar="fecharModalImpacto"
       />
+
+      <HistoricoAnaliseModal
+          :historico="historicoAnalise"
+          :mostrar="mostrarModalHistorico"
+          @fechar="fecharModalHistorico"
+      />
     </template>
   </LayoutPadrao>
 </template>
@@ -229,6 +311,7 @@ import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
+import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
@@ -245,9 +328,11 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import {obterSugestoesMapa} from "@/services/subprocessoService";
+import {listarAnalisesCadastro} from "@/services/analiseService";
+import {apresentarSugestoes as apresentarSugestoesService} from "@/services/processoService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import logger from "@/utils/logger";
-import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
+import type {Analise, Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -276,9 +361,11 @@ const siglaUnidade = computed(() => String(route.params.siglaUnidade));
 
 const {
   podeVisualizarImpacto,
+  podeValidarMapa,
   podeEditarMapa,
   podeDisponibilizarMapa,
   habilitarEditarMapa,
+  habilitarValidarMapa,
   habilitarDisponibilizarMapa,
   podeAnalisarMapa,
   podeVerSugestoes: podeMostrarVerSugestoes,
@@ -293,14 +380,23 @@ const podeAnalisar = computed(() => {
   );
 });
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
+const podeValidar = computed(() => podeValidarMapa.value);
+const habilitarValidar = computed(() => habilitarValidarMapa.value);
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
 const carregandoInicial = ref(true);
 
+const analisesCadastro = ref<Analise[]>([]);
+const historicoAnalise = computed(() => analisesCadastro.value || []);
+const temHistoricoAnalise = computed(() => historicoAnalise.value.length > 0);
+const mostrarModalSugestoes = ref(false);
 const mostrarModalVerSugestoes = ref(false);
+const mostrarModalHistorico = ref(false);
+const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
 
+const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 const {
@@ -312,6 +408,9 @@ const {
 
 const mensagemErroDevolucao = computed(() => {
   return deveExibirErro(!observacaoDevolucao.value.trim()) ? "A justificativa é obrigatória para a devolução." : "";
+});
+const mensagemErroSugestoes = computed(() => {
+  return deveExibirErro(!sugestoes.value.trim()) ? "As sugestões são obrigatórias." : "";
 });
 
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
@@ -327,9 +426,11 @@ const {
   observacaoDevolucao,
   isLoading,
   confirmarAceitacao,
+  confirmarValidacao,
   confirmarDevolucao,
   abrirModalAceitar,
   fecharModalAceitar,
+  abrirModalValidar,
   abrirModalDevolucao: abrirModalDevolucaoBase,
 } = useMapaAcoesAnalise({
   codSubprocesso,
@@ -376,6 +477,62 @@ function verSugestoes() {
 function fecharModalVerSugestoes() {
   mostrarModalVerSugestoes.value = false;
   sugestoesVisualizacao.value = "";
+}
+
+async function carregarSugestoesParaEdicao() {
+  try {
+    sugestoes.value = await sincronizarSugestoesMapa();
+  } catch (error) {
+    logger.error(error);
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+  }
+}
+
+function abrirModalSugestoes() {
+  resetarValidacao();
+  mostrarModalSugestoes.value = true;
+  void carregarSugestoesParaEdicao();
+}
+
+function fecharModalSugestoes() {
+  mostrarModalSugestoes.value = false;
+  sugestoes.value = "";
+  resetarValidacao();
+}
+
+async function handleConfirmarSugestoes() {
+  if (!validarSubmissao(!!sugestoes.value.trim())) {
+    await focarPrimeiroErroInvalido();
+    return;
+  }
+
+  if (!codSubprocesso.value) return;
+
+  try {
+    isLoading.value = true;
+    await apresentarSugestoesService(codSubprocesso.value, {sugestoes: sugestoes.value});
+    await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+  } catch (error) {
+    logger.error(error);
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+async function abrirModalHistorico() {
+  if (codSubprocesso.value) {
+    analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
+  }
+  mostrarModalHistorico.value = true;
+}
+
+function fecharModalHistorico() {
+  mostrarModalHistorico.value = false;
+}
+
+function verHistorico() {
+  void abrirModalHistorico();
 }
 
 const {
