@@ -188,7 +188,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         String observacoes = "Cadastro parece OK.";
-        TextoRequest requestBody = new TextoRequest(observacoes);
+        TextoOpcionalRequest requestBody = new TextoOpcionalRequest(observacoes);
 
         mockMvc.perform(
                         post("/api/subprocessos/{codigo}/aceitar-cadastro", subprocesso.getCodigo())
@@ -232,7 +232,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         admin.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo()); // Or default admin unit
         admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
 
-        TextoRequest requestBody = new TextoRequest("Homologado via teste.");
+        TextoOpcionalRequest requestBody = new TextoOpcionalRequest("Homologado via teste.");
 
         mockMvc.perform(
                         post(
@@ -301,7 +301,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         entityManager.clear();
 
         String obsAceite = "Agora sim, completo.";
-        TextoRequest aceitarReq = new TextoRequest(obsAceite);
+        TextoOpcionalRequest aceitarReq = new TextoOpcionalRequest(obsAceite);
         mockMvc.perform(post("/api/subprocessos/{codigo}/aceitar-cadastro", subprocesso.getCodigo())
                         .with(csrf())
                         .with(user(gestor))

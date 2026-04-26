@@ -74,8 +74,6 @@ class SubprocessoConsultaServiceCoverageTest {
         
         ReflectionTestUtils.setField(target, "acessoService", acessoService);
         ReflectionTestUtils.setField(target, "visualizacaoService", visualizacaoService);
-        ReflectionTestUtils.setField(target, "analiseRepo", analiseRepo);
-        ReflectionTestUtils.setField(target, "analiseHistoricoService", analiseHistoricoService);
 
         ReflectionTestUtils.setField(
                 target,
