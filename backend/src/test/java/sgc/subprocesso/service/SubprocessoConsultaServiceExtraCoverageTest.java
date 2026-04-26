@@ -189,7 +189,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
             when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any())).thenReturn(List.of());
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
-            stubUltimaMovimentacaoNaUnidade(sp);
 
             SubprocessoDetalheResponse res = consultaService.obterDetalhes(1L);
 
@@ -290,7 +289,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(11L), any())).thenReturn(List.of());
             when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(11L)).thenReturn(responsavel);
             when(unidadeService.temMapaVigente(11L)).thenReturn(true);
-            stubUltimaMovimentacaoNaUnidade(sp);
 
             SubprocessoDetalheResponse response = consultaService.obterDetalhes(11L);
 
