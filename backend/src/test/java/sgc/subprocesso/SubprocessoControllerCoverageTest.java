@@ -29,6 +29,8 @@ class SubprocessoControllerCoverageTest {
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
     @MockitoBean
+    private sgc.subprocesso.service.CadastroFluxoService cadastroFluxoService;
+    @MockitoBean
     private sgc.organizacao.service.UnidadeService unidadeService;
     @MockitoBean
     private sgc.organizacao.UsuarioFacade usuarioService;

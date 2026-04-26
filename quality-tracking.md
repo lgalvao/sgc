@@ -2,7 +2,7 @@
 
 > Baseado em: `quality-report.md`  
 > Iniciado em: 2026-04-25  
-> Última atualização: 2026-04-26 (Sessão 2 — concluída)
+> Última atualização: 2026-04-26 (Sessão 3 — em andamento)
 
 ---
 
@@ -10,8 +10,8 @@
 
 | Categoria | Alta 🔴 | Média 🟡 | Baixa 🟢 | Total |
 |---|---|---|---|---|
-| Corrigidos | 9 | 18 | 9 | 36 |
-| Pendentes | 0 | 4 | 0 | 4 |
+| Corrigidos | 9 | 19 | 9 | 37 |
+| Pendentes | 0 | 3 | 0 | 3 |
 
 ---
 
@@ -51,9 +51,9 @@
 | 6.2 | `buscarOpt` retorna `null` via `orElse(null)` | `UsuarioFacade.java` | ✅ Feito |
 | 7.1 | Ordenação de datas no frontend | `subprocessoService.ts` | ✅ Feito (Sessão 2 — `ultimaDataLimite` calculado no backend) |
 | 7.2 | Mapeamento complexo `mapSubprocessoDetalheResponseParaModel` | `subprocessoService.ts` | ✅ Feito (Sessão 2) |
-| 8.4 | Hierarquia de unidades reconstruída por requisição | `ProcessoService.java` | ⏳ Pendente |
+| 8.4 | Hierarquia de unidades reconstruída por requisição | `ProcessoService.java` | ℹ️ Já otimizado — `buscarMapaHierarquia()` em `UnidadeHierarquiaService` é cacheada via `@Cacheable`; `obterIdsUnidadesAcesso` usa esse cache |
 | 8.5 | Requisições duplicadas para subprocesso no frontend | `subprocessoService.ts` | ⏳ Pendente |
-| 1.2 | `SubprocessoTransicaoService` com 933 linhas | `SubprocessoTransicaoService.java` | ⏳ Pendente |
+| 1.2 | `SubprocessoTransicaoService` com 933 linhas | `SubprocessoTransicaoService.java`, `CadastroFluxoService.java` | ✅ Feito (Sessão 3) |
 | 1.3 | `PermissoesSubprocessoDto` com 34 campos booleanos | `PermissoesSubprocessoDto.java` | ⏳ Pendente |
 | 1.4 | Views de frontend com 900+ linhas | `CadastroView.vue`, `MapaView.vue` | ⏳ Pendente |
 | 1.1 | `ProcessoService` com 1315 linhas (God Service) | `ProcessoService.java` | ⏳ Pendente |
@@ -78,8 +78,8 @@
 
 ## Progresso
 
-- **Concluídos:** 36 / 40
-- **Pendentes:** 4 / 40
+- **Concluídos:** 37 / 40
+- **Pendentes:** 3 / 40
 
 ---
 
@@ -87,9 +87,18 @@
 
 - **10.1 (SubprocessoController):** O relatório identificou risco de segurança, mas o código atual já usa `@PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_CADASTRO')")` — verificação correta por lista de recursos.
 - **9.4 (Limitador por IP):** Melhoria arquitetural de maior impacto. Fica como item futuro para evitar riscos de regressão em autenticação.
-- **1.1, 1.2, 1.3, 1.4 (God Service, SubprocessoTransicaoService, PermissoesDto, Views grandes):** Refatorações de alta complexidade sem risco de bug imediato. Priorizadas para próxima rodada.
-- **8.4 (hierarquia por requisição):** Caching de `obterDetalhesCompleto` requer estratégia cuidadosa — dado depende de perfil de usuário e localização atual de subprocessos, tornando a chave de cache complexa. Priorizadas para próxima rodada.
-- **8.5 (requisições duplicadas):** Requer refatoração em composables/stores. Priorizadas para próxima rodada.
+- **1.1, 1.3, 1.4 (God Service, PermissoesDto, Views grandes):** Refatorações de alta complexidade sem risco de bug imediato. Priorizadas para próxima rodada.
+- **8.4 (hierarquia por requisição):** Verificado — `buscarMapaHierarquia()` em `UnidadeHierarquiaService` já é cacheada via `@Cacheable(CACHE_MAPA_HIERARQUIA_UNIDADES)`. `obterIdsUnidadesAcesso` usa esse cache indiretamente via `buscarIdsDescendentes → self().buscarMapaHierarquia()`. Não há ação necessária.
+- **8.5 (requisições duplicadas):** Requer refatoração em composables/stores. Priorizada para próxima rodada.
+
+## Sessão 3 — Resumo de mudanças
+
+| Item | Mudança |
+|---|---|
+| **8.4** | Verificado como já resolvido — hierarquia cacheada via `@Cacheable` em `UnidadeHierarquiaService.buscarMapaHierarquia()` |
+| **1.2** | Extraído `CadastroFluxoService` de `SubprocessoTransicaoService`: 14 métodos de fluxo de cadastro/revisão movidos para o novo serviço. `SubprocessoTransicaoService` reduzido. Controllers e testes atualizados. 1698 testes passando. |
+
+
 - **3.4 (mascarar):** Sem ação necessária — `mascarar` é auxiliar de log para PII (título eleitoral), não sanitização de HTML. Mover para `UtilSanitizacao` misturaria responsabilidades.
 - **6.2 (buscarOpt):** Sem ação necessária — `orElse(null)` em `carregarUsuarioParaAutenticacao` é intencional: método anotado `@Nullable` para suporte ao Spring Security UserDetailsService.
 - **6.4 (listarAnalisesCadastro):** Método privado já anotado `@Nullable`, contrato explícito. Sem mudança de comportamento.

@@ -50,6 +50,7 @@ class ProcessoServiceCoverageTest {
     @Mock private NotificacaoService notificacaoService;
     @Mock private EmailModelosService emailModelosService;
     @Mock private SubprocessoTransicaoService transicaoService;
+    @Mock private CadastroFluxoService cadastroFluxoService;
 
     @InjectMocks
     private ProcessoService target;
@@ -434,7 +435,7 @@ class ProcessoServiceCoverageTest {
         when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
         target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
-        verify(transicaoService).homologarCadastroEmBloco(anyList());
+        verify(cadastroFluxoService).homologarCadastroEmBloco(anyList());
     }
 
     @Nested
@@ -617,7 +618,7 @@ class ProcessoServiceCoverageTest {
 
         target.executarAcaoEmBloco(codProc, req);
 
-        verify(transicaoService).aceitarCadastroEmBloco(List.of(100L));
+        verify(cadastroFluxoService).aceitarCadastroEmBloco(List.of(100L));
         verify(transicaoService).aceitarValidacaoEmBloco(List.of(200L));
     }
 
