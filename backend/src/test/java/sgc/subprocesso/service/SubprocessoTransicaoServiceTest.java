@@ -214,41 +214,6 @@ class SubprocessoTransicaoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve aceitar cadastro em bloco para diferentes tipos de processo")
-        void deveAceitarCadastroEmBlocoDiferentesTipos() {
-            Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
-            Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
-
-            when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(spMap)).thenReturn(spMap.getUnidade());
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(spRev)).thenReturn(spRev.getUnidade());
-
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
-
-            service.aceitarCadastroEmBloco(List.of(10L, 20L));
-
-            assertThat(spMap.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        }
-
-        @Test
-        @DisplayName("Deve homologar cadastro em bloco para diferentes tipos de processo")
-        void deveHomologarCadastroEmBlocoDiferentesTipos() {
-            Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
-            Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
-
-            when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
-            when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
-
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
-
-            service.homologarCadastroEmBloco(List.of(10L, 20L));
-
-            assertThat(spMap.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-        }
-
-        @Test
         @DisplayName("alterarDataLimite deve lançar erro quando data limite é anterior à etapa 2")
         void alterarDataLimiteDeveLancarErroQuandoAnteriorEtapa2() {
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, new Unidade());
@@ -259,23 +224,6 @@ class SubprocessoTransicaoServiceTest {
 
             assertThatThrownBy(() -> service.alterarDataLimite(1L, LocalDate.now().plusDays(7)))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
-        }
-
-        @Test
-        @DisplayName("executarDevolucao deve falhar sem movimentações compativeis")
-        void executarDevolucaoSemMovimentacoesCompativeisDeveFalhar() {
-            Unidade u = criarUnidade(1L, "U", "Unid");
-            Subprocesso sp = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, u);
-
-            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
-
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
-
-            assertThatThrownBy(() -> service.devolverCadastro(1L, "Obs"))
-                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                    .hasMessageContaining("Historico de movimentacoes inconsistente");
         }
 
         @Test
@@ -374,19 +322,6 @@ class SubprocessoTransicaoServiceTest {
                 assertThat(result).isNull();
             }
         }
-    }
-
-    @Test
-    @DisplayName("deve aceitar revisao cadastro clashing")
-    void deveAceitarRevisaoCadastroClashing() {
-        Unidade u = criarUnidade(1L, "U", "Unid");
-        Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, u);
-        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
-
-        service.aceitarRevisaoCadastro(1L, "Obs");
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
     }
 
     private Subprocesso criarSubprocesso(TipoProcesso tipoProcesso, SituacaoSubprocesso situacao, Unidade unidade) {

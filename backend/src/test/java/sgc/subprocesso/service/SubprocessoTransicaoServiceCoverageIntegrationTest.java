@@ -31,6 +31,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
     private SubprocessoTransicaoService transicaoService;
 
     @Autowired
+    private CadastroFluxoService cadastroFluxoService;
+
+    @Autowired
     private SubprocessoRepo subprocessoRepo;
 
     @Autowired
@@ -265,7 +268,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
 
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
 
-            transicaoService.disponibilizarCadastro(sp.getCodigo());
+            cadastroFluxoService.disponibilizarCadastro(sp.getCodigo());
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);

@@ -72,6 +72,8 @@ class ProcessoServiceTest {
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
     private SubprocessoTransicaoService transicaoService;
+    @Mock
+    private CadastroFluxoService cadastroFluxoService;
 
     private void mockarResponsaveisEfetivos() {
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
@@ -166,8 +168,8 @@ class ProcessoServiceTest {
 
             processoService.executarAcaoEmBloco(codProcesso, req);
 
-            verify(transicaoService, never()).aceitarCadastroEmBloco(any());
-            verify(transicaoService, never()).homologarCadastroEmBloco(any());
+            verify(cadastroFluxoService, never()).aceitarCadastroEmBloco(any());
+            verify(cadastroFluxoService, never()).homologarCadastroEmBloco(any());
         }
 
     @Nested
@@ -685,13 +687,13 @@ class ProcessoServiceTest {
             // Teste ACEITAR
             ProcessarAnaliseEmBlocoCommand reqAceitar = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), ACEITAR);
             processoService.executarAcaoEmBloco(1L, reqAceitar);
-            verify(transicaoService).aceitarCadastroEmBloco(List.of(10L));
+            verify(cadastroFluxoService).aceitarCadastroEmBloco(List.of(10L));
             verify(transicaoService).aceitarValidacaoEmBloco(List.of(20L));
 
             // Teste HOMOLOGAR
             ProcessarAnaliseEmBlocoCommand reqHomologar = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), HOMOLOGAR);
             processoService.executarAcaoEmBloco(1L, reqHomologar);
-            verify(transicaoService).homologarCadastroEmBloco(List.of(10L));
+            verify(cadastroFluxoService).homologarCadastroEmBloco(List.of(10L));
             verify(transicaoService).homologarValidacaoEmBloco(List.of(20L));
         }
     }
@@ -993,7 +995,7 @@ class ProcessoServiceTest {
 
                 processoService.executarAcaoEmBloco(100L, req);
 
-                verify(transicaoService).aceitarCadastroEmBloco(List.of(1L, 2L));
+                verify(cadastroFluxoService).aceitarCadastroEmBloco(List.of(1L, 2L));
             }
 
             @Test
@@ -1047,7 +1049,7 @@ class ProcessoServiceTest {
 
                 processoService.executarAcaoEmBloco(100L, req);
 
-                verify(transicaoService).homologarCadastroEmBloco(List.of(1L));
+                verify(cadastroFluxoService).homologarCadastroEmBloco(List.of(1L));
             }
 
             @Test

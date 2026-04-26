@@ -60,6 +60,7 @@ public class ProcessoService {
     private final EmailModelosService emailModelosService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoTransicaoService transicaoService;
+    private final CadastroFluxoService cadastroFluxoService;
 
 
     @Transactional(readOnly = true)
@@ -1159,13 +1160,13 @@ public class ProcessoService {
             case ACEITAR -> executarTransicoesEmBloco(
                     cadastro,
                     validacao,
-                    transicaoService::aceitarCadastroEmBloco,
+                    cadastroFluxoService::aceitarCadastroEmBloco,
                     transicaoService::aceitarValidacaoEmBloco
             );
             case HOMOLOGAR -> executarTransicoesEmBloco(
                     cadastro,
                     validacao,
-                    transicaoService::homologarCadastroEmBloco,
+                    cadastroFluxoService::homologarCadastroEmBloco,
                     transicaoService::homologarValidacaoEmBloco
             );
             default -> log.debug("Ação em bloco {} sem processamento no fluxo de análise", req.acao());

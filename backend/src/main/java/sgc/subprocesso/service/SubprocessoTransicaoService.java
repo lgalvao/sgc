@@ -45,12 +45,8 @@ public class SubprocessoTransicaoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UsuarioFacade usuarioFacade;
     private final MapaManutencaoService mapaManutencaoService;
-    private final AlertaFacade alertaService;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    private static final String ETAPA_REVISAO = "revisão";
-    private static final String ETAPA_CADASTRO = "cadastro";
 
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = Map.of(
             MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -68,47 +64,6 @@ public class SubprocessoTransicaoService {
             MAPEAMENTO, MAPEAMENTO_MAPA_HOMOLOGADO,
             REVISAO, REVISAO_MAPA_HOMOLOGADO
     );
-
-    @Builder
-    private record FluxoCadastroContexto(
-            String etapa,
-            SituacaoSubprocesso situacaoDisponibilizada,
-            SituacaoSubprocesso situacaoEmAndamento,
-            SituacaoSubprocesso situacaoHomologada,
-            TipoTransicao transicaoDevolucao,
-            TipoTransicao transicaoAceite,
-            TipoTransicao transicaoHomologacao,
-            TipoAcaoAnalise acaoDevolucao,
-            TipoAcaoAnalise acaoAceite
-    ) {
-        private static FluxoCadastroContexto revisao() {
-            return FluxoCadastroContexto.builder()
-                    .etapa(ETAPA_REVISAO)
-                    .situacaoDisponibilizada(REVISAO_CADASTRO_DISPONIBILIZADA)
-                    .situacaoEmAndamento(REVISAO_CADASTRO_EM_ANDAMENTO)
-                    .situacaoHomologada(REVISAO_CADASTRO_HOMOLOGADA)
-                    .transicaoDevolucao(REVISAO_CADASTRO_DEVOLVIDA)
-                    .transicaoAceite(REVISAO_CADASTRO_ACEITA)
-                    .transicaoHomologacao(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA)
-                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
-                    .acaoAceite(TipoAcaoAnalise.ACEITE_REVISAO)
-                    .build();
-        }
-
-        private static FluxoCadastroContexto mapeamento() {
-            return FluxoCadastroContexto.builder()
-                    .etapa(ETAPA_CADASTRO)
-                    .situacaoDisponibilizada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
-                    .situacaoEmAndamento(MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
-                    .situacaoHomologada(MAPEAMENTO_CADASTRO_HOMOLOGADO)
-                    .transicaoDevolucao(CADASTRO_DEVOLVIDO)
-                    .transicaoAceite(CADASTRO_ACEITO)
-                    .transicaoHomologacao(TipoTransicao.CADASTRO_HOMOLOGADO)
-                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                    .acaoAceite(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .build();
-        }
-    }
 
     @Builder
     private record RegistrarWorkflowInternoCommand(
@@ -162,87 +117,6 @@ public class SubprocessoTransicaoService {
                     .observacoes(observacoes)
                     .build();
         }
-
-        private static RegistrarWorkflowInternoCommand cadastroComDestino(
-                Subprocesso sp,
-                SituacaoSubprocesso novaSituacao,
-                FluxoCadastroContexto contexto,
-                Unidade unidadeAnalise,
-                Unidade unidadeDestino,
-                Usuario usuario,
-                @Nullable String observacoes
-        ) {
-            return RegistrarWorkflowInternoCommand.builder()
-                    .sp(sp)
-                    .novaSituacao(novaSituacao)
-                    .tipoTransicao(contexto.transicaoDevolucao())
-                    .tipoAnalise(TipoAnalise.CADASTRO)
-                    .tipoAcaoAnalise(contexto.acaoDevolucao())
-                    .unidadeAnalise(unidadeAnalise)
-                    .unidadeDestino(unidadeDestino)
-                    .usuario(usuario)
-                    .motivoAnalise(observacoes)
-                    .observacoes(observacoes)
-                    .build();
-        }
-
-        private static RegistrarWorkflowInternoCommand cadastroParaSuperiorAtual(
-                Subprocesso sp,
-                SituacaoSubprocesso novaSituacao,
-                FluxoCadastroContexto contexto,
-                Usuario usuario,
-                @Nullable String observacoes
-        ) {
-            return RegistrarWorkflowInternoCommand.builder()
-                    .sp(sp)
-                    .novaSituacao(novaSituacao)
-                    .tipoTransicao(contexto.transicaoAceite())
-                    .tipoAnalise(TipoAnalise.CADASTRO)
-                    .tipoAcaoAnalise(contexto.acaoAceite())
-                    .usuario(usuario)
-                    .motivoAnalise(observacoes)
-                    .observacoes(observacoes)
-                    .build();
-        }
-    }
-
-    private record ReaberturaCommand(
-            Long codigo,
-            String justificativa,
-            SituacaoSubprocesso situacaoMinima,
-            SituacaoSubprocesso novaSituacao,
-            TipoTransicao tipoTransicao,
-            boolean revisao
-    ) {
-        private static ReaberturaCommand cadastro(Long codigo, String justificativa) {
-            return new ReaberturaCommand(
-                    codigo,
-                    justificativa,
-                    MAPEAMENTO_MAPA_HOMOLOGADO,
-                    MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                    TipoTransicao.CADASTRO_REABERTO,
-                    false
-            );
-        }
-
-        private static ReaberturaCommand revisao(Long codigo, String justificativa) {
-            return new ReaberturaCommand(
-                    codigo,
-                    justificativa,
-                    REVISAO_MAPA_HOMOLOGADO,
-                    REVISAO_CADASTRO_EM_ANDAMENTO,
-                    REVISAO_CADASTRO_REABERTA,
-                    true
-            );
-        }
-    }
-
-    private record AlertaReaberturaContexto(
-            Processo processo,
-            Unidade unidadeOrigem,
-            String justificativa,
-            boolean revisao
-    ) {
     }
 
     private static @Nullable String normalizarTexto(@Nullable String texto) {
@@ -320,61 +194,6 @@ public class SubprocessoTransicaoService {
                 .build();
 
         return analiseRepo.save(analise);
-    }
-
-    @Transactional
-    public void disponibilizarCadastro(Long codSubprocesso) {
-        disponibilizarCadastro(codSubprocesso, null);
-    }
-
-    @Transactional
-    public void disponibilizarCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        log.info("Disponibilizando cadastro do subprocesso {}", codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario, observacoes);
-    }
-
-    public void iniciarRevisaoCadastro(Long codSubprocesso) {
-        log.info("Iniciando revisão do cadastro do subprocesso {}", codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, NAO_INICIADO);
-
-        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-        subprocessoRepo.save(sp);
-        log.info("Subprocesso {} transicionado para REVISAO_CADASTRO_EM_ANDAMENTO", codSubprocesso);
-    }
-
-    public void cancelarInicioRevisaoCadastro(Long codSubprocesso) {
-        log.info("Cancelando início da revisão do cadastro do subprocesso {}", codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
-
-        sp.setSituacao(NAO_INICIADO);
-        subprocessoRepo.save(sp);
-        log.info("Subprocesso {} transicionado para NAO_INICIADO", codSubprocesso);
-    }
-
-    public void disponibilizarRevisao(Long codSubprocesso) {
-        disponibilizarRevisao(codSubprocesso, null);
-    }
-
-    public void disponibilizarRevisao(Long codSubprocesso, @Nullable String observacoes) {
-        log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario, observacoes);
-    }
-
-    private void disponibilizar(Subprocesso sp, SituacaoSubprocesso novaSituacao,
-                                TipoTransicao transicao, Usuario usuario, @Nullable String observacoes) {
-        validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp);
-
-        sp.setSituacao(novaSituacao);
-        sp.setDataFimEtapa1(LocalDateTime.now());
-        registrarTransicaoParaSuperiorDaUnidade(sp, transicao, usuario, normalizarTexto(observacoes));
     }
 
     @Transactional
@@ -595,58 +414,6 @@ public class SubprocessoTransicaoService {
         registrarTransicaoDentroDoAdmin(sp, TipoTransicao.MAPA_HOMOLOGADO, usuario, normalizarTexto(observacoes));
     }
 
-    public void devolverCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarDevolucao(sp, usuario, observacoes);
-    }
-
-    public void devolverRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarDevolucao(sp, usuario, observacoes);
-    }
-
-    private void executarDevolucao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
-        FluxoCadastroContexto contexto = obterContextoCadastro(sp);
-        validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
-
-        Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
-        Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
-
-        SituacaoSubprocesso novaSituacao = contexto.situacaoDisponibilizada();
-        if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
-            novaSituacao = contexto.situacaoEmAndamento();
-            sp.setDataFimEtapa1(null);
-        }
-
-        registrarWorkflowComDestino(RegistrarWorkflowInternoCommand.cadastroComDestino(
-                sp,
-                novaSituacao,
-                contexto,
-                unidadeAnalise,
-                unidadeDevolucao,
-                usuario,
-                normalizarTexto(observacoes)
-        ));
-
-        log.info("Devolvido {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
-    }
-
-    private Unidade obterUnidadeDevolucao(Subprocesso sp, Unidade unidadeAnalise) {
-        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
-
-        return movimentacoes.stream()
-                .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .map(Movimentacao::getUnidadeOrigem)
-                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
-                .findFirst()
-                .orElseThrow(() -> new ErroInconsistenciaInterna(
-                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
-                                .formatted(sp.getCodigo(), unidadeAnalise.getCodigo())
-                ));
-    }
-
     private void registrarTransicaoParaSuperiorDaUnidade(
             Subprocesso sp,
             TipoTransicao tipoTransicao,
@@ -741,138 +508,6 @@ public class SubprocessoTransicaoService {
         return unidadeService.buscarAdmin();
     }
 
-    public void aceitarCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceite(sp, usuario, observacoes);
-    }
-
-    public void aceitarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceite(sp, usuario, observacoes);
-    }
-
-    @Transactional
-    public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarAceite(sp, usuario, "Avaliação em bloco"));
-    }
-
-    private void executarAceite(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
-        FluxoCadastroContexto contexto = obterContextoCadastro(sp);
-        log.info("Aceitando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
-        validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
-
-        registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand.cadastroParaSuperiorAtual(
-                sp,
-                contexto.situacaoDisponibilizada(),
-                contexto,
-                usuario,
-                normalizarTexto(observacoes)
-        ));
-    }
-
-    public void homologarCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacao(sp, usuario, observacoes);
-    }
-
-    public void homologarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacao(sp, usuario, observacoes);
-    }
-
-    public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco"));
-    }
-
-    private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
-        FluxoCadastroContexto contexto = obterContextoCadastro(sp);
-        log.info("Homologando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
-        validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
-
-        sp.setSituacao(contexto.situacaoHomologada());
-
-        registrarTransicaoDentroDoAdmin(sp, contexto.transicaoHomologacao(), usuario, normalizarTexto(observacoes));
-
-        executarEfeitosDerivadosHomologacaoCadastro(sp);
-    }
-
-    private void executarEfeitosDerivadosHomologacaoCadastro(Subprocesso sp) {
-        String descAlerta = REVISAO == sp.getProcesso().getTipo()
-                ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
-                : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
-        alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, obterUnidadeAdmin(), sp.getUnidade());
-    }
-
-    public void reabrirCadastro(Long codigo, String justificativa) {
-        executarReabertura(ReaberturaCommand.cadastro(codigo, justificativa));
-    }
-
-    public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
-        executarReabertura(ReaberturaCommand.revisao(codigo, justificativa));
-    }
-
-    private void executarReabertura(ReaberturaCommand cmd) {
-
-        Subprocesso sp = consultaService.buscarSubprocesso(cmd.codigo());
-        validacaoService.validarSituacaoMinima(sp,
-                cmd.situacaoMinima(),
-                Mensagens.ERRO_SUBPROCESSO_EM_FASE.formatted(cmd.revisao() ? ETAPA_REVISAO : ETAPA_CADASTRO)
-        );
-
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-
-        sp.setSituacao(cmd.novaSituacao());
-        sp.setDataFimEtapa1(null);
-
-        registrarTransicaoDoAdminParaUnidade(sp, cmd.tipoTransicao(), usuario, cmd.justificativa());
-
-        criarAlertasReabertura(new AlertaReaberturaContexto(sp.getProcesso(), sp.getUnidade(), cmd.justificativa(), cmd.revisao()));
-        log.info("Reaberto {} do SP {}", cmd.revisao() ? ETAPA_REVISAO : ETAPA_CADASTRO, cmd.codigo());
-    }
-
-    private void criarAlertasReabertura(AlertaReaberturaContexto contexto) {
-        Unidade unidade = contexto.unidadeOrigem();
-
-        criarAlertaReaberturaUnidade(contexto);
-
-        Unidade superiorImediato = buscarSuperiorImediato(unidade.getCodigo());
-        if (superiorImediato != null) {
-            criarAlertaReaberturaSuperior(contexto, superiorImediato);
-        }
-    }
-
-    private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {
-        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
-        if (codigoPai == null) {
-            return null;
-        }
-        return unidadeService.buscarPorCodigo(codigoPai);
-    }
-
-    private void criarAlertaReaberturaUnidade(AlertaReaberturaContexto contexto) {
-        if (contexto.revisao()) {
-            alertaService.criarAlertaReaberturaRevisao(contexto.processo(), contexto.unidadeOrigem(), contexto.justificativa());
-            return;
-        }
-        alertaService.criarAlertaReaberturaCadastro(contexto.processo(), contexto.unidadeOrigem());
-    }
-
-    private void criarAlertaReaberturaSuperior(AlertaReaberturaContexto contexto, Unidade unidadeSuperior) {
-        if (contexto.revisao()) {
-            alertaService.criarAlertaReaberturaRevisaoSuperior(contexto.processo(), unidadeSuperior, contexto.unidadeOrigem());
-            return;
-        }
-        alertaService.criarAlertaReaberturaCadastroSuperior(contexto.processo(), unidadeSuperior, contexto.unidadeOrigem());
-    }
-
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoSp = sp.getSituacao();
@@ -912,6 +547,28 @@ public class SubprocessoTransicaoService {
     }
 
 
+    private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {
+        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
+        if (codigoPai == null) {
+            return null;
+        }
+        return unidadeService.buscarPorCodigo(codigoPai);
+    }
+
+    private Unidade obterUnidadeDevolucao(Subprocesso sp, Unidade unidadeAnalise) {
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
+
+        return movimentacoes.stream()
+                .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
+                .map(Movimentacao::getUnidadeOrigem)
+                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
+                .findFirst()
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
+                                .formatted(sp.getCodigo(), unidadeAnalise.getCodigo())
+                ));
+    }
+
     private SituacaoSubprocesso obterSituacaoObrigatoria(Map<TipoProcesso, SituacaoSubprocesso> situacoes, Subprocesso subprocesso, String contexto) {
         TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
         SituacaoSubprocesso situacao = situacoes.get(tipoProcesso);
@@ -919,15 +576,6 @@ public class SubprocessoTransicaoService {
             throw new IllegalStateException("Tipo de processo %s sem situação configurada para %s".formatted(tipoProcesso, contexto));
         }
         return situacao;
-    }
-
-    private FluxoCadastroContexto obterContextoCadastro(Subprocesso sp) {
-        return switch (sp.getProcesso().getTipo()) {
-            case REVISAO -> FluxoCadastroContexto.revisao();
-            case MAPEAMENTO -> FluxoCadastroContexto.mapeamento();
-            default -> throw new IllegalStateException(
-                    "Tipo %s sem fluxo de cadastro definido".formatted(sp.getProcesso().getTipo()));
-        };
     }
 
 }
