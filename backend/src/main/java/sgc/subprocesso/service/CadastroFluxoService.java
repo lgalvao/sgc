@@ -176,25 +176,13 @@ public class CadastroFluxoService {
         disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario, observacoes);
     }
 
-    public void devolverCadastro(Long codSubprocesso, @Nullable String observacoes) {
+    public void devolver(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarDevolucao(sp, usuario, observacoes);
     }
 
-    public void devolverRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarDevolucao(sp, usuario, observacoes);
-    }
-
-    public void aceitarCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarAceite(sp, usuario, observacoes);
-    }
-
-    public void aceitarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+    public void aceitar(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarAceite(sp, usuario, observacoes);
@@ -207,13 +195,7 @@ public class CadastroFluxoService {
         subprocessos.forEach(sp -> executarAceite(sp, usuario, "Avaliação em bloco"));
     }
 
-    public void homologarCadastro(Long codSubprocesso, @Nullable String observacoes) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        executarHomologacao(sp, usuario, observacoes);
-    }
-
-    public void homologarRevisaoCadastro(Long codSubprocesso, @Nullable String observacoes) {
+    public void homologar(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         executarHomologacao(sp, usuario, observacoes);

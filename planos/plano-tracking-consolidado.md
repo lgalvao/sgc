@@ -40,12 +40,13 @@ Conduzir a simplificação estrutural do SGC sem quebrar contratos, requisitos, 
 
 ### 2.4 Diagnóstico de Monitoramento (Auditoria P0)
 
-Após rodadas monitoradas (`SGC_MONITORAMENTO=sim`) dos cenários CDU-07 e CDU-05, foram identificados os seguintes desperdícios:
+Após rodadas monitoradas (`SGC_MONITORAMENTO=sim`) e auditoria de código, as seguintes melhorias foram implementadas/identificadas:
 
-1.  **Redundância de `painel/bootstrap`**: Chamado ~3x por sessão devido à invalidação ampla default em `useInvalidacaoNavegacao.invalidarCachesSubprocesso()`. O default `incluirPainel: true` força recargas desnecessárias em fluxos que não retornam ao Painel imediatamente.
-2.  **Chamadas duplicadas de contexto**: `contexto-edicao` é solicitado duas vezes em sequência antes de ações no `MapaView` (disponibilizar, aceitar, homologar).
-3.  **Double Reload pós-mutação**: Ações como `homologar-cadastro` disparam recarga via `useFluxoSubprocesso` e, ao retornar para a view, o `onActivated` dispara uma segunda busca por não detectar que o estado já está atualizado.
-4.  **Thresholds de Monitoramento**: Identificado que o threshold padrão de 100ms ocultava chamadas rápidas (<10ms) que, somadas, degradam a UX.
+1.  **Invalidação Conservadora**: O default em `useInvalidacaoNavegacao` foi alterado de `true` para `false` para `incluirPainel` e `incluirProcesso`. Isso evitou ~2 round-trips por navegação interna.
+2.  **Double Reload pós-mutação**: Resolvido em `SubprocessoView.vue` com o uso de `dadosValidosEdicao` no `onActivated` e remoção de chamadas redundantes em `useFluxoSubprocesso`.
+3.  **Toast Pendente e Redirecionamento**: Identificado que Toasts de sucesso se perdiam em redirecionamentos. Corrigido com `toastStore.setPending`.
+4.  **Payload Bloat (Movimentações)**: O `SubprocessoConsultaService` agora limita o histórico enviado no contexto inicial a 15 itens, reduzindo drasticamente o JSON para processos antigos.
+5.  **Seletor E2E (BOrchestrator)**: A classe `.orchestrator-container` foi reintroduzida no `App.vue` para estabilizar os seletores semânticos dos helpers Playwright.
 
 ---
 
@@ -56,6 +57,7 @@ Após rodadas monitoradas (`SGC_MONITORAMENTO=sim`) dos cenários CDU-07 e CDU-0
 | Item | Severidade | Situação consolidada | Próxima ação |
 |---|---|---|---|
 | 1.1 `ProcessoService` como God Service | Média | Pendente | separar workflow, consulta e validação |
+| 1.2 `CadastroFluxoService` métodos duplicados | Média | **Concluído** | Consolidado mapeamento e revisão |
 | 1.3 `PermissoesSubprocessoDto` com 34 booleanos | Média | Pendente | redesenhar contrato interno/externo com cuidado |
 | 1.4 `CadastroView.vue` e `MapaView.vue` grandes | Média | Pendente | extrair bootstrap, ações e modais |
 
@@ -63,14 +65,15 @@ Após rodadas monitoradas (`SGC_MONITORAMENTO=sim`) dos cenários CDU-07 e CDU-0
 
 | Prioridade | Frente | Item | Situação |
 |---|---|---|---|
-| P0 | Frontend | Auditar recargas redundantes em `SubprocessoView`, `CadastroView` e `MapaView` após mutações | Pendente |
-| P0 | Frontend | Reduzir invalidação ampla em `useInvalidacaoNavegacao` | Pendente |
+| P0 | Frontend | Auditar recargas redundantes em `SubprocessoView`, `CadastroView` e `MapaView` após mutações | **Concluído** |
+| P0 | Frontend | Reduzir invalidação ampla em `useInvalidacaoNavegacao` | **Concluído** |
 | P0 | Frontend | Consolidar cancelamento escopado por rota/subprocesso com `AbortController` | Pendente |
 | P0 | Qualidade | Rodar a suíte E2E completa como gate de saída | **Concluído** |
 | P0 | Qualidade | Revalidar estabilidade de alertas/notificações nos casos CDU-32/33 | Pendente |
 | P1 | Backend | Consolidar a fachada remanescente de `SubprocessoConsultaService` | Pendente |
 | P1 | Backend | Isolar responsabilidades de `ProcessoService` | Pendente |
 | P1 | Backend | Reduzir acoplamento restante em `SubprocessoTransicaoService` | Parcial |
+| P1 | Backend | Consolidar métodos idênticos em `CadastroFluxoService` | **Concluído** |
 | P1 | Frontend | Extrair bootstrap de contexto e orquestração local de `CadastroView` | Pendente |
 | P1 | Frontend | Extrair bootstrap de contexto e orquestração local de `MapaView` | Pendente |
 | P2 | Backend | Reduzir nulabilidade estrutural em DTOs estáveis | Pendente |
@@ -115,6 +118,7 @@ Após rodadas monitoradas (`SGC_MONITORAMENTO=sim`) dos cenários CDU-07 e CDU-0
 
 O próximo alvo com melhor relação risco/retorno é:
 
-1. **auditoria de recargas e invalidações no frontend de subprocesso**, agora que o store foi consolidado e o pacote E2E crítico está verde;
-2. em seguida, **extração do bootstrap/orquestração de `CadastroView` e `MapaView`**;
-3. depois, **quebra de `ProcessoService`** como principal God Service remanescente.
+1. **otimização de payload e estreitamento de interfaces (P1.1)**, focando em remover duplicação de dados entre o `mapa` e `atividadesDisponiveis` (P1.1 finalizado no histórico de movimentações);
+2. em seguida, **extração do bootstrap/orquestração de `CadastroView` e `MapaView`** (Iniciando P1.3);
+3. depois, **simplificação de `useFluxoSubprocesso`** para consolidar feedback e redirecionamento;
+4. por fim, **quebra de `ProcessoService`** como principal God Service remanescente.

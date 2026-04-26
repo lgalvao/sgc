@@ -2,6 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
@@ -198,7 +199,7 @@ public class SubprocessoConsultaService {
     }
 
     public List<Movimentacao> listarMovimentacoes(Subprocesso sp) {
-        return movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
+        return movimentacaoRepo.listarPorSubprocessoPaginado(sp.getCodigo(), PageRequest.of(0, 15));
     }
 
     private ContextoConsultaSubprocesso montarContextoConsultaLeve(Subprocesso sp) {

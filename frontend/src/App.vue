@@ -70,7 +70,7 @@ const chaveSessao = computed(() =>
   >
     {{ TEXTOS.comum.PULAR_CONTEUDO }}
   </a>
-  <BOrchestrator/>
+  <BOrchestrator class="orchestrator-container"/>
 
   <div class="d-flex flex-column min-vh-100">
     <MainNavbar v-if="route.path !== '/login' && route.path !== '/erro'"/>

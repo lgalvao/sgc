@@ -226,82 +226,44 @@ public class SubprocessoController {
 
     @PostMapping("/{codSubprocesso}/devolver-cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_CADASTRO')")
-    @Operation(summary = "Devolve o cadastro de atividades para the responsável")
-    public void devolverCadastro(
-            @PathVariable Long codSubprocesso,
-            @Valid @RequestBody JustificativaRequest request) {
-
-        String sanitizedObservacoes = Optional.ofNullable(request.justificativa())
-                .map(UtilSanitizacao::sanitizar)
-                .orElse("");
-
-        cadastroFluxoService.devolverCadastro(codSubprocesso, sanitizedObservacoes);
+    @Operation(summary = "Devolve o cadastro de atividades para o responsável")
+    public void devolverCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody JustificativaRequest request) {
+        executarDevolucao(codSubprocesso, request.justificativa());
     }
 
     @PostMapping("/{codSubprocesso}/aceitar-cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita o cadastro de atividades")
-    public void aceitarCadastro(
-            @PathVariable Long codSubprocesso,
-            @Valid @RequestBody TextoOpcionalRequest request) {
-        String sanitizedObservacoes = Optional.ofNullable(request.texto())
-                .map(UtilSanitizacao::sanitizar)
-                .orElse("");
-
-        cadastroFluxoService.aceitarCadastro(codSubprocesso, sanitizedObservacoes);
+    public void aceitarCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
+        executarAceite(codSubprocesso, request.texto());
     }
 
     @PostMapping("/{codSubprocesso}/homologar-cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa o cadastro de atividades")
-    public void homologarCadastro(
-            @PathVariable Long codSubprocesso,
-            @Valid @RequestBody TextoOpcionalRequest request) {
-
-        String sanitizedObservacoes = Optional.ofNullable(request.texto())
-                .map(UtilSanitizacao::sanitizar)
-                .orElse("");
-
-        cadastroFluxoService.homologarCadastro(codSubprocesso, sanitizedObservacoes);
+    public void homologarCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
+        executarHomologacao(codSubprocesso, request.texto());
     }
 
     @PostMapping("/{codSubprocesso}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_REVISAO_CADASTRO')")
-    public void devolverRevisaoCadastro(
-            @PathVariable Long codSubprocesso,
-            @Valid @RequestBody JustificativaRequest request) {
-        String sanitizedObservacoes = Optional.ofNullable(request.justificativa())
-                .map(UtilSanitizacao::sanitizar)
-                .orElse("");
-
-        cadastroFluxoService.devolverRevisaoCadastro(codSubprocesso, sanitizedObservacoes);
+    public void devolverRevisaoCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody JustificativaRequest request) {
+        executarDevolucao(codSubprocesso, request.justificativa());
     }
 
     @PostMapping("/{codSubprocesso}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_REVISAO_CADASTRO')")
-    public void aceitarRevisaoCadastro(
-            @PathVariable Long codSubprocesso,
-            @Valid @RequestBody TextoOpcionalRequest request) {
-        String sanitizedObservacoes = Optional.ofNullable(request.texto())
-                .map(UtilSanitizacao::sanitizar)
-                .orElse("");
-
-        cadastroFluxoService.aceitarRevisaoCadastro(codSubprocesso, sanitizedObservacoes);
+    public void aceitarRevisaoCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
+        executarAceite(codSubprocesso, request.texto());
     }
 
     @PostMapping("/{codSubprocesso}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_REVISAO_CADASTRO')")
-    public void homologarRevisaoCadastro(
-            @PathVariable Long codSubprocesso,
-            @Valid @RequestBody TextoOpcionalRequest request) {
-        String sanitizedObservacoes = Optional.ofNullable(request.texto())
-                .map(UtilSanitizacao::sanitizar)
-                .orElse("");
-
-        cadastroFluxoService.homologarRevisaoCadastro(codSubprocesso, sanitizedObservacoes);
+    public void homologarRevisaoCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
+        executarHomologacao(codSubprocesso, request.texto());
     }
 
     @PostMapping("/{codSubprocesso}/importar-atividades")
@@ -579,6 +541,24 @@ public class SubprocessoController {
     public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
                                                      @RequestBody @Valid CriarAnaliseRequest request) {
         return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
+    }
+
+    private void executarDevolucao(Long codSubprocesso, String justificativa) {
+        cadastroFluxoService.devolver(codSubprocesso, sanitizar(justificativa));
+    }
+
+    private void executarAceite(Long codSubprocesso, String texto) {
+        cadastroFluxoService.aceitar(codSubprocesso, sanitizar(texto));
+    }
+
+    private void executarHomologacao(Long codSubprocesso, String texto) {
+        cadastroFluxoService.homologar(codSubprocesso, sanitizar(texto));
+    }
+
+    private String sanitizar(String texto) {
+        return Optional.ofNullable(texto)
+                .map(UtilSanitizacao::sanitizar)
+                .orElse("");
     }
 
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {

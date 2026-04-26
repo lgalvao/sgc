@@ -160,6 +160,27 @@ Depois de cada rodada:
 
 ## Padrões que já se mostraram úteis
 
+### Toasts e Persistência em Navegação
+
+Se a ação do usuário dispara um redirecionamento (ex: `router.push('/painel')`), a mensagem de sucesso disparada na View original será destruída com ela.
+No SGC, use o `ToastStore` para mensagens que devem sobreviver à navegação:
+
+- ✅ USE: `toastStore.setPending(mensagem)` antes do redirecionamento.
+- ✅ VERIFIQUE: A View de destino (ex: `PainelView`) deve consumir isso no `onMounted/onActivated` via `exibirToastPendente()`.
+
+### Compatibilidade E2E (BOrchestrator)
+
+O sistema de testes Playwright do SGC utiliza seletores semânticos para toasts.
+O componente `BOrchestrator` no `App.vue` **DEVE** ter a classe `.orchestrator-container`. Se for removida, o helper `verificarToast` falhará com "element not found".
+
+### Otimização de Payload (Bloat e Redundância)
+
+Identifique JSONs que carregam o "passado" desnecessariamente:
+
+- **Movimentações**: Em contextos de edição/mapeamento, limite o histórico para as 10-15 mais recentes. O histórico completo deve ser sob demanda.
+- **Atividades e Conhecimentos**: Evite enviar a árvore completa de conhecimentos em listagens onde apenas o ID/Descrição da atividade é necessário (ex: seleção de atividades para competência).
+- **Duplicação**: Se o `mapa` já traz atividades associadas, o campo `atividadesDisponiveis` não deve repetir os dados completos dessas mesmas atividades.
+
 ### Tornar referência explícita
 
 Se a navegação já conhece o subprocesso, carregue essa referência no destino.

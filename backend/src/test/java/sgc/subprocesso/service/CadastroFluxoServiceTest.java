@@ -132,7 +132,7 @@ class CadastroFluxoServiceTest {
 
         when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
 
-        assertThatThrownBy(() -> service.devolverCadastro(1L, "Obs"))
+        assertThatThrownBy(() -> service.devolver(1L, "Obs"))
                 .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Historico de movimentacoes inconsistente");
     }
@@ -146,7 +146,7 @@ class CadastroFluxoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
 
-        service.aceitarRevisaoCadastro(1L, "Obs");
+        service.aceitar(1L, "Obs");
         assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_DISPONIBILIZADA);
     }
 
@@ -283,7 +283,7 @@ class CadastroFluxoServiceTest {
 
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
 
-        service.devolverCadastro(1L, "Obs");
+        service.devolver(1L, "Obs");
 
         verify(transicaoService).registrarAnalise(argThat(cmd ->
                 cmd.unidadeDestinoTransicao().equals(uOrigem)));
@@ -307,7 +307,7 @@ class CadastroFluxoServiceTest {
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
-        service.homologarRevisaoCadastro(1L, "Obs");
+        service.homologar(1L, "Obs");
 
         assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_HOMOLOGADA);
     }
