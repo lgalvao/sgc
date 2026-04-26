@@ -93,7 +93,6 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void homologarValidacaoEmBloco_deveHomologarSucesso() throws Exception {
 
-        Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         // Garante que os subprocessos estejam na unidade do ADMIN (1)

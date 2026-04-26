@@ -110,7 +110,6 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         // GESTOR of unit 6 (parent of units 8 and 9)
     void aceitarValidacaoEmBloco_deveAceitarSucesso() throws Exception {
 
-        Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()

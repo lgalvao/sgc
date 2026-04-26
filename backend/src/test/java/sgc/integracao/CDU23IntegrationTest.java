@@ -99,7 +99,6 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void homologarCadastroEmBloco_deveHomologarTodasSelecionadas() throws Exception {
 
-        Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         // Para homologar, os subprocessos devem estar na unidade do Admin (1)

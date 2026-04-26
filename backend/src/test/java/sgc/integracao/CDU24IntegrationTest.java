@@ -112,7 +112,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void disponibilizarMapaEmBloco_deveDisponibilizarSucesso() throws Exception {
 
-        Long codigoContexto = processo.getCodigo();
         List<Long> unidadesSelecionadas = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         // Garante que os subprocessos estejam na unidade do ADMIN (1)

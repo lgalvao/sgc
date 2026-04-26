@@ -31,10 +31,6 @@ public class SubprocessoConsultaService {
     private final SubprocessoAcessoService acessoService;
     private final SubprocessoVisualizacaoService visualizacaoService;
     
-    // Mantidos para compatibilidade com reflexão em testes legados
-    private final AnaliseRepo analiseRepo;
-    private final AnaliseHistoricoService analiseHistoricoService;
-
     public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         return visualizacaoService.mapaParaVisualizacao(sp);
