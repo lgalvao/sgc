@@ -21,9 +21,6 @@ vi.mock('@/services/subprocessoService', () => ({
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
-    buscarContextoCadastroAtividades: vi.fn(),
-    buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     mapSubprocessoDetalheResponseParaModel: vi.fn((dto) => ({
         codigo: dto.subprocesso.codigo,
         unidade: dto.subprocesso.unidade,

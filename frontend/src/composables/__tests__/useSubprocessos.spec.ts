@@ -1,5 +1,4 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {createPinia, setActivePinia} from "pinia";
 import type {SubprocessoDetalhe} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
@@ -73,7 +72,6 @@ describe("useSubprocessos", () => {
     });
 
     beforeEach(async () => {
-        setActivePinia(createPinia());
         vi.clearAllMocks();
         vi.resetModules();
 
@@ -134,10 +132,10 @@ describe("useSubprocessos", () => {
         const store = useSubprocessos();
         vi.mocked(service.buscarSubprocessoDetalhe).mockRejectedValue(new Error("Falha"));
 
-        await store.buscarSubprocessoDetalhe(10);
+        await store.buscarSubprocessoDetalhe(10).catch(() => {});
 
         expect(store.subprocessoDetalhe).toBeNull();
-        expect(store.lastError?.message).toContain("Falha");
+        expect(store.lastError?.message).toBe("Falha");
     });
 
     it("preserva o detalhe atual durante uma recarga sem limpeza previa", async () => {
@@ -153,7 +151,7 @@ describe("useSubprocessos", () => {
             }) as never
         );
 
-        const requisicao = store.buscarSubprocessoDetalhe(10);
+        const requisicao = store.buscarSubprocessoDetalhe(10, false);
 
         expect(store.subprocessoDetalhe?.codigo).toBe(10);
         expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.NAO_INICIADO);
