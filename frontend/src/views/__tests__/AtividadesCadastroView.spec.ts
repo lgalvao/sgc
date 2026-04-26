@@ -320,6 +320,29 @@ const stubs = {
     },
     HistoricoAnaliseModal: {template: '<div v-if="mostrar" data-testid="modal-historico"></div>', props: ['mostrar']},
     ModalConfirmacao: {template: '<div v-if="modelValue"></div>', props: ['modelValue']},
+    CadastroAcoesHeader: {
+        props: ['unidade', 'codSubprocesso', 'permissoes', 'acaoPrincipalCadastro', 'loadingValidacao', 'podeVisualizarImpacto'],
+        template: `
+            <div data-testid="debug-header">
+                <h1>Atividades e conhecimentos</h1>
+                <div v-if="unidade">{{ unidade.sigla }}</div>
+                <button data-testid="btn-cad-atividades-historico" @click="$emit('abrir-historico')">Histórico</button>
+                <button v-if="permissoes.podeDevolverCadastro" data-testid="btn-acao-devolver" :disabled="!permissoes.habilitarDevolverCadastro" @click="$emit('abrir-devolver')">Devolver</button>
+                <button v-if="acaoPrincipalCadastro?.mostrar" data-testid="btn-acao-analisar-principal" :disabled="!acaoPrincipalCadastro?.habilitar" @click="$emit('abrir-validar')">{{ acaoPrincipalCadastro?.rotuloBotao }}</button>
+                <button v-if="podeVisualizarImpacto" data-testid="cad-atividades__btn-impactos-mapa-edicao" @click="$emit('abrir-impacto')">Impacto</button>
+                <button v-if="permissoes.podeEditarCadastro" data-testid="btn-cad-atividades-importar" @click="$emit('abrir-importar')">Importar</button>
+                <button v-if="permissoes.podeDisponibilizarCadastro || permissoes.podeEditarCadastro" data-testid="btn-cad-atividades-disponibilizar" :disabled="loadingValidacao" @click="$emit('disponibilizar')">Disponibilizar</button>
+            </div>
+        `
+    },
+    ModalAceiteCadastro: {
+        props: ['modelValue', 'loading', 'acao', 'observacao'],
+        template: '<div v-if="modelValue" data-testid="modal-aceite-cadastro"></div>'
+    },
+    ModalDevolucaoCadastro: {
+        props: ['modelValue', 'loading', 'isRevisao', 'observacao'],
+        template: '<div v-if="modelValue" data-testid="modal-devolucao-cadastro"></div>'
+    }
 };
 
 function createWrapper(customState = {}, accessOverrides = {}) {
@@ -327,10 +350,17 @@ function createWrapper(customState = {}, accessOverrides = {}) {
         podeEditarCadastro: ref(true),
         podeDisponibilizarCadastro: ref(true),
         podeVisualizarImpacto: ref(true),
+        podeDevolverCadastro: ref(true),
+        podeAceitarCadastro: ref(true),
+        podeHomologarCadastro: ref(true),
         habilitarEditarCadastro: ref(true),
         habilitarDisponibilizarCadastro: ref(true),
+        habilitarDevolverCadastro: ref(true),
+        habilitarAceitarCadastro: ref(true),
+        habilitarHomologarCadastro: ref(true),
         mesmaUnidade: ref(true),
         habilitarAcessoCadastro: ref(true),
+        acaoPrincipalCadastro: ref(null),
         ...accessOverrides
     } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 

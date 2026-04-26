@@ -243,7 +243,14 @@ const {
   acaoPrincipalCadastro
 } = acesso;
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
-const permissoesUI = computed(() => subprocesso.value?.permissoes || {} as PermissoesSubprocesso);
+const permissoesUI = computed<PermissoesSubprocesso>(() => ({
+  ...(subprocesso.value?.permissoes || {}),
+  podeEditarCadastro: podeEditarCadastro?.value ?? false,
+  podeDisponibilizarCadastro: podeDisponibilizarCadastro?.value ?? false,
+  podeDevolverCadastro: podeDevolverCadastro?.value ?? false,
+  habilitarEditarCadastro: habilitarEditarCadastro?.value ?? false,
+  habilitarDevolverCadastro: habilitarDevolverCadastro?.value ?? false,
+} as PermissoesSubprocesso));
 
 
 const atividades = ref<Atividade[]>([]);
