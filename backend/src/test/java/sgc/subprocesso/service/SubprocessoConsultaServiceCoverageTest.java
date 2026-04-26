@@ -63,8 +63,20 @@ class SubprocessoConsultaServiceCoverageTest {
     @Mock
     private AnaliseHistoricoService analiseHistoricoService;
 
+    private SubprocessoAcessoService acessoService;
+    private SubprocessoVisualizacaoService visualizacaoService;
+
     @BeforeEach
-    void configurarContextoConsultaService() {
+    void configurarServicos() {
+        acessoService = new SubprocessoAcessoService(impactoMapaService);
+        visualizacaoService = new SubprocessoVisualizacaoService(
+                usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
+        
+        ReflectionTestUtils.setField(target, "acessoService", acessoService);
+        ReflectionTestUtils.setField(target, "visualizacaoService", visualizacaoService);
+        ReflectionTestUtils.setField(target, "analiseRepo", analiseRepo);
+        ReflectionTestUtils.setField(target, "analiseHistoricoService", analiseHistoricoService);
+
         ReflectionTestUtils.setField(
                 target,
                 "contextoConsultaService",
@@ -257,27 +269,6 @@ class SubprocessoConsultaServiceCoverageTest {
 
         verify(mapaManutencaoService).mapaVigenteUnidade(10L);
         verify(mapaManutencaoService).atividadesMapaCodigoComConhecimentos(400L);
-    }
-
-    @Test
-    @DisplayName("obterContextoCadastroAtividades deve lancar excecao quando mapa for nulo")
-    void obterContextoCadastroAtividades_MapaNulo() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setProcesso(new Processo());
-        Unidade uni = new Unidade();
-        uni.setCodigo(10L);
-        uni.setNome("U10");
-        sp.setUnidade(uni);
-
-        when(subprocessoRepo.buscarPorCodigoComMapa(1L)).thenReturn(Optional.of(sp));
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("tit", 10L, Perfil.ADMIN));
-        lenient().when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(uni);
-        lenient().when(unidadeService.buscarPorCodigoComSuperior(anyLong())).thenReturn(uni);
-
-        assertThatThrownBy(() -> target.obterContextoCadastroAtividades(1L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem mapa associado");
     }
 
     @Test

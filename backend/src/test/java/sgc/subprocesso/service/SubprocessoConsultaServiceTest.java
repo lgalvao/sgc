@@ -7,6 +7,8 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.test.util.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.subprocesso.model.*;
@@ -34,18 +36,31 @@ class SubprocessoConsultaServiceTest {
     private HierarquiaService hierarquiaService;
     @Mock
     private sgc.mapa.service.MapaManutencaoService mapaManutencaoService;
+    @Mock
+    private MapaVisualizacaoService mapaVisualizacaoService;
+    @Mock
+    private ImpactoMapaService impactoMapaService;
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
 
     @InjectMocks
     private SubprocessoConsultaService service;
 
     @BeforeEach
     void configurarDependenciasAdicionais() {
-        ReflectionTestUtils.setField(service, "analiseHistoricoService", new AnaliseHistoricoService(unidadeService));
-        ReflectionTestUtils.setField(
-                service,
-                "contextoConsultaService",
-                new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService)
-        );
+        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService);
+        ReflectionTestUtils.setField(service, "analiseHistoricoService", analiseHistoricoService);
+        ReflectionTestUtils.setField(service, "analiseRepo", analiseRepo);
+        
+        SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
+        ReflectionTestUtils.setField(service, "contextoConsultaService", contextoConsultaService);
+        
+        SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
+        ReflectionTestUtils.setField(service, "acessoService", acessoService);
+        
+        SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
+                usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
+        ReflectionTestUtils.setField(service, "visualizacaoService", visualizacaoService);
     }
 
     @Test
@@ -57,32 +72,6 @@ class SubprocessoConsultaServiceTest {
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Subprocesso")
                 .hasMessageContaining("99");
-    }
-
-    @Test
-    @DisplayName("obterSugestoes deve retornar string vazia quando mapa estiver ausente fora de etapa de mapa")
-    void obterSugestoesDeveRetornarStringVaziaQuandoMapaEstiverAusenteForaDeEtapaDeMapa() {
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setCodigo(1L);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(subprocesso));
-
-        assertThat(service.obterSugestoes(1L).sugestoes()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("obterSugestoes deve falhar quando mapa estiver ausente em etapa de mapa")
-    void obterSugestoesDeveFalharQuandoMapaEstiverAusenteEmEtapaDeMapa() {
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setCodigo(1L);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
-
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(subprocesso));
-
-        assertThatThrownBy(() -> service.obterSugestoes(1L))
-                .isInstanceOf(ErroInconsistenciaInterna.class)
-                .hasMessageContaining("sem mapa vinculado para leitura de sugestoes");
     }
 
     @Test

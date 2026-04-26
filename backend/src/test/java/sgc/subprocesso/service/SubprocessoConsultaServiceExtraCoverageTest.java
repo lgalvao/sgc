@@ -46,18 +46,28 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     private HierarquiaService hierarquiaService;
     @Mock
     private AnaliseRepo analiseRepo;
+    @Mock
+    private MapaVisualizacaoService mapaVisualizacaoService;
+
     @InjectMocks
     private SubprocessoConsultaService consultaService;
 
     @BeforeEach
     void setUp() {
         localizacaoSubprocessoService = new LocalizacaoSubprocessoService(movimentacaoRepo);
-        ReflectionTestUtils.setField(consultaService, "analiseHistoricoService", new AnaliseHistoricoService(unidadeService));
-        ReflectionTestUtils.setField(
-                consultaService,
-                "contextoConsultaService",
-                new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService)
-        );
+        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService);
+        ReflectionTestUtils.setField(consultaService, "analiseHistoricoService", analiseHistoricoService);
+        ReflectionTestUtils.setField(consultaService, "analiseRepo", analiseRepo);
+
+        SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
+        ReflectionTestUtils.setField(consultaService, "contextoConsultaService", contextoConsultaService);
+
+        SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
+        ReflectionTestUtils.setField(consultaService, "acessoService", acessoService);
+
+        SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
+                usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
+        ReflectionTestUtils.setField(consultaService, "visualizacaoService", visualizacaoService);
     }
 
     private Subprocesso criarSubprocessoComMapa(@Nullable Long codigo) {
