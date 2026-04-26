@@ -56,8 +56,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     void setUp() {
         localizacaoSubprocessoService = new LocalizacaoSubprocessoService(movimentacaoRepo);
         AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService);
-        ReflectionTestUtils.setField(consultaService, "analiseHistoricoService", analiseHistoricoService);
-        ReflectionTestUtils.setField(consultaService, "analiseRepo", analiseRepo);
 
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
         ReflectionTestUtils.setField(consultaService, "contextoConsultaService", contextoConsultaService);
@@ -227,7 +225,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
             stubContextoAutenticado(user);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any())).thenReturn(List.of(dest));
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
 
@@ -259,7 +257,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
             stubContextoAutenticado(user);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any())).thenReturn(List.of(u));
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
 

@@ -83,7 +83,7 @@ class SubprocessoConsultaServiceCoverageTest {
     }
 
     private void stubContextoAutenticado(Usuario usuario) {
-        lenient().when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
                 usuario.getTituloEleitoral(),
                 usuario.getUnidadeAtivaCodigo(),
                 usuario.getPerfilAtivo()
@@ -92,7 +92,7 @@ class SubprocessoConsultaServiceCoverageTest {
         u.setCodigo(usuario.getUnidadeAtivaCodigo());
         u.setNome("Unidade Usuario");
         u.setSigla("UU");
-        lenient().when(unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo())).thenReturn(u);
+        when(unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo())).thenReturn(u);
     }
 
     @Test
