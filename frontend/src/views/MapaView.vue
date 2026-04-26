@@ -569,7 +569,7 @@ async function carregarContextoEdicao(codigo: number) {
     return null;
   }
 
-  atividades.value = data.atividadesDisponiveis;
+  atividades.value = data.mapa.atividades;
   unidade.value = data.unidade;
 
   return data;
@@ -588,7 +588,7 @@ async function carregarContextoInicial() {
     }
 
     codSubprocesso.value = contexto.detalhes.codigo;
-    atividades.value = contexto.atividadesDisponiveis;
+    atividades.value = contexto.mapa.atividades;
     unidade.value = contexto.unidade;
     return contexto;
   }
@@ -614,7 +614,7 @@ async function carregarContextoInicial() {
   }
 
   codSubprocesso.value = diagnostico.resultado.codigo;
-  atividades.value = diagnostico.resultado.contexto.atividadesDisponiveis;
+  atividades.value = diagnostico.resultado.contexto.mapa.atividades;
   unidade.value = diagnostico.resultado.contexto.unidade;
 
   return diagnostico.resultado.contexto;

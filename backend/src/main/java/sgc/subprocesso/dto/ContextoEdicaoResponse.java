@@ -14,7 +14,6 @@ public record ContextoEdicaoResponse(
         Unidade unidade,
         SubprocessoResumoDto subprocesso,
         SubprocessoDetalheResponse detalhes,
-        MapaCompletoDto mapa,
-        List<AtividadeDto> atividadesDisponiveis
+        MapaCompletoDto mapa
 ) {
 }

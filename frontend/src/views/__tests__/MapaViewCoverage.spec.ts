@@ -67,6 +67,7 @@ function criarMapaCompleto(competencias: CompetenciaMapa[] = []): MapaCompleto {
         subprocessoCodigo: 123,
         observacoes: "",
         competencias: competencias as MapaCompleto["competencias"],
+        atividades: [],
         situacao: "CRIADO",
     };
 }
@@ -136,7 +137,6 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
         },
     };
     return {
-        atividadesDisponiveis: [],
         unidade,
         subprocesso,
         detalhes,

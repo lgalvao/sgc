@@ -214,7 +214,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             ContextoEdicaoResponse contexto = consultaService.obterContextoEdicao(sp.getCodigo());
 
-            assertThat(contexto.atividadesDisponiveis()).singleElement().satisfies(atividadeDto -> {
+            assertThat(contexto.mapa().atividades()).singleElement().satisfies(atividadeDto -> {
                 assertThat(atividadeDto.descricao()).isNotBlank();
                 assertThat(atividadeDto.conhecimentos())
                         .extracting(ConhecimentoResumoDto::descricao)

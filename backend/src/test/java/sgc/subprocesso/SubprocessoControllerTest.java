@@ -435,7 +435,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter mapa")
         @WithMockUser(roles = "GESTOR")
         void deveObterMapa() throws Exception {
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
             mockMvc.perform(get("/api/subprocessos/1/mapa"))
@@ -449,7 +449,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter mapa completo")
         @WithMockUser(roles = "GESTOR")
         void deveObterMapaCompleto() throws Exception {
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
             mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
@@ -464,7 +464,7 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "CHEFE")
         void deveSalvarMapa() throws Exception {
             SalvarMapaRequest request = SalvarMapaRequest.builder().competencias(List.of()).build();
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
             mockMvc.perform(post("/api/subprocessos/1/mapa")
@@ -523,7 +523,7 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "GESTOR")
         void deveSalvarMapaCompleto() throws Exception {
             SalvarMapaRequest request = SalvarMapaRequest.builder().competencias(List.of()).build();
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
             mockMvc.perform(post("/api/subprocessos/1/mapa-completo")
@@ -584,7 +584,7 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "GESTOR")
         void deveAdicionarCompetencia() throws Exception {
             CriarCompetenciaRequest request = new CriarCompetenciaRequest("Descricao", List.of(10L));
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
             mockMvc.perform(post("/api/subprocessos/1/competencia")
@@ -601,7 +601,7 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "GESTOR")
         void deveAtualizarCompetencia() throws Exception {
             AtualizarCompetenciaRequest request = new AtualizarCompetenciaRequest("Descricao", List.of());
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
             mockMvc.perform(post("/api/subprocessos/1/competencia/2")
@@ -617,7 +617,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve remover uma competência do mapa")
         @WithMockUser(roles = "GESTOR")
         void deveRemoverCompetencia() throws Exception {
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), null);
+            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
             when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
 
             mockMvc.perform(post("/api/subprocessos/1/competencia/2/remover")

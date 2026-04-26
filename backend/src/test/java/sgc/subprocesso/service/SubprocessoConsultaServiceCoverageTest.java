@@ -150,21 +150,21 @@ class SubprocessoConsultaServiceCoverageTest {
         mapa.setCodigo(300L);
         mapa.setSubprocesso(subprocesso);
         mapa.setCompetencias(Set.of());
+        mapa.setAtividades(Set.of(atividade));
+        atividade.setMapa(mapa);
         subprocesso.setMapa(mapa);
 
         stubContextoAutenticado(usuario);
         when(subprocessoRepo.buscarPorCodigoComMapa(100L)).thenReturn(Optional.of(subprocesso));
         when(unidadeService.temMapaVigente(10L)).thenReturn(false);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
-        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of(atividade));
-        when(mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(100L)).thenReturn(mapa);
+        when(mapaManutencaoService.mapaCompletoSubprocesso(100L)).thenReturn(mapa);
 
         ContextoEdicaoResponse contexto = target.obterContextoEdicao(100L);
 
-        assertThat(contexto.atividadesDisponiveis()).hasSize(1);
-        assertThat(contexto.atividadesDisponiveis().getFirst().descricao()).isEqualTo("Atividade");
-        verify(mapaManutencaoService).mapaComCompetenciasEAtividadesSubprocesso(100L);
-        verify(mapaManutencaoService).atividadesMapaCodigoComConhecimentos(300L);
+        assertThat(contexto.mapa().atividades()).hasSize(1);
+        assertThat(contexto.mapa().atividades().getFirst().descricao()).isEqualTo("Atividade");
+        verify(mapaManutencaoService).mapaCompletoSubprocesso(100L);
     }
 
     @Test
@@ -190,6 +190,7 @@ class SubprocessoConsultaServiceCoverageTest {
         mapa.setCodigo(300L);
         mapa.setSubprocesso(subprocesso);
         mapa.setCompetencias(Set.of());
+        mapa.setAtividades(Set.of());
         subprocesso.setMapa(mapa);
 
         Usuario usuario = Usuario.builder()
@@ -201,8 +202,7 @@ class SubprocessoConsultaServiceCoverageTest {
         stubContextoAutenticado(usuario);
         when(unidadeService.temMapaVigente(10L)).thenReturn(false);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
-        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of());
-        when(mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(100L)).thenReturn(mapa);
+        when(mapaManutencaoService.mapaCompletoSubprocesso(100L)).thenReturn(mapa);
 
         ContextoEdicaoResponse contexto = target.obterContextoEdicao(subprocesso);
 

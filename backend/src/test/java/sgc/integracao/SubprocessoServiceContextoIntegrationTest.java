@@ -103,7 +103,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(contexto.subprocesso().codigo()).isEqualTo(subprocesso.getCodigo());
         assertThat(contexto.detalhes()).isNotNull();
         assertThat(contexto.mapa()).isNotNull();
-        assertThat(contexto.atividadesDisponiveis()).isNotNull();
+        assertThat(contexto.mapa().atividades()).isNotNull();
     }
 
     @Test

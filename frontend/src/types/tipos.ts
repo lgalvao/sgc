@@ -378,7 +378,6 @@ export interface ContextoEdicaoSubprocesso {
     subprocesso: Subprocesso;
     detalhes: SubprocessoDetalhe;
     mapa: MapaCompleto;
-    atividadesDisponiveis: Atividade[];
 }
 
 export interface MapaResumo {
@@ -450,6 +449,7 @@ export interface MapaCompleto {
     subprocessoCodigo: number;
     observacoes: string;
     competencias: Competencia[];
+    atividades: Atividade[];
     situacao: string;
 }
 

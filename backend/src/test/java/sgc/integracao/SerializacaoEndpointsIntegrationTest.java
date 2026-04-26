@@ -180,7 +180,7 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.subprocesso.codigo", is(subprocesso.getCodigo().intValue())))
                 .andExpect(jsonPath("$.detalhes.movimentacoes[0].usuarioNome", not(blankOrNullString())))
                 .andExpect(jsonPath("$.mapa.codigo", is(subprocesso.getMapa().getCodigo().intValue())))
-                .andExpect(jsonPath("$.atividadesDisponiveis[0].descricao", is("Atividade de serialização")));
+                .andExpect(jsonPath("$.mapa.atividades[0].descricao", is("Atividade de serialização")));
     }
 
     @Test

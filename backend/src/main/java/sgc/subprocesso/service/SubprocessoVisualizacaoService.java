@@ -64,18 +64,13 @@ public class SubprocessoVisualizacaoService {
     }
 
     public ContextoEdicaoResponse montarContextoEdicao(Subprocesso subprocesso, SubprocessoDetalheResponse detalhes) {
-        Long codMapa = subprocesso.getMapa().getCodigo();
-        List<Atividade> atividadesComConhecimentos = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
-        Mapa mapaCompleto = mapaManutencaoService.mapaComCompetenciasEAtividadesSubprocesso(subprocesso.getCodigo());
+        Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo());
 
         return new ContextoEdicaoResponse(
                 subprocesso.getUnidade(),
                 SubprocessoResumoDto.fromEntity(subprocesso),
                 detalhes,
-                MapaCompletoDto.fromEntity(mapaCompleto),
-                atividadesComConhecimentos.stream()
-                        .map(AtividadeDto::fromEntity)
-                        .toList()
+                MapaCompletoDto.fromEntity(mapaCompleto)
         );
     }
 

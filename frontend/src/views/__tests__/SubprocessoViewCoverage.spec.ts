@@ -159,12 +159,12 @@ function definirContextoEdicao(detalhe: SubprocessoDetalhe | null): void {
                 codUnidade: detalhe.unidade.codigo,
             },
             unidade: detalhe.unidade,
-            atividadesDisponiveis: [],
             mapa: {
                 codigo: 1,
                 subprocessoCodigo: detalhe.codigo,
                 observacoes: '',
                 competencias: [],
+                atividades: [],
                 situacao: 'CRIADO',
             },
         }

@@ -49,7 +49,7 @@ describe('subprocessoService', () => {
   });
 
   it('listarAtividades', async () => {
-    getMock.mockResolvedValueOnce({ data: { atividadesDisponiveis: [] } } as never);
+    getMock.mockResolvedValueOnce({ data: { mapa: { atividades: [] } } } as never);
     await subprocessoService.listarAtividades(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao');
   });
@@ -133,8 +133,7 @@ describe('subprocessoService', () => {
         localizacaoAtual: 'UND',
         permissoes: {},
       },
-      mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' },
-      atividadesDisponiveis: [],
+      mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], atividades: [], situacao: '' },
     } } as never);
     const resultado = await subprocessoService.buscarContextoEdicao(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao');

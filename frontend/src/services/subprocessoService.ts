@@ -90,7 +90,7 @@ export async function importarAtividades(
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
     const response = await apiClient.get<ContextoEdicaoSubprocesso>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
-    return response.data.atividadesDisponiveis;
+    return response.data.mapa.atividades;
 }
 
 export async function listarAtividadesParaImportacao(codSubprocesso: number): Promise<Atividade[]> {

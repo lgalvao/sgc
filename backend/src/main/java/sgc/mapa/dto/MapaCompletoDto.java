@@ -11,6 +11,7 @@ public record MapaCompletoDto(
         Long subprocessoCodigo,
         @Nullable String observacoes,
         List<CompetenciaMapaDto> competencias,
+        List<AtividadeMapaDto> atividades,
         @Nullable String situacao) {
 
     public static MapaCompletoDto fromEntity(Mapa mapa) {
@@ -19,11 +20,16 @@ public record MapaCompletoDto(
                 .map(CompetenciaMapaDto::fromEntity)
                 .toList();
 
+        List<AtividadeMapaDto> atividades = mapa.getAtividades().stream()
+                .map(AtividadeMapaDto::fromEntity)
+                .toList();
+
         return new MapaCompletoDto(
                 mapa.getCodigo(),
                 subprocesso.getCodigo(),
                 mapa.getObservacoesDisponibilizacao(),
                 competencias,
+                atividades,
                 null);
     }
 }

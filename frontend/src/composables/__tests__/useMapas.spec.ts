@@ -28,6 +28,7 @@ describe("useMapas", () => {
             subprocessoCodigo: 1,
             observacoes: "teste",
             competencias: [],
+            atividades: [],
             situacao: "EM_ANDAMENTO",
         };
         vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
