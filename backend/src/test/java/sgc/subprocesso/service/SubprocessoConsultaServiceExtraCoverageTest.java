@@ -187,7 +187,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
             stubContextoAutenticado(user);
             when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any())).thenReturn(List.of());
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
 
@@ -287,7 +287,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(11L)).thenReturn(Optional.of(sp));
             stubContextoAutenticado(usuario);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(11L)).thenReturn(List.of());
+            when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(11L), any())).thenReturn(List.of());
             when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(11L)).thenReturn(responsavel);
             when(unidadeService.temMapaVigente(11L)).thenReturn(true);
             stubUltimaMovimentacaoNaUnidade(sp);

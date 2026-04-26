@@ -154,7 +154,7 @@ class SubprocessoConsultaServiceCoverageTest {
 
         stubContextoAutenticado(usuario);
         when(subprocessoRepo.buscarPorCodigoComMapa(100L)).thenReturn(Optional.of(subprocesso));
-        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of());
+        when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(100L), any())).thenReturn(List.of(unidade));
         when(unidadeService.temMapaVigente(10L)).thenReturn(false);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of(atividade));
@@ -200,7 +200,7 @@ class SubprocessoConsultaServiceCoverageTest {
                 .build();
 
         stubContextoAutenticado(usuario);
-        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of());
+        when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(100L), any())).thenReturn(List.of(unidade));
         when(unidadeService.temMapaVigente(10L)).thenReturn(false);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of());
