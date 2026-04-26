@@ -73,7 +73,7 @@ class SubprocessoConsultaServiceCoverageTest {
     }
 
     private void stubContextoAutenticado(Usuario usuario) {
-        lenient().when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
                 usuario.getTituloEleitoral(),
                 usuario.getUnidadeAtivaCodigo(),
                 usuario.getPerfilAtivo()
@@ -82,7 +82,7 @@ class SubprocessoConsultaServiceCoverageTest {
         u.setCodigo(usuario.getUnidadeAtivaCodigo());
         u.setNome("Unidade Usuario");
         u.setSigla("UU");
-        lenient().when(unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo())).thenReturn(u);
+        when(unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo())).thenReturn(u);
     }
 
     @Test
@@ -240,7 +240,7 @@ class SubprocessoConsultaServiceCoverageTest {
         when(subprocessoRepo.buscarPorCodigoComMapa(100L)).thenReturn(Optional.of(subprocesso));
         when(mapaManutencaoService.mapaVigenteUnidade(10L)).thenReturn(Optional.of(mapaVigente));
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(400L)).thenReturn(List.of(atividadeVigente));
-        lenient().when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of());
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of());
 
         Usuario usuario = Usuario.builder()
                 .tituloEleitoral("123456789012")
@@ -248,7 +248,7 @@ class SubprocessoConsultaServiceCoverageTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .build();
         stubContextoAutenticado(usuario);
-        lenient().when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
 
         ContextoCadastroAtividadesResponse res = target.obterContextoCadastroAtividades(100L);
 
@@ -272,8 +272,8 @@ class SubprocessoConsultaServiceCoverageTest {
 
         when(subprocessoRepo.buscarPorCodigoComMapa(1L)).thenReturn(Optional.of(sp));
         when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("tit", 10L, Perfil.ADMIN));
-        lenient().when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(uni);
-        lenient().when(unidadeService.buscarPorCodigoComSuperior(anyLong())).thenReturn(uni);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(uni);
+        when(unidadeService.buscarPorCodigoComSuperior(anyLong())).thenReturn(uni);
 
         assertThatThrownBy(() -> target.obterContextoCadastroAtividades(1L))
                 .isInstanceOf(IllegalStateException.class)
