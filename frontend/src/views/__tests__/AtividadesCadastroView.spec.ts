@@ -430,11 +430,33 @@ describe("CadastroView.vue", () => {
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
         subprocessosMock.atualizarStatusLocal = vi.fn();
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
+            lastError: ref(null),
+            clearError: vi.fn(),
             validarCadastro: vi.fn().mockResolvedValue({valido: true}),
-            disponibilizarCadastro: vi.fn().mockResolvedValue(true),
-            disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            disponibilizarCadastro: vi.fn().mockImplementation(() => {
+                pushMock("/painel");
+                return Promise.resolve(true);
+            }),
             iniciarRevisaoCadastro: vi.fn().mockResolvedValue(true),
             cancelarInicioRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            devolverCadastro: vi.fn().mockImplementation(() => {
+                pushMock("/painel");
+                return Promise.resolve(true);
+            }),
+            aceitarCadastro: vi.fn().mockImplementation(() => {
+                pushMock("/painel");
+                return Promise.resolve(true);
+            }),
+            homologarCadastro: vi.fn().mockImplementation((_c, _r, _ir, opts) => {
+                if (opts?.redirecionarParaPainel) {
+                    pushMock("/painel");
+                } else if (opts?.redirecionarPara) {
+                    pushMock(opts.redirecionarPara);
+                }
+                return Promise.resolve(true);
+            }),
+            reabrirCadastro: vi.fn().mockResolvedValue(true),
+            alterarDataLimiteSubprocesso: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
         vi.mocked(subprocessoService.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
@@ -534,7 +556,7 @@ describe("CadastroView.vue", () => {
         modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123);
+        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123, false);
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 

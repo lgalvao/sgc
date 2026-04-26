@@ -109,6 +109,7 @@
         :is-revisao="isRevisao"
         :loading="loadingDisponibilizacao"
         :mostrar="mostrarModalConfirmacao"
+        :erro="fluxoSubprocesso.lastError?.value?.message"
         @confirmar="confirmarDisponibilizacao"
         @fechar="mostrarModalConfirmacao = false"
     />
@@ -134,6 +135,7 @@
           v-model:observacao="observacaoValidacao"
           :loading="loadingAnaliseCadastro"
           :acao="acaoPrincipalCadastro"
+          :erro="fluxoSubprocesso.lastError?.value?.message"
           @confirmar="confirmarValidacaoAnalise"
       />
 
@@ -142,6 +144,7 @@
           v-model:observacao="observacaoDevolucao"
           :loading="loadingDevolucaoAnalise"
           :is-revisao="isRevisao"
+          :erro="fluxoSubprocesso.lastError?.value?.message"
           @confirmar="confirmarDevolucaoAnalise"
       />
     </template>
@@ -809,7 +812,7 @@ async function confirmarValidacaoAnalise() {
             params: {codProcesso: props.codProcesso, siglaUnidade: props.sigla},
           };
 
-      const sucesso = await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req, isRevisao.value, {
+      sucesso = await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req, isRevisao.value, {
         mensagemSucesso: acao.mensagemSucesso,
         redirecionarParaPainel: acao.redirecionarParaPainel,
         redirecionarPara: paramsRedirecionamento
@@ -822,7 +825,7 @@ async function confirmarValidacaoAnalise() {
     }
 
     const req: AceitarCadastroRequest = {observacoes: observacaoValidacao.value};
-    const sucesso = await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req, isRevisao.value, {
+    sucesso = await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req, isRevisao.value, {
       mensagemSucesso: acao.mensagemSucesso
     });
 
