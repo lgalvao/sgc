@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { BFormGroup, BFormTextarea, BFormInvalidFeedback } from 'bootstrap-vue-next';
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
+import AppAlert from "@/components/comum/AppAlert.vue";
 import { TEXTOS } from "@/constants/textos";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
   loading: boolean;
   isRevisao: boolean;
   observacao: string;
+  erro?: string | null;
 }
 
 const props = defineProps<Props>();
@@ -46,6 +48,7 @@ const estadoObservacao = computed(() => {
       variant="danger"
       @confirmar="$emit('confirmar')"
   >
+    <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger" />
     <p>{{ isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DEVOLVER_TEXTO }}</p>
     <BFormGroup class="mb-3" label-for="observacaoDevolucao">
       <template #label>
