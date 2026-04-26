@@ -108,8 +108,10 @@ type SubprocessoStoreMock = {
     buscarSubprocessoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarSubprocessoDetalhe: ReturnType<typeof vi.fn>;
     atualizarStatusLocal: ReturnType<typeof vi.fn>;
+    invalidar: ReturnType<typeof vi.fn>;
     lastError: {message: string} | null;
     clearError: ReturnType<typeof vi.fn>;
+    limparErroIntegracao: ReturnType<typeof vi.fn>;
 };
 
 function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
@@ -211,6 +213,7 @@ const subprocessosMock = reactive({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
+    invalidar: vi.fn(),
     erroIntegracaoContexto: null as {message: string} | null,
     lastError: null as SubprocessoStoreMock["lastError"],
     clearError: vi.fn(),

@@ -80,6 +80,7 @@ const subprocessoStoreMock = reactive({
     erroIntegracaoContexto: null as {message: string; details?: string} | null,
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
     garantirContextoEdicao: vi.fn(),
+    invalidar: vi.fn(),
     limparErroIntegracao: vi.fn(),
 });
 

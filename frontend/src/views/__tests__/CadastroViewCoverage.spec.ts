@@ -112,6 +112,7 @@ const subprocessosMock = reactive({
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
+    invalidar: vi.fn(),
     erroIntegracaoContexto: null as {message: string} | null,
     limparErroIntegracao: vi.fn(),
 });

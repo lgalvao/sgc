@@ -15,6 +15,8 @@ const subprocessoStoreCacheMock = {
     contextoEdicao: null as any,
     erroIntegracaoContexto: null,
     garantirContextoEdicao: vi.fn(),
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    limparContextoAtual: vi.fn(),
     invalidar: vi.fn(),
 };
 
@@ -198,6 +200,10 @@ describe("MapaView somente leitura", () => {
                 plugins: [createTestingPinia({stubActions: true})],
                 stubs,
             },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
+            }
         });
     }
 

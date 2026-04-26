@@ -1,7 +1,7 @@
 import type {RouteLocationNormalized, RouteRecordRaw} from "vue-router";
 
 function lerCodSubprocesso(route: RouteLocationNormalized): number | undefined {
-    const valor = route.query.codSubprocesso;
+    const valor = route.query?.codSubprocesso;
     if (typeof valor !== "string") {
         return undefined;
     }

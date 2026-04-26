@@ -27,6 +27,7 @@ const subprocessoStoreMock = {
     erroIntegracaoContexto: null as {message: string} | null,
     garantirContextoEdicao: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    limparContextoAtual: vi.fn(),
     invalidar: vi.fn(),
 };
 vi.mock('@/stores/subprocesso', () => ({useSubprocessoStore: () => subprocessoStoreMock}));
@@ -100,6 +101,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
         const mapas = useMapas();
@@ -130,6 +135,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
 
@@ -156,6 +165,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
 
@@ -186,6 +199,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
         const mapas = useMapas();
@@ -221,6 +238,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
 
@@ -242,6 +263,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
 
@@ -258,6 +283,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
 
@@ -278,6 +307,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
 
@@ -295,6 +328,10 @@ describe('MapaView Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
 

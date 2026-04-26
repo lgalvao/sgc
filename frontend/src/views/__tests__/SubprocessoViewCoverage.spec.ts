@@ -128,12 +128,14 @@ const subprocessoStoreMock = reactive<{
     erroIntegracaoContexto: ErroStore | null;
     garantirContextoEdicaoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     garantirContextoEdicao: ReturnType<typeof vi.fn>;
+    invalidar: ReturnType<typeof vi.fn>;
     limparErroIntegracao: ReturnType<typeof vi.fn>;
 }>({
     contextoEdicao: null,
     erroIntegracaoContexto: null,
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
     garantirContextoEdicao: vi.fn(),
+    invalidar: vi.fn(),
     limparErroIntegracao: vi.fn(),
 });
 
@@ -208,28 +210,17 @@ describe('SubprocessoView Coverage', () => {
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
         definirContextoEdicao(null);
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
-            codigo: 123,
-            contexto: {
-                detalhes: criarSubprocessoDetalhe({
-                    codigo: 123,
-                    unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
-                    movimentacoes: [],
-                }),
-                subprocesso: {
-                    codigo: 123,
-                    unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
-                    situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                    dataLimite: '2025-01-01',
-                    dataFimEtapa1: '',
-                    dataLimiteEtapa2: '',
-                    atividades: [],
-                    codUnidade: 1,
-                },
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
+            const detalhe = criarSubprocessoDetalhe({
+                codigo: 123,
                 unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
-                atividadesDisponiveis: [],
-                mapa: null,
-            }
+                movimentacoes: [],
+            });
+            definirContextoEdicao(detalhe);
+            return {
+                codigo: 123,
+                contexto: subprocessoStoreMock.contextoEdicao
+            };
         });
         subprocessoStoreMock.garantirContextoEdicao = vi.fn().mockImplementation(async () => {
             const detalhe = criarSubprocessoDetalhe({

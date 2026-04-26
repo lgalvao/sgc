@@ -78,6 +78,10 @@ describe("MapaView Uncovered Branches", () => {
             global: {
                 plugins: [pinia],
                 stubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
         await flushPromises();
@@ -111,6 +115,10 @@ describe("MapaView Uncovered Branches", () => {
             global: {
                 plugins: [pinia],
                 stubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
         await flushPromises();
@@ -144,6 +152,10 @@ describe("MapaView Uncovered Branches", () => {
             global: {
                 plugins: [pinia],
                 stubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
             }
         });
         await flushPromises();

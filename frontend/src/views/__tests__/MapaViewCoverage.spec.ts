@@ -231,7 +231,7 @@ function createWrapper(initialMapaCompleto: MapaCompleto = criarMapaCompleto()) 
             stubs
         },
         props: {
-            codProcesso: "1",
+            codProcesso: 1,
             sigla: "TESTE"
         }
     });
@@ -542,7 +542,9 @@ describe("MapaView coverage", () => {
             atividadesSelecionadas: [1]
         });
 
-        expect(subprocessoStoreCacheMock.invalidar).toHaveBeenCalled();
+        expect(subprocessoStoreCacheMock.invalidar).not.toHaveBeenCalled();
+        expect(useMapas().mapaCompleto.value?.competencias).toHaveLength(1);
+        expect(useMapas().mapaCompleto.value?.competencias[0]?.descricao).toBe("Competência nova");
     });
 
     it("ignora submissões repetidas enquanto a criação de competência estiver em andamento", async () => {
