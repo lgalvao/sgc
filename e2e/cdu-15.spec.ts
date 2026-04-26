@@ -67,15 +67,13 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await navegarParaMapa(page);
         await verificarCompetenciaNoMapa(page, compDesc, [ATIVIDADE_1]);
 
-        // Assert badge in the map main view, not the modal
+        // Valida presença do conhecimento inline na vista unificada (MapaView)
         const cardCompetencia = page.locator('.competencia-card', {hasText: compDesc});
-        const badgeConhecimentos = cardCompetencia
-            .locator('.atividade-associada-card-item', {hasText: ATIVIDADE_1})
-            .getByTestId('cad-mapa__txt-badge-conhecimentos-1');
-        await expect(badgeConhecimentos).toBeVisible();
-        await expect(badgeConhecimentos).toHaveText('1');
-        await expect(badgeConhecimentos).not.toContainText('<div');
-        await expect(badgeConhecimentos).not.toContainText('<strong>');
+        const itemAtividade = cardCompetencia.locator('.atividade-associada-card-item', {hasText: ATIVIDADE_1});
+        await expect(itemAtividade).toBeVisible();
+        
+        // Verifica o texto do conhecimento (fixture 1 tem 'Conhecimento fixture 1')
+        await expect(itemAtividade.locator('.conhecimento-item')).toContainText(/Conhecimento fixture/i);
 
         await btnDisponibilizar.click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA)).toBeVisible();

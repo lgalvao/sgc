@@ -13,8 +13,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
-    navegarParaAtividades,
-    navegarParaAtividadesVisualizacao
+    navegarParaAtividades
 } from './helpers/helpers-atividades.js';
 import {
     acessarSubprocessoAdmin,
@@ -620,7 +619,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
-            await navegarParaAtividadesVisualizacao(page);
+            await navegarParaAtividades(page);
             await capturarTela(page, 'processo', 'analise-gestor', {
                 extra: { perfil: 'GESTOR', unidade: unidadeAlvo, acao: 'analise-cadastro' }
             });
@@ -636,7 +635,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
-            await navegarParaAtividadesVisualizacao(page);
+            await navegarParaAtividades(page);
             await page.getByTestId('btn-acao-analisar-principal').click();
             await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, 'processo', 'modal-homologacao-admin', {
@@ -995,7 +994,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
 
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
+            await navegarParaAtividades(page);
             await capturarTela(page, 'processo', 'cadastro-analise-gestor-coordenadoria', {
                 fullPage: true,
                 tags: ['cadastro', 'analise', 'somente-leitura'],
@@ -1008,7 +1007,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
+            await navegarParaAtividades(page);
             await capturarTela(page, 'processo', 'cadastro-analise-gestor-secretaria', {
                 fullPage: true,
                 tags: ['cadastro', 'analise', 'somente-leitura'],
@@ -1025,7 +1024,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
 
             // Entrar no cadastro de atividades (visualização)
-            await navegarParaAtividadesVisualizacao(page);
+            await navegarParaAtividades(page);
 
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();

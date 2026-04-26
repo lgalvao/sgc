@@ -72,7 +72,7 @@ export default [
                     "verificarBotaoImpactoAusenteDireto",
                     "verificarOpcoesImportacao",
                     "verificarOpcoesImportacaoVazia",
-                    "verificarAcoesAnaliseCadastroVisualizacao",
+                    "verificarAcoesAnaliseCadastro",
                     "esperarPaginaPainel",
                     "esperarPaginaCadastroProcesso",
                     "esperarPaginaDetalhesProcesso",

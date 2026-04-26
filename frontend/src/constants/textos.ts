@@ -207,10 +207,8 @@ export const TEXTOS = {
     cards: {
       ATUALIZACAO_CADASTRO_TITULO: "Atividades e conhecimentos",
       ATUALIZACAO_CADASTRO_TEXTO: "Cadastro de atividades e conhecimentos da unidade",
-      VISUALIZACAO_CADASTRO_TEXTO: "Visualização das atividades e conhecimentos da unidade",
       MAPA_TITULO: "Mapa de competências",
       MAPA_TEXTO: "Mapa de competências técnicas da unidade",
-      MAPA_VISUALIZACAO_TEXTO: "Visualização do mapa de competências técnicas",
       AUTOAVALIACAO_TITULO: "Autoavaliação",
       AUTOAVALIACAO_TEXTO: "Realize sua autoavaliação de competências",
       OCUPACOES_TITULO: "Ocupações críticas",

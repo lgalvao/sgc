@@ -6,14 +6,15 @@ import {
     criarProcessoFixture,
     criarProcessoMapaDisponibilizadoFixture
 } from './fixtures/index.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {autenticar, login, USUARIOS} from './helpers/helpers-auth.js';
 import {
     esperarPaginaDetalhesProcesso,
     esperarPaginaSubprocesso,
     fazerLogout,
+    limparNotificacoes,
     navegarParaSubprocesso
 } from './helpers/helpers-navegacao.js';
-import {acessarDetalhesProcesso, criarProcesso, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
 
 function converterDataHoraBrParaTimestamp(dataHoraTexto: string): number {
     const textoNormalizado = dataHoraTexto.trim().replace(/\s+/g, ' ');
@@ -95,7 +96,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardAtividadesAdmin).toBeVisible();
         await expect(cardAtividadesAdmin).toHaveClass(/card-disabled/);
         await expect(cardAtividadesAdmin).not.toHaveAttribute('role', 'button');
-        await expect(cardAtividadesAdmin).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(cardAtividadesAdmin).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         const cardMapaAdmin = page.getByTestId('card-subprocesso-mapa-desabilitado');
         await expect(cardMapaAdmin).toBeVisible();
@@ -112,7 +113,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         const cardAtividadesGestor = page.getByTestId('card-subprocesso-atividades');
         await expect(cardAtividadesGestor).toBeVisible();
         await expect(cardAtividadesGestor).toHaveClass(/card-disabled/);
-        await expect(cardAtividadesGestor).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(cardAtividadesGestor).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         const cardMapaGestor = page.getByTestId('card-subprocesso-mapa-desabilitado');
         await expect(cardMapaGestor).toBeVisible();
@@ -160,7 +161,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         const cardAtividadesServidor = page.getByTestId('card-subprocesso-atividades');
         await expect(cardAtividadesServidor).toBeVisible();
         await expect(cardAtividadesServidor).toHaveClass(/card-disabled/);
-        await expect(cardAtividadesServidor).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(cardAtividadesServidor).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         const cardMapaServidor = page.getByTestId('card-subprocesso-mapa-desabilitado');
         await expect(cardMapaServidor).toBeVisible();
@@ -189,7 +190,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardAtividadesAdmin).toBeVisible();
         await expect(cardAtividadesAdmin).toHaveClass(/card-actionable/);
         await expect(cardAtividadesAdmin).toHaveAttribute('role', 'button');
-        await expect(cardAtividadesAdmin).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(cardAtividadesAdmin).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         const cardMapaAdminBloqueado = page.getByTestId('card-subprocesso-mapa-desabilitado');
         await expect(cardMapaAdminBloqueado).toBeVisible();
@@ -210,7 +211,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardAtividadesGestor).toBeVisible();
         await expect(cardAtividadesGestor).toHaveClass(/card-actionable/);
         await expect(cardAtividadesGestor).toHaveAttribute('role', 'button');
-        await expect(cardAtividadesGestor).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(cardAtividadesGestor).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         await fazerLogout(page);
         await login(page, USUARIOS.SERVIDOR_SECAO_211.titulo, USUARIOS.SERVIDOR_SECAO_211.senha);
@@ -223,7 +224,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardAtividadesServidor).toBeVisible();
         await expect(cardAtividadesServidor).toHaveClass(/card-actionable/);
         await expect(cardAtividadesServidor).toHaveAttribute('role', 'button');
-        await expect(cardAtividadesServidor).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(cardAtividadesServidor).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         await fazerLogout(page);
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -258,7 +259,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardMapaGestor).toBeVisible();
         await expect(cardMapaGestor).toHaveClass(/card-actionable/);
         await expect(cardMapaGestor).toHaveAttribute('role', 'button');
-        await expect(cardMapaGestor).toContainText('Visualização do mapa de competências técnicas');
+        await expect(cardMapaGestor).toContainText('Mapa de competências técnicas da unidade');
 
         await fazerLogout(page);
         await login(page, USUARIOS.SERVIDOR_SECAO_221.titulo, USUARIOS.SERVIDOR_SECAO_221.senha);
@@ -271,7 +272,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardMapaServidor).toBeVisible();
         await expect(cardMapaServidor).toHaveClass(/card-actionable/);
         await expect(cardMapaServidor).toHaveAttribute('role', 'button');
-        await expect(cardMapaServidor).toContainText('Visualização do mapa de competências técnicas');
+        await expect(cardMapaServidor).toContainText('Mapa de competências técnicas da unidade');
     });
 
     test('Deve manter o acesso de visualização no processo finalizado para servidor da própria unidade', async ({
@@ -302,13 +303,13 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardAtividades).toBeVisible();
         await expect(cardAtividades).toHaveClass(/card-actionable/);
         await expect(cardAtividades).toHaveAttribute('role', 'button');
-        await expect(cardAtividades).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(cardAtividades).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         const cardMapa = page.getByTestId('card-subprocesso-mapa');
         await expect(cardMapa).toBeVisible();
         await expect(cardMapa).toHaveClass(/card-actionable/);
         await expect(cardMapa).toHaveAttribute('role', 'button');
-        await expect(cardMapa).toContainText('Visualização do mapa de competências técnicas');
+        await expect(cardMapa).toContainText('Mapa de competências técnicas da unidade');
     });
 
     test('Deve exibir cards com rotas corretas ao navegar entre subprocessos distintos na mesma sessão', async ({
@@ -339,7 +340,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         // 1. Primeira visita: subprocesso finalizado -> card de cadastro somente leitura
         await page.goto(`/processo/${processoDisponibilizado.codigo}/${UNIDADE}`);
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
 
         // 2. Segunda visita: subprocesso com cadastro EM ANDAMENTO → card editável
         await page.goto(`/processo/${processoEmAndamento.codigo}/${UNIDADE}`);
@@ -374,5 +375,47 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(page.getByTestId('card-subprocesso-ocupacoes')).toContainText('Ocupações críticas');
         await expect(page.getByTestId('card-subprocesso-monitoramento')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-monitoramento')).toContainText('Monitoramento');
+    });
+
+    test('Regressão - cache de sessão no subprocesso: deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA', async ({
+        _resetAutomatico,
+        page,
+        _autenticadoComoAdmin
+    }) => {
+        const descricao = `Regressao cache subprocesso ${Date.now()}`;
+        const unidade = 'ASSESSORIA_12';
+
+        await criarProcesso(page, {
+            descricao,
+            tipo: 'MAPEAMENTO',
+            diasLimite: 30,
+            unidade,
+            expandir: ['SECRETARIA_1'],
+            iniciar: true
+        });
+
+        await acessarDetalhesProcesso(page, descricao);
+        const codProcesso = await extrairProcessoCodigo(page);
+
+        // Primeiro acesso como ADMIN para deixar o contexto do subprocesso carregado na SPA.
+        await page.goto(`/processo/${codProcesso}/${unidade}`);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}$`));
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+
+        // Logout e novo login na mesma aba, sem limpar storage nem reiniciar a aplicação.
+        await fazerLogout(page);
+        await autenticar(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+        await page.waitForURL(/\/painel(?:\?|$)/);
+        await limparNotificacoes(page);
+
+        // Acessa o mesmo subprocesso imediatamente após o login do CHEFE.
+        await page.goto(`/processo/${codProcesso}/${unidade}`);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}$`));
+
+        const cardCadastro = page.getByTestId('card-subprocesso-atividades');
+        await expect(cardCadastro).toBeVisible();
+
+        await cardCadastro.click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${unidade}/cadastro$`));
     });
 });

@@ -44,7 +44,7 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
 }
 
 /**
- * Abre modal de histórico de análise (tela de edição - CadAtividades)
+ * Abre modal de histórico de análise na tela unificada de atividades
  */
 export async function abrirHistoricoAnalise(page: Page) {
     const itemHistorico = page.getByTestId('btn-cad-atividades-historico');
@@ -56,17 +56,7 @@ export async function abrirHistoricoAnalise(page: Page) {
     return modal;
 }
 
-/**
- * Abre modal de histórico de análise na tela unificada de atividades
- */
-export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
-    await page.getByTestId('btn-cad-atividades-historico').click();
-    const modal = page.getByTestId('mdl-historico-analise');
-    await expect(modal).toBeVisible();
-    return modal;
-}
-
-export async function verificarAcoesAnaliseCadastroVisualizacao(page: Page, options: {
+export async function verificarAcoesAnaliseCadastro(page: Page, options: {
     rotuloPrincipal: string | RegExp;
     principalHabilitado: boolean;
     devolverHabilitado: boolean;

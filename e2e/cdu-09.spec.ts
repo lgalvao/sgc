@@ -5,8 +5,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     navegarParaAtividades,
-    navegarParaAtividadesVisualizacao,
-    esperarAtividadesSomenteLeitura,
+    esperarAtividadesSomenteLeitura
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
@@ -85,7 +84,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
 
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
         await esperarAtividadesSomenteLeitura(page);
         await page.goBack();
@@ -104,7 +103,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
 
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivo);

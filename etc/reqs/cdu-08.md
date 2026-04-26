@@ -34,25 +34,17 @@ Ator: CHEFE
 
     10.1. O usuário pode incluir primeiro várias atividades e depois os conhecimentos correspondentes; ou trabalhar em uma atividade por vez até concluir todos os seus conhecimentos. O sistema deve permitir os dois modos de trabalho.
 
-11. Para cada atividade já cadastrada, ao passar o mouse, o sistema exibe botões de edição e remoção.
+11. Para cada atividade já cadastrada, o sistema apresenta permanentemente os botões de edição e remoção. As ações devem ser facilmente identificáveis e operáveis via teclado e leitor de tela, sem dependência de eventos de movimento do mouse (hover).
 
-    11.1. Se o usuário clicar em `Editar`, o sistema habilita a edição do nome da atividade e exibe ao lado um botão `Salvar` e outro `Cancelar`.
+    11.1. Se o usuário clicar em `Editar`, o sistema habilita a edição do nome da atividade e exibe ao lado os controles para `Salvar` e `Cancelar`.
 
-    11.1.1. Se o usuário clicar em `Salvar`, o sistema salva a alteração e volta a exibir os botões `Editar` e `Remover` ao lado do nome da atividade.
+    11.1.1. Se o usuário clicar em `Salvar`, o sistema salva a alteração e retorna ao estado de visualização com as opções de edição e remoção disponíveis.
 
-    11.1.2. Se o usuário clicar em `Cancelar`, o sistema não salva a alteração e volta a exibir o nome da atividade que estava antes da modificação com os botões `Editar` e `Remover` ao lado.
+    11.1.2. Se o usuário clicar em `Cancelar`, o sistema descarta as alterações e restaura o conteúdo anterior.
 
-    11.2. Se o usuário clicar em `Remover`, o sistema solicita que o usuário confirme a operação. Se o usuário confirmar, a atividade e todos os conhecimentos associados a ela são removidos.
+    11.2. Se o usuário clicar em `Remover`, o sistema solicita confirmação. Se confirmado, a atividade e seus conhecimentos são removidos.
 
-12. De forma análoga à usada para atividades, para cada conhecimento já cadastrado, o sistema exibe, ao passar o mouse sobre o conhecimento, uma opção Editar e outra Remover.
-
-    12.1. Se o usuário clicar em `Editar`, o sistema habilita a edição do nome do conhecimento e exibe ao lado um botão `Salvar` e outro `Cancelar`.
-
-    12.1.1. Se o usuário clicar em `Salvar`, o sistema salva a alteração e volta a exibir os botões `Editar` e `Remover` ao lado do nome do conhecimento.
-
-    12.1.2. Se o usuário clicar em `Cancelar`, o sistema não salva a alteração e volta a exibir o nome do conhecimento que estava antes da modificação com os botões `Editar` e `Remover` ao lado.
-
-    12.2. Se o usuário clicar em `Remover`, o sistema solicita que o usuário confirme a operação. Se o usuário confirmar, o conhecimento é removido.
+12. De forma análoga, para cada conhecimento cadastrado, o sistema disponibiliza permanentemente as opções de editar e remover, garantindo operabilidade plena por teclado e tecnologias assistivas.
 
 13. Opcionalmente, o usuário clica no botão `Importar atividades`:
 

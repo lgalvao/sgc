@@ -125,7 +125,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -134,8 +134,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
-            await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
+            await AtividadeHelpers.navegarParaAtividades(page);
             await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
@@ -144,7 +144,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -153,8 +153,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
-            await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
+            await AtividadeHelpers.navegarParaAtividades(page);
             await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
@@ -165,7 +165,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -189,7 +189,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Visualização do mapa de competências técnicas');
+            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -198,7 +198,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, CHEFE, async () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Visualização do mapa de competências técnicas');
+            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
             await MapaHelpers.navegarParaMapa(page);
             await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
             await expect(page.getByTestId('btn-mapa-validar')).toBeEnabled();
@@ -211,7 +211,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Visualização do mapa de competências técnicas');
+            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -220,7 +220,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Visualização do mapa de competências técnicas');
+            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
             await page.getByTestId('card-subprocesso-mapa').click();
             await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
             await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
@@ -233,7 +233,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Visualização do mapa de competências técnicas');
+            await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -294,7 +294,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoRevisao, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro disponibilizada/i);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -303,8 +303,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
-            await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
+            await AtividadeHelpers.navegarParaAtividades(page);
             await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
@@ -313,7 +313,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -322,8 +322,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoRevisao, siglaUnidade);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
-            await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
+            await AtividadeHelpers.navegarParaAtividades(page);
             await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
             await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
@@ -334,7 +334,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
         });
         await expect(page).toHaveURL(/\/login/);
     };

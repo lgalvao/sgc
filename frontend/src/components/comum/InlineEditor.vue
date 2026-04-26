@@ -38,7 +38,7 @@
     </template>
 
     <template v-else>
-      <div class="flex-grow-1 text-break me-2">
+      <div class="text-break me-2">
         <slot/>
       </div>
 
@@ -173,18 +173,12 @@ watch(editValue, (valorAtual, valorAnterior) => {
 
 <style scoped>
 .fade-controls {
-  opacity: 1;
+  opacity: 0.7;
   transition: opacity 0.2s;
 }
 
-@media (hover: hover) {
-  .fade-controls {
-    opacity: 0;
-  }
-
-  .d-flex:hover > .fade-controls,
-  .d-flex:focus-within > .fade-controls {
-    opacity: 1;
-  }
+.d-flex:hover > .fade-controls,
+.d-flex:focus-within > .fade-controls {
+  opacity: 1;
 }
 </style>

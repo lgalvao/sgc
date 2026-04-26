@@ -7,61 +7,66 @@
         <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ unidade.sigla }}</span>
       </template>
       <template #actions>
-        <BButton
-            v-if="codSubprocesso && podeVisualizarImpacto"
-            data-testid="cad-atividades__btn-impactos-mapa-edicao"
-            variant="outline-secondary"
-            @click="abrirModalImpacto"
-        >
-          <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
-        </BButton>
-        <BButton
-            v-if="codSubprocesso && (podeEditarCadastro || podeDevolverCadastro || acaoPrincipalCadastro?.mostrar)"
-            data-testid="btn-cad-atividades-historico"
-            variant="outline-secondary"
-            @click="abrirModalHistorico"
-        >
-          <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
-        </BButton>
-        <BButton
-            v-if="codSubprocesso && podeEditarCadastro"
-            data-testid="btn-cad-atividades-importar"
-            variant="outline-secondary"
-            @click="mostrarModalImportar = true"
-        >
-          <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
-        </BButton>
-        <LoadingButton
-            v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
-            :disabled="loadingValidacao"
-            :loading="loadingValidacao"
-            data-testid="btn-cad-atividades-disponibilizar"
-            icon="check-lg"
-            :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
-            :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
-            variant="success"
-            @click="disponibilizarCadastro"
-        />
-        <BButton
-            v-if="codSubprocesso && podeDevolverCadastro"
-            data-testid="btn-acao-devolver"
-            :disabled="!habilitarDevolverCadastro"
-            :title="TEXTOS.atividades.BOTAO_DEVOLVER"
-            variant="secondary"
-            @click="abrirModalDevolverAnalise"
-        >
-          {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
-        </BButton>
-        <BButton
-            v-if="codSubprocesso && acaoPrincipalCadastro?.mostrar"
-            data-testid="btn-acao-analisar-principal"
-            :disabled="!acaoPrincipalCadastro.habilitar"
-            :title="acaoPrincipalCadastro.rotuloBotao"
-            variant="success"
-            @click="abrirModalValidarAnalise"
-        >
-          {{ acaoPrincipalCadastro.rotuloBotao }}
-        </BButton>
+        <div class="d-flex gap-2">
+          <BButton
+              v-if="codSubprocesso && (podeEditarCadastro || podeDevolverCadastro || acaoPrincipalCadastro?.mostrar)"
+              data-testid="btn-cad-atividades-historico"
+              variant="outline-secondary"
+              @click="abrirModalHistorico"
+          >
+            <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
+          </BButton>
+          <BButton
+              v-if="codSubprocesso && podeDevolverCadastro"
+              data-testid="btn-acao-devolver"
+              :disabled="!habilitarDevolverCadastro"
+              :title="TEXTOS.atividades.BOTAO_DEVOLVER"
+              variant="secondary"
+              @click="abrirModalDevolverAnalise"
+          >
+            {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
+          </BButton>
+          <BButton
+              v-if="codSubprocesso && acaoPrincipalCadastro?.mostrar"
+              data-testid="btn-acao-analisar-principal"
+              :disabled="!acaoPrincipalCadastro.habilitar"
+              :title="acaoPrincipalCadastro.rotuloBotao"
+              variant="success"
+              @click="abrirModalValidarAnalise"
+          >
+            {{ acaoPrincipalCadastro.rotuloBotao }}
+          </BButton>
+        </div>
+
+        <div v-if="podeVisualizarImpacto || podeEditarCadastro || podeDisponibilizarCadastro" class="d-flex gap-2 ms-3 ps-3 border-start">
+          <BButton
+              v-if="codSubprocesso && podeVisualizarImpacto"
+              data-testid="cad-atividades__btn-impactos-mapa-edicao"
+              variant="outline-secondary"
+              @click="abrirModalImpacto"
+          >
+            <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
+          </BButton>
+          <BButton
+              v-if="codSubprocesso && podeEditarCadastro"
+              data-testid="btn-cad-atividades-importar"
+              variant="outline-secondary"
+              @click="mostrarModalImportar = true"
+          >
+            <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
+          </BButton>
+          <LoadingButton
+              v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
+              :disabled="loadingValidacao"
+              :loading="loadingValidacao"
+              data-testid="btn-cad-atividades-disponibilizar"
+              icon="check-lg"
+              :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
+              :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
+              variant="success"
+              @click="disponibilizarCadastro"
+          />
+        </div>
       </template>
     </PageHeader>
 
@@ -310,7 +315,6 @@ const {
   habilitarEditarCadastro,
   habilitarDevolverCadastro,
   podeDisponibilizarCadastro,
-  habilitarDisponibilizarCadastro,
   acaoPrincipalCadastro
 } = acesso;
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);

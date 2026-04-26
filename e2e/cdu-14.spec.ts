@@ -2,23 +2,21 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/index.js';
 import {
-    abrirModalImpactoVisualizacao,
+    abrirModalImpacto,
     adicionarAtividade,
     adicionarConhecimento,
     fecharModalImpacto,
     navegarParaAtividades,
-    navegarParaAtividadesVisualizacao,
     verificarBotaoImpactoDireto
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
-    abrirHistoricoAnaliseVisualizacao,
     aceitarRevisao,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     cancelarDevolucao,
     devolverRevisao,
-    fecharHistoricoAnalise,
+    fecharHistoricoAnalise
 } from './helpers/helpers-analise.js';
 import {verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
@@ -71,14 +69,14 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão (do cadastro )?disponibilizada/i);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
 
-        const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);
+        const modalVisualizacao = await abrirHistoricoAnalise(page);
         await expect(modalVisualizacao).toBeVisible();
         await fecharHistoricoAnalise(page);
 
         await verificarBotaoImpactoDireto(page);
-        await abrirModalImpactoVisualizacao(page);
+        await abrirModalImpacto(page);
         await expect(page.getByTestId('modal-impacto-body')).toBeVisible();
         await expect(page.getByText(TEXTOS.mapa.impacto.ATIVIDADES_INSERIDAS)).toBeVisible();
         await fecharModalImpacto(page);
@@ -108,7 +106,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
 
         await cancelarDevolucao(page);
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
@@ -117,8 +115,8 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        const modal = await abrirHistoricoAnaliseVisualizacao(page);
+        await navegarParaAtividades(page);
+        const modal = await abrirHistoricoAnalise(page);
         await validarCabecalhosHistorico(modal);
         await expect(modal.getByTestId('cell-dataHora-0')).not.toHaveText('');
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);

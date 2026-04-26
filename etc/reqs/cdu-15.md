@@ -18,9 +18,9 @@ Ator: ADMIN
 
     - Um bloco para cada competência criada, cujo título é a descrição da competência
     - Ao lado da descrição da competência, botões de ação (ícones), para editar e para excluir a competência.
-    - Dentro de cada bloco de uma competência, mostrar as descrições das atividades associadas à competência em pequenos blocos internos.
-    - À direita da descrição de cada atividade mostrar um badge com o número de conhecimentos da atividade. Ao passar o mouse sobre esse badge, o sistema exibirá em um tooltip a lista de conhecimentos da atividade.
-    - Botões `Criar competência` e `Disponibilizar` alinhados no canto superior direito da lista de blocos de competências
+    - Dentro de cada bloco de uma competência, mostrar as descrições das atividades associadas em blocos internos flexíveis.
+    - Exibir a lista de conhecimentos de cada atividade logo abaixo de sua descrição (inline). A interface deve garantir que o texto seja quebrado corretamente sem estourar os limites dos cards, mantendo a visibilidade total da informação para busca e tecnologias assistivas.
+    - Botões `Criar competência` e `Disponibilizar` alinhados no canto superior direito.
 
 5. **<<Início de fluxo de criação de competências>>** ADMIN clica no botão Criar competência.
 

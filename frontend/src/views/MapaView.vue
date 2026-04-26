@@ -10,90 +10,94 @@
         </template>
 
         <template #actions>
-          <BButton
-              v-if="podeValidar"
-              data-testid="btn-mapa-sugestoes"
-              variant="outline-secondary"
-              @click="abrirModalSugestoes"
-          >
-            {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
-          </BButton>
+          <div class="d-flex gap-2">
+            <BButton
+                v-if="podeValidar"
+                data-testid="btn-mapa-sugestoes"
+                variant="outline-secondary"
+                @click="abrirModalSugestoes"
+            >
+              {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
+            </BButton>
 
-          <BButton
-              v-if="podeVerSugestoes"
-              data-testid="btn-mapa-ver-sugestoes"
-              variant="outline-secondary"
-              @click="verSugestoes"
-          >
-            {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
-          </BButton>
+            <BButton
+                v-if="podeVerSugestoes"
+                data-testid="btn-mapa-ver-sugestoes"
+                variant="outline-secondary"
+                @click="verSugestoes"
+            >
+              {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
+            </BButton>
 
-          <BButton
-              v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
-              data-testid="btn-mapa-historico"
-              variant="outline-secondary"
-              @click="verHistorico"
-          >
-            {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
-          </BButton>
+            <BButton
+                v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
+                data-testid="btn-mapa-historico"
+                variant="outline-secondary"
+                @click="verHistorico"
+            >
+              {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
+            </BButton>
 
-          <BButton
-              v-if="podeAnalisar"
-              data-testid="btn-mapa-devolver"
-              :disabled="!habilitarDevolverMapa"
-              variant="secondary"
-              @click="abrirModalDevolucao"
-          >
-            {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
-          </BButton>
+            <BButton
+                v-if="podeAnalisar"
+                data-testid="btn-mapa-devolver"
+                :disabled="!habilitarDevolverMapa"
+                variant="secondary"
+                @click="abrirModalDevolucao"
+            >
+              {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
+            </BButton>
 
-          <BButton
-              v-if="podeValidar"
-              data-testid="btn-mapa-validar"
-              :disabled="!habilitarValidar"
-              variant="success"
-              @click="abrirModalValidar"
-          >
-            {{ TEXTOS.mapa.BOTAO_VALIDAR }}
-          </BButton>
+            <BButton
+                v-if="podeValidar"
+                data-testid="btn-mapa-validar"
+                :disabled="!habilitarValidar"
+                variant="success"
+                @click="abrirModalValidar"
+            >
+              {{ TEXTOS.mapa.BOTAO_VALIDAR }}
+            </BButton>
 
-          <BButton
-              v-if="acaoPrincipalMapa?.mostrar"
-              data-testid="btn-mapa-homologar-aceite"
-              :disabled="!acaoPrincipalMapa.habilitar"
-              variant="success"
-              @click="abrirModalAceitar"
-          >
-            {{ acaoPrincipalMapa.rotuloBotao }}
-          </BButton>
+            <BButton
+                v-if="acaoPrincipalMapa?.mostrar"
+                data-testid="btn-mapa-homologar-aceite"
+                :disabled="!acaoPrincipalMapa.habilitar"
+                variant="success"
+                @click="abrirModalAceitar"
+            >
+              {{ acaoPrincipalMapa.rotuloBotao }}
+            </BButton>
+          </div>
 
-          <LoadingButton
-              v-if="podeVisualizarImpacto"
-              :loading="loadingImpacto"
-              data-testid="cad-mapa__btn-impactos-mapa"
-              icon="arrow-right-circle"
-              :text="TEXTOS.mapa.BOTAO_IMPACTO"
-              variant="outline-secondary"
-              @click="abrirModalImpacto"
-          />
-          <BButton
-              v-if="podeEditarMapa"
-              :disabled="!habilitarEditarMapa"
-              data-testid="btn-abrir-criar-competencia"
-              variant="outline-primary"
-              @click="abrirModalCriarLimpo"
-          >
-            <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
-          </BButton>
-          <BButton
-              v-if="podeDisponibilizarMapa"
-              :disabled="loadingDisponibilizacao"
-              data-testid="btn-cad-mapa-disponibilizar"
-              variant="success"
-              @click="abrirModalDisponibilizar"
-          >
-            {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
-          </BButton>
+          <div v-if="podeVisualizarImpacto || podeEditarMapa || podeDisponibilizarMapa" class="d-flex gap-2 ms-3 ps-3 border-start">
+            <LoadingButton
+                v-if="podeVisualizarImpacto"
+                :loading="loadingImpacto"
+                data-testid="cad-mapa__btn-impactos-mapa"
+                icon="arrow-right-circle"
+                :text="TEXTOS.mapa.BOTAO_IMPACTO"
+                variant="outline-secondary"
+                @click="abrirModalImpacto"
+            />
+            <BButton
+                v-if="podeEditarMapa"
+                :disabled="!habilitarEditarMapa"
+                data-testid="btn-abrir-criar-competencia"
+                variant="outline-primary"
+                @click="abrirModalCriarLimpo"
+            >
+              <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
+            </BButton>
+            <BButton
+                v-if="podeDisponibilizarMapa"
+                :disabled="loadingDisponibilizacao"
+                data-testid="btn-cad-mapa-disponibilizar"
+                variant="success"
+                @click="abrirModalDisponibilizar"
+            >
+              {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
+            </BButton>
+          </div>
         </template>
       </PageHeader>
 
@@ -375,7 +379,6 @@ const {
   podeDisponibilizarMapa,
   habilitarEditarMapa,
   habilitarValidarMapa,
-  habilitarDisponibilizarMapa,
   podeAnalisarMapa,
   podeVerSugestoes: podeMostrarVerSugestoes,
   habilitarDevolverMapa,

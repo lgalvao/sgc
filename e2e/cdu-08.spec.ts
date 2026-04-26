@@ -177,7 +177,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade trigger');
             await AtividadeHelpers.verificarBotaoImpactoDropdown(page);
-            await AtividadeHelpers.abrirModalImpactoEdicao(page);
+            await AtividadeHelpers.abrirModalImpacto(page);
             await AtividadeHelpers.fecharModalImpacto(page);
             
             // Verificar botão histórico de análise no modo de revisão (Seção 5)

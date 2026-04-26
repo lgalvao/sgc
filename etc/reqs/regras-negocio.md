@@ -464,7 +464,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 ---
 
-## 16. Views do Sistema
+## 16. Views e Acessibilidade
 
 **RN-16.01 (VW_VINCULACAO_UNIDADE)** — Esta view rastreia o histórico de sucessões de unidades organizacionais (extinções e reestruturações), permitindo identificar qual unidade atual sucedeu unidades históricas. É usada para auditoria de processos históricos e migração de dados.
 > Fonte: `views/view-01-vinculacao-unidade.md`
@@ -483,6 +483,15 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-16.06 (VW_USUARIO_PERFIL_UNIDADE)** — View que é o coração do sistema de autorização. Estabelece o mapeamento completo entre usuários, perfis (ADMIN, GESTOR, CHEFE, SERVIDOR) e unidades. É consultada em cada login e em todas as validações de permissão.
 > Fonte: `views/view-06-usuario-perfil-unidade.md`
+
+**RN-16.07 (Acessibilidade de Interface)** — Toda funcionalidade e informação de domínio deve ser operável por teclado e compatível com leitores de tela (WCAG 2.2 AA). É vedado o uso de estados de 'hover' ou 'tooltips' para ocultar ações essenciais ou dados de domínio. Informações complementares e listas de itens devem ser apresentadas de forma inline ou através de componentes de expansão (toggle) que integrem a ordem de tabulação do sistema.
+> Fonte: Diretriz técnica transversal (SGC-A11Y)
+
+**RN-16.08 (Resiliência a Textos Longos)** — A interface deve ser projetada para acomodar descrições longas de competências, atividades e conhecimentos sem quebra de layout. Deve-se priorizar o uso de quebras de linha automáticas (`word-break`), larguras flexíveis e expansão vertical dos containers, garantindo a legibilidade integral da informação em qualquer resolução.
+> Fonte: Diretriz de UX/Design (SGC-UX)
+
+**RN-16.09 (Código Não-Defensivo)** — O sistema opera em ambiente controlado e seguro. Deve-se evitar o uso excessivo de código defensivo (null-checks redundantes, try-catch genéricos, validações duplicadas no front/back) que comprometa a legibilidade e a manutenibilidade. A integridade dos dados deve ser garantida por tipos fortes e contratos claros.
+> Fonte: Diretriz técnica de engenharia (SGC-ENG)
 
 ---
 
@@ -553,3 +562,4 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 | `views/view-06-usuario-perfil-unidade.md` | VW_USUARIO_PERFIL_UNIDADE                                                                     |
 | `design/arvore-unidades.md`               | Especificação da árvore de seleção de unidades                                                |
 | `design/breadcrumbs.md`                   | Especificação da barra de navegação/breadcrumbs                                               |
+                                             |

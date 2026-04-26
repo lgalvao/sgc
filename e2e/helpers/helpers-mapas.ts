@@ -182,7 +182,7 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
 }
 
 /**
- * Realiza o aceite ou homologação do mapa a partir da visualização do subprocesso.
+ * Realiza o aceite ou homologação do mapa a partir da tela de mapa do subprocesso.
  */
 export async function aceitarOuHomologarMapa(page: Page, observacao: string) {
     await navegarParaMapa(page);

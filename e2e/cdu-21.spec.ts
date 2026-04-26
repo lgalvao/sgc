@@ -106,7 +106,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-atividades')).toHaveClass(/card-actionable/);
-        await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Visualização das atividades e conhecimentos da unidade');
+        await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
     });
 });
 

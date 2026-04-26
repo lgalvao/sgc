@@ -26,7 +26,7 @@ Ator: Usuário (todos os perfis)
 
 4. Na tela de `Detalhes do subprocesso`, usuário clica no card `Mapa de Competências`.
 
-5. O sistema mostra a tela `Visualização de mapa`, com as seguintes informações:
+5. O sistema mostra a tela `Mapa de competências`, com as seguintes informações:
 
     - Título "Mapa de competências técnicas"
     - Identificação da unidade (sigla e nome).

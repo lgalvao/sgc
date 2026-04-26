@@ -6,8 +6,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
-    navegarParaAtividades,
-    navegarParaAtividadesVisualizacao,
+    navegarParaAtividades
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
@@ -199,7 +198,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('4. Cenário 3: Devolução e Histórico', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await page.getByTestId('btn-acao-devolver').click();
         const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
         await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivoDevolucao);
@@ -229,7 +228,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -248,7 +247,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Gestor devolve novamente
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();

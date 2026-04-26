@@ -2,14 +2,12 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoFinalizadoFixture, criarProcessoFixture, validarProcessoFixture} from './fixtures/index.js';
 import {
-    abrirModalImpactoEdicao,
-    abrirModalImpactoVisualizacao,
+    abrirModalImpacto,
     adicionarAtividade,
     adicionarConhecimento,
     editarAtividade,
     fecharModalImpacto,
     navegarParaAtividades,
-    navegarParaAtividadesVisualizacao,
     verificarBotaoImpactoDireto,
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
@@ -52,7 +50,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await editarAtividade(page, novaAtividade, descEditada);
 
         await verificarBotaoImpactoDropdown(page);
-        await abrirModalImpactoEdicao(page);
+        await abrirModalImpacto(page);
 
         // 7.1. Verificar seção Atividades inseridas
         const modal = page.getByRole('dialog');
@@ -73,10 +71,10 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Ringo starr (GESTOR_COORD_12) possui apenas 1 perfil
         await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
 
         await verificarBotaoImpactoDireto(page);
-        await abrirModalImpactoVisualizacao(page);
+        await abrirModalImpacto(page);
         
         const modal = page.getByRole('dialog');
         await expect(modal.getByRole('heading', {name: /Atividades inseridas/i})).toBeVisible();

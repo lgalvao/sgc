@@ -40,6 +40,19 @@ Este guia registra decisões de produto e engenharia para manter a experiência 
 - Em modais, manter mensagens dentro do modal, próximas ao campo ou ao grupo afetado.
 - Em listas editáveis por item, exibir erro no item afetado e rolar/focar o primeiro problema quando isso ajudar.
 
+## Acessibilidade e visibilidade
+
+- **Ações permanentes**: É vedado o uso de estados de 'hover' (passar o mouse) para ocultar botões de ação essenciais (como editar e excluir). As ações devem estar permanentemente visíveis para garantir operabilidade plena via teclado e dispositivos móveis.
+- **Informação de domínio inline**: Dados fundamentais (como a lista de conhecimentos associada a uma atividade) devem ser apresentados de forma inline ou estruturada no corpo da página, nunca escondidos atrás de tooltips ou popovers.
+- **Proximidade**: Os controles de ação (botões) devem ser posicionados o mais próximo possível do item que eles afetam para reduzir a carga cognitiva e facilitar a identificação da funcionalidade.
+- **Operabilidade via teclado**: Todo elemento interativo deve ser um elemento nativo de formulário ou botão (como os do `BootstrapVueNext`), garantindo que integrem a ordem natural de tabulação.
+
+## Resiliência visual e textos longos
+
+- **Quebras automáticas**: Containers devem ser preparados para acomodar textos longos sem quebra de layout, utilizando `overflow-wrap: anywhere` e `word-break: break-word`.
+- **Layout flexível**: Priorizar o uso de larguras flexíveis e expansão vertical. Cards e blocos de conteúdo devem crescer conforme o volume de dados de domínio.
+- **Componentes BVN**: Sempre utilizar componentes da biblioteca `BootstrapVueNext` (ex: `BCard`, `BListGroup`, `BButton`) antes de recorrer a estilos manuais, garantindo que o comportamento responsivo e acessível da biblioteca seja preservado.
+
 ## Backend e contratos
 
 - Preferir DTOs com Bean Validation para entrada de formulário.

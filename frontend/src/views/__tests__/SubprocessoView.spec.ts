@@ -260,8 +260,8 @@ describe('SubprocessoView.vue', () => {
 
     it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {
         // Simula dado desatualizado de uma visita anterior (ex: processo de mapeamento
-        // com podeEditarCadastro=false), que poderia fazer SubprocessoCards mostrar
-        // a rota errada (vis-cadastro em vez de cadastro) na primeira renderização
+        // com podeEditarCadastro=false), que poderia fazer SubprocessoCards carregar
+        // dados incorretos na primeira renderização
         subprocessosMock.subprocessoDetalhe = {
             ...mockSubprocesso,
             codigo: 999,

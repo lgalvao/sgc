@@ -4,14 +4,14 @@
       data-testid="cad-mapa__card-competencia"
       no-body
   >
-    <BCardHeader class="d-flex justify-content-between align-items-center">
-      <BCardTitle class="fs-5 mb-0">
+    <BCardHeader class="d-flex align-items-center">
+      <BCardTitle class="fs-5 mb-0 me-3">
         <strong
             class="competencia-descricao"
             data-testid="cad-mapa__txt-competencia-descricao"
         > {{ competencia.descricao }}</strong>
       </BCardTitle>
-      <div class="d-flex gap-1">
+      <div class="d-flex gap-1 actions-container">
         <BButton
             v-if="podeEditar !== false"
             v-b-tooltip.hover
@@ -45,48 +45,39 @@
         <BCard
             v-for="atividade in competencia.atividades"
             :key="atividade.codigo"
-            class="atividade-associada-card-item d-flex align-items-center group-atividade-associada"
+            class="atividade-associada-card-item d-flex group-atividade-associada"
             no-body
         >
-          <BCardBody class="d-flex align-items-center">
-                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
-                    {{ atividade.descricao }}
-                    <span :id="`badge-tooltip-${competencia.codigo}-${atividade.codigo}`" class="badge-container">
-                      <BBadge
-                          v-if="(atividade.conhecimentos?.length ?? 0) > 0"
-                          variant="secondary"
-                          class="ms-2"
-                          data-testid="cad-mapa__txt-badge-conhecimentos-1"
-                      >
-                        {{ atividade.conhecimentos.length }}
-                      </BBadge>
-                    </span>
-                    <BTooltip
-                        v-if="(atividade.conhecimentos?.length ?? 0) > 0"
-                        placement="top"
-                        :target="`badge-tooltip-${competencia.codigo}-${atividade.codigo}`"
-                    >
-                      <template #title>
-                        <strong>Conhecimentos:</strong>
-                        <ul class="mb-0 ps-3 mt-1">
-                          <li v-for="c in (getAtividadeCompleta(atividade.codigo)?.conhecimentos ?? [])" :key="c.codigo">{{ c.descricao }}</li>
-                        </ul>
-                      </template>
-                    </BTooltip>
-                  </span>
-            <BButton
-                v-if="podeEditar !== false"
-                v-b-tooltip.hover
-                :aria-label="`Remover atividade ${atividade.descricao}`"
-                class="botao-acao-inline"
-                data-testid="btn-remover-atividade-associada"
-                size="sm"
-                title="Remover atividade"
-                variant="outline-secondary"
-                @click="emit('removerAtividade', competencia.codigo, atividade.codigo)"
-            >
-              <i aria-hidden="true" class="bi bi-trash"/>
-            </BButton>
+          <BCardBody class="p-2">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <span class="atividade-associada-descricao fw-bold text-break me-2">
+                {{ atividade.descricao }}
+              </span>
+              <BButton
+                  v-if="podeEditar !== false"
+                  :aria-label="`Remover atividade ${atividade.descricao}`"
+                  class="botao-acao-inline"
+                  data-testid="btn-remover-atividade-associada"
+                  size="sm"
+                  title="Remover atividade"
+                  variant="outline-secondary"
+                  @click="emit('removerAtividade', competencia.codigo, atividade.codigo)"
+              >
+                <i aria-hidden="true" class="bi bi-trash"/>
+              </BButton>
+            </div>
+            
+            <div v-if="(atividade.conhecimentos?.length ?? 0) > 0" class="conhecimentos-inline mt-1">
+              <ul class="list-unstyled mb-0 small text-muted border-top pt-1">
+                <li 
+                    v-for="c in (getAtividadeCompleta(atividade.codigo)?.conhecimentos ?? [])" 
+                    :key="c.codigo"
+                    class="conhecimento-item text-break"
+                >
+                  <i aria-hidden="true" class="bi bi-dot me-1"/>{{ c.descricao }}
+                </li>
+              </ul>
+            </div>
           </BCardBody>
         </BCard>
       </div>
@@ -95,7 +86,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BBadge, BButton, BCard, BCardBody, BCardHeader, BCardTitle, BTooltip} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BCardHeader, BCardTitle, BListGroup, BListGroupItem} from "bootstrap-vue-next";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{
@@ -125,9 +116,18 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
 }
 
 .competencia-descricao {
+  overflow-wrap: anywhere;
   word-break: break-word;
-  max-width: 100%;
-  display: inline-block;
+}
+
+.actions-container {
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.competencia-card:hover .actions-container,
+.actions-container:focus-within {
+  opacity: 1;
 }
 
 .botao-acao {
@@ -139,24 +139,28 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
   padding: 0;
   font-size: 1.1rem;
   border-width: 2px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.botao-acao:focus,
-.botao-acao:hover {
-  background: var(--bs-primary-bg-subtle);
-  box-shadow: 0 0 0 2px var(--bs-primary);
 }
 
 .atividade-associada-card-item {
   border: 1px solid var(--bs-border-color);
   border-radius: 0.375rem;
   background-color: var(--bs-secondary-bg);
+  min-width: 150px;
+  max-width: 300px;
+  flex: 1 1 auto;
 }
 
 .atividade-associada-descricao {
   font-size: 0.85rem;
   color: var(--bs-body-color);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.conhecimento-item {
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .botao-acao-inline {
@@ -168,6 +172,6 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
   padding: 0;
   font-size: 0.8rem;
   border-width: 1px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 </style>
+e>

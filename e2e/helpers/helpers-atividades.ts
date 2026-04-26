@@ -31,15 +31,6 @@ export async function navegarParaAtividades(page: Page) {
     await page.waitForURL(/\/cadastro$/);
 
     await esperarTelaAtividades(page);
-    await esperarAtividadesEditaveis(page);
-}
-
-export async function navegarParaAtividadesVisualizacao(page: Page) {
-    const card = page.getByTestId('card-subprocesso-atividades');
-    await expect(card).toBeVisible();
-    await card.click();
-    await page.waitForURL(/\/cadastro$/);
-    await esperarAtividadesSomenteLeitura(page);
 }
 
 
@@ -225,12 +216,7 @@ export async function verificarBotaoImpactoAusenteDireto(page: Page) {
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeHidden();
 }
 
-export async function abrirModalImpactoEdicao(page: Page) {
-    await page.getByTestId('cad-atividades__btn-impactos-mapa-edicao').click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-}
-
-export async function abrirModalImpactoVisualizacao(page: Page) {
+export async function abrirModalImpacto(page: Page) {
     await page.getByTestId('cad-atividades__btn-impactos-mapa-edicao').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 }

@@ -16,12 +16,12 @@ Ator: GESTOR e ADMIN
 
 3. Usuário clica no card `Mapa de competências`.
 
-4. O sistema apresenta o mapa de competências da unidade na tela `Visualização de mapa`, com os botões:
+4. O sistema apresenta o mapa de competências da unidade na tela `Mapa de competências`, com os botões:
     - `Histórico de análise`;
     - `Devolver para ajustes`;
     - `Registrar aceite`, caso o perfil seja GESTOR ou `Homologar`, caso o perfil seja ADMIN.
 
-5. Caso a situação do subprocesso seja 'Mapa com sugestões', a tela Visualização de mapa incluirá ainda, antes do botão `Histórico de análise`, o botão `Ver sugestões`, a partir do qual será possível visualizar, em uma tela modal, as sugestões registradas para o mapa no subprocesso da unidade.
+5. Caso a situação do subprocesso seja 'Mapa com sugestões', a tela Mapa de competências incluirá ainda, antes do botão `Histórico de análise`, o botão `Ver sugestões`, a partir do qual será possível visualizar, em uma tela modal, as sugestões registradas para o mapa no subprocesso da unidade.
 
 6. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises prévias registradas para a validação do mapa. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da análise pela unidade atual.
 
@@ -33,7 +33,7 @@ Ator: GESTOR e ADMIN
 
    8.2. O sistema abre um modal (título "Devolver mapa") com a pergunta "Confirma a devolução da validação do mapa para ajustes?", um campo de observação (opcional) e os botões `Devolver` e `Cancelar`.
 
-   8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela `Visualização de mapa`.
+   8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela `Mapa de competências`.
 
    8.4. O usuário opcionalmente informa a observação e escolhe `Devolver`.
 
@@ -83,7 +83,7 @@ Ator: GESTOR e ADMIN
 
    9.2. O sistema abre um modal (título "Aceitar mapa") com o texto "Confirma o aceite da validação do mapa?", um campo de observação opcional e os botões `Confirmar` ou `Aceitar`.
 
-   9.3. Caso o usuário escolha o `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela `Visualização de mapa`.
+   9.3. Caso o usuário escolha o `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela `Mapa de competências`.
 
    9.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
 

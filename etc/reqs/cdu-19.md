@@ -11,7 +11,7 @@ Ator: CHEFE
 
 1. No `Painel`, o usuário escolhe um processo e, na tela `Detalhes do subprocesso`, clica no card `Mapa de competências`.
 
-2. O sistema mostra a tela `Visualização de mapa` com os botões `Apresentar sugestões` e `Validar`.
+2. O sistema mostra a tela `Mapa de competências` com os botões `Apresentar sugestões` e `Validar`.
 
 3. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão `Histórico de análise`.
 

@@ -14,8 +14,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
-    navegarParaAtividades,
-    navegarParaAtividadesVisualizacao,
+    navegarParaAtividades
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -107,7 +106,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // George harrison (212121) é Gestor da SECRETARIA_2
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário');
         await verificarPaginaPainel(page);
     });
@@ -115,7 +114,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     test('Fase 1.4: ADMIN homologa cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await homologarCadastroMapeamento(page);
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });

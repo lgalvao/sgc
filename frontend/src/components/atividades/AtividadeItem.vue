@@ -245,6 +245,7 @@ watch(novoConhecimento, (valorAtual, valorAnterior) => {
 }
 
 .atividade-descricao {
+  overflow-wrap: anywhere;
   word-break: break-word;
   max-width: 100%;
   display: inline-block;
@@ -269,4 +270,8 @@ watch(novoConhecimento, (valorAtual, valorAnterior) => {
   border-top-right-radius: 0.375rem;
 }
 
+.group-conhecimento span {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 </style>

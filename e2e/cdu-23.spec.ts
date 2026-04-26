@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroDisponibilizadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
+import {navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {
     aceitarCadastroMapeamento,
     acessarSubprocessoGestor,
@@ -47,12 +47,12 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     test('Setup aceites', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await aceitarCadastroMapeamento(page);
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await aceitarCadastroMapeamento(page);
 
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
@@ -146,12 +146,12 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
 
     test('Setup aceites', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await aceitarCadastroMapeamento(page);
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await aceitarCadastroMapeamento(page);
 
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
@@ -160,7 +160,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
     test('Cenario 1: ADMIN não pode homologar em bloco após devolver para ajustes', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
-        await navegarParaAtividadesVisualizacao(page);
+        await navegarParaAtividades(page);
         await devolverCadastroMapeamento(page, 'Ajustar cadastro antes da homologação');
 
         await acessarDetalhesProcesso(page, descProcesso);

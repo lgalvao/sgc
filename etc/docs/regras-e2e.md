@@ -1,4 +1,8 @@
-# Regras para corrigir problemas em testes end to end (e2e)
+## Regras para corrigir problemas em testes end to end (e2e)
+
+> [!IMPORTANT]
+> **PROIBIDO: RESILIÊNCIA ARTIFICIAL**
+> Nunca use blocos `if`, operadores lógicos `OR` (`||`), ou capturas de erro (`.catch()`) dentro de asserções para fazer um teste passar forçosamente. Se um teste está instável ou falhando, investigue a causa raiz (estado do banco, lógica do backend ou seletor ambíguo). Asserções devem ser determinísticas e inequívocas.
 
 Se um testes end to end falhar, geralmente será por uma dessas causas:
 
@@ -41,9 +45,9 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 | `helpers-auth.ts`       | Login e credenciais (`login`, `loginComPerfil`, `autenticar`, `USUARIOS`)                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `helpers-navegacao.ts`  | Navegação entre páginas (`fazerLogout`, `limparNotificacoes`, `verificarPaginaPainel`, `navegarParaSubprocesso`)                                                                                                                                                                                                                                                                                                                                                                 |
 | `helpers-processos.ts`  | Criar e verificar processos (`criarProcesso`, `extrairProcessoId`, `verificarProcessoNaTabela`, `verificarDetalhesProcesso`, `verificarDetalhesSubprocesso`)                                                                                                                                                                                                                                                                                                                     |
-| `helpers-atividades.ts` | Atividades, conhecimentos e impactos (`adicionarAtividade`, `adicionarConhecimento`, `editarAtividade`, `removerAtividade`, `disponibilizarCadastro`, `abrirModalImpactoEdicao`, `abrirModalImpactoVisualizacao`, `verificarBotaoImpactoAusenteEdicao`, `verificarBotaoImpactoAusenteDireto`)                                                                                                                                                                                    |
+| `helpers-atividades.ts` | Atividades, conhecimentos e impactos (`adicionarAtividade`, `adicionarConhecimento`, `editarAtividade`, `removerAtividade`, `disponibilizarCadastro`, `abrirModalImpacto`, `verificarBotaoImpactoAusenteEdicao`, `verificarBotaoImpactoAusenteDireto`)                                                                                                                                                                                    |
 | `helpers-mapas.ts`      | Competências e mapas (`navegarParaMapa`, `criarCompetencia`, `editarCompetencia`, `excluirCompetenciaConfirmando`, `disponibilizarMapa`)                                                                                                                                                                                                                                                                                                                                         |
-| `helpers-analise.ts`    | Análise de cadastro — navegação (`acessarSubprocessoGestor`, `acessarSubprocessoChefeDireto`, `acessarSubprocessoAdmin`), aceite (`aceitarCadastroMapeamento`, `aceitarRevisao`), devolução (`devolverCadastroMapeamento`, `devolverRevisao`, `cancelarDevolucao`), homologação (`homologarCadastroMapeamento`, `homologarCadastroRevisaoComImpacto`, `cancelarHomologacao`), histórico (`abrirHistoricoAnalise`, `abrirHistoricoAnaliseVisualizacao`, `fecharHistoricoAnalise`) |
+| `helpers-analise.ts`    | Análise de cadastro — navegação (`acessarSubprocessoGestor`, `acessarSubprocessoChefeDireto`, `acessarSubprocessoAdmin`), aceite (`aceitarCadastroMapeamento`, `aceitarRevisao`), devolução (`devolverCadastroMapeamento`, `devolverRevisao`, `cancelarDevolucao`), homologação (`homologarCadastroMapeamento`, `homologarCadastroRevisaoComImpacto`, `cancelarHomologacao`), histórico (`abrirHistoricoAnalise`, `fecharHistoricoAnalise`) |
 
 **IMPORTANTE**: Sempre use os helpers centralizados ao invés de definir funções locais nos arquivos de teste.
 
@@ -133,4 +137,4 @@ Quando um teste falha por um elemento estar "obstruído" ou "não encontrado", *
 
 ### Datas e Localização
 
-Sempre use `.toLocaleDateString('pt-BR')` ao comparar datas geradas dinamicamente nos testes (como `Date.now() + dias`) com o conteúdo da tela. O sistema utiliza o padrão brasileiro.
+Sempre use `.toLocaleDateString('pt-BR')` ao comparar datas geradas dinamicamente nos testes (como `Date.now() + dias`) com o conteúdo da tela. O sistema utiliza o padrão brasileiro.o.
