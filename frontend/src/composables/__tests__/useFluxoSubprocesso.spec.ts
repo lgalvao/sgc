@@ -60,7 +60,7 @@ describe("useFluxoSubprocesso", () => {
         expect(serviceDisponibilizarCadastro).toHaveBeenCalledWith(10);
     });
 
-    it("deve homologar cadastro e recarregar subprocesso", async () => {
+    it("deve homologar cadastro sem recarga implícita (deve ser gerido pela view)", async () => {
         const {homologarCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
         const {homologarCadastro: serviceHomologarCadastro} = await import("@/services/cadastroService");
         (serviceHomologarCadastro as any).mockResolvedValue(undefined);
@@ -69,10 +69,10 @@ describe("useFluxoSubprocesso", () => {
 
         expect(resultado).toBe(true);
         expect(serviceHomologarCadastro).toHaveBeenCalledWith(10, {observacoes: "ok"});
-        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10, true);
+        expect(subprocessoStoreMock.garantirContextoEdicao).not.toHaveBeenCalled();
     });
 
-    it("deve alterar data limite e recarregar subprocesso", async () => {
+    it("deve alterar data limite sem recarga implícita (deve ser gerido pela view)", async () => {
         const {alterarDataLimiteSubprocesso} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
         const {alterarDataLimiteSubprocesso: serviceAlterarDataLimite} = await import("@/services/processoService");
         (serviceAlterarDataLimite as any).mockResolvedValue(undefined);
@@ -80,7 +80,7 @@ describe("useFluxoSubprocesso", () => {
         await alterarDataLimiteSubprocesso(10, {novaData: "2026-04-01"});
 
         expect(serviceAlterarDataLimite).toHaveBeenCalledWith(10, {novaData: "2026-04-01"});
-        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10, true);
+        expect(subprocessoStoreMock.garantirContextoEdicao).not.toHaveBeenCalled();
     });
 
     it("deve retornar false e registrar erro ao reabrir cadastro com falha", async () => {

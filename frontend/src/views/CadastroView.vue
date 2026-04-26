@@ -629,11 +629,11 @@ async function executarAtualizacaoCadastro(
 
 async function carregarContextoInicial() {
   const data = typeof props.codSubprocesso === "number"
-      ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, true)
+      ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, false)
       : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
           Number(props.codProcesso),
           props.sigla,
-          true,
+          false,
       );
   if (!data) {
     logger.error("ERRO: Subprocesso não encontrado!");

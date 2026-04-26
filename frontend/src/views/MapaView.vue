@@ -576,7 +576,7 @@ async function carregarContextoEdicao(codigo: number) {
 
 async function carregarContextoInicial() {
   if (typeof props.codSubprocesso === "number") {
-    const contexto = await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, true);
+    const contexto = await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, false);
     if (!contexto) {
       if (subprocessoStore.erroIntegracaoContexto) {
         notify(subprocessoStore.erroIntegracaoContexto.message, 'danger');

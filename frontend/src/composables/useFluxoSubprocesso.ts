@@ -87,26 +87,25 @@ export function useFluxoSubprocesso() {
     }
 
     async function homologarCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest) {
-        return executarAcao(() => serviceHomologarCadastro(codigoSubprocesso, req), codigoSubprocesso, true);
+        return executarAcao(() => serviceHomologarCadastro(codigoSubprocesso, req));
     }
 
     async function homologarRevisaoCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest) {
-        return executarAcao(() => serviceHomologarRevisaoCadastro(codigoSubprocesso, req), codigoSubprocesso, true);
+        return executarAcao(() => serviceHomologarRevisaoCadastro(codigoSubprocesso, req));
     }
 
     async function alterarDataLimiteSubprocesso(codigoSubprocesso: number, dados: {novaData: string}) {
         return withErrorHandling(async () => {
             await serviceAlterarDataLimite(codigoSubprocesso, dados);
-            await subprocessoStore.garantirContextoEdicao(codigoSubprocesso, true);
         });
     }
 
     async function reabrirCadastro(codigoSubprocesso: number, justificativa: string) {
-        return executarAcao(() => serviceReabrirCadastro(codigoSubprocesso, justificativa), codigoSubprocesso, true);
+        return executarAcao(() => serviceReabrirCadastro(codigoSubprocesso, justificativa));
     }
 
     async function reabrirRevisaoCadastro(codigoSubprocesso: number, justificativa: string) {
-        return executarAcao(() => serviceReabrirRevisaoCadastro(codigoSubprocesso, justificativa), codigoSubprocesso, true);
+        return executarAcao(() => serviceReabrirRevisaoCadastro(codigoSubprocesso, justificativa));
     }
 
     return {

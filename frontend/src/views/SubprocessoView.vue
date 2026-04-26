@@ -373,7 +373,7 @@ function exibirToastPendente() {
 
 async function carregarSubprocesso() {
   const resultadoDireto = typeof props.codSubprocesso === "number"
-      ? await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, true)
+      ? await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, false)
       : null;
 
   if (resultadoDireto) {
@@ -385,7 +385,7 @@ async function carregarSubprocesso() {
   const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
       props.codProcesso,
       props.siglaUnidade,
-      true,
+      false,
   );
 
   if (!resultado) {
@@ -407,6 +407,9 @@ onMounted(async () => {
 onActivated(async () => {
   exibirToastPendente();
   if (!carregamentoInicialConcluido.value) {
+    return;
+  }
+  if (codSubprocesso.value && subprocessoStore.dadosValidosEdicao(codSubprocesso.value)) {
     return;
   }
   await carregarSubprocesso();

@@ -233,6 +233,14 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         }
     }
 
+    function dadosValidosEdicao(codigoSubprocesso: number): boolean {
+        return contextoEdicao.value?.detalhes.codigo === codigoSubprocesso;
+    }
+
+    function dadosValidosCadastro(codigoSubprocesso: number): boolean {
+        return contextoCadastro.value?.detalhes.codigo === codigoSubprocesso;
+    }
+
     return {
         contextoEdicao,
         contextoCadastro,
@@ -245,5 +253,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         garantirContextoCadastroAtividades,
         garantirContextoCadastroAtividadesPorProcessoEUnidade,
         atualizarStatusLocal,
+        dadosValidosEdicao,
+        dadosValidosCadastro,
     };
 });

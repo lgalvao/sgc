@@ -115,6 +115,8 @@ const subprocessosMock = reactive({
     invalidar: vi.fn(),
     erroIntegracaoContexto: null as {message: string} | null,
     limparErroIntegracao: vi.fn(),
+    dadosValidosEdicao: vi.fn().mockReturnValue(false),
+    dadosValidosCadastro: vi.fn().mockReturnValue(false),
 });
 
 vi.mock("vue-router", () => ({
@@ -365,6 +367,7 @@ describe("CadastroView coverage", () => {
         expect(contarChamadas(
             subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade,
         )).toBe(1);
+        expect(subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(expect.anything(), expect.anything(), false);
     });
 
     it("cobre funções complementares e modais", async () => {
@@ -552,7 +555,7 @@ describe("CadastroView coverage", () => {
         await vm.confirmarDisponibilizacao();
 
         expect(subprocessoStore.invalidar).toHaveBeenCalled();
-        expect(processoStore.invalidar).toHaveBeenCalled();
+        expect(processoStore.invalidar).not.toHaveBeenCalled();
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 
