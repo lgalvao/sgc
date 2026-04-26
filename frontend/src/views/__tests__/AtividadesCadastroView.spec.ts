@@ -114,42 +114,47 @@ type SubprocessoStoreMock = {
     limparErroIntegracao: ReturnType<typeof vi.fn>;
 };
 
-function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
-    const permissoes: PermissoesSubprocesso = {
-        podeEditarCadastro: false,
-        podeDisponibilizarCadastro: false,
-        podeDevolverCadastro: false,
-        podeAceitarCadastro: false,
-        podeHomologarCadastro: false,
-        podeEditarMapa: false,
-        podeDisponibilizarMapa: false,
-        podeValidarMapa: false,
-        podeApresentarSugestoes: false,
-        podeVerSugestoes: false,
-        podeDevolverMapa: false,
-        podeAceitarMapa: false,
-        podeHomologarMapa: false,
-        podeVisualizarImpacto: false,
-        podeAlterarDataLimite: false,
-        podeReabrirCadastro: false,
-        podeReabrirRevisao: false,
-        podeEnviarLembrete: false,
-        mesmaUnidade: false,
-        habilitarAcessoCadastro: false,
-        habilitarAcessoMapa: false,
-        habilitarEditarCadastro: false,
-        habilitarDisponibilizarCadastro: false,
-        habilitarDevolverCadastro: false,
-        habilitarAceitarCadastro: false,
-        habilitarHomologarCadastro: false,
-        habilitarEditarMapa: false,
-        habilitarDisponibilizarMapa: false,
-        habilitarValidarMapa: false,
-        habilitarApresentarSugestoes: false,
-        habilitarDevolverMapa: false,
-        habilitarAceitarMapa: false,
-        habilitarHomologarMapa: false,
+function criarPermissoesPadrao(overrides: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
+    return {
+        podeEditarCadastro: true,
+        podeDisponibilizarCadastro: true,
+        podeDevolverCadastro: true,
+        podeAceitarCadastro: true,
+        podeHomologarCadastro: true,
+        podeEditarMapa: true,
+        podeDisponibilizarMapa: true,
+        podeValidarMapa: true,
+        podeApresentarSugestoes: true,
+        podeVerSugestoes: true,
+        podeDevolverMapa: true,
+        podeAceitarMapa: true,
+        podeHomologarMapa: true,
+        podeVisualizarImpacto: true,
+        podeAlterarDataLimite: true,
+        podeReabrirCadastro: true,
+        podeReabrirRevisao: true,
+        podeEnviarLembrete: true,
+        mesmaUnidade: true,
+        habilitarAcessoCadastro: true,
+        habilitarAcessoMapa: true,
+        habilitarEditarCadastro: true,
+        habilitarDisponibilizarCadastro: true,
+        habilitarDevolverCadastro: true,
+        habilitarAceitarCadastro: true,
+        habilitarHomologarCadastro: true,
+        habilitarEditarMapa: true,
+        habilitarDisponibilizarMapa: true,
+        habilitarValidarMapa: true,
+        habilitarApresentarSugestoes: true,
+        habilitarDevolverMapa: true,
+        habilitarAceitarMapa: true,
+        habilitarHomologarMapa: true,
+        ...overrides
     };
+}
+
+function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
+    const permissoes = criarPermissoesPadrao();
     const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
     const mapa: MapaResumo = {codigo: 100, subprocessoCodigo: 123};
     const detalhes: SubprocessoDetalhe = {
@@ -326,11 +331,18 @@ function createWrapper(customState = {}, accessOverrides = {}) {
     vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
         podeEditarCadastro: ref(true),
         podeDisponibilizarCadastro: ref(true),
+        podeDevolverCadastro: ref(true),
+        podeAceitarCadastro: ref(true),
+        podeHomologarCadastro: ref(true),
         podeVisualizarImpacto: ref(true),
         habilitarEditarCadastro: ref(true),
         habilitarDisponibilizarCadastro: ref(true),
+        habilitarDevolverCadastro: ref(true),
+        habilitarAceitarCadastro: ref(true),
+        habilitarHomologarCadastro: ref(true),
         mesmaUnidade: ref(true),
         habilitarAcessoCadastro: ref(true),
+        acaoPrincipalCadastro: ref(null),
         ...accessOverrides
     } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
@@ -386,12 +398,12 @@ describe("CadastroView.vue", () => {
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "MAPEAMENTO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: criarPermissoesPadrao() as unknown as Record<string, boolean>
         };
         subprocessosMock.lastError = null;
         subprocessosMock.erroIntegracaoContexto = null;
-        subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade = vi.fn();
-        subprocessosMock.buscarContextoCadastroAtividades = vi.fn();
+        subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade = vi.fn().mockResolvedValue(criarContextoEdicao());
+        subprocessosMock.buscarContextoCadastroAtividades = vi.fn().mockResolvedValue(criarContextoEdicao());
         subprocessosMock.garantirContextoCadastroAtividadesPorProcessoEUnidade = subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade;
         subprocessosMock.garantirContextoCadastroAtividades = subprocessosMock.buscarContextoCadastroAtividades;
         subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade = vi.fn();
@@ -579,7 +591,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: criarPermissoesPadrao() as unknown as Record<string, boolean>
         };
         vm.atividades = [{
             codigo: 1,
@@ -604,7 +616,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: criarPermissoesPadrao() as unknown as Record<string, boolean>
         };
         vm.atividades = [{
             codigo: 1,
@@ -629,7 +641,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: criarPermissoesPadrao() as unknown as Record<string, boolean>
         };
         vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         vm.atividades = [{
@@ -686,7 +698,7 @@ describe("CadastroView.vue", () => {
             situacao: SituacaoSubprocesso.NAO_INICIADO,
             tipoProcesso: TipoProcesso.REVISAO,
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: criarPermissoesPadrao() as unknown as Record<string, boolean>
         };
         vm.atividades = [{
             codigo: 1,
@@ -707,6 +719,8 @@ describe("CadastroView.vue", () => {
         }
         subprocessosStore.subprocessoDetalhe = {
             ...subprocessosStore.subprocessoDetalhe,
+            codigo: 123,
+            tipoProcesso: TipoProcesso.REVISAO,
             situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
         };
         resolver(true);
@@ -757,6 +771,16 @@ describe("CadastroView.vue", () => {
     });
 
     it("oculta botão disponibilizar quando o perfil não tem ação de edição nem de disponibilização", async () => {
+        const permissoesDesabilitadas = {
+            podeEditarCadastro: false,
+            podeDisponibilizarCadastro: false
+        };
+        // Atualiza as permissões no store para que permissoesUI (passado para o header) reflita o estado
+        subprocessosMock.subprocessoDetalhe = {
+            ...subprocessosMock.subprocessoDetalhe,
+            permissoes: criarPermissoesPadrao(permissoesDesabilitadas)
+        } as any;
+
         const wrapper = createWrapper({}, {
             podeEditarCadastro: ref(false),
             podeDisponibilizarCadastro: ref(false),
