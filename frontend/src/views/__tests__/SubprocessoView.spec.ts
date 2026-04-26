@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import {reactive} from 'vue';
+import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
@@ -66,14 +66,14 @@ const SubprocessoModalStub = {
 
 vi.mock('@/services/processoService', () => ({
     reabrirCadastro: vi.fn(),
-    reabrirRevisaoCadastro: vi.fn(),
     enviarLembrete: vi.fn(),
 }));
 
 const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
-    reabrirRevisaoCadastro: vi.fn(),
+    lastError: ref(null),
+    clearError: vi.fn(),
 };
 const subprocessoStoreMock = reactive({
     contextoEdicao: null as {detalhes: SubprocessoDetalheMock} | null,
@@ -164,7 +164,6 @@ describe('SubprocessoView.vue', () => {
         vi.clearAllMocks();
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
-        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = null;
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
@@ -424,7 +423,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento', false);
     });
 
     it('reabre revisão com sucesso', async () => {
@@ -442,7 +441,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta', true);
     });
 
     it('impede reabertura se justificativa vazia e exibe pendência contextual', async () => {
