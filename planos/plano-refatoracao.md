@@ -21,16 +21,26 @@ Consolidar a arquitetura do SGC em um modelo de alto desempenho, plenamente aces
 ## 2. Engenharia e Arquitetura
 
 ### Combate a God Classes (Backend)
-- Desmembrar classes com múltiplas responsabilidades (Hotspots: `ProcessoService` e `SubprocessoConsultaService`).
-- Isolar lógica de permissões, consultas de domínio e persistência em serviços coesos.
+- **Desmembrar classes massivas**:
+    - `ProcessoService.java` (~1300 linhas): Isolar responsabilidades de criação, workflow e finalização.
+    - `SubprocessoConsultaService.java` (~600 linhas): Extrair cálculo de permissões e montagem de contexto.
+    - `SubprocessoTransicaoService.java` (~600 linhas): Isolar lógicas de movimentação específicas.
 
 ### Código Não-Defensivo
+- **Limpeza Sistemática**: Atacar os hotspots identificados (>270 `@Nullable` e >100 checks manuais de `null`).
 - Remover verificações de nulidade e validações redundantes que não agregam valor em ambiente controlado.
 - Confiar em tipos fortes e contratos estáveis entre frontend e backend.
 
-### Racionalização de Contexto (Frontend)
-- Gerenciar o estado do subprocesso ativamente para evitar recomposições redundantes de contexto em transições de tela.
-- Minimizar round-trips à API sem ganho funcional material.
+### Racionalização de Contexto e Desempenho (Frontend)
+- **Eliminação de Chamadas Redundantes**:
+    - Implementar mecanismos de *deduplication* e *cancelamento de requisições sobrepostas* para evitar sobrecarga na rede e no backend.
+    - Otimizar `useSubprocessos` e stores para garantir que a navegação intrafolha não force a reconstrução total do contexto via API desnecessariamente.
+- **Gestão Eficiente de Cache**:
+    - Adotar cache de curto prazo para dados estáveis do subprocesso dentro da mesma ativação de rota.
+    - Garantir que a invalidação de cache ocorra apenas em eventos de mutação real (transições de workflow).
+- **Quebra de Views Gigantes**:
+    - `CadastroView.vue` (~960 linhas) e `MapaView.vue` (~890 linhas): Extrair lógica de orquestração de modais e manipulação de estado complexo para composables dedicados ou componentes menores.
+
 
 ---
 

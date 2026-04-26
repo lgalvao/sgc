@@ -114,7 +114,7 @@ describe("CompetenciaCard.vue", () => {
         expect(wrapper.emitted("removerAtividade")?.[0]).toEqual([mockCompetencia.codigo, 101]);
     });
 
-    it("deve mostrar badge de conhecimentos se atividade tiver conhecimentos", () => {
+    it("deve mostrar lista de conhecimentos se atividade tiver conhecimentos", () => {
         const wrapper = mount(CompetenciaCard, {
             props: {
                 competencia: mockCompetencia,
@@ -124,8 +124,8 @@ describe("CompetenciaCard.vue", () => {
         });
 
         // Atividade 2 (index 1) tem conhecimentos
-        const badges = wrapper.findAll('[data-testid="cad-mapa__txt-badge-conhecimentos-1"]');
-        expect(badges.length).toBe(1); // Só atividade 2 tem
-        expect(badges[0].text()).toBe("1");
+        const items = wrapper.findAll(".conhecimento-item");
+        expect(items.length).toBe(1); // Só atividade 2 tem
+        expect(items[0].text()).toContain("Java");
     });
 });

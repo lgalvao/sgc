@@ -1,153 +1,140 @@
-import {ref} from "vue";
+import {computed, ref} from "vue";
+import {useSubprocessoStore} from "@/stores/subprocesso";
+import {useMapas} from "@/composables/useMapas";
 import {
     buscarContextoCadastroAtividades as serviceBuscarContextoCadastroAtividades,
     buscarContextoCadastroAtividadesPorProcessoEUnidade as serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade,
-    buscarContextoEdicao as serviceBuscarContextoEdicao,
-    buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
-    buscarSubprocessoDetalhe as serviceBuscarSubprocessoDetalhe,
-    buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
-    mapSubprocessoDetalheResponseParaModel,
 } from "@/services/subprocessoService";
-import {useMapas} from "@/composables/useMapas";
 import type {
-    ContextoCadastroAtividadesSubprocesso,
-    ContextoEdicaoSubprocesso,
     PermissoesSubprocesso,
     SituacaoSubprocesso,
     SubprocessoDetalhe,
 } from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {logger} from "@/utils";
-import {normalizeError} from "@/utils/apiError";
-import {isErroCanceladoHttp} from "@/axios-setup";
 
+// Mantemos o estado local para compatibilidade de escrita direta que as views fazem,
+// mas as funções de busca agora usam a store para dedupe.
 const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
 const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
-function atualizarDetalheLocal(detalhe: SubprocessoDetalhe) {
-    subprocessoDetalhe.value = detalhe;
-}
+export function useSubprocessos() {
+    const store = useSubprocessoStore();
 
-async function buscarSubprocessoDetalhe(codigo: number, limparAntes = true): Promise<SubprocessoDetalhe | null> {
-    if (limparAntes) {
-        subprocessoDetalhe.value = null;
-    }
-
-    await withErrorHandling(async () => {
-        const dto = await serviceBuscarSubprocessoDetalhe(codigo);
-        atualizarDetalheLocal(mapSubprocessoDetalheResponseParaModel(dto));
-    }, (erro) => {
-        logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, erro);
-        if (limparAntes) {
-            subprocessoDetalhe.value = null;
-        }
+    const subprocessoDetalheProxy = computed<SubprocessoDetalhe | null>({
+        get: () => subprocessoDetalhe.value,
+        set: (v) => { subprocessoDetalhe.value = v; }
     });
 
-    return subprocessoDetalhe.value;
-}
+    const lastErrorProxy = computed<typeof lastError.value>({
+        get: () => store.erroIntegracaoContexto,
+        set: (v) => { store.erroIntegracaoContexto = v; }
+    });
 
-async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string): Promise<number | null> {
-    try {
-        return await withErrorHandling(async () => {
-            const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
-            return dto.codigo;
-        });
-    } catch (error: unknown) {
-        const erroNormalizado = normalizeError(error);
-        if (isErroCanceladoHttp(error) || erroNormalizado.code === "REQUEST_CANCELADA") {
+    async function buscarSubprocessoDetalhe(codigo: number, limparAntes = true): Promise<SubprocessoDetalhe | null> {
+        if (limparAntes) subprocessoDetalhe.value = null;
+        try {
+            const contexto = await store.garantirContextoEdicao(codigo, limparAntes);
+            if (contexto) {
+                subprocessoDetalhe.value = contexto.detalhes;
+            }
+        } catch {
+            if (limparAntes) subprocessoDetalhe.value = null;
+        }
+        return subprocessoDetalhe.value;
+    }
+
+    async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string): Promise<number | null> {
+        try {
+            const res = await store.garantirContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade, true);
+            if (res) {
+                subprocessoDetalhe.value = res.contexto.detalhes;
+                return res.codigo;
+            }
+        } catch {
             return null;
         }
-        logger.error("Erro ao buscar ID do subprocesso:", error);
         return null;
     }
-}
 
-async function buscarContextoEdicao(codigo: number) {
-    subprocessoDetalhe.value = null;
-
-    return withErrorHandling(async () => {
-        const data = await serviceBuscarContextoEdicao(codigo);
-        atualizarContextoEdicaoLocal(data);
-
-        return data;
-    });
-}
-
-async function buscarContextoEdicaoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string) {
-    subprocessoDetalhe.value = null;
-
-    return withErrorHandling(async () => {
-        const data = await serviceBuscarContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade);
-        atualizarContextoEdicaoLocal(data);
-
-        return data;
-    });
-}
-
-async function buscarContextoCadastroAtividades(codigo: number) {
-    subprocessoDetalhe.value = null;
-
-    return withErrorHandling(async () => {
-        const data = await serviceBuscarContextoCadastroAtividades(codigo);
-        atualizarContextoCadastroLocal(data);
-
-        return data;
-    });
-}
-
-async function buscarContextoCadastroAtividadesPorProcessoEUnidade(codProcesso: number, siglaUnidade: string) {
-    subprocessoDetalhe.value = null;
-
-    return withErrorHandling(async () => {
-        const data = await serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade(codProcesso, siglaUnidade);
-        atualizarContextoCadastroLocal(data);
-
-        return data;
-    });
-}
-
-function atualizarContextoEdicaoLocal(data: ContextoEdicaoSubprocesso) {
-    atualizarDetalheLocal(data.detalhes);
-
-    const {mapaCompleto} = useMapas();
-    mapaCompleto.value = data.mapa;
-}
-
-function atualizarContextoCadastroLocal(data: ContextoCadastroAtividadesSubprocesso) {
-    atualizarDetalheLocal(data.detalhes);
-}
-
-function atualizarStatusLocal(status: {
-    codigo: number;
-    situacao: SituacaoSubprocesso;
-    permissoes?: PermissoesSubprocesso;
-}) {
-    if (!subprocessoDetalhe.value) {
-        return;
+    async function buscarContextoEdicao(codigo: number) {
+        subprocessoDetalhe.value = null;
+        try {
+            const contexto = await store.garantirContextoEdicao(codigo, true);
+            if (contexto) {
+                subprocessoDetalhe.value = contexto.detalhes;
+                const {mapaCompleto} = useMapas();
+                mapaCompleto.value = contexto.mapa;
+            }
+            return contexto;
+        } catch {
+            return null;
+        }
     }
 
-    subprocessoDetalhe.value = {
-        ...subprocessoDetalhe.value,
-        situacao: status.situacao,
-        permissoes: status.permissoes ?? subprocessoDetalhe.value.permissoes,
-    };
-}
+    async function buscarContextoEdicaoPorProcessoEUnidade(codProcesso: number, siglaUnidade: string) {
+        subprocessoDetalhe.value = null;
+        try {
+            const res = await store.garantirContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade, true);
+            if (res) {
+                subprocessoDetalhe.value = res.contexto.detalhes;
+                const {mapaCompleto} = useMapas();
+                mapaCompleto.value = res.contexto.mapa;
+                return res.contexto;
+            }
+        } catch {
+            return null;
+        }
+        return null;
+    }
 
-export function useSubprocessos() {
+    async function buscarContextoCadastroAtividades(codigo: number) {
+        subprocessoDetalhe.value = null;
+        return withErrorHandling(async () => {
+            const data = await serviceBuscarContextoCadastroAtividades(codigo);
+            subprocessoDetalhe.value = data.detalhes;
+            // Opcionalmente sincroniza a store se quisermos que a store também guarde isso
+            store.contextoEdicao = { detalhes: data.detalhes, mapa: data.mapa } as any;
+            return data;
+        });
+    }
+
+    async function buscarContextoCadastroAtividadesPorProcessoEUnidade(codProcesso: number, siglaUnidade: string) {
+        subprocessoDetalhe.value = null;
+        return withErrorHandling(async () => {
+            const data = await serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade(codProcesso, siglaUnidade);
+            subprocessoDetalhe.value = data.detalhes;
+            store.contextoEdicao = { detalhes: data.detalhes, mapa: data.mapa } as any;
+            return data;
+        });
+    }
+
+    function atualizarStatusLocal(status: {
+        codigo: number;
+        situacao: SituacaoSubprocesso;
+        permissoes?: PermissoesSubprocesso;
+    }) {
+        if (!subprocessoDetalhe.value) return;
+
+        subprocessoDetalhe.value = {
+            ...subprocessoDetalhe.value,
+            situacao: status.situacao,
+            permissoes: status.permissoes ?? subprocessoDetalhe.value.permissoes,
+        };
+        
+        if (store.contextoEdicao && store.contextoEdicao.detalhes.codigo === status.codigo) {
+            store.contextoEdicao.detalhes.situacao = status.situacao;
+            if (status.permissoes) {
+                store.contextoEdicao.detalhes.permissoes = status.permissoes;
+            }
+        }
+    }
+
     return {
-        get subprocessoDetalhe() {
-            return subprocessoDetalhe.value;
-        },
-        set subprocessoDetalhe(valor: SubprocessoDetalhe | null) {
-            subprocessoDetalhe.value = valor;
-        },
-        get lastError() {
-            return lastError.value;
-        },
-        set lastError(valor: typeof lastError.value) {
-            lastError.value = valor;
-        },
-        clearError,
+        get subprocessoDetalhe() { return subprocessoDetalhe.value; },
+        set subprocessoDetalhe(v) { subprocessoDetalhe.value = v; },
+        get lastError() { return store.erroIntegracaoContexto; },
+        set lastError(v) { store.erroIntegracaoContexto = v; },
+        clearError: () => { store.erroIntegracaoContexto = null; },
         buscarSubprocessoDetalhe,
         buscarContextoEdicao,
         buscarContextoEdicaoPorProcessoEUnidade,
@@ -155,5 +142,6 @@ export function useSubprocessos() {
         buscarContextoCadastroAtividadesPorProcessoEUnidade,
         buscarSubprocessoPorProcessoEUnidade,
         atualizarStatusLocal,
+        invalidar: () => store.invalidar()
     };
 }

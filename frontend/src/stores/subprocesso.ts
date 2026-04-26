@@ -8,16 +8,6 @@ import {
 import {logger} from "@/utils";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
-/**
- * Dedupe de sessão para contexto de edição de subprocesso.
- *
- * O contexto de edição carrega situação, permissões e ações disponíveis no momento.
- * Como esses dados mudam ao longo do workflow, não é seguro reutilizar snapshots
- * antigos entre navegações. Mantemos apenas deduplicação de requisições concorrentes,
- * além do mapeamento processo+unidade -> código do subprocesso.
- *
- * Estratégia: nunca considerar o contexto "válido" para reuso entre ativações.
- */
 export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
     const erroIntegracaoContexto = ref<NormalizedError | null>(null);
@@ -30,6 +20,20 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         return `${codProcesso}:${siglaUnidade}`;
     }
 
+    function invalidar(): void {
+        carregamentosPorCodigo.clear();
+        carregamentosPorProcessoUnidade.clear();
+        mapaProcessoUnidadeParaCodigo.clear();
+        erroIntegracaoContexto.value = null;
+        contextoEdicao.value = null;
+    }
+
+    function _registrarContexto(codigo: number, contexto: ContextoEdicaoSubprocesso): void {
+        contextoEdicao.value = contexto;
+        erroIntegracaoContexto.value = null;
+        codSubprocessoCarregado.value = codigo;
+    }
+
     function criarErroSubprocessoNaoEncontrado(mensagemBase: string, erroNormalizado: NormalizedError): NormalizedError {
         return {
             ...erroNormalizado,
@@ -39,25 +43,11 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         };
     }
 
-    /** Invalida o cache — deve ser chamado após qualquer ação de workflow. */
-    function invalidar(): void {
-        carregamentosPorCodigo.clear();
-        carregamentosPorProcessoUnidade.clear();
-        mapaProcessoUnidadeParaCodigo.clear();
-        erroIntegracaoContexto.value = null;
-    }
+    async function garantirContextoEdicao(codSubprocesso: number, limparAntes = false): Promise<ContextoEdicaoSubprocesso | null> {
+        if (limparAntes) {
+            contextoEdicao.value = null;
+        }
 
-    function _registrarContexto(codigo: number, contexto: ContextoEdicaoSubprocesso): void {
-        contextoEdicao.value = contexto;
-        erroIntegracaoContexto.value = null;
-        codSubprocessoCarregado.value = codigo;
-    }
-
-    /**
-     * Retorna o contexto de edição do subprocesso, usando deduplicação de requisições concorrentes.
-     * @returns o contexto ou null em caso de erro
-     */
-    async function garantirContextoEdicao(codSubprocesso: number): Promise<ContextoEdicaoSubprocesso | null> {
         const carregamentoExistente = carregamentosPorCodigo.get(codSubprocesso);
         if (carregamentoExistente) {
             return carregamentoExistente;
@@ -72,37 +62,39 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         } catch (err) {
             const erroNormalizado = normalizeError(err);
             if (erroNormalizado.code === "REQUEST_CANCELADA") {
-                erroIntegracaoContexto.value = erroNormalizado;
+                erroIntegracaoContexto.value = { ...erroNormalizado, code: "REQUEST_CANCELADA" };
                 return null;
             }
-            logger.error(`Erro ao buscar contexto de edição do subprocesso ${codSubprocesso}:`, err);
+            
+            logger.error(`Erro ao buscar contexto do subprocesso ${codSubprocesso}:`, err);
+            
             if (erroNormalizado.kind === "notFound") {
                 erroIntegracaoContexto.value = criarErroSubprocessoNaoEncontrado(
                         "Falha grave ao localizar o subprocesso solicitado.",
                         erroNormalizado
                 );
-                return null;
+            } else {
+                erroIntegracaoContexto.value = erroNormalizado;
             }
-            erroIntegracaoContexto.value = erroNormalizado;
             return null;
         } finally {
             carregamentosPorCodigo.delete(codSubprocesso);
         }
     }
 
-    /**
-     * Resolve o código de subprocesso por processo+unidade e retorna seu contexto,
-     * usando deduplicação de requisições concorrentes.
-     */
     async function garantirContextoEdicaoPorProcessoEUnidade(
         codProcesso: number,
-        siglaUnidade: string
+        siglaUnidade: string,
+        limparAntes = false
     ): Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso } | null> {
-        const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
+        if (limparAntes) {
+            contextoEdicao.value = null;
+        }
 
+        const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
         const codigoMapeado = mapaProcessoUnidadeParaCodigo.get(chaveProcessoUnidade);
         if (typeof codigoMapeado === "number") {
-            const contexto = await garantirContextoEdicao(codigoMapeado);
+            const contexto = await garantirContextoEdicao(codigoMapeado, limparAntes);
             if (contexto) {
                 return {codigo: codigoMapeado, contexto};
             }
@@ -126,18 +118,20 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         } catch (err) {
             const erroNormalizado = normalizeError(err);
             if (erroNormalizado.code === "REQUEST_CANCELADA") {
-                erroIntegracaoContexto.value = erroNormalizado;
+                erroIntegracaoContexto.value = { ...erroNormalizado, code: "REQUEST_CANCELADA" };
                 return null;
             }
-            logger.error(`Erro ao buscar contexto de subprocesso para processo ${codProcesso} unidade ${siglaUnidade}:`, err);
+            
+            logger.error(`Erro ao buscar contexto por processo e unidade:`, err);
+            
             if (erroNormalizado.kind === "notFound") {
                 erroIntegracaoContexto.value = criarErroSubprocessoNaoEncontrado(
                         "Falha grave ao resolver subprocesso por processo e unidade.",
                         erroNormalizado
                 );
-                return null;
+            } else {
+                erroIntegracaoContexto.value = erroNormalizado;
             }
-            erroIntegracaoContexto.value = erroNormalizado;
             return null;
         } finally {
             carregamentosPorProcessoUnidade.delete(chaveProcessoUnidade);

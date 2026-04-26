@@ -1,15 +1,20 @@
 # Tracking de Refatoração e Estabilização
 
 ## Status Geral
-Fase 1 (Unificação Visual/Acessibilidade) concluída. Iniciando Fase 2 (Racionalização Estrutural e Limpeza de Código Defensivo).
+Fase 1 (Unificação Visual/Acessibilidade) concluída. Iniciando Fase 2 (Racionalização Estrutural, Desempenho e Limpeza).
 
 ---
 
-## P0: Estabilização e Validação Crítica
+## P0: Estabilização e Desempenho Crítico (Frontend)
 
-### Suíte E2E
-- [ ] **Regressão Ampla**: Executar todos os 219+ testes (`npx playwright test`) para garantir que as refatorações de layout e backend não introduziram regressões.
-- [ ] **Limpeza de Alertas**: Validar se as mudanças na RN-09.07 (comunicação direta) estabilizaram os testes de alerta (CDU-32/33).
+### Gerenciamento de Requisições e Cache
+- [ ] **Auditoria de Requests**: Mapear chamadas duplicadas no carregamento de `SubprocessoView`, `CadastroView` e `MapaView`.
+- [ ] **Deduplication e Concorrência**: Garantir que requisições idênticas disparadas em paralelo sejam unificadas (via stores ou composables).
+- [ ] **Invalidação Seletiva**: Substituir recargas totais por atualizações incrementais ou uso inteligente de cache local após ações de workflow.
+
+### Suíte E2E e Alertas
+- [ ] **Regressão Ampla**: Executar todos os 219+ testes para garantir integridade.
+- [ ] **Limpeza de Alertas**: Confirmar estabilidade dos testes CDU-32/33 após alinhamento da RN-09.07.
 
 ---
 
@@ -17,19 +22,21 @@ Fase 1 (Unificação Visual/Acessibilidade) concluída. Iniciando Fase 2 (Racion
 
 ### Backend: Quebra de God Classes
 - [ ] **`SubprocessoConsultaService`**: Isolar cálculo de permissões (`PermissoesFluxoDto`) e extrair consultas de Mapa/Cadastro.
-- [ ] **`ProcessoService`**: Mapear responsabilidades de criação/workflow e isolar lógica de finalização/bloqueio.
+- [ ] **`ProcessoService`**: Isolar responsabilidades de criação e lógica de finalização/bloqueio.
+- [ ] **`SubprocessoTransicaoService`**: Isolar lógicas de movimentação específicas.
+
+### Frontend: Modularização
+- [ ] **Modularização de Views**: Fatiar `CadastroView.vue` e `MapaView.vue`, movendo orquestração de modais para componentes dedicados.
 
 ### Remoção de Código Defensivo
-- [ ] **Varredura de DTOs**: Reduzir `@Nullable` e checks manuais de `null` em `UnidadeDto` e `ProcessoDetalheDto`.
-- [ ] **Limpeza no Frontend**: Eliminar verificações redundantes de existência de dados já garantidos pelo contrato de carga de contexto.
+- [ ] **Limpeza de DTOs**: Reduzir `@Nullable` e checks de `null` em `UnidadeDto` e `ProcessoDetalheDto`.
+- [ ] **Simplificação Frontend**: Eliminar guards redundantes de dados garantidos pelo contrato.
 
 ---
 
 ## P2: Dívida Técnica e UX
 
-### Qualidade de Código
-- [ ] **Acessibilidade Mobile**: Validar via capturas de tela (375px) a legibilidade das novas listas inline de conhecimentos.
-- [ ] **Tipagem em Testes**: Eliminar `any` remanescentes em hotspots de cobertura.
-
-### QA Dashboard
-- [ ] **Recuperação do Verde**: Atingir os thresholds de branch coverage no frontend sem relaxar as regras.
+### Qualidade e Tipagem
+- [ ] **Validação Mobile**: Conferir capturas de tela (375px) para resiliência visual.
+- [ ] **Tipagem**: Eliminar `any` remanescentes em hotspots de cobertura.
+- [ ] **QA Dashboard**: Recuperar status verde para cobertura de branches.
