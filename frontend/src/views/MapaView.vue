@@ -335,7 +335,6 @@ import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapaAcoesAnalise} from "@/composables/useMapaAcoesAnalise";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
-import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
@@ -362,11 +361,10 @@ const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
 const {mapaCompleto, impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const {notify} = useNotification();
-const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
-const subprocessoStoreCache = useSubprocessoStore();
+const subprocessoStore = useSubprocessoStore();
 const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
-const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
+const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
 usePerfil();
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
@@ -558,12 +556,11 @@ const {
 } = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
 async function carregarContextoEdicao(codigo: number) {
-  const data = await subprocessoStoreCache.garantirContextoEdicao(codigo);
+  const data = await subprocessoStore.garantirContextoEdicao(codigo);
   if (!data) {
     return null;
   }
 
-  subprocessosStore.subprocessoDetalhe = data.detalhes;
   atividades.value = data.atividadesDisponiveis;
   unidade.value = data.unidade;
 
@@ -574,7 +571,7 @@ async function carregarContextoInicial() {
   const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
     codProcesso: codProcesso.value,
     siglaUnidade: siglaUnidade.value,
-    store: subprocessoStoreCache,
+    store: subprocessoStore,
   });
 
   if (diagnostico.tipo === 'erroIntegracao') {
@@ -592,7 +589,6 @@ async function carregarContextoInicial() {
   }
 
   codSubprocesso.value = diagnostico.resultado.codigo;
-  subprocessosStore.subprocessoDetalhe = diagnostico.resultado.contexto.detalhes;
   atividades.value = diagnostico.resultado.contexto.atividadesDisponiveis;
   unidade.value = diagnostico.resultado.contexto.unidade;
 
@@ -610,7 +606,7 @@ async function executarComSubprocesso(
 function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   if (mapaAtualizado) {
     mapasStore.mapaCompleto.value = mapaAtualizado;
-    subprocessoStoreCache.invalidar();
+    subprocessoStore.invalidar();
   }
 }
 

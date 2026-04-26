@@ -4,7 +4,7 @@ import {createTestingPinia} from '@pinia/testing';
 import {useMapas} from '@/composables/useMapas';
 import MapaView from '@/views/MapaView.vue';
 import * as useFluxoMapaModule from '@/composables/useFluxoMapa';
-import * as useSubprocessosModule from '@/composables/useSubprocessos';
+import type {ContextoEdicaoSubprocesso} from '@/types/tipos';
 
 type MapaViewVm = {
     codSubprocesso: number | null;
@@ -21,8 +21,15 @@ type MapaViewVm = {
     fecharModalDisponibilizar: () => void;
 };
 
-vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: vi.fn()}));
 vi.mock('@/composables/useFluxoMapa', () => ({useFluxoMapa: vi.fn()}));
+const subprocessoStoreMock = {
+    contextoEdicao: null as ContextoEdicaoSubprocesso | null,
+    erroIntegracaoContexto: null as {message: string} | null,
+    garantirContextoEdicao: vi.fn(),
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    invalidar: vi.fn(),
+};
+vi.mock('@/stores/subprocesso', () => ({useSubprocessoStore: () => subprocessoStoreMock}));
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -38,16 +45,6 @@ vi.mock("vue-router", () => ({
 }));
 
 describe('MapaView Coverage', () => {
-    const subprocessosMock = {
-        subprocessoDetalhe: null as null | {codigo: number},
-        buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-        buscarContextoEdicao: vi.fn(),
-        buscarSubprocessoDetalhe: vi.fn(),
-        atualizarStatusLocal: vi.fn(),
-        lastError: null as {message: string} | null,
-        clearError: vi.fn(),
-    };
-
     const commonStubs = {
         PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
         BButton: {template: '<button />'},
@@ -73,11 +70,10 @@ describe('MapaView Coverage', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        subprocessosMock.subprocessoDetalhe = null;
-        subprocessosMock.lastError = null;
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
-        subprocessosMock.buscarContextoEdicao.mockResolvedValue(null);
-        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue(subprocessosMock as unknown as ReturnType<typeof useSubprocessosModule.useSubprocessos>);
+        subprocessoStoreMock.contextoEdicao = null;
+        subprocessoStoreMock.erroIntegracaoContexto = null;
+        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue(null);
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
         fluxoMapaMock.erro = null;
         fluxoMapaMock.lastError = null;
         fluxoMapaMock.clearError = vi.fn();
@@ -128,7 +124,7 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
 
         const wrapper = mount(MapaView, {
             global: {

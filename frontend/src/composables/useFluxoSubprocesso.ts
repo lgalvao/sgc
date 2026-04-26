@@ -17,7 +17,7 @@ import {
     reabrirRevisaoCadastro as serviceReabrirRevisaoCadastro,
 } from "@/services/processoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useSubprocessos} from "@/composables/useSubprocessos";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
@@ -26,7 +26,7 @@ import type {
 
 export function useFluxoSubprocesso() {
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
-    const subprocessos = useSubprocessos();
+    const subprocessoStore = useSubprocessoStore();
 
     async function executarAcao(
         acao: () => Promise<void>,
@@ -38,7 +38,7 @@ export function useFluxoSubprocesso() {
                 await acao();
 
                 if (recarregarSubprocesso && codigoSubprocesso) {
-                    await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso);
+                    await subprocessoStore.garantirContextoEdicao(codigoSubprocesso, true);
                 }
             });
 
@@ -63,14 +63,14 @@ export function useFluxoSubprocesso() {
     async function iniciarRevisaoCadastro(codigoSubprocesso: number) {
         return executarAcao(async () => {
             await serviceIniciarRevisaoCadastro(codigoSubprocesso);
-            await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso, false);
+            await subprocessoStore.garantirContextoEdicao(codigoSubprocesso);
         });
     }
 
     async function cancelarInicioRevisaoCadastro(codigoSubprocesso: number) {
         return executarAcao(async () => {
             await serviceCancelarInicioRevisaoCadastro(codigoSubprocesso);
-            await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso, false);
+            await subprocessoStore.garantirContextoEdicao(codigoSubprocesso);
         });
     }
 
@@ -101,7 +101,7 @@ export function useFluxoSubprocesso() {
     async function alterarDataLimiteSubprocesso(codigoSubprocesso: number, dados: {novaData: string}) {
         return withErrorHandling(async () => {
             await serviceAlterarDataLimite(codigoSubprocesso, dados);
-            await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso);
+            await subprocessoStore.garantirContextoEdicao(codigoSubprocesso, true);
         });
     }
 

@@ -254,9 +254,9 @@ import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
-import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useToastStore} from "@/stores/toast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useAcesso} from "@/composables/useAcesso";
@@ -289,7 +289,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const subprocessosStore = useSubprocessos();
+const subprocessoStore = useSubprocessoStore();
 const mapasStore = useMapas();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
@@ -305,7 +305,7 @@ const {impactoMapa: impactos} = mapasStore;
 const codSubprocesso = ref<number | null>(null);
 const codMapa = ref<number | null>(null);
 const carregandoInicial = ref(true);
-const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
+const subprocesso = computed(() => subprocessoStore.contextoCadastro?.detalhes ?? null);
 const unidade = ref<Unidade | null>(null);
 const acesso = useAcesso(subprocesso);
 const {
@@ -577,7 +577,7 @@ type AcaoAtualizacaoCadastro = () => Promise<RespostaLocalCadastro>;
 
 function processarRespostaLocal(response: RespostaLocalCadastro) {
   atividades.value = response.atividadesAtualizadas;
-  subprocessosStore.atualizarStatusLocal({
+  subprocessoStore.atualizarStatusLocal({
     ...response.subprocesso,
     permissoes: response.permissoes
   });
@@ -620,7 +620,7 @@ async function executarAtualizacaoCadastro(
 
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
-  const data = await subprocessosStore.buscarContextoCadastroAtividadesPorProcessoEUnidade(codProcessoRef, props.sigla);
+  const data = await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(codProcessoRef, props.sigla, true);
   if (!data) {
     logger.error("ERRO: Subprocesso não encontrado!");
     return;

@@ -24,12 +24,12 @@ vi.mock("@/services/processoService", () => ({
     reabrirRevisaoCadastro: vi.fn(),
 }));
 
-const subprocessosStoreMock = {
-    buscarSubprocessoDetalhe: vi.fn(),
+const subprocessoStoreMock = {
+    garantirContextoEdicao: vi.fn(),
 };
 
-vi.mock("@/composables/useSubprocessos", () => ({
-    useSubprocessos: () => subprocessosStoreMock,
+vi.mock("@/stores/subprocesso", () => ({
+    useSubprocessoStore: () => subprocessoStoreMock,
 }));
 
 describe("useFluxoSubprocesso", () => {
@@ -68,7 +68,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(resultado).toBe(true);
         expect(serviceHomologarCadastro).toHaveBeenCalledWith(10, {observacoes: "ok"});
-        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
+        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10, true);
     });
 
     it("deve alterar data limite e recarregar subprocesso", async () => {
@@ -79,7 +79,7 @@ describe("useFluxoSubprocesso", () => {
         await alterarDataLimiteSubprocesso(10, {novaData: "2026-04-01"});
 
         expect(serviceAlterarDataLimite).toHaveBeenCalledWith(10, {novaData: "2026-04-01"});
-        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
+        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10, true);
     });
 
     it("deve retornar false e registrar erro ao reabrir cadastro com falha", async () => {
@@ -111,7 +111,7 @@ describe("useFluxoSubprocesso", () => {
         await iniciarRevisaoCadastro(10);
 
         expect(service).toHaveBeenCalledWith(10);
-        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10, false);
+        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10);
     });
 
     it("deve cancelar inicio da revisao sem limpar o detalhe atual durante a recarga", async () => {
@@ -122,7 +122,7 @@ describe("useFluxoSubprocesso", () => {
         await cancelarInicioRevisaoCadastro(10);
 
         expect(service).toHaveBeenCalledWith(10);
-        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10, false);
+        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10);
     });
 
     it("deve devolver cadastro", async () => {
@@ -185,6 +185,6 @@ describe("useFluxoSubprocesso", () => {
         (service as any).mockResolvedValue(undefined);
 
         await disponibilizarCadastro(10);
-        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).not.toHaveBeenCalled();
+        expect(subprocessoStoreMock.garantirContextoEdicao).not.toHaveBeenCalled();
     });
 });

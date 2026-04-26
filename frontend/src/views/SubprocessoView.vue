@@ -149,16 +149,16 @@
         </BTable>
       </div>
     </div>
-    <div v-else-if="subprocessosStore.lastError" class="py-2">
+    <div v-else-if="subprocessoStore.erroIntegracaoContexto" class="py-2">
       <BAlert
           :model-value="true"
           variant="danger"
           dismissible
-          @dismissed="subprocessosStore.clearError()"
+          @dismissed="subprocessoStore.limparErroIntegracao()"
       >
-        {{ subprocessosStore.lastError.message }}
-        <div v-if="subprocessosStore.lastError.details">
-          <small>Detalhes: {{ subprocessosStore.lastError.details }}</small>
+        {{ subprocessoStore.erroIntegracaoContexto.message }}
+        <div v-if="subprocessoStore.erroIntegracaoContexto.details">
+          <small>Detalhes: {{ subprocessoStore.erroIntegracaoContexto.details }}</small>
         </div>
       </BAlert>
     </div>
@@ -243,7 +243,6 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
-import {useSubprocessos} from "@/composables/useSubprocessos";
 import {enviarLembrete as enviarLembreteService} from "@/services/processoService";
 
 import {useAcesso} from "@/composables/useAcesso";
@@ -251,6 +250,7 @@ import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoPro
 import {formatDateTimeBR, parseDate} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useToastStore} from "@/stores/toast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
@@ -273,7 +273,7 @@ function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
   return resp.tipo;
 }
 
-const subprocessosStore = useSubprocessos();
+const subprocessoStore = useSubprocessoStore();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
@@ -312,7 +312,7 @@ const rowAttrMovimentacao = (item: Movimentacao | null) => {
 };
 
 const subprocesso = computed<SubprocessoDetalhe | null>(
-    () => subprocessosStore.subprocessoDetalhe,
+    () => subprocessoStore.contextoEdicao?.detalhes ?? null,
 );
 
 const {
@@ -362,27 +362,20 @@ function exibirToastPendente() {
 }
 
 async function carregarSubprocesso() {
-  subprocessosStore.subprocessoDetalhe = null;
-  const codigoResolvido = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+  const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
       props.codProcesso,
-      props.siglaUnidade
+      props.siglaUnidade,
+      true,
   );
 
-  if (!codigoResolvido) {
+  if (!resultado) {
     codSubprocesso.value = null;
-    erroNaoEncontrado.value = !subprocessosStore.lastError;
+    erroNaoEncontrado.value = !subprocessoStore.erroIntegracaoContexto;
     return;
   }
 
-  codSubprocesso.value = codigoResolvido;
-  const detalhe = await subprocessosStore.buscarSubprocessoDetalhe(codigoResolvido);
-
-  if (detalhe) {
-    erroNaoEncontrado.value = false;
-    return;
-  }
-
-  erroNaoEncontrado.value = !subprocessosStore.lastError;
+  codSubprocesso.value = resultado.codigo;
+  erroNaoEncontrado.value = false;
 }
 
 onMounted(async () => {
@@ -497,7 +490,7 @@ async function enviarLembreteConfirmado() {
   loadingLembrete.value = true;
   try {
     await enviarLembreteService(props.codProcesso, subprocesso.value.unidade.codigo);
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
+    await subprocessoStore.garantirContextoEdicao(codSubprocesso.value, true);
     modalLembreteAberto.value = false;
     notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');
   } catch {

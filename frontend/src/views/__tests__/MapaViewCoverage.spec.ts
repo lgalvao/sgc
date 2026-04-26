@@ -147,6 +147,8 @@ function criarContextoEdicao(): ContextoEdicaoSubprocesso {
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 const subprocessoStoreCacheMock = {
     invalidar: vi.fn(),
+    contextoEdicao: null as ContextoEdicaoSubprocesso | null,
+    erroIntegracaoContexto: null as {message: string} | null,
     garantirContextoEdicao: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
 };
@@ -161,16 +163,6 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarContextoEdicao: vi.fn(),
 }));
 vi.mock("@/composables/useFluxoMapa", () => ({useFluxoMapa: vi.fn()}));
-const subprocessosMock = reactive({
-    subprocessoDetalhe: null as {codigo: number; situacao: SituacaoSubprocesso; tipoProcesso: TipoProcesso} | null,
-    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    buscarContextoEdicao: vi.fn(),
-    buscarSubprocessoDetalhe: vi.fn(),
-    atualizarStatusLocal: vi.fn(),
-    lastError: null as {message: string} | null,
-    clearError: vi.fn(),
-});
-vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
 vi.mock("@/stores/subprocesso", () => ({useSubprocessoStore: () => subprocessoStoreCacheMock}));
 const fluxoMapaMock = reactive({
     erro: null as {message: string} | null,
@@ -248,12 +240,8 @@ function createWrapper(initialMapaCompleto: MapaCompleto = criarMapaCompleto()) 
 describe("MapaView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        subprocessosMock.subprocessoDetalhe = null;
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
-        subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue(criarContextoEdicao());
-        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
-        subprocessosMock.atualizarStatusLocal = vi.fn();
-        subprocessosMock.lastError = null;
+        subprocessoStoreCacheMock.contextoEdicao = null;
+        subprocessoStoreCacheMock.erroIntegracaoContexto = null;
         subprocessoStoreCacheMock.garantirContextoEdicao.mockResolvedValue(criarContextoEdicao());
         subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
             codigo: 123,
@@ -444,15 +432,17 @@ describe("MapaView coverage", () => {
         await flushPromises();
         const vm = wrapper.vm as unknown as MapaViewVm;
         const store = useMapas();
-        const subprocessosStore = subprocessosMock;
+        const subprocessosStore = subprocessoStoreCacheMock;
         
-        subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
+        subprocessosStore.garantirContextoEdicao = vi.fn().mockResolvedValue({
             ...criarContextoEdicao(),
             atividadesDisponiveis: [{codigo: 1, descricao: "Ativ", conhecimentos: []}],
         });
 
-        // Simulando o retorno da action buscarSubprocessoPorProcessoEUnidade
-        subprocessosStore.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
+        subprocessosStore.garantirContextoEdicaoPorProcessoEUnidade = vi.fn().mockResolvedValue({
+            codigo: 123,
+            contexto: criarContextoEdicao(),
+        });
         
         // Em vez de checar toHaveBeenCalledWith, garantimos que os dados forçados na store funcionam e cobrem a ramificação:
         vm.codSubprocesso = 123;

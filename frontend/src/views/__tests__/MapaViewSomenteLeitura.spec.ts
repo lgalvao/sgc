@@ -12,21 +12,10 @@ const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
 const diagnosticoMock = vi.hoisted(() => vi.fn());
 const subprocessoStoreCacheMock = {
+    contextoEdicao: null as any,
     erroIntegracaoContexto: null,
     garantirContextoEdicao: vi.fn(),
     invalidar: vi.fn(),
-};
-
-const subprocessosMock = {
-    subprocessoDetalhe: {
-        codigo: 123,
-        codSubprocesso: 123,
-    } as any,
-    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    buscarSubprocessoDetalhe: vi.fn(),
-    atualizarStatusLocal: vi.fn(),
-    lastError: null,
-    clearError: vi.fn(),
 };
 
 vi.mock("vue-router", () => ({
@@ -53,10 +42,6 @@ vi.mock("@/services/processoService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     obterMapaVisualizacao: vi.fn(),
     obterSugestoesMapa: vi.fn(),
-}));
-
-vi.mock("@/composables/useSubprocessos", () => ({
-    useSubprocessos: () => subprocessosMock,
 }));
 
 vi.mock("@/stores/subprocesso", () => ({
@@ -113,7 +98,39 @@ const stubs = {
 describe("MapaView somente leitura", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        subprocessosMock.subprocessoDetalhe = {codigo: 123, codSubprocesso: 123} as any;
+        subprocessoStoreCacheMock.contextoEdicao = {
+            detalhes: {
+                codigo: 123,
+                unidade: {codigo: 1, sigla: 'TESTE', nome: 'Unidade Teste'},
+                situacao: 'MAPEAMENTO_MAPA_CRIADO',
+                tipoProcesso: 'MAPEAMENTO',
+                titular: null,
+                responsavel: null,
+                localizacaoAtual: 'TESTE',
+                processoDescricao: 'Processo',
+                dataCriacaoProcesso: '2024-01-01',
+                ultimaDataLimiteSubprocesso: '2025-01-01',
+                prazoEtapaAtual: '2025-01-01',
+                isEmAndamento: true,
+                etapaAtual: 2,
+                movimentacoes: [],
+                elementosProcesso: [],
+                permissoes: {},
+            },
+            unidade: {codigo: 1, sigla: 'TESTE', nome: 'Unidade Teste'},
+            atividadesDisponiveis: [],
+            mapa: {codigo: 10},
+            subprocesso: {
+                codigo: 123,
+                unidade: {codigo: 1, sigla: 'TESTE', nome: 'Unidade Teste'},
+                situacao: 'MAPEAMENTO_MAPA_CRIADO',
+                dataLimite: '2025-01-01',
+                dataFimEtapa1: '',
+                dataLimiteEtapa2: '',
+                atividades: [],
+                codUnidade: 1,
+            },
+        };
 
         diagnosticoMock.mockResolvedValue({
             tipo: 'sucesso',

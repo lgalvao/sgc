@@ -125,7 +125,6 @@ import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
-import {useSubprocessos} from "@/composables/useSubprocessos";
 import {type Mapa, type MapaCompleto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -142,11 +141,9 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const subprocessosStore = useSubprocessos();
+const subprocesso = computed(() => props.subprocesso ?? null);
 
-const subprocesso = computed(() => props.subprocesso ?? subprocessosStore.subprocessoDetalhe);
-
-const {podeEditarCadastro, podeEditarMapa, habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
+const {habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 
 function navegarPara(routeName: string) {

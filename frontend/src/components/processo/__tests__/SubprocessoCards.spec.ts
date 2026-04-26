@@ -15,12 +15,6 @@ vi.mock("vue-router", () => ({
     }),
 }));
 
-vi.mock("@/composables/useSubprocessos", () => ({
-    useSubprocessos: () => ({
-        subprocessoDetalhe: null
-    })
-}));
-
 describe("SubprocessoCards.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();

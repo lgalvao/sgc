@@ -75,19 +75,18 @@ const fluxoSubprocessoMock = {
     reabrirCadastro: vi.fn(),
     reabrirRevisaoCadastro: vi.fn(),
 };
-const subprocessosMock = reactive({
-    subprocessoDetalhe: null as SubprocessoDetalheMock | null,
-    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    buscarSubprocessoDetalhe: vi.fn(),
-    atualizarStatusLocal: vi.fn(),
-    lastError: null as {message: string} | null,
-    clearError: vi.fn(),
+const subprocessoStoreMock = reactive({
+    contextoEdicao: null as {detalhes: SubprocessoDetalheMock} | null,
+    erroIntegracaoContexto: null as {message: string; details?: string} | null,
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    garantirContextoEdicao: vi.fn(),
+    limparErroIntegracao: vi.fn(),
 });
 
 vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
-vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: () => subprocessosMock}));
+vi.mock('@/stores/subprocesso', () => ({useSubprocessoStore: () => subprocessoStoreMock}));
 
 describe('SubprocessoView.vue', () => {
     const mockSubprocesso: SubprocessoDetalheMock = {
@@ -163,14 +162,22 @@ describe('SubprocessoView.vue', () => {
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
-        subprocessosMock.subprocessoDetalhe = null;
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(10);
-        subprocessosMock.buscarSubprocessoDetalhe = vi.fn().mockImplementation(async () => {
-            subprocessosMock.subprocessoDetalhe = mockSubprocesso;
-            return mockSubprocesso;
+        subprocessoStoreMock.contextoEdicao = null;
+        subprocessoStoreMock.erroIntegracaoContexto = null;
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
+            subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
+            return {
+                codigo: 10,
+                contexto: {
+                    detalhes: mockSubprocesso,
+                }
+            };
         });
-        subprocessosMock.atualizarStatusLocal = vi.fn();
-        subprocessosMock.lastError = null;
+        subprocessoStoreMock.garantirContextoEdicao = vi.fn().mockImplementation(async () => {
+            subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
+            return {detalhes: mockSubprocesso};
+        });
+        subprocessoStoreMock.limparErroIntegracao = vi.fn();
     });
 
     // Helper to mount component with specific setup
@@ -203,10 +210,16 @@ describe('SubprocessoView.vue', () => {
             stubActions: true,
         });
 
-        subprocessosMock.buscarSubprocessoDetalhe.mockImplementation(async () => {
-            subprocessosMock.subprocessoDetalhe = subprocessoToUse;
-            return subprocessoToUse;
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
+            subprocessoStoreMock.contextoEdicao = {detalhes: subprocessoToUse};
+            return {
+                codigo: subprocessoToUse.codigo,
+                contexto: {
+                    detalhes: subprocessoToUse,
+                }
+            };
         });
+        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue({detalhes: subprocessoToUse});
 
         const wrapper = mount(SubprocessoView, {
             global: {
@@ -223,22 +236,20 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        return {wrapper, store: subprocessosMock};
+        return {wrapper, store: subprocessoStoreMock};
     };
 
     it('fetches data on mount', async () => {
         mountComponent();
         await flushPromises();
 
-        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
-        expect(subprocessosMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true);
     });
 
     it('recarrega dados ao reativar a view em keepAlive', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockClear();
-        subprocessosMock.buscarSubprocessoDetalhe.mockClear();
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
 
         const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
         for (const hook of hooks) {
@@ -246,27 +257,27 @@ describe('SubprocessoView.vue', () => {
         }
         await flushPromises();
 
-        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
-        expect(subprocessosMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true);
     });
 
     it('mantem orçamento enxuto de chamadas no carregamento inicial do detalhe', async () => {
         mountComponent();
         await flushPromises();
 
-        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
-        expect(subprocessosMock.buscarSubprocessoDetalhe).toHaveBeenCalledTimes(1);
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
     });
 
     it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {
         // Simula dado desatualizado de uma visita anterior (ex: processo de mapeamento
         // com podeEditarCadastro=false), que poderia fazer SubprocessoCards carregar
         // dados incorretos na primeira renderização
-        subprocessosMock.subprocessoDetalhe = {
-            ...mockSubprocesso,
-            codigo: 999,
-            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-            permissoes: {podeEditarCadastro: false}
+        subprocessoStoreMock.contextoEdicao = {
+            detalhes: {
+                ...mockSubprocesso,
+                codigo: 999,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                permissoes: {podeEditarCadastro: false}
+            }
         };
 
         mountComponent();
@@ -274,16 +285,18 @@ describe('SubprocessoView.vue', () => {
 
         // Após o carregamento, o subprocessoDetalhe deve refletir os dados corretos
         // (mockSubprocesso com codigo: 10), não os dados residuais do estado anterior (codigo: 999)
-        expect(subprocessosMock.subprocessoDetalhe).not.toBeNull();
-        expect(subprocessosMock.subprocessoDetalhe?.codigo).toBe(10);
+        expect(subprocessoStoreMock.contextoEdicao).not.toBeNull();
+        expect(subprocessoStoreMock.contextoEdicao?.detalhes.codigo).toBe(10);
     });
 
     it('substitui permissões stale de ADMIN por permissões de CHEFE ao abrir o subprocesso na mesma sessão', async () => {
-        subprocessosMock.subprocessoDetalhe = {
-            ...mockSubprocesso,
-            codigo: 999,
-            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-            permissoes: {podeEditarCadastro: false}
+        subprocessoStoreMock.contextoEdicao = {
+            detalhes: {
+                ...mockSubprocesso,
+                codigo: 999,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                permissoes: {podeEditarCadastro: false}
+            }
         };
 
         const {wrapper} = mountComponent({
@@ -494,12 +507,12 @@ describe('SubprocessoView.vue', () => {
         if (appAlert.exists()) await appAlert.vm.$emit('dismissed');
 
         // Gerenciamento de erros de subprocesso
-        subprocessosMock.subprocessoDetalhe = null;
-        subprocessosMock.lastError = { message: "Erro" };
+        subprocessoStoreMock.contextoEdicao = null;
+        subprocessoStoreMock.erroIntegracaoContexto = { message: "Erro" };
         await vm.$nextTick();
         const bAlert = wrapper.findComponent({name: 'BAlert'});
         if (bAlert.exists()) await bAlert.vm.$emit('dismissed');
-        expect(subprocessosMock.clearError).toHaveBeenCalled();
+        expect(subprocessoStoreMock.limparErroIntegracao).toHaveBeenCalled();
 
         // Atualização de estados de v-model nos modais
         const modalsComp = wrapper.findAllComponents({name: 'ModalConfirmacao'});
