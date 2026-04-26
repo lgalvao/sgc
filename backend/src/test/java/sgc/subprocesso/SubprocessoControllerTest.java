@@ -539,7 +539,7 @@ class SubprocessoControllerTest {
         void deveDisponibilizarMapaEmBloco() throws Exception {
             ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest(List.of(1L, 2L), null);
 
-            mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa-bloco")
+            mockMvc.perform(post("/api/subprocessos/disponibilizar-mapa-bloco")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
@@ -811,7 +811,7 @@ class SubprocessoControllerTest {
         void deveAceitarValidacaoEmBloco() throws Exception {
             ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest(List.of(1L, 2L), null);
 
-            mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao-bloco")
+            mockMvc.perform(post("/api/subprocessos/aceitar-validacao-bloco")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
@@ -826,7 +826,7 @@ class SubprocessoControllerTest {
         void deveHomologarValidacaoEmBloco() throws Exception {
             ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest(List.of(1L, 2L), null);
 
-            mockMvc.perform(post("/api/subprocessos/1/homologar-validacao-bloco")
+            mockMvc.perform(post("/api/subprocessos/homologar-validacao-bloco")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))

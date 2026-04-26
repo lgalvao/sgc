@@ -293,46 +293,41 @@ export async function removerCompetencia(
 // Acoes em Bloco
 
 export async function aceitarCadastroEmBloco(
-    codSubprocesso: number,
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-cadastro-bloco`, {
+    await apiClient.post(`/subprocessos/aceitar-cadastro-bloco`, {
         subprocessos: payload.unidadeCodigos
     });
 }
 
 export async function homologarCadastroEmBloco(
-    codSubprocesso: number,
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-cadastro-bloco`, {
+    await apiClient.post(`/subprocessos/homologar-cadastro-bloco`, {
         subprocessos: payload.unidadeCodigos
     });
 }
 
 export async function aceitarValidacaoEmBloco(
-    codSubprocesso: number,
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao-bloco`, {
+    await apiClient.post(`/subprocessos/aceitar-validacao-bloco`, {
         subprocessos: payload.unidadeCodigos
     });
 }
 
 export async function homologarValidacaoEmBloco(
-    codSubprocesso: number,
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao-bloco`, {
+    await apiClient.post(`/subprocessos/homologar-validacao-bloco`, {
         subprocessos: payload.unidadeCodigos
     });
 }
 
 export async function disponibilizarMapaEmBloco(
-    codSubprocesso: number,
     payload: { unidadeCodigos: number[]; dataLimite?: string }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-mapa-bloco`, {
+    await apiClient.post(`/subprocessos/disponibilizar-mapa-bloco`, {
         subprocessos: payload.unidadeCodigos,
         dataLimite: payload.dataLimite
     });

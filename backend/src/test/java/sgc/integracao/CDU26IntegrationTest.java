@@ -126,7 +126,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/homologar-validacao-bloco", codigoContexto)
+                        post("/api/subprocessos/homologar-validacao-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

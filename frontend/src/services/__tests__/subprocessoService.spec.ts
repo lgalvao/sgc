@@ -285,28 +285,28 @@ describe('subprocessoService', () => {
   });
 
   it('aceitarCadastroEmBloco', async () => {
-    await subprocessoService.aceitarCadastroEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-cadastro-bloco', { subprocessos: [2] });
+    await subprocessoService.aceitarCadastroEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/aceitar-cadastro-bloco', { subprocessos: [2] });
   });
 
   it('homologarCadastroEmBloco', async () => {
-    await subprocessoService.homologarCadastroEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/homologar-cadastro-bloco', { subprocessos: [2] });
+    await subprocessoService.homologarCadastroEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/homologar-cadastro-bloco', { subprocessos: [2] });
   });
 
   it('aceitarValidacaoEmBloco', async () => {
-    await subprocessoService.aceitarValidacaoEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-validacao-bloco', { subprocessos: [2] });
+    await subprocessoService.aceitarValidacaoEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/aceitar-validacao-bloco', { subprocessos: [2] });
   });
 
   it('homologarValidacaoEmBloco', async () => {
-    await subprocessoService.homologarValidacaoEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/homologar-validacao-bloco', { subprocessos: [2] });
+    await subprocessoService.homologarValidacaoEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/homologar-validacao-bloco', { subprocessos: [2] });
   });
 
   it('disponibilizarMapaEmBloco', async () => {
-    await subprocessoService.disponibilizarMapaEmBloco(1, { unidadeCodigos: [2], dataLimite: '2024-01-01' });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa-bloco', { subprocessos: [2], dataLimite: '2024-01-01' });
+    await subprocessoService.disponibilizarMapaEmBloco({ unidadeCodigos: [2], dataLimite: '2024-01-01' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/disponibilizar-mapa-bloco', { subprocessos: [2], dataLimite: '2024-01-01' });
   });
 
   it('listarAnalisesCadastro', async () => {

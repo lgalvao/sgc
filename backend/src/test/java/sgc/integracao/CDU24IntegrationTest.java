@@ -146,7 +146,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", codigoContexto)
+                        post("/api/subprocessos/disponibilizar-mapa-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -194,7 +194,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .build();
 
                 mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", processo.getCodigo())
+                        post("/api/subprocessos/disponibilizar-mapa-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -226,7 +226,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", processo.getCodigo())
+                        post("/api/subprocessos/disponibilizar-mapa-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

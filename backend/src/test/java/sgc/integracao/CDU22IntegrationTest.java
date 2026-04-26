@@ -119,7 +119,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/aceitar-cadastro-bloco", codigoContexto)
+                        post("/api/subprocessos/aceitar-cadastro-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

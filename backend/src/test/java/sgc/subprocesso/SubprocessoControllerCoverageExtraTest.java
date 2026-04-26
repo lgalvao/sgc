@@ -124,7 +124,7 @@ class SubprocessoControllerCoverageExtraTest {
         ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest(List.of(1L), LocalDate.now());
         when(permissionEvaluator.hasPermission(any(), any(), eq("Subprocesso"), eq("DISPONIBILIZAR_MAPA"))).thenReturn(true);
 
-        mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa-bloco")
+        mockMvc.perform(post("/api/subprocessos/disponibilizar-mapa-bloco")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
