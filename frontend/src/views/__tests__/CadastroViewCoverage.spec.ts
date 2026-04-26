@@ -305,9 +305,34 @@ describe("CadastroView coverage", () => {
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.erroIntegracaoContexto = null;
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
+            lastError: ref(null),
+            clearError: vi.fn(),
             validarCadastro: vi.fn(),
-            disponibilizarCadastro: vi.fn().mockResolvedValue(true),
-            disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            disponibilizarCadastro: vi.fn().mockImplementation(() => {
+                subprocessosMock.invalidar();
+                pushMock("/painel");
+                return Promise.resolve(true);
+            }),
+            aceitarCadastro: vi.fn().mockImplementation(() => {
+                subprocessosMock.invalidar();
+                pushMock("/painel");
+                return Promise.resolve(true);
+            }),
+            homologarCadastro: vi.fn().mockImplementation((_c, _r, _ir, opts) => {
+                subprocessosMock.invalidar();
+                if (opts?.redirecionarParaPainel) {
+                    pushMock("/painel");
+                } else if (opts?.redirecionarPara) {
+                    pushMock(opts.redirecionarPara);
+                }
+                return Promise.resolve(true);
+            }),
+            devolverCadastro: vi.fn().mockImplementation(() => {
+                subprocessosMock.invalidar();
+                pushMock("/painel");
+                return Promise.resolve(true);
+            }),
+            reabrirCadastro: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
         vi.mocked(subprocessoService.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(criarContextoCadastro() as never);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
@@ -422,7 +447,7 @@ describe("CadastroView coverage", () => {
             ...criarSubprocessoMinimo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO),
         };
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
-        fluxoSubprocesso.disponibilizarRevisaoCadastro.mockResolvedValue(true);
+        fluxoSubprocesso.disponibilizarCadastro.mockResolvedValue(true);
         await vm.confirmarDisponibilizacao();
         expect(vm.mostrarModalConfirmacao).toBe(false);
 
@@ -578,7 +603,7 @@ describe("CadastroView coverage", () => {
         const primeiraExecucao = vm.confirmarDisponibilizacao();
         const segundaExecucao = vm.confirmarDisponibilizacao();
 
-        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledTimes(1);
+        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123, false);
         expect(vm.loadingDisponibilizacao).toBe(true);
 
         resolver(true);

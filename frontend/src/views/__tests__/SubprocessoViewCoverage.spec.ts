@@ -5,7 +5,7 @@ import SubprocessoView from '@/views/SubprocessoView.vue';
 import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 import * as processoService from '@/services/processoService';
-import {computed, reactive} from 'vue';
+import {computed, reactive, ref} from 'vue';
 import {
     type ContextoEdicaoSubprocesso,
     SituacaoSubprocesso,
@@ -125,7 +125,8 @@ function criarSubprocessoDetalhe(parcial: Partial<SubprocessoDetalhe> = {}): Sub
 const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
-    reabrirRevisaoCadastro: vi.fn(),
+    lastError: ref(null),
+    clearError: vi.fn(),
 };
 
 const subprocessoStoreMock = reactive<{
@@ -213,7 +214,6 @@ describe('SubprocessoView Coverage', () => {
         vi.clearAllMocks();
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
-        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
         definirContextoEdicao(null);
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
             const detalhe = criarSubprocessoDetalhe({
@@ -335,13 +335,13 @@ describe('SubprocessoView Coverage', () => {
         vm.tipoReabertura = 'cadastro';
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValueOnce(true);
         await vm.confirmarReabertura();
-        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(123, 'Justificativa');
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(123, 'Justificativa', false);
 
         vm.justificativaReabertura = 'Justificativa';
         vm.tipoReabertura = 'revisao';
-        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValueOnce(true);
+        fluxoSubprocessoMock.reabrirCadastro.mockResolvedValueOnce(true);
         await vm.confirmarReabertura();
-        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(123, 'Justificativa');
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(123, 'Justificativa', true);
 
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValueOnce(false);
         vm.tipoReabertura = 'cadastro';

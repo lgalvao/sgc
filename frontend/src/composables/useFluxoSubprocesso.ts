@@ -112,29 +112,32 @@ export function useFluxoSubprocesso() {
         );
     }
 
-    async function aceitarCadastro(codigoSubprocesso: number, req: AceitarCadastroRequest, isRevisao = false, options: { mensagemSucesso: string }) {
+    async function aceitarCadastro(codigoSubprocesso: number, req: AceitarCadastroRequest, isRevisao = false, options?: {
+        mensagemSucesso?: string
+    }) {
         return executarAcaoWorkflow(
             () => isRevisao ? serviceAceitarRevisaoCadastro(codigoSubprocesso, req) : serviceAceitarCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: options.mensagemSucesso,
+                mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.ACEITE_REALIZADO,
                 redirecionarParaPainel: true,
                 invalidarCaches: {incluirPainel: true}
             }
         );
     }
 
-    async function homologarCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest, isRevisao = false, options: {
-        mensagemSucesso: string;
-        redirecionarParaPainel: boolean;
+    async function homologarCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest, isRevisao = false, options?: {
+        mensagemSucesso?: string;
+        redirecionarParaPainel?: boolean;
         redirecionarPara?: { name: string; params: any }
     }) {
+        const redirecionarParaPainel = options?.redirecionarParaPainel ?? true;
         return executarAcaoWorkflow(
             () => isRevisao ? serviceHomologarRevisaoCadastro(codigoSubprocesso, req) : serviceHomologarCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: options.mensagemSucesso,
-                redirecionarParaPainel: options.redirecionarParaPainel,
-                redirecionarPara: options.redirecionarPara,
-                invalidarCaches: options.redirecionarParaPainel ? {incluirPainel: true} : {}
+                mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.HOMOLOGACAO_REALIZADA,
+                redirecionarParaPainel,
+                redirecionarPara: options?.redirecionarPara,
+                invalidarCaches: redirecionarParaPainel ? {incluirPainel: true} : {}
             }
         );
     }
