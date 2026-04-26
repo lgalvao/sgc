@@ -55,8 +55,12 @@ Preserve:
 Rode o cenário com monitoramento ligado e saída redirecionada para um único arquivo:
 
 ```bash
-SGC_MONITORAMENTO=sim SGC_MONITORAMENTO_NIVEL_LOG=warn npx playwright test e2e/arquivo.spec.ts > /tmp/arquivo-monitorado.log 2>&1
+SGC_MONITORAMENTO=sim SGC_MONITORAMENTO_TEMPO_MINIMO_HTTP_MS=0 SGC_MONITORAMENTO_TEMPO_MINIMO_JAVA_MS=0 npx playwright test e2e/arquivo.spec.ts --reporter=dot > /tmp/arquivo-monitorado.log 2>&1
 ```
+
+> [!IMPORTANT]
+> **Use o nível INFO**: Por padrão, o monitoramento pode estar em `WARN`. Para ver todas as chamadas HTTP e Java, garanta que o nível está em `info` (padrão se omitido).
+> **Zere os thresholds**: O threshold padrão de 100ms/500ms oculta chamadas rápidas que, se repetidas, causam impacto. Use `0` para auditoria completa.
 
 Se o caso de uso depender de preparação serial, rode o arquivo inteiro. Se houver um cenário isolável sem perder fidelidade, rode o recorte mínimo suficiente.
 

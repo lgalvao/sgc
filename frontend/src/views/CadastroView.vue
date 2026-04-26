@@ -848,7 +848,7 @@ async function confirmarDisponibilizacao() {
         ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
         : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO;
     toastStore.setPending(msg);
-    invalidarCachesSubprocesso();
+    invalidarCachesSubprocesso({incluirPainel: true});
     await router.push("/painel");
   }
 }
@@ -900,10 +900,10 @@ async function confirmarValidacaoAnalise() {
         fecharModalValidarAnalise();
         toastStore.setPending(acao.mensagemSucesso);
         if (acao.redirecionarParaPainel) {
-          invalidarCachesSubprocesso();
+          invalidarCachesSubprocesso({incluirPainel: true});
           await router.push({name: "Painel"});
         } else {
-          invalidarCachesSubprocesso({incluirPainel: false});
+          invalidarCachesSubprocesso();
           await router.push({
             name: "Subprocesso",
             params: {codProcesso: props.codProcesso, siglaUnidade: props.sigla},
@@ -921,7 +921,7 @@ async function confirmarValidacaoAnalise() {
     if (sucesso) {
       fecharModalValidarAnalise();
       toastStore.setPending(acao.mensagemSucesso);
-      invalidarCachesSubprocesso();
+      invalidarCachesSubprocesso({incluirPainel: true});
       await router.push({name: "Painel"});
     }
   } finally {
@@ -947,7 +947,7 @@ async function confirmarDevolucaoAnalise() {
     if (sucesso) {
       fecharModalDevolverAnalise();
       toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
-      invalidarCachesSubprocesso();
+      invalidarCachesSubprocesso({incluirPainel: true});
       await router.push("/painel");
     }
   } finally {

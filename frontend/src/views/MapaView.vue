@@ -435,8 +435,7 @@ const mensagemErroSugestoes = computed(() => {
 
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   fecharModal();
-  toastStore.setPending(mensagem);
-  invalidarCachesSubprocesso();
+  invalidarCachesSubprocesso({incluirPainel: true});
   await router.push({name: "Painel"});
 }
 
@@ -860,7 +859,7 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
       await fluxoMapa.disponibilizarMapa(codigoSubprocesso, payload);
       fecharModalDisponibilizar();
       toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
-      invalidarCachesSubprocesso();
+      invalidarCachesSubprocesso({incluirPainel: true});
       await router.push({name: "Painel"});
     } catch {
       handleErrors(fluxoMapa);

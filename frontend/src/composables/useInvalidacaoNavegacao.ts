@@ -25,10 +25,10 @@ export function useInvalidacaoNavegacao() {
     }
 
     function invalidarCachesSubprocesso(opcoes?: {incluirPainel?: boolean; incluirProcesso?: boolean}): void {
-        if (opcoes?.incluirPainel ?? true) {
+        if (opcoes?.incluirPainel ?? false) {
             painelStore.invalidar();
         }
-        if (opcoes?.incluirProcesso ?? true) {
+        if (opcoes?.incluirProcesso ?? false) {
             processoStore.invalidar();
         }
         subprocessoStore.invalidar();

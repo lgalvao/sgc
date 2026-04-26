@@ -38,6 +38,15 @@ Conduzir a simplificação estrutural do SGC sem quebrar contratos, requisitos, 
 - Estabilidade de URLs recuperada: helpers E2E agora suportam parâmetros de consulta (`codSubprocesso`).
 - Correções de mock: stores agora expõem `invalidar` e `limparContextoAtual` consistentemente em ambiente de teste.
 
+### 2.4 Diagnóstico de Monitoramento (Auditoria P0)
+
+Após rodadas monitoradas (`SGC_MONITORAMENTO=sim`) dos cenários CDU-07 e CDU-05, foram identificados os seguintes desperdícios:
+
+1.  **Redundância de `painel/bootstrap`**: Chamado ~3x por sessão devido à invalidação ampla default em `useInvalidacaoNavegacao.invalidarCachesSubprocesso()`. O default `incluirPainel: true` força recargas desnecessárias em fluxos que não retornam ao Painel imediatamente.
+2.  **Chamadas duplicadas de contexto**: `contexto-edicao` é solicitado duas vezes em sequência antes de ações no `MapaView` (disponibilizar, aceitar, homologar).
+3.  **Double Reload pós-mutação**: Ações como `homologar-cadastro` disparam recarga via `useFluxoSubprocesso` e, ao retornar para a view, o `onActivated` dispara uma segunda busca por não detectar que o estado já está atualizado.
+4.  **Thresholds de Monitoramento**: Identificado que o threshold padrão de 100ms ocultava chamadas rápidas (<10ms) que, somadas, degradam a UX.
+
 ---
 
 ## 3. Pendências reais remanescentes
