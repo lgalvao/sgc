@@ -16,11 +16,11 @@ public class AlertaService {
     private final AlertaRepo alertaRepo;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
 
-    public Alerta salvar(Alerta alerta) {
+    Alerta salvar(Alerta alerta) {
         return alertaRepo.save(alerta);
     }
 
-    public List<Alerta> salvarTodos(List<Alerta> alertas) {
+    List<Alerta> salvarTodos(List<Alerta> alertas) {
         return alertaRepo.saveAll(alertas);
     }
 
@@ -64,11 +64,11 @@ public class AlertaService {
         return alertaRepo.findAllById(codigos);
     }
 
-    public void salvarAlertaUsuario(AlertaUsuario au) {
+    void salvarAlertaUsuario(AlertaUsuario au) {
         alertaUsuarioRepo.save(au);
     }
 
-    public List<AlertaUsuario> salvarAlertasUsuarios(List<AlertaUsuario> alertasUsuarios) {
+    List<AlertaUsuario> salvarAlertasUsuarios(List<AlertaUsuario> alertasUsuarios) {
         return alertaUsuarioRepo.saveAll(alertasUsuarios);
     }
 

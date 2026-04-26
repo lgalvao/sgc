@@ -537,9 +537,9 @@ class SubprocessoControllerTest {
         @DisplayName("deve disponibilizar mapas em bloco")
         @WithMockUser(roles = "GESTOR")
         void deveDisponibilizarMapaEmBloco() throws Exception {
-            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest("DISPONIBILIZAR", List.of(1L, 2L), null);
+            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest(List.of(1L, 2L), null);
 
-            mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa-bloco")
+            mockMvc.perform(post("/api/subprocessos/disponibilizar-mapa-bloco")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
@@ -809,9 +809,9 @@ class SubprocessoControllerTest {
         @DisplayName("deve aceitar validação em bloco")
         @WithMockUser(roles = "GESTOR")
         void deveAceitarValidacaoEmBloco() throws Exception {
-            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest("ACEITAR", List.of(1L, 2L), null);
+            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest(List.of(1L, 2L), null);
 
-            mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao-bloco")
+            mockMvc.perform(post("/api/subprocessos/aceitar-validacao-bloco")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
@@ -824,9 +824,9 @@ class SubprocessoControllerTest {
         @DisplayName("deve homologar validação em bloco")
         @WithMockUser(roles = "ADMIN")
         void deveHomologarValidacaoEmBloco() throws Exception {
-            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest("HOMOLOGAR", List.of(1L, 2L), null);
+            ProcessarEmBlocoRequest request = new ProcessarEmBlocoRequest(List.of(1L, 2L), null);
 
-            mockMvc.perform(post("/api/subprocessos/1/homologar-validacao-bloco")
+            mockMvc.perform(post("/api/subprocessos/homologar-validacao-bloco")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))

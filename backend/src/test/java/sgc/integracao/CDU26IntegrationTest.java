@@ -122,12 +122,11 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         entityManager.clear();
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .acao("HOMOLOGAR_VALIDACAO")
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/homologar-validacao-bloco", codigoContexto)
+                        post("/api/subprocessos/homologar-validacao-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

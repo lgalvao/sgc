@@ -142,12 +142,11 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(unidadesSelecionadas)
-                .acao("DISPONIBILIZAR")
                 .dataLimite(subprocesso1.getDataLimiteEtapa1().toLocalDate().plusDays(1))
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", codigoContexto)
+                        post("/api/subprocessos/disponibilizar-mapa-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -191,12 +190,11 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(List.of(subprocesso1.getCodigo()))
-                .acao("DISPONIBILIZAR")
                 .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 
                 mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", processo.getCodigo())
+                        post("/api/subprocessos/disponibilizar-mapa-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -224,12 +222,11 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(List.of(subprocesso1.getCodigo()))
-                .acao("DISPONIBILIZAR")
                 .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", processo.getCodigo())
+                        post("/api/subprocessos/disponibilizar-mapa-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

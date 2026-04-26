@@ -120,6 +120,7 @@ describe('subprocessoService', () => {
           dataFimEtapa1: null,
           dataLimiteEtapa2: '2025-02-01T00:00:00',
           dataFimEtapa2: null,
+          ultimaDataLimite: '2025-02-01T00:00:00',
           processoDescricao: 'Processo',
           dataCriacaoProcesso: '2024-01-01T00:00:00',
           tipoProcesso: TipoProcesso.MAPEAMENTO,
@@ -169,6 +170,7 @@ describe('subprocessoService', () => {
           dataFimEtapa1: null,
           dataLimiteEtapa2: null,
           dataFimEtapa2: null,
+          ultimaDataLimite: '2025-01-01T00:00:00',
           processoDescricao: 'Processo',
           dataCriacaoProcesso: '2024-01-01T00:00:00',
           tipoProcesso: TipoProcesso.MAPEAMENTO,
@@ -283,28 +285,28 @@ describe('subprocessoService', () => {
   });
 
   it('aceitarCadastroEmBloco', async () => {
-    await subprocessoService.aceitarCadastroEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-cadastro-bloco', { acao: 'ACEITAR', subprocessos: [2] });
+    await subprocessoService.aceitarCadastroEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/aceitar-cadastro-bloco', { subprocessos: [2] });
   });
 
   it('homologarCadastroEmBloco', async () => {
-    await subprocessoService.homologarCadastroEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/homologar-cadastro-bloco', { acao: 'HOMOLOGAR', subprocessos: [2] });
+    await subprocessoService.homologarCadastroEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/homologar-cadastro-bloco', { subprocessos: [2] });
   });
 
   it('aceitarValidacaoEmBloco', async () => {
-    await subprocessoService.aceitarValidacaoEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-validacao-bloco', { acao: 'ACEITAR_VALIDACAO', subprocessos: [2] });
+    await subprocessoService.aceitarValidacaoEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/aceitar-validacao-bloco', { subprocessos: [2] });
   });
 
   it('homologarValidacaoEmBloco', async () => {
-    await subprocessoService.homologarValidacaoEmBloco(1, { unidadeCodigos: [2] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/homologar-validacao-bloco', { acao: 'HOMOLOGAR_VALIDACAO', subprocessos: [2] });
+    await subprocessoService.homologarValidacaoEmBloco({ unidadeCodigos: [2] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/homologar-validacao-bloco', { subprocessos: [2] });
   });
 
   it('disponibilizarMapaEmBloco', async () => {
-    await subprocessoService.disponibilizarMapaEmBloco(1, { unidadeCodigos: [2], dataLimite: '2024-01-01' });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa-bloco', { acao: 'DISPONIBILIZAR', subprocessos: [2], dataLimite: '2024-01-01' });
+    await subprocessoService.disponibilizarMapaEmBloco({ unidadeCodigos: [2], dataLimite: '2024-01-01' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/disponibilizar-mapa-bloco', { subprocessos: [2], dataLimite: '2024-01-01' });
   });
 
   it('listarAnalisesCadastro', async () => {
@@ -326,7 +328,7 @@ describe('subprocessoService', () => {
   });
 
   describe('mapSubprocessoDetalheResponseParaModel', () => {
-    it('deve usar dataLimiteEtapa1 se dataLimiteEtapa1 for maior que dataLimiteEtapa2', () => {
+    it('deve mapear ultimaDataLimite diretamente do backend', () => {
       const dto = {
         subprocesso: {
           codigo: 1,
@@ -334,6 +336,7 @@ describe('subprocessoService', () => {
           situacao: SituacaoSubprocesso.NAO_INICIADO,
           dataLimiteEtapa1: '2025-02-01T00:00:00',
           dataLimiteEtapa2: '2025-01-01T00:00:00',
+          ultimaDataLimite: '2025-02-01T00:00:00',
           processoDescricao: 'P',
           dataCriacaoProcesso: '2024-01-01',
           tipoProcesso: TipoProcesso.MAPEAMENTO,

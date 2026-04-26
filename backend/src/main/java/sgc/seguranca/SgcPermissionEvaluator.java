@@ -122,28 +122,54 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         Perfil perfil = usuario.getPerfilAtivo();
         Processo processo = sp.getProcesso();
 
-        // Caso especial: importação permite consultar processos finalizados
-        if (acao == AcaoPermissao.CONSULTAR_PARA_IMPORTACAO && perfil == CHEFE) {
-            return processo.getSituacao() == FINALIZADO || verificarHierarquia(usuario, sp.getUnidade());
+        if (ehConsultaImportacaoChefe(acao, perfil)) {
+            return verificarImportacaoChefe(usuario, sp, processo);
         }
 
-        // Processo finalizado: bloqueia escrita, permite leitura
         if (processo.getSituacao() == FINALIZADO) {
-            return !acao.dependeLocalizacao() && acao.permitePerfil(perfil);
+            return verificarAcaoEmProcessoFinalizado(acao, perfil);
         }
 
-        // Ações de leitura: verificam hierarquia (exceto admin, que vê tudo)
         if (!acao.dependeLocalizacao()) {
-            if (perfil == ADMIN) return true;
-            if (acao == AcaoPermissao.VERIFICAR_IMPACTOS) return true; // controle feito no serviço
-            return verificarHierarquia(usuario, sp.getUnidade());
+            return verificarAcaoLeitura(usuario, sp, acao, perfil);
         }
 
-        // Ações de escrita: verificam perfil + localização
-        if (!acao.permitePerfil(perfil)) {
-            return false;
-        }
+        return verificarAcaoEscrita(usuario, sp, acao, perfil, logarNegacao);
+    }
 
+    /**
+     * Regra especial: CHEFE pode consultar para importação mesmo em processos finalizados,
+     * desde que o subprocesso pertença à sua hierarquia.
+     */
+    private boolean ehConsultaImportacaoChefe(AcaoPermissao acao, Perfil perfil) {
+        return acao == AcaoPermissao.CONSULTAR_PARA_IMPORTACAO && perfil == CHEFE;
+    }
+
+    private boolean verificarImportacaoChefe(Usuario usuario, Subprocesso sp, Processo processo) {
+        return processo.getSituacao() == FINALIZADO || verificarHierarquia(usuario, sp.getUnidade());
+    }
+
+    /**
+     * Processo finalizado: apenas leitura é permitida (escritas dependem de localização, logo negadas).
+     */
+    private boolean verificarAcaoEmProcessoFinalizado(AcaoPermissao acao, Perfil perfil) {
+        return !acao.dependeLocalizacao() && acao.permitePerfil(perfil);
+    }
+
+    /**
+     * Ações de leitura: ADMIN vê tudo; VERIFICAR_IMPACTOS é controlado pelo serviço; demais verificam hierarquia.
+     */
+    private boolean verificarAcaoLeitura(Usuario usuario, Subprocesso sp, AcaoPermissao acao, Perfil perfil) {
+        if (perfil == ADMIN) return true;
+        if (acao == AcaoPermissao.VERIFICAR_IMPACTOS) return true;
+        return verificarHierarquia(usuario, sp.getUnidade());
+    }
+
+    /**
+     * Ações de escrita: verificam perfil permitido e localização atual do subprocesso.
+     */
+    private boolean verificarAcaoEscrita(Usuario usuario, Subprocesso sp, AcaoPermissao acao, Perfil perfil, boolean logarNegacao) {
+        if (!acao.permitePerfil(perfil)) return false;
         return verificarLocalizacao(usuario, sp, logarNegacao);
     }
 

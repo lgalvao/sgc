@@ -114,12 +114,11 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .acao("ACEITAR_VALIDACAO")
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/aceitar-validacao-bloco", codigoContexto)
+                        post("/api/subprocessos/aceitar-validacao-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

@@ -115,12 +115,11 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .acao("ACEITAR_CADASTRO")
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/aceitar-cadastro-bloco", codigoContexto)
+                        post("/api/subprocessos/aceitar-cadastro-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

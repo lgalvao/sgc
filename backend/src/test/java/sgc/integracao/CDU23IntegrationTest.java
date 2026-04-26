@@ -126,12 +126,11 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         movimentacaoRepo.save(m2);
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .acao("HOMOLOGAR")
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
         mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/homologar-cadastro-bloco", codigoContexto)
+                        post("/api/subprocessos/homologar-cadastro-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))

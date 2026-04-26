@@ -325,19 +325,17 @@ public class SubprocessoController {
                 .build();
     }
 
-    @PostMapping("/{codSubprocesso}/aceitar-cadastro-bloco")
+    @PostMapping("/aceitar-cadastro-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita cadastros em bloco")
-    public void aceitarCadastroEmBloco(@PathVariable Long codSubprocesso,
-                                       @RequestBody @Valid ProcessarEmBlocoRequest request) {
+    public void aceitarCadastroEmBloco(@RequestBody @Valid ProcessarEmBlocoRequest request) {
         transicaoService.aceitarCadastroEmBloco(request.subprocessos());
     }
 
-    @PostMapping("/{codSubprocesso}/homologar-cadastro-bloco")
+    @PostMapping("/homologar-cadastro-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa cadastros em bloco")
-    public void homologarCadastroEmBloco(@PathVariable Long codSubprocesso,
-                                         @RequestBody @Valid ProcessarEmBlocoRequest request) {
+    public void homologarCadastroEmBloco(@RequestBody @Valid ProcessarEmBlocoRequest request) {
         transicaoService.homologarCadastroEmBloco(request.subprocessos());
     }
 
@@ -404,11 +402,10 @@ public class SubprocessoController {
         return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
-    @PostMapping("/{codSubprocesso}/disponibilizar-mapa-bloco")
+    @PostMapping("/disponibilizar-mapa-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza mapas em bloco")
-    public void disponibilizarMapaEmBloco(@PathVariable Long codSubprocesso,
-                                          @RequestBody @Valid ProcessarEmBlocoRequest request) {
+    public void disponibilizarMapaEmBloco(@RequestBody @Valid ProcessarEmBlocoRequest request) {
         DisponibilizarMapaRequest dispoReq = DisponibilizarMapaRequest.builder()
                 .dataLimite(request.dataLimite())
                 .build();
@@ -551,19 +548,17 @@ public class SubprocessoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{codSubprocesso}/aceitar-validacao-bloco")
+    @PostMapping("/aceitar-validacao-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_MAPA')")
     @Operation(summary = "Aceita validação de mapas em bloco")
-    public void aceitarValidacaoEmBloco(@PathVariable Long codSubprocesso,
-                                        @RequestBody @Valid ProcessarEmBlocoRequest request) {
+    public void aceitarValidacaoEmBloco(@RequestBody @Valid ProcessarEmBlocoRequest request) {
         transicaoService.aceitarValidacaoEmBloco(request.subprocessos());
     }
 
-    @PostMapping("/{codSubprocesso}/homologar-validacao-bloco")
+    @PostMapping("/homologar-validacao-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'HOMOLOGAR_MAPA')")
     @Operation(summary = "Homologa validação de mapas em bloco")
-    public void homologarValidacaoEmBloco(@PathVariable Long codSubprocesso,
-                                          @RequestBody @Valid ProcessarEmBlocoRequest request) {
+    public void homologarValidacaoEmBloco(@RequestBody @Valid ProcessarEmBlocoRequest request) {
         transicaoService.homologarValidacaoEmBloco(request.subprocessos());
     }
 

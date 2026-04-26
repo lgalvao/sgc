@@ -131,6 +131,7 @@ function criarRespostaDetalhe(parciais: Partial<SubprocessoDetalheResponse> = {}
             dataFimEtapa1: null,
             dataLimiteEtapa2: null,
             dataFimEtapa2: null,
+            ultimaDataLimite: '2025-01-01T00:00:00',
             processoDescricao: 'Processo',
             dataCriacaoProcesso: '2024-01-01T00:00:00',
             tipoProcesso: TipoProcesso.MAPEAMENTO,
