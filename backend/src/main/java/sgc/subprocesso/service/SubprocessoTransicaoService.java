@@ -6,7 +6,6 @@ import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
-import sgc.alerta.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
@@ -24,9 +23,6 @@ import java.util.*;
 
 import static sgc.processo.model.TipoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
-import static sgc.subprocesso.model.TipoTransicao.*;
 
 @Slf4j
 @Service

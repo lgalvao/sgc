@@ -4,8 +4,8 @@ import {criarProcessoFixture} from './fixtures/index.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
-    navegarParaAtividades,
-    esperarAtividadesSomenteLeitura
+    esperarAtividadesSomenteLeitura,
+    navegarParaAtividades
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,

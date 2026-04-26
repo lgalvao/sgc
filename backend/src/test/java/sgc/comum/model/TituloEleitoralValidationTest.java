@@ -2,14 +2,13 @@ package sgc.comum.model;
 
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.Arguments;
-import java.util.stream.Stream;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.*;
 
 import static org.assertj.core.api.Assertions.*;
 

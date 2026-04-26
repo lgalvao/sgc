@@ -1,10 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/index.js';
-import {
-    esperarAtividadesSomenteLeitura,
-    navegarParaAtividades
-} from './helpers/helpers-atividades.js';
+import {esperarAtividadesSomenteLeitura, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
     aceitarCadastroMapeamento,

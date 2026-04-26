@@ -1,5 +1,5 @@
-import {describe, expect, it, vi, beforeEach} from "vitest";
-import {setActivePinia, createPinia} from "pinia";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createPinia, setActivePinia} from "pinia";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {relatoriosService} from "@/services/relatoriosService";
 

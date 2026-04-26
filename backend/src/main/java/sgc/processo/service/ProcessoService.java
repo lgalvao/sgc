@@ -12,6 +12,7 @@ import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -22,7 +23,6 @@ import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
-import sgc.mapa.model.*;
 
 import java.time.*;
 import java.time.format.*;

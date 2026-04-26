@@ -2,8 +2,8 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.mail.javamail.*;
 import org.springframework.jdbc.core.*;
+import org.springframework.mail.javamail.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;

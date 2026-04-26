@@ -1,14 +1,13 @@
 package sgc.subprocesso.service;
 
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.organizacao.model.Perfil;
-import sgc.subprocesso.dto.PermissoesSubprocessoDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+import lombok.*;
+import org.springframework.stereotype.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import java.util.Set;
+import java.util.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

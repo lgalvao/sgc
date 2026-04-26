@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BBadge, BCard, BCardBody, BCardHeader, BCardTitle, BListGroup, BListGroupItem} from "bootstrap-vue-next";
+import {BCard, BCardBody, BCardHeader, BCardTitle} from "bootstrap-vue-next";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
 import type {MapaVisualizacao} from "@/types/tipos";

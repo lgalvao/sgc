@@ -6,7 +6,7 @@ import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
 import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
-import { TEXTOS } from "../frontend/src/constants/textos.js";
+import {TEXTOS} from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     test.beforeAll(async ({request}) => {

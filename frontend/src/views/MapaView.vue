@@ -344,7 +344,15 @@ import {listarAnalisesCadastro} from "@/services/analiseService";
 import {apresentarSugestoes as apresentarSugestoesService} from "@/services/processoService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import logger from "@/utils/logger";
-import type {Analise, Atividade, Competencia, MapaCompleto, MapaVisualizacao, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
+import type {
+  Analise,
+  Atividade,
+  Competencia,
+  MapaCompleto,
+  MapaVisualizacao,
+  SalvarCompetenciaRequest,
+  Unidade
+} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";

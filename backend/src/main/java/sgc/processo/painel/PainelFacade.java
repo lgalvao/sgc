@@ -7,15 +7,15 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
+import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.painel.dto.PainelBootstrapDto;
+import sgc.processo.painel.dto.*;
 import sgc.processo.service.*;
-import sgc.alerta.dto.AlertaDto;
 
 import java.time.*;
 import java.util.*;

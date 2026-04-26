@@ -13,7 +13,7 @@ import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
-import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
+import sgc.processo.dto.ProcessoDetalheDto.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
@@ -24,7 +24,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.processo.model.SituacaoProcesso.*;
 import static sgc.processo.model.TipoProcesso.*;

@@ -2,10 +2,10 @@ import {ref, type Ref} from 'vue';
 import logger from '@/utils/logger';
 import {TEXTOS} from '@/constants/textos';
 import {
-  aceitarValidacao as aceitarValidacaoService,
-  devolverValidacao as devolverValidacaoService,
-  homologarValidacao as homologarValidacaoService,
-  validarMapa as validarMapaService,
+    aceitarValidacao as aceitarValidacaoService,
+    devolverValidacao as devolverValidacaoService,
+    homologarValidacao as homologarValidacaoService,
+    validarMapa as validarMapaService,
 } from '@/services/processoService';
 
 type NotificacaoMapa = (mensagem: string, variante: 'success' | 'danger' | 'warning' | 'info') => void;

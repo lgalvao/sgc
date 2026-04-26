@@ -8,14 +8,12 @@ import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
-import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j

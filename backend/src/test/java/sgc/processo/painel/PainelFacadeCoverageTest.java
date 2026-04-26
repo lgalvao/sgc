@@ -9,9 +9,9 @@ import sgc.alerta.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
-import sgc.processo.dto.*;
 
 import java.util.*;
 

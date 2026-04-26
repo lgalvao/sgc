@@ -3,8 +3,8 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import sgc.comum.erros.*;
-import sgc.processo.dto.*;
 import sgc.integracao.mocks.*;
+import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 

@@ -127,13 +127,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BFormCheckbox,
-  BFormInvalidFeedback,
-  BFormSelect,
-  BFormSelectOption,
-} from "bootstrap-vue-next";
+import {BAlert, BFormCheckbox, BFormInvalidFeedback, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import * as processoService from "@/services/processoService";

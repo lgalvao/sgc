@@ -1,13 +1,16 @@
 package sgc.relatorio;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import org.openpdf.text.*;
+import org.openpdf.text.Font;
+import org.openpdf.text.Image;
+import org.openpdf.text.Rectangle;
 import org.openpdf.text.pdf.*;
 import org.openpdf.text.pdf.draw.*;
+import org.springframework.core.io.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import org.jspecify.annotations.*;
-import org.springframework.core.io.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.dto.*;
@@ -18,8 +21,8 @@ import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
+import java.awt.*;
 import java.io.*;
-import java.awt.Color;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;

@@ -1,22 +1,15 @@
 package sgc.subprocesso.service;
 
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.UsuarioFacade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.Subprocesso;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

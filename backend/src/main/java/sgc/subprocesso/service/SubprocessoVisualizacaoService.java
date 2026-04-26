@@ -1,37 +1,19 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ImpactoMapaResponse;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.dto.MapaResumoDto;
-import sgc.mapa.dto.MapaVisualizacaoResponse;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.mapa.service.MapaVisualizacaoService;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.UsuarioResumoDto;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.AnaliseHistoricoDto;
-import sgc.subprocesso.dto.ContextoCadastroAtividadesResponse;
-import sgc.subprocesso.dto.ContextoEdicaoResponse;
-import sgc.subprocesso.dto.MovimentacaoDto;
-import sgc.subprocesso.dto.SubprocessoDetalheResponse;
-import sgc.subprocesso.dto.SubprocessoResumoDto;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoAnalise;
-import sgc.subprocesso.model.AnaliseRepo;
+import lombok.*;
+import org.springframework.stereotype.*;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor

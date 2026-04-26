@@ -2,8 +2,7 @@ package sgc.alerta.dto;
 
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.alerta.model.NotificacaoEmail;
-import sgc.alerta.model.TipoNotificacao;
+import sgc.alerta.model.*;
 
 import java.time.*;
 

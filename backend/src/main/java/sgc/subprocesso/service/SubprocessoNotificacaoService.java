@@ -1,7 +1,7 @@
 package sgc.subprocesso.service;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.thymeleaf.context.*;

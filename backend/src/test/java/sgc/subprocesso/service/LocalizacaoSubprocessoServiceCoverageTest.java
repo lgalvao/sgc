@@ -4,8 +4,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.subprocesso.model.*;
 import sgc.organizacao.model.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 

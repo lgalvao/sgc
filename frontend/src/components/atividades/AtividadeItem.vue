@@ -147,7 +147,18 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BCardTitle, BCol, BForm, BFormInput, BFormInvalidFeedback, BRow} from "bootstrap-vue-next";
+import {
+  BAlert,
+  BButton,
+  BCard,
+  BCardBody,
+  BCardTitle,
+  BCol,
+  BForm,
+  BFormInput,
+  BFormInvalidFeedback,
+  BRow
+} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import type {Atividade} from "@/types/tipos";
 import InlineEditor from "@/components/comum/InlineEditor.vue";

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;

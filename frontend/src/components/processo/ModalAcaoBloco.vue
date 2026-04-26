@@ -77,8 +77,7 @@ import {computed, ref, watch} from 'vue';
 import {BAlert, BFormCheckbox, BFormGroup, BTable} from 'bootstrap-vue-next';
 import InputData from '@/components/comum/InputData.vue';
 import ModalPadrao from '@/components/comum/ModalPadrao.vue';
-import {isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
-import {formatDateBR} from "@/utils/dateUtils";
+import {formatDateBR, isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 export interface UnidadeSelecao {

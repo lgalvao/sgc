@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {mount, flushPromises} from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import LoginView from "@/views/LoginView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";

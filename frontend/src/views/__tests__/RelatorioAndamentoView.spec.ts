@@ -1,4 +1,4 @@
-import {describe, expect, it, vi, beforeEach} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {ref} from 'vue';
 import RelatorioAndamentoView from '@/views/RelatorioAndamentoView.vue';

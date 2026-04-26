@@ -2,7 +2,7 @@ package sgc.alerta;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;

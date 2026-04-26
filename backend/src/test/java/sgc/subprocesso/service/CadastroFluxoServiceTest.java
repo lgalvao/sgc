@@ -9,7 +9,6 @@ import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
-import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;

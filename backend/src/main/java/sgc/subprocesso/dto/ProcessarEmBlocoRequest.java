@@ -1,8 +1,8 @@
 package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
-import org.jspecify.annotations.Nullable;
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.comum.*;
 
 import java.time.*;

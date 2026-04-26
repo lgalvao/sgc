@@ -1,8 +1,8 @@
 import type {
     Analise,
     Atividade,
-    AtividadeOperacaoResponse,
     AtividadeImpactada,
+    AtividadeOperacaoResponse,
     CompetenciaImpactada,
     ContextoCadastroAtividadesSubprocesso,
     ContextoEdicaoSubprocesso,

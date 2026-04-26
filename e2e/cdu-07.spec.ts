@@ -14,7 +14,12 @@ import {
     limparNotificacoes,
     navegarParaSubprocesso
 } from './helpers/helpers-navegacao.js';
-import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
+import {
+    acessarDetalhesProcesso,
+    criarProcesso,
+    extrairProcessoCodigo,
+    verificarDetalhesSubprocesso
+} from './helpers/helpers-processos.js';
 
 function converterDataHoraBrParaTimestamp(dataHoraTexto: string): number {
     const textoNormalizado = dataHoraTexto.trim().replace(/\s+/g, ' ');

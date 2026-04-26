@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;

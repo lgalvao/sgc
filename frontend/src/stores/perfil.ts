@@ -10,11 +10,7 @@ import {usePainelStore} from "@/stores/painel";
 import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useUnidadeStore} from "@/stores/unidade";
-import {
-    cancelarRequisicoesPendentes,
-    finalizarTransicaoSessao,
-    iniciarTransicaoSessao
-} from "@/axios-setup";
+import {cancelarRequisicoesPendentes, finalizarTransicaoSessao, iniciarTransicaoSessao} from "@/axios-setup";
 
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage/sessionStorage usando composable

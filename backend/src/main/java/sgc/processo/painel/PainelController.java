@@ -12,7 +12,7 @@ import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.processo.dto.*;
-import sgc.processo.painel.dto.PainelBootstrapDto;
+import sgc.processo.painel.dto.*;
 
 import java.util.*;
 

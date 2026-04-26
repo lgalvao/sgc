@@ -6,7 +6,12 @@ import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 import * as processoService from '@/services/processoService';
 import {computed, reactive} from 'vue';
-import {SituacaoSubprocesso, TipoProcesso, type ContextoEdicaoSubprocesso, type SubprocessoDetalhe} from '@/types/tipos';
+import {
+    type ContextoEdicaoSubprocesso,
+    SituacaoSubprocesso,
+    type SubprocessoDetalhe,
+    TipoProcesso
+} from '@/types/tipos';
 
 vi.mock('vue-router', () => ({
     useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),

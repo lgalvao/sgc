@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.openpdf.text.Document;
+import org.openpdf.text.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;

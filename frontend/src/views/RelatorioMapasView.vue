@@ -59,16 +59,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {
-  BButton,
-  BCard,
-  BCol,
-  BFormGroup,
-  BFormInvalidFeedback,
-  BFormSelect,
-  BRow,
-  BSpinner
-} from "bootstrap-vue-next";
+import {BButton, BCard, BCol, BFormGroup, BFormInvalidFeedback, BFormSelect, BRow, BSpinner} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";

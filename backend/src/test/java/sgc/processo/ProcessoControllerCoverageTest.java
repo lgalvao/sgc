@@ -3,7 +3,7 @@ package sgc.processo;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.organizacao.model.*;

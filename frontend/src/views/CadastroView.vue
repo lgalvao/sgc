@@ -235,7 +235,15 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormCheckbox, BFormGroup, BFormInvalidFeedback, BFormTextarea, BSpinner} from "bootstrap-vue-next";
+import {
+  BAlert,
+  BButton,
+  BFormCheckbox,
+  BFormGroup,
+  BFormInvalidFeedback,
+  BFormTextarea,
+  BSpinner
+} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
@@ -262,10 +270,10 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useAcesso} from "@/composables/useAcesso";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {
+  type AceitarCadastroRequest,
   type Analise,
   type Atividade,
   type AtividadeOperacaoResponse,
-  type AceitarCadastroRequest,
   type ContextoCadastroAtividadesSubprocesso,
   type CriarConhecimentoRequest,
   type DevolverCadastroRequest,

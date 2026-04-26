@@ -18,8 +18,7 @@ import {
     devolverRevisao,
     fecharHistoricoAnalise
 } from './helpers/helpers-analise.js';
-import {verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 

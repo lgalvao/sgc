@@ -232,7 +232,17 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BFormInvalidFeedback, BFormTextarea, BSpinner, BTable, useToast} from "bootstrap-vue-next";
+import {
+  BAlert,
+  BButton,
+  BCard,
+  BCardBody,
+  BFormInvalidFeedback,
+  BFormTextarea,
+  BSpinner,
+  BTable,
+  useToast
+} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref, type Ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";

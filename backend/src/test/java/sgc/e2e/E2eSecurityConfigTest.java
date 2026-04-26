@@ -1,12 +1,10 @@
 package sgc.e2e;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.*;
 import org.springframework.test.web.servlet.*;
 

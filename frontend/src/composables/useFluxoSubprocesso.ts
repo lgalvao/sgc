@@ -18,11 +18,7 @@ import {
 } from "@/services/processoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import type {
-    AceitarCadastroRequest,
-    DevolverCadastroRequest,
-    HomologarCadastroRequest,
-} from "@/types/tipos";
+import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
 
 export function useFluxoSubprocesso() {
     const {lastError, clearError, withErrorHandling} = useErrorHandler();

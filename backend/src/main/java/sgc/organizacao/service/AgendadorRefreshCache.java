@@ -5,7 +5,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.cache.*;
 import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.*;
-import sgc.comum.config.CacheConfig;
+import sgc.comum.config.*;
 
 /**
  * Agendador responsável por invalidar e recarregar periodicamente os caches das views.

@@ -41,13 +41,7 @@ import {BFormGroup} from "bootstrap-vue-next";
 import InputData from "@/components/comum/InputData.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {computed, ref, watch} from "vue";
-import {
-  formatDateBR,
-  formatDateForInput,
-  isDateStrictlyFuture,
-  obterAmanhaFormatado,
-  parseDate,
-} from "@/utils";
+import {formatDateBR, formatDateForInput, isDateStrictlyFuture, obterAmanhaFormatado, parseDate,} from "@/utils";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 

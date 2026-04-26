@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import sgc.alerta.*;
-import sgc.alerta.NotificacaoService;
 import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
