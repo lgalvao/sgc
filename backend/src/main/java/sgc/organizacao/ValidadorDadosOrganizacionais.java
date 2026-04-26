@@ -441,6 +441,7 @@ public class ValidadorDadosOrganizacionais {
         }
     }
 
+    @SuppressWarnings("null")
     private void tentarMapearPerfil(DadosLinhaPerfil dados, ContextoCargaPerfis contexto) {
         try {
             Perfil perfil = Perfil.valueOf(dados.perfilBruto());

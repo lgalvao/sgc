@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.mockito.quality.*;
 import org.springframework.core.env.*;
 import sgc.comum.erros.*;
 
@@ -91,7 +90,7 @@ class LimitadorTentativasLoginCoverageTest {
         target.verificar("");
         target.verificar("   ");
 
-        assertThat(target.getCacheSize()).isEqualTo(0);
+        assertThat(target.getCacheSize()).isZero();
     }
 
     @Test
@@ -101,7 +100,7 @@ class LimitadorTentativasLoginCoverageTest {
 
         target.verificar("1.2.3.4");
 
-        assertThat(target.getCacheSize()).isEqualTo(0);
+        assertThat(target.getCacheSize()).isZero();
     }
 
     @Test
