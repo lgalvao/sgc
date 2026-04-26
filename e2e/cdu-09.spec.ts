@@ -85,7 +85,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
 
         await navegarParaAtividades(page);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
         await esperarAtividadesSomenteLeitura(page);
         await page.goBack();
         await expect(page.getByTestId('header-subprocesso')).toBeVisible();

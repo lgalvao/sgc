@@ -116,7 +116,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         validarProcessoFixture(processoIsolado, descricaoIsolada);
 
         await page.goto(`/processo/${processoIsolado.codigo}`);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoIsolado.codigo}$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoIsolado.codigo}(?:\?.*)?$`));
 
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
         await expect(btnHomologar).toBeVisible();
@@ -128,7 +128,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
         await page.waitForURL(/\/painel/);
         await page.goto(`/processo/${processoIsolado.codigo}`);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoIsolado.codigo}$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoIsolado.codigo}(?:\?.*)?$`));
         await navegarParaSubprocesso(page, unidadeIsolada);
 
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')

@@ -92,7 +92,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
         await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();
 
-        await expect(page).toHaveURL(/\/processo\/\d+$/);
+        await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
         await expect(btnHomologar).toBeDisabled();

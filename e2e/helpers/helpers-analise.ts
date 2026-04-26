@@ -6,7 +6,7 @@ import {TEXTOS} from '../../frontend/src/constants/textos.js';
  * Acessa subprocesso como GESTOR (via lista de unidades)
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
-    await expect(page).toHaveURL(/\/painel$/);
+    await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
 
     const row = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso});
     await expect(row).toBeVisible();
@@ -20,7 +20,7 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
  * Acessa subprocesso como CHEFE (vai direto ao subprocesso)
  */
 export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string, siglaUnidade: string) {
-    await expect(page).toHaveURL(/\/painel$/);
+    await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
 
     const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricaoProcesso)});
     await expect(linhaProcesso).toBeVisible();
@@ -34,7 +34,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
  * Acessa subprocesso como ADMIN (via lista de unidades)
  */
 export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: string, siglaUnidade: string) {
-    await expect(page).toHaveURL(/\/painel$/);
+    await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
 
     await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
     await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
@@ -199,6 +199,6 @@ export async function homologarCadastroMapeamento(page: Page, observacao: string
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
     
     // Aguarda o redirecionamento para a tela do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/(\w+)$/);
+    await expect(page).toHaveURL(/\/processo\/\d+\/(\w+)(?:\?.*)?$/);
 }
 export {fazerLogout, verificarPaginaPainel} from './helpers-navegacao.js';

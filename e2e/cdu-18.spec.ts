@@ -25,7 +25,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         await test.step('2. Navegar para processo finalizado com mapa', async () => {
             // Clicar no processo 99 que tem mapa homologado
             await acessarDetalhesProcesso(page, 'Processo 99');
-            await expect(page).toHaveURL(/\/processo\/\d+$/);
+            await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
         });
 
         await test.step('3. Selecionar unidade de assessoria participante', async () => {
@@ -34,7 +34,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await linhaUnidade.click();
 
             // Verificar navegação para detalhes do subprocesso
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/ASSESSORIA_\d+$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/ASSESSORIA_(?:\d+|12)(?:\?.*)?$`));
         });
 
 
@@ -75,7 +75,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await acessarDetalhesProcesso(page, 'Processo 99');
 
             // CHEFE vai direto para detalhes do subprocesso da sua unidade
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/ASSESSORIA_12$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/ASSESSORIA_12(?:\?.*)?$`));
         });
 
         await test.step('3. Acessar mapa de competências', async () => {

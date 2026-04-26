@@ -29,7 +29,7 @@ export async function navegarParaMapa(page: Page) {
     const card = page.getByTestId('card-subprocesso-mapa');
     await expect(card).toBeVisible();
     await card.click();
-    await page.waitForURL(/\/mapa$/);
+    await page.waitForURL(/\/mapa(?:\?.*)?$/);
     await esperarTelaMapa(page);
 }
 

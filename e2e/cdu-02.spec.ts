@@ -186,7 +186,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             await expect(linhaProcessoCriado).toBeVisible();
 
             await linhaProcessoCriado.click();
-            await expect(page).toHaveURL(/\/processo\/cadastro(?:\?codProcesso=\d+|\/\d+)$/);
+            await expect(page).toHaveURL(/\/processo\/cadastro(?:\?codProcesso=\d+|\/\d+)(?:\?.*)?$/);
             await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoProcesso);
         });
 
@@ -210,7 +210,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             const linhaAdmin = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
             await expect(linhaAdmin).toBeVisible();
             await linhaAdmin.click();
-            await expect(page).toHaveURL(/\/processo\/\d+$/);
+            await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
 
             await fazerLogout(page);
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
@@ -218,7 +218,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             const linhaGestor = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
             await expect(linhaGestor).toBeVisible();
             await linhaGestor.click();
-            await expect(page).toHaveURL(/\/processo\/\d+$/);
+            await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
 
             await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
@@ -226,7 +226,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             const linhaChefe = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
             await expect(linhaChefe).toBeVisible();
             await linhaChefe.click();
-            await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_111$/);
+            await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_111(?:\?.*)?$/);
         });
     });
 

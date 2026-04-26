@@ -68,7 +68,7 @@ export async function criarProcesso(page: Page, options: {
         await botaoSalvar.scrollIntoViewIfNeeded();
         await expect(botaoSalvar).toBeInViewport();
         await botaoSalvar.click();
-        await expect(page).toHaveURL(/\/painel(?:\?|$)/);
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
     }
 }
 
@@ -119,7 +119,7 @@ export async function aguardarProcessoNoPainel(page: Page, options: {
     tipo: TipoProcesso;
     unidadesParticipantes?: string[];
 }): Promise<void> {
-    await expect(page).toHaveURL(/\/painel(?:\?|$)/);
+    await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
     await verificarProcessoNaTabela(page, {
         descricao: options.descricao,
         situacao: options.situacao,
@@ -287,7 +287,7 @@ export async function acessarDetalhesProcesso(page: Page, descricao: string) {
     const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {hasText: descricao});
     await expect(linhaProcesso).toBeVisible();
     await linhaProcesso.click();
-    await expect(page).toHaveURL(/\/processo\/(?:cadastro\?codProcesso=)?\d+(?:\/[A-Z0-9_]+)?$/);
+    await expect(page).toHaveURL(/\/processo\/(?:cadastro\?codProcesso=)?\d+(?:\/[A-Z0-9_]+)?(?:\?.*)?$/);
 }
 
 
@@ -297,5 +297,5 @@ export async function acessarDetalhesProcesso(page: Page, descricao: string) {
 export async function finalizarProcesso(page: Page) {
     await page.getByTestId('btn-processo-finalizar').click();
     await page.getByTestId('btn-finalizar-processo-confirmar').click();
-    await page.waitForURL(/\/painel$/);
+    await page.waitForURL(/\/painel(?:\?.*)?$/);
 }

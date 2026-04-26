@@ -145,8 +145,8 @@ export async function esperarPaginaCadastroProcesso(page: Page): Promise<void> {
  */
 export async function esperarPaginaDetalhesProcesso(page: Page, codigo?: number): Promise<void> {
     const pattern = codigo 
-        ? String.raw`\/processo\/(?:cadastro\?codProcesso=)?${codigo}$`
-        : String.raw`\/processo\/(?:cadastro\?codProcesso=)?\d+$`;
+        ? String.raw`\/processo\/(?:cadastro\?codProcesso=)?${codigo}(?:\?.*)?$`
+        : String.raw`\/processo\/(?:cadastro\?codProcesso=)?\d+(?:\?.*)?$`;
     await page.waitForURL(new RegExp(pattern));
 }
 
@@ -156,8 +156,8 @@ export async function esperarPaginaDetalhesProcesso(page: Page, codigo?: number)
  */
 export async function esperarPaginaSubprocesso(page: Page, siglaUnidade?: string): Promise<void> {
     const regex = siglaUnidade 
-        ? new RegExp(String.raw`\/processo\/\d+\/${siglaUnidade}$`) 
-        : /\/processo\/\d+\/[A-Z0-9_]+$/;
+        ? new RegExp(String.raw`\/processo\/\d+\/${siglaUnidade}(?:\?.*)?$`) 
+        : /\/processo\/\d+\/[A-Z0-9_]+(?:\?.*)?$/;
     await page.waitForURL(regex);
 }
 
@@ -172,7 +172,7 @@ export async function navegarParaSubprocesso(
     // Aguardar qualquer transição de rota antes de checar a URL
     await page.waitForURL(/\/processo\/\d+/);
 
-    const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`);
+    const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}(?:\?.*)?$`);
     if (urlSubprocesso.test(page.url())) return;
 
     await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();

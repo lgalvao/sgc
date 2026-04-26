@@ -607,7 +607,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const processoCodigo = await criarProcessoMapeamentoIniciadoPorFixture(request, cleanup, descricao, unidadeAlvo);
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaAtividades(page);
             await adicionarAtividade(page, atividade);
             await adicionarConhecimento(page, atividade, conhecimento);
@@ -618,7 +618,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaAtividades(page);
             await capturarTela(page, 'processo', 'analise-gestor', {
                 extra: { perfil: 'GESTOR', unidade: unidadeAlvo, acao: 'analise-cadastro' }
@@ -634,7 +634,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaAtividades(page);
             await page.getByTestId('btn-acao-analisar-principal').click();
             await expect(page.getByRole('dialog')).toBeVisible();
@@ -644,7 +644,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologação para captura');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 
             await navegarParaMapa(page);
@@ -673,7 +673,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-validar').click();
             await expect(page.getByRole('dialog')).toBeVisible();
@@ -699,7 +699,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.goto(`/processo/${processoCodigo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}(?:\?.*)?$`));
             await capturarTela(page, 'processo', 'detalhes-processo-finalizavel', {
                 fullPage: true,
                 extra: { perfil: 'ADMIN', acao: 'finalizacao-processo' }
@@ -1367,12 +1367,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
             await expect(btnCriarAtribuicao).toBeVisible();
             await btnCriarAtribuicao.click();
-            await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
+            await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
             await expect(page.getByRole('heading', {name: TEXTOS.atribuicaoTemporaria.TITULO})).toBeVisible();
             await expect(page.getByTestId('input-busca-usuario')).toBeVisible();
             await capturarTela(page, 'unidades', 'tela-criar-atribuicao', { tags: ['tela', 'atribuicao'] });
             await page.getByTestId('btn-cancelar-atribuicao').click();
-            await expect(page).toHaveURL(/\/unidade\/\d+$/);
+            await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
 
             const linkHistorico = page.getByRole('link', {name: /Histórico/i});
             await expect(linkHistorico).toBeVisible();

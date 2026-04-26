@@ -57,7 +57,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await page.goto('/painel');
             await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
             await acessarDetalhesProcesso(page, descricaoProcesso);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
             await AtividadeHelpers.navegarParaAtividades(page);
         });
 
@@ -172,7 +172,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await page.goto('/painel');
             await expect(page.getByTestId('tbl-processos').getByText(descricao).first()).toBeVisible();
             await acessarDetalhesProcesso(page, descricao);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_REVISAO}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_REVISAO}(?:\?.*)?$`));
             await AtividadeHelpers.navegarParaAtividades(page);
 
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade trigger');
@@ -230,7 +230,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await page.goto('/painel');
             await expect(page.getByTestId('tbl-processos').getByText(descAlvo).first()).toBeVisible();
             await acessarDetalhesProcesso(page, descAlvo);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
             await AtividadeHelpers.navegarParaAtividades(page);
 
             // Abre o modal de importação e seleciona atividade do processo A

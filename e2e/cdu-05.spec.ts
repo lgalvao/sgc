@@ -116,7 +116,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await homologarCadastroMapeamento(page);
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+(?:\?.*)?$/);
     });
 
     test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
@@ -259,7 +259,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
 
         await page.getByTestId('card-subprocesso-atividades').click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 
@@ -274,7 +274,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
 
         await page.getByTestId('card-subprocesso-atividades').click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 

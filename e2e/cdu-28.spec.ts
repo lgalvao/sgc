@@ -49,11 +49,11 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
     async function abrirTelaCriacaoAtribuicao(page: import('@playwright/test').Page) {
         await acessarUnidadeAlvo(page);
-        await expect(page).toHaveURL(/\/unidade\/\d+$/);
+        await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
         await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
         await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
-        await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
+        await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
     }
 
     async function selecionarUsuarioAlvo(page: import('@playwright/test').Page) {
@@ -84,7 +84,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
         await acessarUnidadeAlvo(page);
 
-        await expect(page).toHaveURL(/\/unidade\/\d+$/);
+        await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
         await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
         await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();
     });
@@ -122,7 +122,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await abrirTelaCriacaoAtribuicao(page);
 
         await page.getByTestId('btn-cancelar-atribuicao').click();
-        await expect(page).toHaveURL(/\/unidade\/\d+$/);
+        await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
         await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
     });
 

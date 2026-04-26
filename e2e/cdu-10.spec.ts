@@ -18,7 +18,7 @@ import {limparNotificacoes, verificarPaginaPainel,} from './helpers/helpers-nave
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?$`));
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?(?:\?.*)?$`));
 }
 
 test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {

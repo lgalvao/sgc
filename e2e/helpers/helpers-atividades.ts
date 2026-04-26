@@ -28,7 +28,7 @@ export async function navegarParaAtividades(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();
     await card.click();
-    await page.waitForURL(/\/cadastro$/);
+    await page.waitForURL(/\/cadastro(?:\?.*)?$/);
 
     await esperarTelaAtividades(page);
 }

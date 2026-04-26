@@ -281,6 +281,6 @@ test.describe('CDU-03 - Manter processo', () => {
         await esperarPaginaDetalhesProcesso(page);
         await extrairProcessoCodigo(page);
 
-        await expect(page).toHaveURL(/\/processo\/\d+$/);
+        await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
     });
 });
