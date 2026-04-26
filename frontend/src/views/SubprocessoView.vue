@@ -477,21 +477,12 @@ async function confirmarReabertura() {
   }
 
   await executarComCarregamento(loadingReabertura, async () => {
-    let sucesso: boolean;
-    if (tipoReabertura.value === 'cadastro') {
-      sucesso = await fluxoSubprocesso.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
-    } else {
-      sucesso = await fluxoSubprocesso.reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
-    }
+    const isRevisao = tipoReabertura.value === 'revisao';
+    const sucesso = await fluxoSubprocesso.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value, isRevisao);
 
     if (sucesso) {
       fecharModalReabrir();
-      notify(
-          tipoReabertura.value === 'cadastro'
-              ? TEXTOS.subprocesso.SUCESSO_CADASTRO_REABERTO
-              : TEXTOS.subprocesso.SUCESSO_REVISAO_REABERTA,
-          'success',
-      );
+      exibirToastPendente();
       invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: false});
       await carregarSubprocesso();
     }

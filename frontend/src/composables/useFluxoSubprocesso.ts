@@ -18,23 +18,49 @@ import {
 } from "@/services/processoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useSubprocessoStore} from "@/stores/subprocesso";
+import {useToastStore} from "@/stores/toast";
+import {useRouter} from "vue-router";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {TEXTOS} from "@/constants/textos";
 import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
+
+interface WorkflowOptions {
+    mensagemSucesso?: string;
+    redirecionarParaPainel?: boolean;
+    recarregarSubprocesso?: boolean;
+    invalidarCaches?: {
+        incluirPainel?: boolean;
+    };
+    redirecionarPara?: { name: string; params?: Record<string, any> };
+}
 
 export function useFluxoSubprocesso() {
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
     const subprocessoStore = useSubprocessoStore();
+    const toastStore = useToastStore();
+    const router = useRouter();
+    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 
-    async function executarAcao(
-        acao: () => Promise<void>,
-        codigoSubprocesso?: number,
-        recarregarSubprocesso = false,
+    async function executarAcaoWorkflow(
+        acao: () => Promise<any>,
+        options: WorkflowOptions = {}
     ): Promise<boolean> {
         try {
             await withErrorHandling(async () => {
                 await acao();
 
-                if (recarregarSubprocesso && codigoSubprocesso) {
-                    await subprocessoStore.garantirContextoEdicao(codigoSubprocesso, true);
+                if (options.mensagemSucesso) {
+                    toastStore.setPending(options.mensagemSucesso);
+                }
+
+                if (options.invalidarCaches) {
+                    invalidarCachesSubprocesso(options.invalidarCaches);
+                }
+
+                if (options.redirecionarParaPainel) {
+                    await router.push("/painel");
+                } else if (options.redirecionarPara) {
+                    await router.push(options.redirecionarPara);
                 }
             });
 
@@ -48,50 +74,69 @@ export function useFluxoSubprocesso() {
         return withErrorHandling(async () => serviceValidarCadastro(codigoSubprocesso));
     }
 
-    async function disponibilizarCadastro(codigoSubprocesso: number) {
-        return executarAcao(() => serviceDisponibilizarCadastro(codigoSubprocesso));
-    }
-
-    async function disponibilizarRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcao(() => serviceDisponibilizarRevisaoCadastro(codigoSubprocesso));
+    async function disponibilizarCadastro(codigoSubprocesso: number, isRevisao = false) {
+        return executarAcaoWorkflow(
+            () => isRevisao ? serviceDisponibilizarRevisaoCadastro(codigoSubprocesso) : serviceDisponibilizarCadastro(codigoSubprocesso),
+            {
+                mensagemSucesso: isRevisao
+                    ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
+                    : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO,
+                redirecionarParaPainel: true,
+                invalidarCaches: {incluirPainel: true}
+            }
+        );
     }
 
     async function iniciarRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcao(async () => {
+        return executarAcaoWorkflow(async () => {
             await serviceIniciarRevisaoCadastro(codigoSubprocesso);
             await subprocessoStore.garantirContextoCadastroAtividades(codigoSubprocesso, true);
         });
     }
 
     async function cancelarInicioRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcao(async () => {
+        return executarAcaoWorkflow(async () => {
             await serviceCancelarInicioRevisaoCadastro(codigoSubprocesso);
             await subprocessoStore.garantirContextoCadastroAtividades(codigoSubprocesso, true);
         });
     }
 
-    async function devolverCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {
-        return executarAcao(() => serviceDevolverCadastro(codigoSubprocesso, req));
+    async function devolverCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest, isRevisao = false) {
+        return executarAcaoWorkflow(
+            () => isRevisao ? serviceDevolverRevisaoCadastro(codigoSubprocesso, req) : serviceDevolverCadastro(codigoSubprocesso, req),
+            {
+                mensagemSucesso: TEXTOS.sucesso.DEVOLUCAO_REALIZADA,
+                redirecionarParaPainel: true,
+                invalidarCaches: {incluirPainel: true}
+            }
+        );
     }
 
-    async function devolverRevisaoCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {
-        return executarAcao(() => serviceDevolverRevisaoCadastro(codigoSubprocesso, req));
+    async function aceitarCadastro(codigoSubprocesso: number, req: AceitarCadastroRequest, isRevisao = false, options: { mensagemSucesso: string }) {
+        return executarAcaoWorkflow(
+            () => isRevisao ? serviceAceitarRevisaoCadastro(codigoSubprocesso, req) : serviceAceitarCadastro(codigoSubprocesso, req),
+            {
+                mensagemSucesso: options.mensagemSucesso,
+                redirecionarParaPainel: true,
+                invalidarCaches: {incluirPainel: true}
+            }
+        );
     }
 
-    async function aceitarCadastro(codigoSubprocesso: number, req: AceitarCadastroRequest) {
-        return executarAcao(() => serviceAceitarCadastro(codigoSubprocesso, req));
-    }
-
-    async function aceitarRevisaoCadastro(codigoSubprocesso: number, req: AceitarCadastroRequest) {
-        return executarAcao(() => serviceAceitarRevisaoCadastro(codigoSubprocesso, req));
-    }
-
-    async function homologarCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest) {
-        return executarAcao(() => serviceHomologarCadastro(codigoSubprocesso, req));
-    }
-
-    async function homologarRevisaoCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest) {
-        return executarAcao(() => serviceHomologarRevisaoCadastro(codigoSubprocesso, req));
+    async function homologarCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest, isRevisao = false, options: {
+        mensagemSucesso: string;
+        redirecionarParaPainel: boolean;
+        redirecionarPara?: { name: string; params: any }
+    }) {
+        return executarAcaoWorkflow(
+            () => isRevisao ? serviceHomologarRevisaoCadastro(codigoSubprocesso, req) : serviceHomologarCadastro(codigoSubprocesso, req),
+            {
+                mensagemSucesso: options.mensagemSucesso,
+                redirecionarParaPainel: options.redirecionarParaPainel,
+                redirecionarPara: options.redirecionarPara,
+                invalidarCaches: options.redirecionarParaPainel ? {incluirPainel: true} : {}
+            }
+        );
     }
 
     async function alterarDataLimiteSubprocesso(codigoSubprocesso: number, dados: {novaData: string}) {
@@ -100,12 +145,15 @@ export function useFluxoSubprocesso() {
         });
     }
 
-    async function reabrirCadastro(codigoSubprocesso: number, justificativa: string) {
-        return executarAcao(() => serviceReabrirCadastro(codigoSubprocesso, justificativa));
-    }
-
-    async function reabrirRevisaoCadastro(codigoSubprocesso: number, justificativa: string) {
-        return executarAcao(() => serviceReabrirRevisaoCadastro(codigoSubprocesso, justificativa));
+    async function reabrirCadastro(codigoSubprocesso: number, justificativa: string, isRevisao = false) {
+        const msg = isRevisao ? TEXTOS.subprocesso.SUCESSO_REVISAO_REABERTA : TEXTOS.subprocesso.SUCESSO_CADASTRO_REABERTO;
+        return executarAcaoWorkflow(
+            () => isRevisao ? serviceReabrirRevisaoCadastro(codigoSubprocesso, justificativa) : serviceReabrirCadastro(codigoSubprocesso, justificativa),
+            {
+                mensagemSucesso: msg,
+                recarregarSubprocesso: true
+            }
+        );
     }
 
     return {
@@ -113,17 +161,12 @@ export function useFluxoSubprocesso() {
         clearError,
         validarCadastro,
         disponibilizarCadastro,
-        disponibilizarRevisaoCadastro,
         iniciarRevisaoCadastro,
         cancelarInicioRevisaoCadastro,
         devolverCadastro,
-        devolverRevisaoCadastro,
         aceitarCadastro,
-        aceitarRevisaoCadastro,
         homologarCadastro,
-        homologarRevisaoCadastro,
         alterarDataLimiteSubprocesso,
         reabrirCadastro,
-        reabrirRevisaoCadastro,
     };
 }

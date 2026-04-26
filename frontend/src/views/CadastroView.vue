@@ -754,27 +754,13 @@ async function disponibilizarCadastro() {
 async function confirmarDisponibilizacao() {
   if (!codSubprocesso.value || loadingDisponibilizacao.value) return;
 
-  let sucesso: boolean;
   loadingDisponibilizacao.value = true;
   try {
-    if (isRevisao.value) {
-      sucesso = await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso.value);
-    } else {
-      sucesso = await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value);
-    }
+    await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value, isRevisao.value);
   } finally {
     loadingDisponibilizacao.value = false;
   }
-
   mostrarModalConfirmacao.value = false;
-  if (sucesso) {
-    const msg = isRevisao.value
-        ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
-        : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO;
-    toastStore.setPending(msg);
-    invalidarCachesSubprocesso({incluirPainel: true});
-    await router.push("/painel");
-  }
 }
 
 async function abrirModalHistorico() {
@@ -816,37 +802,32 @@ async function confirmarValidacaoAnalise() {
 
     if (acao.codigo === "HOMOLOGAR") {
       const req: HomologarCadastroRequest = {observacoes: observacaoValidacao.value};
-      sucesso = isRevisao.value
-          ? await fluxoSubprocesso.homologarRevisaoCadastro(codSubprocesso.value, req)
-          : await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req);
+      const paramsRedirecionamento = acao.redirecionarParaPainel
+          ? undefined
+          : {
+            name: "Subprocesso",
+            params: {codProcesso: props.codProcesso, siglaUnidade: props.sigla},
+          };
+
+      const sucesso = await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req, isRevisao.value, {
+        mensagemSucesso: acao.mensagemSucesso,
+        redirecionarParaPainel: acao.redirecionarParaPainel,
+        redirecionarPara: paramsRedirecionamento
+      });
 
       if (sucesso) {
         fecharModalValidarAnalise();
-        toastStore.setPending(acao.mensagemSucesso);
-        if (acao.redirecionarParaPainel) {
-          invalidarCachesSubprocesso({incluirPainel: true});
-          await router.push({name: "Painel"});
-        } else {
-          invalidarCachesSubprocesso();
-          await router.push({
-            name: "Subprocesso",
-            params: {codProcesso: props.codProcesso, siglaUnidade: props.sigla},
-          });
-        }
       }
       return;
     }
 
     const req: AceitarCadastroRequest = {observacoes: observacaoValidacao.value};
-    sucesso = isRevisao.value
-        ? await fluxoSubprocesso.aceitarRevisaoCadastro(codSubprocesso.value, req)
-        : await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req);
+    const sucesso = await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req, isRevisao.value, {
+      mensagemSucesso: acao.mensagemSucesso
+    });
 
     if (sucesso) {
       fecharModalValidarAnalise();
-      toastStore.setPending(acao.mensagemSucesso);
-      invalidarCachesSubprocesso({incluirPainel: true});
-      await router.push({name: "Painel"});
     }
   } finally {
     loadingAnaliseCadastro.value = false;
@@ -864,15 +845,10 @@ async function confirmarDevolucaoAnalise() {
   loadingDevolucaoAnalise.value = true;
   try {
     const req: DevolverCadastroRequest = {observacoes: observacaoDevolucao.value};
-    const sucesso = isRevisao.value
-        ? await fluxoSubprocesso.devolverRevisaoCadastro(codSubprocesso.value, req)
-        : await fluxoSubprocesso.devolverCadastro(codSubprocesso.value, req);
+    const sucesso = await fluxoSubprocesso.devolverCadastro(codSubprocesso.value, req, isRevisao.value);
 
     if (sucesso) {
       fecharModalDevolverAnalise();
-      toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
-      invalidarCachesSubprocesso({incluirPainel: true});
-      await router.push("/painel");
     }
   } finally {
     loadingDevolucaoAnalise.value = false;
