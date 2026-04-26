@@ -142,7 +142,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(unidadesSelecionadas)
-                .acao("DISPONIBILIZAR")
                 .dataLimite(subprocesso1.getDataLimiteEtapa1().toLocalDate().plusDays(1))
                 .build();
 
@@ -191,7 +190,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(List.of(subprocesso1.getCodigo()))
-                .acao("DISPONIBILIZAR")
                 .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 
@@ -224,7 +222,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(List.of(subprocesso1.getCodigo()))
-                .acao("DISPONIBILIZAR")
                 .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 

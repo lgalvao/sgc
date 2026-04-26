@@ -122,7 +122,6 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         entityManager.clear();
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .acao("HOMOLOGAR_VALIDACAO")
                 .subprocessos(subprocessosSelecionados)
                 .build();
 

@@ -18,6 +18,7 @@ public record SubprocessoResumoDto(
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,
         @Nullable LocalDateTime dataFimEtapa2,
+        LocalDateTime ultimaDataLimite,
         Long codProcesso,
         Long codUnidade,
         @Nullable Long codMapa,
@@ -34,14 +35,19 @@ public record SubprocessoResumoDto(
             throw new IllegalStateException("Subprocesso deve possuir processo e unidade associados");
         }
 
+        LocalDateTime dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
+        LocalDateTime dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
+        LocalDateTime ultimaDataLimite = calcularUltimaDataLimite(dataLimiteEtapa1, dataLimiteEtapa2);
+
         return SubprocessoResumoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .unidade(UnidadeResumoDto.fromEntityObrigatoria(unidade))
                 .situacao(subprocesso.getSituacao())
-                .dataLimiteEtapa1(subprocesso.getDataLimiteEtapa1())
+                .dataLimiteEtapa1(dataLimiteEtapa1)
                 .dataFimEtapa1(subprocesso.getDataFimEtapa1())
-                .dataLimiteEtapa2(subprocesso.getDataLimiteEtapa2())
+                .dataLimiteEtapa2(dataLimiteEtapa2)
                 .dataFimEtapa2(subprocesso.getDataFimEtapa2())
+                .ultimaDataLimite(ultimaDataLimite)
                 .codProcesso(processo.getCodigo())
                 .codUnidade(unidade.getCodigo())
                 .codMapa(subprocesso.getCodMapa())
@@ -51,5 +57,16 @@ public record SubprocessoResumoDto(
                 .isEmAndamento(subprocesso.isEmAndamento())
                 .etapaAtual(subprocesso.getEtapaAtual())
                 .build();
+    }
+
+    /**
+     * Retorna a data limite mais recente entre etapa 1 e etapa 2.
+     * Se não houver etapa 2, retorna a data da etapa 1.
+     */
+    private static LocalDateTime calcularUltimaDataLimite(LocalDateTime dataLimiteEtapa1, @Nullable LocalDateTime dataLimiteEtapa2) {
+        if (dataLimiteEtapa2 == null) {
+            return dataLimiteEtapa1;
+        }
+        return dataLimiteEtapa1.isAfter(dataLimiteEtapa2) ? dataLimiteEtapa1 : dataLimiteEtapa2;
     }
 }

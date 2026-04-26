@@ -10,9 +10,6 @@ import java.util.*;
 
 @Builder
 public record ProcessarEmBlocoRequest(
-        @NotBlank(message = Mensagens.ACAO_OBRIGATORIA)
-        String acao,
-
         @NotEmpty(message = Mensagens.PELO_MENOS_UM_SUBPROCESSO)
         List<Long> subprocessos,
 

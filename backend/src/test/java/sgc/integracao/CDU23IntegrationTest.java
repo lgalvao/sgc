@@ -126,7 +126,6 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         movimentacaoRepo.save(m2);
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .acao("HOMOLOGAR")
                 .subprocessos(subprocessosSelecionados)
                 .build();
 

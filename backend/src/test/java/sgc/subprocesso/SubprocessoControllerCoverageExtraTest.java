@@ -121,7 +121,7 @@ class SubprocessoControllerCoverageExtraTest {
     @DisplayName("disponibilizarMapaEmBloco - deve processar lista de subprocessos")
     @WithMockUser
     void disponibilizarMapaEmBlocoOk() throws Exception {
-        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("DISPONIBILIZAR", List.of(1L), LocalDate.now());
+        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest(List.of(1L), LocalDate.now());
         when(permissionEvaluator.hasPermission(any(), any(), eq("Subprocesso"), eq("DISPONIBILIZAR_MAPA"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa-bloco")

@@ -359,6 +359,7 @@ export interface SubprocessoDetalheResponse {
         dataFimEtapa1: string | null;
         dataLimiteEtapa2: string | null;
         dataFimEtapa2: string | null;
+        ultimaDataLimite: string;
         processoDescricao: string;
         dataCriacaoProcesso: string;
         tipoProcesso: TipoProcesso;

@@ -115,7 +115,6 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
-                .acao("ACEITAR_CADASTRO")
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
