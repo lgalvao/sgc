@@ -22,16 +22,16 @@ export function useInvalidacaoNavegacao() {
         painelStore.invalidar();
         processoStore.invalidar();
         subprocessoStore.invalidar();
-        limparEstadoSubprocessoAtual();
     }
 
-    function invalidarCachesSubprocesso(opcoes?: {incluirPainel?: boolean}): void {
+    function invalidarCachesSubprocesso(opcoes?: {incluirPainel?: boolean; incluirProcesso?: boolean}): void {
         if (opcoes?.incluirPainel ?? true) {
             painelStore.invalidar();
         }
-        processoStore.invalidar();
+        if (opcoes?.incluirProcesso ?? true) {
+            processoStore.invalidar();
+        }
         subprocessoStore.invalidar();
-        limparEstadoSubprocessoAtual();
     }
 
     return {

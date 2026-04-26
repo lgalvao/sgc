@@ -43,6 +43,35 @@ describe('processo.routes.ts', () => {
         }
     });
 
+    it('deve repassar codSubprocesso pela query quando presente', () => {
+        const subprocesso = processoRoutes.find(r => r.name === 'Subprocesso');
+        const mapa = processoRoutes.find(r => r.name === 'SubprocessoMapa');
+        const cadastro = processoRoutes.find(r => r.name === 'SubprocessoCadastro');
+
+        if (
+            !subprocesso || typeof subprocesso.props !== 'function'
+            || !mapa || typeof mapa.props !== 'function'
+            || !cadastro || typeof cadastro.props !== 'function'
+        ) {
+            throw new Error('Props deve ser uma função');
+        }
+
+        expect(subprocesso.props({
+            params: {codProcesso: '123', siglaUnidade: 'TEST'},
+            query: {codSubprocesso: '77'},
+        } as any)).toEqual({codProcesso: 123, siglaUnidade: 'TEST', codSubprocesso: 77});
+
+        expect(mapa.props({
+            params: {codProcesso: '456', siglaUnidade: 'ABC'},
+            query: {codSubprocesso: '88'},
+        } as any)).toEqual({codProcesso: 456, sigla: 'ABC', codSubprocesso: 88});
+
+        expect(cadastro.props({
+            params: {codProcesso: '789', siglaUnidade: 'CAD'},
+            query: {codSubprocesso: '99'},
+        } as any)).toEqual({codProcesso: 789, sigla: 'CAD', codSubprocesso: 99});
+    });
+
     it('deve manter em cache as views de detalhe de processo e subprocesso', () => {
         const processo = processoRoutes.find(r => r.name === 'Processo');
         const subprocesso = processoRoutes.find(r => r.name === 'Subprocesso');

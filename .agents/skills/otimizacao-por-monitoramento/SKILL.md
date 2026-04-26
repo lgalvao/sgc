@@ -60,6 +60,19 @@ SGC_MONITORAMENTO=sim SGC_MONITORAMENTO_NIVEL_LOG=warn npx playwright test e2e/a
 
 Se o caso de uso depender de preparação serial, rode o arquivo inteiro. Se houver um cenário isolável sem perder fidelidade, rode o recorte mínimo suficiente.
 
+### 1.1 Ativar telemetria do frontend quando o alvo inclui navegação/round-trip do navegador
+
+No lifecycle E2E atual do SGC, o frontend pode subir com `VITE_MONITORAMENTO_MODO='off'`.
+Se a hipótese envolver custo percebido no frontend, sequência de chamadas, navegação SPA ou round-trips redundantes, **não aceite isso como limitação do cenário**.
+
+Antes de tirar conclusões:
+
+1. alinhe o ambiente para subir o frontend monitorado;
+2. garanta que o artefato único realmente capture também a telemetria HTTP do navegador;
+3. só então compare antes/depois.
+
+Em outras palavras: se a skill for usada para performance de frontend, o agente deve **ativar o monitoramento do Vite/navegador primeiro** em vez de analisar apenas o lado backend e chamar isso de suficiente.
+
 ### 2. Analisar um artefato só
 
 Use apenas o arquivo redirecionado do E2E como fonte de análise.

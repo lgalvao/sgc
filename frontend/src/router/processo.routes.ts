@@ -1,5 +1,15 @@
 import type {RouteLocationNormalized, RouteRecordRaw} from "vue-router";
 
+function lerCodSubprocesso(route: RouteLocationNormalized): number | undefined {
+    const valor = route.query.codSubprocesso;
+    if (typeof valor !== "string") {
+        return undefined;
+    }
+
+    const codigo = Number(valor);
+    return Number.isFinite(codigo) ? codigo : undefined;
+}
+
 const processoRoutes: RouteRecordRaw[] = [
     {
         path: "/processo/cadastro",
@@ -25,6 +35,7 @@ const processoRoutes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade,
+            codSubprocesso: lerCodSubprocesso(route),
         }),
         meta: {
             title: "Processos da Unidade",
@@ -39,6 +50,7 @@ const processoRoutes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             sigla: route.params.siglaUnidade,
             codProcesso: Number(route.params.codProcesso),
+            codSubprocesso: lerCodSubprocesso(route),
         }),
         meta: {title: "Mapa"},
     },
@@ -49,6 +61,7 @@ const processoRoutes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade,
+            codSubprocesso: lerCodSubprocesso(route),
         }),
         meta: {title: "Cadastro"},
     },

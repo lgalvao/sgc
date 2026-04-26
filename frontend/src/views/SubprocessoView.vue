@@ -255,7 +255,7 @@ import {useToastStore} from "@/stores/toast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
-const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
+const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
 function formatDataSimples(dataStr: string | null): string {
   if (!dataStr) return '';
@@ -362,6 +362,16 @@ function exibirToastPendente() {
 }
 
 async function carregarSubprocesso() {
+  const resultadoDireto = typeof props.codSubprocesso === "number"
+      ? await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, true)
+      : null;
+
+  if (resultadoDireto) {
+    codSubprocesso.value = resultadoDireto.detalhes.codigo;
+    erroNaoEncontrado.value = false;
+    return;
+  }
+
   const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
       props.codProcesso,
       props.siglaUnidade,
@@ -417,7 +427,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
       );
       fecharModalAlterarDataLimite();
       notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, 'success');
-      invalidarCachesSubprocesso({incluirPainel: false});
+      invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: false});
       await carregarSubprocesso();
     } catch {
       notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, 'danger');
@@ -469,7 +479,7 @@ async function confirmarReabertura() {
               : TEXTOS.subprocesso.SUCESSO_REVISAO_REABERTA,
           'success',
       );
-      invalidarCachesSubprocesso();
+      invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: false});
       await carregarSubprocesso();
     }
   });

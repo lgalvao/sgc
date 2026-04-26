@@ -326,7 +326,7 @@ import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
@@ -355,7 +355,7 @@ const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/Im
 const CriarCompetenciaModal = defineAsyncComponent(() => import("@/components/mapa/CriarCompetenciaModal.vue"));
 const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/mapa/DisponibilizarMapaModal.vue"));
 
-const route = useRoute();
+const props = defineProps<{ codProcesso: number; sigla: string; codSubprocesso?: number }>();
 const router = useRouter();
 const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
@@ -367,8 +367,8 @@ const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidaca
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
 usePerfil();
 
-const codProcesso = computed(() => Number(route.params.codProcesso));
-const siglaUnidade = computed(() => String(route.params.siglaUnidade));
+const codProcesso = computed(() => Number(props.codProcesso));
+const siglaUnidade = computed(() => String(props.sigla));
 
 const {
   podeVisualizarImpacto,
@@ -568,6 +568,23 @@ async function carregarContextoEdicao(codigo: number) {
 }
 
 async function carregarContextoInicial() {
+  if (typeof props.codSubprocesso === "number") {
+    const contexto = await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, true);
+    if (!contexto) {
+      if (subprocessoStore.erroIntegracaoContexto) {
+        notify(subprocessoStore.erroIntegracaoContexto.message, 'danger');
+      } else {
+        notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
+      }
+      return null;
+    }
+
+    codSubprocesso.value = contexto.detalhes.codigo;
+    atividades.value = contexto.atividadesDisponiveis;
+    unidade.value = contexto.unidade;
+    return contexto;
+  }
+
   const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
     codProcesso: codProcesso.value,
     siglaUnidade: siglaUnidade.value,

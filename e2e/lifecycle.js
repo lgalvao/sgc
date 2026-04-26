@@ -361,7 +361,7 @@ function startFrontend() {
             ...normalizarEnv(),
             E2E_BACKEND_BASE_PORT: String(BACKEND_BASE_PORT),
             E2E_WORKER_COUNT: '1',
-            VITE_MONITORAMENTO_MODO: 'off'
+            VITE_MONITORAMENTO_MODO: MODO_MONITORAMENTO === 'sim' ? 'on' : 'off'
         }
     };
 

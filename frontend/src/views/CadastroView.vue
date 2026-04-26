@@ -286,6 +286,7 @@ type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conheci
 const props = defineProps<{
   codProcesso: number | string;
   sigla: string;
+  codSubprocesso?: number;
 }>();
 
 const router = useRouter();
@@ -619,8 +620,13 @@ async function executarAtualizacaoCadastro(
 }
 
 async function carregarContextoInicial() {
-  const codProcessoRef = Number(props.codProcesso);
-  const data = await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(codProcessoRef, props.sigla, true);
+  const data = typeof props.codSubprocesso === "number"
+      ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, true)
+      : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
+          Number(props.codProcesso),
+          props.sigla,
+          true,
+      );
   if (!data) {
     logger.error("ERRO: Subprocesso não encontrado!");
     return;
