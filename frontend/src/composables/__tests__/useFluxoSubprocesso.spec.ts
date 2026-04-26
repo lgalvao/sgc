@@ -26,6 +26,7 @@ vi.mock("@/services/processoService", () => ({
 
 const subprocessoStoreMock = {
     garantirContextoEdicao: vi.fn(),
+    garantirContextoCadastroAtividades: vi.fn(),
 };
 
 vi.mock("@/stores/subprocesso", () => ({
@@ -111,7 +112,7 @@ describe("useFluxoSubprocesso", () => {
         await iniciarRevisaoCadastro(10);
 
         expect(service).toHaveBeenCalledWith(10);
-        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10);
+        expect(subprocessoStoreMock.garantirContextoCadastroAtividades).toHaveBeenCalledWith(10, true);
     });
 
     it("deve cancelar inicio da revisao sem limpar o detalhe atual durante a recarga", async () => {
@@ -122,7 +123,7 @@ describe("useFluxoSubprocesso", () => {
         await cancelarInicioRevisaoCadastro(10);
 
         expect(service).toHaveBeenCalledWith(10);
-        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(10);
+        expect(subprocessoStoreMock.garantirContextoCadastroAtividades).toHaveBeenCalledWith(10, true);
     });
 
     it("deve devolver cadastro", async () => {

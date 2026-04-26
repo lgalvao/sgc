@@ -606,7 +606,9 @@ async function executarComSubprocesso(
 function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   if (mapaAtualizado) {
     mapasStore.mapaCompleto.value = mapaAtualizado;
-    subprocessoStore.invalidar();
+    if (subprocessoStore.contextoEdicao?.detalhes.codigo === codSubprocesso.value) {
+      subprocessoStore.contextoEdicao.mapa = mapaAtualizado;
+    }
   }
 }
 

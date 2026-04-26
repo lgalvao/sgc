@@ -63,14 +63,14 @@ export function useFluxoSubprocesso() {
     async function iniciarRevisaoCadastro(codigoSubprocesso: number) {
         return executarAcao(async () => {
             await serviceIniciarRevisaoCadastro(codigoSubprocesso);
-            await subprocessoStore.garantirContextoEdicao(codigoSubprocesso);
+            await subprocessoStore.garantirContextoCadastroAtividades(codigoSubprocesso, true);
         });
     }
 
     async function cancelarInicioRevisaoCadastro(codigoSubprocesso: number) {
         return executarAcao(async () => {
             await serviceCancelarInicioRevisaoCadastro(codigoSubprocesso);
-            await subprocessoStore.garantirContextoEdicao(codigoSubprocesso);
+            await subprocessoStore.garantirContextoCadastroAtividades(codigoSubprocesso, true);
         });
     }
 
