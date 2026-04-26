@@ -90,6 +90,8 @@ type FluxoSubprocessoMock = {
 };
 
 type SubprocessoStoreMock = {
+    contextoCadastro: ContextoCadastroAtividadesSubprocesso | null;
+    erroIntegracaoContexto: {message: string} | null;
     subprocessoDetalhe: {
         codigo: number;
         situacao: SituacaoSubprocesso | string;
@@ -99,6 +101,8 @@ type SubprocessoStoreMock = {
     } | null;
     buscarContextoCadastroAtividadesPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarContextoCadastroAtividades: ReturnType<typeof vi.fn>;
+    garantirContextoCadastroAtividadesPorProcessoEUnidade: ReturnType<typeof vi.fn>;
+    garantirContextoCadastroAtividades: ReturnType<typeof vi.fn>;
     buscarContextoEdicaoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarContextoEdicao: ReturnType<typeof vi.fn>;
     buscarSubprocessoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
@@ -175,17 +179,42 @@ function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
     };
 }
 
+const estadoContextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
+const buscarContextoCadastroAtividadesPorProcessoEUnidadeMock = vi.fn();
+const buscarContextoCadastroAtividadesMock = vi.fn();
 const subprocessosMock = reactive({
-    subprocessoDetalhe: null as SubprocessoStoreMock["subprocessoDetalhe"],
-    buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
-    buscarContextoCadastroAtividades: vi.fn(),
+    get contextoCadastro() {
+        return estadoContextoCadastro.value;
+    },
+    set contextoCadastro(valor: ContextoCadastroAtividadesSubprocesso | null) {
+        estadoContextoCadastro.value = valor;
+    },
+    get subprocessoDetalhe() {
+        return estadoContextoCadastro.value?.detalhes ?? null;
+    },
+    set subprocessoDetalhe(valor: SubprocessoStoreMock["subprocessoDetalhe"]) {
+        if (!valor) {
+            estadoContextoCadastro.value = null;
+            return;
+        }
+        estadoContextoCadastro.value = {
+            ...(estadoContextoCadastro.value ?? criarContextoEdicao()),
+            detalhes: valor as unknown as ContextoCadastroAtividadesSubprocesso["detalhes"],
+        };
+    },
+    buscarContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
+    buscarContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
+    garantirContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
+    garantirContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
     buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
+    erroIntegracaoContexto: null as {message: string} | null,
     lastError: null as SubprocessoStoreMock["lastError"],
     clearError: vi.fn(),
+    limparErroIntegracao: vi.fn(),
 });
 
 vi.mock("vue-router", () => ({
@@ -220,7 +249,7 @@ vi.mock("@/services/atividadeService", () => ({
     excluirConhecimento: vi.fn(),
 }));
 
-vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
+vi.mock("@/stores/subprocesso", () => ({useSubprocessoStore: () => subprocessosMock}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 const mockAtividadeForm = {
     novaAtividade: ref(""),
@@ -348,6 +377,7 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 describe("CadastroView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        estadoContextoCadastro.value = null;
         subprocessosMock.subprocessoDetalhe = {
             codigo: 123,
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
@@ -356,8 +386,11 @@ describe("CadastroView.vue", () => {
             permissoes: {}
         };
         subprocessosMock.lastError = null;
+        subprocessosMock.erroIntegracaoContexto = null;
         subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade = vi.fn();
         subprocessosMock.buscarContextoCadastroAtividades = vi.fn();
+        subprocessosMock.garantirContextoCadastroAtividadesPorProcessoEUnidade = subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade;
+        subprocessosMock.garantirContextoCadastroAtividades = subprocessosMock.buscarContextoCadastroAtividades;
         subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade = vi.fn();
         subprocessosMock.buscarContextoEdicao = vi.fn();
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn();

@@ -2,6 +2,7 @@ import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {nextTick, ref} from "vue";
+import type {ContextoCadastroAtividadesSubprocesso} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
 import * as useAcessoModule from "@/composables/useAcesso";
@@ -17,26 +18,46 @@ vi.mock("@/utils/logger", () => ({
     }
 }));
 
-const estadoSubprocesso = ref<any>(null);
+const estadoContextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
+const buscarContextoCadastroAtividadesPorProcessoEUnidadeMock = vi.fn();
+const buscarContextoCadastroAtividadesMock = vi.fn();
 
 const subprocessosMock = {
-    buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
-    buscarContextoCadastroAtividades: vi.fn(),
-    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    get contextoCadastro() { return estadoContextoCadastro.value; },
+    set contextoCadastro(v: ContextoCadastroAtividadesSubprocesso | null) { estadoContextoCadastro.value = v; },
+    buscarContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
+    buscarContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
+    garantirContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
+    garantirContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
     atualizarStatusLocal: vi.fn((status: any) => {
-        if (estadoSubprocesso.value) {
-            estadoSubprocesso.value = {
-                ...estadoSubprocesso.value,
-                ...status
+        if (estadoContextoCadastro.value) {
+            estadoContextoCadastro.value = {
+                ...estadoContextoCadastro.value,
+                detalhes: {
+                    ...estadoContextoCadastro.value.detalhes,
+                    ...status
+                }
             };
         }
     }),
-    get subprocessoDetalhe() { return estadoSubprocesso.value; },
-    set subprocessoDetalhe(v: any) { estadoSubprocesso.value = v; }
+    erroIntegracaoContexto: null,
+    limparErroIntegracao: vi.fn(),
+    get subprocessoDetalhe() { return estadoContextoCadastro.value?.detalhes ?? null; },
+    set subprocessoDetalhe(v: any) {
+        estadoContextoCadastro.value = v ? {
+            ...(estadoContextoCadastro.value ?? {
+                detalhes: v,
+                mapa: {codigo: 100, subprocessoCodigo: 123},
+                atividadesDisponiveis: [],
+                unidade: {codigo: 1, sigla: "TESTE", nome: "Teste"}
+            }),
+            detalhes: v
+        } : null;
+    }
 };
 
-vi.mock("@/composables/useSubprocessos", () => ({
-    useSubprocessos: () => subprocessosMock
+vi.mock("@/stores/subprocesso", () => ({
+    useSubprocessoStore: () => subprocessosMock
 }));
 
 vi.mock("@/composables/useFluxoSubprocesso", () => ({

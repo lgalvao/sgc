@@ -76,16 +76,44 @@ type FluxoSubprocessoMock = {
     disponibilizarRevisaoCadastro: ReturnType<typeof vi.fn>;
 };
 
+const estadoContextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
+const buscarContextoCadastroAtividadesPorProcessoEUnidadeMock = vi.fn();
+const buscarContextoCadastroAtividadesMock = vi.fn();
 const subprocessosMock = reactive({
-    subprocessoDetalhe: null as SubprocessoMinimo | null,
-    buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
-    buscarContextoCadastroAtividades: vi.fn(),
+    get contextoCadastro() {
+        return estadoContextoCadastro.value;
+    },
+    set contextoCadastro(valor: ContextoCadastroAtividadesSubprocesso | null) {
+        estadoContextoCadastro.value = valor;
+    },
+    get subprocessoDetalhe() {
+        return estadoContextoCadastro.value?.detalhes ?? null;
+    },
+    set subprocessoDetalhe(valor: SubprocessoMinimo | null) {
+        if (!valor) {
+            estadoContextoCadastro.value = null;
+            return;
+        }
+        estadoContextoCadastro.value = {
+            ...(estadoContextoCadastro.value ?? {
+                detalhes: valor as ContextoCadastroAtividadesSubprocesso["detalhes"],
+                mapa: {codigo: 100, subprocessoCodigo: valor.codigo},
+                atividadesDisponiveis: [],
+                unidade: {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null},
+            }),
+            detalhes: valor as ContextoCadastroAtividadesSubprocesso["detalhes"],
+        };
+    },
+    buscarContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
+    buscarContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
+    garantirContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
+    garantirContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
-    lastError: null as {message: string} | null,
-    clearError: vi.fn(),
+    erroIntegracaoContexto: null as {message: string} | null,
+    limparErroIntegracao: vi.fn(),
 });
 
 vi.mock("vue-router", () => ({
@@ -113,7 +141,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
-vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
+vi.mock("@/stores/subprocesso", () => ({useSubprocessoStore: () => subprocessosMock}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 
 const stubs = {
@@ -260,16 +288,19 @@ describe("CadastroView coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        estadoContextoCadastro.value = null;
         subprocessosMock.subprocessoDetalhe = {
             ...criarSubprocessoMinimo(),
         };
         subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade = vi.fn().mockResolvedValue(criarContextoCadastro());
         subprocessosMock.buscarContextoCadastroAtividades = vi.fn().mockResolvedValue(criarContextoCadastro());
+        subprocessosMock.garantirContextoCadastroAtividadesPorProcessoEUnidade = subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade;
+        subprocessosMock.garantirContextoCadastroAtividades = subprocessosMock.buscarContextoCadastroAtividades;
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
         subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue(criarContextoCadastro());
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
         subprocessosMock.atualizarStatusLocal = vi.fn();
-        subprocessosMock.lastError = null;
+        subprocessosMock.erroIntegracaoContexto = null;
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             validarCadastro: vi.fn(),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
