@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { BFormGroup, BFormTextarea, BFormInvalidFeedback } from 'bootstrap-vue-next';
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
-import { TEXTOS } from "@/utils/mensagens";
+import { TEXTOS } from "@/constants/textos";
 
 interface Props {
   modelValue: boolean;

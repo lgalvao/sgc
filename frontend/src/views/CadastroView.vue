@@ -2,73 +2,20 @@
   <LayoutPadrao>
     <CarregamentoPagina v-if="carregandoInicial" />
     <template v-else>
-      <PageHeader :title="TEXTOS.atividades.TITULO">
-      <template #default>
-        <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ unidade.sigla }}</span>
-      </template>
-      <template #actions>
-        <div class="d-flex gap-2">
-          <BButton
-              v-if="codSubprocesso && (podeEditarCadastro || podeDevolverCadastro || acaoPrincipalCadastro?.mostrar)"
-              data-testid="btn-cad-atividades-historico"
-              variant="outline-secondary"
-              @click="abrirModalHistorico"
-          >
-            <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
-          </BButton>
-          <BButton
-              v-if="codSubprocesso && podeDevolverCadastro"
-              data-testid="btn-acao-devolver"
-              :disabled="!habilitarDevolverCadastro"
-              :title="TEXTOS.atividades.BOTAO_DEVOLVER"
-              variant="secondary"
-              @click="abrirModalDevolverAnalise"
-          >
-            {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
-          </BButton>
-          <BButton
-              v-if="codSubprocesso && acaoPrincipalCadastro?.mostrar"
-              data-testid="btn-acao-analisar-principal"
-              :disabled="!acaoPrincipalCadastro.habilitar"
-              :title="acaoPrincipalCadastro.rotuloBotao"
-              variant="success"
-              @click="abrirModalValidarAnalise"
-          >
-            {{ acaoPrincipalCadastro.rotuloBotao }}
-          </BButton>
-        </div>
-
-        <div v-if="podeVisualizarImpacto || podeEditarCadastro || podeDisponibilizarCadastro" class="d-flex gap-2 ms-3 ps-3 border-start">
-          <BButton
-              v-if="codSubprocesso && podeVisualizarImpacto"
-              data-testid="cad-atividades__btn-impactos-mapa-edicao"
-              variant="outline-secondary"
-              @click="abrirModalImpacto"
-          >
-            <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
-          </BButton>
-          <BButton
-              v-if="codSubprocesso && podeEditarCadastro"
-              data-testid="btn-cad-atividades-importar"
-              variant="outline-secondary"
-              @click="mostrarModalImportar = true"
-          >
-            <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
-          </BButton>
-          <LoadingButton
-              v-if="codSubprocesso && (podeDisponibilizarCadastro || podeEditarCadastro)"
-              :disabled="loadingValidacao"
-              :loading="loadingValidacao"
-              data-testid="btn-cad-atividades-disponibilizar"
-              icon="check-lg"
-              :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
-              :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
-              variant="success"
-              @click="disponibilizarCadastro"
-          />
-        </div>
-      </template>
-    </PageHeader>
+      <CadastroAcoesHeader
+          :unidade="unidade"
+          :cod-subprocesso="codSubprocesso"
+          :permissoes="permissoesUI"
+          :acao-principal-cadastro="acaoPrincipalCadastro"
+          :loading-validacao="loadingValidacao"
+          :pode-visualizar-impacto="podeVisualizarImpacto"
+          @abrir-historico="abrirModalHistorico"
+          @abrir-devolver="abrirModalDevolverAnalise"
+          @abrir-validar="abrirModalValidarAnalise"
+          @abrir-impacto="abrirModalImpacto"
+          @abrir-importar="mostrarModalImportar = true"
+          @disponibilizar="disponibilizarCadastro"
+      />
 
     <div v-if="podeEditarCadastro && isRevisao" class="mt-3 mb-2">
       <BFormCheckbox
@@ -182,54 +129,21 @@
           @confirmar="confirmarRemocao"
       />
 
-      <ModalConfirmacao
+      <ModalAceiteCadastro
           v-model="mostrarModalValidarAnalise"
-          :auto-close="false"
+          v-model:observacao="observacaoValidacao"
           :loading="loadingAnaliseCadastro"
-          :titulo="acaoPrincipalCadastro?.tituloModal ?? ''"
-          :ok-title="acaoPrincipalCadastro?.rotuloConfirmacao ?? ''"
-          test-codigo-confirmar="btn-aceite-cadastro-confirmar"
-          variant="success"
+          :acao="acaoPrincipalCadastro"
           @confirmar="confirmarValidacaoAnalise"
-      >
-        <p>{{ acaoPrincipalCadastro?.textoModal }}</p>
-        <BFormGroup class="mb-3" :label="TEXTOS.comum.OBSERVACAO" label-for="observacaoValidacao">
-          <BFormTextarea
-              id="observacaoValidacao"
-              v-model="observacaoValidacao"
-              data-testid="inp-aceite-cadastro-obs"
-              rows="3"
-          />
-        </BFormGroup>
-      </ModalConfirmacao>
+      />
 
-      <ModalConfirmacao
+      <ModalDevolucaoCadastro
           v-model="mostrarModalDevolverAnalise"
-          :auto-close="false"
+          v-model:observacao="observacaoDevolucao"
           :loading="loadingDevolucaoAnalise"
-          :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
-          :ok-title="TEXTOS.comum.BOTAO_DEVOLVER"
-          test-codigo-confirmar="btn-devolucao-cadastro-confirmar"
-          variant="danger"
+          :is-revisao="isRevisao"
           @confirmar="confirmarDevolucaoAnalise"
-      >
-        <p>{{ isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DEVOLVER_TEXTO }}</p>
-        <BFormGroup class="mb-3" label-for="observacaoDevolucao">
-          <template #label>
-            Observação <span aria-hidden="true" class="text-danger">*</span>
-          </template>
-          <BFormTextarea
-              id="observacaoDevolucao"
-              v-model="observacaoDevolucao"
-              :state="estadoObservacaoDevolucao"
-              data-testid="inp-devolucao-cadastro-obs"
-              rows="3"
-          />
-          <BFormInvalidFeedback :state="estadoObservacaoDevolucao">
-            {{ TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA }}
-          </BFormInvalidFeedback>
-        </BFormGroup>
-      </ModalConfirmacao>
+      />
     </template>
   </LayoutPadrao>
 </template>
@@ -253,12 +167,13 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
-import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
+import CadastroAcoesHeader from "@/components/cadastro/CadastroAcoesHeader.vue";
+import ModalAceiteCadastro from "@/components/cadastro/ModalAceiteCadastro.vue";
+import ModalDevolucaoCadastro from "@/components/cadastro/ModalDevolucaoCadastro.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
@@ -271,6 +186,7 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {
   type AceitarCadastroRequest,
+  type PermissoesSubprocesso,
   type Analise,
   type Atividade,
   type AtividadeOperacaoResponse,
@@ -327,6 +243,7 @@ const {
   acaoPrincipalCadastro
 } = acesso;
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
+const permissoesUI = computed(() => subprocesso.value?.permissoes || {} as PermissoesSubprocesso);
 
 
 const atividades = ref<Atividade[]>([]);

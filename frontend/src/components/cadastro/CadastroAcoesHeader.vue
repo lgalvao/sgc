@@ -2,7 +2,7 @@
 import { BButton } from 'bootstrap-vue-next';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
-import { TEXTOS } from "@/utils/mensagens";
+import { TEXTOS } from "@/constants/textos";
 import type { Unidade, PermissoesSubprocesso } from "@/types/tipos";
 
 interface Props {
