@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("LimitadorTentativasLogin - Cobertura de Testes")
 class LimitadorTentativasLoginCoverageTest {
 

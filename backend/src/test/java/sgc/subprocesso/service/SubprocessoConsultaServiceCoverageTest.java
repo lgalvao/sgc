@@ -248,7 +248,7 @@ class SubprocessoConsultaServiceCoverageTest {
         when(subprocessoRepo.buscarPorCodigoComMapa(100L)).thenReturn(Optional.of(subprocesso));
         when(mapaManutencaoService.mapaVigenteUnidade(10L)).thenReturn(Optional.of(mapaVigente));
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(400L)).thenReturn(List.of(atividadeVigente));
-        lenient().when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of());
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L)).thenReturn(List.of());
 
         Usuario usuario = Usuario.builder()
                 .tituloEleitoral("123456789012")
@@ -256,7 +256,7 @@ class SubprocessoConsultaServiceCoverageTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .build();
         stubContextoAutenticado(usuario);
-        lenient().when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
 
         ContextoCadastroAtividadesResponse res = target.obterContextoCadastroAtividades(100L);
 
