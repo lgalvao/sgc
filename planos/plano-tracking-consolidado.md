@@ -33,12 +33,10 @@ Conduzir a simplificação estrutural do SGC sem quebrar contratos, requisitos, 
 
 ### 2.3 Situação validada nesta rodada
 
-- `npm run typecheck` verde.
-- Pacote E2E direcionado verde:
-  - `npx playwright test captura 05 10 16 17 20 24 jornada`
-- Correções recentes relevantes:
-  - `MapaView.vue`: sincronização do mapa sem invalidar o contexto do subprocesso.
-  - `useFluxoSubprocesso.ts`: início/cancelamento de revisão recarregando `contextoCadastro`, não `contextoEdicao`.
+- `npm run test:unit`: 1286 testes verdes.
+- `npx playwright test`: Todos os 217 cenários E2E (incluindo suíte completa, jornada e capturas) verdes.
+- Estabilidade de URLs recuperada: helpers E2E agora suportam parâmetros de consulta (`codSubprocesso`).
+- Correções de mock: stores agora expõem `invalidar` e `limparContextoAtual` consistentemente em ambiente de teste.
 
 ---
 
@@ -52,8 +50,6 @@ Conduzir a simplificação estrutural do SGC sem quebrar contratos, requisitos, 
 | 1.3 `PermissoesSubprocessoDto` com 34 booleanos | Média | Pendente | redesenhar contrato interno/externo com cuidado |
 | 1.4 `CadastroView.vue` e `MapaView.vue` grandes | Média | Pendente | extrair bootstrap, ações e modais |
 
-> O item 8.5 do relatório de qualidade deixa de aparecer aqui porque foi absorvido pela consolidação do store de subprocesso.
-
 ### 3.2 Backlog estrutural/remanescente da refatoração
 
 | Prioridade | Frente | Item | Situação |
@@ -61,7 +57,7 @@ Conduzir a simplificação estrutural do SGC sem quebrar contratos, requisitos, 
 | P0 | Frontend | Auditar recargas redundantes em `SubprocessoView`, `CadastroView` e `MapaView` após mutações | Pendente |
 | P0 | Frontend | Reduzir invalidação ampla em `useInvalidacaoNavegacao` | Pendente |
 | P0 | Frontend | Consolidar cancelamento escopado por rota/subprocesso com `AbortController` | Pendente |
-| P0 | Qualidade | Rodar a suíte E2E completa como gate de saída | Pendente |
+| P0 | Qualidade | Rodar a suíte E2E completa como gate de saída | **Concluído** |
 | P0 | Qualidade | Revalidar estabilidade de alertas/notificações nos casos CDU-32/33 | Pendente |
 | P1 | Backend | Consolidar a fachada remanescente de `SubprocessoConsultaService` | Pendente |
 | P1 | Backend | Isolar responsabilidades de `ProcessoService` | Pendente |
