@@ -802,6 +802,17 @@ describe("CadastroView.vue", () => {
         expect(btn.exists()).toBe(false);
     });
 
+    it("oculta formulário de nova atividade quando o usuário não tem permissão para editar", async () => {
+        const wrapper = createWrapper({}, {
+            podeEditarCadastro: ref(false),
+            podeDisponibilizarCadastro: ref(false),
+        });
+        await flushPromises();
+
+        const form = wrapper.find('[data-testid="cad-atividade-form"]');
+        expect(form.exists()).toBe(false);
+    });
+
     it("recarrega contexto completo apos importar atividades", async () => {
         const wrapper = createWrapper();
         await flushPromises();

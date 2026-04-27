@@ -38,7 +38,7 @@ defineEmits<{
     <template #actions>
       <div class="d-flex gap-2">
         <BButton
-            v-if="codSubprocesso && (permissoes.podeEditarCadastro || permissoes.podeDevolverCadastro || acaoPrincipalCadastro?.mostrar)"
+            v-if="codSubprocesso"
             data-testid="btn-cad-atividades-historico"
             variant="outline-secondary"
             @click="$emit('abrir-historico')"

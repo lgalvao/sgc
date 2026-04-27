@@ -56,6 +56,7 @@
     />
 
     <CadAtividadeForm
+        v-if="podeEditarCadastro"
         ref="atividadeFormRef"
         v-model="novaAtividade"
         :disabled="!codigoSubprocesso || !habilitarEditarCadastro"
@@ -66,10 +67,10 @@
 
     <EmptyState
         v-if="atividades?.length === 0"
-        :description="TEXTOS.atividades.EMPTY_DESCRIPTION"
+        :description="podeEditarCadastro ? TEXTOS.atividades.EMPTY_DESCRIPTION : TEXTOS.treeTable.EMPTY_DESCRIPTION"
         data-testid="cad-atividades-empty-state"
         icon="bi-list-check"
-        :title="TEXTOS.atividades.EMPTY_TITLE"
+        :title="podeEditarCadastro ? TEXTOS.atividades.EMPTY_TITLE : TEXTOS.treeTable.EMPTY_TITLE"
     />
 
     <div
@@ -804,7 +805,7 @@ onMounted(async () => {
 });
 
 watch(() => atividades.value?.length, (newLen, oldLen) => {
-  if (newLen === 0 && oldLen === undefined) {
+  if (podeEditarCadastro.value && newLen === 0 && oldLen === undefined) {
     nextTick(() => atividadeFormRef.value?.inputRef?.$el?.focus());
   }
 }, {immediate: true});

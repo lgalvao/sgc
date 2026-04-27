@@ -236,4 +236,14 @@ describe("AtividadeItem.vue", () => {
         expect(inputConhecimento.attributes('disabled')).toBeDefined();
         expect(btnAdicionarConhecimento.attributes('disabled')).toBeDefined();
     });
+
+    it("deve ocultar o label 'Conhecimentos *' quando não tiver permissão para editar", async () => {
+        const mountOptions = getCommonMountOptions({}, commonStubs);
+        context.wrapper = mount(AtividadeItem, {
+            ...mountOptions,
+            props: {atividade: atividadeMock, podeEditar: false},
+        });
+
+        expect(context.wrapper.text()).not.toContain('Conhecimentos *');
+    });
 });

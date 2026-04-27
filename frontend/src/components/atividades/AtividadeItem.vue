@@ -61,7 +61,7 @@
 
       <div class="mt-3 ms-3">
         <!-- Label com asterisco para conhecimentos obrigatórios -->
-        <div class="mb-2 text-muted small">
+        <div v-if="podeEditar" class="mb-2 text-muted small">
           <strong>Conhecimentos <span class="text-danger">*</span></strong>
         </div>
 
