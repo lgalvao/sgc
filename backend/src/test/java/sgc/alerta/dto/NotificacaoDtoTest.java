@@ -1,0 +1,50 @@
+package sgc.alerta.dto;
+
+import org.junit.jupiter.api.Test;
+import sgc.alerta.model.NotificacaoEmail;
+import sgc.alerta.model.SituacaoNotificacao;
+import sgc.alerta.model.TipoNotificacao;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class NotificacaoDtoTest {
+
+    @Test
+    void shouldCreateNotificacaoDtoFromEntity() {
+        // Given
+        Long subprocessoCodigo = 123L;
+        LocalDateTime now = LocalDateTime.now();
+        NotificacaoEmail entity = NotificacaoEmail.builder()
+                .codigo(1L)
+                .tipoNotificacao(TipoNotificacao.MAPA_DISPONIBILIZADO)
+                .usuarioDestinoTitulo("123456789012")
+                .destinatario("test@example.com")
+                .assunto("Test Subject")
+                .situacao(SituacaoNotificacao.ENVIADO)
+                .tentativas(1)
+                .dataHoraCriacao(now.minusDays(1))
+                .dataHoraEnvio(now)
+                .proximaTentativaEm(null)
+                .ultimoErro(null)
+                .build();
+
+        // When
+        NotificacaoDto dto = NotificacaoDto.fromEntity(entity, subprocessoCodigo);
+
+        // Then
+        assertThat(dto.codigo()).isEqualTo(entity.getCodigo());
+        assertThat(dto.subprocessoCodigo()).isEqualTo(subprocessoCodigo);
+        assertThat(dto.tipoNotificacao()).isEqualTo(entity.getTipoNotificacao());
+        assertThat(dto.usuarioDestinoTitulo()).isEqualTo(entity.getUsuarioDestinoTitulo());
+        assertThat(dto.destinatario()).isEqualTo(entity.getDestinatario());
+        assertThat(dto.assunto()).isEqualTo(entity.getAssunto());
+        assertThat(dto.situacao()).isEqualTo(entity.getSituacao());
+        assertThat(dto.tentativas()).isEqualTo(entity.getTentativas());
+        assertThat(dto.dataHoraCriacao()).isEqualTo(entity.getDataHoraCriacao());
+        assertThat(dto.dataHoraEnvio()).isEqualTo(entity.getDataHoraEnvio());
+        assertThat(dto.proximaTentativaEm()).isNull();
+        assertThat(dto.ultimoErro()).isNull();
+    }
+}
