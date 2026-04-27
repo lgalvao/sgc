@@ -66,6 +66,7 @@ describe('MapaView Coverage', () => {
         adicionarCompetencia: vi.fn(),
         atualizarCompetencia: vi.fn(),
         removerCompetencia: vi.fn(),
+        removerAtividadeDaCompetencia: vi.fn(),
         disponibilizarMapa: vi.fn(),
     };
 
@@ -81,6 +82,7 @@ describe('MapaView Coverage', () => {
         fluxoMapaMock.adicionarCompetencia = vi.fn();
         fluxoMapaMock.atualizarCompetencia = vi.fn();
         fluxoMapaMock.removerCompetencia = vi.fn();
+        fluxoMapaMock.removerAtividadeDaCompetencia = vi.fn();
         fluxoMapaMock.disponibilizarMapa = vi.fn();
         vi.mocked(useFluxoMapaModule.useFluxoMapa).mockReturnValue(fluxoMapaMock as unknown as ReturnType<typeof useFluxoMapaModule.useFluxoMapa>);
     });
@@ -216,10 +218,7 @@ describe('MapaView Coverage', () => {
 
         await vm.removerAtividadeAssociada(1, 10);
 
-        expect(fluxoMapa.atualizarCompetencia).toHaveBeenCalledWith(456, 1, {
-            descricao: 'Comp 1',
-            atividadesCodigos: [20]
-        });
+        expect(fluxoMapa.removerAtividadeDaCompetencia).toHaveBeenCalledWith(456, 1, 10);
     });
 
     it('desabilita disponibilizacao quando existir competencia sem atividade', async () => {
