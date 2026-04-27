@@ -363,7 +363,9 @@ const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/Im
 const CriarCompetenciaModal = defineAsyncComponent(() => import("@/components/mapa/CriarCompetenciaModal.vue"));
 const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/mapa/DisponibilizarMapaModal.vue"));
 
-const props = defineProps<{ codProcesso: number; sigla: string; codSubprocesso?: number }>();
+import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
+
+const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();
 const router = useRouter();
 const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
@@ -371,12 +373,10 @@ const {mapaCompleto, impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
-const {invalidarCachesSubprocesso, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
+const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
 usePerfil();
 
-const codProcesso = computed(() => Number(props.codProcesso));
-const siglaUnidade = computed(() => String(props.sigla));
 
 const {
   podeVisualizarImpacto,
@@ -402,10 +402,17 @@ const podeValidar = computed(() => podeValidarMapa?.value ?? false);
 const habilitarValidar = computed(() => habilitarValidarMapa?.value ?? false);
 const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
 
-const unidade = ref<Unidade | null>(null);
-const codigoSubprocesso = ref<number | null>(null);
-const carregandoInicial = ref(true);
+const atividades = ref<Atividade[]>([]);
+const competencias = ref<Competencia[]>([]);
 const mapaSomenteLeitura = ref<MapaVisualizacao | null>(null);
+
+const {
+  carregandoInicial,
+  codigoSubprocesso,
+  unidade,
+  carregarContextoInicial,
+  sincronizarEstadoInicialContexto
+} = useMapaOrquestracao(props, atividades, competencias, mapaSomenteLeitura);
 
 const analisesCadastro = ref<Analise[]>([]);
 const historicoAnalise = computed(() => analisesCadastro.value || []);
@@ -570,6 +577,7 @@ async function carregarContextoEdicao(codigo: number) {
   }
 
   atividades.value = data.mapa.atividades;
+  competencias.value = data.mapa.competencias;
   unidade.value = data.unidade;
 
   return data;

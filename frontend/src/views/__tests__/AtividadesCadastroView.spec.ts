@@ -12,6 +12,7 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
+import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import type {
     AtividadeOperacaoResponse,
     ContextoCadastroAtividadesSubprocesso,
@@ -39,19 +40,6 @@ type AtividadeMinima = {
     conhecimentos?: Array<{codigo: number; descricao?: string}>;
 };
 
-function calcularAssinaturaCadastro(lista: AtividadeMinima[]): string {
-    return lista
-        .map((atividade) => {
-            const descricao = (atividade.descricao || '').trim();
-            const conhecimentos = (atividade.conhecimentos || [])
-                .map((conhecimento) => (conhecimento.descricao || '').trim())
-                .sort()
-                .join('\u0001');
-            return `${descricao}\u0002${conhecimentos}`;
-        })
-        .sort((a, b) => a.localeCompare(b))
-        .join('\u0003');
-}
 
 type CadastroViewVm = {
     codigoSubprocesso: number | null;
@@ -420,15 +408,9 @@ describe("CadastroView.vue", () => {
         };
         subprocessosMock.lastError = null;
         subprocessosMock.erroIntegracaoContexto = null;
-        subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade = vi.fn();
-        subprocessosMock.buscarContextoCadastroAtividades = vi.fn();
-        subprocessosMock.garantirContextoCadastroAtividadesPorProcessoEUnidade = subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade;
-        subprocessosMock.garantirContextoCadastroAtividades = subprocessosMock.buscarContextoCadastroAtividades;
-        subprocessosMock.buscarContextoEdicaoPorProcessoEUnidade = vi.fn();
-        subprocessosMock.buscarContextoEdicao = vi.fn();
-        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn();
-        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
         subprocessosMock.atualizarStatusLocal = vi.fn();
+        subprocessosMock.garantirContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(criarContextoEdicao());
+        subprocessosMock.garantirContextoCadastroAtividades.mockResolvedValue(criarContextoEdicao());
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             lastError: ref(null),
             clearError: vi.fn(),

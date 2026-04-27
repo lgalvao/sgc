@@ -1,4 +1,4 @@
-import {SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
+import {SituacaoProcesso, SituacaoSubprocesso, TipoProcesso, type Atividade} from '@/types/tipos';
 
 export function formatDate(date: string | Date | undefined | null, includeTime = true): string {
     if (!date) return '';
@@ -71,12 +71,12 @@ export function formatNumeroCsvBR(value: number | null | undefined, decimalPlace
     }).format(value);
 }
 
-export function calcularAssinaturaCadastro(atividades: import("@/types/tipos").Atividade[]): string {
+export function calcularAssinaturaCadastro(atividades: Atividade[]): string {
+    if (!atividades) return "";
     const itens = atividades.map((a) => ({
         d: a.descricao,
-        c: a.conhecimentos.map((c) => c.descricao).sort((a, b) => a.localeCompare(b))
+        c: (a.conhecimentos || []).map((c) => c.descricao).sort((a, b) => a.localeCompare(b)),
     }));
     itens.sort((a, b) => a.d.localeCompare(b.d));
     return JSON.stringify(itens);
 }
-

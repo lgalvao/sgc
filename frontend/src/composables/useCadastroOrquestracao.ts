@@ -10,7 +10,7 @@ interface CadastroOrquestracaoProps {
     codSubprocesso?: number;
 }
 
-export function useCadastroOrquestracao(props: CadastroOrquestracaoProps) {
+export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
 
     const carregandoInicial = ref(true);
@@ -19,15 +19,15 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps) {
     const unidade = ref<Unidade | null>(null);
     const codMapa = ref<number | null>(null);
 
-    function processarRespostaLocal(response: RespostaLocalCadastro, atividadesRef: Ref<Atividade[]>) {
-        atividadesRef.value = response.atividadesAtualizadas;
+    function processarRespostaLocal(response: RespostaLocalCadastro) {
+        atividades.value = response.atividadesAtualizadas;
         subprocessoStore.atualizarStatusLocal({
             ...response.subprocesso,
             permissoes: response.permissoes
         });
     }
 
-    function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso, atividadesRef: Ref<Atividade[]>) {
+    function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso) {
         processarRespostaLocal({
             subprocesso: {
                 codigo: data.detalhes.codigo,
@@ -35,14 +35,14 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps) {
             },
             permissoes: data.detalhes.permissoes,
             atividadesAtualizadas: data.atividadesDisponiveis,
-        }, atividadesRef);
+        });
 
         atividadesSnapshotInicial.value = data.assinaturaCadastroReferencia ?? calcularAssinaturaCadastro(data.atividadesDisponiveis);
         unidade.value = data.unidade;
         codMapa.value = data.mapa.codigo;
     }
 
-    async function carregarContextoInicial(atividadesRef: Ref<Atividade[]>) {
+    async function carregarContextoInicial() {
         try {
             const data = typeof props.codSubprocesso === "number"
                 ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, false)
@@ -58,7 +58,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps) {
             }
 
             codigoSubprocesso.value = data.detalhes.codigo;
-            sincronizarEstadoInicialContexto(data, atividadesRef);
+            sincronizarEstadoInicialContexto(data);
             return true;
         } catch (e) {
             logger.error("Erro ao carregar contexto inicial", e);

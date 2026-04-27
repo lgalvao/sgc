@@ -210,6 +210,8 @@ const props = defineProps<{
   codSubprocesso?: number;
 }>();
 
+const atividades = ref<Atividade[]>([]);
+
 const {
   carregandoInicial,
   codigoSubprocesso,
@@ -218,7 +220,7 @@ const {
   codMapa,
   carregarContextoInicial,
   processarRespostaLocal
-} = useCadastroOrquestracao(props);
+} = useCadastroOrquestracao(props, atividades);
 
 const subprocessoStore = useSubprocessoStore();
 const mapasStore = useMapas();
@@ -255,7 +257,6 @@ const permissoesUI = computed<PermissoesSubprocesso>(() => ({
 
 
 
-const atividades = ref<Atividade[]>([]);
 const disponibilizacaoSemMudancas = ref(false);
 
 const assinaturaCadastroAtual = computed(() => calcularAssinaturaCadastro(atividades.value));
@@ -499,7 +500,7 @@ async function executarAtualizacaoCadastro(
   try {
     await withErrorHandling(async () => {
       const response = await acao();
-      processarRespostaLocal(response, atividades);
+      processarRespostaLocal(response);
     });
     return true;
   } catch {
@@ -514,7 +515,7 @@ async function adicionarAtividade(): Promise<boolean> {
     try {
       const response = await withErrorHandling(() => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!));
       if (response) {
-        processarRespostaLocal(response, atividades);
+        processarRespostaLocal(response);
         erroNovaAtividade.value = null;
         return true;
       }
@@ -544,13 +545,13 @@ async function confirmarRemocao() {
       const atividadeRemovida = atividades.value[index];
       await withErrorHandling(async () => {
         const response = await atividadeService.excluirAtividade(atividadeRemovida.codigo);
-        processarRespostaLocal(response, atividades);
+        processarRespostaLocal(response);
       });
     } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
       const atividade = atividades.value[index];
       await withErrorHandling(async () => {
         const response = await atividadeService.excluirConhecimento(atividade.codigo, conhecimentoCodigo);
-        processarRespostaLocal(response, atividades);
+        processarRespostaLocal(response);
       });
     }
     mostrarModalConfirmacaoRemocao.value = false;
@@ -623,7 +624,7 @@ async function handleImportAtividades(resultado: AtividadeOperacaoResponse) {
   mostrarModalImportar.value = false;
   clear();
   await nextTick();
-  processarRespostaLocal(resultado, atividades);
+  processarRespostaLocal(resultado);
   if (resultado.aviso) {
     notify(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
   } else {
@@ -803,7 +804,7 @@ async function handleAdicionarAtividade() {
 }
 
 onMounted(async () => {
-  await carregarContextoInicial(atividades);
+  await carregarContextoInicial();
 });
 
 watch(() => atividades.value?.length, (newLen, oldLen) => {
