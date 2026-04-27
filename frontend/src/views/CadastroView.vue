@@ -75,8 +75,8 @@
     />
 
     <div
-        v-for="(atividade, idx) in atividades"
-        :key="atividade.codigo || idx"
+        v-for="atividade in atividadesOrdenadas"
+        :key="atividade.codigo"
         :ref="el => setAtividadeRef(atividade.codigo, el)"
     >
       <AtividadeItem
@@ -85,10 +85,10 @@
           :pode-editar="podeEditarCadastro"
           :habilitar-edicao="habilitarEditarCadastro"
           @atualizar-atividade="(desc: string) => salvarEdicaoAtividade(atividade.codigo, desc)"
-          @remover-atividade="() => removerAtividade(idx)"
-          @adicionar-conhecimento="(desc: string) => adicionarConhecimento(idx, desc)"
+          @remover-atividade="() => removerAtividade(atividade.codigo)"
+          @adicionar-conhecimento="(desc: string) => adicionarConhecimento(atividade.codigo, desc)"
           @atualizar-conhecimento="(idC: number, desc: string) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
-          @remover-conhecimento="(idC: number) => removerConhecimento(idx, idC)"
+          @remover-conhecimento="(idC: number) => removerConhecimento(atividade.codigo, idC)"
       />
     </div>
 
@@ -204,7 +204,7 @@ import * as atividadeService from "@/services/atividadeService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
 
-type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
+type DadosRemocao = { tipo: "atividade" | "conhecimento"; atividadeCodigo: number; conhecimentoCodigo?: number } | null;
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -264,6 +264,10 @@ const disponibilizacaoSemMudancas = ref(false);
 const assinaturaCadastroAtual = computed(() => calcularAssinaturaCadastro(atividades.value));
 const houveAlteracaoCadastro = computed(() => assinaturaCadastroAtual.value !== atividadesSnapshotInicial.value);
 const checkboxSemMudancasDesabilitado = computed(() => loadingInicioRevisao.value || houveAlteracaoCadastro.value);
+
+const atividadesOrdenadas = computed(() => {
+  return [...atividades.value].sort((a, b) => (b.codigo || 0) - (a.codigo || 0));
+});
 
 // Variável habilitarDisponibilizar removida pois não era utilizada
 
@@ -518,29 +522,27 @@ async function adicionarAtividade(): Promise<boolean> {
   return false;
 }
 
-function removerAtividade(idx: number) {
+function removerAtividade(codigo: number) {
   if (!codigoSubprocesso.value) return;
-  dadosRemocao.value = {tipo: "atividade", index: idx};
+  dadosRemocao.value = {tipo: "atividade", atividadeCodigo: codigo};
   mostrarModalConfirmacaoRemocao.value = true;
 }
 
 async function confirmarRemocao() {
   if (!dadosRemocao.value || !codigoSubprocesso.value || loadingRemocao.value) return;
 
-  const {tipo, index, conhecimentoCodigo} = dadosRemocao.value;
+  const {tipo, atividadeCodigo, conhecimentoCodigo} = dadosRemocao.value;
 
   loadingRemocao.value = true;
   try {
     if (tipo === "atividade") {
-      const atividadeRemovida = atividades.value[index];
       await withErrorHandling(async () => {
-        const response = await atividadeService.excluirAtividade(atividadeRemovida.codigo);
+        const response = await atividadeService.excluirAtividade(atividadeCodigo);
         processarRespostaLocal(response);
       });
     } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
-      const atividade = atividades.value[index];
       await withErrorHandling(async () => {
-        const response = await atividadeService.excluirConhecimento(atividade.codigo, conhecimentoCodigo);
+        const response = await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
         processarRespostaLocal(response);
       });
     }
@@ -571,23 +573,22 @@ async function salvarEdicaoAtividade(codigo: number, descricao: string) {
   }
 }
 
-async function adicionarConhecimento(idx: number, descricao: string) {
+async function adicionarConhecimento(atividadeCodigo: number, descricao: string) {
   if (!codigoSubprocesso.value) return;
-  const atividade = atividades.value[idx];
   if (descricao.trim()) {
     const request: CriarConhecimentoRequest = {
       descricao: descricao.trim(),
     };
     await executarAtualizacaoCadastro(
-        () => atividadeService.criarConhecimento(atividade.codigo, request),
+        () => atividadeService.criarConhecimento(atividadeCodigo, request),
         TEXTOS.atividades.ERRO_ADICIONAR_CONHECIMENTO,
     );
   }
 }
 
-function removerConhecimento(idx: number, conhecimentoCodigo?: number) {
+function removerConhecimento(atividadeCodigo: number, conhecimentoCodigo?: number) {
   if (!codigoSubprocesso.value) return;
-  dadosRemocao.value = {tipo: "conhecimento", index: idx, conhecimentoCodigo};
+  dadosRemocao.value = {tipo: "conhecimento", atividadeCodigo, conhecimentoCodigo};
   mostrarModalConfirmacaoRemocao.value = true;
 }
 

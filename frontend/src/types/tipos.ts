@@ -563,6 +563,8 @@ export interface AtividadeImpactada {
     tipoImpacto: TipoImpactoAtividade;
     descricaoAnterior?: string;
     conhecimentos?: string[];
+    conhecimentosAdicionados?: string[];
+    conhecimentosRemovidos?: string[];
     competenciasVinculadas: string[];
 }
 

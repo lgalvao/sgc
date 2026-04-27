@@ -142,17 +142,26 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
 }
 
 .atividade-associada-card-item {
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.375rem;
-  background-color: var(--bs-secondary-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  background-color: transparent;
   min-width: 150px;
   max-width: 300px;
   flex: 1 1 auto;
+  transition: all 0.2s ease-in-out;
+}
+
+.atividade-associada-card-item:hover {
+  border-color: var(--bs-primary-border-subtle);
+  background-color: rgba(var(--bs-primary-rgb), 0.02);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .atividade-associada-descricao {
-  font-size: 0.85rem;
-  color: var(--bs-body-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--bs-emphasis-color);
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -174,4 +183,3 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
   border-width: 1px;
 }
 </style>
-e>

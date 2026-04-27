@@ -132,6 +132,10 @@ export const TEXTOS = {
       ERRO_CARREGAR: "Não foi possível carregar os dados de impacto.",
       TIPO_REMOVIDA: "Atividade removida",
       TIPO_ALTERADA: "Atividade alterada",
+      CONHECIMENTOS_ADICIONADOS: "Conhecimentos adicionados",
+      CONHECIMENTOS_REMOVIDOS: "Conhecimentos removidos",
+      COMPETENCIA_REMOVIDA: "Competência removida",
+      COMPETENCIA_INSERIDA: "Nova competência",
     },
   },
   atribuicaoTemporaria: {

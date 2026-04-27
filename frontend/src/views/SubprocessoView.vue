@@ -168,9 +168,11 @@
       <p class="text-muted">{{ TEXTOS.subprocesso.NAO_ENCONTRADO_DESC }}</p>
       <BButton to="/painel" variant="primary" class="mt-3">Voltar para o Painel</BButton>
     </div>
-    <div v-else class="text-center py-5">
-      <BSpinner :label="TEXTOS.subprocesso.CARREGANDO" variant="primary"/>
-      <p class="mt-2 text-muted">{{ TEXTOS.subprocesso.CARREGANDO }}</p>
+    <div v-else class="loading-container py-5">
+      <div class="loading-content">
+        <BSpinner :label="TEXTOS.subprocesso.CARREGANDO" variant="primary" style="width: 3rem; height: 3rem;"/>
+        <p class="mt-3 text-muted fw-bold">{{ TEXTOS.subprocesso.CARREGANDO }}</p>
+      </div>
     </div>
   </LayoutPadrao>
 
@@ -243,7 +245,7 @@ import {
   BTable,
   useToast
 } from "bootstrap-vue-next";
-import {computed, onActivated, onMounted, ref, type Ref} from "vue";
+import {computed, onActivated, onMounted, ref, type Ref, watch} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
@@ -371,9 +373,9 @@ function exibirToastPendente() {
   }
 }
 
-async function carregarSubprocesso() {
+async function carregarSubprocesso(limpar = false) {
   const resultadoDireto = typeof props.codSubprocesso === "number"
-      ? await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, false)
+      ? await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, limpar)
       : null;
 
   if (resultadoDireto) {
@@ -385,7 +387,7 @@ async function carregarSubprocesso() {
   const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
       props.codProcesso,
       props.siglaUnidade,
-      false,
+      limpar,
   );
 
   if (!resultado) {
@@ -400,9 +402,16 @@ async function carregarSubprocesso() {
 
 onMounted(async () => {
   exibirToastPendente();
-  await carregarSubprocesso();
+  await carregarSubprocesso(true);
   carregamentoInicialConcluido.value = true;
 });
+
+watch(
+    () => [props.codProcesso, props.siglaUnidade, props.codSubprocesso],
+    async () => {
+      await carregarSubprocesso(true);
+    }
+);
 
 onActivated(async () => {
   exibirToastPendente();
@@ -529,3 +538,25 @@ defineExpose({
   justificativaReabertura
 });
 </script>
+
+<style scoped>
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.loading-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
