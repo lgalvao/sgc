@@ -4,6 +4,7 @@ import SubprocessoView from '../SubprocessoView.vue';
 import { createTestingPinia } from '@pinia/testing';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useSubprocessoStore } from '@/stores/subprocesso';
+import { SituacaoSubprocesso } from '@/types/tipos';
 
 vi.mock('@/composables/useAcesso', () => ({
   useAcesso: vi.fn(() => ({
@@ -80,10 +81,9 @@ describe('SubprocessoView Coverage', () => {
     store.contextoEdicao = {
       detalhes: {
         codigo: 1,
-        processo: { codigo: 123, descricao: 'Proc 1' },
-        unidade: { sigla: 'U1', codigo: 2 },
-        situacao: 'EM_ANDAMENTO'
-      }
+        unidade: { sigla: 'U1', nome: 'Unidade 1', codigo: 2 },
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+      } as any
     };
 
     // We trigger multiple actions that might not be fully covered in main spec

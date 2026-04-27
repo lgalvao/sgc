@@ -188,7 +188,7 @@ describe('NotificacoesAdminView', () => {
     ];
     // @ts-ignore
     vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue(mockData);
-    vi.mocked(reenviarFalhasDefinitivas).mockResolvedValue({ reenfileiradas: 1 });
+    vi.mocked(reenviarFalhasDefinitivas).mockResolvedValue({ reenfileiradas: 1, subprocessoCodigo: 2 });
 
     const wrapper = mountComponent();
     await flushPromises();

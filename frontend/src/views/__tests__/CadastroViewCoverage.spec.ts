@@ -4,6 +4,7 @@ import CadastroView from '../CadastroView.vue';
 import { createTestingPinia } from '@pinia/testing';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useSubprocessoStore } from '@/stores/subprocesso';
+import { SituacaoSubprocesso } from '@/types/tipos';
 
 vi.mock('@/composables/useAcesso', () => ({
   useAcesso: vi.fn(() => ({
@@ -96,7 +97,7 @@ describe('CadastroView Coverage', () => {
       },
       props: {
         codProcesso: 123,
-        siglaUnidade: 'U1'
+        sigla: 'U1'
       }
     });
   };
@@ -107,13 +108,12 @@ describe('CadastroView Coverage', () => {
 
     const store = useSubprocessoStore();
     // @ts-ignore
-    store.contextoEdicao = {
+    store.contextoCadastro = {
       detalhes: {
         codigo: 1,
-        processo: { codigo: 123, descricao: 'Proc 1' },
-        unidade: { sigla: 'U1', codigo: 2 },
-        situacao: 'EM_ANDAMENTO'
-      }
+        unidade: { sigla: 'U1', nome: 'Unidade 1', codigo: 2 },
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+      } as any
     };
     // @ts-ignore
     store.garantirContextoEdicao = vi.fn().mockResolvedValue(true);
