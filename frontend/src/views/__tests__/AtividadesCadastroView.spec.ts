@@ -954,6 +954,9 @@ describe("CadastroView.vue", () => {
         vm.atividades = [{codigo: 1, descricao: "A1", conhecimentos: [{codigo: 1, descricao: "C1"}]}];
         await vm.$nextTick();
 
+        // Mock para evitar erro de DOM no teste
+        (vm as any).scrollParaPrimeiroErro = vi.fn();
+
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         fluxoSubprocesso.validarCadastro.mockResolvedValueOnce({
             valido: false,

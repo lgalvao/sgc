@@ -36,7 +36,7 @@
 
     <BAlert
         v-if="erroGlobalFormatado"
-        :key="erroGlobalFormatado.message"
+        :key="erroTick"
         :model-value="true"
         no-fade
         show
@@ -654,39 +654,50 @@ function scrollParaPrimeiroErro() {
 async function disponibilizarCadastro() {
   if (loadingValidacao.value) return;
 
+  // Limpa erros anteriores antes de começar nova tentativa
+  limparErrosValidacaoCadastro();
+
   const situacaoAtualCadastro = subprocesso.value?.situacao;
   const situacaoReferencia = obterSituacaoReferenciaDisponibilizacao();
   const erroPreValidacao = obterErroPreValidacaoDisponibilizacao();
 
   if (erroPreValidacao) {
-    limparErrosValidacaoCadastro();
     erroGlobal.value = erroPreValidacao;
     return;
   }
 
   if (!situacaoAtualCadastro || situacaoAtualCadastro !== situacaoReferencia) {
-    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
+    erroGlobal.value = TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia));
     return;
   }
 
-  if (codigoSubprocesso.value) {
-    loadingValidacao.value = true;
-    limparErrosValidacaoCadastro();
-    try {
-      const resultado = await fluxoSubprocesso.validarCadastro(codigoSubprocesso.value);
-      if (resultado) {
-        aplicarResultadoValidacaoCadastro(resultado.valido, resultado.erros);
-        if (!resultado.valido) {
-          await nextTick();
+  if (!codigoSubprocesso.value) {
+    erroGlobal.value = "Identificador do subprocesso não encontrado. Recarregue a página.";
+    return;
+  }
+
+  loadingValidacao.value = true;
+  
+  try {
+    const resultado = await fluxoSubprocesso.validarCadastro(codigoSubprocesso.value);
+    if (resultado) {
+      aplicarResultadoValidacaoCadastro(resultado.valido, resultado.erros);
+      if (!resultado.valido) {
+        await nextTick();
+        try {
           scrollParaPrimeiroErro();
-          timeoutLimpezaErros();
+        } catch (domError) {
+          logger.warn('Falha ao executar scroll para erro', domError);
         }
       }
-    } catch {
-      // O withErrorHandling já notificou o erro se necessário ou ele será exibido via erroGlobal
-    } finally {
-      loadingValidacao.value = false;
+    } else {
+      erroGlobal.value = "Não foi possível obter o resultado da validação. Tente novamente.";
     }
+  } catch (e: any) {
+    // Tenta extrair mensagem amigável do erro
+    erroGlobal.value = e?.response?.data?.message || e?.message || "Ocorreu um erro ao validar o cadastro.";
+  } finally {
+    loadingValidacao.value = false;
   }
 }
 

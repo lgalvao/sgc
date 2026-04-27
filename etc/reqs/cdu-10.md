@@ -35,7 +35,7 @@ Ator: CHEFE
 
 9. O usuário clica no botão `Disponibilizar`.
 
-10. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores" / Botões `Confirmar` e `Cancelar`.
+10. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades superiores" / Botões `Confirmar` e `Cancelar`.
 
 10.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
 
