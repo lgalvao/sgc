@@ -1,5 +1,5 @@
 import {ref, type Ref} from "vue";
-import type {ContextoEdicaoMapaSubprocesso, Atividade, Competencia, Unidade, MapaVisualizacao} from "@/types/tipos";
+import type {ContextoEdicaoSubprocesso, Atividade, Competencia, Unidade, MapaVisualizacao} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapas} from "@/composables/useMapas";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
@@ -25,7 +25,7 @@ export function useMapaOrquestracao(
     const codigoSubprocesso = ref<number | null>(null);
     const unidade = ref<Unidade | null>(null);
 
-    function sincronizarEstadoInicialContexto(data: ContextoEdicaoMapaSubprocesso) {
+    function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
         atividades.value = data.mapa.atividades;
         competencias.value = data.mapa.competencias;
         unidade.value = data.unidade;
@@ -42,7 +42,7 @@ export function useMapaOrquestracao(
 
     async function carregarContextoInicial(podeEditarMapa: Ref<boolean>) {
         try {
-            let contexto: ContextoEdicaoMapaSubprocesso | null = null;
+            let contexto: ContextoEdicaoSubprocesso | null = null;
 
             if (typeof props.codSubprocesso === "number") {
                 contexto = await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, false);
@@ -53,8 +53,8 @@ export function useMapaOrquestracao(
                     store: subprocessoStore,
                 });
 
-                if (diagnostico?.contextoEdicao) {
-                    contexto = diagnostico.contextoEdicao;
+                if (diagnostico.tipo === 'sucesso') {
+                    contexto = diagnostico.resultado.contexto;
                 }
             }
 

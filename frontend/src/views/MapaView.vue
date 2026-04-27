@@ -137,7 +137,7 @@
                 :competencia="comp"
                 :pode-editar="podeEditarMapa"
                 @editar="iniciarEdicaoCompetencia"
-                @excluir="excluirCompetencia"
+                @excluir="(codigo) => excluirCompetencia(codigo)"
                 @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
             />
           </div>
@@ -186,7 +186,7 @@
           :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
           :mostrar-modal="mostrarModalAceitar"
           @fechar-modal="fecharModalAceitar"
-          @confirmar-aceitacao="confirmarAceitacao"
+          @confirmar-aceitacao="(observacao) => confirmarAceitacao(observacao)"
       />
 
       <ModalPadrao
@@ -338,11 +338,11 @@ import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
-import {obterMapaVisualizacao, obterSugestoesMapa} from "@/services/subprocessoService";
+import {obterSugestoesMapa} from "@/services/subprocessoService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {apresentarSugestoes as apresentarSugestoesService} from "@/services/processoService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import logger from "@/utils/logger";
 import type {
   Analise,
@@ -351,7 +351,6 @@ import type {
   MapaCompleto,
   MapaVisualizacao,
   SalvarCompetenciaRequest,
-  Unidade
 } from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
@@ -363,20 +362,17 @@ const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/Im
 const CriarCompetenciaModal = defineAsyncComponent(() => import("@/components/mapa/CriarCompetenciaModal.vue"));
 const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/mapa/DisponibilizarMapaModal.vue"));
 
-import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
-
 const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();
 const router = useRouter();
 const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
-const {mapaCompleto, impactoMapa: impactos, erro: erroMapa} = mapasStore;
+const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
 usePerfil();
-
 
 const {
   podeVisualizarImpacto,
@@ -411,7 +407,6 @@ const {
   codigoSubprocesso,
   unidade,
   carregarContextoInicial,
-  sincronizarEstadoInicialContexto
 } = useMapaOrquestracao(props, atividades, competencias, mapaSomenteLeitura);
 
 const analisesCadastro = ref<Analise[]>([]);
@@ -570,64 +565,6 @@ const {
   fecharModalImpacto,
 } = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
-async function carregarContextoEdicao(codigo: number) {
-  const data = await subprocessoStore.garantirContextoEdicao(codigo);
-  if (!data) {
-    return null;
-  }
-
-  atividades.value = data.mapa.atividades;
-  competencias.value = data.mapa.competencias;
-  unidade.value = data.unidade;
-
-  return data;
-}
-
-async function carregarContextoInicial() {
-  if (typeof props.codSubprocesso === "number") {
-    const contexto = await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, false);
-    if (!contexto) {
-      if (subprocessoStore.erroIntegracaoContexto) {
-        notify(subprocessoStore.erroIntegracaoContexto.message, 'danger');
-      } else {
-        notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
-      }
-      return null;
-    }
-
-    codigoSubprocesso.value = contexto.detalhes.codigo;
-    atividades.value = contexto.mapa.atividades;
-    unidade.value = contexto.unidade;
-    return contexto;
-  }
-
-  const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
-    codProcesso: codProcesso.value,
-    siglaUnidade: siglaUnidade.value,
-    store: subprocessoStore,
-  });
-
-  if (diagnostico.tipo === 'erroIntegracao') {
-    notify(diagnostico.erro.message, 'danger');
-    return null;
-  }
-
-  if (diagnostico.tipo === 'cancelado') {
-    return null;
-  }
-
-  if (diagnostico.tipo === 'ausencia') {
-    notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
-    return null;
-  }
-
-  codigoSubprocesso.value = diagnostico.resultado.codigo;
-  atividades.value = diagnostico.resultado.contexto.mapa.atividades;
-  unidade.value = diagnostico.resultado.contexto.unidade;
-
-  return diagnostico.resultado.contexto;
-}
-
 async function executarComSubprocesso(
     callback: (id: number) => Promise<void>
 ) {
@@ -645,46 +582,17 @@ function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   }
 }
 
-async function carregarMapaSomenteLeitura(codigo: number) {
-  mapaSomenteLeitura.value = await obterMapaVisualizacao(codigo);
-  mapasStore.mapaCompleto.value = null;
-  atividades.value = [];
-}
-
-async function carregarMapaInicial(codigo: number, contextoInicial?: Awaited<ReturnType<typeof carregarContextoEdicao>> | null) {
-  if (modoSomenteLeitura.value) {
-    await carregarMapaSomenteLeitura(codigo);
-    return;
-  }
-
-  mapaSomenteLeitura.value = null;
-  const data = contextoInicial ?? await carregarContextoEdicao(codigo);
-  if (data?.mapa) {
-    sincronizarMapa(data.mapa);
-    return;
-  }
-
-  await mapasStore.buscarMapaCompleto(codigo);
-}
-
 onMounted(async () => {
-  try {
-    limparEstadoSubprocessoAtual();
-    const contextoInicial = await carregarContextoInicial();
-    if (!codigoSubprocesso.value) {
-      return;
+  const sucesso = await carregarContextoInicial(podeEditarMapa);
+  if (!sucesso) {
+    if (subprocessoStore.erroIntegracaoContexto) {
+      notify(subprocessoStore.erroIntegracaoContexto.message, 'danger');
+    } else {
+      notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
     }
-    await carregarMapaInicial(codigoSubprocesso.value, contextoInicial);
-  } catch (erro) {
-    notify(normalizeError(erro).message, 'danger');
-  } finally {
-    carregandoInicial.value = false;
   }
 });
 
-const atividades = ref<Atividade[]>([]);
-
-const competencias = computed(() => mapaCompleto.value?.competencias || []);
 const codigosAtividadesAssociadas = computed(() => {
   return new Set(
       competencias.value.flatMap((competencia) =>
@@ -799,9 +707,9 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
       } else {
         sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigoSubprocesso, request));
       }
-
       fecharModalCriarNovaCompetencia();
-    } catch {
+    } catch (error) {
+      logger.error(error);
       handleErrors(fluxoMapa);
     } finally {
       loadingCompetencia.value = false;
@@ -810,67 +718,51 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
 }
 
 function excluirCompetencia(codigo: number) {
-  const competencia = competencias.value.find((comp) => comp.codigo === codigo);
-  if (competencia) {
-    competenciaParaExcluir.value = competencia;
+  const comp = competencias.value.find(c => c.codigo === codigo);
+  if (comp) {
+    competenciaParaExcluir.value = comp;
     mostrarModalExcluirCompetencia.value = true;
   }
 }
 
 async function confirmarExclusaoCompetencia() {
-  const competencia = competenciaParaExcluir.value;
-  if (!competencia) return;
+  if (!competenciaParaExcluir.value) return;
 
   await executarComSubprocesso(async (codigoSubprocesso) => {
     loadingExclusao.value = true;
     try {
-      sincronizarMapa(await fluxoMapa.removerCompetencia(codigoSubprocesso, competencia.codigo));
-      fecharModalExcluirCompetencia();
-    } catch {
-      handleErrors(fluxoMapa);
+      sincronizarMapa(await fluxoMapa.removerCompetencia(codigoSubprocesso, competenciaParaExcluir.value!.codigo));
+      mostrarModalExcluirCompetencia.value = false;
+    } catch (error) {
+      logger.error(error);
+      notify(normalizeError(error).message, 'danger');
     } finally {
       loadingExclusao.value = false;
     }
   });
 }
 
-function fecharModalExcluirCompetencia() {
-  mostrarModalExcluirCompetencia.value = false;
-  competenciaParaExcluir.value = null;
-}
-
 async function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
-  const competencia = competencias.value.find((comp) => comp.codigo === competenciaId);
-  if (!competencia) return;
-
   await executarComSubprocesso(async (codigoSubprocesso) => {
-    const atividadesCodigos = (competencia.atividades || []).map((atividade) => atividade.codigo)
-        .filter((codigoAtividade) => codigoAtividade !== codAtividade);
-    const request: SalvarCompetenciaRequest = {
-      descricao: competencia.descricao,
-      atividadesCodigos,
-    };
-
-    sincronizarMapa(await fluxoMapa.atualizarCompetencia(
-        codigoSubprocesso,
-        competencia.codigo,
-        request,
-    ));
+    try {
+      sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigoSubprocesso, competenciaId, codAtividade));
+    } catch (error) {
+      logger.error(error);
+      notify(normalizeError(error).message, 'danger');
+    }
   });
 }
 
-async function disponibilizarMapa(payload: { dataLimite: string; observacoes: string }) {
-  await executarComSubprocesso(async (codigoSubprocesso) => {
-    fluxoMapa.clearError();
-    loadingDisponibilizacao.value = true;
+async function disponibilizarMapa(request: { dataLimite: string; observacoes: string }) {
+  if (loadingDisponibilizacao.value) return;
 
+  await executarComSubprocesso(async (codigoSubprocesso) => {
+    loadingDisponibilizacao.value = true;
     try {
-      await fluxoMapa.disponibilizarMapa(codigoSubprocesso, payload);
-      fecharModalDisponibilizar();
-      toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
-      invalidarCachesSubprocesso({incluirPainel: true});
-      await router.push({name: "Painel"});
-    } catch {
+      await fluxoMapa.disponibilizarMapa(codigoSubprocesso, request);
+      await concluirAcaoPainel(TEXTOS.sucesso.MAPA_DISPONIBILIZADO, fecharModalDisponibilizar);
+    } catch (error) {
+      logger.error(error);
       handleErrors(fluxoMapa);
     } finally {
       loadingDisponibilizacao.value = false;
@@ -880,43 +772,42 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
 
 function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
-  notificacaoDisponibilizacao.value = "";
   clearErrors();
 }
 
+// Expose para testes
 defineExpose({
-  ImpactoMapaModal,
-  CriarCompetenciaModal,
-  DisponibilizarMapaModal,
-  podeVisualizarImpacto,
-  podeEditarMapa,
-  podeDisponibilizarMapa,
-  podeConfirmarDisponibilizacao,
+  codigoSubprocesso,
+  mostrarModalImpacto,
+  mostrarModalCriarNovaCompetencia,
+  mostrarModalExcluirCompetencia,
+  mostrarModalDisponibilizar,
+  loadingImpacto,
+  loadingCompetencia,
+  loadingExclusao,
+  loadingDisponibilizacao,
+  notificacaoDisponibilizacao,
+  atividades,
+  competencias,
+  competenciaSendoEditada,
+  competenciaParaExcluir,
+  fieldErrors,
+  atividadesSemCompetencia,
   existeCompetenciaSemAtividade,
   associacoesMapaValidas,
   unidade,
-  competencias,
-  mapaSomenteLeitura,
-  modoSomenteLeitura,
-  atividades,
-  atividadesSemCompetencia,
-  impactoMapa: impactos,
-  mostrarModalImpacto,
-  loadingImpacto,
-  loadingCompetencia,
   abrirModalImpacto,
-  abrirModalCriarLimpo,
-  iniciarEdicaoCompetencia,
-  excluirAtividade: confirmarExclusaoCompetencia,
-  removerAtividadeAssociada,
-  abrirModalDisponibilizar,
-  disponibilizarMapa,
-  fecharModalDisponibilizar,
   fecharModalImpacto,
-  fecharModalCriarNovaCompetencia,
+  abrirModalCriarLimpo,
   adicionarCompetenciaEFecharModal,
+  excluirCompetencia,
   confirmarExclusaoCompetencia,
-  fecharModalExcluirCompetencia,
-  excluirCompetencia
+  disponibilizarMapa,
+  removerAtividadeAssociada,
+  fecharModalExcluirCompetencia: () => { mostrarModalExcluirCompetencia.value = false; competenciaParaExcluir.value = null; },
+  fecharModalDisponibilizar,
+  abrirModalDisponibilizar,
+  fecharModalCriarNovaCompetencia,
+  iniciarEdicaoCompetencia,
 });
 </script>
