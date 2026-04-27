@@ -73,10 +73,14 @@ export function formatNumeroCsvBR(value: number | null | undefined, decimalPlace
 
 export function calcularAssinaturaCadastro(atividades: Atividade[]): string {
     if (!atividades) return "";
-    const itens = atividades.map((a) => ({
-        d: a.descricao,
-        c: (a.conhecimentos || []).map((c) => c.descricao).sort((a, b) => a.localeCompare(b)),
-    }));
-    itens.sort((a, b) => a.d.localeCompare(b.d));
-    return JSON.stringify(itens);
+    return atividades.map((a) => {
+        const descricao = (a.descricao || "").trim();
+        const conhecimentos = (a.conhecimentos || [])
+            .map((c) => (c.descricao || "").trim())
+            .sort((a, b) => a.localeCompare(b))
+            .join("\u0001");
+        return descricao + "\u0002" + conhecimentos;
+    })
+    .sort((a, b) => a.localeCompare(b))
+    .join("\u0003");
 }
