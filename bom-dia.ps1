@@ -1,24 +1,20 @@
 #Requires -Version 7
 
-# Verifica se é admin e 'eleva' se não for
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-if (-not $isAdmin)
-{
-    Start-Process pwsh -Verb RunAs -ArgumentList "-File `"$PSCommandPath`""
+if (-not $isAdmin) {
+    Start-Process pwsh -Verb RunAs -ArgumentList "-NoExit -File `"$PSCommandPath`""
     exit
 }
 
 $ErrorActionPreference = 'Stop'
 
-function Invoke-Passo
-{
+function Invoke-Passo {
     param([string]$Label, [scriptblock]$Action)
     Write-Host "`n==> $Label" -ForegroundColor Cyan
     & $Action
-    if ($LASTEXITCODE -ne 0)
-    {
+    if ($LASTEXITCODE -ne 0) {
         Write-Host "FALHA: $Label (exit $LASTEXITCODE)" -ForegroundColor Red
         exit $LASTEXITCODE
     }
@@ -26,19 +22,25 @@ function Invoke-Passo
 
 Clear-Host
 
-Invoke-Passo 'Git pull'                 { git pull }
-Invoke-Passo 'Testes backend'           { gradle backend:test }
+Invoke-Passo 'Git pull'          { git pull }
+Invoke-Passo 'Testes backend'    { gradle backend:test }
 
-Invoke-Passo 'Atualização npm global'   { npm update -g }
+# Garantir que pnpm está instalado
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+    Invoke-Passo 'Instalar pnpm' { npm install -g pnpm }
+}
 
-Invoke-Passo 'Atualização npm raiz'    { npm update --save }
-Invoke-Passo 'Typecheck'                { npm run typecheck }
-Invoke-Passo 'Lint'                     { npm run lint }
+Invoke-Passo 'Atualizar pnpm'    { pnpm self-update --silent}
+Invoke-Passo 'Atualizar globais' { pnpm update -g }
+
+Invoke-Passo 'Typecheck'         { pnpm run typecheck }
+Invoke-Passo 'Lint'              { pnpm run lint }
 
 Push-Location frontend
-Invoke-Passo 'Frontend deps'            { npm update --save }
-Invoke-Passo 'Testes frontend'          { npx vitest run }
+Invoke-Passo 'Frontend deps'     { pnpm update }
+Invoke-Passo 'Testes frontend'   { pnpm exec vitest run }
 Pop-Location
 
-Invoke-Passo 'Testes PW mímimos'        { npx playwright test captura jornada }
+Invoke-Passo 'Testes PW mínimos' { pnpm exec playwright test captura jornada }
+
 Write-Host "`nTudo certo!" -ForegroundColor Green

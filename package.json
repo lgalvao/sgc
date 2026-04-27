@@ -4,17 +4,17 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "test": "pnpm -C frontend test",
+    "test:e2e": "playwright test",
+    "test:unit": "pnpm -C frontend run test:unit ",
+    "typecheck": "pnpm run typecheck:e2e && pnpm -C frontend run typecheck",
+    "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "sgc": "node etc/scripts/sgc.js",
     "smells:auditar": "node etc/scripts/sgc.js codigo smells auditar",
-    "test": "npm test --prefix frontend",
-    "test:unit": "npm run test:unit --prefix frontend",
-    "test:e2e": "playwright test",
     "qa:dashboard": "node etc/scripts/sgc.js qa snapshot coletar --perfil rapido",
     "qa:dashboard:serve": "node etc/scripts/sgc.js qa dashboard servir --porta 4179",
-    "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",
-    "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "lint:ox": "oxlint .",
-    "lint": "npm run lint:ox && eslint . --fix",
+    "lint": "pnpm run lint:ox && eslint . --fix",
     "sast": "semgrep scan --config p/java --config p/typescript --config p/javascript --config p/owasp-top-ten --config p/security-audit --config p/secrets --metrics=off"
   },
   "devDependencies": {
