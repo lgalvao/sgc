@@ -445,10 +445,6 @@ function obterSituacaoReferenciaDisponibilizacao(): SituacaoSubprocesso {
 }
 
 function obterErroPreValidacaoDisponibilizacao(): string | null {
-  if (habilitarDisponibilizar.value) {
-    return null;
-  }
-
   const cadastroIncompleto = atividades.value.length === 0
       || atividades.value.some((atividade) => !atividade.conhecimentos || atividade.conhecimentos.length === 0);
 
