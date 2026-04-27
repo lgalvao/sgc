@@ -12,7 +12,7 @@
       </p>
     </div>
 
-    <div v-else-if="impacto" class="impacto-container">
+    <div v-else-if="impacto" class="impacto-container" data-testid="modal-impacto-body">
       <BAlert v-if="!impacto.temImpactos" :model-value="true" variant="success">
         <i aria-hidden="true" class="bi bi-check-circle me-2"/> 
         {{ TEXTOS.mapa.impacto.SEM_IMPACTOS }}

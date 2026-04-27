@@ -14,8 +14,8 @@ export async function esperarAtividadesEditaveis(page: Page) {
 }
 
 export async function esperarSemAcoesEdicaoCadastro(page: Page) {
-    await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
-    await expect(page.getByTestId('btn-adicionar-atividade')).toBeDisabled();
+    await expect(page.getByTestId('inp-nova-atividade')).toBeHidden();
+    await expect(page.getByTestId('btn-adicionar-atividade')).toBeHidden();
     await expect(page.getByTestId('btn-cad-atividades-importar')).toBeHidden();
 }
 

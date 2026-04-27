@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarToast} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 /**
@@ -51,7 +51,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         // Cenario 5: Confirmar reabertura
         await page.getByTestId('btn-confirmar-reabrir').click();
 
-        await verificarAppAlert(page, /Cadastro reaberto/i);
+        await verificarToast(page, /Cadastro reaberto/i);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);
 
