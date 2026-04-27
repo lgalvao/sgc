@@ -408,6 +408,7 @@ const loadingAnaliseCadastro = ref(false);
 const loadingDevolucaoAnalise = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);
+const erroTick = ref(0);
 const observacaoValidacao = ref("");
 const observacaoDevolucao = ref("");
 const atividadeRefs = new Map<number, Element>();
@@ -436,7 +437,15 @@ function limparErrosValidacaoCadastro() {
 
 function registrarErrosValidacaoCadastro(erros: ErroValidacao[]) {
   errosValidacao.value = erros;
-  erroGlobal.value = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
+  const msg = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
+  
+  // Força reatividade limpando e incrementando tick
+  erroGlobal.value = null;
+  erroTick.value++;
+  
+  nextTick(() => {
+    erroGlobal.value = msg;
+  });
 }
 
 function obterSituacaoReferenciaDisponibilizacao(): SituacaoSubprocesso {

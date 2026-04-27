@@ -976,4 +976,50 @@ describe("CadastroView.vue", () => {
         expect(vm.erroGlobal).toBeNull();
         expect(vm.errosValidacao).toEqual([]);
     });
+
+    it("deve fazer o alerta de erro reaparecer ao clicar em disponibilizar novamente após fechar o alerta anterior", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+
+        vm.atividades = [{codigo: 1, descricao: "A1", conhecimentos: [{codigo: 1, descricao: "C1"}]}];
+        await vm.$nextTick();
+        
+        // Mock de scroll para evitar erro
+        (vm as any).scrollParaPrimeiroErro = vi.fn();
+
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+        
+        // 1. Primeira tentativa (falha)
+        fluxoSubprocesso.validarCadastro.mockResolvedValueOnce({
+            valido: false,
+            erros: [{mensagem: "Erro de validação"}]
+        });
+
+        await vm.disponibilizarCadastro();
+        await vm.$nextTick();
+        
+        expect(vm.erroGlobal).toBe("Erro de validação");
+        let alert = wrapper.find('[data-testid="btn-dismiss-alert"]');
+        expect(alert.exists()).toBe(true);
+
+        // 2. Fecha o alerta
+        await alert.trigger('click');
+        await vm.$nextTick();
+        expect(vm.erroGlobal).toBeNull();
+        expect(wrapper.find('[data-testid="btn-dismiss-alert"]').exists()).toBe(false);
+
+        // 3. Segunda tentativa (mesmo erro)
+        fluxoSubprocesso.validarCadastro.mockResolvedValueOnce({
+            valido: false,
+            erros: [{mensagem: "Erro de validação"}]
+        });
+
+        await vm.disponibilizarCadastro();
+        await vm.$nextTick();
+
+        // O teste deve falhar aqui se o bug persistir
+        expect(vm.erroGlobal).toBe("Erro de validação");
+        expect(wrapper.find('[data-testid="btn-dismiss-alert"]').exists()).toBe(true);
+    });
 });
