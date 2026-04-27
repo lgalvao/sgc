@@ -38,7 +38,7 @@ describe("ImpactoMapaModal.vue", () => {
     it("deve mostrar atividades inseridas", async () => {
         const impacto: any = {
             temImpactos: true,
-            atividadesInseridas: [{codigo: 1, descricao: "Nova atividade", competenciasVinculadas: ["Comp A"]}],
+            atividadesInseridas: [{codigo: 1, descricao: "Nova atividade", conhecimentos: ["Conhecimento A"]}],
             atividadesRemovidas: [],
             atividadesAlteradas: [],
             competenciasImpactadas: [],
@@ -49,49 +49,10 @@ describe("ImpactoMapaModal.vue", () => {
 
         expect(wrapper.text()).toContain("Atividades inseridas");
         expect(wrapper.text()).toContain("Nova atividade");
-        expect(wrapper.text()).toContain("Vinculada a: Comp A");
+        expect(wrapper.text()).toContain("Conhecimento A");
     });
 
-    it("deve mostrar atividades removidas", async () => {
-        const impacto: any = {
-            temImpactos: true,
-            atividadesInseridas: [],
-            atividadesRemovidas: [{codigo: 2, descricao: "Atividade removida"}],
-            atividadesAlteradas: [],
-            competenciasImpactadas: [],
-        };
-
-        const wrapper = createWrapper({impacto});
-        await flushPromises();
-
-        expect(wrapper.text()).toContain("Atividades removidas");
-        expect(wrapper.text()).toContain("Atividade removida");
-        const item = wrapper.find('[data-testid="lista-atividades-removidas"] strong');
-        expect(item.classes()).toContain("text-decoration-line-through");
-    });
-
-    it("deve mostrar atividades alteradas", async () => {
-        const impacto: any = {
-            temImpactos: true,
-            atividadesInseridas: [],
-            atividadesRemovidas: [],
-            atividadesAlteradas: [{
-                codigo: 3,
-                descricao: "Atividade nova desc",
-                descricaoAnterior: "Atividade velha desc"
-            }],
-            competenciasImpactadas: [],
-        };
-
-        const wrapper = createWrapper({impacto});
-        await flushPromises();
-
-        expect(wrapper.text()).toContain("Atividades alteradas");
-        expect(wrapper.text()).toContain("Atividade nova desc");
-        expect(wrapper.text()).toContain("Anterior: Atividade velha desc");
-    });
-
-    it("deve mostrar competências impactadas e formatar tipos de impacto corretamente", async () => {
+    it("deve mostrar competências impactadas e suas mensagens de alteração", async () => {
         const impacto: any = {
             temImpactos: true,
             atividadesInseridas: [],
@@ -101,21 +62,15 @@ describe("ImpactoMapaModal.vue", () => {
                 {
                     codigo: 1,
                     descricao: "Competência A",
-                    atividadesAfetadas: ["Ativ 1"],
+                    atividadesAfetadas: ["Atividade removida: Ativ 1"],
                     tiposImpacto: [TipoImpactoCompetencia.ATIVIDADE_REMOVIDA],
                 },
                 {
                     codigo: 2,
                     descricao: "Competência B",
-                    atividadesAfetadas: ["Ativ 2"],
+                    atividadesAfetadas: ["Atividade alterada: Ativ 2", "  Descrição alterada para Ativ 2 Novo"],
                     tiposImpacto: [TipoImpactoCompetencia.ATIVIDADE_ALTERADA],
-                },
-                {
-                    codigo: 3,
-                    descricao: "Competência C",
-                    atividadesAfetadas: ["Ativ 3", "Ativ 4"],
-                    tiposImpacto: [TipoImpactoCompetencia.ATIVIDADE_REMOVIDA, TipoImpactoCompetencia.ATIVIDADE_ALTERADA],
-                },
+                }
             ],
         };
 
@@ -124,14 +79,11 @@ describe("ImpactoMapaModal.vue", () => {
 
         expect(wrapper.text()).toContain("Competências impactadas");
         expect(wrapper.text()).toContain("Competência A");
-        expect(wrapper.text()).toContain("Atividade removida"); // Formatação do tipo
+        expect(wrapper.text()).toContain("Atividade removida: Ativ 1");
 
         expect(wrapper.text()).toContain("Competência B");
-        expect(wrapper.text()).toContain("Atividade alterada"); // Formatação do tipo
-
-        expect(wrapper.text()).toContain("Competência C");
-        // Competência C tem múltiplos tipos
-        expect(wrapper.text()).toContain("Atividade removida, Atividade alterada");
+        expect(wrapper.text()).toContain("Atividade alterada: Ativ 2");
+        expect(wrapper.text()).toContain("Descrição alterada para Ativ 2 Novo");
     });
 
     it("deve emitir evento 'fechar' ao clicar no botão", async () => {

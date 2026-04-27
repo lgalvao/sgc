@@ -11,6 +11,7 @@ import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -39,6 +40,11 @@ public class ImpactoMapaService {
 
     @Transactional(readOnly = true)
     public ImpactoMapaResponse calcularImpactos(Subprocesso subprocesso) {
+        if (subprocesso.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            log.debug("Processo de mapeamento não gera impactos de revisão");
+            return ImpactoMapaResponse.semImpacto();
+        }
+
         Optional<Mapa> mapaVigenteOpt = mapaRepo.buscarMapaVigentePorUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {
             log.warn("Unidade sem mapa vigente, não há impactos a analisar");
@@ -78,12 +84,19 @@ public class ImpactoMapaService {
 
     @Transactional(readOnly = true)
     public boolean podeVisualizarImpactos(Subprocesso subprocesso) {
+        if (subprocesso.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            return false;
+        }
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         return permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)
                 && situacaoPermiteVisualizarImpactos(usuario.getPerfilAtivo(), subprocesso.getSituacao());
     }
 
     private void validarPermissaoVisualizacaoImpacto(Subprocesso subprocesso, Usuario usuario) {
+        if (subprocesso.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
+            throw new ErroValidacao("Visualização de impactos disponível apenas para processos de revisão.");
+        }
+
         if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
         }

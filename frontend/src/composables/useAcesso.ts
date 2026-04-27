@@ -52,7 +52,9 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
 
     const podeAnalisarMapa = computed(() => podeDevolverMapa.value || podeAceitarMapa.value || podeHomologarMapa.value);
 
-    const podeVisualizarImpacto = computed(() => getPermissoes()?.podeVisualizarImpacto ?? false);
+    const podeVisualizarImpacto = computed(() => 
+        isRevisao.value && (getPermissoes()?.podeVisualizarImpacto ?? false)
+    );
 
     const podeAlterarDataLimite = computed(() => getPermissoes()?.podeAlterarDataLimite ?? false);
     const podeReabrirCadastro = computed(() => getPermissoes()?.podeReabrirCadastro ?? false);

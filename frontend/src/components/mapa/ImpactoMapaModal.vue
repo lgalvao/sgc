@@ -93,7 +93,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BListGroup, BListGroupItem, BModal, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BListGroup, BListGroupItem, BModal, BSpinner} from "bootstrap-vue-next";
 import {type ImpactoMapa} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {computed} from "vue";
