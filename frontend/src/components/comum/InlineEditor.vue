@@ -38,23 +38,23 @@
     </template>
 
     <template v-else>
-      <div class="text-break me-2">
-        <slot/>
-      </div>
-
-      <div v-if="canEdit" class="d-flex align-items-center fade-controls">
+      <div v-if="canEdit" class="d-flex align-items-center gap-1 fade-controls me-2">
         <BButton
             :aria-label="ariaLabelEdit"
             :data-testid="testCodigoEditar"
             :disabled="!editEnabled"
             :size="size"
-            class="me-1"
-            variant="outline-primary"
+            class="btn-compacto"
+            variant="outline-secondary"
             @click="startEdit"
         >
           <i aria-hidden="true" class="bi bi-pencil"/>
         </BButton>
         <slot name="extra-actions"/>
+      </div>
+
+      <div class="text-break flex-grow-1">
+        <slot/>
       </div>
     </template>
   </div>
@@ -180,5 +180,17 @@ watch(editValue, (valorAtual, valorAnterior) => {
 .d-flex:hover > .fade-controls,
 .d-flex:focus-within > .fade-controls {
   opacity: 1;
+}
+
+.btn-compacto {
+  padding: 0.2rem 0.35rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-compacto i {
+  font-size: 0.875rem;
 }
 </style>

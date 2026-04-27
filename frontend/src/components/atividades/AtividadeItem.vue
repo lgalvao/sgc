@@ -33,12 +33,12 @@
           <template #extra-actions>
             <BButton
                 :aria-label="'Remover atividade: ' + atividade.descricao"
-                class="ms-1"
                 data-testid="btn-remover-atividade"
                 :disabled="!habilitarEdicao"
                 size="sm"
                 title="Remover"
-                variant="outline-danger"
+                class="btn-compacto"
+                variant="outline-secondary"
                 @click="$emit('remover-atividade')"
             >
               <i aria-hidden="true" class="bi bi-trash"/>
@@ -60,50 +60,9 @@
       </BAlert>
 
       <div class="mt-3 ms-3">
-        <!-- Label com asterisco para conhecimentos obrigatórios -->
-        <div v-if="podeEditar" class="mb-2 text-muted small">
-          <strong>Conhecimentos <span class="text-danger">*</span></strong>
-        </div>
-
-        <div
-            v-for="conhecimento in atividade.conhecimentos"
-            :key="conhecimento.codigo"
-            class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
-            data-testid="cad-atividades__item-conhecimento"
-        >
-          <InlineEditor
-              :can-edit="podeEditar"
-              :edit-enabled="habilitarEdicao"
-              mensagem-erro-obrigatoria="Informe o conhecimento."
-              :model-value="conhecimento.descricao"
-              aria-label="Editar conhecimento"
-              size="sm"
-              test-codigo-cancelar="btn-cancelar-edicao-conhecimento"
-              test-codigo-editar="btn-editar-conhecimento"
-              test-codigo-input="inp-editar-conhecimento"
-              test-codigo-salvar="btn-salvar-edicao-conhecimento"
-              @update:model-value="(val) => $emit('atualizar-conhecimento', conhecimento.codigo, val)"
-          >
-            <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
-
-            <template #extra-actions>
-              <BButton
-                  :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
-                  class="ms-1"
-                  data-testid="btn-remover-conhecimento"
-                  :disabled="!habilitarEdicao"
-                  size="sm"
-                  title="Remover"
-                  variant="outline-danger"
-                  @click="$emit('remover-conhecimento', conhecimento.codigo)"
-              >
-                <i aria-hidden="true" class="bi bi-trash"/>
-              </BButton>
-            </template>
-          </InlineEditor>
-        </div>
         <BForm
             v-if="podeEditar"
+            class="mb-3"
             data-testid="form-novo-conhecimento"
             @submit.prevent="adicionarConhecimento"
         >
@@ -131,6 +90,7 @@
                 size="sm"
                 title="Adicionar conhecimento"
                 type="submit"
+                class="btn-compacto"
                 variant="outline-secondary"
             >
               <i
@@ -141,6 +101,44 @@
           </BCol>
           </BRow>
         </BForm>
+
+        <div
+            v-for="conhecimento in atividade.conhecimentos"
+            :key="conhecimento.codigo"
+            class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+            data-testid="cad-atividades__item-conhecimento"
+        >
+          <InlineEditor
+              :can-edit="podeEditar"
+              :edit-enabled="habilitarEdicao"
+              mensagem-erro-obrigatoria="Informe o conhecimento."
+              :model-value="conhecimento.descricao"
+              aria-label="Editar conhecimento"
+              size="sm"
+              test-codigo-cancelar="btn-cancelar-edicao-conhecimento"
+              test-codigo-editar="btn-editar-conhecimento"
+              test-codigo-input="inp-editar-conhecimento"
+              test-codigo-salvar="btn-salvar-edicao-conhecimento"
+              @update:model-value="(val) => $emit('atualizar-conhecimento', conhecimento.codigo, val)"
+          >
+            <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
+
+            <template #extra-actions>
+              <BButton
+                  :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
+                  data-testid="btn-remover-conhecimento"
+                  :disabled="!habilitarEdicao"
+                  size="sm"
+                  title="Remover"
+                  class="btn-compacto"
+                variant="outline-secondary"
+                  @click="$emit('remover-conhecimento', conhecimento.codigo)"
+              >
+                <i aria-hidden="true" class="bi bi-trash"/>
+              </BButton>
+            </template>
+          </InlineEditor>
+        </div>
       </div>
     </BCardBody>
   </BCard>
@@ -284,5 +282,17 @@ watch(novoConhecimento, (valorAtual, valorAnterior) => {
 .group-conhecimento span {
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.btn-compacto {
+  padding: 0.2rem 0.35rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-compacto i {
+  font-size: 0.875rem;
 }
 </style>

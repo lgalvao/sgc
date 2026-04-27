@@ -67,7 +67,7 @@ defineEmits<{
         </BButton>
       </div>
 
-      <div v-if="podeVisualizarImpacto || permissoes.podeEditarCadastro || permissoes.podeDisponibilizarCadastro" class="d-flex gap-2 ms-3 ps-3 border-start">
+      <div v-if="podeVisualizarImpacto || permissoes.podeEditarCadastro || permissoes.podeDisponibilizarCadastro" class="d-flex gap-2">
         <BButton
             v-if="codSubprocesso && podeVisualizarImpacto"
             data-testid="cad-atividades__btn-impactos-mapa-edicao"
