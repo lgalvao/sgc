@@ -100,7 +100,7 @@ class ImpactoMapaServiceTest {
         Usuario usuario = usuarioAdmin();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoPadrao();
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
@@ -122,7 +122,7 @@ class ImpactoMapaServiceTest {
         Usuario usuario = usuarioAdmin();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoPadrao();
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -163,7 +163,7 @@ class ImpactoMapaServiceTest {
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         Subprocesso subprocesso = criarSubprocessoPadrao();
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
@@ -236,7 +236,7 @@ class ImpactoMapaServiceTest {
         Usuario usuario = usuarioAdmin();
         mockUsuarioAutenticado(usuario);
         Subprocesso subprocesso = criarSubprocessoPadrao();
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -283,7 +283,7 @@ class ImpactoMapaServiceTest {
         Usuario usuario = usuarioAdmin();
         mockUsuarioAutenticado(usuario);
         Subprocesso subprocesso = criarSubprocessoPadrao();
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -331,7 +331,7 @@ class ImpactoMapaServiceTest {
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
         Subprocesso subprocesso = criarSubprocesso(mapaAtual);
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         Usuario usuario = usuarioAdmin();
         mockUsuarioAutenticado(usuario);
@@ -367,7 +367,7 @@ class ImpactoMapaServiceTest {
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
         Subprocesso subprocesso = criarSubprocesso(mapaAtual);
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         Usuario usuario = usuarioAdmin();
         mockUsuarioAutenticado(usuario);
@@ -428,7 +428,7 @@ class ImpactoMapaServiceTest {
             mockAcessoLivre();
             Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
@@ -447,7 +447,7 @@ class ImpactoMapaServiceTest {
             mockAcessoLivre();
             Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
@@ -488,7 +488,7 @@ class ImpactoMapaServiceTest {
             mockAcessoLivre();
             Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
@@ -537,7 +537,7 @@ class ImpactoMapaServiceTest {
             mockAcessoLivre();
             Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
@@ -573,7 +573,7 @@ class ImpactoMapaServiceTest {
             mockAcessoLivre();
             Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
-            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
@@ -639,7 +639,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("verificarImpactos: Atividades com conhecimentos idênticos não devem gerar alteração")
         void verificarImpactos_ConhecimentosIdenticos() {
             mockAcessoLivre();
-            Subprocesso sp = criarSubprocessoPadrao(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso sp = criarSubprocessoPadrao(); sp.setCodigo(1L); sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade(); u.setCodigo(100L); sp.setUnidade(u);
             
             Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(20L);

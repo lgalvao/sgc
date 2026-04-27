@@ -60,7 +60,7 @@ class ImpactoMapaServiceCoverageTest {
         
         Subprocesso sp = criarSubprocesso();
         sp.setUnidade(u);
-        sp.setSituacao(NAO_INICIADO);
+        sp.setSituacaoForcada(NAO_INICIADO);
         
         when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
@@ -82,7 +82,7 @@ class ImpactoMapaServiceCoverageTest {
         Subprocesso sp = criarSubprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u);
-        sp.setSituacao(NAO_INICIADO);
+        sp.setSituacaoForcada(NAO_INICIADO);
         
         when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
@@ -130,7 +130,7 @@ class ImpactoMapaServiceCoverageTest {
             Usuario user = new Usuario();
             user.setPerfilAtivo(perfil);
             Subprocesso sp = criarSubprocesso();
-            sp.setSituacao(situacao);
+            sp.setSituacaoForcada(situacao);
 
             when(permissionEvaluator.verificarPermissao(user, sp, sgc.seguranca.AcaoPermissao.VERIFICAR_IMPACTOS)).thenReturn(true);
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
