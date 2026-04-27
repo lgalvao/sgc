@@ -411,8 +411,8 @@ const {
 
 watch(() => mapasStore.mapaCompleto.value, (novoMapa) => {
   if (novoMapa) {
-    atividades.value = novoMapa.atividades;
-    competencias.value = novoMapa.competencias;
+    atividades.value = novoMapa.atividades || [];
+    competencias.value = novoMapa.competencias || [];
   }
 }, { deep: true, flush: 'sync' });
 
@@ -779,6 +779,7 @@ async function disponibilizarMapa(request: { dataLimite: string; observacoes: st
 
 function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
+  notificacaoDisponibilizacao.value = "";
   clearErrors();
 }
 

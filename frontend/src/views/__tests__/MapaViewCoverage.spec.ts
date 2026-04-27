@@ -58,16 +58,17 @@ type FluxoMapaMock = {
     adicionarCompetencia: ReturnType<typeof vi.fn>;
     atualizarCompetencia: ReturnType<typeof vi.fn>;
     removerCompetencia: ReturnType<typeof vi.fn>;
+    removerAtividadeDaCompetencia: ReturnType<typeof vi.fn>;
     disponibilizarMapa: ReturnType<typeof vi.fn>;
 };
 
-function criarMapaCompleto(competencias: CompetenciaMapa[] = []): MapaCompleto {
+function criarMapaCompleto(competencias: CompetenciaMapa[] = [], atividades: Atividade[] = []): MapaCompleto {
     return {
         codigo: 100,
         subprocessoCodigo: 123,
         observacoes: "",
         competencias: competencias as MapaCompleto["competencias"],
-        atividades: [],
+        atividades: atividades,
         situacao: "CRIADO",
     };
 }
@@ -171,6 +172,7 @@ const fluxoMapaMock = reactive({
     adicionarCompetencia: vi.fn(),
     atualizarCompetencia: vi.fn(),
     removerCompetencia: vi.fn(),
+    removerAtividadeDaCompetencia: vi.fn(),
     disponibilizarMapa: vi.fn(),
 });
 
@@ -315,7 +317,7 @@ describe("MapaView coverage", () => {
 
         // Cobre remover atividade associada
         vm.removerAtividadeAssociada(1, 10);
-        expect(fluxoMapaMock.atualizarCompetencia).toHaveBeenCalled();
+        expect(fluxoMapaMock.removerAtividadeDaCompetencia).toHaveBeenCalled();
     });
 
     it("mantém o botão disponibilizar desabilitado enquanto houver atividade sem competência", async () => {
@@ -330,16 +332,15 @@ describe("MapaView coverage", () => {
         await flushPromises();
 
         const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.atividades = [
-            {codigo: 1, descricao: "Atividade 1"},
-            {codigo: 2, descricao: "Atividade 2"}
-        ];
         store.mapaCompleto.value = criarMapaCompleto([
             {
                 codigo: 10,
                 descricao: "Competência 1",
                 atividades: [{codigo: 1, descricao: "Atividade 1"}]
             }
+        ], [
+            {codigo: 1, descricao: "Atividade 1"},
+            {codigo: 2, descricao: "Atividade 2"}
         ]);
 
         expect(vm.atividadesSemCompetencia).toHaveLength(1);
@@ -455,7 +456,6 @@ describe("MapaView coverage", () => {
         }
 
         // E injetamos os mocks na instância diretamente
-        vm.atividades = [{codigo: 1, descricao: "Ativ"}];
         vm.unidade = {codigo: 1, sigla: "TESTE", nome: "Teste"};
         store.mapaCompleto.value = criarMapaCompleto([
             {
@@ -463,6 +463,8 @@ describe("MapaView coverage", () => {
                 descricao: "C1",
                 atividades: [{codigo: 1, descricao: "Ativ"}]
             }
+        ], [
+            {codigo: 1, descricao: "Ativ"}
         ]);
 
         expect(vm.atividades).toHaveLength(1);
