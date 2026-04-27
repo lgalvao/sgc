@@ -35,7 +35,7 @@ type AtividadeMinima = {
 };
 
 type CadastroViewVm = {
-    codSubprocesso: number | null;
+    codigoSubprocesso: number | null;
     erroGlobal: string | null;
     atividades: AtividadeMinima[];
     mostrarModalConfirmacaoRemocao: boolean;
@@ -399,7 +399,7 @@ describe("CadastroView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as unknown as CadastroViewVm;
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         
         // setAtividadeRef
         const el = document.createElement("div");
@@ -478,7 +478,7 @@ describe("CadastroView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as unknown as CadastroViewVm;
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
 
         const service = await import("@/services/atividadeService");
         vi.mocked(service.excluirAtividade).mockRejectedValue(new Error("Falha"));
@@ -508,7 +508,7 @@ describe("CadastroView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as unknown as CadastroViewVm;
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
 
         subprocessosMock.subprocessoDetalhe = {
             ...criarSubprocessoMinimo(),
@@ -534,7 +534,7 @@ describe("CadastroView coverage", () => {
 
         // Cobre branch where o contexto agregado não retorna dados
         subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(null);
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         await vm.carregarContextoInicial();
     });
 
@@ -592,7 +592,7 @@ describe("CadastroView coverage", () => {
         subprocessosMock.subprocessoDetalhe = {
             ...criarSubprocessoMinimo(),
         };
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
 
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         let resolver!: (valor: boolean) => void;
@@ -618,7 +618,7 @@ describe("CadastroView coverage", () => {
         await flushPromises();
         const vm = wrapper.vm as unknown as CadastroViewVm;
 
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         vm.atividades = [{codigo: 1, conhecimentos: []}];
         vm.dadosRemocao = {tipo: "atividade", index: 0};
 

@@ -327,7 +327,7 @@ describe("CadastroView Uncovered Branches", () => {
         await flushPromises();
         const vm = wrapper.vm as any;
 
-        vm.codSubprocesso = null;
+        vm.codigoSubprocesso = null;
         
         vm.removerAtividade(0);
         expect(vm.mostrarModalConfirmacaoRemocao).toBe(false);

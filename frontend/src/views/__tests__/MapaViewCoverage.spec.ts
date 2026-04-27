@@ -17,7 +17,7 @@ type CompetenciaMapa = {
 };
 
 type MapaViewVm = {
-    codSubprocesso: number | null;
+    codigoSubprocesso: number | null;
     mostrarModalImpacto: boolean;
     mostrarModalCriarNovaCompetencia: boolean;
     mostrarModalExcluirCompetencia: boolean;
@@ -270,7 +270,7 @@ describe("MapaView coverage", () => {
         fluxoMapaMock.removerCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
         fluxoMapaMock.disponibilizarMapa = vi.fn().mockRejectedValue(new Error("Erro"));
 
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         await wrapper.vm.$nextTick();
 
         // Cobre erro no store
@@ -375,7 +375,7 @@ describe("MapaView coverage", () => {
         await flushPromises();
 
         const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.codSubprocesso = null;
+        vm.codigoSubprocesso = null;
         
         // Cobre early return em abrirModalImpacto se codSubprocesso for nulo
         vm.abrirModalImpacto();
@@ -416,7 +416,7 @@ describe("MapaView coverage", () => {
         expect(vm.competenciaParaExcluir).toBeNull();
 
         // Cobre removerAtividadeAssociada sem encontrar a competência (codSubprocesso !== null)
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         vm.removerAtividadeAssociada(999, 10);
         
         // Cobre handleError com fieldErrors.atividadesCodigos
@@ -445,7 +445,7 @@ describe("MapaView coverage", () => {
         });
         
         // Em vez de checar toHaveBeenCalledWith, garantimos que os dados forçados na store funcionam e cobrem a ramificação:
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         const mounted = wrapper.vm.$options.mounted;
         if (mounted) {
             const hooks = Array.isArray(mounted) ? mounted : [mounted];
@@ -528,7 +528,7 @@ describe("MapaView coverage", () => {
         await flushPromises();
         const vm = wrapper.vm as unknown as MapaViewVm;
 
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         fluxoMapaMock.adicionarCompetencia = vi.fn().mockResolvedValue(criarMapaCompleto([
             {
                 codigo: 99,
@@ -552,7 +552,7 @@ describe("MapaView coverage", () => {
         await flushPromises();
         const vm = wrapper.vm as unknown as MapaViewVm;
 
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
 
         let resolver!: (valor: MapaCompleto) => void;
         fluxoMapaMock.adicionarCompetencia = vi.fn().mockImplementation(() => new Promise<MapaCompleto>((resolve) => {
@@ -583,7 +583,7 @@ describe("MapaView coverage", () => {
         await flushPromises();
         const vm = wrapper.vm as unknown as MapaViewVm;
 
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         subprocessoStoreCacheMock.garantirContextoEdicao = vi.fn();
         fluxoMapaMock.adicionarCompetencia = vi.fn().mockResolvedValue(criarMapaCompleto([
             {

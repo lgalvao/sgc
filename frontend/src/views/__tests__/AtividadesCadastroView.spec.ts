@@ -54,7 +54,7 @@ function calcularAssinaturaCadastro(lista: AtividadeMinima[]): string {
 }
 
 type CadastroViewVm = {
-    codSubprocesso: number | null;
+    codigoSubprocesso: number | null;
     unidade: {sigla: string; nome: string} | null;
     atividades: AtividadeMinima[];
     atividadesSnapshotInicial: string;
@@ -401,7 +401,7 @@ function createWrapper(customState = {}, accessOverrides = {}) {
     mapas.erro.value = null;
 
     const vm = wrapper.vm as unknown as CadastroViewVm;
-    vm.codSubprocesso = 123;
+    vm.codigoSubprocesso = 123;
     vm.unidade = {sigla: "TESTE", nome: "Teste"};
 
     return wrapper;
@@ -918,7 +918,7 @@ describe("CadastroView.vue", () => {
         await vm.carregarContextoInicial();
 
         // 375-377 (adicionarAtividade success branch)
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
         const mockAtiv = {atividadesAtualizadas: []};
         mockAtividadeForm.adicionarAtividade.mockResolvedValue(mockAtiv);
         await vm.adicionarAtividade();

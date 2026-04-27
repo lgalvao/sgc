@@ -4,7 +4,7 @@
     <template v-else>
       <CadastroAcoesHeader
           :unidade="unidade"
-          :cod-subprocesso="codSubprocesso"
+          :cod-subprocesso="codigoSubprocesso"
           :permissoes="permissoesUI"
           :acao-principal-cadastro="acaoPrincipalCadastro"
           :loading-validacao="loadingValidacao"
@@ -58,7 +58,7 @@
     <CadAtividadeForm
         ref="atividadeFormRef"
         v-model="novaAtividade"
-        :disabled="!codSubprocesso || !habilitarEditarCadastro"
+        :disabled="!codigoSubprocesso || !habilitarEditarCadastro"
         :erro="erroNovaAtividade"
         :loading="loadingAdicionar"
         @submit="handleAdicionarAtividade"
@@ -91,14 +91,14 @@
     </div>
 
     <ImportarAtividadesModal
-        :cod-subprocesso-destino="codSubprocesso"
+        :cod-subprocesso-destino="codigoSubprocesso"
         :mostrar="mostrarModalImportar"
         @fechar="mostrarModalImportar = false"
         @importar="handleImportAtividades"
     />
 
     <ImpactoMapaModal
-        v-if="codSubprocesso"
+        v-if="codigoSubprocesso"
         :impacto="impactos"
         :loading="loadingImpacto"
         :mostrar="mostrarModalImpacto"
@@ -154,16 +154,11 @@
 <script lang="ts" setup>
 import {
   BAlert,
-  BButton,
   BFormCheckbox,
-  BFormGroup,
-  BFormInvalidFeedback,
-  BFormTextarea,
   BSpinner
 } from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
-import {useRouter} from "vue-router";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
@@ -183,8 +178,7 @@ import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useToastStore} from "@/stores/toast";
-import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useAcesso} from "@/composables/useAcesso";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {
@@ -206,7 +200,6 @@ import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
-import {useErrorHandler} from "@/composables/useErrorHandler";
 import {TEXTOS} from "@/constants/textos";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
@@ -216,21 +209,18 @@ const props = defineProps<{
   codSubprocesso?: number;
 }>();
 
-const router = useRouter();
+// router removido pois não é mais usado após delegar orquestração ao composable
 const subprocessoStore = useSubprocessoStore();
 const mapasStore = useMapas();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
-const toastStore = useToastStore();
-const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const {
   validarSubmissao,
   resetarValidacao,
-  deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 const {impactoMapa: impactos} = mapasStore;
-const codSubprocesso = ref<number | null>(null);
+const codigoSubprocesso = ref<number | null>(null);
 const codMapa = ref<number | null>(null);
 const carregandoInicial = ref(true);
 const subprocesso = computed(() => subprocessoStore.contextoCadastro?.detalhes ?? null);
@@ -247,7 +237,7 @@ const {
 } = acesso;
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const permissoesUI = computed<PermissoesSubprocesso>(() => ({
-  ...(subprocesso.value?.permissoes || {}),
+  ...subprocesso.value?.permissoes,
   podeEditarCadastro: podeEditarCadastro?.value ?? false,
   podeDisponibilizarCadastro: podeDisponibilizarCadastro?.value ?? false,
   podeDevolverCadastro: podeDevolverCadastro?.value ?? false,
@@ -307,11 +297,11 @@ const precisaIniciarRevisao = computed(() =>
 );
 
 async function iniciarRevisaoSeNecessario() {
-  if (!precisaIniciarRevisao.value || !codSubprocesso.value || loadingInicioRevisao.value) return;
+  if (!precisaIniciarRevisao.value || !codigoSubprocesso.value || loadingInicioRevisao.value) return;
 
   loadingInicioRevisao.value = true;
   try {
-    const sucesso = await fluxoSubprocesso.iniciarRevisaoCadastro(codSubprocesso.value);
+    const sucesso = await fluxoSubprocesso.iniciarRevisaoCadastro(codigoSubprocesso.value);
     if (!sucesso) {
       logger.error('Falha ao iniciar revisão do cadastro');
     }
@@ -322,13 +312,13 @@ async function iniciarRevisaoSeNecessario() {
 
 async function cancelarInicioRevisaoSeNecessario() {
   if (situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-      || !codSubprocesso.value
+      || !codigoSubprocesso.value
       || loadingInicioRevisao.value
       || houveAlteracaoCadastro.value) return;
 
   loadingInicioRevisao.value = true;
   try {
-    const sucesso = await fluxoSubprocesso.cancelarInicioRevisaoCadastro(codSubprocesso.value);
+    const sucesso = await fluxoSubprocesso.cancelarInicioRevisaoCadastro(codigoSubprocesso.value);
     if (!sucesso) {
       logger.error('Falha ao cancelar início da revisão do cadastro');
     }
@@ -412,7 +402,7 @@ const {
   loadingImpacto,
   abrirModalImpacto,
   fecharModalImpacto,
-} = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
+} = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
 const loadingValidacao = ref(false);
 const loadingDisponibilizacao = ref(false);
@@ -427,9 +417,6 @@ const observacaoDevolucao = ref("");
 const atividadeRefs = new Map<number, Element>();
 let timeoutLimparErros: ReturnType<typeof setTimeout> | null = null;
 
-const estadoObservacaoDevolucao = computed(() => {
-  return deveExibirErro(!observacaoDevolucao.value.trim()) ? false : null;
-});
 
 function timeoutLimpezaErros() {
   limparTimeoutErrosCadastro();
@@ -567,14 +554,14 @@ async function carregarContextoInicial() {
     return;
   }
 
-  codSubprocesso.value = data.detalhes.codigo;
+  codigoSubprocesso.value = data.detalhes.codigo;
   sincronizarEstadoInicialContexto(data);
 }
 
 async function adicionarAtividade(): Promise<boolean> {
-  if (codMapa.value && codSubprocesso.value) {
+  if (codMapa.value && codigoSubprocesso.value) {
     try {
-      const response = await withErrorHandling(() => adicionarAtividadeAction(codSubprocesso.value!, codMapa.value!));
+      const response = await withErrorHandling(() => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!));
       if (response) {
         processarRespostaLocal(response);
         erroNovaAtividade.value = null;
@@ -590,13 +577,13 @@ async function adicionarAtividade(): Promise<boolean> {
 }
 
 function removerAtividade(idx: number) {
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
   dadosRemocao.value = {tipo: "atividade", index: idx};
   mostrarModalConfirmacaoRemocao.value = true;
 }
 
 async function confirmarRemocao() {
-  if (!dadosRemocao.value || !codSubprocesso.value || loadingRemocao.value) return;
+  if (!dadosRemocao.value || !codigoSubprocesso.value || loadingRemocao.value) return;
 
   const {tipo, index, conhecimentoCodigo} = dadosRemocao.value;
 
@@ -627,7 +614,7 @@ async function confirmarRemocao() {
 }
 
 async function salvarEdicaoAtividade(codigo: number, descricao: string) {
-  if (descricao.trim() && codSubprocesso.value) {
+  if (descricao.trim() && codigoSubprocesso.value) {
     const atividadeOriginal = atividades.value.find((a) => a.codigo === codigo);
     if (atividadeOriginal) {
       const descricaoAtualizada = descricao.trim();
@@ -643,7 +630,7 @@ async function salvarEdicaoAtividade(codigo: number, descricao: string) {
 }
 
 async function adicionarConhecimento(idx: number, descricao: string) {
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
   const atividade = atividades.value[idx];
   if (descricao.trim()) {
     const request: CriarConhecimentoRequest = {
@@ -657,13 +644,13 @@ async function adicionarConhecimento(idx: number, descricao: string) {
 }
 
 function removerConhecimento(idx: number, conhecimentoCodigo?: number) {
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
   dadosRemocao.value = {tipo: "conhecimento", index: idx, conhecimentoCodigo};
   mostrarModalConfirmacaoRemocao.value = true;
 }
 
 async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCodigo: number, descricao: string) {
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
 
   if (descricao.trim()) {
     const descricaoAtualizada = descricao.trim();
@@ -733,11 +720,11 @@ async function disponibilizarCadastro() {
     return;
   }
 
-  if (codSubprocesso.value) {
+  if (codigoSubprocesso.value) {
     loadingValidacao.value = true;
     limparErrosValidacaoCadastro();
     try {
-      const resultado = await fluxoSubprocesso.validarCadastro(codSubprocesso.value);
+      const resultado = await fluxoSubprocesso.validarCadastro(codigoSubprocesso.value);
       if (resultado) {
         aplicarResultadoValidacaoCadastro(resultado.valido, resultado.erros);
         if (!resultado.valido) {
@@ -755,11 +742,11 @@ async function disponibilizarCadastro() {
 }
 
 async function confirmarDisponibilizacao() {
-  if (!codSubprocesso.value || loadingDisponibilizacao.value) return;
+  if (!codigoSubprocesso.value || loadingDisponibilizacao.value) return;
 
   loadingDisponibilizacao.value = true;
   try {
-    await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value, isRevisao.value);
+    await fluxoSubprocesso.disponibilizarCadastro(codigoSubprocesso.value, isRevisao.value);
   } finally {
     loadingDisponibilizacao.value = false;
   }
@@ -767,8 +754,8 @@ async function confirmarDisponibilizacao() {
 }
 
 async function abrirModalHistorico() {
-  if (codSubprocesso.value) {
-    analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
+  if (codigoSubprocesso.value) {
+    analisesCadastro.value = await listarAnalisesCadastro(codigoSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
 }
@@ -794,7 +781,7 @@ function fecharModalDevolverAnalise() {
 }
 
 async function confirmarValidacaoAnalise() {
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
 
   const acao = acaoPrincipalCadastro.value;
   if (!acao) return;
@@ -812,7 +799,7 @@ async function confirmarValidacaoAnalise() {
             params: {codProcesso: props.codProcesso, siglaUnidade: props.sigla},
           };
 
-      sucesso = await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req, isRevisao.value, {
+      sucesso = await fluxoSubprocesso.homologarCadastro(codigoSubprocesso.value, req, isRevisao.value, {
         mensagemSucesso: acao.mensagemSucesso,
         redirecionarParaPainel: acao.redirecionarParaPainel,
         redirecionarPara: paramsRedirecionamento
@@ -825,7 +812,7 @@ async function confirmarValidacaoAnalise() {
     }
 
     const req: AceitarCadastroRequest = {observacoes: observacaoValidacao.value};
-    sucesso = await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req, isRevisao.value, {
+    sucesso = await fluxoSubprocesso.aceitarCadastro(codigoSubprocesso.value, req, isRevisao.value, {
       mensagemSucesso: acao.mensagemSucesso
     });
 
@@ -843,12 +830,12 @@ async function confirmarDevolucaoAnalise() {
     return;
   }
 
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
 
   loadingDevolucaoAnalise.value = true;
   try {
     const req: DevolverCadastroRequest = {observacoes: observacaoDevolucao.value};
-    const sucesso = await fluxoSubprocesso.devolverCadastro(codSubprocesso.value, req, isRevisao.value);
+    const sucesso = await fluxoSubprocesso.devolverCadastro(codigoSubprocesso.value, req, isRevisao.value);
 
     if (sucesso) {
       fecharModalDevolverAnalise();

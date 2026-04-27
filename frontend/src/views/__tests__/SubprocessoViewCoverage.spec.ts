@@ -24,7 +24,7 @@ type ErroStore = {
 
 type SubprocessoViewVm = {
     $nextTick: () => Promise<void>;
-    codSubprocesso: number | null;
+    codigoSubprocesso: number | null;
     justificativaReabertura: string;
     tipoReabertura: 'cadastro' | 'revisao';
     modalLembreteAberto: boolean;
@@ -325,7 +325,7 @@ describe('SubprocessoView Coverage', () => {
 
         const vm = obterVm(wrapper);
         await vm.$nextTick();
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
 
         vm.justificativaReabertura = '';
         await vm.confirmarReabertura();
@@ -427,7 +427,7 @@ describe('SubprocessoView Coverage', () => {
 
         const vm = obterVm(wrapper);
         await vm.$nextTick();
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
 
         await vm.confirmarEnviarLembrete();
         expect(vm.modalLembreteAberto).toBe(true);
@@ -439,7 +439,7 @@ describe('SubprocessoView Coverage', () => {
         vi.mocked(processoService.enviarLembrete).mockRejectedValueOnce(new Error('Fail'));
         await vm.enviarLembreteConfirmado();
 
-        vm.codSubprocesso = null;
+        vm.codigoSubprocesso = null;
         await vm.enviarLembreteConfirmado();
 
         definirContextoEdicao(null);
@@ -469,7 +469,7 @@ describe('SubprocessoView Coverage', () => {
 
         const vm = obterVm(wrapper);
         await vm.$nextTick();
-        vm.codSubprocesso = 123;
+        vm.codigoSubprocesso = 123;
 
         let resolver!: () => void;
         vi.mocked(processoService.enviarLembrete).mockImplementation(() => new Promise<void>((resolve) => {

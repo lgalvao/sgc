@@ -297,7 +297,7 @@
       </ModalConfirmacao>
 
       <ImpactoMapaModal
-          v-if="codSubprocesso"
+          v-if="codigoSubprocesso"
           :impacto="impactos"
           :loading="loadingImpacto"
           :mostrar="mostrarModalImpacto"
@@ -403,7 +403,7 @@ const habilitarValidar = computed(() => habilitarValidarMapa?.value ?? false);
 const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
 
 const unidade = ref<Unidade | null>(null);
-const codSubprocesso = ref<number | null>(null);
+const codigoSubprocesso = ref<number | null>(null);
 const carregandoInicial = ref(true);
 const mapaSomenteLeitura = ref<MapaVisualizacao | null>(null);
 
@@ -454,7 +454,7 @@ const {
   abrirModalValidar,
   abrirModalDevolucao: abrirModalDevolucaoBase,
 } = useMapaAcoesAnalise({
-  codSubprocesso,
+  codSubprocesso: codigoSubprocesso,
   acaoPrincipalMapa,
   concluirAcaoPainel,
   notify,
@@ -474,10 +474,10 @@ async function handleConfirmarDevolucao() {
 }
 
 async function sincronizarSugestoesMapa(): Promise<string> {
-  if (!codSubprocesso.value) {
+  if (!codigoSubprocesso.value) {
     return "";
   }
-  return await obterSugestoesMapa(codSubprocesso.value);
+  return await obterSugestoesMapa(codigoSubprocesso.value);
 }
 
 async function carregarSugestoesParaVisualizacao() {
@@ -527,11 +527,11 @@ async function handleConfirmarSugestoes() {
     return;
   }
 
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
 
   try {
     isLoading.value = true;
-    await apresentarSugestoesService(codSubprocesso.value, {sugestoes: sugestoes.value});
+    await apresentarSugestoesService(codigoSubprocesso.value, {sugestoes: sugestoes.value});
     await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
   } catch (error) {
     logger.error(error);
@@ -542,8 +542,8 @@ async function handleConfirmarSugestoes() {
 }
 
 async function abrirModalHistorico() {
-  if (codSubprocesso.value) {
-    analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
+  if (codigoSubprocesso.value) {
+    analisesCadastro.value = await listarAnalisesCadastro(codigoSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
 }
@@ -561,7 +561,7 @@ const {
   loadingImpacto,
   abrirModalImpacto,
   fecharModalImpacto,
-} = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
+} = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
 async function carregarContextoEdicao(codigo: number) {
   const data = await subprocessoStore.garantirContextoEdicao(codigo);
@@ -587,7 +587,7 @@ async function carregarContextoInicial() {
       return null;
     }
 
-    codSubprocesso.value = contexto.detalhes.codigo;
+    codigoSubprocesso.value = contexto.detalhes.codigo;
     atividades.value = contexto.mapa.atividades;
     unidade.value = contexto.unidade;
     return contexto;
@@ -613,7 +613,7 @@ async function carregarContextoInicial() {
     return null;
   }
 
-  codSubprocesso.value = diagnostico.resultado.codigo;
+  codigoSubprocesso.value = diagnostico.resultado.codigo;
   atividades.value = diagnostico.resultado.contexto.mapa.atividades;
   unidade.value = diagnostico.resultado.contexto.unidade;
 
@@ -621,17 +621,17 @@ async function carregarContextoInicial() {
 }
 
 async function executarComSubprocesso(
-    callback: (codigoSubprocesso: number) => Promise<void>
+    callback: (id: number) => Promise<void>
 ) {
-  const codigoSubprocesso = codSubprocesso.value;
-  if (!codigoSubprocesso) return;
-  await callback(codigoSubprocesso);
+  const codSubp = codigoSubprocesso.value;
+  if (!codSubp) return;
+  await callback(codSubp);
 }
 
 function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   if (mapaAtualizado) {
     mapasStore.mapaCompleto.value = mapaAtualizado;
-    if (subprocessoStore.contextoEdicao?.detalhes.codigo === codSubprocesso.value) {
+    if (subprocessoStore.contextoEdicao?.detalhes.codigo === codigoSubprocesso.value) {
       subprocessoStore.contextoEdicao.mapa = mapaAtualizado;
     }
   }
@@ -663,10 +663,10 @@ onMounted(async () => {
   try {
     limparEstadoSubprocessoAtual();
     const contextoInicial = await carregarContextoInicial();
-    if (!codSubprocesso.value) {
+    if (!codigoSubprocesso.value) {
       return;
     }
-    await carregarMapaInicial(codSubprocesso.value, contextoInicial);
+    await carregarMapaInicial(codigoSubprocesso.value, contextoInicial);
   } catch (erro) {
     notify(normalizeError(erro).message, 'danger');
   } finally {

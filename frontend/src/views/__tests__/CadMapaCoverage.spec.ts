@@ -7,7 +7,7 @@ import * as useFluxoMapaModule from '@/composables/useFluxoMapa';
 import type {ContextoEdicaoSubprocesso} from '@/types/tipos';
 
 type MapaViewVm = {
-    codSubprocesso: number | null;
+    codigoSubprocesso: number | null;
     mostrarModalImpacto: boolean;
     mostrarModalDisponibilizar: boolean;
     fieldErrors: Record<string, string | undefined>;
@@ -175,7 +175,7 @@ describe('MapaView Coverage', () => {
         const mapas = useMapas();
         mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(undefined);
         const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.codSubprocesso = 456;
+        vm.codigoSubprocesso = 456;
 
         await vm.abrirModalImpacto();
 
@@ -212,7 +212,7 @@ describe('MapaView Coverage', () => {
 
         const fluxoMapa = useFluxoMapaModule.useFluxoMapa();
         const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.codSubprocesso = 456;
+        vm.codigoSubprocesso = 456;
 
         await vm.removerAtividadeAssociada(1, 10);
 
@@ -315,7 +315,7 @@ describe('MapaView Coverage', () => {
         });
 
         const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.codSubprocesso = null;
+        vm.codigoSubprocesso = null;
         await vm.disponibilizarMapa({});
 
         const fluxoMapa = useFluxoMapaModule.useFluxoMapa();

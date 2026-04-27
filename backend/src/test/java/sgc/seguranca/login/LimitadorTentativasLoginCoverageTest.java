@@ -28,15 +28,18 @@ class LimitadorTentativasLoginCoverageTest {
     @BeforeEach
     void setUp() {
         relogio = new RelogioMutavel();
+        target = new LimitadorTentativasLogin(environment, 2, relogio);
+    }
+
+    private void setupHabilitarLimiter() {
         when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"prod"});
-
-        target = new LimitadorTentativasLogin(environment, 2, relogio);
     }
 
     @Test
     @DisplayName("Deve cobrir a remoção do IP mais antigo quando o cache está cheio")
     void deveCobrirRemocaoIpMaisAntigoQuandoCacheCheio() {
+        setupHabilitarLimiter();
         target.verificar("1.1.1.1");
         target.verificar("2.2.2.2");
 
@@ -50,6 +53,7 @@ class LimitadorTentativasLoginCoverageTest {
     @Test
     @DisplayName("Deve cobrir o fallback de primeiro IP quando o cache contém apenas filas vazias")
     void deveCobrirFallbackPrimeiroIpQuandoFilasVazias() throws Exception {
+        setupHabilitarLimiter();
         target = new LimitadorTentativasLogin(environment, 1, relogio);
 
         @SuppressWarnings("unchecked")
@@ -64,6 +68,7 @@ class LimitadorTentativasLoginCoverageTest {
     @Test
     @DisplayName("Deve cobrir o caso excepcional de cache vazio ao tentar remover")
     void deveCobrirErroConfiguracaoCacheVazio() {
+        setupHabilitarLimiter();
         target = new LimitadorTentativasLogin(environment, 0, relogio);
 
         assertThatThrownBy(() -> target.verificar("qualquer-ip"))
@@ -74,6 +79,7 @@ class LimitadorTentativasLoginCoverageTest {
     @Test
     @DisplayName("Deve limpar tentativas antigas e remover entrada vazia antes de registrar nova tentativa")
     void deveCobrirLimpezaTentativasAntigasComRemocaoDoIp() {
+        setupHabilitarLimiter();
         target = new LimitadorTentativasLogin(environment, 10, relogio);
         target.verificar("1.1.1.1");
 
@@ -87,6 +93,7 @@ class LimitadorTentativasLoginCoverageTest {
     @Test
     @DisplayName("Deve cobrir o caso em que o IP é branco")
     void deveCobrirIpBranco() {
+        setupHabilitarLimiter();
         target.verificar("");
         target.verificar("   ");
 
@@ -96,6 +103,7 @@ class LimitadorTentativasLoginCoverageTest {
     @Test
     @DisplayName("Deve cobrir o caso em que o limiter está desabilitado por perfil")
     void deveCobrirLimiterDesabilitadoPorPerfil() {
+        when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"test"});
 
         target.verificar("1.2.3.4");

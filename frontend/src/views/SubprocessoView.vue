@@ -105,9 +105,9 @@
       </div>
 
       <SubprocessoCards
-          v-if="codSubprocesso"
+          v-if="codigoSubprocesso"
           :cod-processo="props.codProcesso"
-          :cod-subprocesso="codSubprocesso"
+          :cod-subprocesso="codigoSubprocesso"
           :mapa="null"
           :sigla-unidade="props.siglaUnidade"
           :situacao="subprocesso.situacao"
@@ -298,7 +298,7 @@ const {
 
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
-const codSubprocesso = ref<number | null>(null);
+const codigoSubprocesso = ref<number | null>(null);
 const erroNaoEncontrado = ref(false);
 const modalLembreteAberto = ref(false);
 const mostrarModalAlterarDataLimite = ref(false);
@@ -377,7 +377,7 @@ async function carregarSubprocesso() {
       : null;
 
   if (resultadoDireto) {
-    codSubprocesso.value = resultadoDireto.detalhes.codigo;
+    codigoSubprocesso.value = resultadoDireto.detalhes.codigo;
     erroNaoEncontrado.value = false;
     return;
   }
@@ -389,12 +389,12 @@ async function carregarSubprocesso() {
   );
 
   if (!resultado) {
-    codSubprocesso.value = null;
+    codigoSubprocesso.value = null;
     erroNaoEncontrado.value = !subprocessoStore.erroIntegracaoContexto;
     return;
   }
 
-  codSubprocesso.value = resultado.codigo;
+  codigoSubprocesso.value = resultado.codigo;
   erroNaoEncontrado.value = false;
 }
 
@@ -409,7 +409,7 @@ onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  if (codSubprocesso.value && subprocessoStore.dadosValidosEdicao(codSubprocesso.value)) {
+  if (codigoSubprocesso.value && subprocessoStore.dadosValidosEdicao(codigoSubprocesso.value)) {
     return;
   }
   await carregarSubprocesso();
@@ -469,7 +469,7 @@ function fecharModalReabrir() {
 }
 
 async function confirmarReabertura() {
-  if (!codSubprocesso.value) return;
+  if (!codigoSubprocesso.value) return;
 
   if (!validarSubmissao(Boolean(justificativaReabertura.value.trim()))) {
     void focarPrimeiroErroInvalido();
@@ -478,7 +478,7 @@ async function confirmarReabertura() {
 
   await executarComCarregamento(loadingReabertura, async () => {
     const isRevisao = tipoReabertura.value === 'revisao';
-    const sucesso = await fluxoSubprocesso.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value, isRevisao);
+    const sucesso = await fluxoSubprocesso.reabrirCadastro(codigoSubprocesso.value!, justificativaReabertura.value, isRevisao);
 
     if (sucesso) {
       fecharModalReabrir();
@@ -498,13 +498,13 @@ async function confirmarEnviarLembrete() {
 }
 
 async function enviarLembreteConfirmado() {
-  if (!subprocesso.value || !codSubprocesso.value || loadingLembrete.value) {
+  if (!subprocesso.value || !codigoSubprocesso.value || loadingLembrete.value) {
     return;
   }
   loadingLembrete.value = true;
   try {
     await enviarLembreteService(props.codProcesso, subprocesso.value.unidade.codigo);
-    await subprocessoStore.garantirContextoEdicao(codSubprocesso.value, true);
+    await subprocessoStore.garantirContextoEdicao(codigoSubprocesso.value, true);
     modalLembreteAberto.value = false;
     notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');
   } catch {

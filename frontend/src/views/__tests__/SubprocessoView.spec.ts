@@ -190,12 +190,12 @@ describe('SubprocessoView.vue', () => {
         const subprocessoToUse = overrideMockSubprocesso ? {...mockSubprocesso, ...overrideMockSubprocesso} : mockSubprocesso;
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeAlterarDataLimite: {value: true},
-            podeReabrirCadastro: {value: true},
-            podeReabrirRevisao: {value: true},
-            podeEnviarLembrete: {value: true},
-            podeDisponibilizarCadastro: {value: true},
-            podeEditarCadastro: {value: true},
+            podeAlterarDataLimite: ref(true),
+            podeReabrirCadastro: ref(true),
+            podeReabrirRevisao: ref(true),
+            podeEnviarLembrete: ref(true),
+            podeDisponibilizarCadastro: ref(true),
+            podeEditarCadastro: ref(true),
             ...accessOverrides
         } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
