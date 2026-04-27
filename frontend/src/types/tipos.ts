@@ -508,6 +508,14 @@ export interface ValidacaoCadastro {
     erros: ErroValidacao[];
 }
 
+export interface UnidadeSelecao {
+    codigo: number;
+    sigla: string;
+    nome: string;
+    situacao: string;
+    ultimaDataLimite?: string;
+}
+
 /**
  * Status leve de um subprocesso retornado nas operações CRUD.
  */

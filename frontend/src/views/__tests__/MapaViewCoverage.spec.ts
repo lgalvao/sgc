@@ -7,13 +7,13 @@ import * as useFluxoMapaModule from "@/composables/useFluxoMapa";
 import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
 import MapaView from "../MapaView.vue";
-import type {ContextoEdicaoSubprocesso, MapaCompleto, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
+import type {Atividade, ContextoEdicaoSubprocesso, MapaCompleto, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 type CompetenciaMapa = {
     codigo: number;
     descricao: string;
-    atividades?: Array<{codigo: number; descricao?: string}>;
+    atividades?: Array<{codigo: number; descricao?: string; conhecimentos?: any[]}>;
 };
 
 type MapaViewVm = {
@@ -339,8 +339,8 @@ describe("MapaView coverage", () => {
                 atividades: [{codigo: 1, descricao: "Atividade 1"}]
             }
         ], [
-            {codigo: 1, descricao: "Atividade 1"},
-            {codigo: 2, descricao: "Atividade 2"}
+            {codigo: 1, descricao: "Atividade 1", conhecimentos: []},
+            {codigo: 2, descricao: "Atividade 2", conhecimentos: []}
         ]);
 
         expect(vm.atividadesSemCompetencia).toHaveLength(1);
@@ -461,10 +461,10 @@ describe("MapaView coverage", () => {
             {
                 codigo: 1,
                 descricao: "C1",
-                atividades: [{codigo: 1, descricao: "Ativ"}]
+                atividades: [{codigo: 1, descricao: "Ativ", conhecimentos: []}]
             }
         ], [
-            {codigo: 1, descricao: "Ativ"}
+            {codigo: 1, descricao: "Ativ", conhecimentos: []}
         ]);
 
         expect(vm.atividades).toHaveLength(1);

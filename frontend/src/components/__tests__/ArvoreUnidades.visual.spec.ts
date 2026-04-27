@@ -5,6 +5,12 @@ import ArvoreUnidades from '@/components/unidade/ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
 import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 
+type ArvoreUnidadesVm = {
+    getEstadoSelecao: (unidade: Unidade) => boolean | 'indeterminate';
+    isHabilitado: (unidade: Unidade) => boolean;
+    toggle: (unidade: Unidade, checked: boolean) => void;
+};
+
 describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
     setupComponentTest();
 
@@ -111,7 +117,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const secretaria = criarUnidades()[0];
 
             // SECRETARIA_1 tem 4 filhas: ASSESSORIA_11, ASSESSORIA_12, COORD_11, COORD_12
@@ -131,7 +137,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const secretaria = criarUnidades()[0];
 
             expect(vm.getEstadoSelecao(secretaria)).toBe(true);
@@ -148,7 +154,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const coord11 = criarUnidades()[0].filhas![2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe(false);
@@ -163,7 +169,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const coord11 = criarUnidades()[0].filhas![2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe(true);
@@ -178,7 +184,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const coord11 = criarUnidades()[0].filhas![2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe('indeterminate');
@@ -195,7 +201,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const secretaria = criarUnidades()[0];
 
             // Simula desmarcar SECRETARIA_1
@@ -217,7 +223,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const secretaria = criarUnidades()[0];
             const coord12 = criarUnidades()[0].filhas![3];
 
@@ -242,7 +248,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const coord11 = criarUnidades()[0].filhas![2];
 
             // COORD_11 não é elegível (INTERMEDIARIA)
@@ -285,7 +291,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const coord = unidadesComCoordSemFilhas[0];
 
             expect(vm.isHabilitado(coord)).toBe(false);
@@ -300,7 +306,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const assessoria = criarUnidades()[0].filhas![0];
 
             expect(assessoria.isElegivel).toBe(true);
@@ -338,7 +344,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm;
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const coord11 = criarUnidades()[0].filhas![2];
 
             // Selecionar COORD_11

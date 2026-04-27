@@ -1,4 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
+import {useFluxoMapa} from "../useFluxoMapa";
+import * as service from "@/services/subprocessoService";
 
 vi.mock("@/services/subprocessoService", () => ({
     salvarMapaCompleto: vi.fn(),
@@ -15,9 +17,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve adicionar competencia e retornar mapa atualizado", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         const resposta = {codigo: 1, competencias: [{codigo: 2}]} as any;
         vi.mocked(service.adicionarCompetencia).mockResolvedValue(resposta);
 
@@ -28,9 +28,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve atualizar competencia e retornar mapa atualizado", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         const resposta = {codigo: 1, competencias: [{codigo: 3}]} as any;
         vi.mocked(service.atualizarCompetencia).mockResolvedValue(resposta);
 
@@ -41,9 +39,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve remover competencia e retornar mapa atualizado", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         const resposta = {codigo: 1, competencias: []} as any;
         vi.mocked(service.removerCompetencia).mockResolvedValue(resposta);
 
@@ -54,9 +50,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve disponibilizar mapa", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         vi.mocked(service.disponibilizarMapa).mockResolvedValue(undefined);
 
         await fluxoMapa.disponibilizarMapa(10, {dataLimite: "2026-05-01", observacoes: "obs"});
@@ -65,9 +59,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve salvar mapa completo", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         const resposta = {codigo: 1, competencias: []} as any;
         vi.mocked(service.salvarMapaCompleto).mockResolvedValue(resposta);
 
@@ -79,9 +71,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve salvar ajustes do mapa", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         vi.mocked(service.salvarMapaAjuste).mockResolvedValue(undefined);
 
         const dados = {competencias: [], atividades: [], sugestoes: "ajuste"};
@@ -91,9 +81,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve propagar erro se salvarAjustes falhar", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         vi.mocked(service.salvarMapaAjuste).mockRejectedValue(new Error("Erro ajuste"));
 
         const dados = {competencias: [], atividades: [], sugestoes: ""};
@@ -101,9 +89,7 @@ describe("useFluxoMapa", () => {
     });
 
     it("deve propagar erro se salvarMapa falhar", async () => {
-        const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
-        const service = await import("@/services/subprocessoService");
         vi.mocked(service.salvarMapaCompleto).mockRejectedValue(new Error("Erro grave"));
 
         const dados = {competencias: []};

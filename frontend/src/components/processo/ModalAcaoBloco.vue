@@ -79,14 +79,7 @@ import InputData from '@/components/comum/InputData.vue';
 import ModalPadrao from '@/components/comum/ModalPadrao.vue';
 import {formatDateBR, isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
-
-export interface UnidadeSelecao {
-  codigo: number;
-  sigla: string;
-  nome: string;
-  situacao: string;
-  ultimaDataLimite?: string;
-}
+import type {UnidadeSelecao} from "@/types/tipos";
 
 const props = defineProps<{
   id: string;

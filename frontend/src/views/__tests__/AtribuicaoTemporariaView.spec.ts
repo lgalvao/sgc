@@ -117,28 +117,31 @@ describe('AtribuicaoTemporariaView', () => {
     });
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
     
     expect(buscarUnidadePorCodigo).toHaveBeenCalledWith(1);
-    expect(wrapper.vm.unidade).toBeDefined();
-    expect(wrapper.vm.unidade?.sigla).toBe('TESTE-UNIDADE');
+    expect(vm.unidade).toBeDefined();
+    expect(vm.unidade?.sigla).toBe('TESTE-UNIDADE');
   });
 
   it('deve lidar com erro ao carregar unidade', async () => {
     vi.mocked(buscarUnidadePorCodigo).mockRejectedValue(new Error('Erro de API'));
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    expect(wrapper.vm.erroUsuario).toContain('Falha ao carregar dados da unidade');
+    expect(vm.erroUsuario).toContain('Falha ao carregar dados da unidade');
   });
 
   it('deve validar formulário vazio', async () => {
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    await wrapper.vm.criarAtribuicao();
+    await vm.criarAtribuicao();
 
     expect(mockNotify).not.toHaveBeenCalledWith(expect.any(String), 'danger');
     expect(criarAtribuicaoTemporaria).not.toHaveBeenCalled();
@@ -147,16 +150,17 @@ describe('AtribuicaoTemporariaView', () => {
   it('deve manter o botão de criar habilitado para permitir validação contextual', async () => {
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
     const botaoCriar = wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]');
     expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
 
-    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo());
-    wrapper.vm.dataInicio = '2025-01-01';
-    wrapper.vm.dataTermino = '2025-12-31';
-    wrapper.vm.justificativa = 'Teste de justificativa';
-    await wrapper.vm.$nextTick();
+    vm.selecionarUsuario(usuarioMinimo());
+    vm.dataInicio = '2025-01-01';
+    vm.dataTermino = '2025-12-31';
+    vm.justificativa = 'Teste de justificativa';
+    await vm.$nextTick();
 
     expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
   });
@@ -167,16 +171,17 @@ describe('AtribuicaoTemporariaView', () => {
     vi.mocked(pesquisarUsuarios).mockResolvedValue([usuarioMinimo({nome: 'João da Silva', tituloEleitoral: '123'})]);
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    wrapper.vm.aoAlterarTermoUsuario('João');
+    vm.aoAlterarTermoUsuario('João');
     expect(pesquisarUsuarios).not.toHaveBeenCalled(); // Debounce
 
     vi.runAllTimers();
     await vi.dynamicImportSettled();
 
     expect(pesquisarUsuarios).toHaveBeenCalledWith('João');
-    expect(wrapper.vm.usuariosEncontrados).toHaveLength(1);
+    expect(vm.usuariosEncontrados).toHaveLength(1);
     
     vi.useRealTimers();
   });
@@ -187,14 +192,15 @@ describe('AtribuicaoTemporariaView', () => {
     vi.mocked(pesquisarUsuarios).mockRejectedValue(new Error('Erro na busca'));
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    wrapper.vm.aoAlterarTermoUsuario('Maria');
+    vm.aoAlterarTermoUsuario('Maria');
     vi.runAllTimers();
     await vi.dynamicImportSettled();
 
     expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'danger');
-    expect(wrapper.vm.usuariosEncontrados).toHaveLength(0);
+    expect(vm.usuariosEncontrados).toHaveLength(0);
 
     vi.useRealTimers();
   });
@@ -202,13 +208,14 @@ describe('AtribuicaoTemporariaView', () => {
   it('deve selecionar usuario encontrado', async () => {
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo({nome: 'José', tituloEleitoral: '12345'}));
+    vm.selecionarUsuario(usuarioMinimo({nome: 'José', tituloEleitoral: '12345'}));
 
-    expect(wrapper.vm.usuarioSelecionado).toBe('12345');
-    expect(wrapper.vm.termoUsuario).toBe('José');
-    expect(wrapper.vm.mostrarResultadosUsuarios).toBe(false);
+    expect(vm.usuarioSelecionado).toBe('12345');
+    expect(vm.termoUsuario).toBe('José');
+    expect(vm.mostrarResultadosUsuarios).toBe(false);
   });
 
   it('deve criar atribuicao com sucesso', async () => {
@@ -216,15 +223,16 @@ describe('AtribuicaoTemporariaView', () => {
     vi.mocked(criarAtribuicaoTemporaria).mockResolvedValue();
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
     // Preenchendo o formulário
-    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo());
-    wrapper.vm.dataInicio = '2025-01-01';
-    wrapper.vm.dataTermino = '2025-12-31';
-    wrapper.vm.justificativa = 'Teste de justificativa';
+    vm.selecionarUsuario(usuarioMinimo());
+    vm.dataInicio = '2025-01-01';
+    vm.dataTermino = '2025-12-31';
+    vm.justificativa = 'Teste de justificativa';
 
-    await wrapper.vm.criarAtribuicao();
+    await vm.criarAtribuicao();
 
     expect(criarAtribuicaoTemporaria).toHaveBeenCalledWith(1, {
       tituloEleitoralUsuario: '999',
@@ -233,8 +241,8 @@ describe('AtribuicaoTemporariaView', () => {
       justificativa: 'Teste de justificativa'
     });
     expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'success');
-    expect(wrapper.vm.usuarioSelecionado).toBeNull();
-    expect(wrapper.vm.justificativa).toBe('');
+    expect(vm.usuarioSelecionado).toBeNull();
+    expect(vm.justificativa).toBe('');
   });
 
   it('deve lidar com erro ao criar atribuicao', async () => {
@@ -242,17 +250,18 @@ describe('AtribuicaoTemporariaView', () => {
     vi.mocked(criarAtribuicaoTemporaria).mockRejectedValue(new Error('Erro no servidor'));
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo());
-    wrapper.vm.dataInicio = '2025-01-01';
-    wrapper.vm.dataTermino = '2025-12-31';
-    wrapper.vm.justificativa = 'Teste de justificativa';
+    vm.selecionarUsuario(usuarioMinimo());
+    vm.dataInicio = '2025-01-01';
+    vm.dataTermino = '2025-12-31';
+    vm.justificativa = 'Teste de justificativa';
 
-    await wrapper.vm.criarAtribuicao();
+    await vm.criarAtribuicao();
 
     expect(criarAtribuicaoTemporaria).toHaveBeenCalled();
-    expect((wrapper.vm as unknown as AtribuicaoTemporariaVm).erroFormulario).toContain('Erro no servidor');
+    expect(vm.erroFormulario).toContain('Erro no servidor');
     expect(mockNotify).not.toHaveBeenCalledWith(expect.any(String), 'danger');
   });
 
@@ -260,13 +269,14 @@ describe('AtribuicaoTemporariaView', () => {
     vi.useFakeTimers();
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    wrapper.vm.mostrarResultadosUsuarios = true;
-    wrapper.vm.agendarOcultacaoResultadosUsuarios();
+    vm.mostrarResultadosUsuarios = true;
+    vm.agendarOcultacaoResultadosUsuarios();
     
     vi.runAllTimers();
-    expect(wrapper.vm.mostrarResultadosUsuarios).toBe(false);
+    expect(vm.mostrarResultadosUsuarios).toBe(false);
     
     vi.useRealTimers();
   });
