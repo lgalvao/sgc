@@ -151,7 +151,7 @@ class MapaManutencaoServiceCoverageExtraTest {
         conhecimento.setDescricao("Conhecimento");
         conhecimento.setAtividade(atividade);
 
-        when(repo.buscar(eq(Conhecimento.class), eq(Map.of("codigo", 2L, "atividade.codigo", 1L))))
+        when(repo.buscar(Conhecimento.class, Map.of("codigo", 2L, "atividade.codigo", 1L)))
                 .thenReturn(conhecimento);
 
         mapaService.atualizarConhecimento(1L, 2L, new AtualizarConhecimentoRequest("conhecimento"));

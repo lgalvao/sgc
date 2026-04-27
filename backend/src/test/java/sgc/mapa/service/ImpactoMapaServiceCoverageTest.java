@@ -167,19 +167,16 @@ class ImpactoMapaServiceCoverageTest {
     @DisplayName("conhecimentosDiferentes - casos de borda")
     void conhecimentosDiferentesBorda() {
         Boolean res1 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(), List.of());
-        assertThat(res1).isNotNull();
-        assertThat(res1).isFalse();
+        assertThat(res1).isNotNull().isFalse();
 
         Conhecimento c1 = new Conhecimento(); c1.setDescricao("C1");
         Conhecimento c2 = new Conhecimento(); c2.setDescricao("C2");
 
         Boolean res2 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c1, c2));
-        assertThat(res2).isNotNull();
-        assertThat(res2).isTrue();
+        assertThat(res2).isNotNull().isTrue();
 
         Boolean res3 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c2));
-        assertThat(res3).isNotNull();
-        assertThat(res3).isTrue();
+        assertThat(res3).isNotNull().isTrue();
     }
 
     @Test
