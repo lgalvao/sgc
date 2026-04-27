@@ -10,6 +10,7 @@ import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -42,7 +43,7 @@ class ImpactoMapaServiceTest {
     @Test
     @DisplayName("verificarImpactos - deve lancar ErroAcessoNegado quando nao tiver permissao")
     void verificarImpactosDeveLancarErroAcessoNegado() {
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = criarSubprocessoPadrao();
         Usuario usuario = new Usuario();
 
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
@@ -56,6 +57,14 @@ class ImpactoMapaServiceTest {
         Usuario u = new Usuario();
         u.setPerfilAtivo(Perfil.ADMIN);
         return u;
+    }
+
+    private Subprocesso criarSubprocessoPadrao() {
+        Subprocesso sp = new Subprocesso();
+        Processo p = new Processo();
+        p.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+        sp.setProcesso(p);
+        return sp;
     }
 
     private void mockAcessoLivre() {
@@ -73,10 +82,13 @@ class ImpactoMapaServiceTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(codigoUnidade);
 
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setSituacao(situacao);
+        Subprocesso subprocesso = criarSubprocessoPadrao();
+        subprocesso.setSituacaoForcada(situacao);
         subprocesso.setUnidade(unidade);
         subprocesso.setCodigo(99L);
+        Processo processo = new Processo();
+        processo.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+        subprocesso.setProcesso(processo);
 
         return subprocesso;
     }
@@ -87,7 +99,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -109,7 +121,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
@@ -150,7 +162,7 @@ class ImpactoMapaServiceTest {
         usuario.setPerfilAtivo(Perfil.SERVIDOR);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -223,7 +235,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         mockUsuarioAutenticado(usuario);
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
@@ -270,7 +282,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         mockUsuarioAutenticado(usuario);
-        Subprocesso subprocesso = new Subprocesso();
+        Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
@@ -396,10 +408,13 @@ class ImpactoMapaServiceTest {
                 .sigla("UNID")
                 .nome("Unidade teste")
                 .build();
+        Processo processo = new Processo();
+        processo.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
         return Subprocesso.builder()
                 .codigo(1L)
                 .unidade(unidade)
                 .mapa(mapa)
+                .processo(processo)
                 .build();
     }
 
@@ -411,7 +426,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("verificarImpactos: Falha quando mapa do subprocesso não existe")
         void verificarImpactos_MapaSubprocessoInexistente() {
             mockAcessoLivre();
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
@@ -430,7 +445,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("verificarImpactos: Atividades duplicadas (mesma descrição) usa handler de colisão")
         void verificarImpactos_AtividadesDuplicadas() {
             mockAcessoLivre();
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
@@ -471,7 +486,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("verificarImpactos: Atividade alterada vinculada a Competencia gera impacto")
         void verificarImpactos_AtividadeAlteradaComCompetencia() {
             mockAcessoLivre();
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
@@ -520,7 +535,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("verificarImpactos: Competência sem atividades não deve quebrar cálculo")
         void verificarImpactos_CompetenciaSemAtividades() {
             mockAcessoLivre();
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
@@ -556,7 +571,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("verificarImpactos: Deve acumular tipos e detalhes de impacto na mesma competência")
         void verificarImpactos_DeveAcumularImpactosNaMesmaCompetencia() {
             mockAcessoLivre();
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocessoPadrao();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
@@ -611,7 +626,7 @@ class ImpactoMapaServiceTest {
             CompetenciaImpactadaDto competenciaImpactada = response.competenciasImpactadas().getFirst();
             assertEquals(50L, competenciaImpactada.codigo());
             assertEquals("Comp Estratégica", competenciaImpactada.descricao());
-            assertEquals(2, competenciaImpactada.atividadesAfetadas().size());
+            assertEquals(3, competenciaImpactada.atividadesAfetadas().size());
             assertTrue(competenciaImpactada.atividadesAfetadas().contains("Atividade removida: Atividade removida"));
             assertTrue(competenciaImpactada.atividadesAfetadas().stream()
                     .anyMatch(detalhe -> detalhe.contains("Atividade alterada")));
@@ -624,7 +639,7 @@ class ImpactoMapaServiceTest {
         @DisplayName("verificarImpactos: Atividades com conhecimentos idênticos não devem gerar alteração")
         void verificarImpactos_ConhecimentosIdenticos() {
             mockAcessoLivre();
-            Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso sp = criarSubprocessoPadrao(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade(); u.setCodigo(100L); sp.setUnidade(u);
             
             Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(20L);
@@ -654,7 +669,7 @@ class ImpactoMapaServiceTest {
             // Este teste é artificial para atingir o branch do filter caso o Jacoco o exija,
             // embora na lógica real as descrições devam coincidir.
             List<AtividadeImpactadaDto> alteradas = List.of(
-                AtividadeImpactadaDto.builder().descricao("Inexistente").build()
+                AtividadeImpactadaDto.builder().descricaoAnterior("Inexistente").descricao("Inexistente").build()
             );
             Map<String, Long> descricaoParaCodVigente = Map.of("Outra", 1L);
             Map<Long, List<Competencia>> codAtividadeParaCompetencias = Map.of();

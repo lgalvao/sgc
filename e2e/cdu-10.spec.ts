@@ -114,6 +114,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
 
         await navegarParaAtividades(page);
+        await expect(checkboxSemMudancas).toBeChecked();
+        await checkboxSemMudancas.uncheck();
         await expect(checkboxSemMudancas).not.toBeChecked();
         await botaoDisponibilizar.click();
         await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();

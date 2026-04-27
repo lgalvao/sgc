@@ -25,6 +25,14 @@ class ImpactoMapaServiceCoverageTest {
     @InjectMocks
     private ImpactoMapaService target;
 
+    private Subprocesso criarSubprocesso() {
+        Subprocesso sp = new Subprocesso();
+        sgc.processo.model.Processo p = new sgc.processo.model.Processo();
+        p.setTipo(sgc.processo.model.TipoProcesso.REVISAO);
+        sp.setProcesso(p);
+        return sp;
+    }
+
     @Mock private MapaRepo mapaRepo;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
     @Mock private UsuarioFacade usuarioFacade;
@@ -33,7 +41,7 @@ class ImpactoMapaServiceCoverageTest {
     @DisplayName("verificarImpactos deve lançar ErroAcessoNegado quando sem permissão")
     void verificarImpactosSemPermissao() {
         Usuario user = new Usuario();
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = criarSubprocesso();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(false);
 
@@ -50,7 +58,7 @@ class ImpactoMapaServiceCoverageTest {
         Unidade u = new Unidade();
         u.setCodigo(1L);
         
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = criarSubprocesso();
         sp.setUnidade(u);
         sp.setSituacao(NAO_INICIADO);
         
@@ -71,7 +79,7 @@ class ImpactoMapaServiceCoverageTest {
         Unidade u = new Unidade();
         u.setCodigo(1L);
         
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = criarSubprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u);
         sp.setSituacao(NAO_INICIADO);
@@ -121,7 +129,7 @@ class ImpactoMapaServiceCoverageTest {
         private void testCheckSituacao(Perfil perfil, SituacaoSubprocesso situacao, boolean expected) {
             Usuario user = new Usuario();
             user.setPerfilAtivo(perfil);
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocesso();
             sp.setSituacao(situacao);
 
             when(permissionEvaluator.verificarPermissao(user, sp, sgc.seguranca.AcaoPermissao.VERIFICAR_IMPACTOS)).thenReturn(true);

@@ -815,6 +815,10 @@ async function handleAdicionarAtividade() {
 
 onMounted(async () => {
   await carregarContextoInicial();
+  
+  if (isRevisao.value && situacaoAtual.value === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO && !houveAlteracaoCadastro.value) {
+    atualizarCheckboxSemMudancasSilenciosamente(true);
+  }
 });
 
 watch(() => atividades.value?.length, (newLen, oldLen) => {
