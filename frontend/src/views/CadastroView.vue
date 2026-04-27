@@ -269,7 +269,16 @@ const atividadesOrdenadas = computed(() => {
   return [...atividades.value].sort((a, b) => (b.codigo || 0) - (a.codigo || 0));
 });
 
-// Variável habilitarDisponibilizar removida pois não era utilizada
+const habilitarDisponibilizar = computed(() => {
+  const cadastroCompleto = atividades.value.length > 0 &&
+      atividades.value.every((atividade) => atividade.conhecimentos && atividade.conhecimentos.length > 0);
+
+  if (isRevisao.value) {
+    return cadastroCompleto && (houveAlteracaoCadastro.value || disponibilizacaoSemMudancas.value);
+  }
+
+  return cadastroCompleto;
+});
 
 
 
@@ -424,16 +433,15 @@ function limparErrosValidacaoCadastro() {
   erroGlobal.value = null;
 }
 
-function registrarErrosValidacaoCadastro(erros: ErroValidacao[]) {
+async function registrarErrosValidacaoCadastro(erros: ErroValidacao[]) {
   // Força reatividade limpando e incrementando tick para garantir que o alerta reapareça se for o mesmo erro
   limparErrosValidacaoCadastro();
   erroTick.value++;
-  
-  nextTick(() => {
-    errosValidacao.value = erros;
-    const msg = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
-    erroGlobal.value = msg;
-  });
+
+  await nextTick();
+  errosValidacao.value = erros;
+  const msg = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
+  erroGlobal.value = msg;
 }
 
 function obterSituacaoReferenciaDisponibilizacao(): SituacaoSubprocesso {
@@ -457,13 +465,13 @@ function obterErroPreValidacaoDisponibilizacao(): string | null {
   return null;
 }
 
-function aplicarResultadoValidacaoCadastro(valido: boolean, erros: ErroValidacao[]) {
+async function aplicarResultadoValidacaoCadastro(valido: boolean, erros: ErroValidacao[]) {
   if (valido) {
     mostrarModalConfirmacao.value = true;
     return;
   }
 
-  registrarErrosValidacaoCadastro(erros);
+  await registrarErrosValidacaoCadastro(erros);
 }
 
 const mapaErros = computed(() => {
@@ -655,7 +663,7 @@ async function disponibilizarCadastro() {
   const situacaoReferencia = obterSituacaoReferenciaDisponibilizacao();
   const erroPreValidacao = obterErroPreValidacaoDisponibilizacao();
   if (erroPreValidacao) {
-    registrarErrosValidacaoCadastro([{ tipo: "PRE_VALIDACAO", mensagem: erroPreValidacao }]);
+    await registrarErrosValidacaoCadastro([{ tipo: "PRE_VALIDACAO", mensagem: erroPreValidacao }]);
     return;
   }
 
@@ -674,7 +682,7 @@ async function disponibilizarCadastro() {
   try {
     const resultado = await fluxoSubprocesso.validarCadastro(codigoSubprocesso.value);
     if (resultado) {
-      aplicarResultadoValidacaoCadastro(resultado.valido, resultado.erros);
+      await aplicarResultadoValidacaoCadastro(resultado.valido, resultado.erros);
       if (!resultado.valido) {
         await nextTick();
         try {
@@ -866,5 +874,6 @@ defineExpose({
   timeoutLimpezaErros,
   executarAtualizacaoCadastro,
   processarRespostaLocal,
+  habilitarDisponibilizar,
 });
 </script>

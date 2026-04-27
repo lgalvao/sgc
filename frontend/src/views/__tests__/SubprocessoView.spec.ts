@@ -245,7 +245,7 @@ describe('SubprocessoView.vue', () => {
         mountComponent();
         await flushPromises();
 
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false);
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true);
     });
 
     it('recarrega dados ao reativar a view em keepAlive apenas se dados forem inválidos', async () => {

@@ -109,6 +109,7 @@ describe('useAcesso', () => {
 
   it('deve mapear permissoes corretamente a partir do backend', () => {
     const subprocesso = ref(criarSubprocesso({
+      tipoProcesso: TipoProcesso.REVISAO,
       permissoes: criarPermissoes({
         podeEditarCadastro: true,
         podeDisponibilizarCadastro: true,
