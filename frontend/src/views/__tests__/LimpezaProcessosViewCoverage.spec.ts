@@ -1,0 +1,91 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import LimpezaProcessosView from '../LimpezaProcessosView.vue';
+import { createTestingPinia } from '@pinia/testing';
+import { createRouter, createWebHistory } from 'vue-router';
+import * as processoService from '@/services/processoService';
+
+vi.mock('@/services/processoService', () => ({
+  excluirProcessoCompleto: vi.fn()
+}));
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [{ path: '/', component: {} }]
+});
+
+describe('LimpezaProcessosView Coverage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const mountComponent = () => {
+    return mount(LimpezaProcessosView, {
+      global: {
+        plugins: [createTestingPinia({ createSpy: vi.fn }), router],
+        stubs: {
+          LayoutPadrao: { template: '<div><slot/></div>' },
+          PageHeader: { template: '<div><slot name="actions"/></div>', props: ['title'] },
+          BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
+          AppAlert: true,
+          BSpinner: true,
+          BCard: true,
+          BFormGroup: true,
+          BFormInput: { template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" :data-testid="dataTestid" />', props: ['modelValue', 'dataTestid', 'id'] },
+          BFormInvalidFeedback: { template: '<div><slot/></div>' },
+          BCol: true,
+          BRow: true,
+          LoadingButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
+          ModalConfirmacao: { template: '<div><slot/></div>', props: ['modelValue', 'mostrarModal'] },
+          EmptyState: true
+        }
+      }
+    });
+  };
+
+  it('renders correctly', async () => {
+    const wrapper = mountComponent();
+    await flushPromises();
+    expect(wrapper.exists()).toBe(true);
+  });
+
+  it('handles delete process permanently', async () => {
+    vi.mocked(processoService.excluirProcessoCompleto).mockResolvedValueOnce({} as any);
+
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    // Simulate user entering a process id
+    // @ts-ignore
+    wrapper.vm.codigoProcesso = '123';
+
+    // Test validation bypass manually
+    // @ts-ignore
+    wrapper.vm.abrirConfirmacao();
+    // @ts-ignore
+    expect(wrapper.vm.mostrarConfirmacao).toBe(true);
+
+    // @ts-ignore
+    await wrapper.vm.confirmarExclusao();
+    await flushPromises();
+
+    expect(processoService.excluirProcessoCompleto).toHaveBeenCalledWith(123);
+  });
+
+  it('covers handling api errors', async () => {
+    vi.mocked(processoService.excluirProcessoCompleto).mockRejectedValueOnce(new Error('Test error'));
+
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    // @ts-ignore
+    wrapper.vm.codigoProcesso = '123';
+
+    // @ts-ignore
+    await wrapper.vm.confirmarExclusao();
+    await flushPromises();
+
+    // The component uses notify to show error. If it didn't throw, it was handled
+    expect(processoService.excluirProcessoCompleto).toHaveBeenCalled();
+  });
+});
