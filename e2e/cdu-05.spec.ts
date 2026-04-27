@@ -94,6 +94,38 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByText(descAtividadePrincipal)).toBeVisible();
     });
 
+    test('Fase 1.2b: REGRESSÃO - Alerta de erro deve reaparecer se fechado', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividades(page);
+
+        // Adiciona uma nova atividade SEM conhecimento para invalidar o cadastro
+        const descAtividadeInvalida = `Atividade Incompleta ${Date.now()}`;
+        await adicionarAtividade(page, descAtividadeInvalida);
+
+        // 1. Tenta disponibilizar (deve dar erro)
+        const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+        await btnDisponibilizar.click();
+
+        const alerta = page.getByTestId('alerta-erro-global');
+        await expect(alerta).toBeVisible();
+        await expect(alerta).toContainText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO);
+
+        // 2. Fecha o alerta
+        await alerta.locator('button.btn-close').click();
+        await expect(alerta).not.toBeVisible();
+
+        // 3. Tenta disponibilizar novamente (O BUG: o alerta não voltava)
+        await btnDisponibilizar.click();
+        await expect(alerta).toBeVisible();
+        await expect(alerta).toContainText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO);
+
+        // Cleanup: remove a atividade incompleta para não quebrar os próximos testes do serial
+        const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(descAtividadeInvalida)});
+        await card.getByTestId('btn-remover-atividade').click();
+        await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+    });
+
     test('Fase 1.3: CHEFE disponibiliza cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);

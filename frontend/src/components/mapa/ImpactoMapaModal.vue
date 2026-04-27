@@ -124,10 +124,11 @@
     </div>
 
     <BAlert
-        v-else
+        v-else-if="mostrar"
         :fade="false"
         :model-value="true"
         variant="danger"
+        data-testid="alerta-erro-impacto"
     >
       {{ TEXTOS.mapa.impacto.ERRO_CARREGAR }}
     </BAlert>

@@ -105,9 +105,7 @@ async function capturarTela(
     if (!baseUrlMetadata) {
         baseUrlMetadata = extrairBaseUrl(url);
     }
-    if (!viewportPadraoMetadata) {
-        viewportPadraoMetadata = viewportAtual;
-    }
+    viewportPadraoMetadata ??= viewportAtual;
 
     const nomeArquivo = `${categoria}--${nome}.png`;
     const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
@@ -191,8 +189,8 @@ async function prepararPaginaParaCaptura(
             document.head.appendChild(estilo);
         }
 
-        const scrollOriginal = {x: window.scrollX, y: window.scrollY};
-        window.scrollTo(0, 0);
+        const scrollOriginal = {x: globalThis.scrollX, y: globalThis.scrollY};
+        globalThis.scrollTo(0, 0);
         return scrollOriginal;
     });
 }
@@ -210,7 +208,7 @@ async function restaurarScrollAposCaptura(
 
     await page.evaluate(({x, y}) => {
         document.getElementById('sgc-captura-fullpage-style')?.remove();
-        window.scrollTo(x, y);
+        globalThis.scrollTo(x, y);
     }, scrollOriginal);
 }
 
@@ -239,7 +237,7 @@ async function aguardarModaisEstaveis(page: Page): Promise<void> {
 
         const elementos = Array.from(document.querySelectorAll<HTMLElement>(seletores.join(',')))
             .filter((elemento) => {
-                const estilo = window.getComputedStyle(elemento);
+                const estilo = globalThis.getComputedStyle(elemento);
                 return estilo.display !== 'none' && estilo.visibility !== 'hidden';
             });
 
@@ -268,7 +266,7 @@ async function aguardarModaisEstaveis(page: Page): Promise<void> {
         return Math.max(
             0,
             ...elementos.map((elemento) => {
-                const estilo = window.getComputedStyle(elemento);
+                const estilo = globalThis.getComputedStyle(elemento);
                 return maiorTempo(estilo.transitionDuration)
                     + maiorTempo(estilo.transitionDelay)
                     + maiorTempo(estilo.animationDuration)

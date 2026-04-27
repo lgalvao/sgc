@@ -22,10 +22,8 @@ import {
 } from './helpers/helpers-processos.js';
 
 function converterDataHoraBrParaTimestamp(dataHoraTexto: string): number {
-    const textoNormalizado = dataHoraTexto.trim().replace(/\s+/g, ' ');
-    const correspondencia = textoNormalizado.match(
-        /^(\d{2})\/(\d{2})\/(\d{4})(?: (\d{2}):(\d{2})(?::(\d{2}))?)?$/
-    );
+    const textoNormalizado = dataHoraTexto.trim().replaceAll(/\s+/g, ' ');
+    const correspondencia = new RegExp(/^(\d{2})\/(\d{2})\/(\d{4})(?: (\d{2}):(\d{2})(?::(\d{2}))?)?$/).exec(textoNormalizado);
 
     if (!correspondencia) {
         throw new Error(`Data/hora inválida na tabela de movimentações: "${dataHoraTexto}"`);

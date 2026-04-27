@@ -26,6 +26,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @InjectMocks
     private SubprocessoTransicaoService service;
 
+    private static final String ADMIN = "ADMIN";
+    private static final String SITUACAO = "situacao";
+    private static final String OBTER_ULTIMA_DATA_LIMITE = "obterUltimaDataLimite";
+
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
@@ -89,14 +93,14 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         u.setCodigo(1L);
         Unidade admin = new Unidade();
         admin.setCodigo(99L);
-        admin.setSigla("ADMIN");
+        admin.setSigla(ADMIN);
         u.setUnidadeSuperior(admin);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setProcesso(p);
         sp.setUnidade(u);
-        setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        setField(sp, SITUACAO, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         sp.setMapa(new sgc.mapa.model.Mapa());
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
@@ -120,14 +124,14 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         u.setCodigo(1L);
         Unidade admin = new Unidade();
         admin.setCodigo(99L);
-        admin.setSigla("ADMIN");
+        admin.setSigla(ADMIN);
         u.setUnidadeSuperior(admin);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setProcesso(p);
         sp.setUnidade(u);
-        setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        setField(sp, SITUACAO, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
@@ -150,14 +154,14 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         u.setCodigo(1L);
         Unidade admin = new Unidade();
         admin.setCodigo(99L);
-        admin.setSigla("ADMIN");
+        admin.setSigla(ADMIN);
         u.setUnidadeSuperior(admin);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setProcesso(p);
         sp.setUnidade(u);
-        setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        setField(sp, SITUACAO, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
@@ -196,7 +200,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void obterUltimaDataLimite_semDatas() {
         Subprocesso sp = new Subprocesso();
 
-        LocalDate resultado = invokeMethod(service, "obterUltimaDataLimite", sp);
+        LocalDate resultado = invokeMethod(service, OBTER_ULTIMA_DATA_LIMITE, sp);
 
         assertThat(resultado).isNull();
     }
@@ -208,7 +212,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setCodigo(123L);
         sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(5));
 
-        assertThatThrownBy(() -> invokeMethod(service, "obterUltimaDataLimite", sp))
+        assertThatThrownBy(() -> invokeMethod(service, OBTER_ULTIMA_DATA_LIMITE, sp))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("sem data limite da etapa 1");
     }
@@ -221,7 +225,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(2));
 
-        assertThatThrownBy(() -> invokeMethod(service, "obterUltimaDataLimite", sp))
+        assertThatThrownBy(() -> invokeMethod(service, OBTER_ULTIMA_DATA_LIMITE, sp))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("etapa 1 posterior à etapa 2");
     }

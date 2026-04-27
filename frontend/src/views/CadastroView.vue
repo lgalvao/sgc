@@ -42,6 +42,7 @@
         show
         variant="danger"
         dismissible
+        data-testid="alerta-erro-global"
         @dismissed="erroGlobal = null"
     >
       {{ erroGlobalFormatado.message }}
@@ -264,23 +265,7 @@ const assinaturaCadastroAtual = computed(() => calcularAssinaturaCadastro(ativid
 const houveAlteracaoCadastro = computed(() => assinaturaCadastroAtual.value !== atividadesSnapshotInicial.value);
 const checkboxSemMudancasDesabilitado = computed(() => loadingInicioRevisao.value || houveAlteracaoCadastro.value);
 
-const habilitarDisponibilizar = computed(() => {
-  const cadastroValido = atividades.value.length > 0
-      && atividades.value.every(a => a.conhecimentos && a.conhecimentos.length > 0);
-
-  if (!cadastroValido) {
-    return false;
-  }
-
-  if (!isRevisao.value) {
-    return true;
-  }
-
-  return houveAlteracaoCadastro.value || (
-      disponibilizacaoSemMudancas.value
-      && situacaoAtual.value === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-  );
-});
+// Variável habilitarDisponibilizar removida pois não era utilizada
 
 
 
@@ -436,14 +421,13 @@ function limparErrosValidacaoCadastro() {
 }
 
 function registrarErrosValidacaoCadastro(erros: ErroValidacao[]) {
-  errosValidacao.value = erros;
-  const msg = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
-  
-  // Força reatividade limpando e incrementando tick
-  erroGlobal.value = null;
+  // Força reatividade limpando e incrementando tick para garantir que o alerta reapareça se for o mesmo erro
+  limparErrosValidacaoCadastro();
   erroTick.value++;
   
   nextTick(() => {
+    errosValidacao.value = erros;
+    const msg = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
     erroGlobal.value = msg;
   });
 }
@@ -669,9 +653,8 @@ async function disponibilizarCadastro() {
   const situacaoAtualCadastro = subprocesso.value?.situacao;
   const situacaoReferencia = obterSituacaoReferenciaDisponibilizacao();
   const erroPreValidacao = obterErroPreValidacaoDisponibilizacao();
-
   if (erroPreValidacao) {
-    erroGlobal.value = erroPreValidacao;
+    registrarErrosValidacaoCadastro([{ tipo: "PRE_VALIDACAO", mensagem: erroPreValidacao }]);
     return;
   }
 
@@ -702,9 +685,10 @@ async function disponibilizarCadastro() {
     } else {
       erroGlobal.value = "Não foi possível obter o resultado da validação. Tente novamente.";
     }
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Tenta extrair mensagem amigável do erro
-    erroGlobal.value = e?.response?.data?.message || e?.message || "Ocorreu um erro ao validar o cadastro.";
+    const err = e as { response?: { data?: { message?: string } }; message?: string };
+    erroGlobal.value = err?.response?.data?.message || err?.message || "Ocorreu um erro ao validar o cadastro.";
   } finally {
     loadingValidacao.value = false;
   }
