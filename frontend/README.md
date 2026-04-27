@@ -8,8 +8,8 @@ Para iniciar o servidor de desenvolvimento:
 
 ```bash
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 A aplicação estará disponível em `http://localhost:5173`.
@@ -18,12 +18,12 @@ A aplicação estará disponível em `http://localhost:5173`.
 
 O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **TypeScript**.
 
-* **Framework:** Vue.js 3.5.28 (Composition API, `<script setup>`)
-* **Linguagem:** TypeScript 5.9.3
+* **Framework:** Vue.js 3.5 (Composition API, `<script setup>`)
+* **Linguagem:** TypeScript 5.9
 * **Estado:** Pinia (Setup stores)
 * **Roteamento:** Vue router (Modularizado)
 * **UI:** BootstrapVueNext + Bootstrap 5
-* **Build:** Vite 7.3.1
+* **Build:** Vite 7
 * **HTTP:** Axios (com interceptors para JWT)
 * **Testes:** Vitest (Unitários) + Playwright (E2E)
 * **Qualidade:** ESLint + TypeScript (typecheck)
@@ -52,19 +52,19 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 ### Unitários (Vitest)
 
 ```bash
-npm run test:unit
+pnpm run test:unit
 ```
 
 ### Type check
 
 ```bash
-npm run typecheck
+pnpm run typecheck
 ```
 
 ### Linting
 
 ```bash
-npm run lint
+pnpm run lint
 ```
 
 ### Qualidade completa
@@ -72,13 +72,13 @@ npm run lint
 Para executar testes, linting e typecheck de uma vez:
 
 ```bash
-npm run quality:all
+pnpm run quality:all
 ```
 
 ### E2E (Playwright)
 
 ```bash
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 ## Autenticação
