@@ -181,35 +181,45 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useAcesso} from "@/composables/useAcesso";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
 import {
   type AceitarCadastroRequest,
   type PermissoesSubprocesso,
   type Analise,
   type Atividade,
   type AtividadeOperacaoResponse,
-  type ContextoCadastroAtividadesSubprocesso,
-  type CriarConhecimentoRequest,
   type DevolverCadastroRequest,
   type ErroValidacao,
   type HomologarCadastroRequest,
+  type CriarConhecimentoRequest,
+  type RespostaLocalCadastro,
   SituacaoSubprocesso,
-  TipoProcesso,
-  type Unidade
+  TipoProcesso
 } from "@/types/tipos";
 import logger from "@/utils/logger";
-import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
+
 const props = defineProps<{
   codProcesso: number | string;
   sigla: string;
   codSubprocesso?: number;
 }>();
 
-// router removido pois não é mais usado após delegar orquestração ao composable
+const {
+  carregandoInicial,
+  codigoSubprocesso,
+  atividadesSnapshotInicial,
+  unidade,
+  codMapa,
+  carregarContextoInicial,
+  processarRespostaLocal
+} = useCadastroOrquestracao(props);
+
 const subprocessoStore = useSubprocessoStore();
 const mapasStore = useMapas();
 const fluxoSubprocesso = useFluxoSubprocesso();
@@ -220,11 +230,8 @@ const {
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 const {impactoMapa: impactos} = mapasStore;
-const codigoSubprocesso = ref<number | null>(null);
-const codMapa = ref<number | null>(null);
-const carregandoInicial = ref(true);
+
 const subprocesso = computed(() => subprocessoStore.contextoCadastro?.detalhes ?? null);
-const unidade = ref<Unidade | null>(null);
 const acesso = useAcesso(subprocesso);
 const {
   podeEditarCadastro,
@@ -235,6 +242,7 @@ const {
   podeDisponibilizarCadastro,
   acaoPrincipalCadastro
 } = acesso;
+
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const permissoesUI = computed<PermissoesSubprocesso>(() => ({
   ...subprocesso.value?.permissoes,
@@ -246,23 +254,9 @@ const permissoesUI = computed<PermissoesSubprocesso>(() => ({
 } as PermissoesSubprocesso));
 
 
-const atividades = ref<Atividade[]>([]);
-const atividadesSnapshotInicial = ref<string>('[]');
-const disponibilizacaoSemMudancas = ref(false);
 
-function calcularAssinaturaCadastro(lista: Atividade[]): string {
-  return lista
-      .map(atividade => {
-        const descricao = (atividade.descricao || '').trim();
-        const conhecimentos = (atividade.conhecimentos || [])
-            .map(conhecimento => (conhecimento.descricao || '').trim())
-            .sort()
-            .join('\u0001');
-        return `${descricao}\u0002${conhecimentos}`;
-      })
-      .sort((a, b) => a.localeCompare(b))
-      .join('\u0003');
-}
+const atividades = ref<Atividade[]>([]);
+const disponibilizacaoSemMudancas = ref(false);
 
 const assinaturaCadastroAtual = computed(() => calcularAssinaturaCadastro(atividades.value));
 const houveAlteracaoCadastro = computed(() => assinaturaCadastroAtual.value !== atividadesSnapshotInicial.value);
@@ -495,35 +489,8 @@ const erroGlobalFormatado = computed(() =>
     erroGlobal.value ? {message: erroGlobal.value} : null
 );
 
-type RespostaLocalCadastro = Pick<AtividadeOperacaoResponse, "subprocesso" | "permissoes" | "atividadesAtualizadas">;
 type AcaoAtualizacaoCadastro = () => Promise<RespostaLocalCadastro>;
 
-function processarRespostaLocal(response: RespostaLocalCadastro) {
-  atividades.value = response.atividadesAtualizadas;
-  subprocessoStore.atualizarStatusLocal({
-    ...response.subprocesso,
-    permissoes: response.permissoes
-  });
-}
-
-function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso) {
-  processarRespostaLocal({
-    subprocesso: {
-      codigo: data.detalhes.codigo,
-      situacao: data.detalhes.situacao,
-    },
-    permissoes: data.detalhes.permissoes,
-    atividadesAtualizadas: data.atividadesDisponiveis,
-  });
-  atividadesSnapshotInicial.value = data.assinaturaCadastroReferencia ?? calcularAssinaturaCadastro(data.atividadesDisponiveis);
-  atualizarCheckboxSemMudancasSilenciosamente(
-      data.detalhes.tipoProcesso === TipoProcesso.REVISAO
-      && data.detalhes.situacao === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-      && !houveAlteracaoCadastro.value
-  );
-  unidade.value = data.unidade;
-  codMapa.value = data.mapa.codigo;
-}
 
 async function executarAtualizacaoCadastro(
     acao: AcaoAtualizacaoCadastro,
@@ -532,7 +499,7 @@ async function executarAtualizacaoCadastro(
   try {
     await withErrorHandling(async () => {
       const response = await acao();
-      processarRespostaLocal(response);
+      processarRespostaLocal(response, atividades);
     });
     return true;
   } catch {
@@ -541,29 +508,13 @@ async function executarAtualizacaoCadastro(
   }
 }
 
-async function carregarContextoInicial() {
-  const data = typeof props.codSubprocesso === "number"
-      ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, false)
-      : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
-          Number(props.codProcesso),
-          props.sigla,
-          false,
-      );
-  if (!data) {
-    logger.error("ERRO: Subprocesso não encontrado!");
-    return;
-  }
-
-  codigoSubprocesso.value = data.detalhes.codigo;
-  sincronizarEstadoInicialContexto(data);
-}
 
 async function adicionarAtividade(): Promise<boolean> {
   if (codMapa.value && codigoSubprocesso.value) {
     try {
       const response = await withErrorHandling(() => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!));
       if (response) {
-        processarRespostaLocal(response);
+        processarRespostaLocal(response, atividades);
         erroNovaAtividade.value = null;
         return true;
       }
@@ -593,13 +544,13 @@ async function confirmarRemocao() {
       const atividadeRemovida = atividades.value[index];
       await withErrorHandling(async () => {
         const response = await atividadeService.excluirAtividade(atividadeRemovida.codigo);
-        processarRespostaLocal(response);
+        processarRespostaLocal(response, atividades);
       });
     } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
       const atividade = atividades.value[index];
       await withErrorHandling(async () => {
         const response = await atividadeService.excluirConhecimento(atividade.codigo, conhecimentoCodigo);
-        processarRespostaLocal(response);
+        processarRespostaLocal(response, atividades);
       });
     }
     mostrarModalConfirmacaoRemocao.value = false;
@@ -672,7 +623,7 @@ async function handleImportAtividades(resultado: AtividadeOperacaoResponse) {
   mostrarModalImportar.value = false;
   clear();
   await nextTick();
-  processarRespostaLocal(resultado);
+  processarRespostaLocal(resultado, atividades);
   if (resultado.aviso) {
     notify(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
   } else {
@@ -852,11 +803,7 @@ async function handleAdicionarAtividade() {
 }
 
 onMounted(async () => {
-  try {
-    await carregarContextoInicial();
-  } finally {
-    carregandoInicial.value = false;
-  }
+  await carregarContextoInicial(atividades);
 });
 
 watch(() => atividades.value?.length, (newLen, oldLen) => {

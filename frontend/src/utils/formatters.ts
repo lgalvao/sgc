@@ -3,7 +3,7 @@ import {SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from '@/types/tipos
 export function formatDate(date: string | Date | undefined | null, includeTime = true): string {
     if (!date) return '';
     const d = new Date(date);
-    if (isNaN(d.getTime())) return '';
+    if (Number.isNaN(d.getTime())) return '';
 
     const options: Intl.DateTimeFormatOptions = {
         day: '2-digit',
@@ -69,5 +69,14 @@ export function formatNumeroCsvBR(value: number | null | undefined, decimalPlace
         minimumFractionDigits: decimalPlaces,
         maximumFractionDigits: decimalPlaces,
     }).format(value);
+}
+
+export function calcularAssinaturaCadastro(atividades: import("@/types/tipos").Atividade[]): string {
+    const itens = atividades.map((a) => ({
+        d: a.descricao,
+        c: a.conhecimentos.map((c) => c.descricao).sort((a, b) => a.localeCompare(b))
+    }));
+    itens.sort((a, b) => a.d.localeCompare(b.d));
+    return JSON.stringify(itens);
 }
 

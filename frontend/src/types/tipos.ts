@@ -529,13 +529,16 @@ export interface AtividadeOperacaoResponse {
     aviso?: string | null;
 }
 
-/**
- * Tipos de impacto em atividades.
- */
 export enum TipoImpactoAtividade {
     INSERIDA = "INSERIDA",
     REMOVIDA = "REMOVIDA",
     ALTERADA = "ALTERADA",
+}
+
+export interface RespostaLocalCadastro {
+    subprocesso: SubprocessoStatus;
+    permissoes: PermissoesSubprocesso;
+    atividadesAtualizadas: Atividade[];
 }
 
 /**
