@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import LimpezaProcessosView from '../LimpezaProcessosView.vue';
 import { createTestingPinia } from '@pinia/testing';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import * as processoService from '@/services/processoService';
 
 vi.mock('@/services/processoService', () => ({
@@ -10,7 +10,7 @@ vi.mock('@/services/processoService', () => ({
 }));
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createMemoryHistory(),
   routes: [{ path: '/', component: {} }]
 });
 
@@ -55,18 +55,15 @@ describe('LimpezaProcessosView Coverage', () => {
     const wrapper = mountComponent();
     await flushPromises();
 
+    const vm = wrapper.vm as any;
     // Simulate user entering a process id
-    // @ts-ignore
-    wrapper.vm.codigoProcesso = '123';
+    vm.codigoProcesso = '123';
 
     // Test validation bypass manually
-    // @ts-ignore
-    wrapper.vm.abrirConfirmacao();
-    // @ts-ignore
-    expect(wrapper.vm.mostrarConfirmacao).toBe(true);
+    vm.abrirConfirmacao();
+    expect(vm.mostrarConfirmacao).toBe(true);
 
-    // @ts-ignore
-    await wrapper.vm.confirmarExclusao();
+    await vm.confirmarExclusao();
     await flushPromises();
 
     expect(processoService.excluirProcessoCompleto).toHaveBeenCalledWith(123);
@@ -78,11 +75,10 @@ describe('LimpezaProcessosView Coverage', () => {
     const wrapper = mountComponent();
     await flushPromises();
 
-    // @ts-ignore
-    wrapper.vm.codigoProcesso = '123';
+    const vm = wrapper.vm as any;
+    vm.codigoProcesso = '123';
 
-    // @ts-ignore
-    await wrapper.vm.confirmarExclusao();
+    await vm.confirmarExclusao();
     await flushPromises();
 
     // The component uses notify to show error. If it didn't throw, it was handled

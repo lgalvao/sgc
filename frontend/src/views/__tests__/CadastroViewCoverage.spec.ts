@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
 import CadastroView from '../CadastroView.vue';
 import { createTestingPinia } from '@pinia/testing';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import { useSubprocessoStore } from '@/stores/subprocesso';
 import { SituacaoSubprocesso } from '@/types/tipos';
 
@@ -22,12 +23,9 @@ vi.mock('@/composables/useAcesso', () => ({
 
 vi.mock('@/composables/useAtividadeForm', () => ({
   useAtividadeForm: vi.fn(() => ({
-    atividadeFormRef: { value: null },
-    submitAtividade: vi.fn(),
-    handleAtividadeSubmit: vi.fn(),
-    iniciarEdicaoAtividade: vi.fn(),
-    handleAtividadeCancel: vi.fn(),
-    atividadeIdEditando: { value: null }
+    novaAtividade: ref(''),
+    loadingAdicionar: ref(false),
+    adicionarAtividade: vi.fn()
   }))
 }));
 
@@ -53,7 +51,7 @@ vi.mock('@/composables/useValidacaoFormulario', () => ({
 }));
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createMemoryHistory(),
   routes: [{ path: '/', component: {} }]
 });
 
@@ -107,30 +105,25 @@ describe('CadastroView Coverage', () => {
     await flushPromises();
 
     const store = useSubprocessoStore();
-    // @ts-ignore
-    store.contextoCadastro = {
+    (store as any).contextoCadastro = {
       detalhes: {
         codigo: 1,
         unidade: { sigla: 'U1', nome: 'Unidade 1', codigo: 2 },
         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
       } as any
     };
-    // @ts-ignore
-    store.garantirContextoEdicao = vi.fn().mockResolvedValue(true);
+    (store as any).garantirContextoEdicao = vi.fn().mockResolvedValue(true);
 
     expect(wrapper.exists()).toBe(true);
 
     // Open some modals
-    // @ts-ignore
-    wrapper.vm.abrirModalDevolverAnalise();
+    const vm = wrapper.vm as any;
+    vm.abrirModalDevolverAnalise();
 
-    // @ts-ignore
-    wrapper.vm.disponibilizarCadastro();
+    vm.disponibilizarCadastro();
 
-    // @ts-ignore
-    wrapper.vm.observacaoDevolucao = 'Motivo de teste';
+    vm.observacaoDevolucao = 'Motivo de teste';
 
-    // @ts-ignore
-    await wrapper.vm.confirmarDevolucaoAnalise();
+    await vm.confirmarDevolucaoAnalise();
   });
 });

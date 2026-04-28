@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import NotificacoesAdminView from '../NotificacoesAdminView.vue';
 import { createTestingPinia } from '@pinia/testing';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import { listarResumoSubprocessosAtivos, reenviarFalhasDefinitivas } from '@/services/notificacaoService';
 
 vi.mock('@/services/notificacaoService', () => ({
@@ -22,7 +22,7 @@ vi.mock('@/composables/useNotification', () => ({
 }));
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createMemoryHistory(),
   routes: [{ path: '/', component: {} }, { path: '/subprocesso/:codProcesso/:siglaUnidade', name: 'Subprocesso', component: {} }]
 });
 
@@ -70,8 +70,7 @@ describe('NotificacoesAdminView', () => {
   });
 
   it('renders empty states', async () => {
-    // @ts-ignore
-    vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue([]);
+    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue([]);
     const wrapper = mountComponent();
     await flushPromises();
 
@@ -147,8 +146,7 @@ describe('NotificacoesAdminView', () => {
         podeReenviar: true,
       }
     ];
-    // @ts-ignore
-    vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue(mockData);
+    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
     const wrapper = mountComponent();
     await flushPromises();
 
@@ -186,8 +184,7 @@ describe('NotificacoesAdminView', () => {
         podeReenviar: true,
       }
     ];
-    // @ts-ignore
-    vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue(mockData);
+    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
     vi.mocked(reenviarFalhasDefinitivas).mockResolvedValue({ reenfileiradas: 1, subprocessoCodigo: 2 });
 
     const wrapper = mountComponent();
@@ -200,8 +197,7 @@ describe('NotificacoesAdminView', () => {
     expect(wrapper.find('[data-testid="txt-notificacoes-reenviar-confirmacao"]').exists()).toBe(true);
 
     // Simulate confirm modal
-    // @ts-ignore
-    wrapper.vm.reenviar();
+    (wrapper.vm as any).reenviar();
     await flushPromises();
 
     expect(reenviarFalhasDefinitivas).toHaveBeenCalledWith(2);
@@ -224,8 +220,7 @@ describe('NotificacoesAdminView', () => {
         podeReenviar: true,
       }
     ];
-    // @ts-ignore
-    vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue(mockData);
+    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
     vi.mocked(reenviarFalhasDefinitivas).mockRejectedValue(new Error('Resend error'));
 
     const wrapper = mountComponent();
@@ -235,8 +230,8 @@ describe('NotificacoesAdminView', () => {
     await wrapper.find('[data-testid="btn-notificacoes-reenviar-U2"]').trigger('click');
 
     // Simulate confirm modal
-    // @ts-ignore
-    wrapper.vm.reenviar();
+    // Simulate confirm modal
+    (wrapper.vm as any).reenviar();
     await flushPromises();
 
     expect(reenviarFalhasDefinitivas).toHaveBeenCalledWith(2);
@@ -246,10 +241,8 @@ describe('NotificacoesAdminView', () => {
   it('handles ignoring re-send if nothing selected', async () => {
     const wrapper = mountComponent();
     await flushPromises();
-    // @ts-ignore
-    wrapper.vm.linhaSelecionada = null;
-    // @ts-ignore
-    wrapper.vm.reenviar();
+    (wrapper.vm as any).linhaSelecionada = null;
+    (wrapper.vm as any).reenviar();
 
     expect(reenviarFalhasDefinitivas).not.toHaveBeenCalled();
   });
@@ -270,8 +263,7 @@ describe('NotificacoesAdminView', () => {
         podeReenviar: false,
       }
     ];
-    // @ts-ignore
-    vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue(mockData);
+    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
 
     const wrapper = mountComponent();
     await flushPromises();
@@ -300,8 +292,7 @@ describe('NotificacoesAdminView', () => {
         podeReenviar: false,
       }
     ];
-    // @ts-ignore
-    vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue(mockData);
+    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
     const wrapper = mountComponent();
     await flushPromises();
 
@@ -324,8 +315,7 @@ describe('NotificacoesAdminView', () => {
         podeReenviar: false,
       }
     ];
-    // @ts-ignore
-    vi.mocked(listarResumoSubprocessosAtivos).mockResolvedValue(mockData);
+    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
 
     const wrapper = mount(NotificacoesAdminView, {
       global: {

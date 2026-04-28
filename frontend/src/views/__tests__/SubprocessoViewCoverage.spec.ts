@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import SubprocessoView from '../SubprocessoView.vue';
 import { createTestingPinia } from '@pinia/testing';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import { useSubprocessoStore } from '@/stores/subprocesso';
 import { SituacaoSubprocesso } from '@/types/tipos';
 
@@ -28,7 +28,7 @@ vi.mock('@/services/subprocessoService', () => ({
 }));
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createMemoryHistory(),
   routes: [{ path: '/', component: {} }]
 });
 
@@ -77,8 +77,7 @@ describe('SubprocessoView Coverage', () => {
     await flushPromises();
 
     const store = useSubprocessoStore();
-    // @ts-ignore
-    store.contextoEdicao = {
+    (store as any).contextoEdicao = {
       detalhes: {
         codigo: 1,
         unidade: { sigla: 'U1', nome: 'Unidade 1', codigo: 2 },
@@ -86,35 +85,26 @@ describe('SubprocessoView Coverage', () => {
       } as any
     };
 
+    const vm = wrapper.vm as any;
     // We trigger multiple actions that might not be fully covered in main spec
-    // @ts-ignore
-    await wrapper.vm.confirmarEnviarLembrete();
-    // @ts-ignore
-    expect(wrapper.vm.modalLembreteAberto).toBe(true);
+    await vm.confirmarEnviarLembrete();
+    expect(vm.modalLembreteAberto).toBe(true);
 
-    // @ts-ignore
-    await wrapper.vm.enviarLembreteConfirmado();
+    await vm.enviarLembreteConfirmado();
 
     // Test that reabertura triggers validation
-    // @ts-ignore
-    await wrapper.vm.confirmarReabertura();
+    await vm.confirmarReabertura();
 
     // Open some modals
-    // @ts-ignore
-    wrapper.vm.abrirModalAlterarDataLimite();
-    // @ts-ignore
-    expect(wrapper.vm.mostrarModalAlterarDataLimite).toBe(true);
+    vm.abrirModalAlterarDataLimite();
+    expect(vm.mostrarModalAlterarDataLimite).toBe(true);
 
-    // @ts-ignore
-    wrapper.vm.abrirModalReabrirCadastro();
-    // @ts-ignore
-    expect(wrapper.vm.mostrarModalReabrir).toBe(true);
+    vm.abrirModalReabrirCadastro();
+    expect(vm.mostrarModalReabrir).toBe(true);
 
-    // @ts-ignore
-    wrapper.vm.abrirModalReabrirRevisao();
+    vm.abrirModalReabrirRevisao();
 
     // Cover the invalid validation inside confirmarAlteracaoDataLimite
-    // @ts-ignore
-    await wrapper.vm.confirmarAlteracaoDataLimite();
+    await vm.confirmarAlteracaoDataLimite();
   });
 });
