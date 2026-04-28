@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import sgc.alerta.model.NotificacaoEmail;
 import sgc.alerta.model.SituacaoNotificacao;
 import sgc.alerta.model.TipoNotificacao;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
 
@@ -14,14 +17,25 @@ class NotificacaoDtoTest {
     @Test
     void shouldCreateNotificacaoDtoFromEntity() {
         // Given
-        Long subprocessoCodigo = 123L;
         LocalDateTime now = LocalDateTime.now();
+        
+        Unidade unidade = Unidade.builder().sigla("SIGLA").build();
+        Processo processo = Processo.builder().descricao("Descricao Processo").build();
+        Subprocesso subprocesso = Subprocesso.builder()
+                .codigo(123L)
+                .unidade(unidade)
+                .processo(processo)
+                .build();
+
         NotificacaoEmail entity = NotificacaoEmail.builder()
                 .codigo(1L)
+                .subprocesso(subprocesso)
+                .unidadeDestinoSigla("SIGLA")
                 .tipoNotificacao(TipoNotificacao.MAPA_DISPONIBILIZADO)
                 .usuarioDestinoTitulo("123456789012")
                 .destinatario("test@example.com")
                 .assunto("Test Subject")
+                .corpoHtml("<p>corpo</p>")
                 .situacao(SituacaoNotificacao.ENVIADO)
                 .tentativas(1)
                 .dataHoraCriacao(now.minusDays(1))
@@ -31,15 +45,18 @@ class NotificacaoDtoTest {
                 .build();
 
         // When
-        NotificacaoDto dto = NotificacaoDto.fromEntity(entity, subprocessoCodigo);
+        NotificacaoDto dto = NotificacaoDto.fromEntity(entity);
 
         // Then
         assertThat(dto.codigo()).isEqualTo(entity.getCodigo());
-        assertThat(dto.subprocessoCodigo()).isEqualTo(subprocessoCodigo);
+        assertThat(dto.subprocessoCodigo()).isEqualTo(123L);
+        assertThat(dto.unidadeSigla()).isEqualTo("SIGLA");
+        assertThat(dto.processoDescricao()).isEqualTo("Descricao Processo");
         assertThat(dto.tipoNotificacao()).isEqualTo(entity.getTipoNotificacao());
         assertThat(dto.usuarioDestinoTitulo()).isEqualTo(entity.getUsuarioDestinoTitulo());
         assertThat(dto.destinatario()).isEqualTo(entity.getDestinatario());
         assertThat(dto.assunto()).isEqualTo(entity.getAssunto());
+        assertThat(dto.corpoHtml()).isEqualTo("<p>corpo</p>");
         assertThat(dto.situacao()).isEqualTo(entity.getSituacao());
         assertThat(dto.tentativas()).isEqualTo(entity.getTentativas());
         assertThat(dto.dataHoraCriacao()).isEqualTo(entity.getDataHoraCriacao());

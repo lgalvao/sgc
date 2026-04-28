@@ -85,6 +85,7 @@ BEGIN
                 subprocesso_codigo     NUMBER                            NULL,
                 tipo_notificacao       VARCHAR2(80)                      NULL,
                 usuario_destino_titulo VARCHAR2(12)                      NULL,
+                unidade_destino_sigla  VARCHAR2(20)                      NULL,
                 destinatario           VARCHAR2(255)                     NOT NULL,
                 assunto                VARCHAR2(500)                     NOT NULL,
                 corpo_html             CLOB                              NOT NULL,
@@ -111,17 +112,29 @@ BEGIN
             )
         ]';
     ELSE
-        -- Se a tabela ja existe, garante que a coluna alerta_codigo foi removida (caso tenha sido criada anteriormente)
+        -- Se a tabela ja existe, garante as novas colunas e remove alerta_codigo (legado)
         DECLARE
             v_col_count NUMBER;
         BEGIN
+            -- Coluna legada
             SELECT COUNT(*) INTO v_col_count FROM user_tab_columns WHERE table_name = 'NOTIFICACAO_EMAIL' AND column_name = 'ALERTA_CODIGO';
             IF v_col_count > 0 THEN
-                -- Remove constraint se existir antes de dropar coluna
                 FOR r IN (SELECT constraint_name FROM user_constraints WHERE table_name = 'NOTIFICACAO_EMAIL' AND constraint_name = 'FK_NOTIF_EMAIL_ALERTA') LOOP
                     EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL DROP CONSTRAINT ' || r.constraint_name;
                 END LOOP;
                 EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL DROP COLUMN alerta_codigo';
+            END IF;
+
+            -- Nova coluna: unidade_destino_sigla
+            SELECT COUNT(*) INTO v_col_count FROM user_tab_columns WHERE table_name = 'NOTIFICACAO_EMAIL' AND column_name = 'UNIDADE_DESTINO_SIGLA';
+            IF v_col_count = 0 THEN
+                EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL ADD (unidade_destino_sigla VARCHAR2(20) NULL)';
+            END IF;
+
+            -- Nova coluna: usuario_destino_titulo
+            SELECT COUNT(*) INTO v_col_count FROM user_tab_columns WHERE table_name = 'NOTIFICACAO_EMAIL' AND column_name = 'USUARIO_DESTINO_TITULO';
+            IF v_col_count = 0 THEN
+                EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL ADD (usuario_destino_titulo VARCHAR2(12) NULL)';
             END IF;
         END;
     END IF;

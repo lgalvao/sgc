@@ -1293,7 +1293,6 @@ class ProcessoServiceTest {
 
             when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
             when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
-            when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(titular);
             when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
             when(servicoAlertas.criarAlertaAdmin(eq(p), eq(u), anyString())).thenReturn(alerta);
 
@@ -1301,7 +1300,9 @@ class ProcessoServiceTest {
 
             verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), contains("Lembrete"));
             verify(notificacaoService).enfileirar(argThat(cmd ->
-                    "titular@tre-pe.jus.br".equals(cmd.destinatario())
+                    "u10@tre-pe.jus.br".equals(cmd.destinatario())
+                            && "U10".equals(cmd.unidadeDestinoSigla())
+                            && cmd.usuarioDestinoTitulo() == null
                             && cmd.assunto().contains("Processo teste")
                             && cmd.tipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO
                             && cmd.subprocesso() == null

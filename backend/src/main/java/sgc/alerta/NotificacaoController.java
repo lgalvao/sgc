@@ -26,7 +26,7 @@ public class NotificacaoController {
             @RequestParam(defaultValue = "20") int limite) {
         List<NotificacaoDto> notificacoes = notificacaoService.listarPorSubprocesso(codSubprocesso, limite)
                 .stream()
-                .map(notificacao -> NotificacaoDto.fromEntity(notificacao, codSubprocesso))
+                .map(NotificacaoDto::fromEntity)
                 .toList();
 
         return ResponseEntity.ok(notificacoes);

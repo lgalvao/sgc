@@ -1000,7 +1000,7 @@ describe("CadastroView.vue", () => {
         await vm.$nextTick();
         
         expect(vm.erroGlobal).toBe("Erro de validação");
-        let alert = wrapper.find('[data-testid="btn-dismiss-alert"]');
+        const alert = wrapper.find('[data-testid="btn-dismiss-alert"]');
         expect(alert.exists()).toBe(true);
 
         // 2. Fecha o alerta

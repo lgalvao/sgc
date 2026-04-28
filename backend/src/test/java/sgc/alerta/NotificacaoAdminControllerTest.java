@@ -7,7 +7,8 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.alerta.dto.*;
-import sgc.subprocesso.model.*;
+import sgc.alerta.model.NotificacaoEmail;
+import sgc.alerta.model.SituacaoNotificacao;
 
 import java.time.*;
 import java.util.*;
@@ -28,49 +29,35 @@ class NotificacaoAdminControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    @DisplayName("listarResumoSubprocessosAtivos deve retornar resumo para admin")
-    void listarResumoSubprocessosAtivosDeveRetornarResumoParaAdmin() throws Exception {
-        when(notificacaoService.listarResumoSubprocessosAtivos()).thenReturn(List.of(resumo()));
+    @DisplayName("listar deve retornar lista de notificações individuais")
+    void listarDeveRetornarListaDeNotificacoesIndividuais() throws Exception {
+        NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(123L)
+                .assunto("Teste")
+                .destinatario("teste@teste.com")
+                .situacao(SituacaoNotificacao.ENVIADO)
+                .dataHoraCriacao(LocalDateTime.now())
+                .build();
+        
+        when(notificacaoService.listarTodasAdmin(50)).thenReturn(List.of(notificacao));
 
-        mockMvc.perform(get("/api/admin/notificacoes/subprocessos-ativos"))
+        mockMvc.perform(get("/api/admin/notificacoes/listar").param("limite", "50"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].subprocessoCodigo").value(60000))
-                .andExpect(jsonPath("$[0].processoDescricao").value("Processo"))
-                .andExpect(jsonPath("$[0].statusGeral").value("FALHA_DEFINITIVA"))
-                .andExpect(jsonPath("$[0].podeReenviar").value(true));
+                .andExpect(jsonPath("$[0].codigo").value(123))
+                .andExpect(jsonPath("$[0].assunto").value("Teste"))
+                .andExpect(jsonPath("$[0].destinatario").value("teste@teste.com"))
+                .andExpect(jsonPath("$[0].situacao").value("ENVIADO"));
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    @DisplayName("reenviarFalhasDefinitivas deve reenfileirar para admin")
-    void reenviarFalhasDefinitivasDeveReenfileirarParaAdmin() throws Exception {
-        when(notificacaoService.reenfileirarFalhasDefinitivasPorSubprocesso(60000L)).thenReturn(2);
+    @DisplayName("reenviar deve reenfileirar notificação específica")
+    void reenviarDeveReenfileirarNotificacaoEspecifica() throws Exception {
+        when(notificacaoService.reenviarPorCodigo(123L)).thenReturn(1);
 
-        mockMvc.perform(post("/api/admin/notificacoes/subprocessos/60000/reenviar"))
+        mockMvc.perform(post("/api/admin/notificacoes/123/reenviar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.subprocessoCodigo").value(60000))
-                .andExpect(jsonPath("$.reenfileiradas").value(2));
-    }
-
-    private NotificacaoSubprocessoResumoDto resumo() {
-        return new NotificacaoSubprocessoResumoDto(
-                60000L,
-                1L,
-                "Processo",
-                "SEC",
-                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                3,
-                0,
-                0,
-                1,
-                0,
-                2,
-                SituacaoNotificacao.FALHA_DEFINITIVA,
-                LocalDateTime.of(2026, 4, 22, 9, 0),
-                null,
-                5,
-                "SMTP fora",
-                true
-        );
+                .andExpect(jsonPath("$.codigo").value(123))
+                .andExpect(jsonPath("$.reenfileiradas").value(1));
     }
 }

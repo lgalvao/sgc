@@ -18,16 +18,20 @@ import java.util.*;
 public class NotificacaoAdminController {
     private final NotificacaoService notificacaoService;
 
-    @GetMapping("/subprocessos-ativos")
-    @Operation(summary = "Lista o resumo administrativo de notificações por subprocesso ativo")
-    public ResponseEntity<List<NotificacaoSubprocessoResumoDto>> listarResumoSubprocessosAtivos() {
-        return ResponseEntity.ok(notificacaoService.listarResumoSubprocessosAtivos());
+    @GetMapping("/listar")
+    @Operation(summary = "Lista as notificações individuais de processos ativos")
+    public ResponseEntity<List<NotificacaoDto>> listar(@RequestParam(defaultValue = "50") int limite) {
+        List<NotificacaoDto> dtos = notificacaoService.listarTodasAdmin(limite)
+                .stream()
+                .map(NotificacaoDto::fromEntity)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/reenviar")
-    @Operation(summary = "Recoloca na fila notificações com falha definitiva de um subprocesso")
-    public ResponseEntity<NotificacaoReenvioDto> reenviarFalhasDefinitivas(@PathVariable Long codSubprocesso) {
-        int reenfileiradas = notificacaoService.reenfileirarFalhasDefinitivasPorSubprocesso(codSubprocesso);
-        return ResponseEntity.ok(new NotificacaoReenvioDto(codSubprocesso, reenfileiradas));
+    @PostMapping("/{codigo}/reenviar")
+    @Operation(summary = "Recoloca na fila uma notificação específica com falha definitiva")
+    public ResponseEntity<NotificacaoReenvioDto> reenviar(@PathVariable Long codigo) {
+        int reenfileiradas = notificacaoService.reenviarPorCodigo(codigo);
+        return ResponseEntity.ok(new NotificacaoReenvioDto(codigo, reenfileiradas));
     }
 }

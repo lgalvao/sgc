@@ -60,6 +60,30 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
     List<NotificacaoEmail> findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(Long subprocessoCodigo, Pageable pageable);
 
     @Query("""
+            select notificacao
+              from NotificacaoEmail notificacao
+              left join fetch notificacao.subprocesso subprocesso
+              left join fetch subprocesso.processo processo
+              left join fetch subprocesso.unidade unidade
+             where processo.situacao = sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO
+             order by notificacao.dataHoraCriacao desc
+            """)
+    List<NotificacaoEmail> findTopByProcessoEmAndamento(Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update NotificacaoEmail notificacao
+               set notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.PENDENTE,
+                   notificacao.tentativas = 0,
+                   notificacao.proximaTentativaEm = :agora,
+                   notificacao.dataHoraEnvio = null,
+                   notificacao.ultimoErro = null
+             where notificacao.codigo = :codigo
+               and notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.FALHA_DEFINITIVA
+            """)
+    int reenviarPorCodigo(@Param("codigo") Long codigo, @Param("agora") LocalDateTime agora);
+
+    @Query("""
             select new sgc.alerta.dto.NotificacaoSubprocessoResumoQuery(
                 subprocesso.codigo,
                 processo.codigo,

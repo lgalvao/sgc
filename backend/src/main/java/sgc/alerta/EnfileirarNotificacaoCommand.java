@@ -10,6 +10,7 @@ public record EnfileirarNotificacaoCommand(
         @Nullable Subprocesso subprocesso,
         @Nullable TipoNotificacao tipoNotificacao,
         @Nullable String usuarioDestinoTitulo,
+        @Nullable String unidadeDestinoSigla,
         String destinatario,
         String assunto,
         String corpoHtml,

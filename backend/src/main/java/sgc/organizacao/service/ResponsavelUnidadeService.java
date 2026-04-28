@@ -139,6 +139,7 @@ public class ResponsavelUnidadeService {
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .tipoNotificacao(TipoNotificacao.ATRIBUICAO_TEMPORARIA)
                 .usuarioDestinoTitulo(usuario.getTituloEleitoral())
+                .unidadeDestinoSigla(siglaUnidade)
                 .destinatario(usuario.getEmail())
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)

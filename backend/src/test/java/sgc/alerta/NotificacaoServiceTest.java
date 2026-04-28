@@ -178,6 +178,31 @@ class NotificacaoServiceTest {
     }
 
     @Test
+    @DisplayName("listarTodasAdmin deve buscar notificações de processos em andamento")
+    void listarTodasAdminDeveBuscarNotificacoesDeProcessosEmAndamento() {
+        when(notificacaoEmailRepo.findTopByProcessoEmAndamento(any())).thenReturn(List.of());
+
+        service.listarTodasAdmin(50);
+
+        verify(notificacaoEmailRepo).findTopByProcessoEmAndamento(argThat(pageable ->
+                pageable.getPageNumber() == 0 && pageable.getPageSize() == 50
+        ));
+    }
+
+    @Test
+    @DisplayName("reenviarPorCodigo deve delegar com data atual")
+    void reenviarPorCodigoDeveDelegarComDataAtual() {
+        when(notificacaoEmailRepo.reenviarPorCodigo(
+                123L,
+                LocalDateTime.of(2026, 4, 21, 9, 0)
+        )).thenReturn(1);
+
+        int reenfileiradas = service.reenviarPorCodigo(123L);
+
+        assertThat(reenfileiradas).isEqualTo(1);
+    }
+
+    @Test
     @DisplayName("marcarFalha deve agendar retry antes do limite")
     void marcarFalhaDeveAgendarRetryAntesDoLimite() {
         NotificacaoEmail notificacao = NotificacaoEmail.builder()

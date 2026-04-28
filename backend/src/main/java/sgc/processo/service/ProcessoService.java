@@ -356,7 +356,6 @@ public class ProcessoService {
         String dataLimiteText = dataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
-        Usuario titular = buscarTitularObrigatorio(unidade, unidadeCodigo);
         criarAlertaLembretePrazo(processo, unidade, dataLimiteText);
 
         String assunto = "SGC: Lembrete - " + processo.getDescricao();
@@ -364,7 +363,8 @@ public class ProcessoService {
                 .formatted(codProcesso, unidadeCodigo, LocalDate.now());
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .tipoNotificacao(TipoNotificacao.LEMBRETE_PRAZO)
-                .destinatario(titular.getEmail())
+                .unidadeDestinoSigla(unidade.getSigla())
+                .destinatario(emailUnidade(unidade))
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)
                 .chaveIdempotencia(chave)
@@ -1103,6 +1103,7 @@ public class ProcessoService {
         );
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
+                .unidadeDestinoSigla(unidade.getSigla())
                 .destinatario(emailUnidade(unidade))
                 .assunto("SGC: Finalização do processo " + processo.getDescricao())
                 .corpoHtml(corpo)
@@ -1118,6 +1119,7 @@ public class ProcessoService {
         );
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
+                .unidadeDestinoSigla(unidade.getSigla())
                 .destinatario(emailUnidade(unidade))
                 .assunto("SGC: Finalização do processo " + processo.getDescricao() + " em unidades subordinadas")
                 .corpoHtml(corpo)

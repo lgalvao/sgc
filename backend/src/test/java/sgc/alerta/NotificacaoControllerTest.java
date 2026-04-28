@@ -7,7 +7,9 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.model.Unidade;
 import sgc.seguranca.*;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.time.*;
 import java.util.*;
@@ -46,8 +48,12 @@ class NotificacaoControllerTest {
     }
 
     private NotificacaoEmail notificacao() {
+        Unidade unidade = Unidade.builder().sigla("SEC").build();
+        Subprocesso subprocesso = Subprocesso.builder().codigo(60000L).unidade(unidade).build();
+        
         return NotificacaoEmail.builder()
                 .codigo(10L)
+                .subprocesso(subprocesso)
                 .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
                 .destinatario("destino@tre-pe.jus.br")
                 .assunto("Assunto")

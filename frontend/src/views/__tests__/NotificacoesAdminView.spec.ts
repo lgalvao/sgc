@@ -3,11 +3,11 @@ import { mount, flushPromises } from '@vue/test-utils';
 import NotificacoesAdminView from '../NotificacoesAdminView.vue';
 import { createTestingPinia } from '@pinia/testing';
 import { createRouter, createMemoryHistory } from 'vue-router';
-import { listarResumoSubprocessosAtivos, reenviarFalhasDefinitivas } from '@/services/notificacaoService';
+import { listarNotificacoesAdmin, reenviarNotificacao } from '@/services/notificacaoService';
 
 vi.mock('@/services/notificacaoService', () => ({
-  listarResumoSubprocessosAtivos: vi.fn(),
-  reenviarFalhasDefinitivas: vi.fn()
+  listarNotificacoesAdmin: vi.fn(),
+  reenviarNotificacao: vi.fn()
 }));
 
 const mockNotify = vi.fn();
@@ -40,300 +40,112 @@ describe('NotificacoesAdminView', () => {
           PageHeader: { template: '<div><slot name="actions"/></div>', props: ['title'] },
           ModalConfirmacao: { template: '<div><slot/></div>', props: ['modelValue'] },
           AppAlert: true,
-          BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>', props: ['disabled'] },
+          EmptyState: { template: '<div class="empty-state-stub"><slot/></div>', props: ['title', 'description', 'icon'] },
+          BButton: { template: '<button @click="$emit(\'click\' )" ><slot/></button>', props: ['disabled', 'variant'] },
           BAlert: { template: '<div><slot/></div>', props: ['modelValue', 'variant'] },
           BTable: {
-            template: '<table><tr v-for="item in items" :key="item.unidadeSigla"><slot name="cell(unidadeSigla)" :item="item" /><slot name="cell(processoDescricao)" :item="item" /><slot name="cell(statusGeral)" :item="item" /><slot name="cell(ultimoErro)" :item="item" /><slot name="cell(proximaTentativaEm)" :item="item" /><slot name="cell(acoes)" :item="item" /><slot name="cell(dataHoraEnvio)" :item="item" /></tr></table>',
+            template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(unidadeSigla)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(ultimoErro)" :item="item" /><slot name="cell(proximaTentativaEm)" :item="item" /><slot name="cell(acoes)" :item="item" /><slot name="cell(dataHoraEnvio)" :item="item" /></tr></table>',
             props: ['fields', 'items']
           },
           BSpinner: true,
           BBadge: true,
-          RouterLink: { template: '<a :href="to.name"><slot/></a>', props: ['to'] },
-          UnidadeLink: { template: '<div>{{ item.unidadeSigla }} - {{ item.situacaoSubprocesso }}</div>', props: ['item'] }
+          BModal: { template: '<div class="modal-stub" v-if="modelValue"><slot/></div>', props: ['modelValue', 'title'] },
+          RouterLink: { template: '<a><slot/></a>' },
+          UnidadeLink: { template: '<div>{{ item.unidadeSigla }}</div>', props: ['item'] }
         }
       }
     });
   };
 
   it('renders loading state initially', async () => {
-    vi.mocked(listarResumoSubprocessosAtivos).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(listarNotificacoesAdmin).mockImplementation(() => new Promise(() => {}));
     const wrapper = mountComponent();
     expect(wrapper.find('[data-testid="notificacoes-carregando"]').exists()).toBe(true);
   });
 
-  it('renders error state', async () => {
-    vi.mocked(listarResumoSubprocessosAtivos).mockRejectedValue(new Error('Network error'));
-    const wrapper = mountComponent();
-    await flushPromises();
-    expect(wrapper.find('[data-testid="notificacoes-carregando"]').exists()).toBe(false);
-    expect(wrapper.text()).toContain('Network error');
-  });
-
-  it('renders empty states', async () => {
-    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue([]);
-    const wrapper = mountComponent();
-    await flushPromises();
-
-    expect(wrapper.find('[data-testid="alert-notificacoes-sem-pendencias"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="alert-notificacoes-sem-concluidas"]').exists()).toBe(true);
-  });
-
-  it('renders list properly and sorts correctly', async () => {
+  it('renders list of notifications', async () => {
     const mockData = [
       {
-        subprocessoCodigo: 1,
-        processoCodigo: 10,
+        codigo: 1,
+        subprocessoCodigo: 10,
         unidadeSigla: 'U1',
-        situacaoSubprocesso: 'AGUARDANDO_ENVIO',
-        processoDescricao: 'Proc A',
-        statusGeral: 'PENDENTE',
-        ultimoErro: null,
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 0,
-        podeReenviar: false,
+        destinatario: 'u1@teste.com',
+        assunto: 'Assunto Enviado',
+        situacao: 'ENVIADO',
+        dataHoraCriacao: '2023-01-01T10:00:00Z',
+        dataHoraEnvio: '2023-01-01T10:05:00Z',
+        corpoHtml: '<p>corpo</p>'
       },
       {
-        subprocessoCodigo: 2,
-        processoCodigo: 10,
-        unidadeSigla: 'U2',
-        situacaoSubprocesso: 'ERRO_ENVIO',
-        processoDescricao: 'Proc B',
-        statusGeral: 'FALHA_DEFINITIVA',
-        ultimoErro: 'Erro fatal',
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 5,
-        podeReenviar: true,
-      },
-      {
-        subprocessoCodigo: 3,
-        processoCodigo: 11,
-        unidadeSigla: 'U3',
-        situacaoSubprocesso: 'CONCLUIDO',
-        processoDescricao: 'Proc C',
-        statusGeral: 'OK',
-        ultimoErro: null,
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: '2023-01-01T12:00:00Z',
-        maiorTentativas: 0,
-        podeReenviar: false,
-      },
-      {
-        subprocessoCodigo: 4,
-        processoCodigo: 10,
-        unidadeSigla: 'U4',
-        situacaoSubprocesso: 'ERRO_ENVIO',
-        processoDescricao: 'Proc D',
-        statusGeral: 'INCONSISTENTE',
-        ultimoErro: 'Erro fatal 2',
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 5,
-        podeReenviar: true,
-      },
-      {
-        subprocessoCodigo: 5,
-        processoCodigo: 10,
-        unidadeSigla: 'U5',
-        situacaoSubprocesso: 'ERRO_ENVIO',
-        processoDescricao: 'Proc E',
-        statusGeral: 'FALHA_TEMPORARIA',
-        ultimoErro: 'Erro fatal 3',
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 5,
-        podeReenviar: true,
+        codigo: 2,
+        subprocessoCodigo: 10,
+        unidadeSigla: 'U1',
+        destinatario: 'u1@teste.com',
+        assunto: 'Assunto Pendente',
+        situacao: 'FALHA_DEFINITIVA',
+        dataHoraCriacao: '2023-01-01T11:00:00Z',
+        ultimoErro: 'Erro fatal'
       }
     ];
-    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
+    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
     const wrapper = mountComponent();
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="notificacoes-carregando"]').exists()).toBe(false);
-
-    // Check pending table
-    const pendingTable = wrapper.find('[data-testid="sec-notificacoes-pendentes"]');
-    expect(pendingTable.exists()).toBe(true);
-    // Should contain U2 (FALHA_DEFINITIVA - highest prio) then U1 (PENDENTE)
-    expect(pendingTable.text()).toContain('U2');
-    expect(pendingTable.text()).toContain('U1');
-    expect(pendingTable.text()).toContain('U4');
-    expect(pendingTable.text()).toContain('U5');
-    expect(pendingTable.text()).not.toContain('U3');
-
-    // Check completed table
-    const completedTable = wrapper.find('[data-testid="sec-notificacoes-concluidas"]');
-    expect(completedTable.exists()).toBe(true);
-    expect(completedTable.text()).toContain('U3');
+    expect(wrapper.find('[data-testid="sec-notificacoes-concluidas"]').text()).toContain('Assunto Enviado');
+    expect(wrapper.find('[data-testid="sec-notificacoes-pendentes"]').text()).toContain('Assunto Pendente');
   });
 
-  it('handles re-send action successfully', async () => {
+  it('opens preview modal', async () => {
     const mockData = [
       {
-        subprocessoCodigo: 2,
-        processoCodigo: 10,
-        unidadeSigla: 'U2',
-        situacaoSubprocesso: 'ERRO_ENVIO',
-        processoDescricao: 'Proc B',
-        statusGeral: 'FALHA_DEFINITIVA',
-        ultimoErro: 'Erro fatal',
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 5,
-        podeReenviar: true,
+        codigo: 1,
+        assunto: 'Assunto Preview',
+        situacao: 'ENVIADO',
+        corpoHtml: '<p>conteudo do email</p>',
+        destinatario: 'destino@teste.com'
       }
     ];
-    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
-    vi.mocked(reenviarFalhasDefinitivas).mockResolvedValue({ reenfileiradas: 1, subprocessoCodigo: 2 });
-
+    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
     const wrapper = mountComponent();
     await flushPromises();
 
-    // Click resend button
-    await wrapper.find('[data-testid="btn-notificacoes-reenviar-U2"]').trigger('click');
-
-    // Check if confirm text is visible
-    expect(wrapper.find('[data-testid="txt-notificacoes-reenviar-confirmacao"]').exists()).toBe(true);
-
-    // Simulate confirm modal
-    (wrapper.vm as any).reenviar();
-    await flushPromises();
-
-    expect(reenviarFalhasDefinitivas).toHaveBeenCalledWith(2);
-    expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('recolocada(s)'), 'success');
+    await wrapper.find('[data-testid="btn-preview-1"]').trigger('click');
+    
+    expect(wrapper.find('[data-testid="modal-preview-email"]').exists()).toBe(true);
+    expect(wrapper.find('.email-content-preview').html()).toContain('conteudo do email');
   });
 
-  it('handles re-send action failure', async () => {
+  it('handles re-send action', async () => {
     const mockData = [
       {
-        subprocessoCodigo: 2,
-        processoCodigo: 10,
-        unidadeSigla: 'U2',
-        situacaoSubprocesso: 'ERRO_ENVIO',
-        processoDescricao: 'Proc B',
-        statusGeral: 'FALHA_DEFINITIVA',
-        ultimoErro: 'Erro fatal',
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 5,
-        podeReenviar: true,
+        codigo: 2,
+        situacao: 'FALHA_DEFINITIVA',
+        destinatario: 'destino@teste.com'
       }
     ];
-    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
-    vi.mocked(reenviarFalhasDefinitivas).mockRejectedValue(new Error('Resend error'));
+    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
+    vi.mocked(reenviarNotificacao).mockResolvedValue({ codigo: 2, reenfileiradas: 1 });
 
     const wrapper = mountComponent();
     await flushPromises();
 
-    // Click resend button
-    await wrapper.find('[data-testid="btn-notificacoes-reenviar-U2"]').trigger('click');
+    await wrapper.find('[data-testid="btn-notificacoes-reenviar-2"]').trigger('click');
+    expect(wrapper.find('[data-testid="txt-notificacoes-reenviar-confirmacao"]').text()).toContain('destino@teste.com');
 
-    // Simulate confirm modal
-    // Simulate confirm modal
-    (wrapper.vm as any).reenviar();
+    await (wrapper.vm as any).reenviar();
     await flushPromises();
 
-    expect(reenviarFalhasDefinitivas).toHaveBeenCalledWith(2);
-    expect(mockNotify).toHaveBeenCalledWith('Resend error', 'danger');
-  });
-
-  it('handles ignoring re-send if nothing selected', async () => {
-    const wrapper = mountComponent();
-    await flushPromises();
-    (wrapper.vm as any).linhaSelecionada = null;
-    (wrapper.vm as any).reenviar();
-
-    expect(reenviarFalhasDefinitivas).not.toHaveBeenCalled();
+    expect(reenviarNotificacao).toHaveBeenCalledWith(2);
+    expect(mockNotify).toHaveBeenCalledWith('E-mail recolocado na fila de envio', 'success');
   });
 
   it('covers manual refresh action', async () => {
-    const mockData = [
-      {
-        subprocessoCodigo: 1,
-        processoCodigo: 10,
-        unidadeSigla: 'U1',
-        situacaoSubprocesso: 'AGUARDANDO_ENVIO',
-        processoDescricao: 'Proc A',
-        statusGeral: 'PENDENTE',
-        ultimoErro: null,
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 0,
-        podeReenviar: false,
-      }
-    ];
-    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
-
+    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue([]);
     const wrapper = mountComponent();
     await flushPromises();
 
     vi.clearAllMocks();
-
     await wrapper.find('[data-testid="btn-notificacoes-atualizar"]').trigger('click');
-    await flushPromises();
-
-    expect(vi.mocked(listarResumoSubprocessosAtivos)).toHaveBeenCalled();
-  });
-
-  it('covers formatters', async () => {
-    const mockData = [
-      {
-        subprocessoCodigo: 1,
-        processoCodigo: 10,
-        unidadeSigla: 'U1',
-        situacaoSubprocesso: 'AGUARDANDO_ENVIO',
-        processoDescricao: 'Proc A',
-        statusGeral: 'PENDENTE',
-        ultimoErro: null,
-        proximaTentativaEm: '2023-01-01T12:00:00Z',
-        ultimaNotificacaoEm: 'invalid date',
-        maiorTentativas: 0,
-        podeReenviar: false,
-      }
-    ];
-    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
-    const wrapper = mountComponent();
-    await flushPromises();
-
-    expect(wrapper.text()).toContain('01/01/2023');
-  });
-
-  it('renders correctly without stubs to cover UnidadeLink', async () => {
-    const mockData = [
-      {
-        subprocessoCodigo: 1,
-        processoCodigo: 10,
-        unidadeSigla: 'U1',
-        situacaoSubprocesso: 'AGUARDANDO_ENVIO',
-        processoDescricao: 'Proc A',
-        statusGeral: 'PENDENTE',
-        ultimoErro: null,
-        proximaTentativaEm: null,
-        ultimaNotificacaoEm: null,
-        maiorTentativas: 0,
-        podeReenviar: false,
-      }
-    ];
-    (vi.mocked(listarResumoSubprocessosAtivos) as any).mockResolvedValue(mockData);
-
-    const wrapper = mount(NotificacoesAdminView, {
-      global: {
-        plugins: [createTestingPinia({ createSpy: vi.fn }), router],
-        stubs: {
-          LayoutPadrao: { template: '<div><slot/></div>' },
-          PageHeader: { template: '<div><slot name="actions"/></div>', props: ['title'] },
-          ModalConfirmacao: { template: '<div><slot/></div>', props: ['modelValue'] },
-          AppAlert: true,
-          BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>', props: ['disabled'] },
-          BAlert: { template: '<div><slot/></div>', props: ['modelValue', 'variant'] },
-          BSpinner: true,
-          BBadge: true,
-        }
-      }
-    });
-
-    await flushPromises();
-    expect(wrapper.find('[data-testid="notificacao-unidade-U1"]').exists()).toBe(true);
+    expect(vi.mocked(listarNotificacoesAdmin)).toHaveBeenCalled();
   });
 });

@@ -10,10 +10,13 @@ import java.time.*;
 public record NotificacaoDto(
         Long codigo,
         @Nullable Long subprocessoCodigo,
+        @Nullable String unidadeSigla,
+        @Nullable String processoDescricao,
         @Nullable TipoNotificacao tipoNotificacao,
         @Nullable String usuarioDestinoTitulo,
         String destinatario,
         String assunto,
+        @Nullable String corpoHtml,
         sgc.alerta.model.SituacaoNotificacao situacao,
         int tentativas,
         LocalDateTime dataHoraCriacao,
@@ -21,14 +24,22 @@ public record NotificacaoDto(
         @Nullable LocalDateTime proximaTentativaEm,
         @Nullable String ultimoErro
 ) {
-    public static NotificacaoDto fromEntity(NotificacaoEmail notificacao, Long subprocessoCodigo) {
+    public static NotificacaoDto fromEntity(NotificacaoEmail notificacao) {
+        Long subId = notificacao.getSubprocesso() != null ? notificacao.getSubprocesso().getCodigo() : null;
+        String desc = (notificacao.getSubprocesso() != null && notificacao.getSubprocesso().getProcesso() != null) 
+                ? notificacao.getSubprocesso().getProcesso().getDescricao() 
+                : null;
+
         return NotificacaoDto.builder()
                 .codigo(notificacao.getCodigo())
-                .subprocessoCodigo(subprocessoCodigo)
+                .subprocessoCodigo(subId)
+                .unidadeSigla(notificacao.getUnidadeDestinoSigla())
+                .processoDescricao(desc)
                 .tipoNotificacao(notificacao.getTipoNotificacao())
                 .usuarioDestinoTitulo(notificacao.getUsuarioDestinoTitulo())
                 .destinatario(notificacao.getDestinatario())
                 .assunto(notificacao.getAssunto())
+                .corpoHtml(notificacao.getCorpoHtml())
                 .situacao(notificacao.getSituacao())
                 .tentativas(notificacao.getTentativas())
                 .dataHoraCriacao(notificacao.getDataHoraCriacao())

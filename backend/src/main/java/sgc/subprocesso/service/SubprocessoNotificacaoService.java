@@ -33,6 +33,10 @@ public class SubprocessoNotificacaoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UnidadeService unidadeService;
 
+    private enum OrigemNotificacao {
+        DIRETO, RESPONSAVEL, SUPERIOR
+    }
+
     public void registrarComunicacoesTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
         if (tipoTransicao.geraAlerta()) {
@@ -89,6 +93,7 @@ public class SubprocessoNotificacaoService {
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(sp)
                 .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
+                .unidadeDestinoSigla(sp.getUnidade().getSigla())
                 .destinatario(emailDestino)
                 .assunto(sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA)
                 .corpoHtml(corpo)
@@ -104,7 +109,7 @@ public class SubprocessoNotificacaoService {
         String corpo = processarTemplate(templateEmail, variaveis);
         String emailUnidade = getEmailUnidade(cmd.unidadeDestino());
 
-        EmailGerado emailDireto = new EmailGerado(emailUnidade, assunto, corpo, "direto");
+        EmailGerado emailDireto = new EmailGerado(emailUnidade, assunto, corpo, OrigemNotificacao.DIRETO, cmd.unidadeDestino().getSigla(), null);
         criarNotificacao(cmd, emailDireto);
         notificarResponsavelPessoal(cmd, cmd.unidadeDestino(), emailDireto);
     }
@@ -118,10 +123,11 @@ public class SubprocessoNotificacaoService {
             return;
         }
 
-        if (responsavel.substitutoTitulo() != null) {
-            usuarioService.buscarOpt(responsavel.substitutoTitulo()).ifPresent(u -> {
+        String titulo = responsavel.substitutoTitulo();
+        if (titulo != null) {
+            usuarioService.buscarOpt(titulo).ifPresent(u -> {
                 if (!u.getEmail().isBlank()) {
-                    criarNotificacao(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), "responsavel"));
+                    criarNotificacao(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), OrigemNotificacao.RESPONSAVEL, unidade.getSigla(), titulo));
                 }
             });
         }
@@ -144,13 +150,15 @@ public class SubprocessoNotificacaoService {
         String corpo = processarTemplate(templateEmailSuperior, variaveis);
         String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());
 
-        criarNotificacao(cmd, new EmailGerado(emailSuperior, assunto, corpo, "superior"));
+        criarNotificacao(cmd, new EmailGerado(emailSuperior, assunto, corpo, OrigemNotificacao.SUPERIOR, superior.sigla(), null));
     }
 
     private void criarNotificacao(NotificacaoCommand cmd, EmailGerado email) {
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(cmd.subprocesso())
                 .tipoNotificacao(TipoNotificacao.valueOf(cmd.tipoTransicao().name()))
+                .unidadeDestinoSigla(email.unidadeSigla())
+                .usuarioDestinoTitulo(email.usuarioTitulo())
                 .destinatario(email.destinatario())
                 .assunto(email.assunto())
                 .corpoHtml(email.corpo())
@@ -160,11 +168,11 @@ public class SubprocessoNotificacaoService {
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {
         String destinatario = email.destinatario().trim().toLowerCase(Locale.ROOT);
-        return "subprocesso:%s:transicao:%s:destinatario:%s:tipo:%s".formatted(
+        return "subprocesso:%s:transicao:%s:destinatario:%s:origem:%s".formatted(
                 cmd.subprocesso().getCodigo(),
                 cmd.tipoTransicao().name(),
                 destinatario,
-                email.tipo()
+                email.origem().name()
         );
     }
 
@@ -240,6 +248,6 @@ public class SubprocessoNotificacaoService {
         }
     }
 
-    private record EmailGerado(String destinatario, String assunto, String corpo, String tipo) {
+    private record EmailGerado(String destinatario, String assunto, String corpo, OrigemNotificacao origem, @Nullable String unidadeSigla, @Nullable String usuarioTitulo) {
     }
 }

@@ -29,6 +29,9 @@ public class NotificacaoEmail extends EntidadeBase {
     @Column(name = "usuario_destino_titulo", length = 12)
     private @Nullable String usuarioDestinoTitulo;
 
+    @Column(name = "unidade_destino_sigla", length = 20)
+    private @Nullable String unidadeDestinoSigla;
+
     @Column(name = "destinatario", nullable = false)
     private String destinatario;
 

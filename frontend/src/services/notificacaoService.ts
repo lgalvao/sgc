@@ -1,46 +1,44 @@
 import apiClient from "@/axios-setup";
-import type {SituacaoSubprocesso} from "@/types/tipos";
 
-export type StatusGeralNotificacao =
-    "INCONSISTENTE"
-    | "OK"
-    | "PENDENTE"
+export type StatusNotificacao =
+    "PENDENTE"
+    | "ENVIANDO"
+    | "ENVIADO"
     | "FALHA_TEMPORARIA"
     | "FALHA_DEFINITIVA";
 
-export interface NotificacaoSubprocessoResumo {
-    subprocessoCodigo: number;
-    processoCodigo: number;
-    processoDescricao: string;
-    unidadeSigla: string;
-    situacaoSubprocesso: SituacaoSubprocesso;
-    totalNotificacoes: number;
-    pendentes: number;
-    enviando: number;
-    enviadas: number;
-    falhasTemporarias: number;
-    falhasDefinitivas: number;
-    statusGeral: StatusGeralNotificacao;
-    ultimaNotificacaoEm: string | null;
-    proximaTentativaEm: string | null;
-    maiorTentativas: number;
-    ultimoErro: string | null;
-    podeReenviar: boolean;
+export interface Notificacao {
+    codigo: number;
+    subprocessoCodigo?: number;
+    unidadeSigla?: string;
+    unidadeDestinoSigla?: string;
+    processoDescricao?: string;
+    destinatario: string;
+    assunto: string;
+    corpoHtml?: string;
+    situacao: StatusNotificacao;
+    tentativas: number;
+    dataHoraCriacao: string;
+    dataHoraEnvio?: string;
+    proximaTentativaEm?: string;
+    ultimoErro?: string;
 }
 
 export interface ReenvioNotificacaoResponse {
-    subprocessoCodigo: number;
+    codigo: number;
     reenfileiradas: number;
 }
 
-export async function listarResumoSubprocessosAtivos(): Promise<NotificacaoSubprocessoResumo[]> {
-    const response = await apiClient.get<NotificacaoSubprocessoResumo[]>("/admin/notificacoes/subprocessos-ativos");
+export async function listarNotificacoesAdmin(limite = 50): Promise<Notificacao[]> {
+    const response = await apiClient.get<Notificacao[]>("/admin/notificacoes/listar", {
+        params: { limite }
+    });
     return response.data;
 }
 
-export async function reenviarFalhasDefinitivas(subprocessoCodigo: number): Promise<ReenvioNotificacaoResponse> {
+export async function reenviarNotificacao(codigo: number): Promise<ReenvioNotificacaoResponse> {
     const response = await apiClient.post<ReenvioNotificacaoResponse>(
-        `/admin/notificacoes/subprocessos/${subprocessoCodigo}/reenviar`
+        `/admin/notificacoes/${codigo}/reenviar`
     );
     return response.data;
 }

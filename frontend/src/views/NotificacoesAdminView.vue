@@ -1,6 +1,18 @@
 <template>
   <LayoutPadrao>
-    <h1 class="visually-hidden">{{ TEXTOS.comum.MENU_NOTIFICACOES }}</h1>
+    <PageHeader :title="TEXTOS.comum.MENU_NOTIFICACOES">
+      <template #actions>
+        <BButton
+            data-testid="btn-notificacoes-atualizar"
+            :disabled="carregando"
+            variant="outline-primary"
+            @click="carregar"
+        >
+          <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
+          {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
+        </BButton>
+      </template>
+    </PageHeader>
 
     <div v-if="carregando" class="text-center py-5" data-testid="notificacoes-carregando">
       <BSpinner :label="TEXTOS.comum.CARREGANDO_DADOS" variant="primary"/>
@@ -22,135 +34,146 @@
           @dismissed="clear"
       />
 
-      <section class="mb-5" data-testid="sec-notificacoes-pendentes">
-        <PageHeader :title="TEXTOS.administracao.NOTIFICACOES_PENDENTES_TITULO">
-          <template #actions>
-            <BButton
-                data-testid="btn-notificacoes-atualizar"
-                :disabled="carregando"
-                size="sm"
-                variant="outline-primary"
-                @click="carregar"
-            >
-              <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
-              {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
-            </BButton>
-          </template>
-        </PageHeader>
-        <BAlert
-            v-if="notificacoesPendentes.length === 0"
-            :model-value="true"
-            data-testid="alert-notificacoes-sem-pendencias"
-            variant="success"
-        >
-          {{ TEXTOS.administracao.NOTIFICACOES_SEM_PENDENCIAS }}
-        </BAlert>
+      <section class="mb-5" data-testid="sec-notificacoes-concluidas">
+        <h2 class="h4 mb-3">{{ TEXTOS.administracao.NOTIFICACOES_CONCLUIDAS_TITULO }}</h2>
+        <EmptyState
+            v-if="enviadas.length === 0"
+            :title="TEXTOS.administracao.NOTIFICACOES_SEM_CONCLUIDAS"
+            data-testid="alert-notificacoes-sem-concluidas"
+            icon="bi-info-circle"
+        />
         <BTable
             v-else
-            :fields="camposPendentes"
-            :items="notificacoesPendentes"
-            data-testid="tbl-notificacoes-pendentes"
+            :fields="camposConcluidas"
+            :items="enviadas"
+            data-testid="tbl-notificacoes-concluidas"
             hover
             responsive
             small
         >
-          <template #cell(unidadeSigla)="{ item: linha }">
-            <UnidadeLink :item="linha"/>
+          <template #cell(unidadeSigla)="{ item }">
+            <span class="fw-semibold">{{ item.unidadeSigla || '-' }}</span>
           </template>
 
-          <template #cell(processoDescricao)="{ item: linha }">
-            <span :data-testid="`notificacao-processo-${linha.unidadeSigla}`">
-              {{ linha.processoDescricao }}
-            </span>
-          </template>
-
-          <template #cell(statusGeral)="{ item: linha }">
-            <BBadge :data-testid="`notificacao-status-${linha.unidadeSigla}`" :variant="statusVariant(linha.statusGeral)">
-              {{ statusLabel(linha.statusGeral) }}
-            </BBadge>
-            <div v-if="linha.maiorTentativas > 0" class="text-muted small mt-1">
-              {{ linha.maiorTentativas }} tentativa(s)
+          <template #cell(assunto)="{ item }">
+            <div :title="item.assunto">
+              {{ item.assunto }}
             </div>
           </template>
 
-          <template #cell(ultimoErro)="{ item: linha }">
-            <span
-                v-if="linha.ultimoErro"
-                :data-testid="`notificacao-erro-${linha.unidadeSigla}`"
-                :title="linha.ultimoErro"
-                class="text-muted text-truncate d-inline-block erro-notificacao"
-            >
-              {{ linha.ultimoErro }}
-            </span>
-            <span v-else :data-testid="`notificacao-erro-${linha.unidadeSigla}`">-</span>
+          <template #cell(dataHoraEnvio)="{ item }">
+            {{ formatarDataOuHifen(item.dataHoraEnvio) }}
           </template>
 
-          <template #cell(proximaTentativaEm)="{ item: linha }">
-            <span :data-testid="`notificacao-proxima-tentativa-${linha.unidadeSigla}`">
-              {{ formatarDataOuHifen(linha.proximaTentativaEm) }}
-            </span>
-          </template>
-
-          <template #cell(acoes)="{ item: linha }">
+          <template #cell(acoes)="{ item }">
             <div class="text-end">
               <BButton
-                  v-if="linha.podeReenviar"
-                  :data-testid="`btn-notificacoes-reenviar-${linha.unidadeSigla}`"
+                  v-if="item.corpoHtml"
                   size="sm"
-                  variant="outline-dark"
-                  @click="confirmarReenvio(linha)"
+                  variant="link"
+                  class="p-0 me-2"
+                  :data-testid="`btn-preview-${item.codigo}`"
+                  title="Ver conteúdo do e-mail"
+                  @click="abrirPreview(item)"
               >
-                <i aria-hidden="true" class="bi bi-send"></i>
-                {{ TEXTOS.administracao.NOTIFICACOES_REENVIAR }}
+                <i class="bi bi-eye"></i>
               </BButton>
             </div>
           </template>
         </BTable>
       </section>
 
-      <section data-testid="sec-notificacoes-concluidas">
-        <PageHeader :title="TEXTOS.administracao.NOTIFICACOES_CONCLUIDAS_TITULO"/>
-        <BAlert
-            v-if="notificacoesConcluidas.length === 0"
-            :model-value="true"
-            data-testid="alert-notificacoes-sem-concluidas"
-            variant="secondary"
-        >
-          {{ TEXTOS.administracao.NOTIFICACOES_SEM_CONCLUIDAS }}
-        </BAlert>
+      <section data-testid="sec-notificacoes-pendentes">
+        <h2 class="h4 mb-3">{{ TEXTOS.administracao.NOTIFICACOES_PENDENTES_TITULO }}</h2>
+        <EmptyState
+            v-if="pendentes.length === 0"
+            :title="TEXTOS.administracao.NOTIFICACOES_SEM_PENDENCIAS"
+            data-testid="alert-notificacoes-sem-pendencias"
+            icon="bi-check-circle"
+        />
         <BTable
             v-else
-            :fields="camposConcluidas"
-            :items="notificacoesConcluidas"
-            data-testid="tbl-notificacoes-concluidas"
+            :fields="camposPendentes"
+            :items="pendentes"
+            data-testid="tbl-notificacoes-pendentes"
             hover
             responsive
             small
         >
-          <template #cell(unidadeSigla)="{ item: linha }">
-            <UnidadeLink :item="linha"/>
+          <template #cell(unidadeSigla)="{ item }">
+            <span class="fw-semibold">{{ item.unidadeSigla || '-' }}</span>
           </template>
 
-          <template #cell(processoDescricao)="{ item: linha }">
-            <span :data-testid="`notificacao-processo-${linha.unidadeSigla}`">
-              {{ linha.processoDescricao }}
-            </span>
+          <template #cell(assunto)="{ item }">
+            <div :title="item.assunto">
+              {{ item.assunto }}
+            </div>
           </template>
 
-          <template #cell(statusGeral)="{ item: linha }">
-            <BBadge :data-testid="`notificacao-status-${linha.unidadeSigla}`" :variant="statusVariant(linha.statusGeral)">
-              {{ statusLabel(linha.statusGeral) }}
+          <template #cell(situacao)="{ item }">
+            <BBadge :variant="statusVariant(item.situacao)">
+              {{ statusLabel(item.situacao) }}
             </BBadge>
+            <div v-if="item.tentativas > 0" class="text-muted small">
+              {{ item.tentativas }} tentativa(s)
+            </div>
           </template>
 
-          <template #cell(dataHoraEnvio)="{ item: linha }">
-            <span :data-testid="`notificacao-conclusao-${linha.unidadeSigla}`">
-              {{ formatarDataOuHifen(linha.ultimaNotificacaoEm) }}
-            </span>
+          <template #cell(ultimoErro)="{ item }">
+            <div class="text-truncate text-muted small" style="max-width: 200px;" :title="item.ultimoErro">
+              {{ item.ultimoErro || '-' }}
+            </div>
+          </template>
+
+          <template #cell(proximaTentativaEm)="{ item }">
+             {{ formatarDataOuHifen(item.proximaTentativaEm) }}
+          </template>
+
+          <template #cell(acoes)="{ item }">
+            <div class="text-end d-flex justify-content-end align-items-center">
+              <BButton
+                  v-if="item.corpoHtml"
+                  size="sm"
+                  variant="link"
+                  class="p-0 me-2"
+                  title="Ver conteúdo do e-mail"
+                  @click="abrirPreview(item)"
+              >
+                <i class="bi bi-eye"></i>
+              </BButton>
+              <BButton
+                  v-if="item.situacao === 'FALHA_DEFINITIVA'"
+                  :data-testid="`btn-notificacoes-reenviar-${item.codigo}`"
+                  size="sm"
+                  variant="outline-dark"
+                  title="Tentar reenviar e-mail"
+                  @click="confirmarReenvio(item)"
+              >
+                <i aria-hidden="true" class="bi bi-send"></i>
+              </BButton>
+            </div>
           </template>
         </BTable>
       </section>
     </template>
+
+    <!-- Modal de Preview -->
+    <BModal
+        v-model="mostrarPreview"
+        :title="itemParaPreview?.assunto"
+        size="lg"
+        hide-footer
+        scrollable
+        data-testid="modal-preview-email"
+    >
+      <div v-if="itemParaPreview" class="p-3">
+        <div class="mb-3 border-bottom pb-2">
+          <strong>Para:</strong> {{ itemParaPreview.destinatario }}<br>
+          <strong>Enviado em:</strong> {{ formatarDataOuHifen(itemParaPreview.dataHoraCriacao) }}
+        </div>
+        <div class="email-content-preview border p-3 bg-light rounded" v-html="itemParaPreview.corpoHtml"></div>
+      </div>
+    </BModal>
 
     <ModalConfirmacao
         v-model="mostrarModalReenvio"
@@ -162,134 +185,88 @@
         variant="danger"
         @confirmar="reenviar"
     >
-      <p v-if="linhaSelecionada" data-testid="txt-notificacoes-reenviar-confirmacao">
-        {{ TEXTOS.administracao.NOTIFICACOES_MODAL_REENVIAR_TEXTO(linhaSelecionada.unidadeSigla) }}
+      <p v-if="itemSelecionado" data-testid="txt-notificacoes-reenviar-confirmacao">
+        Confirma o reenvio deste e-mail específico para {{ itemSelecionado.destinatario }}?
       </p>
     </ModalConfirmacao>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {computed, defineComponent, h, onMounted, ref} from "vue";
-import {RouterLink} from "vue-router";
-import {BAlert, BBadge, BButton, BSpinner, BTable} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {BAlert, BBadge, BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
 import {
-  listarResumoSubprocessosAtivos,
-  type NotificacaoSubprocessoResumo,
-  reenviarFalhasDefinitivas,
-  type StatusGeralNotificacao,
+  listarNotificacoesAdmin,
+  type Notificacao,
+  reenviarNotificacao,
+  type StatusNotificacao,
 } from "@/services/notificacaoService";
-import {formatDateTimeBR, formatSituacaoSubprocesso} from "@/utils";
+import {formatDateTimeBR} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import {useNotification} from "@/composables/useNotification";
 
 const {notificacao, notify, clear} = useNotification();
 
-const linhas = ref<NotificacaoSubprocessoResumo[]>([]);
+const itens = ref<Notificacao[]>([]);
 const carregando = ref(true);
 const erro = ref<string | null>(null);
-const linhaSelecionada = ref<NotificacaoSubprocessoResumo | null>(null);
+const itemSelecionado = ref<Notificacao | null>(null);
+const itemParaPreview = ref<Notificacao | null>(null);
 const mostrarModalReenvio = ref(false);
+const mostrarPreview = ref(false);
 const reenviando = ref(false);
 
 const camposBase = [
-  {key: "unidadeSigla", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.UNIDADE, thClass: "col-notificacao-unidade", tdClass: "col-notificacao-unidade"},
-  {key: "statusGeral", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS, thClass: "col-notificacao-situacao", tdClass: "col-notificacao-situacao"},
-  {key: "processoDescricao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROCESSO},
-];
-
-const camposPendentes = [
-  ...camposBase,
-  {key: "ultimoErro", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ERRO, thClass: "col-notificacao-erro", tdClass: "col-notificacao-erro"},
-  {key: "proximaTentativaEm", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROXIMA_TENTATIVA, thClass: "col-notificacao-proxima", tdClass: "col-notificacao-proxima"},
-  {key: "acoes", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ACOES, thClass: "text-end col-notificacao-acoes", tdClass: "text-end col-notificacao-acoes"},
+  {key: "unidadeSigla", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.UNIDADE, thClass: "col-unidade", tdClass: "col-unidade fw-semibold"},
+  {key: "assunto", label: "Assunto"},
 ];
 
 const camposConcluidas = [
   ...camposBase,
-  {key: "dataHoraEnvio", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.CONCLUSAO},
+  {key: "dataHoraEnvio", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.CONCLUSAO, thClass: "col-data", tdClass: "col-data"},
+  {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
 ];
 
-const notificacoesPendentes = computed(() => ordenarLinhas(
-    linhas.value.filter(item => item.statusGeral !== "OK")
-));
+const camposPendentes = [
+  ...camposBase,
+  {key: "situacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS, thClass: "col-status", tdClass: "col-status"},
+  {key: "ultimoErro", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ERRO},
+  {key: "proximaTentativaEm", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROXIMA_TENTATIVA, thClass: "col-data", tdClass: "col-data"},
+  {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
+];
 
-const notificacoesConcluidas = computed(() => ordenarLinhas(
-    linhas.value.filter(item => item.statusGeral === "OK")
-));
+const enviadas = computed(() => itens.value.filter(i => i.situacao === "ENVIADO"));
+const pendentes = computed(() => itens.value.filter(i => i.situacao !== "ENVIADO"));
 
-const UnidadeLink = defineComponent({
-  props: {
-    item: {
-      type: Object as () => NotificacaoSubprocessoResumo,
-      required: true,
-    },
-  },
-  setup(props) {
-    return () => h("div", [
-      h(RouterLink, {
-        to: {
-          name: "Subprocesso",
-          params: {
-            codProcesso: props.item.processoCodigo,
-            siglaUnidade: props.item.unidadeSigla,
-          },
-        },
-        class: "fw-semibold",
-        "data-testid": `notificacao-unidade-${props.item.unidadeSigla}`,
-      }, () => props.item.unidadeSigla),
-      h("div", {class: "text-muted small"}, formatSituacaoSubprocesso(props.item.situacaoSubprocesso)),
-    ]);
-  },
-});
-
-function ordenarLinhas(lista: NotificacaoSubprocessoResumo[]) {
-  return [...lista].sort((a, b) => {
-    const prioridade = pesoStatus(b.statusGeral) - pesoStatus(a.statusGeral);
-    if (prioridade !== 0) return prioridade;
-    return a.unidadeSigla.localeCompare(b.unidadeSigla) || a.processoDescricao.localeCompare(b.processoDescricao);
-  });
-}
-
-function pesoStatus(status: StatusGeralNotificacao): number {
-  const pesos: Record<StatusGeralNotificacao, number> = {
-    INCONSISTENTE: 5,
-    FALHA_DEFINITIVA: 4,
-    FALHA_TEMPORARIA: 3,
-    PENDENTE: 2,
-    OK: 1,
-  };
-  return pesos[status];
-}
-
-function statusLabel(status: StatusGeralNotificacao): string {
-  const labels: Record<StatusGeralNotificacao, string> = {
-    INCONSISTENTE: "Inconsistente",
-    OK: "Enviada",
+function statusLabel(status: StatusNotificacao): string {
+  const labels: Record<StatusNotificacao, string> = {
+    ENVIADO: "Enviado",
     PENDENTE: "Pendente",
+    ENVIANDO: "Enviando...",
     FALHA_TEMPORARIA: "Falha temporária",
     FALHA_DEFINITIVA: "Falha definitiva",
   };
   return labels[status];
 }
 
-function statusVariant(status: StatusGeralNotificacao) {
+function statusVariant(status: StatusNotificacao) {
   const variants = {
-    INCONSISTENTE: "danger",
-    OK: "success",
-    PENDENTE: "primary",
+    ENVIADO: "success",
+    PENDENTE: "secondary",
+    ENVIANDO: "primary",
     FALHA_TEMPORARIA: "warning",
     FALHA_DEFINITIVA: "danger",
-  } as const satisfies Record<StatusGeralNotificacao, "success" | "primary" | "warning" | "danger">;
+  } as const;
   return variants[status];
 }
 
-function formatarDataOuHifen(valor: string | null): string {
+function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";
   const formatada = formatDateTimeBR(valor);
   return formatada === "Não informado" || formatada === "Data inválida" ? "-" : formatada;
@@ -299,7 +276,7 @@ async function carregar() {
   carregando.value = true;
   erro.value = null;
   try {
-    linhas.value = await listarResumoSubprocessosAtivos();
+    itens.value = await listarNotificacoesAdmin();
   } catch (error) {
     erro.value = normalizeError(error).message || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR;
   } finally {
@@ -307,22 +284,27 @@ async function carregar() {
   }
 }
 
-function confirmarReenvio(item: NotificacaoSubprocessoResumo) {
-  linhaSelecionada.value = item;
+function abrirPreview(item: Notificacao) {
+  itemParaPreview.value = item;
+  mostrarPreview.value = true;
+}
+
+function confirmarReenvio(item: Notificacao) {
+  itemSelecionado.value = item;
   mostrarModalReenvio.value = true;
 }
 
 async function reenviar() {
-  if (!linhaSelecionada.value) return;
+  if (!itemSelecionado.value) return;
   reenviando.value = true;
   try {
-    const resultado = await reenviarFalhasDefinitivas(linhaSelecionada.value.subprocessoCodigo);
-    notify(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO(resultado.reenfileiradas), "success");
+    await reenviarNotificacao(itemSelecionado.value.codigo);
+    notify("E-mail recolocado na fila de envio", "success");
     mostrarModalReenvio.value = false;
-    linhaSelecionada.value = null;
+    itemSelecionado.value = null;
     await carregar();
   } catch (error) {
-    notify(normalizeError(error).message || TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO, "danger");
+    notify(normalizeError(error).message || "Erro ao reenviar e-mail", "danger");
   } finally {
     reenviando.value = false;
   }
@@ -332,36 +314,22 @@ onMounted(carregar);
 </script>
 
 <style scoped>
-.erro-notificacao {
+:deep(.col-unidade) { width: 8rem; }
+:deep(.col-status) { width: 10rem; }
+:deep(.col-data) { width: 9rem; }
+:deep(.col-acoes) { width: 6rem; }
+
+.email-content-preview {
+  min-height: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+
+/* Garante que o HTML injetado não quebre o layout */
+.email-content-preview :deep(img) {
   max-width: 100%;
-}
-
-:deep(.col-notificacao-unidade) {
-  width: 12rem;
-}
-
-:deep(.col-notificacao-situacao) {
-  width: 9rem;
-}
-
-:deep(.col-notificacao-erro) {
-  max-width: 28rem;
-}
-
-:deep(.col-notificacao-proxima) {
-  width: 7rem;
-}
-
-:deep(.col-notificacao-acoes) {
-  width: 7rem;
-}
-
-@media (max-width: 992px) {
-  :deep(.col-notificacao-unidade),
-  :deep(.col-notificacao-situacao),
-  :deep(.col-notificacao-proxima),
-  :deep(.col-notificacao-acoes) {
-    width: auto;
-  }
+  height: auto;
 }
 </style>

@@ -33,6 +33,7 @@ public class NotificacaoService {
                 .subprocesso(cmd.subprocesso())
                 .tipoNotificacao(cmd.tipoNotificacao())
                 .usuarioDestinoTitulo(cmd.usuarioDestinoTitulo())
+                .unidadeDestinoSigla(cmd.unidadeDestinoSigla())
                 .destinatario(cmd.destinatario())
                 .assunto(cmd.assunto())
                 .corpoHtml(cmd.corpoHtml())
@@ -70,6 +71,13 @@ public class NotificacaoService {
     }
 
     @Transactional(readOnly = true)
+    public List<NotificacaoEmail> listarTodasAdmin(int limite) {
+        int tamanho = Math.max(1, Math.min(limite, LIMITE_CONSULTA_MAXIMO));
+        // Busca as notificações mais recentes de processos em andamento
+        return notificacaoEmailRepo.findTopByProcessoEmAndamento(PageRequest.of(0, tamanho));
+    }
+
+    @Transactional(readOnly = true)
     public List<NotificacaoSubprocessoResumoDto> listarResumoSubprocessosAtivos() {
         return notificacaoEmailRepo.resumirPorSubprocessosDeProcessosAtivos()
                 .stream()
@@ -79,6 +87,10 @@ public class NotificacaoService {
 
     public int reenfileirarFalhasDefinitivasPorSubprocesso(Long subprocessoCodigo) {
         return notificacaoEmailRepo.reenfileirarFalhasDefinitivasPorSubprocesso(subprocessoCodigo, agora());
+    }
+
+    public int reenviarPorCodigo(Long codigo) {
+        return notificacaoEmailRepo.reenviarPorCodigo(codigo, agora());
     }
 
     public boolean marcarEnviandoSeDisponivel(NotificacaoEmail notificacao) {
