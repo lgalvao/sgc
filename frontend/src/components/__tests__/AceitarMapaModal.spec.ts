@@ -49,7 +49,7 @@ describe("AceitarMapaModal.vue", () => {
         const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
         expect(corpoModal.exists()).toBe(true);
         expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-titulo")).toBe("Aceitar mapa");
-        expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-ok-title")).toBe("Aceitar");
+        expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-ok-title")).toBe("Registrar aceite");
         expect(corpoModal.text()).toContain("Confirma o aceite da validação do mapa?");
     });
 

@@ -9,6 +9,7 @@
       test-codigo-cancelar="btn-acao-bloco-cancelar"
       test-codigo-confirmar="btn-acao-bloco-confirmar"
       :texto-acao="rotuloBotao"
+      variant-acao="success"
       @confirmar="confirmar"
       @fechar="fechar"
   >
@@ -153,8 +154,7 @@ watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) 
 
 const campos = [
   { key: 'selecao', label: '', thStyle: { width: '40px' } },
-  { key: 'sigla', label: 'Sigla' },
-  { key: 'nome', label: 'Nome' },
+  { key: 'sigla', label: 'Unidade' },
   { key: 'situacao', label: 'Situação' }
 ];
 

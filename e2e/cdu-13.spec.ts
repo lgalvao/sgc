@@ -39,7 +39,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await verificarAcoesAnaliseCadastro(page, {
-            rotuloPrincipal: 'Aceitar',
+            rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
             devolverHabilitado: true
         });
@@ -49,7 +49,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await verificarAcoesAnaliseCadastro(page, {
-            rotuloPrincipal: 'Aceitar',
+            rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
             devolverHabilitado: true
         });
@@ -93,7 +93,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await verificarAcoesAnaliseCadastro(page, {
-            rotuloPrincipal: 'Aceitar',
+            rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
             devolverHabilitado: true
         });
@@ -114,7 +114,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await verificarAcoesAnaliseCadastro(page, {
-            rotuloPrincipal: 'Aceitar',
+            rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
             devolverHabilitado: true
         });

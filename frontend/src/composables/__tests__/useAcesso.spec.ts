@@ -219,7 +219,7 @@ describe('useAcesso', () => {
       redirecionarParaPainel: true,
     });
     // Verifica labels específicos de revisão
-    expect(acesso.acaoPrincipalCadastro.value?.rotuloConfirmacao).toContain('Aceitar');
+    expect(acesso.acaoPrincipalCadastro.value?.rotuloConfirmacao).toContain('Registrar aceite');
   });
 
   it('deve expor a ação principal pronta para cadastro quando pode aceitar (mapeamento)', () => {
@@ -239,7 +239,7 @@ describe('useAcesso', () => {
       habilitar: true,
     });
     // Verifica labels específicos de mapeamento (validar)
-    expect(acesso.acaoPrincipalCadastro.value?.rotuloConfirmacao).toContain('Validar');
+    expect(acesso.acaoPrincipalCadastro.value?.rotuloConfirmacao).toContain('Registrar aceite');
   });
 
   it('deve expor a ação principal pronta para mapa quando pode homologar', () => {

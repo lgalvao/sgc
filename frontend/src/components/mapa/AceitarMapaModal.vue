@@ -77,7 +77,7 @@ const corpoModal = computed(() => {
 const rotuloConfirmar = computed(() => {
   return props.homologacao
       ? TEXTOS.mapa.LABEL_HOMOLOGAR
-      : TEXTOS.mapa.BOTAO_ACEITAR;
+      : TEXTOS.mapa.LABEL_REGISTRAR_ACEITE;
 });
 
 watch(() => props.mostrarModal, (mostrar) => {

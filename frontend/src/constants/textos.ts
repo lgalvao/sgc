@@ -17,6 +17,7 @@ export const TEXTOS = {
     BOTAO_INICIAR: "Iniciar",
     BOTAO_HOMOLOGAR: "Homologar",
     BOTAO_ACEITAR: "Aceitar",
+    BOTAO_REGISTRAR_ACEITE: "Registrar aceite",
     BOTAO_VALIDAR: "Validar",
     BOTAO_DEVOLVER: "Devolver",
     BOTAO_REABRIR: "Reabrir",
