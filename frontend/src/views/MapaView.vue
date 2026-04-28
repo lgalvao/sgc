@@ -38,8 +38,41 @@
               {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
             </BButton>
 
+            <BDropdown
+                v-if="usarMenuAcoesMapaSugestoes"
+                data-testid="btn-mapa-acoes"
+                :text="TEXTOS.mapa.BOTAO_ACOES"
+                toggle-class="text-nowrap"
+                variant="secondary"
+            >
+              <BDropdownItemButton
+                  v-if="podeAnalisar"
+                  data-testid="btn-mapa-acao-devolver"
+                  :disabled="!habilitarDevolverMapa"
+                  @click="abrirModalDevolucao"
+              >
+                {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="acaoPrincipalMapa?.mostrar"
+                  data-testid="btn-mapa-acao-homologar-aceite"
+                  :disabled="!acaoPrincipalMapa.habilitar"
+                  @click="abrirModalAceitar"
+              >
+                {{ acaoPrincipalMapa.rotuloBotao }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="podeDisponibilizarMapa"
+                  data-testid="btn-mapa-acao-disponibilizar"
+                  :disabled="loadingDisponibilizacao"
+                  @click="abrirModalDisponibilizar"
+              >
+                {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
+              </BDropdownItemButton>
+            </BDropdown>
+
             <BButton
-                v-if="podeAnalisar"
+                v-if="podeAnalisar && !usarMenuAcoesMapaSugestoes"
                 data-testid="btn-mapa-devolver"
                 :disabled="!habilitarDevolverMapa"
                 variant="secondary"
@@ -59,7 +92,7 @@
             </BButton>
 
             <BButton
-                v-if="acaoPrincipalMapa?.mostrar"
+                v-if="acaoPrincipalMapa?.mostrar && !usarMenuAcoesMapaSugestoes"
                 data-testid="btn-mapa-homologar-aceite"
                 :disabled="!acaoPrincipalMapa.habilitar"
                 variant="success"
@@ -69,7 +102,7 @@
             </BButton>
           </div>
 
-          <div v-if="podeVisualizarImpacto || podeEditarMapa || podeDisponibilizarMapa" class="d-flex gap-2 ms-3 ps-3 border-start">
+          <div v-if="podeVisualizarImpacto || (podeDisponibilizarMapa && !usarMenuAcoesMapaSugestoes)" class="d-flex gap-2 ms-3 ps-3 border-start">
             <LoadingButton
                 v-if="podeVisualizarImpacto"
                 :loading="loadingImpacto"
@@ -80,16 +113,7 @@
                 @click="abrirModalImpacto"
             />
             <BButton
-                v-if="podeEditarMapa"
-                :disabled="!habilitarEditarMapa"
-                data-testid="btn-abrir-criar-competencia"
-                variant="outline-primary"
-                @click="abrirModalCriarLimpo"
-            >
-              <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
-            </BButton>
-            <BButton
-                v-if="podeDisponibilizarMapa"
+                v-if="podeDisponibilizarMapa && !usarMenuAcoesMapaSugestoes"
                 :disabled="loadingDisponibilizacao"
                 data-testid="btn-cad-mapa-disponibilizar"
                 variant="success"
@@ -120,6 +144,17 @@
         </div>
 
         <template v-else>
+          <div class="mb-3 mt-3">
+            <BButton
+                :disabled="!habilitarEditarMapa"
+                data-testid="btn-abrir-criar-competencia"
+                variant="outline-primary"
+                @click="abrirModalCriarLimpo"
+            >
+              <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
+            </BButton>
+          </div>
+
           <div v-if="competencias.length === 0" class="mb-4 mt-3">
             <EmptyState
                 :title="TEXTOS.mapa.EMPTY_TITLE"
@@ -314,7 +349,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BButton, BDropdown, BDropdownItemButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
@@ -352,6 +387,7 @@ import type {
   MapaVisualizacao,
   SalvarCompetenciaRequest,
 } from "@/types/tipos";
+import {SituacaoSubprocesso} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -372,7 +408,7 @@ const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
-usePerfil();
+const {isAdmin} = usePerfil();
 
 const {
   podeVisualizarImpacto,
@@ -392,6 +428,17 @@ const podeAnalisar = computed(() => {
       Boolean(acaoPrincipalMapa.value?.mostrar) ||
       podeAnalisarMapa.value
   );
+});
+const situacaoMapaComSugestoes = computed(() => {
+  const situacao = subprocesso.value?.situacao;
+  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES
+      || situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
+});
+const usarMenuAcoesMapaSugestoes = computed(() => {
+  if (!isAdmin.value || !situacaoMapaComSugestoes.value) {
+    return false;
+  }
+  return podeAnalisar.value || Boolean(acaoPrincipalMapa.value?.mostrar) || podeDisponibilizarMapa.value;
 });
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
 const podeValidar = computed(() => podeValidarMapa?.value ?? false);

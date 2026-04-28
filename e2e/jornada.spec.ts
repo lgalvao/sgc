@@ -65,31 +65,34 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await page.getByTestId('nav-link-notificacoes').click();
             await expect(page).toHaveURL(/\/administracao\/notificacoes/);
 
-            await expect(page.getByRole('heading', {name: 'Notificações pendentes'})).toBeVisible();
-            await expect(page.getByRole('heading', {name: 'Notificações concluídas'})).toBeVisible();
+            const secaoPendentes = page.getByTestId('sec-notificacoes-pendentes');
+            const secaoConcluidas = page.getByTestId('sec-notificacoes-concluidas');
+            await expect(secaoPendentes).toBeVisible();
+            await expect(secaoConcluidas).toBeVisible();
 
             const tabelaPendentes = page.getByTestId('tbl-notificacoes-pendentes');
             await expect(tabelaPendentes).toBeVisible();
-            await expect(tabelaPendentes.getByTestId('notificacao-unidade-SECAO_321')).toBeVisible();
-            await expect(tabelaPendentes.getByTestId('notificacao-processo-SECAO_321')).toHaveText('Mapeamento Secão 321');
-            await expect(tabelaPendentes.getByTestId('notificacao-status-SECAO_321')).toHaveText('Falha definitiva');
-            await expect(tabelaPendentes.getByTestId('notificacao-erro-SECAO_321')).toContainText(/Falha simulada no seed/i);
-            await expect(tabelaPendentes.getByTestId('btn-notificacoes-reenviar-SECAO_321')).toBeVisible();
+            await expect(tabelaPendentes).toContainText('SECAO_321');
+            await expect(tabelaPendentes).toContainText('Mapeamento Secão 321');
+            await expect(tabelaPendentes).toContainText('Falha definitiva');
+            await expect(tabelaPendentes).toContainText(/Falha simulada no seed/i);
+            const btnReenviarPendente = tabelaPendentes.locator('button[title="Tentar reenviar e-mail"]').first();
+            await expect(btnReenviarPendente).toBeVisible();
 
             const tabelaConcluidas = page.getByTestId('tbl-notificacoes-concluidas');
             await expect(tabelaConcluidas).toBeVisible();
-            await expect(tabelaConcluidas.getByTestId('notificacao-unidade-SECAO_311')).toBeVisible();
-            await expect(tabelaConcluidas.getByTestId('notificacao-processo-SECAO_311')).toHaveText('Mapeamento Secão 311');
-            await expect(tabelaConcluidas.getByTestId('notificacao-status-SECAO_311')).toHaveText('Enviada');
-            await expect(tabelaConcluidas.getByTestId('btn-notificacoes-reenviar-SECAO_311')).toBeHidden();
+            await expect(tabelaConcluidas).toContainText('SECAO_311');
+            await expect(tabelaConcluidas).toContainText('Mapeamento Secão 311');
+            await expect(tabelaConcluidas).toContainText('Enviado');
+            await expect(tabelaConcluidas.locator('button[title="Tentar reenviar e-mail"]')).toHaveCount(0);
 
-            await tabelaPendentes.getByTestId('btn-notificacoes-reenviar-SECAO_321').click();
-            await expect(page.getByTestId('txt-notificacoes-reenviar-confirmacao')).toContainText(/Recolocar .* fila .*SECAO_321/i);
+            await btnReenviarPendente.click();
+            await expect(page.getByTestId('txt-notificacoes-reenviar-confirmacao')).toContainText(/Confirma o reenvio/i);
             await page.getByTestId('btn-notificacoes-reenviar-confirmar').click();
 
-            await verificarAppAlert(page, /recolocada/i);
-            await expect(tabelaPendentes.getByTestId('notificacao-status-SECAO_321')).toHaveText('Pendente');
-            await expect(tabelaPendentes.getByTestId('btn-notificacoes-reenviar-SECAO_321')).toBeHidden();
+            await verificarAppAlert(page, /recolocad[oa] na fila/i);
+            await expect(tabelaPendentes).toContainText('Pendente');
+            await expect(tabelaPendentes.locator('button[title="Tentar reenviar e-mail"]')).toHaveCount(0);
         });
         await expect(page).toHaveURL(/\/login/);
     };

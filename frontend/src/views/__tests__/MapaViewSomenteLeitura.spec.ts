@@ -60,6 +60,10 @@ const stubs = {
         props: ['disabled'],
         template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>'
     },
+    BDropdown: {template: '<div :data-testid="$attrs[\'data-testid\']"><slot /></div>'},
+    BDropdownItemButton: {
+        template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="$attrs.disabled" @click="$emit(\'click\')"><slot /></button>'
+    },
     LoadingButton: {
         props: ['loading', 'disabled'],
         template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>'
@@ -194,10 +198,10 @@ describe("MapaView somente leitura", () => {
         } as any);
     });
 
-    function mountComponent() {
+    function mountComponent(initialState?: Record<string, unknown>) {
         return mount(MapaView, {
             global: {
-                plugins: [createTestingPinia({stubActions: true})],
+                plugins: [createTestingPinia({stubActions: true, initialState})],
                 stubs,
             },
             props: {
@@ -220,6 +224,46 @@ describe("MapaView somente leitura", () => {
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="btn-mapa-validar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-mapa-homologar-aceite"]').exists()).toBe(true);
+    });
+
+    it("agrupa ações no botão Ações quando for ADMIN e mapa com sugestões", async () => {
+        subprocessoStoreCacheMock.contextoEdicao.detalhes.situacao = 'MAPEAMENTO_MAPA_COM_SUGESTOES';
+
+        vi.mocked(useAcessoModule.useAcesso).mockReturnValue({
+            podeVisualizarImpacto: ref(false),
+            podeEditarMapa: ref(true),
+            podeDisponibilizarMapa: ref(true),
+            habilitarEditarMapa: ref(true),
+            habilitarDisponibilizarMapa: ref(true),
+            podeValidarMapa: ref(false),
+            habilitarValidarMapa: ref(false),
+            podeVerSugestoes: ref(true),
+            podeAnalisarMapa: ref(true),
+            habilitarDevolverMapa: ref(true),
+            acaoPrincipalMapa: ref({
+                codigo: 'HOMOLOGAR',
+                mostrar: true,
+                habilitar: true,
+                rotuloBotao: 'Homologar',
+                mensagemSucesso: 'Mapa homologado',
+            }),
+        } as any);
+
+        const wrapper = mountComponent({
+            perfil: {
+                perfilSelecionado: 'ADMIN',
+            },
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="btn-mapa-acoes"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-devolver"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-homologar-aceite"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-disponibilizar"]').exists()).toBe(true);
+
+        expect(wrapper.find('[data-testid="btn-mapa-devolver"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="btn-mapa-homologar-aceite"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').exists()).toBe(false);
     });
 
     it("carrega sugestoes e historico pelas acoes de analise", async () => {

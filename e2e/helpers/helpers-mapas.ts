@@ -11,7 +11,16 @@ export async function esperarTelaMapa(page: Page) {
 export async function esperarMapaEditavel(page: Page) {
     await esperarTelaMapa(page);
     await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
-    await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
+    const btnDisponibilizarDireto = page.getByTestId('btn-cad-mapa-disponibilizar');
+    if (await btnDisponibilizarDireto.isVisible()) {
+        await expect(btnDisponibilizarDireto).toBeVisible();
+        return;
+    }
+
+    const btnAcoes = page.getByTestId('btn-mapa-acoes');
+    await expect(btnAcoes).toBeVisible();
+    await btnAcoes.click();
+    await expect(page.getByTestId('btn-mapa-acao-disponibilizar')).toBeVisible();
 }
 
 export async function esperarSemAcoesManutencaoMapa(page: Page) {
@@ -169,7 +178,15 @@ export async function verificarSituacaoSubprocesso(page: Page, situacao: string)
 export async function disponibilizarMapa(page: Page, dataLimite?: string) {
     const data = dataLimite || calcularDataLimite(30);
 
-    await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+    const btnDisponibilizarDireto = page.getByTestId('btn-cad-mapa-disponibilizar');
+    if (await btnDisponibilizarDireto.isVisible()) {
+        await btnDisponibilizarDireto.click();
+    } else {
+        const btnAcoes = page.getByTestId('btn-mapa-acoes');
+        await expect(btnAcoes).toBeVisible();
+        await btnAcoes.click();
+        await page.getByTestId('btn-mapa-acao-disponibilizar').click();
+    }
     const modal = page.getByTestId('mdl-disponibilizar-mapa');
     await expect(modal).toBeVisible();
 
@@ -186,7 +203,15 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
  */
 export async function aceitarOuHomologarMapa(page: Page, observacao: string) {
     await navegarParaMapa(page);
-    await page.getByTestId('btn-mapa-homologar-aceite').click();
+    const btnAceitarOuHomologarDireto = page.getByTestId('btn-mapa-homologar-aceite');
+    if (await btnAceitarOuHomologarDireto.isVisible()) {
+        await btnAceitarOuHomologarDireto.click();
+    } else {
+        const btnAcoes = page.getByTestId('btn-mapa-acoes');
+        await expect(btnAcoes).toBeVisible();
+        await btnAcoes.click();
+        await page.getByTestId('btn-mapa-acao-homologar-aceite').click();
+    }
     const modal = page.getByTestId('body-aceite-mapa');
     await expect(modal).toBeVisible();
     await page.getByTestId('inp-aceite-mapa-observacao').fill(observacao);

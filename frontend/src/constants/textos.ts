@@ -104,6 +104,7 @@ export const TEXTOS = {
     BOTAO_SUGESTOES: "Apresentar sugestões",
     BOTAO_VALIDAR: "Validar",
     BOTAO_VER_SUGESTOES: "Ver sugestões",
+    BOTAO_ACOES: "Ações",
     BOTAO_HISTORICO_ANALISE: "Histórico de análise",
     BOTAO_DEVOLVER: "Devolver",
     BOTAO_ACEITAR: "Aceitar",

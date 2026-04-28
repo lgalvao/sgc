@@ -317,7 +317,13 @@ test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com suge
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
         await navegarParaMapa(page);
 
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        const btnAceitarOuHomologarDireto = page.getByTestId('btn-mapa-homologar-aceite');
+        if (await btnAceitarOuHomologarDireto.isVisible()) {
+            await btnAceitarOuHomologarDireto.click();
+        } else {
+            await page.getByTestId('btn-mapa-acoes').click();
+            await page.getByTestId('btn-mapa-acao-homologar-aceite').click();
+        }
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await expect(page.getByText(TEXTOS.mapa.SUCESSO_HOMOLOGACAO).first()).toBeVisible();
     });
