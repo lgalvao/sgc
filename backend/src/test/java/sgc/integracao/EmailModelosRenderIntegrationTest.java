@@ -199,4 +199,64 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("A análise já pode ser realizada no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
+
+    @Test
+    @DisplayName("Deve renderizar revisão de cadastro disponibilizada conforme CDU-10")
+    void deveRenderizarDisponibilizacaoRevisaoCadastro() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeOrigem", "SESEL");
+        context.setVariable("siglaUnidadeDestino", "COSIS");
+        context.setVariable("nomeProcesso", "Processo revisao 2026");
+
+        String html = templateEngine.process("disponibilizacao-revisao-cadastro", context);
+
+        assertThat(html)
+                .contains("Revisão do cadastro de atividades e conhecimentos disponibilizada")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A unidade <strong>SESEL</strong> concluiu a revisão")
+                .contains("Processo revisao 2026")
+                .contains("A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar revisão de cadastro devolvida conforme CDU-14")
+    void deveRenderizarDevolucaoRevisaoCadastro() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeOrigem", "SESEL");
+        context.setVariable("siglaUnidadeDestino", "SESEL");
+        context.setVariable("nomeProcesso", "Processo revisao 2026");
+        context.setVariable("observacoes", "Favor ajustar o cadastro revisado.");
+
+        String html = templateEngine.process("devolucao-revisao-cadastro", context);
+
+        assertThat(html)
+                .contains("Revisão do cadastro de atividades e conhecimentos devolvida para ajustes")
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("A revisão do cadastro de atividades e conhecimentos da")
+                .contains("Processo revisao 2026")
+                .contains("Favor ajustar o cadastro revisado.")
+                .contains("Acompanhe o processo no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar aceite de revisão de cadastro conforme CDU-14")
+    void deveRenderizarAceiteRevisaoCadastro() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeOrigem", "SESEL");
+        context.setVariable("siglaUnidadeDestino", "COSIS");
+        context.setVariable("nomeProcesso", "Processo revisao 2026");
+
+        String html = templateEngine.process("aceite-revisao-cadastro", context);
+
+        assertThat(html)
+                .contains("Revisão do cadastro de atividades e conhecimentos submetida para análise")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A revisão do cadastro de atividades e conhecimentos da")
+                .contains("Processo revisao 2026")
+                .contains("foi submetida para análise por essa unidade")
+                .contains("A análise já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
 }

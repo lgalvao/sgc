@@ -17,11 +17,17 @@ class EmailTemplatesPadraoVisualTest {
     private static final Set<String> TEMPLATES_SEM_ESTILO_INLINE = Set.of(
             "aceite-cadastro.html",
             "aceite-cadastro-superior.html",
+            "aceite-revisao-cadastro.html",
+            "aceite-revisao-cadastro-superior.html",
             "cadastro-devolvido.html",
             "cadastro-devolvido-superior.html",
             "cadastro-disponibilizado.html",
             "cadastro-disponibilizado-superior.html",
             "atribuicao-temporaria.html",
+            "devolucao-revisao-cadastro.html",
+            "devolucao-revisao-cadastro-superior.html",
+            "disponibilizacao-revisao-cadastro.html",
+            "disponibilizacao-revisao-cadastro-superior.html",
             "lembrete-prazo.html"
     );
 
