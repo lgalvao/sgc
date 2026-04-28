@@ -104,6 +104,26 @@ class EmailTemplatesPadraoVisualTest {
         });
     }
 
+    @Test
+    @DisplayName("somente templates explicitamente permitidos podem usar highlight-box")
+    void somenteTemplatesPermitidosPodemUsarHighlightBox() throws IOException {
+        Set<String> templatesPermitidos = Set.of("processo-iniciado.html");
+
+        List<Path> templates = listarTemplates()
+                .filter(path -> !path.getFileName().toString().equals("_layout.html"))
+                .toList();
+
+        assertThat(templates).allSatisfy(path -> {
+            String conteudo = ler(path);
+            if (templatesPermitidos.contains(path.getFileName().toString())) {
+                return;
+            }
+            assertThat(conteudo)
+                    .withFailMessage("Template %s não deve usar highlight-box sem exigência explícita de CDU.", path.getFileName())
+                    .doesNotContain("highlight-box");
+        });
+    }
+
     private Stream<Path> listarTemplates() throws IOException {
         return Files.list(DIRETORIO_TEMPLATES)
                 .filter(path -> path.getFileName().toString().endsWith(".html"))

@@ -401,4 +401,42 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("A análise já pode ser realizada no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
+    @Test
+    @DisplayName("Deve renderizar cadastro reaberto conforme CDU-32")
+    void deveRenderizarCadastroReaberto() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("observacoes", "Ajustar atividades duplicadas.");
+
+        String html = templateEngine.process("cadastro-reaberto", context);
+
+        assertThat(html)
+                .contains("Cadastro reaberto")
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("foi reaberto para ajustes")
+                .contains("Ajustar atividades duplicadas.")
+                .contains("Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar revisão de cadastro reaberta conforme CDU-33")
+    void deveRenderizarRevisaoCadastroReaberta() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Revisão 2026");
+        context.setVariable("observacoes", "Ajustar descrições das atividades.");
+
+        String html = templateEngine.process("revisao-cadastro-reaberta", context);
+
+        assertThat(html)
+                .contains("Revisão reaberta")
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("A revisão do cadastro de atividades da sua unidade foi reaberta para ajustes")
+                .contains("<strong>Processo:</strong>")
+                .contains("Revisão 2026")
+                .contains("Ajustar descrições das atividades.")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
 }

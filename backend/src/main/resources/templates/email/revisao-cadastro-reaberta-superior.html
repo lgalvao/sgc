@@ -7,10 +7,9 @@
     </th:block>
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
-<p>Informamos que a revisão do cadastro de atividades da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> foi
-    reaberta para ajustes no processo
-    <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
-<p><strong>Justificativa:</strong> <span th:text="${observacoes}">Motivo da reabertura</span></p>
+        <p>Informamos que a revisão do cadastro de atividades da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> foi reaberta para ajustes.</p>
+        <p><strong>Processo:</strong> <span th:text="${nomeProcesso}">PROCESSO</span></p>
+        <p><strong>Justificativa:</strong> <span th:text="${observacoes}">Motivo da reabertura</span></p>
     </th:block>
 </th:block>
 </body>
