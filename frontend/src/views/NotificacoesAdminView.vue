@@ -259,10 +259,10 @@ const TIPOS_NOTIFICACAO_LABELS: Record<string, string> = {
 
 const camposTabela = [
   {key: "destinatario", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.DESTINATARIO, thClass: "col-destinatario", tdClass: "col-destinatario", sortable: true},
-  {key: "tipoNotificacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO, thClass: "col-tipo", tdClass: "col-tipo", sortable: true, formatter: (value: unknown, _key: string, item?: Notificacao) => formatarTipoNotificacao(typeof value === "string" ? value : item?.tipoNotificacao)},
-  {key: "assunto", label: "Assunto", sortable: true, formatter: (value: unknown) => formatarAssunto(typeof value === "string" ? value : undefined)},
+  {key: "tipoNotificacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO, thClass: "col-tipo", tdClass: "col-tipo", sortable: true, formatter: ({value, item}: {value: unknown, item: Notificacao}) => formatarTipoNotificacao(typeof value === "string" ? value : item?.tipoNotificacao)},
+  {key: "assunto", label: "Assunto", sortable: true, formatter: ({value}: {value: unknown}) => formatarAssunto(typeof value === "string" ? value : undefined)},
   {key: "situacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS, thClass: "col-status", tdClass: "col-status", sortable: true},
-  {key: "quando", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.QUANDO, thClass: "col-data", tdClass: "col-data", sortable: true, formatter: (_value: unknown, _key: string, item?: Notificacao) => item ? formatarQuando(item) : "-"},
+  {key: "quando", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.QUANDO, thClass: "col-data", tdClass: "col-data", sortable: true, formatter: ({item}: {item: Notificacao}) => item ? formatarQuando(item) : "-"},
   {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
 ];
 

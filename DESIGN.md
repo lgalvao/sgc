@@ -386,6 +386,7 @@ O sistema permite que ADMIN e GESTOR executem ações sobre múltiplos subproces
 
 # Referências
 
+- **[etc/reqs/cdu-01.md](etc/reqs/cdu-01.md) a [cdu-36.md](etc/reqs/cdu-36.md)** — Especificação detalhada de cada caso de uso.
 - **[README.md](README.md)** — Visão geral, stack, como executar e sumário de testes.
 - **[AGENTS.md](AGENTS.md)** — Convenções de código e regras para desenvolvedores e agentes de IA.
 - **[backend/README.md](backend/README.md)** — Arquitetura detalhada do backend.
@@ -395,4 +396,3 @@ O sistema permite que ADMIN e GESTOR executem ações sobre múltiplos subproces
 - **[etc/reqs/_intro.md](etc/reqs/_intro.md)** — Informações gerais, atores, perfis e situações dos processos.
 - **[etc/reqs/_intro-glossario.md](etc/reqs/_intro-glossario.md)** — Glossário do domínio.
 - **[etc/reqs/regras-negocio.md](etc/reqs/regras-negocio.md)** — Consolidação de todas as regras de negócio.
-- **[etc/reqs/cdu-01.md](etc/reqs/cdu-01.md) a [cdu-36.md](etc/reqs/cdu-36.md)** — Especificação detalhada de cada caso de uso.
