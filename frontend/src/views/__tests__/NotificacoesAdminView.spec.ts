@@ -23,7 +23,7 @@ vi.mock('@/composables/useNotification', () => ({
 
 const router = createRouter({
   history: createMemoryHistory(),
-  routes: [{ path: '/', component: {} }, { path: '/subprocesso/:codProcesso/:siglaUnidade', name: 'Subprocesso', component: {} }]
+  routes: [{ path: '/', component: {} }]
 });
 
 describe('NotificacoesAdminView', () => {
@@ -41,17 +41,15 @@ describe('NotificacoesAdminView', () => {
           ModalConfirmacao: { template: '<div><slot/></div>', props: ['modelValue'] },
           AppAlert: true,
           EmptyState: { template: '<div class="empty-state-stub"><slot/></div>', props: ['title', 'description', 'icon'] },
-          BButton: { template: '<button @click="$emit(\'click\' )" ><slot/></button>', props: ['disabled', 'variant'] },
+          BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>', props: ['disabled', 'variant'] },
           BAlert: { template: '<div><slot/></div>', props: ['modelValue', 'variant'] },
           BTable: {
-            template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(destinatario)" :item="item" /><slot name="cell(tipoNotificacao)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(ultimoErro)" :item="item" /><slot name="cell(proximaTentativaEm)" :item="item" /><slot name="cell(acoes)" :item="item" /><slot name="cell(dataHoraEnvio)" :item="item" /></tr></table>',
+            template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(destinatario)" :item="item" /><slot name="cell(tipoNotificacao)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(quando)" :item="item" /><slot name="cell(acoes)" :item="item" /></tr></table>',
             props: ['fields', 'items']
           },
           BSpinner: true,
           BBadge: true,
           BModal: { template: '<div v-if="modelValue" class="modal-stub" v-bind="$attrs"><slot/></div>', props: ['modelValue', 'title'] },
-          RouterLink: { template: '<a><slot/></a>' },
-          UnidadeLink: { template: '<div>{{ item.unidadeSigla }}</div>', props: ['item'] }
         }
       }
     });
@@ -63,16 +61,15 @@ describe('NotificacoesAdminView', () => {
     expect(wrapper.find('[data-testid="notificacoes-carregando"]').exists()).toBe(true);
   });
 
-  it('renders list of notifications', async () => {
+  it('renders unified list of notifications', async () => {
     const mockData = [
       {
         codigo: 1,
-        subprocessoCodigo: 10,
         unidadeSigla: 'U1',
         processoDescricao: 'Processo Alfa',
         tipoNotificacao: 'PROCESSO_INICIADO',
         destinatario: 'u1@tre-pe.jus.br',
-        assunto: 'Assunto Enviado',
+        assunto: 'SGC: Assunto Enviado',
         situacao: 'ENVIADO',
         tentativas: 0,
         dataHoraCriacao: '2023-01-01T10:00:00Z',
@@ -81,27 +78,28 @@ describe('NotificacoesAdminView', () => {
       },
       {
         codigo: 2,
-        subprocessoCodigo: 10,
-        unidadeSigla: 'U1',
-        processoDescricao: 'Processo Alfa',
+        unidadeSigla: 'U2',
+        processoDescricao: 'Processo Beta',
         tipoNotificacao: 'MAPA_HOMOLOGADO',
-        destinatario: 'admin@tre-pe.jus.br',
-        assunto: 'Assunto Pendente',
+        destinatario: 'u2@tre-pe.jus.br',
+        assunto: 'SGC: Assunto Pendente',
         situacao: 'FALHA_DEFINITIVA',
         tentativas: 2,
         dataHoraCriacao: '2023-01-01T11:00:00Z',
         ultimoErro: 'Erro fatal'
       }
     ];
-    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
+    vi.mocked(listarNotificacoesAdmin).mockResolvedValue(mockData as any);
     const wrapper = mountComponent();
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="sec-notificacoes-concluidas"]').text()).toContain('Assunto Enviado');
-    expect(wrapper.find('[data-testid="sec-notificacoes-pendentes"]').text()).toContain('Assunto Pendente');
+    expect(wrapper.find('[data-testid="tbl-notificacoes"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="sec-notificacoes"]').text()).toContain('Assunto Enviado');
+    expect(wrapper.find('[data-testid="sec-notificacoes"]').text()).toContain('Assunto Pendente');
     expect(wrapper.text()).toContain('U1');
     expect(wrapper.text()).toContain('Início do processo');
     expect(wrapper.text()).toContain('Mapa homologado');
+    expect(wrapper.text()).not.toContain('SGC: Assunto Enviado');
   });
 
   it('opens preview modal', async () => {
@@ -116,16 +114,36 @@ describe('NotificacoesAdminView', () => {
         destinatario: 'destino@teste.com'
       }
     ];
-    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
+    vi.mocked(listarNotificacoesAdmin).mockResolvedValue(mockData as any);
     const wrapper = mountComponent();
     await flushPromises();
 
     await wrapper.find('[data-testid="btn-preview-1"]').trigger('click');
-    
+
     expect(wrapper.find('[data-testid="modal-preview-email"]').exists()).toBe(true);
     const iframe = wrapper.find('[data-testid="iframe-preview-email"]');
     expect(iframe.exists()).toBe(true);
     expect((iframe.element as HTMLIFrameElement).getAttribute('srcdoc')).toContain('conteudo do email');
+  });
+
+  it('opens details modal', async () => {
+    const mockData = [
+      {
+        codigo: 2,
+        situacao: 'FALHA_DEFINITIVA',
+        tentativas: 5,
+        destinatario: 'destino@teste.com',
+        dataHoraCriacao: '2023-01-01T11:00:00Z',
+        ultimoErro: 'SMTP indisponivel'
+      }
+    ];
+    vi.mocked(listarNotificacoesAdmin).mockResolvedValue(mockData as any);
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    await wrapper.find('[data-testid="btn-detalhes-2"]').trigger('click');
+    expect(wrapper.find('[data-testid="modal-detalhes-notificacao"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain('SMTP indisponivel');
   });
 
   it('handles re-send action', async () => {
@@ -137,7 +155,7 @@ describe('NotificacoesAdminView', () => {
         destinatario: 'destino@teste.com'
       }
     ];
-    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
+    vi.mocked(listarNotificacoesAdmin).mockResolvedValue(mockData as any);
     vi.mocked(reenviarNotificacao).mockResolvedValue({ codigo: 2, reenfileiradas: 1 });
 
     const wrapper = mountComponent();
@@ -154,7 +172,7 @@ describe('NotificacoesAdminView', () => {
   });
 
   it('covers manual refresh action', async () => {
-    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue([]);
+    vi.mocked(listarNotificacoesAdmin).mockResolvedValue([] as any);
     const wrapper = mountComponent();
     await flushPromises();
 
@@ -162,5 +180,4 @@ describe('NotificacoesAdminView', () => {
     await wrapper.find('[data-testid="btn-notificacoes-atualizar"]').trigger('click');
     expect(vi.mocked(listarNotificacoesAdmin)).toHaveBeenCalled();
   });
-
 });

@@ -1,6 +1,7 @@
 package sgc.comum;
 
 import jakarta.validation.constraints.*;
+import org.jspecify.annotations.Nullable;
 
 import java.time.*;
 
@@ -16,7 +17,7 @@ public final class ComumDtos {
     }
 
     public record TextoOpcionalRequest(
-            String texto
+            @Nullable String texto
     ) {
     }
 

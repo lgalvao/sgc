@@ -1,5 +1,7 @@
 package sgc.subprocesso.dto;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * DTO para retorno do texto de sugestões de um subprocesso.
  *
@@ -11,7 +13,7 @@ public record SugestoesDto(String sugestoes) {
         return new SugestoesDto("");
     }
 
-    public static SugestoesDto de(String sugestoes) {
-        return new SugestoesDto(sugestoes);
+    public static SugestoesDto de(@Nullable String sugestoes) {
+        return new SugestoesDto(sugestoes != null ? sugestoes : "");
     }
 }

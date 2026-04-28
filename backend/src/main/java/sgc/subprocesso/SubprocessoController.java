@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.*;
 import jakarta.validation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.*;
 import org.springframework.security.access.*;
 import org.springframework.security.access.prepost.*;
@@ -547,16 +548,16 @@ public class SubprocessoController {
         cadastroFluxoService.devolver(codSubprocesso, sanitizar(justificativa));
     }
 
-    private void executarAceite(Long codSubprocesso, String texto) {
+    private void executarAceite(Long codSubprocesso, @Nullable String texto) {
         cadastroFluxoService.aceitar(codSubprocesso, sanitizar(texto));
     }
 
-    private void executarHomologacao(Long codSubprocesso, String texto) {
+    private void executarHomologacao(Long codSubprocesso, @Nullable String texto) {
         cadastroFluxoService.homologar(codSubprocesso, sanitizar(texto));
     }
 
-    private String sanitizar(String texto) {
-        return Optional.of(texto)
+    private String sanitizar(@Nullable String texto) {
+        return Optional.ofNullable(texto)
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
     }
