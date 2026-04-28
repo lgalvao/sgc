@@ -304,8 +304,9 @@ export const TEXTOS = {
     NOTIFICACOES_ERRO_REENVIO: "Não foi possível reenviar as notificações",
     NOTIFICACOES_ERRO_CARREGAR: "Não foi possível carregar as notificações",
     NOTIFICACOES_CAMPOS: {
+      DESTINATARIO: "Destinatário",
       PROCESSO: "Processo",
-      UNIDADE: "Unidade",
+      TIPO: "Tipo",
       STATUS: "Situação",
       ERRO: "Erro",
       PROXIMA_TENTATIVA: "Próxima",

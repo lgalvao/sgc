@@ -87,18 +87,21 @@
             responsive
             small
         >
-          <template #cell(unidadeSigla)="{ item }">
-            <span class="fw-semibold">{{ item.unidadeSigla || '-' }}</span>
+          <template #cell(destinatario)="{ item }">
+            <div class="fw-semibold" :title="item.destinatario">
+              {{ formatarDestinatario(item) }}
+            </div>
+          </template>
+
+          <template #cell(tipoNotificacao)="{ item }">
+            <span>{{ formatarTipoNotificacao(item.tipoNotificacao) }}</span>
           </template>
 
           <template #cell(assunto)="{ item }">
             <div class="linha-assunto" :title="item.assunto">
-              <div class="fw-semibold">{{ item.assunto }}</div>
+              <div class="fw-semibold">{{ formatarAssunto(item.assunto) }}</div>
               <div class="text-muted small">
                 {{ resumirContexto(item) }}
-              </div>
-              <div class="text-muted small text-break">
-                {{ item.destinatario }}
               </div>
             </div>
           </template>
@@ -112,13 +115,14 @@
               <BButton
                   v-if="item.corpoHtml"
                   size="sm"
-                  variant="link"
-                  class="p-0 me-2"
+                  variant="outline-secondary"
+                  class="btn-preview me-2"
                   :data-testid="`btn-preview-${item.codigo}`"
                   title="Ver conteúdo do e-mail"
                   @click="abrirPreview(item)"
               >
-                <i class="bi bi-eye"></i>
+                <i aria-hidden="true" class="bi bi-eye"></i>
+                <span>Preview</span>
               </BButton>
             </div>
           </template>
@@ -142,18 +146,21 @@
             responsive
             small
         >
-          <template #cell(unidadeSigla)="{ item }">
-            <span class="fw-semibold">{{ item.unidadeSigla || '-' }}</span>
+          <template #cell(destinatario)="{ item }">
+            <div class="fw-semibold" :title="item.destinatario">
+              {{ formatarDestinatario(item) }}
+            </div>
+          </template>
+
+          <template #cell(tipoNotificacao)="{ item }">
+            <span>{{ formatarTipoNotificacao(item.tipoNotificacao) }}</span>
           </template>
 
           <template #cell(assunto)="{ item }">
             <div class="linha-assunto" :title="item.assunto">
-              <div class="fw-semibold">{{ item.assunto }}</div>
+              <div class="fw-semibold">{{ formatarAssunto(item.assunto) }}</div>
               <div class="text-muted small">
                 {{ resumirContexto(item) }}
-              </div>
-              <div class="text-muted small text-break">
-                {{ item.destinatario }}
               </div>
             </div>
           </template>
@@ -182,12 +189,13 @@
               <BButton
                   v-if="item.corpoHtml"
                   size="sm"
-                  variant="link"
-                  class="p-0 me-2"
+                  variant="outline-secondary"
+                  class="btn-preview me-2"
                   title="Ver conteúdo do e-mail"
                   @click="abrirPreview(item)"
               >
-                <i class="bi bi-eye"></i>
+                <i aria-hidden="true" class="bi bi-eye"></i>
+                <span>Preview</span>
               </BButton>
               <BButton
                   v-if="item.situacao === 'FALHA_DEFINITIVA'"
@@ -279,8 +287,33 @@ const mostrarModalReenvio = ref(false);
 const mostrarPreview = ref(false);
 const reenviando = ref(false);
 
+const TIPOS_NOTIFICACAO_LABELS: Record<string, string> = {
+  PROCESSO_INICIADO: "Início do processo",
+  PROCESSO_FINALIZADO: "Finalização do processo",
+  DATA_LIMITE_ALTERADA: "Alteração da data limite",
+  LEMBRETE_PRAZO: "Lembrete de prazo",
+  ATRIBUICAO_TEMPORARIA: "Atribuição temporária",
+  CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",
+  CADASTRO_DEVOLVIDO: "Cadastro devolvido para ajustes",
+  CADASTRO_ACEITO: "Cadastro aceito",
+  CADASTRO_HOMOLOGADO: "Cadastro homologado",
+  CADASTRO_REABERTO: "Cadastro reaberto",
+  REVISAO_CADASTRO_DISPONIBILIZADA: "Revisão de cadastro disponibilizada",
+  REVISAO_CADASTRO_DEVOLVIDA: "Revisão de cadastro devolvida",
+  REVISAO_CADASTRO_ACEITA: "Revisão de cadastro aceita",
+  REVISAO_CADASTRO_HOMOLOGADA: "Revisão de cadastro homologada",
+  REVISAO_CADASTRO_REABERTA: "Revisão de cadastro reaberta",
+  MAPA_DISPONIBILIZADO: "Mapa disponibilizado",
+  MAPA_SUGESTOES_APRESENTADAS: "Sugestões apresentadas para o mapa",
+  MAPA_VALIDADO: "Mapa validado",
+  MAPA_VALIDACAO_DEVOLVIDA: "Validação do mapa devolvida",
+  MAPA_VALIDACAO_ACEITA: "Validação do mapa aceita",
+  MAPA_HOMOLOGADO: "Mapa homologado",
+};
+
 const camposBase = [
-  {key: "unidadeSigla", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.UNIDADE, thClass: "col-unidade", tdClass: "col-unidade fw-semibold"},
+  {key: "destinatario", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.DESTINATARIO, thClass: "col-destinatario", tdClass: "col-destinatario"},
+  {key: "tipoNotificacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO, thClass: "col-tipo", tdClass: "col-tipo"},
   {key: "assunto", label: "Assunto"},
 ];
 
@@ -333,18 +366,26 @@ function formatarDataOuHifen(valor?: string | null): string {
 function resumirContexto(item: Notificacao): string {
   return [
     item.processoDescricao,
-    item.tipoNotificacao ? formatarTipoNotificacao(item.tipoNotificacao) : null,
     item.usuarioDestinoTitulo ? `Título ${item.usuarioDestinoTitulo}` : null,
   ].filter(Boolean).join(" • ") || "Sem contexto adicional";
 }
 
-function formatarTipoNotificacao(tipo: string): string {
-  return tipo
-      .toLowerCase()
-      .split("_")
-      .filter(Boolean)
-      .map(parte => parte.charAt(0).toUpperCase() + parte.slice(1))
-      .join(" ");
+function formatarTipoNotificacao(tipo?: string): string {
+  if (!tipo) {
+    return "-";
+  }
+  return TIPOS_NOTIFICACAO_LABELS[tipo] || tipo;
+}
+
+function formatarDestinatario(item: Notificacao): string {
+  if (item.unidadeSigla?.trim()) {
+    return item.unidadeSigla.trim().toUpperCase();
+  }
+  return item.destinatario.trim();
+}
+
+function formatarAssunto(assunto?: string): string {
+  return assunto?.replace(/^SGC:\s*/i, "").trim() || "-";
 }
 
 function filtrarNotificacao(item: Notificacao): boolean {
@@ -362,7 +403,9 @@ function filtrarNotificacao(item: Notificacao): boolean {
     item.processoDescricao,
     item.assunto,
     item.destinatario,
+    formatarDestinatario(item),
     item.tipoNotificacao,
+    formatarTipoNotificacao(item.tipoNotificacao),
     item.usuarioDestinoTitulo,
     item.ultimoErro,
   ].filter(Boolean).join(" ").toLocaleLowerCase("pt-BR");
@@ -446,7 +489,8 @@ onMounted(carregar);
   max-width: min(1100px, calc(100vw - 2rem));
 }
 
-:deep(.col-unidade) { width: 8rem; }
+:deep(.col-destinatario) { width: 12rem; }
+:deep(.col-tipo) { width: 14rem; }
 :deep(.col-status) { width: 10rem; }
 :deep(.col-data) { width: 9rem; }
 :deep(.col-acoes) { width: 6rem; }
@@ -460,6 +504,22 @@ onMounted(carregar);
 
 .linha-assunto {
   min-width: 0;
+}
+
+.btn-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-color: #adb5bd;
+  color: #495057;
+}
+
+.btn-preview:hover,
+.btn-preview:focus {
+  background: #f1f3f5;
+  border-color: #868e96;
+  color: #212529;
 }
 
 .email-content-preview {

@@ -44,7 +44,7 @@ describe('NotificacoesAdminView', () => {
           BButton: { template: '<button @click="$emit(\'click\' )" ><slot/></button>', props: ['disabled', 'variant'] },
           BAlert: { template: '<div><slot/></div>', props: ['modelValue', 'variant'] },
           BTable: {
-            template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(unidadeSigla)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(ultimoErro)" :item="item" /><slot name="cell(proximaTentativaEm)" :item="item" /><slot name="cell(acoes)" :item="item" /><slot name="cell(dataHoraEnvio)" :item="item" /></tr></table>',
+            template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(destinatario)" :item="item" /><slot name="cell(tipoNotificacao)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(ultimoErro)" :item="item" /><slot name="cell(proximaTentativaEm)" :item="item" /><slot name="cell(acoes)" :item="item" /><slot name="cell(dataHoraEnvio)" :item="item" /></tr></table>',
             props: ['fields', 'items']
           },
           BSpinner: true,
@@ -71,7 +71,7 @@ describe('NotificacoesAdminView', () => {
         unidadeSigla: 'U1',
         processoDescricao: 'Processo Alfa',
         tipoNotificacao: 'PROCESSO_INICIADO',
-        destinatario: 'u1@teste.com',
+        destinatario: 'u1@tre-pe.jus.br',
         assunto: 'Assunto Enviado',
         situacao: 'ENVIADO',
         tentativas: 0,
@@ -84,7 +84,8 @@ describe('NotificacoesAdminView', () => {
         subprocessoCodigo: 10,
         unidadeSigla: 'U1',
         processoDescricao: 'Processo Alfa',
-        destinatario: 'u1@teste.com',
+        tipoNotificacao: 'MAPA_HOMOLOGADO',
+        destinatario: 'admin@tre-pe.jus.br',
         assunto: 'Assunto Pendente',
         situacao: 'FALHA_DEFINITIVA',
         tentativas: 2,
@@ -98,6 +99,9 @@ describe('NotificacoesAdminView', () => {
 
     expect(wrapper.find('[data-testid="sec-notificacoes-concluidas"]').text()).toContain('Assunto Enviado');
     expect(wrapper.find('[data-testid="sec-notificacoes-pendentes"]').text()).toContain('Assunto Pendente');
+    expect(wrapper.text()).toContain('U1');
+    expect(wrapper.text()).toContain('Início do processo');
+    expect(wrapper.text()).toContain('Mapa homologado');
   });
 
   it('opens preview modal', async () => {
@@ -165,21 +169,23 @@ describe('NotificacoesAdminView', () => {
         codigo: 1,
         unidadeSigla: 'U1',
         processoDescricao: 'Processo Alfa',
-        destinatario: 'alfa@teste.com',
+        destinatario: 'alfa@tre-pe.jus.br',
         assunto: 'Cadastro disponibilizado',
         situacao: 'ENVIADO',
         tentativas: 0,
         dataHoraCriacao: '2023-01-01T10:00:00Z',
+        tipoNotificacao: 'CADASTRO_DISPONIBILIZADO',
       },
       {
         codigo: 2,
         unidadeSigla: 'U2',
         processoDescricao: 'Processo Beta',
-        destinatario: 'beta@teste.com',
+        destinatario: 'beta@tre-pe.jus.br',
         assunto: 'Falha no envio',
         situacao: 'FALHA_DEFINITIVA',
         tentativas: 3,
         dataHoraCriacao: '2023-01-01T11:00:00Z',
+        tipoNotificacao: 'MAPA_VALIDADO',
       }
     ];
     (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
