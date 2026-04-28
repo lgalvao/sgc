@@ -163,41 +163,4 @@ describe('NotificacoesAdminView', () => {
     expect(vi.mocked(listarNotificacoesAdmin)).toHaveBeenCalled();
   });
 
-  it('filters notifications by search term and status', async () => {
-    const mockData = [
-      {
-        codigo: 1,
-        unidadeSigla: 'U1',
-        processoDescricao: 'Processo Alfa',
-        destinatario: 'alfa@tre-pe.jus.br',
-        assunto: 'Cadastro disponibilizado',
-        situacao: 'ENVIADO',
-        tentativas: 0,
-        dataHoraCriacao: '2023-01-01T10:00:00Z',
-        tipoNotificacao: 'CADASTRO_DISPONIBILIZADO',
-      },
-      {
-        codigo: 2,
-        unidadeSigla: 'U2',
-        processoDescricao: 'Processo Beta',
-        destinatario: 'beta@tre-pe.jus.br',
-        assunto: 'Falha no envio',
-        situacao: 'FALHA_DEFINITIVA',
-        tentativas: 3,
-        dataHoraCriacao: '2023-01-01T11:00:00Z',
-        tipoNotificacao: 'MAPA_VALIDADO',
-      }
-    ];
-    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
-    const wrapper = mountComponent();
-    await flushPromises();
-
-    await wrapper.find('[data-testid="input-notificacoes-busca"]').setValue('beta');
-    expect(wrapper.find('[data-testid="sec-notificacoes-pendentes"]').text()).toContain('Falha no envio');
-    expect(wrapper.find('[data-testid="sec-notificacoes-concluidas"]').text()).not.toContain('Cadastro disponibilizado');
-
-    await wrapper.find('[data-testid="select-notificacoes-situacao"]').setValue('ENVIADO');
-    expect(wrapper.find('[data-testid="sec-notificacoes-concluidas"]').text()).not.toContain('Cadastro disponibilizado');
-    expect(wrapper.find('[data-testid="alert-notificacoes-sem-pendencias"]').exists()).toBe(true);
-  });
 });

@@ -34,42 +34,6 @@
           @dismissed="clear"
       />
 
-      <div class="painel-filtros mb-4">
-        <div class="row g-3 align-items-end">
-          <div class="col-12 col-lg-8">
-            <label class="form-label" for="filtro-notificacoes-busca">
-              {{ TEXTOS.administracao.NOTIFICACOES_BUSCA_LABEL }}
-            </label>
-            <input
-                id="filtro-notificacoes-busca"
-                v-model.trim="termoBusca"
-                class="form-control"
-                data-testid="input-notificacoes-busca"
-                :placeholder="TEXTOS.administracao.NOTIFICACOES_BUSCA_PLACEHOLDER"
-                type="search"
-            >
-          </div>
-          <div class="col-12 col-lg-4">
-            <label class="form-label" for="filtro-notificacoes-situacao">
-              {{ TEXTOS.administracao.NOTIFICACOES_FILTRO_SITUACAO_LABEL }}
-            </label>
-            <select
-                id="filtro-notificacoes-situacao"
-                v-model="filtroSituacao"
-                class="form-select"
-                data-testid="select-notificacoes-situacao"
-            >
-              <option value="TODAS">{{ TEXTOS.administracao.NOTIFICACOES_FILTRO_SITUACAO_TODAS }}</option>
-              <option value="PENDENTE">Pendente</option>
-              <option value="ENVIANDO">Enviando...</option>
-              <option value="ENVIADO">Enviado</option>
-              <option value="FALHA_TEMPORARIA">Falha temporária</option>
-              <option value="FALHA_DEFINITIVA">Falha definitiva</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
       <section class="mb-5" data-testid="sec-notificacoes-concluidas">
         <h2 class="h4 mb-3">{{ TEXTOS.administracao.NOTIFICACOES_CONCLUIDAS_TITULO }}</h2>
         <EmptyState
@@ -86,6 +50,7 @@
             hover
             responsive
             small
+            sort-icon-left
         >
           <template #cell(destinatario)="{ item }">
             <div class="fw-semibold" :title="item.destinatario">
@@ -122,7 +87,6 @@
                   @click="abrirPreview(item)"
               >
                 <i aria-hidden="true" class="bi bi-eye"></i>
-                <span>Preview</span>
               </BButton>
             </div>
           </template>
@@ -145,6 +109,7 @@
             hover
             responsive
             small
+            sort-icon-left
         >
           <template #cell(destinatario)="{ item }">
             <div class="fw-semibold" :title="item.destinatario">
@@ -195,7 +160,6 @@
                   @click="abrirPreview(item)"
               >
                 <i aria-hidden="true" class="bi bi-eye"></i>
-                <span>Preview</span>
               </BButton>
               <BButton
                   v-if="item.situacao === 'FALHA_DEFINITIVA'"
@@ -279,8 +243,6 @@ const {notificacao, notify, clear} = useNotification();
 const itens = ref<Notificacao[]>([]);
 const carregando = ref(true);
 const erro = ref<string | null>(null);
-const termoBusca = ref("");
-const filtroSituacao = ref<StatusNotificacao | "TODAS">("TODAS");
 const itemSelecionado = ref<Notificacao | null>(null);
 const itemParaPreview = ref<Notificacao | null>(null);
 const mostrarModalReenvio = ref(false);
@@ -312,28 +274,27 @@ const TIPOS_NOTIFICACAO_LABELS: Record<string, string> = {
 };
 
 const camposBase = [
-  {key: "destinatario", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.DESTINATARIO, thClass: "col-destinatario", tdClass: "col-destinatario"},
-  {key: "tipoNotificacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO, thClass: "col-tipo", tdClass: "col-tipo"},
-  {key: "assunto", label: "Assunto"},
+  {key: "destinatario", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.DESTINATARIO, thClass: "col-destinatario", tdClass: "col-destinatario", sortable: true},
+  {key: "tipoNotificacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO, thClass: "col-tipo", tdClass: "col-tipo", sortable: true, formatter: (value: unknown, _key: string, item?: Notificacao) => formatarTipoNotificacao(typeof value === "string" ? value : item?.tipoNotificacao)},
+  {key: "assunto", label: "Assunto", sortable: true, formatter: (value: unknown) => formatarAssunto(typeof value === "string" ? value : undefined)},
 ];
 
 const camposConcluidas = [
   ...camposBase,
-  {key: "dataHoraEnvio", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.CONCLUSAO, thClass: "col-data", tdClass: "col-data"},
+  {key: "dataHoraEnvio", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.CONCLUSAO, thClass: "col-data", tdClass: "col-data", sortable: true},
   {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
 ];
 
 const camposPendentes = [
   ...camposBase,
-  {key: "situacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS, thClass: "col-status", tdClass: "col-status"},
-  {key: "ultimoErro", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ERRO},
-  {key: "proximaTentativaEm", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROXIMA_TENTATIVA, thClass: "col-data", tdClass: "col-data"},
+  {key: "situacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS, thClass: "col-status", tdClass: "col-status", sortable: true},
+  {key: "ultimoErro", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.ERRO, sortable: true},
+  {key: "proximaTentativaEm", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROXIMA_TENTATIVA, thClass: "col-data", tdClass: "col-data", sortable: true},
   {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
 ];
 
-const itensFiltrados = computed(() => itens.value.filter(filtrarNotificacao));
-const enviadas = computed(() => itensFiltrados.value.filter(i => i.situacao === "ENVIADO"));
-const pendentes = computed(() => itensFiltrados.value.filter(i => i.situacao !== "ENVIADO"));
+const enviadas = computed(() => itens.value.filter(i => i.situacao === "ENVIADO"));
+const pendentes = computed(() => itens.value.filter(i => i.situacao !== "ENVIADO"));
 
 function statusLabel(status: StatusNotificacao): string {
   const labels: Record<StatusNotificacao, string> = {
@@ -378,8 +339,17 @@ function formatarTipoNotificacao(tipo?: string): string {
 }
 
 function formatarDestinatario(item: Notificacao): string {
+  if (item.usuarioDestinoTitulo?.trim()) {
+    return item.destinatario.trim();
+  }
   if (item.unidadeSigla?.trim()) {
     return item.unidadeSigla.trim().toUpperCase();
+  }
+  const correspondenciaEmailInstitucional = item.destinatario
+      .trim()
+      .match(/^([^@]+)@tre-pe\.jus\.br$/i);
+  if (correspondenciaEmailInstitucional?.[1]) {
+    return correspondenciaEmailInstitucional[1].toUpperCase();
   }
   return item.destinatario.trim();
 }
@@ -388,33 +358,8 @@ function formatarAssunto(assunto?: string): string {
   return assunto?.replace(/^SGC:\s*/i, "").trim() || "-";
 }
 
-function filtrarNotificacao(item: Notificacao): boolean {
-  if (filtroSituacao.value !== "TODAS" && item.situacao !== filtroSituacao.value) {
-    return false;
-  }
-
-  const termo = termoBusca.value.trim().toLocaleLowerCase("pt-BR");
-  if (!termo) {
-    return true;
-  }
-
-  const conteudo = [
-    item.unidadeSigla,
-    item.processoDescricao,
-    item.assunto,
-    item.destinatario,
-    formatarDestinatario(item),
-    item.tipoNotificacao,
-    formatarTipoNotificacao(item.tipoNotificacao),
-    item.usuarioDestinoTitulo,
-    item.ultimoErro,
-  ].filter(Boolean).join(" ").toLocaleLowerCase("pt-BR");
-
-  return conteudo.includes(termo);
-}
-
 function montarPreviewHtml(corpoHtml?: string): string {
-  const conteudo = corpoHtml?.trim() || "<p>Conteúdo indisponível.</p>";
+  const conteudo = limparHtmlPreview(corpoHtml?.trim() || "<p>Conteúdo indisponível.</p>");
   return `<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
@@ -441,6 +386,13 @@ function montarPreviewHtml(corpoHtml?: string): string {
   </head>
   <body>${conteudo}</body>
 </html>`;
+}
+
+function limparHtmlPreview(html: string): string {
+  return html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      .replace(/\son\w+=(["']).*?\1/gi, "")
+      .replace(/\son\w+=([^\s>]+)/gi, "");
 }
 
 async function carregar() {
@@ -494,13 +446,6 @@ onMounted(carregar);
 :deep(.col-status) { width: 10rem; }
 :deep(.col-data) { width: 9rem; }
 :deep(.col-acoes) { width: 6rem; }
-
-.painel-filtros {
-  background: #f8f9fa;
-  border: 1px solid var(--bs-border-color-translucent);
-  border-radius: 0.75rem;
-  padding: 1rem;
-}
 
 .linha-assunto {
   min-width: 0;
