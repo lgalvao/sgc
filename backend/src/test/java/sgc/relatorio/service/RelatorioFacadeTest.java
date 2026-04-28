@@ -241,8 +241,8 @@ class RelatorioFacadeTest {
         assertThat(resultado).hasSize(3);
 
         // Valida sp1
-        assertThat(resultado.get(0).titular()).isEqualTo("Não designado");
-        assertThat(resultado.get(0).responsavel()).isEqualTo("Não designado");
+        assertThat(resultado.getFirst().titular()).isEqualTo("Não designado");
+        assertThat(resultado.getFirst().responsavel()).isEqualTo("Não designado");
         assertThat(resultado.get(0).localizacao()).isEqualTo("-");
         assertThat(resultado.get(0).dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
 

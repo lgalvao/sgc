@@ -26,10 +26,6 @@ class SubprocessoAcessoServiceTest {
     @InjectMocks
     private SubprocessoAcessoService acessoService;
 
-    @BeforeEach
-    void setUp() {
-    }
-
     @Test
     void shouldResolverPermissoesForFinalizado() {
         Subprocesso subprocesso = new Subprocesso();

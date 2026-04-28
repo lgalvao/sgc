@@ -143,14 +143,9 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         List<Alerta> alertasDevolucao =
                 alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
-        // No setUp não gera alerta manual, mas a devolução gera. 
-        // Se houver algum alerta de início de processo, considerar. 
-        // No BaseIntegrationTest o BD é limpo? Sim, @Transactional.
         assertThat(alertasDevolucao).isNotEmpty();
         assertThat(alertasDevolucao.getFirst().getDescricao())
-                .contains(
-                        "Validação do mapa da unidade " + unidade.getSigla() + " devolvida para"
-                                + " ajustes");
+                .contains("Validação do mapa da unidade %s devolvida para ajustes".formatted(unidade.getSigla()));
         assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla())
                 .isEqualTo(subprocesso.getUnidade().getSigla());
 

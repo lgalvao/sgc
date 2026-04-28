@@ -556,7 +556,7 @@ public class SubprocessoController {
     }
 
     private String sanitizar(String texto) {
-        return Optional.ofNullable(texto)
+        return Optional.of(texto)
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
     }

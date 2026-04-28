@@ -2,7 +2,6 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.event.*;
 import org.springframework.context.*;
 import org.springframework.stereotype.*;
@@ -21,7 +20,7 @@ public class CacheAquecimento implements ApplicationListener<ApplicationReadyEve
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
 
     @Override
-    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         try {
             log.info("Iniciando aquecimento dos caches organizacionais...");
             cacheViewsOrganizacaoService.listarTodasUnidades();

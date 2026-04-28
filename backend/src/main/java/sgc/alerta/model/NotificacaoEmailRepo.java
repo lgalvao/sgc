@@ -43,7 +43,7 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
              where notificacao.codigo = :#{#cmd.codigo}
                and notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIANDO
             """)
-    int marcarEnviado(@Param("cmd") MarcarEnviadoCommand cmd);
+    void marcarEnviado(@Param("cmd") MarcarEnviadoCommand cmd);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
@@ -55,7 +55,7 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
              where notificacao.codigo = :#{#cmd.codigo}
                and notificacao.situacao = sgc.alerta.model.SituacaoNotificacao.ENVIANDO
             """)
-    int marcarFalha(@Param("cmd") MarcarFalhaCommand cmd);
+    void marcarFalha(@Param("cmd") MarcarFalhaCommand cmd);
 
     List<NotificacaoEmail> findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(Long subprocessoCodigo, Pageable pageable);
 

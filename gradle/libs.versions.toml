@@ -3,7 +3,6 @@
 springBoot = "4.0.6"
 springDependencyManagement = "1.1.7"
 springDoc = "3.0.2"
-jakartaServlet = "6.1.0"
 
 # Tools & Plugins
 jacoco = "0.8.14"
@@ -14,7 +13,6 @@ openRewrite = "7.18.0"
 # Security & Core Overrides
 jackson = "3.1.1"
 tomcat = "11.0.21"
-thymeleaf = "3.1.4.RELEASE"
 jjwt = "0.13.0"
 owaspSanitizer = "20260313.1"
 
@@ -54,7 +52,6 @@ spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools
 jackson-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson" }
 jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
 tomcat-embed-core = { module = "org.apache.tomcat.embed:tomcat-embed-core", version.ref = "tomcat" }
-thymeleaf-spring6 = { module = "org.thymeleaf:thymeleaf-spring6", version.ref = "thymeleaf" }
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }

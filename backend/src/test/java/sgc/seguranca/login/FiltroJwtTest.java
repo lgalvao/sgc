@@ -69,7 +69,7 @@ class FiltroJwtTest {
 
     @Test
     @DisplayName("Deve ignorar endpoint de eventos SSE")
-    void deveIgnorarEndpointEventos() throws IOException {
+    void deveIgnorarEndpointEventos() {
         when(request.getRequestURI()).thenReturn("/api/eventos");
 
         assertThat(filtro.shouldNotFilter(request)).isTrue();

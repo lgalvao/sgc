@@ -160,7 +160,6 @@ public class ImpactoMapaService {
 
         Set<String> descAnterioresAlteradas = alteradas.stream()
                 .map(AtividadeImpactadaDto::descricaoAnterior)
-                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         List<AtividadeImpactadaDto> removidas = new ArrayList<>();

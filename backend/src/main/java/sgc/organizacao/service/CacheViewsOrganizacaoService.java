@@ -57,7 +57,6 @@ public class CacheViewsOrganizacaoService {
     @Cacheable(cacheNames = CacheConfig.CACHE_VW_RESPONSABILIDADE, sync = true)
     public List<ResponsabilidadeLeitura> listarTodasResponsabilidades() {
         return List.copyOf(responsabilidadeRepo.listarTodasLeituras().stream()
-                .filter(Objects::nonNull)
                 .toList());
     }
 

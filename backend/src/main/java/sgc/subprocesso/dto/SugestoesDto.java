@@ -12,6 +12,6 @@ public record SugestoesDto(String sugestoes) {
     }
 
     public static SugestoesDto de(String sugestoes) {
-        return new SugestoesDto(sugestoes != null ? sugestoes : "");
+        return new SugestoesDto(sugestoes);
     }
 }
