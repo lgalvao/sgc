@@ -74,7 +74,7 @@ public class NotificacaoService {
     public List<NotificacaoEmail> listarTodasAdmin(int limite) {
         int tamanho = Math.max(1, Math.min(limite, LIMITE_CONSULTA_MAXIMO));
         // Busca as notificações mais recentes de processos em andamento
-        return notificacaoEmailRepo.findTopByProcessoEmAndamento(PageRequest.of(0, tamanho));
+        return notificacaoEmailRepo.buscarRecentesDeProcessosEmAndamento(PageRequest.of(0, tamanho));
     }
 
     @Transactional(readOnly = true)

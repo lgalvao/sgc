@@ -68,7 +68,7 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
              where processo.situacao = sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO
              order by notificacao.dataHoraCriacao desc
             """)
-    List<NotificacaoEmail> findTopByProcessoEmAndamento(Pageable pageable);
+    List<NotificacaoEmail> buscarRecentesDeProcessosEmAndamento(Pageable pageable);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
