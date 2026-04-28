@@ -85,6 +85,21 @@ Ajustes relacionados:
 - [backend/src/main/resources/templates/email/aceite-revisao-cadastro.html](C:/sgc/backend/src/main/resources/templates/email/aceite-revisao-cadastro.html)
 - [backend/src/main/resources/templates/email/aceite-revisao-cadastro-superior.html](C:/sgc/backend/src/main/resources/templates/email/aceite-revisao-cadastro-superior.html)
 
+#### Mapa / validação
+
+Revisados nesta rodada:
+
+- [backend/src/main/resources/templates/email/mapa-disponibilizado.html](C:/sgc/backend/src/main/resources/templates/email/mapa-disponibilizado.html)
+- [backend/src/main/resources/templates/email/mapa-disponibilizado-superior.html](C:/sgc/backend/src/main/resources/templates/email/mapa-disponibilizado-superior.html)
+- [backend/src/main/resources/templates/email/sugestoes-mapa.html](C:/sgc/backend/src/main/resources/templates/email/sugestoes-mapa.html)
+- [backend/src/main/resources/templates/email/sugestoes-mapa-superior.html](C:/sgc/backend/src/main/resources/templates/email/sugestoes-mapa-superior.html)
+- [backend/src/main/resources/templates/email/validacao-mapa.html](C:/sgc/backend/src/main/resources/templates/email/validacao-mapa.html)
+- [backend/src/main/resources/templates/email/validacao-mapa-superior.html](C:/sgc/backend/src/main/resources/templates/email/validacao-mapa-superior.html)
+- [backend/src/main/resources/templates/email/devolucao-validacao.html](C:/sgc/backend/src/main/resources/templates/email/devolucao-validacao.html)
+- [backend/src/main/resources/templates/email/devolucao-validacao-superior.html](C:/sgc/backend/src/main/resources/templates/email/devolucao-validacao-superior.html)
+- [backend/src/main/resources/templates/email/aceite-validacao.html](C:/sgc/backend/src/main/resources/templates/email/aceite-validacao.html)
+- [backend/src/main/resources/templates/email/aceite-validacao-superior.html](C:/sgc/backend/src/main/resources/templates/email/aceite-validacao-superior.html)
+
 ### 3. Testes criados/reforçados
 
 #### Testes de renderização real
@@ -103,6 +118,12 @@ Esse teste hoje cobre:
 - disponibilização de revisão de cadastro;
 - devolução de revisão de cadastro;
 - aceite de revisão de cadastro.
+- mapa disponibilizado;
+- mapa disponibilizado para unidade superior.
+- sugestões para mapa;
+- validação de mapa.
+- devolução de validação de mapa;
+- aceite de validação de mapa.
 
 #### Teste sistêmico de padrão visual
 
@@ -146,18 +167,10 @@ Status na última execução:
 
 ### 1. Grupo mapa / validação
 
-Próxima frente principal:
+Status atual:
 
-- [backend/src/main/resources/templates/email/mapa-disponibilizado.html](C:/sgc/backend/src/main/resources/templates/email/mapa-disponibilizado.html)
-- [backend/src/main/resources/templates/email/mapa-disponibilizado-superior.html](C:/sgc/backend/src/main/resources/templates/email/mapa-disponibilizado-superior.html)
-- [backend/src/main/resources/templates/email/sugestoes-mapa.html](C:/sgc/backend/src/main/resources/templates/email/sugestoes-mapa.html)
-- [backend/src/main/resources/templates/email/sugestoes-mapa-superior.html](C:/sgc/backend/src/main/resources/templates/email/sugestoes-mapa-superior.html)
-- [backend/src/main/resources/templates/email/validacao-mapa.html](C:/sgc/backend/src/main/resources/templates/email/validacao-mapa.html)
-- [backend/src/main/resources/templates/email/validacao-mapa-superior.html](C:/sgc/backend/src/main/resources/templates/email/validacao-mapa-superior.html)
-- [backend/src/main/resources/templates/email/devolucao-validacao.html](C:/sgc/backend/src/main/resources/templates/email/devolucao-validacao.html)
-- [backend/src/main/resources/templates/email/devolucao-validacao-superior.html](C:/sgc/backend/src/main/resources/templates/email/devolucao-validacao-superior.html)
-- [backend/src/main/resources/templates/email/aceite-validacao.html](C:/sgc/backend/src/main/resources/templates/email/aceite-validacao.html)
-- [backend/src/main/resources/templates/email/aceite-validacao-superior.html](C:/sgc/backend/src/main/resources/templates/email/aceite-validacao-superior.html)
+- bloco principal de `mapa / validação` revisado.
+- falta apenas decidir se algum template desse grupo ainda possui versão legada paralela sem uso.
 
 Fonte principal:
 
@@ -189,11 +202,10 @@ Sugestão:
 
 ## Ordem recomendada para continuar
 
-1. Revisar o grupo `mapa / validação`.
-2. Criar testes de renderização para esse grupo em `EmailModelosRenderIntegrationTest`.
-3. Expandir `EmailTemplatesPadraoVisualTest` para os templates recém-revisados, proibindo `style=` e `class="btn"`.
-4. Revisar `data-limite-alterada.html`.
-5. Decidir o destino dos templates legados.
+1. Revisar `data-limite-alterada.html`.
+2. Identificar e decidir o destino dos templates legados/órfãos.
+3. Verificar se ainda há templates ativos fora do conjunto “sem style inline / sem btn” e ampliar o teste sistêmico onde couber.
+4. Se houver tempo, reforçar integrações GreenMail para algum fluxo de mapa/validação além dos já existentes.
 
 ## Regras práticas para continuar
 

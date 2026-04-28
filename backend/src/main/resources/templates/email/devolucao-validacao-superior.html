@@ -3,14 +3,19 @@
 <body>
 <th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
-        <h1>Validação do mapa devolvida - Unidade subordinada</h1>
+        <h1>Validação do mapa de competências devolvida para ajustes</h1>
     </th:block>
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
-<p>Informamos que a validação do mapa de competências da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> foi
-    devolvida para ajustes no processo
-    <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
-<p><strong>Observações/Motivo:</strong> <span th:text="${observacoes}">Justificativa da devolução</span></p>
+        <p>
+            Informamos que a validação do mapa de competências da unidade
+            <strong th:text="${siglaUnidade}">UNIDADE</strong> foi devolvida para ajustes no processo
+            <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+        </p>
+        <p th:if="${observacoes != null}">
+            <strong>Observações da análise:</strong>
+            <span th:text="${observacoes}">Justificativa da devolução</span>
+        </p>
     </th:block>
 </th:block>
 </body>

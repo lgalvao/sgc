@@ -3,13 +3,19 @@
 <body>
 <th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
-        <h1>Validação do mapa aceita - Unidade subordinada</h1>
+        <h1>Validação do mapa de competências submetida para análise</h1>
     </th:block>
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
-<p>Informamos que a validação do mapa de competências da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> foi
-    aceita e submetida para análise no processo
-    <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
+        <p>
+            Informamos que a validação do mapa de competências da unidade
+            <strong th:text="${siglaUnidade}">UNIDADE</strong> foi submetida para análise no processo
+            <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+        </p>
+        <p>
+            A análise já pode ser realizada no Sistema de Gestão de Competências
+            (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).
+        </p>
     </th:block>
 </th:block>
 </body>

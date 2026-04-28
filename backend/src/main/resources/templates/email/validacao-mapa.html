@@ -3,39 +3,19 @@
 <body>
 <th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
-        <h1>Validação de Mapa de Competências</h1>
+        <h1>Validação do mapa de competências submetida para análise</h1>
     </th:block>
     <th:block th:fragment="conteudo">
-        <p>Prezado(a) responsável,</p>
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
 
         <p>
-        A unidade
-        <strong th:text="${siglaUnidade}">SIGLA_UNIDADE</strong> validou o
-        mapa de competências elaborado no processo
-        <strong th:text="${nomeProcesso}">NOME_PROCESSO</strong>.
+            A unidade <strong th:text="${siglaUnidade}">SIGLA_UNIDADE</strong> validou o mapa de competências
+            elaborado no processo <strong th:text="${nomeProcesso}">NOME_PROCESSO</strong>.
         </p>
 
-        <div class="highlight-box">
         <p>
-        <strong>Unidade:</strong>
-        <span th:text="${siglaUnidade}">SIGLA_UNIDADE</span>
-        </p>
-        <p>
-        <strong>Processo:</strong>
-        <span th:text="${nomeProcesso}">NOME_PROCESSO</span>
-        </p>
-        <p><strong>Status:</strong> Validado e aguardando análise</p>
-        </div>
-
-        <p>
-        A análise dessa validação já pode ser realizada no Sistema de Gestão
-        de Competências.
-        </p>
-
-        <p style="margin-top: 20px">
-        <a href="https://sgc.tre-pe.jus.br" class="btn">
-        Acessar o Sistema
-        </a>
+            A análise dessa validação já pode ser realizada no Sistema de Gestão de Competências
+            (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).
         </p>
     </th:block>
 </th:block>

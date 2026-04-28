@@ -3,26 +3,20 @@
 <body>
 <th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
-        <h1 th:text="${titulo}">Mapa de Competências disponibilizado</h1>
+        <h1>Mapa de competências disponibilizado</h1>
     </th:block>
     <th:block th:fragment="conteudo">
-        <p>O mapa de Competências da sua unidade foi disponibilizado para validação.</p>
-        <div class="highlight-box">
-            <p style="margin: 5px 0;"><strong>Unidade:</strong> <span th:text="${nomeUnidade}"></span></p>
-            <p style="margin: 5px 0;"><strong>Processo:</strong> <span th:text="${nomeProcesso}"></span></p>
-            <p style="margin: 5px 0;"><strong>Data limite para validação:</strong> <span
-                    th:text="${dataLimiteValidacao}"></span></p>
-        </div>
-        <p><strong>Ações necessárias:</strong></p>
-        <ul>
-            <li>Revisar o mapa de competências gerado</li>
-            <li>Validar ou solicitar ajustes</li>
-            <li>Concluir a validação antes da data limite</li>
-        </ul>
-        <p style="margin-top: 20px;">
-            <a href="https://sgc.tre-pe.jus.br" class="btn">
-                Validar mapa
-            </a>
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}">UNIDADE</strong>,</p>
+
+        <p>
+            O mapa de competências de sua unidade foi disponibilizado no contexto do processo
+            <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+        </p>
+
+        <p>
+            A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências
+            (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>). O prazo para conclusão desta etapa
+            do processo é <strong th:text="${dataLimiteValidacao}">30/04/2026</strong>.
         </p>
     </th:block>
 </th:block>

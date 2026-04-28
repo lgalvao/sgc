@@ -259,4 +259,124 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("A análise já pode ser realizada no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
+
+    @Test
+    @DisplayName("Deve renderizar mapa disponibilizado conforme CDU-17")
+    void deveRenderizarMapaDisponibilizado() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Processo mapa 2026");
+        context.setVariable("dataLimiteValidacao", "12/05/2026");
+
+        String html = templateEngine.process("mapa-disponibilizado", context);
+
+        assertThat(html)
+                .contains("Mapa de competências disponibilizado")
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("O mapa de competências de sua unidade foi disponibilizado")
+                .contains("Processo mapa 2026")
+                .contains("12/05/2026")
+                .contains("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar mapa disponibilizado para unidade superior conforme CDU-17")
+    void deveRenderizarMapaDisponibilizadoSuperior() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("nomeProcesso", "Processo mapa 2026");
+        context.setVariable("dataLimiteValidacao", "12/05/2026");
+
+        String html = templateEngine.process("mapa-disponibilizado-superior", context);
+
+        assertThat(html)
+                .contains("Mapa de competências disponibilizado")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("O mapa de competências da <strong>SESEL</strong> foi disponibilizado")
+                .contains("Processo mapa 2026")
+                .contains("12/05/2026")
+                .contains("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar sugestões de mapa conforme CDU-19")
+    void deveRenderizarSugestoesMapa() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("nomeProcesso", "Processo mapa 2026");
+
+        String html = templateEngine.process("sugestoes-mapa", context);
+
+        assertThat(html)
+                .contains("Sugestões apresentadas para o mapa de competências")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A unidade <strong>SESEL</strong> apresentou sugestões para o mapa de")
+                .contains("competências")
+                .contains("Processo mapa 2026")
+                .contains("A análise dessas sugestões já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar validação de mapa conforme CDU-19")
+    void deveRenderizarValidacaoMapa() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("nomeProcesso", "Processo mapa 2026");
+
+        String html = templateEngine.process("validacao-mapa", context);
+
+        assertThat(html)
+                .contains("Validação do mapa de competências submetida para análise")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A unidade <strong>SESEL</strong> validou o mapa de competências")
+                .contains("Processo mapa 2026")
+                .contains("A análise dessa validação já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar devolução de validação conforme CDU-20")
+    void deveRenderizarDevolucaoValidacao() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Processo mapa 2026");
+        context.setVariable("observacoes", "Favor revisar a validação apresentada.");
+
+        String html = templateEngine.process("devolucao-validacao", context);
+
+        assertThat(html)
+                .contains("Validação do mapa de competências devolvida para ajustes")
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("A validação do mapa de competências da <strong>SESEL</strong>")
+                .contains("Processo mapa 2026")
+                .contains("Favor revisar a validação apresentada.")
+                .contains("Acompanhe o processo no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar aceite de validação conforme CDU-20")
+    void deveRenderizarAceiteValidacao() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("nomeProcesso", "Processo mapa 2026");
+
+        String html = templateEngine.process("aceite-validacao", context);
+
+        assertThat(html)
+                .contains("Validação do mapa de competências submetida para análise")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A validação do mapa de competências da <strong>SESEL</strong>")
+                .contains("Processo mapa 2026")
+                .contains("foi submetida para análise por essa")
+                .contains("A análise já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
 }

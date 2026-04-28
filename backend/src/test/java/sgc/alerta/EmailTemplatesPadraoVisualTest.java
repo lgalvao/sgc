@@ -29,6 +29,17 @@ class EmailTemplatesPadraoVisualTest {
             "disponibilizacao-revisao-cadastro.html",
             "disponibilizacao-revisao-cadastro-superior.html",
             "lembrete-prazo.html"
+            ,
+            "mapa-disponibilizado.html",
+            "mapa-disponibilizado-superior.html",
+            "sugestoes-mapa.html",
+            "sugestoes-mapa-superior.html",
+            "validacao-mapa.html",
+            "validacao-mapa-superior.html",
+            "devolucao-validacao.html",
+            "devolucao-validacao-superior.html",
+            "aceite-validacao.html",
+            "aceite-validacao-superior.html"
     );
 
     @Test
