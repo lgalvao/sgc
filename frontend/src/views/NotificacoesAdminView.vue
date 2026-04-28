@@ -34,6 +34,42 @@
           @dismissed="clear"
       />
 
+      <div class="painel-filtros mb-4">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-8">
+            <label class="form-label" for="filtro-notificacoes-busca">
+              {{ TEXTOS.administracao.NOTIFICACOES_BUSCA_LABEL }}
+            </label>
+            <input
+                id="filtro-notificacoes-busca"
+                v-model.trim="termoBusca"
+                class="form-control"
+                data-testid="input-notificacoes-busca"
+                :placeholder="TEXTOS.administracao.NOTIFICACOES_BUSCA_PLACEHOLDER"
+                type="search"
+            >
+          </div>
+          <div class="col-12 col-lg-4">
+            <label class="form-label" for="filtro-notificacoes-situacao">
+              {{ TEXTOS.administracao.NOTIFICACOES_FILTRO_SITUACAO_LABEL }}
+            </label>
+            <select
+                id="filtro-notificacoes-situacao"
+                v-model="filtroSituacao"
+                class="form-select"
+                data-testid="select-notificacoes-situacao"
+            >
+              <option value="TODAS">{{ TEXTOS.administracao.NOTIFICACOES_FILTRO_SITUACAO_TODAS }}</option>
+              <option value="PENDENTE">Pendente</option>
+              <option value="ENVIANDO">Enviando...</option>
+              <option value="ENVIADO">Enviado</option>
+              <option value="FALHA_TEMPORARIA">Falha temporária</option>
+              <option value="FALHA_DEFINITIVA">Falha definitiva</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <section class="mb-5" data-testid="sec-notificacoes-concluidas">
         <h2 class="h4 mb-3">{{ TEXTOS.administracao.NOTIFICACOES_CONCLUIDAS_TITULO }}</h2>
         <EmptyState
@@ -56,8 +92,14 @@
           </template>
 
           <template #cell(assunto)="{ item }">
-            <div :title="item.assunto">
-              {{ item.assunto }}
+            <div class="linha-assunto" :title="item.assunto">
+              <div class="fw-semibold">{{ item.assunto }}</div>
+              <div class="text-muted small">
+                {{ resumirContexto(item) }}
+              </div>
+              <div class="text-muted small text-break">
+                {{ item.destinatario }}
+              </div>
             </div>
           </template>
 
@@ -105,8 +147,14 @@
           </template>
 
           <template #cell(assunto)="{ item }">
-            <div :title="item.assunto">
-              {{ item.assunto }}
+            <div class="linha-assunto" :title="item.assunto">
+              <div class="fw-semibold">{{ item.assunto }}</div>
+              <div class="text-muted small">
+                {{ resumirContexto(item) }}
+              </div>
+              <div class="text-muted small text-break">
+                {{ item.destinatario }}
+              </div>
             </div>
           </template>
 
@@ -168,10 +216,17 @@
     >
       <div v-if="itemParaPreview" class="p-3">
         <div class="mb-3 border-bottom pb-2">
-          <strong>Para:</strong> {{ itemParaPreview.destinatario }}<br>
-          <strong>Enviado em:</strong> {{ formatarDataOuHifen(itemParaPreview.dataHoraCriacao) }}
+          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_DESTINATARIO }}:</strong> {{ itemParaPreview.destinatario }}<br>
+          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_CRIACAO }}:</strong> {{ formatarDataOuHifen(itemParaPreview.dataHoraCriacao) }}
         </div>
-        <div class="email-content-preview border p-3 bg-light rounded" v-html="itemParaPreview.corpoHtml"></div>
+        <p class="text-muted small mb-2">{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_AVISO }}</p>
+        <iframe
+            class="email-content-preview"
+            data-testid="iframe-preview-email"
+            sandbox=""
+            :srcdoc="montarPreviewHtml(itemParaPreview.corpoHtml)"
+            title="Preview do e-mail"
+        />
       </div>
     </BModal>
 
@@ -216,6 +271,8 @@ const {notificacao, notify, clear} = useNotification();
 const itens = ref<Notificacao[]>([]);
 const carregando = ref(true);
 const erro = ref<string | null>(null);
+const termoBusca = ref("");
+const filtroSituacao = ref<StatusNotificacao | "TODAS">("TODAS");
 const itemSelecionado = ref<Notificacao | null>(null);
 const itemParaPreview = ref<Notificacao | null>(null);
 const mostrarModalReenvio = ref(false);
@@ -241,8 +298,9 @@ const camposPendentes = [
   {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
 ];
 
-const enviadas = computed(() => itens.value.filter(i => i.situacao === "ENVIADO"));
-const pendentes = computed(() => itens.value.filter(i => i.situacao !== "ENVIADO"));
+const itensFiltrados = computed(() => itens.value.filter(filtrarNotificacao));
+const enviadas = computed(() => itensFiltrados.value.filter(i => i.situacao === "ENVIADO"));
+const pendentes = computed(() => itensFiltrados.value.filter(i => i.situacao !== "ENVIADO"));
 
 function statusLabel(status: StatusNotificacao): string {
   const labels: Record<StatusNotificacao, string> = {
@@ -270,6 +328,76 @@ function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";
   const formatada = formatDateTimeBR(valor);
   return formatada === "Não informado" || formatada === "Data inválida" ? "-" : formatada;
+}
+
+function resumirContexto(item: Notificacao): string {
+  return [
+    item.processoDescricao,
+    item.tipoNotificacao ? formatarTipoNotificacao(item.tipoNotificacao) : null,
+    item.usuarioDestinoTitulo ? `Título ${item.usuarioDestinoTitulo}` : null,
+  ].filter(Boolean).join(" • ") || "Sem contexto adicional";
+}
+
+function formatarTipoNotificacao(tipo: string): string {
+  return tipo
+      .toLowerCase()
+      .split("_")
+      .filter(Boolean)
+      .map(parte => parte.charAt(0).toUpperCase() + parte.slice(1))
+      .join(" ");
+}
+
+function filtrarNotificacao(item: Notificacao): boolean {
+  if (filtroSituacao.value !== "TODAS" && item.situacao !== filtroSituacao.value) {
+    return false;
+  }
+
+  const termo = termoBusca.value.trim().toLocaleLowerCase("pt-BR");
+  if (!termo) {
+    return true;
+  }
+
+  const conteudo = [
+    item.unidadeSigla,
+    item.processoDescricao,
+    item.assunto,
+    item.destinatario,
+    item.tipoNotificacao,
+    item.usuarioDestinoTitulo,
+    item.ultimoErro,
+  ].filter(Boolean).join(" ").toLocaleLowerCase("pt-BR");
+
+  return conteudo.includes(termo);
+}
+
+function montarPreviewHtml(corpoHtml?: string): string {
+  const conteudo = corpoHtml?.trim() || "<p>Conteúdo indisponível.</p>";
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+        color: #212529;
+        background: #fff;
+        overflow-wrap: anywhere;
+      }
+      img, table, pre {
+        max-width: 100%;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>${conteudo}</body>
+</html>`;
 }
 
 async function carregar() {
@@ -314,22 +442,32 @@ onMounted(carregar);
 </script>
 
 <style scoped>
+:deep(.modal-dialog) {
+  max-width: min(1100px, calc(100vw - 2rem));
+}
+
 :deep(.col-unidade) { width: 8rem; }
 :deep(.col-status) { width: 10rem; }
 :deep(.col-data) { width: 9rem; }
 :deep(.col-acoes) { width: 6rem; }
 
-.email-content-preview {
-  min-height: 200px;
-  max-height: 60vh;
-  overflow-y: auto;
-  font-family: sans-serif;
-  line-height: 1.5;
+.painel-filtros {
+  background: #f8f9fa;
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 0.75rem;
+  padding: 1rem;
 }
 
-/* Garante que o HTML injetado não quebre o layout */
-.email-content-preview :deep(img) {
-  max-width: 100%;
-  height: auto;
+.linha-assunto {
+  min-width: 0;
+}
+
+.email-content-preview {
+  width: 100%;
+  min-height: 420px;
+  max-height: 60vh;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  background: #fff;
 }
 </style>

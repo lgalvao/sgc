@@ -49,7 +49,7 @@ describe('NotificacoesAdminView', () => {
           },
           BSpinner: true,
           BBadge: true,
-          BModal: { template: '<div class="modal-stub" v-if="modelValue"><slot/></div>', props: ['modelValue', 'title'] },
+          BModal: { template: '<div v-if="modelValue" class="modal-stub" v-bind="$attrs"><slot/></div>', props: ['modelValue', 'title'] },
           RouterLink: { template: '<a><slot/></a>' },
           UnidadeLink: { template: '<div>{{ item.unidadeSigla }}</div>', props: ['item'] }
         }
@@ -69,9 +69,12 @@ describe('NotificacoesAdminView', () => {
         codigo: 1,
         subprocessoCodigo: 10,
         unidadeSigla: 'U1',
+        processoDescricao: 'Processo Alfa',
+        tipoNotificacao: 'PROCESSO_INICIADO',
         destinatario: 'u1@teste.com',
         assunto: 'Assunto Enviado',
         situacao: 'ENVIADO',
+        tentativas: 0,
         dataHoraCriacao: '2023-01-01T10:00:00Z',
         dataHoraEnvio: '2023-01-01T10:05:00Z',
         corpoHtml: '<p>corpo</p>'
@@ -80,9 +83,11 @@ describe('NotificacoesAdminView', () => {
         codigo: 2,
         subprocessoCodigo: 10,
         unidadeSigla: 'U1',
+        processoDescricao: 'Processo Alfa',
         destinatario: 'u1@teste.com',
         assunto: 'Assunto Pendente',
         situacao: 'FALHA_DEFINITIVA',
+        tentativas: 2,
         dataHoraCriacao: '2023-01-01T11:00:00Z',
         ultimoErro: 'Erro fatal'
       }
@@ -101,6 +106,8 @@ describe('NotificacoesAdminView', () => {
         codigo: 1,
         assunto: 'Assunto Preview',
         situacao: 'ENVIADO',
+        tentativas: 0,
+        dataHoraCriacao: '2023-01-01T10:00:00Z',
         corpoHtml: '<p>conteudo do email</p>',
         destinatario: 'destino@teste.com'
       }
@@ -112,7 +119,9 @@ describe('NotificacoesAdminView', () => {
     await wrapper.find('[data-testid="btn-preview-1"]').trigger('click');
     
     expect(wrapper.find('[data-testid="modal-preview-email"]').exists()).toBe(true);
-    expect(wrapper.find('.email-content-preview').html()).toContain('conteudo do email');
+    const iframe = wrapper.find('[data-testid="iframe-preview-email"]');
+    expect(iframe.exists()).toBe(true);
+    expect((iframe.element as HTMLIFrameElement).getAttribute('srcdoc')).toContain('conteudo do email');
   });
 
   it('handles re-send action', async () => {
@@ -120,6 +129,7 @@ describe('NotificacoesAdminView', () => {
       {
         codigo: 2,
         situacao: 'FALHA_DEFINITIVA',
+        tentativas: 5,
         destinatario: 'destino@teste.com'
       }
     ];
@@ -147,5 +157,41 @@ describe('NotificacoesAdminView', () => {
     vi.clearAllMocks();
     await wrapper.find('[data-testid="btn-notificacoes-atualizar"]').trigger('click');
     expect(vi.mocked(listarNotificacoesAdmin)).toHaveBeenCalled();
+  });
+
+  it('filters notifications by search term and status', async () => {
+    const mockData = [
+      {
+        codigo: 1,
+        unidadeSigla: 'U1',
+        processoDescricao: 'Processo Alfa',
+        destinatario: 'alfa@teste.com',
+        assunto: 'Cadastro disponibilizado',
+        situacao: 'ENVIADO',
+        tentativas: 0,
+        dataHoraCriacao: '2023-01-01T10:00:00Z',
+      },
+      {
+        codigo: 2,
+        unidadeSigla: 'U2',
+        processoDescricao: 'Processo Beta',
+        destinatario: 'beta@teste.com',
+        assunto: 'Falha no envio',
+        situacao: 'FALHA_DEFINITIVA',
+        tentativas: 3,
+        dataHoraCriacao: '2023-01-01T11:00:00Z',
+      }
+    ];
+    (vi.mocked(listarNotificacoesAdmin) as any).mockResolvedValue(mockData);
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    await wrapper.find('[data-testid="input-notificacoes-busca"]').setValue('beta');
+    expect(wrapper.find('[data-testid="sec-notificacoes-pendentes"]').text()).toContain('Falha no envio');
+    expect(wrapper.find('[data-testid="sec-notificacoes-concluidas"]').text()).not.toContain('Cadastro disponibilizado');
+
+    await wrapper.find('[data-testid="select-notificacoes-situacao"]').setValue('ENVIADO');
+    expect(wrapper.find('[data-testid="sec-notificacoes-concluidas"]').text()).not.toContain('Cadastro disponibilizado');
+    expect(wrapper.find('[data-testid="alert-notificacoes-sem-pendencias"]').exists()).toBe(true);
   });
 });

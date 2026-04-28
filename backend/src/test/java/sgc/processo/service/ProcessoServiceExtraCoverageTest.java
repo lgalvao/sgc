@@ -324,8 +324,8 @@ class ProcessoServiceExtraCoverageTest {
     }
 
     @Test
-    @DisplayName("enviarLembrete deve falhar quando unidade estiver sem titular oficial")
-    void enviarLembreteDeveFalharSemTitularOficial() {
+    @DisplayName("enviarLembrete deve usar e-mail institucional da unidade mesmo sem titular oficial")
+    void enviarLembreteDeveUsarEmailInstitucionalMesmoSemTitularOficial() {
         Processo processo = criarProcessoComParticipante(2L, 20L);
         when(processoRepo.buscarPorCodigoComParticipantes(2L)).thenReturn(Optional.of(processo));
 
@@ -337,9 +337,13 @@ class ProcessoServiceExtraCoverageTest {
 
         when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html/>");
 
-        assertThatThrownBy(() -> processoService.enviarLembrete(2L, 20L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem titular oficial");
+        processoService.enviarLembrete(2L, 20L);
+
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "u20@tre-pe.jus.br".equals(cmd.destinatario())
+                        && "U20".equals(cmd.unidadeDestinoSigla())
+                        && cmd.chaveIdempotencia().startsWith("processo:2:lembrete:unidade:20:dia:")
+        ));
     }
 
     @Test
@@ -494,8 +498,8 @@ class ProcessoServiceExtraCoverageTest {
     }
 
     @Test
-    @DisplayName("enviarLembrete deve falhar quando titular oficial for nulo")
-    void enviarLembreteDeveFalharQuandoTitularForNulo() {
+    @DisplayName("enviarLembrete deve usar e-mail institucional quando titular oficial for nulo")
+    void enviarLembreteDeveUsarEmailInstitucionalQuandoTitularForNulo() {
         Processo processo = criarProcessoComParticipante(4L, 40L);
         when(processoRepo.buscarPorCodigoComParticipantes(4L)).thenReturn(Optional.of(processo));
 
@@ -506,9 +510,13 @@ class ProcessoServiceExtraCoverageTest {
         when(unidadeService.buscarPorCodigo(40L)).thenReturn(unidade);
         when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html/>");
 
-        assertThatThrownBy(() -> processoService.enviarLembrete(4L, 40L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem titular oficial");
+        processoService.enviarLembrete(4L, 40L);
+
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "u40@tre-pe.jus.br".equals(cmd.destinatario())
+                        && "U40".equals(cmd.unidadeDestinoSigla())
+                        && cmd.chaveIdempotencia().startsWith("processo:4:lembrete:unidade:40:dia:")
+        ));
     }
 
     @Test
@@ -596,6 +604,7 @@ class ProcessoServiceExtraCoverageTest {
         @DisplayName("deve enviar lembrete com sucesso")
         void sucesso() {
             Processo p = new Processo();
+            p.setCodigo(1L);
             p.setDescricao("Processo Teste");
             p.setDataLimite(LocalDateTime.of(2026, 3, 22, 12, 0));
             UnidadeProcesso up = new UnidadeProcesso();
@@ -606,18 +615,18 @@ class ProcessoServiceExtraCoverageTest {
             Unidade u = new Unidade();
             u.setCodigo(1L);
             u.setSigla("UNI1");
-            u.setTituloTitular("TITULAR");
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(u);
 
             when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("html");
-            Usuario titular = new Usuario();
-            titular.setEmail("titular@teste.com");
-            when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(titular);
 
             processoService.enviarLembrete(1L, 1L);
 
             verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
-            verify(notificacaoService).enfileirar(argThat(cmd -> "titular@teste.com".equals(cmd.destinatario())));
+            verify(notificacaoService).enfileirar(argThat(cmd ->
+                    "uni1@tre-pe.jus.br".equals(cmd.destinatario())
+                            && "UNI1".equals(cmd.unidadeDestinoSigla())
+                            && cmd.chaveIdempotencia().startsWith("processo:1:lembrete:unidade:1:dia:")
+            ));
         }
     }
 

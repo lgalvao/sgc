@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.*;
+import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
@@ -568,24 +569,24 @@ class ProcessoServiceCoverageTest {
         Unidade u = new Unidade();
         u.setCodigo(10L);
         u.setSigla("U1");
-        u.setTituloTitular("titular");
         u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
         u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
         
         p.adicionarParticipantes(Set.of(u));
-        
-        Usuario titular = new Usuario();
-        titular.setEmail("teste@teste.com");
 
         when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
         when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-        when(usuarioService.buscarPorLogin("titular")).thenReturn(titular);
         when(emailModelosService.criarEmailLembretePrazo(any(), any(), any())).thenReturn("<html></html>");
 
         target.enviarLembrete(1L, 10L);
 
         verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
-        verify(notificacaoService).enfileirar(argThat(cmd -> "teste@teste.com".equals(cmd.destinatario())));
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "u1@tre-pe.jus.br".equals(cmd.destinatario())
+                        && cmd.tipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO
+                        && "U1".equals(cmd.unidadeDestinoSigla())
+                        && cmd.chaveIdempotencia().startsWith("processo:1:lembrete:unidade:10:dia:")
+        ));
     }
 
     @Test

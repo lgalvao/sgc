@@ -13,6 +13,8 @@ export interface Notificacao {
     unidadeSigla?: string;
     unidadeDestinoSigla?: string;
     processoDescricao?: string;
+    tipoNotificacao?: string;
+    usuarioDestinoTitulo?: string;
     destinatario: string;
     assunto: string;
     corpoHtml?: string;
