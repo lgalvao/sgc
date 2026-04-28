@@ -3,26 +3,19 @@
 <body>
 <th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
-        <h1 th:text="${titulo}">Cadastro disponibilizado para Análise</h1>
+        <h1>Cadastro de atividades e conhecimentos disponibilizado</h1>
     </th:block>
     <th:block th:fragment="conteudo">
-        <p>Um cadastro de atividades está disponível para sua análise.</p>
-        <div class="highlight-box">
-            <p style="margin: 5px 0;"><strong>Unidade:</strong> <span th:text="${nomeUnidade}"></span></p>
-            <p style="margin: 5px 0;"><strong>Processo:</strong> <span th:text="${nomeProcesso}"></span></p>
-            <p style="margin: 5px 0;"><strong>Atividades cadastradas:</strong> <span
-                    th:text="${quantidadeAtividades}"></span></p>
-        </div>
-        <p><strong>Ações necessárias:</strong></p>
-        <ul>
-            <li>Analisar o cadastro de atividades</li>
-            <li>Verificar conformidade com as diretrizes</li>
-            <li>Aceitar o cadastro ou devolver para ajustes</li>
-        </ul>
-        <p style="margin-top: 20px;">
-            <a href="https://sgc.tre-pe.jus.br" class="btn">
-                Analisar cadastro
-            </a>
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeDestino}">UNIDADE SUPERIOR</strong>,</p>
+
+        <p>
+            A unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> disponibilizou o cadastro de atividades e
+            conhecimentos do processo <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+        </p>
+
+        <p>
+            A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências
+            (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).
         </p>
     </th:block>
 </th:block>

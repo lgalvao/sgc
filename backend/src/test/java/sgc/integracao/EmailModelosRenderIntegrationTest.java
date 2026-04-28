@@ -2,8 +2,9 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.thymeleaf.context.*;
+import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
-import sgc.integracao.mocks.*;
 
 import java.time.*;
 import java.util.*;
@@ -16,6 +17,9 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EmailModelosService emailModelosService;
+
+    @Autowired
+    private SpringTemplateEngine templateEngine;
 
     @Test
     @DisplayName("Deve renderizar início de processo de mapeamento para unidade participante")
@@ -111,6 +115,88 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("21/05/2026")
                 .contains("Férias do titular")
                 .contains("escolha o perfil <strong>CHEFE</strong>")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar cadastro disponibilizado conforme CDU-09")
+    void deveRenderizarCadastroDisponibilizado() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("siglaUnidadeDestino", "COSIS");
+        context.setVariable("nomeProcesso", "Processo cadastro 2026");
+
+        String html = templateEngine.process("cadastro-disponibilizado", context);
+
+        assertThat(html)
+                .contains("Cadastro de atividades e conhecimentos disponibilizado")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A unidade <strong>SESEL</strong> disponibilizou o cadastro de atividades e")
+                .contains("conhecimentos do processo")
+                .contains("Processo cadastro 2026")
+                .contains("A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar cadastro disponibilizado para unidade superior conforme CDU-09")
+    void deveRenderizarCadastroDisponibilizadoSuperior() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("siglaUnidadeSuperior", "STIC");
+        context.setVariable("nomeProcesso", "Processo cadastro 2026");
+
+        String html = templateEngine.process("cadastro-disponibilizado-superior", context);
+
+        assertThat(html)
+                .contains("Cadastro disponibilizado em unidade subordinada")
+                .contains("Prezado(a) responsável pela <strong>STIC</strong>")
+                .contains("cadastro de atividades da unidade <strong>SESEL</strong>")
+                .contains("Processo cadastro 2026")
+                .contains("A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar cadastro devolvido conforme CDU-13")
+    void deveRenderizarCadastroDevolvido() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("siglaUnidadeDestino", "SESEL");
+        context.setVariable("nomeProcesso", "Processo devolucao 2026");
+        context.setVariable("observacoes", "Favor revisar as atividades cadastradas.");
+
+        String html = templateEngine.process("cadastro-devolvido", context);
+
+        assertThat(html)
+                .contains("Cadastro de atividades e conhecimentos devolvido para ajustes")
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("O cadastro de atividades e conhecimentos da <strong>SESEL</strong> no processo")
+                .contains("Processo devolucao 2026")
+                .contains("Observações da análise")
+                .contains("Favor revisar as atividades cadastradas.")
+                .contains("Acompanhe o processo no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar cadastro aceito conforme CDU-13")
+    void deveRenderizarCadastroAceito() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeOrigem", "SESEL");
+        context.setVariable("siglaUnidadeDestino", "COSIS");
+        context.setVariable("nomeProcesso", "Processo aceite 2026");
+
+        String html = templateEngine.process("aceite-cadastro", context);
+
+        assertThat(html)
+                .contains("Cadastro de atividades e conhecimentos submetido para análise")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("O cadastro de atividades e conhecimentos da")
+                .contains("<strong>SESEL</strong>")
+                .contains("Processo aceite 2026")
+                .contains("foi submetido para análise por essa unidade")
+                .contains("A análise já pode ser realizada no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
 }

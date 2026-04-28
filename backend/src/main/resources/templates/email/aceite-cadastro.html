@@ -3,27 +3,20 @@
 <body>
 <th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
-        <h1>Cadastro submetido para Análise</h1>
+        <h1>Cadastro de atividades e conhecimentos submetido para análise</h1>
     </th:block>
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeDestino}">SIGLA_UNIDADE_DESTINO</strong>,</p>
 
-        <p>O cadastro de atividades e conhecimentos da <strong
-                th:text="${siglaUnidadeOrigem}">SIGLA_UNIDADE_ORIGEM</strong> no processo <strong
-                th:text="${nomeProcesso}">NOME_PROCESSO</strong> foi submetido para análise por essa unidade.</p>
+        <p>
+            O cadastro de atividades e conhecimentos da
+            <strong th:text="${siglaUnidadeOrigem}">SIGLA_UNIDADE_ORIGEM</strong> no processo
+            <strong th:text="${nomeProcesso}">NOME_PROCESSO</strong> foi submetido para análise por essa unidade.
+        </p>
 
-        <div class="highlight-box">
-            <p><strong>Unidade:</strong> <span th:text="${siglaUnidadeOrigem}">SIGLA_UNIDADE_ORIGEM</span></p>
-            <p><strong>Processo:</strong> <span th:text="${nomeProcesso}">NOME_PROCESSO</span></p>
-            <p><strong>Status:</strong> Aguardando análise</p>
-        </div>
-
-        <p>A análise já pode ser realizada no Sistema de Gestão de Competências.</p>
-
-        <p style="margin-top: 20px;">
-            <a class="btn" href="https://sgc.tre-pe.jus.br">
-                Acessar o Sistema
-            </a>
+        <p>
+            A análise já pode ser realizada no Sistema de Gestão de Competências
+            (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).
         </p>
     </th:block>
 </th:block>

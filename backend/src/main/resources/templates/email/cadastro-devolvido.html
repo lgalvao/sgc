@@ -3,29 +3,24 @@
 <body>
 <th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
-        <h1 th:text="${titulo}">Cadastro devolvido para Ajustes</h1>
+        <h1>Cadastro de atividades e conhecimentos devolvido para ajustes</h1>
     </th:block>
     <th:block th:fragment="conteudo">
-        <p>O cadastro de atividades da sua unidade foi devolvido para ajustes.</p>
-        <div class="highlight-box">
-            <p style="margin: 5px 0;"><strong>Unidade:</strong> <span th:text="${nomeUnidade}"></span></p>
-            <p style="margin: 5px 0;"><strong>Processo:</strong> <span th:text="${nomeProcesso}"></span></p>
-        </div>
-        <div class="highlight-box">
-            <p style="margin: 5px 0;"><strong>Motivo da devolução:</strong></p>
-            <p style="margin: 10px 0;" th:text="${motivo}"></p>
-            <p style="margin: 15px 0 5px 0;"><strong>Observações do analista:</strong></p>
-            <p style="margin: 10px 0;" th:text="${observacoes}"></p>
-        </div>
-        <p><strong>Próximos passos:</strong></p>
-        <ul>
-            <li>Realize os ajustes solicitados</li>
-            <li>Disponibilize novamente o cadastro para análise</li>
-        </ul>
-        <p style="margin-top: 20px;">
-            <a href="https://sgc.tre-pe.jus.br" class="btn">
-                Ajustar cadastro
-            </a>
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeDestino}">UNIDADE</strong>,</p>
+
+        <p>
+            O cadastro de atividades e conhecimentos da <strong th:text="${siglaUnidade}">UNIDADE</strong> no processo
+            <strong th:text="${nomeProcesso}">PROCESSO</strong> foi devolvido para ajustes.
+        </p>
+
+        <p th:if="${observacoes != null}">
+            <strong>Observações da análise:</strong>
+            <span th:text="${observacoes}">Observações</span>
+        </p>
+
+        <p>
+            Acompanhe o processo no Sistema de Gestão de Competências:
+            <a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>.
         </p>
     </th:block>
 </th:block>

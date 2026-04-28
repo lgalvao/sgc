@@ -9,23 +9,25 @@ describe("notificacaoService", () => {
         vi.clearAllMocks();
     });
 
-    it("listarResumoSubprocessosAtivos deve chamar endpoint administrativo", async () => {
-        const dados = [{subprocessoCodigo: 1, statusGeral: "PENDENTE"}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: dados});
+    it("listarNotificacoesAdmin deve chamar endpoint administrativo", async () => {
+        const dados = [{ codigo: 1, destinatario: "teste@teste.com", situacao: "PENDENTE" }];
+        vi.mocked(apiClient.get).mockResolvedValue({ data: dados });
 
-        const resultado = await service.listarResumoSubprocessosAtivos();
+        const resultado = await service.listarNotificacoesAdmin(20);
 
-        expect(apiClient.get).toHaveBeenCalledWith("/admin/notificacoes/subprocessos-ativos");
+        expect(apiClient.get).toHaveBeenCalledWith("/admin/notificacoes/listar", {
+            params: { limite: 20 }
+        });
         expect(resultado).toEqual(dados);
     });
 
-    it("reenviarFalhasDefinitivas deve chamar endpoint de reenvio do subprocesso", async () => {
-        const resposta = {subprocessoCodigo: 1, reenfileiradas: 2};
-        vi.mocked(apiClient.post).mockResolvedValue({data: resposta});
+    it("reenviarNotificacao deve chamar endpoint de reenvio por código", async () => {
+        const resposta = { codigo: 123, reenfileiradas: 1 };
+        vi.mocked(apiClient.post).mockResolvedValue({ data: resposta });
 
-        const resultado = await service.reenviarFalhasDefinitivas(1);
+        const resultado = await service.reenviarNotificacao(123);
 
-        expect(apiClient.post).toHaveBeenCalledWith("/admin/notificacoes/subprocessos/1/reenviar");
+        expect(apiClient.post).toHaveBeenCalledWith("/admin/notificacoes/123/reenviar");
         expect(resultado).toEqual(resposta);
     });
 });

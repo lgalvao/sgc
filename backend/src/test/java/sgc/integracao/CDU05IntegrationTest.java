@@ -189,6 +189,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         unidadeSuperior.setCodigo(null);
         unidadeSuperior.setSigla("U_SUP");
         unidadeSuperior.setNome("Unidade superior");
+        unidadeSuperior.setTipo(TipoUnidade.INTERMEDIARIA);
         unidadeSuperior = unidadeRepo.save(unidadeSuperior);
         registrarUsuarioSeNecessario("202020202020");
         registrarResponsabilidade(unidadeSuperior.getCodigo(), "202020202020", "20202020");
@@ -258,7 +259,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(algumEmailComAssunto("SGC: Início de processo de revisão do mapa de competências")).isTrue();
         assertThat(algumEmailComAssunto("SGC: Início de processo de revisão do mapa de competências em unidades subordinadas")).isTrue();
         assertThat(algumEmailContem("Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos")).isTrue();
-        assertThat(algumEmailContem("estas revisões forem sendo disponibilizadas")).isTrue();
+        assertThat(algumEmailContem("Estas unidades já podem iniciar a revisão")).isTrue();
         assertThat(algumEmailContem("Acompanhe o processo no Sistema de Gestão de Competências")).isTrue();
     }
 
