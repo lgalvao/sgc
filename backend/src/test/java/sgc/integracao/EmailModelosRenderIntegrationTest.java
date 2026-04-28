@@ -93,6 +93,28 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Deve renderizar alteração de data limite conforme CDU-27")
+    void deveRenderizarAlteracaoDataLimite() {
+        Context context = new Context();
+        context.setVariable("titulo", "SGC: Data limite alterada");
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Processo prazo 2026");
+        context.setVariable("novaData", "30/06/2026");
+        context.setVariable("etapa", 2);
+
+        String html = templateEngine.process("data-limite-alterada", context);
+
+        assertThat(html)
+                .contains("SGC: Data limite alterada")
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("A data limite da etapa atual no processo <strong>Processo prazo 2026</strong>")
+                .contains("foi alterada para <strong>30/06/2026</strong>")
+                .contains("Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+
+    @Test
     @DisplayName("Deve renderizar atribuição temporária conforme CDU")
     void deveRenderizarAtribuicaoTemporaria() {
         String html = emailModelosService.criarEmailAtribuicaoTemporaria(

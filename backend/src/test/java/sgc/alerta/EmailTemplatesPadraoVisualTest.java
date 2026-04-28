@@ -14,33 +14,6 @@ import static org.assertj.core.api.Assertions.*;
 class EmailTemplatesPadraoVisualTest {
     private static final Path DIRETORIO_TEMPLATES = Paths.get("src", "main", "resources", "templates", "email");
     private static final String REFERENCIA_LAYOUT = "th:replace=\"~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}\"";
-    private static final Set<String> TEMPLATES_SEM_ESTILO_INLINE = Set.of(
-            "aceite-cadastro.html",
-            "aceite-cadastro-superior.html",
-            "aceite-revisao-cadastro.html",
-            "aceite-revisao-cadastro-superior.html",
-            "cadastro-devolvido.html",
-            "cadastro-devolvido-superior.html",
-            "cadastro-disponibilizado.html",
-            "cadastro-disponibilizado-superior.html",
-            "atribuicao-temporaria.html",
-            "devolucao-revisao-cadastro.html",
-            "devolucao-revisao-cadastro-superior.html",
-            "disponibilizacao-revisao-cadastro.html",
-            "disponibilizacao-revisao-cadastro-superior.html",
-            "lembrete-prazo.html"
-            ,
-            "mapa-disponibilizado.html",
-            "mapa-disponibilizado-superior.html",
-            "sugestoes-mapa.html",
-            "sugestoes-mapa-superior.html",
-            "validacao-mapa.html",
-            "validacao-mapa-superior.html",
-            "devolucao-validacao.html",
-            "devolucao-validacao-superior.html",
-            "aceite-validacao.html",
-            "aceite-validacao-superior.html"
-    );
 
     @Test
     @DisplayName("layout compartilhado deve concentrar a identidade visual do sistema")
@@ -114,17 +87,21 @@ class EmailTemplatesPadraoVisualTest {
     }
 
     @Test
-    @DisplayName("templates já revisados não devem usar estilo inline nem botão destacado")
-    void templatesRevisadosNaoDevemUsarEstiloInlineNemBotaoDestacado() {
-        for (String nomeTemplate : TEMPLATES_SEM_ESTILO_INLINE) {
-            String conteudo = ler(DIRETORIO_TEMPLATES.resolve(nomeTemplate));
+    @DisplayName("todos os templates de conteúdo não devem usar estilo inline nem botão destacado")
+    void todosOsTemplatesDeConteudoNaoDevemUsarEstiloInlineNemBotaoDestacado() throws IOException {
+        List<Path> templates = listarTemplates()
+                .filter(path -> !path.getFileName().toString().equals("_layout.html"))
+                .toList();
+
+        assertThat(templates).allSatisfy(path -> {
+            String conteudo = ler(path);
             assertThat(conteudo)
-                    .withFailMessage("Template %s não deve usar estilo inline.", nomeTemplate)
+                    .withFailMessage("Template %s não deve usar estilo inline.", path.getFileName())
                     .doesNotContain("style=");
             assertThat(conteudo)
-                    .withFailMessage("Template %s não deve usar botão destacado.", nomeTemplate)
+                    .withFailMessage("Template %s não deve usar botão destacado.", path.getFileName())
                     .doesNotContain("class=\"btn\"");
-        }
+        });
     }
 
     private Stream<Path> listarTemplates() throws IOException {

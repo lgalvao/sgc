@@ -8,10 +8,10 @@
     <th:block th:fragment="conteudo">
         <p>Um novo processo de <strong th:text="${tipoProcesso}"></strong> foi iniciado para sua unidade.</p>
         <div class="highlight-box">
-            <p style="margin: 5px 0;"><strong>Unidade:</strong> <span th:text="${nomeUnidade}"></span></p>
-            <p style="margin: 5px 0;"><strong>Processo:</strong> <span th:text="${nomeProcesso}"></span></p>
-            <p style="margin: 5px 0;"><strong>Tipo:</strong> <span th:text="${tipoProcesso}"></span></p>
-            <p style="margin: 5px 0;"><strong>Data limite para etapa 1:</strong> <span th:text="${dataLimite}"></span>
+            <p><strong>Unidade:</strong> <span th:text="${nomeUnidade}"></span></p>
+            <p><strong>Processo:</strong> <span th:text="${nomeProcesso}"></span></p>
+            <p><strong>Tipo:</strong> <span th:text="${tipoProcesso}"></span></p>
+            <p><strong>Data limite para etapa 1:</strong> <span th:text="${dataLimite}"></span>
             </p>
         </div>
         <p><strong>Próximos passos:</strong></p>
@@ -20,8 +20,8 @@
             <li>Complete o cadastro de atividades da unidade</li>
             <li>Disponibilize o cadastro para análise antes da data limite</li>
         </ol>
-        <p style="margin-top: 20px;">
-            <a href="https://sgc.tre-pe.jus.br" class="btn">
+        <p>
+            <a href="https://sgc.tre-pe.jus.br">
                 Acessar sistema
             </a>
         </p>
