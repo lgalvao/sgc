@@ -22,7 +22,7 @@ function Invoke-Passo {
 
 Clear-Host
 
-Invoke-Passo 'Git pull'          { git pull }
+Invoke-Passo 'git pull'          { git pull }
 Invoke-Passo 'Testes backend'    { gradle backend:test }
 
 # Garantir que pnpm está instalado
@@ -31,7 +31,8 @@ if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
 }
 
 Invoke-Passo 'Atualizar pnpm'    { pnpm self-update --silent}
-Invoke-Passo 'Atualizar globais' { pnpm update -g }
+Invoke-Passo 'Atualizar pnpm globais' { pnpm update -g }
+Invoke-Passo 'Atualizar npm globais'  { npm update -g }
 
 Invoke-Passo 'Typecheck'         { pnpm run typecheck }
 Invoke-Passo 'Lint'              { pnpm run lint }
