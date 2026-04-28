@@ -1,6 +1,6 @@
 # Plano de Padronização de E-mails do SGC
 
-Data de referência: 28/04/2026
+Data de referência: 28/04/2026 (atualizado em 28/04/2026)
 
 ## Objetivo
 
@@ -180,32 +180,24 @@ Fonte principal:
 - `etc/reqs/cdu-24.md`
 - `etc/reqs/cdu-25.md`
 
-### 2. Ajuste de outros templates ainda não revisados
+### 2. Ajustes concluídos após a última rodada
 
-- [backend/src/main/resources/templates/email/data-limite-alterada.html](C:/sgc/backend/src/main/resources/templates/email/data-limite-alterada.html)
+- `data-limite-alterada.html` revisado e alinhado ao CDU-27.
+- Lote legado revisado: remoção de templates órfãos sem referências no backend (`processo-finalizado.html`, `email-inicio-processo-operacional.html`, `email-inicio-processo-intermediario.html`, `homologacao-mapa.html`, `mapa-validado.html`, `disponibilizacao-cadastro.html`, `devolucao-cadastro.html`).
+- `processo-iniciado.html` mantido por estar referenciado no fluxo ativo (`TipoTransicao.PROCESSO_INICIADO`).
 
-### 3. Templates legados / órfãos
+### 3. Templates ativos adicionais cobertos no teste de padrão visual
 
-Precisam de decisão:
-
-- [backend/src/main/resources/templates/email/processo-iniciado.html](C:/sgc/backend/src/main/resources/templates/email/processo-iniciado.html)
-- [backend/src/main/resources/templates/email/processo-finalizado.html](C:/sgc/backend/src/main/resources/templates/email/processo-finalizado.html)
-- [backend/src/main/resources/templates/email/email-inicio-processo-operacional.html](C:/sgc/backend/src/main/resources/templates/email/email-inicio-processo-operacional.html)
-- [backend/src/main/resources/templates/email/email-inicio-processo-intermediario.html](C:/sgc/backend/src/main/resources/templates/email/email-inicio-processo-intermediario.html)
-- [backend/src/main/resources/templates/email/homologacao-mapa.html](C:/sgc/backend/src/main/resources/templates/email/homologacao-mapa.html)
-
-Sugestão:
-
-- confirmar se ainda são usados;
-- remover se realmente estiverem órfãos;
-- ou migrar/alinhar se houver uso indireto.
+- `cadastro-reaberto.html`
+- `cadastro-reaberto-superior.html`
+- `revisao-cadastro-reaberta.html`
+- `revisao-cadastro-reaberta-superior.html`
 
 ## Ordem recomendada para continuar
 
-1. Revisar `data-limite-alterada.html`.
-2. Identificar e decidir o destino dos templates legados/órfãos.
-3. Verificar se ainda há templates ativos fora do conjunto “sem style inline / sem btn” e ampliar o teste sistêmico onde couber.
-4. Se houver tempo, reforçar integrações GreenMail para algum fluxo de mapa/validação além dos já existentes.
+1. Revisar, por CDU, se os templates `cadastro-reaberto*` e `revisao-cadastro-reaberta*` precisam de ajustes de redação.
+2. Reforçar integração GreenMail para fluxo de alteração de data limite (CDU-27).
+3. Considerar expandir o teste sistêmico para validar ausência de `highlight-box` onde CDU não exige destaque.
 
 ## Regras práticas para continuar
 

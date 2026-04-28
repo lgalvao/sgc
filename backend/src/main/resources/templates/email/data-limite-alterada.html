@@ -7,17 +7,11 @@
     </th:block>
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}"></strong>,</p>
-        <p>Informamos que a data limite da etapa <strong th:text="${etapa}"></strong> do processo
-            <strong th:text="${nomeProcesso}"></strong> foi alterada para
-            <strong th:text="${novaData}"></strong>.</p>
+        <p>A data limite da etapa atual no processo <strong th:text="${nomeProcesso}"></strong>
+            foi alterada para <strong th:text="${novaData}"></strong>.</p>
 
-        <p>Acesse o sistema para verificar as atualizações:</p>
-
-        <p style="margin-top: 20px;">
-            <a href="https://sgc.tre-pe.jus.br" class="btn">
-                Acessar painel
-            </a>
-        </p>
+        <p>Acesse o Sistema de Gestão de Competências:
+            <a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>.</p>
     </th:block>
 </th:block>
 </body>
