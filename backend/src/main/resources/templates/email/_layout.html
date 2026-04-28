@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:fragment="email(cabecalho, conteudo)">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <style>
+        body {
+            margin: 0;
+            padding: 24px 16px;
+            background-color: #f5f7fa;
+            color: #1f2933;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #d9e2ec;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 24px 24px 16px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #d9e2ec;
+            text-align: left;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #102a43;
+            font-size: 22px;
+            line-height: 1.35;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .content p {
+            margin: 0 0 12px;
+        }
+
+        .content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .content ul,
+        .content ol {
+            margin: 0 0 16px;
+            padding-left: 22px;
+        }
+
+        .content li {
+            margin: 0 0 8px;
+        }
+
+        .highlight-box {
+            margin: 20px 0;
+            padding: 16px 18px;
+            background-color: #f8fbff;
+            border: 1px solid #d9e2ec;
+        }
+
+        .highlight-box p {
+            margin: 0 0 6px;
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 10px 16px;
+            background-color: #d9e2ec;
+            border: 1px solid #bcccdc;
+            color: #102a43 !important;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .btn:hover,
+        .btn:focus {
+            background-color: #bcccdc;
+        }
+
+        a {
+            color: #0b69a3;
+        }
+
+        .footer {
+            padding: 16px 24px 24px;
+            border-top: 1px solid #d9e2ec;
+            background-color: #fafbfc;
+            color: #52606d;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .footer p {
+            margin: 4px 0;
+        }
+
+        .assinatura-automatica {
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+    <title>E-mail SGC</title>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <th:block th:replace="${cabecalho}"/>
+    </div>
+    <div class="content">
+        <th:block th:replace="${conteudo}"/>
+    </div>
+    <div class="footer">
+        <p><strong>Sistema de Gestão de Competências - SGC</strong></p>
+        <p>TRE-PE - Tribunal Regional Eleitoral de Pernambuco</p>
+        <p class="assinatura-automatica">Este é um e-mail automático. Não responda.</p>
+    </div>
+</div>
+</body>
+</html>

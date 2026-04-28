@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Sugestões apresentadas para o mapa - Unidade subordinada</title>
-</head>
 <body>
-<p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
+<th:block th:replace="~{email/_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
+    <th:block th:fragment="cabecalho">
+        <h1>Sugestões apresentadas para o mapa - Unidade subordinada</h1>
+    </th:block>
+    <th:block th:fragment="conteudo">
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
 <p>Informamos que foram apresentadas sugestões para o mapa de competências da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong>
     no processo
     <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
+    </th:block>
+</th:block>
 </body>
 </html>

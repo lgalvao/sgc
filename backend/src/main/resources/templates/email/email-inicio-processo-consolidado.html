@@ -1,58 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-
-        .header {
-            background-color: #0066cc;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .content {
-            padding: 20px;
-        }
-
-        .footer {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-left: 4px solid #0066cc;
-        }
-    </style>
-    <title th:text="${titulo}"></title>
-</head>
 <body>
-<div class="container">
-    <div class="header">
+<th:block th:replace="~{email/_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
+    <th:block th:fragment="cabecalho">
         <h1 th:text="${titulo}">Início de processo</h1>
-    </div>
-    <div class="content">
+    </th:block>
+    <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}"></strong>,</p>
 
         <!-- Parte 12.1 (Participante) -->
@@ -76,15 +29,11 @@
             Acompanhe o processo no Sistema de Gestão de Competências:
         </p>
         <p>
-            <a href="https://sgc.tre-pe.jus.br"
-               style="background-color: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            <a href="https://sgc.tre-pe.jus.br" class="btn">
                 Acessar SGC
             </a>
         </p>
-    </div>
-    <div class="footer">
-        <p>Sistema de Gestão de Competências - TRE-PE</p>
-    </div>
-</div>
+    </th:block>
+</th:block>
 </body>
 </html>

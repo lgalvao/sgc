@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Cadastro reaberto</title>
-</head>
 <body>
-<p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}">UNIDADE</strong>,</p>
+<th:block th:replace="~{email/_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
+    <th:block th:fragment="cabecalho">
+        <h1>Cadastro reaberto</h1>
+    </th:block>
+    <th:block th:fragment="conteudo">
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}">UNIDADE</strong>,</p>
 <p>O cadastro de atividades da sua unidade foi reaberto para ajustes.</p>
 <p><strong>Justificativa:</strong> <span th:text="${observacoes}">Motivo da reabertura</span></p>
 <p>Acesse o sistema para realizar as alterações necessárias: <a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>.</p>
+    </th:block>
+</th:block>
 </body>
 </html>
