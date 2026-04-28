@@ -9,21 +9,21 @@ Padronizar os e-mails do SGC em dois eixos:
 - conteúdo alinhado aos arquivos `etc/reqs/cdu-xx.md`;
 - estrutura visual simples, sóbria e consistente, adequada a clientes corporativos de e-mail.
 
-## Diretrizes de continuidade
+## Diretrizes permanentes
 
 ### Fonte de verdade
 
 - Base primária para assunto e corpo: `etc/reqs/cdu-xx.md`.
 - Documento derivado de apoio: `etc/reqs/regras-negocio.md`.
 
-### Padrão técnico atual
+### Padrão técnico
 
 - Manter templates com Thymeleaf nativo e layout compartilhado `_layout.html`.
 - Usar fragmento via `~{_layout :: email(...)}`.
 - Evitar HTML pesado, JavaScript, efeitos visuais chamativos e dependências desnecessárias.
 - Não introduzir `style=` inline em templates novos/revisados.
 - Preferir links simples ao sistema em vez de botões chamativos.
-- Evitar `highlight-box` quando o CDU não exigir destaque real.
+- Evitar `highlight-box` sem exigência explícita do CDU.
 - Usar apenas variáveis efetivamente fornecidas pelo fluxo atual.
 
 ### Regra de validação ao alterar template
@@ -32,19 +32,12 @@ Padronizar os e-mails do SGC em dois eixos:
 - Ao revisar template, incluir/ajustar teste de renderização.
 - Quando um grupo estiver estável, garantir inclusão no teste sistêmico de padrão visual.
 
-## Pendências
+## Estado final desta rodada
 
-1. **Revisar redação dos templates de reabertura por CDU**
-   - Arquivos-alvo:
-     - `backend/src/main/resources/templates/email/cadastro-reaberto.html`
-     - `backend/src/main/resources/templates/email/cadastro-reaberto-superior.html`
-     - `backend/src/main/resources/templates/email/revisao-cadastro-reaberta.html`
-     - `backend/src/main/resources/templates/email/revisao-cadastro-reaberta-superior.html`
-   - Referência principal: CDU de reabertura correspondente.
-
-2. **Confirmar cobertura GreenMail para alteração de data limite (CDU-27)**
-   - Validar destinatário, assunto e trechos essenciais do corpo para `data-limite-alterada`.
-   - Ajustar/expandir cenário de integração se necessário.
+- Fluxo CDU-27 validado com checagem de outbox e entrega real via GreenMail (destinatário, assunto e corpo essencial).
+- Templates de reabertura (`cadastro` e `revisão`) revisados e alinhados à redação dos CDU-32 e CDU-33.
+- Teste sistêmico visual reforçado para impedir uso indevido de `highlight-box`.
+- Não há pendências abertas neste plano nesta data.
 
 3. **Avaliar expansão do teste sistêmico de padrão visual**
    - Critério: reforçar ausência de `highlight-box` onde o CDU não exige destaque.

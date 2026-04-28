@@ -7,10 +7,10 @@
     </th:block>
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}">UNIDADE</strong>,</p>
-<p>A revisão do cadastro de atividades da sua unidade foi reaberta para ajustes no processo
-    <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
-<p><strong>Justificativa:</strong> <span th:text="${observacoes}">Motivo da reabertura</span></p>
-<p>Acesse o sistema para realizar as alterações necessárias.</p>
+        <p>A revisão do cadastro de atividades da sua unidade foi reaberta para ajustes.</p>
+        <p><strong>Processo:</strong> <span th:text="${nomeProcesso}">PROCESSO</span></p>
+        <p><strong>Justificativa:</strong> <span th:text="${observacoes}">Motivo da reabertura</span></p>
+        <p>Acesse o Sistema de Gestão de Competências para realizar as alterações necessárias: <a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>.</p>
     </th:block>
 </th:block>
 </body>
