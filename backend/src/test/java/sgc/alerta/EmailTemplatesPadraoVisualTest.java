@@ -115,7 +115,7 @@ class EmailTemplatesPadraoVisualTest {
 
     @Test
     @DisplayName("templates já revisados não devem usar estilo inline nem botão destacado")
-    void templatesRevisadosNaoDevemUsarEstiloInlineNemBotaoDestacado() throws IOException {
+    void templatesRevisadosNaoDevemUsarEstiloInlineNemBotaoDestacado() {
         for (String nomeTemplate : TEMPLATES_SEM_ESTILO_INLINE) {
             String conteudo = ler(DIRETORIO_TEMPLATES.resolve(nomeTemplate));
             assertThat(conteudo)

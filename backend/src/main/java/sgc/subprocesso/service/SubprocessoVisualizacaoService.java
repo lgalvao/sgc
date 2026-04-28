@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -38,7 +39,7 @@ public class SubprocessoVisualizacaoService {
     public SubprocessoDetalheResponse construirDetalhe(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto, List<Movimentacao> movimentacoes) {
         Subprocesso subprocesso = contexto.subprocesso();
         Unidade unidadeAlvo = contexto.unidadeAlvo();
-        Usuario titular = buscarTitularSeInformado(unidadeAlvo);
+        Usuario titular = buscarTitularUnidade(unidadeAlvo);
 
         return SubprocessoDetalheResponse.builder()
                 .subprocesso(SubprocessoResumoDto.fromEntity(subprocesso))
@@ -118,7 +119,7 @@ public class SubprocessoVisualizacaoService {
                 .toList();
     }
 
-    private Analise obterAnaliseMaisRecentePorTipo(Long codSubprocesso) {
+    private @Nullable Analise obterAnaliseMaisRecentePorTipo(Long codSubprocesso) {
         return listarAnalisesPorTipo(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
     }
 
@@ -152,7 +153,7 @@ public class SubprocessoVisualizacaoService {
                 .collect(Collectors.joining("\u0003"));
     }
 
-    private Usuario buscarTitularSeInformado(Unidade unidade) {
+    private @Nullable Usuario buscarTitularUnidade(Unidade unidade) {
         String tituloTitular = unidade.getTituloTitular();
         if (tituloTitular == null || tituloTitular.isBlank()) {
             return null;
