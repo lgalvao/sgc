@@ -135,6 +135,12 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         long alertasCount = alertaRepo.count();
         assertThat(alertasCount).isGreaterThan(0);
 
-        // O teste de envio de emails está em NotificacaoEmailServiceTest
+        aguardarEmail(1);
+        assertThat(algumEmailPara("u_livre_mapp@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailComAssunto("SGC: Início de processo de mapeamento de competências")).isTrue();
+        assertThat(algumEmailContem("Comunicamos o início do processo")).isTrue();
+        assertThat(algumEmailContem("Processo mapeamento teste CDU-04")).isTrue();
+        assertThat(algumEmailContem("cadastro de atividades e conhecimentos")).isTrue();
+        assertThat(algumEmailContem("O prazo para conclusão desta etapa do processo é")).isTrue();
     }
 }

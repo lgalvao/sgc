@@ -37,6 +37,38 @@ class EmailModelosServiceTest {
     }
 
     @Nested
+    @DisplayName("Geração de E-mails de Início")
+    class Inicio {
+        @Test
+        @DisplayName("Deve criar email de início consolidado com os dados corretos")
+        void criarEmailInicioProcessoConsolidado() {
+            LocalDateTime dataLimite = LocalDateTime.of(2026, 4, 30, 0, 0);
+            List<String> siglasSubordinadas = List.of("SUB1", "SUB2");
+
+            emailModelosService.criarEmailInicioProcessoConsolidado(
+                    "UT",
+                    "Processo teste",
+                    dataLimite,
+                    "MAPEAMENTO",
+                    false,
+                    siglasSubordinadas
+            );
+
+            assertEquals("email-inicio-processo-consolidado", templateNameCaptor.getValue());
+            Context context = contextCaptor.getValue();
+            assertEquals("SGC: Início de processo de mapeamento de competências em unidades subordinadas",
+                    context.getVariable("titulo"));
+            assertEquals("UT", context.getVariable("siglaUnidade"));
+            assertEquals("Processo teste", context.getVariable("nomeProcesso"));
+            assertEquals("30/04/2026", context.getVariable("dataLimite"));
+            assertEquals("MAPEAMENTO", context.getVariable("tipoProcesso"));
+            assertEquals(false, context.getVariable("isParticipante"));
+            assertEquals(siglasSubordinadas, context.getVariable("siglasSubordinadas"));
+            assertEquals(true, context.getVariable("hasSubordinadas"));
+        }
+    }
+
+    @Nested
     @DisplayName("Geração de E-mails de Finalização")
     class Finalizacao {
         @Test
@@ -51,7 +83,7 @@ class EmailModelosServiceTest {
 
             assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
-            assertEquals("Conclusão do processo " + nomeProcesso, context.getVariable("titulo"));
+            assertEquals("Finalização do processo " + nomeProcesso, context.getVariable("titulo"));
             assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
             assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
         }
@@ -70,7 +102,7 @@ class EmailModelosServiceTest {
             assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals(
-                    "Conclusão do processo " + nomeProcesso + " em unidades subordinadas",
+                    "Finalização do processo " + nomeProcesso + " em unidades subordinadas",
                     context.getVariable("titulo"));
             assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
             assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));

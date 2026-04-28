@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <body>
-<th:block th:replace="~{email/_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
+<th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
         <h1 th:text="${titulo}">Atribuição temporária</h1>
     </th:block>
@@ -13,27 +13,24 @@
             <strong th:text="${siglaUnidade}">UNIDADE</strong>.
         </p>
 
-        <div class="highlight-box">
-            <p>
-                <strong>Período:</strong>
-                <span th:text="${dataInicio}">01/01/2026</span>
-                a
-                <span th:text="${dataTermino}">31/01/2026</span>
-            </p>
-            <p>
-                <strong>Justificativa:</strong>
-                <span th:text="${justificativa}">Justificativa</span>
-            </p>
-        </div>
-
         <p>
-            Acesse o sistema para selecionar o perfil <strong>CHEFE</strong> na unidade da atribuição.
+            <strong>Período:</strong>
+            <span th:text="${dataInicio}">01/01/2026</span>
+            a
+            <span th:text="${dataTermino}">31/01/2026</span>.
         </p>
 
         <p>
-            <a class="btn" th:href="${urlSistema}">Acessar o sistema</a>
+            <strong>Justificativa:</strong>
+            <span th:text="${justificativa}">Justificativa</span>.
+        </p>
+
+        <p>
+            Acesse o sistema em <a th:href="${urlSistema}" th:text="${urlSistema}">https://sgc.tre-pe.jus.br</a>
+            e escolha o perfil <strong>CHEFE</strong> para a unidade da atribuição.
         </p>
     </th:block>
 </th:block>
 </body>
 </html>
+

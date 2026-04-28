@@ -116,6 +116,13 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo()).orElseThrow();
         assertThat(unidadeMapa.getMapaVigente()).isNotNull();
         assertThat(unidadeMapa.getMapaVigente().getCodigo()).isEqualTo(subprocesso.getMapa().getCodigo());
+
+        aguardarEmail(1);
+        assertThat(algumEmailPara("cdu21-und@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailComAssunto("SGC: Finalização do processo Processo CDU-21")).isTrue();
+        assertThat(algumEmailContem("Comunicamos a finalização do processo")).isTrue();
+        assertThat(algumEmailContem("Processo CDU-21")).isTrue();
+        assertThat(algumEmailContem("menu \"Minha unidade\"")).isTrue();
     }
 
     @Test

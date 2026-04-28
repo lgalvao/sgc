@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <body>
-<th:block th:replace="~{email/_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
+<th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
     <th:block th:fragment="cabecalho">
         <h1 th:text="${titulo}">Data Limite Alterada</h1>
     </th:block>

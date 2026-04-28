@@ -251,6 +251,15 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigo(subprocessoCriado.getCodigo());
         assertThat(movs).hasSize(1);
         assertThat(movs.getFirst().getDescricao()).isEqualTo("Processo iniciado");
+
+        aguardarEmail(2);
+        assertThat(algumEmailPara("u_rev@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailPara("u_sup@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailComAssunto("SGC: Início de processo de revisão do mapa de competências")).isTrue();
+        assertThat(algumEmailComAssunto("SGC: Início de processo de revisão do mapa de competências em unidades subordinadas")).isTrue();
+        assertThat(algumEmailContem("Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos")).isTrue();
+        assertThat(algumEmailContem("estas revisões forem sendo disponibilizadas")).isTrue();
+        assertThat(algumEmailContem("Acompanhe o processo no Sistema de Gestão de Competências")).isTrue();
     }
 
     @Test

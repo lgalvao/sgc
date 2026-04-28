@@ -986,12 +986,14 @@ public class ProcessoService {
                 unidadeDestino.getSigla(),
                 processo.getDescricao(),
                 dataLimite,
+                processo.getTipo().name(),
                 participante,
                 subordinadas
         );
-        String assunto = participante
-                ? "SGC: Início do processo " + processo.getDescricao()
-                : "SGC: Início do processo " + processo.getDescricao() + " em unidades subordinadas";
+        String assunto = emailModelosService.criarAssuntoInicioProcesso(
+                processo.getTipo().name(),
+                participante
+        );
 
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(subprocessoDestino)

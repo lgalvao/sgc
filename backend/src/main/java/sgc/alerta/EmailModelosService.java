@@ -17,7 +17,7 @@ import java.util.*;
 public class EmailModelosService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "Conclusão do processo ";
+    private static final String TITULO_PROCESSO_FINALIZACAO_SGC = "Finalização do processo ";
     private static final String TITULO_LEMBRETE_PRAZO = "SGC: Lembrete de prazo - ";
 
     private static final String VAR_TITULO = "titulo";
@@ -34,23 +34,30 @@ public class EmailModelosService {
             String siglaUnidade,
             String nomeProcesso,
             LocalDateTime dataLimite,
+            String tipoProcesso,
             boolean isParticipante,
             List<String> siglasSubordinadas) {
 
         Context context = new Context();
-        String assunto = isParticipante
-                ? "SGC: Início de processo de mapeamento de competências"
-                : "SGC: Início de processo de mapeamento de competências em unidades subordinadas";
+        String assunto = criarAssuntoInicioProcesso(tipoProcesso, isParticipante);
 
         context.setVariable(VAR_TITULO, assunto);
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
+        context.setVariable("tipoProcesso", tipoProcesso);
         context.setVariable("isParticipante", isParticipante);
         context.setVariable("siglasSubordinadas", siglasSubordinadas);
         context.setVariable("hasSubordinadas", !siglasSubordinadas.isEmpty());
 
         return templateEngine.process("email-inicio-processo-consolidado", context);
+    }
+
+    public String criarAssuntoInicioProcesso(String tipoProcesso, boolean participante) {
+        String descricaoTipoProcesso = descricaoTipoProcessoInicio(tipoProcesso);
+        return participante
+                ? "SGC: Início de processo de %s".formatted(descricaoTipoProcesso)
+                : "SGC: Início de processo de %s em unidades subordinadas".formatted(descricaoTipoProcesso);
     }
 
     /**
@@ -59,7 +66,7 @@ public class EmailModelosService {
     public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso) {
         Context context = new Context();
         context.setVariable(
-                VAR_TITULO, "%s%s".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
+                VAR_TITULO, "%s%s".formatted(TITULO_PROCESSO_FINALIZACAO_SGC, nomeProcesso));
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
 
@@ -74,7 +81,7 @@ public class EmailModelosService {
             String siglaUnidade, String nomeProcesso, List<String> siglasUnidadesSubordinadas) {
 
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "%s%s em unidades subordinadas".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
+        ctx.setVariable(VAR_TITULO, "%s%s em unidades subordinadas".formatted(TITULO_PROCESSO_FINALIZACAO_SGC, nomeProcesso));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         ctx.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);
@@ -106,6 +113,15 @@ public class EmailModelosService {
         ctx.setVariable("urlSistema", cmd.urlSistema());
 
         return templateEngine.process("atribuicao-temporaria", ctx);
+    }
+
+    private String descricaoTipoProcessoInicio(String tipoProcesso) {
+        return switch (tipoProcesso) {
+            case "MAPEAMENTO" -> "mapeamento de competências";
+            case "REVISAO" -> "revisão do mapa de competências";
+            case "DIAGNOSTICO" -> "diagnóstico";
+            default -> tipoProcesso.toLowerCase(Locale.ROOT);
+        };
     }
 
     public record EmailAtribuicaoTemporariaCommand(

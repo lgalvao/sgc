@@ -361,7 +361,7 @@ class ProcessoServiceTest {
                     UnidadeMapa.builder().unidadeCodigo(10L).build()
             ));
             when(consultaService.listarEntidadesPorProcesso(id)).thenReturn(List.of(subprocesso));
-            when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyBoolean(), anyList()))
+            when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
                     .thenReturn("<html>inicio</html>");
             mockarResponsaveisEfetivos();
 

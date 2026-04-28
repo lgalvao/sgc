@@ -28,8 +28,22 @@ class EmailModelosServiceExtraCoverageTest {
     void criarEmailInicioProcessoConsolidado() {
         when(templateEngine.process(eq("email-inicio-processo-consolidado"), any(Context.class))).thenReturn("html");
 
-        String res1 = service.criarEmailInicioProcessoConsolidado("U1", "P1", LocalDateTime.now(), true, List.of("U2"));
-        String res2 = service.criarEmailInicioProcessoConsolidado("U1", "P1", LocalDateTime.now(), false, List.of());
+        String res1 = service.criarEmailInicioProcessoConsolidado(
+                "U1",
+                "P1",
+                LocalDateTime.now(),
+                "MAPEAMENTO",
+                true,
+                List.of("U2")
+        );
+        String res2 = service.criarEmailInicioProcessoConsolidado(
+                "U1",
+                "P1",
+                LocalDateTime.now(),
+                "REVISAO",
+                false,
+                List.of()
+        );
 
         assertThat(res1).isEqualTo("html");
         assertThat(res2).isEqualTo("html");

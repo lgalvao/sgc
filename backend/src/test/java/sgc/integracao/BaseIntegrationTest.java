@@ -2,6 +2,7 @@ package sgc.integracao;
 
 import com.icegreen.greenmail.store.*;
 import com.icegreen.greenmail.util.*;
+import jakarta.mail.internet.*;
 import jakarta.mail.*;
 import org.awaitility.*;
 import org.junit.jupiter.api.*;
@@ -107,6 +108,36 @@ public abstract class BaseIntegrationTest {
             String html = extrairHtmlDaMensagem(msg);
             if (html != null && html.contains(busca)) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean algumEmailComAssunto(String busca) throws Exception {
+        if (greenMail == null) return false;
+        var mensagens = greenMail.getReceivedMessages();
+        for (var msg : mensagens) {
+            String assunto = msg.getSubject();
+            if (assunto != null && assunto.contains(busca)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean algumEmailPara(String destinatario) throws Exception {
+        if (greenMail == null) return false;
+        var mensagens = greenMail.getReceivedMessages();
+        for (var msg : mensagens) {
+            Address[] destinatarios = msg.getAllRecipients();
+            if (destinatarios == null) {
+                continue;
+            }
+            for (Address endereco : destinatarios) {
+                if (endereco instanceof InternetAddress internetAddress
+                        && destinatario.equalsIgnoreCase(internetAddress.getAddress())) {
+                    return true;
+                }
             }
         }
         return false;
