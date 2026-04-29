@@ -179,5 +179,5 @@ Eventos em tempo real notificados por *Server-Sent Events* (`/api/alertas/stream
 
 - **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções adicionais.
 - **[Casos de Uso (CDUs)](etc/reqs/)**: Especificações de negócio do 01 ao 36, regras de negócio e glossário.
-- **[Regras de Acesso](etc/docs/regras-acesso.md)**: Especificação completa de permissões.
+- **[Regras de Acesso](etc/reqs/regras-acesso.md)**: Especificação completa de permissões.
 - **[Regras E2E](etc/docs/regras-e2e.md)**: Guia de arquitetura de testes com Playwright.

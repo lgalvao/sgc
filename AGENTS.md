@@ -31,7 +31,7 @@ Para detalhes técnicos, consulte:
       `/api/processos/{codigo}/iniciar`, `/api/processos/{codigo}/excluir`).
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
 * **Controle de Acesso (Security):**
-    * Baseado nas regras documentadas em [`regras-acesso.md`](/etc/docs/regras-acesso.md):
+    * Baseado nas regras documentadas em [`regras-acesso.md`](/etc/reqs/regras-acesso.md):
     * **Leitura**: Hierarquia da Unidade responsável
     * **Escrita**: Localização atual do Subprocesso (com algumas exceções para admin quando não há processo envolvido)
     * **Implementação:** `SgcPermissionEvaluator` (implementa `PermissionEvaluator` do Spring Security)

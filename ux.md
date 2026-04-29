@@ -42,7 +42,7 @@ Este guia registra decisões de produto e engenharia para manter a experiência 
 
 ## Acessibilidade e visibilidade
 
-- **Ações permanentes**: É vedado o uso de estados de 'hover' (passar o mouse) para ocultar botões de ação essenciais (como editar e excluir). As ações devem estar permanentemente visíveis para garantir operabilidade plena via teclado e dispositivos móveis.
+- **Ações permanentes**: É vedado o uso de estados de 'hover' (passar o mouse) para ocultar botões de ação essenciais (ex. editar e excluir). As ações devem estar permanentemente visíveis para garantir operabilidade plena via teclado e dispositivos móveis.
 - **Informação de domínio inline**: Dados fundamentais (como a lista de conhecimentos associada a uma atividade) devem ser apresentados de forma inline ou estruturada no corpo da página, nunca escondidos atrás de tooltips ou popovers.
 - **Proximidade**: Os controles de ação (botões) devem ser posicionados o mais próximo possível do item que eles afetam para reduzir a carga cognitiva e facilitar a identificação da funcionalidade.
 - **Operabilidade via teclado**: Todo elemento interativo deve ser um elemento nativo de formulário ou botão (como os do `BootstrapVueNext`), garantindo que integrem a ordem natural de tabulação.
@@ -64,5 +64,4 @@ Este guia registra decisões de produto e engenharia para manter a experiência 
 ## Exceções saudáveis
 
 - Login pode usar mensagens globais para credenciais inválidas, por segurança.
-- Falhas de permissão, rede ou estado inesperado não precisam parecer validação de campo.
 - Fluxos complexos podem combinar erro por item e erro global quando isso deixar a ação mais clara.
