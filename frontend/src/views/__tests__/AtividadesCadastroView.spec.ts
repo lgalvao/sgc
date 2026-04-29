@@ -22,7 +22,6 @@ import type {
     Unidade
 } from "@/types/tipos";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
-import {Error} from "storybook/internal/components";
 
 vi.mock("@/utils/logger", () => ({
     default: {

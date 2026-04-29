@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useAtividadeForm} from '../useAtividadeForm';
 import * as atividadeService from '@/services/atividadeService';
 import type {CriarAtividadeRequest} from '@/types/tipos';
-import {Error} from "storybook/internal/components";
 
 vi.mock('@/services/atividadeService', () => ({
   criarAtividade: vi.fn(),

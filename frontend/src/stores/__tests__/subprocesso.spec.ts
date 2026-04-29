@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import {useSubprocessoStore} from "../subprocesso";
 import * as subprocessoService from "@/services/subprocessoService";
-import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn(),

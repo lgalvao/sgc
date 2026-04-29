@@ -1,6 +1,5 @@
 import {describe, expect, it, vi} from "vitest";
 import {useAsyncAction} from "../useAsyncAction";
-import {Error} from "storybook/internal/components";
 
 describe("useAsyncAction", () => {
     it("deve executar acao com sucesso", async () => {

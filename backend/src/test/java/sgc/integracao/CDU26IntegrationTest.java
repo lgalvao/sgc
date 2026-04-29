@@ -41,7 +41,6 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade2;
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
-    private Processo processo;
     private Usuario admin;
 
     @BeforeEach
@@ -60,7 +59,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
 
         admin = usuarioRepo.findById("111111111111").orElseThrow();
 
-        processo = ProcessoFixture.processoPadrao();
+        Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);

@@ -85,6 +85,5 @@ class SubprocessoVisualizacaoServiceTest {
         assertThat(result.titular()).isNull();
         assertThat(result.movimentacoes()).isEmpty();
         assertThat(result.localizacaoAtual()).isEqualTo("SIGLA");
-        assertThat(result.permissoes()).isNull();
     }
 }

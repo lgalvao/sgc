@@ -199,9 +199,6 @@ import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/for
 import * as atividadeService from "@/services/atividadeService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
-import {Error} from "storybook/internal/components";
-import Property from "storybook/theming";
-import ScrollBehavior = Property.ScrollBehavior;
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; atividadeCodigo: number; conhecimentoCodigo?: number } | null;
 

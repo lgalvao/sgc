@@ -120,7 +120,6 @@ import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
-import {Error} from "storybook/internal/components";
 
 const props = defineProps<{ codUnidade: number }>();
 

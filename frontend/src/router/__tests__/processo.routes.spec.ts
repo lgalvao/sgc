@@ -1,6 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
 import processoRoutes from '@/router/processo.routes';
-import {Error} from "storybook/internal/components";
 
 vi.mock('@/views/ProcessoCadastroView.vue', () => ({ default: { name: 'ProcessoCadastroView' } }));
 vi.mock('@/views/ProcessoDetalheView.vue', () => ({ default: { name: 'ProcessoDetalheView' } }));

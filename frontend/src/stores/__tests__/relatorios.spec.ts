@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {relatoriosService} from "@/services/relatoriosService";
-import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/relatoriosService", () => ({
   relatoriosService: {

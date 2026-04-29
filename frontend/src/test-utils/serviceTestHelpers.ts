@@ -1,6 +1,5 @@
 import {afterEach, beforeEach, expect, it, vi} from "vitest";
 import apiClient from "@/axios-setup";
-import {Error} from "storybook/internal/components";
 
 vi.mock("@/axios-setup", () => ({
     default: {

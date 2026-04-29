@@ -4,7 +4,6 @@ import AdministradoresView from "@/views/AdministradoresView.vue";
 import * as administradorService from "@/services/administradorService";
 import {createTestingPinia} from "@pinia/testing";
 import {useRouter} from "vue-router";
-import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/administradorService", () => ({
     listarAdministradores: vi.fn(),

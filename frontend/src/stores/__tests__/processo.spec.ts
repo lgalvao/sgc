@@ -3,7 +3,6 @@ import {useProcessoStore} from "../processo";
 import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import * as processoService from "@/services/processoService";
 import {logger} from "@/utils";
-import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/processoService");
 vi.mock("@/utils", async () => {

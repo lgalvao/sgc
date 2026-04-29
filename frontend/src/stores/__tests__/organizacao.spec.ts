@@ -3,7 +3,6 @@ import {useOrganizacaoStore} from "../organizacao";
 import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import * as unidadeService from "@/services/unidadeService";
 import {logger} from "@/utils";
-import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/unidadeService");
 vi.mock("@/utils", async () => {

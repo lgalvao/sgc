@@ -1,6 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
 import {useErrorHandler} from '../useErrorHandler';
-import {Error} from "storybook/internal/components";
 
 describe('useErrorHandler', () => {
     it('inicializa com lastError como null', () => {

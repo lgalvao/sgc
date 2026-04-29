@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useConfiguracoes} from '../useConfiguracoes';
 import * as configuracaoService from '@/services/configuracaoService';
-import {Error} from "storybook/internal/components";
 
 vi.mock('@/services/configuracaoService', () => ({
     buscarConfiguracoes: vi.fn(),

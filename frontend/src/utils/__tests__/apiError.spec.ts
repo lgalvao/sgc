@@ -1,7 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {existsOrFalse, getOrNull, isAxiosError, normalizeError, shouldNotifyGlobally} from '@/utils/apiError';
 import logger from '@/utils/logger';
-import {Error} from "storybook/internal/components";
 
 describe('apiError utils', () => {
     it('isAxiosError deve identificar erros do axios', () => {

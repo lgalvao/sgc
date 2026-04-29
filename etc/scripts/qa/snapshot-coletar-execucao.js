@@ -13,10 +13,10 @@ const DIRETORIO_LATEST = path.join(DIRETORIO_DASHBOARD, "latest");
 const VERSAO_SCHEMA = "1.0.0";
 
 const PERFIS = {
-    rapido: ["backendUnitario", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck"],
-    completo: ["backendUnitario", "backendIntegracao", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "e2ePlaywright"],
-    backend: ["backendUnitario", "backendIntegracao", "backendCobertura"],
-    frontend: ["frontendCobertura", "frontendLint", "frontendTypecheck"]
+    rapido: ["backendUnitario", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendTestIds", "sincroniaValidacoes"],
+    completo: ["backendUnitario", "backendIntegracao", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "e2ePlaywright", "frontendTestIds", "sincroniaValidacoes"],
+    backend: ["backendUnitario", "backendIntegracao", "backendCobertura", "sincroniaValidacoes"],
+    frontend: ["frontendCobertura", "frontendLint", "frontendTypecheck", "frontendTestIds", "sincroniaValidacoes"]
 };
 
 function caminhoRelativo(caminhoAbsoluto) {
@@ -140,6 +140,22 @@ const ADAPTADORES = {
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
         execucao.sumario = saida.code === 0 ? "Typecheck sem erros." : "Erros de tipagem encontrados.";
+        return execucao;
+    },
+    async frontendTestIds() {
+        const execucao = criarExecucao("frontend-test-ids", "Frontend Test IDs", "qualidade", "node etc/scripts/sgc.js frontend test-ids listar-duplicados", ".");
+        const saida = await executarComando({comando: "node", args: ["etc/scripts/sgc.js", "frontend", "test-ids", "listar-duplicados"], cwd: DIRETORIO_RAIZ});
+        execucao.status = saida.code === 0 ? "sucesso" : "falha";
+        execucao.duracaoMs = saida.duracaoMs;
+        execucao.sumario = saida.code === 0 ? "Nenhum test-id duplicado." : "Test-ids duplicados encontrados.";
+        return execucao;
+    },
+    async sincroniaValidacoes() {
+        const execucao = criarExecucao("sincronia-validacoes", "Sincronia de Validações", "qualidade", "node etc/scripts/sgc.js frontend validacoes auditar", ".");
+        const saida = await executarComando({comando: "node", args: ["etc/scripts/sgc.js", "frontend", "validacoes", "auditar"], cwd: DIRETORIO_RAIZ});
+        execucao.status = saida.code === 0 ? "sucesso" : "falha";
+        execucao.duracaoMs = saida.duracaoMs;
+        execucao.sumario = saida.code === 0 ? "Auditoria de validações concluída." : "Divergências de validação encontradas.";
         return execucao;
     },
     async e2ePlaywright() {

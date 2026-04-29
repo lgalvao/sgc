@@ -90,6 +90,9 @@ try {
     const totalOccurrences = duplicates.reduce((sum, [, items]) => sum + items.length, 0);
     console.log(`Total de ids duplicados distintos: ${duplicates.length}`);
     console.log(`Total de ocorrências duplicadas: ${totalOccurrences}`);
+    
+    // Falha o processo para uso como portão de qualidade no CI
+    process.exit(1);
 
 } catch (error) {
     console.error('Erro ao executar o script:', error.message);

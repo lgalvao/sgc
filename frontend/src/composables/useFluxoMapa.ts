@@ -22,7 +22,6 @@ import type {
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useMapas} from "@/composables/useMapas";
-import {Error} from "storybook/internal/components";
 
 export function useFluxoMapa() {
     const {lastError, clearError} = useErrorHandler();
