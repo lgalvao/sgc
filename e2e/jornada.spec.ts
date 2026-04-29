@@ -65,34 +65,35 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await page.getByTestId('nav-link-notificacoes').click();
             await expect(page).toHaveURL(/\/administracao\/notificacoes/);
 
-            const secaoPendentes = page.getByTestId('sec-notificacoes-pendentes');
-            const secaoConcluidas = page.getByTestId('sec-notificacoes-concluidas');
-            await expect(secaoPendentes).toBeVisible();
-            await expect(secaoConcluidas).toBeVisible();
+            const secaoNotificacoes = page.getByTestId('sec-notificacoes');
+            await expect(secaoNotificacoes).toBeVisible();
 
-            const tabelaPendentes = page.getByTestId('tbl-notificacoes-pendentes');
-            await expect(tabelaPendentes).toBeVisible();
-            await expect(tabelaPendentes).toContainText('SECAO_321');
-            await expect(tabelaPendentes).toContainText('Mapeamento Secão 321');
-            await expect(tabelaPendentes).toContainText('Falha definitiva');
-            await expect(tabelaPendentes).toContainText(/Falha simulada no seed/i);
-            const btnReenviarPendente = tabelaPendentes.locator('button[title="Tentar reenviar e-mail"]').first();
+            const tabelaNotificacoes = page.getByTestId('tbl-notificacoes');
+            await expect(tabelaNotificacoes).toBeVisible();
+            await expect(tabelaNotificacoes).toContainText('SECAO_321');
+            await expect(tabelaNotificacoes).toContainText('Mapeamento Secão 321');
+            await expect(tabelaNotificacoes).toContainText('Falha definitiva');
+            await expect(tabelaNotificacoes).toContainText('SECAO_311');
+            await expect(tabelaNotificacoes).toContainText('Mapeamento Secão 311');
+            await expect(tabelaNotificacoes).toContainText('Enviado');
+            const btnDetalhesFalha = tabelaNotificacoes.locator('[data-testid^="btn-detalhes-"]').first();
+            await expect(btnDetalhesFalha).toBeVisible();
+            await btnDetalhesFalha.click();
+            const modalDetalhes = page.getByTestId('modal-detalhes-notificacao');
+            await expect(modalDetalhes).toBeVisible();
+            await expect(modalDetalhes).toContainText(/Falha simulada no seed/i);
+            await page.getByRole('button', {name: /Fechar/i}).click();
+            await expect(modalDetalhes).toBeHidden();
+            const btnReenviarPendente = tabelaNotificacoes.locator('[data-testid^="btn-notificacoes-reenviar-"]').first();
             await expect(btnReenviarPendente).toBeVisible();
-
-            const tabelaConcluidas = page.getByTestId('tbl-notificacoes-concluidas');
-            await expect(tabelaConcluidas).toBeVisible();
-            await expect(tabelaConcluidas).toContainText('SECAO_311');
-            await expect(tabelaConcluidas).toContainText('Mapeamento Secão 311');
-            await expect(tabelaConcluidas).toContainText('Enviado');
-            await expect(tabelaConcluidas.locator('button[title="Tentar reenviar e-mail"]')).toHaveCount(0);
 
             await btnReenviarPendente.click();
             await expect(page.getByTestId('txt-notificacoes-reenviar-confirmacao')).toContainText(/Confirma o reenvio/i);
             await page.getByTestId('btn-notificacoes-reenviar-confirmar').click();
 
             await verificarAppAlert(page, /recolocad[oa] na fila/i);
-            await expect(tabelaPendentes).toContainText('Pendente');
-            await expect(tabelaPendentes.locator('button[title="Tentar reenviar e-mail"]')).toHaveCount(0);
+            await expect(tabelaNotificacoes).toContainText('Pendente');
+            await expect(tabelaNotificacoes.locator('[data-testid^="btn-notificacoes-reenviar-"]')).toHaveCount(0);
         });
         await expect(page).toHaveURL(/\/login/);
     };
@@ -118,9 +119,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AtividadeHelpers.navegarParaCadastro(page);
             const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
             await expect(btnDisponibilizar).toBeVisible();
-            await btnDisponibilizar.click();
-            await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
-            await limparNotificacoes(page);
+            await expect(btnDisponibilizar).toBeDisabled();
 
             await AtividadeHelpers.importarAtividadesVazia(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
             await AtividadeHelpers.disponibilizarCadastro(page);
@@ -279,9 +278,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await AtividadeHelpers.navegarParaCadastro(page);
             const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
             await expect(btnDisponibilizar).toBeVisible();
-            await btnDisponibilizar.click();
-            await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();
-            await limparNotificacoes(page);
+            await expect(btnDisponibilizar).toBeDisabled();
 
             await expect(page.getByText('Atividade 1')).toBeVisible();
             await AtividadeHelpers.adicionarConhecimento(page, 'Atividade 1', 'Conhecimento Revisado');

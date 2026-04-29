@@ -159,15 +159,23 @@ Eventos em tempo real notificados por *Server-Sent Events* (`/api/alertas/stream
 
 ## Testes e Qualidade
 
+O projeto utiliza um toolkit de automação centralizado em `etc/scripts` que orquestra testes, auditorias e correções automáticas.
+
 | Tipo | Comando |
 |---|---|
 | **Todos backend** | `./gradlew :backend:test` |
 | **Unitários backend** | `./gradlew :backend:unitTest` |
 | **Integração backend** | `./gradlew :backend:integrationTest` |
-| **Mutation backend** | `./gradlew :backend:mutationTest` |
 | **Unitários frontend** | `npm run test:unit --prefix frontend` |
 | **End-to-End (E2E)** | `npm run test:e2e` |
 | **Lint Completo** | `npm run lint` |
+| **Auditoria de Cobertura** | `node etc/scripts/sgc.js [backend|frontend] cobertura auditoria` |
+| **Limpeza de Projeto** | `node etc/scripts/sgc.js projeto limpar --confirmar` |
+
+### Correção Ativa (Auto-Fix)
+O toolkit permite corrigir automaticamente problemas comuns de qualidade:
+- **Java:** `node etc/scripts/sgc.js backend java auditar-null --fix` (Injeta `@Nullable`).
+- **Frontend:** `node etc/scripts/sgc.js frontend mensagens analisar --fix` (Remove constantes órfãs).
 
 **Smoke Test (Verificação rápida):**
 - **Linux/macOS:** `./smoke-test.sh`

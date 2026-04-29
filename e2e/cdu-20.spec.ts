@@ -316,14 +316,20 @@ test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com suge
         await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
     });
 
-    test('ADMIN homologa o mapa após aceite do GESTOR com sugestões', async ({_resetAutomatico, page}) => {
+    test('ADMIN vê ações corretas quando o mapa permanece com sugestões após aceite do GESTOR', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
         await navegarParaMapa(page);
 
-        await abrirAcaoPrincipalMapa(page);
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await expect(page.getByText(TEXTOS.mapa.SUCESSO_HOMOLOGACAO).first()).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+        await page.getByTestId('btn-mapa-acoes').click();
+
+        await expect(page.getByTestId('btn-mapa-acao-disponibilizar')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acao-disponibilizar')).toBeEnabled();
+        await expect(page.getByTestId('btn-mapa-acao-devolver')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acao-devolver')).toBeEnabled();
+        await expect(page.getByTestId('btn-mapa-acao-homologar-aceite')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acao-homologar-aceite')).toBeDisabled();
     });
 });
