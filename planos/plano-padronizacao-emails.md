@@ -39,11 +39,16 @@ Padronizar os e-mails do SGC em dois eixos:
 - Teste sistêmico visual reforçado para impedir uso indevido de `highlight-box`.
 - Não há pendências abertas neste plano nesta data.
 
+<<<<<<< ours
 3. **Avaliar expansão do teste sistêmico de padrão visual**
    - Critério: reforçar ausência de `highlight-box` onde o CDU não exige destaque.
    - Arquivo-base do teste: `backend/src/test/java/sgc/alerta/EmailTemplatesPadraoVisualTest.java`.
 
 ## Observação futura (fora de escopo atual)
 
+=======
+## Observação futura (fora de escopo atual)
+
+>>>>>>> theirs
 - CSS inlining no pós-processamento de HTML antes do envio.
 - Ponto de entrada natural, se retomado: `backend/src/main/java/sgc/alerta/EmailService.java`.
