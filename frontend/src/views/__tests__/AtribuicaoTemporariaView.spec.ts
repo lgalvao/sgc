@@ -7,7 +7,6 @@ import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService'
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {createPinia, setActivePinia} from 'pinia';
 import type {Unidade, UsuarioPesquisa} from '@/types/tipos';
-import {Error} from "storybook/internal/components";
 
 type AtribuicaoTemporariaVm = {
   unidade: Unidade | null;

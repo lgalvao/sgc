@@ -4,7 +4,6 @@ import LimpezaProcessosView from '../LimpezaProcessosView.vue';
 import {createTestingPinia} from '@pinia/testing';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import * as processoService from '@/services/processoService';
-import {Error} from "storybook/internal/components";
 
 vi.mock('@/services/processoService', () => ({
   excluirProcessoCompleto: vi.fn()

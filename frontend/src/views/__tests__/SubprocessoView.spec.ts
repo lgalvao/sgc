@@ -6,7 +6,6 @@ import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
-import {Error} from "storybook/internal/components";
 
 vi.mock('vue-router', () => ({
     useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),

@@ -4,7 +4,6 @@ import {createTestingPinia} from '@pinia/testing';
 import HistoricoView from '../HistoricoView.vue';
 import {useRouter} from 'vue-router';
 import * as processoService from '@/services/processoService';
-import {Error} from "storybook/internal/components";
 
 vi.mock('vue-router', () => ({
   useRouter: vi.fn(() => ({

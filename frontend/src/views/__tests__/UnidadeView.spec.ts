@@ -8,7 +8,6 @@ import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
 import {buscarArvoreUnidade, buscarReferenciaMapaVigente} from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {logger} from "@/utils";
-import {Error} from "storybook/internal/components";
 
 const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hoisted(() => {
     const u = {

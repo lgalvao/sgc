@@ -9,7 +9,7 @@ const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "etc", "scripts", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "backend", "testes-priorizar.js");
 const FIXTURE_SNAPSHOT = path.join(DIRETORIO_RAIZ, "etc", "scripts", "test", "fixtures", "qa", "snapshot.json");
-const CAMINHO_FRONTEND_COBERTURA_VERIFICAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "frontend", "cobertura-verificar.js");
+const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "etc", "scripts", "frontend", "cobertura-auditoria.js");
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -22,7 +22,7 @@ async function executarSgc(args, opcoes = {}) {
 }
 
 async function executarScriptFrontendCobertura(args, opcoes = {}) {
-    return execaNode(CAMINHO_FRONTEND_COBERTURA_VERIFICAR, args, {
+    return execaNode(CAMINHO_FRONTEND_COBERTURA_AUDITORIA, args, {
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes
@@ -45,10 +45,10 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("projeto doctor");
     });
 
-    test("despacha ajuda de um comando legado do backend", async () => {
-        const resultado = await executarSgc(["backend", "cobertura", "verificar", "--help"]);
+    test("despacha ajuda de um comando de auditoria do backend", async () => {
+        const resultado = await executarSgc(["backend", "cobertura", "auditoria", "--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Consulta cobertura global e por classe.");
+        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Backend).");
     });
 
     test("audita cheiros de codigo em um recorte controlado", async () => {
@@ -446,11 +446,10 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Extrai mensagens do projeto.");
     });
 
-    test("exibe ajuda padronizada no script frontend cobertura verificar", async () => {
+    test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {
         const resultado = await executarScriptFrontendCobertura(["--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("--json");
-        expect(resultado.stdout).toContain("--min=<n>");
+        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Frontend).");
     });
 
     test("despacha ajuda do servidor do qa dashboard", async () => {
@@ -473,7 +472,7 @@ describe("CLI raiz do toolkit", () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-scripts-"));
         await fs.ensureDir(path.join(diretorioBase, "backend", "build"));
         await fs.ensureDir(path.join(diretorioBase, "etc", "qa-dashboard", "latest"));
-        await fs.outputFile(path.join(diretorioBase, "plano-100-cobertura.md"), "# teste");
+        await fs.outputFile(path.join(diretorioBase, "backend-coverage-auditoria.md"), "# teste");
         await fs.outputFile(path.join(diretorioBase, "etc", "qa-dashboard", "latest", "ultimo-resumo.md"), "ok");
 
         const previa = await executarSgc(["projeto", "limpar", "--json", "--base", diretorioBase]);
@@ -488,7 +487,7 @@ describe("CLI raiz do toolkit", () => {
         const jsonExecucao = JSON.parse(execucao.stdout);
         expect(jsonExecucao.modo).toBe("executar");
         expect(await fs.pathExists(path.join(diretorioBase, "backend", "build"))).toBe(false);
-        expect(await fs.pathExists(path.join(diretorioBase, "plano-100-cobertura.md"))).toBe(false);
+        expect(await fs.pathExists(path.join(diretorioBase, "backend-coverage-auditoria.md"))).toBe(false);
     });
 
     test("nao possui diretorios legados de scripts em backend/frontend", async () => {

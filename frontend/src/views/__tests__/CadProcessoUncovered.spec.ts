@@ -8,7 +8,6 @@ import {useProcessoForm} from "@/composables/useProcessoForm";
 import {ref} from "vue";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
-import {Error} from "storybook/internal/components";
 
 const mockRoute = { query: {} };
 const mockRouter = { push: vi.fn() };

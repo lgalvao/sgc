@@ -8,7 +8,6 @@ import {nextTick} from "vue";
 import {Perfil, SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import * as processoService from "@/services/processoService";
-import {Error} from "storybook/internal/components";
 
 // Mocks
 vi.mock("@/services/processoService", () => ({

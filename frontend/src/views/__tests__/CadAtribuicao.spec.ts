@@ -3,7 +3,6 @@ import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {Error} from "storybook/internal/components";
 
 const {mockPush, mockBuscarUnidade, mockPesquisarUsuarios} = vi.hoisted(() => {
     return {
