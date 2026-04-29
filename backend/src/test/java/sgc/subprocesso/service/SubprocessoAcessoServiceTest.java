@@ -162,6 +162,22 @@ class SubprocessoAcessoServiceTest {
         assertThat(dto.podeReabrirRevisao()).isTrue();
     }
 
+    @Test
+    void shouldNaoPermitirEditarMapaQuandoMapaValidadoNaAnaliseFinal() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_VALIDADO);
+
+        SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
+                subprocesso, Perfil.ADMIN, true, true, false, true);
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
+
+        assertThat(dto.podeEditarMapa()).isFalse();
+        assertThat(dto.habilitarEditarMapa()).isFalse();
+        assertThat(dto.podeHomologarMapa()).isTrue();
+        assertThat(dto.habilitarHomologarMapa()).isTrue();
+    }
+
     private SubprocessoConsultaService.ContextoConsultaSubprocesso createContexto(
             Subprocesso subprocesso, Perfil perfil, boolean mesmaUnidade, boolean isHierarquia,
             boolean processoFinalizado, boolean temMapaVigente) {

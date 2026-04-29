@@ -4,7 +4,7 @@ import {
     criarProcessoFinalizadoFixture,
     validarProcessoFixture
 } from './fixtures/index.js';
-import {navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {navegarParaCadastro} from './helpers/helpers-atividades.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
@@ -35,7 +35,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             // 2.3. O sistema mostra a tela Detalhes do subprocesso
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
 
-            await navegarParaAtividades(page);
+            await navegarParaCadastro(page);
 
             await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
             await expect(page.getByText(/Atividade fixture/)).toBeVisible();
@@ -48,7 +48,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             // 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
 
-            await navegarParaAtividades(page);
+            await navegarParaCadastro(page);
 
             await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
             await expect(page.getByText(/Atividade fixture/)).toBeVisible();
@@ -74,7 +74,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await acessarDetalhesProcesso(page, descProcesso);
 
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
-            await navegarParaAtividades(page);
+            await navegarParaCadastro(page);
 
             await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
             await expect(page.getByText(/Atividade origem/).first()).toBeVisible();

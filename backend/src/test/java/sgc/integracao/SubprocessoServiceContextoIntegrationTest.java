@@ -305,4 +305,28 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
         assertThat(permissoes.podeHomologarMapa()).isTrue();
     }
+
+    @Test
+    @DisplayName("obterPermissoesUI: ADMIN deve ficar em somente leitura quando revisão estiver em MAPA_VALIDADO")
+    void obterPermissoesUI_AdminRevisaoMapaValidadoSomenteLeitura() {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processoRepo.saveAndFlush(processo);
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(1L);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_VALIDADO);
+        movimentacaoRepo.saveAndFlush(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(subprocesso.getUnidade())
+                .unidadeDestino(unidadeRepo.findById(1L).orElseThrow())
+                .usuario(admin)
+                .descricao("Mapa validado e enviado para homologação")
+                .build());
+
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
+
+        assertThat(permissoes.podeEditarMapa()).isFalse();
+        assertThat(permissoes.habilitarEditarMapa()).isFalse();
+        assertThat(permissoes.podeHomologarMapa()).isTrue();
+        assertThat(permissoes.habilitarHomologarMapa()).isTrue();
+    }
 }

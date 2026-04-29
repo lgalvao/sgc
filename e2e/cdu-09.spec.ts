@@ -5,7 +5,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     esperarAtividadesSomenteLeitura,
-    navegarParaAtividades
+    navegarParaCadastro
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
@@ -41,7 +41,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         const timestamp = Date.now();
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         const atividadeDesc = `Atividade incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeDesc);
@@ -65,7 +65,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         const timestamp = Date.now();
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         const atividadeDesc = `Atividade validada ${timestamp}`;
         await adicionarAtividade(page, atividadeDesc);
@@ -84,7 +84,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
 
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
         await esperarAtividadesSomenteLeitura(page);
         await page.goBack();
@@ -103,7 +103,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivo);
@@ -116,7 +116,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
 
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         const modal = await abrirHistoricoAnalise(page);
         await expect(modal.getByTestId('cell-dataHora-0')).not.toHaveText('');
         await expect(modal.getByTestId('cell-unidade-0')).toHaveText('COORD_22');

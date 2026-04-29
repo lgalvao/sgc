@@ -9,6 +9,12 @@ const ROTULOS_TIPO_PROCESSO = {
 
 type TipoProcesso = keyof typeof ROTULOS_TIPO_PROCESSO;
 
+async function buscarUnidadeNaArvore(page: Page, siglaUnidade: string): Promise<void> {
+    const busca = page.getByRole('searchbox', {name: 'Buscar unidade por sigla'});
+    await expect(busca).toBeVisible();
+    await busca.fill(siglaUnidade);
+}
+
 /**
  * Calcula uma data limite N dias no futuro
  */
@@ -73,6 +79,47 @@ export async function criarProcesso(page: Page, options: {
 }
 
 /**
+ * Cria um processo pela UI em formato semântico:
+ * - recebe sempre um array em `unidades`
+ * - expande a árvore automaticamente até encontrar as unidades
+ * - apenas cria o processo, sem iniciá-lo
+ */
+export async function criarProcessoSimples(page: Page, options: {
+    descricao: string;
+    tipo: TipoProcesso;
+    diasLimite?: number;
+    unidades: string[];
+}): Promise<void> {
+    const dias = options.diasLimite ?? 30;
+    await page.getByTestId('btn-painel-criar-processo').click();
+    await expect(page).toHaveURL(/\/processo\/cadastro/);
+
+    await page.getByTestId('inp-processo-descricao').fill(options.descricao);
+    await page.getByTestId('sel-processo-tipo').selectOption(options.tipo);
+    await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(dias));
+
+    await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
+
+    for (const siglaUnidade of options.unidades) {
+        await buscarUnidadeNaArvore(page, siglaUnidade);
+
+        const checkbox = page.getByTestId(`chk-arvore-unidade-${siglaUnidade}`);
+        await expect(checkbox).toBeVisible();
+        await expect(checkbox).toBeEnabled();
+
+        if (!await checkbox.isChecked()) {
+            await checkbox.check();
+        }
+    }
+
+    const botaoSalvar = page.getByTestId('btn-processo-salvar');
+    await botaoSalvar.scrollIntoViewIfNeeded();
+    await expect(botaoSalvar).toBeInViewport();
+    await botaoSalvar.click();
+    await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
+}
+
+/**
  * Verifica os cabeçalhos obrigatórios da tabela de processos
  */
 
@@ -91,7 +138,7 @@ export async function verificarCabecalhosTabelaProcessos(page: Page, compacto = 
 /**
  * Verifica que um processo aparece na tabela com situação e tipo corretos
  */
-export async function verificarProcessoNaTabela(page: Page, options: {
+export async function verificarProcessoTabela(page: Page, options: {
     descricao: string;
     situacao: string;
     tipo: string;
@@ -120,7 +167,7 @@ export async function aguardarProcessoNoPainel(page: Page, options: {
     unidadesParticipantes?: string[];
 }): Promise<void> {
     await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
-    await verificarProcessoNaTabela(page, {
+    await verificarProcessoTabela(page, {
         descricao: options.descricao,
         situacao: options.situacao,
         tipo: ROTULOS_TIPO_PROCESSO[options.tipo],
@@ -135,6 +182,25 @@ export async function iniciarProcessoPeloCadastro(page: Page, options: {
 }): Promise<void> {
     await page.getByTestId('btn-processo-iniciar').click();
     await confirmarInicioProcessoPeloDialogo(page, options);
+}
+
+/**
+ * Inicia o processo já aberto na tela de cadastro/detalhes.
+ * Versão semântica: não exige informar o tipo novamente.
+ */
+export async function iniciarProcesso(page: Page, descricao: string): Promise<void> {
+    await page.getByTestId('btn-processo-iniciar').click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await dialog.getByTestId('btn-iniciar-processo-confirmar').click();
+
+    await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
+    await verificarProcessoTabela(page, {
+        descricao,
+        situacao: 'Em andamento',
+        tipo: ROTULOS_TIPO_PROCESSO.MAPEAMENTO
+    });
 }
 
 export async function confirmarInicioProcessoPeloDialogo(page: Page, options: {

@@ -4,7 +4,7 @@ import {
     criarProcesso,
     extrairProcessoCodigo,
     verificarDetalhesProcesso,
-    verificarProcessoNaTabela
+    verificarProcessoTabela
 } from './helpers/helpers-processos.js';
 import {
     esperarPaginaCadastroProcesso,
@@ -67,7 +67,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         // Aguarda toast e redirect
         await esperarPaginaPainel(page);
         await verificarToast(page, TEXTOS.sucesso.PROCESSO_INICIADO);
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao,
             situacao: 'Em andamento',
             tipo: 'Mapeamento'

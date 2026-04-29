@@ -6,7 +6,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
-    navegarParaAtividades
+    navegarParaCadastro
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
@@ -46,7 +46,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Chefe revisa atividades (muda situação para EM_ANDAMENTO)
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await adicionarAtividade(page, `Atividade revisão nova ${timestamp}`);
         await adicionarConhecimento(page, `Atividade revisão nova ${timestamp}`, 'Conhecimento revisão');
         await page.getByTestId('btn-nav-voltar').click();
@@ -57,7 +57,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('1.1 Cenário adicional: primeiro acesso direto ao cadastro carrega o subprocesso', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
@@ -67,7 +67,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('1.2 Cenário adicional: checkbox fica desabilitado quando houver mudanças no cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
         const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
@@ -95,7 +95,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisaoSemMudancas, unidadeSemMudancas);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
         await expect(checkboxSemMudancas).toBeVisible();
@@ -113,7 +113,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaSubprocesso(page, unidadeSemMudancas);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
 
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await expect(checkboxSemMudancas).toBeChecked();
         await checkboxSemMudancas.uncheck();
         await expect(checkboxSemMudancas).not.toBeChecked();
@@ -124,7 +124,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaSubprocesso(page, unidadeSemMudancas);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Não iniciado/i);
 
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await expect(checkboxSemMudancas).toBeEnabled();
         await checkboxSemMudancas.check();
         await expect(botaoDisponibilizar).toBeEnabled();
@@ -140,7 +140,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('2. Cenário 1: Validação - Atividade sem conhecimento', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         const atividadeIncompleta = `Atividade incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeIncompleta);
@@ -159,7 +159,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('3. Cenário 2: Caminho feliz - Disponibilizar revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await limparNotificacoes(page);
         const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
         if (await botaoDisponibilizar.isDisabled()) {
@@ -198,7 +198,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('4. Cenário 3: Devolução e Histórico', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await page.getByTestId('btn-acao-devolver').click();
         const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
         await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivoDevolucao);
@@ -215,7 +215,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: TEXTOS.alerta.REVISAO_DEVOLVIDA(UNIDADE_ALVO) })).toBeVisible();
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         const modal = await abrirHistoricoAnalise(page);
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText(motivoDevolucao);
@@ -228,7 +228,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -240,14 +240,14 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await disponibilizarCadastro(page);
         await verificarPaginaPainel(page);
 
         // Gestor devolve novamente
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -260,7 +260,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Chefe verifica que histórico tem TODAS as devoluções (a última primeiro)
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         const modal = await abrirHistoricoAnalise(page);
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Terceira devolução');
@@ -272,7 +272,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('6. Cenário 5: Cancelar disponibilização', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await limparNotificacoes(page);
         const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
         if (await botaoDisponibilizar.isDisabled()) {

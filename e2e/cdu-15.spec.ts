@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
-import {verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {verificarProcessoTabela} from './helpers/helpers-processos.js';
 import {
     criarCompetencia,
     disponibilizarMapa,
@@ -113,7 +113,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await disponibilizarMapa(page);
 
         await expect(page).toHaveURL(/\/painel/);
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao: descProcesso,
             situacao: 'Em andamento',
             tipo: 'Mapeamento'

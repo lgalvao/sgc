@@ -24,7 +24,7 @@ export async function esperarAtividadesSomenteLeitura(page: Page) {
     await esperarSemAcoesEdicaoCadastro(page);
 }
 
-export async function navegarParaAtividades(page: Page) {
+export async function navegarParaCadastro(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();
     await card.click();

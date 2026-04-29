@@ -58,7 +58,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
             await acessarDetalhesProcesso(page, descricaoProcesso);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
-            await AtividadeHelpers.navegarParaAtividades(page);
+            await AtividadeHelpers.navegarParaCadastro(page);
         });
 
         await test.step('2.1 Verificar estado inicial do mapeamento', async () => {
@@ -173,7 +173,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await expect(page.getByTestId('tbl-processos').getByText(descricao).first()).toBeVisible();
             await acessarDetalhesProcesso(page, descricao);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_REVISAO}(?:\?.*)?$`));
-            await AtividadeHelpers.navegarParaAtividades(page);
+            await AtividadeHelpers.navegarParaCadastro(page);
 
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade trigger');
             await AtividadeHelpers.verificarBotaoImpactoDropdown(page);
@@ -231,7 +231,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await expect(page.getByTestId('tbl-processos').getByText(descAlvo).first()).toBeVisible();
             await acessarDetalhesProcesso(page, descAlvo);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
-            await AtividadeHelpers.navegarParaAtividades(page);
+            await AtividadeHelpers.navegarParaCadastro(page);
 
             // Abre o modal de importação e seleciona atividade do processo A
             await AtividadeHelpers.selecionarAtividadesParaImportacaoVazia(

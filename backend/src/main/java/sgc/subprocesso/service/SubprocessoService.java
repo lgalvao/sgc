@@ -351,15 +351,13 @@ public class SubprocessoService {
     public Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
-                "Mapa só pode ser editado nas situações 'Mapa criado', 'Cadastro homologado', 'Mapa ajustado', 'Revisão do cadastro homologada', 'Mapa com sugestões' ou 'Mapa validado'. Situação atual: %s".formatted(sp.getSituacao()),
+                "Mapa só pode ser editado nas situações 'Mapa criado', 'Cadastro homologado', 'Mapa ajustado', 'Revisão do cadastro homologada' ou 'Mapa com sugestões'. Situação atual: %s".formatted(sp.getSituacao()),
                 MAPEAMENTO_CADASTRO_HOMOLOGADO,
                 MAPEAMENTO_MAPA_CRIADO,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
-                MAPEAMENTO_MAPA_VALIDADO,
                 REVISAO_CADASTRO_HOMOLOGADA,
                 REVISAO_MAPA_AJUSTADO,
-                REVISAO_MAPA_COM_SUGESTOES,
-                REVISAO_MAPA_VALIDADO);
+                REVISAO_MAPA_COM_SUGESTOES);
         return sp;
     }
 

@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarDetalhesProcesso, criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, criarProcesso, verificarProcessoTabela} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     aceitarCadastroMapeamento,
@@ -14,7 +14,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
-    navegarParaAtividades
+    navegarParaCadastro
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -47,7 +47,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         });
 
         // Validação: Processo foi criado e está na tela de cadastro
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao,
             situacao: 'Criado',
             tipo: 'Mapeamento'
@@ -62,7 +62,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         // Validação: Processo iniciado
         await verificarPaginaPainel(page);
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao,
             situacao: 'Em andamento',
             tipo: 'Mapeamento'
@@ -86,7 +86,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         // Adicionar atividade e Conhecimento usando helpers
         await adicionarAtividade(page, descAtividadePrincipal);
@@ -97,7 +97,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     test('Fase 1.2b: REGRESSÃO - Alerta de erro deve reaparecer se fechado', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         // Adiciona uma nova atividade SEM conhecimento para invalidar o cadastro
         const descAtividadeInvalida = `Atividade Incompleta ${Date.now()}`;
@@ -129,7 +129,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     test('Fase 1.3: CHEFE disponibiliza cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         atividadeComplementarCriada = await disponibilizarCadastro(page);
         await verificarPaginaPainel(page);
     });
@@ -138,7 +138,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // George harrison (212121) é Gestor da SECRETARIA_2
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário');
         await verificarPaginaPainel(page);
     });
@@ -146,7 +146,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     test('Fase 1.4: ADMIN homologa cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await homologarCadastroMapeamento(page);
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+(?:\?.*)?$/);
     });
@@ -238,7 +238,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         // Validação: Redirecionamento e situação do processo iniciado
         await verificarPaginaPainel(page);
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao: descProcRevisao,
             situacao: 'Em andamento',
             tipo: 'Revisão'
@@ -357,7 +357,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
         await verificarPaginaPainel(page);
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
             situacao: 'Em andamento',
             tipo: 'Revisão'
@@ -382,7 +382,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         // Verifica que a atividade criada na fase de Mapeamento foi copiada corretamente (Step 10)
         const descAtividade = `Atividade teste ${timestamp}`;

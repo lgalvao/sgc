@@ -7,7 +7,7 @@ import {
     adicionarConhecimento,
     editarAtividade,
     fecharModalImpacto,
-    navegarParaAtividades,
+    navegarParaCadastro,
     verificarBotaoImpactoDireto,
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
@@ -38,7 +38,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
     test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({_resetAutomatico, page, _autenticadoComoChefeSecao121}) => {
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         // 5.1. Detectar INCLUSÃO
         const novaAtividade = `Nova atividade ${timestamp}`;
@@ -71,7 +71,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // Ringo starr (GESTOR_COORD_12) possui apenas 1 perfil
         await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         await verificarBotaoImpactoDireto(page);
         await abrirModalImpacto(page);

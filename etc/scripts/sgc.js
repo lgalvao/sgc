@@ -32,13 +32,7 @@ program
 
 const backend = program.command("backend").description("Ferramentas do backend.");
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
-criarComandoScript(backendCobertura, "analisar", "Analise tabular da cobertura do backend.", "etc/scripts/backend/cobertura-analisar.js");
-criarComandoScript(backendCobertura, "priorizar", "Ranking resumido de prioridades de cobertura.", "etc/scripts/backend/cobertura-priorizar.js");
-criarComandoScript(backendCobertura, "complexidade", "Ranking de complexidade pelo CSV do JaCoCo.", "etc/scripts/backend/cobertura-complexidade.js");
-criarComandoScript(backendCobertura, "lacunas", "Gera JSON estruturado com lacunas de cobertura.", "etc/scripts/backend/cobertura-lacunas.js");
-criarComandoScript(backendCobertura, "plano", "Gera plano detalhado para 100% de cobertura.", "etc/scripts/backend/cobertura-plano.js");
-criarComandoScript(backendCobertura, "verificar", "Consulta cobertura global e por classe.", "etc/scripts/backend/cobertura-verificar.js");
-criarComandoScript(backendCobertura, "jornada", "Executa a jornada completa de cobertura.", "etc/scripts/backend/cobertura-jornada.js");
+criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "etc/scripts/backend/cobertura-auditoria.js");
 
 const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
 criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "etc/scripts/backend/testes-analisar.js");
@@ -52,10 +46,7 @@ criarComandoScript(backendJava, "instalar-certificados", "Importa certificados l
 
 const frontend = program.command("frontend").description("Ferramentas do frontend.");
 const frontendCobertura = frontend.command("cobertura").description("Cobertura e diagnosticos do frontend.");
-criarComandoScript(frontendCobertura, "verificar", "Lista arquivos abaixo do limiar de cobertura.", "etc/scripts/frontend/cobertura-verificar.js");
-criarComandoScript(frontendCobertura, "impacto", "Prioriza arquivos por impacto potencial de cobertura.", "etc/scripts/frontend/cobertura-impacto.js");
-criarComandoScript(frontendCobertura, "linhas-sem-cobertura", "Mostra linhas sem cobertura no frontend.", "etc/scripts/frontend/cobertura-linhas-sem-cobertura.js");
-criarComandoScript(frontendCobertura, "priorizar-defensivos", "Prioriza branches residuais em arquivos ja muito cobertos.", "etc/scripts/frontend/cobertura-priorizar-defensivos.js");
+criarComandoScript(frontendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Frontend).", "etc/scripts/frontend/cobertura-auditoria.js");
 
 const frontendMensagens = frontend.command("mensagens").description("Analise de mensagens e strings do frontend.");
 criarComandoScript(frontendMensagens, "extrair", "Extrai mensagens do projeto.", "etc/scripts/frontend/mensagens-extrair.js");
@@ -75,16 +66,8 @@ const frontendTelas = frontend.command("telas").description("Ferramentas de capt
 criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "etc/scripts/frontend/telas-capturar.js");
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
-const codigoComentarios = codigo.command("comentarios").description("Limpeza e auditoria de comentarios.");
-criarComandoScript(codigoComentarios, "limpar-ai", "Remove comentarios redundantes e marcadores de agente.", "etc/scripts/codigo/comentarios-limpar-ai.js");
-criarComandoScript(codigoComentarios, "limpar-generico", "Remove comentarios conversacionais e obvios.", "etc/scripts/codigo/comentarios-limpar-generico.js");
 const codigoSmells = codigo.command("smells").description("Auditorias de cheiros de codigo.");
 criarComandoScript(codigoSmells, "auditar", "Gera snapshot de sinais de complexidade acidental e codigo defensivo.", "etc/scripts/codigo/smells-auditar.js");
-const codigoIdLegado = codigo.command("id-legado").description("Auditorias para identificadores legados.");
-criarComandoScript(codigoIdLegado, "identificar", "Gera relatorio de usos legados de `id`.", "etc/scripts/codigo/id-legado-identificar.js");
-const codigoTitleCase = codigo.command("title-case").description("Auditorias e correcoes de textos em Title Case.");
-criarComandoScript(codigoTitleCase, "identificar", "Gera relatorio de ocorrencias suspeitas de Title Case.", "etc/scripts/codigo/title-case-identificar.js");
-criarComandoScript(codigoTitleCase, "corrigir", "Aplica correcoes de Title Case a partir do relatorio.", "etc/scripts/codigo/title-case-corrigir.js");
 
 const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
 criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");
@@ -154,7 +137,7 @@ criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do 
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js qa dashboard servir --porta 4179")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}\n  ${pc.dim("node etc/scripts/sgc.js projeto setup --instalar-dependencias")}\n  ${pc.dim("node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run")}\n  ${pc.dim("node etc/scripts/sgc.js codigo id-legado identificar")}\n  ${pc.dim("node etc/scripts/sgc.js codigo smells auditar --json")}`
+    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura auditoria")}\n  ${pc.dim("node etc/scripts/sgc.js frontend cobertura auditoria")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim("node etc/scripts/sgc.js codigo smells auditar --json")}`
 );
 
 try {

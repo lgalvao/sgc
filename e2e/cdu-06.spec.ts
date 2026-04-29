@@ -12,7 +12,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
-    navegarParaAtividades
+    navegarParaCadastro
 } from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {
@@ -172,7 +172,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
         await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_SUB);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await adicionarAtividade(page, `Atividade bloco ${timestamp}`);
         await adicionarConhecimento(page, `Atividade bloco ${timestamp}`, 'Conhecimento bloco');
         await disponibilizarCadastro(page);

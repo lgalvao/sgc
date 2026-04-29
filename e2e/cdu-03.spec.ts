@@ -3,7 +3,7 @@ import {
     acessarDetalhesProcesso,
     criarProcesso,
     extrairProcessoCodigo,
-    verificarProcessoNaTabela
+    verificarProcessoTabela
 } from './helpers/helpers-processos.js';
 import {
     esperarPaginaCadastroProcesso,
@@ -232,7 +232,7 @@ test.describe('CDU-03 - Manter processo', () => {
             unidade: 'ASSESSORIA_12',
             expandir: ['SECRETARIA_1']
         });
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao,
             situacao: 'Criado',
             tipo: 'Mapeamento'
@@ -271,7 +271,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await esperarPaginaPainel(page);
-        await verificarProcessoNaTabela(page, {
+        await verificarProcessoTabela(page, {
             descricao: descricaoAlt,
             situacao: 'Em andamento',
             tipo: 'Mapeamento'

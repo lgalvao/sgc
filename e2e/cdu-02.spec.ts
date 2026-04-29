@@ -4,7 +4,7 @@ import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {
     criarProcesso,
     verificarCabecalhosTabelaProcessos,
-    verificarProcessoNaTabela
+    verificarProcessoTabela
 } from './helpers/helpers-processos.js';
 
 test.describe('CDU-02 - Visualizar painel', () => {
@@ -33,7 +33,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
 
             await test.step('Verificar campos da tabela de processos ativos', async () => {
                 await verificarCabecalhosTabelaProcessos(page, true);
-                await verificarProcessoNaTabela(page, {
+                await verificarProcessoTabela(page, {
                     descricao: descricaoProcesso,
                     tipo: 'Mapeamento',
                     situacao: 'Criado',
@@ -71,7 +71,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             await expect(page).toHaveURL(/\/painel/);
 
             // Valida que o processo criado aparece na tabela do painel principal
-            await verificarProcessoNaTabela(page, {
+            await verificarProcessoTabela(page, {
                 descricao: descricaoProcesso,
                 tipo: 'Mapeamento',
                 situacao: 'Criado'
@@ -158,7 +158,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             await page.goto('/painel');
 
             // Verifica que o processo foi criado com as filhas operacionais (COORD_11 é INTERMEDIARIA e é filtrada)
-            await verificarProcessoNaTabela(page, {
+            await verificarProcessoTabela(page, {
                 descricao: descricaoProcesso,
                 situacao: 'Criado',
                 tipo: 'Mapeamento',

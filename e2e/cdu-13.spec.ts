@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/index.js';
-import {esperarAtividadesSomenteLeitura, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {esperarAtividadesSomenteLeitura, navegarParaCadastro} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
     aceitarCadastroMapeamento,
@@ -37,7 +37,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await verificarAcoesAnaliseCadastro(page, {
             rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
@@ -47,7 +47,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await verificarAcoesAnaliseCadastro(page, {
             rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
@@ -64,14 +64,14 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
 
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await devolverCadastroMapeamento(page, 'Corrigir conforme Secretaria');
 
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
 
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         const modal = await abrirHistoricoAnalise(page);
         await validarCabecalhosHistorico(modal);
         await expect(modal.getByTestId('cell-dataHora-0')).not.toHaveText('');
@@ -91,7 +91,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     test('Cenarios CDU-13: Hierarquia aceita e ADMIN homologa', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await verificarAcoesAnaliseCadastro(page, {
             rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
@@ -102,7 +102,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await esperarAtividadesSomenteLeitura(page);
         await verificarAcoesAnaliseCadastro(page, {
             rotuloPrincipal: 'Homologar',
@@ -112,7 +112,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await verificarAcoesAnaliseCadastro(page, {
             rotuloPrincipal: 'Registrar aceite',
             principalHabilitado: true,
@@ -123,7 +123,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await verificarAcoesAnaliseCadastro(page, {
             rotuloPrincipal: 'Homologar',
             principalHabilitado: true,
@@ -161,7 +161,7 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
     test('GESTOR cancela devolução e permanece na tela de atividades e conhecimentos', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcessoCancelamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         await page.getByTestId('btn-acao-devolver').click();
         const modal = page.getByRole('dialog');
@@ -178,18 +178,18 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
     test('ADMIN cancela homologação e permanece na tela de atividades e conhecimentos', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcessoCancelamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await aceitarCadastroMapeamento(page, 'Aceite para fluxo de cancelamento 1');
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoCancelamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await aceitarCadastroMapeamento(page, 'Aceite para fluxo de cancelamento 2');
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcessoCancelamento, UNIDADE_ALVO);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         await verificarAcoesAnaliseCadastro(page, {
             rotuloPrincipal: 'Homologar',
             principalHabilitado: true,

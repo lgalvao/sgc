@@ -6,7 +6,7 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     fecharModalImpacto,
-    navegarParaAtividades,
+    navegarParaCadastro,
     verificarBotaoImpactoDireto
 } from './helpers/helpers-atividades.js';
 import {
@@ -54,7 +54,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         // Preparacao 4: CHEFE revisa e disponibiliza
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         await adicionarAtividade(page, atividadeRevisao);
         await adicionarConhecimento(page, atividadeRevisao, 'Conhecimento rev');
@@ -68,7 +68,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão (do cadastro )?disponibilizada/i);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         const modalVisualizacao = await abrirHistoricoAnalise(page);
         await expect(modalVisualizacao).toBeVisible();
@@ -86,7 +86,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
 
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         const modalAnalise = await abrirHistoricoAnalise(page);
         await validarCabecalhosHistorico(modalAnalise);
         await expect(modalAnalise.getByTestId('cell-dataHora-0')).not.toHaveText('');
@@ -105,7 +105,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
 
         await cancelarDevolucao(page);
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
@@ -114,7 +114,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        await navegarParaCadastro(page);
         const modal = await abrirHistoricoAnalise(page);
         await validarCabecalhosHistorico(modal);
         await expect(modal.getByTestId('cell-dataHora-0')).not.toHaveText('');
