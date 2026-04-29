@@ -35,17 +35,19 @@ npm install --prefix etc/scripts
 
 ### Backend
 ```bash
-node etc/scripts/sgc.js backend cobertura verificar --min=95
+node etc/scripts/sgc.js backend cobertura auditoria --min=95
 node etc/scripts/sgc.js backend testes analisar --dir backend --output analise.md
 node etc/scripts/sgc.js backend testes priorizar --input analise.json
-node etc/scripts/sgc.js backend java auditar-null
+node etc/scripts/sgc.js backend java auditar-null --fix
 ```
 
 ### Frontend
 ```bash
-node etc/scripts/sgc.js frontend cobertura verificar --min=80
+node etc/scripts/sgc.js frontend cobertura auditoria --min=80
 node etc/scripts/sgc.js frontend mensagens extrair
+node etc/scripts/sgc.js frontend mensagens analisar --fix
 node etc/scripts/sgc.js frontend validacoes auditar
+node etc/scripts/sgc.js frontend test-ids listar-duplicados
 ```
 
 ### QA & Dashboard
@@ -62,16 +64,24 @@ node etc/scripts/sgc.js projeto limpar --confirmar
 node etc/scripts/sgc.js projeto setup --instalar-dependencias
 ```
 
-## Detalhamento de Comandos Críticos
+## Correção Ativa (Auto-Fix)
 
-### `projeto doctor`
-Valida a saúde do ambiente de desenvolvimento, checando versões de ferramentas (Node, NPM, Git, Java) e a integridade das pastas do repositório.
+O toolkit evoluiu de diagnóstico para correção automática. Atualmente suporta:
 
-### `qa snapshot coletar`
-O comando mais poderoso do toolkit. Ele orquestra testes unitários, integração, lint, typecheck e coleta de cobertura (Java e Web), gerando um `snapshot.json` que alimenta o dashboard histórico de qualidade.
+1.  **Higiene de Mensagens:** `frontend mensagens analisar --fix` remove automaticamente constantes de texto órfãs no `textos.ts`, reduzindo o ruído do código.
+2.  **Qualidade Java:** `backend java auditar-null --fix` injeta anotações `@Nullable` do JSpecify em parâmetros de métodos onde verificações manuais de null são feitas, melhorando a análise estática.
 
-### `testes analisar` (Backend)
-Analisa o pareamento entre classes fonte e classes de teste, identificando lacunas no backlog real (ignorando DTOs estruturais) e cruzando dados com a cobertura do JaCoCo.
+## Portões de Qualidade
+
+Determinados scripts agora atuam como portões de qualidade mandatórios:
+
+- **IDs de Teste Duplicados:** O comando `frontend test-ids listar-duplicados` falha o CI (exit 1) se encontrar duplicatas.
+- **Divergência de Validação:** `frontend validacoes auditar` bloqueia o avanço se as regras de Bean Validation do backend divergirem dos validadores do frontend.
+- **Snapshots de QA:** Todas as novas auditorias estão integradas ao comando `qa snapshot coletar`.
+
+## Documentação Adicional
+
+- **[backlog.md](backlog.md)**: Ideias e roadmap para futuras evoluções do toolkit.
 
 ## Qualidade do Toolkit
 

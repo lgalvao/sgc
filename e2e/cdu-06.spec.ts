@@ -58,9 +58,10 @@ test.describe('CDU-06 - Detalhar processo', () => {
         // Botão "Alterar data limite" deve estar visível para Admin
         await expect(page.getByTestId('btn-alterar-data-limite')).toBeVisible();
         
-        // Botão "Reabrir cadastro" NÃO deve estar visível pois a situação é "Não iniciado" 
-        // (Regra: requer situação >= MAPEAMENTO_MAPA_HOMOLOGADO)
-        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
+        // Botão "Reabrir cadastro" deve permanecer visível para ADMIN, porém desabilitado
+        // enquanto a situação ainda não permite a ação.
+        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeVisible();
+        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeDisabled();
         
         // Botão "Enviar lembrete" deve estar visível
         await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();

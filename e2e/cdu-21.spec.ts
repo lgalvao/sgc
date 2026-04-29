@@ -99,10 +99,14 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-acao-bloco-homologar')).toBeHidden();
 
         await navegarParaSubprocesso(page, 'SECAO_221');
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeHidden();
-        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
-        await expect(page.getByTestId('btn-reabrir-revisao')).toBeHidden();
-        await expect(page.getByTestId('btn-alterar-data-limite')).toBeHidden();
+        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
+        await expect(page.getByTestId('btn-enviar-lembrete')).toBeDisabled();
+        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeVisible();
+        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeDisabled();
+        await expect(page.getByTestId('btn-reabrir-revisao')).toBeVisible();
+        await expect(page.getByTestId('btn-reabrir-revisao')).toBeDisabled();
+        await expect(page.getByTestId('btn-alterar-data-limite')).toBeVisible();
+        await expect(page.getByTestId('btn-alterar-data-limite')).toBeDisabled();
 
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-atividades')).toHaveClass(/card-actionable/);
@@ -129,7 +133,8 @@ test.describe.serial('CDU-21 - Processo com mapas não homologados', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         // Processo com mapa validado (não homologado): botão Finalizar não deve estar disponível
-        await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
     });
 });
 
@@ -178,10 +183,13 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
 
         await expect(page.getByText(/Situação:\s*Finalizado/i)).toBeVisible();
 
-        await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
 
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeHidden();
-        await expect(page.getByTestId('btn-reabrir-revisao')).toBeHidden();
+        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
+        await expect(page.getByTestId('btn-enviar-lembrete')).toBeDisabled();
+        await expect(page.getByTestId('btn-reabrir-revisao')).toBeVisible();
+        await expect(page.getByTestId('btn-reabrir-revisao')).toBeDisabled();
     });
 });

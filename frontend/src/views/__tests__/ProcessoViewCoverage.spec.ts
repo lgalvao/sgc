@@ -72,7 +72,10 @@ const commonStubs = {
     },
     BAlert: {template: '<div v-if="modelValue"><slot /></div>', props: ['modelValue']},
     BBadge: {template: '<span><slot /></span>'},
-    BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+                    BButton: {
+                        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+                        props: ['disabled']
+                    },
     BContainer: {template: '<div><slot /></div>'},
     BSpinner: {template: '<span>Loading</span>'}
 };
@@ -172,7 +175,13 @@ describe("ProcessoViewCoverage.spec.ts", () => {
     });
 
     it("deve lidar com erro ao finalizar processo", async () => {
-        const wrapper = createWrapper();
+        const wrapper = createWrapper({
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                unidadeSelecionada: 999,
+                perfis: ["ADMIN"]
+            }
+        });
 
         vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Erro ao finalizar"));
 
@@ -187,6 +196,32 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             await modal.vm.$emit("confirmar");
         }
         await flushPromises();
+    });
+
+    it("deve exibir botão de finalizar desabilitado para ADMIN quando o processo não puder ser finalizado", async () => {
+        const wrapper = createWrapper({
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                unidadeSelecionada: 999,
+                perfis: ["ADMIN"]
+            },
+            processos: {
+                processoDetalhe: {
+                    codigo: 1,
+                    descricao: "Processo teste",
+                    tipo: TipoProcesso.MAPEAMENTO,
+                    situacao: "EM_ANDAMENTO",
+                    unidades: [],
+                    podeFinalizar: false
+                }
+            }
+        });
+
+        await flushPromises();
+
+        const btnFinalizar = wrapper.find('[data-testid="btn-processo-finalizar"]');
+        expect(btnFinalizar.exists()).toBe(true);
+        expect(btnFinalizar.attributes('disabled')).toBeDefined();
     });
 
     it("não deve exibir erro quando o carregamento inicial for cancelado", async () => {

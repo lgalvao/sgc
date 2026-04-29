@@ -320,7 +320,10 @@ describe("Processo.vue", () => {
                     ProcessoInfo: ProcessoInfoStub,
                     BAlert: BAlertStub,
                     BSpinner: BSpinnerStub,
-                    BButton: {template: '<button @click="$emit(\'click\', $event)"><slot /></button>'},
+                    BButton: {
+                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
+                        props: ['disabled']
+                    },
                     BDropdown: BDropdownStub,
                     BDropdownItemButton: BDropdownItemButtonStub
                 }
@@ -332,6 +335,7 @@ describe("Processo.vue", () => {
         vi.clearAllMocks();
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         toastStore = useToastStore();
     });
 
@@ -846,6 +850,8 @@ describe("Processo.vue", () => {
 
     it("deve abrir modal de finalização de processo", async () => {
         wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
 
         await nextTick();
         await flushPromises();
@@ -858,6 +864,8 @@ describe("Processo.vue", () => {
 
     it("deve exibir o texto simples no modal de finalização", async () => {
         wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
 
         await nextTick();
         await flushPromises();
@@ -876,6 +884,8 @@ describe("Processo.vue", () => {
 
     it("deve chamar API de finalizar processo com sucesso", async () => {
         wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         toastStore = useToastStore();
 
         await nextTick();
@@ -890,6 +900,8 @@ describe("Processo.vue", () => {
 
     it("ignora confirmações repetidas enquanto a finalização está em andamento", async () => {
         wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
 
         await nextTick();
         await flushPromises();
@@ -943,5 +955,24 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         await nextTick();
         expect(wrapper.findComponent(BSpinnerStub).exists()).toBe(true);
+    });
+
+    it("deve manter botão de finalizar visível e desabilitado para ADMIN quando o processo não puder ser finalizado", async () => {
+        wrapper.unmount();
+        wrapper = createWrapper({
+            processo: {
+                ...mockProcesso,
+                podeFinalizar: false,
+            }
+        });
+        perfilStore = usePerfilStore();
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
+
+        await nextTick();
+        await flushPromises();
+
+        const btnFinalizar = wrapper.find('[data-testid="btn-processo-finalizar"]');
+        expect(btnFinalizar.exists()).toBe(true);
+        expect(btnFinalizar.attributes('disabled')).toBeDefined();
     });
 });

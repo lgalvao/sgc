@@ -29,8 +29,9 @@
 
         <template #actions>
           <BButton
-              v-if="podeFinalizar"
+              v-if="mostrarFinalizarProcesso"
               data-testid="btn-processo-finalizar"
+              :disabled="!podeFinalizar"
               variant="danger"
               @click="finalizarProcesso"
           >
@@ -119,6 +120,7 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useNotification} from "@/composables/useNotification";
+import {usePerfil} from "@/composables/usePerfil";
 import {useToastStore} from "@/stores/toast";
 import {useProcessoStore} from "@/stores/processo";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
@@ -144,6 +146,7 @@ type LinhaCliqueSubprocesso = {
 const route = useRoute();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
+const {isAdmin} = usePerfil();
 const toastStore = useToastStore();
 const processoStore = useProcessoStore();
 const {invalidarCachesProcesso, invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
@@ -182,6 +185,7 @@ const participantesHierarquia = computed(() => processo.value?.unidades || []);
 const podeFinalizar = computed(() => {
   return processo.value?.podeFinalizar || false;
 });
+const mostrarFinalizarProcesso = computed(() => isAdmin.value);
 
 const acoesBlocoVisiveis = computed(() => (processo.value?.acoesBloco ?? []).filter(acao => acao.mostrar));
 const usarMenuAcoesBloco = computed(() => acoesBlocoVisiveis.value.length > 1);
