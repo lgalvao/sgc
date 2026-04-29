@@ -46,7 +46,7 @@ function normalizarArgumentosSnapshot(argumentos = []) {
 
 async function executarSnapshotQa(argumentos = []) {
     const argumentosNormalizados = normalizarArgumentosSnapshot(argumentos);
-    await executarNode("etc/scripts/qa/snapshot-coletar-execucao.mjs", argumentosNormalizados);
+    await executarNode("etc/scripts/qa/snapshot-coletar-execucao.js", argumentosNormalizados);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

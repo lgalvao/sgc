@@ -7,9 +7,9 @@ import {execaNode} from "execa";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "etc", "scripts", "sgc.js");
-const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "backend", "testes-priorizar.cjs");
+const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "backend", "testes-priorizar.js");
 const FIXTURE_SNAPSHOT = path.join(DIRETORIO_RAIZ, "etc", "scripts", "test", "fixtures", "qa", "snapshot.json");
-const CAMINHO_FRONTEND_COBERTURA_VERIFICAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "frontend", "cobertura-verificar.cjs");
+const CAMINHO_FRONTEND_COBERTURA_VERIFICAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "frontend", "cobertura-verificar.js");
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
