@@ -6,7 +6,7 @@ import {
     validarProcessoFixture
 } from './fixtures/index.js';
 import {acessarDetalhesProcesso, verificarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
@@ -99,14 +99,15 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-acoes-bloco').getByRole('button')).toBeDisabled();
 
         await navegarParaSubprocesso(page, 'SECAO_221');
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeDisabled();
-        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeVisible();
-        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeDisabled();
-        await expect(page.getByTestId('btn-reabrir-revisao')).toBeVisible();
-        await expect(page.getByTestId('btn-reabrir-revisao')).toBeDisabled();
-        await expect(page.getByTestId('btn-alterar-data-limite')).toBeVisible();
-        await expect(page.getByTestId('btn-alterar-data-limite')).toBeDisabled();
+        await expect(page.getByTestId('btn-subprocesso-acoes')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).toBeDisabled();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).toBeDisabled();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).toBeDisabled();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-alterar-data-limite')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-alterar-data-limite')).toBeDisabled();
 
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-atividades')).toHaveClass(/card-actionable/);
@@ -187,9 +188,10 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
         await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
 
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeDisabled();
-        await expect(page.getByTestId('btn-reabrir-revisao')).toBeVisible();
-        await expect(page.getByTestId('btn-reabrir-revisao')).toBeDisabled();
+        await expect(page.getByTestId('btn-subprocesso-acoes')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).toBeDisabled();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).toBeDisabled();
     });
 });

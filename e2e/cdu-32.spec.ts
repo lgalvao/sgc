@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {navegarParaSubprocesso, verificarToast} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarToast} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 /**
@@ -29,7 +29,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
-        const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
+        const btnReabrir = await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro');
         await expect(btnReabrir).toBeVisible();
         await expect(btnReabrir).toBeEnabled();
 

@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {fazerLogout, navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
@@ -75,7 +75,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(prazoPaginaElement).not.toBeEmpty();
         const prazoPagina = await prazoPaginaElement.innerText();
 
-        const btnAlterarData = page.getByTestId('btn-alterar-data-limite');
+        const btnAlterarData = await obterAcaoCabecalhoSubprocesso(page, 'btn-alterar-data-limite');
         await expect(btnAlterarData).toBeVisible();
         await expect(btnAlterarData).toBeEnabled();
         await btnAlterarData.click();
@@ -110,7 +110,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        const btnAlterarData = page.getByTestId('btn-alterar-data-limite');
+        const btnAlterarData = await obterAcaoCabecalhoSubprocesso(page, 'btn-alterar-data-limite');
         await btnAlterarData.click();
 
         const inputData = page.getByTestId('input-nova-data-limite');

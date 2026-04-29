@@ -16,6 +16,7 @@ import {
 } from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {
+    obterAcaoCabecalhoSubprocesso,
     esperarPaginaDetalhesProcesso,
     navegarParaSubprocesso,
     verificarPaginaPainel
@@ -54,17 +55,12 @@ test.describe('CDU-06 - Detalhar processo', () => {
         });
 
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        
-        // Botão "Alterar data limite" deve estar visível para Admin
-        await expect(page.getByTestId('btn-alterar-data-limite')).toBeVisible();
-        
-        // Botão "Reabrir cadastro" deve permanecer visível para ADMIN, porém desabilitado
-        // enquanto a situação ainda não permite a ação.
-        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeVisible();
-        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeDisabled();
-        
-        // Botão "Enviar lembrete" deve estar visível
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
+        await expect(page.getByTestId('btn-subprocesso-acoes')).toBeVisible();
+
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-alterar-data-limite')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).toBeDisabled();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).toBeVisible();
     });
 
     test('Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN', async ({_resetAutomatico, page}) => {
@@ -110,8 +106,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         // GESTOR não vê ações de alteração administrativa no subprocesso
         await navegarParaSubprocesso(page, UNIDADE_PROCESSO);
-        await expect(page.getByTestId('btn-alterar-data-limite')).toBeHidden();
-        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
+        await expect(page.getByTestId('btn-subprocesso-acoes')).toBeHidden();
     });
 
     test('Fase 1c: Deve ocultar detalhes da revisão para chefe de secretaria interoperacional sem subprocesso próprio', async ({

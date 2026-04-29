@@ -2,7 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaHomologadoFixture, criarProcessoRevisaoMapaHomologadoFixture} from './fixtures/index.js';
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
+import {obterAcaoCabecalhoSubprocesso, verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
@@ -57,7 +57,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
-        const btnReabrir = page.getByTestId('btn-reabrir-revisao');
+        const btnReabrir = await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao');
         await expect(btnReabrir).toBeVisible();
         await expect(btnReabrir).toBeEnabled();
 

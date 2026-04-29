@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -52,7 +52,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
         const situacaoAntes = await page.getByTestId('subprocesso-header__txt-situacao').innerText();
         const localizacaoAntes = await page.getByTestId('subprocesso-header__txt-localizacao').innerText();
-        const btnLembrete = page.getByTestId('btn-enviar-lembrete');
+        const btnLembrete = await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete');
         await expect(btnLembrete).toBeVisible();
         await btnLembrete.click();
 
@@ -63,14 +63,14 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).toBeHidden();
 
-        await btnLembrete.click();
+        await (await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).click();
         await expect(modal.getByRole('heading', {name: TEXTOS.subprocesso.LEMBRETE_TITULO})).toBeVisible();
         await expect(page.getByTestId('txt-modelo-lembrete')).toContainText(TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(UNIDADE_1));
         await page.getByTestId('btn-confirmar-enviar-lembrete').click();
 
         await expect(page.getByText(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO).first()).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).not.toContainText(/Lembrete de prazo enviado/i);
-        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).toBeVisible();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(situacaoAntes);
         await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toHaveText(localizacaoAntes);
     });

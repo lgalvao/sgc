@@ -19,6 +19,10 @@ vi.mock('@/composables/useAcesso', () => ({
     podeAlterarDataLimite: { value: true },
     podeReabrirCadastro: { value: true },
     podeReabrirRevisao: { value: true },
+    mostrarEnviarLembrete: { value: true },
+    mostrarAlterarDataLimite: { value: true },
+    mostrarReabrirCadastro: { value: true },
+    mostrarReabrirRevisao: { value: true },
     acaoPrincipalCadastro: { value: { codigo: 'ACEITAR', rotulo: 'Aceitar', mostrar: true } }
   }))
 }));

@@ -188,3 +188,20 @@ export async function navegarParaSubprocesso(
 
     await expect(page).toHaveURL(urlSubprocesso);
 }
+
+export async function obterAcaoCabecalhoSubprocesso(page: Page, testIdAcao: string) {
+    const dropdown = page.getByTestId('btn-subprocesso-acoes');
+    if (await dropdown.count() > 0) {
+        const acaoMenu = page.getByTestId(testIdAcao);
+        if (await acaoMenu.count() === 0 || !(await acaoMenu.isVisible())) {
+            await expect(dropdown).toBeVisible();
+            await dropdown.click();
+        }
+        await expect(acaoMenu).toBeVisible();
+        return acaoMenu;
+    }
+
+    const acaoDireta = page.getByTestId(testIdAcao);
+    await expect(acaoDireta).toBeVisible();
+    return acaoDireta;
+}
