@@ -22,6 +22,7 @@ import {
 } from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
+import * as MapaHelpers from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -1329,7 +1330,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Modal de reabrir cadastro (CDU-32)
             const btnReabrirCadastro = page.getByRole('button', {name: /Reabrir.*cadastro/i});
-            await expect(btnReabrirCadastro).toBeHidden();
+            await expect(btnReabrirCadastro).toBeVisible();
+            await expect(btnReabrirCadastro).toBeDisabled();
 
             // CDU-34: Botão de enviar lembrete (ação direta, sem modal)
             const btnEnviarLembrete = page.getByRole('button', {name: /Enviar.*lembrete/i});
