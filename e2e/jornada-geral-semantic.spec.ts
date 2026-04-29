@@ -2,7 +2,7 @@ import {test} from './fixtures/complete-fixtures.js';
 import {USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
-test.describe.skip('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
+test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
     const SIGLA_SECAO = 'SECAO_111';
     const SIGLA_COORDENADORIA = 'COORD_11';
     const SIGLA_SECRETARIA = 'SECRETARIA_1';
