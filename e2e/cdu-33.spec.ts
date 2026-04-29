@@ -57,12 +57,11 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
-        const btnReabrir = await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao');
-        await expect(btnReabrir).toBeVisible();
-        await expect(btnReabrir).toBeEnabled();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).toBeEnabled();
 
         // Cenario 3: Abrir modal
-        await btnReabrir.click();
+        await (await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).click();
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
@@ -77,7 +76,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(modal).toBeHidden();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
-        await btnReabrir.click();
+        await (await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-revisao')).click();
         await page.getByTestId('btn-confirmar-reabrir').click();
         await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeVisible();
 

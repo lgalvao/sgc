@@ -976,7 +976,7 @@ describe("Processo.vue", () => {
         expect(btnFinalizar.attributes('disabled')).toBeDefined();
     });
 
-    it("deve manter menu de ações em bloco visível e desabilitado quando nenhuma ação estiver habilitada", async () => {
+    it("deve manter menu de ações em bloco visível e habilitado mesmo quando nenhuma ação estiver habilitada", async () => {
         wrapper.unmount();
         wrapper = createWrapper({
             processo: {
@@ -1021,6 +1021,6 @@ describe("Processo.vue", () => {
 
         const menuAcoes = wrapper.find('[data-testid="btn-processo-acoes-bloco"] button');
         expect(menuAcoes.exists()).toBe(true);
-        expect(menuAcoes.attributes('disabled')).toBeDefined();
+        expect(menuAcoes.attributes('disabled')).toBeUndefined();
     });
 });

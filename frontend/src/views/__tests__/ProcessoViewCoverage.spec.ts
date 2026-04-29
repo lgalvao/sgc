@@ -232,7 +232,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         expect(btnFinalizar.attributes('disabled')).toBeDefined();
     });
 
-    it("deve desabilitar o menu de ações em bloco quando só existirem ações visíveis porém indisponíveis", async () => {
+    it("deve manter o menu de ações em bloco habilitado quando só existirem ações visíveis porém indisponíveis", async () => {
         const wrapper = createWrapper({
             perfil: {
                 perfilSelecionado: "ADMIN",
@@ -286,7 +286,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
         const menuAcoes = wrapper.find('[data-testid="btn-processo-acoes-bloco"] button');
         expect(menuAcoes.exists()).toBe(true);
-        expect(menuAcoes.attributes('disabled')).toBeDefined();
+        expect(menuAcoes.attributes('disabled')).toBeUndefined();
     });
 
     it("não deve exibir erro quando o carregamento inicial for cancelado", async () => {

@@ -29,12 +29,11 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
-        const btnReabrir = await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro');
-        await expect(btnReabrir).toBeVisible();
-        await expect(btnReabrir).toBeEnabled();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).toBeVisible();
+        await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).toBeEnabled();
 
         // Cenario 3: Abrir modal e cancelar
-        await btnReabrir.click();
+        await (await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).click();
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText(/Reabrir cadastro/i)).toBeVisible();
@@ -42,7 +41,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await expect(modal).toBeHidden();
 
         // Cenario 4: Validação sem justificativa
-        await btnReabrir.click();
+        await (await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).click();
         await page.getByTestId('btn-confirmar-reabrir').click();
         await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeVisible();
         await page.getByTestId('inp-justificativa-reabrir').fill('Justificativa de teste');

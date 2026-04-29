@@ -18,7 +18,6 @@
             <BDropdown
                 v-if="mostrarAcoesCabecalho"
                 data-testid="btn-subprocesso-acoes"
-                :disabled="!habilitarAcoesCabecalho"
                 :text="TEXTOS.mapa.BOTAO_ACOES"
                 toggle-class="text-nowrap"
                 variant="outline-secondary"
@@ -354,13 +353,6 @@ const mostrarAcoesCabecalho = computed(() =>
     || mostrarReabrirCadastro.value
     || mostrarReabrirRevisao.value
     || mostrarEnviarLembrete.value
-);
-
-const habilitarAcoesCabecalho = computed(() =>
-    podeAlterarDataLimite.value
-    || podeReabrirCadastro.value
-    || podeReabrirRevisao.value
-    || podeEnviarLembrete.value
 );
 
 const movimentacoes = computed<Movimentacao[]>(

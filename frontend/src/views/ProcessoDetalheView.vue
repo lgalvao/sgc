@@ -41,7 +41,6 @@
           <BDropdown
               v-if="usarMenuAcoesBloco"
               data-testid="btn-processo-acoes-bloco"
-              :disabled="processandoAcaoBloco || !habilitarAcoesBloco"
               :text="TEXTOS.processo.ACOES_EM_BLOCO"
               toggle-class="text-nowrap"
               variant="secondary">
@@ -189,7 +188,6 @@ const mostrarFinalizarProcesso = computed(() => isAdmin.value);
 
 const acoesBlocoVisiveis = computed(() => (processo.value?.acoesBloco ?? []).filter(acao => acao.mostrar));
 const usarMenuAcoesBloco = computed(() => acoesBlocoVisiveis.value.length > 1);
-const habilitarAcoesBloco = computed(() => acoesBlocoVisiveis.value.some(acao => acao.habilitar));
 const acaoBlocoPrincipal = computed(() => acoesBlocoVisiveis.value[0] ?? null);
 
 const unidadesElegiveis = computed(() => {
