@@ -1,6 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useFluxoMapa} from "../useFluxoMapa";
-import * as service from "@/services/subprocessoService";
+import * as subprocessoService from "@/services/subprocessoService";
+import * as processoService from "@/services/processoService";
+import {useMapas} from "@/composables/useMapas";
 
 vi.mock("@/services/subprocessoService", () => ({
     salvarMapaCompleto: vi.fn(),
@@ -11,6 +13,19 @@ vi.mock("@/services/subprocessoService", () => ({
     removerCompetencia: vi.fn(),
 }));
 
+vi.mock("@/services/processoService", () => ({
+    validarMapa: vi.fn(),
+    aceitarValidacao: vi.fn(),
+    homologarValidacao: vi.fn(),
+    devolverValidacao: vi.fn(),
+}));
+
+vi.mock("@/composables/useMapas", () => ({
+    useMapas: vi.fn(() => ({
+        mapaCompleto: { value: null }
+    }))
+}));
+
 describe("useFluxoMapa", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -19,81 +34,139 @@ describe("useFluxoMapa", () => {
     it("deve adicionar competencia e retornar mapa atualizado", async () => {
         const fluxoMapa = useFluxoMapa();
         const resposta = {codigo: 1, competencias: [{codigo: 2}]} as any;
-        vi.mocked(service.adicionarCompetencia).mockResolvedValue(resposta);
+        vi.mocked(subprocessoService.adicionarCompetencia).mockResolvedValue(resposta);
 
         const resultado = await fluxoMapa.adicionarCompetencia(10, {descricao: "Comp", atividadesCodigos: []});
 
-        expect(service.adicionarCompetencia).toHaveBeenCalledWith(10, {descricao: "Comp", atividadesCodigos: []});
+        expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(10, {descricao: "Comp", atividadesCodigos: []});
         expect(resultado).toEqual(resposta);
     });
 
     it("deve atualizar competencia e retornar mapa atualizado", async () => {
         const fluxoMapa = useFluxoMapa();
         const resposta = {codigo: 1, competencias: [{codigo: 3}]} as any;
-        vi.mocked(service.atualizarCompetencia).mockResolvedValue(resposta);
+        vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue(resposta);
 
         const resultado = await fluxoMapa.atualizarCompetencia(10, 20, {descricao: "Comp", atividadesCodigos: [1]});
 
-        expect(service.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {descricao: "Comp", atividadesCodigos: [1]});
+        expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {descricao: "Comp", atividadesCodigos: [1]});
         expect(resultado).toEqual(resposta);
     });
 
     it("deve remover competencia e retornar mapa atualizado", async () => {
         const fluxoMapa = useFluxoMapa();
         const resposta = {codigo: 1, competencias: []} as any;
-        vi.mocked(service.removerCompetencia).mockResolvedValue(resposta);
+        vi.mocked(subprocessoService.removerCompetencia).mockResolvedValue(resposta);
 
         const resultado = await fluxoMapa.removerCompetencia(10, 20);
 
-        expect(service.removerCompetencia).toHaveBeenCalledWith(10, 20);
+        expect(subprocessoService.removerCompetencia).toHaveBeenCalledWith(10, 20);
         expect(resultado).toEqual(resposta);
     });
 
     it("deve disponibilizar mapa", async () => {
         const fluxoMapa = useFluxoMapa();
-        vi.mocked(service.disponibilizarMapa).mockResolvedValue(undefined);
+        vi.mocked(subprocessoService.disponibilizarMapa).mockResolvedValue(undefined);
 
         await fluxoMapa.disponibilizarMapa(10, {dataLimite: "2026-05-01", observacoes: "obs"});
 
-        expect(service.disponibilizarMapa).toHaveBeenCalledWith(10, {dataLimite: "2026-05-01", observacoes: "obs"});
+        expect(subprocessoService.disponibilizarMapa).toHaveBeenCalledWith(10, {dataLimite: "2026-05-01", observacoes: "obs"});
     });
 
     it("deve salvar mapa completo", async () => {
         const fluxoMapa = useFluxoMapa();
         const resposta = {codigo: 1, competencias: []} as any;
-        vi.mocked(service.salvarMapaCompleto).mockResolvedValue(resposta);
+        vi.mocked(subprocessoService.salvarMapaCompleto).mockResolvedValue(resposta);
 
         const dados = {competencias: []};
         const resultado = await fluxoMapa.salvarMapa(10, dados);
 
-        expect(service.salvarMapaCompleto).toHaveBeenCalledWith(10, dados);
+        expect(subprocessoService.salvarMapaCompleto).toHaveBeenCalledWith(10, dados);
         expect(resultado).toEqual(resposta);
     });
 
     it("deve salvar ajustes do mapa", async () => {
         const fluxoMapa = useFluxoMapa();
-        vi.mocked(service.salvarMapaAjuste).mockResolvedValue(undefined);
+        vi.mocked(subprocessoService.salvarMapaAjuste).mockResolvedValue(undefined);
 
         const dados = {competencias: [], atividades: [], sugestoes: "ajuste"};
         await fluxoMapa.salvarAjustes(10, dados);
 
-        expect(service.salvarMapaAjuste).toHaveBeenCalledWith(10, dados);
+        expect(subprocessoService.salvarMapaAjuste).toHaveBeenCalledWith(10, dados);
     });
 
-    it("deve propagar erro se salvarAjustes falhar", async () => {
-        const fluxoMapa = useFluxoMapa();
-        vi.mocked(service.salvarMapaAjuste).mockRejectedValue(new Error("Erro ajuste"));
+    describe("ações de análise", () => {
+        it("deve validar mapa", async () => {
+            const fluxoMapa = useFluxoMapa();
+            await fluxoMapa.validarMapa(10);
+            expect(processoService.validarMapa).toHaveBeenCalledWith(10);
+        });
 
-        const dados = {competencias: [], atividades: [], sugestoes: ""};
-        await expect(fluxoMapa.salvarAjustes(10, dados)).rejects.toThrow("Erro ajuste");
+        it("deve aceitar mapa", async () => {
+            const fluxoMapa = useFluxoMapa();
+            await fluxoMapa.aceitarMapa(10, { observacao: "ok" });
+            expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
+        });
+
+        it("deve homologar mapa", async () => {
+            const fluxoMapa = useFluxoMapa();
+            await fluxoMapa.homologarMapa(10, { observacao: "ok" });
+            expect(processoService.homologarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
+        });
+
+        it("deve devolver mapa", async () => {
+            const fluxoMapa = useFluxoMapa();
+            await fluxoMapa.devolverMapa(10, { justificativa: "ajustar" });
+            expect(processoService.devolverValidacao).toHaveBeenCalledWith(10, { justificativa: "ajustar" });
+        });
     });
 
-    it("deve propagar erro se salvarMapa falhar", async () => {
-        const fluxoMapa = useFluxoMapa();
-        vi.mocked(service.salvarMapaCompleto).mockRejectedValue(new Error("Erro grave"));
+    describe("removerAtividadeDaCompetencia", () => {
+        it("deve remover atividade da competencia e atualizar", async () => {
+            const mockMapa = {
+                competencias: [
+                    {
+                        codigo: 20,
+                        descricao: "Comp 20",
+                        atividades: [{ codigo: 100 }, { codigo: 101 }]
+                    }
+                ]
+            };
+            vi.mocked(useMapas).mockReturnValue({ mapaCompleto: { value: mockMapa } } as any);
 
-        const dados = {competencias: []};
-        await expect(fluxoMapa.salvarMapa(10, dados)).rejects.toThrow("Erro grave");
-        expect(fluxoMapa.erro.value).toBe("Erro grave");
+            const fluxoMapa = useFluxoMapa();
+            await fluxoMapa.removerAtividadeDaCompetencia(10, 20, 100);
+
+            expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {
+                descricao: "Comp 20",
+                atividadesCodigos: [101]
+            });
+        });
+
+        it("deve lançar erro se competencia não for encontrada", async () => {
+            vi.mocked(useMapas).mockReturnValue({ mapaCompleto: { value: { competencias: [] } } } as any);
+
+            const fluxoMapa = useFluxoMapa();
+            await expect(fluxoMapa.removerAtividadeDaCompetencia(10, 20, 100)).rejects.toThrow("Competência não encontrada.");
+        });
+    });
+
+    describe("tratamento de erros", () => {
+        it("deve propagar erro se salvarAjustes falhar", async () => {
+            const fluxoMapa = useFluxoMapa();
+            vi.mocked(subprocessoService.salvarMapaAjuste).mockRejectedValue(new Error("Erro ajuste"));
+
+            const dados = {competencias: [], atividades: [], sugestoes: ""};
+            await expect(fluxoMapa.salvarAjustes(10, dados)).rejects.toThrow("Erro ajuste");
+        });
+
+        it("deve propagar erro se salvarMapa falhar", async () => {
+            const fluxoMapa = useFluxoMapa();
+            vi.mocked(subprocessoService.salvarMapaCompleto).mockRejectedValue(new Error("Erro grave"));
+
+            const dados = {competencias: []};
+            await expect(fluxoMapa.salvarMapa(10, dados)).rejects.toThrow("Erro grave");
+            expect(fluxoMapa.erro.value).toBe("Erro grave");
+        });
     });
 });
