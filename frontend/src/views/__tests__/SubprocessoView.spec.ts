@@ -152,6 +152,14 @@ describe('SubprocessoView.vue', () => {
             emits: ['update:modelValue']
         },
         BButton: {template: '<button :disabled="disabled"><slot /></button>', props: ['disabled']},
+        BDropdown: {
+            template: '<div :data-testid="$attrs[\'data-testid\']"><button :disabled="disabled"><slot /></button></div>',
+            props: ['disabled']
+        },
+        BDropdownItemButton: {
+            template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+            props: ['disabled']
+        },
         BAlert: {
             name: 'BAlert',
             template: '<div><slot /><button @click="$emit(\'dismissed\')">x</button></div>', 
@@ -338,6 +346,7 @@ describe('SubprocessoView.vue', () => {
         expect(wrapper.find('[data-testid="header-subprocesso"]').exists()).toBe(true);
         expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
         expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-subprocesso-acoes"]').exists()).toBe(true);
     });
 
     it('passa o subprocesso carregado ao componente de cards', async () => {

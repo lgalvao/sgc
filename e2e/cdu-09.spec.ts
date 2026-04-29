@@ -9,6 +9,7 @@ import {
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
+    abrirAcaoCadastroDevolver,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     fecharHistoricoAnalise,
@@ -105,7 +106,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);
         await navegarParaCadastro(page);
 
-        await page.getByTestId('btn-acao-devolver').click();
+        await (await abrirAcaoCadastroDevolver(page)).click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivo);
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
 

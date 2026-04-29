@@ -41,6 +41,9 @@ const quantidadeAcoesWorkflow = computed(() => {
   if (props.codSubprocesso && props.acaoPrincipalCadastro?.mostrar) {
     total += 1;
   }
+  if (props.codSubprocesso && props.mostrarDisponibilizarCadastro) {
+    total += 1;
+  }
   return total;
 });
 
@@ -85,6 +88,14 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
           >
             {{ acaoPrincipalCadastro.rotuloBotao }}
           </BDropdownItemButton>
+          <BDropdownItemButton
+              v-if="mostrarDisponibilizarCadastro"
+              data-testid="btn-cadastro-acao-disponibilizar"
+              :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
+              @click="$emit('disponibilizar')"
+          >
+            {{ TEXTOS.atividades.BOTAO_DISPONIBILIZAR }}
+          </BDropdownItemButton>
         </BDropdown>
         <BButton
             v-else-if="codSubprocesso && mostrarDevolverCadastro"
@@ -106,9 +117,20 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         >
           {{ acaoPrincipalCadastro.rotuloBotao }}
         </BButton>
+        <LoadingButton
+            v-else-if="codSubprocesso && mostrarDisponibilizarCadastro"
+            :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
+            :loading="loadingValidacao"
+            data-testid="btn-cad-atividades-disponibilizar"
+            icon="check-lg"
+            :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
+            :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
+            variant="success"
+            @click="$emit('disponibilizar')"
+        />
       </div>
 
-      <div v-if="podeVisualizarImpacto || mostrarImportarAtividades || mostrarDisponibilizarCadastro" class="d-flex gap-2">
+      <div v-if="podeVisualizarImpacto || mostrarImportarAtividades" class="d-flex gap-2">
         <BButton
             v-if="codSubprocesso && podeVisualizarImpacto"
             data-testid="cad-atividades__btn-impactos-mapa-edicao"
@@ -126,17 +148,6 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         >
           <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
         </BButton>
-        <LoadingButton
-            v-if="codSubprocesso && mostrarDisponibilizarCadastro"
-            :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
-            :loading="loadingValidacao"
-            data-testid="btn-cad-atividades-disponibilizar"
-            icon="check-lg"
-            :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
-            :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
-            variant="success"
-            @click="$emit('disponibilizar')"
-        />
       </div>
     </template>
   </PageHeader>

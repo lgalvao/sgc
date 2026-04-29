@@ -15,46 +15,51 @@
             title-test-codigo="subprocesso-header__txt-header-unidade"
         >
           <template #actions>
-            <BButton
-                v-if="mostrarAlterarDataLimite"
-                data-testid="btn-alterar-data-limite"
-                :disabled="!podeAlterarDataLimite"
+            <BDropdown
+                v-if="mostrarAcoesCabecalho"
+                data-testid="btn-subprocesso-acoes"
+                :disabled="!habilitarAcoesCabecalho"
+                :text="TEXTOS.mapa.BOTAO_ACOES"
+                toggle-class="text-nowrap"
                 variant="outline-secondary"
-                @click="abrirModalAlterarDataLimite"
             >
-              <i aria-hidden="true" class="bi bi-calendar me-1"/>
-              {{ TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE }}
-            </BButton>
-            <BButton
-                v-if="mostrarReabrirCadastro"
-                data-testid="btn-reabrir-cadastro"
-                :disabled="!podeReabrirCadastro"
-                variant="outline-secondary"
-                @click="abrirModalReabrirCadastro"
-            >
-              <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
-              {{ TEXTOS.subprocesso.BOTAO_REABRIR_CADASTRO }}
-            </BButton>
-            <BButton
-                v-if="mostrarReabrirRevisao"
-                data-testid="btn-reabrir-revisao"
-                :disabled="!podeReabrirRevisao"
-                variant="outline-secondary"
-                @click="abrirModalReabrirRevisao"
-            >
-              <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
-              {{ TEXTOS.subprocesso.BOTAO_REABRIR_REVISAO }}
-            </BButton>
-            <BButton
-                v-if="mostrarEnviarLembrete"
-                data-testid="btn-enviar-lembrete"
-                :disabled="!podeEnviarLembrete"
-                variant="outline-secondary"
-                @click="confirmarEnviarLembrete"
-            >
-              <i aria-hidden="true" class="bi bi-bell me-1"/>
-              {{ TEXTOS.subprocesso.BOTAO_ENVIAR_LEMBRETE }}
-            </BButton>
+              <BDropdownItemButton
+                  v-if="mostrarAlterarDataLimite"
+                  data-testid="btn-alterar-data-limite"
+                  :disabled="!podeAlterarDataLimite"
+                  @click="abrirModalAlterarDataLimite"
+              >
+                <i aria-hidden="true" class="bi bi-calendar me-1"/>
+                {{ TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="mostrarReabrirCadastro"
+                  data-testid="btn-reabrir-cadastro"
+                  :disabled="!podeReabrirCadastro"
+                  @click="abrirModalReabrirCadastro"
+              >
+                <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
+                {{ TEXTOS.subprocesso.BOTAO_REABRIR_CADASTRO }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="mostrarReabrirRevisao"
+                  data-testid="btn-reabrir-revisao"
+                  :disabled="!podeReabrirRevisao"
+                  @click="abrirModalReabrirRevisao"
+              >
+                <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
+                {{ TEXTOS.subprocesso.BOTAO_REABRIR_REVISAO }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="mostrarEnviarLembrete"
+                  data-testid="btn-enviar-lembrete"
+                  :disabled="!podeEnviarLembrete"
+                  @click="confirmarEnviarLembrete"
+              >
+                <i aria-hidden="true" class="bi bi-bell me-1"/>
+                {{ TEXTOS.subprocesso.BOTAO_ENVIAR_LEMBRETE }}
+              </BDropdownItemButton>
+            </BDropdown>
           </template>
         </PageHeader>
 
@@ -243,6 +248,8 @@ import {
   BButton,
   BCard,
   BCardBody,
+  BDropdown,
+  BDropdownItemButton,
   BFormInvalidFeedback,
   BFormTextarea,
   BSpinner,
@@ -341,6 +348,20 @@ const {
   mostrarReabrirRevisao,
   mostrarEnviarLembrete
 } = useAcesso(subprocesso);
+
+const mostrarAcoesCabecalho = computed(() =>
+    mostrarAlterarDataLimite.value
+    || mostrarReabrirCadastro.value
+    || mostrarReabrirRevisao.value
+    || mostrarEnviarLembrete.value
+);
+
+const habilitarAcoesCabecalho = computed(() =>
+    podeAlterarDataLimite.value
+    || podeReabrirCadastro.value
+    || podeReabrirRevisao.value
+    || podeEnviarLembrete.value
+);
 
 const movimentacoes = computed<Movimentacao[]>(
     () => subprocesso.value?.movimentacoes ?? [],

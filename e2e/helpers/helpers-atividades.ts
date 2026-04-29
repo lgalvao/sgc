@@ -2,6 +2,15 @@ import {expect, type Page} from '@playwright/test';
 import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
+async function obterBotaoDisponibilizarCadastro(page: Page) {
+    const dropdown = page.getByTestId('btn-cadastro-acoes');
+    if (await dropdown.count() > 0) {
+        await dropdown.click();
+        return page.getByTestId('btn-cadastro-acao-disponibilizar');
+    }
+
+    return page.getByTestId('btn-cad-atividades-disponibilizar');
+}
 
 export async function esperarTelaAtividades(page: Page) {
     await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
@@ -10,13 +19,18 @@ export async function esperarTelaAtividades(page: Page) {
 export async function esperarAtividadesEditaveis(page: Page) {
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     await expect(page.getByTestId('btn-adicionar-atividade')).toBeVisible();
-    await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
+    await expect(await obterBotaoDisponibilizarCadastro(page)).toBeVisible();
 }
 
 export async function esperarSemAcoesEdicaoCadastro(page: Page) {
     await expect(page.getByTestId('inp-nova-atividade')).toBeHidden();
     await expect(page.getByTestId('btn-adicionar-atividade')).toBeHidden();
-    await expect(page.getByTestId('btn-cad-atividades-importar')).toBeHidden();
+
+    const botaoImportar = page.getByTestId('btn-cad-atividades-importar');
+    if (await botaoImportar.count() > 0) {
+        await expect(botaoImportar).toBeVisible();
+        await expect(botaoImportar).toBeDisabled();
+    }
 }
 
 export async function esperarAtividadesSomenteLeitura(page: Page) {
@@ -144,7 +158,7 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 }
 
 export async function disponibilizarCadastro(page: Page): Promise<string | null> {
-    const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
+    const botao = await obterBotaoDisponibilizarCadastro(page);
     const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
     let atividadeExtraCriada: string | null = null;
 
@@ -184,7 +198,7 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
 }
 
 export async function verificarBotaoDisponibilizar(page: Page, habilitado: boolean) {
-    const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
+    const botao = await obterBotaoDisponibilizarCadastro(page);
     await expect(botao).toBeVisible();
     // Como a validação agora é no clique, o botão quase sempre está habilitado.
     // O parâmetro 'habilitado' aqui passa a verificar se o fluxo seguiria ou mostraria erro.

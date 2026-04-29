@@ -4,6 +4,8 @@ import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/index.js';
 import {esperarAtividadesSomenteLeitura, navegarParaCadastro} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
+    abrirAcaoCadastroDevolver,
+    abrirAcaoCadastroPrincipal,
     aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
@@ -136,7 +138,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await expect(historicoAdmin.getByTestId('cell-unidade-1')).toHaveText('COORD_21');
         await expect(historicoAdmin.getByTestId('cell-observacao-1')).toHaveText('Ok final 1');
         await fecharHistoricoAnalise(page);
-        await page.getByTestId('btn-acao-analisar-principal').click();
+        await (await abrirAcaoCadastroPrincipal(page)).click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
@@ -163,7 +165,7 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
         await acessarSubprocessoGestor(page, descProcessoCancelamento, UNIDADE_ALVO);
         await navegarParaCadastro(page);
 
-        await page.getByTestId('btn-acao-devolver').click();
+        await (await abrirAcaoCadastroDevolver(page)).click();
         const modal = page.getByRole('dialog');
         await expect(modal.getByRole('heading', {name: TEXTOS.atividades.MODAL_DEVOLVER_TITULO})).toBeVisible();
         await expect(modal.getByText(TEXTOS.atividades.MODAL_DEVOLVER_TEXTO)).toBeVisible();
@@ -171,8 +173,11 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
 
         await expect(modal).toBeHidden();
         await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
-        await expect(page.getByTestId('btn-acao-devolver')).toBeVisible();
-        await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
+        await verificarAcoesAnaliseCadastro(page, {
+            rotuloPrincipal: 'Registrar aceite',
+            principalHabilitado: true,
+            devolverHabilitado: true
+        });
     });
 
     test('ADMIN cancela homologação e permanece na tela de atividades e conhecimentos', async ({_resetAutomatico, page}) => {
@@ -196,7 +201,7 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
             devolverHabilitado: true
         });
 
-        await page.getByTestId('btn-acao-analisar-principal').click();
+        await (await abrirAcaoCadastroPrincipal(page)).click();
         const modal = page.getByRole('dialog');
         await expect(modal.getByRole('heading', {name: TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO})).toBeVisible();
         await expect(modal.getByText(TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO)).toBeVisible();
@@ -204,7 +209,10 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
 
         await expect(modal).toBeHidden();
         await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
-        await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
-        await expect(page.getByTestId('btn-acao-devolver')).toBeVisible();
+        await verificarAcoesAnaliseCadastro(page, {
+            rotuloPrincipal: 'Homologar',
+            principalHabilitado: true,
+            devolverHabilitado: true
+        });
     });
 });

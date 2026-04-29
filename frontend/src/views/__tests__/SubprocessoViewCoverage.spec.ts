@@ -45,6 +45,8 @@ describe('SubprocessoView Coverage', () => {
           LayoutPadrao: { template: '<div><slot/></div>' },
           PageHeader: { template: '<div><slot name="actions"/></div>', props: ['title'] },
           BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
+          BDropdown: { template: '<div :data-testid="$attrs[\'data-testid\']"><button :disabled="disabled"><slot/></button></div>', props: ['disabled'] },
+          BDropdownItemButton: { template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled" @click="$emit(\'click\')"><slot/></button>', props: ['disabled'] },
           AppAlert: true,
           BSpinner: true,
           BCard: true,

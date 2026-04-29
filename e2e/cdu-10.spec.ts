@@ -10,6 +10,7 @@ import {
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
+    abrirAcaoCadastroDevolver,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     fecharHistoricoAnalise,
@@ -199,7 +200,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaCadastro(page);
-        await page.getByTestId('btn-acao-devolver').click();
+        await (await abrirAcaoCadastroDevolver(page)).click();
         const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
         await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivoDevolucao);
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -229,7 +230,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaCadastro(page);
-        await page.getByTestId('btn-acao-devolver').click();
+        await (await abrirAcaoCadastroDevolver(page)).click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
         await verificarPaginaPainel(page);
@@ -248,7 +249,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaCadastro(page);
-        await page.getByTestId('btn-acao-devolver').click();
+        await (await abrirAcaoCadastroDevolver(page)).click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
         await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
         await verificarPaginaPainel(page);
