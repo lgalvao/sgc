@@ -1,6 +1,12 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {esperarMapaSomenteLeitura, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {
+    abrirDevolucaoMapa,
+    abrirSugestoesMapa,
+    abrirValidacaoMapa,
+    esperarMapaSomenteLeitura,
+    navegarParaMapa
+} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -36,21 +42,20 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
         await navegarParaMapa(page);
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         // Cenario 2: Cancelar validação
-        await page.getByTestId('btn-mapa-validar').click();
+        await abrirValidacaoMapa(page);
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText(/Confirma a validação/i)).toBeVisible();
 
         await page.getByTestId('btn-validar-mapa-cancelar').click();
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         // Cenario 3: Validar com sucesso
-        await page.getByTestId('btn-mapa-validar').click();
+        await abrirValidacaoMapa(page);
         await expect(modal).toBeVisible();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
@@ -93,10 +98,10 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await navegarParaMapa(page);
 
-        await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         // Modal abre sem pré-preenchimento (mapa novo, sem sugestões anteriores)
-        await page.getByTestId('btn-mapa-sugestoes').click();
+        await abrirSugestoesMapa(page);
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue('');
@@ -126,8 +131,8 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
-        await page.getByTestId('btn-mapa-devolver').click();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+        await abrirDevolucaoMapa(page);
         await page.getByTestId('inp-devolucao-mapa-obs').fill('Necessário rever competências');
         await page.getByTestId('btn-devolucao-mapa-confirmar').click();
 
@@ -139,8 +144,8 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         await navegarParaMapa(page);
         await esperarMapaSomenteLeitura(page);
-        await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
-        await page.getByTestId('btn-mapa-sugestoes').click();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+        await abrirSugestoesMapa(page);
         await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue(TEXTO_SUGESTAO);
         await page.getByTestId('btn-sugestoes-mapa-cancelar').click();
     });
@@ -156,9 +161,9 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await navegarParaMapa(page);
 
-        await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
-        await page.getByTestId('btn-mapa-sugestoes').click();
+        await abrirSugestoesMapa(page);
         await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue(TEXTO_SUGESTAO);
 
         // Cancela sem alterar o estado

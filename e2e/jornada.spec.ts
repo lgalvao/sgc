@@ -180,9 +180,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
             await MapaHelpers.navegarParaMapa(page);
             await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
-            const btnDisponibilizar = page.getByTestId('btn-cad-mapa-disponibilizar');
-            await expect(btnDisponibilizar).toBeVisible();
-            await btnDisponibilizar.click();
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+            await (await MapaHelpers.abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
             await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
             await limparNotificacoes(page);
 
@@ -203,11 +202,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
             await MapaHelpers.navegarParaMapa(page);
-            await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
-            await expect(page.getByTestId('btn-mapa-validar')).toBeEnabled();
-            await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
-            await expect(page.getByTestId('btn-mapa-sugestoes')).toBeEnabled();
-            await page.getByTestId('btn-mapa-validar').click();
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+            await MapaHelpers.abrirValidacaoMapa(page);
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await page.waitForURL(/\/painel$/);
 
@@ -226,9 +222,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-mapa')).toContainText('Mapa de competências técnicas da unidade');
             await page.getByTestId('card-subprocesso-mapa').click();
             await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
-            await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
-            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
-            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeEnabled();
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
             await page.goBack();
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
             await MapaHelpers.aceitarOuHomologarMapa(page, 'Mapa aceito pelo Gestor.');
@@ -245,9 +239,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
             await MapaHelpers.navegarParaMapa(page);
-            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
-            await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeEnabled();
-            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+            await MapaHelpers.abrirAcaoPrincipalMapa(page);
             const modal = page.getByTestId('body-aceite-mapa');
             await expect(modal).toBeVisible();
             await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa homologado pelo Admin. Ciclo base concluído.');

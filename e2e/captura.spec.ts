@@ -673,7 +673,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaMapa(page);
-            await page.getByTestId('btn-mapa-validar').click();
+            await MapaHelpers.abrirValidacaoMapa(page);
             await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, 'processo', 'modal-validar-mapa', {
                 tags: ['modal', 'validacao-mapa'],
@@ -1070,8 +1070,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['interacao', 'hover']
             });
 
-            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
-            await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+            await (await MapaHelpers.abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
             await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, 'mapa', 'modal-disponibilizar-mapa', {
                 tags: ['modal', 'disponibilizar-mapa']
@@ -1092,7 +1092,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 extra: { estado: 'MAPA_DISPONIBILIZADO', perfil: 'CHEFE', acao: 'validacao-mapa' }
             });
 
-            await page.getByTestId('btn-mapa-validar').click();
+            await MapaHelpers.abrirValidacaoMapa(page);
             await expect(page.getByRole('dialog')).toContainText('Confirma a validação do mapa de competências?');
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await verificarPaginaPainel(page);
@@ -1105,7 +1105,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['mapa', 'analise', 'somente-leitura'],
                 extra: { perfil: 'GESTOR_COORD', acao: 'aceite-mapa-1' }
             });
-            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await MapaHelpers.abrirAcaoPrincipalMapa(page);
             await expect(page.getByTestId('body-aceite-mapa')).toBeVisible();
             await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa consistente para seguir à Secretaria.');
             await page.getByTestId('btn-aceite-mapa-confirmar').click();

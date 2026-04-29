@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoRevisaoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {abrirAcaoMapa, criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -30,7 +30,8 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
             await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO})).toBeVisible();
             await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();
-            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+            await expect(await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).toBeVisible();
             await expect(page.getByText(competencia1)).toBeVisible();
             await expect(page.getByText(competencia2)).toBeVisible();
         });

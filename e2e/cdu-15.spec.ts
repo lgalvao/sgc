@@ -3,6 +3,7 @@ import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {verificarProcessoTabela} from './helpers/helpers-processos.js';
 import {
+    abrirAcaoMapa,
     criarCompetencia,
     disponibilizarMapa,
     editarCompetencia,
@@ -40,7 +41,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
         await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
 
-        const btnDisponibilizar = page.getByTestId('btn-cad-mapa-disponibilizar');
+        const btnDisponibilizar = await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar');
         await btnDisponibilizar.click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
 
@@ -75,7 +76,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         // Verifica o texto do conhecimento (fixture 1 tem 'Conhecimento fixture 1')
         await expect(itemAtividade.locator('.conhecimento-item')).toContainText(/Conhecimento fixture/i);
 
-        await btnDisponibilizar.click();
+        await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA)).toBeVisible();
 
         // CT-02b: Remover a última atividade diretamente no card e manter disponibilização bloqueada
@@ -86,7 +87,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(cardSemAtividades).toBeVisible();
         await expect(cardSemAtividades.locator('.atividade-associada-card-item')).toHaveCount(0);
 
-        await btnDisponibilizar.click();
+        await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE)).toBeVisible();
 
         // CT-02c: Reassociar atividade via edição para continuar o fluxo
@@ -104,7 +105,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         // CT-04: Excluir competência com Confirmação
         await excluirCompetenciaConfirmando(page, newDesc);
-        await btnDisponibilizar.click();
+        await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
 
         // CT-06: Navegar para Disponibilização

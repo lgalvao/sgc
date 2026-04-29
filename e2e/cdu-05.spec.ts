@@ -16,7 +16,7 @@ import {
     disponibilizarCadastro,
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
-import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
+import {abrirAcaoPrincipalMapa, abrirValidacaoMapa, criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 
@@ -167,7 +167,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-validar').click();
+        await abrirValidacaoMapa(page);
         await page.getByTestId('btn-validar-mapa-confirmar').click();
         await verificarPaginaPainel(page);
     });
@@ -176,7 +176,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
     });
@@ -185,7 +185,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
 

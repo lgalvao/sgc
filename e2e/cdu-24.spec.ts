@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {abrirAcaoMapa, criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
@@ -60,13 +60,13 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
 
-        const btnDisponibilizarMapa = page.getByTestId('btn-cad-mapa-disponibilizar');
+        const btnDisponibilizarMapa = await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar');
         await btnDisponibilizarMapa.click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
 
         await criarCompetencia(page, competencia1, [atividade1, atividade2]);
         
-        await btnDisponibilizarMapa.click();
+        await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA)).toBeVisible();
     });
 

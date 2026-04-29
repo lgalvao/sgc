@@ -10,26 +10,23 @@
  *   - Inventário completo por categoria
  *
  * Uso:
- *   cd frontend
- *   node etc/scripts/extrair-mensagens.cjs   # gera mensagens-extraidas.json primeiro
- *   node etc/scripts/analisar-mensagens.cjs  # gera mensagens-analise.md na raiz
+ *   node etc/scripts/sgc.js frontend mensagens analisar [--fix]
  */
 
 'use strict';
 
 import fs from "node:fs";
 import path from "node:path";
+import {execSync} from "node:child_process";
+import pc from "picocolors";
 
 const RAIZ = path.join(import.meta.dirname, '../../..');
 const INPUT_FILE = path.join(RAIZ, 'mensagens-extraidas.json');
 const OUTPUT_FILE = path.join(RAIZ, 'mensagens-analise.md');
+const TEXTOS_TS = path.join(RAIZ, 'frontend/src/constants/textos.ts');
 
 // ── Utilitários ──────────────────────────────────────────────────────────────
 
-/**
- * Normaliza uma string para comparação fuzzy:
- * - Converte para minúsculas, remove pontuação final, artigos iniciais e espaços extras.
- */
 function normalizar(texto) {
     return texto
         .toLowerCase()
@@ -39,9 +36,6 @@ function normalizar(texto) {
         .replaceAll(/\s+/g, ' ');
 }
 
-/**
- * Agrupa mensagens por texto normalizado e retorna apenas os grupos com duplicatas.
- */
 function encontrarDuplicatas(mensagens) {
     const grupos = new Map();
     for (const msg of mensagens) {
@@ -52,9 +46,6 @@ function encontrarDuplicatas(mensagens) {
     return [...grupos.values()].filter(grupo => grupo.length > 1);
 }
 
-/**
- * Agrupa mensagens por texto exato.
- */
 function agruparPorTexto(mensagens) {
     const grupos = new Map();
     for (const msg of mensagens) {
@@ -65,18 +56,12 @@ function agruparPorTexto(mensagens) {
     return grupos;
 }
 
-/**
- * Escapa caracteres especiais de Markdown.
- */
 function escaparMd(texto) {
     return texto.replaceAll('|', String.raw`\|`).replaceAll('`', "'");
 }
 
 // ── Funções de Análise ────────────────────────────────────────────────────────
 
-/**
- * Detecta strings presentes nos testes mas ausentes no código de produção.
- */
 function detectarOrfaosEmTestes(dados) {
     const prodBackend = new Set([
         ...dados.backend.validacao_dto.map(m => normalizar(m.texto)),
@@ -98,9 +83,6 @@ function detectarOrfaosEmTestes(dados) {
     };
 }
 
-/**
- * Detecta strings de produção que não aparecem em nenhum teste.
- */
 function detectarSemTeste(dados) {
     const todasTestes = new Set([
         ...dados.testes.teste_backend.map(m => normalizar(m.texto)),
@@ -119,6 +101,100 @@ function detectarSemTeste(dados) {
     };
 }
 
+// ── Auto-Fix de Constantes Órfãs ──────────────────────────────────────────────
+
+function fixOrphanConstants() {
+    console.log(pc.cyan('🧹 Buscando constantes órfãs em textos.ts...'));
+    
+    if (!fs.existsSync(TEXTOS_TS)) {
+        console.error(pc.red(`❌ Arquivo não encontrado: ${TEXTOS_TS}`));
+        return;
+    }
+
+    const content = fs.readFileSync(TEXTOS_TS, 'utf-8');
+    const lines = content.split(/\r?\n/);
+    const keys = [];
+    let currentCategory = null;
+
+    // Passo 1: Extrair chaves
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const categoryMatch = line.match(/^\s{2}([a-z][a-zA-Z0-9]+):\s+\{/);
+        if (categoryMatch) {
+            currentCategory = categoryMatch[1];
+            continue;
+        }
+        if (currentCategory) {
+            const keyMatch = line.match(/^\s{4}([A-Z0-9_]+)[\s:(]/);
+            if (keyMatch) {
+                keys.push({
+                    full: `${currentCategory}.${keyMatch[1]}`,
+                    category: currentCategory,
+                    key: keyMatch[1],
+                    lineIndex: i
+                });
+            }
+            if (line.match(/^\s{2}\},/)) currentCategory = null;
+        }
+    }
+
+    console.log(`🔍 Verificando uso de ${pc.bold(keys.length)} constantes...`);
+    const orphans = [];
+
+    // Passo 2: Verificar uso via busca em arquivos (usando PowerShell no Windows)
+    for (const item of keys) {
+        const searchPattern = `TEXTOS.${item.full}`;
+        try {
+            // No Windows, usamos Select-String se disponível, ou uma busca simples via Node
+            // Para ser robusto e rápido, vamos carregar todos os arquivos de interesse em memória uma vez
+            // ou usar uma ferramenta de shell. Como estamos no Node, vamos usar uma busca manual rápida.
+            if (!global.cacheArquivosFrontend) {
+                const extensões = ['.ts', '.vue'];
+                const pastas = [path.join(RAIZ, 'frontend/src'), path.join(RAIZ, 'e2e')];
+                global.cacheArquivosFrontend = [];
+                
+                function carregar(dir) {
+                    if (!fs.existsSync(dir)) return;
+                    const entradas = fs.readdirSync(dir, { withFileTypes: true });
+                    for (const e of entradas) {
+                        const p = path.join(dir, e.name);
+                        if (e.isDirectory()) carregar(p);
+                        else if (extensões.includes(path.extname(p)) && !p.includes('textos.ts')) {
+                            global.cacheArquivosFrontend.push(fs.readFileSync(p, 'utf-8'));
+                        }
+                    }
+                }
+                pastas.forEach(carregar);
+            }
+
+            const isUsed = global.cacheArquivosFrontend.some(c => c.includes(searchPattern));
+            if (!isUsed) {
+                orphans.push(item);
+            }
+        } catch (e) {
+            console.error(`Erro ao verificar ${item.full}: ${e.message}`);
+        }
+    }
+
+    if (orphans.length === 0) {
+        console.log(pc.green('✅ Nenhuma constante órfã encontrada.'));
+        return;
+    }
+
+    console.log(pc.yellow(`⚠️ Encontradas ${pc.bold(orphans.length)} constantes órfãs. Removendo...`));
+    
+    // Passo 3: Remover do arquivo (de trás para frente para manter índices)
+    const newLines = [...lines];
+    // Agrupar por índice para remover blocos se sobrarem vazios (opcional, vamos manter simples)
+    orphans.sort((a, b) => b.lineIndex - a.lineIndex).forEach(orphan => {
+        console.log(pc.dim(`   - Removendo ${orphan.full}`));
+        newLines.splice(orphan.lineIndex, 1);
+    });
+
+    fs.writeFileSync(TEXTOS_TS, newLines.join('\n'), 'utf-8');
+    console.log(pc.green('✅ Limpeza de textos.ts concluída.'));
+}
+
 // ── Gerador de Relatório Markdown ─────────────────────────────────────────────
 
 function gerarRelatorio(dados) {
@@ -127,7 +203,6 @@ function gerarRelatorio(dados) {
 
     linhas.push('# Relatório de Análise de Mensagens — SGC', '', `> Gerado em: ${ts} UTC | Fonte: \`mensagens-extraidas.json\``, '');
 
-    // ── Sumário ──
     const totalProd = dados.backend.validacao_dto.length
         + dados.backend.excecao_negocio.length
         + dados.frontend.toast_sucesso.length
@@ -189,10 +264,8 @@ function gerarRelatorio(dados) {
         }
     }
 
-    // ── Órfãos em Testes ──
-    linhas.push('## 4. Mensagens nos Testes sem Correspondência na Produção', '', '> Estas strings aparecem em testes mas não foram encontradas no código de produção.', '> Podem ser mensagens obsoletas, de fixtures de teste, ou textos de UI não capturados.', '');
-
     const { orfaosBackend, orfaosE2e } = detectarOrfaosEmTestes(dados);
+    linhas.push('## 4. Mensagens nos Testes sem Correspondência na Produção', '', '> Estas strings aparecem em testes mas não foram encontradas no código de produção.', '');
 
     if (orfaosBackend.length > 0) {
         linhas.push(`### 4.1 Testes Backend (${orfaosBackend.length} ocorrências)`, '', '| Texto | Arquivo | Linha |', '|---|---|---:|');
@@ -218,10 +291,8 @@ function gerarRelatorio(dados) {
         linhas.push('✅ Nenhuma mensagem de teste sem correspondência encontrada.', '');
     }
 
-    // ── Mensagens de Produção sem Testes ──
-    linhas.push('## 5. Mensagens de Produção sem Cobertura de Teste', '', '> Estas strings existem no código de produção mas não aparecem em nenhum teste.', '');
-
     const { backendSemTeste, frontendSemTeste } = detectarSemTeste(dados);
+    linhas.push('## 5. Mensagens de Produção sem Cobertura de Teste', '', '> Estas strings existem no código de produção mas não aparecem em nenhum teste.', '');
 
     if (backendSemTeste.length > 0) {
         linhas.push(`### 5.1 Backend sem teste (${backendSemTeste.length} ocorrências)`, '', '| Texto | Arquivo | Linha | Tipo |', '|---|---|---:|---|');
@@ -245,43 +316,22 @@ function gerarRelatorio(dados) {
         linhas.push('✅ Todas as mensagens de produção possuem cobertura de teste.', '');
     }
 
-    // ── Inventário Completo ──
     linhas.push('## 6. Inventário Completo de Mensagens de Produção', '');
-
     const secoes = [
-        {
-            titulo: '6.1 Validação de DTOs (Backend)',
-            itens: dados.backend.validacao_dto,
-            colunas: ['texto', 'anotacao', 'arquivo', 'linha'],
-        },
-        {
-            titulo: '6.2 Exceções de Negócio (Backend)',
-            itens: dados.backend.excecao_negocio,
-            colunas: ['texto', 'classe', 'arquivo', 'linha'],
-        },
-        {
-            titulo: '6.3 Mensagens de Sucesso / Toast (Frontend)',
-            itens: dados.frontend.toast_sucesso,
-            colunas: ['texto', 'arquivo', 'linha'],
-        },
-        {
-            titulo: '6.4 Notificações (Frontend)',
-            itens: dados.frontend.notificacao_frontend,
-            colunas: ['texto', 'arquivo', 'linha'],
-        },
+        { titulo: '6.1 Validação de DTOs (Backend)', itens: dados.backend.validacao_dto, colunas: ['texto', 'anotacao', 'arquivo', 'linha'] },
+        { titulo: '6.2 Exceções de Negócio (Backend)', itens: dados.backend.excecao_negocio, colunas: ['texto', 'classe', 'arquivo', 'linha'] },
+        { titulo: '6.3 Mensagens de Sucesso / Toast (Frontend)', itens: dados.frontend.toast_sucesso, colunas: ['texto', 'arquivo', 'linha'] },
+        { titulo: '6.4 Notificações (Frontend)', itens: dados.frontend.notificacao_frontend, colunas: ['texto', 'arquivo', 'linha'] },
     ];
 
     for (const secao of secoes) {
         linhas.push(`### ${secao.titulo} (${secao.itens.length})`, '');
-
         if (secao.itens.length === 0) {
             linhas.push('*Nenhuma mensagem encontrada.*', '');
             continue;
         }
-
         const { colunas } = secao;
         linhas.push('| ' + colunas.join(' | ') + ' |', '| ' + colunas.map((c, i) => i === colunas.length - 1 ? '---:' : '---').join(' | ') + ' |');
-
         for (const msg of secao.itens) {
             const valores = colunas.map(c => {
                 const v = String(msg[c] || '');
@@ -302,21 +352,26 @@ function gerarRelatorio(dados) {
 // ── Função Principal ──────────────────────────────────────────────────────────
 
 function analisar() {
+    const args = process.argv.slice(2);
+    const fixMode = args.includes('--fix');
+
+    if (fixMode) {
+        fixOrphanConstants();
+    }
+
     if (!fs.existsSync(INPUT_FILE)) {
-        console.error(`❌ Arquivo não encontrado: ${INPUT_FILE}`);
-        console.error('Execute primeiro: node etc/scripts/extrair-mensagens.cjs');
+        console.error(pc.red(`❌ Arquivo não encontrado: ${INPUT_FILE}`));
+        console.error('Execute primeiro: node etc/scripts/sgc.js frontend mensagens extrair');
         process.exit(1);
     }
 
-    console.log('📊 Analisando mensagens extraídas...\n');
-
+    console.log(pc.cyan('📊 Analisando mensagens extraídas...\n'));
     const dados = JSON.parse(fs.readFileSync(INPUT_FILE, 'utf-8'));
     const relatorio = gerarRelatorio(dados);
     fs.writeFileSync(OUTPUT_FILE, relatorio, 'utf-8');
 
-    console.log(`✅ Relatório gerado: ${path.relative(process.cwd(), OUTPUT_FILE)}`);
+    console.log(pc.green(`✅ Relatório gerado: ${path.relative(process.cwd(), OUTPUT_FILE)}`));
 
-    // Resumo no console
     const todasProd = [
         ...dados.backend.validacao_dto,
         ...dados.backend.excecao_negocio,
@@ -329,11 +384,11 @@ function analisar() {
     const { backendSemTeste, frontendSemTeste } = detectarSemTeste(dados);
 
     console.log('\n📋 Resumo da análise:');
-    console.log(`   Duplicatas com variações (produção): ${duplicatasVariadas.length}`);
-    console.log(`   Testes backend sem correspondência:  ${orfaosBackend.length}`);
-    console.log(`   Testes E2E sem correspondência:      ${orfaosE2e.length}`);
-    console.log(`   Mensagens backend sem cobertura:     ${backendSemTeste.length}`);
-    console.log(`   Toast frontend sem cobertura:        ${frontendSemTeste.length}`);
+    console.log(`   Duplicatas com variações (produção): ${pc.bold(duplicatasVariadas.length)}`);
+    console.log(`   Testes backend sem correspondência:  ${pc.bold(orfaosBackend.length)}`);
+    console.log(`   Testes E2E sem correspondência:      ${pc.bold(orfaosE2e.length)}`);
+    console.log(`   Mensagens backend sem cobertura:     ${pc.bold(backendSemTeste.length)}`);
+    console.log(`   Toast frontend sem cobertura:        ${pc.bold(frontendSemTeste.length)}`);
 }
 
 analisar();

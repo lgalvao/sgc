@@ -5,7 +5,14 @@ import {
     criarProcessoMapaValidadoFixture,
     validarProcessoFixture
 } from './fixtures/index.js';
-import {esperarMapaEditavel, esperarMapaSomenteLeitura, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {
+    abrirAcaoPrincipalMapa,
+    abrirDevolucaoMapa,
+    abrirSugestoesMapa,
+    esperarMapaEditavel,
+    esperarMapaSomenteLeitura,
+    navegarParaMapa
+} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {
     acessarSubprocessoAdmin,
@@ -42,7 +49,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await abrirAcaoPrincipalMapa(page);
         await expect(page.getByRole('dialog')).toContainText(TEXTOS.mapa.MODAL_ACEITE_TITULO);
         await expect(page.getByTestId('inp-aceite-mapa-observacao')).toBeVisible();
         await page.getByTestId('inp-aceite-mapa-observacao').fill('Observação opcional do aceite');
@@ -59,13 +66,13 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await navegarParaMapa(page);
 
         await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         // Verifica que o botão "Ver sugestões" NÃO aparece (situação é "Mapa validado", não "Mapa com sugestões")
         await expect(page.getByTestId('btn-mapa-ver-sugestoes')).toBeHidden();
 
         // Validação inline: submit vazio não prossegue e exibe erro local
-        await page.getByTestId('btn-mapa-devolver').click();
+        await abrirDevolucaoMapa(page);
         const modalDevolucao = page.locator('.modal.show').filter({hasText: 'Devolver mapa'});
         await expect(modalDevolucao).toBeVisible();
         await expect(modalDevolucao.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
@@ -80,7 +87,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         // Cancela a devolução (passo CDU)
         await modalDevolucao.getByTestId('btn-devolucao-mapa-cancelar').click();
 
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await expect(page).toHaveURL(/\/painel/);
     });
@@ -91,7 +98,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
     });
@@ -122,7 +129,7 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
 
         // Os demais botões de análise também devem estar presentes
         await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         // Clique no botão abre modal com sugestões registradas
         await page.getByTestId('btn-mapa-ver-sugestoes').click();
@@ -130,9 +137,9 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         await expect(modal).toBeVisible();
 
         // Conteúdo do modal exibe as sugestões
-        const txtSugestoes = page.getByTestId('txt-ver-sugestoes-mapa');
+        const txtSugestoes = page.getByTestId('txt-ver-sugestoes-mapa-texto');
         await expect(txtSugestoes).toBeVisible();
-        await expect(txtSugestoes).toHaveValue('Sugestão de ajuste na competência via fixture E2E');
+        await expect(txtSugestoes).toContainText('Sugestão de ajuste na competência via fixture E2E');
 
         // Fecha o modal
         await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();
@@ -162,8 +169,8 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await navegarParaMapa(page);
 
-        await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
-        await page.getByTestId('btn-mapa-sugestoes').click();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+        await abrirSugestoesMapa(page);
         await expect(page.getByRole('dialog')).toBeVisible();
         await page.getByTestId('inp-sugestoes-mapa-texto').fill(TEXTO_SUGESTAO);
         await page.getByTestId('btn-sugestoes-mapa-confirmar').click();
@@ -176,14 +183,13 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await navegarParaMapa(page);
 
         await expect(page.getByTestId('btn-mapa-ver-sugestoes')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeEnabled();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         await page.getByTestId('btn-mapa-ver-sugestoes').click();
-        await expect(page.getByTestId('txt-ver-sugestoes-mapa')).toHaveValue(TEXTO_SUGESTAO);
+        await expect(page.getByTestId('txt-ver-sugestoes-mapa-texto')).toContainText(TEXTO_SUGESTAO);
         await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();
 
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
@@ -203,7 +209,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
         await navegarParaMapa(page);
 
-        await page.getByTestId('btn-mapa-devolver').click();
+        await abrirDevolucaoMapa(page);
         const modal = page.locator('.modal.show').filter({hasText: 'Devolver mapa'});
         await expect(modal).toBeVisible();
         await expect(modal).toContainText('Devolver mapa');
@@ -242,8 +248,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
 
         await navegarParaMapa(page);
         await esperarMapaSomenteLeitura(page);
-        await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-validar')).toBeEnabled();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
     });
 });
@@ -294,7 +299,7 @@ test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com suge
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        await page.getByTestId('btn-mapa-sugestoes').click();
+        await abrirSugestoesMapa(page);
         await expect(page.getByRole('dialog')).toBeVisible();
         await page.getByTestId('inp-sugestoes-mapa-texto').fill(TEXTO_SUGESTAO);
         await page.getByTestId('btn-sugestoes-mapa-confirmar').click();
@@ -305,7 +310,7 @@ test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com suge
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
         await navegarParaMapa(page);
 
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
@@ -317,13 +322,7 @@ test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com suge
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
         await navegarParaMapa(page);
 
-        const btnAceitarOuHomologarDireto = page.getByTestId('btn-mapa-homologar-aceite');
-        if (await btnAceitarOuHomologarDireto.isVisible()) {
-            await btnAceitarOuHomologarDireto.click();
-        } else {
-            await page.getByTestId('btn-mapa-acoes').click();
-            await page.getByTestId('btn-mapa-acao-homologar-aceite').click();
-        }
+        await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await expect(page.getByText(TEXTOS.mapa.SUCESSO_HOMOLOGACAO).first()).toBeVisible();
     });

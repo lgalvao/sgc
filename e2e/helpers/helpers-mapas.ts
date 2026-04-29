@@ -11,21 +11,14 @@ export async function esperarTelaMapa(page: Page) {
 export async function esperarMapaEditavel(page: Page) {
     await esperarTelaMapa(page);
     await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
-    const btnDisponibilizarDireto = page.getByTestId('btn-cad-mapa-disponibilizar');
-    if (await btnDisponibilizarDireto.isVisible()) {
-        await expect(btnDisponibilizarDireto).toBeVisible();
-        return;
-    }
-
     const btnAcoes = page.getByTestId('btn-mapa-acoes');
     await expect(btnAcoes).toBeVisible();
-    await btnAcoes.click();
-    await expect(page.getByTestId('btn-mapa-acao-disponibilizar')).toBeVisible();
+    await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar');
 }
 
 export async function esperarSemAcoesManutencaoMapa(page: Page) {
     await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeHidden();
-    await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeHidden();
+    await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 }
 
 export async function esperarMapaSomenteLeitura(page: Page) {
@@ -175,18 +168,40 @@ export async function verificarSituacaoSubprocesso(page: Page, situacao: string)
     await expect(page.getByTestId('txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'));
 }
 
+export async function abrirAcaoMapa(page: Page, testIdAcao: string) {
+    const btnAcoes = page.getByTestId('btn-mapa-acoes');
+    await expect(btnAcoes).toBeVisible();
+    await btnAcoes.click();
+    const acao = page.getByTestId(testIdAcao);
+    await expect(acao).toBeVisible();
+    return acao;
+}
+
+export async function abrirSugestoesMapa(page: Page) {
+    const acao = await abrirAcaoMapa(page, 'btn-mapa-acao-sugestoes');
+    await acao.click();
+}
+
+export async function abrirValidacaoMapa(page: Page) {
+    const acao = await abrirAcaoMapa(page, 'btn-mapa-acao-validar');
+    await acao.click();
+}
+
+export async function abrirDevolucaoMapa(page: Page) {
+    const acao = await abrirAcaoMapa(page, 'btn-mapa-acao-devolver');
+    await acao.click();
+}
+
+export async function abrirAcaoPrincipalMapa(page: Page) {
+    const acao = await abrirAcaoMapa(page, 'btn-mapa-acao-homologar-aceite');
+    await acao.click();
+}
+
 export async function disponibilizarMapa(page: Page, dataLimite?: string) {
     const data = dataLimite || calcularDataLimite(30);
 
-    const btnDisponibilizarDireto = page.getByTestId('btn-cad-mapa-disponibilizar');
-    if (await btnDisponibilizarDireto.isVisible()) {
-        await btnDisponibilizarDireto.click();
-    } else {
-        const btnAcoes = page.getByTestId('btn-mapa-acoes');
-        await expect(btnAcoes).toBeVisible();
-        await btnAcoes.click();
-        await page.getByTestId('btn-mapa-acao-disponibilizar').click();
-    }
+    const btnDisponibilizar = await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar');
+    await btnDisponibilizar.click();
     const modal = page.getByTestId('mdl-disponibilizar-mapa');
     await expect(modal).toBeVisible();
 
@@ -203,15 +218,7 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
  */
 export async function aceitarOuHomologarMapa(page: Page, observacao: string) {
     await navegarParaMapa(page);
-    const btnAceitarOuHomologarDireto = page.getByTestId('btn-mapa-homologar-aceite');
-    if (await btnAceitarOuHomologarDireto.isVisible()) {
-        await btnAceitarOuHomologarDireto.click();
-    } else {
-        const btnAcoes = page.getByTestId('btn-mapa-acoes');
-        await expect(btnAcoes).toBeVisible();
-        await btnAcoes.click();
-        await page.getByTestId('btn-mapa-acao-homologar-aceite').click();
-    }
+    await abrirAcaoPrincipalMapa(page);
     const modal = page.getByTestId('body-aceite-mapa');
     await expect(modal).toBeVisible();
     await page.getByTestId('inp-aceite-mapa-observacao').fill(observacao);

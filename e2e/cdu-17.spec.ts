@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {abrirAcaoMapa, criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
@@ -49,7 +49,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await navegarParaMapa(page);
 
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         await criarCompetencia(page, competencia1, [atividade1, atividade2]);
         await criarCompetencia(page, competencia2, [atividade3]);
@@ -58,7 +58,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByText(competencia2)).toBeVisible();
 
         // Cenario 2: Abrir modal e verificar campos
-        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+        await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
         await expect(page.getByText('Disponibilização do mapa')).toBeVisible();
         // CDU-17 Passo 9: verificar campo Observações (opcional) e botões
@@ -73,7 +73,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 
         // Cenario 4: Validar data menor que a última data limite do subprocesso
-        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+        await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         const modal = page.getByTestId('mdl-disponibilizar-mapa');
         await expect(modal).toBeVisible();
 
@@ -88,7 +88,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();
 
         // Cenario 5: Disponibilizar com sucesso (com observações preenchidas)
-        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+        await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
         await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
         await page.getByTestId('inp-disponibilizar-mapa-obs').fill('Mapa disponibilizado com observação de teste');
