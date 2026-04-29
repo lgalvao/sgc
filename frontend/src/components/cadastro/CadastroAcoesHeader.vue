@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {BButton} from 'bootstrap-vue-next';
+import {computed} from 'vue';
+import {BButton, BDropdown, BDropdownItemButton} from 'bootstrap-vue-next';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import {TEXTOS} from "@/constants/textos";
@@ -21,8 +22,6 @@ interface Props {
   podeVisualizarImpacto?: boolean;
 }
 
-defineProps<Props>();
-
 defineEmits<{
   (e: 'abrir-historico'): void;
   (e: 'abrir-devolver'): void;
@@ -31,6 +30,21 @@ defineEmits<{
   (e: 'abrir-importar'): void;
   (e: 'disponibilizar'): void;
 }>();
+
+const props = defineProps<Props>();
+
+const quantidadeAcoesWorkflow = computed(() => {
+  let total = 0;
+  if (props.codSubprocesso && props.mostrarDevolverCadastro) {
+    total += 1;
+  }
+  if (props.codSubprocesso && props.acaoPrincipalCadastro?.mostrar) {
+    total += 1;
+  }
+  return total;
+});
+
+const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
 </script>
 
 <template>
@@ -48,8 +62,32 @@ defineEmits<{
         >
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
         </BButton>
+        <BDropdown
+            v-if="codSubprocesso && usarDropdownAcoes"
+            data-testid="btn-cadastro-acoes"
+            :text="TEXTOS.mapa.BOTAO_ACOES"
+            toggle-class="text-nowrap"
+            variant="success"
+        >
+          <BDropdownItemButton
+              v-if="mostrarDevolverCadastro"
+              data-testid="btn-cadastro-acao-devolver"
+              :disabled="!permissoes.habilitarDevolverCadastro"
+              @click="$emit('abrir-devolver')"
+          >
+            {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
+          </BDropdownItemButton>
+          <BDropdownItemButton
+              v-if="acaoPrincipalCadastro?.mostrar"
+              data-testid="btn-cadastro-acao-principal"
+              :disabled="!acaoPrincipalCadastro.habilitar"
+              @click="$emit('abrir-validar')"
+          >
+            {{ acaoPrincipalCadastro.rotuloBotao }}
+          </BDropdownItemButton>
+        </BDropdown>
         <BButton
-            v-if="codSubprocesso && mostrarDevolverCadastro"
+            v-else-if="codSubprocesso && mostrarDevolverCadastro"
             data-testid="btn-acao-devolver"
             :disabled="!permissoes.habilitarDevolverCadastro"
             :title="TEXTOS.atividades.BOTAO_DEVOLVER"
@@ -59,7 +97,7 @@ defineEmits<{
           {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
         </BButton>
         <BButton
-            v-if="codSubprocesso && acaoPrincipalCadastro?.mostrar"
+            v-else-if="codSubprocesso && acaoPrincipalCadastro?.mostrar"
             data-testid="btn-acao-analisar-principal"
             :disabled="!acaoPrincipalCadastro.habilitar"
             :title="acaoPrincipalCadastro.rotuloBotao"

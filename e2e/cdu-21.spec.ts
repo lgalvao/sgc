@@ -92,11 +92,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByText(/Situação:\s*Finalizado/i)).toBeVisible();
 
 
-        await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
 
-
-        await expect(page.getByTestId('btn-acao-bloco-aceitar')).toBeHidden();
-        await expect(page.getByTestId('btn-acao-bloco-homologar')).toBeHidden();
+        await expect(page.getByTestId('btn-processo-acoes-bloco')).toBeVisible();
+        await expect(page.getByTestId('btn-processo-acoes-bloco').getByRole('button')).toBeDisabled();
 
         await navegarParaSubprocesso(page, 'SECAO_221');
         await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();

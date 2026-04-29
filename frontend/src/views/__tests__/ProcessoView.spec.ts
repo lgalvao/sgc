@@ -260,7 +260,7 @@ const BDropdownStub = {
     name: "BDropdown",
     template: `
       <div :data-testid="$attrs['data-testid']">
-        <button type="button">{{ text }}</button>
+        <button :disabled="disabled" type="button">{{ text }}</button>
         <slot />
       </div>
     `,
@@ -974,5 +974,53 @@ describe("Processo.vue", () => {
         const btnFinalizar = wrapper.find('[data-testid="btn-processo-finalizar"]');
         expect(btnFinalizar.exists()).toBe(true);
         expect(btnFinalizar.attributes('disabled')).toBeDefined();
+    });
+
+    it("deve manter menu de ações em bloco visível e desabilitado quando nenhuma ação estiver habilitada", async () => {
+        wrapper.unmount();
+        wrapper = createWrapper({
+            processo: {
+                ...mockProcesso,
+                acoesBloco: [
+                    {
+                        codigo: "homologar-cadastro",
+                        acao: "HOMOLOGAR",
+                        mostrar: true,
+                        habilitar: false,
+                        requerDataLimite: false,
+                        redirecionarPainel: false,
+                        rotulo: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO,
+                        titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
+                        texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
+                        rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+                        unidades: []
+                    },
+                    {
+                        codigo: "disponibilizar-mapa",
+                        acao: "DISPONIBILIZAR",
+                        mostrar: true,
+                        habilitar: false,
+                        requerDataLimite: true,
+                        redirecionarPainel: true,
+                        rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
+                        titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
+                        texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
+                        rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
+                        mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+                        unidades: []
+                    }
+                ]
+            }
+        });
+        perfilStore = usePerfilStore();
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
+
+        await nextTick();
+        await flushPromises();
+
+        const menuAcoes = wrapper.find('[data-testid="btn-processo-acoes-bloco"] button');
+        expect(menuAcoes.exists()).toBe(true);
+        expect(menuAcoes.attributes('disabled')).toBeDefined();
     });
 });

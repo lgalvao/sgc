@@ -62,10 +62,20 @@ export async function verificarAcoesAnaliseCadastro(page: Page, options: {
     devolverHabilitado: boolean;
 }) {
     const botaoHistorico = page.getByTestId('btn-cad-atividades-historico');
-    const botaoDevolver = page.getByTestId('btn-acao-devolver');
-    const botaoPrincipal = page.getByTestId('btn-acao-analisar-principal');
+    const dropdown = page.getByTestId('btn-cadastro-acoes');
+    const usaDropdown = await dropdown.count() > 0;
+
+    const botaoDevolver = usaDropdown
+        ? page.getByTestId('btn-cadastro-acao-devolver')
+        : page.getByTestId('btn-acao-devolver');
+    const botaoPrincipal = usaDropdown
+        ? page.getByTestId('btn-cadastro-acao-principal')
+        : page.getByTestId('btn-acao-analisar-principal');
 
     await expect(botaoHistorico).toBeVisible();
+    if (usaDropdown) {
+        await dropdown.click();
+    }
     await expect(botaoDevolver).toBeVisible();
     await expect(botaoPrincipal).toBeVisible();
     await expect(botaoPrincipal).toHaveText(options.rotuloPrincipal);
@@ -94,6 +104,28 @@ export async function fecharHistoricoAnalise(page: Page) {
     await expect(modal).toBeHidden();
 }
 
+async function abrirAcaoCadastro(page: Page, testIdDireto: string, testIdMenu: string) {
+    const dropdown = page.getByTestId('btn-cadastro-acoes');
+    if (await dropdown.count() > 0) {
+        await dropdown.click();
+        const acaoMenu = page.getByTestId(testIdMenu);
+        await expect(acaoMenu).toBeVisible();
+        return acaoMenu;
+    }
+
+    const acaoDireta = page.getByTestId(testIdDireto);
+    await expect(acaoDireta).toBeVisible();
+    return acaoDireta;
+}
+
+export async function abrirAcaoCadastroDevolver(page: Page) {
+    return abrirAcaoCadastro(page, 'btn-acao-devolver', 'btn-cadastro-acao-devolver');
+}
+
+export async function abrirAcaoCadastroPrincipal(page: Page) {
+    return abrirAcaoCadastro(page, 'btn-acao-analisar-principal', 'btn-cadastro-acao-principal');
+}
+
 // Funções de Devolução
 
 /**
@@ -101,7 +133,7 @@ export async function fecharHistoricoAnalise(page: Page) {
  */
 async function realizarDevolucao(page: Page, observacao: string = '') {
     await limparNotificacoes(page);
-    const btnDevolver = page.getByTestId('btn-acao-devolver');
+    const btnDevolver = await abrirAcaoCadastroDevolver(page);
     await expect(btnDevolver).toBeEnabled();
     await btnDevolver.click();
     const modal = page.locator('.modal.show');
@@ -133,7 +165,7 @@ export async function devolverRevisao(page: Page, observacao: string = '') {
  * Cancela devolução de cadastro
  */
 export async function cancelarDevolucao(page: Page) {
-    const btnDevolver = page.getByTestId('btn-acao-devolver');
+    const btnDevolver = await abrirAcaoCadastroDevolver(page);
     await expect(btnDevolver).toBeEnabled();
     await btnDevolver.click();
 
@@ -154,7 +186,7 @@ export async function cancelarDevolucao(page: Page) {
  */
 async function realizarAceite(page: Page, observacao: string = '') {
     await limparNotificacoes(page);
-    const btnAceitar = page.getByTestId('btn-acao-analisar-principal');
+    const btnAceitar = await abrirAcaoCadastroPrincipal(page);
     await expect(btnAceitar).toBeEnabled();
     await btnAceitar.click();
     const modal = page.locator('.modal.show');
@@ -186,7 +218,7 @@ export async function aceitarRevisao(page: Page, observacao: string = '') {
  * Homologa cadastro (ADMIN) - Mapeamento
  */
 export async function homologarCadastroMapeamento(page: Page, observacao: string = 'Homologado sem ressalvas') {
-    const btnHomologar = page.getByTestId('btn-acao-analisar-principal');
+    const btnHomologar = await abrirAcaoCadastroPrincipal(page);
     await expect(btnHomologar).toBeEnabled();
     await btnHomologar.click();
 

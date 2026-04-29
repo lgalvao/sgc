@@ -72,10 +72,18 @@ const commonStubs = {
     },
     BAlert: {template: '<div v-if="modelValue"><slot /></div>', props: ['modelValue']},
     BBadge: {template: '<span><slot /></span>'},
-                    BButton: {
-                        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
-                        props: ['disabled']
-                    },
+    BButton: {
+        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+        props: ['disabled']
+    },
+    BDropdown: {
+        template: '<div><button :disabled="disabled">{{ text }}</button><slot /></div>',
+        props: ['text', 'disabled']
+    },
+    BDropdownItemButton: {
+        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+        props: ['disabled']
+    },
     BContainer: {template: '<div><slot /></div>'},
     BSpinner: {template: '<span>Loading</span>'}
 };
@@ -150,7 +158,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
                 ...processo,
                 elegiveis: subprocessosElegiveis,
-                acoesBloco: criarAcoesBloco(subprocessosElegiveis),
+                acoesBloco: processo.acoesBloco ?? criarAcoesBloco(subprocessosElegiveis),
             });
         }
         vi.mocked(processoService.finalizarProcesso).mockResolvedValue(undefined);
@@ -222,6 +230,63 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         const btnFinalizar = wrapper.find('[data-testid="btn-processo-finalizar"]');
         expect(btnFinalizar.exists()).toBe(true);
         expect(btnFinalizar.attributes('disabled')).toBeDefined();
+    });
+
+    it("deve desabilitar o menu de ações em bloco quando só existirem ações visíveis porém indisponíveis", async () => {
+        const wrapper = createWrapper({
+            perfil: {
+                perfilSelecionado: "ADMIN",
+                unidadeSelecionada: 999,
+                perfis: ["ADMIN"]
+            },
+            processos: {
+                processoDetalhe: {
+                    codigo: 1,
+                    descricao: "Processo teste",
+                    tipo: TipoProcesso.MAPEAMENTO,
+                    situacao: "FINALIZADO",
+                    unidades: [],
+                    podeFinalizar: false,
+                    acoesBloco: [
+                        {
+                            codigo: "homologar-cadastro",
+                            acao: "HOMOLOGAR",
+                            mostrar: true,
+                            habilitar: false,
+                            requerDataLimite: false,
+                            redirecionarPainel: false,
+                            rotulo: "Homologar",
+                            titulo: "Homologar",
+                            texto: "Homologar",
+                            rotuloBotao: "Homologar",
+                            mensagemSucesso: "ok",
+                            unidades: []
+                        },
+                        {
+                            codigo: "disponibilizar-mapa",
+                            acao: "DISPONIBILIZAR",
+                            mostrar: true,
+                            habilitar: false,
+                            requerDataLimite: true,
+                            redirecionarPainel: true,
+                            rotulo: "Disponibilizar",
+                            titulo: "Disponibilizar",
+                            texto: "Disponibilizar",
+                            rotuloBotao: "Disponibilizar",
+                            mensagemSucesso: "ok",
+                            unidades: []
+                        }
+                    ]
+                },
+                subprocessosElegiveis: []
+            }
+        });
+
+        await flushPromises();
+
+        const menuAcoes = wrapper.find('[data-testid="btn-processo-acoes-bloco"] button');
+        expect(menuAcoes.exists()).toBe(true);
+        expect(menuAcoes.attributes('disabled')).toBeDefined();
     });
 
     it("não deve exibir erro quando o carregamento inicial for cancelado", async () => {
