@@ -34,14 +34,14 @@
                       {{ atividade.descricao }}
                     </span>
                     <div v-if="(atividade.conhecimentos?.length ?? 0) > 0" class="conhecimentos-inline mt-1">
-                      <ul class="list-unstyled mb-0 small text-muted border-top pt-1">
+                      <ul class="conhecimentos-lista mb-0 small text-muted border-top pt-1">
                         <li
                             v-for="conhecimento in atividade.conhecimentos"
                             :key="conhecimento.codigo"
                             class="conhecimento-item text-break"
                             data-testid="txt-conhecimento-item"
                         >
-                          <i aria-hidden="true" class="bi bi-dot me-1"/>{{ conhecimento.descricao }}
+                          {{ conhecimento.descricao }}
                         </li>
                       </ul>
                     </div>
@@ -101,6 +101,11 @@ defineProps<{
   color: var(--bs-emphasis-color);
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.conhecimentos-lista {
+  padding-left: 1rem;
+  list-style-type: disc;
 }
 
 .conhecimento-item {

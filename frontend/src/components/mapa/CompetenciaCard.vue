@@ -68,13 +68,13 @@
             </div>
             
             <div v-if="(atividade.conhecimentos?.length ?? 0) > 0" class="conhecimentos-inline mt-1">
-              <ul class="list-unstyled mb-0 small text-muted border-top pt-2">
+              <ul class="conhecimentos-lista mb-0 small text-muted border-top pt-1">
                 <li 
                     v-for="c in (getAtividadeCompleta(atividade.codigo)?.conhecimentos ?? [])" 
                     :key="c.codigo"
-                    class="conhecimento-item text-break ps-2"
+                    class="conhecimento-item text-break"
                 >
-                  <i aria-hidden="true" class="bi bi-dot me-1"/>{{ c.descricao }}
+                  {{ c.descricao }}
                 </li>
               </ul>
             </div>
@@ -166,14 +166,15 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
   word-break: break-word;
 }
 
+.conhecimentos-lista {
+  padding-left: 1rem;
+  list-style-type: disc;
+}
+
 .conhecimento-item {
-  line-height: 1.4;
+  line-height: 1.2;
   overflow-wrap: anywhere;
   word-break: break-word;
-  margin-bottom: 0.25rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.25rem;
 }
 
 .botao-acao-inline {
