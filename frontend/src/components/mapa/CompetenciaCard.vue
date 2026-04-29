@@ -20,7 +20,7 @@
             data-testid="btn-editar-competencia"
             size="sm"
             title="Editar"
-            variant="outline-primary"
+            variant="outline-secondary"
             @click="emit('editar', competencia)"
         >
           <i aria-hidden="true" class="bi bi-pencil"/>
@@ -33,7 +33,7 @@
             data-testid="btn-excluir-competencia"
             size="sm"
             title="Excluir"
-            variant="outline-danger"
+            variant="outline-secondary"
             @click="emit('excluir', competencia.codigo)"
         >
           <i aria-hidden="true" class="bi bi-trash"/>
