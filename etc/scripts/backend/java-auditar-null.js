@@ -93,31 +93,27 @@ async function fixNullChecks(results) {
         let lines = content.split(/\r?\n/);
         let modified = false;
 
-        // Análise heurística simplificada:
-        // Se a verificação é var != null, e a variável foi recebida como parâmetro no escopo atual,
-        // vamos tentar encontrar o parâmetro e adicionar @Nullable.
-        // Como o parsing AST de Java em JS é complexo, vamos adotar uma abordagem heurística simples
-        // para injetar @Nullable em métodos que tenham "if (var != null)" onde var corresponde a um parâmetro.
-
         for (const item of items) {
-            const match = item.content.match(/if\s*\(\s*([a-zA-Z0-9_]+)\s*(?:!=|==)\s*null\s*\)/);
-            if (!match) continue;
+            const matches = [...item.content.matchAll(/\\b([a-zA-Z0-9_]+)\\s*(?:!=|==)\\s*null\\b/g)];
+            if (matches.length === 0) continue;
 
-            const varName = match[1];
-            
-            // Buscar a declaração do método mais próximo antes desta linha
-            for (let i = item.line - 2; i >= 0; i--) {
-                const methodLine = lines[i];
-                if (methodLine.includes('public') || methodLine.includes('private') || methodLine.includes('protected')) {
-                    if (methodLine.includes('(') && methodLine.includes(')') && methodLine.includes(varName)) {
-                        // Tentar injetar @Nullable
-                        const paramRegex = new RegExp(`([^a-zA-Z0-9_@])([a-zA-Z0-9_<>\[\]]+)\s+${varName}\b`);
-                        if (paramRegex.test(methodLine) && !methodLine.includes(`@Nullable`)) {
-                            lines[i] = methodLine.replace(paramRegex, `$1@org.jspecify.annotations.Nullable $2 ${varName}`);
+            for (const match of matches) {
+                const varName = match[1];
+                
+                // Buscar a declaração do método mais próximo antes desta linha
+                for (let i = item.line - 2; i >= 0; i--) {
+                    const methodLine = lines[i];
+                    if ((methodLine.includes('public') || methodLine.includes('private') || methodLine.includes('protected')) &&
+                        methodLine.includes('(') && methodLine.includes(varName)) {
+                        
+                        const paramRegex = new RegExp(`\\\\b([a-zA-Z0-9_<>[\\\\\\]]+)\\\\s+${varName}\\\\b`);
+                        const paramMatch = methodLine.match(paramRegex);
+
+                        if (paramMatch && !methodLine.includes(`@Nullable ${varName}`) && !methodLine.includes(`@org.jspecify.annotations.Nullable ${varName}`)) {
+                            lines[i] = methodLine.replace(paramRegex, `@org.jspecify.annotations.Nullable $1 ${varName}`);
                             modified = true;
                             fixedCount++;
                             
-                            // Adicionar o import se não houver
                             const hasImport = lines.some(l => l.includes('org.jspecify.annotations.Nullable'));
                             if (!hasImport) {
                                 const packageIdx = lines.findIndex(l => l.startsWith('package '));
@@ -126,8 +122,9 @@ async function fixNullChecks(results) {
                                 }
                             }
                         }
+                        break;
                     }
-                    break; // Só analisa o escopo do método atual
+                    if (methodLine.trim() === '}' || methodLine.trim() === '};') break;
                 }
             }
         }
@@ -147,7 +144,7 @@ async function main() {
     if (args.includes('--help') || args.includes('-h')) {
         exibirAjudaComando({
             comandoSgc: 'java auditar-null',
-            scriptDireto: 'java-auditar-null.js',
+            scriptDireto: 'backend/java-auditar-null.js',
             descricao: 'Audita verificacoes de null no codigo Java e gera relatorios. Pode injetar @Nullable automaticamente com --fix.',
             opcoes: [
                 '--fix     Injeta anotações @Nullable do JSpecify automaticamente em parâmetros de métodos onde verificações nulas são feitas.',
