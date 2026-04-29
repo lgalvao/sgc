@@ -16,8 +16,9 @@
         >
           <template #actions>
             <BButton
-                v-if="podeAlterarDataLimite"
+                v-if="mostrarAlterarDataLimite"
                 data-testid="btn-alterar-data-limite"
+                :disabled="!podeAlterarDataLimite"
                 variant="outline-secondary"
                 @click="abrirModalAlterarDataLimite"
             >
@@ -25,8 +26,9 @@
               {{ TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE }}
             </BButton>
             <BButton
-                v-if="podeReabrirCadastro"
+                v-if="mostrarReabrirCadastro"
                 data-testid="btn-reabrir-cadastro"
+                :disabled="!podeReabrirCadastro"
                 variant="outline-secondary"
                 @click="abrirModalReabrirCadastro"
             >
@@ -34,8 +36,9 @@
               {{ TEXTOS.subprocesso.BOTAO_REABRIR_CADASTRO }}
             </BButton>
             <BButton
-                v-if="podeReabrirRevisao"
+                v-if="mostrarReabrirRevisao"
                 data-testid="btn-reabrir-revisao"
+                :disabled="!podeReabrirRevisao"
                 variant="outline-secondary"
                 @click="abrirModalReabrirRevisao"
             >
@@ -43,8 +46,9 @@
               {{ TEXTOS.subprocesso.BOTAO_REABRIR_REVISAO }}
             </BButton>
             <BButton
-                v-if="podeEnviarLembrete"
+                v-if="mostrarEnviarLembrete"
                 data-testid="btn-enviar-lembrete"
+                :disabled="!podeEnviarLembrete"
                 variant="outline-secondary"
                 @click="confirmarEnviarLembrete"
             >
@@ -331,7 +335,11 @@ const {
   podeAlterarDataLimite,
   podeReabrirCadastro,
   podeReabrirRevisao,
-  podeEnviarLembrete
+  podeEnviarLembrete,
+  mostrarAlterarDataLimite,
+  mostrarReabrirCadastro,
+  mostrarReabrirRevisao,
+  mostrarEnviarLembrete
 } = useAcesso(subprocesso);
 
 const movimentacoes = computed<Movimentacao[]>(

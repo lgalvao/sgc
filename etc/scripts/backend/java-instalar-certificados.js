@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {execFileSync} from "node:child_process";
-import {exibirAjudaComando} from "./lib/cli-ajuda.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 function resolveKeytool() {
     if (process.env.JAVA_HOME) {

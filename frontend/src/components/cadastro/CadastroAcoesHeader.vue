@@ -9,6 +9,9 @@ interface Props {
   unidade?: Unidade | null;
   codSubprocesso?: number | null;
   permissoes: PermissoesSubprocesso;
+  mostrarDevolverCadastro?: boolean;
+  mostrarImportarAtividades?: boolean;
+  mostrarDisponibilizarCadastro?: boolean;
   acaoPrincipalCadastro?: {
     mostrar: boolean;
     habilitar: boolean;
@@ -46,7 +49,7 @@ defineEmits<{
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
         </BButton>
         <BButton
-            v-if="codSubprocesso && permissoes.podeDevolverCadastro"
+            v-if="codSubprocesso && mostrarDevolverCadastro"
             data-testid="btn-acao-devolver"
             :disabled="!permissoes.habilitarDevolverCadastro"
             :title="TEXTOS.atividades.BOTAO_DEVOLVER"
@@ -67,7 +70,7 @@ defineEmits<{
         </BButton>
       </div>
 
-      <div v-if="podeVisualizarImpacto || permissoes.podeEditarCadastro || permissoes.podeDisponibilizarCadastro" class="d-flex gap-2">
+      <div v-if="podeVisualizarImpacto || mostrarImportarAtividades || mostrarDisponibilizarCadastro" class="d-flex gap-2">
         <BButton
             v-if="codSubprocesso && podeVisualizarImpacto"
             data-testid="cad-atividades__btn-impactos-mapa-edicao"
@@ -77,16 +80,17 @@ defineEmits<{
           <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
         </BButton>
         <BButton
-            v-if="codSubprocesso && permissoes.podeEditarCadastro"
+            v-if="codSubprocesso && mostrarImportarAtividades"
             data-testid="btn-cad-atividades-importar"
+            :disabled="!permissoes.habilitarEditarCadastro"
             variant="outline-secondary"
             @click="$emit('abrir-importar')"
         >
           <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
         </BButton>
         <LoadingButton
-            v-if="codSubprocesso && (permissoes.podeDisponibilizarCadastro || permissoes.podeEditarCadastro)"
-            :disabled="loadingValidacao"
+            v-if="codSubprocesso && mostrarDisponibilizarCadastro"
+            :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"

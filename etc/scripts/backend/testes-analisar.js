@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import {exibirAjudaComando} from "./lib/cli-ajuda.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {
     CATEGORIAS_PRIORITARIAS,

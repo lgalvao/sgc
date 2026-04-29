@@ -7,13 +7,9 @@ function exibirAjudaComando({
     exemplos = []
 }) {
     const linhas = [];
-    linhas.push(`Uso recomendado: node etc/scripts/sgc.js backend ${comandoSgc}`);
+    linhas.push(`Uso recomendado: node etc/scripts/sgc.js ${comandoSgc}${argumentos ? ` ${argumentos}` : ''}`);
 
-    if (argumentos) {
-        linhas[0] += ` ${argumentos}`;
-    }
-
-    linhas.push(`Execucao direta: node etc/scripts/backend/${scriptDireto}${argumentos ? ` ${argumentos}` : ''}`);
+    linhas.push(`Execucao direta: node etc/scripts/${scriptDireto}${argumentos ? ` ${argumentos}` : ''}`);
 
     if (descricao) {
         linhas.push('');

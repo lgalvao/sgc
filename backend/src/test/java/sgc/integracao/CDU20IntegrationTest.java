@@ -162,53 +162,35 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         // Verificação do histórico após aceite
-        String responseAceite =
-                mockMvc.perform(get("/api/subprocessos/{codigo}/historico-validacao", subprocesso.getCodigo())
+        String responseAceite = mockMvc.perform(get("/api/subprocessos/{codigo}/historico-validacao", subprocesso.getCodigo())
                                 .with(user(usuarioGestor))
                                 .with(csrf()))
                         .andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-        List<AnaliseHistoricoDto> historicoAceite =
-                objectMapper.readValue(responseAceite, new TypeReference<>() {
-                });
 
+        List<AnaliseHistoricoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<>() {});
         assertThat(historicoAceite).hasSize(2);
-        assertThat(historicoAceite.getFirst().acao())
-                .isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(historicoAceite.getFirst().acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
 
         // Adicionar verificação de Movimentacao e Alerta após aceite
-        List<Movimentacao> movimentacoesAceite =
-                movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
-                        subprocesso.getCodigo());
+        List<Movimentacao> movimentacoesAceite = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());
         assertThat(movimentacoesAceite).hasSize(4); // Setup + devolução + validação + aceite
-        assertThat(movimentacoesAceite.getFirst().getDescricao())
-                .isEqualTo("Mapa de competências validado");
-        assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla())
-                .isEqualTo(unidadeSuperior.getSigla());
-        assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla())
-                .isEqualTo(unidadeSuperiorSuperior.getSigla());
+        assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
+        assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
 
-        List<Alerta> alertasAceite =
-                alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+        List<Alerta> alertasAceite = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
         assertThat(alertasAceite).isNotEmpty(); // devolução + validação + aceite (pode variar se houver de processo)
 
         // Verifica o alerta de aceite para a unidade hierarquicamente superior
         Alerta alertaDeAceite =
-                alertasAceite.stream()
-                        .filter(
-                                a ->
-                                        a.getUnidadeDestino()
-                                                .getSigla()
-                                                .equals(unidadeSuperiorSuperior.getSigla()))
-                        .findFirst()
-                        .orElseThrow(
-                                () ->
-                                        new AssertionError(
-                                                "Alerta de aceite para unidade superior não"
-                                                        + " encontrado"));
+                alertasAceite.stream().filter(a -> a.getUnidadeDestino()
+                        .getSigla()
+                        .equals(unidadeSuperiorSuperior.getSigla())).findFirst().orElseThrow(
+                                () -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
 
         assertThat(alertaDeAceite.getDescricao())
                 .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");
@@ -271,29 +253,22 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         movimentacaoRepo.save(movAdmin);
 
         // Ação
-        mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/homologar-validacao", subprocesso.getCodigo())
-                                .with(csrf()))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/subprocessos/{codigo}/homologar-validacao", subprocesso.getCodigo()).with(csrf())).andExpect(status().isOk());
 
         // Verificações
         Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(spAtualizado.getSituacao())
-                .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
-        List<Movimentacao> movimentacoes =
-                movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
-                        subprocesso.getCodigo());
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());
+
         // Deve ter o setup + homologação
         assertThat(movimentacoes).hasSizeGreaterThanOrEqualTo(2);
-        assertThat(movimentacoes.getFirst().getDescricao())
-                .isEqualTo("Mapa de competências homologado");
+        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências homologado");
         assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
         assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
 
         // Homologação não gera alerta (por design)
-        List<Alerta> alertas =
-                alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+        List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
         assertThat(alertas).isEmpty(); // MAPA_HOMOLOGADO não gera alerta
     }
 
@@ -310,9 +285,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.saveAndFlush(subprocesso);
 
         // Verifica permissões: GESTOR da unidade superior deve ter podeVerSugestoes=true
-        String response = mockMvc.perform(
-                        get("/api/subprocessos/{codigo}", subprocesso.getCodigo())
-                                .with(user(usuarioGestor)))
+        String response = mockMvc.perform(get("/api/subprocessos/{codigo}", subprocesso.getCodigo())
+                        .with(user(usuarioGestor)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -337,10 +311,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.saveAndFlush(subprocesso);
 
         // Verifica permissões: CHEFE não deve ter podeVerSugestoes
-        String response = mockMvc.perform(
-                        get("/api/subprocessos/{codigo}", subprocesso.getCodigo())
-                                .with(user(usuarioChefe)))
-                .andExpect(status().isOk())
+        String response = mockMvc.perform(get("/api/subprocessos/{codigo}", subprocesso.getCodigo()).with(user(usuarioChefe))).andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -360,9 +331,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
         subprocessoRepo.saveAndFlush(subprocesso);
 
-        mockMvc.perform(
-                        get("/api/subprocessos/{codigo}/sugestoes", subprocesso.getCodigo())
-                                .with(user(usuarioGestor)))
+        mockMvc.perform(get("/api/subprocessos/{codigo}/sugestoes", subprocesso.getCodigo())
+                        .with(user(usuarioGestor)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sugestoes").value("Sugestão de ajuste no mapa"));
     }
@@ -386,10 +356,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         movimentacaoRepo.save(movAdmin);
         subprocessoRepo.flush();
 
-        mockMvc.perform(
-                        post("/api/subprocessos/{codigo}/homologar-validacao", subprocesso.getCodigo())
-                                .with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+        mockMvc.perform(post("/api/subprocessos/{codigo}/homologar-validacao", subprocesso.getCodigo()).with(csrf()))
+                .andExpect(status().isUnprocessableContent());
 
         Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
@@ -402,10 +370,11 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
         subprocessoRepo.saveAndFlush(subprocesso);
 
-        String response = mockMvc.perform(
-                        get("/api/subprocessos/{codigo}", subprocesso.getCodigo()))
+        String response = mockMvc.perform(get("/api/subprocessos/{codigo}", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
         assertThat(json.at("/permissoes/podeEditarMapa").asBoolean()).isTrue();

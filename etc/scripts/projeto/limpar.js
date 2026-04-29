@@ -21,6 +21,8 @@ const PADROES_LIMPEZA = [
     "frontend-backend-validation-comparison.md",
     "mensagens-analise.md",
     "mensagens-extraidas.json",
+    "backend-coverage-auditoria.md",
+    "frontend-coverage-auditoria.md",
     "null-checks-analysis.md",
     "null-checks-audit.txt",
     "plano-100-cobertura.md",

@@ -1,6 +1,7 @@
 import {computed, type Ref, unref} from 'vue';
-import {type SubprocessoDetalhe, TipoProcesso} from '@/types/tipos';
+import {type SubprocessoDetalhe, Perfil, TipoProcesso} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
+import {usePerfil} from '@/composables/usePerfil';
 
 type AcaoPrincipalCadastro = {
     codigo: 'ACEITAR' | 'HOMOLOGAR';
@@ -32,6 +33,10 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const getSubprocesso = () => unref(subprocessoRef);
     const getPermissoes = () => getSubprocesso()?.permissoes;
     const isRevisao = computed(() => getSubprocesso()?.tipoProcesso === TipoProcesso.REVISAO);
+    const {perfilSelecionado} = usePerfil();
+    const isAdmin = computed(() => perfilSelecionado.value === Perfil.ADMIN);
+    const isGestor = computed(() => perfilSelecionado.value === Perfil.GESTOR);
+    const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
 
     const podeEditarCadastro = computed(() => getPermissoes()?.podeEditarCadastro ?? false);
     const podeDisponibilizarCadastro = computed(() => getPermissoes()?.podeDisponibilizarCadastro ?? false);
@@ -79,12 +84,26 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const habilitarAceitarMapa = computed(() => getPermissoes()?.habilitarAceitarMapa ?? false);
     const habilitarHomologarMapa = computed(() => getPermissoes()?.habilitarHomologarMapa ?? false);
 
+    const mostrarAlterarDataLimite = computed(() => isAdmin.value);
+    const mostrarReabrirCadastro = computed(() => isAdmin.value);
+    const mostrarReabrirRevisao = computed(() => isAdmin.value);
+    const mostrarEnviarLembrete = computed(() => isAdmin.value);
+
+    const mostrarImportarAtividades = computed(() => isChefe.value);
+    const mostrarDisponibilizarCadastro = computed(() => isChefe.value);
+    const mostrarDevolverCadastro = computed(() => isAdmin.value || isGestor.value);
+
+    const mostrarApresentarSugestoes = computed(() => isChefe.value);
+    const mostrarValidarMapa = computed(() => isChefe.value);
+    const mostrarDisponibilizarMapa = computed(() => isAdmin.value);
+    const mostrarDevolverMapa = computed(() => isAdmin.value || isGestor.value);
+
     const acaoPrincipalCadastro = computed<AcaoPrincipalCadastro | null>(() => {
-        if (podeHomologarCadastro.value) {
+        if (isAdmin.value) {
             return {
                 codigo: 'HOMOLOGAR',
                 mostrar: true,
-                habilitar: habilitarHomologarCadastro.value,
+                habilitar: podeHomologarCadastro.value && habilitarHomologarCadastro.value,
                 tituloModal: TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO,
                 textoModal: TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO,
                 rotuloBotao: TEXTOS.atividades.BOTAO_HOMOLOGAR,
@@ -94,11 +113,11 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
             };
         }
 
-        if (podeAceitarCadastro.value) {
+        if (isGestor.value) {
             return {
                 codigo: 'ACEITAR',
                 mostrar: true,
-                habilitar: habilitarAceitarCadastro.value,
+                habilitar: podeAceitarCadastro.value && habilitarAceitarCadastro.value,
                 tituloModal: isRevisao.value
                     ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TITULO
                     : TEXTOS.atividades.MODAL_VALIDAR_TITULO,
@@ -116,21 +135,21 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     });
 
     const acaoPrincipalMapa = computed<AcaoPrincipalMapa | null>(() => {
-        if (podeHomologarMapa.value) {
+        if (isAdmin.value) {
             return {
                 codigo: 'HOMOLOGAR',
                 mostrar: true,
-                habilitar: habilitarHomologarMapa.value,
+                habilitar: podeHomologarMapa.value && habilitarHomologarMapa.value,
                 rotuloBotao: TEXTOS.mapa.LABEL_HOMOLOGAR,
                 mensagemSucesso: TEXTOS.mapa.SUCESSO_HOMOLOGACAO,
             };
         }
 
-        if (podeAceitarMapa.value) {
+        if (isGestor.value) {
             return {
                 codigo: 'ACEITAR',
                 mostrar: true,
-                habilitar: habilitarAceitarMapa.value,
+                habilitar: podeAceitarMapa.value && habilitarAceitarMapa.value,
                 rotuloBotao: TEXTOS.mapa.LABEL_REGISTRAR_ACEITE,
                 mensagemSucesso: TEXTOS.sucesso.ACEITE_REGISTRADO,
             };
@@ -161,6 +180,17 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         podeReabrirCadastro,
         podeReabrirRevisao,
         podeEnviarLembrete,
+        mostrarAlterarDataLimite,
+        mostrarReabrirCadastro,
+        mostrarReabrirRevisao,
+        mostrarEnviarLembrete,
+        mostrarImportarAtividades,
+        mostrarDisponibilizarCadastro,
+        mostrarDevolverCadastro,
+        mostrarApresentarSugestoes,
+        mostrarValidarMapa,
+        mostrarDisponibilizarMapa,
+        mostrarDevolverMapa,
         habilitarAcessoCadastro,
         habilitarAcessoMapa,
         habilitarEditarCadastro,

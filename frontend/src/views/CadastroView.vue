@@ -6,6 +6,9 @@
           :unidade="unidade"
           :cod-subprocesso="codigoSubprocesso"
           :permissoes="permissoesUI"
+          :mostrar-devolver-cadastro="mostrarDevolverCadastro"
+          :mostrar-importar-atividades="mostrarImportarAtividades"
+          :mostrar-disponibilizar-cadastro="mostrarDisponibilizarCadastro"
           :acao-principal-cadastro="acaoPrincipalCadastro"
           :loading-validacao="loadingValidacao"
           :pode-visualizar-impacto="podeVisualizarImpacto"
@@ -237,6 +240,9 @@ const {
   podeEditarCadastro,
   podeVisualizarImpacto,
   podeDevolverCadastro,
+  mostrarDevolverCadastro,
+  mostrarImportarAtividades,
+  mostrarDisponibilizarCadastro,
   habilitarEditarCadastro,
   habilitarDevolverCadastro,
   podeDisponibilizarCadastro,

@@ -1,8 +1,18 @@
-import {describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useAcesso} from '../useAcesso';
 import {ref} from 'vue';
 import type {PermissoesSubprocesso, SubprocessoDetalhe} from '@/types/tipos';
-import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
+import {Perfil, SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
+
+const {perfilSelecionadoMock} = vi.hoisted(() => ({
+  perfilSelecionadoMock: {value: 'ADMIN'},
+}));
+
+vi.mock('@/composables/usePerfil', () => ({
+  usePerfil: () => ({
+    perfilSelecionado: perfilSelecionadoMock,
+  }),
+}));
 
 function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
   return {
@@ -66,6 +76,10 @@ function criarSubprocesso(parciais: Partial<SubprocessoDetalhe> = {}): Subproces
 }
 
 describe('useAcesso', () => {
+  beforeEach(() => {
+    perfilSelecionadoMock.value = Perfil.ADMIN;
+  });
+
   it('deve retornar false por padrao quando permissoes sao nulas', () => {
     const subprocesso = ref<SubprocessoDetalhe | null>(null);
     const acesso = useAcesso(subprocesso);
@@ -202,6 +216,7 @@ describe('useAcesso', () => {
   });
 
   it('deve expor a ação principal pronta para cadastro quando pode aceitar (revisao)', () => {
+    perfilSelecionadoMock.value = Perfil.GESTOR;
     const subprocesso = criarSubprocesso({
       tipoProcesso: TipoProcesso.REVISAO,
       permissoes: criarPermissoes({
@@ -223,6 +238,7 @@ describe('useAcesso', () => {
   });
 
   it('deve expor a ação principal pronta para cadastro quando pode aceitar (mapeamento)', () => {
+    perfilSelecionadoMock.value = Perfil.GESTOR;
     const subprocesso = criarSubprocesso({
       tipoProcesso: TipoProcesso.MAPEAMENTO,
       permissoes: criarPermissoes({
@@ -260,6 +276,7 @@ describe('useAcesso', () => {
   });
 
   it('deve expor a ação principal pronta para mapa quando pode aceitar', () => {
+    perfilSelecionadoMock.value = Perfil.GESTOR;
     const subprocesso = criarSubprocesso({
       permissoes: criarPermissoes({
         podeAceitarMapa: true,
@@ -277,6 +294,7 @@ describe('useAcesso', () => {
   });
 
   it('deve retornar null para ações principais quando não tem permissão', () => {
+    perfilSelecionadoMock.value = Perfil.CHEFE;
     const subprocesso = criarSubprocesso({
       permissoes: criarPermissoes({
         podeAceitarCadastro: false,
@@ -292,6 +310,7 @@ describe('useAcesso', () => {
   });
 
   it('deve expor ação principal de cadastro quando pode aceitar mas não pode homologar', () => {
+    perfilSelecionadoMock.value = Perfil.GESTOR;
     const subprocesso = criarSubprocesso({
       permissoes: criarPermissoes({
         podeHomologarCadastro: false,
@@ -303,6 +322,7 @@ describe('useAcesso', () => {
   });
 
   it('deve expor ação principal de mapa quando pode aceitar mas não pode homologar', () => {
+    perfilSelecionadoMock.value = Perfil.GESTOR;
     const subprocesso = criarSubprocesso({
       permissoes: criarPermissoes({
         podeHomologarMapa: false,
@@ -387,5 +407,59 @@ describe('useAcesso', () => {
     expect(acesso.habilitarDisponibilizarMapa.value).toBe(true);
     expect(acesso.habilitarValidarMapa.value).toBe(true);
     expect(acesso.habilitarApresentarSugestoes.value).toBe(true);
+  });
+
+  it('deve expor flags de visibilidade por perfil para cadastro, mapa e subprocesso', () => {
+    const acessoAdmin = useAcesso(criarSubprocesso());
+    expect(acessoAdmin.mostrarAlterarDataLimite.value).toBe(true);
+    expect(acessoAdmin.mostrarReabrirCadastro.value).toBe(true);
+    expect(acessoAdmin.mostrarReabrirRevisao.value).toBe(true);
+    expect(acessoAdmin.mostrarEnviarLembrete.value).toBe(true);
+    expect(acessoAdmin.mostrarDisponibilizarMapa.value).toBe(true);
+    expect(acessoAdmin.mostrarDevolverMapa.value).toBe(true);
+    expect(acessoAdmin.acaoPrincipalMapa.value?.codigo).toBe('HOMOLOGAR');
+
+    perfilSelecionadoMock.value = Perfil.GESTOR;
+    const acessoGestor = useAcesso(criarSubprocesso());
+    expect(acessoGestor.mostrarDevolverCadastro.value).toBe(true);
+    expect(acessoGestor.mostrarDevolverMapa.value).toBe(true);
+    expect(acessoGestor.acaoPrincipalCadastro.value?.codigo).toBe('ACEITAR');
+    expect(acessoGestor.acaoPrincipalMapa.value?.codigo).toBe('ACEITAR');
+
+    perfilSelecionadoMock.value = Perfil.CHEFE;
+    const acessoChefe = useAcesso(criarSubprocesso());
+    expect(acessoChefe.mostrarImportarAtividades.value).toBe(true);
+    expect(acessoChefe.mostrarDisponibilizarCadastro.value).toBe(true);
+    expect(acessoChefe.mostrarApresentarSugestoes.value).toBe(true);
+    expect(acessoChefe.mostrarValidarMapa.value).toBe(true);
+    expect(acessoChefe.acaoPrincipalCadastro.value).toBeNull();
+    expect(acessoChefe.acaoPrincipalMapa.value).toBeNull();
+  });
+
+  it('deve manter ação principal visível porém desabilitada fora do estado executável do perfil', () => {
+    const acessoAdmin = useAcesso(criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeHomologarMapa: false,
+        habilitarHomologarMapa: false,
+      }),
+    }));
+    expect(acessoAdmin.acaoPrincipalMapa.value).toMatchObject({
+      codigo: 'HOMOLOGAR',
+      mostrar: true,
+      habilitar: false,
+    });
+
+    perfilSelecionadoMock.value = Perfil.GESTOR;
+    const acessoGestor = useAcesso(criarSubprocesso({
+      permissoes: criarPermissoes({
+        podeAceitarCadastro: false,
+        habilitarAceitarCadastro: false,
+      }),
+    }));
+    expect(acessoGestor.acaoPrincipalCadastro.value).toMatchObject({
+      codigo: 'ACEITAR',
+      mostrar: true,
+      habilitar: false,
+    });
   });
 });

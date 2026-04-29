@@ -1286,14 +1286,6 @@ public class ProcessoService {
         return dataLimite;
     }
 
-    private Usuario buscarTitularObrigatorio(Unidade unidade, Long unidadeCodigo) {
-        String tituloTitular = unidade.getTituloTitular();
-        if (tituloTitular == null || tituloTitular.isBlank()) {
-            throw new IllegalStateException("Unidade %d sem titular oficial para envio de lembrete".formatted(unidadeCodigo));
-        }
-        return usuarioService.buscarPorLogin(tituloTitular);
-    }
-
     record ContextoInicioProcesso(
             TipoProcesso tipo,
             List<Long> codigosUnidades,

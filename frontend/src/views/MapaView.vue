@@ -50,7 +50,7 @@
                 variant="success"
             >
               <BDropdownItemButton
-                  v-if="podeApresentarSugestoes"
+                  v-if="mostrarApresentarSugestoes"
                   data-testid="btn-mapa-acao-sugestoes"
                   :disabled="!habilitarApresentarSugestoes"
                   @click="abrirModalSugestoes"
@@ -58,7 +58,7 @@
                 {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
               </BDropdownItemButton>
               <BDropdownItemButton
-                  v-if="podeValidar"
+                  v-if="mostrarValidarMapa"
                   data-testid="btn-mapa-acao-validar"
                   :disabled="!habilitarValidar"
                   @click="abrirModalValidar"
@@ -365,6 +365,7 @@ import {apresentarSugestoes as apresentarSugestoesService} from "@/services/proc
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import logger from "@/utils/logger";
+import {Perfil} from "@/types/tipos";
 import type {
   Analise,
   Atividade,
@@ -373,7 +374,6 @@ import type {
   MapaVisualizacao,
   SalvarCompetenciaRequest,
 } from "@/types/tipos";
-import {Perfil} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -394,44 +394,37 @@ const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
-const {isAdmin, perfilSelecionado} = usePerfil();
+const {perfilSelecionado} = usePerfil();
 
 const {
   podeVisualizarImpacto,
-  podeValidarMapa,
-  podeApresentarSugestoes,
   podeEditarMapa,
+  mostrarValidarMapa,
+  mostrarApresentarSugestoes,
+  mostrarDisponibilizarMapa,
+  mostrarDevolverMapa,
   habilitarApresentarSugestoes,
   habilitarDisponibilizarMapa,
   habilitarEditarMapa,
   habilitarValidarMapa,
-  podeAnalisarMapa,
   podeVerSugestoes: podeMostrarVerSugestoes,
   habilitarDevolverMapa,
   acaoPrincipalMapa
 } = useAcesso(subprocesso);
 
-const podeAnalisar = computed(() => {
-  return (
-      Boolean(acaoPrincipalMapa.value?.mostrar) ||
-      podeAnalisarMapa.value
-  );
-});
 const usarMenuAcoesMapa = computed(() => {
-  return podeApresentarSugestoes.value
-      || podeValidar.value
-      || podeAnalisar.value
+  return mostrarApresentarSugestoes.value
+      || mostrarValidarMapa.value
+      || mostrarAcaoDevolverMapa.value
       || Boolean(acaoPrincipalMapa.value?.mostrar)
       || mostrarDisponibilizarMapa.value;
 });
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
-const mostrarDisponibilizarMapa = computed(() => isAdmin.value && Boolean(subprocesso.value));
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
-const podeValidar = computed(() => podeValidarMapa?.value ?? false);
 const habilitarValidar = computed(() => habilitarValidarMapa?.value ?? false);
 const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
-const mostrarAcaoDevolverMapa = computed(() => isAdmin.value || podeAnalisar.value);
-const mostrarAcaoPrincipalMapa = computed(() => isAdmin.value || Boolean(acaoPrincipalMapa.value?.mostrar));
+const mostrarAcaoDevolverMapa = computed(() => mostrarDevolverMapa.value);
+const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?.mostrar));
 const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);
 const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);
 

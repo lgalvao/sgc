@@ -4,6 +4,7 @@ import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 const CAMINHO_PADRAO_OUTPUT = "backend-coverage-auditoria.md";
 
@@ -56,6 +57,22 @@ async function gerarRelatorioMarkdown(dados, caminho) {
 async function main() {
     const args = process.argv.slice(2);
     const jsonMode = args.includes("--json");
+    const helpMode = args.includes("--help") || args.includes("-h");
+
+    if (helpMode) {
+        exibirAjudaComando({
+            comandoSgc: 'backend cobertura auditoria',
+            scriptDireto: 'backend/cobertura-auditoria.js',
+            descricao: 'Auditoria unificada de cobertura e risco (Backend).',
+            opcoes: [
+                '--json     Saída em formato JSON para integração com outras ferramentas.',
+                '--output=X Caminho do arquivo Markdown a ser gerado (Padrão: backend-coverage-auditoria.md).',
+                '--min=N    Falha (exit 1) se a cobertura global for menor que N.'
+            ]
+        });
+        process.exit(0);
+    }
+
     const outputArg = args.find(a => a.startsWith("--output="))?.split("=")[1] || CAMINHO_PADRAO_OUTPUT;
     const metaMinima = Number(args.find(a => a.startsWith("--min="))?.split("=")[1] || "0");
 

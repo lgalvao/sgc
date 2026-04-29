@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
-import {exibirAjudaComando} from "./lib/cli-ajuda.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {imprimirCabecalho, escreverLinha} from "../lib/saida.js";
 import {globby} from "globby";
 

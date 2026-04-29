@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import {exibirAjudaComando} from "./lib/cli-ajuda.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 const TARGET_DIRS = ['src/test/java', 'src/main/java'];
 const PACKAGE_PREFIX = 'package ';

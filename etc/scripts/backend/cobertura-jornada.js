@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {execFileSync} from "node:child_process";
 import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
-import {exibirAjudaComando} from "./lib/cli-ajuda.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 function runNodeScript(scriptName, args = [], options = {}) {
     return execFileSync('node', [path.join('etc/scripts/backend', scriptName), ...args], {
