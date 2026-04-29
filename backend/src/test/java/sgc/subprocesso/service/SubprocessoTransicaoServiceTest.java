@@ -214,6 +214,44 @@ class SubprocessoTransicaoServiceTest {
         }
 
         @Test
+        @DisplayName("devolverValidacao deve rejeitar ADMIN quando o mapa estiver validado")
+        void devolverValidacaoDeveRejeitarAdminQuandoMapaValidado() {
+            Unidade uOrigem = criarUnidade(1L, "ORI", "Origem");
+            Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_MAPA_VALIDADO, uOrigem);
+            Usuario usuario = criarUsuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            doThrow(new sgc.comum.erros.ErroValidacao("Situação inválida"))
+                    .when(validacaoService)
+                    .validarSituacaoPermitida(eq(sp), eq(MAPEAMENTO_MAPA_COM_SUGESTOES), eq(REVISAO_MAPA_COM_SUGESTOES));
+
+            assertThatThrownBy(() -> service.devolverValidacao(1L, "Justif"))
+                    .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+
+            verify(analiseRepo, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("homologarValidacao deve rejeitar ADMIN quando o mapa tiver sugestões")
+        void homologarValidacaoDeveRejeitarQuandoMapaComSugestoes() {
+            Unidade uOrigem = criarUnidade(1L, "ORI", "Origem");
+            Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_MAPA_COM_SUGESTOES, uOrigem);
+            Usuario usuario = criarUsuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            doThrow(new sgc.comum.erros.ErroValidacao("Situação inválida"))
+                    .when(validacaoService)
+                    .validarSituacaoPermitida(eq(sp), eq(MAPEAMENTO_MAPA_VALIDADO), eq(REVISAO_MAPA_VALIDADO));
+
+            assertThatThrownBy(() -> service.homologarValidacao(1L, "Obs"))
+                    .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+        }
+
+        @Test
         @DisplayName("alterarDataLimite deve lançar erro quando data limite é anterior à etapa 2")
         void alterarDataLimiteDeveLancarErroQuandoAnteriorEtapa2() {
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, new Unidade());

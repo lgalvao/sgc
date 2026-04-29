@@ -331,11 +331,7 @@ public class SubprocessoTransicaoService {
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp,
-                MAPEAMENTO_MAPA_COM_SUGESTOES,
-                MAPEAMENTO_MAPA_VALIDADO,
-                REVISAO_MAPA_COM_SUGESTOES,
-                REVISAO_MAPA_VALIDADO);
+        validarSituacaoPermitidaParaDevolucao(usuario, sp);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
         Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
@@ -355,6 +351,20 @@ public class SubprocessoTransicaoService {
                 normalizarTexto(justificativa)
         ));
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
+    }
+
+    private void validarSituacaoPermitidaParaDevolucao(Usuario usuario, Subprocesso sp) {
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
+            validacaoService.validarSituacaoPermitida(sp,
+                    MAPEAMENTO_MAPA_COM_SUGESTOES,
+                    REVISAO_MAPA_COM_SUGESTOES);
+            return;
+        }
+        validacaoService.validarSituacaoPermitida(sp,
+                MAPEAMENTO_MAPA_COM_SUGESTOES,
+                MAPEAMENTO_MAPA_VALIDADO,
+                REVISAO_MAPA_COM_SUGESTOES,
+                REVISAO_MAPA_VALIDADO);
     }
 
     public void aceitarValidacao(Long codSubprocesso, @Nullable String observacoes) {
@@ -402,8 +412,8 @@ public class SubprocessoTransicaoService {
     private void executarHomologacaoValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
         log.info("Homologando validação do mapa do subprocesso {}", sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp,
-                MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
+                MAPEAMENTO_MAPA_VALIDADO,
+                REVISAO_MAPA_VALIDADO);
 
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_HOMOLOGADO, sp, "homologação de validação"));
 

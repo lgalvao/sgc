@@ -1220,7 +1220,7 @@ class ProcessoServiceTest {
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             sp.setUnidade(new Unidade());
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));

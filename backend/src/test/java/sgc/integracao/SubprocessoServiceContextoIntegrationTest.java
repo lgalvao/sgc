@@ -290,7 +290,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
-        assertThat(permissoes.podeHomologarMapa()).isTrue();
+        assertThat(permissoes.podeHomologarMapa()).isFalse();
     }
 
     @Test
@@ -303,7 +303,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
-        assertThat(permissoes.podeHomologarMapa()).isTrue();
+        assertThat(permissoes.podeHomologarMapa()).isFalse();
     }
 
     @Test
@@ -326,6 +326,8 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(permissoes.podeEditarMapa()).isFalse();
         assertThat(permissoes.habilitarEditarMapa()).isFalse();
+        assertThat(permissoes.podeDevolverMapa()).isFalse();
+        assertThat(permissoes.habilitarDevolverMapa()).isFalse();
         assertThat(permissoes.podeHomologarMapa()).isTrue();
         assertThat(permissoes.habilitarHomologarMapa()).isTrue();
     }

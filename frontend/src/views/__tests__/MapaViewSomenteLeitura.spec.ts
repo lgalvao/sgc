@@ -179,19 +179,21 @@ describe("MapaView somente leitura", () => {
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarImpacto: ref(false),
+            podeApresentarSugestoes: ref(true),
             podeEditarMapa: ref(false),
             podeDisponibilizarMapa: ref(false),
+            habilitarApresentarSugestoes: ref(true),
             habilitarEditarMapa: ref(false),
             habilitarDisponibilizarMapa: ref(false),
             podeValidarMapa: ref(true),
             habilitarValidarMapa: ref(true),
             podeVerSugestoes: ref(true),
             podeAnalisarMapa: ref(true),
-            habilitarDevolverMapa: ref(true),
+            habilitarDevolverMapa: ref(false),
             acaoPrincipalMapa: ref({
                 codigo: 'HOMOLOGAR',
                 mostrar: true,
-                habilitar: true,
+                habilitar: false,
                 rotuloBotao: 'Homologar',
                 mensagemSucesso: 'Mapa homologado',
             }),
@@ -212,7 +214,11 @@ describe("MapaView somente leitura", () => {
     }
 
     it("renderiza o corpo somente leitura e nao exibe botoes de manutencao", async () => {
-        const wrapper = mountComponent();
+        const wrapper = mountComponent({
+            perfil: {
+                perfilSelecionado: 'ADMIN',
+            },
+        });
         await flushPromises();
 
         expect(subprocessoService.obterMapaVisualizacao).toHaveBeenCalledWith(123);
@@ -221,9 +227,15 @@ describe("MapaView somente leitura", () => {
         expect(wrapper.text()).toContain("Conhecimento 1");
         expect((wrapper.vm as any).modoSomenteLeitura).toBe(true);
         expect(wrapper.find('[data-testid="btn-abrir-criar-competencia"]').exists()).toBe(false);
-        expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').exists()).toBe(false);
-        expect(wrapper.find('[data-testid="btn-mapa-validar"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="btn-mapa-homologar-aceite"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-historico"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acoes"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-devolver"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-devolver"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('[data-testid="btn-mapa-acao-disponibilizar"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-disponibilizar"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('[data-testid="btn-mapa-acao-validar"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-homologar-aceite"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-mapa-acao-homologar-aceite"]').attributes('disabled')).toBeDefined();
     });
 
     it("agrupa ações no botão Ações quando for ADMIN e mapa com sugestões", async () => {
@@ -231,8 +243,10 @@ describe("MapaView somente leitura", () => {
 
         vi.mocked(useAcessoModule.useAcesso).mockReturnValue({
             podeVisualizarImpacto: ref(false),
+            podeApresentarSugestoes: ref(false),
             podeEditarMapa: ref(true),
             podeDisponibilizarMapa: ref(true),
+            habilitarApresentarSugestoes: ref(false),
             habilitarEditarMapa: ref(true),
             habilitarDisponibilizarMapa: ref(true),
             podeValidarMapa: ref(false),
@@ -270,7 +284,15 @@ describe("MapaView somente leitura", () => {
         const wrapper = mountComponent();
         await flushPromises();
 
-        await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
+        await wrapper.find('[data-testid="btn-mapa-ver-sugestoes"]').trigger("click");
+        await flushPromises();
+
+        expect(subprocessoService.obterSugestoesMapa).toHaveBeenCalledWith(123);
+        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-texto"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-texto"]').text()).toContain("Sugestão persistida");
+        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa"]').exists()).toBe(false);
+
+        await wrapper.find('[data-testid="btn-mapa-acao-sugestoes"]').trigger("click");
         await flushPromises();
 
         expect(subprocessoService.obterSugestoesMapa).toHaveBeenCalledWith(123);

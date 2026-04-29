@@ -23,7 +23,6 @@
             id="observacaoAceiteMapa"
             v-model="observacao"
             data-testid="inp-aceite-mapa-observacao"
-            placeholder="Digite observacoes sobre o aceite..."
             rows="3"
         />
       </BFormGroup>

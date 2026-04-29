@@ -111,9 +111,9 @@ public class SubprocessoAcessoService {
                 .podeValidarMapa(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(situacao))
                 .podeApresentarSugestoes(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(situacao))
                 .podeVerSugestoes(contexto.isGestorOuAdmin() && SITUACOES_COM_SUGESTOES_MAPA.contains(situacao))
-                .podeDevolverMapa(verificarGerirMapa(contexto.isGestorOuAdmin(), situacao))
+                .podeDevolverMapa(verificarDevolverMapa(contexto))
                 .podeAceitarMapa(verificarGerirMapa(contexto.isGestor(), situacao))
-                .podeHomologarMapa(verificarGerirMapa(contexto.isAdmin(), situacao))
+                .podeHomologarMapa(verificarHomologarMapa(contexto))
                 .podeVisualizarImpacto(verificarVisualizarImpacto(contexto))
                 .build();
     }
@@ -186,6 +186,22 @@ public class SubprocessoAcessoService {
 
     private boolean verificarEditarMapa(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         return contexto.isAdmin() && SITUACOES_EDICAO_MAPA.contains(contexto.situacao());
+    }
+
+    private boolean verificarDevolverMapa(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        SituacaoSubprocesso situacao = contexto.situacao();
+        if (contexto.isAdmin()) {
+            return situacao == MAPEAMENTO_MAPA_COM_SUGESTOES || situacao == REVISAO_MAPA_COM_SUGESTOES;
+        }
+        return verificarGerirMapa(contexto.isGestor(), situacao);
+    }
+
+    private boolean verificarHomologarMapa(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        SituacaoSubprocesso situacao = contexto.situacao();
+        if (!contexto.isAdmin()) {
+            return false;
+        }
+        return situacao == MAPEAMENTO_MAPA_VALIDADO || situacao == REVISAO_MAPA_VALIDADO;
     }
 
     private boolean verificarGerirMapa(boolean isPermitido, SituacaoSubprocesso situacao) {

@@ -174,6 +174,8 @@ class SubprocessoAcessoServiceTest {
 
         assertThat(dto.podeEditarMapa()).isFalse();
         assertThat(dto.habilitarEditarMapa()).isFalse();
+        assertThat(dto.podeDevolverMapa()).isFalse();
+        assertThat(dto.habilitarDevolverMapa()).isFalse();
         assertThat(dto.podeHomologarMapa()).isTrue();
         assertThat(dto.habilitarHomologarMapa()).isTrue();
     }

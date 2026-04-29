@@ -368,9 +368,9 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("ADMIN deve poder homologar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
+    @DisplayName("ADMIN não deve poder homologar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
     @WithMockAdmin
-    void testHomologarValidacaoComSugestoes_Sucesso() throws Exception {
+    void testHomologarValidacaoComSugestoes_Bloqueado() throws Exception {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
         subprocessoRepo.save(subprocesso);
 
@@ -389,10 +389,10 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(
                         post("/api/subprocessos/{codigo}/homologar-validacao", subprocesso.getCodigo())
                                 .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isUnprocessableEntity());
 
         Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
     }
 
     @Test

@@ -11,26 +11,20 @@
 
         <template #actions>
           <div class="d-flex gap-2">
-            <BButton
-                v-if="podeValidar"
-                data-testid="btn-mapa-sugestoes"
-                variant="outline-secondary"
-                @click="abrirModalSugestoes"
-            >
-              {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
-            </BButton>
-
-            <BButton
+            <LoadingButton
                 v-if="podeVerSugestoes"
+                :loading="loadingSugestoesVisualizacao"
                 data-testid="btn-mapa-ver-sugestoes"
+                loading-text="Carregando..."
+                text="Ver sugestões"
                 variant="outline-secondary"
                 @click="verSugestoes"
             >
               {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
-            </BButton>
+            </LoadingButton>
 
             <BButton
-                v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
+                v-if="codigoSubprocesso"
                 data-testid="btn-mapa-historico"
                 variant="outline-secondary"
                 @click="verHistorico"
@@ -38,71 +32,6 @@
               {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
             </BButton>
 
-            <BDropdown
-                v-if="usarMenuAcoesMapaSugestoes"
-                data-testid="btn-mapa-acoes"
-                :text="TEXTOS.mapa.BOTAO_ACOES"
-                toggle-class="text-nowrap"
-                variant="success"
-            >
-              <BDropdownItemButton
-                  v-if="podeAnalisar"
-                  data-testid="btn-mapa-acao-devolver"
-                  :disabled="!habilitarDevolverMapa"
-                  @click="abrirModalDevolucao"
-              >
-                {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
-              </BDropdownItemButton>
-              <BDropdownItemButton
-                  v-if="acaoPrincipalMapa?.mostrar"
-                  data-testid="btn-mapa-acao-homologar-aceite"
-                  :disabled="!acaoPrincipalMapa.habilitar"
-                  @click="abrirModalAceitar"
-              >
-                {{ acaoPrincipalMapa.rotuloBotao }}
-              </BDropdownItemButton>
-              <BDropdownItemButton
-                  v-if="podeDisponibilizarMapa"
-                  data-testid="btn-mapa-acao-disponibilizar"
-                  :disabled="loadingDisponibilizacao"
-                  @click="abrirModalDisponibilizar"
-              >
-                {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
-              </BDropdownItemButton>
-            </BDropdown>
-
-            <BButton
-                v-if="podeAnalisar && !usarMenuAcoesMapaSugestoes"
-                data-testid="btn-mapa-devolver"
-                :disabled="!habilitarDevolverMapa"
-                variant="secondary"
-                @click="abrirModalDevolucao"
-            >
-              {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
-            </BButton>
-
-            <BButton
-                v-if="podeValidar"
-                data-testid="btn-mapa-validar"
-                :disabled="!habilitarValidar"
-                variant="success"
-                @click="abrirModalValidar"
-            >
-              {{ TEXTOS.mapa.BOTAO_VALIDAR }}
-            </BButton>
-
-            <BButton
-                v-if="acaoPrincipalMapa?.mostrar && !usarMenuAcoesMapaSugestoes"
-                data-testid="btn-mapa-homologar-aceite"
-                :disabled="!acaoPrincipalMapa.habilitar"
-                variant="success"
-                @click="abrirModalAceitar"
-            >
-              {{ acaoPrincipalMapa.rotuloBotao }}
-            </BButton>
-          </div>
-
-          <div v-if="podeVisualizarImpacto || (podeDisponibilizarMapa && !usarMenuAcoesMapaSugestoes)" class="d-flex gap-2 ms-3 ps-3 border-start">
             <LoadingButton
                 v-if="podeVisualizarImpacto"
                 :loading="loadingImpacto"
@@ -112,15 +41,55 @@
                 variant="outline-secondary"
                 @click="abrirModalImpacto"
             />
-            <BButton
-                v-if="podeDisponibilizarMapa && !usarMenuAcoesMapaSugestoes"
-                :disabled="loadingDisponibilizacao"
-                data-testid="btn-cad-mapa-disponibilizar"
+
+            <BDropdown
+                v-if="usarMenuAcoesMapa"
+                data-testid="btn-mapa-acoes"
+                :text="TEXTOS.mapa.BOTAO_ACOES"
+                toggle-class="text-nowrap"
                 variant="success"
-                @click="abrirModalDisponibilizar"
             >
-              {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
-            </BButton>
+              <BDropdownItemButton
+                  v-if="podeApresentarSugestoes"
+                  data-testid="btn-mapa-acao-sugestoes"
+                  :disabled="!habilitarApresentarSugestoes"
+                  @click="abrirModalSugestoes"
+              >
+                {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="podeValidar"
+                  data-testid="btn-mapa-acao-validar"
+                  :disabled="!habilitarValidar"
+                  @click="abrirModalValidar"
+              >
+                {{ TEXTOS.mapa.BOTAO_VALIDAR }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="mostrarDisponibilizarMapa"
+                  data-testid="btn-mapa-acao-disponibilizar"
+                  :disabled="!habilitarDisponibilizarMapa || loadingDisponibilizacao"
+                  @click="abrirModalDisponibilizar"
+              >
+                {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="mostrarAcaoDevolverMapa"
+                  data-testid="btn-mapa-acao-devolver"
+                  :disabled="!habilitarDevolverMapa"
+                  @click="abrirModalDevolucao"
+              >
+                {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  v-if="mostrarAcaoPrincipalMapa"
+                  data-testid="btn-mapa-acao-homologar-aceite"
+                  :disabled="!habilitarAcaoPrincipalMapa"
+                  @click="abrirModalAceitar"
+              >
+                {{ rotuloAcaoPrincipalMapa }}
+              </BDropdownItemButton>
+            </BDropdown>
           </div>
         </template>
       </PageHeader>
@@ -229,15 +198,24 @@
           :mostrar-botao-acao="false"
           test-codigo-cancelar="btn-ver-sugestoes-mapa-fechar"
           texto-cancelar="Fechar"
-          titulo="Sugestões"
+          titulo="Sugestões sobre o mapa"
           @fechar="fecharModalVerSugestoes"
       >
-        <BFormGroup
-            label="Sugestões registradas para o mapa de competências:"
-            label-for="sugestoesVisualizacao"
-            class="mb-3"
-        >
+        <BFormGroup class="mb-3">
+          <template #label>
+            Sugestões registradas para o mapa de competências:
+          </template>
+
+          <div
+              v-if="!isChefe"
+              data-testid="txt-ver-sugestoes-mapa-texto"
+              class="border rounded p-3 bg-light white-space-pre-line"
+          >
+            {{ sugestoesVisualizacao }}
+          </div>
+
           <BFormTextarea
+              v-else
               id="sugestoesVisualizacao"
               v-model="sugestoesVisualizacao"
               data-testid="txt-ver-sugestoes-mapa"
@@ -379,6 +357,7 @@ import {apresentarSugestoes as apresentarSugestoesService} from "@/services/proc
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import logger from "@/utils/logger";
+import {Perfil} from "@/types/tipos";
 import type {
   Analise,
   Atividade,
@@ -387,7 +366,6 @@ import type {
   MapaVisualizacao,
   SalvarCompetenciaRequest,
 } from "@/types/tipos";
-import {SituacaoSubprocesso} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -408,13 +386,15 @@ const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
-const {isAdmin} = usePerfil();
+const {isAdmin, perfilSelecionado} = usePerfil();
 
 const {
   podeVisualizarImpacto,
   podeValidarMapa,
+  podeApresentarSugestoes,
   podeEditarMapa,
-  podeDisponibilizarMapa,
+  habilitarApresentarSugestoes,
+  habilitarDisponibilizarMapa,
   habilitarEditarMapa,
   habilitarValidarMapa,
   podeAnalisarMapa,
@@ -429,21 +409,23 @@ const podeAnalisar = computed(() => {
       podeAnalisarMapa.value
   );
 });
-const situacaoMapaComSugestoes = computed(() => {
-  const situacao = subprocesso.value?.situacao;
-  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES
-      || situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
+const usarMenuAcoesMapa = computed(() => {
+  return podeApresentarSugestoes.value
+      || podeValidar.value
+      || podeAnalisar.value
+      || Boolean(acaoPrincipalMapa.value?.mostrar)
+      || mostrarDisponibilizarMapa.value;
 });
-const usarMenuAcoesMapaSugestoes = computed(() => {
-  if (!isAdmin.value || !situacaoMapaComSugestoes.value) {
-    return false;
-  }
-  return podeAnalisar.value || Boolean(acaoPrincipalMapa.value?.mostrar) || podeDisponibilizarMapa.value;
-});
+const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
+const mostrarDisponibilizarMapa = computed(() => isAdmin.value && Boolean(subprocesso.value));
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
 const podeValidar = computed(() => podeValidarMapa?.value ?? false);
 const habilitarValidar = computed(() => habilitarValidarMapa?.value ?? false);
 const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
+const mostrarAcaoDevolverMapa = computed(() => isAdmin.value || podeAnalisar.value);
+const mostrarAcaoPrincipalMapa = computed(() => isAdmin.value || Boolean(acaoPrincipalMapa.value?.mostrar));
+const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);
+const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);
 
 const atividades = ref<Atividade[]>([]);
 const competencias = ref<Competencia[]>([]);
@@ -471,6 +453,7 @@ const mostrarModalVerSugestoes = ref(false);
 const mostrarModalHistorico = ref(false);
 const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
+const loadingSugestoesVisualizacao = ref(false);
 
 const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
@@ -539,16 +522,30 @@ async function sincronizarSugestoesMapa(): Promise<string> {
 async function carregarSugestoesParaVisualizacao() {
   try {
     sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
+    return true;
   } catch (error) {
     logger.error(error);
     notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+    return false;
   }
 }
 
-function verSugestoes() {
-  mostrarModalVerSugestoes.value = true;
+async function verSugestoes() {
+  if (loadingSugestoesVisualizacao.value) {
+    return;
+  }
+
   sugestoesVisualizacao.value = "";
-  void carregarSugestoesParaVisualizacao();
+  loadingSugestoesVisualizacao.value = true;
+
+  try {
+    const carregou = await carregarSugestoesParaVisualizacao();
+    if (carregou) {
+      mostrarModalVerSugestoes.value = true;
+    }
+  } finally {
+    loadingSugestoesVisualizacao.value = false;
+  }
 }
 
 function fecharModalVerSugestoes() {

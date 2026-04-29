@@ -634,7 +634,7 @@ public class ProcessoService {
             Usuario usuario,
             @Nullable Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        return isSituacaoMapaAnaliseConcluida(subprocesso.getSituacao())
+        return isSituacaoMapaAceitavel(subprocesso.getSituacao())
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, ACEITAR_MAPA, localizacoesPrecarregadas);
     }
 
@@ -652,7 +652,7 @@ public class ProcessoService {
             Usuario usuario,
             @Nullable Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        return isSituacaoMapaAnaliseConcluida(subprocesso.getSituacao())
+        return isSituacaoMapaHomologavel(subprocesso.getSituacao())
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, HOMOLOGAR_MAPA, localizacoesPrecarregadas);
     }
 
@@ -858,10 +858,15 @@ public class ProcessoService {
         return situacao == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || situacao == REVISAO_CADASTRO_DISPONIBILIZADA;
     }
 
-    private boolean isSituacaoMapaAnaliseConcluida(SituacaoSubprocesso situacao) {
+    private boolean isSituacaoMapaAceitavel(SituacaoSubprocesso situacao) {
         return situacao == MAPEAMENTO_MAPA_COM_SUGESTOES
                 || situacao == MAPEAMENTO_MAPA_VALIDADO
                 || situacao == REVISAO_MAPA_COM_SUGESTOES
+                || situacao == REVISAO_MAPA_VALIDADO;
+    }
+
+    private boolean isSituacaoMapaHomologavel(SituacaoSubprocesso situacao) {
+        return situacao == MAPEAMENTO_MAPA_VALIDADO
                 || situacao == REVISAO_MAPA_VALIDADO;
     }
 
