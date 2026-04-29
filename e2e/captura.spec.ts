@@ -8,7 +8,7 @@ import {
     iniciarProcessoPeloCadastro,
     obterAcaoBloco
 } from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso, verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -16,6 +16,7 @@ import {
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
 import {
+    abrirAcaoCadastroPrincipal,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
@@ -622,7 +623,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, 'processo', 'analise-gestor', {
                 extra: { perfil: 'GESTOR', unidade: unidadeAlvo, acao: 'analise-cadastro' }
             });
-            await page.getByTestId('btn-acao-analisar-principal').click();
+            await (await abrirAcaoCadastroPrincipal(page)).click();
             await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, 'processo', 'modal-aceite-gestor', {
                 tags: ['modal', 'aceite']
@@ -635,7 +636,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaCadastro(page);
-            await page.getByTestId('btn-acao-analisar-principal').click();
+            await (await abrirAcaoCadastroPrincipal(page)).click();
             await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, 'processo', 'modal-homologacao-admin', {
                 tags: ['modal', 'homologacao'],
@@ -999,7 +1000,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['cadastro', 'analise', 'somente-leitura'],
                 extra: { perfil: 'GESTOR_COORD', acao: 'aceite-cadastro-1' }
             });
-            await page.getByTestId('btn-acao-analisar-principal').click();
+            await (await abrirAcaoCadastroPrincipal(page)).click();
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro muito bem detalhado. Seguindo para a Secretaria.');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
@@ -1012,7 +1013,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['cadastro', 'analise', 'somente-leitura'],
                 extra: { perfil: 'GESTOR_SEC', acao: 'aceite-cadastro-2' }
             });
-            await page.getByTestId('btn-acao-analisar-principal').click();
+            await (await abrirAcaoCadastroPrincipal(page)).click();
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Ok. Para homologação do ADMIN.');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
@@ -1025,7 +1026,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Entrar no cadastro de atividades (visualização)
             await navegarParaCadastro(page);
 
-            await page.getByTestId('btn-acao-analisar-principal').click();
+            await (await abrirAcaoCadastroPrincipal(page)).click();
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
             // Agora o Mapa deve estar habilitado para edição pelo Admin
@@ -1321,7 +1322,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, 'gestao-subprocessos', 'detalhes-subprocesso-admin', { fullPage: true, extra: { perfil: 'ADMIN' } });
 
             // Modal de alterar data limite (CDU-27)
-            const btnAlterarData = page.getByRole('button', {name: /Alterar.*data.*limite/i});
+            const btnAlterarData = await obterAcaoCabecalhoSubprocesso(page, 'btn-alterar-data-limite');
             await expect(btnAlterarData).toBeVisible();
             await btnAlterarData.click();
             await expect(page.getByRole('dialog')).toBeVisible();
@@ -1329,12 +1330,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Modal de reabrir cadastro (CDU-32)
-            const btnReabrirCadastro = page.getByRole('button', {name: /Reabrir.*cadastro/i});
+            const btnReabrirCadastro = await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro');
             await expect(btnReabrirCadastro).toBeVisible();
             await expect(btnReabrirCadastro).toBeDisabled();
 
             // CDU-34: Botão de enviar lembrete (ação direta, sem modal)
-            const btnEnviarLembrete = page.getByRole('button', {name: /Enviar.*lembrete/i});
+            const btnEnviarLembrete = await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete');
             await expect(btnEnviarLembrete).toBeVisible();
             await capturarTela(page, 'gestao-subprocessos', 'botao-enviar-lembrete', { tags: ['acao-direta'] });
         });
