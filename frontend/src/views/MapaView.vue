@@ -43,7 +43,7 @@
                 data-testid="btn-mapa-acoes"
                 :text="TEXTOS.mapa.BOTAO_ACOES"
                 toggle-class="text-nowrap"
-                variant="secondary"
+                variant="success"
             >
               <BDropdownItemButton
                   v-if="podeAnalisar"
