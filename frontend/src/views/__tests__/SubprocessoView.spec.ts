@@ -194,6 +194,10 @@ describe('SubprocessoView.vue', () => {
             podeReabrirCadastro: ref(true),
             podeReabrirRevisao: ref(true),
             podeEnviarLembrete: ref(true),
+            mostrarAlterarDataLimite: ref(true),
+            mostrarReabrirCadastro: ref(true),
+            mostrarReabrirRevisao: ref(true),
+            mostrarEnviarLembrete: ref(true),
             podeDisponibilizarCadastro: ref(true),
             podeEditarCadastro: ref(true),
             ...accessOverrides

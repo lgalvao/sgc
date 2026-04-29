@@ -17,14 +17,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoVisualizacaoServiceTest {
-
-    @Mock private UsuarioFacade usuarioFacade;
-    @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private MapaVisualizacaoService mapaVisualizacaoService;
     @Mock private ImpactoMapaService impactoMapaService;
     @Mock private SubprocessoAcessoService acessoService;
-    @Mock private AnaliseRepo analiseRepo;
-    @Mock private AnaliseHistoricoService analiseHistoricoService;
 
     @InjectMocks
     private SubprocessoVisualizacaoService service;
