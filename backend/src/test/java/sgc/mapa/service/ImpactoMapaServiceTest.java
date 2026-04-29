@@ -9,8 +9,8 @@ import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.seguranca.*;
-import sgc.processo.model.Processo;
 import sgc.subprocesso.model.*;
 
 import java.util.*;

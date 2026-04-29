@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {normalizeError} from "@/utils/apiError";
 import {createTestingPinia} from "@pinia/testing";
 import {setActivePinia} from "pinia";
+import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/cadastroService", () => ({
     disponibilizarCadastro: vi.fn(),

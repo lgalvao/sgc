@@ -5,6 +5,7 @@ import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {Atividade, ProcessoResumo, UnidadeImportacao} from "@/types/tipos";
 import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
+import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/subprocessoService", () => ({
     importarAtividades: vi.fn(),

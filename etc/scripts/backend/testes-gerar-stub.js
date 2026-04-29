@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import xml2js from "xml2js";
 import {exibirAjudaComando} from "./lib/cli-ajuda.js";
+
 const ROOT_DIR = path.join(import.meta.dirname, '../../..');
 const BASE_DIR = path.join(ROOT_DIR, 'backend');
 const REPORT_PATH = path.join(BASE_DIR, 'build/reports/jacoco/test/jacocoTestReport.xml');

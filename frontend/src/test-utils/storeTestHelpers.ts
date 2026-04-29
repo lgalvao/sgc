@@ -1,5 +1,6 @@
 import {createPinia, setActivePinia} from "pinia";
 import {beforeEach, expect, it, vi} from "vitest";
+import {Error} from "storybook/internal/components";
 
 /**
  * Utilitário para configurar testes de Store com Pinia

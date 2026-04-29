@@ -4,6 +4,7 @@ import {ref} from 'vue';
 import RelatorioAndamentoView from '@/views/RelatorioAndamentoView.vue';
 import * as painelService from '@/services/painelService';
 import {TEXTOS} from '@/constants/textos';
+import {Error} from "storybook/internal/components";
 
 const buscarRelatorioAndamento = vi.fn();
 const exportarAndamentoPdf = vi.fn();

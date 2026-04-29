@@ -1,4 +1,4 @@
-import {SituacaoProcesso, SituacaoSubprocesso, TipoProcesso, type Atividade} from '@/types/tipos';
+import {type Atividade, SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 
 export function formatDate(date: string | Date | undefined | null, includeTime = true): string {
     if (!date) return '';

@@ -1,5 +1,5 @@
 import {ref, type Ref} from "vue";
-import type {ContextoCadastroAtividadesSubprocesso, RespostaLocalCadastro, Atividade, Unidade} from "@/types/tipos";
+import type {Atividade, ContextoCadastroAtividadesSubprocesso, RespostaLocalCadastro, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import logger from "@/utils/logger";

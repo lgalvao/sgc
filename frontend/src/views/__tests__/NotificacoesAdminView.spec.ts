@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, flushPromises } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
 import NotificacoesAdminView from '../NotificacoesAdminView.vue';
-import { createTestingPinia } from '@pinia/testing';
-import { createRouter, createMemoryHistory } from 'vue-router';
-import { listarNotificacoesAdmin, reenviarNotificacao } from '@/services/notificacaoService';
+import {createTestingPinia} from '@pinia/testing';
+import {createMemoryHistory, createRouter} from 'vue-router';
+import {listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
 
 vi.mock('@/services/notificacaoService', () => ({
   listarNotificacoesAdmin: vi.fn(),

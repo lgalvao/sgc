@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
+import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/subprocessoService", () => ({
     obterMapaCompleto: vi.fn(),

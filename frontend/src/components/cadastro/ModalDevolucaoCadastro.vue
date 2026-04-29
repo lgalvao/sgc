@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { BFormGroup, BFormTextarea, BFormInvalidFeedback } from 'bootstrap-vue-next';
+import {computed} from 'vue';
+import {BFormGroup, BFormInvalidFeedback, BFormTextarea} from 'bootstrap-vue-next';
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
-import { TEXTOS } from "@/constants/textos";
+import {TEXTOS} from "@/constants/textos";
 
 interface Props {
   modelValue: boolean;

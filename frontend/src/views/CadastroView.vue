@@ -154,11 +154,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BFormCheckbox,
-  BSpinner
-} from "bootstrap-vue-next";
+import {BAlert, BFormCheckbox, BSpinner} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
@@ -186,14 +182,14 @@ import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
 import {
   type AceitarCadastroRequest,
-  type PermissoesSubprocesso,
   type Analise,
   type Atividade,
   type AtividadeOperacaoResponse,
+  type CriarConhecimentoRequest,
   type DevolverCadastroRequest,
   type ErroValidacao,
   type HomologarCadastroRequest,
-  type CriarConhecimentoRequest,
+  type PermissoesSubprocesso,
   type RespostaLocalCadastro,
   SituacaoSubprocesso,
   TipoProcesso
@@ -203,6 +199,9 @@ import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/for
 import * as atividadeService from "@/services/atividadeService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
+import {Error} from "storybook/internal/components";
+import Property from "storybook/theming";
+import ScrollBehavior = Property.ScrollBehavior;
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; atividadeCodigo: number; conhecimentoCodigo?: number } | null;
 

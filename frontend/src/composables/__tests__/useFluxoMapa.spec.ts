@@ -3,6 +3,7 @@ import {useFluxoMapa} from "../useFluxoMapa";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as processoService from "@/services/processoService";
 import {useMapas} from "@/composables/useMapas";
+import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/subprocessoService", () => ({
     salvarMapaCompleto: vi.fn(),

@@ -5,6 +5,7 @@ import {usePerfilStore} from "@/stores/perfil";
 import {createTestingPinia} from "@pinia/testing";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import * as processoService from "@/services/processoService";
+import {Error} from "storybook/internal/components";
 
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),

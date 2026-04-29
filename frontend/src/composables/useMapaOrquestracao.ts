@@ -1,5 +1,5 @@
 import {ref, type Ref} from "vue";
-import type {ContextoEdicaoSubprocesso, Atividade, Competencia, Unidade, MapaVisualizacao} from "@/types/tipos";
+import type {Atividade, Competencia, ContextoEdicaoSubprocesso, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapas} from "@/composables/useMapas";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";

@@ -3,6 +3,7 @@ import {ref} from "vue";
 import {useMapaAcoesAnalise} from "../useMapaAcoesAnalise";
 import * as processoService from "@/services/processoService";
 import {TEXTOS} from "@/constants/textos";
+import {Error} from "storybook/internal/components";
 
 vi.mock("@/services/processoService", () => ({
     aceitarValidacao: vi.fn(),

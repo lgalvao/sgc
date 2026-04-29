@@ -2,20 +2,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import {exibirAjudaComando} from "./lib/cli-ajuda.js";
-import {extrairCoberturaJacoco, lerRelatorioJacoco} from "../lib/dominios/cobertura-java.js";
+import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {
-    EXTENSAO_JAVA,
     CATEGORIAS_PRIORITARIAS,
     CATEGORIAS_SECUNDARIAS,
-    SUFIXOS_TESTE,
-    normalizarCaminho,
-    inferirCategoria,
-    lerConteudoFonte,
     classificarPerfilDto,
     classificarPerfilModel,
     classificarPerfilOther,
     construirNomeClasseCompleto,
-    criarItemRelatorio
+    criarItemRelatorio,
+    EXTENSAO_JAVA,
+    inferirCategoria,
+    lerConteudoFonte,
+    normalizarCaminho,
+    SUFIXOS_TESTE
 } from "./lib/testes-analisar-regras.js";
 
 function parseArgs(argv) {

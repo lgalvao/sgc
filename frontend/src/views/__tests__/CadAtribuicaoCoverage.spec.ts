@@ -3,6 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {getCommonMountOptions} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
+import {Error} from "storybook/internal/components";
 
 vi.mock('vue-router', () => ({
     useRouter: () => ({

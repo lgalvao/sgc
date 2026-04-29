@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
-import { mount, flushPromises } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {ref} from 'vue';
+import {flushPromises, mount} from '@vue/test-utils';
 import CadastroView from '../CadastroView.vue';
-import { createTestingPinia } from '@pinia/testing';
-import { createRouter, createMemoryHistory } from 'vue-router';
-import { useSubprocessoStore } from '@/stores/subprocesso';
-import { SituacaoSubprocesso } from '@/types/tipos';
+import {createTestingPinia} from '@pinia/testing';
+import {createMemoryHistory, createRouter} from 'vue-router';
+import {useSubprocessoStore} from '@/stores/subprocesso';
+import {SituacaoSubprocesso} from '@/types/tipos';
 
 vi.mock('@/composables/useAcesso', () => ({
   useAcesso: vi.fn(() => ({

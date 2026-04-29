@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
-import path from "node:path";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
-import {imprimirCabecalho, imprimirJson, escreverLinha} from "../lib/saida.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 const CAMINHO_PADRAO_OUTPUT = "backend-coverage-auditoria.md";
 

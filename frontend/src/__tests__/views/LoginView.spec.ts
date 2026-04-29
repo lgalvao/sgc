@@ -7,6 +7,7 @@ import {useRouter} from "vue-router";
 import {Perfil} from "@/types/tipos";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
+import {Error} from "storybook/internal/components";
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),

@@ -201,6 +201,7 @@ import {buscarUnidadePorCodigo as buscarUnidadeServico} from "@/services/unidade
 import {pesquisarUsuarios} from "@/services/usuarioService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
+import {Error} from "storybook/internal/components";
 
 const props = defineProps<{ codUnidade: number }>();
 

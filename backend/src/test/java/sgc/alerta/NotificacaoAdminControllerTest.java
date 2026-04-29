@@ -6,9 +6,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
-import sgc.alerta.dto.*;
-import sgc.alerta.model.NotificacaoEmail;
-import sgc.alerta.model.SituacaoNotificacao;
+import sgc.alerta.model.*;
 
 import java.time.*;
 import java.util.*;

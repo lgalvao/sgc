@@ -327,7 +327,15 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BDropdown, BDropdownItemButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {
+  BAlert,
+  BButton,
+  BDropdown,
+  BDropdownItemButton,
+  BFormGroup,
+  BFormInvalidFeedback,
+  BFormTextarea
+} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
@@ -357,7 +365,6 @@ import {apresentarSugestoes as apresentarSugestoesService} from "@/services/proc
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import logger from "@/utils/logger";
-import {Perfil} from "@/types/tipos";
 import type {
   Analise,
   Atividade,
@@ -366,6 +373,7 @@ import type {
   MapaVisualizacao,
   SalvarCompetenciaRequest,
 } from "@/types/tipos";
+import {Perfil} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";

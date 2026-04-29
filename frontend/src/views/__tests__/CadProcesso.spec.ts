@@ -6,6 +6,7 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import * as unidadeService from '@/services/unidadeService';
 import * as processoService from '@/services/processoService';
 import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import {Error} from "storybook/internal/components";
 
 vi.mock('@/services/processoService', () => ({
     obterDetalhesProcesso: vi.fn(),

@@ -1,4 +1,5 @@
 import logger from '@/utils/logger';
+import {Error} from "storybook/internal/components";
 
 type ErrorLike = {
     stack?: string;

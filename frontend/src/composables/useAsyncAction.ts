@@ -1,4 +1,5 @@
 import {ref} from "vue";
+import {Error} from "storybook/internal/components";
 
 /**
  * Composable que encapsula o padrão try/catch/loading/erro

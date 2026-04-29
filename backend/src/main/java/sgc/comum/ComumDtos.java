@@ -1,7 +1,7 @@
 package sgc.comum;
 
 import jakarta.validation.constraints.*;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.*;
 
 import java.time.*;
 

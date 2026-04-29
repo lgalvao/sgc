@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
-import {imprimirCabecalho, imprimirJson, escreverLinha} from "../lib/saida.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 const CAMINHO_PADRAO_OUTPUT = "frontend-coverage-auditoria.md";
 

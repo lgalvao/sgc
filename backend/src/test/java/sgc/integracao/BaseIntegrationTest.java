@@ -2,8 +2,8 @@ package sgc.integracao;
 
 import com.icegreen.greenmail.store.*;
 import com.icegreen.greenmail.util.*;
-import jakarta.mail.internet.*;
 import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import org.awaitility.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
