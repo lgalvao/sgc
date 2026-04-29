@@ -7,6 +7,9 @@ const DIRETORIO_SCRIPTS = path.resolve(DIRETORIO_LIB, "..");
 const DIRETORIO_RAIZ = path.resolve(DIRETORIO_SCRIPTS, "..", "..");
 
 function resolverNaRaiz(...segmentos) {
+    if (segmentos.length > 0 && path.isAbsolute(segmentos[0])) {
+        return path.join(...segmentos);
+    }
     return path.join(DIRETORIO_RAIZ, ...segmentos);
 }
 
