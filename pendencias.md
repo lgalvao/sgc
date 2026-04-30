@@ -1,7 +1,6 @@
-colegar perfis maiores antes do menores
-toast largo demais
-arvore treetable remover visual zebrado e enfase
+Colegar perfis maiores antes do menores
+Toast largo demais
+
 Tela de subprocesso, compactar detalhes
-Card titulo em cadastro grande demais
 Atualizar os cdus 
-Definir se as notificações deve ser limpadas ao finalizar um processo
+As notificações deve ser limpadas ao finalizar um processo so depois de um prazo

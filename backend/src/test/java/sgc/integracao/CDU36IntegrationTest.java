@@ -22,28 +22,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-36: Gerar relatório de mapas")
 class CDU36IntegrationTest extends BaseIntegrationTest {
-    private static final String API_REL_MAPAS = "/api/relatorios/mapas/{codProcesso}/exportar";
+    private static final String API_REL_MAPAS = "/api/relatorios/mapas/exportar";
 
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
 
     private Unidade unidade;
-    private Processo processo;
 
     @BeforeEach
     void setUp() {
         // Obter unidade
         unidade = unidadeRepo.findById(1L).orElseThrow();
 
-        // Criar processo
-        processo = ProcessoFixture.processoPadrao();
+        // Criar subprocesso
+        Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setDescricao("Processo CDU-36");
         processo = processoRepo.save(processo);
 
-        // Criar subprocesso
         Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -53,7 +53,11 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
         // Criar mapa (opcional, mas ajuda a tornar o teste mais realista)
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);
-        mapaRepo.save(mapa);
+        mapa = mapaRepo.save(mapa);
+        unidadeMapaRepo.save(UnidadeMapa.builder()
+                .unidadeCodigo(unidade.getCodigo())
+                .mapaVigente(mapa)
+                .build());
 
         entityManager.flush();
         entityManager.clear();
@@ -63,20 +67,22 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve gerar relatório de mapas em PDF quando ADMIN")
     @WithMockAdmin
     void gerarRelatorioMapas_comoAdmin_sucesso() throws Exception {
-        // When/Then - Relatório de todos os mapas do processo
-        mockMvc.perform(get(API_REL_MAPAS, processo.getCodigo()).with(csrf()))
+        mockMvc.perform(get(API_REL_MAPAS)
+                        .param("codUnidade", unidade.getCodigo().toString())
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/pdf"))
                 .andExpect(header().exists("Content-Disposition"));
     }
 
     @Test
-    @DisplayName("Deve gerar relatório de mapas filtrado por unidade quando ADMIN")
+    @DisplayName("Deve gerar relatório de mapas para múltiplas unidades quando ADMIN")
     @WithMockAdmin
-    void gerarRelatorioMapas_filtradoPorUnidade_sucesso() throws Exception {
-        // When/Then - Relatório filtrado por unidade específica
-        mockMvc.perform(get(API_REL_MAPAS, processo.getCodigo())
-                        .param("codUnidade", unidade.getCodigo().toString()).with(csrf()))
+    void gerarRelatorioMapas_multiplasUnidades_sucesso() throws Exception {
+        mockMvc.perform(get(API_REL_MAPAS)
+                        .param("codUnidade", unidade.getCodigo().toString())
+                        .param("codUnidade", "999999")
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/pdf"))
                 .andExpect(header().exists("Content-Disposition"));
@@ -86,16 +92,17 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir gerar relatório de mapas sem ser ADMIN")
     @WithMockUser(roles = "GESTOR")
     void gerarRelatorioMapas_semPermissao_proibido() throws Exception {
-        // When/Then
-        mockMvc.perform(get(API_REL_MAPAS, processo.getCodigo()).with(csrf()))
+        mockMvc.perform(get(API_REL_MAPAS)
+                        .param("codUnidade", unidade.getCodigo().toString())
+                        .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @DisplayName("Deve retornar erro ao gerar relatório de processo inexistente")
+    @DisplayName("Deve retornar erro quando não houver parâmetro de unidade")
     @WithMockAdmin
-    void gerarRelatorioMapas_processoInexistente_erro() throws Exception {
-        // When/Then
-        mockMvc.perform(get(API_REL_MAPAS, 99999L).with(csrf())).andExpect(status().is4xxClientError());
+    void gerarRelatorioMapas_semUnidade_erro() throws Exception {
+        mockMvc.perform(get(API_REL_MAPAS).with(csrf()))
+                .andExpect(status().is4xxClientError());
     }
 }

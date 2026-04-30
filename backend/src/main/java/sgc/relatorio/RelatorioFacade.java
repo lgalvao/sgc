@@ -37,8 +37,6 @@ public class RelatorioFacade {
 
     private static final Color COR_PRIMARIA = new Color(30, 64, 124);
     private static final Color COR_SECUNDARIA = new Color(86, 108, 141);
-    private static final Color COR_TABELA_CABECALHO = new Color(218, 226, 239);
-    private static final Color COR_TABELA_ALTERNADA = new Color(245, 247, 250);
     private static final Color COR_BORDA = new Color(194, 201, 209);
     private static final Font FONTE_TITULO = new Font(Font.HELVETICA, 18, Font.BOLD, COR_PRIMARIA);
     private static final Font FONTE_SUBTITULO = new Font(Font.HELVETICA, 11, Font.NORMAL, COR_SECUNDARIA);
@@ -46,6 +44,8 @@ public class RelatorioFacade {
     private static final Font FONTE_TEXTO = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.DARK_GRAY);
     private static final Font FONTE_TEXTO_NEGRITO = new Font(Font.HELVETICA, 10, Font.BOLD, COR_PRIMARIA);
     private static final Font FONTE_TEXTO_SUAVE = new Font(Font.HELVETICA, 9, Font.NORMAL, COR_SECUNDARIA);
+    private static final Font FONTE_TEXTO_CORPO = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
+    private static final Font FONTE_TEXTO_CORPO_SUAVE = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.BLACK);
 
     private final ProcessoService processoService;
     private final SubprocessoConsultaService consultaService;
@@ -80,6 +80,7 @@ public class RelatorioFacade {
 
             adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
                     "Relatório de Andamento",
+                    "Processo",
                     processo.getDescricao(),
                     dataGeracao,
                     processo.getTipo().name(),
@@ -103,14 +104,13 @@ public class RelatorioFacade {
             document.open();
             adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
                     "Relatório de Mapas Vigentes",
+                    "Escopo",
                     "Unidades selecionadas",
                     dataGeracao,
                     null,
                     0,
                     null
             ));
-            adicionarResumo(document, criarResumoMapas(subprocessos, dataGeracao));
-            document.add(criarTituloSecao("Mapas consolidados"));
 
             for (Subprocesso sp : subprocessos) {
                 List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(sp.getMapa().getCodigo());
@@ -252,7 +252,7 @@ public class RelatorioFacade {
         celulaTexto.setVerticalAlignment(Element.ALIGN_MIDDLE);
         celulaTexto.addElement(criarParagrafo(NOME_SISTEMA, FONTE_SUBTITULO, 0f));
         celulaTexto.addElement(criarParagrafo(cabecalho.titulo(), FONTE_TITULO, 0f));
-        celulaTexto.addElement(criarParagrafo("Processo: %s".formatted(cabecalho.subtitulo()), FONTE_TEXTO, 0f));
+        celulaTexto.addElement(criarParagrafo("%s: %s".formatted(cabecalho.rotuloSubtitulo(), cabecalho.subtitulo()), FONTE_TEXTO, 0f));
         
         if (cabecalho.tipoProcesso() != null) {
             String subtituloDetalhe = "TIPO: %s | UNIDADES: %d | DATA LIMITE GERAL: %s".formatted(
@@ -371,87 +371,34 @@ public class RelatorioFacade {
         return p;
     }
 
-    private void adicionarResumo(Document document, LinkedHashMap<String, String> resumo) throws DocumentException {
-        PdfPTable tabelaResumo = new PdfPTable(new float[]{1.4f, 3.6f, 1.4f, 3.6f});
-        tabelaResumo.setWidthPercentage(100f);
-        tabelaResumo.setSpacingAfter(14f);
-
-        List<Map.Entry<String, String>> entradas = new ArrayList<>(resumo.entrySet());
-        for (int i = 0; i < entradas.size(); i += 2) {
-            adicionarLinhaResumo(tabelaResumo, entradas.get(i));
-            if (i + 1 < entradas.size()) {
-                adicionarLinhaResumo(tabelaResumo, entradas.get(i + 1));
-                continue;
-            }
-            tabelaResumo.addCell(criarCelulaResumoRotulo(""));
-            tabelaResumo.addCell(criarCelulaResumoValor(""));
-        }
-
-        document.add(tabelaResumo);
-    }
-
-    private LinkedHashMap<String, String> criarResumoMapas(List<Subprocesso> subprocessos, LocalDateTime dataGeracao) {
-        LinkedHashMap<String, String> resumo = new LinkedHashMap<>();
-        resumo.put("Unidades", Integer.toString(subprocessos.size()));
-        resumo.put("Gerado em", formatarDataHora(dataGeracao));
-        resumo.put("Tipo", "Mapas vigentes");
-        return resumo;
-    }
-
-    private void adicionarLinhaResumo(PdfPTable tabelaResumo, Map.Entry<String, String> entrada) {
-        tabelaResumo.addCell(criarCelulaResumoRotulo(entrada.getKey()));
-        tabelaResumo.addCell(criarCelulaResumoValor(entrada.getValue()));
-    }
-
     private void adicionarSecaoMapa(Document document, Unidade unidade, List<Competencia> competencias) throws DocumentException {
-        PdfPTable cartao = new PdfPTable(1);
-        cartao.setWidthPercentage(100f);
-        cartao.setSpacingAfter(10f);
+        Paragraph sigla = new Paragraph(unidade.getSigla(), new Font(Font.HELVETICA, 15, Font.BOLD, COR_PRIMARIA));
+        sigla.setSpacingAfter(2f);
+        document.add(sigla);
+        Paragraph nome = criarParagrafo(unidade.getNome(), new Font(Font.HELVETICA, 10, Font.BOLD, COR_SECUNDARIA), 0f);
+        nome.setSpacingAfter(4f);
+        document.add(nome);
+        document.add(new Chunk(new LineSeparator(0.8f, 100f, COR_BORDA, Element.ALIGN_CENTER, 0f)));
+        document.add(new Paragraph(" ", new Font(Font.HELVETICA, 2)));
 
-        PdfPCell cabecalho = new PdfPCell(new Phrase("%s - %s".formatted(unidade.getSigla(), unidade.getNome()), FONTE_SECAO));
-        cabecalho.setBackgroundColor(COR_TABELA_CABECALHO);
-        cabecalho.setBorderColor(COR_BORDA);
-        cabecalho.setPadding(8f);
-        cartao.addCell(cabecalho);
-
-        PdfPCell conteudo = new PdfPCell();
-        conteudo.setBorderColor(COR_BORDA);
-        conteudo.setPadding(10f);
-        conteudo.addElement(criarParagrafo("Competências: %d".formatted(competencias.size()), FONTE_TEXTO_NEGRITO, 0f));
         for (Competencia competencia : competencias) {
-            conteudo.addElement(criarParagrafo("Competência: %s".formatted(competencia.getDescricao()), FONTE_TEXTO_NEGRITO, 0f));
+            Paragraph tituloCompetencia = criarParagrafo(competencia.getDescricao(), FONTE_TEXTO_NEGRITO, 0f);
+            tituloCompetencia.setSpacingAfter(4f);
+            document.add(tituloCompetencia);
             for (Atividade atividade : competencia.getAtividades()) {
-                conteudo.addElement(criarParagrafo("Atividade: %s".formatted(atividade.getDescricao()), FONTE_TEXTO, 12f));
+                Paragraph tituloAtividade = criarParagrafo(atividade.getDescricao(), FONTE_TEXTO_CORPO, 10f);
+                tituloAtividade.setSpacingAfter(2f);
+                document.add(tituloAtividade);
                 for (Conhecimento conhecimento : atividade.getConhecimentos()) {
-                    conteudo.addElement(criarParagrafo("• %s".formatted(conhecimento.getDescricao()), FONTE_TEXTO_SUAVE, 24f));
+                    Paragraph itemConhecimento = criarParagrafo("• %s".formatted(conhecimento.getDescricao()), FONTE_TEXTO_CORPO_SUAVE, 20f);
+                    itemConhecimento.setSpacingAfter(2f);
+                    document.add(itemConhecimento);
                 }
+                document.add(new Paragraph(" ", new Font(Font.HELVETICA, 2)));
             }
+            document.add(new Paragraph(" ", new Font(Font.HELVETICA, 3)));
         }
-
-        cartao.addCell(conteudo);
-        document.add(cartao);
-    }
-
-    private PdfPCell criarCelulaResumoRotulo(String texto) {
-        PdfPCell celula = new PdfPCell(new Phrase(texto, FONTE_TEXTO_NEGRITO));
-        celula.setBackgroundColor(Color.WHITE);
-        celula.setBorderColor(COR_BORDA);
-        celula.setPadding(7f);
-        return celula;
-    }
-
-    private PdfPCell criarCelulaResumoValor(String texto) {
-        PdfPCell celula = new PdfPCell(new Phrase(texto, FONTE_TEXTO));
-        celula.setBackgroundColor(COR_TABELA_ALTERNADA);
-        celula.setBorderColor(COR_BORDA);
-        celula.setPadding(7f);
-        return celula;
-    }
-
-    private Paragraph criarTituloSecao(String texto) {
-        Paragraph paragrafo = new Paragraph(texto, FONTE_SECAO);
-        paragrafo.setSpacingAfter(8f);
-        return paragrafo;
+        document.add(new Paragraph(" ", new Font(Font.HELVETICA, 4)));
     }
 
     private Paragraph criarParagrafo(String texto, Font fonte, float indentacao) {
@@ -483,6 +430,7 @@ public class RelatorioFacade {
 
     private record CabecalhoRelatorio(
             String titulo,
+            String rotuloSubtitulo,
             String subtitulo,
             LocalDateTime dataGeracao,
             @Nullable String tipoProcesso,
