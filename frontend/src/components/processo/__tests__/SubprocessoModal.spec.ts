@@ -38,15 +38,14 @@ describe('SubprocessoModal.vue', () => {
             props: propsPadrao
         });
         const input = wrapper.find('[data-testid="input-nova-data-limite"]');
-        
+
         await input.setValue('2026-03-24'); // hoje no mock
-        
-        expect(wrapper.text()).toContain('A data limite para validação deve ser uma data futura.');
-        
+
         const btn = wrapper.find('[data-testid="btn-modal-confirmar"]');
         expect((btn.element as HTMLButtonElement).disabled).toBe(false);
         await btn.trigger('click');
 
+        expect(wrapper.text()).toContain('A data limite para validação deve ser uma data futura.');
         expect(wrapper.emitted('confirmarAlteracao')).toBeFalsy();
     });
 

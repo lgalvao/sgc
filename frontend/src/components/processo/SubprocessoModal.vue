@@ -2,6 +2,8 @@
   <ModalPadrao
       :loading="loading"
       :model-value="mostrarModal"
+      texto-acao="Alterar"
+      variant-acao="success"
       data-testid="mdl-alterar-data-limite"
       test-codigo-cancelar="subprocesso-modal__btn-modal-cancelar"
       test-codigo-confirmar="btn-modal-confirmar"
@@ -40,7 +42,7 @@
 import {BFormGroup} from "bootstrap-vue-next";
 import InputData from "@/components/comum/InputData.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
-import {computed, ref, watch} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
 import {formatDateBR, formatDateForInput, isDateStrictlyFuture, obterAmanhaFormatado, parseDate,} from "@/utils";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
@@ -63,29 +65,36 @@ const emit = defineEmits<{
 }>();
 
 const novaDataLimite = ref("");
-const erroLocalDataLimite = ref("");
+const campoDataInteragido = ref(false);
+const preenchendoValorInicial = ref(false);
 const {
+  validacaoSubmetida,
   validarSubmissao,
+  resetarValidacao,
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 
 const mensagemErroDataLimite = computed(() => {
-  if (erroLocalDataLimite.value) return erroLocalDataLimite.value;
-  return deveExibirErro(!novaDataLimite.value) ? "A data limite é obrigatória." : "";
+  const deveExibirMensagem = campoDataInteragido.value || validacaoSubmetida.value;
+  if (!deveExibirMensagem) return "";
+  if (deveExibirErro(!novaDataLimite.value)) return "A data limite é obrigatória.";
+  if (!isDateStrictlyFuture(parseDate(novaDataLimite.value))) {
+    return "A data limite para validação deve ser uma data futura.";
+  }
+  if (dataLimiteMinimaPorUltimaData.value && novaDataLimite.value < dataLimiteMinimaPorUltimaData.value) {
+    return "A data limite deve ser maior ou igual à última data limite do subprocesso.";
+  }
+  return "";
 });
 
 watch(novaDataLimite, (novaData) => {
-  erroLocalDataLimite.value = "";
+  if (preenchendoValorInicial.value) {
+    return;
+  }
+  campoDataInteragido.value = true;
   if (!novaData || novaData.length !== 10) {
     return;
-  }
-  if (!isDateStrictlyFuture(parseDate(novaData))) {
-    erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
-    return;
-  }
-  if (dataLimiteMinimaPorUltimaData.value && novaData < dataLimiteMinimaPorUltimaData.value) {
-    erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite do subprocesso.";
   }
 });
 
@@ -113,11 +122,17 @@ const isDataValida = computed(() => {
 
 watch(
     () => props.mostrarModal,
-    (novoValor: boolean) => {
+    async (novoValor: boolean) => {
+      resetarValidacao();
+      campoDataInteragido.value = false;
       if (novoValor && props.dataLimiteAtual) {
+        preenchendoValorInicial.value = true;
         novaDataLimite.value = formatDateForInput(props.dataLimiteAtual);
+        await nextTick();
+        preenchendoValorInicial.value = false;
       } else {
         novaDataLimite.value = "";
+        preenchendoValorInicial.value = false;
       }
     },
     {immediate: true},
