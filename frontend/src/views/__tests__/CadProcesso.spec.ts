@@ -3,6 +3,8 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {Perfil, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import {TEXTOS} from "@/constants/textos";
 import * as unidadeService from '@/services/unidadeService';
 import * as processoService from '@/services/processoService';
 import {obterAmanhaFormatado} from "@/utils/dateUtils";
@@ -592,7 +594,7 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper} = createWrapper();
         wrapper.vm.tipo = 'MAPEAMENTO';
         await nextTick();
-        expect(wrapper.text()).toContain('Carregando unidades...');
+        expect(wrapper.text()).toContain(TEXTOS.unidades.CARREGANDO);
     });
 
     it('shows alert with multiple errors', async () => {

@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {defineComponent} from "vue";
 import Unidades from "@/views/UnidadesView.vue";
 import * as unidadeService from "@/services/unidadeService";
+import {TEXTOS} from "@/constants/textos";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const mockPush = vi.fn();
@@ -213,7 +214,7 @@ describe("Unidades.vue", () => {
         // Aguarda um tick para o DOM refletir isLoading = true
         await wrapper.vm.$nextTick();
         expect(wrapper.find(".spinner").exists()).toBe(true);
-        expect(wrapper.text()).toContain("Carregando árvore de unidades...");
+        expect(wrapper.text()).toContain(TEXTOS.unidades.CARREGANDO_ARVORE);
     });
 
     it("deve exibir erro se houver erro ao carregar", async () => {
@@ -261,8 +262,8 @@ describe("Unidades.vue", () => {
     it("deve exibir mensagem quando não houver unidades", async () => {
         const wrapper = createWrapper({unidades: []});
         await flushPromises();
-        expect(wrapper.text()).toContain("Sem unidades por enquanto");
-        expect(wrapper.text()).toContain("Não encontramos unidades nesta consulta.");
+        expect(wrapper.text()).toContain(TEXTOS.unidades.EMPTY_TITLE);
+        expect(wrapper.text()).toContain(TEXTOS.unidades.EMPTY_DESCRIPTION);
         expect(wrapper.findComponent({name: 'TreeTable'}).exists()).toBe(false);
     });
 
@@ -270,7 +271,7 @@ describe("Unidades.vue", () => {
         vi.mocked(unidadeService.buscarTodasUnidades).mockRejectedValueOnce({});
         const wrapper = createWrapper();
         await flushPromises();
-        expect(wrapper.text()).toContain("Falha ao realizar operação. Tente novamente.");
+        expect(wrapper.text()).toContain(TEXTOS.comum.ERRO_OPERACAO);
     });
 
     it("deve recarregar ao clicar no botão de recarregar", async () => {
