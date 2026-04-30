@@ -30,9 +30,13 @@ vi.mock('@/services/atribuicaoTemporariaService', () => ({
     buscarTodasAtribuicoes: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('@/services/unidadeService', () => ({
-    buscarUnidadePorCodigo: mockBuscarUnidade,
-}));
+vi.mock('@/services/unidadeService', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/services/unidadeService')>();
+    return {
+        ...actual,
+        buscarUnidadePorCodigo: mockBuscarUnidade,
+    };
+});
 
 vi.mock('@/services/usuarioService', () => ({
     pesquisarUsuarios: mockPesquisarUsuarios,

@@ -911,8 +911,8 @@ describe("Processo.vue", () => {
             resolver = resolve;
         }) as any);
 
-        const primeiraExecucao = (wrapper.vm as any).confirmarFinalizacao();
-        const segundaExecucao = (wrapper.vm as any).confirmarFinalizacao();
+        const primeiraExecucao = (wrapper.vm).confirmarFinalizacao();
+        const segundaExecucao = (wrapper.vm).confirmarFinalizacao();
 
         expect(processoService.finalizarProcesso).toHaveBeenCalledTimes(1);
 

@@ -65,11 +65,15 @@ vi.mock('@/services/usuarioService', async (importOriginal) => {
     }
 });
 
-vi.mock('@/services/unidadeService', () => ({
-    buscarArvoreUnidade: vi.fn().mockResolvedValue(mockUnidadeData),
-    buscarUnidadePorSigla: vi.fn().mockResolvedValue(mockUnidadeData),
-    buscarReferenciaMapaVigente: vi.fn().mockResolvedValue(null),
-}));
+vi.mock('@/services/unidadeService', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/services/unidadeService')>();
+    return {
+        ...actual,
+        buscarArvoreUnidade: vi.fn().mockResolvedValue(mockUnidadeData),
+        buscarUnidadePorSigla: vi.fn().mockResolvedValue(mockUnidadeData),
+        buscarReferenciaMapaVigente: vi.fn().mockResolvedValue(null),
+    };
+});
 
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
     buscarTodasAtribuicoes: vi.fn().mockResolvedValue([]),

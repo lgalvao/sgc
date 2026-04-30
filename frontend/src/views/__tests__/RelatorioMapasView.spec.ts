@@ -5,11 +5,15 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import * as unidadeService from "@/services/unidadeService";
 import {useRelatoriosStore} from "@/stores/relatorios";
 
-vi.mock("@/services/unidadeService", () => ({
-  buscarTodasUnidades: vi.fn(),
-  buscarCodigosUnidadesComMapaVigente: vi.fn(),
-  mapUnidadesArray: vi.fn((valor) => valor),
-}));
+vi.mock("@/services/unidadeService", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/services/unidadeService")>();
+  return {
+    ...actual,
+    buscarTodasUnidades: vi.fn(),
+    buscarCodigosUnidadesComMapaVigente: vi.fn(),
+    mapUnidadesArray: vi.fn((valor) => valor),
+  };
+});
 
 describe("RelatorioMapasView.vue", () => {
   const ctx = setupComponentTest();
@@ -105,7 +109,7 @@ describe("RelatorioMapasView.vue", () => {
     ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
     await ctx.wrapper.vm.$nextTick();
 
-    const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm as any).$pinia);
+    const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm).$pinia);
     const buscarSpy = vi.spyOn(relatoriosStore, "buscarRelatorioMapas").mockResolvedValue(undefined as any);
 
     await ctx.wrapper.find("[data-testid='arvore-unidades-stub']").trigger("click");
@@ -119,7 +123,7 @@ describe("RelatorioMapasView.vue", () => {
     ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
     await ctx.wrapper.vm.$nextTick();
 
-    const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm as any).$pinia);
+    const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm).$pinia);
     const exportarSpy = vi.spyOn(relatoriosStore, "exportarMapasPdf").mockResolvedValue(undefined as any);
 
     await ctx.wrapper.find("[data-testid='arvore-unidades-stub']").trigger("click");

@@ -15,17 +15,21 @@ vi.mock('@/services/processoService', () => ({
     excluirProcesso: vi.fn(),
 }));
 
-vi.mock('@/services/unidadeService', () => ({
-    buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
-    buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
-        possuiViolacoes: false,
-        resumo: '',
-        quantidadeTiposViolacao: 0,
-        quantidadeOcorrencias: 0,
-        grupos: [],
-    }),
-    mapUnidadesArray: vi.fn((arr) => arr || []),
-}));
+vi.mock('@/services/unidadeService', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/services/unidadeService')>();
+    return {
+        ...actual,
+        buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
+        buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
+            possuiViolacoes: false,
+            resumo: '',
+            quantidadeTiposViolacao: 0,
+            quantidadeOcorrencias: 0,
+            grupos: [],
+        }),
+        mapUnidadesArray: vi.fn((arr) => arr || []),
+    };
+});
 
 const unidadeStoreMock = {
     garantirArvoreElegibilidade: vi.fn().mockResolvedValue([]),
@@ -664,6 +668,7 @@ describe('ProcessoCadastroView.vue', () => {
         await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
 
         await flushPromises();
+        await nextTick();
         await nextTick();
         await nextTick();
 

@@ -17,17 +17,21 @@ vi.mock("@/composables/usePerfil", () => ({
     })
 }));
 
-vi.mock("@/services/unidadeService", () => ({
-    buscarTodasUnidades: vi.fn(),
-    buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
-        possuiViolacoes: false,
-        resumo: '',
-        quantidadeTiposViolacao: 0,
-        quantidadeOcorrencias: 0,
-        grupos: [],
-    }),
-    mapUnidadesArray: vi.fn((arr) => arr || []),
-}));
+vi.mock("@/services/unidadeService", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("@/services/unidadeService")>();
+    return {
+        ...actual,
+        buscarTodasUnidades: vi.fn(),
+        buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
+            possuiViolacoes: false,
+            resumo: '',
+            quantidadeTiposViolacao: 0,
+            quantidadeOcorrencias: 0,
+            grupos: [],
+        }),
+        mapUnidadesArray: vi.fn((arr) => arr || []),
+    };
+});
 
 describe("Unidades.vue", () => {
     const context = setupComponentTest();
@@ -36,7 +40,14 @@ describe("Unidades.vue", () => {
 
     const TreeTableStub = defineComponent({
         name: "TreeTable",
-        props: ["data", "columns", "title", "hideHeaders", "striped", "hideControls"],
+        props: {
+            data: {type: Array, default: () => []},
+            columns: {type: Array, default: () => []},
+            title: {type: String, default: ""},
+            hideHeaders: {type: Boolean, default: false},
+            striped: {type: Boolean, default: false},
+            hideControls: {type: Boolean, default: false},
+        },
         emits: ["row-click"],
         setup(_, {expose}) {
             expose({

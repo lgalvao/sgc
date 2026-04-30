@@ -18,10 +18,14 @@ vi.mock('@/services/processoService', () => ({
     excluirProcesso: vi.fn(),
 }));
 
-vi.mock('@/services/unidadeService', () => ({
-    buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
-    mapUnidadesArray: vi.fn((arr) => arr || []),
-}));
+vi.mock('@/services/unidadeService', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/services/unidadeService')>();
+    return {
+        ...actual,
+        buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
+        mapUnidadesArray: vi.fn((arr) => arr || []),
+    };
+});
 
 const {mockPush, mockRoute} = vi.hoisted(() => {
     return {

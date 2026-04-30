@@ -17,9 +17,13 @@ vi.mock('vue-router', () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-vi.mock('@/services/unidadeService', () => ({
-    buscarUnidadePorCodigo: vi.fn(),
-}));
+vi.mock('@/services/unidadeService', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/services/unidadeService')>();
+    return {
+        ...actual,
+        buscarUnidadePorCodigo: vi.fn(),
+    };
+});
 
 vi.mock('@/services/usuarioService', () => ({
     buscarUsuariosPorUnidade: vi.fn().mockResolvedValue([]),

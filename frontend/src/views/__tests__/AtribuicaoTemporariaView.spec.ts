@@ -23,9 +23,13 @@ type AtribuicaoTemporariaVm = {
 
 const unidadeMinima: Unidade = {codigo: 1, sigla: 'TESTE', nome: 'Unidade de Teste'};
 
-vi.mock('@/services/unidadeService', () => ({
-  buscarUnidadePorCodigo: vi.fn(),
-}));
+vi.mock('@/services/unidadeService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/services/unidadeService')>();
+  return {
+    ...actual,
+    buscarUnidadePorCodigo: vi.fn(),
+  };
+});
 
 vi.mock('@/services/usuarioService', () => ({
   pesquisarUsuarios: vi.fn(),

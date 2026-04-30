@@ -61,18 +61,24 @@ export const useUnidadeStore = defineStore("unidade", () => {
         cacheMapasVigentes.value.clear();
     }
 
-    async function obterUnidade(codigo: number): Promise<Unidade> {
-        if (cacheUnidades.value.has(codigo)) {
+    async function obterUnidade(codigo: number, forcar = false): Promise<Unidade | null> {
+        if (!forcar && cacheUnidades.value.has(codigo)) {
             return cacheUnidades.value.get(codigo)!;
         }
         const response = await buscarArvoreUnidade(codigo);
+        if (!response) {
+            return null;
+        }
         const unidade = mapUnidade(response);
-        cacheUnidades.value.set(codigo, unidade);
-        return unidade;
+        if (unidade?.codigo) {
+            cacheUnidades.value.set(codigo, unidade);
+            return unidade;
+        }
+        return null;
     }
 
-    async function obterReferenciaMapaVigente(codigo: number): Promise<MapaVigenteReferencia | null> {
-        if (cacheMapasVigentes.value.has(codigo)) {
+    async function obterReferenciaMapaVigente(codigo: number, forcar = false): Promise<MapaVigenteReferencia | null> {
+        if (!forcar && cacheMapasVigentes.value.has(codigo)) {
             return cacheMapasVigentes.value.get(codigo)!;
         }
         const mapa = await buscarReferenciaMapaVigente(codigo);

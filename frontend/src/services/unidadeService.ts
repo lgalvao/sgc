@@ -70,6 +70,7 @@ export function mapUnidade(objetoBruto: unknown): Unidade {
         nome: lerTexto(obj, "nome", "nome_unidade"),
         isElegivel: lerBooleanoOpcional(obj, "isElegivel"),
         usuarioCodigo: lerNumero(obj, "usuarioCodigo", "idServidorTitular"),
+        tituloTitular: lerTexto(obj, "tituloTitular", "tituloServidorTitular"),
         responsavel: responsavelBruto
             ? {
                 codigo: lerNumero(responsavel, "codigo"),

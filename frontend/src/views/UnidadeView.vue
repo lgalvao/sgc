@@ -136,11 +136,11 @@ function clearError() {
   lastError.value = null;
 }
 
-async function carregarDados() {
+async function carregarDados(forcar = false) {
   clearError();
   
   // Se já temos a unidade e o mapa no cache, não mostramos o carregamento de página inteira
-  const jaTemNoCache = unidadeStore.cacheUnidades.has(props.codUnidade);
+  const jaTemNoCache = !forcar && unidadeStore.cacheUnidades.has(props.codUnidade);
   if (!jaTemNoCache) {
     carregandoPagina.value = true;
     unidade.value = null;
@@ -150,8 +150,8 @@ async function carregarDados() {
 
   try {
     const [unidadeResp, mapaResp] = await Promise.all([
-      unidadeStore.obterUnidade(props.codUnidade),
-      unidadeStore.obterReferenciaMapaVigente(props.codUnidade),
+      unidadeStore.obterUnidade(props.codUnidade, forcar),
+      unidadeStore.obterReferenciaMapaVigente(props.codUnidade, forcar),
     ]);
     
     unidade.value = unidadeResp;
@@ -198,7 +198,7 @@ onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  await carregarDados();
+  await carregarDados(true);
 });
 watch(() => props.codUnidade, () => {
   void carregarDados();
