@@ -102,6 +102,7 @@ const inputDescricaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 const {
   validarSubmissao,
+  resetarValidacao,
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
@@ -140,6 +141,7 @@ watch(
     () => props.mostrar,
     (mostrar) => {
       if (mostrar) {
+        resetarValidacao();
         if (props.competenciaParaEditar) {
           novaCompetencia.value.descricao = props.competenciaParaEditar.descricao;
           atividadesSelecionadas.value = [
@@ -151,6 +153,8 @@ watch(
           atividadesSelecionadas.value = [];
           competenciaSendoEditada.value = null;
         }
+      } else {
+        resetarValidacao();
       }
     },
     {immediate: true},
