@@ -112,7 +112,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BSpinner, BTable} from 'bootstrap-vue-next';
-import {useRouter} from 'vue-router';
+
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
@@ -133,7 +133,7 @@ import {useAsyncAction} from '@/composables/useAsyncAction';
 
 const {notify} = useNotification();
 const {carregando: carregandoAdmins, erro: erroAdmins, executarSilencioso} = useAsyncAction();
-const router = useRouter();
+
 
 const administradores = ref<AdministradorDto[]>([]);
 const removendoAdmin = ref<string | null>(null);
