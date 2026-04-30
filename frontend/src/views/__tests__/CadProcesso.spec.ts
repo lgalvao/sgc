@@ -309,7 +309,8 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('handles confirmRemove correctly', async () => {
-        const mockProcesso = {codigo: 123, descricao: 'P1'};
+        mockRoute.query = {codProcesso: '123'};
+        const mockProcesso = {codigo: 123, descricao: 'P1', situacao: 'CRIADO', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: []};
         const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
         await flushPromises();
         
@@ -323,16 +324,17 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('handles startProcess correctly', async () => {
-        const mockProcesso = {codigo: 123, descricao: 'P1'};
+        mockRoute.query = {codProcesso: '123'};
+        const mockProcesso = {codigo: 123, descricao: 'P1', situacao: 'CRIADO', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: []};
         const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
         await flushPromises();
         
         vi.mocked(processoService.iniciarProcesso).mockResolvedValue({} as any);
 
-        await wrapper.vm.confirmarInicio();
+        await wrapper.vm.confirmarIniciarProcesso();
         await flushPromises();
 
-        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123);
+        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', []);
         expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
