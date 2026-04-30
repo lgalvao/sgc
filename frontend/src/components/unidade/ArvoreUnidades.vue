@@ -1,29 +1,36 @@
 <template>
   <div class="arvore-unidades">
-    <div v-if="unidadesExibidasOriginais.length > 0" class="d-flex gap-2 mb-2 align-items-center">
+    <div v-if="unidadesExibidasOriginais.length > 0" class="arvore-unidades__toolbar">
       <template v-if="modoSelecao">
-        <BButton
-            aria-label="Selecionar todas as unidades elegíveis"
-            size="sm"
-            variant="outline-primary"
-            @click="selecionarTodas">
-          <i aria-hidden="true" class="bi bi-check-all me-1"/>
-        </BButton>
+        <div class="arvore-unidades__acoes">
+          <BButton
+              aria-label="Selecionar todas as unidades elegíveis"
+              class="arvore-unidades__botao"
+              size="sm"
+              variant="outline-secondary"
+              @click="selecionarTodas">
+            <i aria-hidden="true" class="bi bi-check-all me-1"/>
+            Todos
+          </BButton>
 
-        <BButton
-            aria-label="Desmarcar todas as unidades"
-            size="sm"
-            variant="outline-secondary"
-            @click="deselecionarTodas">
-          <i aria-hidden="true" class="bi bi-x-lg me-1"/>
-        </BButton>
+          <BButton
+              aria-label="Desmarcar todas as unidades"
+              class="arvore-unidades__botao arvore-unidades__botao--secundario"
+              size="sm"
+              variant="outline-secondary"
+              @click="deselecionarTodas">
+            <i aria-hidden="true" class="bi bi-x-lg me-1"/>
+            Limpar
+          </BButton>
+        </div>
       </template>
 
-      <div class="flex-grow-1 position-relative">
+      <div class="arvore-unidades__busca">
         <BFormInput
             v-model="termoBusca"
             aria-label="Buscar unidade por sigla"
-            placeholder="Filtrar por sigla..."
+            class="arvore-unidades__input"
+            placeholder="Filtrar..."
             size="sm"
             type="search"
         />
@@ -404,8 +411,60 @@ defineExpose({
 </script>
 
 <style scoped>
+.arvore-unidades__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.arvore-unidades__acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.arvore-unidades__botao {
+  min-width: 4.5rem;
+  height: 1.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.arvore-unidades__botao--secundario {
+  min-width: 4.8rem;
+}
+
+.arvore-unidades__busca {
+  flex: 1;
+  position: relative;
+}
+
+.arvore-unidades__input {
+  height: 1.85rem;
+}
+
 .arvore-unidades .form-check-input:indeterminate {
   background-color: #6c757d;
   border-color: #6c757d;
+}
+
+@media (max-width: 576px) {
+  .arvore-unidades__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .arvore-unidades__acoes {
+    width: 100%;
+  }
+
+  .arvore-unidades__botao {
+    flex: 1;
+  }
 }
 </style>

@@ -12,13 +12,12 @@
       <div class="d-flex flex-column gap-3">
         <BFormGroup label-for="arvore-unidades-mapas">
           <template #label>
-            Unidade <span aria-hidden="true" class="text-danger">*</span>
+            Unidades participantes <span aria-hidden="true" class="text-danger">*</span>
           </template>
-          <div class="relatorio-mapas__arvore" data-testid="container-arvore-unidades-mapas">
+          <div class="border rounded p-3 container-arvore" data-testid="container-arvore-unidades-mapas">
             <ArvoreUnidades
               id="arvore-unidades-mapas"
               v-model="unidadesSelecionadas"
-              :ocultar-raiz="false"
               :unidades="unidadesDisponiveis"
             />
           </div>
@@ -107,7 +106,7 @@ import {TEXTOS} from "@/constants/textos";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
-import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
+import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
 
 const relatoriosStore = useRelatoriosStore();
 const { notify } = useNotification();
@@ -118,20 +117,43 @@ const carregando = ref(false);
 const relatorioMapas = computed(() => relatoriosStore.relatorioMapas);
 const temUnidadesSelecionadas = computed(() => unidadesSelecionadas.value.length > 0);
 
-function marcarUnidadesElegiveis(unidades: Unidade[]): Unidade[] {
+function aplicarElegibilidadeMapaVigente(unidades: Unidade[], codigosElegiveis: Set<number>): Unidade[] {
+  return unidades.map(unidade => ({
+    ...unidade,
+    isElegivel: codigosElegiveis.has(unidade.codigo),
+    filhas: unidade.filhas ? aplicarElegibilidadeMapaVigente(unidade.filhas, codigosElegiveis) : []
+  }));
+}
+
+function filtrarArvorePorMapaVigente(unidades: Unidade[]): Unidade[] {
   return unidades
-      .filter(unidade => unidade.sigla.toUpperCase() !== "ADMIN")
-      .map(unidade => ({
-        ...unidade,
-        isElegivel: true,
-        filhas: unidade.filhas ? marcarUnidadesElegiveis(unidade.filhas) : []
-      }));
+      .map(unidade => {
+        const filhasFiltradas = unidade.filhas ? filtrarArvorePorMapaVigente(unidade.filhas) : [];
+        const manterUnidade = unidade.isElegivel === true || filhasFiltradas.length > 0;
+
+        if (!manterUnidade) {
+          return null;
+        }
+
+        return {
+          ...unidade,
+          filhas: filhasFiltradas
+        };
+      })
+      .filter((unidade): unidade is Unidade => unidade !== null);
 }
 
 async function carregarUnidades() {
   try {
-    const response = await buscarTodasUnidades();
-    unidadesDisponiveis.value = marcarUnidadesElegiveis(mapUnidadesArray(response as Unidade[]));
+    const [arvore, codigosComMapa] = await Promise.all([
+      buscarTodasUnidades(),
+      buscarCodigosUnidadesComMapaVigente()
+    ]);
+    const unidadesComElegibilidade = aplicarElegibilidadeMapaVigente(
+      mapUnidadesArray(arvore as Unidade[]),
+      new Set(codigosComMapa)
+    );
+    unidadesDisponiveis.value = filtrarArvorePorMapaVigente(unidadesComElegibilidade);
   } catch {
     notify("Erro ao carregar unidades", "danger");
   }
@@ -176,6 +198,13 @@ onMounted(() => {
   padding: 0.75rem;
   border: 1px solid #d7dee8;
   border-radius: 0.65rem;
+  background: #fff;
+}
+
+.container-arvore {
+  overflow-x: hidden;
+  max-height: 22rem;
+  overflow-y: auto;
   background: #fff;
 }
 

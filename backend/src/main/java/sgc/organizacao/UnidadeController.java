@@ -58,6 +58,11 @@ public class UnidadeController {
         return ResponseEntity.ok(validadorDadosOrganizacionais.diagnosticar());
     }
 
+    @GetMapping("/com-mapa-vigente")
+    public ResponseEntity<List<Long>> buscarCodigosUnidadesComMapaVigente() {
+        return ResponseEntity.ok(unidadeService.buscarTodosCodigosUnidadesComMapa());
+    }
+
     @GetMapping("/arvore-com-elegibilidade")
     public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
             @RequestParam("tipoProcesso") String tipoProcesso,

@@ -99,6 +99,18 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar codigos das unidades com mapa vigente")
+    @WithMockUser
+    void deveRetornarCodigosUnidadesComMapaVigente() throws Exception {
+        when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L, 20L));
+
+        mockMvc.perform(get("/api/unidades/com-mapa-vigente"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(10))
+                .andExpect(jsonPath("$[1]").value(20));
+    }
+
+    @Test
     @DisplayName("Deve retornar árvore de elegibilidade")
     @WithMockUser
     void deveRetornarArvoreDeElegibilidade() throws Exception {

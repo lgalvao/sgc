@@ -37,6 +37,8 @@ class RelatorioFacadeTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
+    private UnidadeService unidadeService;
+    @Mock
     private PdfFactory pdfFactory;
     @Mock
     private Document document;
@@ -263,9 +265,6 @@ class RelatorioFacadeTest {
     @DisplayName("Deve gerar relatório de mapas completo")
     void deveGerarRelatorioMapasCompleto() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-        p.setDescricao("Proc teste");
-
         Unidade u = new Unidade();
         u.setSigla("U1");
         u.setNome("Unidade 1");
@@ -275,6 +274,7 @@ class RelatorioFacadeTest {
         sp.setUnidade(u);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
+        sp.getMapa().setSubprocesso(sp);
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
@@ -287,55 +287,81 @@ class RelatorioFacadeTest {
         a.setConhecimentos(Set.of(k));
         c.setAtividades(Set.of(a));
 
-        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        UnidadeMapa unidadeMapa = UnidadeMapa.builder()
+                .unidadeCodigo(1L)
+                .mapaVigente(sp.getMapa())
+                .build();
+
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L))).thenReturn(List.of(unidadeMapa));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        relatorioService.gerarRelatorioMapas(List.of(1L), out);
         verify(document, atLeastOnce()).add(any());
         verify(document, atLeastOnce()).add(argThat(element -> element instanceof PdfPTable tabela
                 && tabela.getNumberOfColumns() == 1));
     }
 
     @Test
-    @DisplayName("Deve filtrar por unidade no relatório de mapas")
-    void deveFiltrarPorUnidadeNoRelatorioMapas() throws DocumentException {
-        when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
-        p.setDescricao("Proc teste");
-
+    @DisplayName("Deve obter relatório de mapas somente para unidades com mapa vigente")
+    void deveObterRelatorioMapasSomenteParaUnidadesComMapaVigente() {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setSigla("U1");
+        u1.setNome("Unidade 1");
+
         Unidade u2 = new Unidade();
         u2.setCodigo(2L);
         u2.setSigla("U2");
+        u2.setNome("Unidade 2");
 
         Subprocesso sp1 = new Subprocesso();
         sp1.setUnidade(u1);
         sp1.setMapa(new Mapa());
         sp1.getMapa().setCodigo(10L);
+        sp1.getMapa().setSubprocesso(sp1);
+
         Subprocesso sp2 = new Subprocesso();
         sp2.setUnidade(u2);
         sp2.setMapa(new Mapa());
         sp2.getMapa().setCodigo(20L);
+        sp2.getMapa().setSubprocesso(sp2);
 
-        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
+        UnidadeMapa mapa1 = UnidadeMapa.builder()
+                .unidadeCodigo(1L)
+                .mapaVigente(sp1.getMapa())
+                .build();
+        UnidadeMapa mapa2 = UnidadeMapa.builder()
+                .unidadeCodigo(2L)
+                .mapaVigente(sp2.getMapa())
+                .build();
+
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of(mapa1, mapa2));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of());
+        when(mapaManutencaoService.competenciasCodMapa(20L)).thenReturn(List.of());
+
+        List<RelatorioMapaDto> resultado = relatorioService.obterRelatorioMapas(List.of(1L, 2L));
+
+        assertThat(resultado).hasSize(2);
+        assertThat(resultado.getFirst().codigoUnidade()).isEqualTo(1L);
+        assertThat(resultado.get(1).codigoUnidade()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("Deve ignorar seleção vazia no relatório de mapas")
+    void deveIgnorarSelecaoVaziaNoRelatorioMapas() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
 
         OutputStream out = new ByteArrayOutputStream();
-        // Filtra pela unidade 1
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        relatorioService.gerarRelatorioMapas(List.of(), out);
         verify(document, atLeastOnce()).add(any());
+        verify(unidadeService, never()).buscarMapasPorUnidades(anyList());
     }
 
     @Test
     @DisplayName("Deve processar competência sem atividades")
     void deveProcessarCompetenciaSemAtividades() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
         Unidade u = new Unidade();
         u.setSigla("U1");
         u.setNome("U1");
@@ -344,17 +370,22 @@ class RelatorioFacadeTest {
         sp.setUnidade(u);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
+        sp.getMapa().setSubprocesso(sp);
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
         c.setAtividades(Set.of()); // Atividades vazias
 
-        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        UnidadeMapa unidadeMapa = UnidadeMapa.builder()
+                .unidadeCodigo(1L)
+                .mapaVigente(sp.getMapa())
+                .build();
+
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L))).thenReturn(List.of(unidadeMapa));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        relatorioService.gerarRelatorioMapas(List.of(1L), out);
         verify(document, atLeastOnce()).add(any());
     }
 
@@ -362,7 +393,6 @@ class RelatorioFacadeTest {
     @DisplayName("Deve processar atividade sem conhecimentos")
     void deveProcessarAtividadeSemConhecimentos() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
-        Processo p = new Processo();
         Unidade u = new Unidade();
         u.setSigla("U1");
         u.setNome("U1");
@@ -371,6 +401,7 @@ class RelatorioFacadeTest {
         sp.setUnidade(u);
         sp.setMapa(new Mapa());
         sp.getMapa().setCodigo(10L);
+        sp.getMapa().setSubprocesso(sp);
 
         Competencia c = new Competencia();
         c.setDescricao("Comp 1");
@@ -379,12 +410,16 @@ class RelatorioFacadeTest {
         a.setConhecimentos(Set.of()); // Conhecimentos vazios
         c.setAtividades(Set.of(a));
 
-        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        UnidadeMapa unidadeMapa = UnidadeMapa.builder()
+                .unidadeCodigo(1L)
+                .mapaVigente(sp.getMapa())
+                .build();
+
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L))).thenReturn(List.of(unidadeMapa));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
-        relatorioService.gerarRelatorioMapas(1L, 1L, out);
+        relatorioService.gerarRelatorioMapas(List.of(1L), out);
         verify(document, atLeastOnce()).add(any());
     }
 
@@ -405,13 +440,12 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
     void deveCobrirErroGerarPdfMapas() throws DocumentException {
-        when(processoService.buscarPorCodigo(1L)).thenReturn(new Processo());
-        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L))).thenReturn(List.of());
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
         OutputStream out = new ByteArrayOutputStream();
-        assertThatThrownBy(() -> relatorioService.gerarRelatorioMapas(1L, 1L, out))
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioMapas(List.of(1L), out))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Erro ao gerar PDF");
     }

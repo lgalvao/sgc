@@ -7,6 +7,7 @@ import {useRelatoriosStore} from "@/stores/relatorios";
 
 vi.mock("@/services/unidadeService", () => ({
   buscarTodasUnidades: vi.fn(),
+  buscarCodigosUnidadesComMapaVigente: vi.fn(),
   mapUnidadesArray: vi.fn((valor) => valor),
 }));
 
@@ -15,7 +16,7 @@ describe("RelatorioMapasView.vue", () => {
 
   const ArvoreUnidadesStub = {
     props: ["modelValue", "unidades"],
-    template: "<div data-testid='arvore-unidades-stub' @click='$emit(\"update:modelValue\", [10, 11])'>Árvore</div>"
+    template: "<div data-testid='arvore-unidades-stub' @click='$emit(\"update:modelValue\", [10])'>Árvore</div>"
   };
 
   const stubs = {
@@ -37,44 +38,67 @@ describe("RelatorioMapasView.vue", () => {
     vi.clearAllMocks();
     vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue([
       {
-        codigo: 1,
-        sigla: "SEC",
-        nome: "Secretaria",
-        filhas: [
-          {
-            codigo: 10,
-            sigla: "COSIS",
-            nome: "Coordenadoria de Sistemas",
-            filhas: []
-          },
-          {
-            codigo: 11,
-            sigla: "COAUD",
-            nome: "Coordenadoria de Auditoria",
-            filhas: []
-          }
-        ]
-      },
-      {
-        codigo: 2,
+        codigo: 999,
         sigla: "ADMIN",
         nome: "Administração",
-        filhas: []
+        filhas: [
+          {
+            codigo: 1,
+            sigla: "SA",
+            nome: "Secretaria A",
+            filhas: [
+              {
+                codigo: 10,
+                sigla: "COSIS",
+                nome: "Coordenadoria de Sistemas",
+                filhas: []
+              },
+              {
+                codigo: 11,
+                sigla: "COAUD",
+                nome: "Coordenadoria de Auditoria",
+                filhas: []
+              }
+            ]
+          }
+        ]
       }
     ] as any);
+    vi.mocked(unidadeService.buscarCodigosUnidadesComMapaVigente).mockResolvedValue([10]);
   });
 
-  it("deve carregar unidades ao montar", async () => {
+  it("deve carregar unidades e codigos com mapa vigente ao montar", async () => {
     ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
     await ctx.wrapper.vm.$nextTick();
 
     expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
+    expect(unidadeService.buscarCodigosUnidadesComMapaVigente).toHaveBeenCalled();
   });
 
-  it("não deve renderizar empty state na tela de mapas", async () => {
+  it("deve mostrar apenas ramos que levam a unidades com mapa vigente", async () => {
     ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
+    await ctx.wrapper.vm.$nextTick();
+    await ctx.wrapper.vm.$nextTick();
 
-    expect(ctx.wrapper.find("[data-testid='empty-state-mapas']").exists()).toBe(false);
+    const vm = ctx.wrapper.vm as unknown as {
+      unidadesDisponiveis: Array<{
+        sigla: string;
+        isElegivel?: boolean;
+        filhas?: Array<{
+          sigla: string;
+          isElegivel?: boolean;
+          filhas?: Array<{ sigla: string; isElegivel?: boolean }>;
+        }>;
+      }>;
+    };
+
+    expect(vm.unidadesDisponiveis[0].sigla).toBe("ADMIN");
+    expect(vm.unidadesDisponiveis[0].isElegivel).toBe(false);
+    expect(vm.unidadesDisponiveis[0].filhas?.[0].sigla).toBe("SA");
+    expect(vm.unidadesDisponiveis[0].filhas?.[0].isElegivel).toBe(false);
+    expect(vm.unidadesDisponiveis[0].filhas?.[0].filhas).toEqual([
+      expect.objectContaining({sigla: "COSIS", isElegivel: true}),
+    ]);
   });
 
   it("deve enviar as unidades selecionadas ao gerar html", async () => {
@@ -88,7 +112,7 @@ describe("RelatorioMapasView.vue", () => {
     await ctx.wrapper.vm.$nextTick();
     await ctx.wrapper.find("[data-testid='btn-gerar-html-mapas']").trigger("click");
 
-    expect(buscarSpy).toHaveBeenCalledWith([10, 11]);
+    expect(buscarSpy).toHaveBeenCalledWith([10]);
   });
 
   it("deve enviar as unidades selecionadas ao exportar pdf", async () => {
@@ -102,7 +126,7 @@ describe("RelatorioMapasView.vue", () => {
     await ctx.wrapper.vm.$nextTick();
     await ctx.wrapper.find("[data-testid='btn-gerar-mapas']").trigger("click");
 
-    expect(exportarSpy).toHaveBeenCalledWith([10, 11]);
+    expect(exportarSpy).toHaveBeenCalledWith([10]);
   });
 
   it("deve desabilitar os botões enquanto não houver unidades selecionadas", async () => {
@@ -120,17 +144,6 @@ describe("RelatorioMapasView.vue", () => {
 
     expect(btnGerarHtml.attributes("disabled")).toBeUndefined();
     expect(btnPdf.attributes("disabled")).toBeUndefined();
-  });
-
-  it("não deve disponibilizar a unidade ADMIN na árvore", async () => {
-    ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
-    await ctx.wrapper.vm.$nextTick();
-
-    const vm = ctx.wrapper.vm as unknown as {
-      unidadesDisponiveis: Array<{ sigla: string }>;
-    };
-
-    expect(vm.unidadesDisponiveis.map(unidade => unidade.sigla)).toEqual(["SEC"]);
   });
 
   it("deve renderizar o relatório html na própria página", async () => {

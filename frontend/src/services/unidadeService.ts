@@ -102,6 +102,10 @@ export async function buscarDiagnosticoOrganizacional(): Promise<DiagnosticoOrga
     return apiGet("/unidades/diagnostico-organizacional");
 }
 
+export async function buscarCodigosUnidadesComMapaVigente(): Promise<number[]> {
+    return apiGet("/unidades/com-mapa-vigente");
+}
+
 export async function buscarUnidadePorSigla(sigla: string) {
     return apiGet(`/unidades/sigla/${sigla}`);
 }
