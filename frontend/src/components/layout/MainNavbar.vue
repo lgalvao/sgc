@@ -79,6 +79,30 @@
           </template>
         </BNavItem>
 
+        <BNavItemDropdown
+            v-if="isAdmin"
+            class="me-lg-1"
+            data-testid="dropdown-acoes-especiais"
+            right
+            no-caret
+        >
+          <template #button-content>
+            <span class="visually-hidden">Ações Especiais</span>
+            <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1" title="Ações Especiais"/>
+            <span aria-hidden="true" class="d-lg-none">Ações Especiais</span>
+          </template>
+          
+          <BDropdownItem
+              data-testid="btn-nav-limpeza-processos"
+              to="/administracao/limpeza-processos"
+              variant="danger"
+          >
+            <span class="text-danger">
+              <i aria-hidden="true" class="bi bi-trash me-2"></i> {{ TEXTOS.administracao.BOTAO_LIMPEZA_PROCESSOS }}
+            </span>
+          </BDropdownItem>
+        </BNavItemDropdown>
+
         <BNavItem
             class="me-lg-0"
             data-testid="btn-logout"
@@ -97,7 +121,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BCollapse, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BNavItem, vBTooltip} from "bootstrap-vue-next";
+import {BCollapse, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BNavItem, BNavItemDropdown, BDropdownItem, vBTooltip} from "bootstrap-vue-next";
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";

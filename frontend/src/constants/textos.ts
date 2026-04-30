@@ -232,7 +232,7 @@ export const TEXTOS = {
   },
   administracao: {
     TITULO: "Administradores",
-    BOTAO_ADICIONAR: "Adicionar administrador",
+    BOTAO_ADICIONAR: "Adicionar",
     EMPTY_TITLE: "Sem administradores cadastrados",
     EMPTY_DESCRIPTION: "Use o botão de adicionar para incluir o primeiro administrador.",
     LABEL_TITULO: "Título",
