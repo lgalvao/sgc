@@ -21,7 +21,7 @@ node etc/scripts/sgc.js
 As dependências do toolkit ficam isoladas neste diretório:
 
 ```bash
-npm install --prefix etc/scripts
+pnpm install
 ```
 
 ## Estrutura do Toolkit
@@ -88,7 +88,7 @@ Determinados scripts agora atuam como portões de qualidade mandatórios:
 O toolkit possui uma suíte de testes automatizados que valida a integração entre os módulos de domínio e a CLI:
 
 ```bash
-npm test --prefix etc/scripts
+pnpm test
 ```
 
 Atualmente, **19 testes** garantem a estabilidade das operações críticas, incluindo simulações de limpeza, diagnósticos de ambiente e análise de cobertura.

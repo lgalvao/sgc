@@ -133,9 +133,9 @@ echo "Iniciando bateria de smoke tests..."
 echo "-----------------------------------"
 
 run_step "junit" "$GRADLE_CMD" :backend:test
-run_step "typecheck" npm run typecheck -s
-run_step "lint" npm run lint -s
-run_step "vitest" npm run test:unit --prefix frontend -- -s --reporter=dot
+run_step "typecheck" pnpm run typecheck -s
+run_step "lint" pnpm run lint -s
+run_step "vitest" pnpm -C frontend run test:unit -- -s --reporter=dot
 run_step "e2e" npx playwright test captura jornada --reporter=dot
 
 echo "-----------------------------------"

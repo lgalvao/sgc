@@ -523,8 +523,8 @@ $adaptadores = @{
         return $execucao
     }
     frontendCobertura = {
-        $execucao = Nova-Execucao 'frontend-cobertura' 'Frontend cobertura' 'cobertura' 'npm run coverage:unit --prefix frontend' 'frontend'
-        $saida = Executar-ComandoCapturando 'npm.cmd' @('run', 'coverage:unit', '--prefix', 'frontend') $diretorioRaiz (Join-Path $diretorioExecucao 'frontend-cobertura.log')
+        $execucao = Nova-Execucao 'frontend-cobertura' 'Frontend cobertura' 'cobertura' 'pnpm -C frontend run coverage:unit' 'frontend'
+        $saida = Executar-ComandoCapturando 'pnpm.cmd' @('-C', 'frontend', 'run', 'coverage:unit') $diretorioRaiz (Join-Path $diretorioExecucao 'frontend-cobertura.log')
         $arquivoJson = Join-Path $diretorioRaiz 'frontend\coverage\coverage-final.json'
         $cobertura = $null
         if (($saida.codigo -eq 0) -and (Testar-ArtefatoFresco $arquivoJson $saida.inicio)) {
@@ -564,8 +564,8 @@ $adaptadores = @{
         return $execucao
     }
     frontendTypecheck = {
-        $execucao = Nova-Execucao 'frontend-typecheck' 'Frontend typecheck' 'qualidade' 'npm run typecheck --prefix frontend' 'frontend'
-        $saida = Executar-ComandoCapturando 'npm.cmd' @('run', 'typecheck', '--prefix', 'frontend') $diretorioRaiz (Join-Path $diretorioExecucao 'frontend-typecheck.log')
+        $execucao = Nova-Execucao 'frontend-typecheck' 'Frontend typecheck' 'qualidade' 'pnpm -C frontend run typecheck' 'frontend'
+        $saida = Executar-ComandoCapturando 'pnpm.cmd' @('-C', 'frontend', 'run', 'typecheck') $diretorioRaiz (Join-Path $diretorioExecucao 'frontend-typecheck.log')
         $metricas = Extrair-ResumoTypecheck $saida.texto
         $execucao.status = Obter-StatusExecucao $saida.codigo $metricas
         $execucao.duracaoMs = $saida.duracaoMs

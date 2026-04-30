@@ -355,7 +355,7 @@ function startBackend() {
 }
 
 function startFrontend() {
-    const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
+    const pnpmExecutable = isWindows ? 'pnpm.cmd' : 'pnpm';
 
     const spawnOptions = {
         cwd: FRONTEND_DIR,
@@ -370,7 +370,7 @@ function startFrontend() {
     };
 
     const frontendProcess = spawn(
-        npmExecutable,
+        pnpmExecutable,
         ['run', 'dev', '--', '--port', String(FRONTEND_PORT)],
         spawnOptions
     );

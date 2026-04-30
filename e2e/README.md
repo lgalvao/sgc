@@ -87,16 +87,16 @@ test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
 
 ```bash
 # Instalar dependências
-npm install
+pnpm install
 
 # Rodar todos os testes (Headless)
-npm run test:e2e
+pnpm run test:e2e
 
 # Rodar com 2 workers isolados (configuração atualmente validada)
-npm run test:e2e:2w
+pnpm run test:e2e:2w
 
 # Rodar captura de telas
-npm run test:e2e:captura
+pnpm run test:e2e:captura
 
 # Rodar com interface gráfica (UI Mode)
 npx playwright test --ui

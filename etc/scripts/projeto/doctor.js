@@ -6,7 +6,7 @@ import {escreverLinha, formatarStatus, imprimirCabecalho, imprimirJson} from "..
 
 const RECURSOS = [
     {tipo: "comando", nome: "node", obrigatorio: true},
-    {tipo: "comando", nome: "npm", obrigatorio: true},
+    {tipo: "comando", nome: "pnpm", obrigatorio: true},
     {tipo: "comando", nome: "git", obrigatorio: true},
     {tipo: "comando", nome: "java", obrigatorio: false},
     {tipo: "comando", nome: "keytool", obrigatorio: false},

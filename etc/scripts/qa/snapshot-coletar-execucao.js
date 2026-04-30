@@ -117,8 +117,8 @@ const ADAPTADORES = {
         return execucao;
     },
     async frontendCobertura() {
-        const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "npm run coverage:unit", "frontend");
-        const saida = await executarComando({comando: "npm", args: ["run", "coverage:unit", "--prefix", "frontend"], cwd: DIRETORIO_RAIZ});
+        const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "pnpm -C frontend run coverage:unit", "frontend");
+        const saida = await executarComando({comando: "pnpm", args: ["-C", "frontend", "run", "coverage:unit"], cwd: DIRETORIO_RAIZ});
         const cobertura = await extrairCoberturaFrontend();
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -135,8 +135,8 @@ const ADAPTADORES = {
         return execucao;
     },
     async frontendTypecheck() {
-        const execucao = criarExecucao("frontend-typecheck", "Frontend typecheck", "qualidade", "npm run typecheck", "frontend");
-        const saida = await executarComando({comando: "npm", args: ["run", "typecheck", "--prefix", "frontend"], cwd: DIRETORIO_RAIZ});
+        const execucao = criarExecucao("frontend-typecheck", "Frontend typecheck", "qualidade", "pnpm -C frontend run typecheck", "frontend");
+        const saida = await executarComando({comando: "pnpm", args: ["-C", "frontend", "run", "typecheck"], cwd: DIRETORIO_RAIZ});
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
         execucao.sumario = saida.code === 0 ? "Typecheck sem erros." : "Erros de tipagem encontrados.";

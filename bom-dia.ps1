@@ -38,7 +38,7 @@ Invoke-Passo 'Typecheck'         { pnpm run typecheck }
 Invoke-Passo 'Lint'              { pnpm run lint }
 
 Push-Location frontend
-Invoke-Passo 'Frontend deps'     { pnpm update }
+Invoke-Passo 'Frontend deps'     { pnpm install }
 Invoke-Passo 'Testes frontend'   { pnpm exec vitest run }
 Pop-Location
 

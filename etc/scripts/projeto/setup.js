@@ -21,7 +21,7 @@ async function executarSetup(opcoes = {}) {
             title: "Instalar dependencias da raiz",
             enabled: () => Boolean(opcoes.instalarDependencias),
             task: async () => {
-                await execa("npm", ["install"], {
+                await execa("pnpm", ["install"], {
                     cwd: resolverNaRaiz(),
                     stdio: "inherit",
                     shell: process.platform === "win32"
@@ -32,7 +32,7 @@ async function executarSetup(opcoes = {}) {
             title: "Instalar dependencias do frontend",
             enabled: () => Boolean(opcoes.instalarDependencias),
             task: async () => {
-                await execa("npm", ["install"], {
+                await execa("pnpm", ["install"], {
                     cwd: resolverNaRaiz("frontend"),
                     stdio: "inherit",
                     shell: process.platform === "win32"
@@ -43,7 +43,7 @@ async function executarSetup(opcoes = {}) {
             title: "Instalar dependencias do toolkit",
             enabled: () => Boolean(opcoes.instalarDependencias),
             task: async () => {
-                await execa("npm", ["install", "--prefix", "etc/scripts"], {
+                await execa("pnpm", ["install"], {
                     cwd: resolverNaRaiz(),
                     stdio: "inherit",
                     shell: process.platform === "win32"

@@ -106,8 +106,8 @@ cd backend
 **3. Apenas frontend:**
 ```bash
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 *Acesse em `http://localhost:5173`.*
 
@@ -166,9 +166,9 @@ O projeto utiliza um toolkit de automação centralizado em `etc/scripts` que or
 | **Todos backend** | `./gradlew :backend:test` |
 | **Unitários backend** | `./gradlew :backend:unitTest` |
 | **Integração backend** | `./gradlew :backend:integrationTest` |
-| **Unitários frontend** | `npm run test:unit --prefix frontend` |
-| **End-to-End (E2E)** | `npm run test:e2e` |
-| **Lint Completo** | `npm run lint` |
+| **Unitários frontend** | `pnpm run test:unit --prefix frontend` |
+| **End-to-End (E2E)** | `pnpm run test:e2e` |
+| **Lint Completo** | `pnpm run lint` |
 | **Auditoria de Cobertura** | `node etc/scripts/sgc.js [backend|frontend] cobertura auditoria` |
 | **Limpeza de Projeto** | `node etc/scripts/sgc.js projeto limpar --confirmar` |
 
