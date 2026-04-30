@@ -209,7 +209,7 @@ export const TEXTOS = {
     ANDAMENTO_PROCESSO: "Relatório: Andamento de processo",
     LABEL_SELECIONE_PROCESSO: "Processo",
     LABEL_SELECIONE_UNIDADE: "Unidade",
-    BOTAO_GERAR: "Gerar relatório",
+    BOTAO_GERAR: "Gerar",
     BOTAO_PDF: "Gerar",
     BOTAO_GERAR_PDF: "Gerar",
     SELECIONE: "Selecione...",

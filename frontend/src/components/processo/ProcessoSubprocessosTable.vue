@@ -2,7 +2,8 @@
   <TreeTable
       :columns="colunas"
       :data="mapeamentoHierarquia"
-      :title="TEXTOS.subprocesso.DETALHE_UNIDADES_TITULO"
+      :hide-controls="true"
+      :striped="false"
       @row-click="emitirCliqueLinha"
   />
 </template>
@@ -36,7 +37,7 @@ const emit = defineEmits<{
 }>();
 
 const colunas = [
-  {key: "unidadeAtual", label: TEXTOS.subprocesso.COLUNA_UNIDADE, width: "55%"},
+  {key: "unidadeAtual", label: "Unidade participante", width: "55%"},
   {key: "situacao", label: TEXTOS.subprocesso.COLUNA_SITUACAO, width: "22%"},
   {key: "dataLimite", label: TEXTOS.subprocesso.COLUNA_DATA_LIMITE, width: "23%"},
 ];

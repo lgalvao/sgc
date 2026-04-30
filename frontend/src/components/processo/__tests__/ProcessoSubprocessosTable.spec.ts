@@ -66,4 +66,22 @@ describe("ProcessoSubprocessosTable.vue", () => {
         expect(sec.situacao).toBe("Cadastro em andamento");
         expect(sec.dataLimite).toBe("31/12/2023");
     });
+
+    it("deve configurar a TreeTable sem título intermediário e sem zebrado", () => {
+        const wrapper = mount(ProcessoSubprocessosTable, {
+            props: {
+                participantesHierarquia: participantesMock
+            }
+        });
+
+        const treeTable = wrapper.findComponent({name: 'TreeTable'});
+
+        expect(treeTable.props('title')).toBeUndefined();
+        expect(treeTable.props('hideControls')).toBe(true);
+        expect(treeTable.props('striped')).toBe(false);
+        expect(treeTable.props('columns')[0]).toMatchObject({
+            key: 'unidadeAtual',
+            label: 'Unidade participante'
+        });
+    });
 });
