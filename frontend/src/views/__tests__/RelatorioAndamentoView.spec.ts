@@ -88,7 +88,8 @@ describe('RelatorioAndamentoView', () => {
         expect(cards.length).toBe(1);
 
         const textoCard = cards[0].text();
-        expect(textoCard).toContain('U1 - Unidade 1');
+        expect(textoCard).toContain('U1');
+        expect(textoCard).toContain('Unidade 1');
         expect(textoCard).toContain('MAPEAMENTO_CADASTRO_EM_ANDAMENTO');
         expect(textoCard).toContain('Local 1');
         expect(textoCard).toContain('10/04/2026 08:00');

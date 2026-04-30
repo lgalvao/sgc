@@ -35,6 +35,7 @@ export const TEXTOS = {
     VERSAO: "Versão",
     PULAR_CONTEUDO: "Pular para o conteúdo principal",
     BOTAO_FECHAR: "Fechar",
+    BOTAO_VOLTAR: "Voltar",
     OBSERVACAO: "Observações",
   },
   login: {
@@ -439,6 +440,8 @@ export const TEXTOS = {
     DESC_DIAS_INATIVACAO: "Dias depois da finalização de um processo para que seja considerado inativo.",
     LABEL_DIAS_ALERTA_NOVO: "Dias para indicação de alerta como novo",
     DESC_DIAS_ALERTA_NOVO: "Dias depois de um alerta ser enviado para que deixe de ser marcado como novo.",
+    LABEL_TEMA_ESCURO: "Habilitar tema escuro (Dark Mode) globalmente",
+    DESC_TEMA_ESCURO: "Quando ativado, o sistema utilizará cores escuras para todos os usuários.",
     SUCESSO_SALVAR: "Configurações salvas.",
     ERRO_SALVAR: "Erro ao salvar configurações.",
     BOTAO_SALVAR: "Salvar",

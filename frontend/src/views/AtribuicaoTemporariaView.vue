@@ -7,27 +7,9 @@
           {{ unidade.sigla }}
         </template>
         <template #actions>
-          <BButton
-              class="btn-acao-cabecalho"
-              :disabled="isLoading"
-              data-testid="btn-cancelar-atribuicao"
-              type="button"
-              variant="outline-secondary"
-              @click="router.push(`/unidade/${codUnidade}`)"
-          >
-            {{ TEXTOS.comum.BOTAO_CANCELAR }}
+          <BButton variant="outline-secondary" :to="`/unidade/${codUnidade}`">
+            <i class="bi bi-arrow-left me-1" /> {{ TEXTOS.comum.BOTAO_VOLTAR }}
           </BButton>
-           <LoadingButton
-               class="btn-acao-cabecalho"
-               :disabled="isLoading"
-               :loading="isLoading"
-               data-testid="cad-atribuicao__btn-criar-atribuicao"
-               :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
-              :text="TEXTOS.comum.BOTAO_CRIAR"
-              type="button"
-              variant="primary"
-              @click="criarAtribuicao"
-          />
         </template>
       </PageHeader>
       <AppAlert
@@ -128,6 +110,28 @@
             {{ mensagemErroJustificativa }}
           </BFormInvalidFeedback>
         </BFormGroup>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <BButton
+              class="btn-acao-footer"
+              :disabled="isLoading"
+              data-testid="btn-cancelar-atribuicao"
+              variant="outline-secondary"
+              @click="router.push(`/unidade/${codUnidade}`)"
+          >
+            {{ TEXTOS.comum.BOTAO_CANCELAR }}
+          </BButton>
+          <LoadingButton
+              class="btn-acao-footer"
+              :disabled="isLoading"
+              :loading="isLoading"
+              data-testid="cad-atribuicao__btn-criar-atribuicao"
+              :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
+              :text="TEXTOS.comum.BOTAO_CRIAR"
+              variant="success"
+              @click="criarAtribuicao"
+          />
+        </div>
       </BForm>
     </div>
   </LayoutPadrao>
@@ -295,8 +299,9 @@ defineExpose({
 </script>
 
 <style scoped>
-.btn-acao-cabecalho {
-  min-width: 7rem;
+.btn-acao-cabecalho,
+.btn-acao-footer {
+  min-width: 8rem;
   justify-content: center;
 }
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, watch} from "vue";
+import {computed, onMounted, watch} from "vue";
 import {useRoute} from "vue-router";
 import {BOrchestrator} from "bootstrap-vue-next";
 import pkg from "../package.json";
@@ -9,6 +9,7 @@ import {TEXTOS} from "@/constants/textos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useCacheSync} from "@/composables/useCacheSync";
+import {useConfiguracoes} from "@/composables/useConfiguracoes";
 
 interface PackageJson {
   version: string;
@@ -19,7 +20,23 @@ interface PackageJson {
 const route = useRoute();
 const perfilStore = usePerfilStore();
 const organizacaoStore = useOrganizacaoStore();
+const {carregarConfiguracoes, getTemaEscuro} = useConfiguracoes();
 const version = (pkg as PackageJson).version;
+
+const aplicarTema = () => {
+  const isDark = getTemaEscuro();
+  document.documentElement.setAttribute("data-bs-theme", isDark ? "dark" : "light");
+};
+
+onMounted(async () => {
+  await carregarConfiguracoes();
+  aplicarTema();
+});
+
+watch(
+    () => getTemaEscuro(),
+    () => aplicarTema()
+);
 
 watch(
     () => perfilStore.usuarioCodigo,

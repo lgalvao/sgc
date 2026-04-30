@@ -66,6 +66,22 @@
           </BFormInvalidFeedback>
         </BFormGroup>
 
+        <BFormGroup
+            label-for="temaEscuro"
+            class="mb-4"
+        >
+          <BFormCheckbox
+              id="temaEscuro"
+              v-model="form.temaEscuro"
+              switch
+          >
+            {{ TEXTOS.configuracoes.LABEL_TEMA_ESCURO }}
+          </BFormCheckbox>
+          <template #description>
+            {{ TEXTOS.configuracoes.DESC_TEMA_ESCURO }}
+          </template>
+        </BFormGroup>
+
         <div class="d-flex justify-content-end">
           <LoadingButton
               :loading="salvando"
@@ -82,7 +98,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref} from 'vue';
-import {BAlert, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BSpinner} from 'bootstrap-vue-next';
+import {BAlert, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormInvalidFeedback, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
@@ -99,7 +115,8 @@ const {
   carregarConfiguracoes,
   salvarConfiguracoes,
   getDiasInativacaoProcesso,
-  getDiasAlertaNovo
+  getDiasAlertaNovo,
+  getTemaEscuro
 } = useConfiguracoes();
 const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
@@ -112,7 +129,8 @@ const {
 
 const form = reactive({
   diasInativacao: 30,
-  diasAlertaNovo: 3
+  diasAlertaNovo: 3,
+  temaEscuro: false
 });
 
 const diasInativacaoInvalido = computed(() => Number(form.diasInativacao) < 1);
@@ -130,6 +148,7 @@ const mensagemErroDiasAlertaNovo = computed(() =>
 function atualizarFormulario() {
   form.diasInativacao = getDiasInativacaoProcesso();
   form.diasAlertaNovo = getDiasAlertaNovo();
+  form.temaEscuro = getTemaEscuro();
 }
 
 async function carregar() {
@@ -159,6 +178,11 @@ async function salvar() {
     chave: 'DIAS_ALERTA_NOVO',
     descricao: 'Dias para indicação de alerta como novo',
     valor: form.diasAlertaNovo.toString()
+  }, {
+    codigo: findCodigo('TEMA_ESCURO'),
+    chave: 'TEMA_ESCURO',
+    descricao: 'Habilitar tema escuro global',
+    valor: form.temaEscuro.toString()
   });
 
   const sucesso = await salvarConfiguracoes(paramsToSave);
@@ -168,6 +192,20 @@ async function salvar() {
     notify(TEXTOS.configuracoes.SUCESSO_SALVAR, 'success');
   } else {
     notify(TEXTOS.configuracoes.ERRO_SALVAR, 'danger');
+  }
+
+  salvando.value = false;
+}
+
+onMounted(async () => {
+  if (configuracoes.value.length === 0) {
+    await carregar();
+  } else {
+    atualizarFormulario();
+  }
+});
+</script>
+.configuracoes.ERRO_SALVAR, 'danger');
   }
 
   salvando.value = false;

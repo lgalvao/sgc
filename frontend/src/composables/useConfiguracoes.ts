@@ -45,6 +45,10 @@ export function useConfiguracoes() {
         return parseInt(valor, 10) || 3;
     }
 
+    function getTemaEscuro(): boolean {
+        return getValor("TEMA_ESCURO", "false") === "true";
+    }
+
     return {
         configuracoes,
         loading: carregando,
@@ -54,5 +58,6 @@ export function useConfiguracoes() {
         getValor,
         getDiasInativacaoProcesso,
         getDiasAlertaNovo,
+        getTemaEscuro,
     };
 }
