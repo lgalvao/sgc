@@ -80,6 +80,16 @@ describe("MainNavbar.vue", () => {
         checkLink("Unidades", "/unidades");
         checkLink("Relatórios", "/relatorios");
         checkLink("Histórico", "/historico");
+
+        const notificacoesNavItem = ctx.wrapper.find('[data-testid="nav-link-notificacoes"]');
+        expect(notificacoesNavItem.exists()).toBe(true);
+
+        const linkNotificacoes = notificacoesNavItem.findComponent(RouterLinkStub);
+        if (linkNotificacoes.exists()) {
+            expect(linkNotificacoes.props().to).toBe("/administracao/notificacoes");
+        } else {
+            expect(notificacoesNavItem.attributes("to")).toBe("/administracao/notificacoes");
+        }
     });
 
     it("deve navegar para a unidade do usuário ao clicar em 'Minha unidade' (não-ADMIN)", async () => {

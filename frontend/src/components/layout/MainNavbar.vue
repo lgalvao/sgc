@@ -20,9 +20,6 @@
         <BNavItem to="/historico">
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.comum.MENU_HISTORICO }}
         </BNavItem>
-        <BNavItem v-if="isAdmin" to="/administracao/notificacoes" data-testid="nav-link-notificacoes">
-          <i aria-hidden="true" class="bi bi-envelope-exclamation me-1"/> {{ TEXTOS.comum.MENU_NOTIFICACOES }}
-        </BNavItem>
       </BNavbarNav>
 
       <!-- Right aligned nav items -->
@@ -38,6 +35,20 @@
               <span class="d-lg-inline">{{ isAdmin ? 'ADMIN' : `${perfilSelecionado} - ${unidadeSelecionada}` }}</span>
             </div>
           </div>
+        </BNavItem>
+
+        <BNavItem
+            v-if="isAdmin"
+            class="me-lg-1"
+            data-testid="nav-link-notificacoes"
+            title="Notificações"
+            to="/administracao/notificacoes"
+        >
+          <template #default>
+            <span class="visually-hidden">{{ TEXTOS.comum.MENU_NOTIFICACOES }}</span>
+            <i aria-hidden="true" class="bi bi-envelope-exclamation me-lg-0 me-1"/>
+            <span aria-hidden="true" class="d-lg-none">{{ TEXTOS.comum.MENU_NOTIFICACOES }}</span>
+          </template>
         </BNavItem>
 
         <BNavItem
