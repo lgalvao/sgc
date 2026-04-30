@@ -186,8 +186,8 @@ const textoTooltip = ehAgrupadorVisual ? "" : (props.unidade.nome ?? "");
 }
 
 .unidade-link:hover {
-  background-color: #f8f9fa;
-  color: #0d6efd;
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-primary);
 }
 
 .unidade-children {

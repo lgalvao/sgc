@@ -373,8 +373,8 @@ function montarPreviewHtml(corpoHtml?: string): string {
         padding: 16px;
         font-family: Arial, sans-serif;
         line-height: 1.5;
-        color: #212529;
-        background: #fff;
+        color: var(--bs-body-color, #212529);
+        background: var(--bs-body-bg, #fff);
         overflow-wrap: anywhere;
       }
       img, table, pre {
@@ -463,15 +463,15 @@ onMounted(carregar);
   align-items: center;
   justify-content: center;
   padding: 0.25rem 0.55rem;
-  border-color: #adb5bd;
-  color: #495057;
+  border-color: var(--bs-border-color);
+  color: var(--bs-secondary-color);
 }
 
 .btn-acao:hover,
 .btn-acao:focus {
-  background: #f1f3f5;
-  border-color: #868e96;
-  color: #212529;
+  background: var(--bs-secondary-bg);
+  border-color: var(--bs-secondary-color);
+  color: var(--bs-body-color);
 }
 
 .detalhes-notificacao dt {
@@ -484,6 +484,6 @@ onMounted(carregar);
   max-height: 60vh;
   border: 1px solid var(--bs-border-color);
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--bs-body-bg);
 }
 </style>

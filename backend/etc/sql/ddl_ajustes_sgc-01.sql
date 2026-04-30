@@ -81,7 +81,7 @@ BEGIN
         EXECUTE IMMEDIATE q'[
             CREATE TABLE NOTIFICACAO_EMAIL
             (
-                codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
+                codigo                 NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
                 subprocesso_codigo     NUMBER                            NULL,
                 tipo_notificacao       VARCHAR2(80)                      NULL,
                 usuario_destino_titulo VARCHAR2(12)                      NULL,
@@ -194,5 +194,24 @@ BEGIN
     IF v_count = 0 THEN
         EXECUTE IMMEDIATE 'CREATE INDEX ix_notif_email_usuario ON NOTIFICACAO_EMAIL (usuario_destino_titulo)';
     END IF;
+END;
+/
+
+-- #################################################################
+-- GARANTE PARAMETROS ESSENCIAIS DO SISTEMA
+-- #################################################################
+DECLARE
+    PROCEDURE garantir_parametro(p_chave VARCHAR2, p_desc VARCHAR2, p_valor VARCHAR2) IS
+        v_count NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_count FROM parametro WHERE chave = p_chave;
+        IF v_count = 0 THEN
+            INSERT INTO parametro (chave, descricao, valor) VALUES (p_chave, p_desc, p_valor);
+        END IF;
+    END;
+BEGIN
+    garantir_parametro('DIAS_INATIVACAO_PROCESSO', 'Dias para inativacao de processos', '30');
+    garantir_parametro('DIAS_ALERTA_NOVO', 'Dias para indicacao de alerta como novo', '3');
+    garantir_parametro('TEMA_ESCURO', 'Habilitar tema escuro global', 'false');
 END;
 /

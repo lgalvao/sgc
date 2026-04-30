@@ -74,8 +74,8 @@ const shouldShowBreadcrumbs = computed(
 .btn-voltar {
   padding: 0.4rem;
   font-size: 0.75rem;
-  border-color: #dee2e6;
-  color: #6c757d;
+  border-color: var(--bs-border-color);
+  color: var(--bs-secondary-color);
   height: 24px;
   display: flex;
   align-items: center;
@@ -84,9 +84,9 @@ const shouldShowBreadcrumbs = computed(
 }
 
 .btn-voltar:hover {
-  background-color: #6c757d;
-  border-color: #6c757d;
-  color: #fff;
+  background-color: var(--bs-secondary-bg);
+  border-color: var(--bs-secondary-color);
+  color: var(--bs-secondary-color);
 }
 
 .breadcrumb-compacto {
@@ -103,7 +103,7 @@ const shouldShowBreadcrumbs = computed(
 }
 
 :deep(.bi-house-door) {
-  color: #6c757d;
+  color: var(--bs-secondary-color);
   font-size: 0.9rem;
   vertical-align: middle;
   margin-top: -2px;

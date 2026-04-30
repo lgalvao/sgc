@@ -8,8 +8,9 @@ import {
 
 export type {Parametro};
 
+const configuracoes = ref<Parametro[]>([]);
+
 export function useConfiguracoes() {
-    const configuracoes = ref<Parametro[]>([]);
     const {carregando, erro, executarSilencioso} = useAsyncAction();
 
     const configuracoesMap = computed(() =>

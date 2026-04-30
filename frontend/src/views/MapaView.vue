@@ -209,7 +209,7 @@
           <div
               v-if="!isChefe"
               data-testid="txt-ver-sugestoes-mapa-texto"
-              class="border rounded p-3 bg-light white-space-pre-line"
+              class="border rounded p-3 bg-body-tertiary white-space-pre-line"
           >
             {{ sugestoesVisualizacao }}
           </div>

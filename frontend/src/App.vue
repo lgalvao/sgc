@@ -93,7 +93,7 @@ const chaveSessao = computed(() =>
     <MainNavbar v-if="route.path !== '/login' && route.path !== '/erro'"/>
     <div
         v-if="shouldShowNavBarExtras"
-        class="bg-light border-bottom"
+        class="bg-body-tertiary border-bottom"
     >
       <div class="container pt-1 pb-2">
         <BarraNavegacao/>
@@ -119,7 +119,7 @@ const chaveSessao = computed(() =>
 
     <footer
         v-if="route.path !== '/login' && route.path !== '/erro'"
-        class="footer-app bg-light text-muted border-top mt-auto"
+        class="footer-app bg-body-tertiary text-body-secondary border-top mt-auto"
     >
       <div class="container-fluid footer-app__conteudo small d-flex justify-content-between align-items-center">
         <span>{{ TEXTOS.comum.VERSAO }} {{ version }}</span>

@@ -196,21 +196,23 @@ onMounted(() => {
   max-height: 22rem;
   overflow: auto;
   padding: 0.75rem;
-  border: 1px solid #d7dee8;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.65rem;
-  background: #fff;
+  background: var(--bs-body-bg);
 }
 
 .container-arvore {
   overflow-x: hidden;
   max-height: 22rem;
   overflow-y: auto;
-  background: #fff;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.65rem;
 }
 
 .relatorio-mapas__card {
-  border: 1px solid #c8d1dc;
-  background: #fff;
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-body-bg);
 }
 
 .relatorio-mapas__cabecalho {
@@ -219,18 +221,18 @@ onMounted(() => {
   gap: 0.2rem;
   padding-bottom: 0.85rem;
   margin-bottom: 0.9rem;
-  border-bottom: 1px solid #d7dee8;
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .relatorio-mapas__titulo {
-  color: #16365f;
+  color: var(--bs-primary-text-emphasis);
   font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
 
 .relatorio-mapas__subtitulo {
-  color: #4b5d73;
+  color: var(--bs-secondary-color);
   font-size: 0.95rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -239,13 +241,13 @@ onMounted(() => {
 
 .relatorio-mapas__competencia {
   padding: 0.95rem 1rem;
-  border: 1px solid #dde4ec;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.65rem;
-  background: #fff;
+  background: var(--bs-secondary-bg);
 }
 
 .relatorio-mapas__secao {
-  color: #1d3557;
+  color: var(--bs-heading-color);
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.35;
@@ -256,7 +258,7 @@ onMounted(() => {
 }
 
 .relatorio-mapas__atividade-titulo {
-  color: #1f2937;
+  color: var(--bs-body-color);
   font-size: 0.98rem;
   font-weight: 600;
   line-height: 1.4;
@@ -265,7 +267,7 @@ onMounted(() => {
 .relatorio-mapas__conhecimentos {
   margin: 0.35rem 0 0;
   padding-left: 1.2rem;
-  color: #374151;
+  color: var(--bs-body-color);
 }
 
 .relatorio-mapas__conhecimentos li + li {

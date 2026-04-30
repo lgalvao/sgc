@@ -69,15 +69,15 @@
               <div class="relatorio-andamento__grid-geral">
                 <div class="relatorio-andamento__info-item">
                   <span class="relatorio-andamento__info-label">Situação</span>
-                  <span class="relatorio-andamento__info-valor fw-bold text-dark">{{ item.situacaoAtual }}</span>
+                  <span class="relatorio-andamento__info-valor fw-bold">{{ item.situacaoAtual }}</span>
                 </div>
                 <div class="relatorio-andamento__info-item">
                   <span class="relatorio-andamento__info-label">Localização</span>
-                  <span class="relatorio-andamento__info-valor fw-bold text-dark">{{ item.localizacao }}</span>
+                  <span class="relatorio-andamento__info-valor fw-bold">{{ item.localizacao }}</span>
                 </div>
                 <div class="relatorio-andamento__info-item">
                   <span class="relatorio-andamento__info-label">Última movimentação</span>
-                  <span class="relatorio-andamento__info-valor fw-bold text-dark">{{ item.dataUltimaMovimentacao }}</span>
+                  <span class="relatorio-andamento__info-valor fw-bold">{{ item.dataUltimaMovimentacao }}</span>
                 </div>
               </div>
             </div>
@@ -231,8 +231,8 @@ onMounted(() => {
 
 <style scoped>
 .relatorio-andamento__card {
-  border: 1px solid #c8d1dc;
-  background: #fff;
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-body-bg);
   border-radius: 0.75rem;
   overflow: hidden;
 }
@@ -243,18 +243,18 @@ onMounted(() => {
   gap: 0.2rem;
   padding-bottom: 0.85rem;
   margin-bottom: 1.2rem;
-  border-bottom: 1px solid #d7dee8;
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .relatorio-andamento__titulo {
-  color: #16365f;
+  color: var(--bs-primary-text-emphasis);
   font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
 
 .relatorio-andamento__subtitulo {
-  color: #4b5d73;
+  color: var(--bs-secondary-color);
   font-size: 0.95rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -273,7 +273,7 @@ onMounted(() => {
 }
 
 .relatorio-andamento__info-label {
-  color: #6b7280;
+  color: var(--bs-secondary-color);
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -282,19 +282,19 @@ onMounted(() => {
 }
 
 .relatorio-andamento__info-valor {
-  color: #1f2937;
+  color: var(--bs-body-color);
   font-size: 0.95rem;
 }
 
 .relatorio-andamento__etapa-card {
   padding: 1rem;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.6rem;
 }
 
 .relatorio-andamento__etapa-titulo {
-  color: #1d3557;
+  color: var(--bs-heading-color);
   font-size: 0.9rem;
   font-weight: 700;
   margin-bottom: 0.75rem;

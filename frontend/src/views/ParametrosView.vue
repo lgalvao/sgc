@@ -164,26 +164,28 @@ async function salvar() {
 
   salvando.value = true;
 
-  const paramsToSave: Parametro[] = [];
+  const findParametro = (chave: string) => configuracoes.value.find(p => p.chave === chave);
 
-  const findCodigo = (chave: string) => configuracoes.value.find(p => p.chave === chave)?.codigo;
+  const pInativacao = findParametro('DIAS_INATIVACAO_PROCESSO');
+  const pAlertaNovo = findParametro('DIAS_ALERTA_NOVO');
+  const pTemaEscuro = findParametro('TEMA_ESCURO');
 
-  paramsToSave.push({
-    codigo: findCodigo('DIAS_INATIVACAO_PROCESSO'),
-    chave: 'DIAS_INATIVACAO_PROCESSO',
-    descricao: 'Dias para inativação de processos',
-    valor: form.diasInativacao.toString()
-  }, {
-    codigo: findCodigo('DIAS_ALERTA_NOVO'),
-    chave: 'DIAS_ALERTA_NOVO',
-    descricao: 'Dias para indicação de alerta como novo',
-    valor: form.diasAlertaNovo.toString()
-  }, {
-    codigo: findCodigo('TEMA_ESCURO'),
-    chave: 'TEMA_ESCURO',
-    descricao: 'Habilitar tema escuro global',
-    valor: form.temaEscuro.toString()
-  });
+  const ausentes = [];
+  if (!pInativacao) ausentes.push('DIAS_INATIVACAO_PROCESSO');
+  if (!pAlertaNovo) ausentes.push('DIAS_ALERTA_NOVO');
+  if (!pTemaEscuro) ausentes.push('TEMA_ESCURO');
+
+  if (ausentes.length > 0) {
+    notify(`Os seguintes parâmetros não foram encontrados no banco de dados: ${ausentes.join(', ')}. Certifique-se de executar o script de migração SQL.`, 'danger');
+    salvando.value = false;
+    return;
+  }
+
+  const paramsToSave: Parametro[] = [
+    { ...pInativacao, valor: form.diasInativacao.toString() },
+    { ...pAlertaNovo, valor: form.diasAlertaNovo.toString() },
+    { ...pTemaEscuro, valor: form.temaEscuro.toString() }
+  ];
 
   const sucesso = await salvarConfiguracoes(paramsToSave);
 
@@ -192,20 +194,6 @@ async function salvar() {
     notify(TEXTOS.configuracoes.SUCESSO_SALVAR, 'success');
   } else {
     notify(TEXTOS.configuracoes.ERRO_SALVAR, 'danger');
-  }
-
-  salvando.value = false;
-}
-
-onMounted(async () => {
-  if (configuracoes.value.length === 0) {
-    await carregar();
-  } else {
-    atualizarFormulario();
-  }
-});
-</script>
-.configuracoes.ERRO_SALVAR, 'danger');
   }
 
   salvando.value = false;
