@@ -127,7 +127,7 @@ function aplicarElegibilidadeMapaVigente(unidades: Unidade[], codigosElegiveis: 
 
 function filtrarArvorePorMapaVigente(unidades: Unidade[]): Unidade[] {
   return unidades
-      .map(unidade => {
+      .map((unidade): Unidade | null => {
         const filhasFiltradas = unidade.filhas ? filtrarArvorePorMapaVigente(unidade.filhas) : [];
         const manterUnidade = unidade.isElegivel === true || filhasFiltradas.length > 0;
 
