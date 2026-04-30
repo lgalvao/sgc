@@ -6,6 +6,7 @@ import {relatoriosService} from "@/services/relatoriosService";
 vi.mock("@/services/relatoriosService", () => ({
   relatoriosService: {
     obterRelatorioAndamento: vi.fn(),
+    obterRelatorioMapas: vi.fn(),
     downloadRelatorioAndamentoPdf: vi.fn(),
     downloadRelatorioMapasPdf: vi.fn(),
   },
@@ -49,6 +50,18 @@ describe("Relatorios Store", () => {
     expect(store.lastError).toBeNull();
   });
 
+  it("deve buscar relatorio de mapas com sucesso", async () => {
+    const store = useRelatoriosStore();
+    const mockData = [{codigoUnidade: 1, siglaUnidade: "SEC", nomeUnidade: "Secretaria", totalCompetencias: 1, competencias: []}];
+    vi.mocked(relatoriosService.obterRelatorioMapas).mockResolvedValue(mockData as any);
+
+    await store.buscarRelatorioMapas(123, 456);
+
+    expect(relatoriosService.obterRelatorioMapas).toHaveBeenCalledWith(123, 456);
+    expect(store.relatorioMapas).toEqual(mockData);
+    expect(store.lastError).toBeNull();
+  });
+
   it("deve exportar mapas PDF com sucesso", async () => {
     const store = useRelatoriosStore();
     vi.mocked(relatoriosService.downloadRelatorioMapasPdf).mockResolvedValue(undefined);
@@ -62,10 +75,12 @@ describe("Relatorios Store", () => {
   it("deve limpar relatorio", () => {
     const store = useRelatoriosStore();
     store.relatorioAndamento = [{siglaUnidade: "UNIT1"}] as any;
+    store.relatorioMapas = [{codigoUnidade: 1}] as any;
 
     store.limparRelatorio();
 
     expect(store.relatorioAndamento).toEqual([]);
+    expect(store.relatorioMapas).toEqual([]);
     expect(store.lastError).toBeNull();
   });
 });

@@ -26,6 +26,24 @@ describe("relatoriosService", () => {
     expect(result).toEqual(mockData);
   });
 
+  it("deve chamar obterRelatorioMapas com o código do processo correto", async () => {
+    const mockData = [{codigoUnidade: 1, siglaUnidade: "SEC", nomeUnidade: "Secretaria", totalCompetencias: 1, competencias: []}];
+    vi.mocked(apiClient.get).mockResolvedValueOnce({data: mockData});
+
+    const result = await relatoriosService.obterRelatorioMapas(123);
+
+    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123");
+    expect(result).toEqual(mockData);
+  });
+
+  it("deve chamar obterRelatorioMapas com codUnidade quando fornecido", async () => {
+    vi.mocked(apiClient.get).mockResolvedValueOnce({data: []});
+
+    await relatoriosService.obterRelatorioMapas(123, 456);
+
+    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123?codUnidade=456");
+  });
+
   it("deve chamar downloadRelatorioAndamentoPdf e disparar o download", async () => {
     const mockBlob = new Blob(["pdf content"], {type: "application/pdf"});
     vi.mocked(apiClient.get).mockResolvedValueOnce({data: mockBlob});
@@ -87,7 +105,7 @@ describe("relatoriosService", () => {
 
     await relatoriosService.downloadRelatorioMapasPdf(123, 456);
 
-    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123/exportar?unidadeId=456", {
+    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123/exportar?codUnidade=456", {
       responseType: "blob",
     });
   });

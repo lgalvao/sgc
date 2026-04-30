@@ -45,4 +45,12 @@ public class RelatorioController {
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_mapas.pdf");
         relatorioService.gerarRelatorioMapas(codProcesso, codUnidade, response.getOutputStream());
     }
+
+    @GetMapping("/mapas/{codProcesso}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Gera a visualização em JSON do relatório consolidado de mapas (CDU-36)")
+    public ResponseEntity<List<RelatorioMapaDto>> obterRelatorioMapas(@PathVariable Long codProcesso,
+                                                                      @RequestParam(required = false) Long codUnidade) {
+        return ResponseEntity.ok(relatorioService.obterRelatorioMapas(codProcesso, codUnidade));
+    }
 }

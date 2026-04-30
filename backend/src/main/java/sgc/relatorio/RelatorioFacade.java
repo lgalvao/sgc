@@ -95,7 +95,10 @@ public class RelatorioFacade {
     @Transactional(readOnly = true)
     public void gerarRelatorioMapas(Long codProcesso, Long codUnidade, OutputStream outputStream) {
         Processo processo = processoService.buscarPorCodigo(codProcesso);
-        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = filtrarSubprocessosPorUnidade(
+                consultaService.listarEntidadesPorProcesso(codProcesso),
+                codUnidade
+        );
         LocalDateTime dataGeracao = LocalDateTime.now();
 
         try (Document document = pdfFactory.createDocument()) {
@@ -121,6 +124,18 @@ public class RelatorioFacade {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<RelatorioMapaDto> obterRelatorioMapas(Long codProcesso, Long codUnidade) {
+        List<Subprocesso> subprocessos = filtrarSubprocessosPorUnidade(
+                consultaService.listarEntidadesPorProcesso(codProcesso),
+                codUnidade
+        );
+
+        return subprocessos.stream()
+                .map(this::criarRelatorioMapaDto)
+                .toList();
+    }
+
     private Map<Long, UnidadeResponsavelDto> buscarResponsaveisPorUnidade(List<Subprocesso> subprocessos) {
         List<Long> codigosUnidade = subprocessos.stream()
                 .map(Subprocesso::getUnidade)
@@ -129,6 +144,55 @@ public class RelatorioFacade {
                 .toList();
 
         return new HashMap<>(responsavelService.buscarResponsaveisUnidades(codigosUnidade));
+    }
+
+    private List<Subprocesso> filtrarSubprocessosPorUnidade(List<Subprocesso> subprocessos, @Nullable Long codUnidade) {
+        if (codUnidade == null) {
+            return subprocessos;
+        }
+
+        return subprocessos.stream()
+                .filter(subprocesso -> subprocesso.getUnidade().getCodigo().equals(codUnidade))
+                .toList();
+    }
+
+    private RelatorioMapaDto criarRelatorioMapaDto(Subprocesso subprocesso) {
+        Unidade unidade = subprocesso.getUnidade();
+        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(subprocesso.getMapa().getCodigo());
+        List<RelatorioMapaCompetenciaDto> competenciasDto = competencias.stream()
+                .map(this::criarRelatorioMapaCompetenciaDto)
+                .toList();
+
+        return new RelatorioMapaDto(
+                unidade.getCodigo(),
+                unidade.getSigla(),
+                unidade.getNome(),
+                competenciasDto.size(),
+                competenciasDto
+        );
+    }
+
+    private RelatorioMapaCompetenciaDto criarRelatorioMapaCompetenciaDto(Competencia competencia) {
+        return new RelatorioMapaCompetenciaDto(
+                competencia.getCodigo(),
+                competencia.getDescricao(),
+                competencia.getAtividades().stream()
+                        .map(this::criarRelatorioMapaAtividadeDto)
+                        .toList()
+        );
+    }
+
+    private RelatorioMapaAtividadeDto criarRelatorioMapaAtividadeDto(Atividade atividade) {
+        return new RelatorioMapaAtividadeDto(
+                atividade.getCodigo(),
+                atividade.getDescricao(),
+                atividade.getConhecimentos().stream()
+                        .map(conhecimento -> new RelatorioMapaConhecimentoDto(
+                                conhecimento.getCodigo(),
+                                conhecimento.getDescricao()
+                        ))
+                        .toList()
+        );
     }
 
     private RelatorioAndamentoDto criarRelatorioAndamentoDto(

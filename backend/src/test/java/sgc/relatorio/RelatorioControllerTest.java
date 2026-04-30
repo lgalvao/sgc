@@ -84,4 +84,36 @@ class RelatorioControllerTest {
         verify(relatorioFacade).gerarRelatorioMapas(eq(1L), eq(2L), any());
     }
 
+    @Test
+    @DisplayName("GET /api/relatorios/mapas/{codProcesso} - Deve retornar relatório de mapas")
+    @WithMockUser(roles = "ADMIN")
+    void deveObterRelatorioMapas() throws Exception {
+        RelatorioMapaDto dto = new RelatorioMapaDto(
+                2L,
+                "SEC",
+                "Secretaria",
+                1,
+                List.of(new RelatorioMapaCompetenciaDto(
+                        3L,
+                        "Competência 1",
+                        List.of(new RelatorioMapaAtividadeDto(
+                                4L,
+                                "Atividade 1",
+                                List.of(new RelatorioMapaConhecimentoDto(5L, "Conhecimento 1"))
+                        ))
+                ))
+        );
+        when(relatorioFacade.obterRelatorioMapas(1L, 2L)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/relatorios/mapas/1").param("codUnidade", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigoUnidade").value(2))
+                .andExpect(jsonPath("$[0].siglaUnidade").value("SEC"))
+                .andExpect(jsonPath("$[0].nomeUnidade").value("Secretaria"))
+                .andExpect(jsonPath("$[0].totalCompetencias").value(1))
+                .andExpect(jsonPath("$[0].competencias[0].descricao").value("Competência 1"))
+                .andExpect(jsonPath("$[0].competencias[0].atividades[0].descricao").value("Atividade 1"))
+                .andExpect(jsonPath("$[0].competencias[0].atividades[0].conhecimentos[0].descricao").value("Conhecimento 1"));
+    }
+
 }
