@@ -3,22 +3,12 @@ import {flushPromises, mount} from "@vue/test-utils";
 import AdministradoresView from "@/views/AdministradoresView.vue";
 import * as administradorService from "@/services/administradorService";
 import {createTestingPinia} from "@pinia/testing";
-import {useRouter} from "vue-router";
+import {TEXTOS} from "@/constants/textos";
 
 vi.mock("@/services/administradorService", () => ({
     listarAdministradores: vi.fn(),
     adicionarAdministrador: vi.fn(),
     removerAdministrador: vi.fn()
-}));
-
-const {pushMock} = vi.hoisted(() => ({
-    pushMock: vi.fn(),
-}));
-
-vi.mock("vue-router", () => ({
-    useRouter: vi.fn(() => ({
-        push: pushMock,
-    })),
 }));
 
 describe("AdministradoresView.vue", () => {
@@ -30,7 +20,6 @@ describe("AdministradoresView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(administradorService.listarAdministradores).mockResolvedValue(mockAdmins);
-        vi.mocked(useRouter).mockReturnValue({push: pushMock} as any);
     });
 
     const createWrapper = () => {
@@ -46,6 +35,18 @@ describe("AdministradoresView.vue", () => {
                     BButton: {template: `<button @click="$emit('click')"><slot /></button>`},
                     BAlert: {template: '<div><slot /></div>'},
                     EmptyState: true,
+                    BTable: {
+                        props: ['items'],
+                        template: `
+                            <table>
+                                <tr v-for="item in items" :key="item.tituloEleitoral">
+                                    <td>{{ item.nome }}</td>
+                                    <td>{{ item.tituloEleitoral }}</td>
+                                    <td><slot name="cell(acoes)" :item="item" /></td>
+                                </tr>
+                            </table>
+                        `
+                    },
                     ModalConfirmacao: {
                         name: 'ModalConfirmacao',
                         props: ['modelValue', 'loading'],
@@ -53,22 +54,22 @@ describe("AdministradoresView.vue", () => {
                         emits: ['confirmar', 'shown', 'update:modelValue']
                     },
                     LoadingButton: {
-                        props: ['loading', 'text'],
-                        template: `<button @click="$emit('click')">{{ text }}<slot /></button>`,
+                        props: ['loading', 'text', 'icon'],
+                        template: `<button class="loading-btn" @click="$emit('click')">{{ text }}<i v-if="icon" :class="'bi bi-' + icon"></i><slot /></button>`,
                         emits: ['click']
+                    },
+                    BuscadorUsuarios: {
+                        name: 'BuscadorUsuarios',
+                        props: ['termo', 'selecionado', 'state'],
+                        template: '<div><input class="buscador-input" :value="termo" @input="$emit(\'update:termo\', $event.target.value)" /></div>',
+                        emits: ['update:termo', 'update:selecionado'],
+                        methods: {
+                            focus() {},
+                            limparResultadosPesquisaUsuarios() {}
+                        }
                     },
                     BFormInvalidFeedback: {template: '<div><slot /></div>'},
                     BFormGroup: {template: '<div><slot /><slot name="label" /></div>'},
-                    BRow: {template: '<div><slot /></div>'},
-                    BCol: {template: '<div><slot /></div>'},
-                    BFormInput: {
-                        props: ['modelValue'],
-                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-                        emits: ['update:modelValue'],
-                        methods: {
-                            focus() {}
-                        }
-                    }
                 }
             }
         });
@@ -78,7 +79,7 @@ describe("AdministradoresView.vue", () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        expect(wrapper.find('h1').text()).toBe('Administradores');
+        expect(wrapper.find('h1').text()).toBe(TEXTOS.administracao.TITULO);
         expect(administradorService.listarAdministradores).toHaveBeenCalled();
         expect(wrapper.text()).toContain("Admin 1");
         expect(wrapper.text()).toContain("Admin 2");
@@ -99,7 +100,7 @@ describe("AdministradoresView.vue", () => {
         const addButton = wrapper.find('button[data-testid="btn-abrir-modal-add-admin"]');
         await addButton.trigger("click");
 
-        const input = wrapper.find('input#tituloEleitoral');
+        const input = wrapper.find('input.buscador-input');
         await input.setValue("333");
 
         vi.mocked(administradorService.adicionarAdministrador).mockResolvedValue({} as any);
@@ -110,21 +111,13 @@ describe("AdministradoresView.vue", () => {
         expect(administradorService.adicionarAdministrador).toHaveBeenCalledWith("333");
     });
 
-    it("deve navegar para a tela de limpeza de processos", async () => {
-        const wrapper = createWrapper();
-        await flushPromises();
-
-        await wrapper.find('button[data-testid="btn-abrir-limpeza-processos"]').trigger("click");
-
-        expect(pushMock).toHaveBeenCalledWith("/administracao/limpeza-processos");
-    });
-
     it("deve remover administrador", async () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        const removeBtn = wrapper.findAll('button').find(b => b.text().includes('Remover'));
-        await removeBtn?.trigger("click");
+        // Encontra o botão de lixeira (LoadingButton com icon="trash")
+        const removeBtn = wrapper.find('button.loading-btn i.bi-trash').element.parentElement;
+        await (removeBtn as HTMLElement).click();
 
         vi.mocked(administradorService.removerAdministrador).mockResolvedValue({} as any);
 
@@ -134,39 +127,29 @@ describe("AdministradoresView.vue", () => {
         expect(administradorService.removerAdministrador).toHaveBeenCalledWith("111");
     });
 
-    it("deve gerenciar estados de modais e fluxos de erro na administração de usuários", async () => {
+    it("deve gerenciar estados de modais e fluxos de erro", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
 
-        // Atualização de v-model nos modais
-        const modals = wrapper.findAllComponents({name: 'ModalConfirmacao'});
-        for (const modal of modals) {
-            await modal.vm.$emit('update:modelValue', true);
-        }
+        // Abre modal
+        await wrapper.find('button[data-testid="btn-abrir-modal-add-admin"]').trigger("click");
         expect(vm.mostrarModalAdicionarAdmin).toBe(true);
-        expect(vm.mostrarModalRemoverAdmin).toBe(true);
-        
-        // Disparo de evento shown do modal
-        const modalAdd = wrapper.findComponent({name: 'ModalConfirmacao'});
-        await modalAdd.vm.$emit('shown');
 
-        // Tentativa de adicionar administrador com título inválido
-        vm.novoAdminTitulo = "";
+        // Tentativa de adicionar administrador com termo vazio
+        vm.termoUsuario = "";
         await vm.adicionarAdmin();
         
         // Tratamento de erro na adição de administrador
-        vm.novoAdminTitulo = "123";
+        vm.termoUsuario = "123";
         vi.mocked(administradorService.adicionarAdministrador).mockRejectedValue(new Error("Erro add"));
         await vm.adicionarAdmin();
-
-        // Tentativa de remover administrador sem seleção
-        vm.adminParaRemover = null;
-        await vm.removerAdmin();
+        expect(vm.erroAdicionarAdmin).toBe("Erro add");
 
         // Tratamento de erro na remoção de administrador
         vm.adminParaRemover = {tituloEleitoral: "111", nome: "Admin"};
         vi.mocked(administradorService.removerAdministrador).mockRejectedValue(new Error("Erro rem"));
         await vm.removerAdmin();
+        expect(vm.erroRemoverAdmin).toBe("Erro rem");
     });
 });

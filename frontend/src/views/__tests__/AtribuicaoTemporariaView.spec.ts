@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {mount} from '@vue/test-utils';
+import {mount, flushPromises} from '@vue/test-utils';
 import AtribuicaoTemporariaView from '../AtribuicaoTemporariaView.vue';
 import {buscarUnidadePorCodigo} from '@/services/unidadeService';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
@@ -73,7 +73,10 @@ const mountOptions = {
       BuscadorUsuarios: {
         name: 'BuscadorUsuarios',
         props: ['termo', 'selecionado'],
-        template: '<div></div>'
+        template: '<div></div>',
+        methods: {
+            limparResultadosPesquisaUsuarios() {}
+        }
       },
       BFormTextarea: {
         name: 'BFormTextarea',
@@ -103,7 +106,7 @@ describe('AtribuicaoTemporariaView', () => {
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
+    await flushPromises();
     
     expect(buscarUnidadePorCodigo).toHaveBeenCalledWith(1);
     expect(vm.unidade).toBeDefined();
@@ -115,7 +118,7 @@ describe('AtribuicaoTemporariaView', () => {
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
+    await flushPromises();
 
     expect(vm.erroUsuario).toContain('Falha ao carregar dados da unidade');
   });
@@ -124,7 +127,7 @@ describe('AtribuicaoTemporariaView', () => {
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
+    await flushPromises();
 
     await vm.criarAtribuicao();
 
@@ -136,7 +139,7 @@ describe('AtribuicaoTemporariaView', () => {
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
+    await flushPromises();
 
     const botaoCriar = wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]');
     expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
@@ -145,7 +148,7 @@ describe('AtribuicaoTemporariaView', () => {
     vm.dataInicio = '2025-01-01';
     vm.dataTermino = '2025-12-31';
     vm.justificativa = 'Teste de justificativa';
-    await vm.$nextTick();
+    await flushPromises();
 
     expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
   });
@@ -156,7 +159,7 @@ describe('AtribuicaoTemporariaView', () => {
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
+    await flushPromises();
 
     // Preenchendo o formulário
     vm.usuarioSelecionado = '999';
@@ -165,6 +168,7 @@ describe('AtribuicaoTemporariaView', () => {
     vm.justificativa = 'Teste de justificativa';
 
     await vm.criarAtribuicao();
+    await flushPromises();
 
     expect(criarAtribuicaoTemporaria).toHaveBeenCalledWith(1, {
       tituloEleitoralUsuario: '999',
@@ -183,7 +187,7 @@ describe('AtribuicaoTemporariaView', () => {
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
+    await flushPromises();
 
     vm.usuarioSelecionado = '999';
     vm.dataInicio = '2025-01-01';
@@ -191,6 +195,7 @@ describe('AtribuicaoTemporariaView', () => {
     vm.justificativa = 'Teste de justificativa';
 
     await vm.criarAtribuicao();
+    await flushPromises();
 
     expect(criarAtribuicaoTemporaria).toHaveBeenCalled();
     expect(vm.erroFormulario).toContain('Erro no servidor');
