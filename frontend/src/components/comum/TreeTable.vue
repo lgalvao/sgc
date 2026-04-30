@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-        v-if="title || flattenedData.length > 0"
+        v-if="deveExibirCabecalhoControles"
         :class="[
           'd-flex',
           'align-items-center',
@@ -38,7 +38,7 @@
     </div>
 
     <div class="table-responsive w-100">
-      <table class="tree-table table table-striped table-hover m-0" data-testid="tbl-tree">
+      <table :class="classesTabela" data-testid="tbl-tree">
         <colgroup>
           <col
               v-for="(column, index) in columns"
@@ -138,6 +138,8 @@ interface TreeTableProps {
   columns: Column[];
   title?: string;
   hideHeaders?: boolean;
+  hideControls?: boolean;
+  striped?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyIcon?: string;
@@ -146,6 +148,8 @@ interface TreeTableProps {
 const props = withDefaults(defineProps<TreeTableProps>(), {
   title: undefined,
   hideHeaders: false,
+  hideControls: false,
+  striped: true,
   emptyTitle: TEXTOS.treeTable.EMPTY_TITLE,
   emptyDescription: TEXTOS.treeTable.EMPTY_DESCRIPTION,
   emptyIcon: "bi-folder2-open",
@@ -232,6 +236,18 @@ const flattenedData = computed((): FlattenedTreeItem[] => {
   return flattened;
 });
 
+const classesTabela = computed(() => ({
+  "tree-table": true,
+  "table": true,
+  "table-hover": true,
+  "m-0": true,
+  "table-striped": props.striped,
+}));
+
+const deveExibirCabecalhoControles = computed(() =>
+    !!props.title || (!props.hideControls && flattenedData.value.length > 0)
+);
+
 const findItemByCodigo = (
     items: TreeItem[],
     codigo: number | string,
@@ -291,6 +307,8 @@ defineExpose({
   internalData,
   findItemByCodigo,
   toggleExpand,
+  expandAll,
+  collapseAll,
   handleTreeRowClick,
 });
 </script>

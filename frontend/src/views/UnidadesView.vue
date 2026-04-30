@@ -4,6 +4,27 @@
       <template #description>
         {{ TEXTOS.unidades.SUBTITULO }}
       </template>
+      <template #actions>
+        <BButton
+            aria-label="Expandir todas as linhas"
+            class="me-2"
+            data-testid="btn-unidades-expandir-todas"
+            size="sm"
+            variant="outline-primary"
+            @click="expandirTodasLinhas"
+        >
+          <i aria-hidden="true" class="bi bi-arrows-expand"/>
+        </BButton>
+        <BButton
+            aria-label="Recolher todas as linhas"
+            data-testid="btn-unidades-recolher-todas"
+            size="sm"
+            variant="outline-secondary"
+            @click="recolherTodasLinhas"
+        >
+          <i aria-hidden="true" class="bi bi-arrows-collapse"/>
+        </BButton>
+      </template>
     </PageHeader>
 
     <div v-if="exibirAlertaDiagnostico" class="mb-3 pt-2">
@@ -40,8 +61,12 @@
 
     <div v-else-if="dadosArvore.length > 0">
       <TreeTable
+          ref="treeTableRef"
           :columns="colunas"
           :data="dadosArvore"
+          :hide-controls="true"
+          :hide-headers="true"
+          :striped="false"
           @row-click="abrirDetalheUnidade"
       />
     </div>
@@ -89,7 +114,13 @@ type LinhaUnidadeArvore = {
   clickable: boolean;
 };
 
+type TreeTableRef = {
+  expandAll: () => void;
+  collapseAll: () => void;
+};
+
 const unidades = ref<Unidade[]>([]);
+const treeTableRef = ref<TreeTableRef | null>(null);
 const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
 const organizacaoStore = useOrganizacaoStore();
@@ -138,6 +169,14 @@ function clearError() {
 
 function dispensarAlertaDiagnostico() {
   alertaDiagnosticoDispensado.value = true;
+}
+
+function expandirTodasLinhas() {
+  treeTableRef.value?.expandAll();
+}
+
+function recolherTodasLinhas() {
+  treeTableRef.value?.collapseAll();
 }
 
 async function carregarUnidades() {

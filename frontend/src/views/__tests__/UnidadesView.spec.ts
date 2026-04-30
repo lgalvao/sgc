@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
+import {defineComponent} from "vue";
 import Unidades from "@/views/UnidadesView.vue";
 import * as unidadeService from "@/services/unidadeService";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
@@ -30,10 +31,39 @@ vi.mock("@/services/unidadeService", () => ({
 
 describe("Unidades.vue", () => {
     const context = setupComponentTest();
+    const expandAllMock = vi.fn();
+    const collapseAllMock = vi.fn();
+
+    const TreeTableStub = defineComponent({
+        name: "TreeTable",
+        props: ["data", "columns", "title", "hideHeaders", "striped", "hideControls"],
+        emits: ["row-click"],
+        setup(_, {expose}) {
+            expose({
+                expandAll: expandAllMock,
+                collapseAll: collapseAllMock,
+            });
+            return {};
+        },
+        template: `
+          <div data-testid="tree-table">
+            <button
+              v-if="data && data.length > 0"
+              data-testid="tree-table-row-click"
+              type="button"
+              @click="$emit('row-click', data[0])"
+            >
+              Abrir
+            </button>
+          </div>
+        `
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();
         mockPush.mockReset();
+        expandAllMock.mockReset();
+        collapseAllMock.mockReset();
         vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue([]);
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
             possuiViolacoes: false,
@@ -73,24 +103,9 @@ describe("Unidades.vue", () => {
                 {},
                 {
                     PageHeader: {
-                        template: "<div><h1>Page header</h1><slot name='description' /></div>"
+                        template: "<div><h1>Page header</h1><slot name='description' /><slot name='actions' /></div>"
                     },
-                    TreeTable: {
-                        name: "TreeTable",
-                        template: `
-                          <div data-testid="tree-table">
-                            <button
-                              v-if="data && data.length > 0"
-                              data-testid="tree-table-row-click"
-                              type="button"
-                              @click="$emit('row-click', data[0])"
-                            >
-                              Abrir
-                            </button>
-                          </div>
-                        `,
-                        props: ["data", "columns", "title"]
-                    },
+                    TreeTable: TreeTableStub,
                     BContainer: {template: "<div><slot /></div>"},
                     BAlert: {
                         name: "BAlert",
@@ -160,24 +175,9 @@ describe("Unidades.vue", () => {
                 },
                 {
                     PageHeader: {
-                        template: "<div><h1>Page header</h1><slot name='description' /></div>"
+                        template: "<div><h1>Page header</h1><slot name='description' /><slot name='actions' /></div>"
                     },
-                    TreeTable: {
-                        name: "TreeTable",
-                        template: `
-                          <div data-testid="tree-table">
-                            <button
-                              v-if="data && data.length > 0"
-                              data-testid="tree-table-row-click"
-                              type="button"
-                              @click="$emit('row-click', data[0])"
-                            >
-                              Abrir
-                            </button>
-                          </div>
-                        `,
-                        props: ["data", "columns", "title"]
-                    },
+                    TreeTable: TreeTableStub,
                     BContainer: {template: "<div><slot /></div>"},
                     BAlert: {
                         name: "BAlert",
@@ -216,8 +216,9 @@ describe("Unidades.vue", () => {
         await flushPromises();
         expect(wrapper.text()).toContain("Erro de API");
 
-        const closeButton = wrapper.find("button");
-        await closeButton.trigger("click");
+        const closeButton = wrapper.findAll("button").find((item) => item.text() === "Close");
+        expect(closeButton).toBeDefined();
+        await closeButton!.trigger("click");
         await wrapper.vm.$nextTick();
 
         expect(wrapper.text()).not.toContain("Erro de API");
@@ -230,6 +231,9 @@ describe("Unidades.vue", () => {
         await flushPromises();
         const arvore = wrapper.findComponent({name: 'TreeTable'});
         expect(arvore.exists()).toBe(true);
+        expect(arvore.props("hideControls")).toBe(true);
+        expect(arvore.props("hideHeaders")).toBe(true);
+        expect(arvore.props("striped")).toBe(false);
         expect(arvore.props("data")).toEqual([
             {
                 codigo: 2,
@@ -283,6 +287,19 @@ describe("Unidades.vue", () => {
         await wrapper.find('[data-testid="tree-table-row-click"]').trigger("click");
 
         expect(mockPush).toHaveBeenCalledWith({path: "/unidade/2"});
+    });
+
+    it("deve acionar expandir e recolher pelos botões do cabeçalho", async () => {
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce(mockUnidades as any);
+        vi.mocked(unidadeService.mapUnidadesArray).mockReturnValueOnce(mockUnidades as any);
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-unidades-expandir-todas"]').trigger("click");
+        await wrapper.find('[data-testid="btn-unidades-recolher-todas"]').trigger("click");
+
+        expect(expandAllMock).toHaveBeenCalled();
+        expect(collapseAllMock).toHaveBeenCalled();
     });
 
 });

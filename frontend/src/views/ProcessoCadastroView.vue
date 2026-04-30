@@ -1,49 +1,7 @@
   <template>
   <LayoutPadrao>
     <div class="col-lg-8 col-md-9 col-12">
-      <PageHeader :title="TEXTOS.processo.cadastro.TITULO">
-        <template #actions>
-          <BButton
-              :disabled="isLoading"
-              data-testid="btn-processo-cancelar"
-              to="/painel"
-              variant="outline-secondary"
-          >
-            {{ TEXTOS.processo.cadastro.BOTAO_CANCELAR }}
-          </BButton>
-
-          <LoadingButton
-              v-if="processoEditando"
-              :disabled="isLoading"
-              data-testid="btn-processo-remover"
-              icon="trash"
-              :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
-              variant="outline-danger"
-              @click="abrirModalRemocao"
-          />
-
-          <LoadingButton
-              :disabled="isFormInvalid || isLoadingData"
-              :loading="isLoading"
-              data-testid="btn-processo-salvar"
-              icon="save"
-              loading-text="Salvando..."
-              :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
-              type="button"
-              variant="outline-primary"
-              @click="salvarProcesso"
-          />
-
-          <LoadingButton
-              :disabled="isFormInvalid || isLoading || isLoadingData"
-              data-testid="btn-processo-iniciar"
-              icon="play-fill"
-              :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
-              variant="success"
-              @click="abrirModalConfirmacao"
-          />
-        </template>
-      </PageHeader>
+      <PageHeader :title="TEXTOS.processo.cadastro.TITULO" />
 
       <div v-if="exibirAlertaDiagnostico" class="mb-3 pt-2">
         <BAlert

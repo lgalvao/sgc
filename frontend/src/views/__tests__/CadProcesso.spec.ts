@@ -160,7 +160,7 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper} = createWrapper();
         expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
         expect(unidadeStoreMock.garantirArvoreElegibilidade).not.toHaveBeenCalled();
-        expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="btn-processo-salvar-rodape"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
     });
@@ -198,8 +198,8 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('disables action buttons when form is incomplete and enables when complete', async () => {
         const {wrapper} = createWrapper();
-        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
-        const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar"]');
+        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar-rodape"]');
+        const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar-rodape"]');
 
         // Initially disabled (empty fields)
         expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
@@ -264,7 +264,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1, 2];
         await nextTick();
 
-        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
+        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar-rodape"]');
         await salvarBtn.trigger('click');
 
         expect(processoService.criarProcesso).toHaveBeenCalledWith({
@@ -289,7 +289,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
         await flushPromises();
 
         expect(wrapper.vm.notificacao).not.toBeNull();
@@ -310,7 +310,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
 
         expect(processoService.atualizarProcesso).toHaveBeenCalledWith(123, {
             codigo: 123,
@@ -336,7 +336,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-iniciar-rodape"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
         vi.mocked(processoService.criarProcesso).mockResolvedValue({codigo: 999} as any);
@@ -363,7 +363,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-iniciar-rodape"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
         await nextTick();
 
@@ -485,7 +485,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-iniciar-rodape"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
         await wrapper.find('[data-testid="btn-iniciar-processo-cancelar"]').trigger('click');
@@ -512,7 +512,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
         await flushPromises();
 
         expect(wrapper.vm.fieldErrors.descricao).toBe('Descrição é obrigatória');
@@ -534,7 +534,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
         await flushPromises();
 
         expect(wrapper.vm.notificacao).not.toBeNull();
@@ -611,7 +611,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        const btn = wrapper.find('[data-testid="btn-processo-salvar"]');
+        const btn = wrapper.find('[data-testid="btn-processo-salvar-rodape"]');
         await btn.trigger('click');
 
         expect(btn.text()).toContain('Salvando...'); // Button content might be replaced by "Salvando..."
@@ -661,7 +661,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
+        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
 
         await flushPromises();
         await nextTick();
