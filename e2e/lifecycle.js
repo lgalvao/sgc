@@ -333,7 +333,11 @@ function startBackend() {
         cwd: BACKEND_DIR,
         shell: isWindows,
         stdio: ['ignore', 'pipe', 'pipe'],
-        env: normalizarEnv()
+        env: {
+            ...normalizarEnv(),
+            MAIL_HOST: '127.0.0.1',
+            MAIL_PORT: String(SMTP_PORT)
+        }
     };
 
     const backendProcess = spawn(gradlewPath, ['bootRun', `-PENV=${PERFIL_LIFECYCLE}`, argsGradle], spawnOptions);
