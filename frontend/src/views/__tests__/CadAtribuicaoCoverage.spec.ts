@@ -30,7 +30,7 @@ vi.mock('@/services/usuarioService', () => ({
     buscarUsuariosPorUnidade: vi.fn().mockResolvedValue([]),
 }));
 
-function criarWrapper(props = {codUnidade: 1}) {
+function criarWrapper(props: {codUnidade: number} = {codUnidade: 1}) {
     return mount(CadAtribuicao, {
         ...getCommonMountOptions(),
         props,

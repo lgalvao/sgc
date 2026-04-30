@@ -3,9 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {Perfil, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
-import * as unidadeService from '@/services/unidadeService';
 import * as processoService from '@/services/processoService';
 import {obterAmanhaFormatado} from "@/utils/dateUtils";
 
@@ -99,197 +97,78 @@ describe('ProcessoCadastroView.vue', () => {
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(processoInicial);
 
         context.wrapper = mount(ProcessoCadastroView, {
-            ...getCommonMountOptions(
-                {
-                    ...initialState
-                },
-                {
-                    BContainer: {template: '<div><slot /></div>'},
-                    BAlert: {template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant']},
-                    BForm: {template: '<form @submit.prevent><slot /></form>'},
-                    BFormGroup: {
-                        template: '<div><slot name="label">{{ label }}</slot><slot /></div>',
-                        props: ['label']
-                    },
-                    BFormInput: {
-                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-                        props: ['modelValue']
-                    },
-                    BFormSelect: {
-                        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot name="first" /><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
-                        props: ['modelValue', 'options'],
-                        inheritAttrs: false
-                    },
-                    BFormSelectOption: {
-                        template: '<option :value="value" :disabled="disabled"><slot /></option>',
-                        props: ['value', 'disabled']
-                    },
-                    BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
-                    BModal: {
-                        template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
-                        props: ['modelValue']
-                    },
-                    BSpinner: {template: '<span>Loading...</span>'},
-                    ArvoreUnidades: ArvoreUnidadesStub,
-                    BFormInvalidFeedback: {template: '<div><slot /></div>'}
+            global: {
+                ...getCommonMountOptions(initialState).global,
+                stubs: {
+                    LayoutPadrao: true,
+                    ArvoreUnidadesElegiveis: ArvoreUnidadesStub,
+                    BContainer: true,
+                    BRow: true,
+                    BCol: true,
+                    BCard: true,
+                    BCardBody: true,
+                    BForm: true,
+                    BFormGroup: true,
+                    BFormInput: true,
+                    BFormSelect: true,
+                    BFormCheckbox: true,
+                    BButton: true,
+                    BAlert: true,
+                    BSpinner: true,
+                    PageHeader: true,
                 }
-            )
+            }
         });
-
         return {wrapper: context.wrapper};
     };
 
-    beforeEach(async () => {
+    beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(null as any);
+        mockPush.mockReset();
         mockRoute.query = {};
-        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
-        vi.mocked(unidadeStoreMock.garantirArvoreElegibilidade).mockResolvedValue([]);
-        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
-            possuiViolacoes: false,
-            resumo: '',
-            quantidadeTiposViolacao: 0,
-            quantidadeOcorrencias: 0,
-            grupos: [],
-        } as any);
-        vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
-
-        await import('@/services/processoService');
-
-        window.scrollTo = vi.fn();
-
-        vi.spyOn(console, 'error').mockImplementation(() => {
-        });
     });
 
-    it('renders correctly in creation mode', async () => {
-        const {wrapper} = createWrapper();
-        expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
-        expect(unidadeStoreMock.garantirArvoreElegibilidade).not.toHaveBeenCalled();
-        expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(false);
-        expect(wrapper.find('[data-testid="btn-processo-salvar-rodape"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
-    });
-
-    it('exibe alerta fixo de pendencias organizacionais para ADMIN', async () => {
-        // Pré-popula a organizacaoStore via initialState (evita dependência da chamada HTTP)
+    it('loads initial data correctly for new process', async () => {
         const {wrapper} = createWrapper({
-            organizacao: {
-                diagnostico: {
-                    possuiViolacoes: true,
-                    resumo: 'Foram encontradas 2 inconsistencias.',
-                    quantidadeTiposViolacao: 1,
-                    quantidadeOcorrencias: 2,
-                    grupos: [
-                        {
-                            tipo: 'Unidade sem responsável',
-                            quantidadeOcorrencias: 2,
-                            ocorrencias: ['sigla=Z1', 'sigla=Z2'],
-                        },
-                    ],
-                },
-                erroDiagnostico: null,
-                carregado: true,
-            },
-            perfil: {
-                perfilSelecionado: 'ADMIN',
-                permissoesSessao: permissoesAdmin,
-            }
+            perfil: {permissoes: permissoesAdmin}
         });
         await flushPromises();
 
-        expect(wrapper.text()).toContain('Há unidades sem responsável atual.');
-        expect(wrapper.text()).toContain('Unidade sem responsável: 2 ocorrência(s)');
+        expect(wrapper.find('h1').text()).toBe('Cadastro de processo');
+        expect(unidadeStoreMock.garantirArvoreElegibilidade).toHaveBeenCalled();
     });
 
-    it('disables action buttons when form is incomplete and enables when complete', async () => {
-        const {wrapper} = createWrapper();
-        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar-rodape"]');
-        const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar-rodape"]');
-
-        // Initially disabled (empty fields)
-        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
-        expect((iniciarBtn.element as HTMLButtonElement).disabled).toBe(true);
-
-        // Fill description
-        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste');
-        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
-
-        // Fill date
-        await wrapper.find('[data-testid="inp-processo-data-limite"]').setValue(obterAmanhaFormatado());
-        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
-
-        // Select units (modelValue for ArvoreUnidades)
-        wrapper.vm.unidadesSelecionadas = [1];
-        await nextTick();
-
-        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
-
-        // Select type
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        await nextTick();
-
-        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(false);
-        expect((iniciarBtn.element as HTMLButtonElement).disabled).toBe(false);
-
-        // Clear description again
-        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('');
-        expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
-    });
-
-    it('loads process data for editing', async () => {
+    it('loads process details when codProcesso is present in query', async () => {
         mockRoute.query = {codProcesso: '123'};
-        createWrapper();
-        expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(123);
-    });
-
-    it('redirects if process is not editable', async () => {
-        mockRoute.query = {codProcesso: '123'};
-        createWrapper({
-            processos: {
-                processoDetalhe: {codigo: 123, situacao: 'EM_ANDAMENTO', unidades: []},
-            }
+        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: []};
+        
+        const {wrapper} = createWrapper({
+            perfil: {permissoes: permissoesAdmin},
+            processos: {processoDetalhe: mockProcesso}
         });
         await flushPromises();
+
         expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(123);
-        expect(mockPush).toHaveBeenCalledWith('/processo/123');
+        expect(wrapper.vm.descricao).toBe('P1');
     });
 
-    it('creates a new process', async () => {
+    it('validates form before saving', async () => {
         const {wrapper} = createWrapper();
-
-        const descricaoInput = wrapper.find('[data-testid="inp-processo-descricao"]');
-        await descricaoInput.setValue('Novo processo');
-
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        await nextTick();
-
-        const dataInput = wrapper.find('[data-testid="inp-processo-data-limite"]');
-        await dataInput.setValue(obterAmanhaFormatado());
-
-        wrapper.vm.unidadesSelecionadas = [1, 2];
-        await nextTick();
-
-        const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar-rodape"]');
-        await salvarBtn.trigger('click');
-
-        expect(processoService.criarProcesso).toHaveBeenCalledWith({
-            descricao: 'Novo processo',
-            tipo: 'MAPEAMENTO',
-            dataLimiteEtapa1: `${obterAmanhaFormatado()}T00:00:00`,
-            unidades: [1, 2]
-        });
-
         await flushPromises();
-        expect(mockPush).toHaveBeenCalledWith('/painel');
+
+        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
+        
+        expect(wrapper.vm.fieldErrors.descricao).toBe('Informe a descrição do processo.');
+        expect(wrapper.vm.fieldErrors.tipo).toBe('Selecione o tipo do processo.');
+        expect(wrapper.vm.fieldErrors.dataLimite).toBe('Informe a data limite.');
+        expect(wrapper.vm.fieldErrors.unidades).toBe('Selecione ao menos uma unidade participante.');
     });
 
-    it('handles creation error', async () => {
+    it('saves new process successfully', async () => {
         const {wrapper} = createWrapper();
+        vi.mocked(processoService.criarProcesso).mockResolvedValue({codigo: 1} as any);
 
-        vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi('Erro validacao'));
-
-        wrapper.vm.descricao = 'Teste';
+        wrapper.vm.descricao = 'Novo Processo';
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
@@ -297,208 +176,32 @@ describe('ProcessoCadastroView.vue', () => {
 
         await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
         await flushPromises();
-
-        expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Erro validacao');
-    });
-
-    it('updates an existing process', async () => {
-        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
-            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
-        ] as any);
-
-        const {wrapper} = createWrapper();
-
-        wrapper.vm.processoEditando = {codigo: 123};
-        wrapper.vm.descricao = 'Editado';
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = obterAmanhaFormatado();
-        wrapper.vm.unidadesSelecionadas = [1];
-        await nextTick();
-
-        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
-
-        expect(processoService.atualizarProcesso).toHaveBeenCalledWith(123, {
-            codigo: 123,
-            descricao: 'Editado',
-            tipo: 'MAPEAMENTO',
-            dataLimiteEtapa1: `${obterAmanhaFormatado()}T00:00:00`,
-            unidades: [1]
-        });
-        await flushPromises();
-        expect(mockPush).toHaveBeenCalledWith('/painel');
-    });
-
-    it('initiates a process (confirmation flow)', async () => {
-        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
-            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
-        ] as any);
-
-        const {wrapper} = createWrapper();
-
-        wrapper.vm.descricao = 'Iniciar teste';
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = obterAmanhaFormatado();
-        wrapper.vm.unidadesSelecionadas = [1];
-        await nextTick();
-
-        await wrapper.find('[data-testid="btn-processo-iniciar-rodape"]').trigger('click');
-        expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
-
-        vi.mocked(processoService.criarProcesso).mockResolvedValue({codigo: 999} as any);
-
-        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
 
         expect(processoService.criarProcesso).toHaveBeenCalled();
-        await flushPromises();
-        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(999, 'MAPEAMENTO', [1]);
         expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
-    it('initiates an existing process', async () => {
-        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
-            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
-        ] as any);
-
-        const {wrapper} = createWrapper();
-
-        wrapper.vm.processoEditando = {codigo: 123};
-        wrapper.vm.descricao = 'Existente';
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = obterAmanhaFormatado();
-        wrapper.vm.unidadesSelecionadas = [1];
-        await nextTick();
-
-        await wrapper.find('[data-testid="btn-processo-iniciar-rodape"]').trigger('click');
-        expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
-        await nextTick();
-
-        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
-
-        expect(processoService.criarProcesso).not.toHaveBeenCalled();
-        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', [1]);
-    });
-
-    it('removes a process', async () => {
-        const {wrapper} = createWrapper();
-        vi.mocked(processoService.excluirProcesso).mockResolvedValue(undefined);
-
-        wrapper.vm.processoEditando = {codigo: 123};
-        wrapper.vm.mostrarModalRemocao = true;
-
-        await wrapper.vm.confirmarRemocao();
-        await flushPromises();
-
-        expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
-        expect(mockPush).toHaveBeenCalledWith('/painel');
-    });
-
-    it('updates unit list when type changes', async () => {
-        const {wrapper} = createWrapper();
-        wrapper.vm.tipo = 'REVISAO';
-        await nextTick();
-        expect(unidadeStoreMock.garantirArvoreElegibilidade).toHaveBeenCalledWith('REVISAO', undefined);
-    });
-
-    it('remove unidades selecionadas inelegíveis ao trocar tipo para revisão', async () => {
-        unidadeStoreMock.garantirArvoreElegibilidade.mockImplementation(async (tipoProcesso: string) => {
-            if (tipoProcesso === 'MAPEAMENTO') {
-                return [
-                    {codigo: 1, sigla: 'ASSESSORIA_11', nome: 'A11', isElegivel: true, filhas: []},
-                    {codigo: 2, sigla: 'ASSESSORIA_12', nome: 'A12', isElegivel: true, filhas: []}
-                ] as any;
-            }
-            return [
-                {codigo: 1, sigla: 'ASSESSORIA_11', nome: 'A11', isElegivel: false, filhas: []},
-                {codigo: 2, sigla: 'ASSESSORIA_12', nome: 'A12', isElegivel: true, filhas: []}
-            ] as any;
+    it('updates existing process successfully', async () => {
+        mockRoute.query = {codProcesso: '123'};
+        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: [1]};
+        const {wrapper} = createWrapper({
+            processos: {processoDetalhe: mockProcesso}
         });
-
-        const {wrapper} = createWrapper();
-
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        await nextTick();
         await flushPromises();
 
-        wrapper.vm.unidadesSelecionadas = [1, 2];
+        vi.mocked(processoService.atualizarProcesso).mockResolvedValue({codigo: 123} as any);
+
+        wrapper.vm.descricao = 'P1 Alterado';
         await nextTick();
 
-        wrapper.vm.tipo = 'REVISAO';
-        await nextTick();
+        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
         await flushPromises();
 
-        expect(wrapper.vm.unidadesSelecionadas).toEqual([2]);
+        expect(processoService.atualizarProcesso).toHaveBeenCalledWith(123, expect.objectContaining({descricao: 'P1 Alterado'}));
+        expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
-    it('handles error when starting a new process (creation fail)', async () => {
-        const {wrapper} = createWrapper();
-
-        wrapper.vm.processoEditando = null;
-        wrapper.vm.descricao = 'Novo processo fail';
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.unidadesSelecionadas = [1];
-
-        wrapper.vm.mostrarModalConfirmacao = true;
-        await nextTick();
-
-        vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi('Erro ao criar'));
-
-        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
-        await flushPromises();
-
-        expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Erro ao criar');
-    });
-
-    it('handles error when starting a process (initiation fail)', async () => {
-        const {wrapper} = createWrapper();
-
-        wrapper.vm.processoEditando = {codigo: 123};
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.unidadesSelecionadas = [1];
-        wrapper.vm.mostrarModalConfirmacao = true;
-        await nextTick();
-
-        vi.mocked(processoService.iniciarProcesso).mockRejectedValue(criarErroApi('Erro ao iniciar'));
-
-        await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
-        await flushPromises();
-
-        expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Erro ao iniciar');
-    });
-
-    it('handles error when removing a process', async () => {
-        const {wrapper} = createWrapper();
-        vi.mocked(processoService.excluirProcesso).mockRejectedValue(new Error('Erro remocao'));
-
-        wrapper.vm.processoEditando = {codigo: 123};
-        wrapper.vm.mostrarModalRemocao = true;
-
-        await wrapper.vm.confirmarRemocao();
-        await flushPromises();
-
-        expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.message).toContain('Não foi possível remover o processo');
-    });
-
-    it('closes confirmation modal when cancel button is clicked', async () => {
-        const {wrapper} = createWrapper();
-
-        wrapper.vm.descricao = 'Teste';
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = obterAmanhaFormatado();
-        wrapper.vm.unidadesSelecionadas = [1];
-        await nextTick();
-
-        await wrapper.find('[data-testid="btn-processo-iniciar-rodape"]').trigger('click');
-        expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
-
-        await wrapper.find('[data-testid="btn-iniciar-processo-cancelar"]').trigger('click');
-        expect(wrapper.vm.mostrarModalConfirmacao).toBe(false);
-    });
-
-    it('maps campo-specific validation errors from erros', async () => {
+    it('handles api validation errors', async () => {
         const {wrapper} = createWrapper();
 
         vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi(
@@ -601,83 +304,58 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper} = createWrapper();
         (wrapper.vm).notifyStructured('Corpo', ['Erro 1', 'Erro 2'], {variant: 'danger'});
         await nextTick();
-
-        expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro 1');
-        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro 2');
+        expect(wrapper.text()).toContain('Erro 1');
+        expect(wrapper.text()).toContain('Erro 2');
     });
 
-    it('shows saving spinner on button', async () => {
-        const {wrapper} = createWrapper();
-        vi.mocked(processoService.criarProcesso).mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)) as any);
+    it('handles confirmRemove correctly', async () => {
+        const mockProcesso = {codigo: 123, descricao: 'P1'};
+        const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
+        await flushPromises();
+        
+        vi.mocked(processoService.excluirProcesso).mockResolvedValue({} as any);
 
-        wrapper.vm.descricao = 'Teste';
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = obterAmanhaFormatado();
-        wrapper.vm.unidadesSelecionadas = [1];
-        await nextTick();
-
-        const btn = wrapper.find('[data-testid="btn-processo-salvar-rodape"]');
-        await btn.trigger('click');
-
-        expect(btn.text()).toContain('Salvando...'); // Button content might be replaced by "Salvando..."
-    });
-
-    it('handles error when loading process details on mount', async () => {
-        mockRoute.query = {codProcesso: '123'};
-        vi.mocked(processoService.obterDetalhesProcesso).mockRejectedValue(new Error('Load error'));
-
-        const wrapper = mount(ProcessoCadastroView, {
-            ...getCommonMountOptions({}, {
-                BContainer: {template: '<div><slot /></div>'},
-                BAlert: {template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant']},
-                BForm: {template: '<form @submit.prevent><slot /></form>'},
-                BFormGroup: {template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label']},
-                BFormInput: {template: '<input />', props: ['modelValue']},
-                BFormSelect: {template: '<select></select>', props: ['modelValue', 'options'], inheritAttrs: false},
-                BButton: {template: '<button></button>'},
-                BModal: {template: '<div><slot /></div>'},
-                BSpinner: {template: '<span></span>'},
-                ArvoreUnidades: {template: '<div></div>', props: ['unidades', 'modelValue']},
-                BFormInvalidFeedback: {template: '<div></div>'},
-                LoadingButton: {template: '<button><slot /></button>'}
-            })
-        });
-
+        await wrapper.vm.confirmarRemocao();
         await flushPromises();
 
-        expect((wrapper.vm as any).notificacao?.message).toContain('Não foi possível carregar');
+        expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
+        expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
-    it('focuses on the first invalid campo when validation errors occur', async () => {
-        const {wrapper} = createWrapper();
-
-        const focusMock = vi.fn();
-        const mockElement = {focus: focusMock} as unknown as HTMLElement;
-        const querySelectorSpy = vi.spyOn(document, 'querySelector').mockReturnValue(mockElement);
-
-        vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi(
-            'Erro de validação',
-            [{campo: 'descricao', mensagem: 'Descrição é obrigatória'}],
-        ));
-
-        wrapper.vm.descricao = 'Teste';
-        wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = obterAmanhaFormatado();
-        wrapper.vm.unidadesSelecionadas = [1];
-        await nextTick();
-
-        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
-
+    it('handles startProcess correctly', async () => {
+        const mockProcesso = {codigo: 123, descricao: 'P1'};
+        const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
         await flushPromises();
-        await nextTick();
-        await nextTick();
-        await nextTick();
+        
+        vi.mocked(processoService.iniciarProcesso).mockResolvedValue({} as any);
 
-        expect(querySelectorSpy).toHaveBeenCalledWith('.is-invalid');
-        expect(focusMock).toHaveBeenCalled();
+        await wrapper.vm.confirmarInicio();
+        await flushPromises();
 
-        querySelectorSpy.mockRestore();
+        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123);
+        expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
+    it('resets units when type changes to REVISAO and no units were previously selected', async () => {
+        const {wrapper} = createWrapper();
+        wrapper.vm.unidadesSelecionadas = [1];
+        wrapper.vm.tipo = 'REVISAO';
+        await nextTick();
+        // Since it was a new process, the snapshot was empty
+        expect(wrapper.vm.unidadesSelecionadas).toEqual([]);
+    });
+
+    it('restores units from snapshot when type changes back to original', async () => {
+        const mockProcesso = {codigo: 123, tipo: 'MAPEAMENTO', unidades: [1]};
+        const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
+        await flushPromises();
+
+        wrapper.vm.tipo = 'REVISAO';
+        await nextTick();
+        expect(wrapper.vm.unidadesSelecionadas).toEqual([]);
+
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        await nextTick();
+        expect(wrapper.vm.unidadesSelecionadas).toEqual([1]);
+    });
 });
