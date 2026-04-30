@@ -16,12 +16,14 @@ describe('ParametrosView', () => {
         configuracoesStore = {
             configuracoes: ref(storeParams ?? [
                 {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
-                {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
+                {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'},
+                {codigo: 3, chave: 'TEMA_ESCURO', valor: 'false', descricao: 'Desc 3'}
             ]),
             loading: ref(loading),
             error: ref(error),
             getDiasInativacaoProcesso: vi.fn().mockReturnValue(30),
             getDiasAlertaNovo: vi.fn().mockReturnValue(5),
+            getTemaEscuro: vi.fn().mockReturnValue(false),
             carregarConfiguracoes: vi.fn().mockResolvedValue([]),
             salvarConfiguracoes: vi.fn().mockResolvedValue(true)
         };

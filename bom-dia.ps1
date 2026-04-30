@@ -31,17 +31,17 @@ if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
 }
 
 Invoke-Passo 'Atualizar pnpm'    { pnpm self-update --silent}
-Invoke-Passo 'Atualizar pnpm globais' { pnpm update -g }
-Invoke-Passo 'Atualizar npm globais'  { npm update -g }
+Invoke-Passo 'Atualizar globais' { pnpm update -g }
+Invoke-Passo 'Atualizar raiz'    { pnpm update }
 
 Invoke-Passo 'Typecheck'         { pnpm run typecheck }
 Invoke-Passo 'Lint'              { pnpm run lint }
 
 Push-Location frontend
-Invoke-Passo 'Frontend deps'     { pnpm install }
+Invoke-Passo 'Frontend deps'     { pnpm update }
 Invoke-Passo 'Testes frontend'   { pnpm exec vitest run }
 Pop-Location
 
-Invoke-Passo 'Testes PW mínimos' { pnpm exec playwright test captura jornada }
+Invoke-Passo 'Testes e2e mínimos' { pnpm exec playwright test captura jornada }
 
 Write-Host "`nTudo certo!" -ForegroundColor Green
