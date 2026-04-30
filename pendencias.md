@@ -3,3 +3,5 @@ toast largo demais
 arvore treetable remover visual zebrado e enfase
 Tela de subprocesso, compactar detalhes
 Card titulo em cadastro grande demais
+Atualizar os cdus 
+Definir se as notificações deve ser limpadas ao finalisar um processo
