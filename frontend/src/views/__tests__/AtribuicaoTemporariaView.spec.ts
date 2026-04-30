@@ -2,41 +2,26 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import AtribuicaoTemporariaView from '../AtribuicaoTemporariaView.vue';
 import {buscarUnidadePorCodigo} from '@/services/unidadeService';
-import {pesquisarUsuarios} from '@/services/usuarioService';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {createPinia, setActivePinia} from 'pinia';
-import type {Unidade, UsuarioPesquisa} from '@/types/tipos';
+import type {Unidade} from '@/types/tipos';
 
 type AtribuicaoTemporariaVm = {
   unidade: Unidade | null;
   erroUsuario: string;
   erroFormulario: string;
   criarAtribuicao: () => Promise<void>;
-  aoAlterarTermoUsuario: (termo: string) => void;
-  selecionarUsuario: (usuario: UsuarioPesquisa) => void;
   usuarioSelecionado: string | null;
   termoUsuario: string;
-  mostrarResultadosUsuarios: boolean;
-  usuariosEncontrados: UsuarioPesquisa[];
   dataInicio: string;
   dataTermino: string;
   justificativa: string;
-  agendarOcultacaoResultadosUsuarios: () => void;
-  aoPressionarTeclaUsuario: (evento: Pick<KeyboardEvent, 'key' | 'preventDefault'>) => Promise<void>;
-  indiceUsuarioDestacado: number;
   notify: (mensagem: string, variante: string) => void;
-  timeoutPesquisaUsuarios: ReturnType<typeof setTimeout> | null;
-  timeoutOcultarResultadosUsuarios: ReturnType<typeof setTimeout> | null;
   $nextTick: () => Promise<void>;
 };
 
 const unidadeMinima: Unidade = {codigo: 1, sigla: 'TESTE', nome: 'Unidade de Teste'};
-const usuarioMinimo = (sobrescritas: Partial<UsuarioPesquisa> = {}): UsuarioPesquisa => ({
-  nome: 'Usuário Teste',
-  tituloEleitoral: '999',
-  ...sobrescritas,
-});
 
 vi.mock('@/services/unidadeService', () => ({
   buscarUnidadePorCodigo: vi.fn(),
@@ -85,10 +70,10 @@ const mountOptions = {
         props: ['disabled'],
         template: '<button :disabled="disabled" @click="$emit(\'click\')">LoadingButton</button>'
       },
-      BFormInput: {
-        name: 'BFormInput',
-        props: ['modelValue'],
-        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+      BuscadorUsuarios: {
+        name: 'BuscadorUsuarios',
+        props: ['termo', 'selecionado'],
+        template: '<div></div>'
       },
       BFormTextarea: {
         name: 'BFormTextarea',
@@ -156,66 +141,13 @@ describe('AtribuicaoTemporariaView', () => {
     const botaoCriar = wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]');
     expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
 
-    vm.selecionarUsuario(usuarioMinimo());
+    vm.usuarioSelecionado = '123';
     vm.dataInicio = '2025-01-01';
     vm.dataTermino = '2025-12-31';
     vm.justificativa = 'Teste de justificativa';
     await vm.$nextTick();
 
     expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
-  });
-
-  it('deve pesquisar usuarios com debounce', async () => {
-    vi.useFakeTimers();
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
-    vi.mocked(pesquisarUsuarios).mockResolvedValue([usuarioMinimo({nome: 'João da Silva', tituloEleitoral: '123'})]);
-
-    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
-    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
-
-    vm.aoAlterarTermoUsuario('João');
-    expect(pesquisarUsuarios).not.toHaveBeenCalled(); // Debounce
-
-    vi.runAllTimers();
-    await vi.dynamicImportSettled();
-
-    expect(pesquisarUsuarios).toHaveBeenCalledWith('João');
-    expect(vm.usuariosEncontrados).toHaveLength(1);
-    
-    vi.useRealTimers();
-  });
-
-  it('deve tratar erro na pesquisa de usuários', async () => {
-    vi.useFakeTimers();
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
-    vi.mocked(pesquisarUsuarios).mockRejectedValue(new Error('Erro na busca'));
-
-    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
-    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
-
-    vm.aoAlterarTermoUsuario('Maria');
-    vi.runAllTimers();
-    await vi.dynamicImportSettled();
-
-    expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'danger');
-    expect(vm.usuariosEncontrados).toHaveLength(0);
-
-    vi.useRealTimers();
-  });
-
-  it('deve selecionar usuario encontrado', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
-    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
-    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
-
-    vm.selecionarUsuario(usuarioMinimo({nome: 'José', tituloEleitoral: '12345'}));
-
-    expect(vm.usuarioSelecionado).toBe('12345');
-    expect(vm.termoUsuario).toBe('José');
-    expect(vm.mostrarResultadosUsuarios).toBe(false);
   });
 
   it('deve criar atribuicao com sucesso', async () => {
@@ -227,7 +159,7 @@ describe('AtribuicaoTemporariaView', () => {
     await vi.dynamicImportSettled();
 
     // Preenchendo o formulário
-    vm.selecionarUsuario(usuarioMinimo());
+    vm.usuarioSelecionado = '999';
     vm.dataInicio = '2025-01-01';
     vm.dataTermino = '2025-12-31';
     vm.justificativa = 'Teste de justificativa';
@@ -253,7 +185,7 @@ describe('AtribuicaoTemporariaView', () => {
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await vi.dynamicImportSettled();
 
-    vm.selecionarUsuario(usuarioMinimo());
+    vm.usuarioSelecionado = '999';
     vm.dataInicio = '2025-01-01';
     vm.dataTermino = '2025-12-31';
     vm.justificativa = 'Teste de justificativa';
@@ -265,111 +197,4 @@ describe('AtribuicaoTemporariaView', () => {
     expect(mockNotify).not.toHaveBeenCalledWith(expect.any(String), 'danger');
   });
 
-  it('deve esconder resultados após blur', async () => {
-    vi.useFakeTimers();
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
-    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
-    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-    await vi.dynamicImportSettled();
-
-    vm.mostrarResultadosUsuarios = true;
-    vm.agendarOcultacaoResultadosUsuarios();
-    
-    vi.runAllTimers();
-    expect(vm.mostrarResultadosUsuarios).toBe(false);
-    
-    vi.useRealTimers();
-  });
-
-  it('deve lidar com teclas no input de usuário', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
-    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
-    await vi.dynamicImportSettled();
-    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-
-    vm.termoUsuario = 'Ana';
-    vm.mostrarResultadosUsuarios = true;
-    vm.usuariosEncontrados = [usuarioMinimo({nome: 'Ana 1', tituloEleitoral: '1'})];
-
-    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
-    Object.defineProperty(event, 'preventDefault', { value: vi.fn() });
-    
-    await vm.aoPressionarTeclaUsuario(event);
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(wrapper.vm.indiceUsuarioDestacado).toBe(0);
-
-    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
-    Object.defineProperty(enterEvent, 'preventDefault', { value: vi.fn() });
-    
-    await vm.aoPressionarTeclaUsuario(enterEvent);
-    expect(vm.usuarioSelecionado).toBe('1');
-  });
-
-  it('deve gerenciar pesquisa de usuários, seleção de resultados e limpeza de timers de interface', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
-    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
-    await vi.dynamicImportSettled();
-    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
-
-    // Descarte de alerta de notificação
-    vm.notify("Msg", "info");
-    await vm.$nextTick();
-    const appAlert = wrapper.findComponent({name: 'AppAlert'});
-    if (appAlert.exists()) await appAlert.vm.$emit('dismissed');
-    expect(mockClear).toHaveBeenCalled();
-
-    // Exibição de resultados ao focar no campo de busca
-    vm.termoUsuario = "Abc"; // length >= 2
-    const input = wrapper.find('[data-testid="input-busca-usuario"]');
-    await input.trigger('focus');
-    expect(vm.mostrarResultadosUsuarios).toBe(true);
-
-    // Seleção de usuário ao clicar no resultado
-    vm.usuariosEncontrados = [{nome: 'User', tituloEleitoral: '123'}];
-    vm.mostrarResultadosUsuarios = true;
-    await vm.$nextTick();
-    const item = wrapper.find('[data-testid="opcao-usuario-123"]');
-    if (item.exists()) await item.trigger('mousedown');
-    expect(vm.usuarioSelecionado).toBe('123');
-
-    // Limpeza de timers ao desmontar componente
-    vm.timeoutPesquisaUsuarios = setTimeout(() => {}, 100);
-    vm.timeoutOcultarResultadosUsuarios = setTimeout(() => {}, 100);
-    wrapper.unmount();
-
-    // Reinicialização para testes de alteração de termo de busca
-    const wrapper2 = mount(AtribuicaoTemporariaView, mountOptions);
-    const vm2 = wrapper2.vm as unknown as AtribuicaoTemporariaVm;
-
-    // Reinicialização de timer de pesquisa ao alterar termo
-    vm2.timeoutPesquisaUsuarios = setTimeout(() => {}, 100);
-    vm2.aoAlterarTermoUsuario("A");
-
-    // v-model gaps
-    const inputUsuario = wrapper2.findComponent({name: 'BFormInput'});
-    if (inputUsuario.exists()) {
-        await inputUsuario.vm.$emit('update:modelValue', 'Novo Termo');
-        expect(vm2.termoUsuario).toBe('Novo Termo');
-    }
-    const inputsData = wrapper2.findAllComponents({name: 'InputData'});
-    if (inputsData.length > 0) await inputsData[0].vm.$emit('update:modelValue', '2025-01-01');
-    if (inputsData.length > 1) await inputsData[1].vm.$emit('update:modelValue', '2025-12-31');
-    const textarea = wrapper2.findComponent({name: 'BFormTextarea'});
-    if (textarea.exists()) await textarea.vm.$emit('update:modelValue', 'Justificativa');
-
-    // Keyboard events gaps
-    vm2.mostrarResultadosUsuarios = false;
-    vm2.termoUsuario = "Abc";
-    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowDown', preventDefault: vi.fn() });
-    expect(vm2.mostrarResultadosUsuarios).toBe(true);
-
-    vm2.usuariosEncontrados = [usuarioMinimo({nome: 'U1'}), usuarioMinimo({nome: 'U2', tituloEleitoral: '2'})];
-    vm2.mostrarResultadosUsuarios = true;
-    vm2.indiceUsuarioDestacado = 0;
-    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowDown', preventDefault: vi.fn() });
-    // Note: coverage is the goal here, the exact index might depend on how many times nextTick is needed
-    
-    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowUp', preventDefault: vi.fn() });
-    await vm2.aoPressionarTeclaUsuario({ key: 'Escape', preventDefault: vi.fn() });
-  });
 });
