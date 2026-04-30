@@ -511,7 +511,7 @@ describe("CadastroView.vue", () => {
         await vm.disponibilizarCadastro();
 
         expect(fluxoSubprocesso.validarCadastro).not.toHaveBeenCalled();
-        expect(vm.erroGlobal).toBe("Não foram detectadas alterações no cadastro para disponibilizar. Se não houver mudanças, marque a opção 'Disponibilização sem mudanças'.");
+        expect(vm.erroGlobal).toBe("Não foram identificadas alterações no cadastro para disponibilizar. Se não houver mudanças, marque a opção 'Disponibilização sem mudanças'.");
         expect(vm.mostrarModalConfirmacao).toBe(false);
     });
 

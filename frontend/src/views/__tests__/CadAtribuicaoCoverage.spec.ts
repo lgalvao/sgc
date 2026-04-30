@@ -29,31 +29,31 @@ vi.mock('@/services/usuarioService', () => ({
     buscarUsuariosPorUnidade: vi.fn().mockResolvedValue([]),
 }));
 
-describe('CadAtribuicao Coverage', () => {
-    function criarWrapper(props = {codUnidade: 1}) {
-        return mount(CadAtribuicao, {
-            ...getCommonMountOptions(),
-            props,
-            global: {
-                plugins: [],
-                stubs: {
-                    LayoutPadrao: true,
-                    BContainer: true,
-                    BCard: true,
-                    BCardBody: true,
-                    BForm: true,
-                    BFormSelect: true,
-                    BFormSelectOption: true,
-                    BFormInput: true,
-                    BFormTextarea: true,
-                    BButton: true,
-                    BAlert: true,
-                    PageHeader: true
-                }
+function criarWrapper(props = {codUnidade: 1}) {
+    return mount(CadAtribuicao, {
+        ...getCommonMountOptions(),
+        props,
+        global: {
+            plugins: [],
+            stubs: {
+                LayoutPadrao: true,
+                BContainer: true,
+                BCard: true,
+                BCardBody: true,
+                BForm: true,
+                BFormSelect: true,
+                BFormSelectOption: true,
+                BFormInput: true,
+                BFormTextarea: true,
+                BButton: true,
+                BAlert: true,
+                PageHeader: true
             }
-        });
-    }
+        }
+    });
+}
 
+describe('CadAtribuicao Coverage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(unidadeService.buscarUnidadePorCodigo).mockResolvedValue({

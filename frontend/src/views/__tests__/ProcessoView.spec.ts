@@ -116,7 +116,7 @@ const mockElegiveis = [
 
 function criarAcoesBloco(elegiveis: any[]) {
     const filtrar = (campo: string) => elegiveis.filter((item) => item[campo]);
-    const criarAcao = (
+    const criarAcao = (params: {
         codigo: string,
         acao: "ACEITAR" | "HOMOLOGAR" | "DISPONIBILIZAR",
         campo: string,
@@ -126,8 +126,20 @@ function criarAcoesBloco(elegiveis: any[]) {
         rotuloBotao: string,
         mensagemSucesso: string,
         redirecionarPainel: boolean,
-        requerDataLimite = false,
-    ) => {
+        requerDataLimite?: boolean
+    }) => {
+        const {
+            codigo,
+            acao,
+            campo,
+            rotulo,
+            titulo,
+            texto,
+            rotuloBotao,
+            mensagemSucesso,
+            redirecionarPainel,
+            requerDataLimite = false
+        } = params;
         const unidades = filtrar(campo);
         return {
             codigo,
@@ -146,62 +158,62 @@ function criarAcoesBloco(elegiveis: any[]) {
     };
 
     return [
-        criarAcao(
-            "aceitar-cadastro",
-            "ACEITAR",
-            "habilitarAceitarCadastroBloco",
-            TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO,
-            TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
-            TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
-            TEXTOS.acaoBloco.aceitar.BOTAO,
-            TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
-            true,
-        ),
-        criarAcao(
-            "aceitar-mapa",
-            "ACEITAR",
-            "habilitarAceitarMapaBloco",
-            TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO,
-            TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO,
-            TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO,
-            TEXTOS.acaoBloco.aceitar.BOTAO,
-            TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO,
-            true,
-        ),
-        criarAcao(
-            "homologar-cadastro",
-            "HOMOLOGAR",
-            "habilitarHomologarCadastroBloco",
-            TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO,
-            TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
-            TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
-            TEXTOS.acaoBloco.homologar.BOTAO,
-            TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
-            false,
-        ),
-        criarAcao(
-            "homologar-mapa",
-            "HOMOLOGAR",
-            "habilitarHomologarMapaBloco",
-            TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO,
-            TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
-            TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
-            TEXTOS.acaoBloco.homologar.BOTAO,
-            TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
-            true,
-        ),
-        criarAcao(
-            "disponibilizar-mapa",
-            "DISPONIBILIZAR",
-            "habilitarDisponibilizarMapaBloco",
-            TEXTOS.acaoBloco.disponibilizar.ROTULO,
-            TEXTOS.acaoBloco.disponibilizar.TITULO,
-            TEXTOS.acaoBloco.disponibilizar.TEXTO,
-            TEXTOS.acaoBloco.disponibilizar.BOTAO,
-            TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
-            true,
-            true,
-        ),
+        criarAcao({
+            codigo: "aceitar-cadastro",
+            acao: "ACEITAR",
+            campo: "habilitarAceitarCadastroBloco",
+            rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO,
+            titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
+            texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
+            rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
+            mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+            redirecionarPainel: true,
+        }),
+        criarAcao({
+            codigo: "aceitar-mapa",
+            acao: "ACEITAR",
+            campo: "habilitarAceitarMapaBloco",
+            rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO,
+            titulo: TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO,
+            texto: TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO,
+            rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
+            mensagemSucesso: TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO,
+            redirecionarPainel: true,
+        }),
+        criarAcao({
+            codigo: "homologar-cadastro",
+            acao: "HOMOLOGAR",
+            campo: "habilitarHomologarCadastroBloco",
+            rotulo: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO,
+            titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
+            texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
+            rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
+            mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+            redirecionarPainel: false,
+        }),
+        criarAcao({
+            codigo: "homologar-mapa",
+            acao: "HOMOLOGAR",
+            campo: "habilitarHomologarMapaBloco",
+            rotulo: TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO,
+            titulo: TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
+            texto: TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
+            rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
+            mensagemSucesso: TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
+            redirecionarPainel: true,
+        }),
+        criarAcao({
+            codigo: "disponibilizar-mapa",
+            acao: "DISPONIBILIZAR",
+            campo: "habilitarDisponibilizarMapaBloco",
+            rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
+            titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
+            texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
+            rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
+            mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+            redirecionarPainel: true,
+            requerDataLimite: true,
+        }),
     ];
 }
 
