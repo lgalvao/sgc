@@ -223,7 +223,11 @@ watch(novoConhecimento, (valorAtual, valorAnterior) => {
 }
 
 .atividade-card:hover {
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.1);
+}
+
+[data-bs-theme="dark"] .atividade-card:hover {
+  box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.5);
 }
 
 .atividade-com-erro {
@@ -269,7 +273,7 @@ watch(novoConhecimento, (valorAtual, valorAnterior) => {
 }
 
 .atividade-titulo-card {
-  background: var(--bs-light);
+  background: var(--bs-tertiary-bg);
   border-bottom: 1px solid var(--bs-border-color);
   padding: 0.5rem 0.75rem;
   margin-left: -0.75rem;

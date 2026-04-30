@@ -44,24 +44,24 @@ defineProps<{
 
 <style scoped>
 .empty-state {
-  background: #f8f9fa;
+  background: var(--bs-tertiary-bg);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
-  border: 1px solid var(--bs-border-color-translucent);
+  border: 1px solid var(--bs-border-color);
 }
 
 .empty-state-icon-wrapper {
   font-size: 1.5rem;
-  color: #64748b;
+  color: var(--bs-secondary-color);
   opacity: 0.7;
 }
 
 .empty-state-title {
-  color: #1e293b;
+  color: var(--bs-heading-color);
 }
 
 .empty-state-description {
-  color: #64748b;
+  color: var(--bs-secondary-color);
   font-size: 0.95rem;
   line-height: 1.45;
 }
@@ -74,13 +74,13 @@ defineProps<{
 }
 
 :deep(.btn-outline-primary) {
-  color: #0a58ca !important; /* Mais escuro para acessibilidade (AA) */
-  border-color: #0a58ca !important;
+  color: var(--bs-primary-text-emphasis) !important;
+  border-color: var(--bs-primary-border-subtle) !important;
 }
 
 :deep(.btn-outline-primary:hover) {
-  background-color: #0a58ca !important;
-  color: white !important;
+  background-color: var(--bs-primary) !important;
+  color: var(--bs-white) !important;
   transform: scale(1.02);
 }
 </style>

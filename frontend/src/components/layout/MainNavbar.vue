@@ -1,6 +1,6 @@
 <template>
-  <BNavbar bg-variant="dark" class="navbar-dark bg-dark border-bottom sticky-top" toggleable="lg" variant="dark">
-    <BNavbarBrand class="fw-bold fs-5 me-4 text-white" to="/painel">
+  <BNavbar class="border-bottom sticky-top bg-body-tertiary" toggleable="lg">
+    <BNavbarBrand class="fw-bold fs-5 me-4 text-body" to="/painel">
       {{ TEXTOS.comum.NOME_SISTEMA }}
     </BNavbarBrand>
 
@@ -23,13 +23,13 @@
       </BNavbarNav>
 
       <!-- Right aligned nav items -->
-      <BNavbarNav class="ms-auto">
+      <BNavbarNav class="ms-auto align-items-lg-center">
 
         <BNavItem
             v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: isMobile }"
             class="me-2 user-profile-item"
         >
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center text-body-secondary">
             <i aria-hidden="true" class="bi bi-person-circle me-2"/>
             <div class="user-info-text">
               <span class="d-lg-inline">{{ isAdmin ? 'ADMIN' : `${perfilSelecionado} - ${unidadeSelecionada}` }}</span>
@@ -111,7 +111,7 @@
         >
           <template #default>
             <span class="visually-hidden">Sair</span>
-            <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1"/>
+            <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1 text-danger"/>
             <span aria-hidden="true" class="d-lg-none">Sair</span>
           </template>
         </BNavItem>

@@ -182,9 +182,9 @@ async function salvar() {
   }
 
   const paramsToSave: Parametro[] = [
-    { ...pInativacao, valor: form.diasInativacao.toString() },
-    { ...pAlertaNovo, valor: form.diasAlertaNovo.toString() },
-    { ...pTemaEscuro, valor: form.temaEscuro.toString() }
+    { ...pInativacao!, valor: form.diasInativacao.toString() },
+    { ...pAlertaNovo!, valor: form.diasAlertaNovo.toString() },
+    { ...pTemaEscuro!, valor: form.temaEscuro.toString() }
   ];
 
   const sucesso = await salvarConfiguracoes(paramsToSave);

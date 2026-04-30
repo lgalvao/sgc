@@ -1,7 +1,13 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import type {Unidade} from "@/types/tipos";
-import {buscarArvoreComElegibilidade, mapUnidadesArray} from "@/services/unidadeService";
+import {
+  buscarArvoreUnidade,
+  buscarArvoreComElegibilidade,
+  buscarReferenciaMapaVigente,
+  mapUnidadesArray,
+  mapUnidade
+} from "@/services/unidadeService";
+import type {MapaVigenteReferencia, Unidade} from "@/types/tipos";
 import {logger} from "@/utils";
 
 /**
@@ -13,6 +19,8 @@ import {logger} from "@/utils";
 export const useUnidadeStore = defineStore("unidade", () => {
     // Mapa de cache indexado por `${tipoProcesso}_${codProcesso ?? 'novo'}`
     const cacheArvoreElegibilidade = ref<Map<string, Unidade[]>>(new Map());
+    const cacheUnidades = ref<Map<number, Unidade>>(new Map());
+    const cacheMapasVigentes = ref<Map<number, MapaVigenteReferencia | null>>(new Map());
     const carregando = ref(new Set<string>());
 
     /**
@@ -49,11 +57,36 @@ export const useUnidadeStore = defineStore("unidade", () => {
 
     function invalidarCache() {
         cacheArvoreElegibilidade.value.clear();
+        cacheUnidades.value.clear();
+        cacheMapasVigentes.value.clear();
+    }
+
+    async function obterUnidade(codigo: number): Promise<Unidade> {
+        if (cacheUnidades.value.has(codigo)) {
+            return cacheUnidades.value.get(codigo)!;
+        }
+        const response = await buscarArvoreUnidade(codigo);
+        const unidade = mapUnidade(response);
+        cacheUnidades.value.set(codigo, unidade);
+        return unidade;
+    }
+
+    async function obterReferenciaMapaVigente(codigo: number): Promise<MapaVigenteReferencia | null> {
+        if (cacheMapasVigentes.value.has(codigo)) {
+            return cacheMapasVigentes.value.get(codigo)!;
+        }
+        const mapa = await buscarReferenciaMapaVigente(codigo);
+        cacheMapasVigentes.value.set(codigo, mapa);
+        return mapa;
     }
 
     return {
         cacheArvoreElegibilidade,
+        cacheUnidades,
+        cacheMapasVigentes,
         garantirArvoreElegibilidade,
+        obterUnidade,
+        obterReferenciaMapaVigente,
         invalidarCache
     };
 });

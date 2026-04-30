@@ -8,7 +8,8 @@ import type {
 import type {Usuario, UsuarioPesquisa} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
-// Mappers internos (formerly in /mappers/sgrh.ts & /mappers/usuarios.ts)
+// Cache de usuários em memória para evitar requisições redundantes
+const cacheUsuarios = new Map<string, Usuario>();
 
 export interface AutenticacaoRequest {
     tituloEleitoral: string;
@@ -205,8 +206,13 @@ export async function buscarUsuariosPorUnidade(
 export async function buscarUsuarioPorTitulo(
     titulo: string,
 ): Promise<Usuario> {
+    if (cacheUsuarios.has(titulo)) {
+        return cacheUsuarios.get(titulo)!;
+    }
     const response = await apiClient.get(`/usuarios/${titulo}`);
-    return response.data;
+    const usuario = response.data;
+    cacheUsuarios.set(titulo, usuario);
+    return usuario;
 }
 
 export async function pesquisarUsuarios(termo: string): Promise<UsuarioPesquisa[]> {

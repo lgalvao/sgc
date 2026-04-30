@@ -111,10 +111,7 @@ import TreeTable, {type TreeItem} from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import {
-  buscarArvoreUnidade as buscarArvoreUnidadeServico,
-  buscarReferenciaMapaVigente as buscarReferenciaMapaVigenteServico
-} from "@/services/unidadeService";
+import {useUnidadeStore} from "@/stores/unidade";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
@@ -126,6 +123,7 @@ const props = defineProps<{ codUnidade: number }>();
 const router = useRouter();
 const {mostrarCriarAtribuicaoTemporaria} = usePerfil();
 const {definirUnidadeAtual} = useUnidadeAtual();
+const unidadeStore = useUnidadeStore();
 
 const unidade = ref<Unidade | null>(null);
 const titularDetalhes = ref<Usuario | null>(null);
@@ -139,17 +137,24 @@ function clearError() {
 }
 
 async function carregarDados() {
-  carregandoPagina.value = true;
   clearError();
-  unidade.value = null;
-  titularDetalhes.value = null;
-  mapaVigente.value = null;
+  
+  // Se já temos a unidade e o mapa no cache, não mostramos o carregamento de página inteira
+  const jaTemNoCache = unidadeStore.cacheUnidades.has(props.codUnidade);
+  if (!jaTemNoCache) {
+    carregandoPagina.value = true;
+    unidade.value = null;
+    titularDetalhes.value = null;
+    mapaVigente.value = null;
+  }
+
   try {
     const [unidadeResp, mapaResp] = await Promise.all([
-      buscarArvoreUnidadeServico(props.codUnidade),
-      buscarReferenciaMapaVigenteServico(props.codUnidade),
+      unidadeStore.obterUnidade(props.codUnidade),
+      unidadeStore.obterReferenciaMapaVigente(props.codUnidade),
     ]);
-    unidade.value = unidadeResp as Unidade;
+    
+    unidade.value = unidadeResp;
     definirUnidadeAtual(unidade.value);
     mapaVigente.value = mapaResp;
 

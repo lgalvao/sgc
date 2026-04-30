@@ -130,7 +130,7 @@ const textoTooltip = ehAgrupadorVisual ? "" : (props.unidade.nome ?? "");
   cursor: pointer;
   width: 1rem;
   font-size: 0.75rem;
-  color: #6c757d;
+  color: var(--bs-secondary-color);
   transition: color 0.2s;
 
   /* Reset button styles */
@@ -144,11 +144,11 @@ const textoTooltip = ehAgrupadorVisual ? "" : (props.unidade.nome ?? "");
 }
 
 .expansor:hover {
-  color: #495057;
+  color: var(--bs-body-color);
 }
 
 .expansor:focus-visible {
-  outline: 2px solid #0d6efd;
+  outline: 2px solid var(--bs-primary);
   border-radius: 2px;
 }
 
