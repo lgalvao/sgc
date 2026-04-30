@@ -6,6 +6,7 @@ import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService'
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {createPinia, setActivePinia} from 'pinia';
 import type {Unidade} from '@/types/tipos';
+import {TEXTOS} from "@/constants/textos";
 
 type AtribuicaoTemporariaVm = {
   unidade: Unidade | null;
@@ -127,7 +128,7 @@ describe('AtribuicaoTemporariaView', () => {
     const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
     await flushPromises();
 
-    expect(vm.erroUsuario).toContain('Falha ao carregar dados da unidade');
+    expect(vm.erroUsuario).toContain(TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR);
   });
 
   it('deve validar formulário vazio', async () => {

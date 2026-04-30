@@ -3,6 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {getCommonMountOptions} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
+import {TEXTOS} from "@/constants/textos";
 
 vi.mock('vue-router', () => ({
     useRouter: () => ({
@@ -68,7 +69,7 @@ describe('CadAtribuicao Coverage', () => {
         const wrapper = criarWrapper();
         await flushPromises();
 
-        expect((wrapper.vm as any).erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
+        expect((wrapper.vm as any).erroUsuario).toBe(TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR);
     });
 
     it('deve falhar rápido quando invariante de unidade é violada', async () => {

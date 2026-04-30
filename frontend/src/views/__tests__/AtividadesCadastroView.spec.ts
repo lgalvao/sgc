@@ -12,6 +12,7 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
+import {TEXTOS} from "@/constants/textos";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import type {
     AtividadeOperacaoResponse,
@@ -485,7 +486,7 @@ describe("CadastroView.vue", () => {
         await vm.disponibilizarCadastro();
 
         expect(fluxoSubprocesso.validarCadastro).not.toHaveBeenCalled();
-        expect(vm.erroGlobal).toBe("O cadastro está incompleto. Certifique-se de que há pelo menos uma atividade e que todas possuem conhecimentos associados.");
+        expect(vm.erroGlobal).toBe(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO);
         expect(vm.mostrarModalConfirmacao).toBe(false);
     });
 
@@ -511,7 +512,7 @@ describe("CadastroView.vue", () => {
         await vm.disponibilizarCadastro();
 
         expect(fluxoSubprocesso.validarCadastro).not.toHaveBeenCalled();
-        expect(vm.erroGlobal).toBe("Não foram identificadas alterações no cadastro para disponibilizar. Se não houver mudanças, marque a opção 'Disponibilização sem mudanças'.");
+        expect(vm.erroGlobal).toBe(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO);
         expect(vm.mostrarModalConfirmacao).toBe(false);
     });
 
