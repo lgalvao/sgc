@@ -138,9 +138,11 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
             await AtividadeHelpers.navegarParaCadastro(page);
-            await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
+            await AnaliseHelpers.verificarAcoesAnaliseCadastro(page, {
+                rotuloPrincipal: /Registrar aceite/i,
+                principalHabilitado: true,
+                devolverHabilitado: true
+            });
             await AnaliseHelpers.aceitarCadastroMapeamento(page, 'Cadastro aceito pelo Gestor.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
@@ -157,9 +159,11 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
             await AtividadeHelpers.navegarParaCadastro(page);
-            await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
+            await AnaliseHelpers.verificarAcoesAnaliseCadastro(page, {
+                rotuloPrincipal: /Homologar/i,
+                principalHabilitado: true,
+                devolverHabilitado: true
+            });
             await AnaliseHelpers.homologarCadastroMapeamento(page);
 
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
@@ -298,9 +302,11 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
             await AtividadeHelpers.navegarParaCadastro(page);
-            await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
+            await AnaliseHelpers.verificarAcoesAnaliseCadastro(page, {
+                rotuloPrincipal: /Registrar aceite/i,
+                principalHabilitado: true,
+                devolverHabilitado: true
+            });
             await AnaliseHelpers.aceitarRevisao(page, 'Revisão aceita.');
 
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
@@ -317,9 +323,11 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
             await AtividadeHelpers.navegarParaCadastro(page);
-            await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeVisible();
-            await expect(page.getByTestId('btn-acao-analisar-principal')).toBeEnabled();
+            await AnaliseHelpers.verificarAcoesAnaliseCadastro(page, {
+                rotuloPrincipal: /Homologar/i,
+                principalHabilitado: true,
+                devolverHabilitado: true
+            });
             await AnaliseHelpers.homologarCadastroMapeamento(page, 'Revisão homologada. Ciclo de manutenção completo.');
 
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();

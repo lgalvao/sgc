@@ -65,8 +65,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();
             const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
             await btnDisponibilizar.waitFor({ state: 'visible' });
-            await btnDisponibilizar.click();
-            await expect(page.getByText(TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO)).toBeVisible();
+            await expect(btnDisponibilizar).toBeDisabled();
         });
 
         await test.step('3. Importar atividades (Fluxo múltiplo e Negativo)', async () => {
