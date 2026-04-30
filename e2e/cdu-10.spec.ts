@@ -103,8 +103,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(checkboxSemMudancas).toBeEnabled();
 
         const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
-        await botaoDisponibilizar.click();
-        await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();
+        await expect(botaoDisponibilizar).toBeDisabled();
 
         await checkboxSemMudancas.check();
         await expect(checkboxSemMudancas).toBeChecked();
@@ -115,11 +114,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
 
         await navegarParaCadastro(page);
+        await expect(botaoDisponibilizar).toBeEnabled();
         await expect(checkboxSemMudancas).toBeChecked();
         await checkboxSemMudancas.uncheck();
         await expect(checkboxSemMudancas).not.toBeChecked();
-        await botaoDisponibilizar.click();
-        await expect(page.getByText(TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO)).toBeVisible();
+        await expect(botaoDisponibilizar).toBeDisabled();
 
         await page.getByTestId('btn-nav-voltar').click();
         await verificarPaginaSubprocesso(page, unidadeSemMudancas);
