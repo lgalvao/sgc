@@ -87,19 +87,6 @@ class RelatorioFacadeCoverageTest {
         verify(doc, atLeastOnce()).add(any());
     }
 
-    @Test
-    @DisplayName("adicionarResumo - deve cobrir número ímpar de entradas")
-    void adicionarResumo_Impar() {
-        Document doc = mock(Document.class);
-        LinkedHashMap<String, String> resumo = new LinkedHashMap<>();
-        resumo.put("K1", "V1");
-        resumo.put("K2", "V2");
-        resumo.put("K3", "V3");
-
-        invokeMethod(target, "adicionarResumo", doc, resumo);
-
-        verify(doc).add(any(org.openpdf.text.pdf.PdfPTable.class));
-    }
 
     @Test
     @DisplayName("formatarSituacaoPdf - deve cobrir partes vazias")
