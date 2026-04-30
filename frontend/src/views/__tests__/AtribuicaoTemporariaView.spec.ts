@@ -51,7 +51,10 @@ vi.mock('@/composables/useNotification', () => ({
 
 const router = createRouter({
   history: createMemoryHistory(),
-  routes: [{ path: '/', component: { template: '<div></div>' } }],
+  routes: [
+    { path: '/', component: { template: '<div></div>' } },
+    { path: '/unidade/:codigo', component: { template: '<div></div>' } }
+  ],
 });
 
 const mountOptions = {
