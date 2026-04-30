@@ -3,6 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {TEXTOS} from "@/constants/textos";
 
 const {mockPush, mockBuscarUnidade, mockPesquisarUsuarios} = vi.hoisted(() => {
     return {
@@ -171,7 +172,7 @@ describe('CadAtribuicao.vue', () => {
 
         // Sem usuario
         await context.wrapper.find('form').trigger('submit');
-        expect(context.wrapper.text()).toContain('Selecione um usuário para criar a atribuição.');
+        expect(context.wrapper.text()).toContain(TEXTOS.atribuicaoTemporaria.ERRO_SELECIONE_USUARIO);
 
         // Com usuario, sem justificativa
         context.wrapper.vm.usuarioSelecionado = '111';
@@ -184,6 +185,6 @@ describe('CadAtribuicao.vue', () => {
         context.wrapper = criarWrapper();
         await flushPromises();
 
-        expect(context.wrapper.vm.erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
+        expect(context.wrapper.vm.erroUsuario).toBe(TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR);
     });
 });
