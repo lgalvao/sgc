@@ -26,29 +26,51 @@ describe("relatoriosService", () => {
     expect(result).toEqual(mockData);
   });
 
-  it("deve chamar obterRelatorioMapas com o código do processo correto", async () => {
+  it("deve chamar obterRelatorioMapas com os códigos das unidades corretos", async () => {
     const mockData = [{codigoUnidade: 1, siglaUnidade: "SEC", nomeUnidade: "Secretaria", totalCompetencias: 1, competencias: []}];
     vi.mocked(apiClient.get).mockResolvedValueOnce({data: mockData});
 
-    const result = await relatoriosService.obterRelatorioMapas(123);
+    const result = await relatoriosService.obterRelatorioMapas([123, 456]);
 
-    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123");
+    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas", {
+      params: {
+        codUnidade: [123, 456]
+      }
+    });
     expect(result).toEqual(mockData);
   });
 
-  it("deve chamar obterRelatorioMapas com codUnidade quando fornecido", async () => {
-    vi.mocked(apiClient.get).mockResolvedValueOnce({data: []});
+  it("deve chamar downloadRelatorioMapasPdf com os códigos das unidades quando fornecidos", async () => {
+    const mockBlob = new Blob(["pdf content"], {type: "application/pdf"});
+    vi.mocked(apiClient.get).mockResolvedValueOnce({data: mockBlob});
 
-    await relatoriosService.obterRelatorioMapas(123, 456);
+    const mockLink = {
+      href: "",
+      setAttribute: vi.fn(),
+      click: vi.fn(),
+      remove: vi.fn(),
+    };
+    vi.spyOn(document, "createElement").mockReturnValue(mockLink as any);
+    vi.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as any);
 
-    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123?codUnidade=456");
+    await relatoriosService.downloadRelatorioMapasPdf([123, 456]);
+
+    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/exportar", {
+      params: {
+        codUnidade: [123, 456]
+      },
+      responseType: "blob",
+    });
+    expect(document.createElement).toHaveBeenCalledWith("a");
+    expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "relatorio-mapas-vigentes.pdf");
+    expect(mockLink.click).toHaveBeenCalled();
+    expect(mockLink.remove).toHaveBeenCalled();
   });
 
   it("deve chamar downloadRelatorioAndamentoPdf e disparar o download", async () => {
     const mockBlob = new Blob(["pdf content"], {type: "application/pdf"});
     vi.mocked(apiClient.get).mockResolvedValueOnce({data: mockBlob});
 
-    // Mock document methods
     const mockLink = {
       href: "",
       setAttribute: vi.fn(),
@@ -63,50 +85,6 @@ describe("relatoriosService", () => {
     expect(apiClient.get).toHaveBeenCalledWith("/relatorios/andamento/123/exportar", {
       responseType: "blob",
     });
-    expect(document.createElement).toHaveBeenCalledWith("a");
     expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "relatorio-andamento-123.pdf");
-    expect(mockLink.click).toHaveBeenCalled();
-    expect(mockLink.remove).toHaveBeenCalled();
-  });
-
-  it("deve chamar downloadRelatorioMapasPdf e disparar o download", async () => {
-    const mockBlob = new Blob(["pdf content"], {type: "application/pdf"});
-    vi.mocked(apiClient.get).mockResolvedValueOnce({data: mockBlob});
-
-    const mockLink = {
-      href: "",
-      setAttribute: vi.fn(),
-      click: vi.fn(),
-      remove: vi.fn(),
-    };
-    vi.spyOn(document, "createElement").mockReturnValue(mockLink as any);
-    vi.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as any);
-
-    await relatoriosService.downloadRelatorioMapasPdf(123);
-
-    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123/exportar", {
-      responseType: "blob",
-    });
-    expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "relatorio-mapas-vigentes-123.pdf");
-  });
-
-  it("deve chamar downloadRelatorioMapasPdf com unidadeId quando fornecido", async () => {
-    const mockBlob = new Blob(["pdf content"], {type: "application/pdf"});
-    vi.mocked(apiClient.get).mockResolvedValueOnce({data: mockBlob});
-
-    const mockLink = {
-      href: "",
-      setAttribute: vi.fn(),
-      click: vi.fn(),
-      remove: vi.fn(),
-    };
-    vi.spyOn(document, "createElement").mockReturnValue(mockLink as any);
-    vi.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as any);
-
-    await relatoriosService.downloadRelatorioMapasPdf(123, 456);
-
-    expect(apiClient.get).toHaveBeenCalledWith("/relatorios/mapas/123/exportar?codUnidade=456", {
-      responseType: "blob",
-    });
   });
 });

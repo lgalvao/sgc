@@ -17,7 +17,6 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import {execSync} from "node:child_process";
 import pc from "picocolors";
 
 const RAIZ = path.join(import.meta.dirname, '../../..');

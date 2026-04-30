@@ -73,19 +73,19 @@ class RelatorioControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/relatorios/mapas/{codProcesso}/exportar - Deve gerar PDF")
+    @DisplayName("GET /api/relatorios/mapas/exportar - Deve gerar PDF")
     @WithMockUser(roles = "ADMIN")
     void deveGerarRelatorioMapasPdf() throws Exception {
-        mockMvc.perform(get("/api/relatorios/mapas/1/exportar").param("codUnidade", "2"))
+        mockMvc.perform(get("/api/relatorios/mapas/exportar").param("codUnidade", "2").param("codUnidade", "3"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_mapas.pdf"));
 
-        verify(relatorioFacade).gerarRelatorioMapas(eq(1L), eq(2L), any());
+        verify(relatorioFacade).gerarRelatorioMapas(eq(List.of(2L, 3L)), any());
     }
 
     @Test
-    @DisplayName("GET /api/relatorios/mapas/{codProcesso} - Deve retornar relatório de mapas")
+    @DisplayName("GET /api/relatorios/mapas - Deve retornar relatório de mapas")
     @WithMockUser(roles = "ADMIN")
     void deveObterRelatorioMapas() throws Exception {
         RelatorioMapaDto dto = new RelatorioMapaDto(
@@ -103,9 +103,9 @@ class RelatorioControllerTest {
                         ))
                 ))
         );
-        when(relatorioFacade.obterRelatorioMapas(1L, 2L)).thenReturn(List.of(dto));
+        when(relatorioFacade.obterRelatorioMapas(List.of(2L, 3L))).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/api/relatorios/mapas/1").param("codUnidade", "2"))
+        mockMvc.perform(get("/api/relatorios/mapas").param("codUnidade", "2").param("codUnidade", "3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].codigoUnidade").value(2))
                 .andExpect(jsonPath("$[0].siglaUnidade").value("SEC"))

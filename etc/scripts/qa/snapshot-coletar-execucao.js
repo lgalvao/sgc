@@ -75,10 +75,10 @@ async function consolidarJUnit(diretorioRelatorio) {
     const totais = { testes: 0, falhas: 0, ignorados: 0, tempoSegundos: 0 };
     for (const arquivo of arquivos) {
         const conteudo = await fs.readFile(arquivo, "utf-8");
-        totais.testes += Number(conteudo.match(/tests=\"(\d+)\"/)?.[1] ?? 0);
-        totais.falhas += Number(conteudo.match(/failures=\"(\d+)\"/)?.[1] ?? 0) + Number(conteudo.match(/errors=\"(\d+)\"/)?.[1] ?? 0);
-        totais.ignorados += Number(conteudo.match(/skipped=\"(\d+)\"/)?.[1] ?? 0);
-        totais.tempoSegundos += Number(conteudo.match(/time=\"([0-9.]+)\"/)?.[1] ?? 0);
+        totais.testes += Number(conteudo.match(/tests="(\d+)"/)?.[1] ?? 0);
+        totais.falhas += Number(conteudo.match(/failures="(\d+)"/)?.[1] ?? 0) + Number(conteudo.match(/errors="(\d+)"/)?.[1] ?? 0);
+        totais.ignorados += Number(conteudo.match(/skipped="(\d+)"/)?.[1] ?? 0);
+        totais.tempoSegundos += Number(conteudo.match(/time="([0-9.]+)"/)?.[1] ?? 0);
     }
     totais.sucessos = Math.max(totais.testes - totais.falhas - totais.ignorados, 0);
     totais.arquivosXml = arquivos.map(caminhoRelativo);

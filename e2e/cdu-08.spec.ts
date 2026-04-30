@@ -6,7 +6,6 @@ import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/index.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {TEXTOS} from "../frontend/src/constants/textos.js";
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';

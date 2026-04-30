@@ -20,15 +20,15 @@ export const useRelatoriosStore = defineStore("relatorios", () => {
     });
   }
 
-  async function buscarRelatorioMapas(codProcesso: number, unidadeId?: number) {
+  async function buscarRelatorioMapas(codigosUnidades: number[]) {
     return withErrorHandling(async () => {
-      relatorioMapas.value = await relatoriosService.obterRelatorioMapas(codProcesso, unidadeId);
+      relatorioMapas.value = await relatoriosService.obterRelatorioMapas(codigosUnidades);
     });
   }
 
-  async function exportarMapasPdf(codProcesso: number, unidadeId?: number) {
+  async function exportarMapasPdf(codigosUnidades: number[]) {
     return withErrorHandling(async () => {
-      await relatoriosService.downloadRelatorioMapasPdf(codProcesso, unidadeId);
+      await relatoriosService.downloadRelatorioMapasPdf(codigosUnidades);
     });
   }
 

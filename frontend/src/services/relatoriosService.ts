@@ -45,9 +45,12 @@ export const relatoriosService = {
     return response.data;
   },
 
-  async obterRelatorioMapas(codProcesso: number, unidadeId?: number): Promise<RelatorioMapa[]> {
-    const sufixoUnidade = unidadeId ? `?codUnidade=${unidadeId}` : "";
-    const response = await apiClient.get<RelatorioMapa[]>(`/relatorios/mapas/${codProcesso}${sufixoUnidade}`);
+  async obterRelatorioMapas(codigosUnidades: number[]): Promise<RelatorioMapa[]> {
+    const response = await apiClient.get<RelatorioMapa[]>("/relatorios/mapas", {
+      params: {
+        codUnidade: codigosUnidades
+      }
+    });
     return response.data;
   },
 
@@ -64,15 +67,17 @@ export const relatoriosService = {
     link.remove();
   },
 
-  async downloadRelatorioMapasPdf(codProcesso: number, unidadeId?: number): Promise<void> {
-    const sufixoUnidade = unidadeId ? `?codUnidade=${unidadeId}` : '';
-    const response = await apiClient.get(`/relatorios/mapas/${codProcesso}/exportar${sufixoUnidade}`, {
+  async downloadRelatorioMapasPdf(codigosUnidades: number[]): Promise<void> {
+    const response = await apiClient.get("/relatorios/mapas/exportar", {
+      params: {
+        codUnidade: codigosUnidades
+      },
       responseType: 'blob'
     });
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `relatorio-mapas-vigentes-${codProcesso}.pdf`);
+    link.setAttribute('download', 'relatorio-mapas-vigentes.pdf');
     document.body.appendChild(link);
     link.click();
     link.remove();

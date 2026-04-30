@@ -35,22 +35,20 @@ public class RelatorioController {
         relatorioService.gerarRelatorioAndamento(codProcesso, response.getOutputStream());
     }
 
-    @GetMapping("/mapas/{codProcesso}/exportar")
+    @GetMapping("/mapas/exportar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Gera relatório consolidado de mapas (CDU-36)")
-    public void gerarRelatorioMapasPdf(@PathVariable Long codProcesso,
-                                    @RequestParam(required = false) Long codUnidade,
-                                    HttpServletResponse response) throws IOException {
+    public void gerarRelatorioMapasPdf(@RequestParam(name = "codUnidade") List<Long> codigosUnidades,
+                                       HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_mapas.pdf");
-        relatorioService.gerarRelatorioMapas(codProcesso, codUnidade, response.getOutputStream());
+        relatorioService.gerarRelatorioMapas(codigosUnidades, response.getOutputStream());
     }
 
-    @GetMapping("/mapas/{codProcesso}")
+    @GetMapping("/mapas")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Gera a visualização em JSON do relatório consolidado de mapas (CDU-36)")
-    public ResponseEntity<List<RelatorioMapaDto>> obterRelatorioMapas(@PathVariable Long codProcesso,
-                                                                      @RequestParam(required = false) Long codUnidade) {
-        return ResponseEntity.ok(relatorioService.obterRelatorioMapas(codProcesso, codUnidade));
+    public ResponseEntity<List<RelatorioMapaDto>> obterRelatorioMapas(@RequestParam(name = "codUnidade") List<Long> codigosUnidades) {
+        return ResponseEntity.ok(relatorioService.obterRelatorioMapas(codigosUnidades));
     }
 }

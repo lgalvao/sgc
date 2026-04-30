@@ -16,7 +16,6 @@ import sgc.mapa.service.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.model.*;
 import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -51,6 +50,7 @@ public class RelatorioFacade {
     private final SubprocessoConsultaService consultaService;
     private final ResponsavelUnidadeService responsavelService;
     private final MapaManutencaoService mapaManutencaoService;
+    private final UnidadeService unidadeService;
     private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
@@ -93,12 +93,8 @@ public class RelatorioFacade {
     }
 
     @Transactional(readOnly = true)
-    public void gerarRelatorioMapas(Long codProcesso, Long codUnidade, OutputStream outputStream) {
-        Processo processo = processoService.buscarPorCodigo(codProcesso);
-        List<Subprocesso> subprocessos = filtrarSubprocessosPorUnidade(
-                consultaService.listarEntidadesPorProcesso(codProcesso),
-                codUnidade
-        );
+    public void gerarRelatorioMapas(List<Long> codigosUnidades, OutputStream outputStream) {
+        List<Subprocesso> subprocessos = buscarSubprocessosMapasVigentes(codigosUnidades);
         LocalDateTime dataGeracao = LocalDateTime.now();
 
         try (Document document = pdfFactory.createDocument()) {
@@ -106,13 +102,13 @@ public class RelatorioFacade {
             document.open();
             adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
                     "Relatório de Mapas Vigentes",
-                    processo.getDescricao(),
+                    "Unidades selecionadas",
                     dataGeracao,
                     null,
                     0,
                     null
             ));
-            adicionarResumo(document, criarResumoMapas(processo, subprocessos, codUnidade, dataGeracao));
+            adicionarResumo(document, criarResumoMapas(subprocessos, dataGeracao));
             document.add(criarTituloSecao("Mapas consolidados"));
 
             for (Subprocesso sp : subprocessos) {
@@ -125,11 +121,8 @@ public class RelatorioFacade {
     }
 
     @Transactional(readOnly = true)
-    public List<RelatorioMapaDto> obterRelatorioMapas(Long codProcesso, Long codUnidade) {
-        List<Subprocesso> subprocessos = filtrarSubprocessosPorUnidade(
-                consultaService.listarEntidadesPorProcesso(codProcesso),
-                codUnidade
-        );
+    public List<RelatorioMapaDto> obterRelatorioMapas(List<Long> codigosUnidades) {
+        List<Subprocesso> subprocessos = buscarSubprocessosMapasVigentes(codigosUnidades);
 
         return subprocessos.stream()
                 .map(this::criarRelatorioMapaDto)
@@ -146,13 +139,18 @@ public class RelatorioFacade {
         return new HashMap<>(responsavelService.buscarResponsaveisUnidades(codigosUnidade));
     }
 
-    private List<Subprocesso> filtrarSubprocessosPorUnidade(List<Subprocesso> subprocessos, @Nullable Long codUnidade) {
-        if (codUnidade == null) {
-            return subprocessos;
+    private List<Subprocesso> buscarSubprocessosMapasVigentes(List<Long> codigosUnidades) {
+        if (codigosUnidades.isEmpty()) {
+            return List.of();
         }
 
-        return subprocessos.stream()
-                .filter(subprocesso -> subprocesso.getUnidade().getCodigo().equals(codUnidade))
+        Set<Long> codigosNormalizados = new LinkedHashSet<>(codigosUnidades);
+
+        return unidadeService.buscarMapasPorUnidades(new ArrayList<>(codigosNormalizados)).stream()
+                .map(UnidadeMapa::getMapaVigente)
+                .filter(Objects::nonNull)
+                .map(Mapa::getSubprocesso)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
@@ -391,17 +389,11 @@ public class RelatorioFacade {
         document.add(tabelaResumo);
     }
 
-    private LinkedHashMap<String, String> criarResumoMapas(
-            Processo processo,
-            List<Subprocesso> subprocessos,
-            @Nullable Long codUnidade,
-            LocalDateTime dataGeracao
-    ) {
+    private LinkedHashMap<String, String> criarResumoMapas(List<Subprocesso> subprocessos, LocalDateTime dataGeracao) {
         LinkedHashMap<String, String> resumo = new LinkedHashMap<>();
-        resumo.put("Processo", processo.getDescricao());
         resumo.put("Unidades", Integer.toString(subprocessos.size()));
         resumo.put("Gerado em", formatarDataHora(dataGeracao));
-        resumo.put("Filtro", codUnidade == null ? "Todas as unidades" : "Unidade %d".formatted(codUnidade));
+        resumo.put("Tipo", "Mapas vigentes");
         return resumo;
     }
 

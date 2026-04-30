@@ -55,9 +55,9 @@ describe("Relatorios Store", () => {
     const mockData = [{codigoUnidade: 1, siglaUnidade: "SEC", nomeUnidade: "Secretaria", totalCompetencias: 1, competencias: []}];
     vi.mocked(relatoriosService.obterRelatorioMapas).mockResolvedValue(mockData as any);
 
-    await store.buscarRelatorioMapas(123, 456);
+    await store.buscarRelatorioMapas([123, 456]);
 
-    expect(relatoriosService.obterRelatorioMapas).toHaveBeenCalledWith(123, 456);
+    expect(relatoriosService.obterRelatorioMapas).toHaveBeenCalledWith([123, 456]);
     expect(store.relatorioMapas).toEqual(mockData);
     expect(store.lastError).toBeNull();
   });
@@ -66,9 +66,9 @@ describe("Relatorios Store", () => {
     const store = useRelatoriosStore();
     vi.mocked(relatoriosService.downloadRelatorioMapasPdf).mockResolvedValue(undefined);
 
-    await store.exportarMapasPdf(123, 456);
+    await store.exportarMapasPdf([123, 456]);
 
-    expect(relatoriosService.downloadRelatorioMapasPdf).toHaveBeenCalledWith(123, 456);
+    expect(relatoriosService.downloadRelatorioMapasPdf).toHaveBeenCalledWith([123, 456]);
     expect(store.lastError).toBeNull();
   });
 

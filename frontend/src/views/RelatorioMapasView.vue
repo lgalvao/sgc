@@ -9,63 +9,44 @@
     </PageHeader>
 
     <BCard class="mb-4">
-      <BRow class="align-items-end">
-        <BCol md="5">
-          <BFormGroup
-              label-for="select-processo-mapas"
-              :state="mensagemErroProcesso ? false : null"
-          >
-            <template #label>
-              {{ TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO }} <span aria-hidden="true" class="text-danger">*</span>
-            </template>
-            <BFormSelect
-              id="select-processo-mapas"
-              v-model="processoIdSelecionado"
-              :options="opcoesProcessos"
-              :state="mensagemErroProcesso ? false : null"
-              data-testid="select-processo-mapas"
+      <div class="d-flex flex-column gap-3">
+        <BFormGroup label-for="arvore-unidades-mapas">
+          <template #label>
+            Unidade <span aria-hidden="true" class="text-danger">*</span>
+          </template>
+          <div class="relatorio-mapas__arvore" data-testid="container-arvore-unidades-mapas">
+            <ArvoreUnidades
+              id="arvore-unidades-mapas"
+              v-model="unidadesSelecionadas"
+              :ocultar-raiz="false"
+              :unidades="unidadesDisponiveis"
             />
-            <BFormInvalidFeedback :state="mensagemErroProcesso ? false : null">
-              {{ mensagemErroProcesso }}
-            </BFormInvalidFeedback>
-          </BFormGroup>
-        </BCol>
-        <BCol md="4">
-          <BFormGroup :label="TEXTOS.relatorios.LABEL_SELECIONE_UNIDADE" label-for="select-unidade-mapas">
-            <BFormSelect
-              id="select-unidade-mapas"
-              v-model="unidadeIdSelecionada"
-              :disabled="!processoIdSelecionado"
-              :options="opcoesUnidades"
-              data-testid="select-unidade-mapas"
-            />
-          </BFormGroup>
-        </BCol>
-        <BCol md="auto">
-          <BButton
-            :disabled="carregando"
-            variant="primary"
-            data-testid="btn-gerar-html-mapas"
-            @click="gerarRelatorio"
-          >
-            <BSpinner v-if="carregando" small class="me-1" />
-            <i v-else class="bi bi-search me-1" />
-            {{ TEXTOS.relatorios.BOTAO_GERAR }}
-          </BButton>
-        </BCol>
-        <BCol md="auto">
-          <BButton
-            :disabled="carregando"
-            variant="success"
-            data-testid="btn-gerar-mapas"
-            @click="exportarPdf"
-          >
-            <BSpinner v-if="carregando" small class="me-1" />
-            <i v-else class="bi bi-file-earmark-pdf me-1" />
-            {{ TEXTOS.relatorios.BOTAO_GERAR_PDF }}
-          </BButton>
-        </BCol>
-      </BRow>
+          </div>
+        </BFormGroup>
+
+        <div class="d-flex flex-wrap gap-2">
+            <BButton
+              :disabled="carregando || !temUnidadesSelecionadas"
+              variant="success"
+              data-testid="btn-gerar-html-mapas"
+              @click="gerarRelatorio"
+            >
+              <BSpinner v-if="carregando" small class="me-1" />
+              <i v-else class="bi bi-search me-1" />
+              {{ TEXTOS.relatorios.BOTAO_GERAR }}
+            </BButton>
+            <BButton
+              :disabled="carregando || !temUnidadesSelecionadas"
+              variant="outline-danger"
+              data-testid="btn-gerar-mapas"
+              @click="exportarPdf"
+            >
+              <BSpinner v-if="carregando" small class="me-1" />
+              <i v-else class="bi bi-file-earmark-pdf me-1" />
+              PDF
+            </BButton>
+        </div>
+      </div>
     </BCard>
 
     <div v-if="carregando && relatorioMapas.length === 0" class="text-center py-5">
@@ -77,35 +58,31 @@
         <BCard
             v-for="mapa in relatorioMapas"
             :key="mapa.codigoUnidade"
-            class="border-start border-4 border-secondary shadow-sm"
+            class="relatorio-mapas__card shadow-sm"
             no-body
             data-testid="card-relatorio-mapas"
         >
           <BCardBody>
-            <BCardTitle class="mb-3">
-              <span class="fw-bold text-primary">{{ mapa.siglaUnidade }} - {{ mapa.nomeUnidade }}</span>
+            <BCardTitle class="mb-3 relatorio-mapas__cabecalho">
+              <span class="relatorio-mapas__titulo">{{ mapa.siglaUnidade }}</span>
+              <span class="relatorio-mapas__subtitulo">{{ mapa.nomeUnidade }}</span>
             </BCardTitle>
 
-            <div class="mb-3 pb-3 border-bottom">
-              <span class="text-muted d-block small">Competências vigentes</span>
-              <span class="fw-bold text-dark">{{ mapa.totalCompetencias }}</span>
-            </div>
-
-            <div class="d-flex flex-column gap-3">
+            <div class="d-flex flex-column gap-2">
               <section
                   v-for="competencia in mapa.competencias"
                   :key="competencia.codigo"
                   class="relatorio-mapas__competencia"
               >
-                <h6 class="fw-bold text-primary mb-2">{{ competencia.descricao }}</h6>
+                <h6 class="mb-2 relatorio-mapas__secao">{{ competencia.descricao }}</h6>
 
                 <div
                     v-for="atividade in competencia.atividades"
                     :key="atividade.codigo"
-                    class="mb-2"
+                    class="relatorio-mapas__atividade"
                 >
-                  <div class="fw-semibold">{{ atividade.descricao }}</div>
-                  <ul v-if="atividade.conhecimentos.length > 0" class="mb-0 mt-1 ps-3 text-muted">
+                  <div class="relatorio-mapas__atividade-titulo">{{ atividade.descricao }}</div>
+                  <ul v-if="atividade.conhecimentos.length > 0" class="relatorio-mapas__conhecimentos">
                     <li v-for="conhecimento in atividade.conhecimentos" :key="conhecimento.codigo">
                       {{ conhecimento.descricao }}
                     </li>
@@ -121,114 +98,52 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from "vue";
-import {BButton, BCard, BCardBody, BCardTitle, BCol, BFormGroup, BFormInvalidFeedback, BFormSelect, BRow, BSpinner} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {BButton, BCard, BCardBody, BCardTitle, BFormGroup, BSpinner} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {TEXTOS} from "@/constants/textos";
-import * as painelService from "@/services/painelService";
-import * as processoService from "@/services/processoService";
-import type {ProcessoResumo, UnidadeParticipante} from "@/types/tipos";
+import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
+import type {Unidade} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
-import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
 
 const relatoriosStore = useRelatoriosStore();
 const { notify } = useNotification();
-const {
-  validarSubmissao,
-  deveExibirErro,
-  focarPrimeiroErroInvalido
-} = useValidacaoFormulario();
 
-const processoIdSelecionado = ref<number | null>(null);
-const unidadeIdSelecionada = ref<number | null>(null);
-const processosDisponiveis = ref<ProcessoResumo[]>([]);
-const unidadesParticipantes = ref<Array<{ value: number; text: string }>>([]);
+const unidadesDisponiveis = ref<Unidade[]>([]);
+const unidadesSelecionadas = ref<number[]>([]);
 const carregando = ref(false);
 const relatorioMapas = computed(() => relatoriosStore.relatorioMapas);
+const temUnidadesSelecionadas = computed(() => unidadesSelecionadas.value.length > 0);
 
-const mensagemErroProcesso = computed(() => {
-  return deveExibirErro(!processoIdSelecionado.value) ? "Selecione um processo." : "";
-});
-
-const opcoesProcessos = computed(() => [
-  { value: null, text: TEXTOS.relatorios.SELECIONE },
-  ...processosDisponiveis.value.map(p => ({ value: p.codigo, text: p.descricao }))
-]);
-
-const opcoesUnidades = computed(() => [
-  {
-    value: null,
-    text: processoIdSelecionado.value ? TEXTOS.relatorios.TODAS_UNIDADES : "(Selecione um processo)"
-  },
-  ...unidadesParticipantes.value
-]);
-
-async function carregarProcessos() {
-  try {
-    const response = await painelService.listarProcessos({ page: 0, size: 100 });
-    processosDisponiveis.value = response?.content ?? [];
-  } catch {
-    notify("Erro ao carregar processos", "danger");
-  }
+function marcarUnidadesElegiveis(unidades: Unidade[]): Unidade[] {
+  return unidades
+      .filter(unidade => unidade.sigla.toUpperCase() !== "ADMIN")
+      .map(unidade => ({
+        ...unidade,
+        isElegivel: true,
+        filhas: unidade.filhas ? marcarUnidadesElegiveis(unidade.filhas) : []
+      }));
 }
 
-function coletarUnidadesParticipantes(unidades: UnidadeParticipante[]): Array<{ value: number; text: string }> {
-  const opcoes = new Map<number, string>();
-
-  const visitar = (itens: UnidadeParticipante[]) => {
-    itens.forEach((unidade) => {
-      const sigla = unidade.sigla?.trim() ?? "";
-      const nome = unidade.nome?.trim() ?? "";
-      const ehVirtual = sigla.toUpperCase() === "ADMIN";
-
-      if (!ehVirtual && unidade.codUnidade) {
-        opcoes.set(unidade.codUnidade, sigla);
-      }
-
-      if (unidade.filhos?.length) {
-        visitar(unidade.filhos);
-      }
-    });
-  };
-
-  visitar(unidades);
-
-  return Array.from(opcoes.entries())
-      .map(([value, text]) => ({value, text}))
-      .sort((a, b) => a.text.localeCompare(b.text, "pt-BR"));
-}
-
-async function carregarUnidadesDoProcesso(codProcesso: number | null) {
-  if (!codProcesso) {
-    unidadesParticipantes.value = [];
-    unidadeIdSelecionada.value = null;
-    return;
-  }
-
+async function carregarUnidades() {
   try {
-    const processo = await processoService.obterDetalhesProcesso(codProcesso);
-    unidadesParticipantes.value = coletarUnidadesParticipantes(processo.unidades ?? []);
-
-    if (!unidadesParticipantes.value.some((unidade) => unidade.value === unidadeIdSelecionada.value)) {
-      unidadeIdSelecionada.value = null;
-    }
+    const response = await buscarTodasUnidades();
+    unidadesDisponiveis.value = marcarUnidadesElegiveis(mapUnidadesArray(response as Unidade[]));
   } catch {
-    unidadesParticipantes.value = [];
-    unidadeIdSelecionada.value = null;
-    notify("Erro ao carregar unidades do processo", "danger");
+    notify("Erro ao carregar unidades", "danger");
   }
 }
 
 async function exportarPdf() {
-  if (!validarSubmissao(!!processoIdSelecionado.value)) {
-    await focarPrimeiroErroInvalido();
+  if (!temUnidadesSelecionadas.value) {
     return;
   }
 
   carregando.value = true;
-  await relatoriosStore.exportarMapasPdf(processoIdSelecionado.value!, unidadeIdSelecionada.value || undefined);
+  await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value);
   carregando.value = false;
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_GERAR, "danger");
@@ -236,13 +151,12 @@ async function exportarPdf() {
 }
 
 async function gerarRelatorio() {
-  if (!validarSubmissao(!!processoIdSelecionado.value)) {
-    await focarPrimeiroErroInvalido();
+  if (!temUnidadesSelecionadas.value) {
     return;
   }
 
   carregando.value = true;
-  await relatoriosStore.buscarRelatorioMapas(processoIdSelecionado.value!, unidadeIdSelecionada.value || undefined);
+  await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value);
   carregando.value = false;
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
@@ -251,10 +165,91 @@ async function gerarRelatorio() {
 
 onMounted(() => {
   relatoriosStore.limparRelatorio();
-  carregarProcessos();
-});
-
-watch(processoIdSelecionado, async (novoProcessoId) => {
-  await carregarUnidadesDoProcesso(novoProcessoId);
+  carregarUnidades();
 });
 </script>
+
+<style scoped>
+.relatorio-mapas__arvore {
+  max-height: 22rem;
+  overflow: auto;
+  padding: 0.75rem;
+  border: 1px solid #d7dee8;
+  border-radius: 0.65rem;
+  background: #fff;
+}
+
+.relatorio-mapas__card {
+  border: 1px solid #c8d1dc;
+  background: #fff;
+}
+
+.relatorio-mapas__cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid #d7dee8;
+}
+
+.relatorio-mapas__titulo {
+  color: #16365f;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.relatorio-mapas__subtitulo {
+  color: #4b5d73;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.relatorio-mapas__competencia {
+  padding: 0.95rem 1rem;
+  border: 1px solid #dde4ec;
+  border-radius: 0.65rem;
+  background: #fff;
+}
+
+.relatorio-mapas__secao {
+  color: #1d3557;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.relatorio-mapas__atividade + .relatorio-mapas__atividade {
+  margin-top: 0.7rem;
+}
+
+.relatorio-mapas__atividade-titulo {
+  color: #1f2937;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.relatorio-mapas__conhecimentos {
+  margin: 0.35rem 0 0;
+  padding-left: 1.2rem;
+  color: #374151;
+}
+
+.relatorio-mapas__conhecimentos li + li {
+  margin-top: 0.18rem;
+}
+
+@media (max-width: 768px) {
+  .relatorio-mapas__titulo {
+    font-size: 1.2rem;
+  }
+
+  .relatorio-mapas__competencia {
+    padding: 0.8rem 0.85rem;
+  }
+}
+</style>

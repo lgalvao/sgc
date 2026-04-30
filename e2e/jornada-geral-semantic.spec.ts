@@ -119,8 +119,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await navegarParaCadastro(page);
 
         // O CHEFE registra uma atividade e um conhecimento da unidade.
-        let DESC_ATIVIDADE = 'Atividade 1';
-        let DESC_CONHECIMENTO = 'Conhecimento 1.1';
+        const DESC_ATIVIDADE = 'Atividade 1';
+        const DESC_CONHECIMENTO = 'Conhecimento 1.1';
 
         await adicionarAtividade(page, DESC_ATIVIDADE);
         await adicionarConhecimento(page, DESC_ATIVIDADE, DESC_CONHECIMENTO);
