@@ -124,7 +124,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
         vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
-        window.scrollTo = vi.fn();
         vi.spyOn(console, 'error').mockImplementation(() => {
         });
     });

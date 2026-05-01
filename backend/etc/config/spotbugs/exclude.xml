@@ -24,6 +24,10 @@
         <Class name="sgc.integracao.SubprocessoServiceListaIntegrationTest"/>
         <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
     </Match>
+    <Match>
+        <Class name="sgc.subprocesso.service.SubprocessoConsultaService$ContextoConsultaSubprocesso"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
 
     <!-- Classe principal da aplicação -->
     <Match>

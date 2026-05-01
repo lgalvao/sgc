@@ -208,9 +208,16 @@ jacoco {
 }
 
 spotbugs {
-    toolVersion = libs.versions.spotbugs.get()
-    ignoreFailures.set(false) 
+    toolVersion.set(libs.versions.spotbugs.get())
+    ignoreFailures.set(false)
     excludeFilter.set(file("etc/config/spotbugs/exclude.xml"))
+}
+
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
+    auxClasspath.from(configurations.compileClasspath)
+    if (name == "spotbugsTest") {
+        auxClasspath.from(sourceSets["main"].output)
+    }
 }
 
 tasks.register("qualityCheck") {

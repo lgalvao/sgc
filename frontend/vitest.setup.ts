@@ -74,3 +74,5 @@ const locationMock = {
 Object.defineProperty(globalThis, "location", {
     value: locationMock,
 });
+
+window.scrollTo = vi.fn();
