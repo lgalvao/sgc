@@ -352,6 +352,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
+import {useMapaCompetenciasMutacoes} from "@/composables/useMapaCompetenciasMutacoes";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
@@ -363,16 +364,13 @@ import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import logger from "@/utils/logger";
+import {normalizeError} from "@/utils/apiError";
 import {Perfil} from "@/types/tipos";
 import type {
   Analise,
-  Competencia,
   MapaCompleto,
   MapaVisualizacao,
-  SalvarCompetenciaRequest,
 } from "@/types/tipos";
-import type {NormalizedError} from "@/utils/apiError";
-import {normalizeError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
 
@@ -670,6 +668,31 @@ function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   }
 }
 
+const {
+  competenciaSendoEditada,
+  mostrarModalCriarNovaCompetencia,
+  mostrarModalExcluirCompetencia,
+  competenciaParaExcluir,
+  loadingCompetencia,
+  loadingExclusao,
+  abrirModalCriarLimpo,
+  fecharModalCriarNovaCompetencia,
+  iniciarEdicaoCompetencia,
+  adicionarCompetenciaEFecharModal,
+  excluirCompetencia,
+  confirmarExclusaoCompetencia,
+  removerAtividadeAssociada,
+  fecharModalExcluirCompetencia,
+} = useMapaCompetenciasMutacoes({
+  codigoSubprocesso,
+  competencias,
+  fluxoMapa,
+  notify,
+  clearErrors,
+  aplicarErroNormalizado,
+  sincronizarMapa,
+});
+
 onMounted(async () => {
   const sucesso = await carregarContextoInicial(podeEditarMapa);
   if (!sucesso) {
@@ -710,17 +733,10 @@ const podeConfirmarDisponibilizacao = computed(() => {
       && associacoesMapaValidas.value
   );
 });
-const competenciaSendoEditada = ref<Competencia | null>(null);
-
-const mostrarModalCriarNovaCompetencia = ref(false);
 const mostrarModalDisponibilizar = ref(false);
-const mostrarModalExcluirCompetencia = ref(false);
-const competenciaParaExcluir = ref<Competencia | null>(null);
 const notificacaoDisponibilizacao = ref("");
 const erroValidacaoMapa = ref("");
-const loadingCompetencia = ref(false);
 const loadingDisponibilizacao = ref(false);
-const loadingExclusao = ref(false);
 
 const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
   'descricao',
@@ -737,29 +753,15 @@ function limparErroMapa() {
   erroMapa.value = null;
 }
 
-function handleErrors(store: { lastError: unknown }) {
-  setFromNormalizedError(store.lastError as NormalizedError | null);
-  if (fieldErrors.value.atividadesCodigos) fieldErrors.value.atividades = fieldErrors.value.atividadesCodigos;
+function sincronizarErrosAtividades() {
+  if (fieldErrors.value.atividadesCodigos) {
+    fieldErrors.value.atividades = fieldErrors.value.atividadesCodigos;
+  }
 }
 
-function abrirModalCriarNovaCompetencia(competenciaParaEditar: Competencia | null = null) {
-  mostrarModalCriarNovaCompetencia.value = true;
-  clearErrors();
-  fluxoMapa.clearError();
-  competenciaSendoEditada.value = competenciaParaEditar;
-}
-
-function abrirModalCriarLimpo() {
-  abrirModalCriarNovaCompetencia();
-}
-
-function fecharModalCriarNovaCompetencia() {
-  mostrarModalCriarNovaCompetencia.value = false;
-  clearErrors();
-}
-
-function iniciarEdicaoCompetencia(competencia: Competencia) {
-  abrirModalCriarNovaCompetencia(competencia);
+function aplicarErroNormalizado(error: ReturnType<typeof normalizeError> | null) {
+  setFromNormalizedError(error);
+  sincronizarErrosAtividades();
 }
 
 function abrirModalDisponibilizar() {
@@ -779,68 +781,6 @@ function abrirModalDisponibilizar() {
   clearErrors();
 }
 
-async function adicionarCompetenciaEFecharModal(dados: { descricao: string; atividadesSelecionadas: number[] }) {
-  if (loadingCompetencia.value) return;
-
-  await executarComSubprocesso(async (codigoSubprocesso) => {
-    const request: SalvarCompetenciaRequest = {
-      descricao: dados.descricao,
-      atividadesCodigos: dados.atividadesSelecionadas,
-    };
-
-    loadingCompetencia.value = true;
-    try {
-      if (competenciaSendoEditada.value) {
-        sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigoSubprocesso, competenciaSendoEditada.value.codigo, request));
-      } else {
-        sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigoSubprocesso, request));
-      }
-      fecharModalCriarNovaCompetencia();
-    } catch (error) {
-      logger.error(error);
-      handleErrors(fluxoMapa);
-    } finally {
-      loadingCompetencia.value = false;
-    }
-  });
-}
-
-function excluirCompetencia(codigo: number) {
-  const comp = competencias.value.find(c => c.codigo === codigo);
-  if (comp) {
-    competenciaParaExcluir.value = comp;
-    mostrarModalExcluirCompetencia.value = true;
-  }
-}
-
-async function confirmarExclusaoCompetencia() {
-  if (!competenciaParaExcluir.value) return;
-
-  await executarComSubprocesso(async (codigoSubprocesso) => {
-    loadingExclusao.value = true;
-    try {
-      sincronizarMapa(await fluxoMapa.removerCompetencia(codigoSubprocesso, competenciaParaExcluir.value!.codigo));
-      mostrarModalExcluirCompetencia.value = false;
-    } catch (error) {
-      logger.error(error);
-      notify(normalizeError(error).message, 'danger');
-    } finally {
-      loadingExclusao.value = false;
-    }
-  });
-}
-
-async function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
-  await executarComSubprocesso(async (codigoSubprocesso) => {
-    try {
-      sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigoSubprocesso, competenciaId, codAtividade));
-    } catch (error) {
-      logger.error(error);
-      notify(normalizeError(error).message, 'danger');
-    }
-  });
-}
-
 async function disponibilizarMapa(request: { dataLimite: string; observacoes: string }) {
   if (loadingDisponibilizacao.value) return;
 
@@ -851,7 +791,7 @@ async function disponibilizarMapa(request: { dataLimite: string; observacoes: st
       await concluirAcaoPainel(TEXTOS.sucesso.MAPA_DISPONIBILIZADO, fecharModalDisponibilizar);
     } catch (error) {
       logger.error(error);
-      handleErrors(fluxoMapa);
+      aplicarErroNormalizado(fluxoMapa.lastError.value as ReturnType<typeof normalizeError> | null);
     } finally {
       loadingDisponibilizacao.value = false;
     }
