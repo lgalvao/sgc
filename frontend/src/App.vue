@@ -28,10 +28,19 @@ const aplicarTema = () => {
   document.documentElement.setAttribute("data-bs-theme", isDark ? "dark" : "light");
 };
 
-onMounted(async () => {
-  await carregarConfiguracoes();
+onMounted(() => {
   aplicarTema();
 });
+
+watch(
+    () => [perfilStore.usuarioCodigo, perfilStore.permissoesSessao?.mostrarMenuConfiguracoes],
+    async ([codigo, podeConfigurar]) => {
+      if (codigo && podeConfigurar) {
+        await carregarConfiguracoes();
+      }
+    },
+    {immediate: true}
+);
 
 watch(
     () => getTemaEscuro(),
