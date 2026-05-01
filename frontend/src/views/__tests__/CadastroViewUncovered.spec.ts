@@ -423,7 +423,7 @@ describe("CadastroView Uncovered Branches", () => {
         // 3. Revisão sem mudanças (disponibilizacaoSemMudancas = true)
         vm.disponibilizacaoSemMudancas = true;
         await vm.confirmarDisponibilizacao();
-        expect(fluxo.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(123);
+        expect(fluxo.disponibilizarCadastro).toHaveBeenCalledWith(123, true);
     });
 
     it("cobre salvarEdicaoAtividade branch descricao invalida", async () => {
