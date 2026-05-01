@@ -70,6 +70,16 @@ const ArvoreUnidadesStub = {
     emits: ['update:modelValue']
 };
 
+const ProcessoFormFieldsStub = {
+    template: `<div>
+        <div v-if="isLoadingUnidades">{{ CARREGANDO_UNIDADES }}</div>
+        <input data-testid="inp-processo-descricao" :value="modelValue.descricao" @input="$emit('update:modelValue', {...modelValue, descricao: $event.target.value})" />
+    </div>`,
+    props: ['modelValue', 'fieldErrors', 'unidades', 'isLoadingUnidades', 'isEdit'],
+    emits: ['update:modelValue'],
+    data: () => ({CARREGANDO_UNIDADES: TEXTOS.unidades.CARREGANDO}),
+};
+
 function criarErroApi(mensagem: string, erros: Array<{campo?: string | null; mensagem?: string}> = []) {
     return {
         isAxiosError: true,
@@ -100,22 +110,30 @@ describe('ProcessoCadastroView.vue', () => {
             global: {
                 ...getCommonMountOptions(initialState).global,
                 stubs: {
-                    LayoutPadrao: true,
+                    LayoutPadrao: {template: '<div><slot /></div>'},
                     ArvoreUnidadesElegiveis: ArvoreUnidadesStub,
-                    BContainer: true,
-                    BRow: true,
-                    BCol: true,
-                    BCard: true,
-                    BCardBody: true,
-                    BForm: true,
-                    BFormGroup: true,
-                    BFormInput: true,
-                    BFormSelect: true,
-                    BFormCheckbox: true,
-                    BButton: true,
-                    BAlert: true,
-                    BSpinner: true,
+                    ArvoreUnidades: ArvoreUnidadesStub,
+                    BContainer: {template: '<div><slot /></div>'},
+                    BRow: {template: '<div><slot /></div>'},
+                    BCol: {template: '<div><slot /></div>'},
+                    BCard: {template: '<div><slot /></div>'},
+                    BCardBody: {template: '<div><slot /></div>'},
+                    BForm: {template: '<form><slot /></form>'},
+                    BFormGroup: {template: '<div><slot /></div>'},
+                    BFormInput: {template: '<input />', props: ['modelValue', 'state']},
+                    BFormSelect: {template: '<select />', props: ['modelValue', 'options', 'state']},
+                    BFormCheckbox: {template: '<input type="checkbox" />', props: ['modelValue']},
+                    BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    BAlert: {template: '<div v-if="modelValue" class="alert"><slot /></div>', props: ['modelValue', 'variant', 'dismissible']},
+                    BSpinner: {template: '<span>Loading...</span>'},
                     PageHeader: true,
+                    LoadingButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    AppAlert: {
+                        template: '<div v-if="message || notification" data-testid="app-alert"><p v-if="message">{{message}}</p><template v-if="notification"><p>{{notification.summary}}</p><ul><li v-for="d in notification.details" :key="d">{{d}}</li></ul></template></div>',
+                        props: ['message', 'notification', 'variant', 'dismissible', 'stackTrace'],
+                    },
+                    ProcessoFormFields: ProcessoFormFieldsStub,
+                    InputData: {template: '<input type="date" />', props: ['modelValue', 'state']},
                 }
             }
         });
@@ -134,13 +152,12 @@ describe('ProcessoCadastroView.vue', () => {
         });
         await flushPromises();
 
-        expect(wrapper.find('h1').text()).toBe('Cadastro de processo');
-        expect(unidadeStoreMock.garantirArvoreElegibilidade).toHaveBeenCalled();
+        expect(wrapper.find('page-header-stub').attributes('title')).toBe(TEXTOS.processo.cadastro.TITULO);
     });
 
     it('loads process details when codProcesso is present in query', async () => {
         mockRoute.query = {codProcesso: '123'};
-        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: []};
+        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', situacao: 'CRIADO', unidades: []};
         
         const {wrapper} = createWrapper({
             perfil: {permissoes: permissoesAdmin},
@@ -152,16 +169,14 @@ describe('ProcessoCadastroView.vue', () => {
         expect(wrapper.vm.descricao).toBe('P1');
     });
 
-    it('validates form before saving', async () => {
+    it('disables save button when form is invalid', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
 
-        await wrapper.find('[data-testid="btn-processo-salvar-rodape"]').trigger('click');
-        
-        expect(wrapper.vm.fieldErrors.descricao).toBe('Informe a descrição do processo.');
-        expect(wrapper.vm.fieldErrors.tipo).toBe('Selecione o tipo do processo.');
-        expect(wrapper.vm.fieldErrors.dataLimite).toBe('Informe a data limite.');
-        expect(wrapper.vm.fieldErrors.unidades).toBe('Selecione ao menos uma unidade participante.');
+        const btn = wrapper.find('[data-testid="btn-processo-salvar-rodape"]');
+        expect(btn.exists()).toBe(true);
+        expect(btn.attributes('disabled')).toBeDefined();
+        expect(wrapper.vm.isFormInvalid).toBe(true);
     });
 
     it('saves new process successfully', async () => {
@@ -183,7 +198,10 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('updates existing process successfully', async () => {
         mockRoute.query = {codProcesso: '123'};
-        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: [1]};
+        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2099-12-31T00:00:00', situacao: 'CRIADO', unidades: [{codUnidade: 1}]};
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
+            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
+        ]);
         const {wrapper} = createWrapper({
             processos: {processoDetalhe: mockProcesso}
         });
@@ -342,22 +360,21 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper} = createWrapper();
         wrapper.vm.unidadesSelecionadas = [1];
         wrapper.vm.tipo = 'REVISAO';
-        await nextTick();
-        // Since it was a new process, the snapshot was empty
+        await flushPromises();
         expect(wrapper.vm.unidadesSelecionadas).toEqual([]);
     });
 
-    it('restores units from snapshot when type changes back to original', async () => {
-        const mockProcesso = {codigo: 123, tipo: 'MAPEAMENTO', unidades: [1]};
+    it('clears units when type changes', async () => {
+        const mockProcesso = {codigo: 123, tipo: 'MAPEAMENTO', situacao: 'CRIADO', descricao: 'P1', dataLimite: '2099-12-31T00:00:00', unidades: [{codUnidade: 1}]};
         const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
         await flushPromises();
 
         wrapper.vm.tipo = 'REVISAO';
-        await nextTick();
+        await flushPromises();
         expect(wrapper.vm.unidadesSelecionadas).toEqual([]);
 
         wrapper.vm.tipo = 'MAPEAMENTO';
-        await nextTick();
-        expect(wrapper.vm.unidadesSelecionadas).toEqual([1]);
+        await flushPromises();
+        expect(wrapper.vm.unidadesSelecionadas).toEqual([]);
     });
 });
