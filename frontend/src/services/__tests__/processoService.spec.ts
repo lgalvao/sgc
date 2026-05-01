@@ -240,51 +240,6 @@ describe('processoService', () => {
         expect(result).toEqual(responseData);
     });
 
-    it('alterarDataLimiteSubprocesso deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        const dados = {novaData: '2024-12-31'};
-        await processoService.alterarDataLimiteSubprocesso(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/data-limite`, {
-            data: dados.novaData
-        });
-    });
-
-    it('apresentarSugestoes deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        const dados = {sugestoes: 'Texto'};
-        await processoService.apresentarSugestoes(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, {
-            texto: dados.sugestoes
-        });
-    });
-
-    it('validarMapa deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        await processoService.validarMapa(codSubprocesso);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/validar-mapa`);
-    });
-
-    it('homologarValidacao deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        const dados = {texto: 'Obs'};
-        await processoService.homologarValidacao(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/homologar-validacao`, dados);
-    });
-
-    it('aceitarValidacao deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        const dados = {texto: 'Obs'};
-        await processoService.aceitarValidacao(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados);
-    });
-
-    it('devolverValidacao deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        const dados = {justificativa: 'Erro'};
-        await processoService.devolverValidacao(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/devolver-validacao`, dados);
-    });
-
     it('buscarSubprocessos deve fazer requisição GET', async () => {
         const codProcesso = 1;
         const responseData = [{codigo: 1, situacao: 'CRIADO'}];
@@ -305,20 +260,6 @@ describe('processoService', () => {
 
         expect(apiClient.get).toHaveBeenCalledWith(`/processos/${codProcesso}/contexto-completo`);
         expect(result).toEqual(responseData);
-    });
-
-    it('reabrirCadastro deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        const justificativa = 'Erro';
-        await processoService.reabrirCadastro(codSubprocesso, justificativa);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, {justificativa});
-    });
-
-    it('reabrirRevisaoCadastro deve fazer requisição POST', async () => {
-        const codSubprocesso = 1;
-        const justificativa = 'Erro';
-        await processoService.reabrirRevisaoCadastro(codSubprocesso, justificativa);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, {justificativa});
     });
 
     it('enviarLembrete deve fazer requisição POST', async () => {

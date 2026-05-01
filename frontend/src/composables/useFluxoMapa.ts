@@ -1,17 +1,15 @@
 import {
     adicionarCompetencia as adicionarCompetenciaService,
+    aceitarValidacao as aceitarValidacaoService,
     atualizarCompetencia as atualizarCompetenciaService,
+    devolverValidacao as devolverValidacaoService,
     disponibilizarMapa as disponibilizarMapaService,
+    homologarValidacao as homologarValidacaoService,
     removerCompetencia as removerCompetenciaService,
     salvarMapaAjuste,
     salvarMapaCompleto,
+    validarMapa as validarMapaService,
 } from "@/services/subprocessoService";
-import {
-    aceitarValidacao as aceitarValidacaoService,
-    devolverValidacao as devolverValidacaoService,
-    homologarValidacao as homologarValidacaoService,
-    validarMapa as validarMapaService
-} from "@/services/processoService";
 import type {
     DisponibilizarMapaRequest,
     MapaCompleto,

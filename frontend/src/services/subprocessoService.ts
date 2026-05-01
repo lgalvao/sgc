@@ -103,6 +103,29 @@ export async function validarCadastro(codSubprocesso: number): Promise<Validacao
     return response.data;
 }
 
+export async function alterarDataLimiteSubprocesso(
+    codSubprocesso: number,
+    dados: { novaData: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/data-limite`, {
+        data: dados.novaData,
+    });
+}
+
+export async function reabrirCadastro(
+    codSubprocesso: number,
+    justificativa: string,
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, {justificativa});
+}
+
+export async function reabrirRevisaoCadastro(
+    codSubprocesso: number,
+    justificativa: string,
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, {justificativa});
+}
+
 export async function obterStatus(codSubprocesso: number): Promise<SubprocessoStatus> {
     const response = await apiClient.get<SubprocessoStatus>(`/subprocessos/${codSubprocesso}/status`);
     return response.data;
@@ -194,6 +217,15 @@ export async function obterSugestoesMapa(
     return response.data.sugestoes ?? "";
 }
 
+export async function apresentarSugestoes(
+    codSubprocesso: number,
+    dados: { sugestoes: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, {
+        texto: dados.sugestoes,
+    });
+}
+
 export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
     const response = await apiClient.get<ImpactoMapaResponse>(`/subprocessos/${codSubprocesso}/impactos-mapa`);
     const data = response.data;
@@ -247,6 +279,31 @@ export async function disponibilizarMapa(
     data: DisponibilizarMapaRequest,
 ): Promise<void> {
     await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-mapa`, data);
+}
+
+export async function validarMapa(codSubprocesso: number): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/validar-mapa`);
+}
+
+export async function homologarValidacao(
+    codSubprocesso: number,
+    dados: { texto: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`, dados);
+}
+
+export async function aceitarValidacao(
+    codSubprocesso: number,
+    dados: { texto: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados);
+}
+
+export async function devolverValidacao(
+    codSubprocesso: number,
+    dados: { justificativa: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/devolver-validacao`, dados);
 }
 
 export async function adicionarCompetencia(

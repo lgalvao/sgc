@@ -149,49 +149,6 @@ export async function buscarSubprocessosElegiveis(
     return response.data;
 }
 
-export async function alterarDataLimiteSubprocesso(
-    codSubprocesso: number,
-    dados: { novaData: string },
-): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/data-limite`, {
-        data: dados.novaData,
-    });
-}
-
-export async function apresentarSugestoes(
-    codSubprocesso: number,
-    dados: { sugestoes: string },
-): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, {
-        texto: dados.sugestoes,
-    });
-}
-
-export async function validarMapa(codSubprocesso: number): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/validar-mapa`);
-}
-
-export async function homologarValidacao(
-    codSubprocesso: number,
-    dados: { texto: string },
-): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`, dados);
-}
-
-export async function aceitarValidacao(
-    codSubprocesso: number,
-    dados: { texto: string },
-): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados);
-}
-
-export async function devolverValidacao(
-    codSubprocesso: number,
-    dados: { justificativa: string },
-): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/devolver-validacao`, dados);
-}
-
 export async function buscarSubprocessos(
     codProcesso: number,
 ): Promise<Subprocesso[]> {
@@ -202,22 +159,6 @@ export async function buscarSubprocessos(
 export async function buscarContextoCompleto(codProcesso: number) {
     const response = await apiClient.get(`/processos/${codProcesso}/contexto-completo`);
     return response.data;
-}
-
-// CDU-32: Reabrir cadastro
-export async function reabrirCadastro(
-    codSubprocesso: number,
-    justificativa: string,
-): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, {justificativa});
-}
-
-// CDU-33: Reabrir revisão de cadastro
-export async function reabrirRevisaoCadastro(
-    codSubprocesso: number,
-    justificativa: string,
-): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, {justificativa});
 }
 
 // CDU-34: Enviar lembrete de prazo

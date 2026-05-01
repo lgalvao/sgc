@@ -66,6 +66,23 @@ describe('subprocessoService', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/validar-cadastro');
   });
 
+  it('alterarDataLimiteSubprocesso', async () => {
+    await subprocessoService.alterarDataLimiteSubprocesso(1, { novaData: '2024-12-31' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/data-limite', {
+      data: '2024-12-31',
+    });
+  });
+
+  it('reabrirCadastro', async () => {
+    await subprocessoService.reabrirCadastro(1, 'Erro');
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/reabrir-cadastro', { justificativa: 'Erro' });
+  });
+
+  it('reabrirRevisaoCadastro', async () => {
+    await subprocessoService.reabrirRevisaoCadastro(1, 'Erro');
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/reabrir-revisao-cadastro', { justificativa: 'Erro' });
+  });
+
   it('obterStatus', async () => {
     getMock.mockResolvedValueOnce({ data: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO } } as never);
     await subprocessoService.obterStatus(1);
@@ -265,6 +282,26 @@ describe('subprocessoService', () => {
     expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa', { dataLimite: '2025-01-01', observacoes: 'teste' });
   });
 
+  it('validarMapa', async () => {
+    await subprocessoService.validarMapa(1);
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/validar-mapa');
+  });
+
+  it('homologarValidacao', async () => {
+    await subprocessoService.homologarValidacao(1, { texto: 'Obs' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/homologar-validacao', { texto: 'Obs' });
+  });
+
+  it('aceitarValidacao', async () => {
+    await subprocessoService.aceitarValidacao(1, { texto: 'Obs' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-validacao', { texto: 'Obs' });
+  });
+
+  it('devolverValidacao', async () => {
+    await subprocessoService.devolverValidacao(1, { justificativa: 'Erro' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/devolver-validacao', { justificativa: 'Erro' });
+  });
+
   it('adicionarCompetencia', async () => {
     postMock.mockResolvedValueOnce({ data: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' } } as never);
     await subprocessoService.adicionarCompetencia(1, { descricao: 'desc', atividadesCodigos: [1] });
@@ -324,6 +361,13 @@ describe('subprocessoService', () => {
     getMock.mockResolvedValueOnce({ data: { sugestoes: null } } as never);
     const resultado = await subprocessoService.obterSugestoesMapa(1);
     expect(resultado).toBe('');
+  });
+
+  it('apresentarSugestoes', async () => {
+    await subprocessoService.apresentarSugestoes(1, { sugestoes: 'Texto' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/apresentar-sugestoes', {
+      texto: 'Texto',
+    });
   });
 
   describe('mapSubprocessoDetalheResponseParaModel', () => {

@@ -6,7 +6,7 @@ import {
     devolverValidacao as devolverValidacaoService,
     homologarValidacao as homologarValidacaoService,
     validarMapa as validarMapaService,
-} from '@/services/processoService';
+} from '@/services/subprocessoService';
 
 type NotificacaoMapa = (mensagem: string, variante: 'success' | 'danger' | 'warning' | 'info') => void;
 

@@ -10,12 +10,12 @@ import {
     homologarRevisaoCadastro as serviceHomologarRevisaoCadastro,
     iniciarRevisaoCadastro as serviceIniciarRevisaoCadastro,
 } from "@/services/cadastroService";
-import {validarCadastro as serviceValidarCadastro} from "@/services/subprocessoService";
 import {
     alterarDataLimiteSubprocesso as serviceAlterarDataLimite,
     reabrirCadastro as serviceReabrirCadastro,
     reabrirRevisaoCadastro as serviceReabrirRevisaoCadastro,
-} from "@/services/processoService";
+    validarCadastro as serviceValidarCadastro,
+} from "@/services/subprocessoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useToastStore} from "@/stores/toast";

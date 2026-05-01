@@ -359,9 +359,8 @@ import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {obterSugestoesMapa} from "@/services/subprocessoService";
+import {apresentarSugestoes, obterSugestoesMapa} from "@/services/subprocessoService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
-import {apresentarSugestoes as apresentarSugestoesService} from "@/services/processoService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import logger from "@/utils/logger";
@@ -577,7 +576,7 @@ async function handleConfirmarSugestoes() {
 
   try {
     isLoading.value = true;
-    await apresentarSugestoesService(codigoSubprocesso.value, {sugestoes: sugestoes.value});
+    await apresentarSugestoes(codigoSubprocesso.value, {sugestoes: sugestoes.value});
     await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
   } catch (error) {
     logger.error(error);
