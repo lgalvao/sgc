@@ -181,6 +181,7 @@ import {useNotification} from "@/composables/useNotification";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useAcesso} from "@/composables/useAcesso";
+import {useCadastroRevisaoSemMudancas} from "@/composables/useCadastroRevisaoSemMudancas";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
 import {
@@ -261,11 +262,8 @@ const permissoesUI = computed<PermissoesSubprocesso>(() => ({
 
 
 
-const disponibilizacaoSemMudancas = ref(false);
-
 const assinaturaCadastroAtual = computed(() => calcularAssinaturaCadastro(atividades.value));
 const houveAlteracaoCadastro = computed(() => assinaturaCadastroAtual.value !== atividadesSnapshotInicial.value);
-const checkboxSemMudancasDesabilitado = computed(() => loadingInicioRevisao.value || houveAlteracaoCadastro.value);
 
 const atividadesOrdenadas = computed(() => {
   return [...atividades.value].sort((a, b) => (b.codigo || 0) - (a.codigo || 0));
@@ -287,82 +285,21 @@ const habilitarDisponibilizar = computed(() => {
 const analisesCadastro = ref<Analise[]>([]);
 
 const situacaoAtual = computed(() => subprocesso.value?.situacao);
-const precisaIniciarRevisao = computed(() =>
-    isRevisao.value &&
-    situacaoAtual.value === SituacaoSubprocesso.NAO_INICIADO
-);
-
-async function iniciarRevisaoSeNecessario() {
-  if (!precisaIniciarRevisao.value || !codigoSubprocesso.value || loadingInicioRevisao.value) return;
-
-  loadingInicioRevisao.value = true;
-  try {
-    const sucesso = await fluxoSubprocesso.iniciarRevisaoCadastro(codigoSubprocesso.value);
-    if (!sucesso) {
-      logger.error('Falha ao iniciar revisão do cadastro');
-    }
-  } finally {
-    loadingInicioRevisao.value = false;
-  }
-}
-
-async function cancelarInicioRevisaoSeNecessario() {
-  if (situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-      || !codigoSubprocesso.value
-      || loadingInicioRevisao.value
-      || houveAlteracaoCadastro.value) return;
-
-  loadingInicioRevisao.value = true;
-  try {
-    const sucesso = await fluxoSubprocesso.cancelarInicioRevisaoCadastro(codigoSubprocesso.value);
-    if (!sucesso) {
-      logger.error('Falha ao cancelar início da revisão do cadastro');
-    }
-  } finally {
-    loadingInicioRevisao.value = false;
-  }
-}
-
-let ignorarAlteracaoCheckboxSemMudancas = false;
-
-function atualizarCheckboxSemMudancasSilenciosamente(valor: boolean) {
-  ignorarAlteracaoCheckboxSemMudancas = true;
-  disponibilizacaoSemMudancas.value = valor;
-  queueMicrotask(() => {
-    ignorarAlteracaoCheckboxSemMudancas = false;
-  });
-}
-
-watch(disponibilizacaoSemMudancas, async (marcado) => {
-  if (ignorarAlteracaoCheckboxSemMudancas) {
-    return;
-  }
-
-  if (marcado) {
-    if (!precisaIniciarRevisao.value) return;
-
-    await iniciarRevisaoSeNecessario();
-    if (situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
-      atualizarCheckboxSemMudancasSilenciosamente(false);
-    }
-    return;
-  }
-
-  if (houveAlteracaoCadastro.value || situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
-    return;
-  }
-
-  await cancelarInicioRevisaoSeNecessario();
-  const situacaoAposCancelamento = subprocesso.value?.situacao;
-  if (situacaoAposCancelamento !== SituacaoSubprocesso.NAO_INICIADO) {
-    atualizarCheckboxSemMudancasSilenciosamente(true);
-  }
-});
-
-watch(houveAlteracaoCadastro, (alterou) => {
-  if (alterou && disponibilizacaoSemMudancas.value) {
-    atualizarCheckboxSemMudancasSilenciosamente(false);
-  }
+const {
+  disponibilizacaoSemMudancas,
+  checkboxSemMudancasDesabilitado,
+  precisaIniciarRevisao,
+  loadingInicioRevisao,
+  iniciarRevisaoSeNecessario,
+  cancelarInicioRevisaoSeNecessario,
+  atualizarCheckboxSemMudancasSilenciosamente,
+  sincronizarDisponibilizacaoSemMudancasInicial
+} = useCadastroRevisaoSemMudancas({
+  codigoSubprocesso,
+  isRevisao,
+  situacaoAtual,
+  houveAlteracaoCadastro,
+  fluxoSubprocesso
 });
 
 const {withErrorHandling, lastError} = useErrorHandler();
@@ -403,7 +340,6 @@ const {
 const loadingValidacao = ref(false);
 const loadingDisponibilizacao = ref(false);
 const loadingRemocao = ref(false);
-const loadingInicioRevisao = ref(false);
 const loadingAnaliseCadastro = ref(false);
 const loadingDevolucaoAnalise = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
@@ -817,10 +753,8 @@ async function handleAdicionarAtividade() {
 
 onMounted(async () => {
   await carregarContextoInicial();
-  
-  if (isRevisao.value && situacaoAtual.value === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO && !houveAlteracaoCadastro.value) {
-    atualizarCheckboxSemMudancasSilenciosamente(true);
-  }
+
+  sincronizarDisponibilizacaoSemMudancasInicial();
 });
 
 watch(() => atividades.value?.length, (newLen, oldLen) => {
