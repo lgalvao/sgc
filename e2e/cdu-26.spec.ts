@@ -37,7 +37,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
     test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
         await expect(btnHomologar).toBeVisible();
@@ -75,7 +75,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
         await expect(modal).toBeHidden();
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
     });
 
     test('Cenario 4: ADMIN confirma homologação em bloco e é redirecionado ao painel', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

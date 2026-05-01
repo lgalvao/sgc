@@ -30,37 +30,32 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await page.getByTestId('card-relatorio-mapas').click();
         await expect(page).toHaveURL(/\/relatorios\/mapas-vigentes/);
 
-        const selectProcesso = page.getByTestId('select-processo-mapas');
-        const selectUnidade = page.getByTestId('select-unidade-mapas');
+        const arvoreContainer = page.getByTestId('container-arvore-unidades-mapas');
         const botaoGerar = page.getByTestId('btn-gerar-mapas');
 
-        await expect(selectProcesso).toBeVisible();
-        await expect(selectUnidade).toBeVisible();
-        await expect(selectUnidade).toContainText(/Todas as unidades/i);
+        await expect(arvoreContainer).toBeVisible();
+        await expect(botaoGerar).toBeDisabled();
 
-        await botaoGerar.click();
-        await expect(page.getByText('Selecione um processo.')).toBeVisible();
+        // Expande para encontrar a unidade do fixture
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        const chkUnidade = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12');
+        await expect(chkUnidade).toBeVisible();
+        await chkUnidade.click();
 
-        await selectProcesso.selectOption({label: descricaoProcesso});
-        await expect(page.getByText('Selecione um processo.')).toBeHidden();
-
-        const requisicaoSemFiltroUnidade = page.waitForRequest((req) => {
-            return req.url().includes(`/relatorios/mapas/${processo.codigo}/exportar`) && !req.url().includes('unidadeId=');
-        });
+        await expect(botaoGerar).toBeEnabled();
 
         const downloadPromise = page.waitForEvent('download');
         await botaoGerar.click();
-        await requisicaoSemFiltroUnidade;
         const download = await downloadPromise;
 
         const filename = download.suggestedFilename();
-        expect(filename).toMatch(new RegExp(`relatorio-mapas-(vigentes-)?${processo.codigo}.pdf`));
+        expect(filename).toMatch(new RegExp(`relatorio-mapas-(vigentes-)?`));
     });
 
-    test('Cenário CDU-36: Mantém opção única de unidade e gera PDF sem unidadeId', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+    test('Cenário CDU-36: Seleciona unidade e gera PDF', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         test.slow();
         const descricaoProcesso = `Relatório CDU-36 filtro ${Date.now()}`;
-        const processo = await criarProcessoMapaHomologadoFixture(request, {
+        await criarProcessoMapaHomologadoFixture(request, {
             descricao: descricaoProcesso,
             unidade: 'SECRETARIA_1',
             diasLimite: 30
@@ -73,21 +68,12 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await page.getByTestId('card-relatorio-mapas').click();
         await expect(page).toHaveURL(/\/relatorios\/mapas-vigentes/);
 
-        const selectProcesso = page.getByTestId('select-processo-mapas');
-        const selectUnidade = page.getByTestId('select-unidade-mapas');
-        const botaoGerar = page.getByTestId('btn-gerar-mapas');
-
-        await selectProcesso.selectOption({label: descricaoProcesso});
-
-        await expect(selectUnidade).toContainText(/Todas as unidades/i);
-
-        const requisicaoSemFiltroUnidade = page.waitForRequest((req) => {
-            return req.url().includes(`/relatorios/mapas/${processo.codigo}/exportar`) && !req.url().includes('unidadeId=');
-        });
+        const chkUnidade = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');
+        await expect(chkUnidade).toBeVisible();
+        await chkUnidade.click();
 
         const downloadPromise = page.waitForEvent('download');
-        await botaoGerar.click();
-        await requisicaoSemFiltroUnidade;
+        await page.getByTestId('btn-gerar-mapas').click();
         await downloadPromise;
     });
 });

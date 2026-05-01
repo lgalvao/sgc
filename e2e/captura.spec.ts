@@ -1229,7 +1229,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
 
             await page.goto(`/processo/${codProcesso}`);
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+            await expect(page.getByTestId('processo-info')).toBeVisible();
             await capturarTela(page, 'operacoes-bloco', 'detalhes-processo-gestor', { 
                 fullPage: true, 
                 extra: { perfil: 'GESTOR', acao: 'ver-bloco' } 
@@ -1257,7 +1257,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 'GESTOR - SECRETARIA_2'
             );
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+            await expect(page.getByTestId('processo-info')).toBeVisible();
             
             const btnAceitarBlocoSec2 = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
             await expect(btnAceitarBlocoSec2).toBeVisible();
@@ -1269,7 +1269,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+            await expect(page.getByTestId('processo-info')).toBeVisible();
 
             // Capturar botão de homologar cadastro em bloco (CDU-23)
             const btnHomologarBloco = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
@@ -1419,8 +1419,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.goto('/relatorios');
             await page.getByTestId('card-relatorio-mapas').click();
-            await expect(page.getByTestId('select-processo-mapas')).toBeVisible();
-            await expect(page.getByTestId('select-unidade-mapas')).toBeVisible();
+            await expect(page.getByTestId('container-arvore-unidades-mapas')).toBeVisible();
             await capturarTela(page, 'relatorios', 'relatorio-mapas', { extra: { relatorio: 'mapas' } });
 
             await expect(page.getByTestId('btn-gerar-mapas')).toBeVisible();

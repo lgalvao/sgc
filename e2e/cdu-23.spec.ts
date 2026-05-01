@@ -60,7 +60,8 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await page.reload();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
         await expect(btnHomologar).toBeVisible();
@@ -77,7 +78,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
         await expect(modal).not.toHaveClass(/show/);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
     });
 
     test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
@@ -93,7 +94,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();
 
         await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
         await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
         await expect(btnHomologar).toBeDisabled();
         await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();
@@ -164,7 +165,12 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
         await devolverCadastroMapeamento(page, 'Ajustar cadastro antes da homologação');
 
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await page.reload();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
+        
+        // Garante que o estado do subprocesso foi atualizado na UI antes de verificar botões de ação em bloco
+        await expect(page.getByRole('row', {name: new RegExp(`${UNIDADE_1}.*Devolvido para ajustes`, 'i')})).toBeVisible();
+
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
         await expect(btnHomologar).toBeDisabled();
     });

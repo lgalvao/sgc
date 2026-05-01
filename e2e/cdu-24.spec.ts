@@ -85,7 +85,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
 
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).not.toHaveClass(/show/);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
     });
 
 

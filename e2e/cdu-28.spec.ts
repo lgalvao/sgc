@@ -57,18 +57,25 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     }
 
     async function selecionarUsuarioAlvo(page: import('@playwright/test').Page) {
-        await page.getByTestId('input-busca-usuario').fill(TITULO_USUARIO_ALVO);
-        const opcaoUsuario = page.getByTestId(/opcao-usuario-/).filter({hasText: NOME_USUARIO_ALVO}).first();
+        const inputBusca = page.getByTestId('input-busca-usuario');
+        await inputBusca.click();
+        await inputBusca.pressSequentially(TITULO_USUARIO_ALVO, {delay: 100});
+        
+        const listaResultados = page.getByTestId('lista-usuarios-pesquisa');
+        await expect(listaResultados).toBeVisible();
+
+        const opcaoUsuario = page.getByTestId(new RegExp(`opcao-usuario-${TITULO_USUARIO_ALVO}`)).filter({hasText: NOME_USUARIO_ALVO}).first();
         await expect(opcaoUsuario).toBeVisible();
         await opcaoUsuario.click();
+        await expect(listaResultados).toBeHidden();
     }
 
     test.beforeEach(async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await page.getByRole('link', {name: /Unidades/i}).click();
         await expect(page).toHaveURL(/\/unidades/);
         await expect(page.getByRole('heading', {name: TEXTOS.unidades.TITULO})).toBeVisible();
-        await expect(page.getByTestId('btn-expandir-todas')).toBeVisible();
-        await page.getByTestId('btn-expandir-todas').click();
+        await expect(page.getByTestId('btn-unidades-expandir-todas')).toBeVisible();
+        await page.getByTestId('btn-unidades-expandir-todas').click();
         await expect(page.getByTestId('tbl-tree')).toBeVisible();
     });
 

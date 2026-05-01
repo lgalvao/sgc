@@ -32,7 +32,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         await acessarDetalhesProcesso(page, descProcesso);
 
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         // Botão finalizar visível
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
@@ -59,7 +59,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-finalizar-processo-cancelar').click();
 
         // Permanece na tela de detalhes do processo
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
@@ -87,7 +87,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // Garantir que botões de ação não aparecem para processos finalizados
 
         await page.goto(`/processo/${codProcesso}`);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         await expect(page.getByText(/Situação:\s*Finalizado/i)).toBeVisible();
 
@@ -127,7 +127,7 @@ test.describe.serial('CDU-21 - Processo com mapas não homologados', () => {
     test('Cenario 5: ADMIN não vê botão Finalizar quando mapas não estão todos homologados', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // CDU-21 Passos 4-5: sistema verifica situação dos subprocessos e bloqueia finalização
         await acessarDetalhesProcesso(page, descProcessoErro);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         // Processo com mapa validado (não homologado): botão Finalizar não deve estar disponível
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
@@ -176,7 +176,7 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
 
     test('Cenario 2: Verificar ausência de botões em processo de revisão finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.goto(`/processo/${codProcessoRevisao}`);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         await expect(page.getByText(/Situação:\s*Finalizado/i)).toBeVisible();
 

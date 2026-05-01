@@ -44,7 +44,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
@@ -61,13 +61,13 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
         await expect(modal).not.toHaveClass(/show/);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
     });
 
     test('Cenario 3a: Botão desabilitado quando item está com gestor subordinado', async ({_resetAutomatico, page, _autenticadoComoGestorSecretaria2}) => {
         // autenticadoComoGestorSecretaria2 já logou como GESTOR SECRETARIA_2
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
@@ -77,7 +77,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     test('Cenario 3b: Botão habilitado após gestor subordinado aceitar', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
         // autenticadoComoGestorCoord22 já logou como GESTOR COORD_22
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
         const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await btnAceitar.click();
         await page.locator('#modal-acao-bloco').getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
@@ -86,7 +86,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         // GESTOR SECRETARIA_2 deve agora ver o botão habilitado
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
         await expect(await obterAcaoBloco(page, 'btn-processo-aceitar-bloco')).toBeEnabled();
     });
 
@@ -100,7 +100,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         // GESTOR SECRETARIA_1 acessa: item está com COORD_11 (intermediário)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await acessarDetalhesProcesso(page, `CDU-22-C4 ${timestamp4}`);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
@@ -171,7 +171,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
 
     test('Cenario REVISAO: GESTOR aceita revisão de cadastro em bloco', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
         await acessarDetalhesProcesso(page, descProcessoRevisao);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         const btnAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();

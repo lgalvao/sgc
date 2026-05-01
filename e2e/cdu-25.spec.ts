@@ -26,7 +26,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
             await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
             await acessarDetalhesProcesso(page, descProcesso);
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+            await expect(page.getByTestId('processo-info')).toBeVisible();
         });
 
         await test.step('Cenario 1: GESTOR visualiza botões de ação em bloco', async () => {
@@ -47,7 +47,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             await modal.getByRole('button', {name: /Cancelar/i}).click();
             
             await expect(modal).toBeHidden();
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+            await expect(page.getByTestId('processo-info')).toBeVisible();
         });
 
         await test.step('Cenario 3: GESTOR realiza aceite em bloco com sucesso', async () => {

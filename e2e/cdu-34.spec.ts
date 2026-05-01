@@ -45,7 +45,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
                                                                                                     _autenticadoComoAdmin
 }) => {
         await acessarDetalhesProcesso(page, descProcesso);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('processo-info')).toBeVisible();
 
         await expect(page.getByTestId('tbl-tree')).toBeVisible();
         await navegarParaSubprocesso(page, UNIDADE_1);
