@@ -13,9 +13,7 @@ interface MapaOrquestracaoProps {
 }
 
 export function useMapaOrquestracao(
-    props: MapaOrquestracaoProps, 
-    atividades: Ref<Atividade[]>, 
-    competencias: Ref<Competencia[]>,
+    props: MapaOrquestracaoProps,
     mapaSomenteLeitura: Ref<MapaVisualizacao | null>
 ) {
     const subprocessoStore = useSubprocessoStore();
@@ -26,8 +24,6 @@ export function useMapaOrquestracao(
     const unidade = ref<Unidade | null>(null);
 
     function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
-        atividades.value = data.mapa.atividades;
-        competencias.value = data.mapa.competencias;
         unidade.value = data.unidade;
         mapasStore.mapaCompleto.value = data.mapa;
     }

@@ -1,13 +1,18 @@
-import {ref} from 'vue';
+import {storeToRefs} from 'pinia';
+import type {Ref} from 'vue';
+import {usePerfilStore} from '@/stores/perfil';
 import type {Unidade} from '@/types/tipos';
 
-// Estado reativo compartilhado (módulo singleton)
-const unidadeAtual = ref<Unidade | null>(null);
-
 export function useUnidadeAtual() {
+    const perfilStore = usePerfilStore();
+    const {unidadeAtualDetalhes} = storeToRefs(perfilStore);
+
     function definirUnidadeAtual(unidade: Unidade | null) {
-        unidadeAtual.value = unidade;
+        perfilStore.unidadeAtualDetalhes = unidade;
     }
 
-    return {unidadeAtual, definirUnidadeAtual};
+    return {
+        unidadeAtual: unidadeAtualDetalhes as Ref<Unidade | null>,
+        definirUnidadeAtual,
+    };
 }

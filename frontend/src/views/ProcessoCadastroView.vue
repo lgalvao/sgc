@@ -191,7 +191,6 @@ const {focarPrimeiroErroInvalido} = useValidacaoFormulario();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
-const ultimaBuscaUnidades = ref<{ tipoProcesso: TipoProcesso; codProcesso?: number } | null>(null);
 const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
 const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
 
@@ -247,13 +246,6 @@ function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
 }
 
 async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcesso?: number) {
-  if (
-      ultimaBuscaUnidades.value?.tipoProcesso === tipoProcesso
-      && ultimaBuscaUnidades.value?.codProcesso === codProcesso
-  ) {
-    return;
-  }
-  ultimaBuscaUnidades.value = {tipoProcesso, codProcesso};
   isLoadingUnidades.value = true;
   try {
     const unidadesMapeadas = await unidadeStore.garantirArvoreElegibilidade(tipoProcesso, codProcesso);

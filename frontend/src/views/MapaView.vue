@@ -346,7 +346,7 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import {computed, defineAsyncComponent, onMounted, ref, watch} from "vue";
+import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
@@ -368,7 +368,6 @@ import logger from "@/utils/logger";
 import {Perfil} from "@/types/tipos";
 import type {
   Analise,
-  Atividade,
   Competencia,
   MapaCompleto,
   MapaVisualizacao,
@@ -428,8 +427,8 @@ const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?
 const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);
 const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);
 
-const atividades = ref<Atividade[]>([]);
-const competencias = ref<Competencia[]>([]);
+const atividades = computed(() => mapasStore.mapaCompleto.value?.atividades ?? []);
+const competencias = computed(() => mapasStore.mapaCompleto.value?.competencias ?? []);
 const mapaSomenteLeitura = ref<MapaVisualizacao | null>(null);
 
 const {
@@ -437,14 +436,7 @@ const {
   codigoSubprocesso,
   unidade,
   carregarContextoInicial,
-} = useMapaOrquestracao(props, atividades, competencias, mapaSomenteLeitura);
-
-watch(() => mapasStore.mapaCompleto.value, (novoMapa) => {
-  if (novoMapa) {
-    atividades.value = novoMapa.atividades || [];
-    competencias.value = novoMapa.competencias || [];
-  }
-}, { deep: true, flush: 'sync' });
+} = useMapaOrquestracao(props, mapaSomenteLeitura);
 
 const analisesCadastro = ref<Analise[]>([]);
 const historicoAnalise = computed(() => analisesCadastro.value || []);

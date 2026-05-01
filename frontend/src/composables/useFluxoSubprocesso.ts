@@ -27,7 +27,6 @@ import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroR
 interface WorkflowOptions {
     mensagemSucesso?: string;
     redirecionarParaPainel?: boolean;
-    recarregarSubprocesso?: boolean;
     invalidarCaches?: {
         incluirPainel?: boolean;
     };
@@ -154,7 +153,6 @@ export function useFluxoSubprocesso() {
             () => isRevisao ? serviceReabrirRevisaoCadastro(codigoSubprocesso, justificativa) : serviceReabrirCadastro(codigoSubprocesso, justificativa),
             {
                 mensagemSucesso: msg,
-                recarregarSubprocesso: true
             }
         );
     }

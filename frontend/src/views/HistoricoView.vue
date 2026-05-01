@@ -2,9 +2,7 @@
   <LayoutPadrao>
     <PageHeader title="Histórico"/>
 
-    <div v-if="loading" class="text-center py-5">
-      <BSpinner label="Carregando..." variant="primary"/>
-    </div>
+    <CarregamentoPagina v-if="loading" />
 
     <TabelaProcessos
         v-else
@@ -21,25 +19,26 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue';
+import {computed, onActivated, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
+import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import * as processoService from '@/services/processoService';
+import {useHistoricoStore} from '@/stores/historico';
 import type {ProcessoResumo} from "@/types/tipos";
 import {logger} from '@/utils';
 
 const router = useRouter();
-const processosFinalizados = ref<ProcessoResumo[]>([]);
+const historicoStore = useHistoricoStore();
 const loading = ref(false);
 
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
 const asc = ref(false);
 
 const processosOrdenados = computed(() => {
-  const lista = [...processosFinalizados.value];
+  const lista = [...historicoStore.processos];
   const campo = criterio.value;
   const direcao = asc.value ? 1 : -1;
 
@@ -59,10 +58,11 @@ const processosOrdenados = computed(() => {
 async function carregarHistorico() {
   loading.value = true;
   try {
-    processosFinalizados.value = await processoService.buscarProcessosFinalizados() ?? [];
+    const processos = await processoService.buscarProcessosFinalizados() ?? [];
+    historicoStore.definirDados(processos);
   } catch (e) {
     logger.error("Erro ao carregar histórico:", e);
-    processosFinalizados.value = [];
+    historicoStore.definirDados([]);
   } finally {
     loading.value = false;
   }
@@ -84,7 +84,19 @@ function verDetalhes(proc: ProcessoResumo | undefined) {
   }
 }
 
+// Flag para distinguir o primeiro mount de ativações subsequentes (keepAlive).
+// onActivated é chamado também no primeiro mount, antes de onMounted — a flag evita
+// recarregamento duplo nesse caso.
+let montadoUmaVez = false;
+
 onMounted(() => {
+  montadoUmaVez = true;
+  carregarHistorico();
+});
+
+onActivated(() => {
+  if (!montadoUmaVez) return;
+  if (historicoStore.dadosValidos()) return;
   carregarHistorico();
 });
 </script>

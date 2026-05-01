@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
+import {createTestingPinia} from "@pinia/testing";
 import HistoricoView from "@/views/HistoricoView.vue";
 import * as processoService from "@/services/processoService";
 
@@ -62,6 +63,12 @@ describe("HistoricoView.vue", () => {
     function createWrapper() {
         return mount(HistoricoView, {
             global: {
+                plugins: [
+                    createTestingPinia({
+                        createSpy: vi.fn,
+                        stubActions: false,
+                    })
+                ],
                 stubs: {
                     LayoutPadrao: LayoutPadraoStub,
                     PageHeader: PageHeaderStub,
