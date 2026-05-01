@@ -142,6 +142,7 @@ describe('ProcessoCadastroView.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([]);
         mockPush.mockReset();
         mockRoute.query = {};
     });
