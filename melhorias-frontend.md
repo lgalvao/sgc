@@ -24,7 +24,7 @@ Medições rápidas do código de produção, sem testes e sem stories:
 
 Passos:
 
-- Atualizar os READMEs do frontend para descrever o padrão real desejado, não o histórico.
+- Deixar a atualização dos READMEs para o fim da simplificação, depois que a arquitetura-alvo estiver estabilizada no código.
 - Definir uma regra simples: estado global só para sessão, cache compartilhado de fato e feedback pendente entre rotas; tela de uso único fica local.
 - Registrar explicitamente que services não precisam passar por store quando a store não agrega cache, dedupe ou contrato de sessão.
 
@@ -43,7 +43,7 @@ Passos:
 
 - Mover ações com rota `/subprocessos/...` para `subprocessoService.ts`, preservando os nomes públicos por domínio.
 - Manter em `processoService.ts` apenas endpoints realmente de `/processos/...` ou agregados de processo.
-- Consolidar `useMapaAcoesAnalise.ts` e `useFluxoMapa.ts`: hoje ambos sabem validar, aceitar, homologar e devolver mapa.
+- Consolidar `useMapaAcoesAnalise.ts` e `useFluxoMapa.ts`: concluído nesta frente; `useFluxoMapa` ficou como executor único do workflow de análise de mapa.
 - Ajustar testes de services depois da movimentação para garantir que nenhum endpoint mudou.
 
 ### 3. Caching existe, mas a política não é uniforme
@@ -104,12 +104,22 @@ Em `CadastroView.vue`, o watcher de `disponibilizacaoSemMudancas` chega a inicia
 Passos:
 
 - Quebrar por fluxo de usuário, não por camada genérica. Bons candidatos:
-  - `useCadastroRevisaoSemMudancas` para iniciar/cancelar revisão e controlar checkbox.
+  - `useCadastroRevisaoSemMudancas` para iniciar/cancelar revisão e controlar checkbox. Concluído nesta frente.
   - `useCadastroAtividadesMutacoes` para adicionar/remover/editar atividade e conhecimento.
   - `useMapaCompetenciasMutacoes` para criar/editar/excluir competência e atualizar mapa.
   - `useMapaSugestoes` para abrir, carregar, editar e submeter sugestões.
 - Cada composable deve retornar dados ou resultado explícito; evitar escrever em outra store por dentro quando a view pode aplicar o retorno.
 - Depois de cada extração, reduzir `defineExpose` dos testes para cobrir comportamento público, não detalhes internos acumulados.
+
+### 5.1 Regra de domínio ainda vaza para o mapper do frontend
+
+`mapSubprocessoDetalheResponseParaModel` ainda injeta `etapaAtual: subprocesso.etapaAtual ?? 1` em `frontend/src/services/subprocessoService.ts`. Esse fallback é simples, mas continua sendo uma decisão de domínio sobre estado do subprocesso fora do backend.
+
+Passos:
+
+- Confirmar qual contrato o backend quer garantir para `etapaAtual` em todos os DTOs de detalhe/contexto.
+- Remover o fallback do frontend assim que o backend passar a devolver o campo sempre preenchido, ou explicitar no contrato backend que `null` é estado válido.
+- Revisar outros mapeamentos do frontend com a mesma lógica de "default silencioso" antes de criar novos composables em cima deles.
 
 ### 6. Há defensividade excessiva e sinais de contratos frouxos
 
@@ -168,16 +178,16 @@ Passos:
 
 ### Fase 1: estabilizar o mapa arquitetural
 
-1. Atualizar os READMEs de `frontend`, `stores`, `composables` e `services`.
-2. Criar uma pequena tabela de política de cache em `frontend/README.md` ou documento dedicado.
-3. Definir a regra de fronteira: `processoService` não deve exportar ações de `/subprocessos/...`.
+1. Definir a regra de fronteira: `processoService` não deve exportar ações de `/subprocessos/...`.
+2. Criar uma pequena tabela de política de cache em documento de trabalho temporário, sem reabrir README agora.
+3. Deixar a atualização de READMEs para a rodada final de consolidação.
 
 Validação: `npm run typecheck` e testes unitários dos arquivos alterados.
 
 ### Fase 2: reduzir overlap de services e workflows
 
 1. Migrar ações de subprocesso de `processoService.ts` para `subprocessoService.ts`.
-2. Consolidar `useMapaAcoesAnalise.ts` com `useFluxoMapa.ts`.
+2. Consolidar `useMapaAcoesAnalise.ts` com `useFluxoMapa.ts`. Concluído.
 3. Ajustar imports nas views sem mudar endpoints.
 
 Validação: testes de `processoService`, `subprocessoService`, `useFluxoMapa`, `MapaView` e `SubprocessoView`.
@@ -192,10 +202,11 @@ Validação: testes de stores e um E2E representativo de workflow com navegaçã
 
 ### Fase 4: atacar telas grandes por fluxo
 
-1. Extrair revisão sem mudanças de `CadastroView.vue`.
+1. Extrair revisão sem mudanças de `CadastroView.vue`. Concluído.
 2. Extrair mutações de atividades de `CadastroView.vue`.
 3. Extrair mutações de competências de `MapaView.vue`.
 4. Extrair sugestões de mapa de `MapaView.vue`.
+5. Remover defaults de domínio do frontend, começando por `etapaAtual ?? 1`.
 
 Critério de aceite: cada extração reduz estado local da view e mantém o retorno explícito do fluxo.
 
@@ -209,11 +220,11 @@ Validação: comparação antes/depois com `SGC_MONITORAMENTO=sim` e testes de c
 
 ## Ordem prática dos primeiros cortes
 
-1. Corrigir documentação local desatualizada.
-2. Mover ações `/subprocessos/...` para `subprocessoService.ts`.
-3. Unificar `useMapaAcoesAnalise` e `useFluxoMapa`.
-4. Ajustar `useProcessoStore.invalidar`.
-5. Medir `MapaView` em modo somente leitura para decidir se a chamada extra de `mapa-visualizacao` deve ficar.
-6. Extrair `useCadastroRevisaoSemMudancas`.
+1. Mover ações `/subprocessos/...` para `subprocessoService.ts`.
+2. Ajustar `useProcessoStore.invalidar`.
+3. Medir `MapaView` em modo somente leitura para decidir se a chamada extra de `mapa-visualizacao` deve ficar.
+4. Extrair mutações de atividades de `CadastroView.vue`.
+5. Extrair mutações de competências de `MapaView.vue`.
+6. Remover defaults de domínio do frontend, começando por `etapaAtual ?? 1`.
 
 Essa sequência reduz confusão estrutural antes de mexer nas telas maiores, mantém diffs pequenos e evita criar endpoint novo sem evidência de round-trip real.
