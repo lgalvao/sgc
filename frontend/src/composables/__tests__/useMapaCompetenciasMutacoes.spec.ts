@@ -50,7 +50,7 @@ describe("useMapaCompetenciasMutacoes", () => {
         
         iniciarEdicaoCompetencia(comp);
         
-        expect(competenciaSendoEditada.value).toBe(comp);
+        expect(competenciaSendoEditada.value).toEqual(comp);
     });
 
     it("deve adicionar nova competência com sucesso", async () => {

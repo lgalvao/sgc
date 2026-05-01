@@ -426,6 +426,37 @@ describe("CadastroView Uncovered Branches", () => {
         expect(fluxo.disponibilizarCadastro).toHaveBeenCalledWith(123, true);
     });
 
+    it("cobre handleImportAtividades", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const res = { atividadesAtualizadas: [], aviso: false } as any;
+        
+        await vm.handleImportAtividades(res);
+        expect(vm.mostrarModalImportar).toBe(false);
+    });
+
+    it("cobre confirmarValidacaoAnalise e confirmarDevolucaoAnalise", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const fluxo = useFluxoSubprocessoModule.useFluxoSubprocesso();
+
+        // 1. Validar Analise (Aceite)
+        vm.acaoPrincipalCadastro = { codigo: 'ACEITAR', mensagemSucesso: 'Aceito' };
+        vm.mostrarModalValidarAnalise = true;
+        await vm.confirmarValidacaoAnalise();
+        expect(fluxo.aceitarCadastro).toHaveBeenCalled();
+        expect(vm.mostrarModalValidarAnalise).toBe(false);
+
+        // 2. Devolver Analise
+        vm.observacaoDevolucao = "Justificativa";
+        vm.mostrarModalDevolverAnalise = true;
+        await vm.confirmarDevolucaoAnalise();
+        expect(fluxo.devolverCadastro).toHaveBeenCalled();
+        expect(vm.mostrarModalDevolverAnalise).toBe(false);
+    });
+
     it("cobre salvarEdicaoAtividade branch descricao invalida", async () => {
         const wrapper = createWrapper();
         await flushPromises();

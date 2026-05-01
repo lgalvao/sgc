@@ -166,4 +166,27 @@ describe("MapaView Uncovered Branches", () => {
         await vm.adicionarCompetenciaEFecharModal({ descricao: "Nova", atividadesSelecionadas: [1] });
         expect(vm.mostrarModalCriarNovaCompetencia).toBe(false);
     });
+
+    it("cobre confirmarAceitacao e handleConfirmarDevolucao", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        
+        vm.codigoSubprocesso = 1;
+        vm.acaoPrincipalMapa = { codigo: 'ACEITAR', mostrar: true };
+        
+        // 1. Aceitar
+        vm.mostrarModalAceitar = true;
+        await vm.confirmarAceitacao("OK");
+        expect(vm.mostrarModalAceitar).toBe(false);
+
+        // 2. Devolver
+        vm.observacaoDevolucao = "Justificativa";
+        vm.mostrarModalDevolucao = true;
+        await vm.handleConfirmarDevolucao();
+        expect(vm.mostrarModalDevolucao).toBe(false);
+    });
 });
