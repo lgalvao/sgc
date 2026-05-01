@@ -61,8 +61,8 @@ export const usePerfilStore = defineStore("perfil", () => {
 
     function definirPerfilUnidade(dados: DadosSelecaoPerfil) {
         painelStore.invalidar();
-        processoStore.invalidar();
-        subprocessoStore.invalidar();
+        processoStore.resetar();
+        subprocessoStore.resetar();
         unidadeStore.invalidarCache();
         mapasStore.invalidar();
         perfilSelecionado.value = dados.perfil;
@@ -162,8 +162,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfis.value = [];
         unidadeAtualDetalhes.value = null;
         painelStore.invalidar();
-        processoStore.invalidar();
-        subprocessoStore.invalidar();
+        processoStore.resetar();
+        subprocessoStore.resetar();
         unidadeStore.invalidarCache();
         mapasStore.invalidar();
     }

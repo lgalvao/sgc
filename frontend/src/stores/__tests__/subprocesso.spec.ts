@@ -251,13 +251,17 @@ describe("subprocesso store (cache e dedupe)", () => {
     });
 
     describe("invalidação", () => {
-        it("deve limpar todo o estado ao invalidar", () => {
+        it("deve manter o último snapshot, mas marcá-lo como inválido", () => {
             const store = useSubprocessoStore();
             store.contextoEdicao = { detalhes: { codigo: 1 } } as any;
             store.contextoCadastro = { detalhes: { codigo: 2 }, atividades: [] } as any;
+
             store.invalidar();
-            expect(store.contextoEdicao).toBeNull();
-            expect(store.contextoCadastro).toBeNull();
+
+            expect(store.contextoEdicao?.detalhes.codigo).toBe(1);
+            expect(store.contextoCadastro?.detalhes.codigo).toBe(2);
+            expect(store.dadosValidosEdicao(1)).toBe(false);
+            expect(store.dadosValidosCadastro(2)).toBe(false);
             expect(store.erroIntegracaoContexto).toBeNull();
         });
     });

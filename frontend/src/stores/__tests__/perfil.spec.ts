@@ -26,10 +26,12 @@ vi.mock("@/services/usuarioService");
 
 const subprocessoStoreMock = {
     invalidar: vi.fn(),
+    resetar: vi.fn(),
 };
 
 const processoStoreMock = {
     invalidar: vi.fn(),
+    resetar: vi.fn(),
 };
 
 const painelStoreMock = {
@@ -95,7 +97,9 @@ describe("usePerfilStore", () => {
         mockSessionStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
         painelStoreMock.invalidar.mockClear();
         processoStoreMock.invalidar.mockClear();
+        processoStoreMock.resetar.mockClear();
         subprocessoStoreMock.invalidar.mockClear();
+        subprocessoStoreMock.resetar.mockClear();
         unidadeStoreMock.invalidarCache.mockClear();
         cancelarRequisicoesPendentesMock.mockClear();
         iniciarTransicaoSessaoMock.mockClear();
@@ -168,8 +172,8 @@ describe("usePerfilStore", () => {
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
             expect(painelStoreMock.invalidar).toHaveBeenCalledTimes(1);
-            expect(processoStoreMock.invalidar).toHaveBeenCalledTimes(1);
-            expect(subprocessoStoreMock.invalidar).toHaveBeenCalledTimes(1);
+            expect(processoStoreMock.resetar).toHaveBeenCalledTimes(1);
+            expect(subprocessoStoreMock.resetar).toHaveBeenCalledTimes(1);
             expect(unidadeStoreMock.invalidarCache).toHaveBeenCalledTimes(1);
 
             context.store.definirPerfilUnidade({
@@ -332,8 +336,8 @@ describe("usePerfilStore", () => {
             expect(context.store.unidadeSelecionada).toBeNull();
             expect(context.store.permissoesSessao).toBeNull();
             expect(painelStoreMock.invalidar).toHaveBeenCalledTimes(1);
-            expect(processoStoreMock.invalidar).toHaveBeenCalledTimes(1);
-            expect(subprocessoStoreMock.invalidar).toHaveBeenCalledTimes(1);
+            expect(processoStoreMock.resetar).toHaveBeenCalledTimes(1);
+            expect(subprocessoStoreMock.resetar).toHaveBeenCalledTimes(1);
             expect(unidadeStoreMock.invalidarCache).toHaveBeenCalledTimes(1);
         });
 

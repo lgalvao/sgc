@@ -24,6 +24,8 @@ type ChaveCarregamento =
 export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
     const contextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
+    const contextoEdicaoInvalido = ref(false);
+    const contextoCadastroInvalido = ref(false);
     const erroIntegracaoContexto = ref<NormalizedError | null>(null);
     const carregamentos = new Map<string, Promise<unknown>>();
     const codigosEdicaoPorProcessoUnidade = new Map<string, number>();
@@ -40,6 +42,8 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     function limparContextoAtual(): void {
         contextoEdicao.value = null;
         contextoCadastro.value = null;
+        contextoEdicaoInvalido.value = false;
+        contextoCadastroInvalido.value = false;
     }
 
     function limparErroIntegracao(): void {
@@ -47,6 +51,13 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     }
 
     function invalidar(): void {
+        carregamentos.clear();
+        contextoEdicaoInvalido.value = contextoEdicao.value !== null;
+        contextoCadastroInvalido.value = contextoCadastro.value !== null;
+        limparErroIntegracao();
+    }
+
+    function resetar(): void {
         carregamentos.clear();
         codigosEdicaoPorProcessoUnidade.clear();
         codigosCadastroPorProcessoUnidade.clear();
@@ -56,11 +67,13 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
     function registrarContextoEdicao(contexto: ContextoEdicaoSubprocesso): void {
         contextoEdicao.value = contexto;
+        contextoEdicaoInvalido.value = false;
         limparErroIntegracao();
     }
 
     function registrarContextoCadastro(contexto: ContextoCadastroAtividadesSubprocesso): void {
         contextoCadastro.value = contexto;
+        contextoCadastroInvalido.value = false;
         limparErroIntegracao();
     }
 
@@ -103,7 +116,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             limparContextoAtual();
         }
 
-        if (contextoEdicao.value?.detalhes.codigo === codigoSubprocesso) {
+        if (dadosValidosEdicao(codigoSubprocesso)) {
             return contextoEdicao.value;
         }
 
@@ -164,7 +177,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
             limparContextoAtual();
         }
 
-        if (contextoCadastro.value?.detalhes.codigo === codigoSubprocesso) {
+        if (dadosValidosCadastro(codigoSubprocesso)) {
             return contextoCadastro.value;
         }
 
@@ -220,6 +233,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     }) {
         if (contextoEdicao.value?.detalhes.codigo === status.codigo) {
             contextoEdicao.value.detalhes.situacao = status.situacao;
+            contextoEdicaoInvalido.value = false;
             if (status.permissoes) {
                 contextoEdicao.value.detalhes.permissoes = status.permissoes;
             }
@@ -227,6 +241,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
         if (contextoCadastro.value?.detalhes.codigo === status.codigo) {
             contextoCadastro.value.detalhes.situacao = status.situacao;
+            contextoCadastroInvalido.value = false;
             if (status.permissoes) {
                 contextoCadastro.value.detalhes.permissoes = status.permissoes;
             }
@@ -234,11 +249,11 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     }
 
     function dadosValidosEdicao(codigoSubprocesso: number): boolean {
-        return contextoEdicao.value?.detalhes.codigo === codigoSubprocesso;
+        return contextoEdicao.value?.detalhes.codigo === codigoSubprocesso && !contextoEdicaoInvalido.value;
     }
 
     function dadosValidosCadastro(codigoSubprocesso: number): boolean {
-        return contextoCadastro.value?.detalhes.codigo === codigoSubprocesso;
+        return contextoCadastro.value?.detalhes.codigo === codigoSubprocesso && !contextoCadastroInvalido.value;
     }
 
     return {
@@ -246,6 +261,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         contextoCadastro,
         erroIntegracaoContexto,
         invalidar,
+        resetar,
         limparContextoAtual,
         limparErroIntegracao,
         garantirContextoEdicao,

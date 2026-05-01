@@ -4,6 +4,8 @@ import {useUnidadeStore} from '@/stores/unidade';
 import {useOrganizacaoStore} from '@/stores/organizacao';
 import {usePainelStore} from '@/stores/painel';
 import {useProcessoStore} from '@/stores/processo';
+import {useSubprocessoStore} from '@/stores/subprocesso';
+import {useMapasStore} from '@/stores/mapas';
 import {createTestingPinia} from '@pinia/testing';
 import {setActivePinia} from 'pinia';
 
@@ -48,6 +50,8 @@ describe('useCacheSync', () => {
   let organizacaoStore: any;
   let painelStore: any;
   let processoStore: any;
+  let subprocessoStore: any;
+  let mapasStore: any;
 
   beforeEach(() => {
     setActivePinia(createTestingPinia({
@@ -57,6 +61,8 @@ describe('useCacheSync', () => {
     organizacaoStore = useOrganizacaoStore();
     painelStore = usePainelStore();
     processoStore = useProcessoStore();
+    subprocessoStore = useSubprocessoStore();
+    mapasStore = useMapasStore();
     lastInstance = null;
     vi.clearAllMocks();
   });
@@ -76,6 +82,8 @@ describe('useCacheSync', () => {
     expect(organizacaoStore.$reset).toHaveBeenCalled();
     expect(painelStore.invalidar).toHaveBeenCalled();
     expect(processoStore.invalidar).toHaveBeenCalled();
+    expect(subprocessoStore.invalidar).toHaveBeenCalled();
+    expect(mapasStore.invalidar).toHaveBeenCalled();
   });
 
   it('não deve fechar a conexão em caso de erro transitório', () => {

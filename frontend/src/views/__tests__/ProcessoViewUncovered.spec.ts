@@ -103,7 +103,7 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
         expect((wrapper.vm as any).acaoBlocoAtual.codigo).toBe('acao-1');
     });
 
-    it("cobre onActivated", async () => {
+    it("cobre onActivated com e sem invalidação", async () => {
         const store = useProcessoStore(pinia);
         store.garantirContextoCompleto = vi.fn().mockResolvedValue({
             codigo: 1,
@@ -131,10 +131,21 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
         vm.show = false;
         await flushPromises();
 
-        // Activate - always reloads (no caching)
+        store.contextoCompleto = {codigo: 1, descricao: "Teste"} as any;
+        store.codProcessoCarregado = 1;
         const contextoAtualizado = { codigo: 1, descricao: "Atualizado" } as any;
         store.garantirContextoCompleto = vi.fn().mockResolvedValue(contextoAtualizado);
-        
+
+        // Reactivate sem invalidação: não recarrega
+        vm.show = true;
+        await flushPromises();
+
+        expect(store.garantirContextoCompleto).not.toHaveBeenCalled();
+
+        // Invalida e reativa: deve recarregar
+        vm.show = false;
+        await flushPromises();
+        store.invalidar();
         vm.show = true;
         await flushPromises();
 

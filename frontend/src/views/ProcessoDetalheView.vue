@@ -347,7 +347,9 @@ onActivated(async () => {
   if (!codProcesso || !carregamentoInicialConcluido.value) {
     return;
   }
-  // Recarrega sempre ao ativar — contexto muda ao longo do workflow
+  if (processoStore.dadosValidos(codProcesso)) {
+    return;
+  }
   try {
     await carregarContextoCompleto();
   } catch {

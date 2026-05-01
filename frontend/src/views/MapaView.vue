@@ -739,6 +739,10 @@ function aplicarErroNormalizado(error: ReturnType<typeof normalizeError> | null)
   sincronizarErrosAtividades();
 }
 
+function handleErrors(store: { lastError: unknown }) {
+  aplicarErroNormalizado(store.lastError as ReturnType<typeof normalizeError> | null);
+}
+
 const {
   competenciaSendoEditada,
   mostrarModalCriarNovaCompetencia,
@@ -820,6 +824,7 @@ defineExpose({
   competencias,
   competenciaSendoEditada,
   competenciaParaExcluir,
+  handleErrors,
   fieldErrors,
   atividadesSemCompetencia,
   existeCompetenciaSemAtividade,

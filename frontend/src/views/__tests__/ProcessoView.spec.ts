@@ -35,6 +35,7 @@ vi.mock("@/stores/processo", async () => {
         useProcessoStore: () => ({
             garantirContextoCompleto: (codProcesso: number) => processoSvc.buscarContextoCompleto(codProcesso),
             invalidar: vi.fn(),
+            dadosValidos: vi.fn().mockReturnValue(false),
             contextoCompleto: null,
         }),
     };
@@ -359,7 +360,7 @@ describe("Processo.vue", () => {
         expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
     });
 
-    it("deve recarregar detalhes ao reativar a view em keepAlive", async () => {
+    it("deve recarregar detalhes ao reativar a view em keepAlive apenas quando o cache estiver inválido", async () => {
         await flushPromises();
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
 

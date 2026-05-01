@@ -23,12 +23,28 @@ describe("processo store", () => {
         expect(context.store.codProcessoCarregado).toBeNull();
     });
 
-    it("invalidar deve limpar carregamentos em andamento", () => {
+    it("invalidar deve marcar o contexto como inválido sem apagar o último snapshot", () => {
+        context.store.contextoCompleto = {codigo: 1} as any;
+        context.store.codProcessoCarregado = 1;
+
         context.store.invalidar();
-        // Não deve lançar exceção
+
+        expect(context.store.contextoCompleto).toEqual({codigo: 1});
+        expect(context.store.dadosValidos(1)).toBe(false);
     });
 
     describe("garantirContextoCompleto", () => {
+        it("deve reutilizar o snapshot atual quando o contexto ainda for válido", async () => {
+            const mockContexto = {codigo: 1} as any;
+            context.store.codProcessoCarregado = 1;
+            context.store.contextoCompleto = mockContexto;
+
+            const result = await context.store.garantirContextoCompleto(1);
+
+            expect(processoService.buscarContextoCompleto).not.toHaveBeenCalled();
+            expect(result).toEqual(mockContexto);
+        });
+
         it("deve buscar do service mesmo com contexto anterior carregado", async () => {
             const mockContexto = {codigo: 1} as any;
             context.store.codProcessoCarregado = 1;
@@ -41,6 +57,20 @@ describe("processo store", () => {
             expect(result).toEqual(mockContexto);
             expect(context.store.contextoCompleto).toEqual(mockContexto);
             expect(context.store.codProcessoCarregado).toBe(1);
+        });
+
+        it("deve voltar a buscar após invalidação explícita", async () => {
+            const mockContexto = {codigo: 1} as any;
+            context.store.codProcessoCarregado = 1;
+            context.store.contextoCompleto = mockContexto;
+            context.store.invalidar();
+            vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue(mockContexto);
+
+            const result = await context.store.garantirContextoCompleto(1);
+
+            expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
+            expect(result).toEqual(mockContexto);
+            expect(context.store.dadosValidos(1)).toBe(true);
         });
 
         it("deve reutilizar carregamento em andamento para evitar requisições duplicadas", async () => {

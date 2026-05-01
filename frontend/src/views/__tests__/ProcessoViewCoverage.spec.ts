@@ -36,6 +36,7 @@ vi.mock("@/stores/processo", async () => {
         useProcessoStore: () => ({
             garantirContextoCompleto: (codProcesso: number) => processoSvc.buscarContextoCompleto(codProcesso),
             invalidar: vi.fn(),
+            dadosValidos: vi.fn().mockReturnValue(false),
             contextoCompleto: null,
         }),
     };

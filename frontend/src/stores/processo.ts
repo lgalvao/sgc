@@ -14,16 +14,37 @@ import {isErroCanceladoHttp} from "@/axios-setup";
  * antigos entre navegações. Mantemos apenas deduplicação de requisições concorrentes
  * e o último payload recebido para consumo imediato da própria view.
  *
- * Estratégia: nunca considerar o contexto "válido" para reuso entre ativações.
+ * Estratégia: reaproveitar o último snapshot enquanto ele não foi invalidado.
+ * A invalidação é explícita após ações de workflow ou eventos SSE. Isso evita
+ * recargas repetidas ao reativar a view sem perder previsibilidade.
  */
 export const useProcessoStore = defineStore("processo", () => {
     const contextoCompleto = ref<Processo | null>(null);
     const codProcessoCarregado = ref<number | null>(null);
+    const contextoInvalido = ref(false);
     const carregamentosEmAndamento = new Map<number, Promise<Processo>>();
+
+    function limparContextoAtual(): void {
+        contextoCompleto.value = null;
+        codProcessoCarregado.value = null;
+        contextoInvalido.value = false;
+    }
 
     /** Invalida o cache — deve ser chamado após qualquer ação de workflow que altera o processo. */
     function invalidar(): void {
+        contextoInvalido.value = true;
         carregamentosEmAndamento.clear();
+    }
+
+    function resetar(): void {
+        carregamentosEmAndamento.clear();
+        limparContextoAtual();
+    }
+
+    function dadosValidos(codProcesso: number): boolean {
+        return contextoCompleto.value?.codigo === codProcesso
+            && codProcessoCarregado.value === codProcesso
+            && !contextoInvalido.value;
     }
 
     /**
@@ -31,6 +52,10 @@ export const useProcessoStore = defineStore("processo", () => {
      * @returns o contexto ou null em caso de erro
      */
     async function garantirContextoCompleto(codProcesso: number): Promise<Processo | null> {
+        if (dadosValidos(codProcesso)) {
+            return contextoCompleto.value;
+        }
+
         const carregamentoExistente = carregamentosEmAndamento.get(codProcesso);
         if (carregamentoExistente) {
             return carregamentoExistente;
@@ -42,6 +67,7 @@ export const useProcessoStore = defineStore("processo", () => {
             const data = await promessaCarregamento;
             contextoCompleto.value = data;
             codProcessoCarregado.value = codProcesso;
+            contextoInvalido.value = false;
             return data;
         } catch (err) {
             const erroNormalizado = normalizeError(err);
@@ -58,7 +84,10 @@ export const useProcessoStore = defineStore("processo", () => {
     return {
         contextoCompleto,
         codProcessoCarregado,
+        limparContextoAtual,
         invalidar,
+        resetar,
+        dadosValidos,
         garantirContextoCompleto,
     };
 });
