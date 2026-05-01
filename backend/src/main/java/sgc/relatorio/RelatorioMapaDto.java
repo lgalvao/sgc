@@ -9,4 +9,7 @@ public record RelatorioMapaDto(
         int totalCompetencias,
         List<RelatorioMapaCompetenciaDto> competencias
 ) {
+    public RelatorioMapaDto {
+        competencias = List.copyOf(competencias);
+    }
 }

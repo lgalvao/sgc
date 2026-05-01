@@ -7,4 +7,7 @@ public record RelatorioMapaCompetenciaDto(
         String descricao,
         List<RelatorioMapaAtividadeDto> atividades
 ) {
+    public RelatorioMapaCompetenciaDto {
+        atividades = List.copyOf(atividades);
+    }
 }
