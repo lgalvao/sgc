@@ -25,14 +25,12 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
-import * as processoService from '@/services/processoService';
 import {useHistoricoStore} from '@/stores/historico';
 import type {ProcessoResumo} from "@/types/tipos";
-import {logger} from '@/utils';
 
 const router = useRouter();
 const historicoStore = useHistoricoStore();
-const loading = ref(false);
+const loading = computed(() => historicoStore.carregando);
 
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
 const asc = ref(false);
@@ -54,19 +52,6 @@ const processosOrdenados = computed(() => {
     return 0;
   });
 });
-
-async function carregarHistorico() {
-  loading.value = true;
-  try {
-    const processos = await processoService.buscarProcessosFinalizados() ?? [];
-    historicoStore.definirDados(processos);
-  } catch (e) {
-    logger.error("Erro ao carregar histórico:", e);
-    historicoStore.definirDados([]);
-  } finally {
-    loading.value = false;
-  }
-}
 
 function ordenarPor(campo: keyof ProcessoResumo) {
   if (criterio.value === campo) {
@@ -91,12 +76,12 @@ let montadoUmaVez = false;
 
 onMounted(() => {
   montadoUmaVez = true;
-  carregarHistorico();
+  void historicoStore.garantirDados();
 });
 
 onActivated(() => {
   if (!montadoUmaVez) return;
   if (historicoStore.dadosValidos()) return;
-  carregarHistorico();
+  void historicoStore.garantirDados();
 });
 </script>

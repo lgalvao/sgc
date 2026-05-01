@@ -268,8 +268,8 @@ import {formatDateTimeBR, parseDate} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
+import {useMapasStore} from "@/stores/mapas";
 import {useToastStore} from "@/stores/toast";
-import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
@@ -291,11 +291,11 @@ function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
 }
 
 const subprocessoStore = useSubprocessoStore();
+const mapasStore = useMapasStore();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const toast = useToast();
-const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const {
   validarSubmissao,
   resetarValidacao,
@@ -440,6 +440,15 @@ onActivated(async () => {
   await carregarSubprocesso();
 });
 
+async function atualizarSubprocessoAtual() {
+  if (!codigoSubprocesso.value) {
+    return;
+  }
+
+  mapasStore.invalidar();
+  await subprocessoStore.garantirContextoEdicao(codigoSubprocesso.value, true);
+}
+
 function abrirModalAlterarDataLimite() {
   if (podeAlterarDataLimite.value) {
     mostrarModalAlterarDataLimite.value = true;
@@ -465,8 +474,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
       );
       fecharModalAlterarDataLimite();
       notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, 'success');
-      invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: false});
-      await carregarSubprocesso();
+      await atualizarSubprocessoAtual();
     } catch {
       notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, 'danger');
     }
@@ -508,8 +516,7 @@ async function confirmarReabertura() {
     if (sucesso) {
       fecharModalReabrir();
       exibirToastPendente();
-      invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: false});
-      await carregarSubprocesso();
+      await atualizarSubprocessoAtual();
     }
   });
 }

@@ -170,6 +170,18 @@ async function carregarDados(forcar = false) {
   }
 }
 
+function dadosLocaisValidos(): boolean {
+  const possuiUnidadeEmCache = unidadeStore.cacheUnidades.has(props.codUnidade);
+  const possuiMapaVigenteEmCache = unidadeStore.cacheMapasVigentes.has(props.codUnidade);
+  const titularResolvido = !unidade.value?.tituloTitular || titularDetalhes.value !== null;
+
+  return unidade.value?.codigo === props.codUnidade
+      && possuiUnidadeEmCache
+      && possuiMapaVigenteEmCache
+      && titularResolvido
+      && !lastError.value;
+}
+
 function irParaCriarAtribuicao() {
   router.push({path: `/unidade/${props.codUnidade}/atribuicao`});
 }
@@ -198,7 +210,10 @@ onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  await carregarDados(true);
+  if (dadosLocaisValidos()) {
+    return;
+  }
+  await carregarDados();
 });
 watch(() => props.codUnidade, () => {
   void carregarDados();

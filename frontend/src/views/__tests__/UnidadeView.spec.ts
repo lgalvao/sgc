@@ -131,7 +131,7 @@ describe('UnidadeView.vue', () => {
         expect(buscarArvoreUnidade).toHaveBeenCalledWith(1);
     });
 
-    it('recarrega dados ao reativar a view em keepAlive', async () => {
+    it('não recarrega dados ao reativar a view em keepAlive quando o cache ainda está válido', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
         vi.mocked(buscarArvoreUnidade).mockClear();
@@ -143,8 +143,8 @@ describe('UnidadeView.vue', () => {
         }
         await flushPromises();
 
-        expect(buscarArvoreUnidade).toHaveBeenCalledWith(1);
-        expect(buscarReferenciaMapaVigente).toHaveBeenCalledWith(1);
+        expect(buscarArvoreUnidade).not.toHaveBeenCalled();
+        expect(buscarReferenciaMapaVigente).not.toHaveBeenCalled();
     });
 
     it('renders unit details correctly', async () => {

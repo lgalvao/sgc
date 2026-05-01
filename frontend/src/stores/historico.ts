@@ -1,6 +1,8 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import type {ProcessoResumo} from "@/types/tipos";
+import {buscarProcessosFinalizados} from "@/services/processoService";
+import {logger} from "@/utils";
 
 /**
  * Store de cache de sessão para o histórico de processos finalizados.
@@ -11,6 +13,7 @@ import type {ProcessoResumo} from "@/types/tipos";
 export const useHistoricoStore = defineStore("historico", () => {
     const processos = ref<ProcessoResumo[]>([]);
     const carregado = ref(false);
+    const carregando = ref(false);
 
     function definirDados(novosProcessos: ProcessoResumo[]) {
         processos.value = novosProcessos;
@@ -25,11 +28,31 @@ export const useHistoricoStore = defineStore("historico", () => {
         return carregado.value;
     }
 
+    async function garantirDados(forcar = false): Promise<void> {
+        if (!forcar && carregado.value) {
+            return;
+        }
+
+        carregando.value = true;
+        try {
+            processos.value = await buscarProcessosFinalizados() ?? [];
+            carregado.value = true;
+        } catch (erro) {
+            logger.error("Erro ao carregar histórico:", erro);
+            processos.value = [];
+            carregado.value = true;
+        } finally {
+            carregando.value = false;
+        }
+    }
+
     return {
         processos,
         carregado,
+        carregando,
         definirDados,
         invalidar,
         dadosValidos,
+        garantirDados,
     };
 });

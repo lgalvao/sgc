@@ -321,7 +321,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
       return;
     }
     notify(mensagemSucesso, 'success');
-    invalidarCachesSubprocesso({incluirPainel: false});
+    invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: true});
     await carregarContextoCompleto();
   } catch (error) {
     lastError.value = normalizeError(error);

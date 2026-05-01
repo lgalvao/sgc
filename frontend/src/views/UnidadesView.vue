@@ -163,6 +163,10 @@ const unidadesExibidas = computed(() => {
 
 const dadosArvore = computed(() => mapearUnidadesParaLinhas(unidadesExibidas.value));
 
+function dadosLocaisValidos(): boolean {
+  return unidades.value.length > 0 && !erro.value;
+}
+
 function clearError() {
   erro.value = null;
 }
@@ -223,7 +227,9 @@ onActivated(() => {
   }
 
   void carregarDiagnostico();
-  void carregarUnidades();
+  if (!dadosLocaisValidos()) {
+    void carregarUnidades();
+  }
 });
 
 </script>

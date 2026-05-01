@@ -141,8 +141,8 @@ describe("Unidades.vue", () => {
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
 
-    it("deve recarregar unidades ao reativar a view em keepAlive", async () => {
-        const wrapper = createWrapper();
+    it("não deve recarregar unidades ao reativar a view em keepAlive quando os dados locais ainda estão válidos", async () => {
+        const wrapper = createWrapper({unidades: mockUnidades});
         await flushPromises();
         vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockClear();
@@ -153,10 +153,23 @@ describe("Unidades.vue", () => {
         }
         await flushPromises();
 
-        // buscarTodasUnidades deve ser chamado no onActivated
-        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
+        expect(unidadeService.buscarTodasUnidades).not.toHaveBeenCalled();
         // buscarDiagnosticoOrganizacional NÃO deve ser chamado novamente — cache de sessão ativo
         expect(unidadeService.buscarDiagnosticoOrganizacional).not.toHaveBeenCalled();
+    });
+
+    it("deve recarregar unidades ao reativar a view em keepAlive quando não houver dados locais", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
+
+        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
+        for (const hook of hooks) {
+            await hook.call(wrapper.vm);
+        }
+        await flushPromises();
+
+        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
 
     it("deve exibir alerta fixo com resumo do diagnostico para ADMIN", async () => {
