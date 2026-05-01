@@ -668,31 +668,6 @@ function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   }
 }
 
-const {
-  competenciaSendoEditada,
-  mostrarModalCriarNovaCompetencia,
-  mostrarModalExcluirCompetencia,
-  competenciaParaExcluir,
-  loadingCompetencia,
-  loadingExclusao,
-  abrirModalCriarLimpo,
-  fecharModalCriarNovaCompetencia,
-  iniciarEdicaoCompetencia,
-  adicionarCompetenciaEFecharModal,
-  excluirCompetencia,
-  confirmarExclusaoCompetencia,
-  removerAtividadeAssociada,
-  fecharModalExcluirCompetencia,
-} = useMapaCompetenciasMutacoes({
-  codigoSubprocesso,
-  competencias,
-  fluxoMapa,
-  notify,
-  clearErrors,
-  aplicarErroNormalizado,
-  sincronizarMapa,
-});
-
 onMounted(async () => {
   const sucesso = await carregarContextoInicial(podeEditarMapa);
   if (!sucesso) {
@@ -763,6 +738,31 @@ function aplicarErroNormalizado(error: ReturnType<typeof normalizeError> | null)
   setFromNormalizedError(error);
   sincronizarErrosAtividades();
 }
+
+const {
+  competenciaSendoEditada,
+  mostrarModalCriarNovaCompetencia,
+  mostrarModalExcluirCompetencia,
+  competenciaParaExcluir,
+  loadingCompetencia,
+  loadingExclusao,
+  abrirModalCriarLimpo,
+  fecharModalCriarNovaCompetencia,
+  iniciarEdicaoCompetencia,
+  adicionarCompetenciaEFecharModal,
+  excluirCompetencia,
+  confirmarExclusaoCompetencia,
+  removerAtividadeAssociada,
+  fecharModalExcluirCompetencia,
+} = useMapaCompetenciasMutacoes({
+  codigoSubprocesso,
+  competencias,
+  fluxoMapa,
+  notify,
+  clearErrors,
+  aplicarErroNormalizado,
+  sincronizarMapa,
+});
 
 function abrirModalDisponibilizar() {
   erroValidacaoMapa.value = "";
