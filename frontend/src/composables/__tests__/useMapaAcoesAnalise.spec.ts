@@ -1,10 +1,10 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import {useMapaAcoesAnalise} from "../useMapaAcoesAnalise";
-import * as processoService from "@/services/processoService";
+import * as subprocessoService from "@/services/subprocessoService";
 import {TEXTOS} from "@/constants/textos";
 
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/subprocessoService", () => ({
     aceitarValidacao: vi.fn(),
     devolverValidacao: vi.fn(),
     homologarValidacao: vi.fn(),
@@ -64,13 +64,13 @@ describe("useMapaAcoesAnalise", () => {
         it("deve validar mapa com sucesso", async () => {
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
             await hooks.confirmarValidacao();
-            expect(processoService.validarMapa).toHaveBeenCalledWith(10);
+            expect(subprocessoService.validarMapa).toHaveBeenCalledWith(10);
             expect(concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, expect.any(Function));
         });
 
         it("deve notificar erro ao falhar validacao", async () => {
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
-            vi.mocked(processoService.validarMapa).mockRejectedValue(new Error("Erro"));
+            vi.mocked(subprocessoService.validarMapa).mockRejectedValue(new Error("Erro"));
             await hooks.confirmarValidacao();
             expect(notify).toHaveBeenCalledWith(TEXTOS.mapa.ERRO_VALIDAR, "danger");
         });
@@ -79,7 +79,7 @@ describe("useMapaAcoesAnalise", () => {
             codSubprocesso.value = null;
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
             await hooks.confirmarValidacao();
-            expect(processoService.validarMapa).not.toHaveBeenCalled();
+            expect(subprocessoService.validarMapa).not.toHaveBeenCalled();
         });
     });
 
@@ -87,7 +87,7 @@ describe("useMapaAcoesAnalise", () => {
         it("deve aceitar validacao com sucesso", async () => {
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
             await hooks.confirmarAceitacao("obs");
-            expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, { texto: "obs" });
+            expect(subprocessoService.aceitarValidacao).toHaveBeenCalledWith(10, { texto: "obs" });
             expect(concluirAcaoPainel).toHaveBeenCalledWith("Aceito!", expect.any(Function));
         });
 
@@ -95,7 +95,7 @@ describe("useMapaAcoesAnalise", () => {
             acaoPrincipalMapa.value = { codigo: "HOMOLOGAR", mensagemSucesso: "Homologado!" };
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
             await hooks.confirmarAceitacao("obs");
-            expect(processoService.homologarValidacao).toHaveBeenCalledWith(10, { texto: "obs" });
+            expect(subprocessoService.homologarValidacao).toHaveBeenCalledWith(10, { texto: "obs" });
             expect(concluirAcaoPainel).toHaveBeenCalledWith("Homologado!", expect.any(Function));
         });
 
@@ -103,12 +103,12 @@ describe("useMapaAcoesAnalise", () => {
             acaoPrincipalMapa.value = null;
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
             await hooks.confirmarAceitacao();
-            expect(processoService.aceitarValidacao).not.toHaveBeenCalled();
+            expect(subprocessoService.aceitarValidacao).not.toHaveBeenCalled();
         });
 
         it("deve notificar erro ao falhar aceitacao", async () => {
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
-            vi.mocked(processoService.aceitarValidacao).mockRejectedValue(new Error("Erro"));
+            vi.mocked(subprocessoService.aceitarValidacao).mockRejectedValue(new Error("Erro"));
             await hooks.confirmarAceitacao();
             expect(notify).toHaveBeenCalledWith(TEXTOS.comum.ERRO_OPERACAO, "danger");
         });
@@ -119,13 +119,13 @@ describe("useMapaAcoesAnalise", () => {
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
             hooks.observacaoDevolucao.value = "justificativa";
             await hooks.confirmarDevolucao();
-            expect(processoService.devolverValidacao).toHaveBeenCalledWith(10, { justificativa: "justificativa" });
+            expect(subprocessoService.devolverValidacao).toHaveBeenCalledWith(10, { justificativa: "justificativa" });
             expect(concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, expect.any(Function));
         });
 
         it("deve notificar erro ao falhar devolucao", async () => {
             const hooks = useMapaAcoesAnalise({ codSubprocesso, acaoPrincipalMapa, concluirAcaoPainel, notify });
-            vi.mocked(processoService.devolverValidacao).mockRejectedValue(new Error("Erro"));
+            vi.mocked(subprocessoService.devolverValidacao).mockRejectedValue(new Error("Erro"));
             await hooks.confirmarDevolucao();
             expect(notify).toHaveBeenCalledWith(TEXTOS.mapa.ERRO_DEVOLVER, "danger");
         });

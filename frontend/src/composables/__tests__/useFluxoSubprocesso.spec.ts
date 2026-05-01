@@ -18,9 +18,6 @@ vi.mock("@/services/cadastroService", () => ({
 
 vi.mock("@/services/subprocessoService", () => ({
     validarCadastro: vi.fn(),
-}));
-
-vi.mock("@/services/processoService", () => ({
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
     reabrirRevisaoCadastro: vi.fn(),
@@ -104,7 +101,7 @@ describe("useFluxoSubprocesso", () => {
     it("deve retornar false e registrar erro ao reabrir cadastro com falha", async () => {
         const {useFluxoSubprocesso} = await import("../useFluxoSubprocesso");
         const {reabrirCadastro, lastError} = useFluxoSubprocesso();
-        const {reabrirCadastro: serviceReabrirCadastro} = await import("@/services/processoService");
+        const {reabrirCadastro: serviceReabrirCadastro} = await import("@/services/subprocessoService");
         const erro = new Error("Falha");
         (serviceReabrirCadastro as any).mockRejectedValue(erro);
 
@@ -159,7 +156,7 @@ describe("useFluxoSubprocesso", () => {
     it("deve reabrir revisao cadastro", async () => {
         const {useFluxoSubprocesso} = await import("../useFluxoSubprocesso");
         const {reabrirCadastro} = useFluxoSubprocesso();
-        const {reabrirRevisaoCadastro: service} = await import("@/services/processoService");
+        const {reabrirRevisaoCadastro: service} = await import("@/services/subprocessoService");
         (service as any).mockResolvedValue(undefined);
 
         await reabrirCadastro(10, "Justificativa", true);

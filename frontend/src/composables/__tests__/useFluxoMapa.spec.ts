@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useFluxoMapa} from "../useFluxoMapa";
 import * as subprocessoService from "@/services/subprocessoService";
-import * as processoService from "@/services/processoService";
 import {useMapas} from "@/composables/useMapas";
 
 vi.mock("@/services/subprocessoService", () => ({
@@ -11,9 +10,6 @@ vi.mock("@/services/subprocessoService", () => ({
     adicionarCompetencia: vi.fn(),
     atualizarCompetencia: vi.fn(),
     removerCompetencia: vi.fn(),
-}));
-
-vi.mock("@/services/processoService", () => ({
     validarMapa: vi.fn(),
     aceitarValidacao: vi.fn(),
     homologarValidacao: vi.fn(),
@@ -99,25 +95,25 @@ describe("useFluxoMapa", () => {
         it("deve validar mapa", async () => {
             const fluxoMapa = useFluxoMapa();
             await fluxoMapa.validarMapa(10);
-            expect(processoService.validarMapa).toHaveBeenCalledWith(10);
+            expect(subprocessoService.validarMapa).toHaveBeenCalledWith(10);
         });
 
         it("deve aceitar mapa", async () => {
             const fluxoMapa = useFluxoMapa();
             await fluxoMapa.aceitarMapa(10, { observacao: "ok" });
-            expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
+            expect(subprocessoService.aceitarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
         });
 
         it("deve homologar mapa", async () => {
             const fluxoMapa = useFluxoMapa();
             await fluxoMapa.homologarMapa(10, { observacao: "ok" });
-            expect(processoService.homologarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
+            expect(subprocessoService.homologarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
         });
 
         it("deve devolver mapa", async () => {
             const fluxoMapa = useFluxoMapa();
             await fluxoMapa.devolverMapa(10, { justificativa: "ajustar" });
-            expect(processoService.devolverValidacao).toHaveBeenCalledWith(10, { justificativa: "ajustar" });
+            expect(subprocessoService.devolverValidacao).toHaveBeenCalledWith(10, { justificativa: "ajustar" });
         });
     });
 

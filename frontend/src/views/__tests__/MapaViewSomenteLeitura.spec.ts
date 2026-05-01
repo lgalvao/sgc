@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as analiseService from "@/services/analiseService";
-import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as useAcessoModule from "@/composables/useAcesso";
 import MapaView from "../MapaView.vue";
@@ -33,17 +32,14 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/subprocessoService", () => ({
+    obterMapaVisualizacao: vi.fn(),
+    obterSugestoesMapa: vi.fn(),
     apresentarSugestoes: vi.fn(),
     validarMapa: vi.fn(),
     aceitarValidacao: vi.fn(),
     homologarValidacao: vi.fn(),
     devolverValidacao: vi.fn(),
-}));
-
-vi.mock("@/services/subprocessoService", () => ({
-    obterMapaVisualizacao: vi.fn(),
-    obterSugestoesMapa: vi.fn(),
 }));
 
 vi.mock("@/stores/subprocesso", () => ({
@@ -175,7 +171,7 @@ describe("MapaView somente leitura", () => {
         } as any);
         vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValue("Sugestão persistida");
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
-        vi.mocked(processoService.apresentarSugestoes).mockResolvedValue(undefined as never);
+        vi.mocked(subprocessoService.apresentarSugestoes).mockResolvedValue(undefined as never);
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarImpacto: ref(false),
@@ -308,7 +304,7 @@ describe("MapaView somente leitura", () => {
         await wrapper.find('[data-testid="btn-confirmar-modal"]').trigger("click");
         await flushPromises();
 
-        expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(123, {sugestoes: "Nova sugestão"});
+        expect(subprocessoService.apresentarSugestoes).toHaveBeenCalledWith(123, {sugestoes: "Nova sugestão"});
 
         await wrapper.find('[data-testid="btn-mapa-historico"]').trigger("click");
         await flushPromises();
