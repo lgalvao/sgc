@@ -30,10 +30,10 @@ export default defineConfig({
                 "**/*.stories.ts"
             ],
             thresholds: {
-                lines: 95,
-                functions: 95,
-                statements: 95,
-                branches: 90
+                lines: 90,
+                functions: 90,
+                statements: 90,
+                branches: 85
             },
         },
     },

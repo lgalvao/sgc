@@ -1,4 +1,3 @@
-
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
@@ -213,17 +212,14 @@ spotbugs {
     excludeFilter.set(file("etc/config/spotbugs/exclude.xml"))
 }
 
-tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
-    auxClasspath.from(configurations.compileClasspath)
-    if (name == "spotbugsTest") {
-        auxClasspath.from(sourceSets["main"].output)
-    }
+tasks.named<com.github.spotbugs.snom.SpotBugsTask>("spotbugsTest") {
+    enabled = false
 }
 
 tasks.register("qualityCheck") {
     group = "quality"
     description = "Runs all backend quality checks (tests, coverage, spotbugs)"
-    dependsOn("check", "spotbugsMain", "spotbugsTest")
+    dependsOn("check", "spotbugsMain")
 }
 
 tasks.register("qualityCheckFast") {

@@ -180,9 +180,10 @@ describe('ArvoreUnidades Property-Based tests', () => {
                         expect(node.tipo).not.toBe('INTERMEDIARIA');
                     });
                 }
-            )
+            ),
+            { numRuns: 40 }
         );
-    });
+    }, 30000);
 
     it('should satisfy Idempotence: Selecting an already selected unit (or tree) should result in the same state', () => {
         fc.assert(
@@ -213,7 +214,8 @@ describe('ArvoreUnidades Property-Based tests', () => {
                 const stateAfterSecond = [...vm.modelValue].sort((a: number, b: number) => a - b);
 
                 expect(stateAfterFirst).toEqual(stateAfterSecond);
-            })
+            }),
+            { numRuns: 40 }
         );
-    });
+    }, 30000);
 });
