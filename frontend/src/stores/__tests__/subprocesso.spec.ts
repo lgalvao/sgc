@@ -264,5 +264,16 @@ describe("subprocesso store (cache e dedupe)", () => {
             expect(store.dadosValidosCadastro(2)).toBe(false);
             expect(store.erroIntegracaoContexto).toBeNull();
         });
+
+        it("deve resetar o estado completo", () => {
+            const store = useSubprocessoStore();
+            store.contextoEdicao = { detalhes: { codigo: 1 } } as any;
+            store.erroIntegracaoContexto = { message: "Erro" } as any;
+            
+            store.resetar();
+            
+            expect(store.contextoEdicao).toBeNull();
+            expect(store.erroIntegracaoContexto).toBeNull();
+        });
     });
 });

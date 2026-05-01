@@ -401,4 +401,37 @@ describe("CadastroView Uncovered Branches", () => {
         await flushPromises();
         // Should return early
     });
+
+    it("cobre confirmarDisponibilizacao em diferentes situações", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const fluxo = useFluxoSubprocessoModule.useFluxoSubprocesso();
+
+        // 1. Mapeamento
+        vm.subprocesso.situacao = SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+        vm.subprocesso.tipoProcesso = TipoProcesso.MAPEAMENTO;
+        await vm.confirmarDisponibilizacao();
+        expect(fluxo.disponibilizarCadastro).toHaveBeenCalledWith(123, false);
+
+        // 2. Revisão
+        vm.subprocesso.situacao = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+        vm.subprocesso.tipoProcesso = TipoProcesso.REVISAO;
+        await vm.confirmarDisponibilizacao();
+        expect(fluxo.disponibilizarCadastro).toHaveBeenCalledWith(123, true);
+
+        // 3. Revisão sem mudanças (disponibilizacaoSemMudancas = true)
+        vm.disponibilizacaoSemMudancas = true;
+        await vm.confirmarDisponibilizacao();
+        expect(fluxo.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(123);
+    });
+
+    it("cobre salvarEdicaoAtividade branch descricao invalida", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        
+        await vm.salvarEdicaoAtividade(1, "   ");
+        // No call to activity service expected
+    });
 });

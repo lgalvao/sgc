@@ -178,9 +178,36 @@ describe("MapaView Uncovered Branches", () => {
         expect(vm.mostrarModalExcluirCompetencia).toBe(true);
         expect(vm.competenciaParaExcluir?.codigo).toBe(1);
 
-        // Async components references exposed
         expect(vm.ImpactoMapaModal).toBeDefined();
         expect(vm.CriarCompetenciaModal).toBeDefined();
         expect(vm.DisponibilizarMapaModal).toBeDefined();
+    });
+
+    it("cobre confirmarExclusaoCompetencia", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        
+        vm.competenciaParaExcluir = { codigo: 50 };
+        vm.mostrarModalExcluirCompetencia = true;
+        
+        await vm.confirmarExclusaoCompetencia();
+        expect(vm.mostrarModalExcluirCompetencia).toBe(false);
+    });
+
+    it("cobre adicionarCompetenciaEFecharModal", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        
+        vm.mostrarModalCriarNovaCompetencia = true;
+        await vm.adicionarCompetenciaEFecharModal({ descricao: "Nova", atividadesSelecionadas: [1] });
+        expect(vm.mostrarModalCriarNovaCompetencia).toBe(false);
     });
 });
