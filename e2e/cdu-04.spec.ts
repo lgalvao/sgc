@@ -59,7 +59,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
         const dataLimiteStr = await page.getByTestId('inp-processo-data-limite').inputValue();
 
-        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-processo-iniciar-rodape').click();
         const modal = page.getByRole('dialog');
         await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

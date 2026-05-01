@@ -488,7 +488,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['selecao', 'unidades']
             });
 
-            await page.getByTestId('btn-processo-salvar').click();
+            await page.getByTestId('btn-processo-salvar-rodape').click();
             await expect(page).toHaveURL(/\/painel/);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
             await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
@@ -576,7 +576,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             // Modal de iniciar processo
-            await page.getByTestId('btn-processo-iniciar').click();
+            await page.getByTestId('btn-processo-iniciar-rodape').click();
             await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, 'processo', 'modal-iniciar-processo', {
                 tags: ['modal', 'confirmacao'],
@@ -728,14 +728,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
             // Estado inicial vazio
-            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-salvar-rodape')).toBeDisabled();
             await capturarTela(page, 'processo', 'botoes-desativados-form-vazio', {
                 tags: ['validacao', 'form'],
                 extra: { motivo: 'falta-campos-obrigatorios' }
             });
 
             await page.getByTestId('inp-processo-descricao').fill(descricao);
-            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-salvar-rodape')).toBeDisabled();
             await capturarTela(page, 'processo', 'botoes-desativados-falta-data-unidade', {
                 extra: { preenchido: 'descricao' }
             });
@@ -745,7 +745,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
-            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-salvar-rodape')).toBeDisabled();
             await capturarTela(page, 'processo', 'botoes-desativados-falta-unidade', {
                 extra: { preenchido: ['descricao', 'tipo', 'data'] }
             });
@@ -757,12 +757,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-arvore-expand-COORD_21').click();
             await expect(page.getByTestId('chk-arvore-unidade-SECAO_211')).toBeVisible();
             await page.getByTestId('chk-arvore-unidade-SECAO_211').click();
-            await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
+            await expect(page.getByTestId('btn-processo-salvar-rodape')).toBeEnabled();
             await capturarTela(page, 'processo', 'botoes-ativados-form-completo', {
                 tags: ['validacao', 'sucesso']
             });
 
-            await page.getByTestId('btn-processo-iniciar').click();
+            await page.getByTestId('btn-processo-iniciar-rodape').click();
             await confirmarInicioProcessoPeloDialogo(page, {
                 descricao,
                 tipo: 'MAPEAMENTO'

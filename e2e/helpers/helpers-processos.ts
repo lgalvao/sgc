@@ -70,7 +70,7 @@ export async function criarProcesso(page: Page, options: {
             tipo: options.tipo
         });
     } else {
-        const botaoSalvar = page.getByTestId('btn-processo-salvar');
+        const botaoSalvar = page.getByTestId('btn-processo-salvar-rodape');
         await botaoSalvar.scrollIntoViewIfNeeded();
         await expect(botaoSalvar).toBeInViewport();
         await botaoSalvar.click();
@@ -112,7 +112,7 @@ export async function criarProcessoSimples(page: Page, options: {
         }
     }
 
-    const botaoSalvar = page.getByTestId('btn-processo-salvar');
+    const botaoSalvar = page.getByTestId('btn-processo-salvar-rodape');
     await botaoSalvar.scrollIntoViewIfNeeded();
     await expect(botaoSalvar).toBeInViewport();
     await botaoSalvar.click();
@@ -180,7 +180,7 @@ export async function iniciarProcessoPeloCadastro(page: Page, options: {
     tipo: TipoProcesso;
     unidadesParticipantes?: string[];
 }): Promise<void> {
-    await page.getByTestId('btn-processo-iniciar').click();
+    await page.getByTestId('btn-processo-iniciar-rodape').click();
     await confirmarInicioProcessoPeloDialogo(page, options);
 }
 
@@ -189,7 +189,7 @@ export async function iniciarProcessoPeloCadastro(page: Page, options: {
  * Versão semântica: não exige informar o tipo novamente.
  */
 export async function iniciarProcesso(page: Page, descricao: string): Promise<void> {
-    await page.getByTestId('btn-processo-iniciar').click();
+    await page.getByTestId('btn-processo-iniciar-rodape').click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();

@@ -19,8 +19,8 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
 
-        const btnSalvar = page.getByTestId('btn-processo-salvar');
-        const btnIniciar = page.getByTestId('btn-processo-iniciar');
+        const btnSalvar = page.getByTestId('btn-processo-salvar-rodape');
+        const btnIniciar = page.getByTestId('btn-processo-iniciar-rodape');
 
         await expect(btnSalvar).toBeDisabled();
         await expect(btnIniciar).toBeDisabled();
@@ -100,7 +100,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         const novaDescricao = descricaoOriginal + ' (Editado)';
         await page.getByTestId('inp-processo-descricao').fill(novaDescricao);
-        await page.getByTestId('btn-processo-salvar').click();
+        await page.getByTestId('btn-processo-salvar-rodape').click();
 
         await esperarPaginaPainel(page);
         await verificarToast(page, TEXTOS.sucesso.PROCESSO_ALTERADO);
@@ -118,7 +118,7 @@ test.describe('CDU-03 - Manter processo', () => {
         });
 
         await acessarDetalhesProcesso(page, descricao);
-        await page.getByTestId('btn-processo-remover').click();
+        await page.getByTestId('btn-processo-remover-rodape').click();
         await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeVisible();
 
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
@@ -220,7 +220,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('btn-painel-criar-processo').click();
         await page.getByTestId('inp-processo-descricao').fill(descricao);
-        await page.getByTestId('btn-processo-cancelar').click();
+        await page.getByTestId('btn-processo-cancelar-rodape').click();
         await esperarPaginaPainel(page);
         await expect(page.getByText(descricao)).toBeHidden();
 
@@ -245,7 +245,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.goto('/painel');
 
         await acessarDetalhesProcesso(page, descricao);
-        await page.getByTestId('btn-processo-remover').click();
+        await page.getByTestId('btn-processo-remover-rodape').click();
         await page.getByTestId('btn-modal-confirmacao-cancelar').click();
         await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeHidden();
     });
@@ -267,7 +267,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
-        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-processo-iniciar-rodape').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await esperarPaginaPainel(page);

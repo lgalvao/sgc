@@ -28,8 +28,7 @@ export interface ProcessoContext {
  *   // Já tem um processo criado!
  *   await page.goto(`/processo/cadastro?codProcesso=${processoFixture.codigo}`);
  *   await page.getByTestId('inp-processo-descricao').fill('Nova descrição');
- *   await page.getByTestId('btn-processo-salvar').click();
- * });
+ *   await page.getByTestId('btn-processo-salvar-rodape').click(); * });
  * ```
  */
 export const test = base.extend<ProcessoContext>({

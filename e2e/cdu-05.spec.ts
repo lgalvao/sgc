@@ -57,7 +57,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
-        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-processo-iniciar-rodape').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // Validação: Processo iniciado
@@ -222,7 +222,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         const dataLimiteStr = (await page.getByTestId('inp-processo-data-limite').inputValue()).split('-').reverse().join('/');
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
-        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-processo-iniciar-rodape').click();
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
@@ -232,7 +232,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
 
-        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-processo-iniciar-rodape').click();
         await expect(modal).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
@@ -325,7 +325,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         });
 
         await acessarDetalhesProcesso(page, descricaoRevisaoSecretaria);
-        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-processo-iniciar-rodape').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
         await verificarPaginaPainel(page);
 
@@ -354,7 +354,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         });
 
         await acessarDetalhesProcesso(page, descProcRevisaoHierarquiaInteroperacional);
-        await page.getByTestId('btn-processo-iniciar').click();
+        await page.getByTestId('btn-processo-iniciar-rodape').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
         await verificarPaginaPainel(page);
         await verificarProcessoTabela(page, {
