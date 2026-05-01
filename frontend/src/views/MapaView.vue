@@ -186,7 +186,7 @@
       </template>
 
       <AceitarMapaModal
-          :loading="isLoading"
+          :loading="carregandoFluxoMapa"
           :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
           :mostrar-modal="mostrarModalAceitar"
           @fechar-modal="fecharModalAceitar"
@@ -228,7 +228,7 @@
       <ModalConfirmacao
           v-model="mostrarModalSugestoes"
           :auto-close="false"
-          :loading="isLoading"
+          :loading="loadingSugestoesEnvio"
           :ok-title="TEXTOS.comum.BOTAO_APRESENTAR"
           test-codigo-cancelar="btn-sugestoes-mapa-cancelar"
           test-codigo-confirmar="btn-sugestoes-mapa-confirmar"
@@ -262,7 +262,7 @@
 
       <ModalConfirmacao
           v-model="mostrarModalValidar"
-          :loading="isLoading"
+          :loading="carregandoFluxoMapa"
           :ok-title="TEXTOS.comum.BOTAO_VALIDAR"
           test-codigo-cancelar="btn-validar-mapa-cancelar"
           test-codigo-confirmar="btn-validar-mapa-confirmar"
@@ -276,7 +276,7 @@
       <ModalConfirmacao
           v-model="mostrarModalDevolucao"
           :auto-close="false"
-          :loading="isLoading"
+          :loading="carregandoFluxoMapa"
           :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
           test-codigo-cancelar="btn-devolucao-mapa-cancelar"
           test-codigo-confirmar="btn-devolucao-mapa-confirmar"
@@ -353,7 +353,6 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
-import {useMapaAcoesAnalise} from "@/composables/useMapaAcoesAnalise";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
@@ -386,6 +385,7 @@ const props = defineProps<{ codProcesso: number | string; sigla: string; codSubp
 const router = useRouter();
 const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
+const carregandoFluxoMapa = fluxoMapa.carregando;
 const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const {notify} = useNotification();
 const toastStore = useToastStore();
@@ -429,6 +429,11 @@ const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBo
 const atividades = computed(() => mapasStore.mapaCompleto.value?.atividades ?? []);
 const competencias = computed(() => mapasStore.mapaCompleto.value?.competencias ?? []);
 const mapaSomenteLeitura = ref<MapaVisualizacao | null>(null);
+const mostrarModalAceitar = ref(false);
+const mostrarModalValidar = ref(false);
+const mostrarModalDevolucao = ref(false);
+const observacaoDevolucao = ref("");
+const loadingSugestoesEnvio = ref(false);
 
 const {
   carregandoInicial,
@@ -471,29 +476,59 @@ async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   await router.push({name: "Painel"});
 }
 
-const {
-  mostrarModalAceitar,
-  mostrarModalValidar,
-  mostrarModalDevolucao,
-  observacaoDevolucao,
-  isLoading,
-  confirmarAceitacao,
-  confirmarValidacao,
-  confirmarDevolucao,
-  abrirModalAceitar,
-  fecharModalAceitar,
-  abrirModalValidar,
-  abrirModalDevolucao: abrirModalDevolucaoBase,
-} = useMapaAcoesAnalise({
-  codSubprocesso: codigoSubprocesso,
-  acaoPrincipalMapa,
-  concluirAcaoPainel,
-  notify,
-});
+function abrirModalAceitar() {
+  mostrarModalAceitar.value = true;
+}
+
+function fecharModalAceitar() {
+  mostrarModalAceitar.value = false;
+}
+
+function abrirModalValidar() {
+  mostrarModalValidar.value = true;
+}
+
+function fecharModalValidar() {
+  mostrarModalValidar.value = false;
+}
 
 function abrirModalDevolucao() {
   resetarValidacao();
-  abrirModalDevolucaoBase();
+  mostrarModalDevolucao.value = true;
+}
+
+function fecharModalDevolucao() {
+  mostrarModalDevolucao.value = false;
+  observacaoDevolucao.value = "";
+}
+
+async function confirmarValidacao() {
+  if (!codigoSubprocesso.value) return;
+
+  try {
+    await fluxoMapa.validarMapa(codigoSubprocesso.value);
+    await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
+  } catch {
+    notify(TEXTOS.mapa.ERRO_VALIDAR, 'danger');
+  }
+}
+
+async function confirmarAceitacao(observacao = "") {
+  if (!codigoSubprocesso.value) return;
+
+  const acao = acaoPrincipalMapa.value;
+  if (!acao) return;
+
+  try {
+    if (acao.codigo === "HOMOLOGAR") {
+      await fluxoMapa.homologarMapa(codigoSubprocesso.value, {observacao});
+    } else {
+      await fluxoMapa.aceitarMapa(codigoSubprocesso.value, {observacao});
+    }
+    await concluirAcaoPainel(acao.mensagemSucesso, fecharModalAceitar);
+  } catch {
+    notify(TEXTOS.comum.ERRO_OPERACAO, 'danger');
+  }
 }
 
 async function handleConfirmarDevolucao() {
@@ -501,7 +536,17 @@ async function handleConfirmarDevolucao() {
     await focarPrimeiroErroInvalido();
     return;
   }
-  await confirmarDevolucao();
+
+  if (!codigoSubprocesso.value) return;
+
+  try {
+    await fluxoMapa.devolverMapa(codigoSubprocesso.value, {
+      justificativa: observacaoDevolucao.value,
+    });
+    await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
+  } catch {
+    notify(TEXTOS.mapa.ERRO_DEVOLVER, 'danger');
+  }
 }
 
 async function sincronizarSugestoesMapa(): Promise<string> {
@@ -575,14 +620,14 @@ async function handleConfirmarSugestoes() {
   if (!codigoSubprocesso.value) return;
 
   try {
-    isLoading.value = true;
+    loadingSugestoesEnvio.value = true;
     await apresentarSugestoes(codigoSubprocesso.value, {sugestoes: sugestoes.value});
     await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
   } catch (error) {
     logger.error(error);
     notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
   } finally {
-    isLoading.value = false;
+    loadingSugestoesEnvio.value = false;
   }
 }
 
