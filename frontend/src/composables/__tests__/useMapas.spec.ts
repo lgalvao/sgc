@@ -1,4 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createTestingPinia} from "@pinia/testing";
+import {setActivePinia} from "pinia";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 
 vi.mock("@/services/subprocessoService", () => ({
@@ -9,6 +11,7 @@ vi.mock("@/services/subprocessoService", () => ({
 describe("useMapas", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        setActivePinia(createTestingPinia({createSpy: vi.fn}));
     });
 
     it("deve inicializar com valores nulos", async () => {

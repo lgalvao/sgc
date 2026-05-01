@@ -176,12 +176,7 @@
       <p class="text-muted">{{ TEXTOS.subprocesso.NAO_ENCONTRADO_DESC }}</p>
       <BButton to="/painel" variant="primary" class="mt-3">Voltar para o Painel</BButton>
     </div>
-    <div v-else class="loading-container py-5">
-      <div class="loading-content">
-        <BSpinner :label="TEXTOS.subprocesso.CARREGANDO" variant="primary" style="width: 3rem; height: 3rem;"/>
-        <p class="mt-3 text-muted fw-bold">{{ TEXTOS.subprocesso.CARREGANDO }}</p>
-      </div>
-    </div>
+    <CarregamentoPagina v-else class="py-5" />
   </LayoutPadrao>
 
   <SubprocessoModal
@@ -251,7 +246,6 @@ import {
   BDropdownItemButton,
   BFormInvalidFeedback,
   BFormTextarea,
-  BSpinner,
   BTable,
   useToast
 } from "bootstrap-vue-next";
@@ -263,6 +257,7 @@ import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {enviarLembrete as enviarLembreteService} from "@/services/processoService";

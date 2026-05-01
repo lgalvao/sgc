@@ -1,6 +1,8 @@
 import {mount} from "@vue/test-utils";
 import {BBreadcrumbItem, BButton} from "bootstrap-vue-next";
 import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createTestingPinia} from "@pinia/testing";
+import {setActivePinia} from "pinia";
 import {useRoute} from "vue-router";
 import {Perfil} from "@/types/tipos";
 import BarraNavegacao from "../layout/BarraNavegacao.vue";
@@ -59,6 +61,7 @@ describe("BarraNavegacao.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        setActivePinia(createTestingPinia({createSpy: vi.fn}));
         const {definirUnidadeAtual} = useUnidadeAtual();
         definirUnidadeAtual(null);
     });
@@ -133,15 +136,14 @@ describe("BarraNavegacao.vue", () => {
         });
 
         it("deve renderizar breadcrumbs para rotas de unidade (ADMIN vê 'Unidades')", () => {
-            const {definirUnidadeAtual} = useUnidadeAtual();
-            definirUnidadeAtual({codigo: 1, sigla: "UNIDADE_1"} as any);
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {codUnidade: "1"}),
             );
             const wrapper = mount(BarraNavegacao, getCommonMountOptions({
                 perfil: {
                     perfilSelecionado: Perfil.ADMIN,
-                    permissoesSessao: {mostrarArvoreCompletaUnidades: true}
+                    permissoesSessao: {mostrarArvoreCompletaUnidades: true},
+                    unidadeAtualDetalhes: {codigo: 1, sigla: "UNIDADE_1"}
                 }
             }, {BButton}));
 
@@ -154,15 +156,14 @@ describe("BarraNavegacao.vue", () => {
         });
 
         it("deve renderizar breadcrumbs para rotas de unidade (não-ADMIN vê 'Minha unidade')", () => {
-            const {definirUnidadeAtual} = useUnidadeAtual();
-            definirUnidadeAtual({codigo: 456, sigla: "UNIDADE_456"} as any);
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/unidade/456", mockMatchedUnidade, "Unidade", {codUnidade: "456"}),
             );
             const wrapper = mount(BarraNavegacao, getCommonMountOptions({
                 perfil: {
                     perfilSelecionado: Perfil.GESTOR,
-                    permissoesSessao: {mostrarArvoreCompletaUnidades: false}
+                    permissoesSessao: {mostrarArvoreCompletaUnidades: false},
+                    unidadeAtualDetalhes: {codigo: 456, sigla: "UNIDADE_456"}
                 }
             }, {BButton}));
 

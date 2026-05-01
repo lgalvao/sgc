@@ -52,13 +52,14 @@ describe('HistoricoView.vue', () => {
         plugins: [
           createTestingPinia({
             createSpy: vi.fn,
+            stubActions: false,
           })
         ],
         stubs: {
           LayoutPadrao: LayoutPadraoStub,
           PageHeader: PageHeaderStub,
           TabelaProcessos: TabelaProcessosStub,
-          BSpinner: { template: '<div data-testid="spinner"></div>' }
+          CarregamentoPagina: { template: '<div data-testid="carregamento-pagina"></div>' }
         }
       }
     });

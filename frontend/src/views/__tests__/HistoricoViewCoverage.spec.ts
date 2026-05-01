@@ -39,7 +39,7 @@ describe("HistoricoView Coverage", () => {
                     router,
                     createTestingPinia({
                         createSpy: vi.fn,
-                        stubActions: true,
+                        stubActions: false,
                     }),
                 ],
             },

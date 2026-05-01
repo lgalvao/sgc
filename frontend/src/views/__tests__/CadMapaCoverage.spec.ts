@@ -4,6 +4,7 @@ import {createTestingPinia} from '@pinia/testing';
 import {useMapas} from '@/composables/useMapas';
 import MapaView from '@/views/MapaView.vue';
 import * as useFluxoMapaModule from '@/composables/useFluxoMapa';
+import * as subprocessoService from '@/services/subprocessoService';
 import type {ContextoEdicaoSubprocesso} from '@/types/tipos';
 
 type MapaViewVm = {
@@ -22,6 +23,12 @@ type MapaViewVm = {
 };
 
 vi.mock('@/composables/useFluxoMapa', () => ({useFluxoMapa: vi.fn()}));
+vi.mock('@/services/subprocessoService', () => ({
+    verificarImpactosMapa: vi.fn(),
+    obterMapaCompleto: vi.fn(),
+    obterMapaVisualizacao: vi.fn(),
+    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+}));
 const subprocessoStoreMock = {
     contextoEdicao: null as ContextoEdicaoSubprocesso | null,
     erroIntegracaoContexto: null as {message: string} | null,
@@ -144,15 +151,12 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const mapas = useMapas();
-        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(undefined);
-
         await wrapper.vm.$nextTick(); // Wait for mount
 
         const vm = wrapper.vm as unknown as MapaViewVm;
         await vm.abrirModalImpacto();
 
-        expect(mapas.buscarImpactoMapa).not.toHaveBeenCalled();
+        expect(subprocessoService.verificarImpactosMapa).not.toHaveBeenCalled();
     });
 
     it('abrirModalImpacto calls store when codSubprocesso is present', async () => {
@@ -174,14 +178,14 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const mapas = useMapas();
-        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(undefined);
+        vi.mocked(subprocessoService.verificarImpactosMapa).mockResolvedValue({} as any);
         const vm = wrapper.vm as unknown as MapaViewVm;
         vm.codigoSubprocesso = 456;
 
         await vm.abrirModalImpacto();
+        await new Promise(r => setTimeout(r, 0));
 
-        expect(mapas.buscarImpactoMapa).toHaveBeenCalledWith(456);
+        expect(subprocessoService.verificarImpactosMapa).toHaveBeenCalledWith(456);
         expect(vm.mostrarModalImpacto).toBe(true);
     });
 

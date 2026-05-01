@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/services/usuarioService";
-import type {Perfil} from "@/types/tipos";
+import type {Perfil, Unidade} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
@@ -10,6 +10,7 @@ import {usePainelStore} from "@/stores/painel";
 import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useUnidadeStore} from "@/stores/unidade";
+import {useMapasStore} from "@/stores/mapas";
 import {cancelarRequisicoesPendentes, finalizarTransicaoSessao, iniciarTransicaoSessao} from "@/axios-setup";
 
 export const usePerfilStore = defineStore("perfil", () => {
@@ -24,11 +25,13 @@ export const usePerfilStore = defineStore("perfil", () => {
 
     // Estados não persistidos
     const perfisUnidades = ref<PerfilUnidade[]>([]);
+    const unidadeAtualDetalhes = ref<Unidade | null>(null);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
     const painelStore = usePainelStore();
     const processoStore = useProcessoStore();
     const unidadeStore = useUnidadeStore();
     const subprocessoStore = useSubprocessoStore();
+    const mapasStore = useMapasStore();
 
     // Map para lookup O(1) de perfil -> unidade
     const perfilUnidadeMap = computed(() =>
@@ -61,6 +64,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         processoStore.invalidar();
         subprocessoStore.invalidar();
         unidadeStore.invalidarCache();
+        mapasStore.invalidar();
         perfilSelecionado.value = dados.perfil;
         unidadeSelecionada.value = dados.unidadeCodigo;
         unidadeSelecionadaSigla.value = dados.unidadeSigla;
@@ -156,10 +160,12 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
+        unidadeAtualDetalhes.value = null;
         painelStore.invalidar();
         processoStore.invalidar();
         subprocessoStore.invalidar();
         unidadeStore.invalidarCache();
+        mapasStore.invalidar();
     }
 
     return {
@@ -172,6 +178,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         perfisUnidades,
         perfis,
         unidadeAtual,
+        unidadeAtualDetalhes,
         lastError,
         clearError,
         definirUsuarioCodigo,

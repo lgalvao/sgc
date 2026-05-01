@@ -72,10 +72,7 @@
           @row-click="abrirDetalhesUnidade"/>
     </div>
 
-    <div v-else class="text-center py-5">
-      <BSpinner :label="TEXTOS.processo.CARREGANDO_DETALHES" variant="primary"/>
-      <p class="mt-2 text-muted">{{ TEXTOS.processo.CARREGANDO_DETALHES }}</p>
-    </div>
+    <CarregamentoPagina v-else-if="!lastError" :mensagem="TEXTOS.processo.CARREGANDO_DETALHES" />
 
     <!-- Modal de Ação em Bloco -->
     <ModalAcaoBloco
@@ -108,7 +105,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BDropdown, BDropdownItemButton, BSpinner} from "bootstrap-vue-next";
+import {BButton, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
@@ -116,12 +113,14 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useNotification} from "@/composables/useNotification";
 import {usePerfil} from "@/composables/usePerfil";
 import {useToastStore} from "@/stores/toast";
 import {useProcessoStore} from "@/stores/processo";
+import {useHistoricoStore} from "@/stores/historico";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
@@ -148,6 +147,7 @@ const {notificacao, notify, clear} = useNotification();
 const {isAdmin} = usePerfil();
 const toastStore = useToastStore();
 const processoStore = useProcessoStore();
+const historicoStore = useHistoricoStore();
 const {invalidarCachesProcesso, invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
@@ -165,7 +165,6 @@ function clearError() {
 
 async function carregarContextoCompleto() {
   clearError();
-  processo.value = null;
 
   try {
     const data = await processoStore.garantirContextoCompleto(codProcesso);
@@ -174,6 +173,7 @@ async function carregarContextoCompleto() {
     }
     return data;
   } catch (error) {
+    processo.value = null;
     lastError.value = normalizeError(error);
     throw error;
   }
@@ -272,6 +272,7 @@ async function confirmarFinalizacao() {
     await processoService.finalizarProcesso(codProcesso);
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
     invalidarCachesProcesso();
+    historicoStore.invalidar();
     await router.push("/painel");
   } catch (error) {
     lastError.value = normalizeError(error);

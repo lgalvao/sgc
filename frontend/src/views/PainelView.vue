@@ -1,10 +1,7 @@
 <template>
   <LayoutPadrao>
     <h1 class="visually-hidden">{{ TEXTOS.painel.TITULO }}</h1>
-    <div v-if="carregandoPainel" class="text-center py-5" data-testid="painel-carregando">
-      <BSpinner :label="TEXTOS.comum.CARREGANDO_DADOS" variant="primary" />
-      <p class="mt-2 text-muted">{{ TEXTOS.comum.CARREGANDO_DADOS }}</p>
-    </div>
+    <CarregamentoPagina v-if="carregandoPainel" data-testid="painel-carregando" />
     <template v-else>
       <!-- Tabela de Processos -->
       <div class="mb-5">
@@ -66,12 +63,13 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BSpinner, BTable, useToast} from "bootstrap-vue-next";
+import {BButton, BTable, useToast} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {formatDateTimeBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";

@@ -558,13 +558,12 @@ describe("CadastroView.vue", () => {
     it("carrega impacto ao abrir modal", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const mapas = useMapas();
-        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
+        vi.mocked(subprocessoService.verificarImpactosMapa).mockResolvedValue(null as any);
 
         await wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-edicao"]').trigger("click");
         await flushPromises();
 
-        expect(mapas.buscarImpactoMapa).toHaveBeenCalledWith(123);
+        expect(subprocessoService.verificarImpactosMapa).toHaveBeenCalledWith(123);
         expect(wrapper.findComponent(ImpactoMapaModal).exists()).toBe(true);
     });
 
