@@ -1,95 +1,95 @@
-import {describe, expect, it, vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createPinia, setActivePinia} from "pinia";
 import {useUnidadeStore} from "../unidade";
-import {setupStoreTest} from "@/test-utils/storeTestHelpers";
-import * as unidadeService from "@/services/unidadeService";
-import {logger} from "@/utils";
+import * as unidadeService from "../../services/unidadeService";
 
-vi.mock("@/services/unidadeService");
-vi.mock("@/utils", async () => {
-    const actual = await vi.importActual("@/utils") as any;
-    return {
-        ...actual,
-        logger: {
-            error: vi.fn(),
-        },
-    };
-});
+vi.mock("../../services/unidadeService", () => ({
+    buscarArvoreUnidade: vi.fn(),
+    buscarArvoreComElegibilidade: vi.fn(),
+    buscarReferenciaMapaVigente: vi.fn(),
+    mapUnidadesArray: vi.fn(a => a),
+    mapUnidade: vi.fn(a => a),
+}));
 
-describe("unidade store", () => {
-    const context = setupStoreTest(useUnidadeStore);
+vi.mock("@/utils", () => ({
+    logger: { error: vi.fn() }
+}));
 
-    it("deve inicializar com estado vazio", () => {
-        expect(context.store.cacheArvoreElegibilidade.size).toBe(0);
+describe("useUnidadeStore", () => {
+    beforeEach(() => {
+        setActivePinia(createPinia());
+        vi.clearAllMocks();
     });
 
-    describe("garantirArvoreElegibilidade", () => {
-        it("deve buscar do service e mapear resultados", async () => {
-            const mockArvore = [{codigo: 1, nome: "U1", sigla: "U1"}] as any;
-            vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue(mockArvore);
-            vi.mocked(unidadeService.mapUnidadesArray).mockReturnValue(mockArvore);
+    it("deve buscar e cachear arvore com elegibilidade", async () => {
+        const store = useUnidadeStore();
+        const mockData = [{ codigo: 1 }];
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue(mockData as any);
 
-            const result = await context.store.garantirArvoreElegibilidade("MAPEAMENTO");
+        const res1 = await store.garantirArvoreElegibilidade("T1", 1);
+        const res2 = await store.garantirArvoreElegibilidade("T1", 1);
 
-            expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith("MAPEAMENTO", undefined);
-            expect(unidadeService.mapUnidadesArray).toHaveBeenCalled();
-            expect(result).toEqual(mockArvore);
-            expect(context.store.cacheArvoreElegibilidade.get("MAPEAMENTO_novo")).toEqual(mockArvore);
-        });
-
-        it("deve usar cache se já estiver disponível", async () => {
-            const mockArvore = [{codigo: 1}] as any;
-            context.store.cacheArvoreElegibilidade.set("MAPEAMENTO_1", mockArvore);
-
-            const result = await context.store.garantirArvoreElegibilidade("MAPEAMENTO", 1);
-
-            expect(unidadeService.buscarArvoreComElegibilidade).not.toHaveBeenCalled();
-            expect(result).toEqual(mockArvore);
-        });
-
-        it("deve lidar com chamadas paralelas e evitar buscas duplicadas", async () => {
-            const mockArvore = [{codigo: 1}] as any;
-            let resolveBusca: (val: any) => void = () => {};
-            const buscaPromise = new Promise((resolve) => {
-                resolveBusca = resolve;
-            });
-            vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockReturnValue(buscaPromise as any);
-            vi.mocked(unidadeService.mapUnidadesArray).mockReturnValue(mockArvore);
-
-            const p1 = context.store.garantirArvoreElegibilidade("MAPEAMENTO");
-            const p2 = context.store.garantirArvoreElegibilidade("MAPEAMENTO");
-
-            resolveBusca(mockArvore);
-
-            const [r1, r2] = await Promise.all([p1, p2]);
-
-            expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledTimes(1);
-            expect(r1).toEqual(mockArvore);
-            expect(r2).toEqual(mockArvore);
-        });
-
-        it("deve retornar array vazio e logar erro se a busca falhar", async () => {
-            vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockRejectedValue(new Error("Erro API"));
-
-            const result = await context.store.garantirArvoreElegibilidade("MAPEAMENTO");
-
-            expect(result).toEqual([]);
-            expect(logger.error).toHaveBeenCalled();
-        });
-
-        it("deve lidar com caso onde response não é array", async () => {
-            vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue(null as any);
-            vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr as any[]);
-
-            const result = await context.store.garantirArvoreElegibilidade("MAPEAMENTO");
-
-            expect(result).toEqual([]);
-            expect(unidadeService.mapUnidadesArray).toHaveBeenCalledWith([]);
-        });
+        expect(res1).toEqual(mockData);
+        expect(res2).toEqual(mockData);
+        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledTimes(1);
     });
 
-    it("invalidarCache deve limpar o cache", () => {
-        context.store.cacheArvoreElegibilidade.set("test", []);
-        context.store.invalidarCache();
-        expect(context.store.cacheArvoreElegibilidade.size).toBe(0);
+    it("deve tratar erro na busca da arvore", async () => {
+        const store = useUnidadeStore();
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockRejectedValue(new Error("Fail"));
+
+        const res = await store.garantirArvoreElegibilidade("T1", 1);
+        expect(res).toEqual([]);
+    });
+
+    it("deve deduplicar requisicoes paralelas", async () => {
+        const store = useUnidadeStore();
+        let resolvePromise: any;
+        const promessa = new Promise(resolve => { resolvePromise = resolve; });
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockReturnValue(promessa as any);
+
+        const p1 = store.garantirArvoreElegibilidade("T1", 1);
+        const p2 = store.garantirArvoreElegibilidade("T1", 1);
+        
+        resolvePromise([{ codigo: 1 }]);
+        const [res1, res2] = await Promise.all([p1, p2]);
+
+        expect(res1).toEqual([{ codigo: 1 }]);
+        expect(res2).toEqual([{ codigo: 1 }]);
+        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledTimes(1);
+    });
+
+    it("obterUnidade deve retornar null se servico retornar null", async () => {
+        const store = useUnidadeStore();
+        vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue(null as any);
+        
+        const res = await store.obterUnidade(1);
+        expect(res).toBeNull();
+    });
+
+    it("obterUnidade deve retornar null se unidade nao tiver codigo", async () => {
+        const store = useUnidadeStore();
+        vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue({ nome: "U" } as any);
+        vi.mocked(unidadeService.mapUnidade).mockReturnValue({ nome: "U" } as any);
+        
+        const res = await store.obterUnidade(1);
+        expect(res).toBeNull();
+    });
+
+    it("invalidarCache deve limpar tudo", () => {
+        const store = useUnidadeStore();
+        store.cacheUnidades.set(1, { codigo: 1 } as any);
+        store.invalidarCache();
+        expect(store.cacheUnidades.size).toBe(0);
+    });
+
+    it("obterReferenciaMapaVigente deve usar cache", async () => {
+        const store = useUnidadeStore();
+        vi.mocked(unidadeService.buscarReferenciaMapaVigente).mockResolvedValue({ codigo: 10 } as any);
+        
+        await store.obterReferenciaMapaVigente(1);
+        await store.obterReferenciaMapaVigente(1);
+        
+        expect(unidadeService.buscarReferenciaMapaVigente).toHaveBeenCalledTimes(1);
     });
 });

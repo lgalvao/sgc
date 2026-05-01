@@ -558,7 +558,8 @@ defineExpose({
   mostrarModalReabrir,
   modalLembreteAberto,
   loadingLembrete,
-  justificativaReabertura
+  justificativaReabertura,
+  onActivated
 });
 </script>
 

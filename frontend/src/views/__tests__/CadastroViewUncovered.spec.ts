@@ -2,7 +2,6 @@ import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
-import type {ContextoCadastroAtividadesSubprocesso} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
 import * as useAcessoModule from "@/composables/useAcesso";
@@ -12,36 +11,29 @@ vi.mock("@/utils/logger", () => ({
     default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }
 }));
 
-const estadoContextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
-const buscarContextoCadastroAtividadesPorProcessoEUnidadeMock = vi.fn();
-const buscarContextoCadastroAtividadesMock = vi.fn();
-
-const subprocessosMock = {
-    get contextoCadastro() { return estadoContextoCadastro.value; },
-    set contextoCadastro(v: ContextoCadastroAtividadesSubprocesso | null) { estadoContextoCadastro.value = v; },
-    buscarContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
-    buscarContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
-    garantirContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
-    garantirContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
-    atualizarStatusLocal: vi.fn(),
-    erroIntegracaoContexto: null,
-    limparErroIntegracao: vi.fn(),
-    get subprocessoDetalhe() { return estadoContextoCadastro.value?.detalhes ?? null; },
-    set subprocessoDetalhe(v: any) {
-        estadoContextoCadastro.value = v ? {
-            ...(estadoContextoCadastro.value ?? {
-                detalhes: v,
-                mapa: {codigo: 100, subprocessoCodigo: 123},
-                atividadesDisponiveis: [],
-                unidade: {codigo: 1, sigla: "TESTE", nome: "Teste"}
-            }),
-            detalhes: v
-        } : null;
-    }
-};
+const estadoContextoCadastro = ref({
+    detalhes: {
+        codigo: 123,
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        permissoes: { podeEditarCadastro: true }
+    },
+    mapa: {codigo: 100, subprocessoCodigo: 123},
+    atividadesDisponiveis: [],
+    unidade: {codigo: 1, sigla: "TESTE", nome: "Teste"}
+});
 
 vi.mock("@/stores/subprocesso", () => ({
-    useSubprocessoStore: () => subprocessosMock
+    useSubprocessoStore: () => ({
+        contextoCadastro: estadoContextoCadastro.value,
+        buscarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
+        buscarContextoCadastroAtividades: vi.fn(),
+        garantirContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
+        garantirContextoCadastroAtividades: vi.fn(),
+        atualizarStatusLocal: vi.fn(),
+        erroIntegracaoContexto: null,
+        limparErroIntegracao: vi.fn(),
+    })
 }));
 
 vi.mock("@/composables/useFluxoSubprocesso", () => ({
@@ -56,10 +48,9 @@ vi.mock("@/composables/useValidacaoFormulario", () => ({
     }))
 }));
 
-const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 vi.mock("vue-router", () => ({
     useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
-    useRouter: () => ({push: pushMock}),
+    useRouter: () => ({push: vi.fn()}),
 }));
 
 vi.mock("@/services/analiseService", () => ({
@@ -84,14 +75,8 @@ const stubs = {
     ModalConfirmacao: {template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>', props: ['modelValue']},
     ModalAceiteCadastro: {template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>', props: ['modelValue']},
     ModalDevolucaoCadastro: {template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>', props: ['modelValue']},
+    CadastroAcoesHeader: {template: '<div><button @click="$emit(\'disponibilizar\')">Disp</button></div>'},
 };
-
-function createWrapper() {
-    return mount(CadastroView, {
-        global: { plugins: [createTestingPinia({stubActions: true})], stubs },
-        props: { codProcesso: "1", sigla: "TESTE" }
-    });
-}
 
 describe("CadastroView Uncovered Branches", () => {
     beforeEach(() => {
@@ -116,34 +101,28 @@ describe("CadastroView Uncovered Branches", () => {
         } as any);
     });
 
-    it("cobre confirmarDisponibilizacao", async () => {
-        const wrapper = createWrapper();
+    it("cobre fluxos de cadastro", async () => {
+        const wrapper = mount(CadastroView, {
+            global: { plugins: [createTestingPinia({stubActions: true})], stubs },
+            props: { codProcesso: "1", sigla: "TESTE" }
+        });
         await flushPromises();
         const vm = wrapper.vm as any;
         vm.codigoSubprocesso = 123;
-        vm.subprocesso.situacao = SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
-        vm.subprocesso.tipoProcesso = TipoProcesso.MAPEAMENTO;
+
+        // 1. Disponibilizar
         await vm.confirmarDisponibilizacao();
         expect(useFluxoSubprocessoModule.useFluxoSubprocesso().disponibilizarCadastro).toHaveBeenCalled();
-    });
 
-    it("cobre handleImportAtividades", async () => {
-        const wrapper = createWrapper();
-        await flushPromises();
-        const vm = wrapper.vm as any;
+        // 2. Importar
         await vm.handleImportAtividades({ atividadesAtualizadas: [], aviso: false });
         expect(vm.mostrarModalImportar).toBe(false);
-    });
 
-    it("cobre confirmarValidacaoAnalise e confirmarDevolucaoAnalise", async () => {
-        const wrapper = createWrapper();
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        vm.codigoSubprocesso = 123;
-
+        // 3. Analise
         await vm.confirmarValidacaoAnalise();
         expect(useFluxoSubprocessoModule.useFluxoSubprocesso().aceitarCadastro).toHaveBeenCalled();
 
+        // 4. Devolução
         vm.observacaoDevolucao = "Justificativa";
         await vm.confirmarDevolucaoAnalise();
         expect(useFluxoSubprocessoModule.useFluxoSubprocesso().devolverCadastro).toHaveBeenCalled();

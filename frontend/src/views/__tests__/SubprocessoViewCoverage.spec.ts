@@ -110,7 +110,15 @@ describe('SubprocessoView Coverage', () => {
 
     vm.abrirModalReabrirRevisao();
 
-    // Cover the invalid validation inside confirmarAlteracaoDataLimite
-    await vm.confirmarAlteracaoDataLimite();
+    // 1. rowAttrMovimentacao(null)
+    expect(vm.rowAttrMovimentacao(null)).toEqual({});
+
+    // 2. confirmarEnviarLembrete(!subprocesso)
+    vm.subprocesso = null;
+    await vm.confirmarEnviarLembrete();
+
+    // 3. atualizarSubprocessoAtual(!codigoSubprocesso)
+    vm.codigoSubprocesso = null;
+    await vm.atualizarSubprocessoAtual();
   });
 });
