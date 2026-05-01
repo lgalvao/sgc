@@ -4,7 +4,6 @@ import MapaView from "../MapaView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import * as useAcessoModule from "@/composables/useAcesso";
 import {useMapas} from "@/composables/useMapas";
-import {useSubprocessoStore} from "@/stores/subprocesso";
 import {ref} from "vue";
 
 vi.mock("vue-router", () => ({
@@ -126,7 +125,7 @@ describe("MapaView Uncovered Branches", () => {
         await flushPromises();
         const vm = wrapper.vm as any;
         
-        const mapasStore = useMapas(pinia);
+        const mapasStore = useMapas();
         mapasStore.mapaCompleto.value = {
             competencias: [{ codigo: 1, descricao: "Comp 1" }]
         } as any;
