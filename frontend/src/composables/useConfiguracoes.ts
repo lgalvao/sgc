@@ -18,6 +18,7 @@ export function useConfiguracoes() {
     );
 
     async function carregarConfiguracoes() {
+        configuracoes.value = [];
         await executarSilencioso(async () => {
             configuracoes.value = await serviceBuscarConfiguracoes();
         }, "Não foi possível carregar as configurações.");
