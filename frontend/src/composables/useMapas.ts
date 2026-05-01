@@ -1,4 +1,5 @@
 import {storeToRefs} from "pinia";
+import type {Ref} from "vue";
 import {obterMapaCompleto, verificarImpactosMapa} from "@/services/subprocessoService";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -28,8 +29,8 @@ export function useMapas() {
     }
 
     return {
-        mapaCompleto: mapaCompleto as import("vue").Ref<MapaCompleto | null>,
-        impactoMapa: impactoMapa as import("vue").Ref<ImpactoMapa | null>,
+        mapaCompleto: mapaCompleto as Ref<MapaCompleto | null>,
+        impactoMapa: impactoMapa as Ref<ImpactoMapa | null>,
         carregando,
         erro,
         lastError,

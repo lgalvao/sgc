@@ -84,6 +84,9 @@ function verDetalhes(proc: ProcessoResumo | undefined) {
   }
 }
 
+// Flag para distinguir o primeiro mount de ativações subsequentes (keepAlive).
+// onActivated é chamado também no primeiro mount, antes de onMounted — a flag evita
+// recarregamento duplo nesse caso.
 let montadoUmaVez = false;
 
 onMounted(() => {

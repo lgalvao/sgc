@@ -173,6 +173,8 @@ async function carregarContextoCompleto() {
     }
     return data;
   } catch (error) {
+    // Limpa os dados apenas em caso de erro para evitar exibir informações desatualizadas como válidas.
+    // Durante o recarregamento em background, os dados antigos permanecem visíveis (sem flash de spinner).
     processo.value = null;
     lastError.value = normalizeError(error);
     throw error;

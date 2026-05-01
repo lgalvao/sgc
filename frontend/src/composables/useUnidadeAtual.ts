@@ -1,4 +1,5 @@
 import {storeToRefs} from 'pinia';
+import type {Ref} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import type {Unidade} from '@/types/tipos';
 
@@ -11,7 +12,7 @@ export function useUnidadeAtual() {
     }
 
     return {
-        unidadeAtual: unidadeAtualDetalhes as import('vue').Ref<Unidade | null>,
+        unidadeAtual: unidadeAtualDetalhes as Ref<Unidade | null>,
         definirUnidadeAtual,
     };
 }
