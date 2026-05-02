@@ -6,7 +6,7 @@ const searchDir = path.join(import.meta.dirname, '../../../frontend/src');
 const extensions = ['.vue'];
 // Melhora o regex para capturar data-testid estáticos e dinâmicos
 // Suporta: data-testid="valor", :data-testid="'valor'", data-testid='valor'
-const regex = /\b:?(data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/g;
+const regex = /(^|[\s<])(:?)(data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/gm;
 
 function scanDirectory(directory) {
     let results = [];
@@ -22,19 +22,18 @@ function scanDirectory(directory) {
             const content = fs.readFileSync(absolutePath, 'utf-8');
             let match;
             while ((match = regex.exec(content)) !== null) {
-                const attrName = match[1];
-                let value = match[3] || match[4] || '';
+                const attrName = match[3];
+                let value = match[5] || match[6] || '';
 
-                // Se for um binding dinâmico (começa com :), tentamos extrair o literal se for simples
+                // Se for um binding dinâmico (começa com :), só aceitamos literal estático.
                 // Ex: :data-testid="'meu-id'" -> meu-id
-                // Se for complexo (ex: prop || 'padrao'), ignoramos para evitar falsos positivos
-                const isDynamic = match[0].startsWith(':');
+                // Ex: :data-testid="dataTestid" -> ignorado, pois o valor real vem por prop/estado
+                const isDynamic = match[2] === ':';
                 if (isDynamic) {
                     const literalMatch = value.match(/^['"]([^'"]+)['"]$/);
                     if (literalMatch) {
                         value = literalMatch[1];
-                    } else if (value.includes('||') || value.includes('?') || value.includes('!')) {
-                        // Ignora expressões complexas pois o test-id real depende do estado
+                    } else {
                         continue;
                     }
                 }

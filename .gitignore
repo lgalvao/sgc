@@ -71,6 +71,8 @@ test-quality-report.md
 title-case-report.txt
 unit-test-report.md
 view-validations-audit.md
+etc/qa-dashboard/
+etc/qualidade/frontend-cruft/
 
 # Playwright E2E test results
 !test-results/

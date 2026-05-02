@@ -13,10 +13,10 @@ const DIRETORIO_LATEST = path.join(DIRETORIO_DASHBOARD, "latest");
 const VERSAO_SCHEMA = "1.0.0";
 
 const PERFIS = {
-    rapido: ["backendUnitario", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendTestIds", "sincroniaValidacoes"],
-    completo: ["backendUnitario", "backendIntegracao", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "e2ePlaywright", "frontendTestIds", "sincroniaValidacoes"],
+    rapido: ["backendUnitario", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "frontendTestIds", "sincroniaValidacoes"],
+    completo: ["backendUnitario", "backendIntegracao", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "e2ePlaywright", "frontendTestIds", "sincroniaValidacoes"],
     backend: ["backendUnitario", "backendIntegracao", "backendCobertura", "sincroniaValidacoes"],
-    frontend: ["frontendCobertura", "frontendLint", "frontendTypecheck", "frontendTestIds", "sincroniaValidacoes"]
+    frontend: ["frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "frontendTestIds", "sincroniaValidacoes"]
 };
 
 function caminhoRelativo(caminhoAbsoluto) {
@@ -65,6 +65,14 @@ async function executarComando({comando, args, cwd, env}) {
             stderr: erro.message,
             duracaoMs: Date.now() - inicio
         };
+    }
+}
+
+function parseJsonSeguro(conteudo, fallback = {}) {
+    try {
+        return JSON.parse(conteudo);
+    } catch {
+        return fallback;
     }
 }
 
@@ -117,8 +125,8 @@ const ADAPTADORES = {
         return execucao;
     },
     async frontendCobertura() {
-        const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "pnpm -C frontend run coverage:unit", "frontend");
-        const saida = await executarComando({comando: "pnpm", args: ["-C", "frontend", "run", "coverage:unit"], cwd: DIRETORIO_RAIZ});
+        const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "pnpm -C frontend run coverage:unit:collect", "frontend");
+        const saida = await executarComando({comando: "pnpm", args: ["-C", "frontend", "run", "coverage:unit:collect"], cwd: DIRETORIO_RAIZ});
         const cobertura = await extrairCoberturaFrontend();
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -140,6 +148,24 @@ const ADAPTADORES = {
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
         execucao.sumario = saida.code === 0 ? "Typecheck sem erros." : "Erros de tipagem encontrados.";
+        return execucao;
+    },
+    async frontendCruft() {
+        const execucao = criarExecucao("frontend-cruft", "Frontend cruft", "qualidade", "node etc/scripts/sgc.js frontend cruft validar --json-resumido", ".");
+        const saida = await executarComando({comando: "node", args: ["etc/scripts/sgc.js", "frontend", "cruft", "validar", "--json-resumido"], cwd: DIRETORIO_RAIZ});
+        const resultado = parseJsonSeguro(saida.stdout, {});
+        execucao.status = saida.code === 0 && resultado.status === "ok" ? "sucesso" : "falha";
+        execucao.duracaoMs = saida.duracaoMs;
+        execucao.metricas = {
+            scoreTotal: resultado.resumo?.scoreTotal ?? null,
+            faixa: resultado.resumo?.faixa ?? null,
+            violacoes: resultado.violacoes ?? [],
+            avisos: resultado.avisos ?? [],
+            hotspots: resultado.hotspots ?? []
+        };
+        execucao.sumario = resultado.resumo
+            ? `Score de cruft: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa}).`
+            : "Validacao de cruft executada.";
         return execucao;
     },
     async frontendTestIds() {
@@ -177,7 +203,10 @@ async function coletarGit() {
 }
 
 async function main() {
-    const perfil = process.argv.find(a => a.startsWith("--perfil="))?.split("=")[1] || "rapido";
+    const indicePerfil = process.argv.indexOf("--perfil");
+    const perfilPorOpcao = indicePerfil >= 0 ? process.argv[indicePerfil + 1] : null;
+    const perfilPorAtribuicao = process.argv.find(a => a.startsWith("--perfil="))?.split("=")[1] ?? null;
+    const perfil = perfilPorOpcao || perfilPorAtribuicao || "rapido";
     const inicio = Date.now();
     const timestamp = formatarTimestampArquivo();
     const diretorioExecucao = path.join(DIRETORIO_RUNS, timestamp);
@@ -190,6 +219,16 @@ async function main() {
         console.log(`Executando ${adaptador}...`);
         verificacoes.push(await ADAPTADORES[adaptador]());
     }
+
+    const hotspotsCruft = verificacoes
+        .filter((item) => Array.isArray(item.metricas?.hotspots))
+        .flatMap((item) => item.metricas.hotspots.map((hotspot) => ({
+            nome: hotspot.arquivo,
+            risco: hotspot.score,
+            origem: item.codigo
+        })))
+        .sort((a, b) => b.risco - a.risco)
+        .slice(0, 20);
 
     const snapshot = {
         versaoSchema: VERSAO_SCHEMA,
@@ -207,7 +246,8 @@ async function main() {
                 sucesso: verificacoes.filter(v => v.status === "sucesso").length,
                 falha: verificacoes.filter(v => v.status === "falha").length
             }
-        }
+        },
+        hotspots: hotspotsCruft
     };
 
     await fs.writeFile(path.join(diretorioExecucao, "snapshot.json"), JSON.stringify(snapshot, null, 2));

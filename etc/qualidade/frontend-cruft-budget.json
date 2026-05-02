@@ -1,0 +1,58 @@
+{
+  "versaoSchema": "1.0.0",
+  "camadas": {
+    "service": {
+      "target": 120,
+      "hard": 180
+    },
+    "store": {
+      "target": 100,
+      "hard": 150
+    },
+    "composable": {
+      "target": 120,
+      "hard": 170
+    },
+    "view": {
+      "target": 250,
+      "hard": 350
+    },
+    "component": {
+      "target": 180,
+      "hard": 260
+    },
+    "router": {
+      "target": 120,
+      "hard": 180
+    },
+    "utils": {
+      "target": 80,
+      "hard": 140
+    },
+    "outro": {
+      "target": 120,
+      "hard": 180
+    }
+  },
+  "metricas": {
+    "maximosProducao": {
+      "anyExplicito": 1,
+      "checksNull": 25,
+      "fallbacksDefensivos": 68,
+      "catchBlocks": 65,
+      "castsDuplos": 2,
+      "storageDireto": 3,
+      "exportsSuspeitos": 41,
+      "arquivosAcimaTargetPorCamada": {
+        "service": 3,
+        "store": 3,
+        "composable": 8,
+        "view": 10,
+        "component": 13,
+        "router": 0,
+        "utils": 4,
+        "outro": 5
+      }
+    }
+  }
+}

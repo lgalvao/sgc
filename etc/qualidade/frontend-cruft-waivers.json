@@ -1,0 +1,373 @@
+{
+  "versaoSchema": "1.0.0",
+  "waivers": [
+    {
+      "arquivo": "frontend/src/views/MapaView.vue",
+      "camada": "view",
+      "maxLinhas": 814,
+      "responsavel": "frontend",
+      "justificativa": "View central ainda concentra fluxo de mapa, mutacoes e exibicao.",
+      "criterioRemocao": "Extrair orquestracao, secoes de tela e interacoes de mutacao."
+    },
+    {
+      "arquivo": "frontend/src/types/tipos.ts",
+      "camada": "outro",
+      "maxLinhas": 612,
+      "responsavel": "frontend",
+      "justificativa": "Arquivo central de tipos ainda agrega dominios distintos.",
+      "criterioRemocao": "Fatiar tipos por dominio sem quebrar imports publicos do frontend."
+    },
+    {
+      "arquivo": "frontend/src/views/CadastroView.vue",
+      "camada": "view",
+      "maxLinhas": 707,
+      "responsavel": "frontend",
+      "justificativa": "Tela ainda mistura fluxo, validacao e apresentacao do cadastro.",
+      "criterioRemocao": "Separar orquestracao, secoes visuais e regras locais em composables/componentes."
+    },
+    {
+      "arquivo": "frontend/src/views/SubprocessoView.vue",
+      "camada": "view",
+      "maxLinhas": 596,
+      "responsavel": "frontend",
+      "justificativa": "Tela ainda coordena muitos estados e variacoes do subprocesso.",
+      "criterioRemocao": "Extrair secoes de estado e navegacao do subprocesso."
+    },
+    {
+      "arquivo": "frontend/src/constants/textos.ts",
+      "camada": "outro",
+      "maxLinhas": 450,
+      "responsavel": "frontend",
+      "justificativa": "Constante agregadora de textos ainda esta monolitica.",
+      "criterioRemocao": "Dividir textos por modulo ou fluxo principal."
+    },
+    {
+      "arquivo": "frontend/src/services/subprocessoService.ts",
+      "camada": "service",
+      "maxLinhas": 397,
+      "responsavel": "frontend",
+      "justificativa": "Service central ainda concentra muitos endpoints legitimos.",
+      "criterioRemocao": "Separar leituras, mapa, cadastro e acoes em fronteiras menores."
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/ArvoreUnidades.vue",
+      "camada": "component",
+      "maxLinhas": 471,
+      "responsavel": "frontend",
+      "justificativa": "Componente ainda mistura arvore, tabela e regras de interacao.",
+      "criterioRemocao": "Extrair renderizacao de linha, controles e logica de expansao."
+    },
+    {
+      "arquivo": "frontend/src/views/NotificacoesAdminView.vue",
+      "camada": "view",
+      "maxLinhas": 490,
+      "responsavel": "frontend",
+      "justificativa": "Tela administrativa ainda combina filtros, fluxo e tabela extensa.",
+      "criterioRemocao": "Separar busca, listagem e acoes de notificacao."
+    },
+    {
+      "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
+      "camada": "view",
+      "maxLinhas": 470,
+      "responsavel": "frontend",
+      "justificativa": "Tela de cadastro de processo ainda centraliza formulario e orquestracao.",
+      "criterioRemocao": "Extrair secoes do formulario e bootstrap de dados."
+    },
+    {
+      "arquivo": "frontend/src/stores/subprocesso.ts",
+      "camada": "store",
+      "maxLinhas": 276,
+      "responsavel": "frontend",
+      "justificativa": "Store ainda concentra cache curto e multiplas leituras do subprocesso.",
+      "criterioRemocao": "Separar responsabilidades de cache e consulta derivada."
+    },
+    {
+      "arquivo": "frontend/src/components/comum/TreeTable.vue",
+      "camada": "component",
+      "maxLinhas": 360,
+      "responsavel": "frontend",
+      "justificativa": "Componente generico ainda concentra estrutura e comportamento demais.",
+      "criterioRemocao": "Dividir cabecalho, corpo e interacoes da tabela em subcomponentes."
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "camada": "outro",
+      "maxLinhas": 258,
+      "responsavel": "frontend",
+      "justificativa": "Infra HTTP central ainda agrega autenticacao, erros e transicoes de sessao.",
+      "criterioRemocao": "Separar interceptors, sessao e normalizacao de erro."
+    },
+    {
+      "arquivo": "frontend/src/components/atividades/ImportarAtividadesModal.vue",
+      "camada": "component",
+      "maxLinhas": 321,
+      "responsavel": "frontend",
+      "justificativa": "Modal ainda coordena importacao, selecao e feedback completo.",
+      "criterioRemocao": "Extrair lista, resumo e acoes de importacao."
+    },
+    {
+      "arquivo": "frontend/src/views/ProcessoDetalheView.vue",
+      "camada": "view",
+      "maxLinhas": 368,
+      "responsavel": "frontend",
+      "justificativa": "Tela ainda mistura acoes em bloco, navegacao e exibicao do processo.",
+      "criterioRemocao": "Separar resumo, acoes e tabela de subprocessos."
+    },
+    {
+      "arquivo": "frontend/src/components/atividades/AtividadeItem.vue",
+      "camada": "component",
+      "maxLinhas": 303,
+      "responsavel": "frontend",
+      "justificativa": "Item de atividade ainda concentra varios modos de edicao e exibicao.",
+      "criterioRemocao": "Extrair acoes inline e blocos condicionais do item."
+    },
+    {
+      "arquivo": "frontend/src/utils/apiError.ts",
+      "camada": "utils",
+      "maxLinhas": 175,
+      "responsavel": "frontend",
+      "justificativa": "Utilitario central ainda combina classificacao e formatacao de erro.",
+      "criterioRemocao": "Separar mapeamento de erro HTTP da formatacao para UI."
+    },
+    {
+      "arquivo": "frontend/src/stores/mapas.ts",
+      "camada": "store",
+      "maxLinhas": 184,
+      "responsavel": "frontend",
+      "justificativa": "Store ainda agrega estado, carga e invalidacao do mapa.",
+      "criterioRemocao": "Separar leitura de mapa completo das operacoes derivadas."
+    },
+    {
+      "arquivo": "frontend/src/services/processoService.ts",
+      "camada": "service",
+      "maxLinhas": 194,
+      "responsavel": "frontend",
+      "justificativa": "Service de processo ainda concentra chamadas heterogeneas.",
+      "criterioRemocao": "Fatiar acoes de processo e leituras de contexto."
+    },
+    {
+      "arquivo": "frontend/src/composables/useAcesso.ts",
+      "camada": "composable",
+      "maxLinhas": 189,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda agrega muitos derivados de permissao.",
+      "criterioRemocao": "Separar acesso de cadastro, mapa e acoes em bloco."
+    },
+    {
+      "arquivo": "frontend/src/utils/treeUtils.ts",
+      "camada": "utils",
+      "maxLinhas": 153,
+      "responsavel": "frontend",
+      "justificativa": "Utilitario central da arvore ainda reune transformacoes demais.",
+      "criterioRemocao": "Separar flatten, busca e anotacao da arvore."
+    },
+    {
+      "arquivo": "frontend/src/components/comum/BuscadorUsuarios.vue",
+      "camada": "component",
+      "maxLinhas": 268,
+      "responsavel": "frontend",
+      "justificativa": "Componente ainda mistura busca remota, teclado e dropdown.",
+      "criterioRemocao": "Extrair estado de busca e lista de sugestoes."
+    },
+    {
+      "arquivo": "frontend/src/views/LoginView.vue",
+      "camada": "view",
+      "maxLinhas": 340,
+      "responsavel": "frontend",
+      "justificativa": "Tela ainda concentra etapas, validacao e tratamento de erro do login.",
+      "criterioRemocao": "Separar passo inicial, selecao de perfil e fluxo de erro."
+    },
+    {
+      "arquivo": "frontend/src/utils/dateUtils.ts",
+      "camada": "utils",
+      "maxLinhas": 129,
+      "responsavel": "frontend",
+      "justificativa": "Arquivo central de datas ainda concentra varios formatos e helpers.",
+      "criterioRemocao": "Separar parsing, formatacao e calculos de data."
+    },
+    {
+      "arquivo": "frontend/src/composables/useCadastroAtividadesMutacoes.ts",
+      "camada": "composable",
+      "maxLinhas": 177,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda concentra mutacoes e sincronizacao do cadastro.",
+      "criterioRemocao": "Separar comandos de CRUD e revalidacao local."
+    },
+    {
+      "arquivo": "frontend/src/views/AtribuicaoTemporariaView.vue",
+      "camada": "view",
+      "maxLinhas": 312,
+      "responsavel": "frontend",
+      "justificativa": "Tela ainda agrega busca, formulario e listagem.",
+      "criterioRemocao": "Extrair formulario e listagem da atribuicao temporaria."
+    },
+    {
+      "arquivo": "frontend/src/views/RelatorioAndamentoView.vue",
+      "camada": "view",
+      "maxLinhas": 310,
+      "responsavel": "frontend",
+      "justificativa": "Tela de relatorio ainda combina filtros, tabela e exportacao.",
+      "criterioRemocao": "Separar filtros e apresentacao do relatorio."
+    },
+    {
+      "arquivo": "frontend/src/stores/perfil.ts",
+      "camada": "store",
+      "maxLinhas": 155,
+      "responsavel": "frontend",
+      "justificativa": "Store ainda fica acima do budget mesmo apos a limpeza atual.",
+      "criterioRemocao": "Reduzir fronteira de sessao e mover ponte de unidade atual."
+    },
+    {
+      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
+      "camada": "composable",
+      "maxLinhas": 174,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda concentra fluxo amplo do subprocesso.",
+      "criterioRemocao": "Separar bootstrap, navegacao e mutacoes do subprocesso."
+    },
+    {
+      "arquivo": "frontend/src/components/processo/ModalAcaoBloco.vue",
+      "camada": "component",
+      "maxLinhas": 234,
+      "responsavel": "frontend",
+      "justificativa": "Modal ainda combina variacoes de acoes em bloco.",
+      "criterioRemocao": "Extrair formulario e conteudo especifico de cada acao."
+    },
+    {
+      "arquivo": "frontend/src/components/processo/ProcessoFormFields.vue",
+      "camada": "component",
+      "maxLinhas": 229,
+      "responsavel": "frontend",
+      "justificativa": "Componente de formulario ainda concentra muitos campos e regras.",
+      "criterioRemocao": "Separar campos basicos, unidades e datas do processo."
+    },
+    {
+      "arquivo": "frontend/src/composables/useMapaCompetenciasMutacoes.ts",
+      "camada": "composable",
+      "maxLinhas": 154,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda centraliza mutacoes diferentes do mapa.",
+      "criterioRemocao": "Separar comandos de competencia e conhecimento."
+    },
+    {
+      "arquivo": "frontend/src/views/RelatorioMapasView.vue",
+      "camada": "view",
+      "maxLinhas": 287,
+      "responsavel": "frontend",
+      "justificativa": "Tela de relatorio de mapas ainda concentra filtros e tabela.",
+      "criterioRemocao": "Separar formulario de filtros da apresentacao do resultado."
+    },
+    {
+      "arquivo": "frontend/src/App.vue",
+      "camada": "outro",
+      "maxLinhas": 165,
+      "responsavel": "frontend",
+      "justificativa": "Componente raiz ainda concentra preload de configuracao e sincronias.",
+      "criterioRemocao": "Extrair sincronias transversais do App para composables dedicados."
+    },
+    {
+      "arquivo": "frontend/src/utils/formatters.ts",
+      "camada": "utils",
+      "maxLinhas": 87,
+      "responsavel": "frontend",
+      "justificativa": "Arquivo ainda agrega formatadores diferentes em um unico modulo.",
+      "criterioRemocao": "Separar formatadores numericos, textuais e de unidade."
+    },
+    {
+      "arquivo": "frontend/src/components/processo/SubprocessoCards.vue",
+      "camada": "component",
+      "maxLinhas": 216,
+      "responsavel": "frontend",
+      "justificativa": "Componente ainda concentra card, estado e acoes do subprocesso.",
+      "criterioRemocao": "Extrair card base e acoes contextuais do subprocesso."
+    },
+    {
+      "arquivo": "frontend/src/components/mapa/CriarCompetenciaModal.vue",
+      "camada": "component",
+      "maxLinhas": 208,
+      "responsavel": "frontend",
+      "justificativa": "Modal ainda concentra fluxo completo de criacao de competencia.",
+      "criterioRemocao": "Separar formulario, selecao de atividades e validacao."
+    },
+    {
+      "arquivo": "frontend/src/types/dtos.ts",
+      "camada": "outro",
+      "maxLinhas": 150,
+      "responsavel": "frontend",
+      "justificativa": "Arquivo central de DTOs ainda agrega contratos distintos.",
+      "criterioRemocao": "Separar DTOs por dominio e fluxo."
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/UnidadeTreeNode.vue",
+      "camada": "component",
+      "maxLinhas": 203,
+      "responsavel": "frontend",
+      "justificativa": "Componente ainda combina renderizacao e regra condicional extensa.",
+      "criterioRemocao": "Separar celulas e regras de exibicao da unidade."
+    },
+    {
+      "arquivo": "frontend/src/composables/useBreadcrumbs.ts",
+      "camada": "composable",
+      "maxLinhas": 141,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda mistura varios tipos de breadcrumb em um unico fluxo.",
+      "criterioRemocao": "Separar breadcrumbs de processo, subprocesso e unidade."
+    },
+    {
+      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
+      "camada": "composable",
+      "maxLinhas": 132,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda agrupa mutacoes e controle de sugestoes.",
+      "criterioRemocao": "Separar leitura e apresentacao de sugestoes das mutacoes."
+    },
+    {
+      "arquivo": "frontend/src/components/mapa/CompetenciaCard.vue",
+      "camada": "component",
+      "maxLinhas": 191,
+      "responsavel": "frontend",
+      "justificativa": "Card ainda concentra exibicao e acoes de competencia.",
+      "criterioRemocao": "Extrair acoes do card e secoes de conhecimento."
+    },
+    {
+      "arquivo": "frontend/src/components/comum/InlineEditor.vue",
+      "camada": "component",
+      "maxLinhas": 197,
+      "responsavel": "frontend",
+      "justificativa": "Componente ainda combina modos de edicao e teclado em excesso.",
+      "criterioRemocao": "Separar modo leitura, edicao e confirmacao."
+    },
+    {
+      "arquivo": "frontend/src/services/diagnosticoService.ts",
+      "camada": "service",
+      "maxLinhas": 123,
+      "responsavel": "frontend",
+      "justificativa": "Service ainda fica logo acima do budget inicial.",
+      "criterioRemocao": "Reduzir helper interno e estreitar a API publica."
+    },
+    {
+      "arquivo": "frontend/src/composables/useCadastroRevisaoSemMudancas.ts",
+      "camada": "composable",
+      "maxLinhas": 130,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda concentra fluxo de revisao sem mudancas.",
+      "criterioRemocao": "Extrair confirmacao e comandos de revisao."
+    },
+    {
+      "arquivo": "frontend/src/composables/useFluxoMapa.ts",
+      "camada": "composable",
+      "maxLinhas": 122,
+      "responsavel": "frontend",
+      "justificativa": "Composable ainda fica no limite acima do budget.",
+      "criterioRemocao": "Separar bootstrap do mapa das acoes locais."
+    },
+    {
+      "arquivo": "frontend/src/components/comum/TreeRowItem.vue",
+      "camada": "component",
+      "maxLinhas": 181,
+      "responsavel": "frontend",
+      "justificativa": "Componente ainda excede por pouco o budget do layer.",
+      "criterioRemocao": "Reduzir ramificacoes de renderizacao da linha."
+    }
+  ]
+}

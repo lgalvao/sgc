@@ -15,10 +15,13 @@
     "test": "pnpm run test:unit",
     "test:unit": "vitest --run --reporter=dot --no-color",
     "coverage:unit": "vitest --run --coverage --reporter=dot --no-color",
-    "quality:test": "vitest --run --coverage --reporter=dot --no-color",
-    "quality:lint": "oxlint . && eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist || true",
-    "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict || true",
-    "quality:all": "pnpm run quality:test && pnpm run quality:lint && pnpm run quality:typecheck"
+    "coverage:unit:collect": "vitest --run --coverage --reporter=dot --no-color --coverage.thresholds.lines=0 --coverage.thresholds.functions=0 --coverage.thresholds.statements=0 --coverage.thresholds.branches=0",
+    "cruft:audit": "node ../etc/scripts/sgc.js frontend cruft auditar",
+    "cruft:check": "node ../etc/scripts/sgc.js frontend cruft validar",
+    "quality:test": "pnpm run test:unit",
+    "quality:lint": "oxlint . && eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist",
+    "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
+    "quality:all": "pnpm run quality:test && pnpm run quality:lint && pnpm run quality:typecheck && pnpm run cruft:check"
   },
   "dependencies": {
     "axios": "1.15.1",

@@ -11,6 +11,8 @@
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "sgc": "node etc/scripts/sgc.js",
     "smells:auditar": "node etc/scripts/sgc.js codigo smells auditar",
+    "frontend:cruft": "node etc/scripts/sgc.js frontend cruft auditar",
+    "frontend:cruft:check": "node etc/scripts/sgc.js frontend cruft validar",
     "qa:dashboard": "node etc/scripts/sgc.js qa snapshot coletar --perfil rapido",
     "qa:dashboard:serve": "node etc/scripts/sgc.js qa dashboard servir --porta 4179",
     "lint:ox": "oxlint .",

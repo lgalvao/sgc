@@ -55,6 +55,10 @@ criarComandoScript(frontendMensagens, "analisar", "Analisa o JSON de mensagens e
 const frontendValidacoes = frontend.command("validacoes").description("Auditorias de validacao do frontend.");
 criarComandoScript(frontendValidacoes, "auditar", "Compara validacoes de frontend e backend.", "etc/scripts/frontend/validacoes-auditar.js");
 
+const frontendCruft = frontend.command("cruft").description("Auditorias de cruft e budgets do frontend.");
+criarComandoScript(frontendCruft, "auditar", "Audita cruft estrutural do frontend.", "etc/scripts/frontend/cruft-auditar.js");
+criarComandoScript(frontendCruft, "validar", "Valida budgets e waivers do cruft do frontend.", "etc/scripts/frontend/cruft-validar.js");
+
 const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
 criarComandoScript(frontendViews, "auditar-validacoes", "Audita links e validacoes nas views.", "etc/scripts/frontend/views-auditar-validacoes.js");
 

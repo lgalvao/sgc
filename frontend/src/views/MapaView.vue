@@ -2,97 +2,35 @@
   <LayoutPadrao>
     <CarregamentoPagina v-if="carregandoInicial" />
     <template v-else>
-      <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
-        <template #default>
-          <div class="fs-5" data-testid="subprocesso-header__txt-header-unidade">
-            {{ unidade?.sigla }}
-          </div>
-        </template>
-
-        <template #actions>
-          <div class="d-flex gap-2">
-            <LoadingButton
-                v-if="podeVerSugestoes"
-                :loading="loadingSugestoesVisualizacao"
-                data-testid="btn-mapa-ver-sugestoes"
-                loading-text="Carregando..."
-                text="Ver sugestões"
-                variant="outline-secondary"
-                @click="verSugestoes"
-            >
-              {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
-            </LoadingButton>
-
-            <BButton
-                v-if="codigoSubprocesso"
-                data-testid="btn-mapa-historico"
-                variant="outline-secondary"
-                @click="verHistorico"
-            >
-              {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
-            </BButton>
-
-            <LoadingButton
-                v-if="podeVisualizarImpacto"
-                :loading="loadingImpacto"
-                data-testid="cad-mapa__btn-impactos-mapa"
-                icon="arrow-right-circle"
-                :text="TEXTOS.mapa.BOTAO_IMPACTO"
-                variant="outline-secondary"
-                @click="abrirModalImpacto"
-            />
-
-            <BDropdown
-                v-if="usarMenuAcoesMapa"
-                data-testid="btn-mapa-acoes"
-                :text="TEXTOS.mapa.BOTAO_ACOES"
-                toggle-class="text-nowrap"
-                variant="success"
-            >
-              <BDropdownItemButton
-                  v-if="mostrarApresentarSugestoes"
-                  data-testid="btn-mapa-acao-sugestoes"
-                  :disabled="!habilitarApresentarSugestoes"
-                  @click="abrirModalSugestoes"
-              >
-                {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
-              </BDropdownItemButton>
-              <BDropdownItemButton
-                  v-if="mostrarValidarMapa"
-                  data-testid="btn-mapa-acao-validar"
-                  :disabled="!habilitarValidarMapa"
-                  @click="abrirModalValidar"
-              >
-                {{ TEXTOS.mapa.BOTAO_VALIDAR }}
-              </BDropdownItemButton>
-              <BDropdownItemButton
-                  v-if="mostrarDisponibilizarMapa"
-                  data-testid="btn-mapa-acao-disponibilizar"
-                  :disabled="!habilitarDisponibilizarMapa || loadingDisponibilizacao"
-                  @click="abrirModalDisponibilizar"
-              >
-                {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
-              </BDropdownItemButton>
-              <BDropdownItemButton
-                  v-if="mostrarDevolverMapa"
-                  data-testid="btn-mapa-acao-devolver"
-                  :disabled="!habilitarDevolverMapa"
-                  @click="abrirModalDevolucao"
-              >
-                {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
-              </BDropdownItemButton>
-              <BDropdownItemButton
-                  v-if="mostrarAcaoPrincipalMapa"
-                  data-testid="btn-mapa-acao-homologar-aceite"
-                  :disabled="!habilitarAcaoPrincipalMapa"
-                  @click="abrirModalAceitar"
-              >
-                {{ rotuloAcaoPrincipalMapa }}
-              </BDropdownItemButton>
-            </BDropdown>
-          </div>
-        </template>
-      </PageHeader>
+      <MapaAcoesHeader
+          :codigo-subprocesso="codigoSubprocesso"
+          :habilitar-acao-principal-mapa="habilitarAcaoPrincipalMapa"
+          :habilitar-apresentar-sugestoes="habilitarApresentarSugestoes"
+          :habilitar-devolver-mapa="habilitarDevolverMapa"
+          :habilitar-disponibilizar-mapa="habilitarDisponibilizarMapa"
+          :habilitar-validar-mapa="habilitarValidarMapa"
+          :loading-disponibilizacao="loadingDisponibilizacao"
+          :loading-impacto="loadingImpacto"
+          :loading-sugestoes-visualizacao="loadingSugestoesVisualizacao"
+          :mostrar-acao-principal-mapa="mostrarAcaoPrincipalMapa"
+          :mostrar-apresentar-sugestoes="mostrarApresentarSugestoes"
+          :mostrar-devolver-mapa="mostrarDevolverMapa"
+          :mostrar-disponibilizar-mapa="mostrarDisponibilizarMapa"
+          :mostrar-validar-mapa="mostrarValidarMapa"
+          :pode-ver-sugestoes="podeVerSugestoes"
+          :pode-visualizar-impacto="podeVisualizarImpacto"
+          :rotulo-acao-principal-mapa="rotuloAcaoPrincipalMapa"
+          :unidade="unidade"
+          :usar-menu-acoes-mapa="usarMenuAcoesMapa"
+          @abrir-acao-principal="abrirModalAceitar"
+          @abrir-devolver="abrirModalDevolucao"
+          @abrir-disponibilizar="abrirModalDisponibilizar"
+          @abrir-historico="verHistorico"
+          @abrir-impacto="abrirModalImpacto"
+          @abrir-sugestoes="abrirModalSugestoes"
+          @abrir-validar="abrirModalValidar"
+          @ver-sugestoes="verSugestoes"
+      />
 
       <BAlert
           v-if="erroMapaExibido"
@@ -327,19 +265,11 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BButton,
-  BDropdown,
-  BDropdownItemButton,
-  BFormGroup,
-  BFormInvalidFeedback,
-  BFormTextarea
-} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
-import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import MapaAcoesHeader from "@/components/mapa/MapaAcoesHeader.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import MapaSomenteLeitura from "@/components/mapa/MapaSomenteLeitura.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
@@ -458,7 +388,6 @@ const {
   verSugestoes,
   fecharModalVerSugestoes,
   abrirModalSugestoes,
-  fecharModalSugestoes,
   handleConfirmarSugestoes,
   sincronizarSugestoesMapa,
   carregarSugestoesParaVisualizacao,

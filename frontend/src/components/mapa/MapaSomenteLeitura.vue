@@ -10,14 +10,14 @@
               v-for="competencia in mapa.competencias"
               :key="competencia.codigo"
               class="mb-2 competencia-card"
-              data-testid="cad-mapa__card-competencia"
+              data-testid="mapa-visualizacao__card-competencia"
               no-body
           >
             <BCardHeader>
               <BCardTitle class="fs-5 mb-0">
                 <strong
                     class="competencia-descricao"
-                    data-testid="cad-mapa__txt-competencia-descricao"
+                    data-testid="mapa-visualizacao__txt-competencia-descricao"
                 >{{ competencia.descricao }}</strong>
               </BCardTitle>
             </BCardHeader>

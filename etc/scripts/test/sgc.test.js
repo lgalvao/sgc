@@ -98,6 +98,152 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.frontend_fallback_or).toBe(1);
     });
 
+    test("audita cruft do frontend em um recorte controlado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cruft-auditar-"));
+        const frontendDir = path.join(base, "frontend", "src");
+        const budget = path.join(base, "budget.json");
+
+        await fs.outputJson(budget, {
+            versaoSchema: "1.0.0",
+            camadas: {
+                service: {target: 4, hard: 8},
+                component: {target: 6, hard: 10},
+                outro: {target: 6, hard: 10}
+            },
+            metricas: {
+                maximosProducao: {
+                    anyExplicito: 1,
+                    checksNull: 1,
+                    fallbacksDefensivos: 1,
+                    catchBlocks: 1,
+                    castsDuplos: 0,
+                    storageDireto: 1,
+                    exportsSuspeitos: 1,
+                    arquivosAcimaTargetPorCamada: {
+                        service: 1,
+                        component: 1,
+                        outro: 0
+                    }
+                }
+            }
+        });
+
+        await fs.outputFile(
+            path.join(frontendDir, "services", "exemploService.ts"),
+            [
+                "export function exemploService(valor: any) {",
+                "  if (valor === null) {",
+                "    return valor || [];",
+                "  }",
+                "  return valor;",
+                "}",
+            ].join("\n")
+        );
+        await fs.outputFile(
+            path.join(frontendDir, "components", "ExemploCard.vue"),
+            [
+                "<script setup lang=\"ts\">",
+                "const salvar = () => localStorage.setItem('chave', 'valor');",
+                "</script>",
+                "<template><button @click=\"salvar\">Salvar</button></template>"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "cruft",
+            "auditar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base,
+            "--budget",
+            budget
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.contagens.producao.anyExplicito).toBe(1);
+        expect(conteudo.contagens.producao.checksNull).toBe(1);
+        expect(conteudo.contagens.producao.fallbacksDefensivos).toBe(1);
+        expect(conteudo.contagens.producao.storageDireto).toBe(1);
+        expect(conteudo.contagens.producao.exportsSuspeitos).toBe(1);
+        expect(conteudo.contagens.producao.arquivosAcimaTarget.service).toBe(1);
+    });
+
+    test("valida cruft do frontend com waiver de tamanho", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cruft-validar-"));
+        const frontendDir = path.join(base, "frontend", "src");
+        const budget = path.join(base, "budget.json");
+        const waivers = path.join(base, "waivers.json");
+
+        await fs.outputJson(budget, {
+            versaoSchema: "1.0.0",
+            camadas: {
+                service: {target: 3, hard: 6},
+                outro: {target: 6, hard: 10}
+            },
+            metricas: {
+                maximosProducao: {
+                    anyExplicito: 0,
+                    checksNull: 0,
+                    fallbacksDefensivos: 0,
+                    catchBlocks: 0,
+                    castsDuplos: 0,
+                    storageDireto: 0,
+                    exportsSuspeitos: 2,
+                    arquivosAcimaTargetPorCamada: {
+                        service: 1,
+                        outro: 0
+                    }
+                }
+            }
+        });
+        await fs.outputJson(waivers, {
+            versaoSchema: "1.0.0",
+            waivers: [
+                {
+                    arquivo: "frontend/src/services/exemploService.ts",
+                    camada: "service",
+                    maxLinhas: 6,
+                    responsavel: "teste",
+                    justificativa: "Congelamento de baseline",
+                    criterioRemocao: "Reduzir o arquivo."
+                }
+            ]
+        });
+        await fs.outputFile(
+            path.join(frontendDir, "services", "exemploService.ts"),
+            [
+                "export function exemploService() {",
+                "  return 1;",
+                "}",
+                "export function outro() {",
+                "  return 2;",
+                "}"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "cruft",
+            "validar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base,
+            "--budget",
+            budget,
+            "--waivers",
+            waivers
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.status).toBe("ok");
+        expect(conteudo.violacoes).toEqual([]);
+    });
+
     test("analisa testes do backend com resumo no console e sidecar JSON", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-"));
         const markdown = path.join(diretorioSaida, "relatorio.md");

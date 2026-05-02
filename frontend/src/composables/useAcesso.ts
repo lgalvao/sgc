@@ -1,7 +1,8 @@
 import {computed, type Ref, unref} from 'vue';
-import {type SubprocessoDetalhe, Perfil, TipoProcesso} from '@/types/tipos';
+import {type PermissoesSubprocesso, type SubprocessoDetalhe, Perfil, TipoProcesso} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
 import {usePerfil} from '@/composables/usePerfil';
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
 
 type AcaoPrincipalCadastro = {
     codigo: 'ACEITAR' | 'HOMOLOGAR';
@@ -39,7 +40,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
 
     // Dynamic permission computeds to reduce boilerplate
-    const permissoes = computed(() => getPermissoes() || {} as any);
+    const permissoes = computed<PermissoesSubprocesso>(() => getPermissoes() ?? PERMISSOES_SUBPROCESSO_VAZIAS);
     
     const podeAnalisarCadastro = computed(() => 
         permissoes.value.podeDevolverCadastro || 
