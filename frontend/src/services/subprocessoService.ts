@@ -20,6 +20,8 @@ import type {
 } from "@/types/tipos";
 import apiClient from "../axios-setup";
 
+const CAMINHO_SUBPROCESSOS = "/subprocessos";
+
 interface ImportarAtividadesRequest {
     codSubprocessoOrigem: number;
     codigosAtividades?: number[];
@@ -29,27 +31,27 @@ interface BuscarSubprocessoPorProcessoEUnidadeResponse {
     codigo: number;
 }
 
-interface ContextoEdicaoResponseBackend extends Omit<ContextoEdicaoSubprocesso, "detalhes"> {
-    detalhes: SubprocessoDetalheResponse;
-}
-
-interface ContextoCadastroAtividadesResponseBackend extends Omit<ContextoCadastroAtividadesSubprocesso, "detalhes"> {
+interface ContextoComDetalhesResponse {
     detalhes: SubprocessoDetalheResponse;
 }
 
 interface ImpactoMapaResponse {
     temImpactos: boolean;
-    inseridas?: AtividadeImpactada[];
-    removidas?: AtividadeImpactada[];
-    alteradas?: AtividadeImpactada[];
-    competenciasImpactadas?: CompetenciaImpactada[];
-    totalInseridas?: number;
-    totalRemovidas?: number;
-    totalAlteradas?: number;
-    totalCompetenciasImpactadas?: number;
+    inseridas: AtividadeImpactada[];
+    removidas: AtividadeImpactada[];
+    alteradas: AtividadeImpactada[];
+    competenciasImpactadas: CompetenciaImpactada[];
+    totalInseridas: number;
+    totalRemovidas: number;
+    totalAlteradas: number;
+    totalCompetenciasImpactadas: number;
 }
 
-export function mapSubprocessoDetalheResponseParaModel(dto: SubprocessoDetalheResponse): SubprocessoDetalhe {
+function caminhoSubprocesso(codSubprocesso: number, sufixo = ""): string {
+    return `${CAMINHO_SUBPROCESSOS}/${codSubprocesso}${sufixo}`;
+}
+
+function mapearDetalheSubprocesso(dto: SubprocessoDetalheResponse): SubprocessoDetalhe {
     const subprocesso = dto.subprocesso;
     return {
         codigo: subprocesso.codigo,
@@ -71,6 +73,30 @@ export function mapSubprocessoDetalheResponseParaModel(dto: SubprocessoDetalheRe
     };
 }
 
+function mapearContextoComDetalhes<T extends ContextoComDetalhesResponse>(contexto: T): Omit<T, "detalhes"> & { detalhes: SubprocessoDetalhe } {
+    return {
+        ...contexto,
+        detalhes: mapearDetalheSubprocesso(contexto.detalhes),
+    };
+}
+
+function mapearPayloadCompetencia(competencia: SalvarCompetenciaRequest) {
+    return {
+        descricao: competencia.descricao,
+        atividadesCodigos: competencia.atividadesCodigos,
+    };
+}
+
+async function postarAcaoEmBloco(
+    acao: string,
+    payload: { unidadeCodigos: number[]; dataLimite?: string }
+): Promise<void> {
+    await apiClient.post(`${CAMINHO_SUBPROCESSOS}/${acao}`, {
+        subprocessos: payload.unidadeCodigos,
+        ...(payload.dataLimite ? {dataLimite: payload.dataLimite} : {}),
+    });
+}
+
 export async function importarAtividades(
     codSubprocessoDestino: number,
     codSubprocessoOrigem: number,
@@ -81,24 +107,24 @@ export async function importarAtividades(
         ...(codigosAtividades && codigosAtividades.length > 0 ? {codigosAtividades} : {}),
     };
     const response = await apiClient.post<AtividadeOperacaoResponse>(
-        `/subprocessos/${codSubprocessoDestino}/importar-atividades`,
+        caminhoSubprocesso(codSubprocessoDestino, "/importar-atividades"),
         request,
     );
     return response.data;
 }
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
-    const response = await apiClient.get<ContextoEdicaoSubprocesso>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
+    const response = await apiClient.get<ContextoEdicaoSubprocesso>(caminhoSubprocesso(codSubprocesso, "/contexto-edicao"));
     return response.data.mapa.atividades;
 }
 
 export async function listarAtividadesParaImportacao(codSubprocesso: number): Promise<Atividade[]> {
-    const response = await apiClient.get<Atividade[]>(`/subprocessos/${codSubprocesso}/atividades-importacao`);
+    const response = await apiClient.get<Atividade[]>(caminhoSubprocesso(codSubprocesso, "/atividades-importacao"));
     return response.data;
 }
 
 export async function validarCadastro(codSubprocesso: number): Promise<ValidacaoCadastro> {
-    const response = await apiClient.get<ValidacaoCadastro>(`/subprocessos/${codSubprocesso}/validar-cadastro`);
+    const response = await apiClient.get<ValidacaoCadastro>(caminhoSubprocesso(codSubprocesso, "/validar-cadastro"));
     return response.data;
 }
 
@@ -106,7 +132,7 @@ export async function alterarDataLimiteSubprocesso(
     codSubprocesso: number,
     dados: { novaData: string },
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/data-limite`, {
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/data-limite"), {
         data: dados.novaData,
     });
 }
@@ -115,84 +141,72 @@ export async function reabrirCadastro(
     codSubprocesso: number,
     justificativa: string,
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, {justificativa});
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/reabrir-cadastro"), {justificativa});
 }
 
 export async function reabrirRevisaoCadastro(
     codSubprocesso: number,
     justificativa: string,
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, {justificativa});
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/reabrir-revisao-cadastro"), {justificativa});
 }
 
 export async function obterStatus(codSubprocesso: number): Promise<SubprocessoStatus> {
-    const response = await apiClient.get<SubprocessoStatus>(`/subprocessos/${codSubprocesso}/status`);
+    const response = await apiClient.get<SubprocessoStatus>(caminhoSubprocesso(codSubprocesso, "/status"));
     return response.data;
 }
 
 export async function buscarSubprocessoDetalhe(
     codSubprocesso: number,
 ): Promise<SubprocessoDetalheResponse> {
-    const response = await apiClient.get<SubprocessoDetalheResponse>(`/subprocessos/${codSubprocesso}`);
+    const response = await apiClient.get<SubprocessoDetalheResponse>(caminhoSubprocesso(codSubprocesso));
     return response.data;
 }
 
 export async function buscarContextoEdicao(
     codSubprocesso: number,
 ): Promise<ContextoEdicaoSubprocesso> {
-    const response = await apiClient.get<ContextoEdicaoResponseBackend>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
-    return {
-        ...response.data,
-        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
-    };
+    const response = await apiClient.get<ContextoEdicaoSubprocesso & ContextoComDetalhesResponse>(caminhoSubprocesso(codSubprocesso, "/contexto-edicao"));
+    return mapearContextoComDetalhes(response.data);
 }
 
 export async function buscarContextoEdicaoPorProcessoEUnidade(
     codProcesso: number,
     siglaUnidade: string,
 ): Promise<ContextoEdicaoSubprocesso> {
-    const response = await apiClient.get<ContextoEdicaoResponseBackend>("/subprocessos/contexto-edicao/buscar", {
+    const response = await apiClient.get<ContextoEdicaoSubprocesso & ContextoComDetalhesResponse>(`${CAMINHO_SUBPROCESSOS}/contexto-edicao/buscar`, {
         params: {codProcesso, siglaUnidade},
     });
-    return {
-        ...response.data,
-        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
-    };
+    return mapearContextoComDetalhes(response.data);
 }
 
 export async function buscarContextoCadastroAtividades(
     codSubprocesso: number,
 ): Promise<ContextoCadastroAtividadesSubprocesso> {
-    const response = await apiClient.get<ContextoCadastroAtividadesResponseBackend>(
-        `/subprocessos/${codSubprocesso}/contexto-cadastro-atividades`,
+    const response = await apiClient.get<ContextoCadastroAtividadesSubprocesso & ContextoComDetalhesResponse>(
+        caminhoSubprocesso(codSubprocesso, "/contexto-cadastro-atividades"),
     );
-    return {
-        ...response.data,
-        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
-    };
+    return mapearContextoComDetalhes(response.data);
 }
 
 export async function buscarContextoCadastroAtividadesPorProcessoEUnidade(
     codProcesso: number,
     siglaUnidade: string,
 ): Promise<ContextoCadastroAtividadesSubprocesso> {
-    const response = await apiClient.get<ContextoCadastroAtividadesResponseBackend>(
-        "/subprocessos/contexto-cadastro-atividades/buscar",
+    const response = await apiClient.get<ContextoCadastroAtividadesSubprocesso & ContextoComDetalhesResponse>(
+        `${CAMINHO_SUBPROCESSOS}/contexto-cadastro-atividades/buscar`,
         {
             params: {codProcesso, siglaUnidade},
         },
     );
-    return {
-        ...response.data,
-        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
-    };
+    return mapearContextoComDetalhes(response.data);
 }
 
 export async function buscarSubprocessoPorProcessoEUnidade(
     codProcesso: number,
     siglaUnidade: string,
 ): Promise<BuscarSubprocessoPorProcessoEUnidadeResponse> {
-    const response = await apiClient.get<BuscarSubprocessoPorProcessoEUnidadeResponse>("/subprocessos/buscar", {
+    const response = await apiClient.get<BuscarSubprocessoPorProcessoEUnidadeResponse>(`${CAMINHO_SUBPROCESSOS}/buscar`, {
         params: {codProcesso, siglaUnidade},
     });
     return response.data;
@@ -203,38 +217,38 @@ export async function buscarSubprocessoPorProcessoEUnidade(
 export async function obterSugestoesMapa(
     codSubprocesso: number,
 ): Promise<string> {
-    const response = await apiClient.get<{sugestoes: string}>(`/subprocessos/${codSubprocesso}/sugestoes`);
-    return response.data.sugestoes ?? "";
+    const response = await apiClient.get<{sugestoes: string}>(caminhoSubprocesso(codSubprocesso, "/sugestoes"));
+    return response.data.sugestoes;
 }
 
 export async function apresentarSugestoes(
     codSubprocesso: number,
     dados: { sugestoes: string },
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, {
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/apresentar-sugestoes"), {
         texto: dados.sugestoes,
     });
 }
 
 export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
-    const response = await apiClient.get<ImpactoMapaResponse>(`/subprocessos/${codSubprocesso}/impactos-mapa`);
+    const response = await apiClient.get<ImpactoMapaResponse>(caminhoSubprocesso(codSubprocesso, "/impactos-mapa"));
     const data = response.data;
 
     return {
         temImpactos: data.temImpactos,
-        atividadesInseridas: data.inseridas ?? [],
-        atividadesRemovidas: data.removidas ?? [],
-        atividadesAlteradas: data.alteradas ?? [],
-        competenciasImpactadas: data.competenciasImpactadas ?? [],
-        totalAtividadesInseridas: data.totalInseridas ?? 0,
-        totalAtividadesRemovidas: data.totalRemovidas ?? 0,
-        totalAtividadesAlteradas: data.totalAlteradas ?? 0,
-        totalCompetenciasImpactadas: data.totalCompetenciasImpactadas ?? 0
+        atividadesInseridas: data.inseridas,
+        atividadesRemovidas: data.removidas,
+        atividadesAlteradas: data.alteradas,
+        competenciasImpactadas: data.competenciasImpactadas,
+        totalAtividadesInseridas: data.totalInseridas,
+        totalAtividadesRemovidas: data.totalRemovidas,
+        totalAtividadesAlteradas: data.totalAlteradas,
+        totalCompetenciasImpactadas: data.totalCompetenciasImpactadas
     };
 }
 
 export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> {
-    const response = await apiClient.get<MapaCompleto>(`/subprocessos/${codSubprocesso}/mapa-completo`);
+    const response = await apiClient.get<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo"));
     return response.data;
 }
 
@@ -243,14 +257,14 @@ export async function salvarMapaCompleto(
     data: SalvarMapaRequest,
 ): Promise<MapaCompleto> {
     const response = await apiClient.post<MapaCompleto>(
-        `/subprocessos/${codSubprocesso}/mapa-completo`,
+        caminhoSubprocesso(codSubprocesso, "/mapa-completo"),
         data,
     );
     return response.data;
 }
 
 export async function obterMapaAjuste(codSubprocesso: number): Promise<MapaAjuste> {
-    const response = await apiClient.get<MapaAjuste>(`/subprocessos/${codSubprocesso}/mapa-ajuste`);
+    const response = await apiClient.get<MapaAjuste>(caminhoSubprocesso(codSubprocesso, "/mapa-ajuste"));
     return response.data;
 }
 
@@ -259,7 +273,7 @@ export async function salvarMapaAjuste(
     data: SalvarAjustesRequest,
 ): Promise<void> {
     await apiClient.post(
-        `/subprocessos/${codSubprocesso}/mapa-ajuste/atualizar`,
+        caminhoSubprocesso(codSubprocesso, "/mapa-ajuste/atualizar"),
         data,
     );
 }
@@ -268,47 +282,43 @@ export async function disponibilizarMapa(
     codSubprocesso: number,
     data: DisponibilizarMapaRequest,
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-mapa`, data);
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/disponibilizar-mapa"), data);
 }
 
 export async function validarMapa(codSubprocesso: number): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/validar-mapa`);
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/validar-mapa"));
 }
 
 export async function homologarValidacao(
     codSubprocesso: number,
     dados: { texto: string },
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`, dados);
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/homologar-validacao"), dados);
 }
 
 export async function aceitarValidacao(
     codSubprocesso: number,
     dados: { texto: string },
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados);
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/aceitar-validacao"), dados);
 }
 
 export async function devolverValidacao(
     codSubprocesso: number,
     dados: { justificativa: string },
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/devolver-validacao`, dados);
+    await apiClient.post(caminhoSubprocesso(codSubprocesso, "/devolver-validacao"), dados);
 }
 
 export async function adicionarCompetencia(
     codSubprocesso: number,
     competencia: SalvarCompetenciaRequest,
 ): Promise<MapaCompleto> {
-    const requestBody = {
-        descricao: competencia.descricao,
-        atividadesCodigos: competencia.atividadesCodigos,
-    };
-    const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencia`,
-        requestBody,
+    const response = await apiClient.post<MapaCompleto>(
+        caminhoSubprocesso(codSubprocesso, "/competencia"),
+        mapearPayloadCompetencia(competencia),
     );
-    return response.data as MapaCompleto;
+    return response.data;
 }
 
 export async function atualizarCompetencia(
@@ -316,25 +326,21 @@ export async function atualizarCompetencia(
     codCompetencia: number,
     competencia: SalvarCompetenciaRequest,
 ): Promise<MapaCompleto> {
-    const requestBody = {
-        descricao: competencia.descricao,
-        atividadesCodigos: competencia.atividadesCodigos,
-    };
-    const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencia/${codCompetencia}`,
-        requestBody,
+    const response = await apiClient.post<MapaCompleto>(
+        caminhoSubprocesso(codSubprocesso, `/competencia/${codCompetencia}`),
+        mapearPayloadCompetencia(competencia),
     );
-    return response.data as MapaCompleto;
+    return response.data;
 }
 
 export async function removerCompetencia(
     codSubprocesso: number,
     codCompetencia: number,
 ): Promise<MapaCompleto> {
-    const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencia/${codCompetencia}/remover`,
+    const response = await apiClient.post<MapaCompleto>(
+        caminhoSubprocesso(codSubprocesso, `/competencia/${codCompetencia}/remover`),
     );
-    return response.data as MapaCompleto;
+    return response.data;
 }
 
 // Acoes em Bloco
@@ -342,42 +348,31 @@ export async function removerCompetencia(
 export async function aceitarCadastroEmBloco(
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/aceitar-cadastro-bloco`, {
-        subprocessos: payload.unidadeCodigos
-    });
+    await postarAcaoEmBloco("aceitar-cadastro-bloco", payload);
 }
 
 export async function homologarCadastroEmBloco(
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/homologar-cadastro-bloco`, {
-        subprocessos: payload.unidadeCodigos
-    });
+    await postarAcaoEmBloco("homologar-cadastro-bloco", payload);
 }
 
 export async function aceitarValidacaoEmBloco(
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/aceitar-validacao-bloco`, {
-        subprocessos: payload.unidadeCodigos
-    });
+    await postarAcaoEmBloco("aceitar-validacao-bloco", payload);
 }
 
 export async function homologarValidacaoEmBloco(
     payload: { unidadeCodigos: number[] }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/homologar-validacao-bloco`, {
-        subprocessos: payload.unidadeCodigos
-    });
+    await postarAcaoEmBloco("homologar-validacao-bloco", payload);
 }
 
 export async function disponibilizarMapaEmBloco(
     payload: { unidadeCodigos: number[]; dataLimite?: string }
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/disponibilizar-mapa-bloco`, {
-        subprocessos: payload.unidadeCodigos,
-        dataLimite: payload.dataLimite
-    });
+    await postarAcaoEmBloco("disponibilizar-mapa-bloco", payload);
 }
 
 // Analises / Historico
@@ -386,7 +381,7 @@ export const listarAnalisesCadastro = async (
     codSubprocesso: number,
 ): Promise<Analise[]> => {
     const response = await apiClient.get<Analise[]>(
-        `/subprocessos/${codSubprocesso}/historico-cadastro`,
+        caminhoSubprocesso(codSubprocesso, "/historico-cadastro"),
     );
     return response.data;
 };
@@ -394,8 +389,8 @@ export const listarAnalisesCadastro = async (
 export const listarAnalisesValidacao = async (
     codSubprocesso: number,
 ): Promise<Analise[]> => {
-    const response = await apiClient.get(
-        `/subprocessos/${codSubprocesso}/historico-validacao`,
+    const response = await apiClient.get<Analise[]>(
+        caminhoSubprocesso(codSubprocesso, "/historico-validacao"),
     );
-    return response.data as Analise[];
+    return response.data;
 };

@@ -7,10 +7,7 @@
         dismissible
         @dismissed="clearError()"
     >
-      {{ lastError.message }}
-      <div v-if="lastError.details">
-        <small>Detalhes: {{ lastError.details }}</small>
-      </div>
+      {{ lastError }}
     </BAlert>
 
     <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO" />
@@ -41,40 +38,19 @@
 
         <BCard class="mb-4" no-body>
           <BCardBody>
-            <p class="mt-2" data-testid="unidade-titular-info">
-              <strong>{{ TEXTOS.unidade.LABEL_TITULAR }}</strong> {{ unidade.titular ? unidade.titular.nome : TEXTOS.unidade.NAO_INFORMADO }}
-            </p>
-            <p v-if="unidade.titular" class="ms-3 mb-2">
-              <span v-if="unidade.titular.ramal" class="me-3">
-                <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-                {{ unidade.titular.ramal }}
-              </span>
-              <span v-if="unidade.titular.email">
-                <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-                <a
-                    :aria-label="`Enviar e-mail para ${unidade.titular.email}`"
-                    :href="`mailto:${unidade.titular.email}`"
-                >{{ unidade.titular.email }}</a>
-              </span>
-            </p>
-            <template v-if="responsavelExibivel">
-              <p class="mt-2" data-testid="unidade-responsavel-info">
-                <strong>{{ TEXTOS.unidade.LABEL_RESPONSAVEL }}</strong> {{ responsavelExibivel.nome }}
-              </p>
-              <p class="ms-3 mb-0">
-                <span v-if="responsavelExibivel.ramal" class="me-3">
-                  <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-                  {{ responsavelExibivel.ramal }}
-                </span>
-                <span v-if="responsavelExibivel.email">
-                  <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-                  <a
-                      :aria-label="`Enviar e-mail para ${responsavelExibivel.email}`"
-                      :href="`mailto:${responsavelExibivel.email}`"
-                  >{{ responsavelExibivel.email }}</a>
-                </span>
-              </p>
-            </template>
+            <UnidadeContatoInfo
+                :contato="unidade.titular"
+                data-testid="unidade-titular-info"
+                detalhes-class="ms-3 mb-2"
+                :label="TEXTOS.unidade.LABEL_TITULAR"
+                :nome-fallback="TEXTOS.unidade.NAO_INFORMADO"
+            />
+            <UnidadeContatoInfo
+                v-if="responsavelExibivel"
+                :contato="responsavelExibivel"
+                data-testid="unidade-responsavel-info"
+                :label="TEXTOS.unidade.LABEL_RESPONSAVEL"
+            />
           </BCardBody>
         </BCard>
       </div>
@@ -86,7 +62,7 @@
       />
 
       <div
-          v-if="unidade && unidade.filhas && unidade.filhas.length > 0"
+          v-if="temSubordinadas"
           class="mt-5"
       >
         <TreeTable
@@ -104,13 +80,14 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BCardBody} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
-import {computed, onActivated, onMounted, ref, watch} from "vue";
+import {computed, onActivated, ref, watch} from "vue";
 import {useRouter} from "vue-router";
-import type {MapaVigenteReferencia, Unidade, Usuario} from "@/types/tipos";
+import type {MapaVigenteReferencia, Responsavel, Unidade, Usuario} from "@/types/tipos";
 import TreeTable, {type TreeItem} from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import UnidadeContatoInfo from "@/components/unidade/UnidadeContatoInfo.vue";
 import {useUnidadeStore} from "@/stores/unidade";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
@@ -126,7 +103,7 @@ const unidadeStore = useUnidadeStore();
 
 const unidade = ref<Unidade | null>(null);
 const mapaVigente = ref<MapaVigenteReferencia | null>(null);
-const lastError = ref<{message: string; details?: string} | null>(null);
+const lastError = ref<string | null>(null);
 const carregandoPagina = ref(true);
 const carregamentoInicialConcluido = ref(false);
 
@@ -134,11 +111,21 @@ function clearError() {
   lastError.value = null;
 }
 
+function possuiDadosLocaisValidos(): boolean {
+  return unidade.value?.codigo === props.codUnidade
+      && unidadeStore.cacheUnidades.has(props.codUnidade)
+      && unidadeStore.cacheMapasVigentes.has(props.codUnidade)
+      && !lastError.value;
+}
+
+function deveExibirCarregamento(forcar: boolean): boolean {
+  return forcar || !unidadeStore.cacheUnidades.has(props.codUnidade);
+}
+
 async function carregarDados(forcar = false) {
   clearError();
-  
-  const jaTemNoCache = !forcar && unidadeStore.cacheUnidades.has(props.codUnidade);
-  if (!jaTemNoCache) {
+
+  if (deveExibirCarregamento(forcar)) {
     carregandoPagina.value = true;
     unidade.value = null;
     mapaVigente.value = null;
@@ -149,27 +136,17 @@ async function carregarDados(forcar = false) {
       unidadeStore.obterUnidade(props.codUnidade, forcar),
       unidadeStore.obterReferenciaMapaVigente(props.codUnidade, forcar),
     ]);
-    
+
     unidade.value = unidadeResp;
     definirUnidadeAtual(unidade.value);
     mapaVigente.value = mapaResp;
   } catch (error: unknown) {
     const err = error as Error;
-    lastError.value = {message: err.message || TEXTOS.unidade.ERRO_CARREGAR};
+    lastError.value = err.message || TEXTOS.unidade.ERRO_CARREGAR;
     logger.error("Erro ao carregar dados da unidade:", error);
   } finally {
     carregandoPagina.value = false;
   }
-}
-
-function dadosLocaisValidos(): boolean {
-  const possuiUnidadeEmCache = unidadeStore.cacheUnidades.has(props.codUnidade);
-  const possuiMapaVigenteEmCache = unidadeStore.cacheMapasVigentes.has(props.codUnidade);
-
-  return unidade.value?.codigo === props.codUnidade
-      && possuiUnidadeEmCache
-      && possuiMapaVigenteEmCache
-      && !lastError.value;
 }
 
 function irParaCriarAtribuicao() {
@@ -192,32 +169,31 @@ function visualizarMapa() {
   }
 }
 
-onMounted(async () => {
-  await carregarDados();
-  carregamentoInicialConcluido.value = true;
-});
 onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  if (dadosLocaisValidos()) {
+  if (possuiDadosLocaisValidos()) {
     return;
   }
   await carregarDados();
 });
-watch(() => props.codUnidade, () => {
-  void carregarDados();
-});
+watch(
+    () => props.codUnidade,
+    async () => {
+      await carregarDados();
+      carregamentoInicialConcluido.value = true;
+    },
+    {immediate: true}
+);
 
 const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
+const subordinadas = computed(() => unidade.value?.filhas ?? []);
+const temSubordinadas = computed(() => subordinadas.value.length > 0);
 
-const dadosFormatadosSubordinadas = computed(() => {
-  if (!unidade.value || !unidade.value.filhas || unidade.value.filhas.length === 0)
-    return [];
-  return formatarDadosParaArvore(unidade.value.filhas);
-});
+const dadosFormatadosSubordinadas = computed(() => formatarDadosParaArvore(subordinadas.value));
 
-const responsavelExibivel = computed(() => {
+const responsavelExibivel = computed<Usuario | Responsavel | null>(() => {
   const responsavel = unidade.value?.responsavel;
   if (!responsavel || unidade.value?.tipoResponsabilidade === 'TITULAR') {
     return null;
@@ -234,10 +210,8 @@ interface UnidadeFormatada {
 }
 
 function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
-  if (!dados) return [];
-
   return dados.map((item) => {
-    const children = item.filhas ? formatarDadosParaArvore(item.filhas) : [];
+    const children = formatarDadosParaArvore(item.filhas ?? []);
     return {
       codigo: item.codigo,
       nome: item.nome,
