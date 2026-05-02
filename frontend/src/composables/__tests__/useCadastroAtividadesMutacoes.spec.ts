@@ -100,6 +100,17 @@ describe("useCadastroAtividadesMutacoes", () => {
         expect(mostrarModalConfirmacaoRemocao.value).toBe(false);
     });
 
+    it("deve ignorar confirmacao de remocao em andamento", async () => {
+        const {removerAtividade, confirmarRemocao, loadingRemocao} = setup();
+        removerAtividade(1);
+        loadingRemocao.value = true;
+
+        await confirmarRemocao();
+
+        expect(atividadeService.excluirAtividade).not.toHaveBeenCalled();
+        expect(atividadeService.excluirConhecimento).not.toHaveBeenCalled();
+    });
+
     it("deve confirmar remoção de atividade com sucesso", async () => {
         const {removerAtividade, confirmarRemocao, mostrarModalConfirmacaoRemocao} = setup();
         removerAtividade(1);
@@ -160,6 +171,15 @@ describe("useCadastroAtividadesMutacoes", () => {
         await confirmarRemocao();
 
         expect(atividadeService.excluirConhecimento).toHaveBeenCalledWith(1, 50);
+    });
+
+    it("deve ignorar remover conhecimento sem subprocesso", () => {
+        codigoSubprocesso.value = null;
+        const {removerConhecimento, mostrarModalConfirmacaoRemocao} = setup();
+
+        removerConhecimento(1, 50);
+
+        expect(mostrarModalConfirmacaoRemocao.value).toBe(false);
     });
 
     it("deve ignorar remocao sem dados", async () => {

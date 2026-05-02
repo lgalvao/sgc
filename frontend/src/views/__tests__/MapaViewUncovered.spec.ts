@@ -221,18 +221,19 @@ describe("MapaView Uncovered Branches", () => {
         });
         await flushPromises();
         const vm = wrapper.vm as any;
-        vm.codigoSubprocesso = 123;
+        const ex = vm.$.exposed as any;
+        ex.codigoSubprocesso.value = 123;
 
         // 1. Caso de erro no disponibilizar
         const fluxo = useFluxoMapa();
         vi.mocked(fluxo.disponibilizarMapa).mockRejectedValue(new Error("Erro"));
-        await vm.disponibilizarMapa({dataLimite: "2024-01-01", observacoes: ""});
+        await ex.disponibilizarMapa({dataLimite: "2024-01-01", observacoes: ""});
         expect(vm.loadingDisponibilizacao).toBe(false);
 
         // 2. abrirModalDisponibilizar com erro de validação (sem competências)
         const mapasStore = useMapas();
         mapasStore.mapaCompleto.value = { competencias: [] } as any;
-        vm.abrirModalDisponibilizar();
+        ex.abrirModalDisponibilizar();
         expect(vm.erroValidacaoMapa).toContain("competência");
     });
 
@@ -245,32 +246,33 @@ describe("MapaView Uncovered Branches", () => {
 
         const mapasStore = useMapas();
         const vm = wrapper.vm as any;
+        const ex = vm.$.exposed as any;
 
         mapasStore.mapaCompleto.value = {competencias: [], atividades: []} as any;
-        expect(vm.obterMensagemErroChecklistDisponibilizacao()).toContain("competência");
-        vm.abrirModalDisponibilizar();
+        expect(ex.obterMensagemErroChecklistDisponibilizacao()).toContain("competência");
+        ex.abrirModalDisponibilizar();
         expect(vm.mostrarModalDisponibilizar).toBe(false);
 
         mapasStore.mapaCompleto.value = {
             competencias: [{codigo: 1, descricao: "Comp 1", atividades: []}],
             atividades: []
         } as any;
-        expect(vm.obterMensagemErroChecklistDisponibilizacao()).toContain("atividade");
+        expect(ex.obterMensagemErroChecklistDisponibilizacao()).toContain("atividade");
 
         mapasStore.mapaCompleto.value = {
             competencias: [{codigo: 1, descricao: "Comp 1", atividades: [{codigo: 10}]}],
             atividades: [{codigo: 10}, {codigo: 20}]
         } as any;
-        expect(vm.obterMensagemErroChecklistDisponibilizacao()).toContain("competência");
+        expect(ex.obterMensagemErroChecklistDisponibilizacao()).toContain("competência");
 
         mapasStore.mapaCompleto.value = {
             competencias: [{codigo: 1, descricao: "Comp 1", atividades: [{codigo: 10}]}],
             atividades: [{codigo: 10}]
         } as any;
-        vm.abrirModalDisponibilizar();
+        ex.abrirModalDisponibilizar();
         expect(vm.erroValidacaoMapa).toBe("");
         expect(vm.mostrarModalDisponibilizar).toBe(true);
-        vm.fecharModalDisponibilizar();
+        ex.fecharModalDisponibilizar();
         expect(vm.mostrarModalDisponibilizar).toBe(false);
     });
 
@@ -282,31 +284,32 @@ describe("MapaView Uncovered Branches", () => {
         await flushPromises();
 
         const vm = wrapper.vm as any;
-        vm.abrirModalAceitar();
+        const ex = vm.$.exposed as any;
+        ex.abrirModalAceitar();
         expect(vm.mostrarModalAceitar).toBe(true);
-        vm.fecharModalAceitar();
+        ex.fecharModalAceitar();
         expect(vm.mostrarModalAceitar).toBe(false);
 
-        vm.abrirModalValidar();
+        ex.abrirModalValidar();
         expect(vm.mostrarModalValidar).toBe(true);
-        vm.fecharModalValidar();
+        ex.fecharModalValidar();
         expect(vm.mostrarModalValidar).toBe(false);
 
-        vm.abrirModalDevolucao();
+        ex.abrirModalDevolucao();
         expect(vm.mostrarModalDevolucao).toBe(true);
-        vm.fecharModalDevolucao();
+        ex.fecharModalDevolucao();
         expect(vm.mostrarModalDevolucao).toBe(false);
 
         vm.mostrarModalHistorico = true;
-        vm.fecharModalHistorico();
+        ex.fecharModalHistorico();
         expect(vm.mostrarModalHistorico).toBe(false);
 
         vm.mostrarModalVerSugestoes = true;
-        vm.fecharModalVerSugestoes();
+        ex.fecharModalVerSugestoes();
         expect(vm.mostrarModalVerSugestoes).toBe(false);
 
         vi.mocked(subprocessoService.obterSugestoesMapa).mockRejectedValueOnce(new Error("Falha"));
-        await vm.verSugestoes();
+        await ex.verSugestoes();
     });
 
     it("cobre handleConfirmarSugestoes e verSugestoes", async () => {
@@ -316,13 +319,14 @@ describe("MapaView Uncovered Branches", () => {
         });
         await flushPromises();
         const vm = wrapper.vm as any;
-        vm.codigoSubprocesso = 123;
-        vm.sugestoes = "Novas sugestões";
+        const ex = vm.$.exposed as any;
+        ex.codigoSubprocesso.value = 123;
+        ex.sugestoes.value = "Novas sugestões";
 
-        await vm.handleConfirmarSugestoes();
+        await ex.handleConfirmarSugestoes();
         expect(vm.mostrarModalSugestoes).toBe(false);
 
-        await vm.verSugestoes();
+        await ex.verSugestoes();
     });
 
     it("cobre sincronizacao do mapa e carregamento de sugestoes direto", async () => {
@@ -333,16 +337,17 @@ describe("MapaView Uncovered Branches", () => {
         await flushPromises();
 
         const vm = wrapper.vm as any;
+        const ex = vm.$.exposed as any;
         const mapasStore = useMapas();
 
-        vm.sincronizarMapa({codigo: 9, competencias: []});
+        ex.sincronizarMapa({codigo: 9, competencias: []});
         expect(mapasStore.mapaCompleto.value).toBeDefined();
 
         vi.mocked(subprocessoService.obterSugestoesMapa).mockRejectedValueOnce(new Error("Falha"));
-        await vm.carregarSugestoesParaVisualizacao();
+        await ex.carregarSugestoesParaVisualizacao();
 
         vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValueOnce("Texto");
-        await vm.carregarSugestoesParaEdicao();
+        await ex.carregarSugestoesParaEdicao();
     });
 
     it("cobre fluxos de validação, devolução e histórico", async () => {

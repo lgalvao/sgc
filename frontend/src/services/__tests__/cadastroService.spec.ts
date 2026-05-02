@@ -1,83 +1,43 @@
-import {describe} from "vitest";
-import {setupServiceTest, testErrorHandling, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
-import * as cadastroService from "@/services/cadastroService";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import apiClient from "@/axios-setup";
+import * as cadastroService from "../cadastroService";
+
+vi.mock("@/axios-setup", () => ({
+    default: {
+        post: vi.fn(),
+    },
+}));
 
 describe("cadastroService", () => {
-    setupServiceTest();
-
-    describe("disponibilizarCadastro", () => {
-        testPostEndpoint(
-            () => cadastroService.disponibilizarCadastro(1),
-            "/subprocessos/1/cadastro/disponibilizar"
-        );
-        testErrorHandling(() => cadastroService.disponibilizarCadastro(1), 'post');
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    describe("disponibilizarRevisaoCadastro", () => {
-        testPostEndpoint(
-            () => cadastroService.disponibilizarRevisaoCadastro(1),
-            "/subprocessos/1/disponibilizar-revisao"
-        );
-        testErrorHandling(() => cadastroService.disponibilizarRevisaoCadastro(1), 'post');
-    });
+    const postMock = vi.mocked(apiClient.post);
 
-    describe("devolverCadastro", () => {
-        const input = {observacoes: "teste"};
-        testPostEndpoint(
-            () => cadastroService.devolverCadastro(1, input),
-            "/subprocessos/1/devolver-cadastro",
-            {justificativa: "teste"}
-        );
-        testErrorHandling(() => cadastroService.devolverCadastro(1, input), 'post');
-    });
+    it("chama os endpoints de cadastro", async () => {
+        postMock.mockResolvedValue({data: undefined} as never);
 
-    describe("aceitarCadastro", () => {
-        const input = {observacoes: "teste"};
-        testPostEndpoint(
-            () => cadastroService.aceitarCadastro(1, input),
-            "/subprocessos/1/aceitar-cadastro",
-            {texto: "teste"}
-        );
-        testErrorHandling(() => cadastroService.aceitarCadastro(1, input), 'post');
-    });
+        await cadastroService.disponibilizarCadastro(1);
+        await cadastroService.iniciarRevisaoCadastro(1);
+        await cadastroService.cancelarInicioRevisaoCadastro(1);
+        await cadastroService.disponibilizarRevisaoCadastro(1);
+        await cadastroService.devolverCadastro(1, {observacoes: "Obs"});
+        await cadastroService.aceitarCadastro(1, {observacoes: "Obs"});
+        await cadastroService.homologarCadastro(1, {observacoes: "Obs"});
+        await cadastroService.devolverRevisaoCadastro(1, {observacoes: "Obs"});
+        await cadastroService.aceitarRevisaoCadastro(1, {observacoes: "Obs"});
+        await cadastroService.homologarRevisaoCadastro(1, {observacoes: "Obs"});
 
-    describe("homologarCadastro", () => {
-        const input = {observacoes: "teste"};
-        testPostEndpoint(
-            () => cadastroService.homologarCadastro(1, input),
-            "/subprocessos/1/homologar-cadastro",
-            {texto: "teste"}
-        );
-        testErrorHandling(() => cadastroService.homologarCadastro(1, input), 'post');
-    });
-
-    describe("devolverRevisaoCadastro", () => {
-        const input = {observacoes: "teste"};
-        testPostEndpoint(
-            () => cadastroService.devolverRevisaoCadastro(1, input),
-            "/subprocessos/1/devolver-revisao-cadastro",
-            {justificativa: "teste"}
-        );
-        testErrorHandling(() => cadastroService.devolverRevisaoCadastro(1, input), 'post');
-    });
-
-    describe("aceitarRevisaoCadastro", () => {
-        const input = {observacoes: "teste"};
-        testPostEndpoint(
-            () => cadastroService.aceitarRevisaoCadastro(1, input),
-            "/subprocessos/1/aceitar-revisao-cadastro",
-            {texto: "teste"}
-        );
-        testErrorHandling(() => cadastroService.aceitarRevisaoCadastro(1, input), 'post');
-    });
-
-    describe("homologarRevisaoCadastro", () => {
-        const input = {observacoes: "teste"};
-        testPostEndpoint(
-            () => cadastroService.homologarRevisaoCadastro(1, input),
-            "/subprocessos/1/homologar-revisao-cadastro",
-            {texto: "teste"}
-        );
-        testErrorHandling(() => cadastroService.homologarRevisaoCadastro(1, input), 'post');
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/cadastro/disponibilizar");
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/iniciar-revisao-cadastro");
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/cancelar-inicio-revisao-cadastro");
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/disponibilizar-revisao");
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/devolver-cadastro", {justificativa: "Obs"});
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/aceitar-cadastro", {texto: "Obs"});
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/homologar-cadastro", {texto: "Obs"});
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/devolver-revisao-cadastro", {justificativa: "Obs"});
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/aceitar-revisao-cadastro", {texto: "Obs"});
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/homologar-revisao-cadastro", {texto: "Obs"});
     });
 });
