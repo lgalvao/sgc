@@ -5,6 +5,7 @@ import {ref} from "vue";
 import * as analiseService from "@/services/analiseService";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as useAcessoModule from "@/composables/useAcesso";
+import * as useMapasModule from "@/composables/useMapas";
 import MapaView from "../MapaView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -144,6 +145,36 @@ describe("MapaView somente leitura", () => {
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
         vi.mocked(subprocessoService.apresentarSugestoes).mockResolvedValue(undefined as never);
 
+        const mapaMock = {
+            codigo: 10,
+            competencias: [
+                {
+                    codigo: 1,
+                    descricao: "Competencia 1",
+                    atividades: [
+                        {
+                            codigo: 2,
+                            descricao: "Atividade 1",
+                            conhecimentos: [{codigo: 3, descricao: "Conhecimento 1"}],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        vi.spyOn(useMapasModule, 'useMapas').mockReturnValue({
+            mapaCompleto: ref(mapaMock),
+            impactoMapa: ref(null),
+            carregando: ref(false),
+            erro: ref(null),
+            definirMapaCompleto: vi.fn(),
+            definirImpactoMapa: vi.fn(),
+            invalidar: vi.fn(),
+            invalidarImpacto: vi.fn(),
+            buscarMapaCompleto: vi.fn(),
+            buscarImpactoMapa: vi.fn(),
+        } as any);
+
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarImpacto: ref(false),
             podeApresentarSugestoes: ref(true),
@@ -172,34 +203,9 @@ describe("MapaView somente leitura", () => {
     });
 
     function mountComponent(initialState?: Record<string, unknown>) {
-        const piniaState = initialState || {};
-        const mapaMock = {
-            codigo: 10,
-            competencias: [
-                {
-                    codigo: 1,
-                    descricao: "Competencia 1",
-                    atividades: [
-                        {
-                            codigo: 2,
-                            descricao: "Atividade 1",
-                            conhecimentos: [{codigo: 3, descricao: "Conhecimento 1"}],
-                        },
-                    ],
-                },
-            ],
-        };
-
-        if (!piniaState.mapas) {
-            (piniaState as any).mapas = {
-                mapaCompleto: mapaMock,
-                cacheMapaCompleto: new Map([[123, mapaMock]])
-            };
-        }
-
         return mount(MapaView, {
             global: {
-                plugins: [createTestingPinia({stubActions: true, initialState: piniaState})],
+                plugins: [createTestingPinia({stubActions: true, initialState})],
                 stubs,
             },
             props: {
