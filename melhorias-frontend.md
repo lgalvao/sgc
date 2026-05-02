@@ -4,18 +4,7 @@ Arquivo reduzido ao backlog real que ainda está pendente no checkout atual.
 
 ## Pendências principais
 
-### 1. Política de cache e invalidação ainda não está formalizada
-
-A base foi estabilizada: `processo`, `subprocesso`, `painel`, `historico`, `unidade` e parte das views já trabalham melhor com validade explícita. Ainda falta fechar a política como regra simples e uniforme.
-
-Pendências:
-
-- definir a política por recurso: `painel`, `historico`, `processo`, `subprocesso`, `mapa`, `unidade`, `organizacao`;
-- documentar para cada recurso: escopo, chave, TTL ou invalidação explícita, e se a tela deve fazer refresh local ou esperar reativação;
-- fechar os fluxos adjacentes de `unidade` e `organizacao` com a mesma semântica;
-- decidir se `historico` continua sem TTL ou se deve seguir política parecida com `painel`.
-
-### 2. `MapaView` ainda tem carregamento sobreposto em modo somente leitura
+### 1. `MapaView` ainda tem carregamento sobreposto em modo somente leitura
 
 `useMapaOrquestracao.ts` ainda pode carregar contexto com mapa e depois buscar `mapa-visualizacao`.
 
@@ -26,7 +15,7 @@ Pendências:
 - se a leitura exigir payload próprio, explicitar isso no contrato e evitar carregar mapa completo no caminho de leitura;
 - medir antes/depois com monitoramento.
 
-### 3. `MapaView` ainda concentra o fluxo de sugestões
+### 2. `MapaView` ainda concentra o fluxo de sugestões
 
 As mutações de competências já saíram da view. O bloco de sugestões ainda está embutido nela.
 
@@ -36,7 +25,7 @@ Pendências:
 - manter retorno explícito do fluxo, sem esconder atualização em store por dentro;
 - reduzir `defineExpose` conforme os testes deixarem de depender de detalhe interno.
 
-### 4. Regra de domínio ainda vaza no mapper do frontend
+### 3. Regra de domínio ainda vaza no mapper do frontend
 
 `frontend/src/services/subprocessoService.ts` ainda faz `etapaAtual ?? 1`.
 
@@ -46,7 +35,7 @@ Pendências:
 - remover o fallback do frontend quando o backend devolver o campo corretamente;
 - revisar outros defaults silenciosos no mapper.
 
-### 5. Contratos frouxos e defensividade excessiva
+### 4. Contratos frouxos e defensividade excessiva
 
 Ainda há mistura de `null`, `false`, estado em store e toast como formas de erro, além de alguns `casts` em fronteiras de API.
 
@@ -56,7 +45,7 @@ Pendências:
 - priorizar correção de fronteiras com `as unknown` em services/stores;
 - evitar retorno silencioso de lista vazia quando isso muda o significado da tela.
 
-### 6. `useAcesso.ts` continua grande demais
+### 5. `useAcesso.ts` continua grande demais
 
 Ainda concentra permissões, habilitações e visibilidade de vários domínios.
 
@@ -66,7 +55,7 @@ Pendências:
 - preferir consumir ações prontas vindas do backend quando já existirem no payload;
 - evitar rederivar regra de negócio no frontend.
 
-### 7. Relatórios e importação ainda podem justificar payload agregado
+### 6. Relatórios e importação ainda podem justificar payload agregado
 
 `RelatorioMapasView.vue` e `ImportarAtividadesModal.vue` ainda são candidatos a reduzir coreografia de chamadas.
 
@@ -76,7 +65,7 @@ Pendências:
 - só criar endpoint agregado se a repetição estiver comprovada;
 - remover etapas intermediárias no frontend apenas depois do contrato novo existir.
 
-### 8. Organização de testes ainda reflete acúmulo histórico
+### 7. Organização de testes ainda reflete acúmulo histórico
 
 Ainda existem testes duplicados por localização e arquivos `Coverage`/`Uncovered` que já não representam mais uma fase transitória clara.
 
@@ -88,8 +77,7 @@ Pendências:
 
 ## Ordem prática
 
-1. Fechar a política de validade/invalidação para `organizacao` e `mapas`.
-2. Medir `MapaView` em modo somente leitura.
-3. Extrair `useMapaSugestoes`.
-4. Remover `etapaAtual ?? 1`.
-5. Consolidar testes duplicados quando essas superfícies estabilizarem.
+1. Medir `MapaView` em modo somente leitura.
+2. Extrair `useMapaSugestoes`.
+3. Remover `etapaAtual ?? 1`.
+4. Consolidar testes duplicados quando essas superfícies estabilizarem.
