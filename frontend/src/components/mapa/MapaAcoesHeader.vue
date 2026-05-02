@@ -29,6 +29,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  unidade: null,
+  codigoSubprocesso: null,
   podeVerSugestoes: false,
   loadingSugestoesVisualizacao: false,
   podeVisualizarImpacto: false,

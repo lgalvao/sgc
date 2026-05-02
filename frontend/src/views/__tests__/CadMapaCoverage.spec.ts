@@ -17,7 +17,6 @@ type MapaViewVm = {
     abrirModalImpacto: () => Promise<void>;
     fecharModalImpacto: () => void;
     removerAtividadeAssociada: (codigoCompetencia: number, codigoAtividade: number) => Promise<void> | void;
-    handleErrors: (store: {lastError?: {erros?: Array<{campo?: string; mensagem?: string}>}}) => Promise<void>;
     disponibilizarMapa: (payload: Record<string, unknown>) => Promise<void>;
     fecharModalDisponibilizar: () => void;
 };
@@ -279,30 +278,6 @@ describe('MapaView Coverage', () => {
         vm.fecharModalImpacto();
 
         expect(vm.mostrarModalImpacto).toBe(false);
-    });
-
-    it('handleErrors covers activitiesIds branch', async () => {
-        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
-        const wrapper = mount(MapaView, {
-            global: {
-                plugins: [pinia],
-                stubs: commonStubs
-            },
-            props: {
-                codProcesso: 1,
-                sigla: "TESTE"
-            }
-        });
-
-        const store = {
-            lastError: {
-                erros: [{campo: 'atividadesCodigos', mensagem: 'Erro em atividade'}]
-            }
-        };
-
-        const vm = wrapper.vm as unknown as MapaViewVm;
-        await vm.handleErrors(store);
-        expect(vm.fieldErrors.atividades).toBe('Erro em atividade');
     });
 
     it('disponibilizarMapa returns early if codSubprocesso is null', async () => {

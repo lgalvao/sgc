@@ -66,7 +66,6 @@ type CadastroViewVm = {
     processarRespostaLocal: (payload: {atividadesAtualizadas?: unknown[]}) => void;
     notify: (mensagem: string, variante: string) => void;
     carregarContextoInicial: () => Promise<void>;
-    timeoutLimpezaErros: () => void;
     $nextTick: () => Promise<void>;
 };
 
@@ -903,9 +902,6 @@ describe("CadastroView.vue", () => {
 
         // Branches de timeout e outros
 
-        vm.timeoutLimparErros = setTimeout(() => {}, 100);
-        vm.timeoutLimpezaErros();
-        
         // Cobre ramo sem contexto agregado
         subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(null);
         await vm.carregarContextoInicial();

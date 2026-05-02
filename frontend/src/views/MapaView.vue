@@ -137,14 +137,14 @@
           @fechar-impacto="fecharModalImpacto"
           @fechar-ver-sugestoes="fecharModalVerSugestoes"
           @salvar-competencia="adicionarCompetenciaEFecharModal"
-          @update:mostrarModalDevolucao="mostrarModalDevolucao = $event"
-          @update:mostrarModalExcluirCompetencia="mostrarModalExcluirCompetencia = $event"
-          @update:mostrarModalSugestoes="mostrarModalSugestoes = $event"
-          @update:mostrarModalValidar="mostrarModalValidar = $event"
-          @update:mostrarModalVerSugestoes="mostrarModalVerSugestoes = $event"
-          @update:observacaoDevolucao="observacaoDevolucao = $event"
+          @update:mostrar-modal-devolucao="mostrarModalDevolucao = $event"
+          @update:mostrar-modal-excluir-competencia="mostrarModalExcluirCompetencia = $event"
+          @update:mostrar-modal-sugestoes="mostrarModalSugestoes = $event"
+          @update:mostrar-modal-validar="mostrarModalValidar = $event"
+          @update:mostrar-modal-ver-sugestoes="mostrarModalVerSugestoes = $event"
+          @update:observacao-devolucao="observacaoDevolucao = $event"
           @update:sugestoes="sugestoes = $event"
-          @update:sugestoesVisualizacao="sugestoesVisualizacao = $event"
+          @update:sugestoes-visualizacao="sugestoesVisualizacao = $event"
       />
     </template>
   </LayoutPadrao>
@@ -273,10 +273,7 @@ const {
   verSugestoes,
   fecharModalVerSugestoes,
   abrirModalSugestoes,
-  handleConfirmarSugestoes,
-  sincronizarSugestoesMapa,
-  carregarSugestoesParaVisualizacao,
-  carregarSugestoesParaEdicao
+  handleConfirmarSugestoes
 } = useMapaSugestoes({
   codigoSubprocesso,
   notify,
@@ -483,10 +480,6 @@ function aplicarErroNormalizado(error: ReturnType<typeof normalizeError> | null)
   sincronizarErrosAtividades();
 }
 
-function handleErrors(store: { lastError: unknown }) {
-  aplicarErroNormalizado(store.lastError as ReturnType<typeof normalizeError> | null);
-}
-
 const {
   competenciaSendoEditada,
   mostrarModalCriarNovaCompetencia,
@@ -501,7 +494,6 @@ const {
   excluirCompetencia,
   confirmarExclusaoCompetencia,
   removerAtividadeAssociada,
-  fecharModalExcluirCompetencia,
 } = useMapaCompetenciasMutacoes({
   codigoSubprocesso,
   competencias,

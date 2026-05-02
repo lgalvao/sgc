@@ -18,7 +18,7 @@ interface Props {
   mostrarModalExcluirCompetencia: boolean;
   loadingExclusao: boolean;
   competenciaParaExcluir: Competencia | null;
-  carregandoFluxoMapa: boolean;
+  carregandoFluxoMapa?: boolean;
   homologacao: boolean;
   mostrarModalAceitar: boolean;
   mostrarModalVerSugestoes: boolean;
@@ -40,7 +40,12 @@ interface Props {
   mostrarModalHistorico: boolean;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  carregandoFluxoMapa: false,
+  ultimaDataLimiteSubprocesso: null,
+  codigoSubprocesso: null,
+  impactos: null,
+});
 
 defineEmits<{
   (e: "fechar-criar-competencia"): void;
@@ -87,7 +92,7 @@ defineEmits<{
       @fechar-criar-competencia="$emit('fechar-criar-competencia')"
       @fechar-disponibilizar="$emit('fechar-disponibilizar')"
       @salvar-competencia="$emit('salvar-competencia', $event)"
-      @update:mostrarModalExcluirCompetencia="$emit('update:mostrarModalExcluirCompetencia', $event)"
+      @update:mostrar-modal-excluir-competencia="$emit('update:mostrarModalExcluirCompetencia', $event)"
   />
 
   <MapaAnaliseModais
@@ -110,9 +115,9 @@ defineEmits<{
       @fechar-aceite="$emit('fechar-aceite')"
       @fechar-historico="$emit('fechar-historico')"
       @fechar-impacto="$emit('fechar-impacto')"
-      @update:mostrarModalDevolucao="$emit('update:mostrarModalDevolucao', $event)"
-      @update:mostrarModalValidar="$emit('update:mostrarModalValidar', $event)"
-      @update:observacaoDevolucao="$emit('update:observacaoDevolucao', $event)"
+      @update:mostrar-modal-devolucao="$emit('update:mostrarModalDevolucao', $event)"
+      @update:mostrar-modal-validar="$emit('update:mostrarModalValidar', $event)"
+      @update:observacao-devolucao="$emit('update:observacaoDevolucao', $event)"
   />
 
   <MapaSugestoesModais
@@ -125,9 +130,9 @@ defineEmits<{
       :sugestoes-visualizacao="sugestoesVisualizacao"
       @confirmar-sugestoes="$emit('confirmar-sugestoes')"
       @fechar-ver-sugestoes="$emit('fechar-ver-sugestoes')"
-      @update:mostrarModalSugestoes="$emit('update:mostrarModalSugestoes', $event)"
-      @update:mostrarModalVerSugestoes="$emit('update:mostrarModalVerSugestoes', $event)"
+      @update:mostrar-modal-sugestoes="$emit('update:mostrarModalSugestoes', $event)"
+      @update:mostrar-modal-ver-sugestoes="$emit('update:mostrarModalVerSugestoes', $event)"
       @update:sugestoes="$emit('update:sugestoes', $event)"
-      @update:sugestoesVisualizacao="$emit('update:sugestoesVisualizacao', $event)"
+      @update:sugestoes-visualizacao="$emit('update:sugestoesVisualizacao', $event)"
   />
 </template>
