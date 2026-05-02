@@ -34,14 +34,6 @@
       "criterioRemocao": "Dividir textos por modulo ou fluxo principal."
     },
     {
-      "arquivo": "frontend/src/services/subprocessoService.ts",
-      "camada": "service",
-      "maxLinhas": 397,
-      "responsavel": "frontend",
-      "justificativa": "Service central ainda concentra muitos endpoints legitimos.",
-      "criterioRemocao": "Separar leituras, mapa, cadastro e acoes em fronteiras menores."
-    },
-    {
       "arquivo": "frontend/src/components/unidade/ArvoreUnidades.vue",
       "camada": "component",
       "maxLinhas": 471,

@@ -176,6 +176,7 @@ import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
+import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
 import logger from "@/utils/logger";
 import {normalizeError} from "@/utils/apiError";
 import {Perfil} from "@/types/tipos";
@@ -403,15 +404,9 @@ async function executarComSubprocesso(
   await callback(codSubp);
 }
 
-function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
-  const codSubprocessoAtual = codigoSubprocesso.value;
-  if (mapaAtualizado && codSubprocessoAtual) {
-    mapasStore.definirMapaCompleto(codSubprocessoAtual, mapaAtualizado);
-    if (subprocessoStore.contextoEdicao?.detalhes.codigo === codSubprocessoAtual) {
-      subprocessoStore.contextoEdicao.mapa = mapaAtualizado;
-    }
-  }
-}
+const contextoEdicaoAtual = computed(() => subprocessoStore.contextoEdicao);
+const sincronizarMapaStore = (mapaAtualizado: MapaCompleto | null | undefined) =>
+    sincronizarMapaContexto(mapaAtualizado, codigoSubprocesso.value, mapasStore.definirMapaCompleto, contextoEdicaoAtual);
 
 onMounted(async () => {
   const sucesso = await carregarContextoInicial();
@@ -443,20 +438,6 @@ const existeCompetenciaSemAtividade = computed(() => {
   return competencias.value.some((competencia) => (competencia.atividades?.length ?? 0) === 0);
 });
 
-const associacoesMapaValidas = computed(() => {
-  return !existeCompetenciaSemAtividade.value && atividadesSemCompetencia.value.length === 0;
-});
-
-const podeConfirmarDisponibilizacao = computed(() => {
-  return (
-      competencias.value.length > 0
-      && associacoesMapaValidas.value
-  );
-});
-const notificacaoDisponibilizacao = ref("");
-const erroValidacaoMapa = ref("");
-const loadingDisponibilizacao = ref(false);
-
 const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
   'descricao',
   'atividades',
@@ -465,12 +446,6 @@ const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors
   'observacoes',
   'generic'
 ]);
-const erroMapaExibido = computed(() => erroValidacaoMapa.value || erroMapa.value);
-
-function limparErroMapa() {
-  erroValidacaoMapa.value = "";
-  erroMapa.value = null;
-}
 
 function sincronizarErrosAtividades() {
   if (fieldErrors.value.atividadesCodigos) {
@@ -509,57 +484,29 @@ const {
   notify,
   clearErrors,
   aplicarErroNormalizado,
-  sincronizarMapa,
+  sincronizarMapa: sincronizarMapaStore,
 });
 
-function obterMensagemErroChecklistDisponibilizacao() {
-  if (competencias.value.length === 0) {
-    return TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS;
-  }
-
-  if (existeCompetenciaSemAtividade.value) {
-    return TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE;
-  }
-
-  if (atividadesSemCompetencia.value.length > 0) {
-    return TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA;
-  }
-
-  return "";
-}
-
-function abrirModalDisponibilizar() {
-  erroValidacaoMapa.value = "";
-  if (!podeConfirmarDisponibilizacao.value) {
-    erroValidacaoMapa.value = obterMensagemErroChecklistDisponibilizacao();
-    return;
-  }
-
-  mostrarModalDisponibilizar.value = true;
-  clearErrors();
-}
-
-async function disponibilizarMapa(request: { dataLimite: string; observacoes: string }) {
-  if (loadingDisponibilizacao.value) return;
-
-  await executarComSubprocesso(async (codigoSubprocesso) => {
-    loadingDisponibilizacao.value = true;
-    try {
-      await fluxoMapa.disponibilizarMapa(codigoSubprocesso, request);
-      await concluirAcaoPainel(TEXTOS.sucesso.MAPA_DISPONIBILIZADO, fecharModalDisponibilizar);
-    } catch (error) {
-      logger.error(error);
-      aplicarErroNormalizado(normalizeError(error) as ReturnType<typeof normalizeError>);
-    } finally {
-      loadingDisponibilizacao.value = false;
-    }
-  });
-}
-
-function fecharModalDisponibilizar() {
-  mostrarModalDisponibilizar.value = false;
-  notificacaoDisponibilizacao.value = "";
-  clearErrors();
-}
+const {
+  erroValidacaoMapa,
+  loadingDisponibilizacao,
+  notificacaoDisponibilizacao,
+  abrirModalDisponibilizar,
+  fecharModalDisponibilizar,
+  disponibilizarMapa,
+  limparErroMapa,
+  sincronizarMapaContexto,
+} = useMapaDisponibilizacao({
+  competencias,
+  existeCompetenciaSemAtividade,
+  atividadesSemCompetencia,
+  mostrarModalDisponibilizar,
+  clearErrors,
+  executarComSubprocesso,
+  disponibilizarMapaFluxo: fluxoMapa.disponibilizarMapa,
+  concluirAcaoPainel,
+  aplicarErroNormalizado,
+});
+const erroMapaExibido = computed(() => erroValidacaoMapa.value || erroMapa.value);
 
 </script>
