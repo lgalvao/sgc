@@ -100,7 +100,7 @@
           :historico-analise="historicoAnalise"
           :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
           :impactos="impactos ?? null"
-          :is-chefe="isChefe"
+          :pode-apresentar-sugestoes="podeApresentarSugestoes"
           :loading-competencia="loadingCompetencia"
           :loading-exclusao="loadingExclusao"
           :loading-impacto="loadingImpacto"
@@ -161,7 +161,6 @@ import MapaSomenteLeitura from "@/components/mapa/MapaSomenteLeitura.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {computed, onMounted, reactive, ref, toRefs, unref} from "vue";
 import {useRouter} from "vue-router";
-import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
@@ -179,7 +178,6 @@ import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
 import {useMapaAnaliseFluxo} from "@/views/mapaAnaliseFluxo";
 import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
 import {normalizeError} from "@/utils/apiError";
-import {Perfil} from "@/types/tipos";
 import type {
   Analise,
   MapaCompleto,
@@ -195,10 +193,10 @@ const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
-const {perfilSelecionado} = usePerfil();
 
 const {
   podeVisualizarImpacto,
+  podeApresentarSugestoes,
   podeEditarMapa,
   mostrarValidarMapa,
   mostrarApresentarSugestoes,
@@ -220,7 +218,6 @@ const usarMenuAcoesMapa = computed(() => {
       || Boolean(acaoPrincipalMapa.value?.mostrar)
       || mostrarDisponibilizarMapa.value;
 });
-const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
 const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
 const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?.mostrar));
 const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);

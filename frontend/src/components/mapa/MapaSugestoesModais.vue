@@ -7,7 +7,7 @@ import {TEXTOS} from "@/constants/textos";
 
 interface Props {
   mostrarModalVerSugestoes: boolean;
-  isChefe: boolean;
+  podeApresentarSugestoes: boolean;
   sugestoesVisualizacao: string;
   mostrarModalSugestoes: boolean;
   loadingSugestoesEnvio: boolean;
@@ -68,7 +68,7 @@ function focarSugestoes() {
       </template>
 
       <div
-          v-if="!isChefe"
+          v-if="!podeApresentarSugestoes"
           class="border rounded p-3 bg-body-tertiary white-space-pre-line"
           data-testid="txt-ver-sugestoes-mapa-texto"
       >

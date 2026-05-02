@@ -22,7 +22,7 @@ interface Props {
   homologacao: boolean;
   mostrarModalAceitar: boolean;
   mostrarModalVerSugestoes: boolean;
-  isChefe: boolean;
+  podeApresentarSugestoes: boolean;
   sugestoesVisualizacao: string;
   mostrarModalSugestoes: boolean;
   loadingSugestoesEnvio: boolean;
@@ -116,7 +116,7 @@ defineEmits<{
   />
 
   <MapaSugestoesModais
-      :is-chefe="isChefe"
+      :pode-apresentar-sugestoes="podeApresentarSugestoes"
       :loading-sugestoes-envio="loadingSugestoesEnvio"
       :mensagem-erro-sugestoes="mensagemErroSugestoes"
       :mostrar-modal-sugestoes="mostrarModalSugestoes"
