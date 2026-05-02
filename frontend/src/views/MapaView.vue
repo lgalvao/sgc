@@ -99,7 +99,7 @@
           :field-errors="fieldErrors"
           :historico-analise="historicoAnalise"
           :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
-          :impactos="impactos"
+          :impactos="impactos ?? null"
           :is-chefe="isChefe"
           :loading-competencia="loadingCompetencia"
           :loading-exclusao="loadingExclusao"

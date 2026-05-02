@@ -8,7 +8,6 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalAceiteCadastro from "@/components/cadastro/ModalAceiteCadastro.vue";
 import ModalDevolucaoCadastro from "@/components/cadastro/ModalDevolucaoCadastro.vue";
 import type {
-  AcaoBlocoProcesso,
   Analise,
   AtividadeOperacaoResponse,
   ImpactoMapa,
@@ -22,7 +21,7 @@ interface DadosRemocao {
 interface Props {
   codigoSubprocesso?: number | null;
   mostrarModalImportar: boolean;
-  impactos: ImpactoMapa;
+  impactos?: ImpactoMapa | null;
   loadingImpacto: boolean;
   mostrarModalImpacto: boolean;
   isRevisao: boolean;
@@ -37,7 +36,11 @@ interface Props {
   mostrarModalValidarAnalise: boolean;
   observacaoValidacao: string;
   loadingAnaliseCadastro: boolean;
-  acaoPrincipalCadastro: AcaoBlocoProcesso | null;
+  acaoPrincipalCadastro: {
+    tituloModal: string;
+    rotuloConfirmacao: string;
+    textoModal: string;
+  } | null;
   mostrarModalDevolverAnalise: boolean;
   observacaoDevolucao: string;
   loadingDevolucaoAnalise: boolean;

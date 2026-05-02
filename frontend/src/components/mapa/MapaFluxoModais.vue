@@ -41,7 +41,7 @@ interface Props {
   mensagemErroDevolucao: string;
   observacaoDevolucao: string;
   codigoSubprocesso?: number | null;
-  impactos: ImpactoMapa;
+  impactos?: ImpactoMapa | null;
   loadingImpacto: boolean;
   mostrarModalImpacto: boolean;
   historicoAnalise: Analise[];
@@ -52,7 +52,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   (e: "fechar-criar-competencia"): void;
-  (e: "salvar-competencia", valor: Competencia): void;
+  (e: "salvar-competencia", valor: { descricao: string; atividadesSelecionadas: number[] }): void;
   (e: "fechar-disponibilizar"): void;
   (e: "disponibilizar", valor: { dataLimite: string; observacoes: string }): void;
   (e: "update:mostrarModalExcluirCompetencia", valor: boolean): void;
@@ -135,7 +135,7 @@ function focarDevolucao() {
         :loading="loadingCompetencia"
         :mostrar="mostrarModalCriarNovaCompetencia"
         @fechar="$emit('fechar-criar-competencia')"
-        @salvar="$emit('salvar-competencia', $event)"
+        @salvar="emit('salvar-competencia', $event)"
     />
 
     <DisponibilizarMapaModal
@@ -143,7 +143,7 @@ function focarDevolucao() {
         :loading="loadingDisponibilizacao"
         :mostrar="mostrarModalDisponibilizar"
         :notificacao="notificacaoDisponibilizacao"
-        :ultima-data-limite-subprocesso="ultimaDataLimiteSubprocesso"
+        :ultima-data-limite-subprocesso="ultimaDataLimiteSubprocesso ?? undefined"
         @disponibilizar="$emit('disponibilizar', $event)"
         @fechar="$emit('fechar-disponibilizar')"
     />

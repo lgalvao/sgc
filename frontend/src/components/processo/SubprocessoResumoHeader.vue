@@ -1,27 +1,30 @@
 <script setup lang="ts">
+import {computed, unref, type Ref} from "vue";
 import {BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import type {ResponsavelDto, SubprocessoDetalhe} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
+type PropBooleana = boolean | Ref<boolean> | undefined;
+
 interface Props {
   subprocesso: SubprocessoDetalhe;
   siglaUnidadeFallback: string;
-  mostrarAcoesCabecalho: boolean;
-  mostrarAlterarDataLimite: boolean;
-  podeAlterarDataLimite: boolean;
-  mostrarReabrirCadastro: boolean;
-  podeReabrirCadastro: boolean;
-  mostrarReabrirRevisao: boolean;
-  podeReabrirRevisao: boolean;
-  mostrarEnviarLembrete: boolean;
-  podeEnviarLembrete: boolean;
+  mostrarAcoesCabecalho?: PropBooleana;
+  mostrarAlterarDataLimite?: PropBooleana;
+  podeAlterarDataLimite?: PropBooleana;
+  mostrarReabrirCadastro?: PropBooleana;
+  podeReabrirCadastro?: PropBooleana;
+  mostrarReabrirRevisao?: PropBooleana;
+  podeReabrirRevisao?: PropBooleana;
+  mostrarEnviarLembrete?: PropBooleana;
+  podeEnviarLembrete?: PropBooleana;
   formatSituacaoSubprocesso: (situacao: string) => string;
   formatDataSimples: (data: string | null) => string;
   formatTipoResponsabilidade: (responsavel: ResponsavelDto | null) => string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 defineEmits<{
   (e: "abrir-alterar-data-limite"): void;
@@ -29,6 +32,20 @@ defineEmits<{
   (e: "abrir-reabrir-revisao"): void;
   (e: "confirmar-enviar-lembrete"): void;
 }>();
+
+function normalizarFlag(valor: PropBooleana) {
+  return Boolean(unref(valor));
+}
+
+const mostrarAcoesCabecalhoNormalizado = computed(() => normalizarFlag(props.mostrarAcoesCabecalho));
+const mostrarAlterarDataLimiteNormalizado = computed(() => normalizarFlag(props.mostrarAlterarDataLimite));
+const podeAlterarDataLimiteNormalizado = computed(() => normalizarFlag(props.podeAlterarDataLimite));
+const mostrarReabrirCadastroNormalizado = computed(() => normalizarFlag(props.mostrarReabrirCadastro));
+const podeReabrirCadastroNormalizado = computed(() => normalizarFlag(props.podeReabrirCadastro));
+const mostrarReabrirRevisaoNormalizado = computed(() => normalizarFlag(props.mostrarReabrirRevisao));
+const podeReabrirRevisaoNormalizado = computed(() => normalizarFlag(props.podeReabrirRevisao));
+const mostrarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.mostrarEnviarLembrete));
+const podeEnviarLembreteNormalizado = computed(() => normalizarFlag(props.podeEnviarLembrete));
 </script>
 
 <template>
@@ -40,43 +57,43 @@ defineEmits<{
     >
       <template #actions>
         <BDropdown
-            v-if="mostrarAcoesCabecalho"
+            v-if="mostrarAcoesCabecalhoNormalizado"
             data-testid="btn-subprocesso-acoes"
             :text="TEXTOS.mapa.BOTAO_ACOES"
             toggle-class="text-nowrap"
             variant="outline-secondary"
         >
           <BDropdownItemButton
-              v-if="mostrarAlterarDataLimite"
+              v-if="mostrarAlterarDataLimiteNormalizado"
               data-testid="btn-alterar-data-limite"
-              :disabled="!podeAlterarDataLimite"
+              :disabled="!podeAlterarDataLimiteNormalizado"
               @click="$emit('abrir-alterar-data-limite')"
           >
             <i aria-hidden="true" class="bi bi-calendar me-1"/>
             {{ TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE }}
           </BDropdownItemButton>
           <BDropdownItemButton
-              v-if="mostrarReabrirCadastro"
+              v-if="mostrarReabrirCadastroNormalizado"
               data-testid="btn-reabrir-cadastro"
-              :disabled="!podeReabrirCadastro"
+              :disabled="!podeReabrirCadastroNormalizado"
               @click="$emit('abrir-reabrir-cadastro')"
           >
             <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
             {{ TEXTOS.subprocesso.BOTAO_REABRIR_CADASTRO }}
           </BDropdownItemButton>
           <BDropdownItemButton
-              v-if="mostrarReabrirRevisao"
+              v-if="mostrarReabrirRevisaoNormalizado"
               data-testid="btn-reabrir-revisao"
-              :disabled="!podeReabrirRevisao"
+              :disabled="!podeReabrirRevisaoNormalizado"
               @click="$emit('abrir-reabrir-revisao')"
           >
             <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
             {{ TEXTOS.subprocesso.BOTAO_REABRIR_REVISAO }}
           </BDropdownItemButton>
           <BDropdownItemButton
-              v-if="mostrarEnviarLembrete"
+              v-if="mostrarEnviarLembreteNormalizado"
               data-testid="btn-enviar-lembrete"
-              :disabled="!podeEnviarLembrete"
+              :disabled="!podeEnviarLembreteNormalizado"
               @click="$emit('confirmar-enviar-lembrete')"
           >
             <i aria-hidden="true" class="bi bi-bell me-1"/>

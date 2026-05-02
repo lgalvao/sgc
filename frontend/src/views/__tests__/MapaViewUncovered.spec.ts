@@ -148,7 +148,7 @@ describe("MapaView Uncovered Branches", () => {
         vm.excluirCompetencia(1);
         expect(vm.mostrarModalExcluirCompetencia).toBe(true);
 
-        expect(vm.ImpactoMapaModal).toBeDefined();
+        expect(wrapper.findComponent({name: "MapaFluxoModais"}).exists()).toBe(true);
     });
 
     it("cobre confirmarExclusaoCompetencia", async () => {

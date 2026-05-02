@@ -48,10 +48,10 @@
         "store": 3,
         "composable": 8,
         "view": 10,
-        "component": 13,
+        "component": 14,
         "router": 0,
         "utils": 4,
-        "outro": 5
+        "outro": 6
       }
     }
   }

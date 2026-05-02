@@ -10,14 +10,6 @@
       "criterioRemocao": "Extrair orquestracao, secoes de tela e interacoes de mutacao."
     },
     {
-      "arquivo": "frontend/src/types/tipos.ts",
-      "camada": "outro",
-      "maxLinhas": 612,
-      "responsavel": "frontend",
-      "justificativa": "Arquivo central de tipos ainda agrega dominios distintos.",
-      "criterioRemocao": "Fatiar tipos por dominio sem quebrar imports publicos do frontend."
-    },
-    {
       "arquivo": "frontend/src/views/CadastroView.vue",
       "camada": "view",
       "maxLinhas": 707,
@@ -40,6 +32,22 @@
       "responsavel": "frontend",
       "justificativa": "Constante agregadora de textos ainda esta monolitica.",
       "criterioRemocao": "Dividir textos por modulo ou fluxo principal."
+    },
+    {
+      "arquivo": "frontend/src/types/subprocesso.ts",
+      "camada": "outro",
+      "maxLinhas": 252,
+      "responsavel": "frontend",
+      "justificativa": "A fatiacao de tipos separou subprocesso do agregador antigo, mas ainda concentrou contratos demais neste modulo.",
+      "criterioRemocao": "Separar detalhe, validacao e operacoes de subprocesso em modulos menores."
+    },
+    {
+      "arquivo": "frontend/src/types/mapa.ts",
+      "camada": "outro",
+      "maxLinhas": 150,
+      "responsavel": "frontend",
+      "justificativa": "A fatiacao de tipos separou mapa do agregador antigo, mas impacto e requests ainda estao no mesmo modulo.",
+      "criterioRemocao": "Separar requests, leitura de mapa e impacto em arquivos menores."
     },
     {
       "arquivo": "frontend/src/services/subprocessoService.ts",
@@ -88,6 +96,14 @@
       "responsavel": "frontend",
       "justificativa": "Componente generico ainda concentra estrutura e comportamento demais.",
       "criterioRemocao": "Dividir cabecalho, corpo e interacoes da tabela em subcomponentes."
+    },
+    {
+      "arquivo": "frontend/src/components/mapa/MapaFluxoModais.vue",
+      "camada": "component",
+      "maxLinhas": 301,
+      "responsavel": "frontend",
+      "justificativa": "A extração dos modais tirou peso da view, mas ainda manteve muitos fluxos do mapa no mesmo componente.",
+      "criterioRemocao": "Separar modais de edicao dos modais de analise e sugestoes."
     },
     {
       "arquivo": "frontend/src/axios-setup.ts",

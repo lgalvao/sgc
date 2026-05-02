@@ -95,62 +95,42 @@
       />
     </div>
 
-    <ImportarAtividadesModal
-        :cod-subprocesso-destino="codigoSubprocesso"
-        :mostrar="mostrarModalImportar"
-        @fechar="mostrarModalImportar = false"
-        @importar="handleImportAtividades"
-    />
-
-    <ImpactoMapaModal
-        v-if="codigoSubprocesso"
-        :impacto="impactos"
-        :loading="loadingImpacto"
-        :mostrar="mostrarModalImpacto"
-        @fechar="fecharModalImpacto"
-    />
-
-    <ConfirmacaoDisponibilizacaoModal
-        :is-revisao="isRevisao"
-        :loading="loadingDisponibilizacao"
-        :mostrar="mostrarModalConfirmacao"
-        :erro="fluxoSubprocesso.lastError?.value?.message"
-        @confirmar="confirmarDisponibilizacao"
-        @fechar="mostrarModalConfirmacao = false"
-    />
-
-    <HistoricoAnaliseModal
-        :historico="historicoAnalises"
-        :mostrar="mostrarModalHistorico"
-        @fechar="mostrarModalHistorico = false"
-    />
-
-      <ModalConfirmacao
-          v-model="mostrarModalConfirmacaoRemocao"
-          :loading="loadingRemocao"
-          :mensagem="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO"
-          :ok-title="TEXTOS.comum.BOTAO_REMOVER"
-          :titulo="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TITULO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TITULO"
-          variant="danger"
-          @confirmar="confirmarRemocao"
-      />
-
-      <ModalAceiteCadastro
-          v-model="mostrarModalValidarAnalise"
-          v-model:observacao="observacaoValidacao"
-          :loading="loadingAnaliseCadastro"
-          :acao="acaoPrincipalCadastro"
-          :erro="fluxoSubprocesso.lastError?.value?.message"
-          @confirmar="confirmarValidacaoAnalise"
-      />
-
-      <ModalDevolucaoCadastro
-          v-model="mostrarModalDevolverAnalise"
-          v-model:observacao="observacaoDevolucao"
-          :loading="loadingDevolucaoAnalise"
+      <CadastroFluxoModais
+          :acao-principal-cadastro="acaoPrincipalCadastro"
+          :codigo-subprocesso="codigoSubprocesso"
+          :dados-remocao="dadosRemocao"
+          :erro-fluxo="fluxoSubprocesso.lastError?.value?.message"
+          :historico-analises="historicoAnalises"
+          :impactos="impactos ?? null"
           :is-revisao="isRevisao"
-          :erro="fluxoSubprocesso.lastError?.value?.message"
-          @confirmar="confirmarDevolucaoAnalise"
+          :loading-analise-cadastro="loadingAnaliseCadastro"
+          :loading-devolucao-analise="loadingDevolucaoAnalise"
+          :loading-disponibilizacao="loadingDisponibilizacao"
+          :loading-impacto="loadingImpacto"
+          :loading-remocao="loadingRemocao"
+          :mostrar-modal-confirmacao="mostrarModalConfirmacao"
+          :mostrar-modal-confirmacao-remocao="mostrarModalConfirmacaoRemocao"
+          :mostrar-modal-devolver-analise="mostrarModalDevolverAnalise"
+          :mostrar-modal-historico="mostrarModalHistorico"
+          :mostrar-modal-impacto="mostrarModalImpacto"
+          :mostrar-modal-importar="mostrarModalImportar"
+          :mostrar-modal-validar-analise="mostrarModalValidarAnalise"
+          :observacao-devolucao="observacaoDevolucao"
+          :observacao-validacao="observacaoValidacao"
+          @confirmar-devolucao-analise="confirmarDevolucaoAnalise"
+          @confirmar-disponibilizacao="confirmarDisponibilizacao"
+          @confirmar-remocao="confirmarRemocao"
+          @confirmar-validacao-analise="confirmarValidacaoAnalise"
+          @fechar-impacto="fecharModalImpacto"
+          @importar="handleImportAtividades"
+          @update:mostrarModalConfirmacao="mostrarModalConfirmacao = $event"
+          @update:mostrarModalConfirmacaoRemocao="mostrarModalConfirmacaoRemocao = $event"
+          @update:mostrarModalDevolverAnalise="mostrarModalDevolverAnalise = $event"
+          @update:mostrarModalHistorico="mostrarModalHistorico = $event"
+          @update:mostrarModalImportar="mostrarModalImportar = $event"
+          @update:mostrarModalValidarAnalise="mostrarModalValidarAnalise = $event"
+          @update:observacaoDevolucao="observacaoDevolucao = $event"
+          @update:observacaoValidacao="observacaoValidacao = $event"
       />
     </template>
   </LayoutPadrao>
@@ -160,19 +140,13 @@
 import {BAlert, BFormCheckbox, BSpinner} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
-import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
-import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
-import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import CadastroAcoesHeader from "@/components/cadastro/CadastroAcoesHeader.vue";
-import ModalAceiteCadastro from "@/components/cadastro/ModalAceiteCadastro.vue";
-import ModalDevolucaoCadastro from "@/components/cadastro/ModalDevolucaoCadastro.vue";
+import CadastroFluxoModais from "@/components/cadastro/CadastroFluxoModais.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
