@@ -27,129 +27,28 @@
               data-testid="form-login"
               @submit.prevent="handleLogin"
           >
-            <BFormGroup
-                label-for="titulo"
-                class="mb-3"
-            >
-              <template #label>
-                <i
-                    aria-hidden="true"
-                    class="bi bi-person-circle me-2"
-                />
-                {{ TEXTOS.login.LABEL_USUARIO }} <span aria-hidden="true" class="text-danger">*</span>
-              </template>
-              <!-- eslint-disable vuejs-accessibility/no-autofocus -->
-               <BFormInput
-                   id="titulo"
-                   v-model="titulo"
-                   aria-required="true"
-                   :readonly="loginStep > 1"
-                   :disabled="isLoading"
-                   autocomplete="username"
-                   autofocus
-                   data-testid="inp-login-usuario"
-                   inputmode="numeric"
-                   name="titulo"
-                   :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
-                   :state="mensagemErroTitulo ? false : null"
-                   type="text"
-               />
-              <!-- eslint-enable vuejs-accessibility/no-autofocus -->
-              <BFormInvalidFeedback :state="mensagemErroTitulo ? false : null">
-                {{ mensagemErroTitulo }}
-              </BFormInvalidFeedback>
-            </BFormGroup>
-            <BFormGroup
-                label-for="senha"
-                class="mb-3"
-            >
-              <template #label>
-                <i
-                    aria-hidden="true"
-                    class="bi bi-key me-2"
-                />
-                {{ TEXTOS.login.LABEL_SENHA }} <span aria-hidden="true" class="text-danger">*</span>
-              </template>
-              <BInputGroup>
-                <BFormInput
-                    id="senha"
-                    v-model="senha"
-                    aria-required="true"
-                    :autocomplete="showPassword ? 'off' : 'current-password'"
-                    :readonly="loginStep > 1"
-                    :disabled="isLoading"
-                    :state="mensagemErroSenha ? false : null"
-                    :type="showPassword ? 'text' : 'password'"
-                    data-testid="inp-login-senha"
-                    name="senha"
-                    :placeholder="TEXTOS.login.PLACEHOLDER_SENHA"
-                    @keydown="verificarCapsLock"
-                    @keyup="verificarCapsLock"
-                />
-                <template #append>
-                  <BButton
-                      :aria-label="showPassword ? TEXTOS.login.OCULTAR_SENHA : TEXTOS.login.MOSTRAR_SENHA"
-                      :disabled="isLoading"
-                      class="text-secondary border-0"
-                      variant="link"
-                      @click="showPassword = !showPassword"
-                  >
-                    <i
-                        :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                        aria-hidden="true"
-                    />
-                  </BButton>
-                </template>
-              </BInputGroup>
-              <BFormInvalidFeedback :state="mensagemErroSenha ? false : null">
-                {{ mensagemErroSenha }}
-              </BFormInvalidFeedback>
-              <BAlert
-                  v-if="capsLockAtivado"
-                  :model-value="true"
-                  variant="warning"
-                  class="small mt-1 py-1 px-2 mb-0"
-                  data-testid="alert-caps-lock"
-              >
-                <i
-                    aria-hidden="true"
-                    class="bi bi-exclamation-triangle-fill me-1"
-                />
-                {{ TEXTOS.login.CAPS_LOCK }}
-              </BAlert>
-            </BFormGroup>
+            <LoginCredenciaisCampos
+                :caps-lock-ativado="capsLockAtivado"
+                :is-loading="isLoading"
+                :login-bloqueado="selecionandoPerfil"
+                :mensagem-erro-senha="mensagemErroSenha"
+                :mensagem-erro-titulo="mensagemErroTitulo"
+                :senha="senha"
+                :show-password="showPassword"
+                :titulo="titulo"
+                @toggle-senha="alternarVisibilidadeSenha"
+                @update:senha="senha = $event"
+                @update:titulo="titulo = $event"
+                @verificar-caps-lock="verificarCapsLock"
+            />
 
-            <BFormGroup
-                v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
-                label-for="par"
-                class="mb-3"
-                data-testid="sec-login-perfil"
-            >
-              <template #label>
-                {{ TEXTOS.login.SELECAO_PERFIL }} <span aria-hidden="true" class="text-danger">*</span>
-              </template>
-              <BFormSelect
-                  id="par"
-                  v-model="parSelecionado"
-                  :options="perfisUnidadesOptions"
-                  :state="mensagemErroPerfil ? false : null"
-                  data-testid="sel-login-perfil"
-                  text-field="text"
-                  value-field="value"
-              >
-                <template #first>
-                  <BFormSelectOption
-                      :value="null"
-                      disabled
-                  >
-                    {{ TEXTOS.login.SELECIONE_OPCAO }}
-                  </BFormSelectOption>
-                </template>
-              </BFormSelect>
-              <BFormInvalidFeedback :state="mensagemErroPerfil ? false : null">
-                {{ mensagemErroPerfil }}
-              </BFormInvalidFeedback>
-            </BFormGroup>
+            <LoginPerfilSelect
+                :mensagem-erro-perfil="mensagemErroPerfil"
+                :mostrar="selecionandoPerfil && perfisUnidadesDisponiveis.length > 1"
+                :par-selecionado="parSelecionado"
+                :perfis-unidades-options="perfisUnidadesOptions"
+                @update:par-selecionado="parSelecionado = $event"
+            />
 
           <LoadingButton
               :loading="isLoading"
@@ -179,24 +78,18 @@
 
 <script lang="ts" setup>
 import {
-  BAlert,
-  BButton,
   BCard,
   BCol,
   BContainer,
   BForm,
-  BFormGroup,
-  BFormInput,
-  BFormInvalidFeedback,
-  BFormSelect,
-  BFormSelectOption,
-  BInputGroup,
   BRow,
 } from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
+import LoginCredenciaisCampos from "@/components/login/LoginCredenciaisCampos.vue";
+import LoginPerfilSelect from "@/components/login/LoginPerfilSelect.vue";
 import {logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import type {PerfilUnidade} from "@/types/autenticacao";
@@ -225,6 +118,7 @@ const {
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 
+const selecionandoPerfil = computed(() => loginStep.value > 1);
 const credenciaisPreenchidas = computed(() => Boolean(titulo.value && senha.value));
 const mensagemErroTitulo = computed(() => deveExibirErro(!titulo.value) ? TEXTOS.login.ERRO_CAMPO_TITULO : "");
 const mensagemErroSenha = computed(() => deveExibirErro(!senha.value) ? TEXTOS.login.ERRO_CAMPO_SENHA : "");
@@ -253,10 +147,14 @@ const verificarCapsLock = (event: KeyboardEvent) => {
   }
 };
 
+function alternarVisibilidadeSenha() {
+  showPassword.value = !showPassword.value;
+}
+
 const handleLogin = async () => {
-  if (loginStep.value === 1) {
+  if (!selecionandoPerfil.value) {
     await performInitialLogin();
-  } else if (loginStep.value === 2) {
+  } else {
     await performProfileSelection();
   }
 };
