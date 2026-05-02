@@ -14,19 +14,17 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         ? mapaCompletoGlobal
         : computed(() => {
             const codigoAtual = toValue(codigoSubprocesso);
-            if (typeof codigoAtual !== "number") {
-                return mapaCompletoGlobal.value;
-            }
-            return mapasStore.obterMapaCompletoCache(codigoAtual) ?? mapaCompletoGlobal.value;
+            return typeof codigoAtual === "number"
+                ? mapasStore.obterMapaCompletoCache(codigoAtual)
+                : null;
         });
     const impactoMapa = codigoSubprocesso === undefined
         ? impactoMapaGlobal
         : computed(() => {
             const codigoAtual = toValue(codigoSubprocesso);
-            if (typeof codigoAtual !== "number") {
-                return impactoMapaGlobal.value;
-            }
-            return mapasStore.obterImpactoMapaCache(codigoAtual) ?? impactoMapaGlobal.value;
+            return typeof codigoAtual === "number"
+                ? mapasStore.obterImpactoMapaCache(codigoAtual)
+                : null;
         });
 
     async function buscarMapaCompleto(codSubprocesso: number) {

@@ -661,11 +661,7 @@ async function executarComSubprocesso(
 function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   const codSubprocessoAtual = codigoSubprocesso.value;
   if (mapaAtualizado && codSubprocessoAtual) {
-    if (typeof mapasStore.definirMapaCompleto === "function") {
-      mapasStore.definirMapaCompleto(codSubprocessoAtual, mapaAtualizado);
-    } else {
-      mapasStore.mapaCompleto.value = mapaAtualizado;
-    }
+    mapasStore.definirMapaCompleto(codSubprocessoAtual, mapaAtualizado);
     if (subprocessoStore.contextoEdicao?.detalhes.codigo === codSubprocessoAtual) {
       subprocessoStore.contextoEdicao.mapa = mapaAtualizado;
     }

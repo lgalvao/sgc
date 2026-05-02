@@ -216,13 +216,13 @@ describe('MapaView Coverage', () => {
             }
         });
         const mapas = useMapas();
-        mapas.mapaCompleto.value = {
-            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}]
-        } as unknown as typeof mapas.mapaCompleto.value;
-
-        const fluxoMapa = useFluxoMapaModule.useFluxoMapa();
         const vm = wrapper.vm as unknown as MapaViewVm;
         vm.codigoSubprocesso = 456;
+        mapas.definirMapaCompleto(456, {
+            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}]
+        } as unknown as NonNullable<typeof mapas.mapaCompleto.value>);
+
+        const fluxoMapa = useFluxoMapaModule.useFluxoMapa();
 
         await vm.removerAtividadeAssociada(1, 10);
 
@@ -254,12 +254,13 @@ describe('MapaView Coverage', () => {
         });
 
         const mapas = useMapas();
-        mapas.mapaCompleto.value = {
+        const vm = wrapper.vm as unknown as MapaViewVm;
+        vm.codigoSubprocesso = 456;
+        mapas.definirMapaCompleto(456, {
             competencias: [{codigo: 1, descricao: 'Comp 1', atividades: []}]
-        } as unknown as typeof mapas.mapaCompleto.value;
+        } as unknown as NonNullable<typeof mapas.mapaCompleto.value>);
 
         await wrapper.vm.$nextTick();
-        const vm = wrapper.vm as unknown as MapaViewVm;
 
         expect(vm.existeCompetenciaSemAtividade).toBe(true);
         expect(vm.podeConfirmarDisponibilizacao).toBe(false);
