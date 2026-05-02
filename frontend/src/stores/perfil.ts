@@ -3,7 +3,6 @@ import {computed, ref} from "vue";
 import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/types/autenticacao";
 import type {Perfil, Unidade} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
-import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 import {useSessionStorage} from "@/composables/useSessionStorage";
 import {usePainelStore} from "@/stores/painel";
@@ -13,6 +12,7 @@ import {useUnidadeStore} from "@/stores/unidade";
 import {useMapasStore} from "@/stores/mapas";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {cancelarRequisicoesPendentes, finalizarTransicaoSessao, iniciarTransicaoSessao} from "@/axios-setup";
+import {logger} from "@/utils";
 
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage/sessionStorage usando composable
@@ -22,12 +22,8 @@ export const usePerfilStore = defineStore("perfil", () => {
     const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
     const permissoesSessao = useLocalStorage<PermissoesSessao | null>("permissoesSessao", null);
     const usuarioNome = useSessionStorage<string | null>("usuarioNome", null);
-    const perfis = useLocalStorage<Perfil[]>("perfis", []);
-
-    // Estados não persistidos
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const unidadeAtualDetalhes = ref<Unidade | null>(null);
-    const {lastError, clearError, withErrorHandling} = useErrorHandler();
     const painelStore = usePainelStore();
     const processoStore = useProcessoStore();
     const unidadeStore = useUnidadeStore();
@@ -35,113 +31,96 @@ export const usePerfilStore = defineStore("perfil", () => {
     const mapasStore = useMapasStore();
     const organizacaoStore = useOrganizacaoStore();
 
-    // Map para lookup O(1) de perfil -> unidade
-    const perfilUnidadeMap = computed(() =>
-        new Map(perfisUnidades.value.map(pu => [pu.perfil, pu]))
-    );
-
     const unidadeAtual = computed(() => {
-        if (!perfilSelecionado.value) return null;
-        if (unidadeSelecionada.value) return unidadeSelecionada.value;
+        if (!perfilSelecionado.value) {
+            return null;
+        }
+        if (unidadeSelecionada.value) {
+            return unidadeSelecionada.value;
+        }
 
-        const pu = perfilUnidadeMap.value.get(perfilSelecionado.value);
-        return pu ? pu.unidade.codigo : null;
+        return perfisUnidades.value.find((perfilUnidade) => perfilUnidade.perfil === perfilSelecionado.value)?.unidade.codigo ?? null;
     });
 
-    function definirUsuarioCodigo(novoId: string) {
-        usuarioCodigo.value = novoId;
-        // localStorage.setItem removido - sincronização automática
-    }
-
-    interface DadosSelecaoPerfil {
+    interface SessaoPerfil {
+        tituloEleitoral?: string;
+        nome: string;
         perfil: Perfil;
         unidadeCodigo: number;
         unidadeSigla: string;
         permissoes: PermissoesSessao;
-        nome?: string;
     }
 
-    function definirPerfilUnidade(dados: DadosSelecaoPerfil) {
+    function invalidarDadosDaSessao() {
         painelStore.invalidar();
         processoStore.resetar();
         subprocessoStore.resetar();
         unidadeStore.invalidarCache();
         mapasStore.invalidar();
         organizacaoStore.invalidar();
+    }
+
+    function aplicarSessaoPerfil(dados: SessaoPerfil) {
+        invalidarDadosDaSessao();
         perfilSelecionado.value = dados.perfil;
         unidadeSelecionada.value = dados.unidadeCodigo;
         unidadeSelecionadaSigla.value = dados.unidadeSigla;
         permissoesSessao.value = dados.permissoes;
-        if (dados.nome) {
-            usuarioNome.value = dados.nome;
+        usuarioNome.value = dados.nome;
+        if (dados.tituloEleitoral) {
+            usuarioCodigo.value = dados.tituloEleitoral;
         }
     }
 
-    function definirPerfis(novosPerfis: Perfil[]) {
-        perfis.value = novosPerfis;
-        // localStorage.setItem removido - sincronização automática
+    function limparSessaoLocal() {
+        usuarioCodigo.value = null;
+        perfilSelecionado.value = null;
+        unidadeSelecionada.value = null;
+        unidadeSelecionadaSigla.value = null;
+        permissoesSessao.value = null;
+        usuarioNome.value = null;
+        perfisUnidades.value = [];
+        unidadeAtualDetalhes.value = null;
     }
 
     async function iniciarLogin(tituloEleitoral: string, senha: string): Promise<FluxoLogin> {
-        return withErrorHandling(async () => {
-            const fluxoLogin = await usuarioService.login({
-                tituloEleitoral,
-                senha,
-            });
-            perfisUnidades.value = fluxoLogin.perfisUnidades;
-
-            const listaPerfis = [
-                ...new Set(
-                    fluxoLogin.perfisUnidades.map((p) => p.perfil),
-                ),
-            ];
-            definirPerfis(listaPerfis);
-
-            if (fluxoLogin.sessao && fluxoLogin.perfisUnidades.length === 1) {
-                const perfilUnidadeSelecionado = fluxoLogin.perfisUnidades[0];
-                definirPerfilUnidade({
-                    perfil: fluxoLogin.sessao.perfil,
-                    unidadeCodigo: fluxoLogin.sessao.unidadeCodigo,
-                    unidadeSigla: perfilUnidadeSelecionado.unidade.sigla,
-                    permissoes: fluxoLogin.sessao.permissoes,
-                    nome: fluxoLogin.sessao.nome,
-                });
-                definirUsuarioCodigo(fluxoLogin.sessao.tituloEleitoral);
-                finalizarTransicaoSessao();
-            }
-
-            return fluxoLogin;
-        }).catch((error: { response?: { status: number } }) => {
-            if (error?.response?.status === 404 || error?.response?.status === 401) {
-                return {
-                    autenticado: false,
-                    requerSelecaoPerfil: false,
-                    perfisUnidades: [],
-                    sessao: null,
-                };
-            }
-            throw error;
+        const fluxoLogin = await usuarioService.login({
+            tituloEleitoral,
+            senha,
         });
+        perfisUnidades.value = fluxoLogin.perfisUnidades;
+
+        if (fluxoLogin.sessao && fluxoLogin.perfisUnidades.length === 1) {
+            aplicarSessaoPerfil({
+                tituloEleitoral: fluxoLogin.sessao.tituloEleitoral,
+                nome: fluxoLogin.sessao.nome,
+                perfil: fluxoLogin.sessao.perfil,
+                unidadeCodigo: fluxoLogin.sessao.unidadeCodigo,
+                unidadeSigla: fluxoLogin.perfisUnidades[0].unidade.sigla,
+                permissoes: fluxoLogin.sessao.permissoes,
+            });
+            finalizarTransicaoSessao();
+        }
+
+        return fluxoLogin;
     }
 
     async function concluirLoginComPerfil(
         perfilUnidade: PerfilUnidade,
     ) {
-        return withErrorHandling(async () => {
-            const loginResponse = await usuarioService.entrar({
-                perfil: perfilUnidade.perfil,
-                unidadeCodigo: perfilUnidade.unidade.codigo,
-            });
-            definirPerfilUnidade({
-                perfil: loginResponse.perfil,
-                unidadeCodigo: loginResponse.unidadeCodigo,
-                unidadeSigla: perfilUnidade.unidade.sigla,
-                permissoes: loginResponse.permissoes,
-                nome: loginResponse.nome,
-            });
-            definirUsuarioCodigo(loginResponse.tituloEleitoral);
-            finalizarTransicaoSessao();
+        const loginResponse = await usuarioService.entrar({
+            perfil: perfilUnidade.perfil,
+            unidadeCodigo: perfilUnidade.unidade.codigo,
         });
+        aplicarSessaoPerfil({
+            tituloEleitoral: loginResponse.tituloEleitoral,
+            nome: loginResponse.nome,
+            perfil: loginResponse.perfil,
+            unidadeCodigo: loginResponse.unidadeCodigo,
+            unidadeSigla: perfilUnidade.unidade.sigla,
+            permissoes: loginResponse.permissoes,
+        });
+        finalizarTransicaoSessao();
     }
 
     async function logout() {
@@ -150,26 +129,12 @@ export const usePerfilStore = defineStore("perfil", () => {
 
         try {
             await usuarioService.logout();
-        } catch {
-            // A sessão local deve ser limpa mesmo se o backend já estiver indisponível.
+        } catch (erro) {
+            logger.warn("Falha ao encerrar sessao remota; limpando sessao local.", erro);
         }
 
-        // Limpa estados - remoção do localStorage é automática
-        usuarioCodigo.value = null;
-        perfilSelecionado.value = null;
-        unidadeSelecionada.value = null;
-        unidadeSelecionadaSigla.value = null;
-        permissoesSessao.value = null;
-        usuarioNome.value = null;
-        perfisUnidades.value = [];
-        perfis.value = [];
-        unidadeAtualDetalhes.value = null;
-        painelStore.invalidar();
-        processoStore.resetar();
-        subprocessoStore.resetar();
-        unidadeStore.invalidarCache();
-        mapasStore.invalidar();
-        organizacaoStore.invalidar();
+        limparSessaoLocal();
+        invalidarDadosDaSessao();
     }
 
     return {
@@ -180,13 +145,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         permissoesSessao,
         usuarioNome,
         perfisUnidades,
-        perfis,
         unidadeAtual,
         unidadeAtualDetalhes,
-        lastError,
-        clearError,
-        definirUsuarioCodigo,
-        definirPerfilUnidade,
         iniciarLogin,
         concluirLoginComPerfil,
         logout,

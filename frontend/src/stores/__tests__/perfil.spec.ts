@@ -26,54 +26,37 @@ describe("usePerfilStore", () => {
         vi.clearAllMocks();
     });
 
-    it("deve definir usuarioCodigo", () => {
-        const store = usePerfilStore();
-        store.definirUsuarioCodigo("123456");
-        expect(store.usuarioCodigo).toBe("123456");
-    });
-
-    it("deve definir perfil e unidade", () => {
+    it("deve realizar login com sucesso e definir sessao se houver um unico perfil", async () => {
         const store = usePerfilStore();
         const organizacaoStore = useOrganizacaoStore();
         organizacaoStore.diagnostico = {possuiViolacoes: true} as any;
         organizacaoStore.carregado = true as any;
 
-        store.definirPerfilUnidade({
-            perfil: Perfil.GESTOR,
-            unidadeCodigo: 1,
-            unidadeSigla: "U1",
-            permissoes: { acoes: [] } as any,
-            nome: "Usuario Teste"
-        });
-        expect(store.perfilSelecionado).toBe(Perfil.GESTOR);
-        expect(store.unidadeSelecionada).toBe(1);
-        expect(store.unidadeSelecionadaSigla).toBe("U1");
-        expect(store.usuarioNome).toBe("Usuario Teste");
-        expect(organizacaoStore.diagnostico).toBeNull();
-        expect(organizacaoStore.carregado).toBe(false);
-    });
-
-    it("deve realizar login com sucesso e definir perfil se único", async () => {
-        const store = usePerfilStore();
         const mockFluxo = {
             autenticado: true,
             requerSelecaoPerfil: false,
-            perfisUnidades: [{ perfil: Perfil.GESTOR, unidade: { codigo: 1, sigla: "U1" } }],
-            sessao: { perfil: Perfil.GESTOR, unidadeCodigo: 1, tituloEleitoral: "123", nome: "Teste", permissoes: { acoes: [] } }
+            perfisUnidades: [{perfil: Perfil.GESTOR, unidade: {codigo: 1, sigla: "U1", nome: "Unidade 1"}}],
+            sessao: {perfil: Perfil.GESTOR, unidadeCodigo: 1, tituloEleitoral: "123", nome: "Teste", permissoes: {acoes: []}}
         };
         vi.mocked(usuarioService.login).mockResolvedValue(mockFluxo as any);
 
         const res = await store.iniciarLogin("123", "senha");
+
         expect(res).toEqual(mockFluxo);
         expect(store.perfilSelecionado).toBe(Perfil.GESTOR);
+        expect(store.unidadeSelecionada).toBe(1);
+        expect(store.unidadeSelecionadaSigla).toBe("U1");
+        expect(store.usuarioNome).toBe("Teste");
+        expect(store.usuarioCodigo).toBe("123");
+        expect(organizacaoStore.diagnostico).toBeNull();
+        expect(organizacaoStore.carregado).toBe(false);
     });
 
-    it("deve tratar erro 404 no login", async () => {
+    it("deve propagar erro 404 no login", async () => {
         const store = usePerfilStore();
         vi.mocked(usuarioService.login).mockRejectedValue({ response: { status: 404 } });
 
-        const res = await store.iniciarLogin("123", "senha");
-        expect(res.autenticado).toBe(false);
+        await expect(store.iniciarLogin("123", "senha")).rejects.toEqual({response: {status: 404}});
     });
 
     it("deve relançar erro genérico no login", async () => {
@@ -90,6 +73,7 @@ describe("usePerfilStore", () => {
 
         await store.concluirLoginComPerfil({ perfil: Perfil.GESTOR, unidade: { codigo: 1, sigla: "U1" } } as any);
         expect(store.perfilSelecionado).toBe(Perfil.GESTOR);
+        expect(store.usuarioCodigo).toBe("123");
     });
 
     it("deve realizar logout", async () => {

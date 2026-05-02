@@ -1,11 +1,14 @@
 import {
+    type AcaoBlocoProcesso,
     type AtualizarProcessoRequest,
     type CriarProcessoRequest,
     type Processo,
     type ProcessoResumo,
     SituacaoSubprocesso,
+    SituacaoProcesso,
     type Subprocesso,
     type SubprocessoElegivel,
+    TipoProcesso,
     type UnidadeImportacao,
     type UnidadeParticipante
 } from "@/types/tipos";
@@ -15,8 +18,21 @@ import apiClient from "../axios-setup";
 const CAMINHO_PROCESSOS = "/processos";
 
 interface ProcessoDetalheResponseBackend extends ProcessoDetalheDto {
+    codigo: number;
+    descricao: string;
+    tipo: TipoProcesso;
+    situacao: SituacaoProcesso;
+    dataLimite: string;
+    dataCriacao: string;
+    dataFinalizacao?: string;
+    podeFinalizar: boolean;
+    podeHomologarCadastro: boolean;
+    podeHomologarMapa: boolean;
+    podeAceitarCadastroBloco: boolean;
+    podeDisponibilizarMapaBloco: boolean;
     unidades: UnidadeParticipanteDto[];
     resumoSubprocessos: ProcessoResumo[];
+    acoesBloco: AcaoBlocoProcesso[];
 }
 
 function caminhoProcesso(codProcesso?: number, sufixo = ""): string {
@@ -25,19 +41,36 @@ function caminhoProcesso(codProcesso?: number, sufixo = ""): string {
 
 function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {
     return {
-        ...dto,
+        nome: dto.nome!,
+        sigla: dto.sigla!,
+        codUnidade: dto.codUnidade,
         codSubprocesso: dto.codSubprocesso ?? 0,
+        codUnidadeSuperior: dto.codUnidadeSuperior,
         situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso | undefined) ?? SituacaoSubprocesso.NAO_INICIADO,
         dataLimite: dto.dataLimite ?? "",
+        mapaCodigo: dto.mapaCodigo,
+        localizacaoAtualCodigo: dto.localizacaoAtualCodigo,
         filhos: (dto.filhos ?? []).map(mapearUnidadeParticipante),
     };
 }
 
 function mapearProcessoDetalhe(dto: ProcessoDetalheResponseBackend): Processo {
     return {
-        ...dto,
+        codigo: dto.codigo,
+        descricao: dto.descricao,
+        tipo: dto.tipo,
+        situacao: dto.situacao,
+        dataLimite: dto.dataLimite,
+        dataCriacao: dto.dataCriacao,
+        dataFinalizacao: dto.dataFinalizacao,
+        podeFinalizar: dto.podeFinalizar,
+        podeHomologarCadastro: dto.podeHomologarCadastro,
+        podeHomologarMapa: dto.podeHomologarMapa,
+        podeAceitarCadastroBloco: dto.podeAceitarCadastroBloco,
+        podeDisponibilizarMapaBloco: dto.podeDisponibilizarMapaBloco,
         unidades: dto.unidades.map(mapearUnidadeParticipante),
         resumoSubprocessos: dto.resumoSubprocessos,
+        acoesBloco: dto.acoesBloco,
     };
 }
 

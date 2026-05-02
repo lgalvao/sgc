@@ -10,6 +10,26 @@ describe('processoService', () => {
         vi.clearAllMocks();
     });
 
+    function criarDetalheProcesso() {
+        return {
+            codigo: 1,
+            descricao: 'Processo teste',
+            tipo: TipoProcesso.MAPEAMENTO,
+            situacao: 'CRIADO',
+            dataLimite: '2024-12-31',
+            dataCriacao: '2024-01-01',
+            dataFinalizacao: undefined,
+            podeFinalizar: false,
+            podeHomologarCadastro: false,
+            podeHomologarMapa: false,
+            podeAceitarCadastroBloco: false,
+            podeDisponibilizarMapaBloco: false,
+            unidades: [],
+            resumoSubprocessos: [],
+            acoesBloco: []
+        };
+    }
+
     it('buscarUnidadesParaImportacao deve mapear unidades para importacao', async () => {
         const codProcesso = 1;
         const responseData = [
@@ -141,7 +161,7 @@ describe('processoService', () => {
 
     it('obterDetalhesProcesso deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = {codigo: 1, descricao: 'Detalhes', unidades: [], resumoSubprocessos: []};
+        const responseData = criarDetalheProcesso();
         vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.obterDetalhesProcesso(codProcesso);
@@ -187,7 +207,7 @@ describe('processoService', () => {
 
     it('buscarContextoCompleto deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = {codigo: 1, contexto: 'completo', unidades: [], resumoSubprocessos: []};
+        const responseData = criarDetalheProcesso();
         vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.buscarContextoCompleto(codProcesso);
