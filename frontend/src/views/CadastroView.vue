@@ -288,7 +288,6 @@ const {
   loadingInicioRevisao,
   iniciarRevisaoSeNecessario,
   cancelarInicioRevisaoSeNecessario,
-  atualizarCheckboxSemMudancasSilenciosamente,
   sincronizarDisponibilizacaoSemMudancasInicial
 } = useCadastroRevisaoSemMudancas({
   codigoSubprocesso,

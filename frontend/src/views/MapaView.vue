@@ -442,7 +442,6 @@ const {
 
 const analisesCadastro = ref<Analise[]>([]);
 const historicoAnalise = computed(() => analisesCadastro.value || []);
-const temHistoricoAnalise = computed(() => historicoAnalise.value.length > 0);
 const mostrarModalSugestoes = ref(false);
 const mostrarModalVerSugestoes = ref(false);
 const mostrarModalHistorico = ref(false);
@@ -838,7 +837,7 @@ defineExpose({
   confirmarExclusaoCompetencia,
   disponibilizarMapa,
   removerAtividadeAssociada,
-  fecharModalExcluirCompetencia: () => { mostrarModalExcluirCompetencia.value = false; competenciaParaExcluir.value = null; },
+  fecharModalExcluirCompetencia,
   fecharModalDisponibilizar,
   abrirModalDisponibilizar,
   fecharModalCriarNovaCompetencia,
