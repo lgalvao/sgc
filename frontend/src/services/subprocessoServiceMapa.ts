@@ -16,7 +16,15 @@ import {
 } from "./subprocessoServiceBase";
 
 const obter = async <T>(caminho: string): Promise<T> => (await apiClient.get<T>(caminho)).data;
-const postar = async <T>(caminho: string, payload?: object): Promise<T> => (await apiClient.post<T>(caminho, payload)).data;
+const postarDados = async <T>(caminho: string, payload?: object): Promise<T> =>
+    (await (payload === undefined ? apiClient.post<T>(caminho) : apiClient.post<T>(caminho, payload))).data;
+const postar = async (caminho: string, payload?: object): Promise<void> => {
+    if (payload === undefined) {
+        await apiClient.post(caminho);
+        return;
+    }
+    await apiClient.post(caminho, payload);
+};
 
 export async function obterSugestoesMapa(codSubprocesso: number): Promise<string> { return (await obter<{sugestoes: string}>(caminhoSubprocesso(codSubprocesso, "/sugestoes"))).sugestoes; }
 export async function apresentarSugestoes(codSubprocesso: number, dados: { sugestoes: string }): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/apresentar-sugestoes"), {texto: dados.sugestoes}); }
@@ -37,7 +45,7 @@ export async function verificarImpactosMapa(codSubprocesso: number): Promise<Imp
 }
 
 export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> { return obter<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo")); }
-export async function salvarMapaCompleto(codSubprocesso: number, data: SalvarMapaRequest): Promise<MapaCompleto> { return postar<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo"), data); }
+export async function salvarMapaCompleto(codSubprocesso: number, data: SalvarMapaRequest): Promise<MapaCompleto> { return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo"), data); }
 export async function obterMapaAjuste(codSubprocesso: number): Promise<MapaAjuste> { return obter<MapaAjuste>(caminhoSubprocesso(codSubprocesso, "/mapa-ajuste")); }
 export async function salvarMapaAjuste(codSubprocesso: number, data: SalvarAjustesRequest): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/mapa-ajuste/atualizar"), data); }
 export async function disponibilizarMapa(codSubprocesso: number, data: DisponibilizarMapaRequest): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/disponibilizar-mapa"), data); }
@@ -50,7 +58,7 @@ export async function adicionarCompetencia(
     codSubprocesso: number,
     competencia: SalvarCompetenciaRequest,
 ): Promise<MapaCompleto> {
-    return postar<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/competencia"), mapearPayloadCompetencia(competencia));
+    return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/competencia"), mapearPayloadCompetencia(competencia));
 }
 
 export async function atualizarCompetencia(
@@ -58,11 +66,11 @@ export async function atualizarCompetencia(
     codCompetencia: number,
     competencia: SalvarCompetenciaRequest,
 ): Promise<MapaCompleto> {
-    return postar<MapaCompleto>(caminhoSubprocesso(codSubprocesso, `/competencia/${codCompetencia}`), mapearPayloadCompetencia(competencia));
+    return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, `/competencia/${codCompetencia}`), mapearPayloadCompetencia(competencia));
 }
 
 export async function removerCompetencia(codSubprocesso: number, codCompetencia: number): Promise<MapaCompleto> {
-    return postar<MapaCompleto>(caminhoSubprocesso(codSubprocesso, `/competencia/${codCompetencia}/remover`));
+    return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, `/competencia/${codCompetencia}/remover`));
 }
 
 export async function aceitarCadastroEmBloco(payload: { unidadeCodigos: number[] }): Promise<void> {

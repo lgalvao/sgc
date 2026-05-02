@@ -22,11 +22,9 @@ import {
 } from "./subprocessoServiceBase";
 
 const obter = async <T>(caminho: string, params?: object): Promise<T> =>
-    (await apiClient.get<T>(caminho, params ? {params} : undefined)).data;
+    (await (params ? apiClient.get<T>(caminho, {params}) : apiClient.get<T>(caminho))).data;
 
-const postar = async (caminho: string, payload: object): Promise<void> => {
-    await apiClient.post(caminho, payload);
-};
+const postar = async (caminho: string, payload: object): Promise<void> => { await apiClient.post(caminho, payload); };
 
 export async function importarAtividades(
     codSubprocessoDestino: number,
