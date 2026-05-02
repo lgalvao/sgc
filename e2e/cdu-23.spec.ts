@@ -168,8 +168,9 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
         await page.reload();
         await expect(page.getByTestId('processo-info')).toBeVisible();
         
-        // Garante que o estado do subprocesso foi atualizado na UI antes de verificar botões de ação em bloco
-        await expect(page.getByRole('row', {name: new RegExp(`${UNIDADE_1}.*Devolvido para ajustes`, 'i')})).toBeVisible();
+        // Garante que o estado do subprocesso foi atualizado na UI antes de verificar botões de ação em bloco.
+        // Como a devolução foi para uma unidade intermediária (SECRETARIA_2), a situação permanece "Cadastro disponibilizado".
+        await expect(page.getByRole('row', {name: new RegExp(`${UNIDADE_1}.*Cadastro disponibilizado`, 'i')})).toBeVisible();
 
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
         await expect(btnHomologar).toBeDisabled();

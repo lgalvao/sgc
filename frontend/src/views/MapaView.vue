@@ -359,17 +359,16 @@ import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {apresentarSugestoes, obterSugestoesMapa} from "@/services/subprocessoService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
+import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
 import logger from "@/utils/logger";
 import {normalizeError} from "@/utils/apiError";
 import {Perfil} from "@/types/tipos";
 import type {
   Analise,
   MapaCompleto,
-  MapaVisualizacao,
 } from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
@@ -419,35 +418,28 @@ const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?
 const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);
 const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);
 
-const atividades = computed(() => mapasStore.mapaCompleto.value?.atividades ?? []);
-const competencias = computed(() => mapasStore.mapaCompleto.value?.competencias ?? []);
-const mapaSomenteLeitura = ref<MapaVisualizacao | null>(null);
-const mostrarModalAceitar = ref(false);
-const mostrarModalValidar = ref(false);
-const mostrarModalDevolucao = ref(false);
-const observacaoDevolucao = ref("");
-const loadingSugestoesEnvio = ref(false);
-
 const {
   carregandoInicial,
   codigoSubprocesso,
   unidade,
   carregarContextoInicial,
-} = useMapaOrquestracao(props, mapaSomenteLeitura);
+} = useMapaOrquestracao(props);
+
 const mapasStore = useMapas(codigoSubprocesso);
 const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 
+const atividades = computed(() => mapasStore.mapaCompleto.value?.atividades ?? []);
+const competencias = computed(() => mapasStore.mapaCompleto.value?.competencias ?? []);
+const mapaSomenteLeitura = computed(() => mapasStore.mapaCompleto.value);
+
+const mostrarModalAceitar = ref(false);
+const mostrarModalValidar = ref(false);
+const mostrarModalDevolucao = ref(false);
+const observacaoDevolucao = ref("");
+
 const analisesCadastro = ref<Analise[]>([]);
 const historicoAnalise = computed(() => analisesCadastro.value);
-const mostrarModalSugestoes = ref(false);
-const mostrarModalVerSugestoes = ref(false);
 const mostrarModalHistorico = ref(false);
-const sugestoes = ref("");
-const sugestoesVisualizacao = ref("");
-const loadingSugestoesVisualizacao = ref(false);
-
-const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
-const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 const {
   validarSubmissao,
@@ -455,6 +447,33 @@ const {
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
+
+const {
+  sugestoes,
+  sugestoesVisualizacao,
+  loadingSugestoesVisualizacao,
+  loadingSugestoesEnvio,
+  mostrarModalSugestoes,
+  mostrarModalVerSugestoes,
+  verSugestoes,
+  fecharModalVerSugestoes,
+  abrirModalSugestoes,
+  fecharModalSugestoes,
+  handleConfirmarSugestoes,
+  sincronizarSugestoesMapa,
+  carregarSugestoesParaVisualizacao,
+  carregarSugestoesParaEdicao
+} = useMapaSugestoes({
+  codigoSubprocesso,
+  notify,
+  concluirAcaoPainel,
+  validarSubmissao,
+  focarPrimeiroErroInvalido,
+  resetarValidacao
+});
+
+const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
+const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 const mensagemErroDevolucao = computed(() => {
   return deveExibirErro(!observacaoDevolucao.value.trim()) ? "A justificativa é obrigatória para a devolução." : "";
@@ -543,88 +562,6 @@ async function handleConfirmarDevolucao() {
   }
 }
 
-async function sincronizarSugestoesMapa(): Promise<string> {
-  if (!codigoSubprocesso.value) {
-    return "";
-  }
-  return await obterSugestoesMapa(codigoSubprocesso.value);
-}
-
-async function carregarSugestoesParaVisualizacao() {
-  try {
-    sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
-    return true;
-  } catch (error) {
-    logger.error(error);
-    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
-    return false;
-  }
-}
-
-async function verSugestoes() {
-  if (loadingSugestoesVisualizacao.value) {
-    return;
-  }
-
-  sugestoesVisualizacao.value = "";
-  loadingSugestoesVisualizacao.value = true;
-
-  try {
-    const carregou = await carregarSugestoesParaVisualizacao();
-    if (carregou) {
-      mostrarModalVerSugestoes.value = true;
-    }
-  } finally {
-    loadingSugestoesVisualizacao.value = false;
-  }
-}
-
-function fecharModalVerSugestoes() {
-  mostrarModalVerSugestoes.value = false;
-  sugestoesVisualizacao.value = "";
-}
-
-async function carregarSugestoesParaEdicao() {
-  try {
-    sugestoes.value = await sincronizarSugestoesMapa();
-  } catch (error) {
-    logger.error(error);
-    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
-  }
-}
-
-function abrirModalSugestoes() {
-  resetarValidacao();
-  mostrarModalSugestoes.value = true;
-  void carregarSugestoesParaEdicao();
-}
-
-function fecharModalSugestoes() {
-  mostrarModalSugestoes.value = false;
-  sugestoes.value = "";
-  resetarValidacao();
-}
-
-async function handleConfirmarSugestoes() {
-  if (!validarSubmissao(!!sugestoes.value.trim())) {
-    await focarPrimeiroErroInvalido();
-    return;
-  }
-
-  if (!codigoSubprocesso.value) return;
-
-  try {
-    loadingSugestoesEnvio.value = true;
-    await apresentarSugestoes(codigoSubprocesso.value, {sugestoes: sugestoes.value});
-    await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
-  } catch (error) {
-    logger.error(error);
-    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
-  } finally {
-    loadingSugestoesEnvio.value = false;
-  }
-}
-
 async function abrirModalHistorico() {
   if (codigoSubprocesso.value) {
     analisesCadastro.value = await listarAnalisesCadastro(codigoSubprocesso.value);
@@ -666,7 +603,7 @@ function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
 }
 
 onMounted(async () => {
-  const sucesso = await carregarContextoInicial(podeEditarMapa);
+  const sucesso = await carregarContextoInicial();
   if (!sucesso) {
     if (subprocessoStore.erroIntegracaoContexto) {
       notify(subprocessoStore.erroIntegracaoContexto.message, 'danger');

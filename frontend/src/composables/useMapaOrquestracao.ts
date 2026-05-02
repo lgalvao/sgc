@@ -1,8 +1,7 @@
-import {ref, type Ref} from "vue";
-import type {ContextoEdicaoSubprocesso, MapaVisualizacao, Unidade} from "@/types/tipos";
+import {ref} from "vue";
+import type {ContextoEdicaoSubprocesso, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
-import {obterMapaVisualizacao} from "@/services/subprocessoService";
 import logger from "@/utils/logger";
 
 interface MapaOrquestracaoProps {
@@ -12,8 +11,7 @@ interface MapaOrquestracaoProps {
 }
 
 export function useMapaOrquestracao(
-    props: MapaOrquestracaoProps,
-    mapaSomenteLeitura: Ref<MapaVisualizacao | null>
+    props: MapaOrquestracaoProps
 ) {
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
@@ -27,15 +25,7 @@ export function useMapaOrquestracao(
         mapasStore.definirMapaCompleto(data.detalhes.codigo, data.mapa);
     }
 
-    async function carregarDadosMapaSomenteLeitura(codigo: number) {
-        try {
-            mapaSomenteLeitura.value = await obterMapaVisualizacao(codigo);
-        } catch (error) {
-            logger.error("Erro ao carregar visualização do mapa", error);
-        }
-    }
-
-    async function carregarContextoInicial(podeEditarMapa: Ref<boolean>) {
+    async function carregarContextoInicial() {
         try {
             let contexto: ContextoEdicaoSubprocesso | null = null;
 
@@ -59,11 +49,6 @@ export function useMapaOrquestracao(
             codigoSubprocesso.value = contexto.detalhes.codigo;
             sincronizarEstadoInicialContexto(contexto);
 
-            // Lógica de visualização vs edição
-            if (!podeEditarMapa.value) {
-                await carregarDadosMapaSomenteLeitura(contexto.detalhes.codigo);
-            }
-
             return true;
         } catch (e) {
             logger.error("Erro ao carregar contexto inicial do mapa", e);
@@ -78,7 +63,6 @@ export function useMapaOrquestracao(
         codigoSubprocesso,
         unidade,
         carregarContextoInicial,
-        sincronizarEstadoInicialContexto,
-        carregarDadosMapaSomenteLeitura
+        sincronizarEstadoInicialContexto
     };
 }

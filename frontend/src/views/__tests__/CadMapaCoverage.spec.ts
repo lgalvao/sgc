@@ -26,7 +26,6 @@ vi.mock('@/composables/useFluxoMapa', () => ({useFluxoMapa: vi.fn()}));
 vi.mock('@/services/subprocessoService', () => ({
     verificarImpactosMapa: vi.fn(),
     obterMapaCompleto: vi.fn(),
-    obterMapaVisualizacao: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
 }));
 const subprocessoStoreMock = {

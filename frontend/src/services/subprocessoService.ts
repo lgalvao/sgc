@@ -10,7 +10,6 @@ import type {
     ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
-    MapaVisualizacao,
     SalvarAjustesRequest,
     SalvarCompetenciaRequest,
     SalvarMapaRequest,
@@ -65,7 +64,7 @@ export function mapSubprocessoDetalheResponseParaModel(dto: SubprocessoDetalheRe
         tipoProcesso: subprocesso.tipoProcesso,
         prazoEtapaAtual: subprocesso.dataLimiteEtapa2 ?? subprocesso.dataLimiteEtapa1,
         isEmAndamento: subprocesso.isEmAndamento,
-        etapaAtual: subprocesso.etapaAtual ?? 1,
+        etapaAtual: subprocesso.etapaAtual,
         movimentacoes: dto.movimentacoes,
         elementosProcesso: [],
         permissoes: dto.permissoes,
@@ -200,15 +199,6 @@ export async function buscarSubprocessoPorProcessoEUnidade(
 }
 
 // Mapa / Competencias
-
-export async function obterMapaVisualizacao(
-    codSubprocesso: number,
-): Promise<MapaVisualizacao> {
-    const response = await apiClient.get<MapaVisualizacao>(
-        `/subprocessos/${codSubprocesso}/mapa-visualizacao`,
-    );
-    return response.data;
-}
 
 export async function obterSugestoesMapa(
     codSubprocesso: number,

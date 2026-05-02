@@ -344,7 +344,7 @@ export interface SubprocessoDetalhe {
     tipoProcesso: TipoProcesso;
     prazoEtapaAtual: string;
     isEmAndamento: boolean;
-    etapaAtual: number;
+    etapaAtual: number | null;
     movimentacoes: Movimentacao[];
     elementosProcesso: unknown[];
     permissoes: PermissoesSubprocesso;

@@ -1,0 +1,64 @@
+[WebServer] [SMTP] Servidor SMTP local executando na porta 1025
+[WebServer] 10:59:52.876 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to System property 'spring.devtools.restart.enabled' being set to false
+[WebServer] Iniciando aquecimento dos caches organizacionais...
+[WebServer] Caches organizacionais aquecidos com sucesso.
+[WebServer] > sgc@1.0.0 dev /Users/leonardo/sgc/frontend
+[WebServer] > vite -- --port 5173
+[WebServer] [32m[1mVITE[22m v7.3.2[39m  [2mready in [0m[1m224[22m[2m[0m ms[22m
+[WebServer] [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[WebServer] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[WebServer] >>> Infra E2E no ar. Frontend: 5173. Backend: 10000 (perfil e2e). Monitoramento: nao.
+
+Running 8 tests using 1 worker
+
+[WebServer] Todos os caches de aplicação foram limpos.
+[WebServer] Reset do banco de dados e caches concluído.
+[WebServer] Todos os caches de aplicação foram limpos.
+[WebServer] Reset do banco de dados e caches concluído.
+[WebServer] Todos os caches de aplicação foram limpos.
+[WebServer] Reset do banco de dados e caches concluído.
+[WebServer] Processo criado com 1 unidades participantes
+[WebServer] Criando 1 subprocessos para o processo 400
+[WebServer] Criando alertas de início do processo 400
+  ✓  1 [chromium] › e2e/cdu-23.spec.ts:39:5 › CDU-23 - Homologar cadastros em bloco › Setup data (456ms)
+[WebServer] Processo 400 iniciado para 1 unidades.
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***1313
+[WebServer] Usuário ***1313 autorizado: GESTOR-COORD_22
+[WebServer] Aceitando cadastro do subprocesso 400
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***2121
+[WebServer] Usuário ***2121 autorizado: GESTOR-SECRETARIA_2
+[WebServer] Aceitando cadastro do subprocesso 400
+  ✓  2 [chromium] › e2e/cdu-23.spec.ts:48:5 › CDU-23 - Homologar cadastros em bloco › Setup aceites (3.5s)
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***1919
+[WebServer] Usuário ***1919 autorizado: ADMIN-ADMIN
+[WebServer] [33mWARN DIAGN. ORGANIZACIONAL [Unidade sem responsável]: 1 ocorrencia(s). sigla=SECAO_SEM_RESP, tipo=OPERACIONAL[0m
+  ✓  3 [chromium] › e2e/cdu-23.spec.ts:61:5 › CDU-23 - Homologar cadastros em bloco › Cenario 1: ADMIN abre modal e cancela homologação em bloco (1.6s)
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***1919
+[WebServer] Usuário ***1919 autorizado: ADMIN-ADMIN
+[WebServer] Homologando cadastro do subprocesso 400
+  ✓  4 [chromium] › e2e/cdu-23.spec.ts:84:5 › CDU-23 - Homologar cadastros em bloco › Cenario 2: ADMIN confirma homologação em bloco e permanece na tela (788ms)
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***1919
+[WebServer] Usuário ***1919 autorizado: ADMIN-ADMIN
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***1414
+[WebServer] Usuário ***1414 autorizado: CHEFE-SECAO_221
+  ✓  5 [chromium] › e2e/cdu-23.spec.ts:103:5 › CDU-23 - Homologar cadastros em bloco › Cenario 3: Homologação em bloco registra movimentação e alerta com data/hora (891ms)
+  ✓  6 [chromium] › e2e/cdu-23.spec.ts:139:5 › CDU-23 - Homologar cadastros em bloco após devolução › Setup data (45ms)
+[WebServer] Todos os caches de aplicação foram limpos.
+[WebServer] Reset do banco de dados e caches concluído.
+[WebServer] Processo criado com 1 unidades participantes
+[WebServer] Criando 1 subprocessos para o processo 400
+[WebServer] Criando alertas de início do processo 400
+[WebServer] Processo 400 iniciado para 1 unidades.
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***1313
+[WebServer] Usuário ***1313 autorizado: GESTOR-COORD_22
+[WebServer] Aceitando cadastro do subprocesso 400
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***2121
+[WebServer] Usuário ***2121 autorizado: GESTOR-SECRETARIA_2
+[WebServer] Aceitando cadastro do subprocesso 400
+  ✓  7 [chromium] › e2e/cdu-23.spec.ts:148:5 › CDU-23 - Homologar cadastros em bloco após devolução › Setup aceites (2.7s)
+[WebServer] Usuário autenticado sem AD (perfil e2e): ***1919
+[WebServer] Usuário ***1919 autorizado: ADMIN-ADMIN
+[WebServer] Devolvido cadastro do subprocesso 400
+  ✓  8 [chromium] › e2e/cdu-23.spec.ts:161:5 › CDU-23 - Homologar cadastros em bloco após devolução › Cenario 1: ADMIN não pode homologar em bloco após devolver para ajustes (1.7s)
+
+  8 passed (22.5s)

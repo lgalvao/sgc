@@ -57,10 +57,10 @@
 import {BCard, BCardBody, BCardHeader, BCardTitle} from "bootstrap-vue-next";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
-import type {MapaVisualizacao} from "@/types/tipos";
+import type {MapaCompleto} from "@/types/tipos";
 
 defineProps<{
-  mapa: MapaVisualizacao | null;
+  mapa: MapaCompleto | null;
 }>();
 </script>
 

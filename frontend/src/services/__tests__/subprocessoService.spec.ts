@@ -159,7 +159,7 @@ describe('subprocessoService', () => {
       processoDescricao: 'Processo',
       situacao: SituacaoSubprocesso.NAO_INICIADO,
       ultimaDataLimiteSubprocesso: '2025-02-01T00:00:00',
-      etapaAtual: 1,
+      etapaAtual: null,
       localizacaoAtual: 'UND',
     });
   });
@@ -220,12 +220,6 @@ describe('subprocessoService', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/buscar', {
       params: { codProcesso: 1, siglaUnidade: 'SIGLA' }
     });
-  });
-
-  it('obterMapaVisualizacao', async () => {
-    getMock.mockResolvedValueOnce({ data: { codigo: 1, descricao: '', competencias: [] } } as never);
-    await subprocessoService.obterMapaVisualizacao(1);
-    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/mapa-visualizacao');
   });
 
   it('obterSugestoesMapa', async () => {

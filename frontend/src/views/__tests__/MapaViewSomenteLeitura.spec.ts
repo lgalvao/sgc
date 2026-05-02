@@ -28,7 +28,6 @@ vi.mock("@/services/analiseService", () => ({
 }));
 
 vi.mock("@/services/subprocessoService", () => ({
-    obterMapaVisualizacao: vi.fn(),
     obterSugestoesMapa: vi.fn(),
     apresentarSugestoes: vi.fn(),
     validarMapa: vi.fn(),
@@ -141,24 +140,6 @@ describe("MapaView somente leitura", () => {
             contexto,
         });
 
-        vi.mocked(subprocessoService.obterMapaVisualizacao).mockResolvedValue({
-            codigo: 10,
-            descricao: "Mapa de Teste",
-            competencias: [
-                {
-                    codigo: 1,
-                    descricao: "Competencia 1",
-                    atividades: [
-                        {
-                            codigo: 2,
-                            descricao: "Atividade 1",
-                            conhecimentos: [{codigo: 3, descricao: "Conhecimento 1"}],
-                        },
-                    ],
-                },
-            ],
-            sugestoes: "Sugestão persistida",
-        } as any);
         vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValue("Sugestão persistida");
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
         vi.mocked(subprocessoService.apresentarSugestoes).mockResolvedValue(undefined as never);
@@ -191,9 +172,34 @@ describe("MapaView somente leitura", () => {
     });
 
     function mountComponent(initialState?: Record<string, unknown>) {
+        const piniaState = initialState || {};
+        const mapaMock = {
+            codigo: 10,
+            competencias: [
+                {
+                    codigo: 1,
+                    descricao: "Competencia 1",
+                    atividades: [
+                        {
+                            codigo: 2,
+                            descricao: "Atividade 1",
+                            conhecimentos: [{codigo: 3, descricao: "Conhecimento 1"}],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        if (!piniaState.mapas) {
+            (piniaState as any).mapas = {
+                mapaCompleto: mapaMock,
+                cacheMapaCompleto: new Map([[123, mapaMock]])
+            };
+        }
+
         return mount(MapaView, {
             global: {
-                plugins: [createTestingPinia({stubActions: true, initialState})],
+                plugins: [createTestingPinia({stubActions: true, initialState: piniaState})],
                 stubs,
             },
             props: {
@@ -211,7 +217,6 @@ describe("MapaView somente leitura", () => {
         });
         await flushPromises();
 
-        expect(subprocessoService.obterMapaVisualizacao).toHaveBeenCalledWith(123);
         expect(wrapper.text()).toContain("Competencia 1");
         expect(wrapper.text()).toContain("Atividade 1");
         expect(wrapper.text()).toContain("Conhecimento 1");
