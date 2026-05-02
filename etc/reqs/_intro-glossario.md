@@ -68,7 +68,13 @@ Também referido como de competências técnicas e identificação das ocupaçõ
 
 ## Responsável
 
-Servidor titular ou substituto da titularidade de uma unidade organizacional, de acordo com as informações vigentes no SGRH no momento da consulta.
+Servidor que exerce o papel de chefia em uma unidade organizacional em um dado momento. A responsabilidade é uma informação derivada, que segue a seguinte ordem de precedência:
+1. **Atribuição Temporária**: servidor designado pelo sistema SGC para assumir a unidade por um período específico (ex: em casos não cobertos por substituição formal no SGRH).
+2. **Substituto**: Servidor registrado formalmente no SGRH como substituto do titular, por um período determinado.
+3. **Titular**: O resposável 'oficial' pela unidade caso não haja substituto ativo no SGRH ou atribuição temporária definida no SGC para a unidade.
+
+## Titular
+Servidor designado formalmente para a chefia de uma unidade organizacional, no SGRH.
 
 ## SEDOC
 

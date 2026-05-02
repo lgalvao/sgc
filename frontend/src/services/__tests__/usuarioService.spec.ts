@@ -103,6 +103,7 @@ describe("usuarioService", () => {
         expect(usuarioService.mapUsuarioToFrontend({
             tituloEleitoral: "123",
             nome: "Pessoa",
+            matricula: "M123",
             email: "pessoa@teste.com",
             ramal: "123",
             unidade: {codigo: 1, nome: "Unidade", sigla: "UND"},
@@ -112,6 +113,7 @@ describe("usuarioService", () => {
         expect(usuarioService.mapUsuarioToFrontend({
             tituloEleitoral: "abc",
             nome: "Pessoa",
+            matricula: "M123",
             email: "pessoa@teste.com",
             ramal: "123",
             unidade: {codigo: 1, nome: "Unidade", sigla: "UND"},
@@ -119,30 +121,34 @@ describe("usuarioService", () => {
         } as never).codigo).toBe(0);
 
         expect(usuarioService.mapVWUsuarioToUsuario({
-            codigo: 7,
+            titulo: "999",
+            matricula: "M999",
             nome: "VW",
-            unidade: {codigo: 1, nome: "Unidade", sigla: "UND"},
+            unidade_lot_codigo: 1,
             email: "vw@teste.com",
             ramal: "321",
-            titulo_eleitoral: "999",
-        })).toMatchObject({codigo: 7, nome: "VW", tituloEleitoral: "999"});
+        })).toMatchObject({codigo: 999, nome: "VW", tituloEleitoral: "999", matricula: "M999"});
 
         expect(usuarioService.mapVWUsuarioToUsuario({
-            titulo: "abc",
-            nome_completo: "Nome Completo",
-            unidade_sigla: "UND",
-            ramal_telefone: "777",
-        })).toMatchObject({
-            codigo: 0,
-            nome: "Nome Completo",
-            tituloEleitoral: "abc",
+            titulo: "123",
+            matricula: "M123",
+            nome: "Nome",
+            unidade_lot_codigo: 1,
+            email: "teste@teste",
             ramal: "777",
+            unidade_sigla: "UND",
+        })).toMatchObject({
+            codigo: 123,
+            nome: "Nome",
+            tituloEleitoral: "123",
+            ramal: "777",
+            unidade: {codigo: 1, sigla: "UND"}
         });
 
         expect(usuarioService.mapVWUsuariosArray([
-            {codigo: 1, nome: "A"},
-            {titulo: "2", nome_completo: "B"},
-        ] as never)).toHaveLength(2);
+            {titulo: "1", matricula: "M1", nome: "A", email: "a@a", ramal: "1", unidade_lot_codigo: 1},
+            {titulo: "2", matricula: "M2", nome: "B", email: "b@b", ramal: "2", unidade_lot_codigo: 2},
+        ])).toHaveLength(2);
     });
 
     it("faz chamadas HTTP e respeita cache por titulo", async () => {

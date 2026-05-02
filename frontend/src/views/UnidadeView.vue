@@ -229,7 +229,7 @@ const dadosFormatadosSubordinadas = computed(() => {
 
 const responsavelExibivel = computed(() => {
   const responsavel = unidade.value?.responsavel;
-  if (!responsavel || responsavelEhTitular(responsavel, titularDetalhes.value, unidade.value?.tituloTitular)) {
+  if (!responsavel || unidade.value?.tipoResponsabilidade === 'TITULAR') {
     return null;
   }
   return responsavel;
@@ -257,7 +257,7 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
   });
 }
 
-function responsavelEhTitular(responsavel: Usuario, titular: Usuario | null, tituloTitular?: string): boolean {
+function responsavelEhTitular(responsavel: {tituloEleitoral?: string, nome?: string}, titular: Usuario | null, tituloTitular?: string): boolean {
   if (responsavel.tituloEleitoral && tituloTitular && responsavel.tituloEleitoral === tituloTitular) {
     return true;
   }

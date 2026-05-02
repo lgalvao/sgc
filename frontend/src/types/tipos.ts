@@ -41,6 +41,7 @@ export interface Unidade {
     usuarioCodigo?: number;
     tituloTitular?: string;
     isElegivel?: boolean;
+    tipoResponsabilidade?: string;
     responsavel?: Responsavel | Usuario | null;
 }
 

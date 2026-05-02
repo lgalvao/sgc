@@ -47,6 +47,10 @@ public class UnidadeDto {
     private boolean isElegivel;
 
     @JsonView(OrganizacaoViews.Publica.class)
+    @JsonProperty("tipoResponsabilidade")
+    private @Nullable String tipoResponsabilidade;
+
+    @JsonView(OrganizacaoViews.Publica.class)
     private @Nullable UsuarioResumoDto responsavel;
 
     public static @Nullable UnidadeDto fromEntity(@Nullable Unidade entity) {
@@ -69,6 +73,7 @@ public class UnidadeDto {
         Responsabilidade responsabilidade = entity.getResponsabilidade();
         if (responsabilidade != null) {
             dto.setResponsavel(UsuarioResumoDto.fromEntity(responsabilidade.getUsuario()));
+            dto.setTipoResponsabilidade(responsabilidade.getTipo());
         }
 
         return dto;
