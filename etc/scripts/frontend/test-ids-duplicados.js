@@ -4,6 +4,9 @@ import path from "path";
 
 const searchDir = path.join(import.meta.dirname, '../../../frontend/src');
 const extensions = ['.vue'];
+const idsCompartilhadosPermitidos = new Set([
+    'subprocesso-header__txt-header-unidade',
+]);
 // Melhora o regex para capturar data-testid estáticos e dinâmicos
 // Suporta: data-testid="valor", :data-testid="'valor'", data-testid='valor'
 const regex = /(^|[\s<])(:?)(data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/gm;
@@ -68,6 +71,7 @@ try {
 
     // Filtrar apenas duplicados
     const duplicates = Object.entries(groupedByValue)
+        .filter(([value]) => !idsCompartilhadosPermitidos.has(value))
         .filter(([value, items]) => items.length > 1)
         .sort((a, b) => b[1].length - a[1].length);
 

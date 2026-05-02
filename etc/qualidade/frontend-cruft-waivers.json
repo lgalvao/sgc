@@ -34,22 +34,6 @@
       "criterioRemocao": "Dividir textos por modulo ou fluxo principal."
     },
     {
-      "arquivo": "frontend/src/types/subprocesso.ts",
-      "camada": "outro",
-      "maxLinhas": 252,
-      "responsavel": "frontend",
-      "justificativa": "A fatiacao de tipos separou subprocesso do agregador antigo, mas ainda concentrou contratos demais neste modulo.",
-      "criterioRemocao": "Separar detalhe, validacao e operacoes de subprocesso em modulos menores."
-    },
-    {
-      "arquivo": "frontend/src/types/mapa.ts",
-      "camada": "outro",
-      "maxLinhas": 150,
-      "responsavel": "frontend",
-      "justificativa": "A fatiacao de tipos separou mapa do agregador antigo, mas impacto e requests ainda estao no mesmo modulo.",
-      "criterioRemocao": "Separar requests, leitura de mapa e impacto em arquivos menores."
-    },
-    {
       "arquivo": "frontend/src/services/subprocessoService.ts",
       "camada": "service",
       "maxLinhas": 397,
@@ -96,14 +80,6 @@
       "responsavel": "frontend",
       "justificativa": "Componente generico ainda concentra estrutura e comportamento demais.",
       "criterioRemocao": "Dividir cabecalho, corpo e interacoes da tabela em subcomponentes."
-    },
-    {
-      "arquivo": "frontend/src/components/mapa/MapaFluxoModais.vue",
-      "camada": "component",
-      "maxLinhas": 301,
-      "responsavel": "frontend",
-      "justificativa": "A extração dos modais tirou peso da view, mas ainda manteve muitos fluxos do mapa no mesmo componente.",
-      "criterioRemocao": "Separar modais de edicao dos modais de analise e sugestoes."
     },
     {
       "arquivo": "frontend/src/axios-setup.ts",

@@ -65,7 +65,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
 <template>
   <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
     <template #default>
-      <div v-if="unidade" class="fs-5" data-testid="mapa-header__txt-header-unidade">
+      <div v-if="unidade" class="fs-5" data-testid="subprocesso-header__txt-header-unidade">
         {{ unidade.sigla }}
       </div>
     </template>
