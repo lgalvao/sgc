@@ -137,4 +137,27 @@ describe("useCadastroAtividadesMutacoes", () => {
             descricao: "Desc Atualizada"
         });
     });
+
+    it("deve lidar com erro em executarAtualizacaoCadastro", async () => {
+        const {salvarEdicaoAtividade} = setup();
+        atividades.value = [{codigo: 1, descricao: "Desc"}];
+        vi.mocked(atividadeService.atualizarAtividade).mockRejectedValue(new Error("Falha"));
+
+        const success = await salvarEdicaoAtividade(1, "Nova");
+
+        expect(success).toBe(undefined); // executarAtualizacaoCadastro retorna bool via try/catch mas salvarEdicaoAtividade não retorna nada
+        expect(notify).toHaveBeenCalled();
+    });
+
+    it("deve lidar com erro em confirmarRemocao", async () => {
+        const {removerAtividade, confirmarRemocao, mostrarModalConfirmacaoRemocao} = setup();
+        removerAtividade(1);
+        vi.mocked(atividadeService.excluirAtividade).mockRejectedValue(new Error("Erro de remoção"));
+        lastError.value = {message: "Erro customizado"};
+
+        await confirmarRemocao();
+
+        expect(notify).toHaveBeenCalledWith("Erro customizado", "danger");
+        expect(mostrarModalConfirmacaoRemocao.value).toBe(false);
+    });
 });

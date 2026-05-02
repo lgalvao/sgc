@@ -69,6 +69,13 @@ describe("usePerfilStore", () => {
         expect(res.autenticado).toBe(false);
     });
 
+    it("deve relançar erro genérico no login", async () => {
+        const store = usePerfilStore();
+        vi.mocked(usuarioService.login).mockRejectedValue(new Error("Erro grave"));
+
+        await expect(store.iniciarLogin("123", "senha")).rejects.toThrow("Erro grave");
+    });
+
     it("deve concluir login com perfil", async () => {
         const store = usePerfilStore();
         const mockSessao = { perfil: Perfil.GESTOR, unidadeCodigo: 1, tituloEleitoral: "123", nome: "Teste", permissoes: { acoes: [] } };

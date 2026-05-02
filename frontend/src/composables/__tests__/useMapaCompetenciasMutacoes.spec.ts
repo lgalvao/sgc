@@ -86,4 +86,80 @@ describe("useMapaCompetenciasMutacoes", () => {
 
         expect(fluxoMapa.removerAtividadeDaCompetencia).toHaveBeenCalledWith(123, 50, 10);
     });
+
+    it("deve fechar modal de criação", () => {
+        const {fecharModalCriarNovaCompetencia, mostrarModalCriarNovaCompetencia} = setup();
+        mostrarModalCriarNovaCompetencia.value = true;
+
+        fecharModalCriarNovaCompetencia();
+
+        expect(mostrarModalCriarNovaCompetencia.value).toBe(false);
+        expect(clearErrors).toHaveBeenCalled();
+    });
+
+    it("deve iniciar exclusão de competência", () => {
+        const localCompetencias = ref([{codigo: 50, descricao: "C"}] as any);
+        const {excluirCompetencia, mostrarModalExcluirCompetencia, competenciaParaExcluir} = useMapaCompetenciasMutacoes({
+            codigoSubprocesso,
+            competencias: localCompetencias as any,
+            fluxoMapa,
+            notify,
+            clearErrors,
+            aplicarErroNormalizado,
+            sincronizarMapa,
+        });
+
+        excluirCompetencia(50);
+
+        expect(mostrarModalExcluirCompetencia.value).toBe(true);
+        expect(competenciaParaExcluir.value?.codigo).toBe(50);
+    });
+
+    it("deve confirmar exclusão de competência com sucesso", async () => {
+        const localCompetencias = ref([{codigo: 50, descricao: "C"}] as any);
+        const {excluirCompetencia, confirmarExclusaoCompetencia, mostrarModalExcluirCompetencia} = useMapaCompetenciasMutacoes({
+            codigoSubprocesso,
+            competencias: localCompetencias as any,
+            fluxoMapa,
+            notify,
+            clearErrors,
+            aplicarErroNormalizado,
+            sincronizarMapa,
+        });
+        excluirCompetencia(50);
+        fluxoMapa.removerCompetencia.mockResolvedValue({} as any);
+
+        await confirmarExclusaoCompetencia();
+
+        expect(fluxoMapa.removerCompetencia).toHaveBeenCalledWith(123, 50);
+        expect(mostrarModalExcluirCompetencia.value).toBe(false);
+    });
+
+    it("deve lidar com erro ao adicionar competência", async () => {
+        const {adicionarCompetenciaEFecharModal} = setup();
+        fluxoMapa.adicionarCompetencia.mockRejectedValue(new Error("Erro"));
+
+        await adicionarCompetenciaEFecharModal({descricao: "Nova", atividadesSelecionadas: []});
+
+        expect(aplicarErroNormalizado).toHaveBeenCalled();
+    });
+
+    it("deve lidar com erro ao confirmar exclusão", async () => {
+        const localCompetencias = ref([{codigo: 50, descricao: "C"}] as any);
+        const {excluirCompetencia, confirmarExclusaoCompetencia} = useMapaCompetenciasMutacoes({
+            codigoSubprocesso,
+            competencias: localCompetencias as any,
+            fluxoMapa,
+            notify,
+            clearErrors,
+            aplicarErroNormalizado,
+            sincronizarMapa,
+        });
+        excluirCompetencia(50);
+        fluxoMapa.removerCompetencia.mockRejectedValue(new Error("Erro de exclusão"));
+
+        await confirmarExclusaoCompetencia();
+
+        expect(notify).toHaveBeenCalledWith(expect.stringContaining("Erro de exclusão"), "danger");
+    });
 });

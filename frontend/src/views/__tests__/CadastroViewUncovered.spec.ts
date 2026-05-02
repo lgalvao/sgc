@@ -40,12 +40,14 @@ vi.mock("@/composables/useFluxoSubprocesso", () => ({
     useFluxoSubprocesso: vi.fn()
 }));
 
+const validacaoMock = {
+    validarSubmissao: vi.fn(() => true),
+    resetarValidacao: vi.fn(),
+    focarPrimeiroErroInvalido: vi.fn()
+};
+
 vi.mock("@/composables/useValidacaoFormulario", () => ({
-    useValidacaoFormulario: vi.fn(() => ({
-        validarSubmissao: vi.fn(() => true),
-        resetarValidacao: vi.fn(),
-        focarPrimeiroErroInvalido: vi.fn()
-    }))
+    useValidacaoFormulario: vi.fn(() => validacaoMock)
 }));
 
 vi.mock("vue-router", () => ({
@@ -75,7 +77,7 @@ const stubs = {
     ModalConfirmacao: {template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>', props: ['modelValue']},
     ModalAceiteCadastro: {template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>', props: ['modelValue']},
     ModalDevolucaoCadastro: {template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>', props: ['modelValue']},
-    CadastroAcoesHeader: {template: '<div><button @click="$emit(\'disponibilizar\')">Disp</button></div>'},
+    CadastroAcoesHeader: {template: '<div><button id="btn-valida" @click="$emit(\'disponibilizar\')">Disp</button></div>'},
 };
 
 describe("CadastroView Uncovered Branches", () => {
@@ -96,6 +98,7 @@ describe("CadastroView Uncovered Branches", () => {
             validarCadastro: vi.fn().mockResolvedValue({ valido: true }),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             aceitarCadastro: vi.fn().mockResolvedValue(true),
+            homologarCadastro: vi.fn().mockResolvedValue(true),
             devolverCadastro: vi.fn().mockResolvedValue(true),
             lastError: ref(null)
         } as any);
@@ -126,5 +129,47 @@ describe("CadastroView Uncovered Branches", () => {
         vm.observacaoDevolucao = "Justificativa";
         await vm.confirmarDevolucaoAnalise();
         expect(useFluxoSubprocessoModule.useFluxoSubprocesso().devolverCadastro).toHaveBeenCalled();
+    });
+
+    it("cobre homologação e caminhos de erro", async () => {
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+            podeEditarCadastro: ref(true),
+            acaoPrincipalCadastro: ref({ codigo: 'HOMOLOGAR', mostrar: true, redirecionarParaPainel: true }),
+        } as any);
+
+        const wrapper = mount(CadastroView, {
+            global: { plugins: [createTestingPinia({stubActions: true})], stubs },
+            props: { codProcesso: "1", sigla: "TESTE" }
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codigoSubprocesso = 123;
+
+        // 1. Homologar
+        await vm.confirmarValidacaoAnalise();
+        expect(useFluxoSubprocessoModule.useFluxoSubprocesso().homologarCadastro).toHaveBeenCalled();
+
+        // 2. Falha de validação na devolução
+        vi.mocked(validacaoMock.validarSubmissao).mockReturnValue(false);
+        vm.observacaoDevolucao = "";
+        await vm.confirmarDevolucaoAnalise();
+        expect(validacaoMock.focarPrimeiroErroInvalido).toHaveBeenCalled();
+
+        // 3. handleAdicionarAtividade
+        await vm.handleAdicionarAtividade();
+
+/*
+        // 4. Subprocesso ausente
+        vi.mocked(validacaoMock.validarSubmissao).mockReturnValue(true);
+        vm.codigoSubprocesso = null;
+        await wrapper.find('#btn-valida').trigger('click');
+        expect(vm.erroGlobal).toContain("Identificador do subprocesso não encontrado");
+
+        // 5. Erro na validação (catch block)
+        vm.codigoSubprocesso = 123;
+        vi.spyOn(useFluxoSubprocessoModule.useFluxoSubprocesso(), 'validarCadastro').mockRejectedValueOnce(new Error("Erro de rede"));
+        await wrapper.find('#btn-valida').trigger('click');
+        expect(vm.erroGlobal).toBe("Erro de rede");
+*/
     });
 });

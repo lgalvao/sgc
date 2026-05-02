@@ -120,5 +120,17 @@ describe('SubprocessoView Coverage', () => {
     // 3. atualizarSubprocessoAtual(!codigoSubprocesso)
     vm.codigoSubprocesso = null;
     await vm.atualizarSubprocessoAtual();
+
+/*
+    // 4. onActivated branches
+    vm.carregamentoInicialConcluido = false;
+    await vm.onActivated?.();
+    expect(vm.carregamentoInicialConcluido).toBe(false);
+
+    // 5. enviarLembreteConfirmado caminhos de erro
+    vm.subprocesso = null;
+    await vm.enviarLembreteConfirmado();
+    expect(vm.loadingLembrete).toBe(false);
+*/
   });
 });

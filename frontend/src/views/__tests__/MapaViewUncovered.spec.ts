@@ -4,11 +4,34 @@ import MapaView from "../MapaView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import * as useAcessoModule from "@/composables/useAcesso";
 import {useMapas} from "@/composables/useMapas";
+import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {ref} from "vue";
+import * as subprocessoService from "@/services/subprocessoService";
 
 vi.mock("vue-router", () => ({
     useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
     useRouter: () => ({push: vi.fn()}),
+}));
+
+vi.mock("@/services/subprocessoService", () => ({
+    obterSugestoesMapa: vi.fn().mockResolvedValue("Sugestões mock"),
+    apresentarSugestoes: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock("@/services/analiseService", () => ({
+    listarAnalisesCadastro: vi.fn().mockResolvedValue([]),
+}));
+
+const mapasStoreMock = {
+    mapaCompleto: ref({ atividades: [], competencias: [] }),
+    buscarMapaCompleto: vi.fn(),
+    buscarImpactoMapa: vi.fn(),
+    impactoMapa: ref(null),
+    erro: ref(null),
+};
+
+vi.mock("@/composables/useMapas", () => ({
+    useMapas: () => mapasStoreMock
 }));
 
 vi.mock("@/composables/useContextoSubprocesso", () => ({
@@ -22,21 +45,23 @@ vi.mock("@/composables/useContextoSubprocesso", () => ({
     })
 }));
 
+const fluxoMapaMock = {
+    carregando: ref(false),
+    validarMapa: vi.fn().mockResolvedValue({}),
+    homologarMapa: vi.fn().mockResolvedValue({}),
+    aceitarMapa: vi.fn().mockResolvedValue({}),
+    devolverMapa: vi.fn().mockResolvedValue({}),
+    disponibilizarMapa: vi.fn().mockResolvedValue({}),
+    adicionarCompetencia: vi.fn().mockResolvedValue({}),
+    atualizarCompetencia: vi.fn().mockResolvedValue({}),
+    removerCompetencia: vi.fn().mockResolvedValue({}),
+    removerAtividadeDaCompetencia: vi.fn().mockResolvedValue({}),
+    lastError: ref(null),
+    clearError: vi.fn()
+};
+
 vi.mock("@/composables/useFluxoMapa", () => ({
-    useFluxoMapa: () => ({
-        carregando: ref(false),
-        validarMapa: vi.fn().mockResolvedValue({}),
-        homologarMapa: vi.fn().mockResolvedValue({}),
-        aceitarMapa: vi.fn().mockResolvedValue({}),
-        devolverMapa: vi.fn().mockResolvedValue({}),
-        disponibilizarMapa: vi.fn().mockResolvedValue({}),
-        adicionarCompetencia: vi.fn().mockResolvedValue({}),
-        atualizarCompetencia: vi.fn().mockResolvedValue({}),
-        removerCompetencia: vi.fn().mockResolvedValue({}),
-        removerAtividadeDaCompetencia: vi.fn().mockResolvedValue({}),
-        lastError: ref(null),
-        clearError: vi.fn()
-    })
+    useFluxoMapa: () => fluxoMapaMock
 }));
 
 const stubs = {
@@ -187,5 +212,84 @@ describe("MapaView Uncovered Branches", () => {
         vm.mostrarModalDevolucao = true;
         await vm.handleConfirmarDevolucao();
         expect(vm.mostrarModalDevolucao).toBe(false);
+    });
+
+    it("cobre disponibilizarMapa e caminhos de erro", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codigoSubprocesso = 123;
+
+        // 1. Caso de erro no disponibilizar
+        const fluxo = useFluxoMapa();
+        vi.mocked(fluxo.disponibilizarMapa).mockRejectedValue(new Error("Erro"));
+        await vm.disponibilizarMapa({dataLimite: "2024-01-01", observacoes: ""});
+        expect(vm.loadingDisponibilizacao).toBe(false);
+
+        // 2. abrirModalDisponibilizar com erro de validação (sem competências)
+        const mapasStore = useMapas();
+        mapasStore.mapaCompleto.value = { competencias: [] } as any;
+        vm.abrirModalDisponibilizar();
+        expect(vm.erroValidacaoMapa).toContain("competência");
+    });
+
+    it("cobre handleConfirmarSugestoes e verSugestoes", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codigoSubprocesso = 123;
+        vm.sugestoes = "Novas sugestões";
+
+        await vm.handleConfirmarSugestoes();
+        expect(vm.mostrarModalSugestoes).toBe(false);
+
+        await vm.verSugestoes();
+        expect(vm.mostrarModalVerSugestoes).toBe(true);
+    });
+
+    it("cobre fluxos de validação, devolução e histórico", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codigoSubprocesso = 123;
+
+        // 1. Validar
+        vm.abrirModalValidar();
+        expect(vm.mostrarModalValidar).toBe(true);
+        await vm.confirmarValidacao();
+        expect(fluxoMapaMock.validarMapa).toHaveBeenCalled();
+
+        // 2. Devolver
+        vm.abrirModalDevolucao();
+        expect(vm.mostrarModalDevolucao).toBe(true);
+        vm.observacaoDevolucao = "Obs";
+        await vm.handleConfirmarDevolucao();
+        expect(fluxoMapaMock.devolverMapa).toHaveBeenCalled();
+
+        // 3. Histórico
+        await vm.verHistorico();
+        expect(vm.mostrarModalHistorico).toBe(true);
+
+        // 4. sincronizarMapa
+        vm.sincronizarMapa({ codigo: 1, competencias: [] });
+        expect(useMapas().mapaCompleto.value).toBeDefined();
+
+        // 5. Disponibilizar
+        vm.mostrarModalDisponibilizar = true;
+        await vm.disponibilizarMapa({ dataLimite: "2023-12-31", observacoes: "" });
+        expect(fluxoMapaMock.disponibilizarMapa).toHaveBeenCalled();
+
+        // 6. Fechar modal exclusão
+        vm.fecharModalExcluirCompetencia();
+        expect(vm.mostrarModalExcluirCompetencia).toBe(false);
     });
 });

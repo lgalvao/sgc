@@ -180,4 +180,41 @@ describe('NotificacoesAdminView', () => {
     await wrapper.find('[data-testid="btn-notificacoes-atualizar"]').trigger('click');
     expect(vi.mocked(listarNotificacoesAdmin)).toHaveBeenCalled();
   });
+
+  it('handles re-send failure', async () => {
+    const mockData = [{ codigo: 1, situacao: 'FALHA_DEFINITIVA', destinatario: 'a@a.com' }];
+    vi.mocked(listarNotificacoesAdmin).mockResolvedValue(mockData as any);
+    vi.mocked(reenviarNotificacao).mockRejectedValue(new Error('Erro Reenvio'));
+
+    const wrapper = mountComponent();
+    await flushPromises();
+    const vm = wrapper.vm as any;
+    vm.itemSelecionado = mockData[0];
+
+    await vm.reenviar();
+    await flushPromises();
+
+    expect(mockNotify).toHaveBeenCalledWith('Erro Reenvio', 'danger');
+  });
+
+  it('handles load failure', async () => {
+    vi.mocked(listarNotificacoesAdmin).mockRejectedValue(new Error('Erro Lista'));
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Erro Lista');
+  });
+
+  it('covers formatarDestinatario institutional email branch', () => {
+    const wrapper = mountComponent();
+    const vm = wrapper.vm as any;
+    
+    // 1. Institutional email
+    const item1 = { destinatario: 'leonardo@tre-pe.jus.br' };
+    expect(vm.formatarDestinatario(item1)).toBe('LEONARDO');
+
+    // 2. Already has title
+    const item2 = { destinatario: 'a@a.com', usuarioDestinoTitulo: 'TITULO' };
+    expect(vm.formatarDestinatario(item2)).toBe('a@a.com');
+  });
 });

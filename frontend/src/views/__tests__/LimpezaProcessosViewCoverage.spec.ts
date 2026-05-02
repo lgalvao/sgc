@@ -84,4 +84,24 @@ describe('LimpezaProcessosView Coverage', () => {
     // The component uses notify to show error. If it didn't throw, it was handled
     expect(processoService.excluirProcessoCompleto).toHaveBeenCalled();
   });
+
+  it('covers validation failure when opening confirmation', async () => {
+    const wrapper = mountComponent();
+    const vm = wrapper.vm as any;
+    vm.codigoProcesso = ''; // Invalid
+
+    await vm.abrirConfirmacao();
+    
+    expect(vm.mostrarConfirmacao).toBe(false);
+  });
+
+  it('covers early return in confirm deletion if code is missing', async () => {
+    const wrapper = mountComponent();
+    const vm = wrapper.vm as any;
+    vm.codigoProcesso = ''; // Nullifies codigoConfirmacao
+
+    await vm.confirmarExclusao();
+    
+    expect(processoService.excluirProcessoCompleto).not.toHaveBeenCalled();
+  });
 });

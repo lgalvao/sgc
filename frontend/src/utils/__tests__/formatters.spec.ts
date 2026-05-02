@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {
+    calcularAssinaturaCadastro,
     formatDate,
     formatNumeroCsvBR,
     formatSituacaoProcesso,
@@ -21,8 +22,48 @@ describe('formatters', () => {
       expect(formatDate(date, false)).toMatch(/15\/01\/2024/);
     });
 
+    it('deve formatar data valida com hora', () => {
+      const date = new Date('2024-01-15T10:30:00');
+      const formatado = formatDate(date, true);
+      expect(formatado).toMatch(/15\/01\/2024/);
+      expect(formatado).toMatch(/10:30/);
+    });
+
     it('deve formatar data invalida como string vazia', () => {
       expect(formatDate('data-invalida')).toBe('');
+    });
+  });
+
+  describe('calcularAssinaturaCadastro', () => {
+    it('deve retornar string vazia para lista nula ou vazia', () => {
+      expect(calcularAssinaturaCadastro(null as any)).toBe('');
+      expect(calcularAssinaturaCadastro([])).toBe('');
+    });
+
+    it('deve calcular assinatura para uma atividade', () => {
+      const atividades = [
+        {
+          descricao: ' Atividade 1 ',
+          conhecimentos: [
+            {descricao: ' C2 '},
+            {descricao: ' C1 '}
+          ]
+        }
+      ] as any;
+
+      const assinatura = calcularAssinaturaCadastro(atividades);
+      // "Atividade 1" + \u0002 + "C1" + \u0001 + "C2"
+      expect(assinatura).toBe('Atividade 1\u0002C1\u0001C2');
+    });
+
+    it('deve calcular assinatura para múltiplas atividades ordenadas', () => {
+      const atividades = [
+        {descricao: 'B', conhecimentos: []},
+        {descricao: 'A', conhecimentos: []}
+      ] as any;
+
+      const assinatura = calcularAssinaturaCadastro(atividades);
+      expect(assinatura).toBe('A\u0002\u0003B\u0002');
     });
   });
 

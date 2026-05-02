@@ -1,5 +1,8 @@
 import {describe, expect, it, vi} from 'vitest';
-import {carregarContextoSubprocessoInicial} from '@/composables/useContextoSubprocesso';
+import {
+  carregarContextoSubprocessoInicial,
+  diagnosticarCarregamentoContextoSubprocessoInicial,
+} from '@/composables/useContextoSubprocesso';
 
 function criarStoreMock() {
   return {
@@ -54,5 +57,67 @@ describe('carregarContextoSubprocessoInicial', () => {
     expect(store.garantirContextoEdicao).not.toHaveBeenCalled();
     expect(store.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'GAB');
     expect(resultado).toBeNull();
+  });
+});
+
+describe('diagnosticarCarregamentoContextoSubprocessoInicial', () => {
+  it('deve retornar sucesso quando encontrar contexto', async () => {
+    const resultadoMock = {codigo: 1, contexto: {} as any};
+    const store = criarStoreMock();
+    store.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(resultadoMock);
+
+    const resultado = await diagnosticarCarregamentoContextoSubprocessoInicial({
+      codProcesso: 1,
+      siglaUnidade: 'U',
+      store,
+    });
+
+    expect(resultado).toEqual({tipo: 'sucesso', resultado: resultadoMock});
+  });
+
+  it('deve retornar cancelado quando a requisição for cancelada', async () => {
+    const store = {
+      ...criarStoreMock(),
+      erroIntegracaoContexto: {code: 'REQUEST_CANCELADA'},
+    };
+    store.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+
+    const resultado = await diagnosticarCarregamentoContextoSubprocessoInicial({
+      codProcesso: 1,
+      siglaUnidade: 'U',
+      store: store as any,
+    });
+
+    expect(resultado).toEqual({tipo: 'cancelado'});
+  });
+
+  it('deve retornar erroIntegracao quando houver outro erro', async () => {
+    const erroMock = {code: 'ERRO_INTERNO'} as any;
+    const store = {
+      ...criarStoreMock(),
+      erroIntegracaoContexto: erroMock,
+    };
+    store.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+
+    const resultado = await diagnosticarCarregamentoContextoSubprocessoInicial({
+      codProcesso: 1,
+      siglaUnidade: 'U',
+      store: store as any,
+    });
+
+    expect(resultado).toEqual({tipo: 'erroIntegracao', erro: erroMock});
+  });
+
+  it('deve retornar ausencia quando não encontrar nada e não houver erro', async () => {
+    const store = criarStoreMock();
+    store.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+
+    const resultado = await diagnosticarCarregamentoContextoSubprocessoInicial({
+      codProcesso: 1,
+      siglaUnidade: 'U',
+      store,
+    });
+
+    expect(resultado).toEqual({tipo: 'ausencia'});
   });
 });
