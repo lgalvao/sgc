@@ -58,7 +58,6 @@ type CadastroViewVm = {
     errosValidacao?: Array<{atividadeCodigo?: number; mensagem: string}>;
     notificacao: unknown;
     novaAtividade: string;
-    timeoutLimparErros: ReturnType<typeof setTimeout> | null;
     podeHomologarCadastro?: boolean;
     handleImportAtividades: (resultado: any) => Promise<void>;
     disponibilizarCadastro: () => Promise<void>;
@@ -67,7 +66,6 @@ type CadastroViewVm = {
     processarRespostaLocal: (payload: {atividadesAtualizadas?: unknown[]}) => void;
     notify: (mensagem: string, variante: string) => void;
     carregarContextoInicial: () => Promise<void>;
-    timeoutLimpezaErros: () => void;
     $nextTick: () => Promise<void>;
 };
 
@@ -870,11 +868,6 @@ describe("CadastroView.vue", () => {
         const histModal = wrapper.findComponent({name: 'HistoricoAnaliseModal'});
         if (histModal.exists()) await histModal.vm.$emit('fechar');
 
-        // Branches de timeout e outros
-
-        vm.timeoutLimparErros = setTimeout(() => {}, 100);
-        vm.timeoutLimpezaErros();
-        
         // Cobre ramo sem contexto agregado
         subprocessosMock.buscarContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(null);
         await vm.carregarContextoInicial();

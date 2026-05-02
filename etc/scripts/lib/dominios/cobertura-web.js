@@ -91,7 +91,9 @@ async function extrairCoberturaFrontend(caminhoRelativo = "frontend/coverage/cov
             statementsCobertos: statements.cobertos,
             statementsTotal: statements.total,
             branchesPercentual: calcularPercentualPorTotal(branches.cobertos, branches.total),
+            branchesTotal: branches.total,
             functionsPercentual: calcularPercentualPorTotal(functions.cobertos, functions.total),
+            functionsTotal: functions.total,
             linesPercentual: calcularPercentualPorTotal(lines.cobertos, lines.total)
         });
     }

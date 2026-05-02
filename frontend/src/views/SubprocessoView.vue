@@ -162,7 +162,7 @@ import {
   BTable,
   useToast
 } from "bootstrap-vue-next";
-import {computed, onActivated, onMounted, reactive, ref, type Ref, toRefs, watch} from "vue";
+import {computed, onActivated, onMounted, ref, type Ref, watch} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
@@ -184,6 +184,7 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
 import {useToastStore} from "@/stores/toast";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {useSubprocessoAcoesAdministrativas} from "@/views/subprocessoAcoesAdministrativas";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
@@ -216,19 +217,8 @@ const {
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 
-const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
-const justificativaReabertura = ref('');
 const codigoSubprocesso = ref<number | null>(null);
 const erroNaoEncontrado = ref(false);
-const estadoModais = reactive({
-  modalLembreteAberto: false,
-  mostrarModalAlterarDataLimite: false,
-  mostrarModalReabrir: false,
-});
-const {modalLembreteAberto, mostrarModalAlterarDataLimite, mostrarModalReabrir} = toRefs(estadoModais);
-const loadingDataLimite = ref(false);
-const loadingReabertura = ref(false);
-const loadingLembrete = ref(false);
 const carregamentoInicialConcluido = ref(false);
 
 const camposMovimentacoes = [
@@ -276,19 +266,6 @@ const dataLimite = computed(() => {
   const ultimaDataLimite = subprocesso.value?.ultimaDataLimiteSubprocesso;
   return ultimaDataLimite ? parseDate(ultimaDataLimite) : null;
 });
-
-const mensagemErroJustificativa = computed(() => {
-  return deveExibirErro(!justificativaReabertura.value.trim()) ? "Informe a justificativa para reabrir." : "";
-});
-
-async function executarComCarregamento(loading: Ref<boolean>, acao: () => Promise<void>) {
-  loading.value = true;
-  try {
-    await acao();
-  } finally {
-    loading.value = false;
-  }
-}
 
 function exibirToastPendente() {
   const pendente = toastStore.consumePending();
@@ -365,101 +342,41 @@ async function atualizarSubprocessoAtual() {
   await subprocessoStore.garantirContextoEdicao(codigoSubprocesso.value, true);
 }
 
-function abrirModalAlterarDataLimite() {
-  if (podeAlterarDataLimite.value) {
-    mostrarModalAlterarDataLimite.value = true;
-  } else {
-    notify(TEXTOS.subprocesso.ERRO_SEM_PERMISSAO_DATA, 'danger');
-  }
-}
-
-function fecharModalAlterarDataLimite() {
-  mostrarModalAlterarDataLimite.value = false;
-}
-
-async function confirmarAlteracaoDataLimite(novaData: string) {
-  if (!novaData || !subprocesso.value) {
-    return;
-  }
-
-  await executarComCarregamento(loadingDataLimite, async () => {
-    try {
-      await fluxoSubprocesso.alterarDataLimiteSubprocesso(
-          subprocesso.value!.codigo,
-          {novaData},
-      );
-      fecharModalAlterarDataLimite();
-      notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, 'success');
-      await atualizarSubprocessoAtual();
-    } catch {
-      notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, 'danger');
-    }
-  });
-}
-
-// CDU-32/33: Reabrir cadastro/revisão
-function abrirModalReabrirCadastro() {
-  resetarValidacao();
-  tipoReabertura.value = 'cadastro';
-  justificativaReabertura.value = '';
-  mostrarModalReabrir.value = true;
-}
-
-function abrirModalReabrirRevisao() {
-  resetarValidacao();
-  tipoReabertura.value = 'revisao';
-  justificativaReabertura.value = '';
-  mostrarModalReabrir.value = true;
-}
-
-function fecharModalReabrir() {
-  mostrarModalReabrir.value = false;
-  justificativaReabertura.value = '';
-}
-
-async function confirmarReabertura() {
-  if (!codigoSubprocesso.value) return;
-
-  if (!validarSubmissao(Boolean(justificativaReabertura.value.trim()))) {
-    void focarPrimeiroErroInvalido();
-    return;
-  }
-
-  await executarComCarregamento(loadingReabertura, async () => {
-    const isRevisao = tipoReabertura.value === 'revisao';
-    const sucesso = await fluxoSubprocesso.reabrirCadastro(codigoSubprocesso.value!, justificativaReabertura.value, isRevisao);
-
-    if (sucesso) {
-      fecharModalReabrir();
-      exibirToastPendente();
-      await atualizarSubprocessoAtual();
-    }
-  });
-}
-
-async function confirmarEnviarLembrete() {
-  if (!subprocesso.value) {
-    return;
-  }
-  modalLembreteAberto.value = true;
-  return true;
-}
-
-async function enviarLembreteConfirmado() {
-  if (!subprocesso.value || !codigoSubprocesso.value || loadingLembrete.value) {
-    return;
-  }
-  loadingLembrete.value = true;
-  try {
-    await enviarLembreteService(props.codProcesso, subprocesso.value.unidade.codigo);
-    await subprocessoStore.garantirContextoEdicao(codigoSubprocesso.value, true);
-    modalLembreteAberto.value = false;
-    notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');
-  } catch {
-    notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, 'danger');
-  } finally {
-    loadingLembrete.value = false;
-  }
-}
+const {
+  tipoReabertura,
+  justificativaReabertura,
+  modalLembreteAberto,
+  mostrarModalAlterarDataLimite,
+  mostrarModalReabrir,
+  loadingDataLimite,
+  loadingReabertura,
+  loadingLembrete,
+  mensagemErroJustificativa,
+  abrirModalAlterarDataLimite,
+  fecharModalAlterarDataLimite,
+  confirmarAlteracaoDataLimite,
+  abrirModalReabrirCadastro,
+  abrirModalReabrirRevisao,
+  fecharModalReabrir,
+  confirmarReabertura,
+  confirmarEnviarLembrete,
+  enviarLembreteConfirmado,
+} = useSubprocessoAcoesAdministrativas({
+  subprocesso,
+  codigoSubprocesso,
+  codProcesso: props.codProcesso,
+  podeAlterarDataLimite,
+  deveExibirErro,
+  resetarValidacao,
+  validarSubmissao,
+  focarPrimeiroErroInvalido,
+  notify,
+  atualizarSubprocessoAtual,
+  exibirToastPendente,
+  alterarDataLimiteSubprocesso: fluxoSubprocesso.alterarDataLimiteSubprocesso,
+  reabrirCadastro: fluxoSubprocesso.reabrirCadastro,
+  enviarLembrete: enviarLembreteService,
+  garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
+});
 
 </script>

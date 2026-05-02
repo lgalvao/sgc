@@ -43,7 +43,7 @@ async function gerarRelatorioMarkdown(dados, caminho) {
 
     hotspots.forEach((h, i) => {
         const prioridade = h.scoreImpacto > 100 ? "P1" : (h.scoreImpacto > 40 ? "P2" : "P3");
-        md += `| ${i + 1} | \`${h.arquivo}\` | ${h.scoreImpacto.toFixed(1)} | ${h.statementsTotal - h.statementsCobertos} | ${h.linesPercentual}% | ${prioridade} |\n`;
+        md += `| ${i + 1} | \`${h.arquivo}\` | ${h.scoreImpacto.toFixed(1)} | ${h.statementsTotal - h.statementsCobertos} | ${h.coberturaLinhas}% | ${prioridade} |\n`;
     });
 
     md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;

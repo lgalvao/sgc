@@ -1,7 +1,6 @@
 import {computed, type Ref, unref} from 'vue';
-import {type PermissoesSubprocesso, type SubprocessoDetalhe, Perfil, TipoProcesso} from '@/types/tipos';
+import {type PermissoesSubprocesso, type SubprocessoDetalhe, TipoProcesso} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
-import {usePerfil} from '@/composables/usePerfil';
 import {criarAcessosPermissao} from '@/composables/acessoPermissoes';
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
 
@@ -35,11 +34,6 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const getSubprocesso = () => unref(subprocessoRef);
     const getPermissoes = () => getSubprocesso()?.permissoes;
     const isRevisao = computed(() => getSubprocesso()?.tipoProcesso === TipoProcesso.REVISAO);
-    const {perfilSelecionado} = usePerfil();
-    const isAdmin = computed(() => perfilSelecionado.value === Perfil.ADMIN);
-    const isGestor = computed(() => perfilSelecionado.value === Perfil.GESTOR);
-    const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
-
     const permissoes = computed<PermissoesSubprocesso>(() => getPermissoes() ?? PERMISSOES_SUBPROCESSO_VAZIAS);
     const acessosPermissao = criarAcessosPermissao(permissoes);
 
@@ -59,22 +53,22 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         isRevisao.value && permissoes.value.podeVisualizarImpacto
     );
 
-    const mostrarAlterarDataLimite = computed(() => isAdmin.value);
-    const mostrarReabrirCadastro = computed(() => isAdmin.value);
-    const mostrarReabrirRevisao = computed(() => isAdmin.value);
-    const mostrarEnviarLembrete = computed(() => isAdmin.value);
+    const mostrarAlterarDataLimite = computed(() => permissoes.value.podeAlterarDataLimite);
+    const mostrarReabrirCadastro = computed(() => permissoes.value.podeReabrirCadastro);
+    const mostrarReabrirRevisao = computed(() => permissoes.value.podeReabrirRevisao);
+    const mostrarEnviarLembrete = computed(() => permissoes.value.podeEnviarLembrete);
 
-    const mostrarImportarAtividades = computed(() => isChefe.value);
-    const mostrarDisponibilizarCadastro = computed(() => isChefe.value);
-    const mostrarDevolverCadastro = computed(() => isAdmin.value || isGestor.value);
+    const mostrarImportarAtividades = computed(() => permissoes.value.podeEditarCadastro);
+    const mostrarDisponibilizarCadastro = computed(() => permissoes.value.podeDisponibilizarCadastro);
+    const mostrarDevolverCadastro = computed(() => permissoes.value.podeDevolverCadastro);
 
-    const mostrarApresentarSugestoes = computed(() => isChefe.value);
-    const mostrarValidarMapa = computed(() => isChefe.value);
-    const mostrarDisponibilizarMapa = computed(() => isAdmin.value);
-    const mostrarDevolverMapa = computed(() => isAdmin.value || isGestor.value);
+    const mostrarApresentarSugestoes = computed(() => permissoes.value.podeApresentarSugestoes);
+    const mostrarValidarMapa = computed(() => permissoes.value.podeValidarMapa);
+    const mostrarDisponibilizarMapa = computed(() => permissoes.value.podeDisponibilizarMapa);
+    const mostrarDevolverMapa = computed(() => permissoes.value.podeDevolverMapa);
 
     const acaoPrincipalCadastro = computed<AcaoPrincipalCadastro | null>(() => {
-        if (isAdmin.value) {
+        if (permissoes.value.podeHomologarCadastro) {
             return {
                 codigo: 'HOMOLOGAR',
                 mostrar: true,
@@ -88,7 +82,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
             };
         }
 
-        if (isGestor.value) {
+        if (permissoes.value.podeAceitarCadastro) {
             return {
                 codigo: 'ACEITAR',
                 mostrar: true,
@@ -110,7 +104,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     });
 
     const acaoPrincipalMapa = computed<AcaoPrincipalMapa | null>(() => {
-        if (isAdmin.value) {
+        if (permissoes.value.podeHomologarMapa) {
             return {
                 codigo: 'HOMOLOGAR',
                 mostrar: true,
@@ -120,7 +114,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
             };
         }
 
-        if (isGestor.value) {
+        if (permissoes.value.podeAceitarMapa) {
             return {
                 codigo: 'ACEITAR',
                 mostrar: true,
