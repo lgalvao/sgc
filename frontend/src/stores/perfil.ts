@@ -92,7 +92,7 @@ export const usePerfilStore = defineStore("perfil", () => {
 
             const listaPerfis = [
                 ...new Set(
-                    fluxoLogin.perfisUnidades.map((p) => p.perfil as unknown as Perfil),
+                    fluxoLogin.perfisUnidades.map((p) => p.perfil),
                 ),
             ];
             definirPerfis(listaPerfis);
@@ -100,7 +100,7 @@ export const usePerfilStore = defineStore("perfil", () => {
             if (fluxoLogin.sessao && fluxoLogin.perfisUnidades.length === 1) {
                 const perfilUnidadeSelecionado = fluxoLogin.perfisUnidades[0];
                 definirPerfilUnidade({
-                    perfil: fluxoLogin.sessao.perfil as unknown as Perfil,
+                    perfil: fluxoLogin.sessao.perfil,
                     unidadeCodigo: fluxoLogin.sessao.unidadeCodigo,
                     unidadeSigla: perfilUnidadeSelecionado.unidade.sigla,
                     permissoes: fluxoLogin.sessao.permissoes,
@@ -133,7 +133,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });
             definirPerfilUnidade({
-                perfil: loginResponse.perfil as unknown as Perfil,
+                perfil: loginResponse.perfil,
                 unidadeCodigo: loginResponse.unidadeCodigo,
                 unidadeSigla: perfilUnidade.unidade.sigla,
                 permissoes: loginResponse.permissoes,

@@ -5,7 +5,7 @@ import type {
     SessaoLoginDto,
     UsuarioDto
 } from "@/types/dtos";
-import type {Usuario, UsuarioPesquisa} from "@/types/tipos";
+import {type Usuario, type UsuarioPesquisa, Perfil} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 // Cache de usuários em memória para evitar requisições redundantes
@@ -20,8 +20,6 @@ export interface EntrarRequest {
     perfil: string;
     unidadeCodigo: number;
 }
-
-export type Perfil = "ADMIN" | "GESTOR" | "CHEFE" | "SERVIDOR";
 
 export interface Unidade {
     codigo: number;
@@ -62,8 +60,8 @@ export function mapUsuarioToFrontend(usuarioDto: UsuarioDto): Usuario {
             nome: usuarioDto.unidade.nome,
             sigla: usuarioDto.unidade.sigla,
         },
-        perfis: usuarioDto.perfis as unknown[], // Casting to match generic array if needed, or specific
-    } as Usuario; // Force cast to match potentially looser frontend type
+        perfis: usuarioDto.perfis,
+    };
 }
 
 export interface SessaoLogin {
@@ -163,11 +161,16 @@ export function mapVWUsuarioToUsuario(vw: VWUsuario): Usuario {
     return {
         codigo,
         nome: vw?.nome ?? vw?.nome_completo ?? vw?.nome_usuario ?? "",
-        unidade: (vw?.unidade ?? vw?.unidade_sigla ?? vw?.unidade_codigo ?? "") as unknown,
+        unidade: {
+            codigo: vw?.unidade_codigo ?? 0,
+            nome: (vw?.unidade as string) ?? "",
+            sigla: vw?.unidade_sigla ?? "",
+        },
         email: vw?.email ?? null,
         ramal: vw?.ramal ?? vw?.ramal_telefone ?? null,
         tituloEleitoral: vw?.titulo_eleitoral ?? vw?.titulo ?? "",
-    } as Usuario;
+        perfis: [],
+    };
 }
 
 export function mapVWUsuariosArray(arr: VWUsuario[] = []): Usuario[] {

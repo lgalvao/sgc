@@ -38,51 +38,24 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const isGestor = computed(() => perfilSelecionado.value === Perfil.GESTOR);
     const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
 
-    const podeEditarCadastro = computed(() => getPermissoes()?.podeEditarCadastro ?? false);
-    const podeDisponibilizarCadastro = computed(() => getPermissoes()?.podeDisponibilizarCadastro ?? false);
-    const podeDevolverCadastro = computed(() => getPermissoes()?.podeDevolverCadastro ?? false);
-    const podeAceitarCadastro = computed(() => getPermissoes()?.podeAceitarCadastro ?? false);
-    const podeHomologarCadastro = computed(() => getPermissoes()?.podeHomologarCadastro ?? false);
-
-    const podeAnalisarCadastro = computed(() => podeDevolverCadastro.value || podeAceitarCadastro.value || podeHomologarCadastro.value);
-
-    const podeEditarMapa = computed(() => getPermissoes()?.podeEditarMapa ?? false);
-    const podeDisponibilizarMapa = computed(() => getPermissoes()?.podeDisponibilizarMapa ?? false);
-    const podeValidarMapa = computed(() => getPermissoes()?.podeValidarMapa ?? false);
-    const podeApresentarSugestoes = computed(() => getPermissoes()?.podeApresentarSugestoes ?? false);
-    const podeVerSugestoes = computed(() => getPermissoes()?.podeVerSugestoes ?? false);
-    const podeDevolverMapa = computed(() => getPermissoes()?.podeDevolverMapa ?? false);
-    const podeAceitarMapa = computed(() => getPermissoes()?.podeAceitarMapa ?? false);
-    const podeHomologarMapa = computed(() => getPermissoes()?.podeHomologarMapa ?? false);
-
-    const podeAnalisarMapa = computed(() => podeDevolverMapa.value || podeAceitarMapa.value || podeHomologarMapa.value);
-
-    const podeVisualizarImpacto = computed(() => 
-        isRevisao.value && (getPermissoes()?.podeVisualizarImpacto ?? false)
+    // Dynamic permission computeds to reduce boilerplate
+    const permissoes = computed(() => getPermissoes() || {} as any);
+    
+    const podeAnalisarCadastro = computed(() => 
+        permissoes.value.podeDevolverCadastro || 
+        permissoes.value.podeAceitarCadastro || 
+        permissoes.value.podeHomologarCadastro
     );
 
-    const podeAlterarDataLimite = computed(() => getPermissoes()?.podeAlterarDataLimite ?? false);
-    const podeReabrirCadastro = computed(() => getPermissoes()?.podeReabrirCadastro ?? false);
-    const podeReabrirRevisao = computed(() => getPermissoes()?.podeReabrirRevisao ?? false);
-    const podeEnviarLembrete = computed(() => getPermissoes()?.podeEnviarLembrete ?? false);
+    const podeAnalisarMapa = computed(() => 
+        permissoes.value.podeDevolverMapa || 
+        permissoes.value.podeAceitarMapa || 
+        permissoes.value.podeHomologarMapa
+    );
 
-    const mesmaUnidade = computed(() => getPermissoes()?.mesmaUnidade ?? false);
-    const habilitarAcessoCadastro = computed(() => getPermissoes()?.habilitarAcessoCadastro ?? false);
-    const habilitarAcessoMapa = computed(() => getPermissoes()?.habilitarAcessoMapa ?? false);
-
-    const habilitarEditarCadastro = computed(() => getPermissoes()?.habilitarEditarCadastro ?? false);
-    const habilitarDisponibilizarCadastro = computed(() => getPermissoes()?.habilitarDisponibilizarCadastro ?? false);
-    const habilitarDevolverCadastro = computed(() => getPermissoes()?.habilitarDevolverCadastro ?? false);
-    const habilitarAceitarCadastro = computed(() => getPermissoes()?.habilitarAceitarCadastro ?? false);
-    const habilitarHomologarCadastro = computed(() => getPermissoes()?.habilitarHomologarCadastro ?? false);
-
-    const habilitarEditarMapa = computed(() => getPermissoes()?.habilitarEditarMapa ?? false);
-    const habilitarDisponibilizarMapa = computed(() => getPermissoes()?.habilitarDisponibilizarMapa ?? false);
-    const habilitarValidarMapa = computed(() => getPermissoes()?.habilitarValidarMapa ?? false);
-    const habilitarApresentarSugestoes = computed(() => getPermissoes()?.habilitarApresentarSugestoes ?? false);
-    const habilitarDevolverMapa = computed(() => getPermissoes()?.habilitarDevolverMapa ?? false);
-    const habilitarAceitarMapa = computed(() => getPermissoes()?.habilitarAceitarMapa ?? false);
-    const habilitarHomologarMapa = computed(() => getPermissoes()?.habilitarHomologarMapa ?? false);
+    const podeVisualizarImpacto = computed(() => 
+        isRevisao.value && (permissoes.value.podeVisualizarImpacto ?? false)
+    );
 
     const mostrarAlterarDataLimite = computed(() => isAdmin.value);
     const mostrarReabrirCadastro = computed(() => isAdmin.value);
@@ -103,7 +76,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
             return {
                 codigo: 'HOMOLOGAR',
                 mostrar: true,
-                habilitar: podeHomologarCadastro.value && habilitarHomologarCadastro.value,
+                habilitar: permissoes.value.podeHomologarCadastro && permissoes.value.habilitarHomologarCadastro,
                 tituloModal: TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO,
                 textoModal: TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO,
                 rotuloBotao: TEXTOS.atividades.BOTAO_HOMOLOGAR,
@@ -117,7 +90,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
             return {
                 codigo: 'ACEITAR',
                 mostrar: true,
-                habilitar: podeAceitarCadastro.value && habilitarAceitarCadastro.value,
+                habilitar: permissoes.value.podeAceitarCadastro && permissoes.value.habilitarAceitarCadastro,
                 tituloModal: isRevisao.value
                     ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TITULO
                     : TEXTOS.atividades.MODAL_VALIDAR_TITULO,
@@ -139,7 +112,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
             return {
                 codigo: 'HOMOLOGAR',
                 mostrar: true,
-                habilitar: podeHomologarMapa.value && habilitarHomologarMapa.value,
+                habilitar: permissoes.value.podeHomologarMapa && permissoes.value.habilitarHomologarMapa,
                 rotuloBotao: TEXTOS.mapa.LABEL_HOMOLOGAR,
                 mensagemSucesso: TEXTOS.mapa.SUCESSO_HOMOLOGACAO,
             };
@@ -149,7 +122,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
             return {
                 codigo: 'ACEITAR',
                 mostrar: true,
-                habilitar: podeAceitarMapa.value && habilitarAceitarMapa.value,
+                habilitar: permissoes.value.podeAceitarMapa && permissoes.value.habilitarAceitarMapa,
                 rotuloBotao: TEXTOS.mapa.LABEL_REGISTRAR_ACEITE,
                 mensagemSucesso: TEXTOS.sucesso.ACEITE_REGISTRADO,
             };
@@ -159,27 +132,44 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     });
 
     return {
-        mesmaUnidade,
-        podeEditarCadastro,
-        podeDisponibilizarCadastro,
-        podeDevolverCadastro,
-        podeAceitarCadastro,
-        podeHomologarCadastro,
+        // Pass-through permissions
+        podeEditarCadastro: computed(() => permissoes.value.podeEditarCadastro ?? false),
+        podeDisponibilizarCadastro: computed(() => permissoes.value.podeDisponibilizarCadastro ?? false),
+        podeDevolverCadastro: computed(() => permissoes.value.podeDevolverCadastro ?? false),
+        podeAceitarCadastro: computed(() => permissoes.value.podeAceitarCadastro ?? false),
+        podeHomologarCadastro: computed(() => permissoes.value.podeHomologarCadastro ?? false),
+        podeEditarMapa: computed(() => permissoes.value.podeEditarMapa ?? false),
+        podeDisponibilizarMapa: computed(() => permissoes.value.podeDisponibilizarMapa ?? false),
+        podeValidarMapa: computed(() => permissoes.value.podeValidarMapa ?? false),
+        podeApresentarSugestoes: computed(() => permissoes.value.podeApresentarSugestoes ?? false),
+        podeVerSugestoes: computed(() => permissoes.value.podeVerSugestoes ?? false),
+        podeDevolverMapa: computed(() => permissoes.value.podeDevolverMapa ?? false),
+        podeAceitarMapa: computed(() => permissoes.value.podeAceitarMapa ?? false),
+        podeHomologarMapa: computed(() => permissoes.value.podeHomologarMapa ?? false),
+        podeAlterarDataLimite: computed(() => permissoes.value.podeAlterarDataLimite ?? false),
+        podeReabrirCadastro: computed(() => permissoes.value.podeReabrirCadastro ?? false),
+        podeReabrirRevisao: computed(() => permissoes.value.podeReabrirRevisao ?? false),
+        podeEnviarLembrete: computed(() => permissoes.value.podeEnviarLembrete ?? false),
+        mesmaUnidade: computed(() => permissoes.value.mesmaUnidade ?? false),
+        habilitarAcessoCadastro: computed(() => permissoes.value.habilitarAcessoCadastro ?? false),
+        habilitarAcessoMapa: computed(() => permissoes.value.habilitarAcessoMapa ?? false),
+        habilitarEditarCadastro: computed(() => permissoes.value.habilitarEditarCadastro ?? false),
+        habilitarDisponibilizarCadastro: computed(() => permissoes.value.habilitarDisponibilizarCadastro ?? false),
+        habilitarDevolverCadastro: computed(() => permissoes.value.habilitarDevolverCadastro ?? false),
+        habilitarAceitarCadastro: computed(() => permissoes.value.habilitarAceitarCadastro ?? false),
+        habilitarHomologarCadastro: computed(() => permissoes.value.habilitarHomologarCadastro ?? false),
+        habilitarEditarMapa: computed(() => permissoes.value.habilitarEditarMapa ?? false),
+        habilitarDisponibilizarMapa: computed(() => permissoes.value.habilitarDisponibilizarMapa ?? false),
+        habilitarValidarMapa: computed(() => permissoes.value.habilitarValidarMapa ?? false),
+        habilitarApresentarSugestoes: computed(() => permissoes.value.habilitarApresentarSugestoes ?? false),
+        habilitarDevolverMapa: computed(() => permissoes.value.habilitarDevolverMapa ?? false),
+        habilitarAceitarMapa: computed(() => permissoes.value.habilitarAceitarMapa ?? false),
+        habilitarHomologarMapa: computed(() => permissoes.value.habilitarHomologarMapa ?? false),
+
+        // Custom logic
         podeAnalisarCadastro,
-        podeEditarMapa,
-        podeDisponibilizarMapa,
-        podeValidarMapa,
-        podeApresentarSugestoes,
-        podeVerSugestoes,
-        podeDevolverMapa,
-        podeAceitarMapa,
-        podeHomologarMapa,
         podeAnalisarMapa,
         podeVisualizarImpacto,
-        podeAlterarDataLimite,
-        podeReabrirCadastro,
-        podeReabrirRevisao,
-        podeEnviarLembrete,
         mostrarAlterarDataLimite,
         mostrarReabrirCadastro,
         mostrarReabrirRevisao,
@@ -191,20 +181,6 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         mostrarValidarMapa,
         mostrarDisponibilizarMapa,
         mostrarDevolverMapa,
-        habilitarAcessoCadastro,
-        habilitarAcessoMapa,
-        habilitarEditarCadastro,
-        habilitarDisponibilizarCadastro,
-        habilitarDevolverCadastro,
-        habilitarAceitarCadastro,
-        habilitarHomologarCadastro,
-        habilitarEditarMapa,
-        habilitarDisponibilizarMapa,
-        habilitarValidarMapa,
-        habilitarApresentarSugestoes,
-        habilitarDevolverMapa,
-        habilitarAceitarMapa,
-        habilitarHomologarMapa,
         acaoPrincipalCadastro,
         acaoPrincipalMapa
     };
