@@ -9,26 +9,44 @@ import type {Unidade} from "@/types/tipos";
 interface Props {
   unidade?: Unidade | null;
   codigoSubprocesso?: number | null;
-  podeVerSugestoes: boolean;
-  loadingSugestoesVisualizacao: boolean;
-  podeVisualizarImpacto: boolean;
-  loadingImpacto: boolean;
-  usarMenuAcoesMapa: boolean;
-  mostrarApresentarSugestoes: boolean;
-  habilitarApresentarSugestoes: boolean;
-  mostrarValidarMapa: boolean;
-  habilitarValidarMapa: boolean;
-  mostrarDisponibilizarMapa: boolean;
-  habilitarDisponibilizarMapa: boolean;
-  loadingDisponibilizacao: boolean;
-  mostrarDevolverMapa: boolean;
-  habilitarDevolverMapa: boolean;
-  mostrarAcaoPrincipalMapa: boolean;
-  habilitarAcaoPrincipalMapa: boolean;
-  rotuloAcaoPrincipalMapa: string;
+  podeVerSugestoes?: boolean;
+  loadingSugestoesVisualizacao?: boolean;
+  podeVisualizarImpacto?: boolean;
+  loadingImpacto?: boolean;
+  usarMenuAcoesMapa?: boolean;
+  mostrarApresentarSugestoes?: boolean;
+  habilitarApresentarSugestoes?: boolean;
+  mostrarValidarMapa?: boolean;
+  habilitarValidarMapa?: boolean;
+  mostrarDisponibilizarMapa?: boolean;
+  habilitarDisponibilizarMapa?: boolean;
+  loadingDisponibilizacao?: boolean;
+  mostrarDevolverMapa?: boolean;
+  habilitarDevolverMapa?: boolean;
+  mostrarAcaoPrincipalMapa?: boolean;
+  habilitarAcaoPrincipalMapa?: boolean;
+  rotuloAcaoPrincipalMapa?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  podeVerSugestoes: false,
+  loadingSugestoesVisualizacao: false,
+  podeVisualizarImpacto: false,
+  loadingImpacto: false,
+  usarMenuAcoesMapa: false,
+  mostrarApresentarSugestoes: false,
+  habilitarApresentarSugestoes: false,
+  mostrarValidarMapa: false,
+  habilitarValidarMapa: false,
+  mostrarDisponibilizarMapa: false,
+  habilitarDisponibilizarMapa: false,
+  loadingDisponibilizacao: false,
+  mostrarDevolverMapa: false,
+  habilitarDevolverMapa: false,
+  mostrarAcaoPrincipalMapa: false,
+  habilitarAcaoPrincipalMapa: false,
+  rotuloAcaoPrincipalMapa: TEXTOS.mapa.LABEL_HOMOLOGAR,
+});
 
 defineEmits<{
   (e: "ver-sugestoes"): void;

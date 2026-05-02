@@ -90,193 +90,76 @@
         <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
       </div>
 
-      <template v-if="!modoSomenteLeitura">
-        <CriarCompetenciaModal
-            :atividades="atividades"
-            :competencia-para-editar="competenciaSendoEditada"
-            :field-errors="fieldErrors"
-            :loading="loadingCompetencia"
-            :mostrar="mostrarModalCriarNovaCompetencia"
-            @fechar="fecharModalCriarNovaCompetencia"
-            @salvar="adicionarCompetenciaEFecharModal"
-        />
-
-        <DisponibilizarMapaModal
-            :field-errors="fieldErrors"
-            :loading="loadingDisponibilizacao"
-            :mostrar="mostrarModalDisponibilizar"
-            :notificacao="notificacaoDisponibilizacao"
-            :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
-            @disponibilizar="disponibilizarMapa"
-            @fechar="fecharModalDisponibilizar"
-        />
-
-        <ModalConfirmacao
-            v-model="mostrarModalExcluirCompetencia"
-            :loading="loadingExclusao"
-            :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
-            data-testid="mdl-excluir-competencia"
-            test-codigo-confirmar="btn-confirmar-exclusao-competencia"
-            :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
-            variant="danger"
-            @confirmar="confirmarExclusaoCompetencia"
-        />
-      </template>
-
-      <AceitarMapaModal
-          :loading="carregandoFluxoMapa"
+      <MapaFluxoModais
+          :atividades="atividades"
+          :carregando-fluxo-mapa="carregandoFluxoMapa"
+          :codigo-subprocesso="codigoSubprocesso"
+          :competencia-para-excluir="competenciaParaExcluir"
+          :competencia-sendo-editada="competenciaSendoEditada"
+          :field-errors="fieldErrors"
+          :historico-analise="historicoAnalise"
           :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
-          :mostrar-modal="mostrarModalAceitar"
-          @fechar-modal="fecharModalAceitar"
-          @confirmar-aceitacao="(observacao) => confirmarAceitacao(observacao)"
-      />
-
-      <ModalPadrao
-          v-model="mostrarModalVerSugestoes"
-          :mostrar-botao-acao="false"
-          test-codigo-cancelar="btn-ver-sugestoes-mapa-fechar"
-          texto-cancelar="Fechar"
-          titulo="Sugestões sobre o mapa"
-          @fechar="fecharModalVerSugestoes"
-      >
-        <BFormGroup class="mb-3">
-          <template #label>
-            Sugestões registradas para o mapa de competências:
-          </template>
-
-          <div
-              v-if="!isChefe"
-              data-testid="txt-ver-sugestoes-mapa-texto"
-              class="border rounded p-3 bg-body-tertiary white-space-pre-line"
-          >
-            {{ sugestoesVisualizacao }}
-          </div>
-
-          <BFormTextarea
-              v-else
-              id="sugestoesVisualizacao"
-              v-model="sugestoesVisualizacao"
-              data-testid="txt-ver-sugestoes-mapa"
-              readonly
-              rows="5"
-          />
-        </BFormGroup>
-      </ModalPadrao>
-
-      <ModalConfirmacao
-          v-model="mostrarModalSugestoes"
-          :auto-close="false"
-          :loading="loadingSugestoesEnvio"
-          :ok-title="TEXTOS.comum.BOTAO_APRESENTAR"
-          test-codigo-cancelar="btn-sugestoes-mapa-cancelar"
-          test-codigo-confirmar="btn-sugestoes-mapa-confirmar"
-          titulo="Apresentar sugestões"
-          variant="success"
-          @confirmar="handleConfirmarSugestoes"
-          @shown="() => sugestoesTextareaRef?.$el?.focus()"
-      >
-        <BFormGroup
-            label-for="sugestoesTextarea"
-            :state="mensagemErroSugestoes ? false : null"
-            class="mb-3"
-        >
-          <template #label>
-            Sugestões para o mapa de competências: <span aria-hidden="true" class="text-danger">*</span>
-          </template>
-          <BFormTextarea
-              id="sugestoesTextarea"
-              ref="sugestoesTextareaRef"
-              v-model="sugestoes"
-              aria-required="true"
-              :state="mensagemErroSugestoes ? false : null"
-              data-testid="inp-sugestoes-mapa-texto"
-              rows="5"
-          />
-          <BFormInvalidFeedback :state="mensagemErroSugestoes ? false : null">
-            {{ mensagemErroSugestoes }}
-          </BFormInvalidFeedback>
-        </BFormGroup>
-      </ModalConfirmacao>
-
-      <ModalConfirmacao
-          v-model="mostrarModalValidar"
-          :loading="carregandoFluxoMapa"
-          :ok-title="TEXTOS.comum.BOTAO_VALIDAR"
-          test-codigo-cancelar="btn-validar-mapa-cancelar"
-          test-codigo-confirmar="btn-validar-mapa-confirmar"
-          titulo="Validação de mapa"
-          variant="success"
-          @confirmar="confirmarValidacao"
-      >
-        <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
-      </ModalConfirmacao>
-
-      <ModalConfirmacao
-          v-model="mostrarModalDevolucao"
-          :auto-close="false"
-          :loading="carregandoFluxoMapa"
-          :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
-          test-codigo-cancelar="btn-devolucao-mapa-cancelar"
-          test-codigo-confirmar="btn-devolucao-mapa-confirmar"
-          titulo="Devolver mapa"
-          variant="danger"
-          @confirmar="handleConfirmarDevolucao"
-          @shown="() => observacaoDevolucaoRef?.$el?.focus()"
-      >
-        <p>Confirma a devolução da validação do mapa para ajustes?</p>
-        <BFormGroup
-            label-for="observacaoDevolucao"
-            :state="mensagemErroDevolucao ? false : null"
-            class="mb-3"
-        >
-          <template #label>
-            Observação: <span aria-hidden="true" class="text-danger">*</span>
-          </template>
-          <BFormTextarea
-              id="observacaoDevolucao"
-              ref="observacaoDevolucaoRef"
-              v-model="observacaoDevolucao"
-              :state="mensagemErroDevolucao ? false : null"
-              data-testid="inp-devolucao-mapa-obs"
-              placeholder="Digite observações sobre a devolução..."
-              rows="3"
-          />
-          <BFormInvalidFeedback :state="mensagemErroDevolucao ? false : null">
-            {{ mensagemErroDevolucao }}
-          </BFormInvalidFeedback>
-        </BFormGroup>
-      </ModalConfirmacao>
-
-      <ImpactoMapaModal
-          v-if="codigoSubprocesso"
-          :impacto="impactos"
-          :loading="loadingImpacto"
-          :mostrar="mostrarModalImpacto"
-          @fechar="fecharModalImpacto"
-      />
-
-      <HistoricoAnaliseModal
-          :historico="historicoAnalise"
-          :mostrar="mostrarModalHistorico"
-          @fechar="fecharModalHistorico"
+          :impactos="impactos"
+          :is-chefe="isChefe"
+          :loading-competencia="loadingCompetencia"
+          :loading-exclusao="loadingExclusao"
+          :loading-impacto="loadingImpacto"
+          :loading-disponibilizacao="loadingDisponibilizacao"
+          :loading-sugestoes-envio="loadingSugestoesEnvio"
+          :mensagem-erro-devolucao="mensagemErroDevolucao"
+          :mensagem-erro-sugestoes="mensagemErroSugestoes"
+          :modo-somente-leitura="modoSomenteLeitura"
+          :mostrar-modal-aceitar="mostrarModalAceitar"
+          :mostrar-modal-criar-nova-competencia="mostrarModalCriarNovaCompetencia"
+          :mostrar-modal-devolucao="mostrarModalDevolucao"
+          :mostrar-modal-disponibilizar="mostrarModalDisponibilizar"
+          :mostrar-modal-excluir-competencia="mostrarModalExcluirCompetencia"
+          :mostrar-modal-historico="mostrarModalHistorico"
+          :mostrar-modal-impacto="mostrarModalImpacto"
+          :mostrar-modal-sugestoes="mostrarModalSugestoes"
+          :mostrar-modal-validar="mostrarModalValidar"
+          :mostrar-modal-ver-sugestoes="mostrarModalVerSugestoes"
+          :notificacao-disponibilizacao="notificacaoDisponibilizacao"
+          :observacao-devolucao="observacaoDevolucao"
+          :sugestoes="sugestoes"
+          :sugestoes-visualizacao="sugestoesVisualizacao"
+          :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
+          @confirmar-aceitacao="confirmarAceitacao"
+          @confirmar-devolucao="handleConfirmarDevolucao"
+          @confirmar-exclusao-competencia="confirmarExclusaoCompetencia"
+          @confirmar-sugestoes="handleConfirmarSugestoes"
+          @confirmar-validacao="confirmarValidacao"
+          @disponibilizar="disponibilizarMapa"
+          @fechar-aceite="fecharModalAceitar"
+          @fechar-criar-competencia="fecharModalCriarNovaCompetencia"
+          @fechar-disponibilizar="fecharModalDisponibilizar"
+          @fechar-historico="fecharModalHistorico"
+          @fechar-impacto="fecharModalImpacto"
+          @fechar-ver-sugestoes="fecharModalVerSugestoes"
+          @salvar-competencia="adicionarCompetenciaEFecharModal"
+          @update:mostrarModalDevolucao="mostrarModalDevolucao = $event"
+          @update:mostrarModalExcluirCompetencia="mostrarModalExcluirCompetencia = $event"
+          @update:mostrarModalSugestoes="mostrarModalSugestoes = $event"
+          @update:mostrarModalValidar="mostrarModalValidar = $event"
+          @update:mostrarModalVerSugestoes="mostrarModalVerSugestoes = $event"
+          @update:observacaoDevolucao="observacaoDevolucao = $event"
+          @update:sugestoes="sugestoes = $event"
+          @update:sugestoesVisualizacao="sugestoesVisualizacao = $event"
       />
     </template>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
-import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import MapaAcoesHeader from "@/components/mapa/MapaAcoesHeader.vue";
+import MapaFluxoModais from "@/components/mapa/MapaFluxoModais.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import MapaSomenteLeitura from "@/components/mapa/MapaSomenteLeitura.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import ModalPadrao from "@/components/comum/ModalPadrao.vue";
-import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
-import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import {computed, defineAsyncComponent, onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
@@ -300,13 +183,7 @@ import type {
   Analise,
   MapaCompleto,
 } from "@/types/tipos";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
-
-// Lazy loading de componentes pesados ou modais
-const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/ImpactoMapaModal.vue"));
-const CriarCompetenciaModal = defineAsyncComponent(() => import("@/components/mapa/CriarCompetenciaModal.vue"));
-const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/mapa/DisponibilizarMapaModal.vue"));
 
 const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();
 const router = useRouter();
@@ -400,9 +277,6 @@ const {
   focarPrimeiroErroInvalido,
   resetarValidacao
 });
-
-const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
-const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 const mensagemErroDevolucao = computed(() => {
   return deveExibirErro(!observacaoDevolucao.value.trim()) ? "A justificativa é obrigatória para a devolução." : "";
