@@ -51,6 +51,9 @@ public class UnidadeDto {
     private @Nullable String tipoResponsabilidade;
 
     @JsonView(OrganizacaoViews.Publica.class)
+    private @Nullable UsuarioResumoDto titular;
+
+    @JsonView(OrganizacaoViews.Publica.class)
     private @Nullable UsuarioResumoDto responsavel;
 
     public static @Nullable UnidadeDto fromEntity(@Nullable Unidade entity) {
@@ -69,6 +72,8 @@ public class UnidadeDto {
                 entity.getTipo(),
                 entity.getTituloTitular()
         );
+
+        dto.setTitular(UsuarioResumoDto.fromEntity(entity.getTitular()));
 
         Responsabilidade responsabilidade = entity.getResponsabilidade();
         if (responsabilidade != null) {

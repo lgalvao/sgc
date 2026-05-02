@@ -42,6 +42,7 @@ export interface Unidade {
     tituloTitular?: string;
     isElegivel?: boolean;
     tipoResponsabilidade?: string;
+    titular?: Usuario | null;
     responsavel?: Responsavel | Usuario | null;
 }
 

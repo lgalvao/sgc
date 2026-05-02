@@ -42,19 +42,19 @@
         <BCard class="mb-4" no-body>
           <BCardBody>
             <p class="mt-2" data-testid="unidade-titular-info">
-              <strong>{{ TEXTOS.unidade.LABEL_TITULAR }}</strong> {{ titularDetalhes ? titularDetalhes.nome : TEXTOS.unidade.NAO_INFORMADO }}
+              <strong>{{ TEXTOS.unidade.LABEL_TITULAR }}</strong> {{ unidade.titular ? unidade.titular.nome : TEXTOS.unidade.NAO_INFORMADO }}
             </p>
-            <p v-if="titularDetalhes" class="ms-3 mb-2">
-              <span v-if="titularDetalhes.ramal" class="me-3">
+            <p v-if="unidade.titular" class="ms-3 mb-2">
+              <span v-if="unidade.titular.ramal" class="me-3">
                 <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-                {{ titularDetalhes.ramal }}
+                {{ unidade.titular.ramal }}
               </span>
-              <span v-if="titularDetalhes.email">
+              <span v-if="unidade.titular.email">
                 <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
                 <a
-                    :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
-                    :href="`mailto:${titularDetalhes.email}`"
-                >{{ titularDetalhes.email }}</a>
+                    :aria-label="`Enviar e-mail para ${unidade.titular.email}`"
+                    :href="`mailto:${unidade.titular.email}`"
+                >{{ unidade.titular.email }}</a>
               </span>
             </p>
             <template v-if="responsavelExibivel">
@@ -126,7 +126,6 @@ const {definirUnidadeAtual} = useUnidadeAtual();
 const unidadeStore = useUnidadeStore();
 
 const unidade = ref<Unidade | null>(null);
-const titularDetalhes = ref<Usuario | null>(null);
 const mapaVigente = ref<MapaVigenteReferencia | null>(null);
 const lastError = ref<{message: string; details?: string} | null>(null);
 const carregandoPagina = ref(true);
@@ -139,12 +138,10 @@ function clearError() {
 async function carregarDados(forcar = false) {
   clearError();
   
-  // Se já temos a unidade e o mapa no cache, não mostramos o carregamento de página inteira
   const jaTemNoCache = !forcar && unidadeStore.cacheUnidades.has(props.codUnidade);
   if (!jaTemNoCache) {
     carregandoPagina.value = true;
     unidade.value = null;
-    titularDetalhes.value = null;
     mapaVigente.value = null;
   }
 
@@ -157,10 +154,6 @@ async function carregarDados(forcar = false) {
     unidade.value = unidadeResp;
     definirUnidadeAtual(unidade.value);
     mapaVigente.value = mapaResp;
-
-    if (unidade.value?.tituloTitular) {
-      titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
-    }
   } catch (error: unknown) {
     const err = error as Error;
     lastError.value = {message: err.message || TEXTOS.unidade.ERRO_CARREGAR};
@@ -173,12 +166,10 @@ async function carregarDados(forcar = false) {
 function dadosLocaisValidos(): boolean {
   const possuiUnidadeEmCache = unidadeStore.cacheUnidades.has(props.codUnidade);
   const possuiMapaVigenteEmCache = unidadeStore.cacheMapasVigentes.has(props.codUnidade);
-  const titularResolvido = !unidade.value?.tituloTitular || titularDetalhes.value !== null;
 
   return unidade.value?.codigo === props.codUnidade
       && possuiUnidadeEmCache
       && possuiMapaVigenteEmCache
-      && titularResolvido
       && !lastError.value;
 }
 
@@ -250,20 +241,11 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas) : [];
     return {
       codigo: item.codigo,
-      nome: item.sigla + " - " + item.nome,
-      expanded: true,
+      nome: item.nome,
+      sigla: item.sigla,
+      expanded: false,
       ...(children.length > 0 && {children})
     };
   });
-}
-
-function responsavelEhTitular(responsavel: {tituloEleitoral?: string, nome?: string}, titular: Usuario | null, tituloTitular?: string): boolean {
-  if (responsavel.tituloEleitoral && tituloTitular && responsavel.tituloEleitoral === tituloTitular) {
-    return true;
-  }
-  if (responsavel.tituloEleitoral && titular?.tituloEleitoral) {
-    return responsavel.tituloEleitoral === titular.tituloEleitoral;
-  }
-  return Boolean(responsavel.nome && titular?.nome && responsavel.nome === titular.nome);
 }
 </script>

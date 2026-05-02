@@ -45,6 +45,12 @@ public class Unidade extends EntidadeBase {
     private SituacaoUnidade situacao;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "titulo_titular", referencedColumnName = "titulo", insertable = false, updatable = false)
+    @Nullable
+    @JsonIgnore
+    private Usuario titular;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_superior_codigo")
     @Nullable
     @JsonIgnore

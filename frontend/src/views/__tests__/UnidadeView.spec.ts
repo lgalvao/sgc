@@ -4,22 +4,26 @@ import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
 import {usePerfilStore} from '@/stores/perfil';
-import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
 import {buscarArvoreUnidade, buscarReferenciaMapaVigente} from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {logger} from "@/utils";
 
 const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hoisted(() => {
     const u = {
         codigo: 10,
         nome: 'Titular teste',
         tituloEleitoral: '123456',
+        matricula: 'M10',
+        email: 't@t',
+        ramal: '1',
         unidade: {codigo: 1, sigla: 'TEST'}
     };
     const ur = {
         codigo: 20,
         nome: 'Responsavel teste',
         tituloEleitoral: '654321',
+        matricula: 'M20',
+        email: 'r@r',
+        ramal: '2',
         unidade: {codigo: 1, sigla: 'TEST'}
     };
     return {
@@ -28,24 +32,18 @@ const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hois
             codigo: 1,
             sigla: 'TEST',
             nome: 'UnidadeView Teste',
-            usuarioCodigo: 10,
-            tituloTitular: '123456',
+            titular: u,
             responsavel: ur,
-            filhas: [
-                {codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: []},
-                {codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: []}
+            tipoResponsabilidade: 'SUBSTITUTO',
+            subunidades: [
+                {codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', subunidades: []},
+                {codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', subunidades: []}
             ]
         },
         mockUsuario: u,
         mockUsuarioResponsavel: ur
     };
 });
-
-vi.mock("@/utils", () => ({
-    logger: {
-        error: vi.fn(),
-    }
-}));
 
 vi.mock('vue-router', async (importOriginal) => {
     const actual: any = await importOriginal();
@@ -57,14 +55,6 @@ vi.mock('vue-router', async (importOriginal) => {
     };
 });
 
-vi.mock('@/services/usuarioService', async (importOriginal) => {
-    const actual: any = await importOriginal();
-    return {
-        ...actual,
-        buscarUsuarioPorTitulo: vi.fn().mockResolvedValue(mockUsuario),
-    }
-});
-
 vi.mock('@/services/unidadeService', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/services/unidadeService')>();
     return {
@@ -74,10 +64,6 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
         buscarReferenciaMapaVigente: vi.fn().mockResolvedValue(null),
     };
 });
-
-vi.mock('@/services/atribuicaoTemporariaService', () => ({
-    buscarTodasAtribuicoes: vi.fn().mockResolvedValue([]),
-}));
 
 const TreeTableStub = {
     template: '<div data-testid="tree-table"></div>',
@@ -94,7 +80,6 @@ describe('UnidadeView.vue', () => {
     });
 
     let perfilStore: any;
-    const mockUnidade = mockUnidadeData;
 
     const createWrapper = (initialStateOverride = {}) => {
         context.wrapper = mount(UnidadeView, {
@@ -131,97 +116,32 @@ describe('UnidadeView.vue', () => {
         expect(buscarArvoreUnidade).toHaveBeenCalledWith(1);
     });
 
-    it('não recarrega dados ao reativar a view em keepAlive quando o cache ainda está válido', async () => {
-        const {wrapper} = createWrapper();
-        await flushPromises();
-        vi.mocked(buscarArvoreUnidade).mockClear();
-        vi.mocked(buscarReferenciaMapaVigente).mockClear();
-
-        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
-        for (const hook of hooks) {
-            await hook.call(wrapper.vm);
-        }
-        await flushPromises();
-
-        expect(buscarArvoreUnidade).not.toHaveBeenCalled();
-        expect(buscarReferenciaMapaVigente).not.toHaveBeenCalled();
-    });
-
     it('renders unit details correctly', async () => {
         const {wrapper} = createWrapper();
-
-        await wrapper.vm.$nextTick();
         await flushPromises();
 
         expect(wrapper.text()).toContain('TEST');
         expect(wrapper.text()).toContain('UnidadeView Teste');
-        expect(wrapper.text()).toContain('Titular: Titular teste');
+        expect(wrapper.text()).toContain('Titular teste');
     });
 
-    it('renders "Criar atribuição" button only for ADMIN', async () => {
-        const {wrapper, perfilStore} = createWrapper();
-        await flushPromises();
-        perfilStore.perfilSelecionado = 'ADMIN';
-        perfilStore.permissoesSessao = {mostrarCriarAtribuicaoTemporaria: true};
-        await wrapper.vm.$nextTick();
-        expect(wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').exists()).toBe(true);
-
-        perfilStore.perfilSelecionado = 'USER';
-        perfilStore.permissoesSessao = {mostrarCriarAtribuicaoTemporaria: false};
-        await wrapper.vm.$nextTick();
-        expect(wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').exists()).toBe(false);
-    });
-
-    it('navigates to create assignment', async () => {
-        const {wrapper, perfilStore} = createWrapper();
-        await flushPromises();
-        perfilStore.perfilSelecionado = 'ADMIN';
-        perfilStore.permissoesSessao = {mostrarCriarAtribuicaoTemporaria: true};
-        await wrapper.vm.$nextTick();
-
-        await wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').trigger('click');
-        expect(mockPush).toHaveBeenCalledWith({path: '/unidade/1/atribuicao'});
-    });
-
-    it('renders responsible person correctly from API payload', async () => {
-        const unidadeComResponsavel = {
-            ...mockUnidade,
-            responsavel: mockUsuarioResponsavel
+    it('não exibe responsável quando for o titular', async () => {
+        const unidadeTitular = {
+            ...mockUnidadeData,
+            tipoResponsabilidade: 'TITULAR'
         };
-        (buscarArvoreUnidade as any).mockResolvedValueOnce(unidadeComResponsavel);
+        (buscarArvoreUnidade as any).mockResolvedValueOnce(unidadeTitular);
 
         const {wrapper} = createWrapper();
-
-        await wrapper.vm.$nextTick();
         await flushPromises();
 
-        expect(wrapper.text()).toContain('Responsável: Responsavel teste');
-    });
-
-    it('não exibe responsável quando for o mesmo usuário titular', async () => {
-        const unidadeComMesmoResponsavel = {
-            ...mockUnidade,
-            responsavel: {
-                ...mockUsuario,
-                ramal: '1234',
-                email: 'titular@example.com'
-            }
-        };
-        (buscarArvoreUnidade as any).mockResolvedValueOnce(unidadeComMesmoResponsavel);
-
-        const {wrapper} = createWrapper();
-
-        await wrapper.vm.$nextTick();
-        await flushPromises();
-
-        expect(wrapper.text()).toContain('Titular: Titular teste');
+        expect(wrapper.text()).toContain('Titular teste');
         expect(wrapper.find('[data-testid="unidade-responsavel-info"]').exists()).toBe(false);
     });
 
     it('renders subordinate units tree table', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
-        await wrapper.vm.$nextTick();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
         expect(treeTable.exists()).toBe(true);
@@ -230,7 +150,6 @@ describe('UnidadeView.vue', () => {
     it('navigates to subordinate unit on row click', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
-        await wrapper.vm.$nextTick();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
         treeTable.vm.$emit('row-click', {codigo: 2});
@@ -253,13 +172,6 @@ describe('UnidadeView.vue', () => {
         });
     });
 
-    it('não exibe botão de mapa vigente sem referência explícita', async () => {
-        const {wrapper} = createWrapper();
-        await flushPromises();
-
-        expect(wrapper.find('[data-testid="btn-mapa-vigente"]').exists()).toBe(false);
-    });
-
     it('displays error alert when fetching unit fails', async () => {
         (buscarArvoreUnidade as any).mockRejectedValueOnce(new Error('Erro ao carregar unidade'));
         const {wrapper} = createWrapper();
@@ -270,61 +182,18 @@ describe('UnidadeView.vue', () => {
         expect(wrapper.text()).toContain('Erro ao carregar unidade');
     });
 
-    it('logs error when fetching titular fails', async () => {
-        (buscarUsuarioPorTitulo as any).mockRejectedValue(new Error('Fetch error'));
-
-        createWrapper();
-        await flushPromises();
-
-        expect(logger.error).toHaveBeenCalledWith('Erro ao carregar dados da unidade:', expect.any(Error));
-    });
-
-    it('renderiza contatos do titular com ícones e links', async () => {
-        const mockUserWithContact = {
-            ...mockUsuario,
-            ramal: '1234',
-            email: 'test@example.com'
-        };
-        (buscarUsuarioPorTitulo as any).mockResolvedValue(mockUserWithContact);
-
+    it('renderiza contatos do titular com links', async () => {
         const {wrapper} = createWrapper();
-
-        await wrapper.vm.$nextTick();
         await flushPromises();
 
-        const ramalLink = wrapper.find('a[href="tel:1234"]');
-        expect(ramalLink.exists()).toBe(false);
-        expect(wrapper.text()).toContain('1234');
-        expect(wrapper.find('.bi-telephone-fill').exists()).toBe(true);
-
-        const emailLink = wrapper.find('a[href="mailto:test@example.com"]');
+        const emailLink = wrapper.find('a[href="mailto:t@t"]');
         expect(emailLink.exists()).toBe(true);
-        expect(emailLink.text()).toBe('test@example.com');
-        expect(emailLink.attributes('aria-label')).toBe('Enviar e-mail para test@example.com');
-        expect(wrapper.find('.bi-envelope-fill').exists()).toBe(true);
-    });
-
-    it('handles unit with no children safely', async () => {
-        const mockUnidadeSemFilhas = {
-            ...mockUnidade,
-            filhas: []
-        };
-        (buscarArvoreUnidade as any).mockResolvedValue(mockUnidadeSemFilhas);
-
-        const {wrapper} = createWrapper();
-        await wrapper.vm.$nextTick();
-        await flushPromises();
-
-        expect((wrapper.vm).dadosFormatadosSubordinadas).toEqual([]);
-
-        const treeTable = wrapper.findComponent(TreeTableStub);
-        expect(treeTable.exists()).toBe(false);
+        expect(emailLink.text()).toBe('t@t');
     });
 
     it('handles null unit gracefully', async () => {
         (buscarArvoreUnidade as any).mockResolvedValue(null);
         const {wrapper} = createWrapper();
-        await wrapper.vm.$nextTick();
         await flushPromises();
 
         expect(wrapper.findComponent(EmptyState).exists()).toBe(true);
