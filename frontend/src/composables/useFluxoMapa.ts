@@ -19,12 +19,12 @@ import type {
 } from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useMapas} from "@/composables/useMapas";
+import {useMapasStore} from "@/stores/mapas";
 
 export function useFluxoMapa() {
     const {lastError, clearError} = useErrorHandler();
     const {carregando, erro, executar} = useAsyncAction();
-    const mapasStore = useMapas();
+    const mapasStore = useMapasStore();
 
     async function salvarMapa(codSubprocesso: number, dados: SalvarMapaRequest): Promise<MapaCompleto | undefined> {
         return executar(async () => {
@@ -64,9 +64,7 @@ export function useFluxoMapa() {
 
     async function removerAtividadeDaCompetencia(codSubprocesso: number, codCompetencia: number, codAtividade: number): Promise<MapaCompleto | undefined> {
         return executar(async () => {
-            const mapa = typeof mapasStore.obterMapaCompletoCache === "function"
-                ? mapasStore.obterMapaCompletoCache(codSubprocesso)
-                : mapasStore.mapaCompleto.value;
+            const mapa = mapasStore.obterMapaCompletoCache(codSubprocesso);
             const competencia = mapa?.competencias.find(c => c.codigo === codCompetencia);
             if (!competencia) throw new Error("Competência não encontrada.");
 

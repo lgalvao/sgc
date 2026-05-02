@@ -60,9 +60,6 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
             codigoSubprocesso.value = data.detalhes.codigo;
             sincronizarEstadoInicialContexto(data);
             return true;
-        } catch (e) {
-            logger.error("Erro ao carregar contexto inicial", e);
-            return false;
         } finally {
             carregandoInicial.value = false;
         }

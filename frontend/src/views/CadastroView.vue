@@ -300,7 +300,7 @@ const {
 const {withErrorHandling, lastError} = useErrorHandler();
 
 const historicoAnalises = computed(() => {
-  return analisesCadastro.value || [];
+  return analisesCadastro.value;
 });
 
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
@@ -520,10 +520,8 @@ async function disponibilizarCadastro() {
     } else {
       erroGlobal.value = "Não foi possível obter o resultado da validação. Tente novamente.";
     }
-  } catch (e: unknown) {
-    // Tenta extrair mensagem amigável do erro
-    const err = e as { response?: { data?: { message?: string } }; message?: string };
-    erroGlobal.value = err?.response?.data?.message || err?.message || "Ocorreu um erro ao validar o cadastro.";
+  } catch {
+    erroGlobal.value = fluxoSubprocesso.lastError.value?.message ?? "Ocorreu um erro ao validar o cadastro.";
   } finally {
     loadingValidacao.value = false;
   }
