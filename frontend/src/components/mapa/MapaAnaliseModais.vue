@@ -5,6 +5,7 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import type {Analise, ImpactoMapa} from "@/types/tipos";
+import {TEXTOS} from "@/constants/textos";
 
 const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/ImpactoMapaModal.vue"));
 

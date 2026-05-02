@@ -2,6 +2,7 @@
 import type {Analise, Atividade, Competencia, ImpactoMapa} from "@/types/tipos";
 import MapaEdicaoModais from "@/components/mapa/MapaEdicaoModais.vue";
 import MapaAnaliseModais from "@/components/mapa/MapaAnaliseModais.vue";
+import MapaSugestoesModais from "@/components/mapa/MapaSugestoesModais.vue";
 
 interface Props {
   modoSomenteLeitura: boolean;
@@ -95,34 +96,37 @@ defineEmits<{
       :historico-analise="historicoAnalise"
       :homologacao="homologacao"
       :impactos="impactos"
-      :is-chefe="isChefe"
       :loading-impacto="loadingImpacto"
-      :loading-sugestoes-envio="loadingSugestoesEnvio"
       :mensagem-erro-devolucao="mensagemErroDevolucao"
-      :mensagem-erro-sugestoes="mensagemErroSugestoes"
       :mostrar-modal-aceitar="mostrarModalAceitar"
       :mostrar-modal-devolucao="mostrarModalDevolucao"
       :mostrar-modal-historico="mostrarModalHistorico"
       :mostrar-modal-impacto="mostrarModalImpacto"
-      :mostrar-modal-sugestoes="mostrarModalSugestoes"
       :mostrar-modal-validar="mostrarModalValidar"
-      :mostrar-modal-ver-sugestoes="mostrarModalVerSugestoes"
       :observacao-devolucao="observacaoDevolucao"
-      :sugestoes="sugestoes"
-      :sugestoes-visualizacao="sugestoesVisualizacao"
       @confirmar-aceitacao="$emit('confirmar-aceitacao', $event)"
       @confirmar-devolucao="$emit('confirmar-devolucao')"
-      @confirmar-sugestoes="$emit('confirmar-sugestoes')"
       @confirmar-validacao="$emit('confirmar-validacao')"
       @fechar-aceite="$emit('fechar-aceite')"
       @fechar-historico="$emit('fechar-historico')"
       @fechar-impacto="$emit('fechar-impacto')"
-      @fechar-ver-sugestoes="$emit('fechar-ver-sugestoes')"
       @update:mostrarModalDevolucao="$emit('update:mostrarModalDevolucao', $event)"
-      @update:mostrarModalSugestoes="$emit('update:mostrarModalSugestoes', $event)"
       @update:mostrarModalValidar="$emit('update:mostrarModalValidar', $event)"
-      @update:mostrarModalVerSugestoes="$emit('update:mostrarModalVerSugestoes', $event)"
       @update:observacaoDevolucao="$emit('update:observacaoDevolucao', $event)"
+  />
+
+  <MapaSugestoesModais
+      :is-chefe="isChefe"
+      :loading-sugestoes-envio="loadingSugestoesEnvio"
+      :mensagem-erro-sugestoes="mensagemErroSugestoes"
+      :mostrar-modal-sugestoes="mostrarModalSugestoes"
+      :mostrar-modal-ver-sugestoes="mostrarModalVerSugestoes"
+      :sugestoes="sugestoes"
+      :sugestoes-visualizacao="sugestoesVisualizacao"
+      @confirmar-sugestoes="$emit('confirmar-sugestoes')"
+      @fechar-ver-sugestoes="$emit('fechar-ver-sugestoes')"
+      @update:mostrarModalSugestoes="$emit('update:mostrarModalSugestoes', $event)"
+      @update:mostrarModalVerSugestoes="$emit('update:mostrarModalVerSugestoes', $event)"
       @update:sugestoes="$emit('update:sugestoes', $event)"
       @update:sugestoesVisualizacao="$emit('update:sugestoesVisualizacao', $event)"
   />

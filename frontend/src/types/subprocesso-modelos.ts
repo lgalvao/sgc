@@ -1,3 +1,4 @@
+import type {Atividade} from "./mapa";
 import type {Usuario, Unidade} from "./organizacao";
 
 export enum SituacaoSubprocesso {

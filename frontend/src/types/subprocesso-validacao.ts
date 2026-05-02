@@ -1,5 +1,6 @@
 import type {Atividade} from "./mapa";
-import type {PermissoesSubprocesso, SubprocessoStatus} from "./subprocesso-modelos";
+import type {PermissoesSubprocesso} from "./subprocesso-contexto";
+import type {SubprocessoStatus} from "./subprocesso-modelos";
 
 export interface ErroValidacao {
   tipo: string;
