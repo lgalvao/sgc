@@ -21,7 +21,7 @@ public class ClienteAcessoAdE2e extends ClienteAcessoAd {
 
     @Override
     public void autenticar(String titulo, String senha) {
-        log.info("Usuário autenticado sem AD (perfil e2e): {}", mascarar(titulo));
+        log.debug("Usuário autenticado sem AD (perfil e2e): {}", mascarar(titulo));
     }
 
     private String mascarar(String valor) {

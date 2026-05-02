@@ -16,56 +16,16 @@
         @dismissed="clear()"/>
 
     <div v-if="processo">
-      <PageHeader
-          :title="processo.descricao"
-          title-test-codigo="processo-info">
-
-        <template #default>
-          <ProcessoInfo
-              :show-data-limite="false"
-              :situacao="processo.situacao"
-              :tipo="processo.tipo"/>
-        </template>
-
-        <template #actions>
-          <BButton
-              v-if="mostrarFinalizarProcesso"
-              data-testid="btn-processo-finalizar"
-              :disabled="!podeFinalizar"
-              variant="danger"
-              @click="finalizarProcesso"
-          >
-            {{ TEXTOS.processo.FINALIZAR }}
-          </BButton>
-
-          <BDropdown
-              v-if="usarMenuAcoesBloco"
-              data-testid="btn-processo-acoes-bloco"
-              :text="TEXTOS.processo.ACOES_EM_BLOCO"
-              toggle-class="text-nowrap"
-              variant="secondary">
-            <BDropdownItemButton
-                v-for="acao in acoesBlocoVisiveis"
-                :id="obterIdBotaoAcao(acao.codigo)"
-                :key="acao.codigo"
-                :data-testid="obterTestIdBotaoAcao(acao.codigo)"
-                :disabled="!acao.habilitar || processandoAcaoBloco"
-                @click="abrirModalBloco(acao)">
-              {{ acao.rotulo }}
-            </BDropdownItemButton>
-          </BDropdown>
-
-          <BButton
-              v-else-if="acaoBlocoPrincipal"
-              :id="obterIdBotaoAcao(acaoBlocoPrincipal.codigo)"
-              :data-testid="obterTestIdBotaoAcao(acaoBlocoPrincipal.codigo)"
-              :disabled="!acaoBlocoPrincipal.habilitar || processandoAcaoBloco"
-              variant="success"
-              @click="abrirModalBloco(acaoBlocoPrincipal)">
-            {{ acaoBlocoPrincipal.rotulo }}
-          </BButton>
-        </template>
-      </PageHeader>
+      <ProcessoAcoes
+          :acao-bloco-principal="acaoBlocoPrincipal"
+          :acoes-bloco-visiveis="acoesBlocoVisiveis"
+          :mostrar-finalizar-processo="mostrarFinalizarProcesso"
+          :pode-finalizar="podeFinalizar"
+          :processando-acao-bloco="processandoAcaoBloco"
+          :processo="processo"
+          :usar-menu-acoes-bloco="usarMenuAcoesBloco"
+          @abrir-acao-bloco="abrirModalBloco"
+          @finalizar="finalizarProcesso"/>
 
       <ProcessoSubprocessosTable
           :participantes-hierarquia="participantesHierarquia"
@@ -105,36 +65,24 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
-import PageHeader from "@/components/layout/PageHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
+import ProcessoAcoes from "@/components/processo/ProcessoAcoes.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useNotification} from "@/composables/useNotification";
+import {useProcessoAcoes} from "@/views/processoDetalheAcoes";
 import {usePerfil} from "@/composables/usePerfil";
-import {useToastStore} from "@/stores/toast";
 import {useProcessoStore} from "@/stores/processo";
-import {useHistoricoStore} from "@/stores/historico";
-import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
-import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import type {Processo} from "@/types/tipos";
 import {logger} from "@/utils";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
-import * as processoService from "@/services/processoService";
 import {TEXTOS} from "@/constants/textos";
 
-type ModalAcaoBlocoRef = {
-  abrir: () => void;
-  fechar: () => void;
-  setProcessando: (valor: boolean) => void;
-  setErro: (mensagem: string) => void;
-};
 type LinhaCliqueSubprocesso = {
   clickable?: boolean;
   sigla?: string;
@@ -145,22 +93,19 @@ const route = useRoute();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const {isAdmin} = usePerfil();
-const toastStore = useToastStore();
 const processoStore = useProcessoStore();
-const historicoStore = useHistoricoStore();
-const {invalidarCachesProcesso, invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
 const lastError = ref<NormalizedError | null>(null);
-const modalBlocoRef = ref<ModalAcaoBlocoRef | null>(null);
-const mostrarModalFinalizacao = ref(false);
-const acaoBlocoAtual = ref<AcaoBlocoProcesso | null>(null);
-const processandoAcaoBloco = ref(false);
-const loadingFinalizacao = ref(false);
 const carregamentoInicialConcluido = ref(false);
 
 function clearError() {
   lastError.value = null;
+}
+
+function registrarErro(error: unknown) {
+  lastError.value = normalizeError(error);
+  return lastError.value?.message || TEXTOS.processo.ERRO_PADRAO;
 }
 
 async function carregarContextoCompleto() {
@@ -182,28 +127,33 @@ async function carregarContextoCompleto() {
 }
 
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
-
-const podeFinalizar = computed(() => {
-  return processo.value?.podeFinalizar || false;
-});
+const podeFinalizar = computed(() => processo.value?.podeFinalizar || false);
 const mostrarFinalizarProcesso = computed(() => isAdmin.value);
-
 const acoesBlocoVisiveis = computed(() => (processo.value?.acoesBloco ?? []).filter(acao => acao.mostrar));
 const usarMenuAcoesBloco = computed(() => acoesBlocoVisiveis.value.length > 1);
 const acaoBlocoPrincipal = computed(() => acoesBlocoVisiveis.value[0] ?? null);
-
-const unidadesElegiveis = computed(() => {
-  const elegiveis = acaoBlocoAtual.value?.unidades ?? [];
-  return elegiveis.map((u: SubprocessoElegivel) => ({
-    codigo: u.unidadeCodigo,
-    sigla: u.unidadeSigla,
-    nome: u.unidadeNome,
-    situacao: formatSituacaoSubprocesso(u.situacao),
-    ultimaDataLimite: u.ultimaDataLimite
-  }));
+const {
+  acaoBlocoAtual,
+  abrirModalBloco,
+  confirmarFinalizacao,
+  executarAcaoBloco,
+  finalizarProcesso,
+  idsElegiveis,
+  loadingFinalizacao,
+  modalBlocoRef,
+  mostrarModalFinalizacao,
+  obterIdBotaoAcao,
+  obterTestIdBotaoAcao,
+  processandoAcaoBloco,
+  unidadesElegiveis,
+} = useProcessoAcoes({
+  codProcesso,
+  processo,
+  carregarContextoCompleto,
+  clearError,
+  notify,
+  registrarErro,
 });
-
-const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
 
 async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
   if (!row.clickable || !row.sigla) {
@@ -223,112 +173,6 @@ async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
     });
   } catch (error) {
     logger.error(`Erro ao navegar para detalhes da unidade ${row.sigla}:`, error);
-  }
-}
-
-function finalizarProcesso() {
-  mostrarModalFinalizacao.value = true;
-}
-
-function obterIdBotaoAcao(codigoAcao: string) {
-  switch (codigoAcao) {
-    case "aceitar-cadastro":
-      return "btn-aceitar-bloco";
-    case "aceitar-mapa":
-      return "btn-aceitar-mapas-bloco";
-    case "homologar-cadastro":
-      return "btn-homologar-bloco";
-    case "homologar-mapa":
-      return "btn-homologar-mapas-bloco";
-    case "disponibilizar-mapa":
-      return "btn-disponibilizar-bloco";
-    default:
-      return `btn-${codigoAcao}`;
-  }
-}
-
-function obterTestIdBotaoAcao(codigoAcao: string) {
-  switch (codigoAcao) {
-    case "aceitar-cadastro":
-      return "btn-processo-aceitar-bloco";
-    case "aceitar-mapa":
-      return "btn-processo-aceitar-mapas-bloco";
-    case "homologar-cadastro":
-      return "btn-processo-homologar-bloco";
-    case "homologar-mapa":
-      return "btn-processo-homologar-mapas-bloco";
-    case "disponibilizar-mapa":
-      return "btn-processo-disponibilizar-bloco";
-    default:
-      return `btn-processo-${codigoAcao}`;
-  }
-}
-
-async function confirmarFinalizacao() {
-  if (loadingFinalizacao.value) {
-    return;
-  }
-  loadingFinalizacao.value = true;
-  try {
-    clearError();
-    await processoService.finalizarProcesso(codProcesso);
-    toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
-    invalidarCachesProcesso();
-    historicoStore.invalidar();
-    await router.push("/painel");
-  } catch (error) {
-    lastError.value = normalizeError(error);
-    const mensagem = lastError.value?.message || TEXTOS.processo.ERRO_PADRAO;
-    notify(mensagem, 'danger');
-  } finally {
-    loadingFinalizacao.value = false;
-  }
-}
-
-function abrirModalBloco(acao: AcaoBlocoProcesso) {
-  acaoBlocoAtual.value = acao;
-  modalBlocoRef.value?.abrir();
-}
-
-async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) {
-  try {
-    clearError();
-    processandoAcaoBloco.value = true;
-    modalBlocoRef.value?.setProcessando(true);
-    if (!processo.value) {
-      modalBlocoRef.value?.setErro("Detalhes do processo não carregados.");
-      processandoAcaoBloco.value = false;
-      return;
-    }
-    if (!acaoBlocoAtual.value) {
-      modalBlocoRef.value?.setErro(TEXTOS.processo.ERRO_ACAO_BLOCO);
-      processandoAcaoBloco.value = false;
-      return;
-    }
-    await processoService.executarAcaoEmBloco(processo.value.codigo, {
-      unidadeCodigos: dados.ids,
-      acao: acaoBlocoAtual.value.acao,
-      dataLimite: dados.dataLimite,
-    });
-
-    modalBlocoRef.value?.fechar();
-    const {mensagemSucesso, redirecionarPainel} = acaoBlocoAtual.value;
-
-    if (redirecionarPainel) {
-      toastStore.setPending(mensagemSucesso);
-      invalidarCachesProcesso();
-      await router.push("/painel");
-      return;
-    }
-    notify(mensagemSucesso, 'success');
-    invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: true});
-    await carregarContextoCompleto();
-  } catch (error) {
-    lastError.value = normalizeError(error);
-    modalBlocoRef.value?.setErro(lastError.value?.message || TEXTOS.processo.ERRO_ACAO_BLOCO);
-    modalBlocoRef.value?.setProcessando(false);
-  } finally {
-    processandoAcaoBloco.value = false;
   }
 }
 

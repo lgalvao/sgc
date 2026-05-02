@@ -61,8 +61,83 @@ const commonStubs = {
     PageHeader: {template: '<div><slot/><slot name="actions"/></div>'},
     ProcessoAcoes: {
         name: 'ProcessoAcoes',
-        template: '<div></div>',
-        emits: ['finalizar']
+        props: [
+            'mostrarFinalizarProcesso',
+            'podeFinalizar',
+            'usarMenuAcoesBloco',
+            'acoesBlocoVisiveis',
+            'acaoBlocoPrincipal',
+            'processandoAcaoBloco'
+        ],
+        emits: ['finalizar', 'abrir-acao-bloco'],
+        methods: {
+            obterId(codigo: string) {
+                switch (codigo) {
+                    case 'aceitar-cadastro':
+                        return 'btn-aceitar-bloco';
+                    case 'aceitar-mapa':
+                        return 'btn-aceitar-mapas-bloco';
+                    case 'homologar-cadastro':
+                        return 'btn-homologar-bloco';
+                    case 'homologar-mapa':
+                        return 'btn-homologar-mapas-bloco';
+                    case 'disponibilizar-mapa':
+                        return 'btn-disponibilizar-bloco';
+                    default:
+                        return `btn-${codigo}`;
+                }
+            },
+            obterTestId(codigo: string) {
+                switch (codigo) {
+                    case 'aceitar-cadastro':
+                        return 'btn-processo-aceitar-bloco';
+                    case 'aceitar-mapa':
+                        return 'btn-processo-aceitar-mapas-bloco';
+                    case 'homologar-cadastro':
+                        return 'btn-processo-homologar-bloco';
+                    case 'homologar-mapa':
+                        return 'btn-processo-homologar-mapas-bloco';
+                    case 'disponibilizar-mapa':
+                        return 'btn-processo-disponibilizar-bloco';
+                    default:
+                        return `btn-processo-${codigo}`;
+                }
+            }
+        },
+        template: `
+          <div>
+            <button
+                v-if="mostrarFinalizarProcesso"
+                data-testid="btn-processo-finalizar"
+                :disabled="!podeFinalizar"
+                @click="$emit('finalizar')"
+            >
+              Finalizar
+            </button>
+            <div v-if="usarMenuAcoesBloco" data-testid="btn-processo-acoes-bloco">
+              <button type="button">Ações em bloco</button>
+              <button
+                  v-for="acao in acoesBlocoVisiveis"
+                  :id="obterId(acao.codigo)"
+                  :key="acao.codigo"
+                  :data-testid="obterTestId(acao.codigo)"
+                  :disabled="!acao.habilitar || processandoAcaoBloco"
+                  @click="$emit('abrir-acao-bloco', acao)"
+              >
+                {{ acao.rotulo }}
+              </button>
+            </div>
+            <button
+                v-else-if="acaoBlocoPrincipal"
+                :id="obterId(acaoBlocoPrincipal.codigo)"
+                :data-testid="obterTestId(acaoBlocoPrincipal.codigo)"
+                :disabled="!acaoBlocoPrincipal.habilitar || processandoAcaoBloco"
+                @click="$emit('abrir-acao-bloco', acaoBlocoPrincipal)"
+            >
+              {{ acaoBlocoPrincipal.rotulo }}
+            </button>
+          </div>
+        `
     },
     TreeTable: {template: '<div>TreeTable</div>'},
     ModalAcaoBloco: ModalAcaoBlocoStub,
