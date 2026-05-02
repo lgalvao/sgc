@@ -60,7 +60,7 @@
               <BDropdownItemButton
                   v-if="mostrarValidarMapa"
                   data-testid="btn-mapa-acao-validar"
-                  :disabled="!habilitarValidar"
+                  :disabled="!habilitarValidarMapa"
                   @click="abrirModalValidar"
               >
                 {{ TEXTOS.mapa.BOTAO_VALIDAR }}
@@ -74,7 +74,7 @@
                 {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
               </BDropdownItemButton>
               <BDropdownItemButton
-                  v-if="mostrarAcaoDevolverMapa"
+                  v-if="mostrarDevolverMapa"
                   data-testid="btn-mapa-acao-devolver"
                   :disabled="!habilitarDevolverMapa"
                   @click="abrirModalDevolucao"
@@ -401,7 +401,7 @@ const {
   habilitarDisponibilizarMapa,
   habilitarEditarMapa,
   habilitarValidarMapa,
-  podeVerSugestoes: podeMostrarVerSugestoes,
+  podeVerSugestoes,
   habilitarDevolverMapa,
   acaoPrincipalMapa
 } = useAcesso(subprocesso);
@@ -409,15 +409,12 @@ const {
 const usarMenuAcoesMapa = computed(() => {
   return mostrarApresentarSugestoes.value
       || mostrarValidarMapa.value
-      || mostrarAcaoDevolverMapa.value
+      || mostrarDevolverMapa.value
       || Boolean(acaoPrincipalMapa.value?.mostrar)
       || mostrarDisponibilizarMapa.value;
 });
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
-const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
-const habilitarValidar = computed(() => habilitarValidarMapa?.value ?? false);
 const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
-const mostrarAcaoDevolverMapa = computed(() => mostrarDevolverMapa.value);
 const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?.mostrar));
 const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);
 const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);
@@ -441,7 +438,7 @@ const mapasStore = useMapas(codigoSubprocesso);
 const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 
 const analisesCadastro = ref<Analise[]>([]);
-const historicoAnalise = computed(() => analisesCadastro.value || []);
+const historicoAnalise = computed(() => analisesCadastro.value);
 const mostrarModalSugestoes = ref(false);
 const mostrarModalVerSugestoes = ref(false);
 const mostrarModalHistorico = ref(false);

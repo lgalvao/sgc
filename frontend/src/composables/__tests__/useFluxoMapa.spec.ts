@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useFluxoMapa} from "../useFluxoMapa";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useMapas} from "@/composables/useMapas";
+import {useMapasStore} from "@/stores/mapas";
 
 vi.mock("@/services/subprocessoService", () => ({
     salvarMapaCompleto: vi.fn(),
@@ -16,9 +16,9 @@ vi.mock("@/services/subprocessoService", () => ({
     devolverValidacao: vi.fn(),
 }));
 
-vi.mock("@/composables/useMapas", () => ({
-    useMapas: vi.fn(() => ({
-        mapaCompleto: { value: null }
+vi.mock("@/stores/mapas", () => ({
+    useMapasStore: vi.fn(() => ({
+        obterMapaCompletoCache: vi.fn().mockReturnValue(null)
     }))
 }));
 
@@ -128,7 +128,9 @@ describe("useFluxoMapa", () => {
                     }
                 ]
             };
-            vi.mocked(useMapas).mockReturnValue({ mapaCompleto: { value: mockMapa } } as any);
+            vi.mocked(useMapasStore).mockReturnValue({
+                obterMapaCompletoCache: vi.fn().mockReturnValue(mockMapa)
+            } as any);
 
             const fluxoMapa = useFluxoMapa();
             await fluxoMapa.removerAtividadeDaCompetencia(10, 20, 100);
@@ -140,7 +142,9 @@ describe("useFluxoMapa", () => {
         });
 
         it("deve lançar erro se competencia não for encontrada", async () => {
-            vi.mocked(useMapas).mockReturnValue({ mapaCompleto: { value: { competencias: [] } } } as any);
+            vi.mocked(useMapasStore).mockReturnValue({
+                obterMapaCompletoCache: vi.fn().mockReturnValue({ competencias: [] })
+            } as any);
 
             const fluxoMapa = useFluxoMapa();
             await expect(fluxoMapa.removerAtividadeDaCompetencia(10, 20, 100)).rejects.toThrow("Competência não encontrada.");

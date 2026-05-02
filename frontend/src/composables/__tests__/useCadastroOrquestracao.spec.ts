@@ -37,9 +37,9 @@ describe("useCadastroOrquestracao", () => {
         expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
     });
 
-    it("deve lidar com erro ao carregar contexto", async () => {
+    it("deve retornar false quando contexto não for encontrado", async () => {
         const {carregarContextoInicial} = useCadastroOrquestracao(props, atividades);
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockRejectedValue(new Error("Erro"));
+        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(null);
 
         const success = await carregarContextoInicial();
 

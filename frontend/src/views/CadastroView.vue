@@ -199,6 +199,7 @@ import {
 } from "@/types/tipos";
 import logger from "@/utils/logger";
 import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/formatters";
+import {normalizeError} from "@/utils/apiError";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
 
@@ -300,7 +301,7 @@ const {
 const {withErrorHandling, lastError} = useErrorHandler();
 
 const historicoAnalises = computed(() => {
-  return analisesCadastro.value || [];
+  return analisesCadastro.value;
 });
 
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
@@ -520,10 +521,8 @@ async function disponibilizarCadastro() {
     } else {
       erroGlobal.value = "Não foi possível obter o resultado da validação. Tente novamente.";
     }
-  } catch (e: unknown) {
-    // Tenta extrair mensagem amigável do erro
-    const err = e as { response?: { data?: { message?: string } }; message?: string };
-    erroGlobal.value = err?.response?.data?.message || err?.message || "Ocorreu um erro ao validar o cadastro.";
+  } catch (e) {
+    erroGlobal.value = normalizeError(e).message;
   } finally {
     loadingValidacao.value = false;
   }
