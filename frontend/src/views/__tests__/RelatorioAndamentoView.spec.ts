@@ -50,7 +50,11 @@ const stubs = {
     BRow: {template: '<div class="row"><slot /></div>'},
     BCol: {template: '<div class="col"><slot /></div>'},
     BFormGroup: {template: '<div><slot /></div>', props: ['label', 'labelFor']},
-    BFormSelect: {template: '<select />', props: ['modelValue', 'options']},
+    BFormSelect: {
+        template: '<select v-bind="$attrs"><slot /></select>',
+        props: ['modelValue', 'options'],
+        inheritAttrs: false
+    },
     BButton: {template: '<button><slot /></button>', props: ['variant', 'disabled', 'to']},
     BSpinner: {template: '<div />'},
 };

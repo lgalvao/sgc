@@ -40,12 +40,12 @@ clear
 invoke_passo 'git pull' git pull
 invoke_passo 'Testes backend' "$GRADLE_CMD" backend:test
 
-# Garantir que pnpm está instalado
+# Garantir que pnpm está instalado via corepack
 if ! command -v pnpm &> /dev/null; then
-    invoke_passo 'Instalar pnpm' npm install -g pnpm
+    invoke_passo 'Habilitar corepack' corepack enable
 fi
 
-invoke_passo 'Atualizar pnpm' pnpm self-update --silent || true
+invoke_passo 'Atualizar pnpm' corepack prepare pnpm@latest --activate
 invoke_passo 'Atualizar globais' pnpm update -g
 invoke_passo 'Atualizar raiz' pnpm update
 

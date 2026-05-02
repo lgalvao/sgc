@@ -63,7 +63,8 @@ describe("LoginView.vue", () => {
                 BFormSelect: {
                     props: ['modelValue', 'options', 'value-field', 'text-field'],
                     emits: ['update:modelValue'],
-                    template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot name="first" /><slot /></select>'
+                    template: '<select v-bind="$attrs" :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot name="first" /><slot /></select>',
+                    inheritAttrs: false
                 },
                 BFormSelectOption: {
                     props: ['value'],

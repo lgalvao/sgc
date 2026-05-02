@@ -121,7 +121,11 @@ describe('ProcessoCadastroView.vue', () => {
                     BForm: {template: '<form><slot /></form>'},
                     BFormGroup: {template: '<div><slot /></div>'},
                     BFormInput: {template: '<input />', props: ['modelValue', 'state']},
-                    BFormSelect: {template: '<select />', props: ['modelValue', 'options', 'state']},
+                    BFormSelect: {
+                        template: '<select v-bind="$attrs"><slot name="first" /><slot /></select>',
+                        props: ['modelValue', 'options', 'state'],
+                        inheritAttrs: false
+                    },
                     BFormCheckbox: {template: '<input type="checkbox" />', props: ['modelValue']},
                     BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BAlert: {template: '<div v-if="modelValue" class="alert"><slot /></div>', props: ['modelValue', 'variant', 'dismissible']},

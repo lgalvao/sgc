@@ -102,7 +102,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
                         props: ['modelValue']
                     },
                     BFormSelect: {
-                        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
+                        template: '<select v-bind="$attrs" :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option value="MAPEAMENTO">MAPEAMENTO</option></select>',
                         props: ['modelValue', 'options'],
                         inheritAttrs: false
                     },

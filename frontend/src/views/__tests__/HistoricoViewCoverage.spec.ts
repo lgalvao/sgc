@@ -5,7 +5,6 @@ import HistoricoView from "@/views/HistoricoView.vue";
 import {createMemoryHistory, createRouter} from "vue-router";
 import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import * as processoService from "@/services/processoService";
-import {useHistoricoStore} from "@/stores/historico";
 
 vi.mock("@/services/processoService", () => ({
     buscarProcessosFinalizados: vi.fn(),

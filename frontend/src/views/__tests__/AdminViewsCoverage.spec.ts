@@ -21,7 +21,7 @@ const stubs = {
     BForm: { template: '<form><slot/></form>' },
     BFormGroup: { template: '<div><slot/></div>' },
     BFormInput: { template: '<input/>' },
-    BFormSelect: { template: '<select/>' },
+    BFormSelect: { template: '<select><slot/></select>', props: ['options', 'modelValue'] },
     BFormTextarea: { template: '<textarea/>' },
     BSpinner: { template: '<div></div>' },
     AppAlert: { template: '<div></div>' },

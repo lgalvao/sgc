@@ -23,7 +23,8 @@ const stubs = {
     BAlert: {template: '<div><slot /></div>'},
     BFormSelect: {
         props: ['modelValue', 'options'],
-        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot /><option v-for="opt in options" :key="opt.codigo || opt.codUnidade" :value="opt.codigo || opt.codUnidade">{{ opt.descricao || opt.sigla }}</option></select>'
+        template: '<select v-bind="$attrs" :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot /><option v-for="opt in options" :key="opt.codigo || opt.codUnidade" :value="opt.codigo || opt.codUnidade">{{ opt.descricao || opt.sigla }}</option></select>',
+        inheritAttrs: false
     },
     BFormSelectOption: {template: '<option><slot /></option>'},
     BFormCheckbox: {
