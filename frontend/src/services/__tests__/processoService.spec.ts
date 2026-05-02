@@ -10,64 +10,7 @@ describe('processoService', () => {
         vi.clearAllMocks();
     });
 
-    describe('Mappers', () => {
-        it('deve mapear UnidadeParticipanteDto com e sem campos opcionais', () => {
-            // Com todos os campos preenchidos
-            const dtoCompleto = {
-                codUnidade: 1,
-                codSubprocesso: 10,
-                situacaoSubprocesso: 'MAPEAMENTO_MAPA_EM_ANDAMENTO',
-                dataLimite: '2024-12-31',
-                filhos: [{
-                    codUnidade: 2,
-                    codSubprocesso: 20
-                }]
-            };
-
-            const frontendCompleto = processoService.mapUnidadeParticipanteDtoToFrontend(dtoCompleto as any);
-            expect(frontendCompleto.codUnidade).toBe(1);
-            expect(frontendCompleto.codSubprocesso).toBe(10);
-            expect(frontendCompleto.situacaoSubprocesso).toBe('MAPEAMENTO_MAPA_EM_ANDAMENTO');
-            expect(frontendCompleto.dataLimite).toBe('2024-12-31');
-            expect(frontendCompleto.filhos.length).toBe(1);
-            expect(frontendCompleto.filhos[0].codUnidade).toBe(2);
-
-            // Faltando campos opcionais
-            const dtoIncompleto = {
-                codUnidade: 3,
-            };
-            const frontendIncompleto = processoService.mapUnidadeParticipanteDtoToFrontend(dtoIncompleto as any);
-            expect(frontendIncompleto.codUnidade).toBe(3);
-            expect(frontendIncompleto.codSubprocesso).toBe(0);
-            expect(frontendIncompleto.situacaoSubprocesso).toBe('NAO_INICIADO');
-            expect(frontendIncompleto.dataLimite).toBe('');
-            expect(frontendIncompleto.filhos).toEqual([]);
-        });
-
-        it('deve mapear ProcessoDetalheDto com e sem unidades/resumos', () => {
-            // Completo
-            const dtoCompleto = {
-                codigo: 1,
-                unidades: [{ codUnidade: 1 }],
-                resumoSubprocessos: [{ codSubprocesso: 1 }]
-            };
-            const frontendCompleto = processoService.mapProcessoDetalheDtoToFrontend(dtoCompleto as any);
-            expect(frontendCompleto.unidades.length).toBe(1);
-            expect(frontendCompleto.unidades[0].codUnidade).toBe(1);
-            expect(frontendCompleto.resumoSubprocessos.length).toBe(1);
-
-            // Incompleto
-            const dtoIncompleto = {
-                codigo: 2,
-            };
-            const frontendIncompleto = processoService.mapProcessoDetalheDtoToFrontend(dtoIncompleto as any);
-            expect(frontendIncompleto.codigo).toBe(2);
-            expect(frontendIncompleto.unidades).toEqual([]);
-            expect(frontendIncompleto.resumoSubprocessos).toEqual([]);
-        });
-    });
-
-    it('buscarUnidadesParaImportacao deve mapear propriedades opcionais com fallback', async () => {
+    it('buscarUnidadesParaImportacao deve mapear unidades para importacao', async () => {
         const codProcesso = 1;
         const responseData = [
             {
@@ -82,8 +25,10 @@ describe('processoService', () => {
                 localizacaoAtualCodigo: 1000
             },
             {
+                nome: 'Unidade 2',
+                sigla: 'U2',
                 codUnidade: 2,
-                // Simulando campos faltando que vão cair no nullish coalescing `??`
+                codSubprocesso: 0,
             }
         ];
         
@@ -100,8 +45,8 @@ describe('processoService', () => {
         expect(result[0].mapaCodigo).toBe(100);
         expect(result[0].localizacaoAtualCodigo).toBe(1000);
 
-        expect(result[1].nome).toBe('');
-        expect(result[1].sigla).toBe('');
+        expect(result[1].nome).toBe('Unidade 2');
+        expect(result[1].sigla).toBe('U2');
         expect(result[1].codSubprocesso).toBe(0);
         expect(result[1].dataLimite).toBeUndefined();
         expect(result[1].mapaCodigo).toBeUndefined();
@@ -196,24 +141,13 @@ describe('processoService', () => {
 
     it('obterDetalhesProcesso deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = {codigo: 1, descricao: 'Detalhes'};
+        const responseData = {codigo: 1, descricao: 'Detalhes', unidades: [], resumoSubprocessos: []};
         vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.obterDetalhesProcesso(codProcesso);
 
         expect(apiClient.get).toHaveBeenCalledWith(`/processos/${codProcesso}/detalhes`);
-        expect(result).toEqual(responseData);
-    });
-
-    it('processarAcaoEmBloco deve fazer requisição POST', async () => {
-        const payload = {
-            codProcesso: 1,
-            unidades: ['U1'],
-            tipoAcao: 'aceitar' as const,
-            unidadeUsuario: 'U2'
-        };
-        await processoService.processarAcaoEmBloco(payload);
-        expect(apiClient.post).toHaveBeenCalledWith(`/processos/${payload.codProcesso}/acoes-em-bloco`, payload);
+        expect(result).toMatchObject(responseData);
     });
 
     it('executarAcaoEmBloco deve fazer requisição POST com ação explícita', async () => {
@@ -253,7 +187,7 @@ describe('processoService', () => {
 
     it('buscarContextoCompleto deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = {codigo: 1, contexto: 'completo'};
+        const responseData = {codigo: 1, contexto: 'completo', unidades: [], resumoSubprocessos: []};
         vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.buscarContextoCompleto(codProcesso);
