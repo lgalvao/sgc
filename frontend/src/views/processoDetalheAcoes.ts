@@ -1,5 +1,6 @@
 import {computed, ref, type Ref} from "vue";
 import {useRouter} from "vue-router";
+import type {VarianteAlerta} from "@/composables/useNotification";
 import {useHistoricoStore} from "@/stores/historico";
 import {useToastStore} from "@/stores/toast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
@@ -22,7 +23,7 @@ interface Dependencias {
   carregarContextoCompleto: () => Promise<Processo | null | undefined>;
   clearError: () => void;
   registrarErro: (error: unknown) => string;
-  notify: (mensagem: string, variant?: string) => void;
+  notify: (mensagem: string, variant?: VarianteAlerta) => void;
 }
 
 export function useProcessoAcoes({

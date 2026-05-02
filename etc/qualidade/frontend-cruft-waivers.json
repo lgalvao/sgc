@@ -98,14 +98,6 @@
       "criterioRemocao": "Extrair lista, resumo e acoes de importacao."
     },
     {
-      "arquivo": "frontend/src/views/ProcessoDetalheView.vue",
-      "camada": "view",
-      "maxLinhas": 368,
-      "responsavel": "frontend",
-      "justificativa": "Tela ainda mistura acoes em bloco, navegacao e exibicao do processo.",
-      "criterioRemocao": "Separar resumo, acoes e tabela de subprocessos."
-    },
-    {
       "arquivo": "frontend/src/components/atividades/AtividadeItem.vue",
       "camada": "component",
       "maxLinhas": 303,
@@ -160,14 +152,6 @@
       "responsavel": "frontend",
       "justificativa": "Componente ainda mistura busca remota, teclado e dropdown.",
       "criterioRemocao": "Extrair estado de busca e lista de sugestoes."
-    },
-    {
-      "arquivo": "frontend/src/views/LoginView.vue",
-      "camada": "view",
-      "maxLinhas": 340,
-      "responsavel": "frontend",
-      "justificativa": "Tela ainda concentra etapas, validacao e tratamento de erro do login.",
-      "criterioRemocao": "Separar passo inicial, selecao de perfil e fluxo de erro."
     },
     {
       "arquivo": "frontend/src/utils/dateUtils.ts",
