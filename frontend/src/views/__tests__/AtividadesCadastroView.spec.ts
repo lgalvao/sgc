@@ -19,6 +19,7 @@ import type {
     AtividadeOperacaoResponse,
     ContextoCadastroAtividadesSubprocesso,
     MapaResumo,
+    PermissoesSubprocesso,
     SubprocessoDetalhe,
     Unidade
 } from "@/types/tipos";
@@ -86,7 +87,7 @@ type SubprocessoStoreMock = {
         situacao: SituacaoSubprocesso | string;
         tipoProcesso: TipoProcesso | string;
         unidade?: {sigla: string};
-        permissoes?: Record<string, boolean>;
+        permissoes?: PermissoesSubprocesso;
     } | null;
     buscarContextoCadastroAtividadesPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarContextoCadastroAtividades: ReturnType<typeof vi.fn>;
@@ -705,7 +706,10 @@ describe("CadastroView.vue", () => {
             throw new Error("Resolver não definido");
         }
         subprocessosStore.subprocessoDetalhe = {
-            ...subprocessosStore.subprocessoDetalhe,
+            codigo: 123,
+            tipoProcesso: TipoProcesso.REVISAO,
+            unidade: {sigla: "TESTE"},
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
             situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
         };
         resolver(true);

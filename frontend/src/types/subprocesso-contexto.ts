@@ -95,3 +95,13 @@ export interface ContextoCadastroAtividadesSubprocesso {
   atividadesDisponiveis: Atividade[];
   assinaturaCadastroReferencia?: string;
 }
+
+type ContextoComDetalhes<TContexto, TDetalhes> = Omit<TContexto, "detalhes"> & {
+  detalhes: TDetalhes;
+};
+
+export type ContextoEdicaoSubprocessoResponse =
+  ContextoComDetalhes<ContextoEdicaoSubprocesso, SubprocessoDetalheResponse>;
+
+export type ContextoCadastroAtividadesSubprocessoResponse =
+  ContextoComDetalhes<ContextoCadastroAtividadesSubprocesso, SubprocessoDetalheResponse>;

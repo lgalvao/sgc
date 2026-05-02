@@ -6,7 +6,7 @@ import type {
     SituacaoSubprocesso,
 } from "@/types/tipos";
 
-type ContextoSubprocesso = ContextoEdicaoSubprocesso | ContextoCadastroAtividadesSubprocesso;
+export type ContextoSubprocesso = ContextoEdicaoSubprocesso | ContextoCadastroAtividadesSubprocesso;
 
 export type AtualizacaoStatusLocal = {
     codigo: number;

@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {ref} from "vue";
+import {ref, type Ref} from "vue";
 import type {
     ContextoCadastroAtividadesSubprocesso,
     ContextoEdicaoSubprocesso,
@@ -10,7 +10,7 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
-import {atualizarDetalhesContexto, dadosValidos, type AtualizacaoStatusLocal, registrarContexto} from "@/stores/subprocessoStoreHelpers";
+import {atualizarDetalhesContexto, type ContextoSubprocesso, dadosValidos, type AtualizacaoStatusLocal, registrarContexto} from "@/stores/subprocessoStoreHelpers";
 import {logger} from "@/utils";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
@@ -19,6 +19,19 @@ type ChaveCarregamento =
     | "EDICAO_PROCESSO_UNIDADE"
     | "CADASTRO_CODIGO"
     | "CADASTRO_PROCESSO_UNIDADE";
+
+type ConfigContexto<T extends ContextoSubprocesso> = {
+    tipoCodigo: ChaveCarregamento;
+    tipoProcessoUnidade: ChaveCarregamento;
+    contextoRef: Ref<T | null>;
+    contextoInvalidoRef: Ref<boolean>;
+    codigosPorProcessoUnidade: Map<string, number>;
+    buscarPorCodigo: (codigoSubprocesso: number) => Promise<T>;
+    buscarPorProcessoEUnidade: (codProcesso: number, siglaUnidade: string) => Promise<T>;
+    registrar: (contexto: T) => void;
+    mensagemCodigo: (codigoSubprocesso: number) => string;
+    mensagemProcessoUnidade: (codProcesso: number, siglaUnidade: string) => string;
+};
 
 export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
@@ -47,6 +60,12 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
     function limparErroIntegracao(): void {
         erroIntegracaoContexto.value = null;
+    }
+
+    function limparContextoSeNecessario(limparAntes: boolean): void {
+        if (limparAntes) {
+            limparContextoAtual();
+        }
     }
 
     function invalidar(): void {
@@ -106,40 +125,39 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         return promessa;
     }
 
-    async function garantirContextoEdicao(codigoSubprocesso: number, limparAntes = false): Promise<ContextoEdicaoSubprocesso | null> {
-        if (limparAntes) {
-            limparContextoAtual();
-        }
-
-        if (dadosValidosEdicao(codigoSubprocesso)) {
-            return contextoEdicao.value;
+    async function garantirContextoPorCodigo<T extends ContextoSubprocesso>(
+        codigoSubprocesso: number,
+        limparAntes: boolean,
+        config: ConfigContexto<T>,
+    ): Promise<T | null> {
+        limparContextoSeNecessario(limparAntes);
+        if (dadosValidos(config.contextoRef, config.contextoInvalidoRef, codigoSubprocesso)) {
+            return config.contextoRef.value;
         }
 
         try {
             const data = await executarComDedupe(
-                gerarChave("EDICAO_CODIGO", codigoSubprocesso),
-                () => serviceBuscarContextoEdicao(codigoSubprocesso),
+                gerarChave(config.tipoCodigo, codigoSubprocesso),
+                () => config.buscarPorCodigo(codigoSubprocesso),
             );
-            registrarContextoEdicao(data);
+            config.registrar(data);
             return data;
         } catch (erro) {
-            return registrarErroIntegracao(erro, `Falha grave ao localizar o subprocesso ${codigoSubprocesso}.`);
+            return registrarErroIntegracao(erro, config.mensagemCodigo(codigoSubprocesso));
         }
     }
 
-    async function garantirContextoEdicaoPorProcessoEUnidade(
+    async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso>(
         codProcesso: number,
         siglaUnidade: string,
-        limparAntes = false
-    ): Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso } | null> {
-        if (limparAntes) {
-            limparContextoAtual();
-        }
-
+        limparAntes: boolean,
+        config: ConfigContexto<T>,
+    ): Promise<{ codigo: number; contexto: T } | null> {
+        limparContextoSeNecessario(limparAntes);
         const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
-        const codigoMapeado = codigosEdicaoPorProcessoUnidade.get(chaveProcessoUnidade);
+        const codigoMapeado = config.codigosPorProcessoUnidade.get(chaveProcessoUnidade);
         if (typeof codigoMapeado === "number") {
-            const contexto = await garantirContextoEdicao(codigoMapeado, limparAntes);
+            const contexto = await garantirContextoPorCodigo(codigoMapeado, limparAntes, config);
             if (contexto) {
                 return {codigo: codigoMapeado, contexto};
             }
@@ -147,45 +165,65 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
 
         try {
             return await executarComDedupe(
-                gerarChave("EDICAO_PROCESSO_UNIDADE", chaveProcessoUnidade),
+                gerarChave(config.tipoProcessoUnidade, chaveProcessoUnidade),
                 async () => {
-                    const contexto = await serviceBuscarContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade);
+                    const contexto = await config.buscarPorProcessoEUnidade(codProcesso, siglaUnidade);
                     const codigo = contexto.detalhes.codigo;
-                    codigosEdicaoPorProcessoUnidade.set(chaveProcessoUnidade, codigo);
-                    registrarContextoEdicao(contexto);
+                    config.codigosPorProcessoUnidade.set(chaveProcessoUnidade, codigo);
+                    config.registrar(contexto);
                     return {codigo, contexto};
                 },
             );
         } catch (erro) {
-            return registrarErroIntegracao(
-                erro,
-                `Falha grave ao resolver subprocesso do processo ${codProcesso} para a unidade ${siglaUnidade}.`,
-            );
+            return registrarErroIntegracao(erro, config.mensagemProcessoUnidade(codProcesso, siglaUnidade));
         }
+    }
+
+    const configContextoEdicao: ConfigContexto<ContextoEdicaoSubprocesso> = {
+        tipoCodigo: "EDICAO_CODIGO",
+        tipoProcessoUnidade: "EDICAO_PROCESSO_UNIDADE",
+        contextoRef: contextoEdicao,
+        contextoInvalidoRef: contextoEdicaoInvalido,
+        codigosPorProcessoUnidade: codigosEdicaoPorProcessoUnidade,
+        buscarPorCodigo: serviceBuscarContextoEdicao,
+        buscarPorProcessoEUnidade: serviceBuscarContextoEdicaoPorProcessoEUnidade,
+        registrar: registrarContextoEdicao,
+        mensagemCodigo: (codigoSubprocesso) => `Falha grave ao localizar o subprocesso ${codigoSubprocesso}.`,
+        mensagemProcessoUnidade: (codProcesso, siglaUnidade) =>
+            `Falha grave ao resolver subprocesso do processo ${codProcesso} para a unidade ${siglaUnidade}.`,
+    };
+
+    const configContextoCadastro: ConfigContexto<ContextoCadastroAtividadesSubprocesso> = {
+        tipoCodigo: "CADASTRO_CODIGO",
+        tipoProcessoUnidade: "CADASTRO_PROCESSO_UNIDADE",
+        contextoRef: contextoCadastro,
+        contextoInvalidoRef: contextoCadastroInvalido,
+        codigosPorProcessoUnidade: codigosCadastroPorProcessoUnidade,
+        buscarPorCodigo: serviceBuscarContextoCadastroAtividades,
+        buscarPorProcessoEUnidade: serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade,
+        registrar: registrarContextoCadastro,
+        mensagemCodigo: (codigoSubprocesso) => `Falha grave ao carregar o cadastro do subprocesso ${codigoSubprocesso}.`,
+        mensagemProcessoUnidade: (codProcesso, siglaUnidade) =>
+            `Falha grave ao resolver o cadastro do processo ${codProcesso} para a unidade ${siglaUnidade}.`,
+    };
+
+    async function garantirContextoEdicao(codigoSubprocesso: number, limparAntes = false): Promise<ContextoEdicaoSubprocesso | null> {
+        return garantirContextoPorCodigo(codigoSubprocesso, limparAntes, configContextoEdicao);
+    }
+
+    async function garantirContextoEdicaoPorProcessoEUnidade(
+        codProcesso: number,
+        siglaUnidade: string,
+        limparAntes = false
+    ): Promise<{ codigo: number; contexto: ContextoEdicaoSubprocesso } | null> {
+        return garantirContextoPorProcessoEUnidade(codProcesso, siglaUnidade, limparAntes, configContextoEdicao);
     }
 
     async function garantirContextoCadastroAtividades(
         codigoSubprocesso: number,
         limparAntes = false,
     ): Promise<ContextoCadastroAtividadesSubprocesso | null> {
-        if (limparAntes) {
-            limparContextoAtual();
-        }
-
-        if (dadosValidosCadastro(codigoSubprocesso)) {
-            return contextoCadastro.value;
-        }
-
-        try {
-            const data = await executarComDedupe(
-                gerarChave("CADASTRO_CODIGO", codigoSubprocesso),
-                () => serviceBuscarContextoCadastroAtividades(codigoSubprocesso),
-            );
-            registrarContextoCadastro(data);
-            return data;
-        } catch (erro) {
-            return registrarErroIntegracao(erro, `Falha grave ao carregar o cadastro do subprocesso ${codigoSubprocesso}.`);
-        }
+        return garantirContextoPorCodigo(codigoSubprocesso, limparAntes, configContextoCadastro);
     }
 
     async function garantirContextoCadastroAtividadesPorProcessoEUnidade(
@@ -193,32 +231,8 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         siglaUnidade: string,
         limparAntes = false,
     ): Promise<ContextoCadastroAtividadesSubprocesso | null> {
-        if (limparAntes) {
-            limparContextoAtual();
-        }
-
-        const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
-        const codigoMapeado = codigosCadastroPorProcessoUnidade.get(chaveProcessoUnidade);
-        if (typeof codigoMapeado === "number") {
-            return garantirContextoCadastroAtividades(codigoMapeado, limparAntes);
-        }
-
-        try {
-            return await executarComDedupe(
-                gerarChave("CADASTRO_PROCESSO_UNIDADE", chaveProcessoUnidade),
-                async () => {
-                    const contexto = await serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade(codProcesso, siglaUnidade);
-                    codigosCadastroPorProcessoUnidade.set(chaveProcessoUnidade, contexto.detalhes.codigo);
-                    registrarContextoCadastro(contexto);
-                    return contexto;
-                },
-            );
-        } catch (erro) {
-            return registrarErroIntegracao(
-                erro,
-                `Falha grave ao resolver o cadastro do processo ${codProcesso} para a unidade ${siglaUnidade}.`,
-            );
-        }
+        const resultado = await garantirContextoPorProcessoEUnidade(codProcesso, siglaUnidade, limparAntes, configContextoCadastro);
+        return resultado?.contexto ?? null;
     }
 
     function atualizarStatusLocal(status: AtualizacaoStatusLocal) {
