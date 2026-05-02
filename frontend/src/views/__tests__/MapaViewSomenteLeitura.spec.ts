@@ -294,9 +294,10 @@ describe("MapaView somente leitura", () => {
         await flushPromises();
 
         expect(subprocessoService.obterSugestoesMapa).toHaveBeenCalledWith(123);
-        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-texto"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-texto"]').text()).toContain("Sugestão persistida");
-        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-texto"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa"]').exists()).toBe(true);
+        expect((wrapper.find('[data-testid="txt-ver-sugestoes-mapa"]').element as HTMLTextAreaElement).value)
+            .toContain("Sugestão persistida");
 
         await wrapper.find('[data-testid="btn-mapa-acao-sugestoes"]').trigger("click");
         await flushPromises();

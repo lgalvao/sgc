@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from 'vitest'
+import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
 import CadastroAcoesHeader from '../CadastroAcoesHeader.vue'
 import {TEXTOS} from "@/constants/textos"
@@ -119,7 +119,7 @@ describe('CadastroAcoesHeader.vue', () => {
           permissoes: {...permissoesBase, habilitarDevolverCadastro: false}
         }
       })
-      expect(wrapper.find('[data-testid="btn-acao-devolver"]').element.disabled).toBe(true)
+      expect((wrapper.find('[data-testid="btn-acao-devolver"]').element as HTMLButtonElement).disabled).toBe(true)
     })
 
     it('deve desabilitar botão principal se a ação estiver desabilitada no objeto', () => {
@@ -133,7 +133,7 @@ describe('CadastroAcoesHeader.vue', () => {
           }
         }
       })
-      expect(wrapper.find('[data-testid="btn-acao-analisar-principal"]').element.disabled).toBe(true)
+      expect((wrapper.find('[data-testid="btn-acao-analisar-principal"]').element as HTMLButtonElement).disabled).toBe(true)
     })
 
     it('deve mostrar e habilitar botão de impacto se permitido', async () => {
@@ -171,7 +171,7 @@ describe('CadastroAcoesHeader.vue', () => {
           permissoes: {...permissoesBase, habilitarEditarCadastro: false}
         }
       })
-      expect(wrapper.find('[data-testid="btn-cad-atividades-importar"]').element.disabled).toBe(true)
+      expect((wrapper.find('[data-testid="btn-cad-atividades-importar"]').element as HTMLButtonElement).disabled).toBe(true)
     })
   })
 

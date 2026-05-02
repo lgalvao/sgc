@@ -1,4 +1,5 @@
 import {computed, reactive, ref, toRefs, type ComputedRef, type Ref} from "vue";
+import type {VarianteAlerta} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
 import type {SubprocessoDetalhe} from "@/types/tipos";
 
@@ -13,7 +14,7 @@ type DependenciasSubprocessoAcoesAdministrativas = {
     resetarValidacao: () => void;
     validarSubmissao: (valido: boolean) => boolean;
     focarPrimeiroErroInvalido: () => Promise<void>;
-    notify: (mensagem: string, variante: string) => void;
+    notify: (mensagem: string, variante: VarianteAlerta) => void;
     atualizarSubprocessoAtual: () => Promise<void>;
     exibirToastPendente: () => void;
     alterarDataLimiteSubprocesso: (codigoSubprocesso: number, payload: { novaData: string }) => Promise<unknown>;

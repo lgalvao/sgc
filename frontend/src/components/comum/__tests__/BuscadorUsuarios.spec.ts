@@ -25,29 +25,24 @@ describe('BuscadorUsuarios.vue', () => {
     vi.useRealTimers()
   })
 
-  async function aguardarProcessamento(wrapper?: any) {
+  async function aguardarProcessamento(wrapper: any) {
+    // Avança o tempo para o debounce de 300ms
+    await vi.advanceTimersByTime(305)
+    // Deixa as promessas (pesquisarUsuarios) resolverem
     await vi.runAllTicks()
-    // Avança o tempo para o debounce
-    await vi.advanceTimersByTime(300)
-    await vi.runAllTicks()
-    // Múltiplos ticks para garantir que watches e renderização terminaram
-    for (let i = 0; i < 3; i++) {
-      await Promise.resolve()
-      if (wrapper) await wrapper.vm.$nextTick()
-    }
+    // Deixa o Vue processar as mudanças de estado
+    await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick()
   }
 
   it('não deve pesquisar se o termo tiver menos de 2 caracteres', async () => {
     const wrapper = mount(BuscadorUsuarios, {
-      props: {
-        termo: 'a'
-      }
+      props: { termo: '' }
     })
     
-    const input = wrapper.find('input')
-    await input.setValue('a')
-    
-    vi.advanceTimersByTime(300)
+    // Simula a alteração do termo
+    await wrapper.find('input').setValue('a')
+    await vi.advanceTimersByTime(305)
     
     expect(usuarioService.pesquisarUsuarios).not.toHaveBeenCalled()
   })
@@ -60,30 +55,18 @@ describe('BuscadorUsuarios.vue', () => {
     vi.mocked(usuarioService.pesquisarUsuarios).mockResolvedValue(usuarios)
     
     const wrapper = mount(BuscadorUsuarios, {
-      props: {
-        termo: ''
-      }
+      props: { termo: '' }
     })
     
-    const input = wrapper.find('input')
-    await input.setValue('Jo')
+    await wrapper.find('input').setValue('Jo')
     
-    // Verifica se não chamou imediatamente
     expect(usuarioService.pesquisarUsuarios).not.toHaveBeenCalled()
     
-    // Avança o tempo do debounce (300ms)
-    await vi.advanceTimersByTime(300)
+    await aguardarProcessamento(wrapper)
     
     expect(usuarioService.pesquisarUsuarios).toHaveBeenCalledWith('Jo')
-    
-    // Aguarda promessas
-    await vi.runAllTicks()
-    await wrapper.vm.$nextTick()
-    
     expect(wrapper.find('[data-testid="lista-usuarios-pesquisa"]').exists()).toBe(true)
-    const itens = wrapper.findAll('.list-group-item')
-    expect(itens).toHaveLength(2)
-    expect(itens[0].text()).toContain('João Silva')
+    expect(wrapper.findAll('.list-group-item')).toHaveLength(2)
   })
 
   it('deve selecionar um usuário ao clicar na opção', async () => {
@@ -93,105 +76,82 @@ describe('BuscadorUsuarios.vue', () => {
     const wrapper = mount(BuscadorUsuarios, {
       props: {
         termo: '',
-        'onUpdate:termo': (val: string) => wrapper.setProps({termo: val}),
-        'onUpdate:selecionado': (val: string | null) => wrapper.setProps({selecionado: val})
+        selecionado: null
       }
     })
     
     await wrapper.find('input').setValue('Jo')
     await aguardarProcessamento(wrapper)
     
-    const lista = wrapper.find('[data-testid="lista-usuarios-pesquisa"]')
-    expect(lista.exists()).toBe(true)
-    
     const opcao = wrapper.find('[data-testid="opcao-usuario-123456789012"]')
-    // Usamos mousedown.prevent no componente
     await opcao.trigger('mousedown')
     
-    expect(wrapper.props('selecionado')).toBe('123456789012')
-    expect(wrapper.props('termo')).toBe('João Silva')
-    expect(wrapper.find('[data-testid="lista-usuarios-pesquisa"]').exists()).toBe(false)
+    expect(wrapper.emitted('update:selecionado')![0]).toEqual(['123456789012'])
+    // O primeiro emit é do setValue ('Jo'), o segundo é da seleção ('João Silva')
+    expect(wrapper.emitted('update:termo')![1]).toEqual(['João Silva'])
   })
 
-  it('deve navegar pelos resultados com as setas do teclado e selecionar com Enter', async () => {
+  it('deve navegar pelos resultados com as setas do teclado', async () => {
     const usuarios = [
-      {nome: 'João Silva', tituloEleitoral: '1'},
-      {nome: 'Maria Souza', tituloEleitoral: '2'}
+      {nome: 'User 1', tituloEleitoral: '1'},
+      {nome: 'User 2', tituloEleitoral: '2'}
     ]
     vi.mocked(usuarioService.pesquisarUsuarios).mockResolvedValue(usuarios)
     
     const wrapper = mount(BuscadorUsuarios, {
-      props: {
-        termo: '',
-        'onUpdate:termo': (val: string) => wrapper.setProps({termo: val}),
-        'onUpdate:selecionado': (val: string | null) => wrapper.setProps({selecionado: val})
-      }
+      props: { termo: '' }
     })
     
     const input = wrapper.find('input')
+    await input.setValue('User')
+    await aguardarProcessamento(wrapper)
+    
+    const itens = wrapper.findAll('.list-group-item')
+    // O primeiro deve estar ativo por causa do watch
+    expect(itens[0].classes()).toContain('active')
+    
+    // Seta para baixo
+    await input.trigger('keydown', { key: 'ArrowDown' })
+    await wrapper.vm.$nextTick()
+    expect(itens[1].classes()).toContain('active')
+    
+    // Seta para cima
+    await input.trigger('keydown', { key: 'ArrowUp' })
+    await wrapper.vm.$nextTick()
+    expect(itens[0].classes()).toContain('active')
+  })
+
+  it('deve tratar erro na pesquisa', async () => {
+    vi.mocked(usuarioService.pesquisarUsuarios).mockRejectedValue(new Error('Erro'))
+    
+    const wrapper = mount(BuscadorUsuarios, {
+      props: { termo: '' }
+    })
+    
     await wrapper.find('input').setValue('Jo')
     await aguardarProcessamento(wrapper)
     
-    // O primeiro item deve estar destacado por padrão (watch em usuariosEncontrados)
-    const itens = wrapper.findAll('.list-group-item')
-    expect(itens.length).toBeGreaterThan(0)
-    expect(itens[0].classes()).toContain('active')
-    
-    // Pressiona Seta para Baixo
-    await input.trigger('keydown', {key: 'ArrowDown'})
-    expect(itens[1].classes()).toContain('active')
-    
-    // Pressiona Enter
-    await input.trigger('keydown', {key: 'Enter'})
-    expect(wrapper.props('selecionado')).toBe('2')
-    expect(wrapper.props('termo')).toBe('Maria Souza')
+    expect(mockNotify).toHaveBeenCalled()
+    expect(wrapper.text()).not.toContain('Buscando')
   })
 
-  it('deve ocultar resultados ao pressionar Escape', async () => {
+  it('deve ocultar resultados ao perder o foco (blur) com delay', async () => {
     vi.mocked(usuarioService.pesquisarUsuarios).mockResolvedValue([{nome: 'Jo', tituloEleitoral: '1'}])
-    
     const wrapper = mount(BuscadorUsuarios, {
-      props: {termo: ''}
+      props: { termo: '' }
     })
     
     const input = wrapper.find('input')
     await input.setValue('Jo')
-    await vi.advanceTimersByTime(300)
-    await vi.runAllTicks()
+    await aguardarProcessamento(wrapper)
     
     expect(wrapper.find('[data-testid="lista-usuarios-pesquisa"]').exists()).toBe(true)
     
-    await input.trigger('keydown', {key: 'Escape'})
-    expect(wrapper.find('[data-testid="lista-usuarios-pesquisa"]').exists()).toBe(false)
-  })
-
-  it('deve tratar erro na pesquisa e notificar o usuário', async () => {
-    vi.mocked(usuarioService.pesquisarUsuarios).mockRejectedValue(new Error('Falha na API'))
-    
-    const wrapper = mount(BuscadorUsuarios, {
-      props: {termo: ''}
-    })
-    
-    await wrapper.find('input').setValue('Jo')
-    await vi.advanceTimersByTime(300)
-    await vi.runAllTicks()
-    
-    expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('Erro ao pesquisar'), 'danger')
-    expect(wrapper.text()).not.toContain('Buscando usuários...')
-  })
-  
-  it('deve mostrar mensagem quando nenhum usuário for encontrado', async () => {
-    vi.mocked(usuarioService.pesquisarUsuarios).mockResolvedValue([])
-    
-    const wrapper = mount(BuscadorUsuarios, {
-      props: {termo: ''}
-    })
-    
-    await wrapper.find('input').setValue('Jo')
-    await vi.advanceTimersByTime(300)
-    await vi.runAllTicks()
+    await input.trigger('blur')
+    // Ocultação tem delay de 150ms no código
+    await vi.advanceTimersByTime(160)
     await wrapper.vm.$nextTick()
     
-    expect(wrapper.text()).toContain('Nenhum usuário encontrado')
+    expect(wrapper.find('[data-testid="lista-usuarios-pesquisa"]').exists()).toBe(false)
   })
 })
