@@ -59,7 +59,7 @@
             :key="mapa.codigoUnidade"
             class="relatorio-mapas__card shadow-sm"
             no-body
-            data-testid="card-relatorio-mapas"
+            data-testid="card-mapa-vigente"
         >
           <BCardBody>
             <BCardTitle class="mb-3 relatorio-mapas__cabecalho">

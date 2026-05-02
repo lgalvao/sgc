@@ -182,7 +182,7 @@ describe("RelatorioMapasView.vue", () => {
     }, stubs));
     await ctx.wrapper.vm.$nextTick();
 
-    expect(ctx.wrapper.find("[data-testid='card-relatorio-mapas']").exists()).toBe(true);
+    expect(ctx.wrapper.find("[data-testid='card-mapa-vigente']").exists()).toBe(true);
     expect(ctx.wrapper.text()).toContain("COORD");
     expect(ctx.wrapper.text()).toContain("Coordenadoria");
     expect(ctx.wrapper.text()).toContain("Competência 1");

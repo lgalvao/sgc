@@ -30,11 +30,17 @@ const emit = defineEmits<{
 }>();
 
 function atualizarTitulo(valor: string | number | null) {
-  emit("update:titulo", valor == null ? "" : String(valor));
+  emit(
+      "update:titulo",
+      typeof valor === "string" ? valor : typeof valor === "number" ? String(valor) : "",
+  );
 }
 
 function atualizarSenha(valor: string | number | null) {
-  emit("update:senha", valor == null ? "" : String(valor));
+  emit(
+      "update:senha",
+      typeof valor === "string" ? valor : typeof valor === "number" ? String(valor) : "",
+  );
 }
 </script>
 

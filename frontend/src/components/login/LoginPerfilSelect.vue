@@ -15,12 +15,12 @@ interface PerfilOption {
 
 interface Props {
   mostrar: boolean;
-  parSelecionado: PerfilUnidade | string | null;
+  parSelecionado: PerfilUnidade | null;
   perfisUnidadesOptions: PerfilOption[];
   mensagemErroPerfil: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
   (e: "update:parSelecionado", valor: PerfilUnidade | null): void;
@@ -33,6 +33,10 @@ function atualizarPerfilSelecionado(valor: PerfilUnidade | PerfilUnidade[] | str
   }
 
   emit("update:parSelecionado", null);
+}
+
+function valorSelecionadoModel() {
+  return props.parSelecionado;
 }
 </script>
 
@@ -48,7 +52,7 @@ function atualizarPerfilSelecionado(valor: PerfilUnidade | PerfilUnidade[] | str
     </template>
     <BFormSelect
         id="par"
-        :model-value="parSelecionado"
+        :model-value="valorSelecionadoModel()"
         :options="perfisUnidadesOptions"
         :state="mensagemErroPerfil ? false : null"
         data-testid="sel-login-perfil"

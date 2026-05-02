@@ -28,7 +28,7 @@ describe('RelatoriosView.vue', () => {
         ctx.wrapper = mount(RelatoriosView, mountOptions);
 
         expect(ctx.wrapper.find('[data-testid="card-relatorio-andamento"]').exists()).toBe(true);
-        expect(ctx.wrapper.find('[data-testid="card-relatorios-mapas-vigentes"]').exists()).toBe(true);
+        expect(ctx.wrapper.find('[data-testid="card-relatorio-mapas"]').exists()).toBe(true);
     });
 
     it('deve navegar para relatório de andamento ao clicar no card', async () => {
@@ -43,7 +43,7 @@ describe('RelatoriosView.vue', () => {
         const mountOptions = getCommonMountOptions({}, stubs);
         ctx.wrapper = mount(RelatoriosView, mountOptions);
 
-        await ctx.wrapper.find('[data-testid="card-relatorios-mapas-vigentes"]').trigger('click');
+        await ctx.wrapper.find('[data-testid="card-relatorio-mapas"]').trigger('click');
         expect(mockPush).toHaveBeenCalledWith('/relatorios/mapas-vigentes');
     });
 

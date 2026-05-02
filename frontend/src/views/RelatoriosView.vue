@@ -25,7 +25,7 @@
       <BCol md="4" class="mb-4">
         <BCard
           class="h-100 card-actionable"
-          data-testid="card-relatorios-mapas-vigentes"
+          data-testid="card-relatorio-mapas"
           role="button"
           tabindex="0"
           @click="router.push('/relatorios/mapas-vigentes')"
