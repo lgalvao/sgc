@@ -5,8 +5,6 @@ import {normalizeError} from "@/utils/apiError";
 import logger from "@/utils/logger";
 
 interface FluxoMapaCompetencias {
-    lastError: Ref<unknown>;
-    clearError: () => void;
     adicionarCompetencia(codigoSubprocesso: number, request: SalvarCompetenciaRequest): Promise<MapaCompleto | undefined>;
     atualizarCompetencia(codigoSubprocesso: number, codigoCompetencia: number, request: SalvarCompetenciaRequest): Promise<MapaCompleto | undefined>;
     removerCompetencia(codigoSubprocesso: number, codigoCompetencia: number): Promise<MapaCompleto | undefined>;
@@ -45,14 +43,13 @@ export function useMapaCompetenciasMutacoes({
         await callback(codigo);
     }
 
-    function handleErrors() {
-        aplicarErroNormalizado(fluxoMapa.lastError.value as NormalizedError | null);
+    function handleErrors(error: unknown) {
+        aplicarErroNormalizado(normalizeError(error) as NormalizedError);
     }
 
     function abrirModalCriarNovaCompetencia(competenciaParaEditar: Competencia | null = null) {
         mostrarModalCriarNovaCompetencia.value = true;
         clearErrors();
-        fluxoMapa.clearError();
         competenciaSendoEditada.value = competenciaParaEditar;
     }
 
@@ -88,7 +85,7 @@ export function useMapaCompetenciasMutacoes({
                 fecharModalCriarNovaCompetencia();
             } catch (error) {
                 logger.error(error);
-                handleErrors();
+                handleErrors(error);
             } finally {
                 loadingCompetencia.value = false;
             }

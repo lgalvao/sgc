@@ -18,11 +18,9 @@ import type {
     SalvarMapaRequest
 } from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
-import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useMapasStore} from "@/stores/mapas";
 
 export function useFluxoMapa() {
-    const {lastError, clearError} = useErrorHandler();
     const {carregando, erro, executar} = useAsyncAction();
     const mapasStore = useMapasStore();
 
@@ -108,8 +106,6 @@ export function useFluxoMapa() {
     return {
         carregando,
         erro,
-        lastError,
-        clearError,
         salvarMapa,
         salvarAjustes,
         disponibilizarMapa,

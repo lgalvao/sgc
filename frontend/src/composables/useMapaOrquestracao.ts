@@ -2,7 +2,6 @@ import {ref, type Ref} from "vue";
 import type {ContextoEdicaoSubprocesso, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
-import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import {obterMapaVisualizacao} from "@/services/subprocessoService";
 import logger from "@/utils/logger";
 
@@ -43,14 +42,12 @@ export function useMapaOrquestracao(
             if (typeof props.codSubprocesso === "number") {
                 contexto = await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, false);
             } else {
-                const diagnostico = await diagnosticarCarregamentoContextoSubprocessoInicial({
-                    codProcesso: Number(props.codProcesso),
-                    siglaUnidade: props.sigla,
-                    store: subprocessoStore,
-                });
-
-                if (diagnostico.tipo === 'sucesso') {
-                    contexto = diagnostico.resultado.contexto;
+                const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
+                    Number(props.codProcesso),
+                    props.sigla,
+                );
+                if (resultado) {
+                    contexto = resultado.contexto;
                 }
             }
 

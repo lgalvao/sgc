@@ -1,14 +1,12 @@
 import {storeToRefs} from "pinia";
 import {computed, toValue, type MaybeRefOrGetter, type Ref} from "vue";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
-import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useMapasStore} from "@/stores/mapas";
 
 export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | undefined>) {
     const mapasStore = useMapasStore();
     const {mapaCompleto: mapaCompletoGlobal, impactoMapa: impactoMapaGlobal} = storeToRefs(mapasStore);
-    const {lastError, clearError} = useErrorHandler();
     const {carregando, erro, executarSilencioso} = useAsyncAction();
     const mapaCompleto = codigoSubprocesso === undefined
         ? mapaCompletoGlobal
@@ -48,8 +46,6 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         impactoMapa: impactoMapa as Ref<ImpactoMapa | null>,
         carregando,
         erro,
-        lastError,
-        clearError,
         definirMapaCompleto: mapasStore.definirMapaCompleto,
         definirImpactoMapa: mapasStore.definirImpactoMapa,
         invalidar: mapasStore.invalidar,

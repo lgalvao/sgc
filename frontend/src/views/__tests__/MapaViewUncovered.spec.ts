@@ -37,17 +37,6 @@ vi.mock("@/composables/useMapas", () => ({
     useMapas: () => mapasStoreMock
 }));
 
-vi.mock("@/composables/useContextoSubprocesso", () => ({
-    carregarContextoSubprocessoInicial: vi.fn().mockResolvedValue({
-        codigo: 123,
-        contexto: {
-            detalhes: { codigo: 123 },
-            atividadesDisponiveis: [],
-            unidade: { sigla: "TESTE" }
-        }
-    })
-}));
-
 const fluxoMapaMock = {
     carregando: ref(false),
     validarMapa: vi.fn().mockResolvedValue({}),
@@ -59,8 +48,6 @@ const fluxoMapaMock = {
     atualizarCompetencia: vi.fn().mockResolvedValue({}),
     removerCompetencia: vi.fn().mockResolvedValue({}),
     removerAtividadeDaCompetencia: vi.fn().mockResolvedValue({}),
-    lastError: ref(null),
-    clearError: vi.fn()
 };
 
 vi.mock("@/composables/useFluxoMapa", () => ({

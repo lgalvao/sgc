@@ -99,18 +99,18 @@ export const useMapasStore = defineStore("mapas", () => {
             return carregamentoExistente;
         }
 
-        const promessaCarregamento = serviceObterMapaCompleto(codigoSubprocesso)
-            .then((mapa) => {
+        const promessaCarregamento = (async () => {
+            try {
+                const mapa = await serviceObterMapaCompleto(codigoSubprocesso);
                 definirMapaCompleto(codigoSubprocesso, mapa);
                 return mapa;
-            })
-            .catch((erro) => {
+            } catch (erro) {
                 logger.error(`Erro ao carregar mapa completo do subprocesso ${codigoSubprocesso}:`, erro);
                 throw erro;
-            })
-            .finally(() => {
+            } finally {
                 carregamentosMapa.delete(codigoSubprocesso);
-            });
+            }
+        })();
 
         carregamentosMapa.set(codigoSubprocesso, promessaCarregamento);
         return promessaCarregamento;
@@ -128,18 +128,18 @@ export const useMapasStore = defineStore("mapas", () => {
             return carregamentoExistente;
         }
 
-        const promessaCarregamento = serviceVerificarImpactosMapa(codigoSubprocesso)
-            .then((impacto) => {
+        const promessaCarregamento = (async () => {
+            try {
+                const impacto = await serviceVerificarImpactosMapa(codigoSubprocesso);
                 definirImpactoMapa(codigoSubprocesso, impacto);
                 return impacto;
-            })
-            .catch((erro) => {
+            } catch (erro) {
                 logger.error(`Erro ao verificar impactos do mapa ${codigoSubprocesso}:`, erro);
                 throw erro;
-            })
-            .finally(() => {
+            } finally {
                 carregamentosImpacto.delete(codigoSubprocesso);
-            });
+            }
+        })();
 
         carregamentosImpacto.set(codigoSubprocesso, promessaCarregamento);
         return promessaCarregamento;
