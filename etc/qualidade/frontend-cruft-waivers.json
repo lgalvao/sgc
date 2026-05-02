@@ -178,14 +178,6 @@
       "criterioRemocao": "Extrair formulario e listagem da atribuicao temporaria."
     },
     {
-      "arquivo": "frontend/src/views/RelatorioAndamentoView.vue",
-      "camada": "view",
-      "maxLinhas": 310,
-      "responsavel": "frontend",
-      "justificativa": "Tela de relatorio ainda combina filtros, tabela e exportacao.",
-      "criterioRemocao": "Separar filtros e apresentacao do relatorio."
-    },
-    {
       "arquivo": "frontend/src/stores/perfil.ts",
       "camada": "store",
       "maxLinhas": 155,
@@ -224,14 +216,6 @@
       "responsavel": "frontend",
       "justificativa": "Composable ainda centraliza mutacoes diferentes do mapa.",
       "criterioRemocao": "Separar comandos de competencia e conhecimento."
-    },
-    {
-      "arquivo": "frontend/src/views/RelatorioMapasView.vue",
-      "camada": "view",
-      "maxLinhas": 287,
-      "responsavel": "frontend",
-      "justificativa": "Tela de relatorio de mapas ainda concentra filtros e tabela.",
-      "criterioRemocao": "Separar formulario de filtros da apresentacao do resultado."
     },
     {
       "arquivo": "frontend/src/App.vue",

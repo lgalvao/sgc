@@ -139,7 +139,7 @@
 <script lang="ts" setup>
 import {BAlert, BFormCheckbox, BSpinner} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
-import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onMounted, reactive, ref, toRefs, watch} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
@@ -292,11 +292,20 @@ watch(assinaturaCadastroAtual, (valorAtual, valorAnterior) => {
   }
 });
 
-const mostrarModalImportar = ref(false);
-const mostrarModalConfirmacao = ref(false);
-const mostrarModalHistorico = ref(false);
-const mostrarModalValidarAnalise = ref(false);
-const mostrarModalDevolverAnalise = ref(false);
+const estadoModais = reactive({
+  mostrarModalImportar: false,
+  mostrarModalConfirmacao: false,
+  mostrarModalHistorico: false,
+  mostrarModalValidarAnalise: false,
+  mostrarModalDevolverAnalise: false,
+});
+const {
+  mostrarModalImportar,
+  mostrarModalConfirmacao,
+  mostrarModalHistorico,
+  mostrarModalValidarAnalise,
+  mostrarModalDevolverAnalise,
+} = toRefs(estadoModais);
 const {
   mostrarModalImpacto,
   loadingImpacto,
@@ -624,57 +633,4 @@ watch(() => atividades.value?.length, (newLen, oldLen) => {
   }
 }, {immediate: true});
 
-defineExpose({
-  codigoSubprocesso,
-  atividades,
-  atividadesSnapshotInicial,
-  unidade,
-  subprocesso,
-  houveAlteracaoCadastro,
-  disponibilizacaoSemMudancas,
-  precisaIniciarRevisao,
-  loadingInicioRevisao,
-  mostrarModalImportar,
-  mostrarModalConfirmacao,
-  mostrarModalHistorico,
-  mostrarModalConfirmacaoRemocao,
-  mostrarModalValidarAnalise,
-  mostrarModalDevolverAnalise,
-  loadingValidacao,
-  loadingDisponibilizacao,
-  loadingRemocao,
-  loadingAnaliseCadastro,
-  loadingDevolucaoAnalise,
-  errosValidacao,
-  erroGlobal,
-  observacaoValidacao,
-  observacaoDevolucao,
-  atividadeRefs,
-  calcularAssinaturaCadastro,
-  iniciarRevisaoSeNecessario,
-  cancelarInicioRevisaoSeNecessario,
-  removerAtividade,
-  confirmarRemocao,
-  salvarEdicaoAtividade,
-  adicionarConhecimento,
-  removerConhecimento,
-  salvarEdicaoConhecimento,
-  handleImportAtividades,
-  disponibilizarCadastro,
-  confirmarDisponibilizacao,
-  abrirModalHistorico,
-  abrirModalValidarAnalise,
-  fecharModalValidarAnalise,
-  abrirModalDevolverAnalise,
-  fecharModalDevolverAnalise,
-  confirmarValidacaoAnalise,
-  confirmarDevolucaoAnalise,
-  handleAdicionarAtividade,
-  setAtividadeRef,
-  scrollParaPrimeiroErro,
-  timeoutLimpezaErros,
-  executarAtualizacaoCadastro,
-  processarRespostaLocal,
-  habilitarDisponibilizar,
-});
 </script>

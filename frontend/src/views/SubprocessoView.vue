@@ -157,16 +157,12 @@
 import {
   BAlert,
   BButton,
-  BCard,
-  BCardBody,
-  BDropdown,
-  BDropdownItemButton,
   BFormInvalidFeedback,
   BFormTextarea,
   BTable,
   useToast
 } from "bootstrap-vue-next";
-import {computed, onActivated, onMounted, ref, type Ref, watch} from "vue";
+import {computed, onActivated, onMounted, reactive, ref, type Ref, toRefs, watch} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
@@ -224,9 +220,12 @@ const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
 const codigoSubprocesso = ref<number | null>(null);
 const erroNaoEncontrado = ref(false);
-const modalLembreteAberto = ref(false);
-const mostrarModalAlterarDataLimite = ref(false);
-const mostrarModalReabrir = ref(false);
+const estadoModais = reactive({
+  modalLembreteAberto: false,
+  mostrarModalAlterarDataLimite: false,
+  mostrarModalReabrir: false,
+});
+const {modalLembreteAberto, mostrarModalAlterarDataLimite, mostrarModalReabrir} = toRefs(estadoModais);
 const loadingDataLimite = ref(false);
 const loadingReabertura = ref(false);
 const loadingLembrete = ref(false);
@@ -463,50 +462,4 @@ async function enviarLembreteConfirmado() {
   }
 }
 
-defineExpose({
-  codigoSubprocesso,
-  formatDataSimples,
-  formatTipoResponsabilidade,
-  rowAttrMovimentacao,
-  carregarSubprocesso,
-  atualizarSubprocessoAtual,
-  confirmarEnviarLembrete,
-  enviarLembreteConfirmado,
-  confirmarReabertura,
-  confirmarAlteracaoDataLimite,
-  abrirModalAlterarDataLimite,
-  fecharModalAlterarDataLimite,
-  abrirModalReabrirCadastro,
-  abrirModalReabrirRevisao,
-  fecharModalReabrir,
-  exibirToastPendente,
-  mostrarModalAlterarDataLimite,
-  mostrarModalReabrir,
-  modalLembreteAberto,
-  loadingLembrete,
-  justificativaReabertura,
-  onActivated
-});
 </script>
-
-<style scoped>
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.loading-content {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>

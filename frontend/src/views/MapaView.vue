@@ -159,7 +159,7 @@ import MapaFluxoModais from "@/components/mapa/MapaFluxoModais.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import MapaSomenteLeitura from "@/components/mapa/MapaSomenteLeitura.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, reactive, ref, toRefs} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
@@ -238,15 +238,23 @@ const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const atividades = computed(() => mapasStore.mapaCompleto.value?.atividades ?? []);
 const competencias = computed(() => mapasStore.mapaCompleto.value?.competencias ?? []);
 const mapaSomenteLeitura = computed(() => mapasStore.mapaCompleto.value);
-
-const mostrarModalAceitar = ref(false);
-const mostrarModalValidar = ref(false);
-const mostrarModalDevolucao = ref(false);
+const estadoModais = reactive({
+  mostrarModalAceitar: false,
+  mostrarModalValidar: false,
+  mostrarModalDevolucao: false,
+  mostrarModalHistorico: false,
+  mostrarModalDisponibilizar: false,
+});
+const {
+  mostrarModalAceitar,
+  mostrarModalValidar,
+  mostrarModalDevolucao,
+  mostrarModalHistorico,
+  mostrarModalDisponibilizar,
+} = toRefs(estadoModais);
 const observacaoDevolucao = ref("");
-
 const analisesCadastro = ref<Analise[]>([]);
 const historicoAnalise = computed(() => analisesCadastro.value);
-const mostrarModalHistorico = ref(false);
 
 const {
   validarSubmissao,
@@ -445,7 +453,6 @@ const podeConfirmarDisponibilizacao = computed(() => {
       && associacoesMapaValidas.value
   );
 });
-const mostrarModalDisponibilizar = ref(false);
 const notificacaoDisponibilizacao = ref("");
 const erroValidacaoMapa = ref("");
 const loadingDisponibilizacao = ref(false);
@@ -555,62 +562,4 @@ function fecharModalDisponibilizar() {
   clearErrors();
 }
 
-// Expose para testes
-defineExpose({
-  codigoSubprocesso,
-  mostrarModalImpacto,
-  mostrarModalCriarNovaCompetencia,
-  mostrarModalExcluirCompetencia,
-  mostrarModalDisponibilizar,
-  mostrarModalAceitar,
-  mostrarModalValidar,
-  mostrarModalDevolucao,
-  mostrarModalVerSugestoes,
-  mostrarModalSugestoes,
-  loadingImpacto,
-  loadingCompetencia,
-  loadingExclusao,
-  loadingDisponibilizacao,
-  notificacaoDisponibilizacao,
-  sugestoes,
-  sugestoesVisualizacao,
-  atividades,
-  competencias,
-  competenciaSendoEditada,
-  competenciaParaExcluir,
-  handleErrors,
-  fieldErrors,
-  atividadesSemCompetencia,
-  existeCompetenciaSemAtividade,
-  associacoesMapaValidas,
-  obterMensagemErroChecklistDisponibilizacao,
-  unidade,
-  abrirModalImpacto,
-  fecharModalImpacto,
-  abrirModalCriarLimpo,
-  abrirModalAceitar,
-  fecharModalAceitar,
-  abrirModalValidar,
-  fecharModalValidar,
-  abrirModalDevolucao,
-  fecharModalDevolucao,
-  sincronizarSugestoesMapa,
-  carregarSugestoesParaVisualizacao,
-  carregarSugestoesParaEdicao,
-  verSugestoes,
-  fecharModalVerSugestoes,
-  handleConfirmarSugestoes,
-  fecharModalHistorico,
-  sincronizarMapa,
-  adicionarCompetenciaEFecharModal,
-  excluirCompetencia,
-  confirmarExclusaoCompetencia,
-  disponibilizarMapa,
-  removerAtividadeAssociada,
-  fecharModalExcluirCompetencia,
-  fecharModalDisponibilizar,
-  abrirModalDisponibilizar,
-  fecharModalCriarNovaCompetencia,
-  iniciarEdicaoCompetencia,
-});
 </script>

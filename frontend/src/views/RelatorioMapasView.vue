@@ -8,45 +8,14 @@
       </template>
     </PageHeader>
 
-    <BCard class="mb-4">
-      <div class="d-flex flex-column gap-3">
-        <BFormGroup label-for="arvore-unidades-mapas">
-          <template #label>
-            Unidades participantes <span aria-hidden="true" class="text-danger">*</span>
-          </template>
-          <div class="border rounded p-3 container-arvore" data-testid="container-arvore-unidades-mapas">
-            <ArvoreUnidades
-              id="arvore-unidades-mapas"
-              v-model="unidadesSelecionadas"
-              :unidades="unidadesDisponiveis"
-            />
-          </div>
-        </BFormGroup>
-
-        <div class="d-flex flex-wrap gap-2">
-            <BButton
-              :disabled="carregando || !temUnidadesSelecionadas"
-              variant="success"
-              data-testid="btn-gerar-html-mapas"
-              @click="gerarRelatorio"
-            >
-              <BSpinner v-if="carregando" small class="me-1" />
-              <i v-else class="bi bi-search me-1" />
-              {{ TEXTOS.relatorios.BOTAO_GERAR }}
-            </BButton>
-            <BButton
-              :disabled="carregando || !temUnidadesSelecionadas"
-              variant="outline-danger"
-              data-testid="btn-gerar-mapas"
-              @click="exportarPdf"
-            >
-              <BSpinner v-if="carregando" small class="me-1" />
-              <i v-else class="bi bi-file-earmark-pdf me-1" />
-              PDF
-            </BButton>
-        </div>
-      </div>
-    </BCard>
+    <RelatorioMapasFiltros
+        :carregando="carregando"
+        :tem-unidades-selecionadas="temUnidadesSelecionadas"
+        :unidades-disponiveis="unidadesDisponiveis"
+        :unidades-selecionadas="unidadesSelecionadas"
+        @exportar="exportarPdf"
+        @gerar="gerarRelatorio"
+        @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
 
     <div v-if="carregando && relatorioMapas.length === 0" class="text-center py-5">
       <BSpinner variant="primary"/>
@@ -54,43 +23,10 @@
 
     <template v-else-if="relatorioMapas.length > 0">
       <div class="d-flex flex-column gap-3">
-        <BCard
+        <RelatorioMapaVigenteCard
             v-for="mapa in relatorioMapas"
             :key="mapa.codigoUnidade"
-            class="relatorio-mapas__card shadow-sm"
-            no-body
-            data-testid="card-mapa-vigente"
-        >
-          <BCardBody>
-            <BCardTitle class="mb-3 relatorio-mapas__cabecalho">
-              <span class="relatorio-mapas__titulo">{{ mapa.siglaUnidade }}</span>
-              <span class="relatorio-mapas__subtitulo">{{ mapa.nomeUnidade }}</span>
-            </BCardTitle>
-
-            <div class="d-flex flex-column gap-2">
-              <section
-                  v-for="competencia in mapa.competencias"
-                  :key="competencia.codigo"
-                  class="relatorio-mapas__competencia"
-              >
-                <h6 class="mb-2 relatorio-mapas__secao">{{ competencia.descricao }}</h6>
-
-                <div
-                    v-for="atividade in competencia.atividades"
-                    :key="atividade.codigo"
-                    class="relatorio-mapas__atividade"
-                >
-                  <div class="relatorio-mapas__atividade-titulo">{{ atividade.descricao }}</div>
-                  <ul v-if="atividade.conhecimentos.length > 0" class="relatorio-mapas__conhecimentos">
-                    <li v-for="conhecimento in atividade.conhecimentos" :key="conhecimento.codigo">
-                      {{ conhecimento.descricao }}
-                    </li>
-                  </ul>
-                </div>
-              </section>
-            </div>
-          </BCardBody>
-        </BCard>
+            :mapa="mapa"/>
       </div>
     </template>
   </LayoutPadrao>
@@ -98,12 +34,13 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BCard, BCardBody, BCardTitle, BFormGroup, BSpinner} from "bootstrap-vue-next";
+import {BButton, BSpinner} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import RelatorioMapasFiltros from "@/components/relatorios/RelatorioMapasFiltros.vue";
+import RelatorioMapaVigenteCard from "@/components/relatorios/RelatorioMapaVigenteCard.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {TEXTOS} from "@/constants/textos";
-import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
 import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
@@ -190,97 +127,3 @@ onMounted(() => {
   carregarUnidades();
 });
 </script>
-
-<style scoped>
-.relatorio-mapas__arvore {
-  max-height: 22rem;
-  overflow: auto;
-  padding: 0.75rem;
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.65rem;
-  background: var(--bs-body-bg);
-}
-
-.container-arvore {
-  overflow-x: hidden;
-  max-height: 22rem;
-  overflow-y: auto;
-  background: var(--bs-body-bg);
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.65rem;
-}
-
-.relatorio-mapas__card {
-  border: 1px solid var(--bs-border-color);
-  background: var(--bs-body-bg);
-}
-
-.relatorio-mapas__cabecalho {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding-bottom: 0.85rem;
-  margin-bottom: 0.9rem;
-  border-bottom: 1px solid var(--bs-border-color);
-}
-
-.relatorio-mapas__titulo {
-  color: var(--bs-primary-text-emphasis);
-  font-size: 1.45rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-.relatorio-mapas__subtitulo {
-  color: var(--bs-secondary-color);
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.relatorio-mapas__competencia {
-  padding: 0.95rem 1rem;
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.65rem;
-  background: var(--bs-secondary-bg);
-}
-
-.relatorio-mapas__secao {
-  color: var(--bs-heading-color);
-  font-size: 1.08rem;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.relatorio-mapas__atividade + .relatorio-mapas__atividade {
-  margin-top: 0.7rem;
-}
-
-.relatorio-mapas__atividade-titulo {
-  color: var(--bs-body-color);
-  font-size: 0.98rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.relatorio-mapas__conhecimentos {
-  margin: 0.35rem 0 0;
-  padding-left: 1.2rem;
-  color: var(--bs-body-color);
-}
-
-.relatorio-mapas__conhecimentos li + li {
-  margin-top: 0.18rem;
-}
-
-@media (max-width: 768px) {
-  .relatorio-mapas__titulo {
-    font-size: 1.2rem;
-  }
-
-  .relatorio-mapas__competencia {
-    padding: 0.8rem 0.85rem;
-  }
-}
-</style>
