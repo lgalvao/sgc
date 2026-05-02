@@ -802,7 +802,7 @@ async function disponibilizarMapa(request: { dataLimite: string; observacoes: st
       await concluirAcaoPainel(TEXTOS.sucesso.MAPA_DISPONIBILIZADO, fecharModalDisponibilizar);
     } catch (error) {
       logger.error(error);
-      aplicarErroNormalizado(fluxoMapa.lastError.value as ReturnType<typeof normalizeError> | null);
+      aplicarErroNormalizado(normalizeError(error) as ReturnType<typeof normalizeError>);
     } finally {
       loadingDisponibilizacao.value = false;
     }

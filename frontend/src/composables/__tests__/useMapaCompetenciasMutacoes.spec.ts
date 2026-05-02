@@ -6,8 +6,6 @@ describe("useMapaCompetenciasMutacoes", () => {
     const codigoSubprocesso = ref<number | null>(null);
     const competencias = computed(() => []);
     const fluxoMapa = {
-        lastError: ref<any>(null),
-        clearError: vi.fn(),
         adicionarCompetencia: vi.fn(),
         atualizarCompetencia: vi.fn(),
         removerCompetencia: vi.fn(),
@@ -41,7 +39,6 @@ describe("useMapaCompetenciasMutacoes", () => {
         expect(mostrarModalCriarNovaCompetencia.value).toBe(true);
         expect(competenciaSendoEditada.value).toBeNull();
         expect(clearErrors).toHaveBeenCalled();
-        expect(fluxoMapa.clearError).toHaveBeenCalled();
     });
 
     it("deve ignorar abertura quando nao ha subprocesso", async () => {

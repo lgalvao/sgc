@@ -68,8 +68,6 @@ describe('MapaView Coverage', () => {
     };
     const fluxoMapaMock = {
         erro: null as {message: string} | null,
-        lastError: null as {message?: string; erros?: Array<{campo?: string; mensagem?: string}>} | null,
-        clearError: vi.fn(),
         adicionarCompetencia: vi.fn(),
         atualizarCompetencia: vi.fn(),
         removerCompetencia: vi.fn(),
@@ -84,8 +82,6 @@ describe('MapaView Coverage', () => {
         subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue(null);
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
         fluxoMapaMock.erro = null;
-        fluxoMapaMock.lastError = null;
-        fluxoMapaMock.clearError = vi.fn();
         fluxoMapaMock.adicionarCompetencia = vi.fn();
         fluxoMapaMock.atualizarCompetencia = vi.fn();
         fluxoMapaMock.removerCompetencia = vi.fn();

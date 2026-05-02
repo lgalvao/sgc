@@ -9,7 +9,6 @@ import MapaView from "../MapaView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
-const diagnosticoMock = vi.hoisted(() => vi.fn());
 const subprocessoStoreCacheMock = {
     contextoEdicao: null as any,
     erroIntegracaoContexto: null,
@@ -22,10 +21,6 @@ const subprocessoStoreCacheMock = {
 vi.mock("vue-router", () => ({
     useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}, query: {}}),
     useRouter: () => ({push: pushMock}),
-}));
-
-vi.mock("@/composables/useContextoSubprocesso", () => ({
-    diagnosticarCarregamentoContextoSubprocessoInicial: diagnosticoMock,
 }));
 
 vi.mock("@/services/analiseService", () => ({
@@ -100,7 +95,18 @@ const stubs = {
 describe("MapaView somente leitura", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        const contexto = {
+            detalhes: {
+                codigo: 123,
+                codSubprocesso: 123,
+                permissoes: {},
+            },
+            unidade: {sigla: 'TESTE', nome: 'Unidade Teste'},
+            atividadesDisponiveis: [],
+            mapa: {codigo: 10},
+        };
         subprocessoStoreCacheMock.contextoEdicao = {
+            ...contexto,
             detalhes: {
                 codigo: 123,
                 unidade: {codigo: 1, sigla: 'TESTE', nome: 'Unidade Teste'},
@@ -119,9 +125,6 @@ describe("MapaView somente leitura", () => {
                 elementosProcesso: [],
                 permissoes: {},
             },
-            unidade: {codigo: 1, sigla: 'TESTE', nome: 'Unidade Teste'},
-            atividadesDisponiveis: [],
-            mapa: {codigo: 10},
             subprocesso: {
                 codigo: 123,
                 unidade: {codigo: 1, sigla: 'TESTE', nome: 'Unidade Teste'},
@@ -133,22 +136,9 @@ describe("MapaView somente leitura", () => {
                 codUnidade: 1,
             },
         };
-
-        diagnosticoMock.mockResolvedValue({
-            tipo: 'sucesso',
-            resultado: {
-                codigo: 123,
-                contexto: {
-                    detalhes: {
-                        codigo: 123,
-                        codSubprocesso: 123,
-                        permissoes: {},
-                    },
-                    unidade: {sigla: 'TESTE', nome: 'Unidade Teste'},
-                    atividadesDisponiveis: [],
-                    mapa: {codigo: 10},
-                },
-            },
+        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+            codigo: 123,
+            contexto,
         });
 
         vi.mocked(subprocessoService.obterMapaVisualizacao).mockResolvedValue({
