@@ -97,6 +97,7 @@ describe('MapaView Coverage', () => {
     it('removerAtividadeAssociada does nothing if competency not found', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
+            stubActions: false,
             initialState: {
                 mapas: {
                     mapaCompleto: {
@@ -132,6 +133,7 @@ describe('MapaView Coverage', () => {
     it('abrirModalImpacto does nothing if codSubprocesso is missing', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
+            stubActions: false,
             initialState: {
                 subprocessos: {subprocessoDetalhe: null}, // ensures codSubprocesso setup might fail or return null
                 mapas: {mapaCompleto: {competencias: []}}
@@ -162,6 +164,7 @@ describe('MapaView Coverage', () => {
     it('abrirModalImpacto calls store when codSubprocesso is present', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
+            stubActions: false,
             initialState: {
                 mapas: {mapaCompleto: {competencias: []}}
             }
@@ -192,6 +195,7 @@ describe('MapaView Coverage', () => {
     it('removerAtividadeAssociada updates store if competency is found', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
+            stubActions: false,
             initialState: {
                 mapas: {
                     mapaCompleto: {
@@ -228,6 +232,7 @@ describe('MapaView Coverage', () => {
     it('desabilita disponibilizacao quando existir competencia sem atividade', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
+            stubActions: false,
             initialState: {
                 mapas: {
                     mapaCompleto: {
@@ -261,7 +266,7 @@ describe('MapaView Coverage', () => {
     });
 
     it('fecharModalImpacto closes the modal', async () => {
-        const pinia = createTestingPinia();
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
@@ -281,7 +286,7 @@ describe('MapaView Coverage', () => {
     });
 
     it('handleErrors covers activitiesIds branch', async () => {
-        const pinia = createTestingPinia();
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
@@ -305,7 +310,7 @@ describe('MapaView Coverage', () => {
     });
 
     it('disponibilizarMapa returns early if codSubprocesso is null', async () => {
-        const pinia = createTestingPinia();
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
@@ -326,7 +331,7 @@ describe('MapaView Coverage', () => {
     });
 
     it('fecharModalDisponibilizar clears state', async () => {
-        const pinia = createTestingPinia();
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],

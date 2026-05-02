@@ -79,7 +79,7 @@ describe('useCacheSync', () => {
     lastInstance?.emit('org-cache-refreshed', {});
 
     expect(unidadeStore.invalidarCache).toHaveBeenCalled();
-    expect(organizacaoStore.$reset).toHaveBeenCalled();
+    expect(organizacaoStore.invalidar).toHaveBeenCalled();
     expect(painelStore.invalidar).toHaveBeenCalled();
     expect(processoStore.invalidar).toHaveBeenCalled();
     expect(subprocessoStore.invalidar).toHaveBeenCalled();

@@ -22,6 +22,7 @@ describe("organizacao store", () => {
         expect(context.store.diagnostico).toBeNull();
         expect(context.store.erroDiagnostico).toBeNull();
         expect(context.store.carregado).toBe(false);
+        expect(context.store.dadosValidos()).toBe(false);
     });
 
     describe("garantirDiagnostico", () => {
@@ -88,6 +89,25 @@ describe("organizacao store", () => {
             await context.store.garantirDiagnostico(true);
 
             expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalledTimes(2);
+        });
+
+        it("deve invalidar o cache explicitamente", async () => {
+            vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
+                possuiViolacoes: false,
+                resumo: "OK",
+                grupos: [],
+                quantidadeTiposViolacao: 0,
+                quantidadeOcorrencias: 0
+            });
+
+            await context.store.garantirDiagnostico(true);
+
+            context.store.invalidar();
+
+            expect(context.store.diagnostico).toBeNull();
+            expect(context.store.erroDiagnostico).toBeNull();
+            expect(context.store.carregado).toBe(false);
+            expect(context.store.dadosValidos()).toBe(false);
         });
 
         it("deve lidar com erro ao buscar diagnóstico", async () => {

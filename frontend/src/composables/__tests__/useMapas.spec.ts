@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {createTestingPinia} from "@pinia/testing";
-import {setActivePinia} from "pinia";
+import {createPinia, setActivePinia} from "pinia";
+import {ref} from "vue";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 
 vi.mock("@/services/subprocessoService", () => ({
@@ -11,7 +11,7 @@ vi.mock("@/services/subprocessoService", () => ({
 describe("useMapas", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        setActivePinia(createTestingPinia({createSpy: vi.fn}));
+        setActivePinia(createPinia());
     });
 
     it("deve inicializar com valores nulos", async () => {
@@ -39,6 +39,27 @@ describe("useMapas", () => {
         await mapas.buscarMapaCompleto(1);
 
         expect(service.obterMapaCompleto).toHaveBeenCalledWith(1);
+        expect(mapas.mapaCompleto.value).toEqual(mockMapa);
+    });
+
+    it("deve reaproveitar o cache do mapa por subprocesso ao reativar a view", async () => {
+        const {useMapas} = await import("../useMapas");
+        const service = await import("@/services/subprocessoService");
+        const mapas = useMapas();
+        const mockMapa: MapaCompleto = {
+            codigo: 1,
+            subprocessoCodigo: 1,
+            observacoes: "teste",
+            competencias: [],
+            atividades: [],
+            situacao: "EM_ANDAMENTO",
+        };
+        vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
+
+        await mapas.buscarMapaCompleto(1);
+        await mapas.buscarMapaCompleto(1);
+
+        expect(service.obterMapaCompleto).toHaveBeenCalledTimes(1);
         expect(mapas.mapaCompleto.value).toEqual(mockMapa);
     });
 
@@ -76,6 +97,40 @@ describe("useMapas", () => {
         expect(mapas.impactoMapa.value).toEqual(mockImpacto);
     });
 
+    it("deve manter snapshots separados por subprocesso em views keepAlive", async () => {
+        const {useMapas} = await import("../useMapas");
+        const service = await import("@/services/subprocessoService");
+        const codigoAtual = ref<number | null>(1);
+        const mapas = useMapas(codigoAtual);
+        const mapaUm: MapaCompleto = {
+            codigo: 1,
+            subprocessoCodigo: 1,
+            observacoes: "mapa 1",
+            competencias: [],
+            atividades: [],
+            situacao: "EM_ANDAMENTO",
+        };
+        const mapaDois: MapaCompleto = {
+            codigo: 2,
+            subprocessoCodigo: 2,
+            observacoes: "mapa 2",
+            competencias: [],
+            atividades: [],
+            situacao: "EM_ANDAMENTO",
+        };
+        vi.mocked(service.obterMapaCompleto)
+            .mockResolvedValueOnce(mapaUm)
+            .mockResolvedValueOnce(mapaDois);
+
+        await mapas.buscarMapaCompleto(1);
+        codigoAtual.value = 2;
+        await mapas.buscarMapaCompleto(2);
+        expect(mapas.mapaCompleto.value).toEqual(mapaDois);
+
+        codigoAtual.value = 1;
+        expect(mapas.mapaCompleto.value).toEqual(mapaUm);
+    });
+
     it("não deve buscar impacto se codSubprocesso for zero", async () => {
         const {useMapas} = await import("../useMapas");
         const service = await import("@/services/subprocessoService");
@@ -84,6 +139,38 @@ describe("useMapas", () => {
         await mapas.buscarImpactoMapa(0);
 
         expect(service.verificarImpactosMapa).not.toHaveBeenCalled();
+    });
+
+    it("deve invalidar o impacto quando o mapa do mesmo subprocesso é atualizado", async () => {
+        const {useMapas} = await import("../useMapas");
+        const service = await import("@/services/subprocessoService");
+        const mapas = useMapas();
+        const mockImpacto: ImpactoMapa = {
+            temImpactos: true,
+            totalAtividadesInseridas: 0,
+            totalAtividadesRemovidas: 0,
+            totalAtividadesAlteradas: 0,
+            totalCompetenciasImpactadas: 0,
+            atividadesInseridas: [],
+            atividadesRemovidas: [],
+            atividadesAlteradas: [],
+            competenciasImpactadas: [],
+        };
+        vi.mocked(service.verificarImpactosMapa).mockResolvedValue(mockImpacto);
+        vi.mocked(service.obterMapaCompleto).mockResolvedValue({
+            codigo: 1,
+            subprocessoCodigo: 1,
+            observacoes: "novo",
+            competencias: [],
+            atividades: [],
+            situacao: "EM_ANDAMENTO",
+        });
+
+        await mapas.buscarImpactoMapa(1);
+        expect(mapas.impactoMapa.value).toEqual(mockImpacto);
+
+        await mapas.buscarMapaCompleto(1);
+        expect(mapas.impactoMapa.value).toBeNull();
     });
 
 });

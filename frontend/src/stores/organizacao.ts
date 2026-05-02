@@ -15,12 +15,16 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
     const carregado = ref(false);
     let carregamentoEmAndamento: Promise<void> | null = null;
 
+    function dadosValidos(): boolean {
+        return carregado.value;
+    }
+
     /**
-     * Carrega o diagnóstico organizacional somente se ainda não foi carregado nesta sessão.
+     * Carrega o diagnóstico organizacional somente se ainda estiver válido nesta sessão.
      * @param deveExibir - resultado de `usePerfil().mostrarDiagnosticoOrganizacional`; se falso, não busca.
      */
     async function garantirDiagnostico(deveExibir: boolean): Promise<void> {
-        if (!deveExibir || carregado.value) {
+        if (!deveExibir || dadosValidos()) {
             return;
         }
 
@@ -45,12 +49,16 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
         }
     }
 
-    function $reset() {
+    function invalidar() {
         diagnostico.value = null;
         erroDiagnostico.value = null;
         carregado.value = false;
         carregamentoEmAndamento = null;
     }
 
-    return {diagnostico, erroDiagnostico, carregado, garantirDiagnostico, $reset};
+    function $reset() {
+        invalidar();
+    }
+
+    return {diagnostico, erroDiagnostico, carregado, dadosValidos, garantirDiagnostico, invalidar, $reset};
 });

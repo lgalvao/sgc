@@ -22,7 +22,7 @@ export function useCacheSync() {
 
     source.addEventListener(EVENTO_CACHE_ATUALIZADO, () => {
         unidadeStore.invalidarCache();
-        organizacaoStore.$reset();
+        organizacaoStore.invalidar();
         invalidarCachesProcesso();
     });
 

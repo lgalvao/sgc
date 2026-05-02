@@ -64,7 +64,9 @@ export function useFluxoMapa() {
 
     async function removerAtividadeDaCompetencia(codSubprocesso: number, codCompetencia: number, codAtividade: number): Promise<MapaCompleto | undefined> {
         return executar(async () => {
-            const mapa = mapasStore.mapaCompleto.value;
+            const mapa = typeof mapasStore.obterMapaCompletoCache === "function"
+                ? mapasStore.obterMapaCompletoCache(codSubprocesso)
+                : mapasStore.mapaCompleto.value;
             const competencia = mapa?.competencias.find(c => c.codigo === codCompetencia);
             if (!competencia) throw new Error("Competência não encontrada.");
 

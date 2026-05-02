@@ -221,7 +221,7 @@ const {
 } = useCadastroOrquestracao(props, atividades);
 
 const subprocessoStore = useSubprocessoStore();
-const mapasStore = useMapas();
+const mapasStore = useMapas(codigoSubprocesso);
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const {

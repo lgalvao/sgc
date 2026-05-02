@@ -25,9 +25,14 @@ vi.mock("@/services/analiseService", () => ({
 const mapasStoreMock = {
     mapaCompleto: ref({ atividades: [], competencias: [] }),
     buscarMapaCompleto: vi.fn(),
-    buscarImpactoMapa: vi.fn(),
+    buscarImpactoMapa: vi.fn(async (codigo: number) => {
+        await subprocessoService.obterSugestoesMapa?.(codigo as never);
+    }),
     impactoMapa: ref(null),
     erro: ref(null),
+    definirMapaCompleto: vi.fn((_codigo: number, mapa: unknown) => {
+        mapasStoreMock.mapaCompleto.value = mapa as typeof mapasStoreMock.mapaCompleto.value;
+    }),
 };
 
 vi.mock("@/composables/useMapas", () => ({

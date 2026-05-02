@@ -9,6 +9,7 @@ vi.mock('@/services/processoService', () => ({
 }));
 
 const mockNotify = vi.fn();
+const mockNotifyStructured = vi.fn();
 const mockClear = vi.fn();
 const mockValidarSubmissao = vi.fn((v) => v);
 const mockDeveExibirErro = vi.fn((v) => v);
@@ -17,6 +18,7 @@ vi.mock('@/composables/useNotification', () => ({
   useNotification: vi.fn(() => ({
     notificacao: null,
     notify: mockNotify,
+    notifyStructured: mockNotifyStructured,
     clear: mockClear
   }))
 }));
@@ -59,6 +61,7 @@ describe('LimpezaProcessosView', () => {
     vi.mocked(useNotification).mockReturnValueOnce({
       notificacao: { message: 'msg', variant: 'info', dismissible: true } as any,
       notify: mockNotify,
+      notifyStructured: mockNotifyStructured,
       clear: mockClear
     });
     const wrapper = mountComponent();

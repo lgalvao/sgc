@@ -381,10 +381,8 @@ const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/
 
 const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();
 const router = useRouter();
-const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
 const carregandoFluxoMapa = fluxoMapa.carregando;
-const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
@@ -439,6 +437,8 @@ const {
   unidade,
   carregarContextoInicial,
 } = useMapaOrquestracao(props, mapaSomenteLeitura);
+const mapasStore = useMapas(codigoSubprocesso);
+const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 
 const analisesCadastro = ref<Analise[]>([]);
 const historicoAnalise = computed(() => analisesCadastro.value || []);
@@ -659,9 +659,14 @@ async function executarComSubprocesso(
 }
 
 function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
-  if (mapaAtualizado) {
-    mapasStore.mapaCompleto.value = mapaAtualizado;
-    if (subprocessoStore.contextoEdicao?.detalhes.codigo === codigoSubprocesso.value) {
+  const codSubprocessoAtual = codigoSubprocesso.value;
+  if (mapaAtualizado && codSubprocessoAtual) {
+    if (typeof mapasStore.definirMapaCompleto === "function") {
+      mapasStore.definirMapaCompleto(codSubprocessoAtual, mapaAtualizado);
+    } else {
+      mapasStore.mapaCompleto.value = mapaAtualizado;
+    }
+    if (subprocessoStore.contextoEdicao?.detalhes.codigo === codSubprocessoAtual) {
       subprocessoStore.contextoEdicao.mapa = mapaAtualizado;
     }
   }

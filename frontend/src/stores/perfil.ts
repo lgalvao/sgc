@@ -11,6 +11,7 @@ import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useMapasStore} from "@/stores/mapas";
+import {useOrganizacaoStore} from "@/stores/organizacao";
 import {cancelarRequisicoesPendentes, finalizarTransicaoSessao, iniciarTransicaoSessao} from "@/axios-setup";
 
 export const usePerfilStore = defineStore("perfil", () => {
@@ -32,6 +33,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     const unidadeStore = useUnidadeStore();
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
+    const organizacaoStore = useOrganizacaoStore();
 
     // Map para lookup O(1) de perfil -> unidade
     const perfilUnidadeMap = computed(() =>
@@ -65,6 +67,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         subprocessoStore.resetar();
         unidadeStore.invalidarCache();
         mapasStore.invalidar();
+        organizacaoStore.invalidar();
         perfilSelecionado.value = dados.perfil;
         unidadeSelecionada.value = dados.unidadeCodigo;
         unidadeSelecionadaSigla.value = dados.unidadeSigla;
@@ -166,6 +169,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         subprocessoStore.resetar();
         unidadeStore.invalidarCache();
         mapasStore.invalidar();
+        organizacaoStore.invalidar();
     }
 
     return {

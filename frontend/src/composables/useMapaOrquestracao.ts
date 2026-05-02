@@ -1,7 +1,7 @@
 import {ref, type Ref} from "vue";
 import type {ContextoEdicaoSubprocesso, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useMapas} from "@/composables/useMapas";
+import {useMapasStore} from "@/stores/mapas";
 import {diagnosticarCarregamentoContextoSubprocessoInicial} from "@/composables/useContextoSubprocesso";
 import {obterMapaVisualizacao} from "@/services/subprocessoService";
 import logger from "@/utils/logger";
@@ -17,7 +17,7 @@ export function useMapaOrquestracao(
     mapaSomenteLeitura: Ref<MapaVisualizacao | null>
 ) {
     const subprocessoStore = useSubprocessoStore();
-    const mapasStore = useMapas();
+    const mapasStore = useMapasStore();
 
     const carregandoInicial = ref(true);
     const codigoSubprocesso = ref<number | null>(null);
@@ -25,7 +25,7 @@ export function useMapaOrquestracao(
 
     function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
         unidade.value = data.unidade;
-        mapasStore.mapaCompleto.value = data.mapa;
+        mapasStore.definirMapaCompleto(data.detalhes.codigo, data.mapa);
     }
 
     async function carregarDadosMapaSomenteLeitura(codigo: number) {

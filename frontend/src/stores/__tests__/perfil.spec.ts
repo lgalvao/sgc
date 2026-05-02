@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import {usePerfilStore} from "../perfil";
+import {useOrganizacaoStore} from "../organizacao";
 import * as usuarioService from "../../services/usuarioService";
 import {Perfil} from "@/types/tipos";
 import {ref} from "vue";
@@ -33,6 +34,10 @@ describe("usePerfilStore", () => {
 
     it("deve definir perfil e unidade", () => {
         const store = usePerfilStore();
+        const organizacaoStore = useOrganizacaoStore();
+        organizacaoStore.diagnostico = {possuiViolacoes: true} as any;
+        organizacaoStore.carregado = true as any;
+
         store.definirPerfilUnidade({
             perfil: Perfil.GESTOR,
             unidadeCodigo: 1,
@@ -44,6 +49,8 @@ describe("usePerfilStore", () => {
         expect(store.unidadeSelecionada).toBe(1);
         expect(store.unidadeSelecionadaSigla).toBe("U1");
         expect(store.usuarioNome).toBe("Usuario Teste");
+        expect(organizacaoStore.diagnostico).toBeNull();
+        expect(organizacaoStore.carregado).toBe(false);
     });
 
     it("deve realizar login com sucesso e definir perfil se único", async () => {
@@ -87,12 +94,17 @@ describe("usePerfilStore", () => {
 
     it("deve realizar logout", async () => {
         const store = usePerfilStore();
+        const organizacaoStore = useOrganizacaoStore();
         store.usuarioCodigo = "123" as any;
+        organizacaoStore.diagnostico = {possuiViolacoes: true} as any;
+        organizacaoStore.carregado = true as any;
         
         await store.logout();
         
         expect(store.usuarioCodigo).toBeNull();
         expect(usuarioService.logout).toHaveBeenCalled();
+        expect(organizacaoStore.diagnostico).toBeNull();
+        expect(organizacaoStore.carregado).toBe(false);
     });
 
     it("unidadeAtual deve retornar valor correto", () => {
