@@ -93,6 +93,7 @@ export function useMapaDisponibilizacao({
     }
 
     return {
+        podeConfirmarDisponibilizacao,
         erroValidacaoMapa,
         loadingDisponibilizacao,
         notificacaoDisponibilizacao,

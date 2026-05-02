@@ -159,14 +159,11 @@ import {useCadastroAtividadesMutacoes} from "@/composables/useCadastroAtividades
 import {useCadastroRevisaoSemMudancas} from "@/composables/useCadastroRevisaoSemMudancas";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
+import {useCadastroAnaliseFluxo} from "@/views/cadastroAnaliseFluxo";
 import {
-  type AceitarCadastroRequest,
-  type Analise,
   type Atividade,
   type AtividadeOperacaoResponse,
-  type DevolverCadastroRequest,
   type ErroValidacao,
-  type HomologarCadastroRequest,
   type PermissoesSubprocesso,
   SituacaoSubprocesso,
   TipoProcesso
@@ -254,8 +251,6 @@ const habilitarDisponibilizar = computed(() => {
 
 
 
-const analisesCadastro = ref<Analise[]>([]);
-
 const situacaoAtual = computed(() => subprocesso.value?.situacao);
 const {
   disponibilizacaoSemMudancas,
@@ -274,10 +269,6 @@ const {
 });
 
 const {withErrorHandling, lastError} = useErrorHandler();
-
-const historicoAnalises = computed(() => {
-  return analisesCadastro.value;
-});
 
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
 
@@ -316,13 +307,9 @@ const {
 
 const loadingValidacao = ref(false);
 const loadingDisponibilizacao = ref(false);
-const loadingAnaliseCadastro = ref(false);
-const loadingDevolucaoAnalise = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);
 const erroTick = ref(0);
-const observacaoValidacao = ref("");
-const observacaoDevolucao = ref("");
 const atividadeRefs = new Map<number, Element>();
 let timeoutLimparErros: ReturnType<typeof setTimeout> | null = null;
 
@@ -524,97 +511,36 @@ async function confirmarDisponibilizacao() {
   mostrarModalConfirmacao.value = false;
 }
 
-async function abrirModalHistorico() {
-  if (codigoSubprocesso.value) {
-    analisesCadastro.value = await listarAnalisesCadastro(codigoSubprocesso.value);
-  }
-  mostrarModalHistorico.value = true;
-}
-
-function abrirModalValidarAnalise() {
-  mostrarModalValidarAnalise.value = true;
-}
-
-function fecharModalValidarAnalise() {
-  mostrarModalValidarAnalise.value = false;
-  observacaoValidacao.value = "";
-}
-
-function abrirModalDevolverAnalise() {
-  resetarValidacao();
-  mostrarModalDevolverAnalise.value = true;
-}
-
-function fecharModalDevolverAnalise() {
-  mostrarModalDevolverAnalise.value = false;
-  observacaoDevolucao.value = "";
-  resetarValidacao();
-}
-
-async function confirmarValidacaoAnalise() {
-  if (!codigoSubprocesso.value) return;
-
-  const acao = acaoPrincipalCadastro.value;
-  if (!acao) return;
-
-  loadingAnaliseCadastro.value = true;
-  try {
-    let sucesso: boolean;
-
-    if (acao.codigo === "HOMOLOGAR") {
-      const req: HomologarCadastroRequest = {observacoes: observacaoValidacao.value};
-      const paramsRedirecionamento = acao.redirecionarParaPainel
-          ? undefined
-          : {
-            name: "Subprocesso",
-            params: {codProcesso: props.codProcesso, siglaUnidade: props.sigla},
-          };
-
-      sucesso = await fluxoSubprocesso.homologarCadastro(codigoSubprocesso.value, req, isRevisao.value, {
-        mensagemSucesso: acao.mensagemSucesso,
-        redirecionarParaPainel: acao.redirecionarParaPainel,
-        redirecionarPara: paramsRedirecionamento
-      });
-
-      if (sucesso) {
-        fecharModalValidarAnalise();
-      }
-      return;
-    }
-
-    const req: AceitarCadastroRequest = {observacoes: observacaoValidacao.value};
-    sucesso = await fluxoSubprocesso.aceitarCadastro(codigoSubprocesso.value, req, isRevisao.value, {
-      mensagemSucesso: acao.mensagemSucesso
-    });
-
-    if (sucesso) {
-      fecharModalValidarAnalise();
-    }
-  } finally {
-    loadingAnaliseCadastro.value = false;
-  }
-}
-
-async function confirmarDevolucaoAnalise() {
-  if (!validarSubmissao(!!observacaoDevolucao.value.trim())) {
-    void focarPrimeiroErroInvalido();
-    return;
-  }
-
-  if (!codigoSubprocesso.value) return;
-
-  loadingDevolucaoAnalise.value = true;
-  try {
-    const req: DevolverCadastroRequest = {observacoes: observacaoDevolucao.value};
-    const sucesso = await fluxoSubprocesso.devolverCadastro(codigoSubprocesso.value, req, isRevisao.value);
-
-    if (sucesso) {
-      fecharModalDevolverAnalise();
-    }
-  } finally {
-    loadingDevolucaoAnalise.value = false;
-  }
-}
+const {
+  historicoAnalises,
+  loadingAnaliseCadastro,
+  loadingDevolucaoAnalise,
+  observacaoValidacao,
+  observacaoDevolucao,
+  abrirModalHistorico,
+  abrirModalValidarAnalise,
+  fecharModalValidarAnalise,
+  abrirModalDevolverAnalise,
+  fecharModalDevolverAnalise,
+  confirmarValidacaoAnalise,
+  confirmarDevolucaoAnalise,
+} = useCadastroAnaliseFluxo({
+  codigoSubprocesso,
+  codProcesso: props.codProcesso,
+  sigla: props.sigla,
+  isRevisao,
+  acaoPrincipalCadastro,
+  mostrarModalHistorico,
+  mostrarModalValidarAnalise,
+  mostrarModalDevolverAnalise,
+  resetarValidacao,
+  validarSubmissao,
+  focarPrimeiroErroInvalido,
+  listarAnalisesCadastro,
+  homologarCadastro: fluxoSubprocesso.homologarCadastro,
+  aceitarCadastro: fluxoSubprocesso.aceitarCadastro,
+  devolverCadastro: fluxoSubprocesso.devolverCadastro,
+});
 
 async function handleAdicionarAtividade() {
   const sucesso = await adicionarAtividade();

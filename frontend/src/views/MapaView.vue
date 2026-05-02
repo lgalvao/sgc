@@ -176,8 +176,8 @@ import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
+import {useMapaAnaliseFluxo} from "@/views/mapaAnaliseFluxo";
 import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
-import logger from "@/utils/logger";
 import {normalizeError} from "@/utils/apiError";
 import {Perfil} from "@/types/tipos";
 import type {
@@ -301,100 +301,45 @@ async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   await router.push({name: "Painel"});
 }
 
-function abrirModalAceitar() {
-  mostrarModalAceitar.value = true;
-}
-
-function fecharModalAceitar() {
-  mostrarModalAceitar.value = false;
-}
-
-function abrirModalValidar() {
-  mostrarModalValidar.value = true;
-}
-
-function fecharModalValidar() {
-  mostrarModalValidar.value = false;
-}
-
-function abrirModalDevolucao() {
-  resetarValidacao();
-  mostrarModalDevolucao.value = true;
-}
-
-function fecharModalDevolucao() {
-  mostrarModalDevolucao.value = false;
-  observacaoDevolucao.value = "";
-}
-
-async function confirmarValidacao() {
-  if (!codigoSubprocesso.value) return;
-
-  try {
-    await fluxoMapa.validarMapa(codigoSubprocesso.value);
-    await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
-  } catch {
-    notify(TEXTOS.mapa.ERRO_VALIDAR, 'danger');
-  }
-}
-
-async function confirmarAceitacao(observacao = "") {
-  if (!codigoSubprocesso.value) return;
-
-  const acao = acaoPrincipalMapa.value;
-  if (!acao) return;
-
-  try {
-    if (acao.codigo === "HOMOLOGAR") {
-      await fluxoMapa.homologarMapa(codigoSubprocesso.value, {observacao});
-    } else {
-      await fluxoMapa.aceitarMapa(codigoSubprocesso.value, {observacao});
-    }
-    await concluirAcaoPainel(acao.mensagemSucesso, fecharModalAceitar);
-  } catch {
-    notify(TEXTOS.comum.ERRO_OPERACAO, 'danger');
-  }
-}
-
-async function handleConfirmarDevolucao() {
-  if (!validarSubmissao(!!observacaoDevolucao.value.trim())) {
-    await focarPrimeiroErroInvalido();
-    return;
-  }
-
-  if (!codigoSubprocesso.value) return;
-
-  try {
-    await fluxoMapa.devolverMapa(codigoSubprocesso.value, {
-      justificativa: observacaoDevolucao.value,
-    });
-    await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
-  } catch {
-    notify(TEXTOS.mapa.ERRO_DEVOLVER, 'danger');
-  }
-}
-
-async function abrirModalHistorico() {
-  if (codigoSubprocesso.value) {
-    analisesCadastro.value = await listarAnalisesCadastro(codigoSubprocesso.value);
-  }
-  mostrarModalHistorico.value = true;
-}
-
-function fecharModalHistorico() {
-  mostrarModalHistorico.value = false;
-}
-
-function verHistorico() {
-  void abrirModalHistorico();
-}
-
 const {
   mostrarModalImpacto,
   loadingImpacto,
   abrirModalImpacto,
   fecharModalImpacto,
 } = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
+
+const {
+  abrirModalAceitar,
+  fecharModalAceitar,
+  abrirModalValidar,
+  fecharModalValidar,
+  abrirModalDevolucao,
+  fecharModalDevolucao,
+  confirmarValidacao,
+  confirmarAceitacao,
+  handleConfirmarDevolucao,
+  fecharModalHistorico,
+  verHistorico,
+} = useMapaAnaliseFluxo({
+  codigoSubprocesso,
+  acaoPrincipalMapa,
+  mostrarModalAceitar,
+  mostrarModalValidar,
+  mostrarModalDevolucao,
+  mostrarModalHistorico,
+  observacaoDevolucao,
+  analisesCadastro,
+  resetarValidacao,
+  validarSubmissao,
+  focarPrimeiroErroInvalido,
+  concluirAcaoPainel,
+  notify,
+  listarAnalisesCadastro,
+  validarMapa: fluxoMapa.validarMapa,
+  homologarMapa: fluxoMapa.homologarMapa,
+  aceitarMapa: fluxoMapa.aceitarMapa,
+  devolverMapa: fluxoMapa.devolverMapa,
+});
 
 async function executarComSubprocesso(
     callback: (id: number) => Promise<void>
@@ -488,6 +433,7 @@ const {
 });
 
 const {
+  podeConfirmarDisponibilizacao,
   erroValidacaoMapa,
   loadingDisponibilizacao,
   notificacaoDisponibilizacao,
