@@ -199,6 +199,7 @@ import {
 } from "@/types/tipos";
 import logger from "@/utils/logger";
 import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/formatters";
+import {normalizeError} from "@/utils/apiError";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
 
@@ -520,8 +521,8 @@ async function disponibilizarCadastro() {
     } else {
       erroGlobal.value = "Não foi possível obter o resultado da validação. Tente novamente.";
     }
-  } catch {
-    erroGlobal.value = fluxoSubprocesso.lastError.value?.message ?? "Ocorreu um erro ao validar o cadastro.";
+  } catch (e) {
+    erroGlobal.value = normalizeError(e).message;
   } finally {
     loadingValidacao.value = false;
   }
