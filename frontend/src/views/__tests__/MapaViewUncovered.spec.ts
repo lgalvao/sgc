@@ -236,6 +236,42 @@ describe("MapaView Uncovered Branches", () => {
         expect(vm.erroValidacaoMapa).toContain("competência");
     });
 
+    it("cobre o checklist de disponibilizacao em cada ramificacao", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+
+        const mapasStore = useMapas();
+        const vm = wrapper.vm as any;
+
+        mapasStore.mapaCompleto.value = {competencias: [], atividades: []} as any;
+        expect(vm.obterMensagemErroChecklistDisponibilizacao()).toContain("competência");
+        vm.abrirModalDisponibilizar();
+        expect(vm.mostrarModalDisponibilizar).toBe(false);
+
+        mapasStore.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: "Comp 1", atividades: []}],
+            atividades: []
+        } as any;
+        expect(vm.obterMensagemErroChecklistDisponibilizacao()).toContain("atividade");
+
+        mapasStore.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: "Comp 1", atividades: [{codigo: 10}]}],
+            atividades: [{codigo: 10}, {codigo: 20}]
+        } as any;
+        expect(vm.obterMensagemErroChecklistDisponibilizacao()).toContain("competência");
+
+        mapasStore.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: "Comp 1", atividades: [{codigo: 10}]}],
+            atividades: [{codigo: 10}]
+        } as any;
+        vm.abrirModalDisponibilizar();
+        expect(vm.erroValidacaoMapa).toBe("");
+        expect(vm.mostrarModalDisponibilizar).toBe(true);
+    });
+
     it("cobre handleConfirmarSugestoes e verSugestoes", async () => {
         const wrapper = mount(MapaView, {
             global: { plugins: [pinia], stubs },

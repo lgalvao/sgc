@@ -4,7 +4,9 @@ import SubprocessoView from '../SubprocessoView.vue';
 import {createTestingPinia} from '@pinia/testing';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {useSubprocessoStore} from '@/stores/subprocesso';
+import {useToastStore} from '@/stores/toast';
 import {SituacaoSubprocesso} from '@/types/tipos';
+import * as processoService from '@/services/processoService';
 
 vi.mock('@/composables/useAcesso', () => ({
   useAcesso: vi.fn(() => ({
@@ -27,7 +29,7 @@ vi.mock('@/composables/useAcesso', () => ({
   }))
 }));
 
-vi.mock('@/services/subprocessoService', () => ({
+vi.mock('@/services/processoService', () => ({
   enviarLembrete: vi.fn().mockResolvedValue({}),
 }));
 
@@ -41,7 +43,7 @@ describe('SubprocessoView Coverage', () => {
     vi.clearAllMocks();
   });
 
-  const mountComponent = () => {
+  const mountComponent = (props: Partial<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }> = {}) => {
     return mount(SubprocessoView, {
       global: {
         plugins: [createTestingPinia({ createSpy: vi.fn }), router],
@@ -73,7 +75,8 @@ describe('SubprocessoView Coverage', () => {
       },
       props: {
         codProcesso: 123,
-        siglaUnidade: 'U1'
+        siglaUnidade: 'U1',
+        ...props
       }
     });
   };
@@ -87,50 +90,84 @@ describe('SubprocessoView Coverage', () => {
       detalhes: {
         codigo: 1,
         unidade: { sigla: 'U1', nome: 'Unidade 1', codigo: 2 },
-        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+        prazoEtapaAtual: '2024-01-01T00:00:00',
+        ultimaDataLimiteSubprocesso: '2024-02-01T00:00:00',
+        movimentacoes: [{codigo: 7, dataHora: '2024-01-02T00:00:00'}],
+        titular: {nome: 'Titular', ramal: '123', email: 'titular@teste.com'},
+        responsavel: {usuario: {nome: 'Resp', ramal: '456', email: 'resp@teste.com'}, tipo: 'Atribuição temporária', dataFim: '2024-03-01T00:00:00'}
       } as any
     };
 
     const vm = wrapper.vm as any;
-    // We trigger multiple actions that might not be fully covered in main spec
-    await vm.confirmarEnviarLembrete();
-    expect(vm.modalLembreteAberto).toBe(true);
-
-    await vm.enviarLembreteConfirmado();
-
-    // Test that reabertura triggers validation
-    await vm.confirmarReabertura();
-
-    // Open some modals
+    expect(vm.formatTipoResponsabilidade(null)).toBe('');
+    expect(vm.formatTipoResponsabilidade({tipo: 'Substituição', dataFim: '2024-03-01T00:00:00'})).toContain('até 01/03/2024');
+    expect(vm.formatTipoResponsabilidade({tipo: 'Atribuição temporária', dataFim: '2024-03-01T00:00:00'})).toContain('Atrib. temporária');
+    expect(vm.formatTipoResponsabilidade({tipo: 'Outra'})).toBe('Outra');
+    expect(vm.rowAttrMovimentacao(null)).toEqual({});
+    expect(vm.rowAttrMovimentacao({codigo: 7})).toEqual({'data-testid': 'row-movimentacao-7'});
+    vm.fecharModalAlterarDataLimite();
     vm.abrirModalAlterarDataLimite();
     expect(vm.mostrarModalAlterarDataLimite).toBe(true);
-
+    vm.fecharModalAlterarDataLimite();
+    expect(vm.mostrarModalAlterarDataLimite).toBe(false);
     vm.abrirModalReabrirCadastro();
     expect(vm.mostrarModalReabrir).toBe(true);
-
+    vm.fecharModalReabrir();
+    expect(vm.mostrarModalReabrir).toBe(false);
     vm.abrirModalReabrirRevisao();
+    expect(vm.mostrarModalReabrir).toBe(true);
 
-    // 1. rowAttrMovimentacao(null)
-    expect(vm.rowAttrMovimentacao(null)).toEqual({});
+    vm.codigoSubprocesso = 10;
+    await vm.atualizarSubprocessoAtual();
+    expect((store as any).garantirContextoEdicao).toHaveBeenCalledWith(10, true);
 
-    // 2. confirmarEnviarLembrete(!subprocesso)
-    vm.subprocesso = null;
     await vm.confirmarEnviarLembrete();
+    expect(vm.modalLembreteAberto).toBe(true);
+    await vm.enviarLembreteConfirmado();
+    expect(processoService.enviarLembrete).toHaveBeenCalledWith(123, 2);
 
-    // 3. atualizarSubprocessoAtual(!codigoSubprocesso)
+    (store as any).contextoEdicao = null;
+    await vm.confirmarEnviarLembrete();
+    vm.loadingLembrete = true;
+    await vm.enviarLembreteConfirmado();
+
+    await vm.confirmarReabertura();
+    expect(vm.mostrarModalReabrir).toBe(true);
+  });
+
+  it('usa o carregamento direto quando a rota já traz o codigo do subprocesso', async () => {
+    const wrapper = mountComponent({codSubprocesso: 10});
+    const store = useSubprocessoStore();
+    (store as any).garantirContextoEdicao.mockResolvedValue({
+      detalhes: {
+        codigo: 10,
+        unidade: { sigla: 'U1', nome: 'Unidade 1', codigo: 2 },
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+      }
+    });
+    await flushPromises();
+
+    expect((store as any).garantirContextoEdicao).toHaveBeenCalledWith(10, true);
+    expect(wrapper.exists()).toBe(true);
+  });
+
+  it('cobre toast pendente, watch de props e retorno antecipado de ativação', async () => {
+    const toastStore = useToastStore();
+    (toastStore as any).setPending?.('Mensagem de teste');
+
+    const wrapper = mountComponent();
+    const vm = wrapper.vm as any;
+    const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
+    if (hooks[0]) {
+      await hooks[0].call(wrapper.vm);
+    }
+    await flushPromises();
+
+    await wrapper.setProps({codProcesso: 456});
+    await flushPromises();
+
     vm.codigoSubprocesso = null;
     await vm.atualizarSubprocessoAtual();
-
-/*
-    // 4. onActivated branches
-    vm.carregamentoInicialConcluido = false;
-    await vm.onActivated?.();
-    expect(vm.carregamentoInicialConcluido).toBe(false);
-
-    // 5. enviarLembreteConfirmado caminhos de erro
-    vm.subprocesso = null;
-    await vm.enviarLembreteConfirmado();
-    expect(vm.loadingLembrete).toBe(false);
-*/
   });
 });

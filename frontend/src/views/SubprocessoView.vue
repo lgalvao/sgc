@@ -547,13 +547,22 @@ async function enviarLembreteConfirmado() {
 }
 
 defineExpose({
+  codigoSubprocesso,
+  formatDataSimples,
+  formatTipoResponsabilidade,
+  rowAttrMovimentacao,
+  carregarSubprocesso,
+  atualizarSubprocessoAtual,
   confirmarEnviarLembrete,
   enviarLembreteConfirmado,
   confirmarReabertura,
   confirmarAlteracaoDataLimite,
   abrirModalAlterarDataLimite,
+  fecharModalAlterarDataLimite,
   abrirModalReabrirCadastro,
   abrirModalReabrirRevisao,
+  fecharModalReabrir,
+  exibirToastPendente,
   mostrarModalAlterarDataLimite,
   mostrarModalReabrir,
   modalLembreteAberto,

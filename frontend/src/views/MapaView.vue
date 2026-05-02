@@ -767,16 +767,26 @@ const {
   sincronizarMapa,
 });
 
+function obterMensagemErroChecklistDisponibilizacao() {
+  if (competencias.value.length === 0) {
+    return TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS;
+  }
+
+  if (existeCompetenciaSemAtividade.value) {
+    return TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE;
+  }
+
+  if (atividadesSemCompetencia.value.length > 0) {
+    return TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA;
+  }
+
+  return "";
+}
+
 function abrirModalDisponibilizar() {
   erroValidacaoMapa.value = "";
   if (!podeConfirmarDisponibilizacao.value) {
-    if (competencias.value.length === 0) {
-      erroValidacaoMapa.value = TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS;
-    } else if (existeCompetenciaSemAtividade.value) {
-      erroValidacaoMapa.value = TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE;
-    } else if (atividadesSemCompetencia.value.length > 0) {
-      erroValidacaoMapa.value = TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA;
-    }
+    erroValidacaoMapa.value = obterMensagemErroChecklistDisponibilizacao();
     return;
   }
 
@@ -828,6 +838,7 @@ defineExpose({
   atividadesSemCompetencia,
   existeCompetenciaSemAtividade,
   associacoesMapaValidas,
+  obterMensagemErroChecklistDisponibilizacao,
   unidade,
   abrirModalImpacto,
   fecharModalImpacto,
