@@ -44,6 +44,16 @@ describe("useMapaCompetenciasMutacoes", () => {
         expect(fluxoMapa.clearError).toHaveBeenCalled();
     });
 
+    it("deve ignorar abertura quando nao ha subprocesso", async () => {
+        codigoSubprocesso.value = null;
+        const {adicionarCompetenciaEFecharModal} = setup();
+
+        await adicionarCompetenciaEFecharModal({descricao: "Nova", atividadesSelecionadas: [1]});
+
+        expect(fluxoMapa.adicionarCompetencia).not.toHaveBeenCalled();
+        expect(fluxoMapa.atualizarCompetencia).not.toHaveBeenCalled();
+    });
+
     it("deve abrir modal de edição", () => {
         const {iniciarEdicaoCompetencia, competenciaSendoEditada} = setup();
         const comp = {codigo: 1} as any;
@@ -85,6 +95,22 @@ describe("useMapaCompetenciasMutacoes", () => {
         await removerAtividadeAssociada(50, 10);
 
         expect(fluxoMapa.removerAtividadeDaCompetencia).toHaveBeenCalledWith(123, 50, 10);
+    });
+
+    it("deve ignorar exclusao quando competencia nao existe", () => {
+        const {excluirCompetencia, mostrarModalExcluirCompetencia} = setup();
+
+        excluirCompetencia(999);
+
+        expect(mostrarModalExcluirCompetencia.value).toBe(false);
+    });
+
+    it("deve ignorar confirmacao sem competencia selecionada", async () => {
+        const {confirmarExclusaoCompetencia} = setup();
+
+        await confirmarExclusaoCompetencia();
+
+        expect(fluxoMapa.removerCompetencia).not.toHaveBeenCalled();
     });
 
     it("deve fechar modal de criação", () => {
@@ -161,5 +187,14 @@ describe("useMapaCompetenciasMutacoes", () => {
         await confirmarExclusaoCompetencia();
 
         expect(notify).toHaveBeenCalledWith(expect.stringContaining("Erro de exclusão"), "danger");
+    });
+
+    it("deve lidar com erro ao remover atividade associada", async () => {
+        const {removerAtividadeAssociada} = setup();
+        fluxoMapa.removerAtividadeDaCompetencia.mockRejectedValue(new Error("Erro de remoção"));
+
+        await removerAtividadeAssociada(50, 10);
+
+        expect(notify).toHaveBeenCalledWith(expect.stringContaining("Erro de remoção"), "danger");
     });
 });

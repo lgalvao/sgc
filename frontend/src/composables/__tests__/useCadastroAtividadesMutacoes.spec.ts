@@ -61,6 +61,16 @@ describe("useCadastroAtividadesMutacoes", () => {
         expect(adicionarAtividadeAction).not.toHaveBeenCalled();
     });
 
+    it("deve retornar falso quando a API nao responde na adicao", async () => {
+        const {adicionarAtividade} = setup();
+        adicionarAtividadeAction.mockResolvedValue(null);
+
+        const result = await adicionarAtividade();
+
+        expect(result).toBe(false);
+        expect(processarRespostaLocal).not.toHaveBeenCalled();
+    });
+
     it("deve lidar com erro ao adicionar atividade", async () => {
         const {adicionarAtividade, erroNovaAtividade} = setup();
         adicionarAtividadeAction.mockRejectedValue(new Error("Erro"));
@@ -79,6 +89,15 @@ describe("useCadastroAtividadesMutacoes", () => {
         
         expect(dadosRemocao.value).toEqual({tipo: "atividade", atividadeCodigo: 1});
         expect(mostrarModalConfirmacaoRemocao.value).toBe(true);
+    });
+
+    it("deve ignorar remoção de atividade sem subprocesso", () => {
+        codigoSubprocesso.value = null;
+        const {removerAtividade, mostrarModalConfirmacaoRemocao} = setup();
+
+        removerAtividade(1);
+
+        expect(mostrarModalConfirmacaoRemocao.value).toBe(false);
     });
 
     it("deve confirmar remoção de atividade com sucesso", async () => {
@@ -105,6 +124,15 @@ describe("useCadastroAtividadesMutacoes", () => {
         }));
     });
 
+    it("deve ignorar edicao de atividade sem descricao", async () => {
+        const {salvarEdicaoAtividade} = setup();
+        atividades.value = [{codigo: 1, descricao: "Antiga"}];
+
+        await salvarEdicaoAtividade(1, "   ");
+
+        expect(atividadeService.atualizarAtividade).not.toHaveBeenCalled();
+    });
+
     it("deve adicionar conhecimento", async () => {
         const {adicionarConhecimento} = setup();
         vi.mocked(atividadeService.criarConhecimento).mockResolvedValue({} as any);
@@ -114,6 +142,14 @@ describe("useCadastroAtividadesMutacoes", () => {
         expect(atividadeService.criarConhecimento).toHaveBeenCalledWith(1, {
             descricao: "Novo Conhecimento"
         });
+    });
+
+    it("deve ignorar conhecimento sem descricao", async () => {
+        const {adicionarConhecimento} = setup();
+
+        await adicionarConhecimento(1, " ");
+
+        expect(atividadeService.criarConhecimento).not.toHaveBeenCalled();
     });
 
     it("deve preparar e confirmar remoção de conhecimento", async () => {
@@ -126,6 +162,15 @@ describe("useCadastroAtividadesMutacoes", () => {
         expect(atividadeService.excluirConhecimento).toHaveBeenCalledWith(1, 50);
     });
 
+    it("deve ignorar remocao sem dados", async () => {
+        const {confirmarRemocao} = setup();
+
+        await confirmarRemocao();
+
+        expect(atividadeService.excluirAtividade).not.toHaveBeenCalled();
+        expect(atividadeService.excluirConhecimento).not.toHaveBeenCalled();
+    });
+
     it("deve salvar edição de conhecimento", async () => {
         const {salvarEdicaoConhecimento} = setup();
         vi.mocked(atividadeService.atualizarConhecimento).mockResolvedValue({} as any);
@@ -136,6 +181,14 @@ describe("useCadastroAtividadesMutacoes", () => {
             codigo: 50,
             descricao: "Desc Atualizada"
         });
+    });
+
+    it("deve ignorar edicao de conhecimento sem descricao", async () => {
+        const {salvarEdicaoConhecimento} = setup();
+
+        await salvarEdicaoConhecimento(1, 50, "");
+
+        expect(atividadeService.atualizarConhecimento).not.toHaveBeenCalled();
     });
 
     it("deve lidar com erro em executarAtualizacaoCadastro", async () => {

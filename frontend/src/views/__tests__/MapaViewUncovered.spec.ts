@@ -325,6 +325,26 @@ describe("MapaView Uncovered Branches", () => {
         await vm.verSugestoes();
     });
 
+    it("cobre sincronizacao do mapa e carregamento de sugestoes direto", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+
+        const vm = wrapper.vm as any;
+        const mapasStore = useMapas();
+
+        vm.sincronizarMapa({codigo: 9, competencias: []});
+        expect(mapasStore.mapaCompleto.value).toBeDefined();
+
+        vi.mocked(subprocessoService.obterSugestoesMapa).mockRejectedValueOnce(new Error("Falha"));
+        await vm.carregarSugestoesParaVisualizacao();
+
+        vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValueOnce("Texto");
+        await vm.carregarSugestoesParaEdicao();
+    });
+
     it("cobre fluxos de validação, devolução e histórico", async () => {
         const wrapper = mount(MapaView, {
             global: { plugins: [pinia], stubs },
