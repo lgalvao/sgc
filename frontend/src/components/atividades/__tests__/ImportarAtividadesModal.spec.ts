@@ -4,6 +4,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {Atividade, ProcessoResumo, UnidadeImportacao} from "@/types/tipos";
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
 
 vi.mock("@/services/subprocessoService", () => ({
@@ -145,7 +146,7 @@ describe("ImportarAtividadesModal.vue", () => {
             atividade: null,
             subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO"},
             atividadesAtualizadas: mockAtividades,
-            permissoes: {},
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
             aviso: "Importação concluída",
         } as any);
 

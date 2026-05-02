@@ -4,6 +4,7 @@ import ImportarAtividadesModal from './ImportarAtividadesModal.vue';
 import {ref} from 'vue';
 import * as processoService from '@/services/processoService';
 import * as subprocessoService from '@/services/subprocessoService';
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
 
 const meta: Meta<typeof ImportarAtividadesModal> = {
     title: 'Atividades/ImportarAtividadesModal',
@@ -55,7 +56,7 @@ export const Default: Story = {
                 atividade: null,
                 subprocesso: {codigo: 200, situacao: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO'},
                 atividadesAtualizadas: mockAtividades,
-                permissoes: {},
+                permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
                 aviso: 'Importação concluída',
             } as any);
             return {args, show};
@@ -85,7 +86,7 @@ export const SemProcessos: Story = {
                 atividade: null,
                 subprocesso: {codigo: 200, situacao: 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO'},
                 atividadesAtualizadas: mockAtividades,
-                permissoes: {},
+                permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
                 aviso: null,
             } as any);
             return {args, show};

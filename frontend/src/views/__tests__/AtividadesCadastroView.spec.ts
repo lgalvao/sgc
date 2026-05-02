@@ -430,7 +430,7 @@ describe("CadastroView.vue", () => {
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "MAPEAMENTO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
 
         await vm.disponibilizarCadastro();
@@ -465,7 +465,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividades = [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}];
         vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
@@ -494,7 +494,7 @@ describe("CadastroView.vue", () => {
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "MAPEAMENTO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
 
         await vm.disponibilizarCadastro();
@@ -578,7 +578,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividades = [{
             codigo: 1,
@@ -603,7 +603,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividades = [{
             codigo: 1,
@@ -628,7 +628,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         vm.atividades = [{
@@ -652,7 +652,7 @@ describe("CadastroView.vue", () => {
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
         vm.atividades = [{
@@ -685,7 +685,7 @@ describe("CadastroView.vue", () => {
             situacao: SituacaoSubprocesso.NAO_INICIADO,
             tipoProcesso: TipoProcesso.REVISAO,
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividades = [{
             codigo: 1,
@@ -726,7 +726,7 @@ describe("CadastroView.vue", () => {
             situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
             tipoProcesso: TipoProcesso.REVISAO,
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividades = [{
             codigo: 1,
