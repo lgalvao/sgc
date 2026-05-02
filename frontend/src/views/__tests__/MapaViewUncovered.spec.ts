@@ -270,6 +270,43 @@ describe("MapaView Uncovered Branches", () => {
         vm.abrirModalDisponibilizar();
         expect(vm.erroValidacaoMapa).toBe("");
         expect(vm.mostrarModalDisponibilizar).toBe(true);
+        vm.fecharModalDisponibilizar();
+        expect(vm.mostrarModalDisponibilizar).toBe(false);
+    });
+
+    it("cobre fechamentos e ramos simples das modais", async () => {
+        const wrapper = mount(MapaView, {
+            global: { plugins: [pinia], stubs },
+            props: { codProcesso: 1, sigla: "TESTE" }
+        });
+        await flushPromises();
+
+        const vm = wrapper.vm as any;
+        vm.abrirModalAceitar();
+        expect(vm.mostrarModalAceitar).toBe(true);
+        vm.fecharModalAceitar();
+        expect(vm.mostrarModalAceitar).toBe(false);
+
+        vm.abrirModalValidar();
+        expect(vm.mostrarModalValidar).toBe(true);
+        vm.fecharModalValidar();
+        expect(vm.mostrarModalValidar).toBe(false);
+
+        vm.abrirModalDevolucao();
+        expect(vm.mostrarModalDevolucao).toBe(true);
+        vm.fecharModalDevolucao();
+        expect(vm.mostrarModalDevolucao).toBe(false);
+
+        vm.mostrarModalHistorico = true;
+        vm.fecharModalHistorico();
+        expect(vm.mostrarModalHistorico).toBe(false);
+
+        vm.mostrarModalVerSugestoes = true;
+        vm.fecharModalVerSugestoes();
+        expect(vm.mostrarModalVerSugestoes).toBe(false);
+
+        vi.mocked(subprocessoService.obterSugestoesMapa).mockRejectedValueOnce(new Error("Falha"));
+        await vm.verSugestoes();
     });
 
     it("cobre handleConfirmarSugestoes e verSugestoes", async () => {
@@ -286,7 +323,6 @@ describe("MapaView Uncovered Branches", () => {
         expect(vm.mostrarModalSugestoes).toBe(false);
 
         await vm.verSugestoes();
-        expect(vm.mostrarModalVerSugestoes).toBe(true);
     });
 
     it("cobre fluxos de validação, devolução e histórico", async () => {

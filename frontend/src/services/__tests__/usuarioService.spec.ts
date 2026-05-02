@@ -127,6 +127,18 @@ describe("usuarioService", () => {
             titulo_eleitoral: "999",
         })).toMatchObject({codigo: 7, nome: "VW", tituloEleitoral: "999"});
 
+        expect(usuarioService.mapVWUsuarioToUsuario({
+            titulo: "abc",
+            nome_completo: "Nome Completo",
+            unidade_sigla: "UND",
+            ramal_telefone: "777",
+        })).toMatchObject({
+            codigo: 0,
+            nome: "Nome Completo",
+            tituloEleitoral: "abc",
+            ramal: "777",
+        });
+
         expect(usuarioService.mapVWUsuariosArray([
             {codigo: 1, nome: "A"},
             {titulo: "2", nome_completo: "B"},
