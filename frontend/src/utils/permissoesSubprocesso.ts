@@ -35,3 +35,12 @@ export const PERMISSOES_SUBPROCESSO_VAZIAS: PermissoesSubprocesso = {
     habilitarAceitarMapa: false,
     habilitarHomologarMapa: false,
 };
+
+export function normalizarPermissoesSubprocesso(
+    permissoes?: Partial<PermissoesSubprocesso> | null,
+): PermissoesSubprocesso {
+    return {
+        ...PERMISSOES_SUBPROCESSO_VAZIAS,
+        ...permissoes,
+    };
+}

@@ -78,7 +78,7 @@ export interface SubprocessoDetalheResponse {
   titular: Usuario | null;
   movimentacoes: Movimentacao[];
   localizacaoAtual: string;
-  permissoes: PermissoesSubprocesso;
+  permissoes: Partial<PermissoesSubprocesso> | null;
 }
 
 export interface ContextoEdicaoSubprocesso {

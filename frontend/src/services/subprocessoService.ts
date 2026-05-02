@@ -18,6 +18,7 @@ import type {
     SubprocessoStatus,
     ValidacaoCadastro
 } from "@/types/tipos";
+import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
 import apiClient from "../axios-setup";
 
 const CAMINHO_SUBPROCESSOS = "/subprocessos";
@@ -69,7 +70,7 @@ function mapearDetalheSubprocesso(dto: SubprocessoDetalheResponse): SubprocessoD
         etapaAtual: subprocesso.etapaAtual,
         movimentacoes: dto.movimentacoes,
         elementosProcesso: [],
-        permissoes: dto.permissoes,
+        permissoes: normalizarPermissoesSubprocesso(dto.permissoes),
     };
 }
 

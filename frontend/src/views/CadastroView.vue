@@ -174,6 +174,7 @@ import {
 import logger from "@/utils/logger";
 import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/formatters";
 import {normalizeError} from "@/utils/apiError";
+import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
 
@@ -223,13 +224,13 @@ const {
 
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const permissoesUI = computed<PermissoesSubprocesso>(() => ({
-  ...subprocesso.value?.permissoes,
-  podeEditarCadastro: podeEditarCadastro?.value ?? false,
-  podeDisponibilizarCadastro: podeDisponibilizarCadastro?.value ?? false,
-  podeDevolverCadastro: podeDevolverCadastro?.value ?? false,
-  habilitarEditarCadastro: habilitarEditarCadastro?.value ?? false,
-  habilitarDevolverCadastro: habilitarDevolverCadastro?.value ?? false,
-} as PermissoesSubprocesso));
+  ...normalizarPermissoesSubprocesso(subprocesso.value?.permissoes),
+  podeEditarCadastro: podeEditarCadastro.value,
+  podeDisponibilizarCadastro: podeDisponibilizarCadastro.value,
+  podeDevolverCadastro: podeDevolverCadastro.value,
+  habilitarEditarCadastro: habilitarEditarCadastro.value,
+  habilitarDevolverCadastro: habilitarDevolverCadastro.value,
+}));
 
 
 
