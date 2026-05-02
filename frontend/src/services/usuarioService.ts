@@ -53,6 +53,7 @@ export function mapUsuarioToFrontend(usuarioDto: UsuarioDto): Usuario {
         codigo,
         tituloEleitoral: usuarioDto.tituloEleitoral,
         nome: usuarioDto.nome,
+        matricula: usuarioDto.matricula,
         email: usuarioDto.email,
         ramal: usuarioDto.ramal,
         unidade: {
@@ -135,40 +136,30 @@ export function perfisUnidadesParaDominio(
 }
 
 export interface VWUsuario {
-    codigo?: number;
-    titulo?: string;
-    nome?: string;
-    nome_completo?: string;
-    nome_usuario?: string;
-    unidade?: unknown;
+    titulo: string;
+    matricula: string;
+    nome: string;
+    email: string;
+    ramal: string;
+    unidade_lot_codigo: number;
     unidade_sigla?: string;
-    unidade_codigo?: number;
-    email?: string | null;
-    ramal?: string | null;
-    ramal_telefone?: string | null;
-    titulo_eleitoral?: string;
 }
 
 export function mapVWUsuarioToUsuario(vw: VWUsuario): Usuario {
-    const candidateId =
-        vw?.codigo ??
-        (typeof vw?.titulo === "string" && /^\d+$/.test(vw.titulo)
-            ? Number(vw.titulo)
-            : undefined) ??
-        undefined;
-    const codigo = Number(candidateId ?? 0);
+    const codigo = /^\d+$/.test(vw.titulo) ? Number(vw.titulo) : 0;
 
     return {
         codigo,
-        nome: vw?.nome ?? vw?.nome_completo ?? vw?.nome_usuario ?? "",
+        tituloEleitoral: vw.titulo,
+        nome: vw.nome,
+        matricula: vw.matricula,
         unidade: {
-            codigo: vw?.unidade_codigo ?? 0,
-            nome: (vw?.unidade as string) ?? "",
-            sigla: vw?.unidade_sigla ?? "",
+            codigo: vw.unidade_lot_codigo,
+            nome: "", // Nome será carregado se necessário ou virá de outra fonte
+            sigla: vw.unidade_sigla ?? "",
         },
-        email: vw?.email ?? null,
-        ramal: vw?.ramal ?? vw?.ramal_telefone ?? null,
-        tituloEleitoral: vw?.titulo_eleitoral ?? vw?.titulo ?? "",
+        email: vw.email,
+        ramal: vw.ramal,
         perfis: [],
     };
 }

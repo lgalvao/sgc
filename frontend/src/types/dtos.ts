@@ -95,6 +95,7 @@ export interface PerfilUnidadeDto {
 export interface UsuarioDto {
     tituloEleitoral: string;
     nome: string;
+    matricula: string;
     email: string;
     ramal: string;
     unidade: UnidadeDto;

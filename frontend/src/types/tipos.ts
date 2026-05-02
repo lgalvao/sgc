@@ -178,10 +178,12 @@ export interface Subprocesso {
 export interface Usuario {
     codigo: number;
     nome: string;
+    matricula: string;
     tituloEleitoral: string;
     unidade: Unidade;
     email: string;
     ramal: string;
+    perfis?: string[];
 }
 
 export interface Alerta {
