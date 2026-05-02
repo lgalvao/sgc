@@ -3,9 +3,7 @@ import {ref} from "vue";
 import {
   buscarArvoreUnidade,
   buscarArvoreComElegibilidade,
-  buscarReferenciaMapaVigente,
-  mapUnidadesArray,
-  mapUnidade
+  buscarReferenciaMapaVigente
 } from "@/services/unidadeService";
 import type {MapaVigenteReferencia, Unidade} from "@/types/tipos";
 import {logger} from "@/utils";
@@ -41,10 +39,9 @@ export const useUnidadeStore = defineStore("unidade", () => {
 
         const promessa = (async () => {
             try {
-                const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
-                const unidadesMapeadas = mapUnidadesArray(Array.isArray(response) ? response : []);
-                cacheArvoreElegibilidade.value.set(key, unidadesMapeadas);
-                return unidadesMapeadas;
+                const unidades = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
+                cacheArvoreElegibilidade.value.set(key, unidades);
+                return unidades;
             } catch (error) {
                 logger.error(`Erro ao buscar árvore de unidades (${key}):`, error);
                 return [];
@@ -72,10 +69,9 @@ export const useUnidadeStore = defineStore("unidade", () => {
         if (!response) {
             return null;
         }
-        const unidade = mapUnidade(response);
-        if (unidade?.codigo) {
-            cacheUnidades.value.set(codigo, unidade);
-            return unidade;
+        if (response.codigo) {
+            cacheUnidades.value.set(codigo, response);
+            return response;
         }
         return null;
     }

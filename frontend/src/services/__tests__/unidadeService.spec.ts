@@ -3,14 +3,10 @@ import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade,
     buscarReferenciaMapaVigente,
-    buscarSubordinadas,
-    buscarSuperior,
     buscarTodasUnidades,
     buscarUnidadePorCodigo,
-    buscarUnidadePorSigla,
-    mapUnidade,
-    mapUnidadesArray,
-    mapUnidadeSnapshot
+    buscarDiagnosticoOrganizacional,
+    buscarCodigosUnidadesComMapaVigente
 } from '../unidadeService';
 import * as apiUtils from '@/utils/apiUtils';
 
@@ -30,14 +26,8 @@ describe('unidadeService', () => {
       expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades');
     });
 
-    it('deve chamar buscarUnidadePorSigla corretamente', async () => {
-      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({});
-      await buscarUnidadePorSigla('TESTE');
-      expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/sigla/TESTE');
-    });
-
     it('deve chamar buscarUnidadePorCodigo corretamente', async () => {
-      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({});
+      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({ subunidades: [] });
       await buscarUnidadePorCodigo(123);
       expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/123');
     });
@@ -55,7 +45,7 @@ describe('unidadeService', () => {
     });
 
     it('deve chamar buscarArvoreUnidade corretamente', async () => {
-      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce([]);
+      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({ subunidades: [] });
       await buscarArvoreUnidade(123);
       expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/123/arvore');
     });
@@ -65,60 +55,69 @@ describe('unidadeService', () => {
       expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/123/mapa-vigente/referencia');
     });
 
-    it('deve chamar buscarSubordinadas corretamente', async () => {
-      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce([]);
-      await buscarSubordinadas('TESTE');
-      expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/sigla/TESTE/subordinadas');
+    it('deve chamar buscarDiagnosticoOrganizacional corretamente', async () => {
+      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({ possuiViolacoes: false });
+      await buscarDiagnosticoOrganizacional();
+      expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/diagnostico-organizacional');
     });
 
-    it('deve chamar buscarSuperior corretamente', async () => {
-      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({ codigo: 1, subunidades: [] });
-      const res = await buscarSuperior('TESTE');
-      expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/sigla/TESTE/superior');
-      expect(res).toMatchObject({ codigo: 1 });
+    it('deve chamar buscarCodigosUnidadesComMapaVigente corretamente', async () => {
+      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce([1, 2]);
+      await buscarCodigosUnidadesComMapaVigente();
+      expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/com-mapa-vigente');
     });
   });
 
-  describe('mappers', () => {
-    it('deve mapear mapUnidadeSnapshot corretamente', () => {
-      const obj = {
-        codigo: 1,
-        nome: 'Teste',
-        sigla: 'TST',
-        subunidades: [{ codigo: 2, nome: 'Filha', sigla: 'FIL', subunidades: [] }]
-      };
-      const result = mapUnidadeSnapshot(obj);
-      expect(result.codigo).toBe(1);
-      expect(result.nome).toBe('Teste');
-      expect(result.sigla).toBe('TST');
-      expect(result.filhas).toHaveLength(1);
+  describe('mapeamento interno', () => {
+    it('deve mapear a árvore de unidades ao buscar todas', async () => {
+      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce([
+        {
+          codigo: 1,
+          nome: 'Teste',
+          sigla: 'TST',
+          subunidades: [{ codigo: 2, nome: 'Filha', sigla: 'FIL', subunidades: [] }]
+        }
+      ]);
+
+      const result = await buscarTodasUnidades();
+
+      expect(result).toEqual([
+        {
+          codigo: 1,
+          nome: 'Teste',
+          sigla: 'TST',
+          tipo: undefined,
+          isElegivel: undefined,
+          tituloTitular: undefined,
+          tipoResponsabilidade: undefined,
+          titular: null,
+          responsavel: null,
+          filhas: [
+            {
+              codigo: 2,
+              nome: 'Filha',
+              sigla: 'FIL',
+              tipo: undefined,
+              isElegivel: undefined,
+              tituloTitular: undefined,
+              tipoResponsabilidade: undefined,
+              titular: null,
+              responsavel: null,
+              filhas: []
+            }
+          ]
+        }
+      ]);
     });
 
-    it('deve mapear mapUnidade corretamente', () => {
-      const obj = {
+    it('deve mapear unidade com responsavel e titular ao buscar por codigo', async () => {
+      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({
         codigo: 1,
+        nome: 'Teste',
         sigla: 'TST',
         tipo: 'Setor',
-        nome: 'Teste',
         isElegivel: true,
-        usuarioCodigo: 2,
-        responsavel: null,
-        subunidades: []
-      };
-      const result = mapUnidade(obj);
-      expect(result.codigo).toBe(1);
-      expect(result.sigla).toBe('TST');
-      expect(result.tipo).toBe('Setor');
-      expect(result.nome).toBe('Teste');
-      expect(result.isElegivel).toBe(true);
-      expect(result.responsavel).toBeNull();
-      expect(result.filhas).toEqual([]);
-    });
-
-    it('deve mapear mapUnidade com responsavel e titular', () => {
-      const obj = {
         responsavel: {
-          codigo: 1,
           nome: 'Resp',
           tituloEleitoral: '123',
           matricula: 'M1',
@@ -126,7 +125,6 @@ describe('unidadeService', () => {
           ramal: '1'
         },
         titular: {
-          codigo: 2,
           nome: 'Tit',
           tituloEleitoral: '456',
           matricula: 'M2',
@@ -134,16 +132,18 @@ describe('unidadeService', () => {
           ramal: '2'
         },
         subunidades: []
-      };
-      const result = mapUnidade(obj);
+      });
+
+      const result = await buscarUnidadePorCodigo(1);
+
+      expect(result.codigo).toBe(1);
+      expect(result.sigla).toBe('TST');
+      expect(result.tipo).toBe('Setor');
+      expect(result.nome).toBe('Teste');
+      expect(result.isElegivel).toBe(true);
       expect(result.responsavel?.nome).toBe('Resp');
       expect(result.titular?.nome).toBe('Tit');
-    });
-
-    it('deve mapear mapUnidadesArray', () => {
-      const result = mapUnidadesArray([{ codigo: 1, nome: 'Unidade 1', sigla: 'U1', subunidades: [] }]);
-      expect(result).toHaveLength(1);
-      expect(result[0].codigo).toBe(1);
+      expect(result.filhas).toEqual([]);
     });
   });
 });

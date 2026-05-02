@@ -30,7 +30,6 @@ vi.mock("@/services/unidadeService", async (importOriginal) => {
             quantidadeOcorrencias: 0,
             grupos: [],
         }),
-        mapUnidadesArray: vi.fn((arr) => arr || []),
     };
 });
 
@@ -84,7 +83,6 @@ describe("Unidades.vue", () => {
             quantidadeOcorrencias: 0,
             grupos: [],
         } as any);
-        vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
     });
 
     const mockUnidades = [
@@ -106,7 +104,6 @@ describe("Unidades.vue", () => {
                 new Error(serviceOverride.error)
             );
         } else if (serviceOverride.unidades !== undefined) {
-            vi.mocked(unidadeService.mapUnidadesArray).mockReturnValueOnce(serviceOverride.unidades);
             vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce(serviceOverride.unidades as any);
         }
 
@@ -251,7 +248,6 @@ describe("Unidades.vue", () => {
 
     it("deve exibir TreeTable quando houver unidades", async () => {
         vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce(mockUnidades as any);
-        vi.mocked(unidadeService.mapUnidadesArray).mockReturnValueOnce(mockUnidades as any);
         const wrapper = createWrapper();
         await flushPromises();
         const arvore = wrapper.findComponent({name: 'TreeTable'});
@@ -316,7 +312,6 @@ describe("Unidades.vue", () => {
 
     it("deve acionar expandir e recolher pelos botões do cabeçalho", async () => {
         vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce(mockUnidades as any);
-        vi.mocked(unidadeService.mapUnidadesArray).mockReturnValueOnce(mockUnidades as any);
         const wrapper = createWrapper();
         await flushPromises();
 

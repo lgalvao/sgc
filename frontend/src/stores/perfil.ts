@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
-import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/services/usuarioService";
+import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/types/autenticacao";
 import type {Perfil, Unidade} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";

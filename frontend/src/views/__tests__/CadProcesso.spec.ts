@@ -27,7 +27,6 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
             quantidadeOcorrencias: 0,
             grupos: [],
         }),
-        mapUnidadesArray: vi.fn((arr) => arr || []),
     };
 });
 

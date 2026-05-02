@@ -7,8 +7,6 @@ vi.mock("../../services/unidadeService", () => ({
     buscarArvoreUnidade: vi.fn(),
     buscarArvoreComElegibilidade: vi.fn(),
     buscarReferenciaMapaVigente: vi.fn(),
-    mapUnidadesArray: vi.fn(a => a),
-    mapUnidade: vi.fn(a => a),
 }));
 
 vi.mock("@/utils", () => ({
@@ -23,7 +21,7 @@ describe("useUnidadeStore", () => {
 
     it("deve buscar e cachear arvore com elegibilidade", async () => {
         const store = useUnidadeStore();
-        const mockData = [{ codigo: 1 }];
+        const mockData = [{ codigo: 1, filhas: [{ codigo: 2, filhas: [] }] }];
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue(mockData as any);
 
         const res1 = await store.garantirArvoreElegibilidade("T1", 1);
@@ -70,10 +68,20 @@ describe("useUnidadeStore", () => {
     it("obterUnidade deve retornar null se unidade nao tiver codigo", async () => {
         const store = useUnidadeStore();
         vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue({ nome: "U" } as any);
-        vi.mocked(unidadeService.mapUnidade).mockReturnValue({ nome: "U" } as any);
         
         const res = await store.obterUnidade(1);
         expect(res).toBeNull();
+    });
+
+    it("deve reutilizar unidade ja mapeada pelo service", async () => {
+        const store = useUnidadeStore();
+        const unidade = { codigo: 1, nome: "U", filhas: [] };
+        vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue(unidade as any);
+
+        const res = await store.obterUnidade(1);
+
+        expect(res).toEqual(unidade);
+        expect(store.cacheUnidades.get(1)).toEqual(unidade);
     });
 
     it("invalidarCache deve limpar tudo", () => {

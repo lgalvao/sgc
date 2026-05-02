@@ -11,7 +11,6 @@ vi.mock("@/services/unidadeService", async (importOriginal) => {
     ...actual,
     buscarTodasUnidades: vi.fn(),
     buscarCodigosUnidadesComMapaVigente: vi.fn(),
-    mapUnidadesArray: vi.fn((valor) => valor),
   };
 });
 

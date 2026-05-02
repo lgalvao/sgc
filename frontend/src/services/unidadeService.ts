@@ -1,16 +1,51 @@
-import type {DiagnosticoOrganizacional, MapaVigenteReferencia, Unidade, UnidadeSnapshot} from "@/types/tipos";
+import type {DiagnosticoOrganizacional, MapaVigenteReferencia, Unidade} from "@/types/tipos";
 import {apiGet} from "@/utils/apiUtils";
 
-export function mapUnidadeSnapshot(dto: any): UnidadeSnapshot {
+type UsuarioResumoDto = {
+    tituloEleitoral: string;
+    matricula: string;
+    nome: string;
+    email: string;
+    ramal: string;
+};
+
+type UnidadeApiDto = {
+    codigo: number;
+    nome: string;
+    sigla: string;
+    tipo?: string;
+    isElegivel?: boolean;
+    tituloTitular?: string;
+    tipoResponsabilidade?: string;
+    titular?: UsuarioResumoDto | null;
+    responsavel?: UsuarioResumoDto | null;
+    subunidades?: UnidadeApiDto[];
+};
+
+const unidadeVazia: Unidade = {
+    codigo: 0,
+    nome: "",
+    sigla: "",
+    filhas: []
+};
+
+function mapearUsuarioResumo(usuario?: UsuarioResumoDto | null): Unidade["titular"] {
+    if (!usuario) {
+        return null;
+    }
+
     return {
-        codigo: dto.codigo,
-        nome: dto.nome,
-        sigla: dto.sigla,
-        filhas: dto.subunidades.map(mapUnidadeSnapshot),
+        codigo: 0,
+        tituloEleitoral: usuario.tituloEleitoral,
+        matricula: usuario.matricula,
+        nome: usuario.nome,
+        email: usuario.email,
+        ramal: usuario.ramal,
+        unidade: unidadeVazia
     };
 }
 
-export function mapUnidade(dto: any): Unidade {
+function mapearUnidade(dto: UnidadeApiDto): Unidade {
     return {
         codigo: dto.codigo,
         sigla: dto.sigla,
@@ -19,37 +54,27 @@ export function mapUnidade(dto: any): Unidade {
         isElegivel: dto.isElegivel,
         tituloTitular: dto.tituloTitular,
         tipoResponsabilidade: dto.tipoResponsabilidade,
-        titular: dto.titular ? {
-            codigo: 0,
-            tituloEleitoral: dto.titular.tituloEleitoral,
-            matricula: dto.titular.matricula,
-            nome: dto.titular.nome,
-            email: dto.titular.email,
-            ramal: dto.titular.ramal,
-            unidade: {} as Unidade
-        } : null,
-        responsavel: dto.responsavel
-            ? {
-                codigo: 0,
-                tituloEleitoral: dto.responsavel.tituloEleitoral,
-                matricula: dto.responsavel.matricula,
-                nome: dto.responsavel.nome,
-                email: dto.responsavel.email,
-                ramal: dto.responsavel.ramal,
-                unidade: {} as Unidade,
-            }
-            : null,
-        filhas: dto.subunidades.map(mapUnidade),
+        titular: mapearUsuarioResumo(dto.titular),
+        responsavel: mapearUsuarioResumo(dto.responsavel),
+        filhas: (dto.subunidades ?? []).map(mapearUnidade),
     };
 }
 
-export function mapUnidadesArray(arr: any[]): Unidade[] {
-    return arr.map(mapUnidade);
+function mapearListaUnidades(unidades: UnidadeApiDto[]): Unidade[] {
+    return unidades.map(mapearUnidade);
+}
+
+function montarUrlArvoreComElegibilidade(tipoProcesso: string, codProcesso?: number): string {
+    const params = new URLSearchParams({tipoProcesso});
+    if (codProcesso !== undefined) {
+        params.set("codProcesso", String(codProcesso));
+    }
+    return `/unidades/arvore-com-elegibilidade?${params.toString()}`;
 }
 
 export async function buscarTodasUnidades(): Promise<Unidade[]> {
-    const data = await apiGet<any[]>("/unidades");
-    return mapUnidadesArray(data);
+    const data = await apiGet<UnidadeApiDto[]>("/unidades");
+    return mapearListaUnidades(data);
 }
 
 export async function buscarDiagnosticoOrganizacional(): Promise<DiagnosticoOrganizacional> {
@@ -60,43 +85,24 @@ export async function buscarCodigosUnidadesComMapaVigente(): Promise<number[]> {
     return apiGet("/unidades/com-mapa-vigente");
 }
 
-export async function buscarUnidadePorSigla(sigla: string): Promise<Unidade> {
-    const data = await apiGet<any>(`/unidades/sigla/${sigla}`);
-    return mapUnidade(data);
-}
-
 export async function buscarUnidadePorCodigo(codigo: number): Promise<Unidade> {
-    const data = await apiGet<any>(`/unidades/${codigo}`);
-    return mapUnidade(data);
+    const data = await apiGet<UnidadeApiDto>(`/unidades/${codigo}`);
+    return mapearUnidade(data);
 }
 
 export async function buscarArvoreComElegibilidade(
     tipoProcesso: string,
     codProcesso?: number,
 ): Promise<Unidade[]> {
-    let url = `/unidades/arvore-com-elegibilidade?tipoProcesso=${tipoProcesso}`;
-    if (codProcesso) {
-        url += `&codProcesso=${codProcesso}`;
-    }
-    const data = await apiGet<any[]>(url);
-    return mapUnidadesArray(data);
+    const data = await apiGet<UnidadeApiDto[]>(montarUrlArvoreComElegibilidade(tipoProcesso, codProcesso));
+    return mapearListaUnidades(data);
 }
 
-export async function buscarArvoreUnidade(codigo: number): Promise<Unidade[]> {
-    const data = await apiGet<any[]>(`/unidades/${codigo}/arvore`);
-    return mapUnidadesArray(data);
+export async function buscarArvoreUnidade(codigo: number): Promise<Unidade> {
+    const data = await apiGet<UnidadeApiDto>(`/unidades/${codigo}/arvore`);
+    return mapearUnidade(data);
 }
 
 export async function buscarReferenciaMapaVigente(codigo: number): Promise<MapaVigenteReferencia | null> {
     return (await apiGet<MapaVigenteReferencia | null>(`/unidades/${codigo}/mapa-vigente/referencia`)) ?? null;
-}
-
-export async function buscarSubordinadas(sigla: string): Promise<Unidade[]> {
-    const data = await apiGet<any[]>(`/unidades/sigla/${sigla}/subordinadas`);
-    return mapUnidadesArray(data);
-}
-
-export async function buscarSuperior(sigla: string): Promise<Unidade> {
-    const data = await apiGet<any>(`/unidades/sigla/${sigla}/superior`);
-    return mapUnidade(data);
 }

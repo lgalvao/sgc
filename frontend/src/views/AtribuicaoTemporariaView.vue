@@ -163,7 +163,7 @@ import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/dateUtils";
-import {buscarUnidadePorCodigo as buscarUnidadeServico} from "@/services/unidadeService";
+import {buscarUnidadePorCodigo} from "@/services/unidadeService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 
@@ -222,8 +222,7 @@ const mensagemErroJustificativa = computed(() =>
 
 onMounted(async () => {
   try {
-    const response = await buscarUnidadeServico(codUnidade.value);
-    unidade.value = response as Unidade;
+    unidade.value = await buscarUnidadePorCodigo(codUnidade.value);
   } catch (error) {
     erroUsuario.value = TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
     logger.error(error);

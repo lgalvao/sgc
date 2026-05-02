@@ -106,7 +106,7 @@ import {TEXTOS} from "@/constants/textos";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
-import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
+import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
 
 const relatoriosStore = useRelatoriosStore();
 const { notify } = useNotification();
@@ -150,7 +150,7 @@ async function carregarUnidades() {
       buscarCodigosUnidadesComMapaVigente()
     ]);
     const unidadesComElegibilidade = aplicarElegibilidadeMapaVigente(
-      mapUnidadesArray(arvore as Unidade[]),
+      arvore,
       new Set(codigosComMapa)
     );
     unidadesDisponiveis.value = filtrarArvorePorMapaVigente(unidadesComElegibilidade);

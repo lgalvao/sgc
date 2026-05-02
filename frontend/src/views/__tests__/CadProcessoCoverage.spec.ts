@@ -23,7 +23,6 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
     return {
         ...actual,
         buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
-        mapUnidadesArray: vi.fn((arr) => arr || []),
     };
 });
 
@@ -123,7 +122,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(null as any);
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
-        vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
         vi.spyOn(console, 'error').mockImplementation(() => {
         });
     });

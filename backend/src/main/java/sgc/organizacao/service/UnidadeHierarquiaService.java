@@ -247,6 +247,7 @@ public class UnidadeHierarquiaService {
     UnidadeDto montarComSubunidades(UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
         List<UnidadeDto> filhas = mapaFilhas.get(dto.getCodigo());
         if (filhas == null || filhas.isEmpty()) {
+            dto.setSubunidades(new ArrayList<>());
             return dto;
         }
 

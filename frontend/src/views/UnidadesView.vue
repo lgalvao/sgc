@@ -97,7 +97,7 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
-import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
+import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
@@ -185,8 +185,7 @@ function recolherTodasLinhas() {
 
 async function carregarUnidades() {
   await executarSilencioso(async () => {
-    const response = await buscarTodasUnidades();
-    unidades.value = mapUnidadesArray(response as Unidade[]);
+    unidades.value = await buscarTodasUnidades();
   }, TEXTOS.comum.ERRO_OPERACAO);
 }
 

@@ -199,7 +199,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
-import type {PerfilUnidade} from "@/services/usuarioService";
+import type {PerfilUnidade} from "@/types/autenticacao";
 import {TEXTOS} from "@/constants/textos";
 
 import {usePerfilStore} from "@/stores/perfil";

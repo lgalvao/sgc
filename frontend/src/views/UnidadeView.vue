@@ -114,7 +114,6 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useUnidadeStore} from "@/stores/unidade";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
-import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
 

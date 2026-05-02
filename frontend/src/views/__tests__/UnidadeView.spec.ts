@@ -3,11 +3,9 @@ import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
-import {usePerfilStore} from '@/stores/perfil';
-import {buscarArvoreUnidade, buscarReferenciaMapaVigente} from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hoisted(() => {
+const {mockPush, mockUnidadeData, mockMapaVigente, mockObterUnidade, mockObterReferenciaMapaVigente} = vi.hoisted(() => {
     const u = {
         codigo: 10,
         nome: 'Titular teste',
@@ -35,13 +33,14 @@ const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hois
             titular: u,
             responsavel: ur,
             tipoResponsabilidade: 'SUBSTITUTO',
-            subunidades: [
-                {codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', subunidades: []},
-                {codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', subunidades: []}
+            filhas: [
+                {codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: []},
+                {codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: []}
             ]
         },
-        mockUsuario: u,
-        mockUsuarioResponsavel: ur
+        mockMapaVigente: {codProcesso: 99, codSubprocesso: 77},
+        mockObterUnidade: vi.fn(),
+        mockObterReferenciaMapaVigente: vi.fn()
     };
 });
 
@@ -55,13 +54,14 @@ vi.mock('vue-router', async (importOriginal) => {
     };
 });
 
-vi.mock('@/services/unidadeService', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@/services/unidadeService')>();
+vi.mock('@/stores/unidade', () => {
     return {
-        ...actual,
-        buscarArvoreUnidade: vi.fn().mockResolvedValue(mockUnidadeData),
-        buscarUnidadePorSigla: vi.fn().mockResolvedValue(mockUnidadeData),
-        buscarReferenciaMapaVigente: vi.fn().mockResolvedValue(null),
+        useUnidadeStore: () => ({
+            cacheUnidades: new Map<number, unknown>(),
+            cacheMapasVigentes: new Map<number, unknown>(),
+            obterUnidade: mockObterUnidade,
+            obterReferenciaMapaVigente: mockObterReferenciaMapaVigente,
+        }),
     };
 });
 
@@ -76,10 +76,9 @@ describe('UnidadeView.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (buscarArvoreUnidade as any).mockResolvedValue(mockUnidadeData);
+        mockObterUnidade.mockResolvedValue(mockUnidadeData);
+        mockObterReferenciaMapaVigente.mockResolvedValue(null);
     });
-
-    let perfilStore: any;
 
     const createWrapper = (initialStateOverride = {}) => {
         context.wrapper = mount(UnidadeView, {
@@ -105,15 +104,12 @@ describe('UnidadeView.vue', () => {
                 codUnidade: 1
             },
         });
-
-        perfilStore = usePerfilStore();
-
-        return {wrapper: context.wrapper, perfilStore};
+        return {wrapper: context.wrapper};
     };
 
     it('fetches data on mount', async () => {
         createWrapper();
-        expect(buscarArvoreUnidade).toHaveBeenCalledWith(1);
+        expect(mockObterUnidade).toHaveBeenCalledWith(1, false);
     });
 
     it('renders unit details correctly', async () => {
@@ -130,7 +126,7 @@ describe('UnidadeView.vue', () => {
             ...mockUnidadeData,
             tipoResponsabilidade: 'TITULAR'
         };
-        (buscarArvoreUnidade as any).mockResolvedValueOnce(unidadeTitular);
+        mockObterUnidade.mockResolvedValueOnce(unidadeTitular);
 
         const {wrapper} = createWrapper();
         await flushPromises();
@@ -158,7 +154,7 @@ describe('UnidadeView.vue', () => {
     });
 
     it('renders and clicks "Mapa vigente" button when map exists', async () => {
-        vi.mocked(buscarReferenciaMapaVigente).mockResolvedValueOnce({codProcesso: 99, codSubprocesso: 77});
+        mockObterReferenciaMapaVigente.mockResolvedValueOnce(mockMapaVigente);
         const {wrapper} = createWrapper();
         await flushPromises();
 
@@ -173,7 +169,7 @@ describe('UnidadeView.vue', () => {
     });
 
     it('displays error alert when fetching unit fails', async () => {
-        (buscarArvoreUnidade as any).mockRejectedValueOnce(new Error('Erro ao carregar unidade'));
+        mockObterUnidade.mockRejectedValueOnce(new Error('Erro ao carregar unidade'));
         const {wrapper} = createWrapper();
         await flushPromises();
 
@@ -192,7 +188,7 @@ describe('UnidadeView.vue', () => {
     });
 
     it('handles null unit gracefully', async () => {
-        (buscarArvoreUnidade as any).mockResolvedValue(null);
+        mockObterUnidade.mockResolvedValue(null);
         const {wrapper} = createWrapper();
         await flushPromises();
 
