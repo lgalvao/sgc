@@ -6,6 +6,7 @@ import * as analiseService from "@/services/analiseService";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useMapasModule from "@/composables/useMapas";
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import MapaView from "../MapaView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -99,7 +100,7 @@ describe("MapaView somente leitura", () => {
             detalhes: {
                 codigo: 123,
                 codSubprocesso: 123,
-                permissoes: {},
+                permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
             },
             unidade: {sigla: 'TESTE', nome: 'Unidade Teste'},
             atividadesDisponiveis: [],
@@ -123,7 +124,7 @@ describe("MapaView somente leitura", () => {
                 etapaAtual: 2,
                 movimentacoes: [],
                 elementosProcesso: [],
-                permissoes: {},
+                permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
             },
             subprocesso: {
                 codigo: 123,

@@ -1,0 +1,50 @@
+import type {Ref} from "vue";
+import type {
+    ContextoCadastroAtividadesSubprocesso,
+    ContextoEdicaoSubprocesso,
+    PermissoesSubprocesso,
+    SituacaoSubprocesso,
+} from "@/types/tipos";
+
+type ContextoSubprocesso = ContextoEdicaoSubprocesso | ContextoCadastroAtividadesSubprocesso;
+
+export type AtualizacaoStatusLocal = {
+    codigo: number;
+    situacao: SituacaoSubprocesso;
+    permissoes?: PermissoesSubprocesso;
+};
+
+export function registrarContexto<T extends ContextoSubprocesso>(
+    contextoRef: Ref<T | null>,
+    contextoInvalidoRef: Ref<boolean>,
+    contexto: T,
+    limparErroIntegracao: () => void,
+): void {
+    contextoRef.value = contexto;
+    contextoInvalidoRef.value = false;
+    limparErroIntegracao();
+}
+
+export function atualizarDetalhesContexto<T extends ContextoSubprocesso>(
+    contextoRef: Ref<T | null>,
+    contextoInvalidoRef: Ref<boolean>,
+    status: AtualizacaoStatusLocal,
+): void {
+    if (contextoRef.value?.detalhes.codigo !== status.codigo) {
+        return;
+    }
+
+    contextoRef.value.detalhes.situacao = status.situacao;
+    contextoInvalidoRef.value = false;
+    if (status.permissoes) {
+        contextoRef.value.detalhes.permissoes = status.permissoes;
+    }
+}
+
+export function dadosValidos<T extends ContextoSubprocesso>(
+    contextoRef: Ref<T | null>,
+    contextoInvalidoRef: Ref<boolean>,
+    codigoSubprocesso: number,
+): boolean {
+    return contextoRef.value?.detalhes.codigo === codigoSubprocesso && !contextoInvalidoRef.value;
+}

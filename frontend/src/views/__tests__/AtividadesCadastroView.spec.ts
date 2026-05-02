@@ -13,12 +13,12 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
 import {TEXTOS} from "@/constants/textos";
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import type {
     AtividadeOperacaoResponse,
     ContextoCadastroAtividadesSubprocesso,
     MapaResumo,
-    PermissoesSubprocesso,
     SubprocessoDetalhe,
     Unidade
 } from "@/types/tipos";
@@ -104,41 +104,6 @@ type SubprocessoStoreMock = {
 };
 
 function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
-    const permissoes: PermissoesSubprocesso = {
-        podeEditarCadastro: false,
-        podeDisponibilizarCadastro: false,
-        podeDevolverCadastro: false,
-        podeAceitarCadastro: false,
-        podeHomologarCadastro: false,
-        podeEditarMapa: false,
-        podeDisponibilizarMapa: false,
-        podeValidarMapa: false,
-        podeApresentarSugestoes: false,
-        podeVerSugestoes: false,
-        podeDevolverMapa: false,
-        podeAceitarMapa: false,
-        podeHomologarMapa: false,
-        podeVisualizarImpacto: false,
-        podeAlterarDataLimite: false,
-        podeReabrirCadastro: false,
-        podeReabrirRevisao: false,
-        podeEnviarLembrete: false,
-        mesmaUnidade: false,
-        habilitarAcessoCadastro: false,
-        habilitarAcessoMapa: false,
-        habilitarEditarCadastro: false,
-        habilitarDisponibilizarCadastro: false,
-        habilitarDevolverCadastro: false,
-        habilitarAceitarCadastro: false,
-        habilitarHomologarCadastro: false,
-        habilitarEditarMapa: false,
-        habilitarDisponibilizarMapa: false,
-        habilitarValidarMapa: false,
-        habilitarApresentarSugestoes: false,
-        habilitarDevolverMapa: false,
-        habilitarAceitarMapa: false,
-        habilitarHomologarMapa: false,
-    };
     const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
     const mapa: MapaResumo = {codigo: 100, subprocessoCodigo: 123};
     const detalhes: SubprocessoDetalhe = {
@@ -157,7 +122,7 @@ function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
         etapaAtual: 1,
         movimentacoes: [],
         elementosProcesso: [],
-        permissoes,
+        permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
     };
     return {
         detalhes,
@@ -405,7 +370,7 @@ describe("CadastroView.vue", () => {
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "MAPEAMENTO",
             unidade: {sigla: "TESTE"},
-            permissoes: {}
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         subprocessosMock.lastError = null;
         subprocessosMock.erroIntegracaoContexto = null;

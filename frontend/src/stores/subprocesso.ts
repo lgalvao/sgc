@@ -3,8 +3,6 @@ import {ref} from "vue";
 import type {
     ContextoCadastroAtividadesSubprocesso,
     ContextoEdicaoSubprocesso,
-    PermissoesSubprocesso,
-    SituacaoSubprocesso,
 } from "@/types/tipos";
 import {
     buscarContextoCadastroAtividades as serviceBuscarContextoCadastroAtividades,
@@ -12,6 +10,7 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
+import {atualizarDetalhesContexto, dadosValidos, type AtualizacaoStatusLocal, registrarContexto} from "@/stores/subprocessoStoreHelpers";
 import {logger} from "@/utils";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 
@@ -66,15 +65,11 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     }
 
     function registrarContextoEdicao(contexto: ContextoEdicaoSubprocesso): void {
-        contextoEdicao.value = contexto;
-        contextoEdicaoInvalido.value = false;
-        limparErroIntegracao();
+        registrarContexto(contextoEdicao, contextoEdicaoInvalido, contexto, limparErroIntegracao);
     }
 
     function registrarContextoCadastro(contexto: ContextoCadastroAtividadesSubprocesso): void {
-        contextoCadastro.value = contexto;
-        contextoCadastroInvalido.value = false;
-        limparErroIntegracao();
+        registrarContexto(contextoCadastro, contextoCadastroInvalido, contexto, limparErroIntegracao);
     }
 
     function criarErroSubprocessoNaoEncontrado(mensagemBase: string, erroNormalizado: NormalizedError): NormalizedError {
@@ -226,34 +221,17 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         }
     }
 
-    function atualizarStatusLocal(status: {
-        codigo: number;
-        situacao: SituacaoSubprocesso;
-        permissoes?: PermissoesSubprocesso;
-    }) {
-        if (contextoEdicao.value?.detalhes.codigo === status.codigo) {
-            contextoEdicao.value.detalhes.situacao = status.situacao;
-            contextoEdicaoInvalido.value = false;
-            if (status.permissoes) {
-                contextoEdicao.value.detalhes.permissoes = status.permissoes;
-            }
-        }
-
-        if (contextoCadastro.value?.detalhes.codigo === status.codigo) {
-            contextoCadastro.value.detalhes.situacao = status.situacao;
-            contextoCadastroInvalido.value = false;
-            if (status.permissoes) {
-                contextoCadastro.value.detalhes.permissoes = status.permissoes;
-            }
-        }
+    function atualizarStatusLocal(status: AtualizacaoStatusLocal) {
+        atualizarDetalhesContexto(contextoEdicao, contextoEdicaoInvalido, status);
+        atualizarDetalhesContexto(contextoCadastro, contextoCadastroInvalido, status);
     }
 
     function dadosValidosEdicao(codigoSubprocesso: number): boolean {
-        return contextoEdicao.value?.detalhes.codigo === codigoSubprocesso && !contextoEdicaoInvalido.value;
+        return dadosValidos(contextoEdicao, contextoEdicaoInvalido, codigoSubprocesso);
     }
 
     function dadosValidosCadastro(codigoSubprocesso: number): boolean {
-        return contextoCadastro.value?.detalhes.codigo === codigoSubprocesso && !contextoCadastroInvalido.value;
+        return dadosValidos(contextoCadastro, contextoCadastroInvalido, codigoSubprocesso);
     }
 
     return {

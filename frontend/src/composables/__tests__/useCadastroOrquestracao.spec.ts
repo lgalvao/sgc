@@ -1,6 +1,7 @@
 import {describe, it, expect, beforeEach, vi} from "vitest";
 import {ref} from "vue";
 import {useCadastroOrquestracao} from "../useCadastroOrquestracao";
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 
 const storeMock = {
     garantirContextoCadastroAtividades: vi.fn(),
@@ -24,7 +25,7 @@ describe("useCadastroOrquestracao", () => {
     it("deve carregar contexto inicial por processo e unidade", async () => {
         const {carregarContextoInicial, codigoSubprocesso} = useCadastroOrquestracao(props, atividades);
         vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
-            detalhes: {codigo: 123, situacao: "S", permissoes: {}},
+            detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [],
             unidade: {sigla: "U"},
             mapa: {codigo: 50}

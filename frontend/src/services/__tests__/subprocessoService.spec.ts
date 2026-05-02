@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as subprocessoService from '../subprocessoService';
 import apiClient from '@/axios-setup';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
 
 vi.mock('@/axios-setup', () => ({
   default: {
@@ -109,10 +110,15 @@ describe('subprocessoService', () => {
       responsavel: null,
       movimentacoes: [],
       localizacaoAtual: 'UND',
-      permissoes: {},
+      permissoes: null,
     } } as never);
-    await subprocessoService.buscarSubprocessoDetalhe(1);
+    const resultado = await subprocessoService.buscarSubprocessoDetalhe(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1');
+    expect(resultado).toMatchObject({
+      codigo: 1,
+      localizacaoAtual: 'UND',
+      permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
+    });
   });
 
   it('buscarContextoEdicao', async () => {
@@ -148,7 +154,7 @@ describe('subprocessoService', () => {
         responsavel: null,
         movimentacoes: [],
         localizacaoAtual: 'UND',
-        permissoes: {},
+        permissoes: null,
       },
       mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], atividades: [], situacao: '' },
     } } as never);
@@ -197,7 +203,7 @@ describe('subprocessoService', () => {
         responsavel: null,
         movimentacoes: [],
         localizacaoAtual: 'UND',
-        permissoes: {},
+        permissoes: null,
       },
       mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' },
       atividadesDisponiveis: [],

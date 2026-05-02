@@ -28,9 +28,7 @@ interface ImportarAtividadesRequest {
     codigosAtividades?: number[];
 }
 
-interface BuscarSubprocessoPorProcessoEUnidadeResponse {
-    codigo: number;
-}
+interface BuscarSubprocessoPorProcessoEUnidadeResponse { codigo: number; }
 
 interface ContextoComDetalhesResponse {
     detalhes: SubprocessoDetalheResponse;
@@ -159,9 +157,9 @@ export async function obterStatus(codSubprocesso: number): Promise<SubprocessoSt
 
 export async function buscarSubprocessoDetalhe(
     codSubprocesso: number,
-): Promise<SubprocessoDetalheResponse> {
+): Promise<SubprocessoDetalhe> {
     const response = await apiClient.get<SubprocessoDetalheResponse>(caminhoSubprocesso(codSubprocesso));
-    return response.data;
+    return mapearDetalheSubprocesso(response.data);
 }
 
 export async function buscarContextoEdicao(

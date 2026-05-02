@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import {useSubprocessoStore} from "../subprocesso";
 import * as subprocessoService from "@/services/subprocessoService";
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn(),
@@ -146,7 +147,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve atualizar permissoes se fornecidas", () => {
             const store = useSubprocessoStore();
-            store.contextoEdicao = { detalhes: { codigo: 10, situacao: "ANTIGA", permissoes: {} } } as any;
+            store.contextoEdicao = { detalhes: { codigo: 10, situacao: "ANTIGA", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS } } as any;
             const novasPermissoes = { habilitarEditar: true } as any;
 
             store.atualizarStatusLocal({ codigo: 10, situacao: "NOVA" as any, permissoes: novasPermissoes });
@@ -156,7 +157,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve atualizar permissoes no contexto de cadastro se fornecidas", () => {
             const store = useSubprocessoStore();
-            store.contextoCadastro = { detalhes: { codigo: 10, situacao: "ANTIGA", permissoes: {} } } as any;
+            store.contextoCadastro = { detalhes: { codigo: 10, situacao: "ANTIGA", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS } } as any;
             const novasPermissoes = { habilitarEditar: true } as any;
 
             store.atualizarStatusLocal({ codigo: 10, situacao: "NOVA" as any, permissoes: novasPermissoes });
