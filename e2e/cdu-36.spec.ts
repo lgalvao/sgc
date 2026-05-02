@@ -14,7 +14,7 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
     test('Cenários CDU-36: ADMIN define filtros e gera PDF de mapas', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         test.slow();
         const descricaoProcesso = `Relatório CDU-36 ${Date.now()}`;
-        const processo = await criarProcessoMapaHomologadoFixture(request, {
+        await criarProcessoMapaHomologadoFixture(request, {
             descricao: descricaoProcesso,
             unidade: 'ASSESSORIA_12',
             diasLimite: 30
