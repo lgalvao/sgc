@@ -1,8 +1,8 @@
 # SGC - Backlog de Limpezas e Qualidade (Estado Atual)
 
-Este documento reflete o estado atual do sistema após as rodadas de refatoração de Maio/2026. Itens concluídos foram arquivados para manter o foco no que resta.
+Este documento reflete o estado atual do sistema após rodadas de refatoração do frontend.
 
-## 📊 Métricas Atuais (Snapshot 2026-05-03)
+## 📊 Métricas Atuais 
 
 | Métrica | Valor Atual | Meta / Limite | Status |
 | :--- | :--- | :--- | :--- |
@@ -24,11 +24,6 @@ Este documento reflete o estado atual do sistema após as rodadas de refatoraç�
 
 ## 🚀 Próximas Ações
 
-### P1 - Prioridade Imediata (Concluído)
-- [x] **Extração da Árvore**: `ArvoreUnidades.vue` decomposta em `ArvoreToolbar.vue`, `useArvoreSelecao.ts` e `useArvoreExpansao.ts`.
-- [x] **Refatoração de Notificações**: `NotificacoesAdminView.vue` simplificada com extração de `NotificacaoTabela.vue` e centralização de labels.
-- [x] **Decomposição do Cadastro**: `ProcessoCadastroView.vue` simplificada com `ProcessoDiagnosticoAlert.vue` e `ProcessoCadastroModais.vue`.
-
 ### P2 - Próximos Passos
 - [ ] **Ajuste de Cobertura (Gaps)**: Atacar arquivos com baixa cobertura de funções (ex: `UnidadeView.vue` e `analiseFluxo.ts`) para atingir os 90%.
 
@@ -38,4 +33,3 @@ Este documento reflete o estado atual do sistema após as rodadas de refatoraç�
     - [ ] `axios-setup.ts`: Reduzir para 250 (atual: 247).
     - [ ] `ProcessoCadastroView.vue`: Reduzir para 460 (atual: 456).
 - [ ] **Simplificação de Erros**: Unificar redundância no `useErrorHandler.ts` entre erros de rede e de negócio via `normalizarErro`.
-

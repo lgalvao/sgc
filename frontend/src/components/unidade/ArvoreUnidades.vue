@@ -179,7 +179,9 @@ defineExpose({
   toggle,
   toggleExpand,
   selecionarTodas,
-  deselecionarTodas
+  deselecionarTodas,
+  expandedUnits,
+  unidadesSelecionadasLocal
 });
 </script>
 

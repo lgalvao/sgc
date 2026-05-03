@@ -366,8 +366,15 @@ function abrirModalRemocao() {
   mostrarModalRemocao.value = true;
 }
 
+function fecharModalRemocao() {
+  mostrarModalRemocao.value = false;
+}
+
 async function confirmarRemocao() {
-  if (!processoEditando.value) return;
+  if (!processoEditando.value) {
+    fecharModalRemocao();
+    return;
+  }
   isLoading.value = true;
   const descRemovida = processoEditando.value.descricao;
   try {
@@ -376,9 +383,9 @@ async function confirmarRemocao() {
     invalidarCachesProcesso();
     await router.push("/painel");
     limparCampos();
-    mostrarModalRemocao.value = false;
+    fecharModalRemocao();
   } catch (error) {
-    mostrarModalRemocao.value = false;
+    fecharModalRemocao();
     handleApiErrors(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
   } finally {
     isLoading.value = false;
