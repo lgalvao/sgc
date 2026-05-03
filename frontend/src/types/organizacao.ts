@@ -68,4 +68,3 @@ export interface UnidadeSnapshot {
   filhas?: UnidadeSnapshot[];
 }
 
-export type {UnidadeSelecao};

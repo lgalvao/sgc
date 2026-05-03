@@ -139,7 +139,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("obterPermissoesUI: Deve retornar todas as permissões falsas se o processo estiver FINALIZADO")
+    @DisplayName("obterPermissoesUI: Processo FINALIZADO deve manter ações de ADMIN visíveis, mas desabilitadas")
     void obterPermissoesUI_ProcessoFinalizado() {
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processoRepo.save(processo);
@@ -149,7 +149,8 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(permissoes.podeEditarCadastro()).isFalse();
         assertThat(permissoes.podeEditarMapa()).isFalse();
         assertThat(permissoes.podeHomologarMapa()).isFalse();
-        assertThat(permissoes.podeReabrirCadastro()).isFalse();
+        assertThat(permissoes.podeReabrirCadastro()).isTrue();
+        assertThat(permissoes.habilitarReabrirCadastro()).isFalse();
     }
 
     @Test
@@ -163,7 +164,8 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(permissoes.podeHomologarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
         assertThat(permissoes.podeAlterarDataLimite()).isTrue();
-        assertThat(permissoes.podeReabrirCadastro()).isFalse(); // Agora deve ser false (DISPONIBILIZADO < MAPA_HOMOLOGADO)
+        assertThat(permissoes.podeReabrirCadastro()).isTrue();
+        assertThat(permissoes.habilitarReabrirCadastro()).isFalse();
         assertThat(permissoes.podeEnviarLembrete()).isTrue();
     }
 
@@ -290,7 +292,8 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
-        assertThat(permissoes.podeHomologarMapa()).isFalse();
+        assertThat(permissoes.podeHomologarMapa()).isTrue();
+        assertThat(permissoes.habilitarHomologarMapa()).isFalse();
     }
 
     @Test
@@ -303,7 +306,8 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
-        assertThat(permissoes.podeHomologarMapa()).isFalse();
+        assertThat(permissoes.podeHomologarMapa()).isTrue();
+        assertThat(permissoes.habilitarHomologarMapa()).isFalse();
     }
 
     @Test

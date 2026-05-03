@@ -388,8 +388,10 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp);
             assertThat(res.habilitarAcessoCadastro()).isFalse();
             assertThat(res.habilitarAcessoMapa()).isFalse();
-            assertThat(res.podeReabrirCadastro()).isFalse();
-            assertThat(res.podeReabrirRevisao()).isFalse();
+            assertThat(res.podeReabrirCadastro()).isTrue();
+            assertThat(res.habilitarReabrirCadastro()).isFalse();
+            assertThat(res.podeReabrirRevisao()).isTrue();
+            assertThat(res.habilitarReabrirRevisao()).isFalse();
         }
 
         @Test

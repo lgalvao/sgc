@@ -31,6 +31,7 @@
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-playwright": "^2.10.2",
+    "fallow": "^2.62.0",
     "globals": "^17.6.0",
     "oxlint": "^1.62.0",
     "smtp-server": "^3.18.4",
@@ -41,6 +42,9 @@
   "pnpm": {
     "overrides": {
       "glob": "^13.0.0"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "fallow"
+    ]
   }
 }

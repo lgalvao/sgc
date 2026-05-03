@@ -16,33 +16,3 @@ export function setupStoreTest<T>(useStore: () => T) {
     return context;
 }
 
-/**
- * Testa se uma action da store chama o método do serviço com os argumentos corretos
- */
-export function testServiceCall<T>(
-    action: () => Promise<T>,
-    service: Record<string, any>,
-    method: string,
-    expectedArgs: unknown[]
-) {
-    it("deve chamar o service com os parâmetros corretos", async () => {
-        await action();
-        expect(service[method]).toHaveBeenCalledWith(...expectedArgs);
-    });
-}
-
-/**
- * Testa se uma action da store lança erro quando o serviço falha
- */
-export function testErrorHandling<T>(
-    action: () => Promise<T>,
-    errorType?: Error | unknown
-) {
-    it("deve lançar um erro em caso de falha", async () => {
-        if (errorType) {
-            expect(action()).rejects.toThrow(errorType);
-        } else {
-            expect(action()).rejects.toThrow();
-        }
-    });
-}

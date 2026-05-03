@@ -2,7 +2,7 @@ import type {AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import axios, {AxiosHeaders} from "axios";
 import type {Router} from "vue-router";
 import {normalizeError, shouldNotifyGlobally} from '@/utils/apiError';
-import {logger} from "@/utils";
+import logger from "@/utils/logger";
 
 let routerInstance: Router | null = null;
 const CHAVE_MONITORAMENTO_SESSAO = 'sgc.monitoramento.ativo';
@@ -29,18 +29,6 @@ let sessaoEmTransicao = false;
 
 export function setRouter(router: Router) {
     routerInstance = router;
-}
-
-export function ativarMonitoramentoHttp() {
-    if (typeof window !== 'undefined') {
-        window.sessionStorage.setItem(CHAVE_MONITORAMENTO_SESSAO, 'true');
-    }
-}
-
-export function desativarMonitoramentoHttp() {
-    if (typeof window !== 'undefined') {
-        window.sessionStorage.removeItem(CHAVE_MONITORAMENTO_SESSAO);
-    }
 }
 
 function isMonitoramentoSolicitadoPorSessao(): boolean {
@@ -167,7 +155,7 @@ function registrarConclusaoResposta(response: AxiosResponse) {
     return response;
 }
 
-export const apiClient = axios.create({
+const apiClient = axios.create({
     baseURL: import.meta.env?.VITE_API_BASE_URL || "/api",
     withCredentials: true,
     xsrfCookieName: 'XSRF-TOKEN',
