@@ -33,7 +33,7 @@ export function useFeedback() {
                 canvas.toBlob((blob: Blob | null) => resolver(blob), 'image/webp', 0.85)
             })
         } catch (erro) {
-            console.warn('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
+            console.error('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
             captura.value = null
         }
     }

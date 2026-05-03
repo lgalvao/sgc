@@ -82,7 +82,7 @@
       @confirmar-enviar-lembrete="enviarLembreteConfirmado"
       @confirmar-reabertura="confirmarReabertura"
       @fechar-modal-data="fecharModalAlterarDataLimite"
-      @update:justificativaReabertura="justificativaReabertura = $event"
+      @update:justificativa-reabertura="justificativaReabertura = $event"
       @update:modalLembreteAberto="modalLembreteAberto = $event"
       @update:mostrarModalReabrir="mostrarModalReabrir = $event"
   />

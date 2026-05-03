@@ -54,7 +54,7 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
       :ok-title="TEXTOS.comum.BOTAO_REABRIR"
       test-codigo-confirmar="btn-confirmar-reabrir"
       variant="success"
-      @update:modelValue="$emit('update:mostrarModalReabrir', $event)"
+      @update:model-value="$emit('update:mostrarModalReabrir', $event)"
       @confirmar="$emit('confirmar-reabertura')"
   >
     <p>{{ TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PREFIXO }} {{
@@ -86,7 +86,7 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
       test-codigo-confirmar="btn-confirmar-enviar-lembrete"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
       variant="success"
-      @update:modelValue="$emit('update:modalLembreteAberto', $event)"
+      @update:model-value="$emit('update:modalLembreteAberto', $event)"
       @confirmar="$emit('confirmar-enviar-lembrete')"
   >
     <p data-testid="txt-modelo-lembrete">

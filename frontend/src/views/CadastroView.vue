@@ -123,14 +123,14 @@
           @confirmar-validacao-analise="confirmarValidacaoAnalise"
           @fechar-impacto="fecharModalImpacto"
           @importar="handleImportAtividades"
-          @update:mostrarModalConfirmacao="mostrarModalConfirmacao = $event"
-          @update:mostrarModalConfirmacaoRemocao="mostrarModalConfirmacaoRemocao = $event"
-          @update:mostrarModalDevolverAnalise="mostrarModalDevolverAnalise = $event"
-          @update:mostrarModalHistorico="mostrarModalHistorico = $event"
-          @update:mostrarModalImportar="mostrarModalImportar = $event"
-          @update:mostrarModalValidarAnalise="mostrarModalValidarAnalise = $event"
-          @update:observacaoDevolucao="observacaoDevolucao = $event"
-          @update:observacaoValidacao="observacaoValidacao = $event"
+          @update:mostrar-modal-confirmacao="mostrarModalConfirmacao = $event"
+          @update:mostrar-modal-confirmacao-remocao="mostrarModalConfirmacaoRemocao = $event"
+          @update:mostrar-modal-devolver-analise="mostrarModalDevolverAnalise = $event"
+          @update:mostrar-modal-historico="mostrarModalHistorico = $event"
+          @update:mostrar-modal-importar="mostrarModalImportar = $event"
+          @update:mostrar-modal-validar-analise="mostrarModalValidarAnalise = $event"
+          @update:observacao-devolucao="observacaoDevolucao = $event"
+          @update:observacao-validacao="observacaoValidacao = $event"
       />
     </template>
   </LayoutPadrao>
@@ -230,16 +230,6 @@ const atividadesOrdenadas = computed(() => {
   return [...atividades.value].sort((a, b) => (b.codigo || 0) - (a.codigo || 0));
 });
 
-const habilitarDisponibilizar = computed(() => {
-  const cadastroCompleto = atividades.value.length > 0 &&
-      atividades.value.every((atividade) => atividade.conhecimentos && atividade.conhecimentos.length > 0);
-
-  if (isRevisao.value) {
-    return cadastroCompleto && (houveAlteracaoCadastro.value || disponibilizacaoSemMudancas.value);
-  }
-
-  return cadastroCompleto;
-});
 
 
 
@@ -247,10 +237,7 @@ const situacaoAtual = computed(() => subprocesso.value?.situacao);
 const {
   disponibilizacaoSemMudancas,
   checkboxSemMudancasDesabilitado,
-  precisaIniciarRevisao,
   loadingInicioRevisao,
-  iniciarRevisaoSeNecessario,
-  cancelarInicioRevisaoSeNecessario,
   sincronizarDisponibilizacaoSemMudancasInicial
 } = useCadastroRevisaoSemMudancas({
   codigoSubprocesso,
@@ -389,9 +376,7 @@ const {
   observacaoDevolucao,
   abrirModalHistorico,
   abrirModalValidarAnalise,
-  fecharModalValidarAnalise,
   abrirModalDevolverAnalise,
-  fecharModalDevolverAnalise,
   confirmarValidacaoAnalise,
   confirmarDevolucaoAnalise,
 } = useCadastroAnaliseFluxo({

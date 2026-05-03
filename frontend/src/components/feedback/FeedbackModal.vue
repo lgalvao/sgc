@@ -76,13 +76,19 @@ function abrirCapturaEmNovaAba() {
             <div v-if="urlCaptura" class="mb-3">
                 <p class="form-label mb-1 small text-muted">Captura de tela incluída:</p>
                 <div class="d-flex align-items-center gap-2">
-                    <img
-                        :src="urlCaptura"
-                        alt="Prévia da captura de tela"
-                        class="img-thumbnail feedback-thumbnail"
-                        style="max-width: 200px; cursor: pointer"
+                    <button
+                        type="button"
+                        class="btn p-0 border-0"
+                        title="Abrir captura em nova aba"
                         @click="abrirCapturaEmNovaAba"
-                    />
+                    >
+                        <img
+                            :src="urlCaptura"
+                            alt="Prévia da captura de tela"
+                            class="img-thumbnail feedback-thumbnail"
+                            style="max-width: 200px"
+                        />
+                    </button>
                     <button
                         class="btn btn-sm btn-link text-danger p-0"
                         type="button"
