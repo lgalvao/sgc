@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import CompetenciaEdicaoModal from '../modais/CompetenciaEdicaoModal.vue';
 import type {Atividade, Competencia} from '@/types/tipos';
@@ -6,7 +6,6 @@ import type {Atividade, Competencia} from '@/types/tipos';
 const atividadeBase = (codigo: number, descricao: string): Atividade => ({
     codigo,
     descricao,
-    ordem: codigo,
     conhecimentos: [],
 });
 
@@ -14,7 +13,6 @@ const competenciaBase = (codigo: number, atv: Atividade[] = []): Competencia => 
     codigo,
     descricao: `Competência ${codigo}`,
     atividades: atv,
-    mapaCodigo: 1,
 });
 
 describe('CompetenciaEdicaoModal.vue', () => {

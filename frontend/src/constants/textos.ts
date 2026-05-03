@@ -268,6 +268,8 @@ export const TEXTOS = {
     NOTIFICACOES_PREVIEW_CRIACAO: "Criado em",
     NOTIFICACOES_MODAL_REENVIAR_TITULO: "Reenviar e-mail",
     NOTIFICACOES_ERRO_CARREGAR: "Não foi possível carregar as notificações",
+    NOTIFICACOES_SUCESSO_REENVIO: "E-mail recolocado na fila de envio",
+    NOTIFICACOES_ERRO_REENVIO: "Erro ao reenviar e-mail",
     NOTIFICACOES_CAMPOS: {
       DESTINATARIO: "Destinatário",
       PROCESSO: "Processo",

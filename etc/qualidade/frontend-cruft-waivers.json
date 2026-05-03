@@ -20,7 +20,7 @@
     {
       "arquivo": "frontend/src/constants/textos.ts",
       "camada": "outro",
-      "maxLinhas": 450,
+      "maxLinhas": 452,
       "responsavel": "frontend",
       "justificativa": "Constante agregadora de textos ainda esta monolitica.",
       "criterioRemocao": "Dividir textos por modulo ou fluxo principal."

@@ -71,8 +71,8 @@
           </template>
 
           <template #cell(situacao)="{ item }">
-            <BBadge :variante="statusVariant(item.situacao)">
-              {{ statusLabel(item.situacao) }}
+            <BBadge :variante="obterStatusNotificacao(item.situacao).variant">
+              {{ obterStatusNotificacao(item.situacao).label }}
             </BBadge>
           </template>
 
@@ -163,7 +163,7 @@
           <dd class="col-sm-8">{{ formatarTipoNotificacao(itemParaDetalhes.tipoNotificacao) }}</dd>
 
           <dt class="col-sm-4">Situação</dt>
-          <dd class="col-sm-8">{{ statusLabel(itemParaDetalhes.situacao) }}</dd>
+          <dd class="col-sm-8">{{ obterStatusNotificacao(itemParaDetalhes.situacao).label }}</dd>
 
           <dt class="col-sm-4">Criado em</dt>
           <dd class="col-sm-8">{{ formatarDataOuHifen(itemParaDetalhes.dataHoraCriacao) }}</dd>
@@ -268,37 +268,16 @@ const camposTabela = [
 
 const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
 
-function statusLabel(status: StatusNotificacao): string {
-  const labels: Record<StatusNotificacao, string> = {
-    ENVIADO: "Enviado",
-    PENDENTE: "Pendente",
-    ENVIANDO: "Enviando...",
-    FALHA_TEMPORARIA: "Falha temporária",
-    FALHA_DEFINITIVA: "Falha definitiva",
-  };
-  return labels[status];
-}
+const STATUS_NOTIFICACAO: Record<StatusNotificacao, {label: string; variant: string; prioridade: number}> = {
+  ENVIADO:          {label: "Enviado",          variant: "success",   prioridade: 4},
+  PENDENTE:         {label: "Pendente",         variant: "secondary", prioridade: 2},
+  ENVIANDO:         {label: "Enviando...",       variant: "primary",   prioridade: 3},
+  FALHA_TEMPORARIA: {label: "Falha temporária", variant: "warning",   prioridade: 1},
+  FALHA_DEFINITIVA: {label: "Falha definitiva", variant: "danger",    prioridade: 0},
+};
 
-function statusVariant(status: StatusNotificacao) {
-  const variants = {
-    ENVIADO: "success",
-    PENDENTE: "secondary",
-    ENVIANDO: "primary",
-    FALHA_TEMPORARIA: "warning",
-    FALHA_DEFINITIVA: "danger",
-  } as const;
-  return variants[status];
-}
-
-function prioridadeStatus(status: StatusNotificacao): number {
-  const prioridades: Record<StatusNotificacao, number> = {
-    FALHA_DEFINITIVA: 0,
-    FALHA_TEMPORARIA: 1,
-    PENDENTE: 2,
-    ENVIANDO: 3,
-    ENVIADO: 4,
-  };
-  return prioridades[status];
+function obterStatusNotificacao(status: StatusNotificacao) {
+  return STATUS_NOTIFICACAO[status];
 }
 
 function formatarDataOuHifen(valor?: string | null): string {
@@ -347,7 +326,7 @@ function formatarQuando(item: Notificacao): string {
 }
 
 function compararNotificacoes(a: Notificacao, b: Notificacao): number {
-  const prioridade = prioridadeStatus(a.situacao) - prioridadeStatus(b.situacao);
+  const prioridade = STATUS_NOTIFICACAO[a.situacao].prioridade - STATUS_NOTIFICACAO[b.situacao].prioridade;
   if (prioridade !== 0) {
     return prioridade;
   }
@@ -392,9 +371,9 @@ function montarPreviewHtml(corpoHtml?: string): string {
 
 function limparHtmlPreview(html: string): string {
   return html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-      .replace(/\son\w+=(["']).*?\1/gi, "")
-      .replace(/\son\w+=([^\s>]+)/gi, "");
+      .replaceAll(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      .replaceAll(/\son\w+=(["']).*?\1/gi, "")
+      .replaceAll(/\son\w+=([^\s>]+)/gi, "");
 }
 
 async function carregar() {
@@ -429,12 +408,12 @@ async function reenviar() {
   reenviando.value = true;
   try {
     await reenviarNotificacao(itemSelecionado.value.codigo);
-    notify("E-mail recolocado na fila de envio", "success");
+    notify(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO, "success");
     mostrarModalReenvio.value = false;
     itemSelecionado.value = null;
     await carregar();
   } catch (error) {
-    notify(normalizarErro(error).mensagem || "Erro ao reenviar e-mail", "danger");
+    notify(normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO, "danger");
   } finally {
     reenviando.value = false;
   }

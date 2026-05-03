@@ -12,8 +12,6 @@ import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
 import sgc.feedback.dto.*;
 import sgc.seguranca.*;
-import tools.jackson.databind.*;
-
 import java.time.*;
 import java.util.*;
 
@@ -31,9 +29,6 @@ class FeedbackControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @MockitoBean
     private FeedbackService feedbackService;

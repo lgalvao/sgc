@@ -1,6 +1,5 @@
 package sgc.feedback.dto;
 
-import jakarta.validation.*;
 import jakarta.validation.constraints.*;
 import org.jspecify.annotations.*;
 import sgc.feedback.*;

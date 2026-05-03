@@ -289,9 +289,6 @@ async function carregarProcessoParaEdicao(codProcesso: number) {
   isLoadingData.value = true;
   try {
     const processo = await processoService.obterDetalhesProcesso(codProcesso);
-    if (!processo) {
-      return;
-    }
     if (processo.situacao !== 'CRIADO') {
       await router.push(`/processo/${processo.codigo}`);
       return;
@@ -452,9 +449,7 @@ async function confirmarRemocao() {
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
       invalidarCachesProcesso();
       await router.push("/painel");
-      if (!processoEditando.value) {
-        limparCampos();
-      }
+      limparCampos();
       fecharModalRemocao();
     } catch (error) {
       fecharModalRemocao();
