@@ -90,7 +90,7 @@ describe('useFeedback', () => {
     })
 
     it('deve continuar sem screenshot quando html2canvas falha', async () => {
-        const spyWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+        const spyError = vi.spyOn(console, 'error').mockImplementation(() => {})
         const html2canvas = await import('html2canvas')
         vi.mocked(html2canvas.default).mockRejectedValueOnce(new Error('canvas error'))
 
@@ -99,11 +99,11 @@ describe('useFeedback', () => {
 
         await fb.capturarTela()
         expect(fb.captura.value).toBeNull()
-        expect(spyWarn).toHaveBeenCalledWith(
+        expect(spyError).toHaveBeenCalledWith(
             expect.stringContaining('[Feedback] Captura de tela falhou'),
             expect.any(Error)
         )
-        spyWarn.mockRestore()
+        spyError.mockRestore()
     })
 
     it('deve definir enviando como true durante o envio e false ao finalizar', async () => {
