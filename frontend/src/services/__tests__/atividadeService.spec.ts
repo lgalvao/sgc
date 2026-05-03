@@ -11,26 +11,6 @@ describe("atividadeService", () => {
         setActivePinia(createPinia());
     });
 
-    it("listarAtividades deve buscar atividades", async () => {
-        const dtoList = [{codigo: 1, descricao: "Atividade DTO"}];
-        mockApi.get.mockResolvedValue({data: dtoList});
-
-        const result = await service.listarAtividades();
-
-        expect(mockApi.get).toHaveBeenCalledWith("/atividades");
-        expect(result).toEqual(dtoList);
-    });
-
-    it("obterAtividadePorCodigo deve buscar uma atividade", async () => {
-        const dto = {codigo: 1, descricao: "Atividade DTO"};
-        mockApi.get.mockResolvedValue({data: dto});
-
-        const result = await service.obterAtividadePorCodigo(1);
-
-        expect(mockApi.get).toHaveBeenCalledWith("/atividades/1");
-        expect(result).toEqual(dto);
-    });
-
     it("criarAtividade deve enviar POST", async () => {
         const request = {descricao: "Nova"};
         const responseDto = {
@@ -87,16 +67,6 @@ describe("atividadeService", () => {
         expect(result).toEqual(responseDto);
     });
 
-    it("listarConhecimentos deve buscar conhecimentos", async () => {
-        const dtoList = [{codigo: 1, descricao: "Conhecimento DTO"}];
-        mockApi.get.mockResolvedValue({data: dtoList});
-
-        const result = await service.listarConhecimentos(1);
-
-        expect(mockApi.get).toHaveBeenCalledWith("/atividades/1/conhecimentos");
-        expect(result).toEqual(dtoList);
-    });
-
     it("criarConhecimento deve enviar POST e retornar AtividadeOperacaoResponse", async () => {
         const request = {descricao: "Novo conhecimento"};
         const responseDto = {
@@ -151,12 +121,9 @@ describe("atividadeService", () => {
     });
 
     describe("Tratamento de erros", () => {
-        testErrorHandling(() => service.listarAtividades());
-        testErrorHandling(() => service.obterAtividadePorCodigo(1));
         testErrorHandling(() => service.criarAtividade({descricao: "Nova"}, 123), 'post');
         testErrorHandling(() => service.atualizarAtividade(1, {codigo: 1} as any), 'post');
         testErrorHandling(() => service.excluirAtividade(1), 'post');
-        testErrorHandling(() => service.listarConhecimentos(1));
         testErrorHandling(() => service.criarConhecimento(1, {descricao: "Novo"}), 'post');
         testErrorHandling(() => service.atualizarConhecimento(1, 1, {codigo: 1} as any), 'post');
         testErrorHandling(() => service.excluirConhecimento(1, 1), 'post');

@@ -2,7 +2,6 @@ import {describe, expect, it} from 'vitest';
 import {
     formatarDataBR,
     ehDataEstritamenteFutura,
-    ehDataValidaEFutura,
     obterAmanhaFormatado,
     obterHojeFormatado,
     analisarData
@@ -42,12 +41,10 @@ describe('dateUtils', () => {
     expect(formatarDataBR("invalid")).toBe("Data inválida");
   });
 
-  it('ehDataValidaEFutura and ehDataEstritamenteFutura', () => {
-    expect(ehDataValidaEFutura(null)).toBe(false);
+  it('ehDataEstritamenteFutura', () => {
     expect(ehDataEstritamenteFutura(null)).toBe(false);
     
     const today = new Date();
-    expect(ehDataValidaEFutura(today)).toBe(true);
     expect(ehDataEstritamenteFutura(today)).toBe(false);
     
     const tomorrow = new Date();

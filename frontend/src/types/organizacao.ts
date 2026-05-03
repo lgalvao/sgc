@@ -49,20 +49,9 @@ export interface Usuario {
   perfis?: string[];
 }
 
-export interface AtribuicaoTemporaria {
-  codigo: number;
-  usuario: Usuario;
-  unidade: Unidade;
-  dataInicio: string;
-  dataFim: string;
-  dataTermino: string;
-  justificativa: string;
-}
-
 export interface UnidadeSnapshot {
   codigo: number;
   nome: string;
   sigla: string;
   filhas?: UnidadeSnapshot[];
 }
-

@@ -7,11 +7,6 @@ export interface CriarAtribuicaoTemporariaRequest {
     justificativa: string;
 }
 
-export async function buscarTodasAtribuicoes() {
-    const response = await apiClient.get("/unidades/atribuicoes");
-    return response.data;
-}
-
 export async function criarAtribuicaoTemporaria(
     codUnidade: number,
     request: CriarAtribuicaoTemporariaRequest,

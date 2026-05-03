@@ -21,7 +21,6 @@ const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, 
 vi.mock("@/services/painelService", () => ({
     obterBootstrap: vi.fn(),
     listarProcessos: vi.fn(),
-    listarAlertas: vi.fn(),
     marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -38,7 +37,6 @@ describe("PainelView.vue", () => {
             processos: [],
             alertas: []
         });
-        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
         (painelService.listarProcessos as any).mockResolvedValue(mockPageVazia);
     });
 
@@ -140,8 +138,7 @@ describe("PainelView.vue", () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(painelService.listarProcessos).not.toHaveBeenCalled();
-        expect(painelService.listarAlertas).not.toHaveBeenCalled();
+        expect(painelService.obterBootstrap).not.toHaveBeenCalled();
     });
 
     it("deve mostrar botão de criar processo apenas para admin", async () => {

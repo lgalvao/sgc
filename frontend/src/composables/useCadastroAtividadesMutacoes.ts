@@ -48,6 +48,7 @@ export function useCadastroAtividadesMutacoes({
     };
 
     const prepararRemocao = (tipo: "atividade" | "conhecimento", atividadeCodigo: number, conhecimentoCodigo?: number) => {
+        if (!codigoSubprocesso.value) return;
         dadosRemocao.value = {tipo, atividadeCodigo, conhecimentoCodigo};
         mostrarModalConfirmacaoRemocao.value = true;
     };

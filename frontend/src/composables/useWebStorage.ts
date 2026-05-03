@@ -33,17 +33,3 @@ export function useWebStorage<T>(
 
     return valorArmazenado;
 }
-
-export function removerDoArmazenamento(
-    armazenamento: ArmazenamentoWeb,
-    chave: string,
-): void {
-    armazenamento.removeItem(chave);
-}
-
-export function removerMultiplosDoArmazenamento(
-    armazenamento: ArmazenamentoWeb,
-    chaves: string[],
-): void {
-    chaves.forEach((chave) => armazenamento.removeItem(chave));
-}

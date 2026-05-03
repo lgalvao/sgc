@@ -7,12 +7,6 @@ vi.mock("@/utils/date", async () => {
     return {
         ...actual,
         obterAmanhaFormatado: () => '2026-03-25',
-        ehDataValidaEFutura: (d: any) => {
-            if (!d) return false;
-            // Simplificado para o teste
-            const dateStr = typeof d === 'string' ? d : d.toISOString().split('T')[0];
-            return dateStr > '2026-03-24';
-        },
         analisarData: (d: string) => new Date(d + 'T12:00:00')
     };
 });

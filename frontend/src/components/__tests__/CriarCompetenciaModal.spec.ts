@@ -122,8 +122,8 @@ describe("CriarCompetenciaModal.vue", () => {
         await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.text()).toContain('A descrição da competência é obrigatória.');
-        expect(wrapper.text()).toContain('Selecione ao menos uma atividade para criar a competência.');
+        expect(wrapper.text()).toContain('A descrição é obrigatória.');
+        expect(wrapper.text()).toContain('Selecione ao menos uma atividade.');
         expect(wrapper.emitted('salvar')).toBeFalsy();
     });
 

@@ -34,7 +34,6 @@ const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, 
 vi.mock("@/services/painelService", () => ({
     obterBootstrap: vi.fn(),
     listarProcessos: vi.fn(),
-    listarAlertas: vi.fn(),
     marcarAlertasLidos: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -51,7 +50,6 @@ describe('PainelView Coverage', () => {
             processos: [],
             alertas: []
         });
-        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
         (painelService.listarProcessos as any).mockResolvedValue(mockPageVazia);
     });
 

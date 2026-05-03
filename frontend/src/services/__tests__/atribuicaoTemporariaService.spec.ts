@@ -1,18 +1,9 @@
 import {describe} from "vitest";
-import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
-import {buscarTodasAtribuicoes, criarAtribuicaoTemporaria} from "../atribuicaoTemporariaService";
+import {setupServiceTest, testErrorHandling, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
+import {criarAtribuicaoTemporaria} from "../atribuicaoTemporariaService";
 
 describe("atribuicaoTemporariaService", () => {
     setupServiceTest();
-
-    describe("buscarTodasAtribuicoes", () => {
-        testGetEndpoint(
-            () => buscarTodasAtribuicoes(),
-            "/unidades/atribuicoes",
-            [{codigo: 1}]
-        );
-        testErrorHandling(() => buscarTodasAtribuicoes());
-    });
 
     describe("criarAtribuicaoTemporaria", () => {
         const request = {

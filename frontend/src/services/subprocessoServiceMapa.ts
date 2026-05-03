@@ -1,7 +1,6 @@
 import type {
     DisponibilizarMapaRequest,
     ImpactoMapa,
-    MapaAjuste,
     MapaCompleto,
     SalvarAjustesRequest,
     SalvarCompetenciaRequest,
@@ -12,7 +11,6 @@ import {
     caminhoSubprocesso,
     type ImpactoMapaResponse,
     mapearPayloadCompetencia,
-    postarAcaoEmBloco,
 } from "./subprocessoServiceBase";
 
 const obter = async <T>(caminho: string): Promise<T> => (await apiClient.get<T>(caminho)).data;
@@ -46,7 +44,6 @@ export async function verificarImpactosMapa(codSubprocesso: number): Promise<Imp
 
 export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> { return obter<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo")); }
 export async function salvarMapaCompleto(codSubprocesso: number, data: SalvarMapaRequest): Promise<MapaCompleto> { return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo"), data); }
-export async function obterMapaAjuste(codSubprocesso: number): Promise<MapaAjuste> { return obter<MapaAjuste>(caminhoSubprocesso(codSubprocesso, "/mapa-ajuste")); }
 export async function salvarMapaAjuste(codSubprocesso: number, data: SalvarAjustesRequest): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/mapa-ajuste/atualizar"), data); }
 export async function disponibilizarMapa(codSubprocesso: number, data: DisponibilizarMapaRequest): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/disponibilizar-mapa"), data); }
 export async function validarMapa(codSubprocesso: number): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/validar-mapa")); }
@@ -71,26 +68,4 @@ export async function atualizarCompetencia(
 
 export async function removerCompetencia(codSubprocesso: number, codCompetencia: number): Promise<MapaCompleto> {
     return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, `/competencia/${codCompetencia}/remover`));
-}
-
-export async function aceitarCadastroEmBloco(payload: { unidadeCodigos: number[] }): Promise<void> {
-    await postarAcaoEmBloco("aceitar-cadastro-bloco", payload);
-}
-
-export async function homologarCadastroEmBloco(payload: { unidadeCodigos: number[] }): Promise<void> {
-    await postarAcaoEmBloco("homologar-cadastro-bloco", payload);
-}
-
-export async function aceitarValidacaoEmBloco(payload: { unidadeCodigos: number[] }): Promise<void> {
-    await postarAcaoEmBloco("aceitar-validacao-bloco", payload);
-}
-
-export async function homologarValidacaoEmBloco(payload: { unidadeCodigos: number[] }): Promise<void> {
-    await postarAcaoEmBloco("homologar-validacao-bloco", payload);
-}
-
-export async function disponibilizarMapaEmBloco(
-    payload: { unidadeCodigos: number[]; dataLimite?: string },
-): Promise<void> {
-    await postarAcaoEmBloco("disponibilizar-mapa-bloco", payload);
 }

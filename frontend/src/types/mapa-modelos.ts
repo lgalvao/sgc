@@ -39,14 +39,6 @@ export interface MapaResumo {
   dataHoraHomologado?: string | null;
 }
 
-export interface MapaVisualizacao {
-  codigo: number;
-  descricao: string;
-  competencias: Competencia[];
-  atividadesSemCompetencia?: Atividade[];
-  sugestoes?: string;
-}
-
 export interface MapaCompleto {
   codigo: number;
   subprocessoCodigo: number;
@@ -54,10 +46,4 @@ export interface MapaCompleto {
   competencias: Competencia[];
   atividades: Atividade[];
   situacao: string;
-}
-
-export interface MapaAjuste {
-  codigo: number;
-  descricao: string;
-  competencias: Competencia[];
 }

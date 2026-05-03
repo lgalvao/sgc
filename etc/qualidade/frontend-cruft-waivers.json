@@ -50,6 +50,14 @@
       "criterioRemocao": "Extrair secoes do formulario e bootstrap de dados."
     },
     {
+      "arquivo": "frontend/src/views/AtribuicaoTemporariaView.vue",
+      "camada": "view",
+      "maxLinhas": 312,
+      "responsavel": "frontend",
+      "justificativa": "Tela ainda agrega busca, formulario e listagem.",
+      "criterioRemocao": "Extrair formulario e listagem da atribuicao temporaria."
+    },
+    {
       "arquivo": "frontend/src/components/comum/TreeTable.vue",
       "camada": "component",
       "maxLinhas": 360,
@@ -161,22 +169,6 @@
       "responsavel": "frontend",
       "justificativa": "Componente ainda concentra card, estado e acoes do subprocesso.",
       "criterioRemocao": "Extrair card base e acoes contextuais do subprocesso."
-    },
-    {
-      "arquivo": "frontend/src/components/mapa/CriarCompetenciaModal.vue",
-      "camada": "component",
-      "maxLinhas": 208,
-      "responsavel": "frontend",
-      "justificativa": "Modal ainda concentra fluxo completo de criacao de competencia.",
-      "criterioRemocao": "Separar formulario, selecao de atividades e validacao."
-    },
-    {
-      "arquivo": "frontend/src/types/dtos.ts",
-      "camada": "outro",
-      "maxLinhas": 150,
-      "responsavel": "frontend",
-      "justificativa": "Arquivo central de DTOs ainda agrega contratos distintos.",
-      "criterioRemocao": "Separar DTOs por dominio e fluxo."
     },
     {
       "arquivo": "frontend/src/components/unidade/UnidadeTreeNode.vue",

@@ -6,8 +6,7 @@ vi.mock("@/utils/date", async () => {
     const actual = await vi.importActual("@/utils/date") as any;
     return {
         ...actual,
-        obterAmanhaFormatado: () => '2026-03-25',
-        ehDataValidaEFutura: (d: string) => d > '2026-03-24'
+        obterAmanhaFormatado: () => '2026-03-25'
     };
 });
 

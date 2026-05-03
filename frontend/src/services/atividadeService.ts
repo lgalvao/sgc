@@ -7,16 +7,6 @@ import type {
 } from "@/types/tipos";
 import apiClient from "@/axios-setup";
 
-export async function listarAtividades(): Promise<Atividade[]> {
-    const response = await apiClient.get<Atividade[]>("/atividades");
-    return response.data;
-}
-
-export async function obterAtividadePorCodigo(codAtividade: number): Promise<Atividade> {
-    const response = await apiClient.get<Atividade>(`/atividades/${codAtividade}`);
-    return response.data;
-}
-
 export async function criarAtividade(
     request: CriarAtividadeRequest,
     codMapa: number,
@@ -39,15 +29,6 @@ export async function atualizarAtividade(
 
 export async function excluirAtividade(codAtividade: number): Promise<AtividadeOperacaoResponse> {
     const response = await apiClient.post<AtividadeOperacaoResponse>(`/atividades/${codAtividade}/excluir`);
-    return response.data;
-}
-
-export async function listarConhecimentos(
-    codAtividade: number,
-): Promise<Conhecimento[]> {
-    const response = await apiClient.get<Conhecimento[]>(
-        `/atividades/${codAtividade}/conhecimentos`,
-    );
     return response.data;
 }
 

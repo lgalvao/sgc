@@ -7,8 +7,7 @@ vi.mock("@/utils/date", async () => {
     return {
         ...actual,
         obterAmanhaFormatado: () => '2026-03-25',
-        ehDataEstritamenteFutura: (d: string) => d > '2026-03-24',
-        ehDataValidaEFutura: (d: string) => d > '2026-03-24'
+        ehDataEstritamenteFutura: (d: string) => d > '2026-03-24'
     };
 });
 

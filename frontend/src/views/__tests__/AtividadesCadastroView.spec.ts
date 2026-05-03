@@ -406,7 +406,6 @@ describe("CadastroView.vue", () => {
             alterarDataLimiteSubprocesso: vi.fn().mockResolvedValue(true),
         } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
         vi.mocked(subprocessoService.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(criarContextoEdicao() as never);
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoCadastroAtividades).mockResolvedValue(criarContextoEdicao());
     });
 

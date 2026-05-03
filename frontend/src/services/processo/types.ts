@@ -5,11 +5,8 @@ import {
     type Processo,
     type ProcessoResumo,
     SituacaoProcesso,
-    type Subprocesso,
-    type SubprocessoElegivel,
     TipoProcesso,
-    type UnidadeImportacao,
-    type UnidadeParticipante
+    type UnidadeImportacao
 } from "@/types/tipos";
 import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
 
@@ -19,10 +16,7 @@ export type {
     CriarProcessoRequest,
     Processo,
     ProcessoResumo,
-    Subprocesso,
-    SubprocessoElegivel,
-    UnidadeImportacao,
-    UnidadeParticipante
+    UnidadeImportacao
 };
 
 export interface ProcessoDetalheResponseBackend extends ProcessoDetalheDto {

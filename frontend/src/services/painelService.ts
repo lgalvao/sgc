@@ -45,26 +45,6 @@ export async function listarProcessos(
     return response.data;
 }
 
-export async function listarAlertas(
-    params: ListarParams<"dataHora" | "processo"> = {}
-): Promise<Page<Alerta>> {
-    const { codUnidade, page = 0, size = 20, sort, order } = params;
-    const queryParams: Record<string, string | number> = {
-        page,
-        size,
-    };
-    if (codUnidade !== undefined && codUnidade !== null) {
-        queryParams.unidade = codUnidade;
-    }
-    if (sort) {
-        queryParams.sort = `${sort},${order}`;
-    }
-    const response = await apiClient.get<Page<Alerta>>("/painel/alertas", {
-        params: queryParams,
-    });
-    return response.data;
-}
-
 export async function marcarAlertasLidos(codigos: number[]): Promise<void> {
     await apiClient.post("/painel/alertas/marcar-lidos", codigos);
 }

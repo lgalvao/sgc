@@ -6,7 +6,6 @@ import type {
     SubprocessoDetalheResponse,
 } from "@/types/tipos";
 import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
-import apiClient from "../axios-setup";
 
 export const CAMINHO_SUBPROCESSOS = "/subprocessos";
 
@@ -14,8 +13,6 @@ export interface ImportarAtividadesRequest {
     codSubprocessoOrigem: number;
     codigosAtividades?: number[];
 }
-
-export interface BuscarSubprocessoPorProcessoEUnidadeResponse { codigo: number; }
 
 export interface ImpactoMapaResponse {
     temImpactos: boolean;
@@ -69,14 +66,4 @@ export function mapearPayloadCompetencia(competencia: SalvarCompetenciaRequest) 
         descricao: competencia.descricao,
         atividadesCodigos: competencia.atividadesCodigos,
     };
-}
-
-export async function postarAcaoEmBloco(
-    acao: string,
-    payload: { unidadeCodigos: number[]; dataLimite?: string },
-): Promise<void> {
-    await apiClient.post(`${CAMINHO_SUBPROCESSOS}/${acao}`, {
-        subprocessos: payload.unidadeCodigos,
-        ...(payload.dataLimite ? {dataLimite: payload.dataLimite} : {}),
-    });
 }
