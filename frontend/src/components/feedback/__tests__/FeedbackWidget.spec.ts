@@ -4,6 +4,7 @@ import FeedbackWidget from '../FeedbackWidget.vue'
 import {createTestingPinia} from '@pinia/testing'
 import * as useFeedbackModule from '@/composables/useFeedback'
 import * as bootstrapVueNext from 'bootstrap-vue-next'
+import FeedbackModal from '../FeedbackModal.vue'
 
 // Mock do composable useFeedback
 const mockUseFeedback = {
@@ -67,7 +68,7 @@ describe('FeedbackWidget.vue', () => {
         
         expect(mockUseFeedback.capturarTela).toHaveBeenCalled()
         // O modal deve estar visível (verificando a prop do componente stub)
-        const modal = wrapper.findComponent({name: 'FeedbackModal'})
+        const modal = wrapper.findComponent(FeedbackModal)
         expect(modal.props('visivel')).toBe(true)
     })
 
@@ -90,7 +91,7 @@ describe('FeedbackWidget.vue', () => {
         })
         
         // Simular o evento 'enviar' do modal
-        const modal = wrapper.findComponent({name: 'FeedbackModal'})
+        const modal = wrapper.findComponent(FeedbackModal)
         await modal.vm.$emit('enviar', 'ELOGIO', '5')
         
         expect(mockUseFeedback.enviarFeedback).toHaveBeenCalledWith('ELOGIO', '5')
@@ -117,7 +118,7 @@ describe('FeedbackWidget.vue', () => {
             }
         })
         
-        const modal = wrapper.findComponent({name: 'FeedbackModal'})
+        const modal = wrapper.findComponent(FeedbackModal)
         await modal.vm.$emit('enviar', 'BUG', '1')
         
         expect(mockCriarToast).toHaveBeenCalledWith(expect.objectContaining({
