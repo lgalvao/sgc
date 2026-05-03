@@ -40,7 +40,7 @@ defineProps<{ id?: string; placeholder?: string; state?: boolean | null; dataTes
 const inputRef = ref<InstanceType<typeof BFormInput> | null>(null);
 const {
   usuariosEncontrados, pesquisandoUsuarios, mostrarResultadosUsuarios, indiceUsuarioDestacado, termoPesquisaMinimaAtingida,
-  aoAlterarTermo, selecionarUsuario, agendarOcultacao, limparResultados, calcularProximoIndice
+  aoAlterarTermo, selecionarUsuario, agendarOcultacao, calcularProximoIndice
 } = useBuscadorUsuarios(termo, selecionado);
 
 async function destacarUsuario(indice: number) {
