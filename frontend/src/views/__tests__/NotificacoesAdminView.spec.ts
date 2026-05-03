@@ -5,10 +5,14 @@ import {createTestingPinia} from '@pinia/testing';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
 
-vi.mock('@/services/notificacaoService', () => ({
-  listarNotificacoesAdmin: vi.fn(),
-  reenviarNotificacao: vi.fn()
-}));
+vi.mock('@/services/notificacaoService', async (importActual) => {
+  const actual = await importActual<typeof import('@/services/notificacaoService')>();
+  return {
+    ...actual,
+    listarNotificacoesAdmin: vi.fn(),
+    reenviarNotificacao: vi.fn()
+  };
+});
 
 const mockNotify = vi.fn();
 const mockClear = vi.fn();

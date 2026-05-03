@@ -73,6 +73,7 @@ vi.mock('@/services/processo', () => ({
 const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
+    reabrirRevisaoCadastro: vi.fn(),
     lastError: ref(null),
     clearError: vi.fn(),
 };
@@ -171,6 +172,7 @@ describe('SubprocessoView.vue', () => {
         vi.clearAllMocks();
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
+        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = null;
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
@@ -426,7 +428,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento', false);
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
     });
 
     it('reabre revisão com sucesso', async () => {
@@ -444,7 +446,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta', true);
+        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
     });
 
     it('impede reabertura se justificativa vazia e exibe pendência contextual', async () => {

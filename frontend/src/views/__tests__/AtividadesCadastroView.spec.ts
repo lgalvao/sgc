@@ -384,6 +384,10 @@ describe("CadastroView.vue", () => {
                 pushMock("/painel");
                 return Promise.resolve(true);
             }),
+            disponibilizarRevisaoCadastro: vi.fn().mockImplementation(() => {
+                pushMock("/painel");
+                return Promise.resolve(true);
+            }),
             iniciarRevisaoCadastro: vi.fn().mockResolvedValue(true),
             cancelarInicioRevisaoCadastro: vi.fn().mockResolvedValue(true),
             devolverCadastro: vi.fn().mockImplementation(() => {
@@ -394,7 +398,7 @@ describe("CadastroView.vue", () => {
                 pushMock("/painel");
                 return Promise.resolve(true);
             }),
-            homologarCadastro: vi.fn().mockImplementation((_c, _r, _ir, opts) => {
+            homologarCadastro: vi.fn().mockImplementation((_c, _r, opts) => {
                 if (opts?.redirecionarParaPainel) {
                     pushMock("/painel");
                 } else if (opts?.redirecionarPara) {
@@ -502,7 +506,7 @@ describe("CadastroView.vue", () => {
         modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123, false);
+        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123);
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 
