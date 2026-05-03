@@ -77,6 +77,8 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Não tratar service, composable e store como camadas obrigatórias se uma delas só repassa chamadas sem agregar contrato.
 - Se uma única view consome o estado, prefira sincronização local ou contexto explícito.
 - Não criar wrapper visual novo sem ganho claro de contrato, acessibilidade, responsividade ou padronização.
+- Não colapsar visibilidade e habilitação da UI na mesma regra. Se a pessoa usuária pode realizar a ação, mas o workflow, a localização, a permissão contextual ou o carregamento impedem a execução agora, o controle deve continuar visível e ficar desabilitado.
+- Se o backend não separar claramente "pode mostrar" de "pode executar", prefira endurecer o DTO/contrato na borda a recriar regra de permissão no frontend.
 - Preserve textos, navegação e comportamento exigidos por `etc/reqs`.
 
 ## Heurísticas Full-Stack
@@ -106,6 +108,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - stores finas com um único consumidor real;
 - estado exposto mas sem uso em produção;
 - services ou wrappers que só repassam chamada sem agregar contrato;
+- DTOs/permissões que já distinguem capacidade e habilitação, mas cujo frontend ainda trata isso como uma única flag;
 - testes que continuam presos ao fluxo implícito anterior.
 
 ### Frontend: alvos ruins
@@ -114,6 +117,8 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - composable que acumula estado de múltiplas telas sem necessidade real;
 - remoção de componente visual compartilhado que ainda protege contrato de UI;
 - refatoração “estética” que espalha regra de negócio pela view;
+- simplificação que faz ação desabilitada sumir quando o contrato correto de UX pede ação visível e indisponível;
+- compensar DTO fraco com heurística local de perfil, situação ou localização no frontend em vez de corrigir a borda;
 - simplificação que muda textos, navegação ou permissões fora do que `etc/reqs` permite.
 
 ## Fluxo recomendado
@@ -134,6 +139,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 1. Escolher o menor corte seguro.
 - Uma fronteira por vez.
 - Não misturar simplificação estrutural com mudança de regra.
+- Se a simplificação tocar visibilidade de ação, confirme explicitamente se o comportamento correto é ocultar ou desabilitar.
 
 1. Tornar o fluxo explícito.
 - Se dois métodos diferem só por contexto, extraia o contexto.
@@ -142,6 +148,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Se uma tela depende de contexto herdado, prefira buscar uma referência explícita.
 - Se uma action busca um detalhe e a tela precisa dele imediatamente, prefira retornar esse detalhe em vez de depender de leitura posterior do store global.
 - Se uma recarga automática não tem consumidor real além do recurso local afetado, remova o efeito colateral e recarregue só o que a tela usa.
+- Se o frontend precisa decidir entre mostrar e habilitar, prefira um contrato explícito com flags separadas em vez de inferência implícita no componente.
 
 1. Validar logo após cada bloco.
 
@@ -172,6 +179,8 @@ npm run lint
 - Esta duplicação está no backend, no frontend ou atravessa a fronteira entre os dois?
 - Esta dependência precisa mesmo ser global?
 - Esta regra pode ser centralizada sem mudar o contrato externo?
+- Estou simplificando uma regra de UX real ou apenas apagando um estado desabilitado que parecia redundante?
+- A distinção entre "ação inexistente para este perfil" e "ação indisponível neste contexto" continua preservada?
 - A leitura do fluxo ficou mais curta?
 - Há algum collaborator implícito que pode virar dado explícito?
 - Existe código morto liberado por esta simplificação?
