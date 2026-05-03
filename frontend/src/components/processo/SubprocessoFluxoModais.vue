@@ -30,8 +30,8 @@ const emit = defineEmits<{
   (e: "confirmar-enviar-lembrete"): void;
 }>();
 
-function atualizarJustificativaReabertura(valor: string) {
-  emit("update:justificativaReabertura", valor);
+function atualizarJustificativaReabertura(valor: string | number | null) {
+  emit("update:justificativaReabertura", String(valor ?? ""));
 }
 </script>
 

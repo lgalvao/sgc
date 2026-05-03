@@ -120,10 +120,7 @@ import {useSubprocessoCarregamento} from "@/views/subprocessoCarregamento";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
-function formatDataSimples(dataStr: string | null): string {
-  if (!dataStr) return '';
-  return formatDateBR(dataStr);
-}
+function formatDataSimples(dataStr: string | null): string { return dataStr ? formatDateBR(dataStr) : ''; }
 
 function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
   if (!resp?.tipo) return '';
