@@ -356,7 +356,7 @@ onMounted(async () => {
 const codigosAtividadesAssociadas = computed(() => {
   return new Set(
       competencias.value.flatMap((competencia) =>
-          (competencia.atividades || []).map((atividade) => atividade.codigo)
+          competencia.atividades.map((atividade) => atividade.codigo)
       )
   );
 });
@@ -369,7 +369,7 @@ const atividadesSemCompetencia = computed(() => {
 });
 
 const existeCompetenciaSemAtividade = computed(() => {
-  return competencias.value.some((competencia) => (competencia.atividades?.length ?? 0) === 0);
+  return competencias.value.some((competencia) => competencia.atividades.length === 0);
 });
 
 const {errors: fieldErrors, setFromErroNormalizado, clearErrors} = useFormErrors([
