@@ -1,0 +1,147 @@
+package sgc.feedback;
+
+import lombok.extern.slf4j.*;
+import tools.jackson.databind.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import org.springframework.web.multipart.*;
+import sgc.comum.erros.*;
+import sgc.feedback.dto.*;
+import sgc.organizacao.*;
+
+import java.io.*;
+import java.nio.file.*;
+import java.time.*;
+import java.util.*;
+
+/**
+ * Serviço responsável por validar e persistir registros de feedback UAT.
+ *
+ * <p>O {@code usuarioId} e {@code usuarioNome} armazenados na entidade são sempre
+ * extraídos do contexto de segurança — os metadados do cliente são apenas informativos.
+ */
+@Service
+@Slf4j
+@Transactional
+public class FeedbackService {
+
+    private final FeedbackRepo repo;
+    private final FeedbackPropriedades propriedades;
+    private final UsuarioFacade usuarioFacade;
+    private final ObjectMapper objectMapper;
+
+    public FeedbackService(FeedbackRepo repo,
+                           FeedbackPropriedades propriedades,
+                           UsuarioFacade usuarioFacade,
+                           ObjectMapper objectMapper) {
+        this.repo = repo;
+        this.propriedades = propriedades;
+        this.usuarioFacade = usuarioFacade;
+        this.objectMapper = objectMapper;
+    }
+
+    /**
+     * Registra um novo feedback, opcionalmente com screenshot.
+     *
+     * @param payload    dados submetidos pelo usuário
+     * @param screenshot arquivo de captura de tela (pode ser nulo)
+     * @return DTO com o id e a data/hora do registro criado
+     */
+    public FeedbackRespostaDto registrar(FeedbackPayloadDto payload, @Nullable MultipartFile screenshot) {
+        validarNota(payload.nota());
+        validarScreenshot(screenshot);
+
+        var usuario = usuarioFacade.usuarioAutenticado();
+        String metadataJson = serializarMetadados(payload.metadados());
+        String caminhoScreenshot = salvarScreenshot(screenshot);
+
+        String rota = extrairRota(payload.metadados());
+
+        FeedbackRegistro registro = FeedbackRegistro.builder()
+                .tipo(payload.tipo())
+                .nota(payload.nota())
+                .metadataJson(metadataJson)
+                .caminhoScreenshot(caminhoScreenshot)
+                .usuarioId(usuario.getTituloEleitoral())
+                .usuarioNome(usuario.getNome())
+                .enviadoEm(OffsetDateTime.now())
+                .rota(rota)
+                .status(FeedbackStatus.NOVO)
+                .build();
+
+        FeedbackRegistro salvo = repo.save(registro);
+        log.info("Feedback registrado: id={} tipo={} usuario={}", salvo.getId(), salvo.getTipo(), salvo.getUsuarioId());
+        return new FeedbackRespostaDto(salvo.getId(), salvo.getEnviadoEm());
+    }
+
+    private void validarNota(String nota) {
+        if (nota == null || nota.isBlank()) {
+            throw new ErroValidacao("nota não pode estar em branco");
+        }
+        if (nota.length() > 2000) {
+            throw new ErroValidacao("nota não pode exceder 2000 caracteres");
+        }
+    }
+
+    private void validarScreenshot(@Nullable MultipartFile screenshot) {
+        if (screenshot == null || screenshot.isEmpty()) {
+            return;
+        }
+        if (screenshot.getSize() > propriedades.maxScreenshotSizeBytes()) {
+            throw new ErroValidacao("screenshot excede o tamanho máximo permitido de %d bytes".formatted(propriedades.maxScreenshotSizeBytes()));
+        }
+    }
+
+    private @Nullable String salvarScreenshot(@Nullable MultipartFile screenshot) {
+        if (screenshot == null || screenshot.isEmpty()) {
+            return null;
+        }
+
+        String dir = propriedades.screenshotDir();
+        if (dir == null || dir.isBlank()) {
+            log.warn("sgc.feedback.screenshot-dir não configurado; screenshot descartado.");
+            return null;
+        }
+
+        Path diretorioBase = Path.of(dir).toAbsolutePath().normalize();
+        String nomeArquivo = UUID.randomUUID() + "_" + System.currentTimeMillis() + ".webp";
+        Path destino = diretorioBase.resolve(nomeArquivo).normalize();
+
+        // Prevenção de path traversal
+        if (!destino.startsWith(diretorioBase)) {
+            throw new ErroValidacao("caminho de destino inválido para screenshot");
+        }
+
+        try {
+            Files.createDirectories(diretorioBase);
+            Files.write(destino, screenshot.getBytes());
+            return destino.toString();
+        } catch (IOException e) {
+            log.error("Falha ao salvar screenshot: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private @Nullable String serializarMetadados(@Nullable Object metadados) {
+        if (metadados == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(metadados);
+        } catch (Exception e) {
+            log.warn("Falha ao serializar metadados de feedback: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private String extrairRota(@Nullable Object metadados) {
+        if (metadados instanceof JsonNode node) {
+            JsonNode rotaNode = node.get("rotaCaminho");
+            if (rotaNode != null && !rotaNode.isNull()) {
+                return rotaNode.isNull() ? "/desconhecido" : rotaNode.asString();
+            }
+        }
+        return "/desconhecido";
+    }
+}

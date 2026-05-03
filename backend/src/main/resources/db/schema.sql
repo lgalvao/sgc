@@ -976,3 +976,25 @@ create index if not exists idx_unidade_processo_unidade on sgc.unidade_processo 
 create index if not exists idx_notif_email_fila on sgc.notificacao_email (situacao, proxima_tentativa_em, data_hora_criacao);
 create index if not exists idx_notif_email_subproc_sit on sgc.notificacao_email (subprocesso_codigo, situacao);
 create index if not exists idx_notif_email_usuario on sgc.notificacao_email (usuario_destino_titulo);
+
+-- Feedback UAT (perfil hom)
+create table if not exists sgc.sgc_feedback
+(
+    id                 uuid          not null,
+    tipo               varchar(20)   not null,
+    nota               varchar(2000) not null,
+    metadata_json      clob,
+    caminho_screenshot varchar(500),
+    usuario_id         varchar(100)  not null,
+    usuario_nome       varchar(200)  not null,
+    enviado_em         timestamp with time zone not null,
+    rota               varchar(500)  not null,
+    status             varchar(20)   default 'NOVO' not null,
+    constraint pk_sgc_feedback primary key (id),
+    constraint ck_feedback_tipo check (tipo in ('BUG', 'SUGESTAO', 'QUESTAO', 'ELOGIO')),
+    constraint ck_feedback_status check (status in ('NOVO', 'REVISADO', 'RESOLVIDO', 'DESCARTADO'))
+);
+
+create index if not exists idx_feedback_status on sgc.sgc_feedback (status);
+create index if not exists idx_feedback_usuario on sgc.sgc_feedback (usuario_id);
+create index if not exists idx_feedback_data on sgc.sgc_feedback (enviado_em);

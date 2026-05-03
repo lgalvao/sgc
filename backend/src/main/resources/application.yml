@@ -181,6 +181,17 @@ springdoc:
   api-docs.enabled: true
   swagger-ui.enabled: true
 
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+sgc:
+  feedback:
+    screenshot-dir: ${SGC_FEEDBACK_SCREENSHOT_DIR:/var/sgc/feedback/screenshots}
+    max-screenshot-size-bytes: 5242880
+
 logging:
   level:
     org.hibernate: WARN
