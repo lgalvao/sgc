@@ -10,14 +10,16 @@
 - [x] **P1: ProcessoCadastroView.vue** - Simplificado `handleApiErrors` e movida lógica de mapeamento para `useProcessoForm.ts`.
 - [x] **P2: BuscadorUsuarios.vue** - Adicionados guards de igualdade e limpeza automática reativa (removido `defineExpose`).
 - [x] **P3: useFluxoSubprocesso.ts** - Refatorados imports para usar namespace (`import * as`).
+- [x] **P1 - Refatoração de `ProcessoFormFields.vue`**: Componente decomposto em `ProcessoBasicFields`, `ProcessoUnidadesField` e `ProcessoDeadlineField`. Lógica de foco simplificada.
+- [x] **P1 - Consolidação de Helpers de Status**: Criado `utils/statusHelpers.ts` centralizando variantes e labels de Processos e Notificações.
+- [x] **P1 - Estabilização de Stubs**: Atualizados stubs de testes em `CadProcesso.spec.ts` para refletir a nova interface do formulário.
 
 ## Pendentes Prioritários (P1)
-- [ ] **P1: ProcessoFormFields.vue** - Refatorar `focarPrimeiroErro` (CRAP 156). Lógica de busca no DOM acoplada ao componente.
-- [ ] **P1: Consolidar Notification Labels** - Centralizar mapeamentos de Badge + Label em `utils/statusHelpers.ts`.
 
 ## Pendentes de Qualidade (P2-P4)
-- [ ] **P3: ArvoreUnidades.vue** - Componente muito grande (800+ linhas). Iniciar extração de subcomponentes (`ArvoreUnidadeItem.vue`).
-- [ ] **P4: Waivers Ratchet** - Revisar `frontend-cruft-waivers.json` para reduzir limites de arquivos que foram limpos.
+- [ ] **P2 - Extração da Árvore**: Decompor `ArvoreUnidades.vue` em subcomponentes menores (Nó, Pesquisa, Toggle).
+- [ ] **P2 - Refatoração de `NotificacoesAdminView.vue`**: Extrair lógica de listagem e filtros para componentes dedicados.
+- [ ] **P3 - Ratcheting de Waivers**: Reduzir os limites em `frontend-cruft-waivers.json` após as limpezas.vos que foram limpos.
 
 ## Achados Recentes (Varredura de 2026-05-03)
 - [ ] **P3: useErrorHandler.ts** - Possui redundância na captura de erros de rede vs erros de negócio. Padronizar via `normalizarErro`.
