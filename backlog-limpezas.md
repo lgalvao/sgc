@@ -3,8 +3,8 @@
 ## Estado atual (auditado em 2026-05-03 — segunda varredura)
 
 - Gate de cruft: **ok**
-- Lint: **0 erros, 0 warnings** (após remoção de `BFormRadioGroup` em `FeedbackModal.vue`)
-- Testes unitários: **1186 testes** em **146 arquivos**, todos passando
+- Lint: **0 erros, 0 warnings**
+- Testes unitários: **1205 testes** em **147 arquivos**, todos passando
 - `fallow dead-code`: **zerado**
 - `fallow health`: **90.9**
 - `fallow dupes`: **6 clone groups**, **153 linhas**, **0.8%**
