@@ -54,6 +54,9 @@ Depois de remover um acoplamento, procure métodos, campos, mocks, stubs e teste
 7. Validar em passos pequenos.
 Faça uma mudança curta, valide, registre aprendizado, então siga.
 
+8. Preferir simplificação local antes de abstração compartilhada.
+Se a lógica ainda pertence claramente a uma única tela ou fluxo, prefira helper local de view ou componente local de apresentação antes de inventar camada genérica.
+
 ## Guardrails do SGC
 
 ### Backend
@@ -65,6 +68,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Não simplificar permissão sem confronto explícito com `etc/docs/regras-acesso.md`.
 - Em `subprocesso`, simplifique antes duplicações de busca, validação e contexto; evite fusões amplas de serviço.
 - Prefira helpers privados, `command`/DTO interno e centralização de leitura antes de criar abstrações novas.
+- Se o frontend estiver reconstruindo regra de acesso, workflow ou disponibilidade por falta de sinal no DTO, prefira completar o contrato backend em vez de espalhar heurística no cliente.
 - Se houver muitos parâmetros, use objeto de transporte, em linha com `AGENTS.md`.
 - Se a simplificação alterar contrato interno real, atualize os testes.
 - Se Gradle falhar só ao armazenar cache, repita sem cache antes de tratar como regressão de código.
@@ -76,9 +80,12 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Não usar store singleton como ponte implícita entre uma action recém-chamada e a leitura imediata da mesma tela.
 - Não tratar service, composable e store como camadas obrigatórias se uma delas só repassa chamadas sem agregar contrato.
 - Se uma única view consome o estado, prefira sincronização local ou contexto explícito.
+- Se a lógica continua sendo propriedade de uma única view, prefira extrair para `src/views/*.ts` ou componente local coeso em vez de criar composable global ou helper “utilitário” artificial.
 - Não criar wrapper visual novo sem ganho claro de contrato, acessibilidade, responsividade ou padronização.
 - Não colapsar visibilidade e habilitação da UI na mesma regra. Se a pessoa usuária pode realizar a ação, mas o workflow, a localização, a permissão contextual ou o carregamento impedem a execução agora, o controle deve continuar visível e ficar desabilitado.
 - Se o backend não separar claramente "pode mostrar" de "pode executar", prefira endurecer o DTO/contrato na borda a recriar regra de permissão no frontend.
+- Não reintroduzir `Perfil`, `isAdmin`, `isChefe`, `isGestor` ou equivalentes para decidir UI quando o backend já entrega permissões estruturadas.
+- Não manter API pública de store, composable ou view apenas para sustentar testes antigos; ajuste ou apague os testes quando a superfície de produção encolher.
 - Preserve textos, navegação e comportamento exigidos por `etc/reqs`.
 
 ## Heurísticas Full-Stack
@@ -106,9 +113,12 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - composables que atualizam outros stores por dentro;
 - actions que já carregam um recurso, mas obrigam a view a reler um singleton para usar o resultado;
 - stores finas com um único consumidor real;
+- stores cuja superfície pública cresceu só para apoiar testes ou chamadas redundantes;
 - estado exposto mas sem uso em produção;
 - services ou wrappers que só repassam chamada sem agregar contrato;
 - DTOs/permissões que já distinguem capacidade e habilitação, mas cujo frontend ainda trata isso como uma única flag;
+- views grandes que ainda misturam orquestração de fluxo e seções visuais que podem virar componente local de apresentação;
+- arquivos centrais cujo código pode ser fatiado por responsabilidade real sem alterar o contrato externo;
 - testes que continuam presos ao fluxo implícito anterior.
 
 ### Frontend: alvos ruins
@@ -119,6 +129,8 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - refatoração “estética” que espalha regra de negócio pela view;
 - simplificação que faz ação desabilitada sumir quando o contrato correto de UX pede ação visível e indisponível;
 - compensar DTO fraco com heurística local de perfil, situação ou localização no frontend em vez de corrigir a borda;
+- extração para helper/composable compartilhado quando o código continua com um único consumidor claro;
+- mover blocos grandes para outro arquivo sem reduzir superfície, acoplamento ou responsabilidade real;
 - simplificação que muda textos, navegação ou permissões fora do que `etc/reqs` permite.
 
 ## Fluxo recomendado
@@ -134,12 +146,15 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - estado global desnecessário;
 - efeito colateral escondido;
 - wrapper fino;
+- contrato frouxo na borda;
+- regra de permissão reconstruída no cliente;
 - código morto.
 
 1. Escolher o menor corte seguro.
 - Uma fronteira por vez.
 - Não misturar simplificação estrutural com mudança de regra.
 - Se a simplificação tocar visibilidade de ação, confirme explicitamente se o comportamento correto é ocultar ou desabilitar.
+- Só considere um arquivo realmente simplificado se a superfície pública, o acoplamento ou a responsabilidade dele tiverem diminuído de forma verificável.
 
 1. Tornar o fluxo explícito.
 - Se dois métodos diferem só por contexto, extraia o contexto.
@@ -149,6 +164,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Se uma action busca um detalhe e a tela precisa dele imediatamente, prefira retornar esse detalhe em vez de depender de leitura posterior do store global.
 - Se uma recarga automática não tem consumidor real além do recurso local afetado, remova o efeito colateral e recarregue só o que a tela usa.
 - Se o frontend precisa decidir entre mostrar e habilitar, prefira um contrato explícito com flags separadas em vez de inferência implícita no componente.
+- Se a borda do service já consegue normalizar DTO, status, permissões ou datas de forma estável, concentre isso ali e pare de repetir defaults e defensividade na store e na view.
 
 1. Validar logo após cada bloco.
 
@@ -179,6 +195,8 @@ npm run lint
 - Esta duplicação está no backend, no frontend ou atravessa a fronteira entre os dois?
 - Esta dependência precisa mesmo ser global?
 - Esta regra pode ser centralizada sem mudar o contrato externo?
+- O melhor corte aqui é um helper local de view, um componente local de apresentação, ou um contrato compartilhado mais forte na borda?
+- Estou mantendo alguma API pública apenas porque os testes antigos se acostumaram com ela?
 - Estou simplificando uma regra de UX real ou apenas apagando um estado desabilitado que parecia redundante?
 - A distinção entre "ação inexistente para este perfil" e "ação indisponível neste contexto" continua preservada?
 - A leitura do fluxo ficou mais curta?
