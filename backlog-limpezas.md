@@ -1,25 +1,38 @@
-# Backlog de Limpezas e Refatorações Frontend
+# SGC - Backlog de Limpezas e Qualidade (Estado Atual)
 
-## [CONCLUÍDO - 2026-05-03]
-- [x] **P0: NotificacoesAdminView.vue** - Extraída lógica de status para `notificacaoService.ts`.
-- [x] **P0: useFeedback.ts** - Removido `usuarioEmail` morto e corrigidos testes (spy logger).
-- [x] **P0: useFluxoSubprocesso.ts** - Removida flag booleana `isRevisao` em favor de funções nomeadas explícitas.
-- [x] **P0: AtribuicaoTemporariaView.vue** - Removido `defineExpose` e refatorados testes para interação via DOM.
-- [x] **P1: apiError/normalizer.ts** - Refatorado para reduzir complexidade (ciclomática reduzida). Criada suíte de testes unitários robusta.
-- [x] **P1: axios-setup.ts** - Refatorado `handleResponseError` para decompor responsabilidades (log, 401, erro global).
-- [x] **P1: ProcessoCadastroView.vue** - Simplificado `handleApiErrors` e movida lógica de mapeamento para `useProcessoForm.ts`.
-- [x] **P2: BuscadorUsuarios.vue** - Adicionados guards de igualdade e limpeza automática reativa (removido `defineExpose`).
-- [x] **P3: useFluxoSubprocesso.ts** - Refatorados imports para usar namespace (`import * as`).
-- [x] **P1 - Refatoração de `ProcessoFormFields.vue`**: Componente decomposto em `ProcessoBasicFields`, `ProcessoUnidadesField` e `ProcessoDeadlineField`. Lógica de foco simplificada.
-- [x] **P1 - Consolidação de Helpers de Status**: Criado `utils/statusHelpers.ts` centralizando variantes e labels de Processos e Notificações.
-- [x] **P1 - Estabilização de Stubs**: Atualizados stubs de testes em `CadProcesso.spec.ts` para refletir a nova interface do formulário.
+Este documento reflete o estado atual do sistema após as rodadas de refatoração de Maio/2026. Itens concluídos foram arquivados para manter o foco no que resta.
 
-## Pendentes Prioritários (P1)
+## 📊 Métricas Atuais (Snapshot 2026-05-03)
 
-## Pendentes de Qualidade (P2-P4)
-- [ ] **P2 - Extração da Árvore**: Decompor `ArvoreUnidades.vue` em subcomponentes menores (Nó, Pesquisa, Toggle).
-- [ ] **P2 - Refatoração de `NotificacoesAdminView.vue`**: Extrair lógica de listagem e filtros para componentes dedicados.
-- [ ] **P3 - Ratcheting de Waivers**: Reduzir os limites em `frontend-cruft-waivers.json` após as limpezas.vos que foram limpos.
+| Métrica | Valor Atual | Meta / Limite | Status |
+| :--- | :--- | :--- | :--- |
+| **Complexidade (Smells)** | 1641 | < 1000 | 🟠 Crítico |
+| **Cruft Frontend (Score)** | 2977.5 | < 2000 | 🟠 Crítico |
+| **Cobertura (Funções)** | 86.43% | 90.00% | 🟡 Alerta |
+| **Cobertura (Branches)** | 84.90% | 85.00% | 🟢 Quase lá |
+| **Testes Unitários** | 1257 Passando | 100% | 🟢 OK |
+| **E2E (Captura)** | 17 Passando | 100% | 🟢 OK |
 
-## Achados Recentes (Varredura de 2026-05-03)
-- [ ] **P3: useErrorHandler.ts** - Possui redundância na captura de erros de rede vs erros de negócio. Padronizar via `normalizarErro`.
+### 🛠️ Hotspots Identificados (Top Prioridade)
+
+1.  **frontend/src/components/unidade/ArvoreUnidades.vue**: 365.5 pts (471 linhas). Mistura renderização recursiva com lógica de busca.
+2.  **frontend/src/views/ProcessoCadastroView.vue**: 234.5 pts (456 linhas). Ainda centraliza muita orquestração apesar das melhorias no form.
+3.  **frontend/src/views/NotificacoesAdminView.vue**: 220.5 pts (461 linhas). Combina filtros complexos com uma tabela de logs extensa.
+4.  **frontend/src/views/MapaView.vue**: 194 pts (442 linhas). Concentra fluxo de mapa, mutações e exibição.
+
+---
+
+## 🚀 Próximas Ações
+
+### P1 - Prioridade Imediata
+- [ ] **Extração da Árvore**: Decompor `ArvoreUnidades.vue` em subcomponentes: `ArvoreUnidadeNode.vue`, `ArvoreSearch.vue` e `ArvoreActions.vue`.
+- [ ] **Refatoração de Notificações**: Extrair lógica de listagem e filtros de `NotificacoesAdminView.vue` para reduzir o tamanho da View.
+- [ ] **Ajuste de Cobertura (Gaps)**: Atacar arquivos com baixa cobertura de funções (ex: `UnidadeView.vue` e `analiseFluxo.ts`) para atingir os 90%.
+
+### P2 - Qualidade e Ratcheting
+- [ ] **Ratcheting de Waivers**: Reduzir os limites em `frontend-cruft-waivers.json`.
+    - [ ] `ProcessoFormFields.vue`: Remover waiver (atual: 95 linhas, limite normal: 200).
+    - [ ] `axios-setup.ts`: Reduzir para 250 (atual: 247).
+    - [ ] `ProcessoCadastroView.vue`: Reduzir para 460 (atual: 456).
+- [ ] **Simplificação de Erros**: Unificar redundância no `useErrorHandler.ts` entre erros de rede e de negócio via `normalizarErro`.
+
