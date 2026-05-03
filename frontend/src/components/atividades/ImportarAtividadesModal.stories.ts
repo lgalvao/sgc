@@ -2,7 +2,7 @@ import {vi} from "vitest";
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import ImportarAtividadesModal from './ImportarAtividadesModal.vue';
 import {ref} from 'vue';
-import * as processoService from '@/services/processoService';
+import * as processoService from '@/services/processo';
 import * as subprocessoService from '@/services/subprocessoService';
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
 
@@ -30,7 +30,7 @@ const mockAtividades = [
     {codigo: 51, descricao: 'Atividade importada 2'},
 ];
 
-vi.mock('@/services/processoService', () => ({
+vi.mock('@/services/processo', () => ({
     buscarProcessosParaImportacao: vi.fn(),
     buscarUnidadesParaImportacao: vi.fn(),
 }));

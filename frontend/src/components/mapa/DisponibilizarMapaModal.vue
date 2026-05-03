@@ -84,7 +84,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";
 import {computed, ref, watch} from "vue";
-import {isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
+import {ehDataEstritamenteFutura, obterAmanhaFormatado} from "@/utils/date";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{
@@ -131,7 +131,7 @@ watch([dataLimiteValidacao, ultimaDataLimiteFormatada], ([novaData, ultimaDataLi
   erroLocalDataLimite.value = "";
   if (!novaData || novaData.length !== 10) return;
 
-  if (!isDateStrictlyFuture(novaData)) {
+  if (!ehDataEstritamenteFutura(novaData)) {
     erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
     return;
   }

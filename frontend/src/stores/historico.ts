@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import type {ProcessoResumo} from "@/types/tipos";
-import {buscarProcessosFinalizados} from "@/services/processoService";
+import {buscarProcessosFinalizados} from "@/services/processo";
 import {logger} from "@/utils";
 
 /**

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import {computed} from 'vue';
-import {BFormGroup, BFormTextarea} from 'bootstrap-vue-next';
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import CadastroObservacaoModal from "@/components/cadastro/CadastroObservacaoModal.vue";
+import {useCadastroObservacaoModalModel} from "@/components/cadastro/cadastroObservacaoModalModel";
 import {TEXTOS} from "@/constants/textos";
 
 interface Props {
@@ -24,38 +22,23 @@ const emit = defineEmits<{
   (e: 'update:observacao', value: string): void;
   (e: 'confirmar'): void;
 }>();
-
-const model = computed({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
-});
-
-const obs = computed({
-  get: () => props.observacao,
-  set: (val) => emit('update:observacao', val)
-});
+const {model, observacaoModel} = useCadastroObservacaoModalModel(props, emit);
 </script>
 
 <template>
-  <ModalConfirmacao
+  <CadastroObservacaoModal
       v-model="model"
-      :auto-close="false"
+      v-model:observacao="observacaoModel"
+      :erro="erro"
+      :input-data-testid="'inp-aceite-cadastro-obs'"
+      :input-id="'observacaoValidacao'"
+      :label="TEXTOS.comum.OBSERVACAO"
       :loading="loading"
-      :titulo="acao?.tituloModal ?? ''"
-      :ok-title="acao?.rotuloConfirmacao ?? ''"
-      test-codigo-confirmar="btn-aceite-cadastro-confirmar"
+      :ok-title="acao?.rotuloConfirmacao"
+      :test-codigo-confirmar="'btn-aceite-cadastro-confirmar'"
+      :texto="acao?.textoModal"
+      :titulo="acao?.tituloModal"
       variant="success"
       @confirmar="$emit('confirmar')"
-  >
-    <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger" />
-    <p>{{ acao?.textoModal }}</p>
-    <BFormGroup class="mb-3" :label="TEXTOS.comum.OBSERVACAO" label-for="observacaoValidacao">
-      <BFormTextarea
-          id="observacaoValidacao"
-          v-model="obs"
-          data-testid="inp-aceite-cadastro-obs"
-          rows="3"
-      />
-    </BFormGroup>
-  </ModalConfirmacao>
+  />
 </template>

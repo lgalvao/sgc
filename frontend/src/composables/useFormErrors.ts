@@ -1,5 +1,5 @@
 import {ref} from 'vue';
-import type {NormalizedError} from '@/utils/apiError';
+import type {ErroNormalizado} from '@/utils/apiError';
 
 export function useFormErrors(initialFields: string[] = []) {
     const errors = ref<Record<string, string>>(
@@ -12,7 +12,7 @@ export function useFormErrors(initialFields: string[] = []) {
         });
     }
 
-    function setFromNormalizedError(normalizedError: NormalizedError | null) {
+    function setFromErroNormalizado(normalizedError: ErroNormalizado | null) {
         clearErrors();
 
         if (!normalizedError?.erros) return;
@@ -32,7 +32,7 @@ export function useFormErrors(initialFields: string[] = []) {
     return {
         errors,
         clearErrors,
-        setFromNormalizedError,
+        setFromErroNormalizado,
         hasErrors
     };
 }

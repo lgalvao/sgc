@@ -3,7 +3,7 @@ import {mount} from "@vue/test-utils";
 import type {UnidadeSelecao} from "@/types/tipos";
 import ModalAcaoBloco from "../processo/ModalAcaoBloco.vue";
 import {BButton} from "bootstrap-vue-next";
-import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import {obterAmanhaFormatado} from "@/utils/date";
 
 type ModalAcaoBlocoVm = {
     mostrar: boolean;

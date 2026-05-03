@@ -138,15 +138,8 @@
       "criterioRemocao": "Extrair estado de busca e lista de sugestoes."
     },
     {
-      "arquivo": "frontend/src/utils/dateUtils.ts",
-      "camada": "utils",
-      "maxLinhas": 129,
-      "responsavel": "frontend",
-      "justificativa": "Arquivo central de datas ainda concentra varios formatos e helpers.",
-      "criterioRemocao": "Separar parsing, formatacao e calculos de data."
-    },
-    {
-      "arquivo": "frontend/src/composables/useCadastroAtividadesMutacoes.ts",
+      "arquivo": "frontend/src/components/comum/BuscadorUsuarios.vue",
+
       "camada": "composable",
       "maxLinhas": 177,
       "responsavel": "frontend",
@@ -208,14 +201,6 @@
       "responsavel": "frontend",
       "justificativa": "Componente raiz ainda concentra preload de configuracao e sincronias.",
       "criterioRemocao": "Extrair sincronias transversais do App para composables dedicados."
-    },
-    {
-      "arquivo": "frontend/src/utils/formatters.ts",
-      "camada": "utils",
-      "maxLinhas": 87,
-      "responsavel": "frontend",
-      "justificativa": "Arquivo ainda agrega formatadores diferentes em um unico modulo.",
-      "criterioRemocao": "Separar formatadores numericos, textuais e de unidade."
     },
     {
       "arquivo": "frontend/src/components/processo/SubprocessoCards.vue",
@@ -280,14 +265,6 @@
       "responsavel": "frontend",
       "justificativa": "Componente ainda combina modos de edicao e teclado em excesso.",
       "criterioRemocao": "Separar modo leitura, edicao e confirmacao."
-    },
-    {
-      "arquivo": "frontend/src/services/diagnosticoService.ts",
-      "camada": "service",
-      "maxLinhas": 123,
-      "responsavel": "frontend",
-      "justificativa": "Service ainda fica logo acima do budget inicial.",
-      "criterioRemocao": "Reduzir helper interno e estreitar a API publica."
     },
     {
       "arquivo": "frontend/src/composables/useCadastroRevisaoSemMudancas.ts",

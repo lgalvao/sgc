@@ -15,7 +15,7 @@ interface UseCadastroAtividadesMutacoesParams {
     codigoSubprocesso: Ref<number | null>;
     codMapa: Ref<number | null>;
     withErrorHandling: <T>(operacao: () => Promise<T>) => Promise<T>;
-    lastError: Ref<{ message?: string } | null>;
+    lastError: Ref<{ mensagem?: string } | null>;
     notify: (mensagem: string, variante: VarianteAlerta) => void;
     processarRespostaLocal: (response: AtividadeOperacaoResponse) => void;
     adicionarAtividadeAction: (codigoSubprocesso: number, codMapa: number) => Promise<AtividadeOperacaoResponse | null>;
@@ -72,7 +72,7 @@ export function useCadastroAtividadesMutacoes({
             erroNovaAtividade.value = null;
             return true;
         } catch {
-            erroNovaAtividade.value = lastError.value?.message || TEXTOS.atividades.ERRO_ADICIONAR;
+            erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
             return false;
         }
     }
@@ -105,7 +105,7 @@ export function useCadastroAtividadesMutacoes({
             mostrarModalConfirmacaoRemocao.value = false;
             dadosRemocao.value = null;
         } catch (e: unknown) {
-            const err = lastError.value?.message || (e as Error).message;
+            const err = lastError.value?.mensagem || (e as Error).message;
             notify(err || TEXTOS.atividades.ERRO_REMOVER, "danger");
             mostrarModalConfirmacaoRemocao.value = false;
         } finally {

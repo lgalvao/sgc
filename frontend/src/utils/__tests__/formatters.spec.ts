@@ -2,7 +2,6 @@ import {describe, expect, it} from 'vitest';
 import {
     calcularAssinaturaCadastro,
     formatDate,
-    formatNumeroCsvBR,
     formatSituacaoProcesso,
     formatSituacaoSubprocesso,
     formatTipoProcesso
@@ -115,18 +114,6 @@ describe('formatters', () => {
 
     it('deve retornar o proprio valor se nao houver label', () => {
       expect(formatSituacaoSubprocesso('OUTRA_SITUACAO_SUB')).toBe('OUTRA_SITUACAO_SUB');
-    });
-  });
-
-  describe('formatNumeroCsvBR', () => {
-    it('deve retornar string vazia para valor nulo/indefinido', () => {
-      expect(formatNumeroCsvBR(null)).toBe('');
-      expect(formatNumeroCsvBR(undefined)).toBe('');
-    });
-
-    it('deve formatar numero com a quantidade de casas decimais esperada', () => {
-      expect(formatNumeroCsvBR(1000.5)).toBe('1.000,5');
-      expect(formatNumeroCsvBR(1000.555, 2)).toBe('1.000,56'); // pt-BR rounding pode variar, mas testando o funcionamento padrao
     });
   });
 });

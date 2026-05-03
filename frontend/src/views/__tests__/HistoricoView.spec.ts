@@ -3,7 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import HistoricoView from '../HistoricoView.vue';
 import {useRouter} from 'vue-router';
-import * as processoService from '@/services/processoService';
+import * as processoService from '@/services/processo';
 
 vi.mock('vue-router', () => ({
   useRouter: vi.fn(() => ({
@@ -11,7 +11,7 @@ vi.mock('vue-router', () => ({
   }))
 }));
 
-vi.mock('@/services/processoService', () => ({
+vi.mock('@/services/processo', () => ({
   buscarProcessosFinalizados: vi.fn(),
 }));
 

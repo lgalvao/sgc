@@ -78,7 +78,7 @@ import {computed, ref, watch} from 'vue';
 import {BAlert, BFormCheckbox, BFormGroup, BTable} from 'bootstrap-vue-next';
 import InputData from '@/components/comum/InputData.vue';
 import ModalPadrao from '@/components/comum/ModalPadrao.vue';
-import {formatDateBR, isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
+import {formatarDataBR, ehDataEstritamenteFutura, obterAmanhaFormatado} from "@/utils/date";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import type {UnidadeSelecao} from "@/types/tipos";
 
@@ -135,7 +135,7 @@ const dataMinimaPermitida = computed(() => {
 });
 
 const dataMinimaPermitidaFormatada = computed(() => {
-  return dataMinimaPermitida.value ? formatDateBR(dataMinimaPermitida.value) : "";
+  return dataMinimaPermitida.value ? formatarDataBR(dataMinimaPermitida.value) : "";
 });
 
 watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) => {
@@ -143,7 +143,7 @@ watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) 
   if (!novaData || novaData.length !== 10 || !props.mostrarDataLimite) {
     return;
   }
-  if (!isDateStrictlyFuture(novaData)) {
+  if (!ehDataEstritamenteFutura(novaData)) {
     erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
     return;
   }

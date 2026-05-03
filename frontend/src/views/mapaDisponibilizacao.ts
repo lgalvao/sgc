@@ -2,7 +2,7 @@ import {computed, type ComputedRef, ref, type Ref} from "vue";
 import type {Competencia, DisponibilizarMapaRequest, MapaCompleto} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import logger from "@/utils/logger";
-import {normalizeError} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 
 type DependenciasMapaDisponibilizacao = {
     competencias: ComputedRef<Competencia[]>;
@@ -13,7 +13,7 @@ type DependenciasMapaDisponibilizacao = {
     executarComSubprocesso: (callback: (codigoSubprocesso: number) => Promise<void>) => Promise<void>;
     disponibilizarMapaFluxo: (codigoSubprocesso: number, request: DisponibilizarMapaRequest) => Promise<void>;
     concluirAcaoPainel: (mensagem: string, fecharModal: () => void) => Promise<void>;
-    aplicarErroNormalizado: (error: ReturnType<typeof normalizeError> | null) => void;
+    aplicarErroNormalizado: (error: ReturnType<typeof normalizarErro> | null) => void;
 };
 
 export function useMapaDisponibilizacao({
@@ -72,7 +72,7 @@ export function useMapaDisponibilizacao({
                 await concluirAcaoPainel(TEXTOS.sucesso.MAPA_DISPONIBILIZADO, fecharModalDisponibilizar);
             } catch (error) {
                 logger.error(error);
-                aplicarErroNormalizado(normalizeError(error) as ReturnType<typeof normalizeError>);
+                aplicarErroNormalizado(normalizarErro(error) as ReturnType<typeof normalizarErro>);
             } finally {
                 loadingDisponibilizacao.value = false;
             }

@@ -3,7 +3,7 @@ import {BTable} from "bootstrap-vue-next";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import type {Movimentacao} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
-import {formatDateTimeBR} from "@/utils";
+import {formatarDataHoraBR} from "@/utils";
 
 defineProps<{
   movimentacoes: Movimentacao[];
@@ -45,7 +45,7 @@ function rowAttrMovimentacao(item: Movimentacao | null) {
         />
       </template>
       <template #cell(dataHora)="data">
-        {{ formatDateTimeBR(data.item.dataHora) }}
+        {{ formatarDataHoraBR(data.item.dataHora) }}
       </template>
       <template #cell(unidadeOrigem)="data">
         {{ data.item.unidadeOrigemSigla || '-' }}

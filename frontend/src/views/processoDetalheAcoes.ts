@@ -7,7 +7,7 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 import {obterIdBotaoAcaoProcesso, obterTestIdBotaoAcaoProcesso} from "@/components/processo/processoAcoes";
 
 type ModalAcaoBlocoRef = {

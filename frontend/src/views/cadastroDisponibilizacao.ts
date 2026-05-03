@@ -3,7 +3,7 @@ import type {Atividade, ErroValidacao} from "@/types/tipos";
 import {SituacaoSubprocesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
-import {normalizeError} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 import logger from "@/utils/logger";
 
 type ResultadoValidacaoCadastro = {
@@ -137,7 +137,7 @@ export function useCadastroDisponibilizacao({
                 logger.warn("Falha ao executar scroll para erro", erroDom);
             }
         } catch (error) {
-            erroGlobal.value = normalizeError(error).message;
+            erroGlobal.value = normalizarErro(error).mensagem;
         } finally {
             loadingValidacao.value = false;
         }

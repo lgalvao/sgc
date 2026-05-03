@@ -48,14 +48,14 @@
         data-testid="alerta-erro-global"
         @dismissed="erroGlobal = null"
     >
-      {{ erroGlobalFormatado.message }}
+      {{ erroGlobalFormatado.mensagem }}
     </BAlert>
 
     <AppAlert
         v-if="notificacao"
-        :message="notificacao.message"
-        :variant="notificacao.variant"
-        :dismissible="notificacao.dismissible ?? true"
+        :mensagem="notificacao.mensagem"
+        :variante="notificacao.variante"
+        :dispensavel="notificacao.dispensavel ?? true"
         @dismissed="clear()"
     />
 
@@ -99,7 +99,7 @@
           :acao-principal-cadastro="acaoPrincipalCadastro"
           :codigo-subprocesso="codigoSubprocesso"
           :dados-remocao="dadosRemocao"
-          :erro-fluxo="fluxoSubprocesso.lastError?.value?.message"
+          :erro-fluxo="fluxoSubprocesso.lastError?.value?.mensagem"
           :historico-analises="historicoAnalises"
           :impactos="impactos ?? null"
           :is-revisao="isRevisao"
@@ -379,7 +379,7 @@ const {
 });
 
 const erroGlobalFormatado = computed(() =>
-    erroGlobal.value ? {message: erroGlobal.value} : null
+    erroGlobal.value ? {mensagem: erroGlobal.value} : null
 );
 
 const {

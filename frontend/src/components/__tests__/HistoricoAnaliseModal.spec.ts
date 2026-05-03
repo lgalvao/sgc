@@ -1,6 +1,6 @@
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
-import {formatDateBR} from "@/utils";
+import {formatarDataBR} from "@/utils";
 import HistoricoAnaliseModal from "../processo/HistoricoAnaliseModal.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
@@ -68,7 +68,7 @@ describe("HistoricoAnaliseModal", () => {
 
         const rows = context.wrapper.findAll("tbody tr");
         expect(rows.length).toBe(mockAnalises.length);
-        const expectedDate = formatDateBR(new Date(mockAnalises[0].dataHora));
+        const expectedDate = formatarDataBR(new Date(mockAnalises[0].dataHora));
         expect(rows[0].text()).toContain(expectedDate);
         expect(rows[0].text()).toContain("TEST");
         expect(rows[0].text()).toContain("ACEITE_MAPEAMENTO");

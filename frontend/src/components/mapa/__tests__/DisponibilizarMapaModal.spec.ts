@@ -2,13 +2,13 @@ import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import DisponibilizarMapaModal from '../DisponibilizarMapaModal.vue';
 
-vi.mock("@/utils/dateUtils", async () => {
-    const actual = await vi.importActual<typeof import("@/utils/dateUtils")>("@/utils/dateUtils");
+vi.mock("@/utils/date", async () => {
+    const actual = await vi.importActual<typeof import("@/utils/date")>("@/utils/date");
     return {
         ...actual,
         obterAmanhaFormatado: () => '2026-03-25',
-        isDateStrictlyFuture: (d: string) => d > '2026-03-24',
-        isDateValidAndFuture: (d: string) => d > '2026-03-24'
+        ehDataEstritamenteFutura: (d: string) => d > '2026-03-24',
+        ehDataValidaEFutura: (d: string) => d > '2026-03-24'
     };
 });
 

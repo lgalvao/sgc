@@ -31,8 +31,7 @@
     "date-fns": "^4.1.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.33",
-    "vue-router": "^5.0.6",
-    "zod": "^4.4.2"
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
     "@chialab/vitest-axe": "^0.19.1",

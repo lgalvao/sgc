@@ -1,11 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {nextTick} from 'vue';
-import {
-    removeFromLocalStorage,
-    removeMultipleFromLocalStorage,
-    useLocalStorage,
-    useLocalStorageMultiple
-} from '@/composables/useLocalStorage';
+import {useLocalStorage} from '@/composables/useLocalStorage';
 
 describe('useLocalStorage', () => {
     beforeEach(() => {
@@ -54,37 +49,5 @@ describe('useLocalStorage', () => {
         val.value.a = 2;
         await nextTick();
         expect(localStorage.getItem('test-key')).toBe(JSON.stringify({a: 2}));
-    });
-});
-
-describe('useLocalStorageMultiple', () => {
-    it('deve gerenciar múltiplas chaves', async () => {
-        const items = useLocalStorageMultiple({
-            k1: 'v1',
-            k2: 10
-        });
-
-        expect(items.k1.value).toBe('v1');
-        expect(items.k2.value).toBe(10);
-
-        items.k1.value = 'v2';
-        await nextTick();
-        expect(localStorage.getItem('k1')).toBe(JSON.stringify('v2'));
-    });
-});
-
-describe('removeFromLocalStorage utilities', () => {
-    it('removeFromLocalStorage deve remover uma chave', () => {
-        localStorage.setItem('key1', 'val');
-        removeFromLocalStorage('key1');
-        expect(localStorage.getItem('key1')).toBeNull();
-    });
-
-    it('removeMultipleFromLocalStorage deve remover múltiplas chaves', () => {
-        localStorage.setItem('key1', 'val1');
-        localStorage.setItem('key2', 'val2');
-        removeMultipleFromLocalStorage(['key1', 'key2']);
-        expect(localStorage.getItem('key1')).toBeNull();
-        expect(localStorage.getItem('key2')).toBeNull();
     });
 });

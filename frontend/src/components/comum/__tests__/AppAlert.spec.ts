@@ -3,22 +3,22 @@ import {mount} from '@vue/test-utils';
 import AppAlert from '../AppAlert.vue';
 
 describe('AppAlert.vue', () => {
-  it('deve renderizar a prop message no modo simples', () => {
+  it('deve renderizar a prop mensagem no modo simples', () => {
     const wrapper = mount(AppAlert, {
       props: {
-        message: 'Alerta de erro simples'
+        mensagem: 'Alerta de erro simples'
       }
     });
     expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(true);
     expect(wrapper.text()).toContain('Alerta de erro simples');
   });
 
-  it('deve renderizar o notification no modo estruturado e ocultar/exibir detalhes', async () => {
+  it('deve renderizar o notificacao no modo estruturado e ocultar/exibir detalhes', async () => {
     const wrapper = mount(AppAlert, {
       props: {
-        notification: {
-          summary: 'Resumo do erro',
-          details: ['Erro 1', 'Erro 2']
+        notificacao: {
+          resumo: 'Resumo do erro',
+          detalhes: ['Erro 1', 'Erro 2']
         }
       }
     });
@@ -37,7 +37,7 @@ describe('AppAlert.vue', () => {
   it('deve renderizar o stack trace quando em modo dev', async () => {
     const wrapper = mount(AppAlert, {
       props: {
-        message: 'Erro com stack',
+        mensagem: 'Erro com stack',
         stackTrace: 'Error at line 1'
       }
     });
@@ -49,7 +49,7 @@ describe('AppAlert.vue', () => {
     expect(wrapper.text()).toContain('Error at line 1');
   });
 
-  it('nao deve renderizar se não houver message ou notification', () => {
+  it('nao deve renderizar se não houver mensagem ou notificacao', () => {
     const wrapper = mount(AppAlert, {
       props: {}
     });
@@ -59,7 +59,7 @@ describe('AppAlert.vue', () => {
   it('deve emitir o evento dismissed', async () => {
     const wrapper = mount(AppAlert, {
       props: {
-        message: 'Erro'
+        mensagem: 'Erro'
       }
     });
 

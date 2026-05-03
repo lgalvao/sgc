@@ -1,9 +1,9 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import type {Processo} from "@/types/tipos";
-import {buscarContextoCompleto as serviceBuscarContextoCompleto} from "@/services/processoService";
+import {buscarContextoCompleto as serviceBuscarContextoCompleto} from "@/services/processo";
 import {logger} from "@/utils";
-import {normalizeError} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 import {isErroCanceladoHttp} from "@/axios-setup";
 
 /**
@@ -70,8 +70,8 @@ export const useProcessoStore = defineStore("processo", () => {
             contextoInvalido.value = false;
             return data;
         } catch (err) {
-            const erroNormalizado = normalizeError(err);
-            if (isErroCanceladoHttp(err) || erroNormalizado.code === "REQUEST_CANCELADA") {
+            const erroNormalizado = normalizarErro(err);
+            if (isErroCanceladoHttp(err) || erroNormalizado.codigo === "REQUEST_CANCELADA") {
                 return null;
             }
             logger.error(`Erro ao buscar contexto completo do processo ${codProcesso}:`, err);

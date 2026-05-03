@@ -117,7 +117,7 @@ import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import InputData from "@/components/comum/InputData.vue";
 import type {Unidade} from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
-import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import {obterAmanhaFormatado} from "@/utils/date";
 
 interface ProcessoFormData {
   descricao: string;

@@ -2,7 +2,7 @@ import {describe, expect, it} from "vitest";
 import {mount} from "@vue/test-utils";
 import {nextTick} from "vue";
 import ProcessoFormFields from "../ProcessoFormFields.vue";
-import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import {obterAmanhaFormatado} from "@/utils/date";
 
 const modelValueBase = {
     descricao: "",

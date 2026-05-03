@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import {createTestingPinia} from "@pinia/testing";
 import HistoricoView from "@/views/HistoricoView.vue";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 
 const {mockPush} = vi.hoisted(() => ({
     mockPush: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/processo", () => ({
     buscarProcessosFinalizados: vi.fn(),
 }));
 

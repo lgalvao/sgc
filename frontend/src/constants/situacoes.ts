@@ -38,20 +38,6 @@ export const SITUACOES_MAPA = {
     DISPONIVEL_VALIDACAO: "disponivel_validacao",
 } as const;
 
-// Labels para exibição
-export const LABELS_SITUACAO = {
-    [SITUACOES_SUBPROCESSO.CADASTRO_DISPONIBILIZADO]: "Cadastro disponibilizado",
-    [SITUACOES_SUBPROCESSO.MAPA_VALIDADO]: "Mapa validado",
-    [SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO]: "Mapa homologado",
-    [SITUACOES_SUBPROCESSO.MAPA_CRIADO]: "Mapa criado",
-    [SITUACOES_MAPA.VIGENTE]: "Vigente",
-    [SITUACOES_MAPA.DISPONIBILIZADO]: "Disponibilizado",
-    [SITUACOES_MAPA.EM_ANDAMENTO]: "Em andamento",
-    [SITUACOES_MAPA.DISPONIVEL_VALIDACAO]: "Disponibilizado",
-    CADASTRO_EM_ANDAMENTO: SITUACOES_SUBPROCESSO.CADASTRO_EM_ANDAMENTO,
-    NAO_DISPONIBILIZADO: "Não disponibilizado",
-} as const;
-
 // Classes CSS para badges de situação
 export const CLASSES_BADGE_SITUACAO = {
     [SITUACOES_SUBPROCESSO.AGUARDANDO]: "bg-warning text-dark",

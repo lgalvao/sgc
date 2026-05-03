@@ -177,7 +177,7 @@ import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
 import {useMapaAnaliseFluxo} from "@/views/mapaAnaliseFluxo";
 import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
-import {normalizeError} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 import type {Analise, MapaCompleto,} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -351,7 +351,7 @@ onMounted(async () => {
   const sucesso = await carregarContextoInicial();
   if (!sucesso) {
     if (subprocessoStore.erroIntegracaoContexto) {
-      notify(subprocessoStore.erroIntegracaoContexto.message, 'danger');
+      notify(subprocessoStore.erroIntegracaoContexto.mensagem, 'danger');
     } else {
       notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
     }
@@ -377,7 +377,7 @@ const existeCompetenciaSemAtividade = computed(() => {
   return competencias.value.some((competencia) => (competencia.atividades?.length ?? 0) === 0);
 });
 
-const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
+const {errors: fieldErrors, setFromErroNormalizado, clearErrors} = useFormErrors([
   'descricao',
   'atividades',
   'atividadesCodigos',
@@ -392,13 +392,13 @@ function sincronizarErrosAtividades() {
   }
 }
 
-function aplicarErroNormalizado(error: ReturnType<typeof normalizeError> | null) {
-  setFromNormalizedError(error);
+function aplicarErroNormalizado(error: ReturnType<typeof normalizarErro> | null) {
+  setFromErroNormalizado(error);
   sincronizarErrosAtividades();
 }
 
 function handleErrors(store: { lastError: unknown }) {
-  aplicarErroNormalizado(store.lastError as ReturnType<typeof normalizeError> | null);
+  aplicarErroNormalizado(store.lastError as ReturnType<typeof normalizarErro> | null);
 }
 
 const {

@@ -2,9 +2,9 @@
   <LayoutPadrao>
     <AppAlert
         v-if="notificacao"
-        :dismissible="notificacao.dismissible ?? true"
-        :message="notificacao.message"
-        :variant="notificacao.variant"
+        :dispensavel="notificacao.dispensavel ?? true"
+        :mensagem="notificacao.mensagem"
+        :variante="notificacao.variante"
         @dismissed="clear()"
     />
     <div v-if="subprocesso">
@@ -49,9 +49,9 @@
           dismissible
           @dismissed="subprocessoStore.limparErroIntegracao()"
       >
-        {{ subprocessoStore.erroIntegracaoContexto.message }}
-        <div v-if="subprocessoStore.erroIntegracaoContexto.details">
-          <small>Detalhes: {{ subprocessoStore.erroIntegracaoContexto.details }}</small>
+        {{ subprocessoStore.erroIntegracaoContexto.mensagem }}
+        <div v-if="subprocessoStore.erroIntegracaoContexto.detalhes">
+          <small>Detalhes: {{ subprocessoStore.erroIntegracaoContexto.detalhes }}</small>
         </div>
       </BAlert>
     </div>
@@ -77,7 +77,7 @@
       :mostrar-modal-reabrir="mostrarModalReabrir"
       :sigla-unidade="subprocesso?.unidade?.sigla ?? ''"
       :tipo-reabertura="tipoReabertura"
-      :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? parseDate(subprocesso.ultimaDataLimiteSubprocesso) : null"
+      :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? analisarData(subprocesso.ultimaDataLimiteSubprocesso) : null"
       @confirmar-alteracao-data="confirmarAlteracaoDataLimite"
       @confirmar-enviar-lembrete="enviarLembreteConfirmado"
       @confirmar-reabertura="confirmarReabertura"
@@ -100,11 +100,11 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
-import {enviarLembrete as enviarLembreteService} from "@/services/processoService";
+import {enviarLembrete as enviarLembreteService} from "@/services/processo";
 
 import {useAcesso} from "@/composables/useAcesso";
 import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
-import {formatDateBR, parseDate} from "@/utils";
+import {formatarDataBR, analisarData} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -116,7 +116,7 @@ import {useSubprocessoCarregamento} from "@/views/subprocessoCarregamento";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
-function formatDataSimples(dataStr: string | null): string { return dataStr ? formatDateBR(dataStr) : ''; }
+function formatDataSimples(dataStr: string | null): string { return dataStr ? formatarDataBR(dataStr) : ''; }
 
 function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
   if (!resp?.tipo) return '';
@@ -168,10 +168,10 @@ const movimentacoes = computed<Movimentacao[]>(
 );
 const dataLimite = computed(() => {
   if (subprocesso.value?.prazoEtapaAtual) {
-    return parseDate(subprocesso.value.prazoEtapaAtual);
+    return analisarData(subprocesso.value.prazoEtapaAtual);
   }
   const ultimaDataLimite = subprocesso.value?.ultimaDataLimiteSubprocesso;
-  return ultimaDataLimite ? parseDate(ultimaDataLimite) : null;
+  return ultimaDataLimite ? analisarData(ultimaDataLimite) : null;
 });
 
 function exibirToastPendente() {

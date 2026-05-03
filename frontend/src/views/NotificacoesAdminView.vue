@@ -26,11 +26,11 @@
     <template v-else>
       <AppAlert
           v-if="notificacao"
-          :dismissible="notificacao.dismissible"
-          :message="notificacao.message"
-          :notification="notificacao.notification"
+          :dispensavel="notificacao.dispensavel"
+          :mensagem="notificacao.mensagem"
+          :notification="notificacao.notificacao"
           :stack-trace="notificacao.stackTrace"
-          :variant="notificacao.variant"
+          :variante="notificacao.variante"
           @dismissed="clear"
       />
 
@@ -71,7 +71,7 @@
           </template>
 
           <template #cell(situacao)="{ item }">
-            <BBadge :variant="statusVariant(item.situacao)">
+            <BBadge :variante="statusVariant(item.situacao)">
               {{ statusLabel(item.situacao) }}
             </BBadge>
           </template>
@@ -216,8 +216,8 @@ import {
   reenviarNotificacao,
   type StatusNotificacao,
 } from "@/services/notificacaoService";
-import {formatDateTimeBR} from "@/utils";
-import {normalizeError} from "@/utils/apiError";
+import {formatarDataHoraBR} from "@/utils";
+import {normalizarErro} from "@/utils/apiError";
 import {useNotification} from "@/composables/useNotification";
 
 const {notificacao, notify, clear} = useNotification();
@@ -303,7 +303,7 @@ function prioridadeStatus(status: StatusNotificacao): number {
 
 function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";
-  const formatada = formatDateTimeBR(valor);
+  const formatada = formatarDataHoraBR(valor);
   return formatada === "Não informado" || formatada === "Data inválida" ? "-" : formatada;
 }
 
@@ -403,7 +403,7 @@ async function carregar() {
   try {
     itens.value = await listarNotificacoesAdmin();
   } catch (error) {
-    erro.value = normalizeError(error).message || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR;
+    erro.value = normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR;
   } finally {
     carregando.value = false;
   }
@@ -434,7 +434,7 @@ async function reenviar() {
     itemSelecionado.value = null;
     await carregar();
   } catch (error) {
-    notify(normalizeError(error).message || "Erro ao reenviar e-mail", "danger");
+    notify(normalizarErro(error).mensagem || "Erro ao reenviar e-mail", "danger");
   } finally {
     reenviando.value = false;
   }

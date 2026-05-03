@@ -1,9 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import {useHistoricoStore} from "../historico";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/processo", () => ({
     buscarProcessosFinalizados: vi.fn()
 }));
 

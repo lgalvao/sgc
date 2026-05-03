@@ -4,7 +4,7 @@ import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
-import * as processoService from '@/services/processoService';
+import * as processoService from '@/services/processo';
 import * as useAcessoModule from '@/composables/useAcesso';
 import {TEXTOS} from "@/constants/textos";
 
@@ -65,7 +65,7 @@ const SubprocessoModalStub = {
     emits: ['confirmar-alteracao', 'fechar-modal']
 };
 
-vi.mock('@/services/processoService', () => ({
+vi.mock('@/services/processo', () => ({
     reabrirCadastro: vi.fn(),
     enviarLembrete: vi.fn(),
 }));
@@ -577,9 +577,9 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = {
-            message: 'Erro de Banco',
-            details: 'Connection timeout'
-        };
+            mensagem: 'Erro de Banco',
+            detalhes: 'Connection timeout'
+        } as any;
         await wrapper.vm.$nextTick();
         
         expect(wrapper.text()).toContain('Erro de Banco');

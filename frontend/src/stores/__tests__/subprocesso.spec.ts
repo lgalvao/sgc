@@ -194,13 +194,13 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve tratar erro 404 como erro inesperado com mensagem customizada", async () => {
             const store = useSubprocessoStore();
-            const erro404 = { response: { status: 404, data: { message: "Não achei" } }, isAxiosError: true };
+            const erro404 = { response: { status: 404, data: { mensagem: "Não achei" } }, isAxiosError: true };
             vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue(erro404);
 
             await store.garantirContextoEdicao(10);
 
-            expect(store.erroIntegracaoContexto?.kind).toBe("unexpected");
-            expect(store.erroIntegracaoContexto?.message).toContain("indica inconsistência interna");
+            expect(store.erroIntegracaoContexto?.tipo).toBe("inesperado");
+            expect(store.erroIntegracaoContexto?.mensagem).toContain("indica inconsistência interna");
         });
 
         it("deve tratar erro de request cancelada", async () => {
@@ -210,7 +210,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
             await store.garantirContextoEdicao(10);
 
-            expect(store.erroIntegracaoContexto?.code).toBe("REQUEST_CANCELADA");
+            expect(store.erroIntegracaoContexto?.codigo).toBe("REQUEST_CANCELADA");
         });
 
         it("deve propagar erro genérico", async () => {
@@ -219,12 +219,12 @@ describe("subprocesso store (cache e dedupe)", () => {
 
             await store.garantirContextoEdicao(10);
 
-            expect(store.erroIntegracaoContexto?.message).toBe("Erro genérico");
+            expect(store.erroIntegracaoContexto?.mensagem).toBe("Erro genérico");
         });
 
         it("deve limpar erro de integração", () => {
             const store = useSubprocessoStore();
-            store.erroIntegracaoContexto = { message: "Erro" } as any;
+            store.erroIntegracaoContexto = { mensagem: "Erro" } as any;
             store.limparErroIntegracao();
             expect(store.erroIntegracaoContexto).toBeNull();
         });
@@ -266,7 +266,7 @@ describe("subprocesso store (cache e dedupe)", () => {
         it("deve resetar o estado completo", () => {
             const store = useSubprocessoStore();
             store.contextoEdicao = { detalhes: { codigo: 1 } } as any;
-            store.erroIntegracaoContexto = { message: "Erro" } as any;
+            store.erroIntegracaoContexto = { mensagem: "Erro" } as any;
             
             store.resetar();
             

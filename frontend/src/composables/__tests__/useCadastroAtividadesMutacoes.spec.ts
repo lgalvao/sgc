@@ -74,7 +74,7 @@ describe("useCadastroAtividadesMutacoes", () => {
     it("deve lidar com erro ao adicionar atividade", async () => {
         const {adicionarAtividade, erroNovaAtividade} = setup();
         adicionarAtividadeAction.mockRejectedValue(new Error("Erro"));
-        lastError.value = {message: "Erro customizado"};
+        lastError.value = {mensagem: "Erro customizado"};
 
         const result = await adicionarAtividade();
 
@@ -226,7 +226,7 @@ describe("useCadastroAtividadesMutacoes", () => {
         const {removerAtividade, confirmarRemocao, mostrarModalConfirmacaoRemocao} = setup();
         removerAtividade(1);
         vi.mocked(atividadeService.excluirAtividade).mockRejectedValue(new Error("Erro de remoção"));
-        lastError.value = {message: "Erro customizado"};
+        lastError.value = {mensagem: "Erro customizado"};
 
         await confirmarRemocao();
 

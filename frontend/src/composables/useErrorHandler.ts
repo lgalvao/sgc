@@ -1,11 +1,11 @@
 import {ref} from 'vue';
-import {type NormalizedError, normalizeError} from '@/utils/apiError';
+import {type ErroNormalizado, normalizarErro} from '@/utils/apiError';
 
 /**
  * Composable para tratamento centralizado de erros em stores.
  */
 export function useErrorHandler() {
-    const lastError = ref<NormalizedError | null>(null);
+    const lastError = ref<ErroNormalizado | null>(null);
 
     /**
      * Limpa o último erro armazenado.
@@ -21,13 +21,13 @@ export function useErrorHandler() {
      */
     async function withErrorHandling<T>(
         fn: () => Promise<T>,
-        onError?: (error: NormalizedError) => void
+        onError?: (error: ErroNormalizado) => void
     ): Promise<T> {
         lastError.value = null;
         try {
             return await fn();
         } catch (error) {
-            const normalized = normalizeError(error);
+            const normalized = normalizarErro(error);
             lastError.value = normalized;
 
             if (onError) {

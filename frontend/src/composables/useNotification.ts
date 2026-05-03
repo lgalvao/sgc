@@ -3,36 +3,36 @@ import {ref} from 'vue';
 export type VarianteAlerta = 'danger' | 'warning' | 'success' | 'info';
 
 export interface NotificacaoEstruturada {
-    summary: string;
-    details: string[];
+    resumo: string;
+    detalhes: string[];
 }
 
 export interface EstadoNotificacao {
-    message?: string;
-    notification?: NotificacaoEstruturada;
-    variant: VarianteAlerta;
-    dismissible?: boolean;
+    mensagem?: string;
+    notificacao?: NotificacaoEstruturada;
+    variante: VarianteAlerta;
+    dispensavel?: boolean;
     stackTrace?: string;
 }
 
 export function useNotification() {
     const notificacao = ref<EstadoNotificacao | null>(null);
 
-    function notify(message: string, variant: VarianteAlerta = 'danger', dismissible = true) {
-        notificacao.value = {message, variant, dismissible};
+    function notify(mensagem: string, variante: VarianteAlerta = 'danger', dispensavel = true) {
+        notificacao.value = {mensagem, variante, dispensavel};
     }
 
     function notifyStructured(
-        summary: string,
-        details: string[],
-        options: {
-            variant?: VarianteAlerta;
+        resumo: string,
+        detalhes: string[],
+        opcoes: {
+            variante?: VarianteAlerta;
             stackTrace?: string;
-            dismissible?: boolean;
+            dispensavel?: boolean;
         } = {}
     ) {
-        const {variant = 'danger', stackTrace, dismissible = true} = options;
-        notificacao.value = {notification: {summary, details}, variant, stackTrace, dismissible};
+        const {variante = 'danger', stackTrace, dispensavel = true} = opcoes;
+        notificacao.value = {notificacao: {resumo, detalhes}, variante, stackTrace, dispensavel};
     }
 
     function clear() {

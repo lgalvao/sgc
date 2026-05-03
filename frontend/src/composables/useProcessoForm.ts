@@ -1,7 +1,7 @@
 import {computed, ref, watch} from 'vue';
 import {useFormErrors} from '@/composables/useFormErrors';
 import {type AtualizarProcessoRequest, type CriarProcessoRequest, type Processo, TipoProcesso} from '@/types/tipos';
-import {isDateStrictlyFuture} from "@/utils/dateUtils";
+import {ehDataEstritamenteFutura} from "@/utils/date";
 
 export function useProcessoForm(initialData?: Processo) {
     const descricao = ref(initialData?.descricao ?? '');
@@ -14,7 +14,7 @@ export function useProcessoForm(initialData?: Processo) {
         initialData?.unidades.map(u => u.codUnidade) ?? []
     );
 
-    const {errors: fieldErrors, setFromNormalizedError, clearErrors, hasErrors} = useFormErrors([
+    const {errors: fieldErrors, setFromErroNormalizado, clearErrors, hasErrors} = useFormErrors([
         'descricao',
         'tipo',
         'dataLimite',
@@ -33,7 +33,7 @@ export function useProcessoForm(initialData?: Processo) {
     watch(dataLimite, (novaData) => {
         fieldErrors.value.dataLimite = '';
         // Só valida se a data parecer completa (10 caracteres no formato yyyy-mm-dd)
-        if (novaData?.length === 10 && !isDateStrictlyFuture(novaData)) {
+        if (novaData?.length === 10 && !ehDataEstritamenteFutura(novaData)) {
             fieldErrors.value.dataLimite = 'A data limite deve ser uma data futura.';
         }
     });
@@ -84,7 +84,7 @@ export function useProcessoForm(initialData?: Processo) {
         unidadesSelecionadas,
         fieldErrors,
         isFormInvalid,
-        setFromNormalizedError,
+        setFromErroNormalizado,
         clearErrors,
         hasErrors,
         construirCriarRequest,

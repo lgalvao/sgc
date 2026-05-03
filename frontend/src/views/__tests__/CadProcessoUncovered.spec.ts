@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import ProcessoCadastroView from "../ProcessoCadastroView.vue";
 import {createTestingPinia} from "@pinia/testing";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {ref} from "vue";
@@ -17,7 +17,7 @@ vi.mock("vue-router", () => ({
     useRouter: () => mockRouter,
 }));
 
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/processo", () => ({
     criarProcesso: vi.fn().mockResolvedValue({codigo: 1}),
     iniciarProcesso: vi.fn().mockResolvedValue({}),
     excluirProcesso: vi.fn().mockResolvedValue({}),
@@ -118,7 +118,7 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
             unidadesSelecionadas: ref([]),
             fieldErrors: ref({}),
             isFormInvalid: ref(false),
-            setFromNormalizedError: vi.fn(),
+            setFromErroNormalizado: vi.fn(),
             clearErrors: vi.fn(),
             hasErrors: vi.fn().mockReturnValue(false),
             construirCriarRequest: vi.fn(),
@@ -151,7 +151,7 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
         await vm.confirmarIniciarProcesso();
         
         expect(vm.mostrarModalConfirmacao).toBe(false);
-        expect(vm.notificacao.message).toBe(TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
+        expect(vm.notificacao.mensagem).toBe(TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
     });
 
     it("cobre confirmarRemocao limpando campos", async () => {
@@ -163,7 +163,7 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
             unidadesSelecionadas: ref([]),
             fieldErrors: ref({}),
             isFormInvalid: ref(false),
-            setFromNormalizedError: vi.fn(),
+            setFromErroNormalizado: vi.fn(),
             clearErrors: vi.fn(),
             hasErrors: vi.fn().mockReturnValue(false),
             construirCriarRequest: vi.fn(),

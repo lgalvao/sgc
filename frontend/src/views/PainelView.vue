@@ -70,7 +70,7 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import {formatDateTimeBR} from "@/utils";
+import {formatarDataHoraBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
@@ -190,7 +190,7 @@ function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
 }
 
 const camposAlertas = [
-  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: false, formatter: ({value}: {value: unknown}) => formatDateTimeBR(value as string | Date)},
+  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: false, formatter: ({value}: {value: unknown}) => formatarDataHoraBR(value as string | Date)},
   {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
   {key: "processo", label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO, sortable: false},
   {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},

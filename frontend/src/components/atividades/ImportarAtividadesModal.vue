@@ -130,7 +130,7 @@
 import {BAlert, BFormCheckbox, BFormInvalidFeedback, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 import * as subprocessoService from "@/services/subprocessoService";
 import {
   type Atividade,
@@ -139,7 +139,7 @@ import {
   type UnidadeImportacao,
 } from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
-import {normalizeError} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 const props = defineProps<{
@@ -305,7 +305,7 @@ async function importar() {
     emit("importar", resultadoImportacao.value);
     fechar();
   } catch (error_) {
-    erroImportacao.value = normalizeError(error_).message;
+    erroImportacao.value = normalizarErro(error_).mensagem;
   } finally {
     importando.value = false;
   }

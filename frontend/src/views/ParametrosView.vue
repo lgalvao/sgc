@@ -13,9 +13,9 @@
     <template v-else>
       <AppAlert
           v-if="notificacao"
-          :dismissible="notificacao.dismissible ?? true"
-          :message="notificacao.message"
-          :variant="notificacao.variant"
+          :dispensavel="notificacao.dispensavel ?? true"
+          :mensagem="notificacao.mensagem"
+          :variante="notificacao.variante"
           @dismissed="clear"
       />
 

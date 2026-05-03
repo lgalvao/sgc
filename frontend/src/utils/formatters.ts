@@ -63,14 +63,6 @@ export function formatSituacaoSubprocesso(situacao: SituacaoSubprocesso | string
     return labels[situacao] || situacao;
 }
 
-export function formatNumeroCsvBR(value: number | null | undefined, decimalPlaces: number = 1): string {
-    if (value === null || value === undefined) return '';
-    return new Intl.NumberFormat('pt-BR', {
-        minimumFractionDigits: decimalPlaces,
-        maximumFractionDigits: decimalPlaces,
-    }).format(value);
-}
-
 export function calcularAssinaturaCadastro(atividades: Atividade[]): string {
     if (!atividades) return "";
     return atividades.map((a) => {

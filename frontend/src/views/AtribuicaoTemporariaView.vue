@@ -14,9 +14,9 @@
       </PageHeader>
       <AppAlert
           v-if="notificacao"
-          :dismissible="notificacao.dismissible ?? true"
-          :message="notificacao.message"
-          :variant="notificacao.variant"
+          :dispensavel="notificacao.dispensavel ?? true"
+          :mensagem="notificacao.mensagem"
+          :variante="notificacao.variante"
           @dismissed="clear()"
       />
       <BAlert
@@ -142,7 +142,7 @@ import {BAlert, BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BFormTex
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
-import {normalizeError} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 import type {Unidade} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
@@ -153,7 +153,7 @@ import BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {TEXTOS} from "@/constants/textos";
-import {obterHojeFormatado} from "@/utils/dateUtils";
+import {obterHojeFormatado} from "@/utils/date";
 import {buscarUnidadePorCodigo} from "@/services/unidadeService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -252,7 +252,7 @@ async function criarAtribuicao() {
     resetarFormularioAtribuicao();
   } catch (error) {
     logger.error(error);
-    erroFormulario.value = normalizeError(error).message || TEXTOS.atribuicaoTemporaria.ERRO_CRIAR;
+    erroFormulario.value = normalizarErro(error).mensagem || TEXTOS.atribuicaoTemporaria.ERRO_CRIAR;
   } finally {
     isLoading.value = false;
   }

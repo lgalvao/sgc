@@ -10,8 +10,8 @@ describe('useErrorHandler', () => {
     it('clearError limpa o erro', () => {
         const {lastError, clearError} = useErrorHandler();
         lastError.value = {
-            kind: 'validation',
-            message: 'Erro de validação'
+            tipo: 'validacao',
+            mensagem: 'Erro de validação'
         };
         clearError();
         expect(lastError.value).toBeNull();
@@ -20,8 +20,8 @@ describe('useErrorHandler', () => {
     it('withErrorHandling limpa erro antes de executar', async () => {
         const {lastError, withErrorHandling} = useErrorHandler();
         lastError.value = {
-            kind: 'validation',
-            message: 'Erro anterior'
+            tipo: 'validacao',
+            mensagem: 'Erro anterior'
         };
 
         await withErrorHandling(async () => {
@@ -50,7 +50,7 @@ describe('useErrorHandler', () => {
         ).rejects.toThrow('Erro de teste');
 
         expect(lastError.value).not.toBeNull();
-        expect(lastError.value?.message).toBe('Erro de teste');
+        expect(lastError.value?.mensagem).toBe('Erro de teste');
     });
 
     it('withErrorHandling chama callback onError quando fornecido', async () => {
@@ -67,7 +67,7 @@ describe('useErrorHandler', () => {
         expect(onError).toHaveBeenCalledOnce();
         expect(onError).toHaveBeenCalledWith(
             expect.objectContaining({
-                message: 'Erro de teste'
+                mensagem: 'Erro de teste'
             })
         );
     });

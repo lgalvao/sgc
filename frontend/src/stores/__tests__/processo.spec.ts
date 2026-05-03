@@ -1,10 +1,10 @@
 import {describe, expect, it, vi} from "vitest";
 import {useProcessoStore} from "../processo";
 import {setupStoreTest} from "@/test-utils/storeTestHelpers";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 import {logger} from "@/utils";
 
-vi.mock("@/services/processoService");
+vi.mock("@/services/processo");
 vi.mock("@/utils", async () => {
     const actual = await vi.importActual("@/utils") as any;
     return {

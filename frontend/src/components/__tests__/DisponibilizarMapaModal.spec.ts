@@ -3,7 +3,7 @@ import {mount} from "@vue/test-utils";
 import {BFormInput} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import DisponibilizarMapaModal from "@/components/mapa/DisponibilizarMapaModal.vue";
-import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import {obterAmanhaFormatado} from "@/utils/date";
 
 const ModalPadraoStub = {
     template: `

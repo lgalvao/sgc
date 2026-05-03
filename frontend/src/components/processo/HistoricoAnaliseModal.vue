@@ -47,7 +47,7 @@
             </template>
             <template #cell(dataHora)="{ item, index }">
               <span :data-testid="`cell-dataHora-${index}`">
-                {{ formatDateTimeBR((item as Analise).dataHora) }}
+                {{ formatarDataHoraBR((item as Analise).dataHora) }}
               </span>
             </template>
             <template #cell(unidadeSigla)="{ item, index }">
@@ -87,7 +87,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
 import type {Analise} from "@/types/tipos";
-import {formatDateTimeBR} from "@/utils/dateUtils";
+import {formatarDataHoraBR} from "@/utils/date";
 
 
 const __ = defineProps<{

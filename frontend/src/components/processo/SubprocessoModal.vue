@@ -43,7 +43,7 @@ import {BFormGroup} from "bootstrap-vue-next";
 import InputData from "@/components/comum/InputData.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {computed, nextTick, ref, watch} from "vue";
-import {formatDateBR, formatDateForInput, isDateStrictlyFuture, obterAmanhaFormatado, parseDate,} from "@/utils";
+import {formatarDataBR, formatarDataParaInput, ehDataEstritamenteFutura, obterAmanhaFormatado, analisarData,} from "@/utils";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 
@@ -79,7 +79,7 @@ const mensagemErroDataLimite = computed(() => {
   const deveExibirMensagem = campoDataInteragido.value || validacaoSubmetida.value;
   if (!deveExibirMensagem) return "";
   if (deveExibirErro(!novaDataLimite.value)) return "A data limite é obrigatória.";
-  if (!isDateStrictlyFuture(parseDate(novaDataLimite.value))) {
+  if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) {
     return "A data limite para validação deve ser uma data futura.";
   }
   if (dataLimiteMinimaPorUltimaData.value && novaDataLimite.value < dataLimiteMinimaPorUltimaData.value) {
@@ -100,7 +100,7 @@ watch(novaDataLimite, (novaData) => {
 
 const dataLimiteMinimaPorUltimaData = computed(() => {
   if (!props.ultimaDataLimiteSubprocesso) return "";
-  return formatDateForInput(props.ultimaDataLimiteSubprocesso);
+  return formatarDataParaInput(props.ultimaDataLimiteSubprocesso);
 });
 
 const dataLimiteMinima = computed(() => {
@@ -111,12 +111,12 @@ const dataLimiteMinima = computed(() => {
 });
 
 const dataLimiteAtualFormatada = computed(() => {
-  return formatDateBR(props.dataLimiteAtual);
+  return formatarDataBR(props.dataLimiteAtual);
 });
 
 const isDataValida = computed(() => {
   if (!novaDataLimite.value) return false;
-  if (!isDateStrictlyFuture(parseDate(novaDataLimite.value))) return false;
+  if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) return false;
   return !dataLimiteMinimaPorUltimaData.value || novaDataLimite.value >= dataLimiteMinimaPorUltimaData.value;
 });
 
@@ -127,7 +127,7 @@ watch(
       campoDataInteragido.value = false;
       if (novoValor && props.dataLimiteAtual) {
         preenchendoValorInicial.value = true;
-        novaDataLimite.value = formatDateForInput(props.dataLimiteAtual);
+        novaDataLimite.value = formatarDataParaInput(props.dataLimiteAtual);
         await nextTick();
         preenchendoValorInicial.value = false;
       } else {

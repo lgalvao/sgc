@@ -2,12 +2,12 @@ import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import ModalAcaoBloco from '../ModalAcaoBloco.vue';
 
-vi.mock("@/utils/dateUtils", async () => {
-    const actual = await vi.importActual("@/utils/dateUtils") as any;
+vi.mock("@/utils/date", async () => {
+    const actual = await vi.importActual("@/utils/date") as any;
     return {
         ...actual,
         obterAmanhaFormatado: () => '2026-03-25',
-        isDateValidAndFuture: (d: string) => d > '2026-03-24'
+        ehDataValidaEFutura: (d: string) => d > '2026-03-24'
     };
 });
 

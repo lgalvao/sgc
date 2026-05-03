@@ -63,9 +63,9 @@
           />
           <AppAlert
               v-if="notificacao"
-              :dismissible="notificacao.dismissible ?? true"
-              :message="notificacao.message"
-              :variant="notificacao.variant"
+              :dispensavel="notificacao.dispensavel ?? true"
+              :mensagem="notificacao.mensagem"
+              :variante="notificacao.variante"
               class="mt-3"
               @dismissed="clear()"
           />
@@ -85,7 +85,7 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import LoginCredenciaisCampos from "@/components/login/LoginCredenciaisCampos.vue";
 import LoginPerfilSelect from "@/components/login/LoginPerfilSelect.vue";
 import {logger} from "@/utils";
-import {normalizeError} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 import type {PerfilUnidade} from "@/types/autenticacao";
 import {TEXTOS} from "@/constants/textos";
 
@@ -170,17 +170,17 @@ const performInitialLogin = async () => {
         notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
       }
   } catch (error: unknown) {
-    const erroNormalizado = normalizeError(error);
-    if (erroNormalizado.kind === 'unexpected') {
-      logger.error("Erro interno no login:", erroNormalizado.message);
+    const erroNormalizado = normalizarErro(error);
+    if (erroNormalizado.tipo === 'inesperado') {
+      logger.error("Erro interno no login:", erroNormalizado.mensagem);
       await router.push("/erro");
       return;
     }
-    if (erroNormalizado.kind !== 'notFound' && erroNormalizado.kind !== 'unauthorized') {
+    if (erroNormalizado.tipo !== 'naoEncontrado' && erroNormalizado.tipo !== 'naoAutorizado') {
       logger.error("Erro no login:", error instanceof Error ? error.message : "Erro desconhecido");
     }
 
-    if (erroNormalizado.kind === 'notFound' || erroNormalizado.kind === 'unauthorized') {
+    if (erroNormalizado.tipo === 'naoEncontrado' || erroNormalizado.tipo === 'naoAutorizado') {
       notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
     } else {
       notify(TEXTOS.login.ERRO_GENERICO, 'danger');
@@ -216,9 +216,9 @@ const performProfileSelection = async () => {
       notify(TEXTOS.login.ERRO_GENERICO, 'danger');
     }
   } catch (error) {
-    const erroNormalizado = normalizeError(error);
-    if (erroNormalizado.kind === 'unexpected') {
-      logger.error("Erro interno ao selecionar perfil:", erroNormalizado.message);
+    const erroNormalizado = normalizarErro(error);
+    if (erroNormalizado.tipo === 'inesperado') {
+      logger.error("Erro interno ao selecionar perfil:", erroNormalizado.mensagem);
       await router.push("/erro");
       return;
     }

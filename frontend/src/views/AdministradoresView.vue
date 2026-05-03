@@ -125,7 +125,7 @@ import {
   listarAdministradores,
   removerAdministrador
 } from '@/services/administradorService';
-import {normalizeError} from '@/utils/apiError';
+import {normalizarErro} from '@/utils/apiError';
 import {useNotification} from '@/composables/useNotification';
 import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
 import {TEXTOS} from '@/constants/textos';
@@ -205,7 +205,7 @@ async function adicionarAdmin() {
     notify(TEXTOS.administracao.SUCESSO_ADICIONADO, 'success');
     await carregarAdministradores();
   } catch (error) {
-    erroAdicionarAdmin.value = normalizeError(error).message;
+    erroAdicionarAdmin.value = normalizarErro(error).mensagem;
   } finally {
     adicionandoAdmin.value = false;
   }
@@ -229,7 +229,7 @@ async function removerAdmin() {
     mostrarModalRemoverAdmin.value = false;
     adminParaRemover.value = null;
   } catch (error) {
-    erroRemoverAdmin.value = normalizeError(error).message;
+    erroRemoverAdmin.value = normalizarErro(error).mensagem;
   } finally {
     removendoAdmin.value = null;
   }

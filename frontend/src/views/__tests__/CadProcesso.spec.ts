@@ -4,10 +4,10 @@ import {nextTick} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {TEXTOS} from "@/constants/textos";
-import * as processoService from '@/services/processoService';
-import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import * as processoService from '@/services/processo';
+import {obterAmanhaFormatado} from "@/utils/date";
 
-vi.mock('@/services/processoService', () => ({
+vi.mock('@/services/processo', () => ({
     obterDetalhesProcesso: vi.fn(),
     criarProcesso: vi.fn(),
     atualizarProcesso: vi.fn(),
@@ -132,7 +132,7 @@ describe('ProcessoCadastroView.vue', () => {
                     PageHeader: true,
                     LoadingButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     AppAlert: {
-                        template: '<div v-if="message || notification" data-testid="app-alert"><p v-if="message">{{message}}</p><template v-if="notification"><p>{{notification.summary}}</p><ul><li v-for="d in notification.details" :key="d">{{d}}</li></ul></template></div>',
+                        template: '<div v-if="message || notification" data-testid="app-alert"><p v-if="message">{{message}}</p><template v-if="notification"><p>{{notification.resumo}}</p><ul><li v-for="d in notification.detalhes" :key="d">{{d}}</li></ul></template></div>',
                         props: ['message', 'notification', 'variant', 'dismissible', 'stackTrace'],
                     },
                     ProcessoFormFields: ProcessoFormFieldsStub,
@@ -251,7 +251,7 @@ describe('ProcessoCadastroView.vue', () => {
         expect(wrapper.vm.fieldErrors.dataLimite).toBe('Data inválida');
         expect(wrapper.vm.fieldErrors.unidades).toBe('Selecione ao menos uma unidade');
         expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro genérico');
+        expect(wrapper.vm.notificacao?.notificacao?.detalhes).toContain('Erro genérico');
     });
 
     it('handles error without lastError (network/runtime error)', async () => {
@@ -269,12 +269,12 @@ describe('ProcessoCadastroView.vue', () => {
         await flushPromises();
 
         expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.message).toContain('Não foi possível salvar o processo');
+        expect(wrapper.vm.notificacao?.mensagem).toContain('Não foi possível salvar o processo');
     });
 
     it('does nothing when confirmarRemocao is called without processoEditando', async () => {
         const {wrapper} = createWrapper();
-        const processoServiceModule = await import('@/services/processoService');
+        const processoServiceModule = await import('@/services/processo');
         vi.spyOn(processoServiceModule, 'excluirProcesso');
 
         wrapper.vm.processoEditando = null;

@@ -4,7 +4,7 @@ import Processo from "@/views/ProcessoDetalheView.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {createTestingPinia} from "@pinia/testing";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
@@ -27,11 +27,11 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-vi.mock("@/services/processoService");
+vi.mock("@/services/processo");
 
 // Mock da useProcessoStore (Rodada 2) — delega ao processoService já mockado
 vi.mock("@/stores/processo", async () => {
-    const processoSvc = await import("@/services/processoService");
+    const processoSvc = await import("@/services/processo");
     return {
         useProcessoStore: () => ({
             garantirContextoCompleto: (codProcesso: number) => processoSvc.buscarContextoCompleto(codProcesso),

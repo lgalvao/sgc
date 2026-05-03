@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "../ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 import {useProcessoStore} from "@/stores/processo";
 
 const mocks = vi.hoisted(() => ({
@@ -17,7 +17,7 @@ vi.mock("vue-router", () => ({
     useRoute: () => mocks.mockRoute,
 }));
 
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/processo", () => ({
     executarAcaoEmBloco: vi.fn().mockResolvedValue({}),
 }));
 

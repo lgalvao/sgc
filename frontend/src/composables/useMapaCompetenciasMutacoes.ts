@@ -1,7 +1,7 @@
 import {type ComputedRef, ref, type Ref} from "vue";
 import type {Competencia, MapaCompleto, SalvarCompetenciaRequest} from "@/types/tipos";
-import type {NormalizedError} from "@/utils/apiError";
-import {normalizeError} from "@/utils/apiError";
+import type {ErroNormalizado} from "@/utils/apiError";
+import {normalizarErro} from "@/utils/apiError";
 import logger from "@/utils/logger";
 
 interface FluxoMapaCompetencias {
@@ -17,7 +17,7 @@ interface UseMapaCompetenciasMutacoesParams {
     fluxoMapa: FluxoMapaCompetencias;
     notify: (mensagem: string, variante: "danger" | "warning" | "success" | "info") => void;
     clearErrors: () => void;
-    aplicarErroNormalizado: (error: NormalizedError | null) => void;
+    aplicarErroNormalizado: (error: ErroNormalizado | null) => void;
     sincronizarMapa: (mapaAtualizado: MapaCompleto | null | undefined) => void;
 }
 
@@ -44,7 +44,7 @@ export function useMapaCompetenciasMutacoes({
     }
 
     function handleErrors(error: unknown) {
-        aplicarErroNormalizado(normalizeError(error) as NormalizedError);
+        aplicarErroNormalizado(normalizarErro(error) as ErroNormalizado);
     }
 
     function abrirModalCriarNovaCompetencia(competenciaParaEditar: Competencia | null = null) {
@@ -110,7 +110,7 @@ export function useMapaCompetenciasMutacoes({
                 mostrarModalExcluirCompetencia.value = false;
             } catch (error) {
                 logger.error(error);
-                notify(normalizeError(error).message, "danger");
+                notify(normalizarErro(error).mensagem, "danger");
             } finally {
                 loadingExclusao.value = false;
             }
@@ -123,7 +123,7 @@ export function useMapaCompetenciasMutacoes({
                 sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigo, competenciaId, codigoAtividade));
             } catch (error) {
                 logger.error(error);
-                notify(normalizeError(error).message, "danger");
+                notify(normalizarErro(error).mensagem, "danger");
             }
         });
     }

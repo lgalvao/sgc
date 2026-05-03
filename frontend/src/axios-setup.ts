@@ -1,7 +1,7 @@
 import type {AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import axios, {AxiosHeaders} from "axios";
 import type {Router} from "vue-router";
-import {normalizeError, shouldNotifyGlobally} from '@/utils/apiError';
+import {normalizarErro, deveNotificarGlobalmente} from '@/utils/apiError';
 import logger from "@/utils/logger";
 
 let routerInstance: Router | null = null;
@@ -217,10 +217,10 @@ const handleResponseError = (error: unknown) => {
         });
     }
 
-    const normalized = normalizeError(error);
+    const normalized = normalizarErro(error);
 
     // Caso especial: 401 - redirecionar para login
-    if (normalized.kind === 'unauthorized') {
+    if (normalized.tipo === 'naoAutorizado') {
         const currentPath = routerInstance?.currentRoute?.value?.path;
         if (currentPath !== '/login') {
             routerInstance?.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
@@ -229,8 +229,8 @@ const handleResponseError = (error: unknown) => {
     }
 
     // Loga globalmente erros de rede e inesperados para diagnóstico
-    if (shouldNotifyGlobally(normalized)) {
-        logger.error("[axios] Erro global:", normalized.message);
+    if (deveNotificarGlobalmente(normalized)) {
+        logger.error("[axios] Erro global:", normalized.mensagem);
     }
 
     // Sempre rejeitar para permitir tratamento local

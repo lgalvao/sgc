@@ -1,12 +1,12 @@
 import {describe, expect, it} from 'vitest';
 import {
-    formatDateBR,
-    isDateStrictlyFuture,
-    isDateValidAndFuture,
+    formatarDataBR,
+    ehDataEstritamenteFutura,
+    ehDataValidaEFutura,
     obterAmanhaFormatado,
     obterHojeFormatado,
-    parseDate
-} from '../dateUtils';
+    analisarData
+} from '../date';
 
 describe('dateUtils', () => {
   it('obterAmanhaFormatado and obterHojeFormatado', () => {
@@ -14,44 +14,44 @@ describe('dateUtils', () => {
     expect(obterHojeFormatado()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
-  it('parseDate covers multiple branches', () => {
+  it('analisarData covers multiple branches', () => {
     // 22: trimmed empty
-    expect(parseDate("  ")).toBeNull();
+    expect(analisarData("  ")).toBeNull();
     
     // 36: timestamp string
     const now = Date.now();
-    expect(parseDate(now.toString())?.getTime()).toBe(now);
-    expect(parseDate("invalid_timestamp")).toBeNull();
+    expect(analisarData(now.toString())?.getTime()).toBe(now);
+    expect(analisarData("invalid_timestamp")).toBeNull();
 
     // 58: number input
-    expect(parseDate(now)?.getTime()).toBe(now);
-    expect(parseDate(NaN)).toBeNull();
+    expect(analisarData(now)?.getTime()).toBe(now);
+    expect(analisarData(NaN)).toBeNull();
 
     // 69: array input
-    expect(parseDate([2023, 1, 1])).toBeInstanceOf(Date);
+    expect(analisarData([2023, 1, 1])).toBeInstanceOf(Date);
 
     // 48: object with value (BTable context)
-    expect(parseDate({ value: "2023-01-01" })).toBeInstanceOf(Date);
+    expect(analisarData({ value: "2023-01-01" })).toBeInstanceOf(Date);
     
     // 53: Date instance
-    expect(parseDate(new Date("invalid"))).toBeNull();
+    expect(analisarData(new Date("invalid"))).toBeNull();
   });
 
-  it('formatDateBR handles nulls and invalid dates', () => {
-    expect(formatDateBR(null)).toBe("Não informado");
-    expect(formatDateBR("invalid")).toBe("Data inválida");
+  it('formatarDataBR handles nulls and invalid dates', () => {
+    expect(formatarDataBR(null)).toBe("Não informado");
+    expect(formatarDataBR("invalid")).toBe("Data inválida");
   });
 
-  it('isDateValidAndFuture and isDateStrictlyFuture', () => {
-    expect(isDateValidAndFuture(null)).toBe(false);
-    expect(isDateStrictlyFuture(null)).toBe(false);
+  it('ehDataValidaEFutura and ehDataEstritamenteFutura', () => {
+    expect(ehDataValidaEFutura(null)).toBe(false);
+    expect(ehDataEstritamenteFutura(null)).toBe(false);
     
     const today = new Date();
-    expect(isDateValidAndFuture(today)).toBe(true);
-    expect(isDateStrictlyFuture(today)).toBe(false);
+    expect(ehDataValidaEFutura(today)).toBe(true);
+    expect(ehDataEstritamenteFutura(today)).toBe(false);
     
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    expect(isDateStrictlyFuture(tomorrow)).toBe(true);
+    expect(ehDataEstritamenteFutura(tomorrow)).toBe(true);
   });
 });

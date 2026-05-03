@@ -22,9 +22,7 @@
         </BNavItem>
       </BNavbarNav>
 
-      <!-- Right aligned nav items -->
       <BNavbarNav class="ms-auto align-items-lg-center">
-
         <BNavItem
             v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: isMobile }"
             class="me-2 user-profile-item"
@@ -91,7 +89,6 @@
             <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1" title="Ações Especiais"/>
             <span aria-hidden="true" class="d-lg-none">Ações Especiais</span>
           </template>
-          
           <BDropdownItem
               data-testid="btn-nav-limpeza-processos"
               to="/administracao/limpeza-processos"
@@ -150,8 +147,6 @@ const {
   mostrarMenuConfiguracoes,
   mostrarMenuAdministradores
 } = usePerfil();
-
-// Controle reativo de largura para desabilitar tooltips no mobile
 const windowWidth = ref(window.innerWidth);
 const updateWidth = () => {
   windowWidth.value = window.innerWidth;
@@ -159,9 +154,6 @@ const updateWidth = () => {
 onMounted(() => window.addEventListener('resize', updateWidth));
 onUnmounted(() => window.removeEventListener('resize', updateWidth));
 const isMobile = computed(() => windowWidth.value < 992);
-
-// Para ADMIN: mostra "Unidades" e direciona para a árvore completa
-// Para outros perfis: mostra "Minha unidade" e direciona para unidade do usuário
 const labelUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? TEXTOS.comum.MENU_UNIDADES : TEXTOS.comum.MENU_MINHA_UNIDADE);
 const iconUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
 const linkUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
@@ -179,8 +171,5 @@ async function handleLogout() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-@media (max-width: 992px) {
 }
 </style>

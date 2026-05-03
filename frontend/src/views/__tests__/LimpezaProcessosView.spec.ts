@@ -2,9 +2,9 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import LimpezaProcessosView from '../LimpezaProcessosView.vue';
 import {createTestingPinia} from '@pinia/testing';
-import {excluirProcessoCompleto} from '@/services/processoService';
+import {excluirProcessoCompleto} from '@/services/processo';
 
-vi.mock('@/services/processoService', () => ({
+vi.mock('@/services/processo', () => ({
   excluirProcessoCompleto: vi.fn()
 }));
 

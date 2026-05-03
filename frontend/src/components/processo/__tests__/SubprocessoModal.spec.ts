@@ -2,18 +2,18 @@ import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import SubprocessoModal from '../SubprocessoModal.vue';
 
-vi.mock("@/utils/dateUtils", async () => {
-    const actual = await vi.importActual("@/utils/dateUtils") as any;
+vi.mock("@/utils/date", async () => {
+    const actual = await vi.importActual("@/utils/date") as any;
     return {
         ...actual,
         obterAmanhaFormatado: () => '2026-03-25',
-        isDateValidAndFuture: (d: any) => {
+        ehDataValidaEFutura: (d: any) => {
             if (!d) return false;
             // Simplificado para o teste
             const dateStr = typeof d === 'string' ? d : d.toISOString().split('T')[0];
             return dateStr > '2026-03-24';
         },
-        parseDate: (d: string) => new Date(d + 'T12:00:00')
+        analisarData: (d: string) => new Date(d + 'T12:00:00')
     };
 });
 

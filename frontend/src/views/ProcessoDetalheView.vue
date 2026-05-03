@@ -2,17 +2,17 @@
   <LayoutPadrao>
     <AppAlert
         v-if="lastError"
-        :message="lastError.message"
+        :mensagem="lastError.mensagem"
         variant="danger"
         @dismissed="clearError()"/>
 
     <AppAlert
         v-if="notificacao"
-        :dismissible="notificacao.dismissible ?? true"
-        :message="notificacao.message"
-        :notification="notificacao.notification"
+        :dispensavel="notificacao.dispensavel ?? true"
+        :mensagem="notificacao.mensagem"
+        :notification="notificacao.notificacao"
         :stack-trace="notificacao.stackTrace"
-        :variant="notificacao.variant"
+        :variante="notificacao.variante"
         @dismissed="clear()"/>
 
     <div v-if="processo">
@@ -80,7 +80,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useProcessoStore} from "@/stores/processo";
 import type {Processo} from "@/types/tipos";
 import {logger} from "@/utils";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
 
 type LinhaCliqueSubprocesso = {
@@ -96,7 +96,7 @@ const {isAdmin} = usePerfil();
 const processoStore = useProcessoStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
-const lastError = ref<NormalizedError | null>(null);
+const lastError = ref<ErroNormalizado | null>(null);
 const carregamentoInicialConcluido = ref(false);
 
 function clearError() {
@@ -104,8 +104,8 @@ function clearError() {
 }
 
 function registrarErro(error: unknown) {
-  lastError.value = normalizeError(error);
-  return lastError.value?.message || TEXTOS.processo.ERRO_PADRAO;
+  lastError.value = normalizarErro(error);
+  return lastError.value?.mensagem || TEXTOS.processo.ERRO_PADRAO;
 }
 
 async function carregarContextoCompleto() {
@@ -121,7 +121,7 @@ async function carregarContextoCompleto() {
     // Limpa os dados apenas em caso de erro para evitar exibir informações desatualizadas como válidas.
     // Durante o recarregamento em background, os dados antigos permanecem visíveis (sem flash de spinner).
     processo.value = null;
-    lastError.value = normalizeError(error);
+    lastError.value = normalizarErro(error);
     throw error;
   }
 }

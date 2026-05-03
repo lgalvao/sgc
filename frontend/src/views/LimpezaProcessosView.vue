@@ -4,9 +4,9 @@
 
     <AppAlert
         v-if="notificacao"
-        :dismissible="notificacao.dismissible ?? true"
-        :message="notificacao.message"
-        :variant="notificacao.variant"
+        :dispensavel="notificacao.dispensavel ?? true"
+        :mensagem="notificacao.mensagem"
+        :variante="notificacao.variante"
         @dismissed="clear()"
     />
 
@@ -80,8 +80,8 @@ import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useNotification} from '@/composables/useNotification';
 import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
-import {normalizeError} from '@/utils/apiError';
-import {excluirProcessoCompleto} from '@/services/processoService';
+import {normalizarErro} from '@/utils/apiError';
+import {excluirProcessoCompleto} from '@/services/processo';
 
 const {notificacao, notify, clear} = useNotification();
 const {
@@ -124,7 +124,7 @@ async function confirmarExclusao() {
     codigoProcesso.value = '';
     notify(TEXTOS.administracao.LIMPEZA_SUCESSO, 'success');
   } catch (error) {
-    notify(normalizeError(error).message, 'danger');
+    notify(normalizarErro(error).mensagem, 'danger');
   } finally {
     excluindo.value = false;
   }

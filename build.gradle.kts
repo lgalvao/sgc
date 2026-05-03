@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
-    alias(libs.plugins.open.rewrite) apply false
-    id("base")
 }
 
 allprojects {

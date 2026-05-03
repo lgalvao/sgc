@@ -1,29 +1,29 @@
 import {describe, expect, it, vi} from 'vitest';
-import {existsOrFalse, getOrNull, isAxiosError, normalizeError, shouldNotifyGlobally} from '@/utils/apiError';
+import {ehErroAxios, normalizarErro, deveNotificarGlobalmente} from '@/utils/apiError';
 import logger from '@/utils/logger';
 
 describe('apiError utils', () => {
-    it('isAxiosError deve identificar erros do axios', () => {
-        expect(isAxiosError({isAxiosError: true})).toBe(true);
-        expect(isAxiosError({isAxiosError: false})).toBe(false);
-        expect(isAxiosError({})).toBe(false);
-        expect(isAxiosError(null)).toBe(false);
+    it('ehErroAxios deve identificar erros do axios', () => {
+        expect(ehErroAxios({isAxiosError: true})).toBe(true);
+        expect(ehErroAxios({isAxiosError: false})).toBe(false);
+        expect(ehErroAxios({})).toBe(false);
+        expect(ehErroAxios(null)).toBe(false);
     });
 
-    describe('normalizeError', () => {
+    describe('normalizarErro', () => {
         it('deve normalizar erro de rede', () => {
             const err = {isAxiosError: true, response: undefined};
-            const normalized = normalizeError(err);
-            expect(normalized.kind).toBe('network');
-            expect(normalized.message).toContain('conexão');
+            const normalized = normalizarErro(err);
+            expect(normalized.tipo).toBe('rede');
+            expect(normalized.mensagem).toContain('conexão');
         });
 
         it('deve normalizar requisicao cancelada', () => {
             const err = {isAxiosError: true, code: 'ERR_CANCELED', response: undefined};
-            const normalized = normalizeError(err);
-            expect(normalized.kind).toBe('network');
-            expect(normalized.code).toBe('REQUEST_CANCELADA');
-            expect(normalized.message).toBe('Requisição cancelada.');
+            const normalized = normalizarErro(err);
+            expect(normalized.tipo).toBe('rede');
+            expect(normalized.codigo).toBe('REQUEST_CANCELADA');
+            expect(normalized.mensagem).toBe('Requisição cancelada.');
         });
 
         it('deve normalizar erro HTTP com resposta', () => {
@@ -34,10 +34,10 @@ describe('apiError utils', () => {
                     data: {message: 'Não achei', code: 'E001'}
                 }
             };
-            const normalized = normalizeError(err);
-            expect(normalized.kind).toBe('notFound');
-            expect(normalized.message).toBe('Não achei');
-            expect(normalized.code).toBe('E001');
+            const normalized = normalizarErro(err);
+            expect(normalized.tipo).toBe('naoEncontrado');
+            expect(normalized.mensagem).toBe('Não achei');
+            expect(normalized.codigo).toBe('E001');
             expect(normalized.status).toBe(404);
         });
 
@@ -54,7 +54,8 @@ describe('apiError utils', () => {
                 }
             };
 
-            const normalized = normalizeError(err);
+
+            const normalized = normalizarErro(err);
 
             expect(normalized.erros).toEqual([{campo: 'descricao', mensagem: 'Descrição obrigatória'}]);
             expect(normalized).not.toHaveProperty('subErrors');
@@ -65,75 +66,40 @@ describe('apiError utils', () => {
                 isAxiosError: true,
                 response: {status: 500}
             };
-            const normalized = normalizeError(err);
-            expect(normalized.kind).toBe('unexpected');
-            expect(normalized.message).toBe('Erro 500: O servidor não retornou uma mensagem detalhada.');
+            const normalized = normalizarErro(err);
+            expect(normalized.tipo).toBe('inesperado');
+            expect(normalized.mensagem).toBe('Erro 500: O servidor não retornou uma mensagem detalhada.');
         });
 
         it('deve normalizar erro genérico do JS', () => {
             const err = new Error('Erro custom');
-            const normalized = normalizeError(err);
-            expect(normalized.kind).toBe('unexpected');
-            expect(normalized.message).toBe('Erro custom');
+            const normalized = normalizarErro(err);
+            expect(normalized.tipo).toBe('inesperado');
+            expect(normalized.mensagem).toBe('Erro custom');
             expect(normalized.stackTrace).toBeDefined();
         });
 
         it('deve normalizar erro desconhecido (string)', () => {
-            const normalized = normalizeError('string error');
-            expect(logger.error).toHaveBeenCalledWith("[normalizeError] Erro não mapeado:", "string error");
-            expect(normalized.kind).toBe('unexpected');
-            expect(normalized.message).toBe('Erro desconhecido ou não mapeado pela aplicação.');
+            const normalized = normalizarErro('string error');
+            expect(logger.error).toHaveBeenCalledWith("[normalizarErro] Erro não mapeado:", "string error");
+            expect(normalized.tipo).toBe('inesperado');
+            expect(normalized.mensagem).toBe('Erro desconhecido ou não mapeado pela aplicação.');
         });
 
         it('mapeia outros status corretamente', () => {
-            expect(normalizeError({isAxiosError: true, response: {status: 400}}).kind).toBe('validation');
-            expect(normalizeError({isAxiosError: true, response: {status: 401}}).kind).toBe('unauthorized');
-            expect(normalizeError({isAxiosError: true, response: {status: 403}}).kind).toBe('forbidden');
-            expect(normalizeError({isAxiosError: true, response: {status: 409}}).kind).toBe('conflict');
-            expect(normalizeError({isAxiosError: true, response: {status: 503}}).kind).toBe('unexpected');
+            expect(normalizarErro({isAxiosError: true, response: {status: 400}}).tipo).toBe('validacao');
+            expect(normalizarErro({isAxiosError: true, response: {status: 401}}).tipo).toBe('naoAutorizado');
+            expect(normalizarErro({isAxiosError: true, response: {status: 403}}).tipo).toBe('proibido');
+            expect(normalizarErro({isAxiosError: true, response: {status: 409}}).tipo).toBe('conflito');
+            expect(normalizarErro({isAxiosError: true, response: {status: 503}}).tipo).toBe('inesperado');
         });
     });
 
-    it('shouldNotifyGlobally deve decidir corretamente', () => {
-        expect(shouldNotifyGlobally({kind: 'unauthorized'} as any)).toBe(true);
-        expect(shouldNotifyGlobally({kind: 'validation'} as any)).toBe(false);
-        expect(shouldNotifyGlobally({kind: 'network'} as any)).toBe(true);
-        expect(shouldNotifyGlobally({kind: 'forbidden'} as any)).toBe(false);
-    });
-
-    describe('helper functions', () => {
-        it('existsOrFalse retorna true se sucesso', async () => {
-            const call = vi.fn().mockResolvedValue('ok');
-            const res = await existsOrFalse(call);
-            expect(res).toBe(true);
+    it('deveNotificarGlobalmente deve decidir corretamente', () => {
+        expect(deveNotificarGlobalmente({tipo: 'naoAutorizado'} as any)).toBe(true);
+        expect(deveNotificarGlobalmente({tipo: 'validacao'} as any)).toBe(false);
+        expect(deveNotificarGlobalmente({tipo: 'rede'} as any)).toBe(true);
+        expect(deveNotificarGlobalmente({tipo: 'proibido'} as any)).toBe(false);
+        });
         });
 
-        it('existsOrFalse retorna false se 404', async () => {
-            const call = vi.fn().mockRejectedValue({isAxiosError: true, response: {status: 404}});
-            const res = await existsOrFalse(call);
-            expect(res).toBe(false);
-        });
-
-        it('existsOrFalse propaga outros erros', async () => {
-            const call = vi.fn().mockRejectedValue(new Error('Other'));
-            await expect(existsOrFalse(call)).rejects.toThrow('Other');
-        });
-
-        it('getOrNull retorna dado se sucesso', async () => {
-            const call = vi.fn().mockResolvedValue('data');
-            const res = await getOrNull(call);
-            expect(res).toBe('data');
-        });
-
-        it('getOrNull retorna null se 404', async () => {
-            const call = vi.fn().mockRejectedValue({isAxiosError: true, response: {status: 404}});
-            const res = await getOrNull(call);
-            expect(res).toBeNull();
-        });
-
-        it('getOrNull propaga outros erros', async () => {
-            const call = vi.fn().mockRejectedValue(new Error('Other'));
-            await expect(getOrNull(call)).rejects.toThrow('Other');
-        });
-    });
-});

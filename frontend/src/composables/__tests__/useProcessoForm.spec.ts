@@ -2,7 +2,7 @@ import {describe, expect, it} from "vitest";
 import {useProcessoForm} from "../useProcessoForm";
 import {TipoProcesso} from "@/types/tipos";
 import {flushPromises} from "@vue/test-utils";
-import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import {obterAmanhaFormatado} from "@/utils/date";
 
 describe("useProcessoForm", () => {
     it("deve inicializar com valores vazios", () => {

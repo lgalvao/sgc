@@ -1,7 +1,7 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 import * as subprocessoService from "@/services/subprocessoService";
 import type {Atividade, ProcessoResumo, UnidadeImportacao} from "@/types/tipos";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
@@ -11,7 +11,7 @@ vi.mock("@/services/subprocessoService", () => ({
     importarAtividades: vi.fn(),
     listarAtividadesParaImportacao: vi.fn(),
 }));
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/processo", () => ({
     buscarProcessosParaImportacao: vi.fn(),
     buscarUnidadesParaImportacao: vi.fn(),
 }));

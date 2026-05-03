@@ -5,12 +5,12 @@ import {nextTick} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
-import * as processoService from '@/services/processoService';
+import * as processoService from '@/services/processo';
 import {useProcessoStore} from '@/stores/processo';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {useUnidadeStore} from '@/stores/unidade';
 
-vi.mock('@/services/processoService', () => ({
+vi.mock('@/services/processo', () => ({
     obterDetalhesProcesso: vi.fn(),
     criarProcesso: vi.fn(),
     atualizarProcesso: vi.fn(),
@@ -150,7 +150,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         await flushPromises();
 
         expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro genérico de regra de negócio');
+        expect(wrapper.vm.notificacao?.notificacao?.detalhes).toContain('Erro genérico de regra de negócio');
         expect(wrapper.vm.fieldErrors.descricao).toBe('Descrição inválida');
     });
 
@@ -175,7 +175,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect(processoService.criarProcesso).toHaveBeenCalled();
         expect(processoService.iniciarProcesso).not.toHaveBeenCalled();
         expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Failed to create');
+        expect(wrapper.vm.notificacao?.notificacao?.resumo).toContain('Failed to create');
         expect(wrapper.vm.isLoading).toBe(false);
     });
 
@@ -204,7 +204,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect(processoService.criarProcesso).toHaveBeenCalled();
         expect(processoService.iniciarProcesso).toHaveBeenCalledWith(777, 'MAPEAMENTO', [1]);
         expect(wrapper.vm.notificacao).not.toBeNull();
-        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Failed to start');
+        expect(wrapper.vm.notificacao?.notificacao?.resumo).toContain('Failed to start');
         expect(wrapper.vm.isLoading).toBe(false);
     });
 
@@ -240,7 +240,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
         expect((wrapper.vm).mostrarModalRemocao).toBe(false);
         expect((wrapper.vm).notificacao).not.toBeNull();
-        expect((wrapper.vm).notificacao?.notification?.summary).toContain('Failed to delete');
+        expect((wrapper.vm).notificacao?.notificacao?.resumo).toContain('Failed to delete');
     });
 
     it('fecharModalRemocao closes the modal', async () => {

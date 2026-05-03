@@ -15,7 +15,7 @@ import {
     registrarContexto
 } from "@/stores/subprocessoStoreHelpers";
 import {logger} from "@/utils";
-import {type NormalizedError, normalizeError} from "@/utils/apiError";
+import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 
 type ChaveCarregamento =
     | "EDICAO_CODIGO"
@@ -41,7 +41,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
     const contextoEdicaoInvalido = ref(false);
     const contextoCadastroInvalido = ref(false);
-    const erroIntegracaoContexto = ref<NormalizedError | null>(null);
+    const erroIntegracaoContexto = ref<ErroNormalizado | null>(null);
     const carregamentos = new Map<string, Promise<unknown>>();
     const codigosEdicaoPorProcessoUnidade = new Map<string, number>();
     const codigosCadastroPorProcessoUnidade = new Map<string, number>();
@@ -88,24 +88,24 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         registrarContexto(contextoCadastro, contextoCadastroInvalido, contexto, limparErroIntegracao);
     }
 
-    function criarErroSubprocessoNaoEncontrado(mensagemBase: string, erroNormalizado: NormalizedError): NormalizedError {
+    function criarErroSubprocessoNaoEncontrado(mensagemBase: string, erroNormalizado: ErroNormalizado): ErroNormalizado {
         return {
             ...erroNormalizado,
-            kind: "unexpected",
-            message: `${mensagemBase} Isso indica inconsistência interna ou tentativa inválida de acesso.`,
-            code: erroNormalizado.code ?? "SUBPROCESSO_NAO_ENCONTRADO_INESPERADO",
+            tipo: "inesperado",
+            mensagem: `${mensagemBase} Isso indica inconsistência interna ou tentativa inválida de acesso.`,
+            codigo: erroNormalizado.codigo ?? "SUBPROCESSO_NAO_ENCONTRADO_INESPERADO",
         };
     }
 
     function registrarErroIntegracao(erro: unknown, mensagemBase: string): null {
-        const erroNormalizado = normalizeError(erro);
-        if (erroNormalizado.code === "REQUEST_CANCELADA") {
+        const erroNormalizado = normalizarErro(erro);
+        if (erroNormalizado.codigo === "REQUEST_CANCELADA") {
             erroIntegracaoContexto.value = erroNormalizado;
             return null;
         }
 
         logger.error(mensagemBase, erro);
-        erroIntegracaoContexto.value = erroNormalizado.kind === "notFound"
+        erroIntegracaoContexto.value = erroNormalizado.tipo === "naoEncontrado"
             ? criarErroSubprocessoNaoEncontrado(mensagemBase, erroNormalizado)
             : erroNormalizado;
         return null;

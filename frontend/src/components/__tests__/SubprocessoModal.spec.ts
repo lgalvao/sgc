@@ -31,7 +31,7 @@ describe("SubprocessoModal", () => {
     });
 
     it("deve mostrar erro ao confirmar se a data for inválida", async () => {
-        vi.spyOn(utils, "isDateStrictlyFuture").mockReturnValue(false);
+        vi.spyOn(utils, "ehDataEstritamenteFutura").mockReturnValue(false);
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
         });
@@ -45,7 +45,7 @@ describe("SubprocessoModal", () => {
     });
 
     it("deve habilitar o botão de confirmar se a data for válida", async () => {
-        vi.spyOn(utils, "isDateStrictlyFuture").mockReturnValue(true);
+        vi.spyOn(utils, "ehDataEstritamenteFutura").mockReturnValue(true);
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
         });
@@ -67,7 +67,7 @@ describe("SubprocessoModal", () => {
     });
 
     it('deve emitir "confirmarAlteracao" com a nova data', async () => {
-        vi.spyOn(utils, "isDateStrictlyFuture").mockReturnValue(true);
+        vi.spyOn(utils, "ehDataEstritamenteFutura").mockReturnValue(true);
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
         });

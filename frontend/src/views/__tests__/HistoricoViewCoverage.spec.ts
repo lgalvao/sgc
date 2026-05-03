@@ -4,9 +4,9 @@ import {createTestingPinia} from "@pinia/testing";
 import HistoricoView from "@/views/HistoricoView.vue";
 import {createMemoryHistory, createRouter} from "vue-router";
 import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/processo", () => ({
     buscarProcessosFinalizados: vi.fn(),
 }));
 

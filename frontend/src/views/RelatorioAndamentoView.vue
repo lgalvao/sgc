@@ -43,7 +43,7 @@ import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";
 import type {ProcessoResumo} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
-import {formatDateBR, formatDateTimeBR} from "@/utils/dateUtils";
+import {formatarDataBR, formatarDataHoraBR} from "@/utils/date";
 
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
@@ -58,8 +58,8 @@ const relatorioAndamento = computed(() => relatoriosStore.relatorioAndamento);
 const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(item => {
   const dt1 = item.dataLimiteEtapa1;
   const dt2 = item.dataLimiteEtapa2;
-  const dt1Formatada = dt1 ? formatDateBR(dt1) : '-';
-  const dt2Formatada = dt2 ? formatDateBR(dt2) : '-';
+  const dt1Formatada = dt1 ? formatarDataBR(dt1) : '-';
+  const dt2Formatada = dt2 ? formatarDataBR(dt2) : '-';
   const mostraPrazoAjustado = Boolean(dt2 && dt1 && dt2Formatada !== dt1Formatada);
 
   return {
@@ -67,9 +67,9 @@ const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(ite
     localizacao: item.localizacao || '-',
     dataLimiteEtapa1: dt1Formatada,
     dataLimiteEtapa2: dt2Formatada,
-    dataFimEtapa1: item.dataFimEtapa1 ? formatDateBR(item.dataFimEtapa1) : '-',
-    dataFimEtapa2: item.dataFimEtapa2 ? formatDateBR(item.dataFimEtapa2) : '-',
-    dataUltimaMovimentacao: item.dataUltimaMovimentacao ? formatDateTimeBR(item.dataUltimaMovimentacao) : '-',
+    dataFimEtapa1: item.dataFimEtapa1 ? formatarDataBR(item.dataFimEtapa1) : '-',
+    dataFimEtapa2: item.dataFimEtapa2 ? formatarDataBR(item.dataFimEtapa2) : '-',
+    dataUltimaMovimentacao: item.dataUltimaMovimentacao ? formatarDataHoraBR(item.dataUltimaMovimentacao) : '-',
     mostraPrazoAjustado
   };
 }));

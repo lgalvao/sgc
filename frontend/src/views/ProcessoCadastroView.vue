@@ -23,11 +23,11 @@
       <BForm class="mt-4">
         <AppAlert
             v-if="notificacao"
-            :dismissible="notificacao.dismissible ?? true"
-            :message="notificacao.message"
-            :notification="notificacao.notification"
+            :dispensavel="notificacao.dispensavel ?? true"
+            :mensagem="notificacao.mensagem"
+            :notification="notificacao.notificacao"
             :stack-trace="notificacao.stackTrace"
-            :variant="notificacao.variant"
+            :variante="notificacao.variante"
             @dismissed="clear()"
         />
 
@@ -132,7 +132,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
-import {isAxiosError, normalizeError, shouldNotifyGlobally} from "@/utils/apiError";
+import {ehErroAxios, normalizarErro, deveNotificarGlobalmente} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
@@ -142,7 +142,7 @@ import {useToastStore} from "@/stores/toast";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
 import {usePerfil} from "@/composables/usePerfil";
 
@@ -153,7 +153,7 @@ const {
   unidadesSelecionadas,
   fieldErrors,
   isFormInvalid,
-  setFromNormalizedError,
+  setFromErroNormalizado,
   clearErrors,
   hasErrors,
   construirCriarRequest,
@@ -213,7 +213,7 @@ function dispensarAlertaDiagnostico() {
   alertaDiagnosticoDispensado.value = true;
 }
 
-function extrairErrosGenericos(error: ReturnType<typeof normalizeError>): string[] {
+function extrairErrosGenericos(error: ReturnType<typeof normalizarErro>): string[] {
   return error.erros
       ?.filter(erro => !erro.campo)
       .map(erro => erro.mensagem ?? "")
@@ -325,11 +325,11 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
   clearErrors();
   clear();
 
-  const erroNormalizado = normalizeError(error);
-  const usarErroEstruturado = isAxiosError(error) || (erroNormalizado.erros?.length ?? 0) > 0;
+  const erroNormalizado = normalizarErro(error);
+  const usarErroEstruturado = ehErroAxios(error) || (erroNormalizado.erros?.length ?? 0) > 0;
 
   if (usarErroEstruturado) {
-    setFromNormalizedError(erroNormalizado);
+    setFromErroNormalizado(erroNormalizado);
     if (fieldErrors.value.dataLimiteEtapa1) fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
 
     const hasFieldErrors = hasErrors();
@@ -337,10 +337,10 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
 
     if (!hasFieldErrors || genericErrors.length > 0) {
       notifyStructured(
-          erroNormalizado.message || defaultMsg,
+          erroNormalizado.mensagem || defaultMsg,
           genericErrors,
           {
-            variant: 'danger',
+            variante: 'danger',
             stackTrace: erroNormalizado.stackTrace || undefined,
           }
       );
@@ -352,7 +352,7 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
     notify(defaultMsg, 'danger');
   }
 
-  if (shouldNotifyGlobally(erroNormalizado)) {
+  if (deveNotificarGlobalmente(erroNormalizado)) {
     logger.error(title + ":", error);
   }
 }

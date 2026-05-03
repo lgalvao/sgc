@@ -7,10 +7,10 @@ import {useToastStore} from "@/stores/toast";
 import {nextTick} from "vue";
 import {Perfil, SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
-import * as processoService from "@/services/processoService";
+import * as processoService from "@/services/processo";
 
 // Mocks
-vi.mock("@/services/processoService", () => ({
+vi.mock("@/services/processo", () => ({
     buscarContextoCompleto: vi.fn().mockResolvedValue({elegiveis: []}),
     executarAcaoEmBloco: vi.fn().mockResolvedValue({}),
     finalizarProcesso: vi.fn().mockResolvedValue({}),
@@ -30,7 +30,7 @@ vi.mock("vue-router", () => ({
 
 // Mock da useProcessoStore (Rodada 2) — delega ao processoService já mockado
 vi.mock("@/stores/processo", async () => {
-    const processoSvc = await import("@/services/processoService");
+    const processoSvc = await import("@/services/processo");
     return {
         useProcessoStore: () => ({
             garantirContextoCompleto: (codProcesso: number) => processoSvc.buscarContextoCompleto(codProcesso),

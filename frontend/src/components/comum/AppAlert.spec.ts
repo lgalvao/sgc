@@ -29,7 +29,7 @@ function montarAlerta(props: InstanceType<typeof AppAlert>['$props']) {
 
 describe('AppAlert A11y', () => {
   it('has no accessibility violations in default mode', async () => {
-    const {wrapper, alvo} = montarAlerta({message: 'Hello world'});
+    const {wrapper, alvo} = montarAlerta({mensagem: 'Hello world'});
     const results = await run(alvo);
     expect(results).toHaveNoViolations();
     wrapper.unmount();
@@ -38,9 +38,9 @@ describe('AppAlert A11y', () => {
 
   it('has no accessibility violations in detailed mode', async () => {
     const {wrapper, alvo} = montarAlerta({
-      notification: {
-        summary: 'Error',
-        details: ['Detail 1', 'Detail 2']
+      notificacao: {
+        resumo: 'Error',
+        detalhes: ['Detail 1', 'Detail 2']
       },
     });
     const results = await run(alvo);

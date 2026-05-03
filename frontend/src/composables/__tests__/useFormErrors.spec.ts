@@ -8,14 +8,14 @@ describe('useFormErrors', () => {
     });
 
     it('sets errors from normalized error', () => {
-        const {errors, setFromNormalizedError} = useFormErrors(['field1']);
+        const {errors, setFromErroNormalizado} = useFormErrors(['field1']);
         const normalizedError = {
-            kind: 'validation' as const,
-            message: 'Global error',
+            tipo: 'validacao' as const,
+            mensagem: 'Global error',
             erros: [{campo: 'field1', mensagem: 'Error 1'}]
         };
 
-        setFromNormalizedError(normalizedError);
+        setFromErroNormalizado(normalizedError);
         expect(errors.value.field1).toBe('Error 1');
     });
 
@@ -34,52 +34,52 @@ describe('useFormErrors', () => {
     });
 
     it('handles null normalized error', () => {
-        const {errors, setFromNormalizedError} = useFormErrors(['field1']);
-        setFromNormalizedError(null);
+        const {errors, setFromErroNormalizado} = useFormErrors(['field1']);
+        setFromErroNormalizado(null);
         expect(errors.value.field1).toBe('');
     });
 
     it('handles normalized error without erros', () => {
-        const {errors, setFromNormalizedError} = useFormErrors(['field1']);
+        const {errors, setFromErroNormalizado} = useFormErrors(['field1']);
         const normalizedError = {
-            kind: 'validation' as const,
-            message: 'Global error'
+            tipo: 'validacao' as const,
+            mensagem: 'Global error'
         };
-        setFromNormalizedError(normalizedError);
+        setFromErroNormalizado(normalizedError);
         expect(errors.value.field1).toBe('');
     });
 
     it('ignores erros with missing fields', () => {
-        const {errors, setFromNormalizedError} = useFormErrors(['field1']);
+        const {errors, setFromErroNormalizado} = useFormErrors(['field1']);
         const normalizedError = {
-            kind: 'validation' as const,
-            message: 'Global error',
+            tipo: 'validacao' as const,
+            mensagem: 'Global error',
             erros: [{mensagem: 'Error 1'}] // Missing campo
         };
-        setFromNormalizedError(normalizedError);
+        setFromErroNormalizado(normalizedError);
         expect(errors.value.field1).toBe('');
     });
 
     it('ignores erros for fields not in tracking list', () => {
-        const {errors, setFromNormalizedError} = useFormErrors(['field1']);
+        const {errors, setFromErroNormalizado} = useFormErrors(['field1']);
         const normalizedError = {
-            kind: 'validation' as const,
-            message: 'Global error',
+            tipo: 'validacao' as const,
+            mensagem: 'Global error',
             erros: [{campo: 'otherField', mensagem: 'Error 1'}]
         };
-        setFromNormalizedError(normalizedError);
+        setFromErroNormalizado(normalizedError);
         expect(errors.value.field1).toBe('');
         expect(errors.value).not.toHaveProperty('otherField');
     });
 
     it('uses default message if erro message is missing', () => {
-        const {errors, setFromNormalizedError} = useFormErrors(['field1']);
+        const {errors, setFromErroNormalizado} = useFormErrors(['field1']);
         const normalizedError = {
-            kind: 'validation' as const,
-            message: 'Global error',
+            tipo: 'validacao' as const,
+            mensagem: 'Global error',
             erros: [{campo: 'field1'}] // Missing message
         };
-        setFromNormalizedError(normalizedError);
+        setFromErroNormalizado(normalizedError);
         expect(errors.value.field1).toBe('Campo inválido');
     });
 });
