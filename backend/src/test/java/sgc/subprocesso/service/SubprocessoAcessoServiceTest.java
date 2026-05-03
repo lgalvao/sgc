@@ -28,10 +28,18 @@ class SubprocessoAcessoServiceTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
         SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
-                subprocesso, Perfil.SERVIDOR, true, true, true, true);
+                subprocesso, Perfil.ADMIN, true, true, true, true);
 
         PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
 
+        assertThat(dto.podeAlterarDataLimite()).isTrue();
+        assertThat(dto.podeReabrirCadastro()).isTrue();
+        assertThat(dto.podeReabrirRevisao()).isTrue();
+        assertThat(dto.podeEnviarLembrete()).isTrue();
+        assertThat(dto.habilitarAlterarDataLimite()).isFalse();
+        assertThat(dto.habilitarReabrirCadastro()).isFalse();
+        assertThat(dto.habilitarReabrirRevisao()).isFalse();
+        assertThat(dto.habilitarEnviarLembrete()).isFalse();
         assertThat(dto.habilitarEditarCadastro()).isFalse();
         assertThat(dto.habilitarDisponibilizarCadastro()).isFalse();
         assertThat(dto.habilitarDevolverCadastro()).isFalse();
@@ -144,6 +152,7 @@ class SubprocessoAcessoServiceTest {
 
         PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
         assertThat(dto.podeReabrirCadastro()).isTrue();
+        assertThat(dto.habilitarReabrirCadastro()).isTrue();
     }
 
     @Test
@@ -156,6 +165,7 @@ class SubprocessoAcessoServiceTest {
 
         PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
         assertThat(dto.podeReabrirRevisao()).isTrue();
+        assertThat(dto.habilitarReabrirRevisao()).isTrue();
     }
 
     @Test
@@ -174,6 +184,20 @@ class SubprocessoAcessoServiceTest {
         assertThat(dto.habilitarDevolverMapa()).isFalse();
         assertThat(dto.podeHomologarMapa()).isTrue();
         assertThat(dto.habilitarHomologarMapa()).isTrue();
+    }
+
+    @Test
+    void shouldManterHomologarMapaVisivelMasDesabilitadoQuandoAdminEstaEmMapaComSugestoes() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+
+        SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
+                subprocesso, Perfil.ADMIN, true, true, false, true);
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
+
+        assertThat(dto.podeHomologarMapa()).isTrue();
+        assertThat(dto.habilitarHomologarMapa()).isFalse();
     }
 
     private SubprocessoConsultaService.ContextoConsultaSubprocesso createContexto(

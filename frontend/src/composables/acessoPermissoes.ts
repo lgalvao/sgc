@@ -11,7 +11,8 @@ const CHAVES_PERMISSOES = [
     'habilitarDevolverCadastro', 'habilitarAceitarCadastro', 'habilitarHomologarCadastro',
     'habilitarEditarMapa', 'habilitarDisponibilizarMapa', 'habilitarValidarMapa',
     'habilitarApresentarSugestoes', 'habilitarDevolverMapa', 'habilitarAceitarMapa',
-    'habilitarHomologarMapa',
+    'habilitarHomologarMapa', 'habilitarAlterarDataLimite', 'habilitarReabrirCadastro',
+    'habilitarReabrirRevisao', 'habilitarEnviarLembrete',
 ] as const satisfies readonly (keyof PermissoesSubprocesso)[];
 
 type ChavePermissao = (typeof CHAVES_PERMISSOES)[number];

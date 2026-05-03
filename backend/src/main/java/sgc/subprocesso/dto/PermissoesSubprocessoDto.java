@@ -40,6 +40,10 @@ public record PermissoesSubprocessoDto(
         boolean habilitarApresentarSugestoes,
         boolean habilitarDevolverMapa,
         boolean habilitarAceitarMapa,
-        boolean habilitarHomologarMapa
+        boolean habilitarHomologarMapa,
+        boolean habilitarAlterarDataLimite,
+        boolean habilitarReabrirCadastro,
+        boolean habilitarReabrirRevisao,
+        boolean habilitarEnviarLembrete
 ) {
 }

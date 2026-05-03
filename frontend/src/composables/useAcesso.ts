@@ -59,7 +59,9 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const mostrarEnviarLembrete = computed(() => permissoes.value.podeEnviarLembrete);
 
     const mostrarImportarAtividades = computed(() => permissoes.value.podeEditarCadastro);
-    const mostrarDisponibilizarCadastro = computed(() => permissoes.value.podeDisponibilizarCadastro);
+    const mostrarDisponibilizarCadastro = computed(() =>
+        permissoes.value.podeDisponibilizarCadastro || permissoes.value.podeEditarCadastro
+    );
     const mostrarDevolverCadastro = computed(() => permissoes.value.podeDevolverCadastro);
 
     const mostrarApresentarSugestoes = computed(() => permissoes.value.podeApresentarSugestoes);

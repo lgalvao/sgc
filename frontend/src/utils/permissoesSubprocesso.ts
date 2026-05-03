@@ -34,6 +34,10 @@ export const PERMISSOES_SUBPROCESSO_VAZIAS: PermissoesSubprocesso = {
     habilitarDevolverMapa: false,
     habilitarAceitarMapa: false,
     habilitarHomologarMapa: false,
+    habilitarAlterarDataLimite: false,
+    habilitarReabrirCadastro: false,
+    habilitarReabrirRevisao: false,
+    habilitarEnviarLembrete: false,
 };
 
 export function normalizarPermissoesSubprocesso(
