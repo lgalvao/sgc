@@ -1,5 +1,6 @@
 package sgc.feedback;
 
+import lombok.*;
 import lombok.extern.slf4j.*;
 import tools.jackson.databind.*;
 import org.jspecify.annotations.*;
@@ -24,22 +25,13 @@ import java.util.*;
 @Service
 @Slf4j
 @Transactional
+@RequiredArgsConstructor
 public class FeedbackService {
 
     private final FeedbackRepo repo;
     private final FeedbackPropriedades propriedades;
     private final UsuarioFacade usuarioFacade;
     private final ObjectMapper objectMapper;
-
-    public FeedbackService(FeedbackRepo repo,
-                           FeedbackPropriedades propriedades,
-                           UsuarioFacade usuarioFacade,
-                           ObjectMapper objectMapper) {
-        this.repo = repo;
-        this.propriedades = propriedades;
-        this.usuarioFacade = usuarioFacade;
-        this.objectMapper = objectMapper;
-    }
 
     /**
      * Registra um novo feedback, opcionalmente com screenshot.

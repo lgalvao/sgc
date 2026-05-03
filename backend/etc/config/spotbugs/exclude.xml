@@ -54,6 +54,7 @@
             <Class name="sgc.processo.service.ProcessoConsultaService"/>
             <Class name="sgc.seguranca.LoginFacade"/>
             <Class name="sgc.e2e.E2eController"/>
+            <Class name="sgc.feedback.FeedbackService"/>
         </Or>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
