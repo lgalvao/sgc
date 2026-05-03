@@ -77,6 +77,10 @@ const ProcessoFormFieldsStub = {
     props: ['modelValue', 'fieldErrors', 'unidades', 'isLoadingUnidades', 'isEdit'],
     emits: ['update:modelValue'],
     data: () => ({CARREGANDO_UNIDADES: TEXTOS.unidades.CARREGANDO}),
+    methods: {
+        focarDescricao: vi.fn(),
+        focarPrimeiroErro: vi.fn(),
+    }
 };
 
 function criarErroApi(mensagem: string, erros: Array<{campo?: string | null; mensagem?: string}> = []) {

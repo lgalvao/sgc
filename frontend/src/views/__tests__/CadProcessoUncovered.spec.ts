@@ -40,7 +40,13 @@ const stubs = {
     BAlert: {template: '<div class="b-alert"><slot /></div>'},
     AppAlert: {template: '<div class="app-alert"></div>'},
     ModalConfirmacao: {template: '<div><slot /></div>'},
-    ProcessoFormFields: {template: '<div></div>'},
+    ProcessoFormFields: {
+        template: '<div></div>',
+        methods: {
+            focarDescricao: vi.fn(),
+            focarPrimeiroErro: vi.fn(),
+        }
+    },
     BForm: {template: '<form @submit.prevent><slot /></form>'},
 };
 
