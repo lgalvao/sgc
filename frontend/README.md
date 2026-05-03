@@ -21,12 +21,12 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 * **Framework:** Vue.js 3.5 (Composition API, `<script setup>`)
 * **Linguagem:** TypeScript 5.9
 * **Estado:** Pinia (Setup stores)
-* **Roteamento:** Vue router (Modularizado)
+* **Roteamento:** Vue Router (modularizado)
 * **UI:** BootstrapVueNext + Bootstrap 5
 * **Build:** Vite 7
 * **HTTP:** Axios (com interceptors para JWT)
-* **Testes:** Vitest (Unitários) + Playwright (E2E)
-* **Qualidade:** ESLint + TypeScript (typecheck)
+* **Testes:** Vitest (unitários) + Playwright (E2E)
+* **Qualidade:** ESLint + OXLint + TypeScript (typecheck)
 
 ### Fluxo de Dados
 
@@ -83,7 +83,14 @@ pnpm run test:e2e
 
 ## Autenticação
 
-A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo
-`axios-setup.ts`.
+A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo `axios-setup.ts`.
+
+## Builds
+
+| Comando | Destino |
+|---|---|
+| `pnpm run build` | Build padrão (desenvolvimento) |
+| `pnpm run build:hom` | Build para homologação (habilita widget de feedback) |
+| `pnpm run build:prod` | Build para produção |
 
 Para convenções de código, veja o arquivo **[AGENTS.md](../AGENTS.md)** na raiz do projeto.

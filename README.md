@@ -26,8 +26,9 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 |---|---|
 | **Backend** | Java 25, Spring Boot 4, Hibernate 7 / JPA, Bean Validation, Gradle (Kotlin DSL) |
 | **Banco de Dados** | Oracle JDBC (`ojdbc11`) em produção; H2 em memória para desenvolvimento e testes |
-| **Frontend** | Vue.js 3.5 (Composition API, `<script setup>`), TypeScript 5.9, Vite 7.3, Pinia 3, BootstrapVueNext 0.44, Axios |
+| **Frontend** | Vue.js 3.5 (Composition API, `<script setup>`), TypeScript 5.9, Vite 7, Pinia 3, BootstrapVueNext 0.44, Axios |
 | **Autenticação** | JWT (via API de Acesso AD do TRE-PE) |
+| **Observabilidade** | Spring Boot Actuator, Micrometer, Prometheus, Grafana |
 | **Testes** | JUnit 6 + Mockito (backend), Vitest 4 (frontend unitário), Playwright 1.58 (E2E), Storybook 10 (componentes) |
 
 ### Estrutura do Repositório
@@ -37,6 +38,7 @@ sgc/
 ├── backend/            # API REST (Spring Boot 4)
 ├── frontend/           # SPA (Vue.js 3.5)
 ├── e2e/                # Testes End-to-End (Playwright)
+├── monitoring/         # Configurações de Prometheus e Grafana
 └── etc/
     ├── reqs/           # Especificações de requisitos (CDUs e Regras de Negócio)
     ├── docs/           # Documentação técnica (regras de acesso, E2E, etc.)
@@ -112,11 +114,72 @@ pnpm run dev
 *Acesse em `http://localhost:5173`.*
 
 ### Perfis de Backend
+
 | Perfil | Banco | Uso |
 |---|---|---|
 | `local` (padrão) | H2 em memória | Desenvolvimento rápido |
 | `e2e` | H2 em memória + fixtures | Testes automáticos E2E |
 | `hom` | Oracle | Homologação |
+| `prod` | Oracle | Produção |
+
+---
+
+## Observabilidade
+
+### Spring Boot Actuator
+
+Os endpoints de gerenciamento estão disponíveis em `/actuator` e exigem autenticação com perfil **ADMIN**.
+
+| Perfil | Endpoints expostos |
+|---|---|
+| `local` / `e2e` | `health`, `info` |
+| `hom` / `prod` | `health`, `info`, `metrics`, `logfile`, `prometheus` |
+
+Exemplos de uso (com token JWT de ADMIN):
+```bash
+# Saúde da aplicação (com detalhes)
+curl -H "Authorization: Bearer <token>" http://localhost:10000/actuator/health
+
+# Métricas Prometheus
+curl -H "Authorization: Bearer <token>" http://localhost:10000/actuator/prometheus
+
+# Últimas linhas do log
+curl -H "Authorization: Bearer <token>" http://localhost:10000/actuator/logfile
+```
+
+### Log em Arquivo
+
+Nos perfis `hom` e `prod`, o SGC escreve logs em arquivo com rotação automática.
+Configure o caminho via variável de ambiente:
+
+```bash
+LOGGING_FILE_NAME=/var/log/sgc/sgc.log
+```
+
+Política de rotação padrão: arquivos de até **10 MB**, retenção de **30 dias**, cap total de **200 MB**.
+
+### Prometheus + Grafana
+
+Para subir a stack de monitoramento junto com a aplicação:
+
+```bash
+# 1. Obtenha um token JWT de usuário ADMIN
+echo -n "<token-jwt-admin>" > monitoring/sgc-token
+
+# 2. Suba a aplicação + stack de monitoramento
+docker compose -f compose.hom.yaml -f compose.monitoring.yaml up -d
+```
+
+- **Grafana**: `http://localhost:3000` (usuário: `admin` / senha: `admin`)
+- **Prometheus**: `http://localhost:9090`
+
+O dashboard **"SGC - Visão Geral"** é provisionado automaticamente no Grafana com métricas de:
+- Status e uptime da aplicação
+- Requisições HTTP (taxa e latência p95)
+- Uso de memória JVM e GC
+- Pool de conexões HikariCP
+
+> Para alterar a senha padrão do Grafana, defina `GRAFANA_ADMIN_PASSWORD` no ambiente.
 
 ---
 
@@ -169,7 +232,7 @@ O projeto utiliza um toolkit de automação centralizado em `etc/scripts` que or
 | **Unitários frontend** | `pnpm run test:unit --prefix frontend` |
 | **End-to-End (E2E)** | `pnpm run test:e2e` |
 | **Lint Completo** | `pnpm run lint` |
-| **Auditoria de Cobertura** | `node etc/scripts/sgc.js [backend|frontend] cobertura auditoria` |
+| **Auditoria de Cobertura** | `node etc/scripts/sgc.js [backend\|frontend] cobertura auditoria` |
 | **Limpeza de Projeto** | `node etc/scripts/sgc.js projeto limpar --confirmar` |
 
 ### Correção Ativa (Auto-Fix)
