@@ -130,6 +130,14 @@
       "criterioRemocao": "Extrair formulario e conteudo especifico de cada acao."
     },
     {
+      "arquivo": "frontend/src/components/processo/ProcessoFormFields.vue",
+      "camada": "component",
+      "maxLinhas": 229,
+      "responsavel": "frontend",
+      "justificativa": "Componente de formulario ainda concentra muitos campos e regras.",
+      "criterioRemocao": "Separar campos basicos, unidades e datas do processo."
+    },
+    {
       "arquivo": "frontend/src/composables/useMapaCompetenciasMutacoes.ts",
       "camada": "composable",
       "maxLinhas": 154,
