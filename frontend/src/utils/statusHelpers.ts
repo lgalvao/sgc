@@ -1,4 +1,4 @@
-import {SituacaoProcesso, SituacaoSubprocesso, StatusNotificacao} from "@/types/tipos";
+import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 
 /**
  * Utilitário para centralizar mapeamentos visuais de status (badges, variantes e prioridades).

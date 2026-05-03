@@ -4,7 +4,7 @@ import {BBadge, BButton, BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
-import {type ProcessoResumo, SituacaoProcesso} from "@/types/tipos";
+import {type ProcessoResumo} from "@/types/tipos";
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/formatters";
 
 type CampoOrdenacaoProcesso = keyof ProcessoResumo | "dataFinalizacao";
@@ -122,7 +122,7 @@ defineExpose({fields});
       </template>
 
       <template #cell(situacao)="{ item }">
-        <BBadge :variant="getProcessoBadgeVariant(item.situacao)" data-testid="badge-situacao">
+        <BBadge :variant="(getProcessoBadgeVariant(item.situacao) as any)" data-testid="badge-situacao">
           {{ formatSituacaoProcesso(item.situacao) }}
         </BBadge>
       </template>
