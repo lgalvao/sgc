@@ -8,10 +8,12 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.*;
+import sgc.comum.erros.*;
 import sgc.feedback.dto.*;
+import tools.jackson.core.*;
 import tools.jackson.databind.*;
 
-import java.io.*;
+import java.util.*;
 
 /**
  * Endpoint de feedback disponível apenas no perfil {@code hom} (UAT).
@@ -44,8 +46,8 @@ public class FeedbackController {
         FeedbackPayloadDto payload;
         try {
             payload = objectMapper.readValue(data, FeedbackPayloadDto.class);
-        } catch (tools.jackson.core.JacksonException e) {
-            throw new sgc.comum.erros.ErroValidacao("VALIDATION_ERROR", "payload inválido: " + e.getMessage());
+        } catch (JacksonException e) {
+            throw new ErroValidacao("VALIDATION_ERROR", "payload inválido: " + e.getMessage());
         }
         validar(payload);
         FeedbackRespostaDto resposta = feedbackService.registrar(payload, screenshot);
@@ -56,15 +58,15 @@ public class FeedbackController {
         var violations = obterViolacoes(payload);
         if (!violations.isEmpty()) {
             var primeira = violations.iterator().next();
-            throw new sgc.comum.erros.ErroValidacao(
+            throw new ErroValidacao(
                     "VALIDATION_ERROR",
                     primeira.getPropertyPath() + " " + primeira.getMessage()
             );
         }
     }
 
-    private java.util.Set<ConstraintViolation<FeedbackPayloadDto>> obterViolacoes(FeedbackPayloadDto payload) {
-        var factory = jakarta.validation.Validation.buildDefaultValidatorFactory();
+    private Set<ConstraintViolation<FeedbackPayloadDto>> obterViolacoes(FeedbackPayloadDto payload) {
+        var factory = Validation.buildDefaultValidatorFactory();
         var validator = factory.getValidator();
         return validator.validate(payload);
     }

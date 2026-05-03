@@ -139,7 +139,7 @@ public class FeedbackService {
         if (metadados instanceof JsonNode node) {
             JsonNode rotaNode = node.get("rotaCaminho");
             if (rotaNode != null && !rotaNode.isNull()) {
-                return rotaNode.isNull() ? "/desconhecido" : rotaNode.asString();
+                return rotaNode.asString();
             }
         }
         return "/desconhecido";
