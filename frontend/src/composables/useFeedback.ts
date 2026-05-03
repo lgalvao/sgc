@@ -3,6 +3,7 @@ import {useRoute} from 'vue-router'
 import html2canvas from 'html2canvas'
 import apiClient from '@/axios-setup'
 import {usePerfilStore} from '@/stores/perfil'
+import {logger} from '@/utils'
 import type {MetadadosFeedback, PayloadFeedback, FeedbackTipo} from '@/types/feedback'
 
 const TIMEOUT_CAPTURA_MS = 5_000
@@ -35,14 +36,12 @@ export function useFeedback() {
                 canvas.toBlob((blob: Blob | null) => resolver(blob), 'image/webp', 0.85)
             })
         } catch (erro) {
-            console.error('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
+            logger.error('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
             captura.value = null
         }
     }
 
     function montarMetadados(): MetadadosFeedback {
-
-
         return {
             usuarioCodigo: perfilStore.usuarioCodigo ?? '',
             usuarioNome: perfilStore.usuarioNome ?? '',

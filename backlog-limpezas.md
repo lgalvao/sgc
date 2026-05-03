@@ -1,41 +1,43 @@
 # Backlog de limpezas do frontend
 
-## Estado atual (auditado em 2026-05-03 — segunda varredura)
+## Estado atual (auditado em 2026-05-03 — terceira varredura)
 
-- Gate de cruft: **ok**
+- Gate de cruft: **ok**, 0 violações
 - Lint: **0 erros, 0 warnings**
-- Testes unitários: **1205 testes** em **147 arquivos**, todos passando
+- Testes unitários: **1247 testes** em **151 arquivos**, todos passando
 - `fallow dead-code`: **zerado**
-- `fallow health`: **90.9**
-- `fallow dupes`: **6 clone groups**, **153 linhas**, **0.8%**
+- `fallow health`: **98 A** (subiu de 90.9 após cobertura dos hotspots)
+- `fallow dupes`: **6 clone groups**, ~0.2% (houve melhora)
 
-## Ja concluido de verdade
+## Já concluído
 
 ### Infra e baseline
 
-- configuração do `fallow` em `frontend/.fallowrc.jsonc`
-- estabilização do loop de validação
+- Configuração do `fallow` em `frontend/.fallowrc.jsonc`
+- Estabilização do loop de validação
+- Lint zerado (0 erros, 0 warnings)
 
 ### Remoção de arquivos completamente mortos
 
 - `frontend/src/services/alertaService.ts`
 - `frontend/src/services/diagnosticoService.ts`
-- `frontend/src/utils/csv.ts`
-- `frontend/src/utils/validators.ts`
-- `frontend/src/constants/index.ts`
-- `frontend/src/constants/situacoes.ts`
-- `frontend/src/utils/styleUtils.ts`
-- remoção de dependências órfãs: `papaparse`, `@types/papaparse`, `zod`
-- `frontend/src/types/dtos.ts` — removido; tipos migrados para módulos naturais
+- `frontend/src/utils/csv.ts`, `validators.ts`, `styleUtils.ts`
+- `frontend/src/constants/index.ts`, `situacoes.ts`
+- `frontend/src/types/dtos.ts` (tipos migrados para módulos naturais)
+- Dependências órfãs: `papaparse`, `@types/papaparse`, `zod`
 
-### Cortes pequenos concluídos
+### Cortes pequenos
 
-- poda de `frontend/src/components/layout/MainNavbar.vue`
-- consolidação dos modais de observação de cadastro
-- limpeza de exports em `frontend/src/utils/index.ts`
-- consolidação dos modais do mapa em `frontend/src/components/mapa/modais/`
-- remoção de `BFormRadioGroup` não usado em `FeedbackModal.vue`
-- testes unitários para `frontend/src/utils/date/parsing.ts` (19 testes, cobertura completa de branches)
+- Poda de `MainNavbar.vue`
+- Consolidação dos modais de observação de cadastro
+- Limpeza de exports em `frontend/src/utils/index.ts`
+- Consolidação dos modais do mapa em `frontend/src/components/mapa/modais/`
+- Remoção de `BFormRadioGroup` não usado em `FeedbackModal.vue`
+- `useFeedback.ts`: `console.error` → `logger.error`; linhas em branco vazias removidas
+- `subprocessoAcoesAdministrativas.ts`: `confirmarEnviarLembrete` era `async` sem `await` e retornava `true` inconsistentemente — corrigido
+- `AtribuicaoTemporariaView.vue`: `codUnidade = computed(() => props.codUnidade)` era ruído puro — removido
+- `AtribuicaoTemporariaView.vue`: double null-check em `usuarioSelecionado` após `validarSubmissao` — removido
+- `ProcessoCadastroView.vue`: alias `Processo as ProcessoModel` desnecessário — removido
 
 ### Fatiamentos estruturais concluídos
 
@@ -45,122 +47,183 @@
 - `useAcesso.ts` → `frontend/src/composables/acesso/`
 - `stores/subprocesso.ts` → `frontend/src/stores/subprocesso/`
 
-### Baseline do `fallow dead-code` zerado
+### Cobertura de testes adicionada
 
-### Lint zerado (0 erros, 0 warnings)
+- `frontend/src/utils/date/parsing.ts` — 19 testes, todos os branches cobertos
+- `frontend/src/components/mapa/modais/CompetenciaEdicaoModal.vue` — 11 testes
+- `frontend/src/components/processo/processoAcoes.ts` — 14 testes
 
-## Pendente real
+---
 
-### Prioridade 1 — hotspot `usePerfil.ts` ⭐
+## Pendente — achados da varredura de 2026-05-03
 
-- `frontend/src/composables/usePerfil.ts`
-- 38 LOC, 7 dependentes diretos
-- fallow classifica como "high impact · effort:medium"
-- ação: avaliar superfície, estreitar o que não é contrato real
+### P0 — Ruído e inconsistências simples (corte seguro, sem risco)
 
-### Prioridade 2 — testes faltantes em hotspots
+#### `NotificacoesAdminView.vue` (490 LOC)
 
-- ~~`frontend/src/utils/date/parsing.ts`~~ ✅ coberto (19 testes)
+- `TIPOS_NOTIFICACAO_LABELS`, `statusLabel`, `statusVariant` e `prioridadeStatus` são dicionários de constantes de domínio embutidos diretamente na view
+- `statusLabel` e `statusVariant` fazem lookup separado no mesmo conjunto de keys — podem ser unificados em `obterStatusNotificacao(): { label, variant }`
+- Candidato a extrair para `notificacaoService.ts` ou arquivo de constantes de domínio
+- **Ação:** extrair as 4 funções/dicionários para `frontend/src/services/notificacaoService.ts` ou `notificacaoLabels.ts`
 
-- `frontend/src/components/mapa/modais/CompetenciaEdicaoModal.vue`
-  - 3 funções complexas sem cobertura de testes
+#### `AtribuicaoTemporariaView.vue` — `defineExpose` excessivo
 
-- `frontend/src/components/processo/processoAcoes.ts`
-  - 2 funções complexas sem cobertura de testes
+- Expõe 14 itens internos (`router`, `notify`, `clear`, `validacaoSubmetida`, etc.) — cheiro de teste que acessa internals em vez de usar a API pública
+- **Ação:** verificar se os testes unitários consomem esses campos; se sim, reescrever os testes para usar a interface pública; se não, remover o `defineExpose`
 
-### Prioridade 3 — duplicações reais (fallow dupes — 6 grupos, 153 linhas)
+#### `useFeedback.ts` — `usuarioEmail: ''` fixo
 
-#### Fácil (corte claro e seguro)
+- Linha 49: `usuarioEmail: ''` é sempre string vazia — campo sem uso real
+- **Ação:** verificar se o backend usa o campo; se não, remover do `MetadadosFeedback`
 
-- `frontend/src/services/relatoriosService.ts`
-  - 6 linhas internas duplicadas: lógica de blob/download idêntica em dois métodos
-  - extrair função privada `baixarPdf`
+#### `useFluxoSubprocesso.ts` — boolean flag `isRevisao`
 
-#### Moderado
+- 5 funções recebem `isRevisao = false` como parâmetro booleano
+- Padrão de boolean flag que inverte comportamento interno — viola o princípio de uma responsabilidade por função
+- Cada função faz `isRevisao ? serviceFooRevisao(...) : serviceFoo(...)` — duplicação de lógica de despacho
+- **Ação:** separar em funções nomeadas (`disponibilizarCadastro` / `disponibilizarRevisaoCadastro`) ou usar overload explícito
 
-- `frontend/src/components/mapa/modais/MapaDevolucaoModal.vue`
-  x `frontend/src/components/mapa/modais/MapaSugestoesEnvioModal.vue`
-  - 22 linhas (script completo); diferem em variante, label e textos
+### P1 — Complexidade real confirmada pelo fallow
 
-- `frontend/src/services/processo/types.ts`
-  x `frontend/src/types/processo.ts`
-  - 14 linhas; overlap entre `ProcessoDetalheResponseBackend` e `Processo`
+#### `apiError/normalizer.ts` — CRAP 380, cyclomatic 19
 
-#### Com cuidado
+- `normalizarErro` tem 19 caminhos de execução em 23 linhas
+- Cada branch é essencial (cancelamento, erro de rede, resposta HTTP, Error nativo, desconhecido)
+- **Recomendação:** extrair cada case para função privada nomeada (`normalizarCancelamento`, `normalizarErroRede`, `normalizarRespostaHttp`, `normalizarErroGenerico`)
+- Não toca no contrato público — só reorganiza internamente
+- Adicionar testes unitários antes de modificar (não há spec hoje)
 
-- `frontend/src/views/ProcessoCadastroView.vue`
-  x `frontend/src/views/UnidadesView.vue`
-  - 18 linhas; só mexer se cair junto com refatoração maior das views
+#### `ProcessoFormFields.vue:focarPrimeiroErro` — CRAP 156, cyclomatic 12
 
-- `frontend/src/components/unidade/ArvoreUnidades.vue`
-  x `frontend/src/views/ProcessoCadastroView.vue`
-  - 9 linhas
+- Função de 27 linhas com 12 paths — lógica de foco sequencial em campos do formulário
+- **Ação:** verificar se pode ser substituída por `useValidacaoFormulario().focarPrimeiroErroInvalido` que já existe globalmente
 
-### Prioridade 4 — waivers estruturais ainda vivos
+#### `axios-setup.ts:handleResponseError` — CRAP 156, cyclomatic 12
+
+- 38 linhas, concentra autenticação + sessão expirada + notificação global + redirect
+- Já tem waiver (258 linhas)
+- **Ação:** extrair `tratarSessaoExpirada` e `tratarErroAutenticacao` como funções privadas nomeadas
+
+#### `ProcessoCadastroView.vue:handleApiErrors` — CRAP 156, cyclomatic 12
+
+- Função de 35 linhas que centraliza erros de campo + erros genéricos + logging + scroll
+- **Ação:** já identificado no backlog anterior; extrair `aplicarErrosCampo` e `notificarErrosGenericos`
+
+### P2 — Defensividade excessiva
+
+#### `ProcessoCadastroView.vue` linha 292
+
+- `if (!processo) { return; }` logo após `await processoService.obterDetalhesProcesso(...)` — o serviço nunca retorna null segundo o tipo (`Promise<Processo>`)
+- **Ação:** remover o guard defensivo ou tipar corretamente o retorno
+
+#### `ProcessoCadastroView.vue` linha 455
+
+- `if (!processoEditando.value) { limparCampos(); }` dentro de um bloco que só executa se `processoEditando.value` existia (linha 447: `if (processoEditando.value)`)
+- Branch morto — a condição interna nunca é verdadeira nesse contexto
+- **Ação:** remover o `if` interno; chamar `limparCampos()` diretamente
+
+#### `subprocessoAcoesAdministrativas.ts` linha 69
+
+- `if (habilitarAlterarDataLimite.value)` antes de abrir o modal — mas o botão que chama isso já tem `:disabled="!habilitarAlterarDataLimite"` no template
+- Guard duplo — o estado de UI já controla o acesso
+- **Ação:** avaliar se o guard extra é necessário (e.g., ataques diretos via keyboard); se não, remover
+
+### P3 — Inconsistências de padrão
+
+#### `NotificacoesAdminView.vue` — textos hardcoded no script
+
+- Linha 432: `"E-mail recolocado na fila de envio"` e linha 437: `"Erro ao reenviar e-mail"` — não usam `TEXTOS`
+- **Ação:** mover para `TEXTOS.administracao.*` ou constante local
+
+#### `useFluxoSubprocesso.ts` — imports com alias `service*`
+
+- 11 imports com alias `as service*` (`aceitarCadastro as serviceAceitarCadastro`, etc.)
+- Padrão verboso — o namespace `service` não agrega informação já que estão em `cadastroService`
+- **Ação:** importar com `* as cadastroService` e `* as subprocessoService` para tornar o código mais legível
+
+#### `useFeedback.ts` — `montarMetadados` exposta implicitamente
+
+- `montarMetadados` é função privada mas o composable tem apenas 4 exports — ela fica "escondida" dentro da closure sem nome descritivo no retorno
+- Padrão ok, mas `usuarioEmail: ''` (linha 49) é campo morto que deveria ser removido
+
+#### `AtribuicaoTemporariaView.vue` — `erroUsuario` com dois papéis
+
+- `erroUsuario` é usado tanto para erro de carregamento inicial (linha 218) quanto como erro de validação de campo de usuário (linha 228: `erroUsuario.value = ""`)
+- Responsabilidade dupla — dificulta entender quando o erro é do server vs. da validação
+- **Ação:** separar em `erroCarregamento` (para o mounted) e manter `erroUsuario` só para validação de campo
+
+### P4 — Waivers estruturais ainda vivos (para rodadas futuras)
 
 #### Views
 
-- `frontend/src/views/MapaView.vue` (waiver 814)
-- `frontend/src/views/CadastroView.vue` (waiver 707)
-- `frontend/src/views/NotificacoesAdminView.vue` (waiver 490)
-- `frontend/src/views/ProcessoCadastroView.vue` (waiver 470)
-- `frontend/src/views/AtribuicaoTemporariaView.vue` (waiver 312)
+- `MapaView.vue` (waiver 814) — já bem fatiado; avaliar extração de `MapaCompetenciasSection`
+- `CadastroView.vue` (waiver 707)
+- `NotificacoesAdminView.vue` (waiver 490) — candidato a extrair `NotificacoesFiltros` e `NotificacoesTabela`
+- `ProcessoCadastroView.vue` (waiver 470)
+- `AtribuicaoTemporariaView.vue` (waiver 312)
 
 #### Componentes
 
-- `frontend/src/components/unidade/ArvoreUnidades.vue` (waiver 471)
-- `frontend/src/components/comum/TreeTable.vue` (waiver 360)
-- `frontend/src/components/atividades/ImportarAtividadesModal.vue` (waiver 321)
-- `frontend/src/components/atividades/AtividadeItem.vue` (waiver 303)
-- `frontend/src/components/processo/ModalAcaoBloco.vue` (waiver 234)
-- `frontend/src/components/processo/ProcessoFormFields.vue` (waiver 229, atual 228 — waiver obsoleto)
-- `frontend/src/components/processo/SubprocessoCards.vue` (waiver 216)
-- `frontend/src/components/unidade/UnidadeTreeNode.vue` (waiver 203)
-- `frontend/src/components/comum/InlineEditor.vue` (waiver 197)
-- `frontend/src/components/mapa/CompetenciaCard.vue` (waiver 191)
-- `frontend/src/components/comum/TreeRowItem.vue` (waiver 181)
+- `ArvoreUnidades.vue` (waiver 471)
+- `TreeTable.vue` (waiver 360)
+- `ImportarAtividadesModal.vue` (waiver 321)
+- `AtividadeItem.vue` (waiver 303)
+- `ModalAcaoBloco.vue` (waiver 234)
+- `ProcessoFormFields.vue` (waiver 229)
+- `SubprocessoCards.vue` (waiver 216)
+- `UnidadeTreeNode.vue` (waiver 203)
+- `InlineEditor.vue` (waiver 197)
+- `CompetenciaCard.vue` (waiver 191)
+- `TreeRowItem.vue` (waiver 181)
 
 #### Composables / stores / outros
 
-- `frontend/src/stores/mapas.ts` (waiver 184)
-- `frontend/src/stores/perfil.ts` (waiver 155)
-- `frontend/src/composables/useFluxoSubprocesso.ts` (waiver duplicado: 174 e 312)
-- `frontend/src/composables/useMapaCompetenciasMutacoes.ts` (waiver 154)
-- `frontend/src/composables/useBreadcrumbs.ts` (waiver 141)
-- `frontend/src/composables/useMapaSugestoes.ts` (waiver 132)
-- `frontend/src/composables/useCadastroRevisaoSemMudancas.ts` (waiver 130)
-- `frontend/src/composables/useFluxoMapa.ts` (waiver 122)
-- `frontend/src/axios-setup.ts` (waiver 258)
-- `frontend/src/constants/textos.ts` (waiver 450)
-- `frontend/src/utils/treeUtils.ts` (waiver 153)
-- `frontend/src/App.vue` (waiver 165)
+- `useFluxoSubprocesso.ts` (waiver 174) — boolean flags `isRevisao` são o problema real aqui
+- `stores/mapas.ts` (waiver 184)
+- `stores/perfil.ts` (waiver 155)
+- `useMapaCompetenciasMutacoes.ts` (waiver 154)
+- `useBreadcrumbs.ts` (waiver 141)
+- `useMapaSugestoes.ts` (waiver 132)
+- `useCadastroRevisaoSemMudancas.ts` (waiver 130)
+- `useFluxoMapa.ts` (waiver 122)
+- `axios-setup.ts` (waiver 258)
+- `constants/textos.ts` (waiver 450)
+- `utils/treeUtils.ts` (waiver 153)
+- `App.vue` (waiver 165)
 
-## Guardrails das próximas rodadas
-
-- manter contratos públicos e `data-testid`
-- não recriar regra de acesso no frontend
-- preferir helper local ou componente local antes de abrir nova camada
-- apagar sobra liberada na mesma rodada
-- manter tudo em **português brasileiro**
-- sempre validar a rodada com o menor conjunto suficiente
+---
 
 ## Ordem recomendada de execução
 
-1. estreitar `usePerfil.ts` (maior ROI, hotspot confirmado)
-2. extrair `baixarPdf` em `relatoriosService.ts` (6 linhas, risco zero)
-3. adicionar testes para `date/parsing.ts` e `CompetenciaEdicaoModal.vue`
-4. corrigir entrada duplicada de `useFluxoSubprocesso.ts` no arquivo de waivers
-5. remover waiver obsoleto de `ProcessoFormFields.vue` (arquivo abaixo do limite)
-6. atacar duplicações moderadas e waivers grandes
+1. **P0 fácil:** `statusLabel` + `statusVariant` → `obterStatusNotificacao` em `NotificacoesAdminView.vue`
+2. **P2 imediato:** remover branch morto `if (!processoEditando.value)` em `ProcessoCadastroView.vue`
+3. **P2 imediato:** remover guard `if (!processo)` defensivo desnecessário em `carregarProcessoParaEdicao`
+4. **P0:** extrair dicionários de notificação para `notificacaoService.ts` ou arquivo de labels
+5. **P0:** textos hardcoded em `NotificacoesAdminView.vue` → `TEXTOS.administracao.*`
+6. **P3:** imports com alias `service*` em `useFluxoSubprocesso.ts` → `* as cadastroService`
+7. **P1:** adicionar testes para `apiError/normalizer.ts` antes de refatorar
+8. **P1:** extrair cases de `normalizarErro` em funções privadas nomeadas
+9. **P1:** extrair `tratarSessaoExpirada` de `axios-setup.ts`
+10. **P3:** separar `erroCarregamento` de `erroUsuario` em `AtribuicaoTemporariaView.vue`
+11. **P4:** atacar boolean flags `isRevisao` em `useFluxoSubprocesso.ts`
+12. **P4:** waivers grandes (rodadas separadas)
+
+## Guardrails
+
+- Manter contratos públicos e `data-testid`
+- Não recriar regra de acesso no frontend
+- Preferir helper local antes de nova camada
+- Apagar sobra liberada na mesma rodada
+- Manter tudo em **português brasileiro**
+- Sempre validar com o menor conjunto suficiente
 
 ## Comandos úteis
 
 ```bash
 node etc/scripts/sgc.js frontend cruft validar
-npx fallow dead-code -r frontend
-npx fallow dupes -r frontend
 npx fallow health -r frontend
+npx eslint frontend/src --ext .vue,.ts
 npm --prefix frontend run typecheck
 npm --prefix frontend run test:unit
-npx eslint frontend/src --ext .vue,.ts
+pnpm -C frontend exec vitest run <arquivo> --reporter=verbose --no-color
 ```

@@ -131,10 +131,9 @@ export function useSubprocessoAcoesAdministrativas({
         });
     }
 
-    async function confirmarEnviarLembrete() {
+    function confirmarEnviarLembrete() {
         if (!subprocesso.value) return;
         modalLembreteAberto.value = true;
-        return true;
     }
 
     async function enviarLembreteConfirmado() {

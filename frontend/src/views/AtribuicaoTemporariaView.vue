@@ -7,7 +7,7 @@
           {{ unidade.sigla }}
         </template>
         <template #actions>
-          <BButton variant="outline-secondary" :to="`/unidade/${codUnidade}`">
+          <BButton variant="outline-secondary" :to="`/unidade/${props.codUnidade}`">
             <i class="bi bi-arrow-left me-1" /> {{ TEXTOS.comum.BOTAO_VOLTAR }}
           </BButton>
         </template>
@@ -117,7 +117,7 @@
               :disabled="isLoading"
               data-testid="btn-cancelar-atribuicao"
               variant="outline-secondary"
-              @click="router.push(`/unidade/${codUnidade}`)"
+              @click="router.push(`/unidade/${props.codUnidade}`)"
           >
             {{ TEXTOS.comum.BOTAO_CANCELAR }}
           </BButton>
@@ -162,7 +162,7 @@ const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
-const codUnidade = computed(() => props.codUnidade);
+
 const unidade = ref<Unidade | null>(null);
 const usuarioSelecionado = ref<string | null>(null);
 const termoUsuario = ref("");
@@ -213,7 +213,7 @@ const mensagemErroJustificativa = computed(() =>
 
 onMounted(async () => {
   try {
-    unidade.value = await buscarUnidadePorCodigo(codUnidade.value);
+    unidade.value = await buscarUnidadePorCodigo(props.codUnidade);
   } catch (error) {
     erroUsuario.value = TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
     logger.error(error);
@@ -233,10 +233,7 @@ async function criarAtribuicao() {
     return;
   }
 
-  const tituloEleitoralUsuario = usuarioSelecionado.value;
-  if (!tituloEleitoralUsuario) {
-    return;
-  }
+  const tituloEleitoralUsuario = usuarioSelecionado.value!;
 
   isLoading.value = true;
 
@@ -271,7 +268,7 @@ function resetarFormularioAtribuicao() {
 
 defineExpose({
   router,
-  codUnidade,
+  codUnidade: props.codUnidade,
   unidade,
   termoUsuario,
   usuarioSelecionado,

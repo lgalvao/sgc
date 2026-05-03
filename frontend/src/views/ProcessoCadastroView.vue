@@ -143,7 +143,7 @@ import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import * as processoService from "@/services/processo";
-import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
+import {Processo, TipoProcesso, type Unidade} from "@/types/tipos";
 import {usePerfil} from "@/composables/usePerfil";
 
 const {
@@ -264,7 +264,7 @@ async function carregarDiagnosticoOrganizacional() {
 
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
-const processoEditando = ref<ProcessoModel | null>(null);
+const processoEditando = ref<Processo | null>(null);
 
 const isLoadingData = ref(false);
 
