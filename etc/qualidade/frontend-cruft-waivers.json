@@ -107,12 +107,11 @@
     },
     {
       "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
-
-      "camada": "view",
-      "maxLinhas": 312,
+      "camada": "composable",
+      "maxLinhas": 174,
       "responsavel": "frontend",
-      "justificativa": "Tela ainda agrega busca, formulario e listagem.",
-      "criterioRemocao": "Extrair formulario e listagem da atribuicao temporaria."
+      "justificativa": "Composable ainda concentra fluxo amplo do subprocesso.",
+      "criterioRemocao": "Separar bootstrap, navegacao e mutacoes do subprocesso."
     },
     {
       "arquivo": "frontend/src/stores/perfil.ts",
@@ -121,14 +120,6 @@
       "responsavel": "frontend",
       "justificativa": "Store ainda fica acima do budget mesmo apos a limpeza atual.",
       "criterioRemocao": "Reduzir fronteira de sessao e mover ponte de unidade atual."
-    },
-    {
-      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
-      "camada": "composable",
-      "maxLinhas": 174,
-      "responsavel": "frontend",
-      "justificativa": "Composable ainda concentra fluxo amplo do subprocesso.",
-      "criterioRemocao": "Separar bootstrap, navegacao e mutacoes do subprocesso."
     },
     {
       "arquivo": "frontend/src/components/processo/ModalAcaoBloco.vue",

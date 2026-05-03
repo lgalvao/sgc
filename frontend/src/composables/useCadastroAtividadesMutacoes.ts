@@ -80,7 +80,7 @@ export function useCadastroAtividadesMutacoes({
             });
             mostrarModalConfirmacaoRemocao.value = false;
             dadosRemocao.value = null;
-        } catch (e: any) {
+        } catch (e: unknown) {
             notify(lastError.value?.mensagem || (e as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger");
             mostrarModalConfirmacaoRemocao.value = false;
         } finally {

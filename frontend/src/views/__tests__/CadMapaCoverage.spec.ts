@@ -13,11 +13,10 @@ type MapaViewVm = {
     mostrarModalDisponibilizar: boolean;
     fieldErrors: Record<string, string | undefined>;
     existeCompetenciaSemAtividade: boolean;
-    podeConfirmarDisponibilizacao: boolean;
+    aplicarErroNormalizado: (error: {erros?: Array<{campo?: string; mensagem?: string}>} | null) => void;
     abrirModalImpacto: () => Promise<void>;
     fecharModalImpacto: () => void;
     removerAtividadeAssociada: (codigoCompetencia: number, codigoAtividade: number) => Promise<void> | void;
-    handleErrors: (store: {lastError?: {erros?: Array<{campo?: string; mensagem?: string}>}}) => Promise<void>;
     disponibilizarMapa: (payload: Record<string, unknown>) => Promise<void>;
     fecharModalDisponibilizar: () => void;
 };
@@ -258,7 +257,6 @@ describe('MapaView Coverage', () => {
         await wrapper.vm.$nextTick();
 
         expect(vm.existeCompetenciaSemAtividade).toBe(true);
-        expect(vm.podeConfirmarDisponibilizacao).toBe(false);
     });
 
     it('fecharModalImpacto closes the modal', async () => {
@@ -281,7 +279,7 @@ describe('MapaView Coverage', () => {
         expect(vm.mostrarModalImpacto).toBe(false);
     });
 
-    it('handleErrors covers activitiesIds branch', async () => {
+    it('aplicarErroNormalizado sincroniza campo atividadesCodigos para atividades', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
         const wrapper = mount(MapaView, {
             global: {
@@ -294,14 +292,8 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const store = {
-            lastError: {
-                erros: [{campo: 'atividadesCodigos', mensagem: 'Erro em atividade'}]
-            }
-        };
-
         const vm = wrapper.vm as unknown as MapaViewVm;
-        await vm.handleErrors(store);
+        vm.aplicarErroNormalizado({erros: [{campo: 'atividadesCodigos', mensagem: 'Erro em atividade'}]});
         expect(vm.fieldErrors.atividades).toBe('Erro em atividade');
     });
 

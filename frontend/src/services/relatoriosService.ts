@@ -1,5 +1,15 @@
 import apiClient from "@/axios-setup";
 
+function baixarPdf(blob: Blob, nomeArquivo: string): void {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', nomeArquivo);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 export interface RelatorioAndamento {
   siglaUnidade: string;
   nomeUnidade: string;
@@ -58,13 +68,7 @@ export const relatoriosService = {
     const response = await apiClient.get(`/relatorios/andamento/${codProcesso}/exportar`, {
       responseType: 'blob'
     });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `relatorio-andamento-${codProcesso}.pdf`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    baixarPdf(new Blob([response.data]), `relatorio-andamento-${codProcesso}.pdf`);
   },
 
   async downloadRelatorioMapasPdf(codigosUnidades: number[]): Promise<void> {
@@ -74,12 +78,6 @@ export const relatoriosService = {
       },
       responseType: 'blob'
     });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'relatorio-mapas-vigentes.pdf');
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    baixarPdf(new Blob([response.data]), 'relatorio-mapas-vigentes.pdf');
   }
 };
