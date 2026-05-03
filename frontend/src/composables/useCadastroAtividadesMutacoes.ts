@@ -3,6 +3,7 @@ import type {Atividade, AtividadeOperacaoResponse} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import * as atividadeService from "@/services/atividadeService";
 import type {VarianteAlerta} from "@/composables/useNotification";
+import {useConhecimentoMutacoes} from "./useConhecimentoMutacoes";
 
 export type DadosRemocaoCadastro = {
     tipo: "atividade" | "conhecimento";
@@ -21,8 +22,6 @@ interface UseCadastroAtividadesMutacoesParams {
     adicionarAtividadeAction: (codigoSubprocesso: number, codMapa: number) => Promise<AtividadeOperacaoResponse | null>;
 }
 
-type AcaoAtualizacaoCadastro = () => Promise<AtividadeOperacaoResponse>;
-
 export function useCadastroAtividadesMutacoes({
     atividades,
     codigoSubprocesso,
@@ -38,37 +37,29 @@ export function useCadastroAtividadesMutacoes({
     const loadingRemocao = ref(false);
     const mostrarModalConfirmacaoRemocao = ref(false);
 
-    async function executarAtualizacaoCadastro(
-        acao: AcaoAtualizacaoCadastro,
-        mensagemErro: string,
-    ) {
+    const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
         try {
-            await withErrorHandling(async () => {
-                const response = await acao();
-                processarRespostaLocal(response);
-            });
+            await withErrorHandling(async () => processarRespostaLocal(await acao()));
             return true;
         } catch {
-            notify(mensagemErro, "danger");
+            notify(msg, "danger");
             return false;
         }
-    }
+    };
+
+    const prepararRemocao = (tipo: "atividade" | "conhecimento", atividadeCodigo: number, conhecimentoCodigo?: number) => {
+        dadosRemocao.value = {tipo, atividadeCodigo, conhecimentoCodigo};
+        mostrarModalConfirmacaoRemocao.value = true;
+    };
+
+    const {adicionarConhecimento, removerConhecimento, salvarEdicaoConhecimento} = useConhecimentoMutacoes(codigoSubprocesso, executarAtualizacao, prepararRemocao);
 
     async function adicionarAtividade(): Promise<boolean> {
-        if (!codMapa.value || !codigoSubprocesso.value) {
-            return false;
-        }
-
+        if (!codMapa.value || !codigoSubprocesso.value) return false;
         try {
-            const response = await withErrorHandling(() =>
-                adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!)
-            );
-
-            if (!response) {
-                return false;
-            }
-
-            processarRespostaLocal(response);
+            const resp = await withErrorHandling(() => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!));
+            if (!resp) return false;
+            processarRespostaLocal(resp);
             erroNovaAtividade.value = null;
             return true;
         } catch {
@@ -77,36 +68,19 @@ export function useCadastroAtividadesMutacoes({
         }
     }
 
-    function removerAtividade(codigo: number) {
-        if (!codigoSubprocesso.value) return;
-        dadosRemocao.value = {tipo: "atividade", atividadeCodigo: codigo};
-        mostrarModalConfirmacaoRemocao.value = true;
-    }
-
     async function confirmarRemocao() {
         if (!dadosRemocao.value || !codigoSubprocesso.value || loadingRemocao.value) return;
-
         const {tipo, atividadeCodigo, conhecimentoCodigo} = dadosRemocao.value;
-
         loadingRemocao.value = true;
         try {
-            if (tipo === "atividade") {
-                await withErrorHandling(async () => {
-                    const response = await atividadeService.excluirAtividade(atividadeCodigo);
-                    processarRespostaLocal(response);
-                });
-            } else if (conhecimentoCodigo !== undefined) {
-                await withErrorHandling(async () => {
-                    const response = await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
-                    processarRespostaLocal(response);
-                });
-            }
-
+            await withErrorHandling(async () => {
+                const resp = tipo === "atividade" ? await atividadeService.excluirAtividade(atividadeCodigo) : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
+                processarRespostaLocal(resp);
+            });
             mostrarModalConfirmacaoRemocao.value = false;
             dadosRemocao.value = null;
-        } catch (e: unknown) {
-            const err = lastError.value?.mensagem || (e as Error).message;
-            notify(err || TEXTOS.atividades.ERRO_REMOVER, "danger");
+        } catch (e: any) {
+            notify(lastError.value?.mensagem || (e as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger");
             mostrarModalConfirmacaoRemocao.value = false;
         } finally {
             loadingRemocao.value = false;
@@ -115,62 +89,13 @@ export function useCadastroAtividadesMutacoes({
 
     async function salvarEdicaoAtividade(codigo: number, descricao: string) {
         if (!descricao.trim() || !codigoSubprocesso.value) return;
-
-        const atividadeOriginal = atividades.value.find((atividade) => atividade.codigo === codigo);
-        if (!atividadeOriginal) return;
-
-        const descricaoAtualizada = descricao.trim();
-        await executarAtualizacaoCadastro(
-            () => atividadeService.atualizarAtividade(codigo, {
-                ...atividadeOriginal,
-                descricao: descricaoAtualizada,
-            }),
-            TEXTOS.atividades.ERRO_SALVAR_ATIVIDADE,
-        );
-    }
-
-    async function adicionarConhecimento(atividadeCodigo: number, descricao: string) {
-        if (!codigoSubprocesso.value || !descricao.trim()) return;
-
-        await executarAtualizacaoCadastro(
-            () => atividadeService.criarConhecimento(atividadeCodigo, {
-                descricao: descricao.trim(),
-            }),
-            TEXTOS.atividades.ERRO_ADICIONAR_CONHECIMENTO,
-        );
-    }
-
-    function removerConhecimento(atividadeCodigo: number, conhecimentoCodigo?: number) {
-        if (!codigoSubprocesso.value) return;
-        dadosRemocao.value = {tipo: "conhecimento", atividadeCodigo, conhecimentoCodigo};
-        mostrarModalConfirmacaoRemocao.value = true;
-    }
-
-    async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCodigo: number, descricao: string) {
-        if (!codigoSubprocesso.value || !descricao.trim()) return;
-
-        const descricaoAtualizada = descricao.trim();
-        await executarAtualizacaoCadastro(
-            () => atividadeService.atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, {
-                codigo: conhecimentoCodigo,
-                descricao: descricaoAtualizada,
-            }),
-            TEXTOS.atividades.ERRO_ATUALIZAR_CONHECIMENTO,
-        );
+        const atividade = atividades.value.find((a) => a.codigo === codigo);
+        if (atividade) await executarAtualizacao(() => atividadeService.atualizarAtividade(codigo, {...atividade, descricao: descricao.trim()}), TEXTOS.atividades.ERRO_SALVAR_ATIVIDADE);
     }
 
     return {
-        erroNovaAtividade,
-        dadosRemocao,
-        loadingRemocao,
-        mostrarModalConfirmacaoRemocao,
-        executarAtualizacaoCadastro,
-        adicionarAtividade,
-        removerAtividade,
-        confirmarRemocao,
-        salvarEdicaoAtividade,
-        adicionarConhecimento,
-        removerConhecimento,
-        salvarEdicaoConhecimento,
+        erroNovaAtividade, dadosRemocao, loadingRemocao, mostrarModalConfirmacaoRemocao,
+        adicionarAtividade, removerAtividade: (c: number) => prepararRemocao("atividade", c), confirmarRemocao, salvarEdicaoAtividade,
+        adicionarConhecimento, removerConhecimento, salvarEdicaoConhecimento,
     };
 }

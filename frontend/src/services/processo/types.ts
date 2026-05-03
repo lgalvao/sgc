@@ -11,7 +11,7 @@ import {
     type UnidadeImportacao,
     type UnidadeParticipante
 } from "@/types/tipos";
-import type {ProcessoDetalheDto} from "@/types/dtos";
+import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
 
 export type {
     AcaoBlocoProcesso,
@@ -38,7 +38,7 @@ export interface ProcessoDetalheResponseBackend extends ProcessoDetalheDto {
     podeHomologarMapa: boolean;
     podeAceitarCadastroBloco: boolean;
     podeDisponibilizarMapaBloco: boolean;
-    unidades: any[];
+    unidades: UnidadeParticipanteDto[];
     resumoSubprocessos: ProcessoResumo[];
     acoesBloco: AcaoBlocoProcesso[];
 }

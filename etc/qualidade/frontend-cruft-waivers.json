@@ -50,14 +50,6 @@
       "criterioRemocao": "Extrair secoes do formulario e bootstrap de dados."
     },
     {
-      "arquivo": "frontend/src/stores/subprocesso.ts",
-      "camada": "store",
-      "maxLinhas": 276,
-      "responsavel": "frontend",
-      "justificativa": "Store ainda concentra cache curto e multiplas leituras do subprocesso.",
-      "criterioRemocao": "Separar responsabilidades de cache e consulta derivada."
-    },
-    {
       "arquivo": "frontend/src/components/comum/TreeTable.vue",
       "camada": "component",
       "maxLinhas": 360,

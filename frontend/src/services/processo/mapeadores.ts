@@ -1,11 +1,6 @@
-import {
-    type AcaoBlocoProcesso,
-    type Processo,
-    type ProcessoResumo,
-    SituacaoSubprocesso,
-    type UnidadeParticipante
-} from "@/types/tipos";
-import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
+import {SituacaoSubprocesso, type UnidadeParticipante} from "@/types/tipos";
+import type {UnidadeParticipanteDto} from "@/types/dtos";
+import type {Processo, ProcessoDetalheResponseBackend} from "./types";
 
 export function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {
     return {
@@ -22,7 +17,7 @@ export function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeP
     };
 }
 
-export function mapearProcessoDetalhe(dto: any): Processo {
+export function mapearProcessoDetalhe(dto: ProcessoDetalheResponseBackend): Processo {
     return {
         codigo: dto.codigo,
         descricao: dto.descricao,

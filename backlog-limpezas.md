@@ -3,13 +3,13 @@
 ## Estado atual
 
 - Gate de cruft: **ok**
-- Score atual: **3594**
+- Score atual: **3542**
 - Violacoes: **0**
 - Baseline do `fallow`:
   - dead files: **0**
   - dead export pct: **9.3%**
   - health score: **94.6 / A**
-  - unused dep: **1** (`zod`)
+  - unused dep: **0** (zod removido)
 
 ## Ja concluido nesta rodada
 
@@ -23,10 +23,30 @@
 - remocao de dependencias orfas:
   - `papaparse`
   - `@types/papaparse`
+  - `zod`
 - poda de `frontend/src/components/layout/MainNavbar.vue`
 - consolidacao dos modais de observacao de cadastro:
   - `frontend/src/components/cadastro/CadastroObservacaoModal.vue`
   - `frontend/src/components/cadastro/cadastroObservacaoModalModel.ts`
+- **Limpeza de exports mortos (P0):**
+  - `useLocalStorage.ts` (poda de `useLocalStorageMultiple`, `removeFromLocalStorage`, etc)
+  - `situacoes.ts` (poda de `LABELS_SITUACAO`)
+  - `styleUtils.ts` (poda completa, arquivo agora apenas exporta vazio ou foi reduzido)
+  - `formatters.ts` (poda de `formatNumeroCsvBR`)
+- **Fatiamento de Hotspots (P1):**
+  - `dateUtils.ts` fatiado em `frontend/src/utils/date/` (totalmente em português)
+  - `apiError.ts` fatiado em `frontend/src/utils/apiError/` (totalmente em português, contratos Axios preservados)
+  - `processoService.ts` fatiado em `frontend/src/services/processo/` (removido código morto como `obterProcessoPorCodigo`)
+  - `useAcesso.ts` fatiado em `frontend/src/composables/acesso/`
+  - `stores/subprocesso.ts` fatiado em `frontend/src/stores/subprocesso/` (separado orquestrador e tipos)
+- **Ratchet de Waivers:**
+  - removido waiver de `formatters.ts`
+  - removido waiver de `diagnosticoService.ts`
+  - removido waiver de `dateUtils.ts`
+  - removido waiver de `apiError.ts`
+  - removido waiver de `processoService.ts`
+  - removido waiver de `useAcesso.ts`
+  - removido waiver de `stores/subprocesso.ts`
 
 ## Guardrails para as proximas rodadas
 
@@ -34,92 +54,12 @@
 - nao recriar regra de acesso no frontend
 - preferir helper local ou componente local antes de abrir nova camada
 - apagar sobra liberada na mesma rodada
+- usar sempre **português brasileiro** para novo código
 - rodar sempre:
   - `node etc/scripts/sgc.js frontend cruft validar`
   - `npx fallow dead-code -r frontend`
   - `npx fallow dupes -r frontend`
   - `npx fallow health -r frontend`
-
-## Prioridade 0 - ganhos pequenos e seguros
-
-### 1. Remover API publica sobrando em arquivos pequenos
-
-Atacar primeiro exports mortos sem abrir refatoracao grande:
-
-- `frontend/src/composables/useLocalStorage.ts`
-  - `useLocalStorageMultiple`
-  - `removeFromLocalStorage`
-  - `removeMultipleFromLocalStorage`
-- `frontend/src/constants/situacoes.ts`
-  - `LABELS_SITUACAO`
-- `frontend/src/utils/styleUtils.ts`
-  - `badgeClass`
-  - `iconeTipo`
-- `frontend/src/utils/formatters.ts`
-  - `formatNumeroCsvBR`
-
-### 2. Verificar dependencia orfa
-
-- `zod`
-  - hoje o `fallow` aponta `unused-dep:zod`
-  - confirmar se ainda existe uso real no frontend antes de remover
-
-## Prioridade 1 - hotspots com melhor custo/beneficio
-
-Esses pontos aparecem ao mesmo tempo como **waiver**, **arquivo acima do target** ou **high complexity**.
-
-### 1. `frontend/src/utils/dateUtils.ts`
-
-- sinais:
-  - waiver ativo
-  - `parseDate` com complexidade alta
-  - varios exports mortos
-- corte recomendado:
-  - separar parsing
-  - separar formatacao
-  - separar calculos/validacoes
-
-### 2. `frontend/src/utils/apiError.ts`
-
-- sinais:
-  - waiver ativo
-  - `normalizeError` e `mapStatusToKind` como hotspots
-  - exports mortos (`existsOrFalse`, `getOrNull`)
-- corte recomendado:
-  - separar classificacao HTTP
-  - separar formatacao para UI
-  - remover helpers sem consumidor
-
-### 3. `frontend/src/services/processoService.ts`
-
-- sinais:
-  - waiver ativo
-  - exports mortos (`obterProcessoPorCodigo`, `buscarSubprocessosElegiveis`, `buscarSubprocessos`)
-  - duplicacao com `src/types/processo.ts`
-- corte recomendado:
-  - fatiar leituras x acoes
-  - remover API publica sem consumidor
-  - endurecer contratos na borda
-
-### 4. `frontend/src/composables/useAcesso.ts`
-
-- sinais:
-  - waiver ativo
-  - hotspot em `acaoPrincipalCadastro`
-- corte recomendado:
-  - separar acesso de cadastro
-  - separar acesso de mapa
-  - separar acoes em bloco
-
-### 5. `frontend/src/stores/subprocesso.ts`
-
-- sinais:
-  - waiver ativo
-  - ainda e o store de suporte mais sensivel
-- corte recomendado:
-  - separar cache curto
-  - separar consultas derivadas
-  - manter a decisao de reaproveitamento dentro do store
 
 ## Prioridade 2 - waivers grandes que ainda pedem poda estrutural
 
@@ -220,12 +160,12 @@ Esses pontos ainda nao sao prova automatica de remocao imediata, mas merecem aud
 
 ## Ordem recomendada de execucao
 
-1. `dateUtils.ts`
-2. `apiError.ts`
-3. `processoService.ts`
-4. `useAcesso.ts`
-5. `stores/subprocesso.ts`
-6. `MapaEdicaoModais.vue` x `MapaFluxoModais.vue`
+1. ~~`dateUtils.ts`~~ (concluído)
+2. ~~`apiError.ts`~~ (concluído)
+3. ~~`processoService.ts`~~ (concluído)
+4. ~~`useAcesso.ts`~~ (concluído)
+5. ~~`stores/subprocesso.ts`~~ (concluído)
+6. `MapaEdicaoModais.vue` x `MapaFluxoModais.vue` (EM ANDAMENTO)
 7. `ProcessoCadastroView.vue`
 8. `MapaView.vue`
 9. `CadastroView.vue`
@@ -241,13 +181,3 @@ npx fallow health -r frontend
 pnpm -C frontend run typecheck
 pnpm -C frontend run test:unit
 ```
-
-## Leitura curta do estado atual
-
-- o `fallow` ainda tem bastante valor
-- a fase mais barata de remocao de arquivos mortos ja foi feita
-- o proximo ganho real esta em:
-  - reduzir superficie publica sobrando
-  - podar duplicacao localizada
-  - fatiar hotspots reais de complexidade
-  - remover waivers que ja estiverem maduros para cair
