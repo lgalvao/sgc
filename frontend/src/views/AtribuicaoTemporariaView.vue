@@ -176,7 +176,6 @@ const inputUsuarioRef = ref<InstanceType<typeof BuscadorUsuarios> | null>(null);
 const erroUsuario = ref("");
 const erroFormulario = ref("");
 const {
-  validacaoSubmetida,
   resetarValidacao,
   deveExibirErro,
   validarSubmissao,
