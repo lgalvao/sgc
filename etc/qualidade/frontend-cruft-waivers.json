@@ -28,10 +28,10 @@
     {
       "arquivo": "frontend/src/components/unidade/ArvoreUnidades.vue",
       "camada": "component",
-      "maxLinhas": 471,
+      "maxLinhas": 200,
       "responsavel": "frontend",
-      "justificativa": "Componente ainda mistura arvore, tabela e regras de interacao.",
-      "criterioRemocao": "Extrair renderizacao de linha, controles e logica de expansao."
+      "justificativa": "Componente refatorado, mas ainda levemente acima do target devido a composicao de subcomponentes.",
+      "criterioRemocao": "Simplificar template e agrupar propriedades de controle."
     },
     {
       "arquivo": "frontend/src/views/NotificacoesAdminView.vue",
@@ -44,7 +44,7 @@
     {
       "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
       "camada": "view",
-      "maxLinhas": 466,
+      "maxLinhas": 460,
       "responsavel": "frontend",
       "justificativa": "Tela de cadastro de processo ainda centraliza formulario e orquestracao.",
       "criterioRemocao": "Extrair secoes do formulario e bootstrap de dados."
@@ -68,7 +68,7 @@
     {
       "arquivo": "frontend/src/axios-setup.ts",
       "camada": "outro",
-      "maxLinhas": 258,
+      "maxLinhas": 250,
       "responsavel": "frontend",
       "justificativa": "Infra HTTP central ainda agrega autenticacao, erros e transicoes de sessao.",
       "criterioRemocao": "Separar interceptors, sessao e normalizacao de erro."

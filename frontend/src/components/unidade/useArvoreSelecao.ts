@@ -1,5 +1,6 @@
 import {computed, ref, watch} from "vue";
 import type {Unidade} from "@/types/tipos";
+import {mapearHierarquia, coletarCodigosElegiveis, getTodasSubunidades} from "./arvoreSelecaoHelpers";
 
 export function useArvoreSelecao(props: {
   unidades: Unidade[];
@@ -9,45 +10,9 @@ export function useArvoreSelecao(props: {
   const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
   // Mapas para acesso rápido (Pai e Unidade)
-  const maps = computed(() => {
-    const pMap = new Map<number, Unidade>();
-    const uMap = new Map<number, Unidade>();
-
-    const traverse = (node: Unidade, parent?: Unidade) => {
-      const nodeVisual = node as Unidade & { agrupadorVisual?: boolean };
-      if (nodeVisual.agrupadorVisual) {
-        if (node.filhas) {
-          node.filhas.forEach(child => traverse(child, parent));
-        }
-        return;
-      }
-
-      uMap.set(node.codigo, node);
-      if (parent) {
-        pMap.set(node.codigo, parent);
-      }
-      if (node.filhas) {
-        node.filhas.forEach(child => traverse(child, node));
-      }
-    };
-
-    props.unidades.forEach(u => traverse(u));
-    return {parentMap: pMap, unitMap: uMap};
-  });
+  const maps = computed(() => mapearHierarquia(props.unidades));
 
   const parentMap = computed(() => maps.value.parentMap);
-
-  function coletarCodigosElegiveis(unidades: Unidade[]): Set<number> {
-    const codigosElegiveis = new Set<number>();
-    const visitar = (unidade: Unidade) => {
-      if (unidade.isElegivel === true) {
-        codigosElegiveis.add(unidade.codigo);
-      }
-      (unidade.filhas ?? []).forEach(visitar);
-    };
-    unidades.forEach(visitar);
-    return codigosElegiveis;
-  }
 
   function filtrarSelecaoPorElegibilidade(selecao: number[]): number[] {
     const codigosElegiveis = coletarCodigosElegiveis(props.unidades);
@@ -92,19 +57,6 @@ export function useArvoreSelecao(props: {
     }
 
     return "indeterminate";
-  }
-
-  function getTodasSubunidades(unidade: Unidade): Unidade[] {
-    const result: Unidade[] = [];
-    if (unidade.filhas) {
-      for (const filha of unidade.filhas) {
-        result.push(filha);
-        if (filha.filhas) {
-          result.push(...getTodasSubunidades(filha));
-        }
-      }
-    }
-    return result;
   }
 
   function updateAncestors(node: Unidade, selectionSet: Set<number>) {
