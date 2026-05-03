@@ -1,7 +1,7 @@
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
-import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
+import AceitarMapaModal from "@/components/mapa/modais/MapaAceitacaoModal.vue";
 
 const ModalConfirmacaoStub = {
     template: `

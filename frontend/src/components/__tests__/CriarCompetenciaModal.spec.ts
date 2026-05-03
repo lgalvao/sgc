@@ -2,7 +2,7 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import {flushPromises, mount} from "@vue/test-utils";
 import {BCard, BFormCheckbox, BFormTextarea} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
-import CriarCompetenciaModal from "@/components/mapa/CriarCompetenciaModal.vue";
+import CriarCompetenciaModal from "@/components/mapa/modais/CompetenciaEdicaoModal.vue";
 
 const ModalPadraoStub = {
     template: `

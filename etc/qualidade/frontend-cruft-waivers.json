@@ -98,24 +98,8 @@
       "criterioRemocao": "Separar flatten, busca e anotacao da arvore."
     },
     {
-      "arquivo": "frontend/src/components/comum/BuscadorUsuarios.vue",
-      "camada": "component",
-      "maxLinhas": 268,
-      "responsavel": "frontend",
-      "justificativa": "Componente ainda mistura busca remota, teclado e dropdown.",
-      "criterioRemocao": "Extrair estado de busca e lista de sugestoes."
-    },
-    {
-      "arquivo": "frontend/src/components/comum/BuscadorUsuarios.vue",
+      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
 
-      "camada": "composable",
-      "maxLinhas": 177,
-      "responsavel": "frontend",
-      "justificativa": "Composable ainda concentra mutacoes e sincronizacao do cadastro.",
-      "criterioRemocao": "Separar comandos de CRUD e revalidacao local."
-    },
-    {
-      "arquivo": "frontend/src/views/AtribuicaoTemporariaView.vue",
       "camada": "view",
       "maxLinhas": 312,
       "responsavel": "frontend",

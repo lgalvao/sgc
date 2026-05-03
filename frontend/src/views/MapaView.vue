@@ -90,7 +90,7 @@
         <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
       </div>
 
-      <MapaFluxoModais
+      <MapaModaisRoot
           :atividades="atividades"
           :carregando-fluxo-mapa="carregandoFluxoMapa"
           :codigo-subprocesso="codigoSubprocesso"
@@ -155,7 +155,7 @@ import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import EmptyState from "@/components/comum/EmptyState.vue";
 import MapaAcoesHeader from "@/components/mapa/MapaAcoesHeader.vue";
-import MapaFluxoModais from "@/components/mapa/MapaFluxoModais.vue";
+import MapaModaisRoot from "@/components/mapa/modais/MapaModaisRoot.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import MapaSomenteLeitura from "@/components/mapa/MapaSomenteLeitura.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";

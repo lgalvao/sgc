@@ -305,7 +305,6 @@ const {
   dadosRemocao,
   loadingRemocao,
   mostrarModalConfirmacaoRemocao,
-  executarAtualizacaoCadastro,
   adicionarAtividade,
   removerAtividade,
   confirmarRemocao,

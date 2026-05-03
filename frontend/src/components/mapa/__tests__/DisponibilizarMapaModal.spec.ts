@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
-import DisponibilizarMapaModal from '../DisponibilizarMapaModal.vue';
+import DisponibilizarMapaModal from '../modais/MapaDisponibilizacaoModal.vue';
 
 vi.mock("@/utils/date", async () => {
     const actual = await vi.importActual<typeof import("@/utils/date")>("@/utils/date");

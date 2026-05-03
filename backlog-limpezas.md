@@ -39,6 +39,11 @@
   - `processoService.ts` fatiado em `frontend/src/services/processo/` (removido código morto como `obterProcessoPorCodigo`)
   - `useAcesso.ts` fatiado em `frontend/src/composables/acesso/`
   - `stores/subprocesso.ts` fatiado em `frontend/src/stores/subprocesso/` (separado orquestrador e tipos)
+- **Estabilização de Cruft P1:**
+  - `BuscadorUsuarios.vue` fatiado em `frontend/src/composables/useBuscadorUsuarios.ts` (waiver removido)
+  - `useCadastroAtividadesMutacoes.ts` fatiado em `useConhecimentoMutacoes.ts`
+  - Eliminado uso de `any` em `services/processo/`
+  - Enxugamento de `normalizer.ts`, `orquestrador.ts` e `store/index.ts` para conformidade com o budget
 - **Ratchet de Waivers:**
   - removido waiver de `formatters.ts`
   - removido waiver de `diagnosticoService.ts`
