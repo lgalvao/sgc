@@ -1,0 +1,93 @@
+import {onActivated, onMounted, ref, watch, type ComputedRef} from "vue";
+
+type ContextoEdicaoDireto = { detalhes: { codigo: number } } | null;
+type ContextoEdicaoPorProcesso = { codigo: number } | null;
+
+type DependenciasSubprocessoCarregamento = {
+    codProcesso: number;
+    siglaUnidade: string;
+    codSubprocesso?: number;
+    erroIntegracaoContexto: ComputedRef<unknown>;
+    dadosValidosEdicao: (codigoSubprocesso: number) => boolean;
+    garantirContextoEdicao: (codigoSubprocesso: number, limpar: boolean) => Promise<ContextoEdicaoDireto>;
+    garantirContextoEdicaoPorProcessoEUnidade: (
+        codProcesso: number,
+        siglaUnidade: string,
+        limpar: boolean,
+    ) => Promise<ContextoEdicaoPorProcesso>;
+    invalidarMapa: () => void;
+    exibirToastPendente: () => void;
+};
+
+export function useSubprocessoCarregamento({
+    codProcesso,
+    siglaUnidade,
+    codSubprocesso,
+    erroIntegracaoContexto,
+    dadosValidosEdicao,
+    garantirContextoEdicao,
+    garantirContextoEdicaoPorProcessoEUnidade,
+    invalidarMapa,
+    exibirToastPendente,
+}: DependenciasSubprocessoCarregamento) {
+    const codigoSubprocesso = ref<number | null>(null);
+    const erroNaoEncontrado = ref(false);
+    const carregamentoInicialConcluido = ref(false);
+
+    async function carregarSubprocesso(limpar = false) {
+        const resultadoDireto = typeof codSubprocesso === "number"
+            ? await garantirContextoEdicao(codSubprocesso, limpar)
+            : null;
+
+        if (resultadoDireto) {
+            codigoSubprocesso.value = resultadoDireto.detalhes.codigo;
+            erroNaoEncontrado.value = false;
+            return;
+        }
+
+        const resultado = await garantirContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade, limpar);
+        if (!resultado) {
+            codigoSubprocesso.value = null;
+            erroNaoEncontrado.value = !erroIntegracaoContexto.value;
+            return;
+        }
+
+        codigoSubprocesso.value = resultado.codigo;
+        erroNaoEncontrado.value = false;
+    }
+
+    async function atualizarSubprocessoAtual() {
+        const codigo = codigoSubprocesso.value;
+        if (!codigo) return;
+
+        invalidarMapa();
+        await garantirContextoEdicao(codigo, true);
+    }
+
+    onMounted(async () => {
+        exibirToastPendente();
+        await carregarSubprocesso(true);
+        carregamentoInicialConcluido.value = true;
+    });
+
+    watch(
+        () => [codProcesso, siglaUnidade, codSubprocesso],
+        async () => {
+            await carregarSubprocesso(true);
+        },
+    );
+
+    onActivated(async () => {
+        exibirToastPendente();
+        if (!carregamentoInicialConcluido.value) return;
+        if (codigoSubprocesso.value && dadosValidosEdicao(codigoSubprocesso.value)) return;
+        await carregarSubprocesso();
+    });
+
+    return {
+        codigoSubprocesso,
+        erroNaoEncontrado,
+        carregarSubprocesso,
+        atualizarSubprocessoAtual,
+    };
+}

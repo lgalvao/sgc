@@ -162,7 +162,7 @@ import {
   BTable,
   useToast
 } from "bootstrap-vue-next";
-import {computed, onActivated, onMounted, ref, type Ref, watch} from "vue";
+import {computed} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
@@ -185,6 +185,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {useToastStore} from "@/stores/toast";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useSubprocessoAcoesAdministrativas} from "@/views/subprocessoAcoesAdministrativas";
+import {useSubprocessoCarregamento} from "@/views/subprocessoCarregamento";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
@@ -216,10 +217,6 @@ const {
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
-
-const codigoSubprocesso = ref<number | null>(null);
-const erroNaoEncontrado = ref(false);
-const carregamentoInicialConcluido = ref(false);
 
 const camposMovimentacoes = [
   {key: "dataHora", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DATA},
@@ -281,66 +278,21 @@ function exibirToastPendente() {
     });
   }
 }
-
-async function carregarSubprocesso(limpar = false) {
-  const resultadoDireto = typeof props.codSubprocesso === "number"
-      ? await subprocessoStore.garantirContextoEdicao(props.codSubprocesso, limpar)
-      : null;
-
-  if (resultadoDireto) {
-    codigoSubprocesso.value = resultadoDireto.detalhes.codigo;
-    erroNaoEncontrado.value = false;
-    return;
-  }
-
-  const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
-      props.codProcesso,
-      props.siglaUnidade,
-      limpar,
-  );
-
-  if (!resultado) {
-    codigoSubprocesso.value = null;
-    erroNaoEncontrado.value = !subprocessoStore.erroIntegracaoContexto;
-    return;
-  }
-
-  codigoSubprocesso.value = resultado.codigo;
-  erroNaoEncontrado.value = false;
-}
-
-onMounted(async () => {
-  exibirToastPendente();
-  await carregarSubprocesso(true);
-  carregamentoInicialConcluido.value = true;
+const {
+  codigoSubprocesso,
+  erroNaoEncontrado,
+  atualizarSubprocessoAtual,
+} = useSubprocessoCarregamento({
+  codProcesso: props.codProcesso,
+  siglaUnidade: props.siglaUnidade,
+  codSubprocesso: props.codSubprocesso,
+  erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
+  dadosValidosEdicao: subprocessoStore.dadosValidosEdicao,
+  garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
+  garantirContextoEdicaoPorProcessoEUnidade: subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade,
+  invalidarMapa: mapasStore.invalidar,
+  exibirToastPendente,
 });
-
-watch(
-    () => [props.codProcesso, props.siglaUnidade, props.codSubprocesso],
-    async () => {
-      await carregarSubprocesso(true);
-    }
-);
-
-onActivated(async () => {
-  exibirToastPendente();
-  if (!carregamentoInicialConcluido.value) {
-    return;
-  }
-  if (codigoSubprocesso.value && subprocessoStore.dadosValidosEdicao(codigoSubprocesso.value)) {
-    return;
-  }
-  await carregarSubprocesso();
-});
-
-async function atualizarSubprocessoAtual() {
-  if (!codigoSubprocesso.value) {
-    return;
-  }
-
-  mapasStore.invalidar();
-  await subprocessoStore.garantirContextoEdicao(codigoSubprocesso.value, true);
-}
 
 const {
   tipoReabertura,
