@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue'
-import {BFormGroup, BFormRadioGroup, BFormTextarea, BModal} from 'bootstrap-vue-next'
+import {BFormGroup, BFormTextarea, BModal} from 'bootstrap-vue-next'
 import type {FeedbackTipo} from '@/types/feedback'
 
 const props = defineProps<{
