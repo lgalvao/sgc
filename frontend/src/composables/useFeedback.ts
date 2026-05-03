@@ -30,7 +30,7 @@ export function useFeedback() {
             ])
 
             captura.value = await new Promise<Blob | null>((resolver) => {
-                canvas.toBlob((blob) => resolver(blob), 'image/webp', 0.85)
+                canvas.toBlob((blob: Blob | null) => resolver(blob), 'image/webp', 0.85)
             })
         } catch (erro) {
             console.warn('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
