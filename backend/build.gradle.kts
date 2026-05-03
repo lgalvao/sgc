@@ -57,6 +57,7 @@ dependencies {
     runtimeOnly(libs.ojdbc11)
     runtimeOnly(libs.jjwt.impl)
     runtimeOnly(libs.jjwt.jackson)
+    runtimeOnly(libs.micrometer.registry.prometheus)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.spring.boot.starter.test)
@@ -83,6 +84,10 @@ dependencies {
 tasks.withType<BootJar> {
     enabled = true
     mainClass.set("sgc.Sgc")
+}
+
+springBoot {
+    buildInfo()
 }
 
 tasks.named<BootRun>("bootRun") {

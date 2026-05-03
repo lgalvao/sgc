@@ -57,6 +57,9 @@ jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 owasp-java-html-sanitizer = { module = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer", version.ref = "owaspSanitizer" }
 
+# Observability
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
+
 # General Libs
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api" }
