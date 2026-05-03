@@ -27,6 +27,19 @@ setRouter(router);
 
 app.use(createBootstrap());
 app.directive('b-tooltip', vBTooltip);
+
+if (import.meta.env.VITE_FEEDBACK_WIDGET === 'true') {
+    const {default: FeedbackWidget} = await import('@/components/feedback/FeedbackWidget.vue');
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const widgetApp = createApp(FeedbackWidget);
+    widgetApp.use(pinia);
+    widgetApp.use(router);
+    widgetApp.use(createBootstrap());
+    widgetApp.directive('b-tooltip', vBTooltip);
+    widgetApp.mount(container);
+}
+
 app.mount("#app");
 
 globalThis.__pinia__ = pinia;

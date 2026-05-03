@@ -8,6 +8,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "build": "vite build",
+    "build:hom": "vite build --mode hom",
+    "build:prod": "vite build --mode production",
     "preview": "vite preview",
     "lint:ox": "oxlint .",
     "lint": "pnpm run lint:ox && pnpm exec eslint . --ext .vue,.js,.mjs,.ts --fix",
@@ -29,6 +31,7 @@
     "bootstrap-icons": "^1.13.1",
     "bootstrap-vue-next": "^0.44.7",
     "date-fns": "^4.1.0",
+    "html2canvas": "^1.4.1",
     "pinia": "^3.0.4",
     "vue": "^3.5.33",
     "vue-router": "^5.0.6"
