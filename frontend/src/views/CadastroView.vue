@@ -393,8 +393,11 @@ const {
   focarPrimeiroErroInvalido,
   listarAnalisesCadastro,
   homologarCadastro: fluxoSubprocesso.homologarCadastro,
+  homologarRevisaoCadastro: fluxoSubprocesso.homologarRevisaoCadastro,
   aceitarCadastro: fluxoSubprocesso.aceitarCadastro,
+  aceitarRevisaoCadastro: fluxoSubprocesso.aceitarRevisaoCadastro,
   devolverCadastro: fluxoSubprocesso.devolverCadastro,
+  devolverRevisaoCadastro: fluxoSubprocesso.devolverRevisaoCadastro,
 });
 
 async function handleAdicionarAtividade() {

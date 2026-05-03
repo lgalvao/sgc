@@ -23,19 +23,30 @@ type DependenciasCadastroAnaliseFluxo = {
     homologarCadastro: (
         codigoSubprocesso: number,
         request: HomologarCadastroRequest,
-        revisao: boolean,
+        opcoes: { mensagemSucesso: string; redirecionarParaPainel: boolean; redirecionarPara?: { name: string; params: { codProcesso: number | string; siglaUnidade: string } } },
+    ) => Promise<boolean>;
+    homologarRevisaoCadastro: (
+        codigoSubprocesso: number,
+        request: HomologarCadastroRequest,
         opcoes: { mensagemSucesso: string; redirecionarParaPainel: boolean; redirecionarPara?: { name: string; params: { codProcesso: number | string; siglaUnidade: string } } },
     ) => Promise<boolean>;
     aceitarCadastro: (
         codigoSubprocesso: number,
         request: AceitarCadastroRequest,
-        revisao: boolean,
+        opcoes: { mensagemSucesso: string },
+    ) => Promise<boolean>;
+    aceitarRevisaoCadastro: (
+        codigoSubprocesso: number,
+        request: AceitarCadastroRequest,
         opcoes: { mensagemSucesso: string },
     ) => Promise<boolean>;
     devolverCadastro: (
         codigoSubprocesso: number,
         request: DevolverCadastroRequest,
-        revisao: boolean,
+    ) => Promise<boolean>;
+    devolverRevisaoCadastro: (
+        codigoSubprocesso: number,
+        request: DevolverCadastroRequest,
     ) => Promise<boolean>;
 };
 
@@ -53,8 +64,11 @@ export function useCadastroAnaliseFluxo({
     focarPrimeiroErroInvalido,
     listarAnalisesCadastro,
     homologarCadastro,
+    homologarRevisaoCadastro,
     aceitarCadastro,
+    aceitarRevisaoCadastro,
     devolverCadastro,
+    devolverRevisaoCadastro,
 }: DependenciasCadastroAnaliseFluxo) {
     const analisesCadastro = ref<Analise[]>([]);
     const historicoAnalises = computed(() => analisesCadastro.value);
@@ -100,7 +114,9 @@ export function useCadastroAnaliseFluxo({
                 const redirecionarPara = acao.redirecionarParaPainel
                     ? undefined
                     : {name: "Subprocesso", params: {codProcesso, siglaUnidade: sigla}};
-                const sucesso = await homologarCadastro(codigo, req, isRevisao.value, {
+                
+                const fn = isRevisao.value ? homologarRevisaoCadastro : homologarCadastro;
+                const sucesso = await fn(codigo, req, {
                     mensagemSucesso: acao.mensagemSucesso,
                     redirecionarParaPainel: acao.redirecionarParaPainel,
                     redirecionarPara,
@@ -112,7 +128,8 @@ export function useCadastroAnaliseFluxo({
             }
 
             const req: AceitarCadastroRequest = {observacoes: observacaoValidacao.value};
-            const sucesso = await aceitarCadastro(codigo, req, isRevisao.value, {
+            const fn = isRevisao.value ? aceitarRevisaoCadastro : aceitarCadastro;
+            const sucesso = await fn(codigo, req, {
                 mensagemSucesso: acao.mensagemSucesso,
             });
             if (sucesso) {
@@ -135,7 +152,8 @@ export function useCadastroAnaliseFluxo({
         loadingDevolucaoAnalise.value = true;
         try {
             const req: DevolverCadastroRequest = {observacoes: observacaoDevolucao.value};
-            const sucesso = await devolverCadastro(codigo, req, isRevisao.value);
+            const fn = isRevisao.value ? devolverRevisaoCadastro : devolverCadastro;
+            const sucesso = await fn(codigo, req);
             if (sucesso) {
                 fecharModalDevolverAnalise();
             }
