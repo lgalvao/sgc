@@ -3,7 +3,7 @@
  */
 
 // Situações de subprocesso
-export const SITUACOES_SUBPROCESSO = {
+const SITUACOES_SUBPROCESSO = {
     AGUARDANDO: "Aguardando",
     EM_ANDAMENTO: "Em andamento",
     AGUARDANDO_VALIDACAO: "Aguardando validação",
