@@ -20,7 +20,7 @@ defineProps<{
   siglaUnidade: string;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "fechar-modal-data"): void;
   (e: "confirmar-alteracao-data", novaData: string): void;
   (e: "update:mostrarModalReabrir", valor: boolean): void;
@@ -29,6 +29,10 @@ defineEmits<{
   (e: "update:modalLembreteAberto", valor: boolean): void;
   (e: "confirmar-enviar-lembrete"): void;
 }>();
+
+function atualizarJustificativaReabertura(valor: string) {
+  emit("update:justificativaReabertura", valor);
+}
 </script>
 
 <template>
@@ -63,7 +67,7 @@ defineEmits<{
         data-testid="inp-justificativa-reabrir"
         :placeholder="TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PLACEHOLDER"
         rows="3"
-        @update:model-value="$emit('update:justificativaReabertura', $event)"
+        @update:model-value="atualizarJustificativaReabertura"
     />
     <BFormInvalidFeedback
         :state="mensagemErroJustificativa ? false : null"

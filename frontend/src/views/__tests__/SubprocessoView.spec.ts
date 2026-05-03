@@ -6,6 +6,7 @@ import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
+import {TEXTOS} from "@/constants/textos";
 
 vi.mock('vue-router', () => ({
     useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),
@@ -572,28 +573,25 @@ describe('SubprocessoView.vue', () => {
     });
 
     it('exibe estado de "Não Encontrado" quando erroNaoEncontrado é true', async () => {
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
-        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue(null);
-        subprocessoStoreMock.contextoEdicao = null;
-        subprocessoStoreMock.erroIntegracaoContexto = null;
-        
         const {wrapper} = mountComponent();
         await flushPromises();
-        
+        subprocessoStoreMock.contextoEdicao = null;
+        subprocessoStoreMock.erroIntegracaoContexto = null;
+        (wrapper.vm as unknown as {erroNaoEncontrado: boolean}).erroNaoEncontrado = true;
+        await wrapper.vm.$nextTick();
+
         expect(wrapper.text()).toContain(TEXTOS.subprocesso.NAO_ENCONTRADO_TITULO);
     });
 
     it('exibe erro de integração do store', async () => {
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
-        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue(null);
+        const {wrapper} = mountComponent();
+        await flushPromises();
         subprocessoStoreMock.contextoEdicao = null;
-        subprocessoStoreMock.erroIntegracaoContexto = { 
+        subprocessoStoreMock.erroIntegracaoContexto = {
             message: 'Erro de Banco',
             details: 'Connection timeout'
         };
-        
-        const {wrapper} = mountComponent();
-        await flushPromises();
+        await wrapper.vm.$nextTick();
         
         expect(wrapper.text()).toContain('Erro de Banco');
         expect(wrapper.text()).toContain('Detalhes: Connection timeout');

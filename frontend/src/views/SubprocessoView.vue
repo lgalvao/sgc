@@ -108,7 +108,7 @@ import {enviarLembrete as enviarLembreteService} from "@/services/processoServic
 
 import {useAcesso} from "@/composables/useAcesso";
 import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
-import {parseDate} from "@/utils";
+import {formatDateBR, parseDate} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -122,8 +122,7 @@ const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubpro
 
 function formatDataSimples(dataStr: string | null): string {
   if (!dataStr) return '';
-  const data = new Date(dataStr);
-  return data.toLocaleDateString('pt-BR');
+  return formatDateBR(dataStr);
 }
 
 function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
