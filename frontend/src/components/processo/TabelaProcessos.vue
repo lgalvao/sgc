@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type {BTableSortBy} from "bootstrap-vue-next";
-import {BBadge, BButton, BTable} from "bootstrap-vue-next";
+import {BBadge, BButton, BTable, type BTableSortBy, type ColorVariant} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
@@ -122,7 +121,7 @@ defineExpose({fields});
       </template>
 
       <template #cell(situacao)="{ item }">
-        <BBadge :variant="(getProcessoBadgeVariant(item.situacao) as any)" data-testid="badge-situacao">
+        <BBadge :variant="(getProcessoBadgeVariant(item.situacao) as ColorVariant)" data-testid="badge-situacao">
           {{ formatSituacaoProcesso(item.situacao) }}
         </BBadge>
       </template>

@@ -27,6 +27,7 @@ export interface Notificacao {
 }
 
 export { STATUS_NOTIFICACAO_INFO, getNotificacaoStatusInfo as obterStatusNotificacao } from "@/utils/statusHelpers";
+import { STATUS_NOTIFICACAO_INFO } from "@/utils/statusHelpers";
 
 export interface ReenvioNotificacaoResponse {
     codigo: number;
@@ -46,3 +47,23 @@ export async function reenviarNotificacao(codigo: number): Promise<ReenvioNotifi
     );
     return response.data;
 }
+
+export function obterTimestampOrdenacao(item: Notificacao): number {
+    const referencia = item.proximaTentativaEm || item.dataHoraEnvio || item.dataHoraCriacao;
+    const timestamp = referencia ? Date.parse(referencia) : Number.NaN;
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+export function compararNotificacoes(a: Notificacao, b: Notificacao): number {
+    const infoA = STATUS_NOTIFICACAO_INFO[a.situacao];
+    const infoB = STATUS_NOTIFICACAO_INFO[b.situacao];
+    
+    if (!infoA || !infoB) return 0;
+    
+    const prioridade = infoA.prioridade - infoB.prioridade;
+    if (prioridade !== 0) {
+        return prioridade;
+    }
+    return obterTimestampOrdenacao(b) - obterTimestampOrdenacao(a);
+}
+

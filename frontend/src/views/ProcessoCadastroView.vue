@@ -1,26 +1,16 @@
-  <template>
+<template>
   <LayoutPadrao>
     <div class="col-lg-8 col-md-9 col-12">
       <PageHeader :title="TEXTOS.processo.cadastro.TITULO" />
 
-      <div v-if="exibirAlertaDiagnostico" class="mb-3 pt-2">
-        <BAlert
-            :model-value="true"
-            dismissible
-            variant="warning"
-            @dismissed="dispensarAlertaDiagnostico"
-        >
-          <strong>Há unidades sem responsável atual.</strong>
-          <div class="mt-1">{{ resumoDiagnostico }}</div>
-          <ul class="mb-0 mt-2 ps-3">
-            <li v-for="grupo in gruposDiagnostico" :key="grupo.tipo">
-              {{ grupo.tipo }}: {{ grupo.quantidadeOcorrencias }} ocorrência(s)
-            </li>
-          </ul>
-        </BAlert>
-      </div>
+      <ProcessoDiagnosticoAlert
+          :exibir="exibirAlertaDiagnostico"
+          :grupos="gruposDiagnostico"
+          :resumo="resumoDiagnostico"
+          @dismiss="dispensarAlertaDiagnostico"
+      />
 
-      <BForm class="mt-4">
+      <BForm class="mt-4" @submit.prevent>
         <AppAlert
             v-if="notificacao"
             :dispensavel="notificacao.dispensavel ?? true"
@@ -84,52 +74,29 @@
       </BForm>
     </div>
 
-    <!-- Modal de confirmação cadastro -->
-    <ModalConfirmacao
-        v-model="mostrarModalConfirmacao"
-        :auto-close="false"
-        :loading="isLoading"
-        :cancel-title="TEXTOS.comum.BOTAO_CANCELAR"
-        :ok-title="TEXTOS.comum.BOTAO_INICIAR"
-        variant="success"
-        test-codigo-cancelar="btn-iniciar-processo-cancelar"
-        test-codigo-confirmar="btn-iniciar-processo-confirmar"
-        :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
-        @confirmar="confirmarIniciarProcesso"
-    >
-      <p><strong>Descrição:</strong> {{ descricao }}</p>
-      <p><strong>Tipo:</strong> {{ tipo }}</p>
-      <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
-      <hr>
-      <p>
-        {{ TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO }}
-      </p>
-    </ModalConfirmacao>
-
-    <!-- Modal de confirmação de remoção -->
-    <ModalConfirmacao
-        v-model="mostrarModalRemocao"
-        :auto-close="false"
-        :loading="isLoading"
-        :ok-title="TEXTOS.processo.cadastro.BOTAO_REMOVER"
-        :titulo="TEXTOS.processo.cadastro.REMOVER_TITULO"
-        variant="danger"
-        @confirmar="confirmarRemocao"
-    >
-      <p>{{ TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao) }}</p>
-    </ModalConfirmacao>
+    <ProcessoCadastroModais
+        v-model:mostrar-confirmacao="mostrarModalConfirmacao"
+        v-model:mostrar-remocao="mostrarModalRemocao"
+        :descricao="descricao"
+        :is-loading="isLoading"
+        :tipo-label="tipo || '-'"
+        :total-unidades="unidadesSelecionadas.length"
+        @confirmar-iniciar="confirmarIniciarProcesso"
+        @confirmar-remocao="confirmarRemocao"
+    />
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BForm} from "bootstrap-vue-next";
+import {BForm} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
+import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoAlert.vue";
+import ProcessoCadastroModais from "@/components/processo/ProcessoCadastroModais.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
 import {ehErroAxios, normalizarErro, extrairErrosGenericos, deveNotificarGlobalmente} from "@/utils/apiError";
@@ -215,14 +182,12 @@ function dispensarAlertaDiagnostico() {
 
 function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
   const codigosElegiveis = new Set<number>();
-
   const visitar = (unidade: Unidade) => {
     if (unidade.isElegivel === true) {
       codigosElegiveis.add(unidade.codigo);
     }
     (unidade.filhas ?? []).forEach(visitar);
   };
-
   unidadesArvore.forEach(visitar);
   return codigosElegiveis;
 }
@@ -258,7 +223,6 @@ async function carregarDiagnosticoOrganizacional() {
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<Processo | null>(null);
-
 const isLoadingData = ref(false);
 
 onMounted(async () => {
@@ -271,7 +235,6 @@ onMounted(async () => {
     await buscarUnidadesParaProcesso(tipo.value);
   }
 
-  // Auto-focus na descrição ao carregar
   if (!processoEditando.value) {
     await nextTick();
     formFieldsRef.value?.focarDescricao();
@@ -303,9 +266,7 @@ async function carregarProcessoParaEdicao(codProcesso: number) {
 }
 
 watch(tipo, async (novoTipo) => {
-  const codProcesso = processoEditando.value
-      ? processoEditando.value.codigo
-      : undefined;
+  const codProcesso = processoEditando.value ? processoEditando.value.codigo : undefined;
   if (novoTipo) {
     await buscarUnidadesParaProcesso(novoTipo, codProcesso);
   }
@@ -320,19 +281,13 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
 
   if (usarErroEstruturado) {
     setFromErroNormalizado(erroNormalizado);
-
-    const hasFieldErrors = hasErrors();
     const genericErrors = extrairErrosGenericos(erroNormalizado);
 
-    if (!hasFieldErrors || genericErrors.length > 0) {
-      notifyStructured(
-          erroNormalizado.mensagem || defaultMsg,
-          genericErrors,
-          {
-            variante: 'danger',
-            stackTrace: erroNormalizado.stackTrace || undefined,
-          }
-      );
+    if (!hasErrors() || genericErrors.length > 0) {
+      notifyStructured(erroNormalizado.mensagem || defaultMsg, genericErrors, {
+        variante: 'danger',
+        stackTrace: erroNormalizado.stackTrace || undefined,
+      });
       globalThis.scrollTo(0, 0);
     } else {
       void focarPrimeiroErroInvalido();
@@ -353,20 +308,15 @@ async function salvarProcesso() {
   try {
     if (processoEditando.value) {
       const request = construirAtualizarRequest(processoEditando.value.codigo);
-      await processoService.atualizarProcesso(
-          processoEditando.value.codigo,
-          request,
-      );
+      await processoService.atualizarProcesso(processoEditando.value.codigo, request);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_ALTERADO);
-      invalidarCachesProcesso();
-      await router.push("/painel");
     } else {
       const request = construirCriarRequest();
       await processoService.criarProcesso(request);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_CRIADO);
-      invalidarCachesProcesso();
-      await router.push("/painel");
     }
+    invalidarCachesProcesso();
+    await router.push("/painel");
     limparCampos();
   } catch (error) {
     handleApiErrors(error, "Erro ao salvar processo", "Não foi possível salvar o processo.");
@@ -382,7 +332,6 @@ function abrirModalConfirmacao() {
 async function confirmarIniciarProcesso() {
   clearErrors();
   isLoading.value = true;
-
   let codigoProcesso = processoEditando.value?.codigo;
 
   if (!codigoProcesso) {
@@ -399,19 +348,8 @@ async function confirmarIniciarProcesso() {
   }
 
   try {
-    if (!tipo.value) {
-      notify(TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO, "danger");
-      mostrarModalConfirmacao.value = false;
-      isLoading.value = false;
-      return;
-    }
-
-    await processoService.iniciarProcesso(
-        codigoProcesso,
-        tipo.value,
-        unidadesSelecionadas.value,
-    );
-
+    if (!tipo.value) throw new Error("Tipo não definido");
+    await processoService.iniciarProcesso(codigoProcesso, tipo.value, unidadesSelecionadas.value);
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_INICIADO);
     invalidarCachesProcesso();
     await router.push("/painel");
@@ -428,29 +366,22 @@ function abrirModalRemocao() {
   mostrarModalRemocao.value = true;
 }
 
-function fecharModalRemocao() {
-  mostrarModalRemocao.value = false;
-}
-
 async function confirmarRemocao() {
-  if (processoEditando.value) {
-    isLoading.value = true;
-    const descRemovida = processoEditando.value.descricao;
-    try {
-      await processoService.excluirProcesso(processoEditando.value.codigo);
-      toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
-      invalidarCachesProcesso();
-      await router.push("/painel");
-      limparCampos();
-      fecharModalRemocao();
-    } catch (error) {
-      fecharModalRemocao();
-      handleApiErrors(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
-    } finally {
-      isLoading.value = false;
-    }
-  } else {
-    fecharModalRemocao();
+  if (!processoEditando.value) return;
+  isLoading.value = true;
+  const descRemovida = processoEditando.value.descricao;
+  try {
+    await processoService.excluirProcesso(processoEditando.value.codigo);
+    toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
+    invalidarCachesProcesso();
+    await router.push("/painel");
+    limparCampos();
+    mostrarModalRemocao.value = false;
+  } catch (error) {
+    mostrarModalRemocao.value = false;
+    handleApiErrors(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>

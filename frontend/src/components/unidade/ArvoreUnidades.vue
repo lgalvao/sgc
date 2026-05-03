@@ -1,46 +1,12 @@
 <template>
   <div class="arvore-unidades">
-    <div v-if="unidadesExibidasOriginais.length > 0" class="arvore-unidades__toolbar">
-      <template v-if="modoSelecao">
-        <div class="arvore-unidades__acoes">
-          <BButton
-              aria-label="Selecionar todas as unidades elegíveis"
-              class="arvore-unidades__botao"
-              size="sm"
-              variant="outline-secondary"
-              @click="selecionarTodas">
-            <i aria-hidden="true" class="bi bi-check-all me-1"/>
-            Todos
-          </BButton>
-
-          <BButton
-              aria-label="Desmarcar todas as unidades"
-              class="arvore-unidades__botao arvore-unidades__botao--secundario"
-              size="sm"
-              variant="outline-secondary"
-              @click="deselecionarTodas">
-            <i aria-hidden="true" class="bi bi-x-lg me-1"/>
-            Limpar
-          </BButton>
-        </div>
-      </template>
-
-      <div class="arvore-unidades__busca">
-        <BFormInput
-            v-model="termoBusca"
-            aria-label="Buscar unidade por sigla"
-            class="arvore-unidades__input"
-            placeholder="Filtrar..."
-            size="sm"
-            type="search"
-        />
-        <i
-            v-if="!termoBusca"
-            class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted"
-            style="pointer-events: none;"
-        />
-      </div>
-    </div>
+    <ArvoreToolbar
+        v-if="unidadesExibidasOriginais.length > 0"
+        v-model:termo-busca="termoBusca"
+        :modo-selecao="modoSelecao"
+        @selecionar-todos="selecionarTodas(unidadesExibidas)"
+        @limpar-selecao="deselecionarTodas"
+    />
 
     <UnidadeTreeNode
         v-for="unidade in unidadesExibidas"
@@ -59,10 +25,12 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch} from "vue";
-import {BButton, BFormInput} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
 import {organizarArvoreUnidades, TITULO_GRUPO_ZONAS_ELEITORAIS} from "@/utils/treeUtils";
 import UnidadeTreeNode from "./UnidadeTreeNode.vue";
+import ArvoreToolbar from "./ArvoreToolbar.vue";
+import {useArvoreSelecao} from "./useArvoreSelecao";
+import {useArvoreExpansao} from "./useArvoreExpansao";
 
 type UnidadeExibida = Unidade & {
   agrupadorVisual?: boolean;
@@ -70,7 +38,7 @@ type UnidadeExibida = Unidade & {
 
 interface Props {
   unidades: Unidade[];
-  modelValue: number[]; 
+  modelValue: number[];
   filtrarPor?: (unidade: Unidade) => boolean;
   ocultarRaiz?: boolean;
   modoSelecao?: boolean;
@@ -84,9 +52,28 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();
 
-const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+// Composables
+const {
+  unidadesSelecionadasLocal,
+  isChecked,
+  isHabilitado,
+  getEstadoSelecao,
+  toggle,
+  selecionarTodas,
+  deselecionarTodas,
+  filtrarSelecaoPorElegibilidade
+} = useArvoreSelecao(props, emit);
+
+const {
+  isExpanded,
+  toggleExpand,
+  expandirRecursivo,
+  limparExpansao
+} = useArvoreExpansao();
+
 const termoBusca = ref("");
 
+// Lógica de Agrupamento Visual (Zonas Eleitorais)
 function criarCodigoGrupoZonasEleitorais(codigoPai: number): number {
   return -((Math.abs(codigoPai) * 1000) + 999);
 }
@@ -120,35 +107,7 @@ function organizarUnidadesParaExibicao(unidades: Unidade[], codigoPai: number): 
   });
 }
 
-// Mapas para acesso rápido (Pai e Unidade)
-const maps = computed(() => {
-  const pMap = new Map<number, Unidade>();
-  const uMap = new Map<number, Unidade>();
-
-  const traverse = (node: Unidade, parent?: Unidade) => {
-    const nodeVisual = node as UnidadeExibida;
-    if (nodeVisual.agrupadorVisual) {
-      if (node.filhas) {
-        node.filhas.forEach(child => traverse(child, parent));
-      }
-      return;
-    }
-
-    uMap.set(node.codigo, node);
-    if (parent) {
-      pMap.set(node.codigo, parent);
-    }
-    if (node.filhas) {
-      node.filhas.forEach(child => traverse(child, node));
-    }
-  };
-
-  props.unidades.forEach(u => traverse(u));
-  return {parentMap: pMap, unitMap: uMap};
-});
-
-const parentMap = computed(() => maps.value.parentMap);
-
+// Lógica de Busca e Filtragem
 function filtrarUnidadesRecursivo(unidades: Unidade[], termo: string): Unidade[] {
   if (!termo) return unidades;
 
@@ -194,176 +153,12 @@ const unidadesExibidas = computed((): UnidadeExibida[] => {
   return filtrarUnidadesRecursivo(unidadesExibidasOriginais.value, termoBusca.value) as UnidadeExibida[];
 });
 
+// Watchers
 watch(termoBusca, (novoTermo) => {
   if (novoTermo) {
-    const expandirMatches = (unidades: Unidade[]) => {
-      unidades.forEach(u => {
-        if (u.filhas && u.filhas.length > 0) {
-          expandedUnits.value.add(u.codigo);
-          expandirMatches(u.filhas);
-        }
-      });
-    };
-    expandirMatches(unidadesExibidas.value);
+    expandirRecursivo(unidadesExibidas.value);
   }
 });
-
-function getTodasSubunidades(unidade: Unidade): Unidade[] {
-  const result: Unidade[] = [];
-  if (unidade.filhas) {
-    for (const filha of unidade.filhas) {
-      result.push(filha);
-      if (filha.filhas) {
-        result.push(...getTodasSubunidades(filha));
-      }
-    }
-  }
-  return result;
-}
-
-function coletarCodigosElegiveis(unidades: Unidade[]): Set<number> {
-  const codigosElegiveis = new Set<number>();
-
-  const visitar = (unidade: Unidade) => {
-    if (unidade.isElegivel === true) {
-      codigosElegiveis.add(unidade.codigo);
-    }
-    (unidade.filhas ?? []).forEach(visitar);
-  };
-
-  unidades.forEach(visitar);
-  return codigosElegiveis;
-}
-
-function filtrarSelecaoPorElegibilidade(selecao: number[]): number[] {
-  const codigosElegiveis = coletarCodigosElegiveis(props.unidades);
-  return selecao.filter(codigo => codigosElegiveis.has(codigo));
-}
-
-function isChecked(codigo: number): boolean {
-  if (!props.modoSelecao) return false;
-  return unidadesSelecionadasLocal.value.includes(codigo);
-}
-
-function isHabilitado(unidade: Unidade): boolean {
-  if (!props.modoSelecao) return false;
-  if (unidade.isElegivel) return true;
-  if (!unidade.filhas || unidade.filhas.length === 0) return false;
-  return unidade.filhas.some(filha => isHabilitado(filha));
-}
-
-function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
-  if (!props.modoSelecao) return false;
-
-  const selfSelected = isChecked(unidade.codigo);
-
-  if (!unidade.filhas || unidade.filhas.length === 0) {
-    return selfSelected;
-  }
-
-  const estadosFilhas = unidade.filhas.map(filha => getEstadoSelecao(filha));
-  const todasFilhasMarcadas = estadosFilhas.every(estado => estado === true);
-  const algumaFilhaSelecionada = estadosFilhas.some(estado => estado !== false);
-
-  if (todasFilhasMarcadas) {
-    return true;
-  }
-
-  if (!algumaFilhaSelecionada) {
-    return selfSelected;
-  }
-
-  if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
-    return true;
-  }
-
-  return "indeterminate";
-}
-
-function toggle(unidade: Unidade, checked: boolean) {
-  if (!props.modoSelecao) return;
-
-  const newSelection = new Set(unidadesSelecionadasLocal.value);
-  const unitsToToggle = [unidade, ...getTodasSubunidades(unidade)];
-
-  if (checked) {
-    unitsToToggle.forEach(u => {
-      if (u.isElegivel) {
-        newSelection.add(u.codigo);
-      }
-    });
-  } else {
-    unitsToToggle.forEach(u => newSelection.delete(u.codigo));
-  }
-
-  const unidadeVisual = unidade as UnidadeExibida;
-  if (unidadeVisual.agrupadorVisual) {
-    (unidade.filhas ?? []).forEach(filha => updateAncestors(filha, newSelection));
-  } else {
-    updateAncestors(unidade, newSelection);
-  }
-  unidadesSelecionadasLocal.value = Array.from(newSelection);
-}
-
-function updateAncestors(node: Unidade, selectionSet: Set<number>) {
-  let current = node;
-  while (true) {
-    const parent = parentMap.value.get(current.codigo);
-    if (!parent) break;
-
-    const children = parent.filhas || [];
-    const allChildrenSelected = children.every(child => selectionSet.has(child.codigo));
-
-    if (allChildrenSelected) {
-      if (parent.isElegivel) {
-        selectionSet.add(parent.codigo);
-      }
-    } else if (parent.tipo !== 'INTEROPERACIONAL') {
-      selectionSet.delete(parent.codigo);
-    }
-    current = parent;
-  }
-}
-
-function selecionarTodas() {
-  if (!props.modoSelecao) return;
-  const newSelection = new Set<number>(unidadesSelecionadasLocal.value);
-
-  const traverse = (nodes: Unidade[]) => {
-    nodes.forEach(node => {
-      if (node.isElegivel) {
-        newSelection.add(node.codigo);
-      }
-      if (node.filhas) {
-        traverse(node.filhas);
-      }
-    });
-  };
-
-  traverse(unidadesExibidas.value);
-  unidadesSelecionadasLocal.value = Array.from(newSelection);
-}
-
-function deselecionarTodas() {
-  if (!props.modoSelecao) return;
-  unidadesSelecionadasLocal.value = [];
-}
-
-watch(
-    () => props.modelValue,
-    (novoValor) => {
-      const novoValorFiltrado = filtrarSelecaoPorElegibilidade(novoValor);
-      const sortedNew = [...novoValorFiltrado].sort();
-      const sortedLocal = [...unidadesSelecionadasLocal.value].sort();
-
-      if (JSON.stringify(sortedNew) !== JSON.stringify(sortedLocal)) {
-        unidadesSelecionadasLocal.value = [...novoValorFiltrado];
-      }
-    },
-    {deep: true},
-);
-
-const expandedUnits = ref<Set<number>>(new Set());
 
 watch(() => props.unidades, (newUnidades) => {
   const selecaoFiltrada = filtrarSelecaoPorElegibilidade(unidadesSelecionadasLocal.value);
@@ -372,31 +167,9 @@ watch(() => props.unidades, (newUnidades) => {
   }
 
   if (newUnidades && newUnidades.length > 0) {
-    expandedUnits.value = new Set();
+    limparExpansao();
   }
 }, {immediate: true});
-
-function isExpanded(unidade: Unidade): boolean {
-  return expandedUnits.value.has(unidade.codigo);
-}
-
-function toggleExpand(unidade: Unidade) {
-  if (expandedUnits.value.has(unidade.codigo)) {
-    expandedUnits.value.delete(unidade.codigo);
-  } else {
-    expandedUnits.value.add(unidade.codigo);
-  }
-}
-
-watch(
-    unidadesSelecionadasLocal,
-    (newValue) => {
-      if (JSON.stringify(newValue) !== JSON.stringify(props.modelValue)) {
-        emit("update:modelValue", newValue);
-      }
-    },
-    {deep: true}
-);
 
 defineExpose({
   getEstadoSelecao,
@@ -411,60 +184,8 @@ defineExpose({
 </script>
 
 <style scoped>
-.arvore-unidades__toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.4rem;
-}
-
-.arvore-unidades__acoes {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.arvore-unidades__botao {
-  min-width: 4.5rem;
-  height: 1.85rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.875rem;
-}
-
-.arvore-unidades__botao--secundario {
-  min-width: 4.8rem;
-}
-
-.arvore-unidades__busca {
-  flex: 1;
-  position: relative;
-}
-
-.arvore-unidades__input {
-  height: 1.85rem;
-}
-
 .arvore-unidades .form-check-input:indeterminate {
   background-color: #6c757d;
   border-color: #6c757d;
-}
-
-@media (max-width: 576px) {
-  .arvore-unidades__toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .arvore-unidades__acoes {
-    width: 100%;
-  }
-
-  .arvore-unidades__botao {
-    flex: 1;
-  }
 }
 </style>

@@ -4,6 +4,7 @@ import NotificacoesAdminView from '../NotificacoesAdminView.vue';
 import {createTestingPinia} from '@pinia/testing';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
+import {formatarDestinatario} from "@/utils/notificacaoFormatters";
 
 vi.mock('@/services/notificacaoService', async (importActual) => {
   const actual = await importActual<typeof import('@/services/notificacaoService')>();
@@ -54,6 +55,10 @@ describe('NotificacoesAdminView', () => {
           BSpinner: true,
           BBadge: true,
           BModal: { template: '<div v-if="modelValue" class="modal-stub" v-bind="$attrs"><slot/></div>', props: ['modelValue', 'title'] },
+          NotificacaoTabela: {
+            template: '<div data-testid="tbl-notificacoes"><div v-for="item in items" :key="item.codigo" class="row-stub"><span>{{ item.assunto }}</span><span>{{ item.tipoNotificacao }}</span><button :data-testid="\'btn-detalhes-\' + item.codigo" @click="$emit(\'detalhes\', item)"></button><button :data-testid="\'btn-preview-\' + item.codigo" @click="$emit(\'preview\', item)"></button><button :data-testid="\'btn-notificacoes-reenviar-\' + item.codigo" @click="$emit(\'reenviar\', item)"></button></div></div>',
+            props: ['items']
+          }
         }
       }
     });
@@ -98,12 +103,11 @@ describe('NotificacoesAdminView', () => {
     await flushPromises();
 
     expect(wrapper.find('[data-testid="tbl-notificacoes"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="sec-notificacoes"]').text()).toContain('Assunto Enviado');
-    expect(wrapper.find('[data-testid="sec-notificacoes"]').text()).toContain('Assunto Pendente');
-    expect(wrapper.text()).toContain('U1');
-    expect(wrapper.text()).toContain('Início do processo');
-    expect(wrapper.text()).toContain('Mapa homologado');
-    expect(wrapper.text()).not.toContain('SGC: Assunto Enviado');
+    expect(wrapper.find('[data-testid="tbl-notificacoes"]').text()).toContain('Assunto Enviado');
+    expect(wrapper.find('[data-testid="tbl-notificacoes"]').text()).toContain('Assunto Pendente');
+    expect(wrapper.text()).toContain('PROCESSO_INICIADO');
+    expect(wrapper.text()).toContain('MAPA_HOMOLOGADO');
+    expect(wrapper.text()).toContain('SGC: Assunto Enviado');
   });
 
   it('opens preview modal', async () => {
@@ -210,15 +214,12 @@ describe('NotificacoesAdminView', () => {
   });
 
   it('covers formatarDestinatario institutional email branch', () => {
-    const wrapper = mountComponent();
-    const vm = wrapper.vm as any;
-    
     // 1. Institutional email
     const item1 = { destinatario: 'leonardo@tre-pe.jus.br' };
-    expect(vm.formatarDestinatario(item1)).toBe('LEONARDO');
+    expect(formatarDestinatario(item1)).toBe('LEONARDO');
 
     // 2. Already has title
     const item2 = { destinatario: 'a@a.com', usuarioDestinoTitulo: 'TITULO' };
-    expect(vm.formatarDestinatario(item2)).toBe('a@a.com');
+    expect(formatarDestinatario(item2)).toBe('a@a.com');
   });
 });

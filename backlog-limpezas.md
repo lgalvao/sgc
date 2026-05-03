@@ -24,9 +24,12 @@ Este documento reflete o estado atual do sistema após as rodadas de refatoraç�
 
 ## 🚀 Próximas Ações
 
-### P1 - Prioridade Imediata
-- [ ] **Extração da Árvore**: Decompor `ArvoreUnidades.vue` em subcomponentes: `ArvoreUnidadeNode.vue`, `ArvoreSearch.vue` e `ArvoreActions.vue`.
-- [ ] **Refatoração de Notificações**: Extrair lógica de listagem e filtros de `NotificacoesAdminView.vue` para reduzir o tamanho da View.
+### P1 - Prioridade Imediata (Concluído)
+- [x] **Extração da Árvore**: `ArvoreUnidades.vue` decomposta em `ArvoreToolbar.vue`, `useArvoreSelecao.ts` e `useArvoreExpansao.ts`.
+- [x] **Refatoração de Notificações**: `NotificacoesAdminView.vue` simplificada com extração de `NotificacaoTabela.vue` e centralização de labels.
+- [x] **Decomposição do Cadastro**: `ProcessoCadastroView.vue` simplificada com `ProcessoDiagnosticoAlert.vue` e `ProcessoCadastroModais.vue`.
+
+### P2 - Próximos Passos
 - [ ] **Ajuste de Cobertura (Gaps)**: Atacar arquivos com baixa cobertura de funções (ex: `UnidadeView.vue` e `analiseFluxo.ts`) para atingir os 90%.
 
 ### P2 - Qualidade e Ratcheting
