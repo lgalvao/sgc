@@ -1,118 +1,127 @@
-import {describe, expect, it} from 'vitest'
+import {describe, it, expect, vi, beforeEach} from 'vitest'
 import {mount} from '@vue/test-utils'
-import FeedbackButton from '../FeedbackButton.vue'
-import FeedbackModal from '../FeedbackModal.vue'
+import FeedbackWidget from '../FeedbackWidget.vue'
+import {createTestingPinia} from '@pinia/testing'
+import * as useFeedbackModule from '@/composables/useFeedback'
+import * as bootstrapVueNext from 'bootstrap-vue-next'
 
-describe('FeedbackButton.vue', () => {
-    it('deve renderizar o botão com ícone padrão', () => {
-        const wrapper = mount(FeedbackButton)
-        expect(wrapper.find('[data-testid="feedback-btn"]').exists()).toBe(true)
-        expect(wrapper.find('.bi-chat-square-text').exists()).toBe(true)
-    })
+// Mock do composable useFeedback
+const mockUseFeedback = {
+    captura: {value: null},
+    enviando: {value: false},
+    capturarTela: vi.fn(),
+    enviarFeedback: vi.fn(),
+    removerCaptura: vi.fn(),
+}
 
-    it('deve emitir evento click ao clicar', async () => {
-        const wrapper = mount(FeedbackButton)
-        await wrapper.find('[data-testid="feedback-btn"]').trigger('click')
-        expect(wrapper.emitted('click')).toBeTruthy()
-    })
+vi.spyOn(useFeedbackModule, 'useFeedback').mockReturnValue(mockUseFeedback as any)
 
-    it('deve desabilitar botão no estado carregando', () => {
-        const wrapper = mount(FeedbackButton, {props: {estado: 'carregando'}})
-        expect(wrapper.find('button').attributes('disabled')).toBeDefined()
-    })
-
-    it('deve exibir ícone de sucesso no estado sucesso', () => {
-        const wrapper = mount(FeedbackButton, {props: {estado: 'sucesso'}})
-        expect(wrapper.find('.bi-check-lg').exists()).toBe(true)
-    })
-
-    it('deve exibir ícone de erro no estado erro', () => {
-        const wrapper = mount(FeedbackButton, {props: {estado: 'erro'}})
-        expect(wrapper.find('.bi-exclamation-triangle').exists()).toBe(true)
-    })
+// Mock do useToast e outros componentes do bootstrap-vue-next
+const mockCriarToast = vi.fn()
+vi.mock('bootstrap-vue-next', async () => {
+    const actual = await vi.importActual('bootstrap-vue-next')
+    return {
+        ...(actual as any),
+        useToast: vi.fn(() => ({create: mockCriarToast}))
+    }
 })
 
-describe('FeedbackModal.vue', () => {
-    const stubs = {
-        BModal: {
-            template: '<div v-if="modelValue" data-testid="feedback-modal"><slot /></div>',
-            props: ['modelValue', 'title', 'hideFooter'],
-        },
-        BFormGroup: {
-            template: '<div><slot /><slot name="invalid-feedback" /><slot name="label" /></div>',
-        },
-        BFormRadioGroup: {
-            template: '<div data-testid="feedback-tipo"></div>',
-            props: ['modelValue', 'options'],
-        },
-        BFormTextarea: {
-            template: '<textarea data-testid="feedback-nota" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
-            props: ['modelValue', 'rows', 'state', 'maxlength', 'placeholder'],
-            emits: ['update:modelValue'],
-        },
-    }
-
-    it('deve exibir modal quando visivel=true', () => {
-        const wrapper = mount(FeedbackModal, {
-            props: {visivel: true, captura: null, enviando: false},
-            global: {stubs},
-        })
-        expect(wrapper.find('[data-testid="feedback-modal"]').exists()).toBe(true)
+describe('FeedbackWidget.vue', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+        mockUseFeedback.captura.value = null
+        mockUseFeedback.enviando.value = false
     })
 
-    it('não deve exibir modal quando visivel=false', () => {
-        const wrapper = mount(FeedbackModal, {
-            props: {visivel: false, captura: null, enviando: false},
-            global: {stubs},
+    it('deve renderizar o botão de feedback', () => {
+        const wrapper = mount(FeedbackWidget, {
+            global: {
+                plugins: [createTestingPinia()],
+                stubs: {
+                    Teleport: true,
+                    BOrchestrator: true,
+                    FeedbackButton: true,
+                    FeedbackModal: true
+                }
+            }
         })
-        expect(wrapper.find('[data-testid="feedback-modal"]').exists()).toBe(false)
+        expect(wrapper.findComponent({name: 'FeedbackButton'}).exists()).toBe(true)
     })
 
-    it('deve emitir evento enviar com tipo e nota ao submeter formulário válido', async () => {
-        const wrapper = mount(FeedbackModal, {
-            props: {visivel: true, captura: null, enviando: false},
-            global: {stubs},
+    it('deve abrir o modal ao clicar no botão', async () => {
+        const wrapper = mount(FeedbackWidget, {
+            global: {
+                plugins: [createTestingPinia()],
+                stubs: {
+                    Teleport: true,
+                    BOrchestrator: true,
+                    FeedbackButton: {
+                        template: '<button @click="$emit(\'click\')">Feedback</button>'
+                    },
+                    FeedbackModal: true
+                }
+            }
         })
-
-        const textarea = wrapper.find('textarea[data-testid="feedback-nota"]')
-        await textarea.setValue('Nota com pelo menos dez caracteres')
-        await wrapper.find('form').trigger('submit')
-
-        expect(wrapper.emitted('enviar')).toBeTruthy()
-        const args = wrapper.emitted('enviar')![0] as [string, string]
-        expect(args[0]).toBe('bug')
-        expect(args[1]).toBe('Nota com pelo menos dez caracteres')
+        
+        await wrapper.find('button').trigger('click')
+        
+        expect(mockUseFeedback.capturarTela).toHaveBeenCalled()
+        // O modal deve estar visível (verificando a prop do componente stub)
+        const modal = wrapper.findComponent({name: 'FeedbackModal'})
+        expect(modal.props('visivel')).toBe(true)
     })
 
-    it('não deve emitir enviar quando nota for muito curta', async () => {
-        const wrapper = mount(FeedbackModal, {
-            props: {visivel: true, captura: null, enviando: false},
-            global: {stubs},
+    it('deve fechar o modal e mostrar toast ao enviar com sucesso', async () => {
+        mockUseFeedback.enviarFeedback.mockResolvedValueOnce(undefined)
+        
+        const wrapper = mount(FeedbackWidget, {
+            global: {
+                plugins: [createTestingPinia()],
+                stubs: {
+                    Teleport: true,
+                    BOrchestrator: true,
+                    FeedbackButton: true,
+                    FeedbackModal: {
+                        template: '<div />',
+                        props: ['visivel']
+                    }
+                }
+            }
         })
-
-        const textarea = wrapper.find('textarea[data-testid="feedback-nota"]')
-        await textarea.setValue('curta')
-        await wrapper.find('form').trigger('submit')
-
-        expect(wrapper.emitted('enviar')).toBeFalsy()
-        expect(wrapper.text()).toContain('pelo menos 10 caracteres')
+        
+        // Simular o evento 'enviar' do modal
+        const modal = wrapper.findComponent({name: 'FeedbackModal'})
+        await modal.vm.$emit('enviar', 'ELOGIO', '5')
+        
+        expect(mockUseFeedback.enviarFeedback).toHaveBeenCalledWith('ELOGIO', '5')
+        expect(mockCriarToast).toHaveBeenCalledWith(expect.objectContaining({
+            props: expect.objectContaining({variant: 'success'})
+        }))
     })
 
-    it('deve emitir fechar ao clicar no botão cancelar', async () => {
-        const wrapper = mount(FeedbackModal, {
-            props: {visivel: true, captura: null, enviando: false},
-            global: {stubs},
+    it('deve mostrar toast de erro se o envio falhar', async () => {
+        mockUseFeedback.enviarFeedback.mockRejectedValueOnce(new Error('Falha'))
+        
+        const wrapper = mount(FeedbackWidget, {
+            global: {
+                plugins: [createTestingPinia()],
+                stubs: {
+                    Teleport: true,
+                    BOrchestrator: true,
+                    FeedbackButton: true,
+                    FeedbackModal: {
+                        template: '<div />',
+                        props: ['visivel']
+                    }
+                }
+            }
         })
-        await wrapper.find('button[type="button"]').trigger('click')
-        expect(wrapper.emitted('fechar')).toBeTruthy()
-    })
-
-    it('deve exibir prévia quando captura está disponível', () => {
-        const captura = new Blob(['fake'], {type: 'image/webp'})
-        const wrapper = mount(FeedbackModal, {
-            props: {visivel: true, captura, enviando: false},
-            global: {stubs},
-        })
-        expect(wrapper.find('img').exists()).toBe(true)
+        
+        const modal = wrapper.findComponent({name: 'FeedbackModal'})
+        await modal.vm.$emit('enviar', 'BUG', '1')
+        
+        expect(mockCriarToast).toHaveBeenCalledWith(expect.objectContaining({
+            props: expect.objectContaining({variant: 'danger'})
+        }))
     })
 })

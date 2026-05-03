@@ -2,7 +2,7 @@
 set -euo pipefail
 
 NOME_SISTEMA="sgc"
-CONTAINER_CLI="${CONTAINER_CLI:-podman}"
+CONTAINER_CLI="${CONTAINER_CLI:-docker}"
 REGISTRY="${REGISTRY:-registry.tre-pe.gov.br/sesel}"
 PORTA_HOST="${PORTA_HOST:-8980}"
 PORTA_CONTAINER="${PORTA_CONTAINER:-10000}"
