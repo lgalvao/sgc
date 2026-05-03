@@ -1,7 +1,7 @@
 import {createPinia, setActivePinia} from "pinia";
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
 import router from "@/router";
-import {logger} from "@/utils";
+import logger from "@/utils/logger";
 
 // Hoist mock instance so it's shared between module and test
 const {mockInstance} = vi.hoisted(() => {
@@ -29,14 +29,26 @@ vi.mock("@/router", () => ({
     },
 }));
 
-vi.mock("@/utils", () => {
+vi.mock("@/utils/logger", () => {
     return {
-        logger: {
+        default: {
             error: vi.fn(),
             warn: vi.fn(),
             info: vi.fn(),
         }
     }
+});
+
+vi.mock("@/utils", async () => {
+    const actual = await vi.importActual("@/utils") as any;
+    return {
+        ...actual,
+        logger: {
+            error: vi.fn(),
+            warn: vi.fn(),
+            info: vi.fn(),
+        }
+    };
 });
 
 vi.mock("axios", () => {
