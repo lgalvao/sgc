@@ -553,4 +553,56 @@ describe('SubprocessoView.vue', () => {
         toastStore.setPending("Msg");
         mountComponent();
     });
+
+    it('formata corretamente o tipo de responsabilidade', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        expect(vm.formatTipoResponsabilidade(null)).toBe('');
+        expect(vm.formatTipoResponsabilidade({tipo: 'Titular'})).toBe('Titular');
+        expect(vm.formatTipoResponsabilidade({
+            tipo: 'Substituição',
+            dataFim: '2023-12-31'
+        })).toContain('Substituição (até 31/12/2023)');
+        expect(vm.formatTipoResponsabilidade({
+            tipo: 'Atribuição temporária',
+            dataFim: '2023-12-31'
+        })).toContain('Atrib. temporária (até 31/12/2023)');
+    });
+
+    it('exibe estado de "Não Encontrado" quando erroNaoEncontrado é true', async () => {
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue(null);
+        subprocessoStoreMock.contextoEdicao = null;
+        subprocessoStoreMock.erroIntegracaoContexto = null;
+        
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        
+        expect(wrapper.text()).toContain(TEXTOS.subprocesso.NAO_ENCONTRADO_TITULO);
+    });
+
+    it('exibe erro de integração do store', async () => {
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue(null);
+        subprocessoStoreMock.contextoEdicao = null;
+        subprocessoStoreMock.erroIntegracaoContexto = { 
+            message: 'Erro de Banco',
+            details: 'Connection timeout'
+        };
+        
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        
+        expect(wrapper.text()).toContain('Erro de Banco');
+        expect(wrapper.text()).toContain('Detalhes: Connection timeout');
+    });
+
+    it('renderiza EmptyState quando não há movimentações', async () => {
+        const {wrapper} = mountComponent({movimentacoes: []});
+        await flushPromises();
+        
+        expect(wrapper.find('[data-testid="empty-state-movimentacoes"]').exists()).toBe(true);
+    });
 });

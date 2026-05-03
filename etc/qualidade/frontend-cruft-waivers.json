@@ -18,14 +18,6 @@
       "criterioRemocao": "Separar orquestracao, secoes visuais e regras locais em composables/componentes."
     },
     {
-      "arquivo": "frontend/src/views/SubprocessoView.vue",
-      "camada": "view",
-      "maxLinhas": 596,
-      "responsavel": "frontend",
-      "justificativa": "Tela ainda coordena muitos estados e variacoes do subprocesso.",
-      "criterioRemocao": "Extrair secoes de estado e navegacao do subprocesso."
-    },
-    {
       "arquivo": "frontend/src/constants/textos.ts",
       "camada": "outro",
       "maxLinhas": 450,

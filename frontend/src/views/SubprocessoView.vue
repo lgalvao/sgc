@@ -40,39 +40,7 @@
           :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       />
 
-      <div class="mt-4">
-        <h4>{{ TEXTOS.subprocesso.MOVIMENTACOES_TITULO }}</h4>
-        <BTable
-            :fields="camposMovimentacoes"
-            :items="movimentacoes"
-            :tbody-tr-props="rowAttrMovimentacao"
-            data-testid="tbl-movimentacoes"
-            primary-key="codigo"
-            small
-            responsive
-            show-empty
-            stacked="md"
-        >
-          <template #empty>
-            <EmptyState
-                class="mb-0"
-                data-testid="empty-state-movimentacoes"
-                :description="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TEXTO"
-                icon="bi-arrow-left-right"
-                :title="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TITULO"
-            />
-          </template>
-          <template #cell(dataHora)="data">
-            {{ formatDateTimeBR(data.item.dataHora) }}
-          </template>
-          <template #cell(unidadeOrigem)="data">
-            {{ data.item.unidadeOrigemSigla || '-' }}
-          </template>
-          <template #cell(unidadeDestino)="data">
-            {{ data.item.unidadeDestinoSigla || '-' }}
-          </template>
-        </BTable>
-      </div>
+      <SubprocessoMovimentacoes :movimentacoes="movimentacoes" />
     </div>
     <div v-else-if="subprocessoStore.erroIntegracaoContexto" class="py-2">
       <BAlert
@@ -96,80 +64,43 @@
     <CarregamentoPagina v-else class="py-5" />
   </LayoutPadrao>
 
-  <SubprocessoModal
+  <SubprocessoFluxoModais
       :data-limite-atual="dataLimite"
       :etapa-atual="subprocesso?.etapaAtual ?? null"
-      :loading="loadingDataLimite"
-      :mostrar-modal="mostrarModalAlterarDataLimite"
+      :justificativa-reabertura="justificativaReabertura"
+      :loading-data-limite="loadingDataLimite"
+      :loading-lembrete="loadingLembrete"
+      :loading-reabertura="loadingReabertura"
+      :mensagem-erro-justificativa="mensagemErroJustificativa"
+      :modal-lembrete-aberto="modalLembreteAberto"
+      :mostrar-modal-alterar-data-limite="mostrarModalAlterarDataLimite"
+      :mostrar-modal-reabrir="mostrarModalReabrir"
+      :sigla-unidade="subprocesso?.unidade?.sigla ?? ''"
+      :tipo-reabertura="tipoReabertura"
       :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? parseDate(subprocesso.ultimaDataLimiteSubprocesso) : null"
-      @fechar-modal="fecharModalAlterarDataLimite"
-      @confirmar-alteracao="confirmarAlteracaoDataLimite"
+      @confirmar-alteracao-data="confirmarAlteracaoDataLimite"
+      @confirmar-enviar-lembrete="enviarLembreteConfirmado"
+      @confirmar-reabertura="confirmarReabertura"
+      @fechar-modal-data="fecharModalAlterarDataLimite"
+      @update:justificativaReabertura="justificativaReabertura = $event"
+      @update:modalLembreteAberto="modalLembreteAberto = $event"
+      @update:mostrarModalReabrir="mostrarModalReabrir = $event"
   />
-
-  <!-- Modal para reabrir cadastro/revisão -->
-  <ModalConfirmacao
-      v-model="mostrarModalReabrir"
-      :auto-close="false"
-      :loading="loadingReabertura"
-      :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
-      :ok-title="TEXTOS.comum.BOTAO_REABRIR"
-      test-codigo-confirmar="btn-confirmar-reabrir"
-      variant="success"
-      @confirmar="confirmarReabertura"
-  >
-    <p>{{ TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PREFIXO }} {{
-        tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.CADASTRO : TEXTOS.subprocesso.REVISAO_CADASTRO
-      }} <span aria-hidden="true" class="text-danger">*</span>:</p>
-    <BFormTextarea
-        id="justificativaReabertura"
-        v-model="justificativaReabertura"
-        :state="mensagemErroJustificativa ? false : null"
-        data-testid="inp-justificativa-reabrir"
-        :placeholder="TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PLACEHOLDER"
-        rows="3"
-    />
-    <BFormInvalidFeedback
-        :state="mensagemErroJustificativa ? false : null"
-        class="d-block"
-        data-testid="txt-reabertura-pendencia-justificativa"
-    >
-      {{ mensagemErroJustificativa }}
-    </BFormInvalidFeedback>
-  </ModalConfirmacao>
-
-  <ModalConfirmacao
-      v-model="modalLembreteAberto"
-      :auto-close="false"
-      :loading="loadingLembrete"
-      :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
-      test-codigo-confirmar="btn-confirmar-enviar-lembrete"
-      :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
-      variant="success"
-      @confirmar="enviarLembreteConfirmado"
-  >
-    <p data-testid="txt-modelo-lembrete">
-      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade?.sigla ?? '') }}
-    </p>
-  </ModalConfirmacao>
 </template>
 
 <script lang="ts" setup>
 import {
   BAlert,
   BButton,
-  BFormInvalidFeedback,
-  BFormTextarea,
-  BTable,
   useToast
 } from "bootstrap-vue-next";
 import {computed} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
-import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
+import SubprocessoFluxoModais from "@/components/processo/SubprocessoFluxoModais.vue";
+import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimentacoes.vue";
 import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
-import EmptyState from "@/components/comum/EmptyState.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
@@ -177,7 +108,7 @@ import {enviarLembrete as enviarLembreteService} from "@/services/processoServic
 
 import {useAcesso} from "@/composables/useAcesso";
 import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
-import {formatDateTimeBR, parseDate} from "@/utils";
+import {parseDate} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -217,19 +148,6 @@ const {
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
-
-const camposMovimentacoes = [
-  {key: "dataHora", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DATA},
-  {key: "unidadeOrigem", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_ORIGEM},
-  {key: "unidadeDestino", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DESTINO},
-  {key: "descricao", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DESCRICAO}
-];
-
-const rowAttrMovimentacao = (item: Movimentacao | null) => {
-  return item
-      ? {'data-testid': `row-movimentacao-${item.codigo}`}
-      : {};
-};
 
 const subprocesso = computed<SubprocessoDetalhe | null>(
     () => subprocessoStore.contextoEdicao?.detalhes ?? null,
