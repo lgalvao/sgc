@@ -39,6 +39,10 @@ function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): Permiss
     habilitarDevolverMapa: false,
     habilitarAceitarMapa: false,
     habilitarHomologarMapa: false,
+    habilitarAlterarDataLimite: false,
+    habilitarReabrirCadastro: false,
+    habilitarReabrirRevisao: false,
+    habilitarEnviarLembrete: false,
     ...parciais,
   };
 }

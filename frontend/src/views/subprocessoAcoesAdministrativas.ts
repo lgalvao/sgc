@@ -9,7 +9,7 @@ type DependenciasSubprocessoAcoesAdministrativas = {
     subprocesso: ComputedRef<SubprocessoDetalhe | null>;
     codigoSubprocesso: Ref<number | null>;
     codProcesso: number;
-    podeAlterarDataLimite: ComputedRef<boolean>;
+    habilitarAlterarDataLimite: ComputedRef<boolean>;
     deveExibirErro: (condicao: boolean) => boolean;
     resetarValidacao: () => void;
     validarSubmissao: (valido: boolean) => boolean;
@@ -27,7 +27,7 @@ export function useSubprocessoAcoesAdministrativas({
     subprocesso,
     codigoSubprocesso,
     codProcesso,
-    podeAlterarDataLimite,
+    habilitarAlterarDataLimite,
     deveExibirErro,
     resetarValidacao,
     validarSubmissao,
@@ -66,7 +66,7 @@ export function useSubprocessoAcoesAdministrativas({
     }
 
     function abrirModalAlterarDataLimite() {
-        if (podeAlterarDataLimite.value) {
+        if (habilitarAlterarDataLimite.value) {
             mostrarModalAlterarDataLimite.value = true;
             return;
         }

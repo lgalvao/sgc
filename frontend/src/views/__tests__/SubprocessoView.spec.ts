@@ -197,10 +197,10 @@ describe('SubprocessoView.vue', () => {
         const subprocessoToUse = overrideMockSubprocesso ? {...mockSubprocesso, ...overrideMockSubprocesso} : mockSubprocesso;
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeAlterarDataLimite: ref(true),
-            podeReabrirCadastro: ref(true),
-            podeReabrirRevisao: ref(true),
-            podeEnviarLembrete: ref(true),
+            habilitarAlterarDataLimite: ref(true),
+            habilitarReabrirCadastro: ref(true),
+            habilitarReabrirRevisao: ref(true),
+            habilitarEnviarLembrete: ref(true),
             mostrarAlterarDataLimite: ref(true),
             mostrarReabrirCadastro: ref(true),
             mostrarReabrirRevisao: ref(true),
@@ -365,7 +365,7 @@ describe('SubprocessoView.vue', () => {
     });
 
     it('shows error when opening date limit modal is not allowed', async () => {
-        const {wrapper} = mountComponent({}, {podeAlterarDataLimite: {value: false}});
+        const {wrapper} = mountComponent({}, {habilitarAlterarDataLimite: {value: false}});
         await flushPromises();
         const vm = wrapper.vm as unknown as SubprocessoViewVm;
         await vm.$nextTick();

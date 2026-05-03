@@ -37,6 +37,10 @@ const permissoesBase = {
   habilitarDevolverMapa: true,
   habilitarAceitarMapa: true,
   habilitarHomologarMapa: true,
+  habilitarAlterarDataLimite: true,
+  habilitarReabrirCadastro: true,
+  habilitarReabrirRevisao: true,
+  habilitarEnviarLembrete: true,
 }
 
 const propsPadrao = {

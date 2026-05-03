@@ -17,10 +17,10 @@
           :mostrar-enviar-lembrete="mostrarEnviarLembrete"
           :mostrar-reabrir-cadastro="mostrarReabrirCadastro"
           :mostrar-reabrir-revisao="mostrarReabrirRevisao"
-          :pode-alterar-data-limite="podeAlterarDataLimite"
-          :pode-enviar-lembrete="podeEnviarLembrete"
-          :pode-reabrir-cadastro="podeReabrirCadastro"
-          :pode-reabrir-revisao="podeReabrirRevisao"
+          :habilitar-alterar-data-limite="habilitarAlterarDataLimite"
+          :habilitar-enviar-lembrete="habilitarEnviarLembrete"
+          :habilitar-reabrir-cadastro="habilitarReabrirCadastro"
+          :habilitar-reabrir-revisao="habilitarReabrirRevisao"
           :sigla-unidade-fallback="props.siglaUnidade"
           :subprocesso="subprocesso"
           @abrir-alterar-data-limite="abrirModalAlterarDataLimite"
@@ -150,10 +150,10 @@ const subprocesso = computed<SubprocessoDetalhe | null>(
 );
 
 const {
-  podeAlterarDataLimite,
-  podeReabrirCadastro,
-  podeReabrirRevisao,
-  podeEnviarLembrete,
+  habilitarAlterarDataLimite,
+  habilitarReabrirCadastro,
+  habilitarReabrirRevisao,
+  habilitarEnviarLembrete,
   mostrarAlterarDataLimite,
   mostrarReabrirCadastro,
   mostrarReabrirRevisao,
@@ -230,7 +230,7 @@ const {
   subprocesso,
   codigoSubprocesso,
   codProcesso: props.codProcesso,
-  podeAlterarDataLimite,
+  habilitarAlterarDataLimite,
   deveExibirErro,
   resetarValidacao,
   validarSubmissao,

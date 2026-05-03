@@ -37,6 +37,10 @@ export interface PermissoesSubprocesso {
   habilitarDevolverMapa: boolean;
   habilitarAceitarMapa: boolean;
   habilitarHomologarMapa: boolean;
+  habilitarAlterarDataLimite: boolean;
+  habilitarReabrirCadastro: boolean;
+  habilitarReabrirRevisao: boolean;
+  habilitarEnviarLembrete: boolean;
 }
 
 export interface SubprocessoDetalhe {

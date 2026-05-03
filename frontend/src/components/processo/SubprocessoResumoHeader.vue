@@ -12,13 +12,13 @@ interface Props {
   siglaUnidadeFallback: string;
   mostrarAcoesCabecalho?: PropBooleana;
   mostrarAlterarDataLimite?: PropBooleana;
-  podeAlterarDataLimite?: PropBooleana;
+  habilitarAlterarDataLimite?: PropBooleana;
   mostrarReabrirCadastro?: PropBooleana;
-  podeReabrirCadastro?: PropBooleana;
+  habilitarReabrirCadastro?: PropBooleana;
   mostrarReabrirRevisao?: PropBooleana;
-  podeReabrirRevisao?: PropBooleana;
+  habilitarReabrirRevisao?: PropBooleana;
   mostrarEnviarLembrete?: PropBooleana;
-  podeEnviarLembrete?: PropBooleana;
+  habilitarEnviarLembrete?: PropBooleana;
   formatSituacaoSubprocesso: (situacao: string) => string;
   formatDataSimples: (data: string | null) => string;
   formatTipoResponsabilidade: (responsavel: ResponsavelDto | null) => string;
@@ -39,13 +39,13 @@ function normalizarFlag(valor: PropBooleana) {
 
 const mostrarAcoesCabecalhoNormalizado = computed(() => normalizarFlag(props.mostrarAcoesCabecalho));
 const mostrarAlterarDataLimiteNormalizado = computed(() => normalizarFlag(props.mostrarAlterarDataLimite));
-const podeAlterarDataLimiteNormalizado = computed(() => normalizarFlag(props.podeAlterarDataLimite));
+const habilitarAlterarDataLimiteNormalizado = computed(() => normalizarFlag(props.habilitarAlterarDataLimite));
 const mostrarReabrirCadastroNormalizado = computed(() => normalizarFlag(props.mostrarReabrirCadastro));
-const podeReabrirCadastroNormalizado = computed(() => normalizarFlag(props.podeReabrirCadastro));
+const habilitarReabrirCadastroNormalizado = computed(() => normalizarFlag(props.habilitarReabrirCadastro));
 const mostrarReabrirRevisaoNormalizado = computed(() => normalizarFlag(props.mostrarReabrirRevisao));
-const podeReabrirRevisaoNormalizado = computed(() => normalizarFlag(props.podeReabrirRevisao));
+const habilitarReabrirRevisaoNormalizado = computed(() => normalizarFlag(props.habilitarReabrirRevisao));
 const mostrarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.mostrarEnviarLembrete));
-const podeEnviarLembreteNormalizado = computed(() => normalizarFlag(props.podeEnviarLembrete));
+const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.habilitarEnviarLembrete));
 </script>
 
 <template>
@@ -66,7 +66,7 @@ const podeEnviarLembreteNormalizado = computed(() => normalizarFlag(props.podeEn
           <BDropdownItemButton
               v-if="mostrarAlterarDataLimiteNormalizado"
               data-testid="btn-alterar-data-limite"
-              :disabled="!podeAlterarDataLimiteNormalizado"
+              :disabled="!habilitarAlterarDataLimiteNormalizado"
               @click="$emit('abrir-alterar-data-limite')"
           >
             <i aria-hidden="true" class="bi bi-calendar me-1"/>
@@ -75,7 +75,7 @@ const podeEnviarLembreteNormalizado = computed(() => normalizarFlag(props.podeEn
           <BDropdownItemButton
               v-if="mostrarReabrirCadastroNormalizado"
               data-testid="btn-reabrir-cadastro"
-              :disabled="!podeReabrirCadastroNormalizado"
+              :disabled="!habilitarReabrirCadastroNormalizado"
               @click="$emit('abrir-reabrir-cadastro')"
           >
             <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
@@ -84,7 +84,7 @@ const podeEnviarLembreteNormalizado = computed(() => normalizarFlag(props.podeEn
           <BDropdownItemButton
               v-if="mostrarReabrirRevisaoNormalizado"
               data-testid="btn-reabrir-revisao"
-              :disabled="!podeReabrirRevisaoNormalizado"
+              :disabled="!habilitarReabrirRevisaoNormalizado"
               @click="$emit('abrir-reabrir-revisao')"
           >
             <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
@@ -93,7 +93,7 @@ const podeEnviarLembreteNormalizado = computed(() => normalizarFlag(props.podeEn
           <BDropdownItemButton
               v-if="mostrarEnviarLembreteNormalizado"
               data-testid="btn-enviar-lembrete"
-              :disabled="!podeEnviarLembreteNormalizado"
+              :disabled="!habilitarEnviarLembreteNormalizado"
               @click="$emit('confirmar-enviar-lembrete')"
           >
             <i aria-hidden="true" class="bi bi-bell me-1"/>
