@@ -23,6 +23,12 @@ export function useBuscadorUsuarios(
         indiceUsuarioDestacado.value = usuarios.length > 0 ? 0 : -1;
     });
 
+    watch(termo, (novoTermo) => {
+        if (!novoTermo?.trim()) {
+            limparResultados();
+        }
+    });
+
     onBeforeUnmount(() => {
         if (timeoutPesquisa) clearTimeout(timeoutPesquisa);
         if (timeoutOcultar) clearTimeout(timeoutOcultar);
@@ -30,10 +36,14 @@ export function useBuscadorUsuarios(
 
     const atualizarUsuarioSelecionadoPorNome = (nome: string) => {
         const u = usuariosEncontrados.value.find((item) => item.nome === nome.trim());
-        selecionado.value = u?.tituloEleitoral ?? null;
+        const novoSelecionado = u?.tituloEleitoral ?? null;
+        if (selecionado.value !== novoSelecionado) {
+            selecionado.value = novoSelecionado;
+        }
     };
 
     const limparResultados = () => {
+        if (usuariosEncontrados.value.length === 0 && !mostrarResultadosUsuarios.value && !pesquisandoUsuarios.value) return;
         usuariosEncontrados.value = [];
         pesquisandoUsuarios.value = false;
         mostrarResultadosUsuarios.value = false;
@@ -43,7 +53,8 @@ export function useBuscadorUsuarios(
     async function executarPesquisa() {
         pesquisandoUsuarios.value = true;
         try {
-            usuariosEncontrados.value = await pesquisarUsuarios(termo.value.trim());
+            const resultados = await pesquisarUsuarios(termo.value.trim());
+            usuariosEncontrados.value = resultados;
             atualizarUsuarioSelecionadoPorNome(termo.value);
         } catch (error) {
             limparResultados();
@@ -55,13 +66,16 @@ export function useBuscadorUsuarios(
     }
 
     const aoAlterarTermo = (valor: string | number | null) => {
-        termo.value = valor == null ? "" : String(valor);
+        const novoTermo = valor == null ? "" : String(valor);
+
+        termo.value = novoTermo;
         mostrarResultadosUsuarios.value = termoPesquisaMinimaAtingida.value;
         indiceUsuarioDestacado.value = -1;
-        atualizarUsuarioSelecionadoPorNome(termo.value);
+        atualizarUsuarioSelecionadoPorNome(novoTermo);
+        
         if (timeoutPesquisa) clearTimeout(timeoutPesquisa);
 
-        if (!termoPesquisaMinimaAtingida.value || !termo.value.trim()) {
+        if (!termoPesquisaMinimaAtingida.value || !novoTermo.trim()) {
             limparResultados();
             return;
         }
@@ -70,8 +84,12 @@ export function useBuscadorUsuarios(
     };
 
     const selecionarUsuario = (usuario: UsuarioPesquisa) => {
-        selecionado.value = usuario.tituloEleitoral;
-        termo.value = usuario.nome;
+        if (selecionado.value !== usuario.tituloEleitoral) {
+            selecionado.value = usuario.tituloEleitoral;
+        }
+        if (termo.value !== usuario.nome) {
+            termo.value = usuario.nome;
+        }
         mostrarResultadosUsuarios.value = false;
         indiceUsuarioDestacado.value = -1;
     };

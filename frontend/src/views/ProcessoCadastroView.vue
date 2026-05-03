@@ -132,7 +132,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
-import {ehErroAxios, normalizarErro, deveNotificarGlobalmente} from "@/utils/apiError";
+import {ehErroAxios, normalizarErro, extrairErrosGenericos, deveNotificarGlobalmente} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
@@ -211,13 +211,6 @@ const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoading.valu
 
 function dispensarAlertaDiagnostico() {
   alertaDiagnosticoDispensado.value = true;
-}
-
-function extrairErrosGenericos(error: ReturnType<typeof normalizarErro>): string[] {
-  return error.erros
-      ?.filter(erro => !erro.campo)
-      .map(erro => erro.mensagem ?? "")
-      .filter(Boolean) ?? [];
 }
 
 function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
@@ -327,7 +320,6 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
 
   if (usarErroEstruturado) {
     setFromErroNormalizado(erroNormalizado);
-    if (fieldErrors.value.dataLimiteEtapa1) fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
 
     const hasFieldErrors = hasErrors();
     const genericErrors = extrairErrosGenericos(erroNormalizado);
@@ -341,8 +333,8 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
             stackTrace: erroNormalizado.stackTrace || undefined,
           }
       );
-      window.scrollTo(0, 0);
-    } else if (hasFieldErrors) {
+      globalThis.scrollTo(0, 0);
+    } else {
       void focarPrimeiroErroInvalido();
     }
   } else {

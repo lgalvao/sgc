@@ -32,17 +32,17 @@ export function setRouter(router: Router) {
 }
 
 function isMonitoramentoSolicitadoPorSessao(): boolean {
-    if (typeof window === 'undefined') {
+    if (globalThis.window === undefined) {
         return false;
     }
-    return window.sessionStorage.getItem(CHAVE_MONITORAMENTO_SESSAO) === 'true';
+    return globalThis.sessionStorage.getItem(CHAVE_MONITORAMENTO_SESSAO) === 'true';
 }
 
 function isMonitoramentoSolicitadoPorUrl(): boolean {
-    if (typeof window === 'undefined') {
+    if (globalThis.window === undefined) {
         return false;
     }
-    return new URLSearchParams(window.location.search).get('monitoramento') === '1';
+    return new URLSearchParams(globalThis.location.search).get('monitoramento') === '1';
 }
 
 function isMonitoramentoAtivo(): boolean {
@@ -167,12 +167,12 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config: ConfiguracaoMonitorada) => {
     if (sessaoEmTransicao && !isRequisicaoPermitidaDuranteTransicao(config.url)) {
-        return Promise.reject({
-            isAxiosError: true,
-            code: "ERR_CANCELED",
-            name: "CanceledError",
-            config,
-        });
+        const error = new Error("Requisição cancelada por transição de sessão") as import('axios').AxiosError;
+        error.isAxiosError = true;
+        error.code = "ERR_CANCELED";
+        error.name = "CanceledError";
+        error.config = config;
+        return Promise.reject(error);
     }
 
     const monitoramentoAtivo = isMonitoramentoAtivo();
@@ -198,8 +198,25 @@ apiClient.interceptors.request.use((config: ConfiguracaoMonitorada) => {
     return config;
 });
 
-const handleResponseError = (error: unknown) => {
-    const config = (error as {config?: ConfiguracaoMonitorada})?.config;
+function logErroMonitoramento(error: import('axios').AxiosError, metadados: MetadadosMonitoramento, config?: ConfiguracaoMonitorada) {
+    logger.error("[http] erro", {
+        metodo: config?.method?.toUpperCase(),
+        url: config?.url,
+        status: error?.response?.status,
+        duracaoMs: calcularDuracao(metadados.inicioMs),
+        correlacaoId: metadados.correlacaoId,
+    });
+}
+
+function tratarErroNaoAutorizado() {
+    const currentPath = routerInstance?.currentRoute?.value?.path;
+    if (currentPath !== '/login') {
+        routerInstance?.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
+    }
+}
+
+const handleResponseError = (error: import('axios').AxiosError) => {
+    const config = error?.config as ConfiguracaoMonitorada;
     const metadados = config?.metadadosMonitoramento;
     limparControleCancelamento(config);
 
@@ -208,32 +225,17 @@ const handleResponseError = (error: unknown) => {
     }
 
     if (metadados?.monitoramentoAtivo) {
-        logger.error("[http] erro", {
-            metodo: config?.method?.toUpperCase(),
-            url: config?.url,
-            status: (error as {response?: {status?: number}})?.response?.status,
-            duracaoMs: calcularDuracao(metadados.inicioMs),
-            correlacaoId: metadados.correlacaoId,
-        });
+        logErroMonitoramento(error, metadados, config);
     }
 
     const normalized = normalizarErro(error);
 
-    // Caso especial: 401 - redirecionar para login
     if (normalized.tipo === 'naoAutorizado') {
-        const currentPath = routerInstance?.currentRoute?.value?.path;
-        if (currentPath !== '/login') {
-            routerInstance?.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
-        }
-        return Promise.reject(error);
-    }
-
-    // Loga globalmente erros de rede e inesperados para diagnóstico
-    if (deveNotificarGlobalmente(normalized)) {
+        tratarErroNaoAutorizado();
+    } else if (deveNotificarGlobalmente(normalized)) {
         logger.error("[axios] Erro global:", normalized.mensagem);
     }
 
-    // Sempre rejeitar para permitir tratamento local
     return Promise.reject(error);
 };
 

@@ -186,7 +186,7 @@ function fecharModalAdicionarAdmin() {
   usuarioSelecionado.value = null;
   resetarValidacao();
   erroAdicionarAdmin.value = '';
-  inputTituloRef.value?.limparResultadosPesquisaUsuarios();
+
 }
 
 async function adicionarAdmin() {

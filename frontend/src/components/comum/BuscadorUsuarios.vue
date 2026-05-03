@@ -63,7 +63,7 @@ async function aoPressionarTeclaUsuario(evento: KeyboardEvent) {
   }
 }
 
-defineExpose({ focus: () => inputRef.value?.$el?.focus(), limparResultadosPesquisaUsuarios: limparResultados });
+defineExpose({ focus: () => inputRef.value?.$el?.focus() });
 </script>
 
 <style scoped>

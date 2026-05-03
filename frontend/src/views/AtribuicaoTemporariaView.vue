@@ -258,7 +258,7 @@ async function criarAtribuicao() {
 function resetarFormularioAtribuicao() {
   usuarioSelecionado.value = null;
   termoUsuario.value = "";
-  inputUsuarioRef.value?.limparResultadosPesquisaUsuarios();
+
   dataInicio.value = "";
   dataTermino.value = "";
   justificativa.value = "";

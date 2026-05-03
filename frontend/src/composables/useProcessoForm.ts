@@ -14,13 +14,26 @@ export function useProcessoForm(initialData?: Processo) {
         initialData?.unidades.map(u => u.codUnidade) ?? []
     );
 
-    const {errors: fieldErrors, setFromErroNormalizado, clearErrors, hasErrors} = useFormErrors([
+    const {
+        errors: fieldErrors,
+        setFromErroNormalizado: baseSetFromErroNormalizado,
+        clearErrors,
+        hasErrors
+    } = useFormErrors([
         'descricao',
         'tipo',
         'dataLimite',
         'unidades',
         'dataLimiteEtapa1'
     ]);
+
+    function setFromErroNormalizado(normalizedError: import('@/utils/apiError').ErroNormalizado | null) {
+        baseSetFromErroNormalizado(normalizedError);
+        // Mapeamento de erro legado/backend para o campo da UI
+        if (fieldErrors.value.dataLimiteEtapa1 && !fieldErrors.value.dataLimite) {
+            fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
+        }
+    }
 
     watch(descricao, () => {
         fieldErrors.value.descricao = '';
