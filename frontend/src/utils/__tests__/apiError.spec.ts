@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {ehErroAxios, normalizarErro, deveNotificarGlobalmente} from '@/utils/apiError';
 import logger from '@/utils/logger';
 
@@ -102,4 +102,3 @@ describe('apiError utils', () => {
         expect(deveNotificarGlobalmente({tipo: 'proibido'} as any)).toBe(false);
         });
         });
-

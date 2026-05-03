@@ -1,7 +1,6 @@
-import {ref, type Ref} from "vue";
+import type {Ref} from "vue";
 import {TEXTOS} from "@/constants/textos";
 import * as atividadeService from "@/services/atividadeService";
-import type {VarianteAlerta} from "@/composables/useNotification";
 import type {AtividadeOperacaoResponse} from "@/types/tipos";
 
 export function useConhecimentoMutacoes(

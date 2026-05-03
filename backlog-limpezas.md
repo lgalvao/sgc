@@ -3,13 +3,15 @@
 ## Estado atual
 
 - Gate de cruft: **ok**
-- Score atual: **3103**
+- Score atual: **3022**
 - Violacoes: **0**
+- Avisos: **0**
 - Baseline atual do `fallow`:
-  - dead files: **3**
-  - dead export pct: **6.6%**
-  - health score: **95.9 / A**
-  - unused dep: **0**
+  - `dead-code`: **0 issues**
+  - duplicacao: **6 clone groups**, **153 linhas**, **0.3%**
+  - health score: **98 / A**
+  - dead files: **0.0%**
+  - dead exports: **0.0%**
 
 ## Ja concluido de verdade
 
@@ -29,6 +31,9 @@
   - `frontend/src/services/diagnosticoService.ts`
   - `frontend/src/utils/csv.ts`
   - `frontend/src/utils/validators.ts`
+  - `frontend/src/constants/index.ts`
+  - `frontend/src/constants/situacoes.ts`
+  - `frontend/src/utils/styleUtils.ts`
 - remocao dos testes que so sustentavam esses arquivos
 - remocao de dependencias orfas:
   - `papaparse`
@@ -41,6 +46,11 @@
 - consolidacao dos modais de observacao de cadastro:
   - `frontend/src/components/cadastro/CadastroObservacaoModal.vue`
   - `frontend/src/components/cadastro/cadastroObservacaoModalModel.ts`
+- limpeza de exports pequenos:
+  - `frontend/src/composables/useWebStorage.ts`
+  - `frontend/src/utils/index.ts`
+  - `frontend/src/services/processo/types.ts`
+  - `frontend/src/utils/date/validation.ts`
 
 ### Fatiamentos estruturais ja feitos
 
@@ -49,6 +59,33 @@
 - `processoService.ts` fatiado em `frontend/src/services/processo/`
 - `useAcesso.ts` fatiado em `frontend/src/composables/acesso/`
 - `stores/subprocesso.ts` fatiado em `frontend/src/stores/subprocesso/`
+
+### Rodada ampla encerrada agora
+
+- limpeza de APIs orfas em services:
+  - `frontend/src/services/analiseService.ts`
+  - `frontend/src/services/atividadeService.ts`
+  - `frontend/src/services/atribuicaoTemporariaService.ts`
+  - `frontend/src/services/painelService.ts`
+  - `frontend/src/services/subprocessoServiceContexto.ts`
+  - `frontend/src/services/subprocessoServiceMapa.ts`
+  - `frontend/src/services/subprocessoServiceBase.ts`
+- poda das suites herdadas que so sustentavam essa superficie morta:
+  - `frontend/src/services/__tests__/analiseService.spec.ts`
+  - `frontend/src/services/__tests__/atividadeService.spec.ts`
+  - `frontend/src/services/__tests__/atribuicaoTemporariaService.spec.ts`
+  - `frontend/src/services/__tests__/painelService.spec.ts`
+  - `frontend/src/services/__tests__/subprocessoService.spec.ts`
+  - `frontend/src/__tests__/views/PainelView.spec.ts`
+  - `frontend/src/__tests__/views/PainelViewCoverage.spec.ts`
+  - `frontend/src/views/__tests__/AtividadesCadastroView.spec.ts`
+  - `frontend/src/components/__tests__/InputData.spec.ts`
+- remocao de tipos mortos:
+  - `frontend/src/types/dtos.ts`
+  - `frontend/src/types/mapa-modelos.ts`
+  - `frontend/src/types/organizacao.ts`
+- remocao do waiver obsoleto de `frontend/src/types/dtos.ts`
+- baseline do `fallow dead-code` zerado
 
 ### Waivers removidos nesta campanha
 
@@ -59,10 +96,11 @@
 - `frontend/src/stores/subprocesso.ts`
 - `frontend/src/components/comum/BuscadorUsuarios.vue`
 - `frontend/src/components/mapa/CriarCompetenciaModal.vue`
+- `frontend/src/types/dtos.ts`
 
 ## Em andamento agora
 
-Esses pontos ja aparecem no worktree e precisam ser considerados como rodada viva:
+Esses pontos seguem como fronteira viva no worktree e nao devem ser atacados no escuro:
 
 - consolidacao dos modais do mapa em `frontend/src/components/mapa/modais/`
 - enxugamento de:
@@ -81,63 +119,81 @@ Esses pontos ja aparecem no worktree e precisam ser considerados como rodada viv
 - manter tudo em **portugues brasileiro**
 - sempre validar a rodada com o menor conjunto suficiente
 
-## Prioridade 0 - sobras pequenas e baratas
+## Prioridade 0 - fechar a rodada viva do mapa
 
-### Dead files atuais
+### Modais do mapa
 
-O `fallow` ainda acusa estes arquivos como mortos:
+- consolidar a fronteira `frontend/src/components/mapa/modais/`
+- decidir se `CompetenciaAtividadeItem.vue` fica como extracao legitima ou sobra temporaria
+- reduzir acoplamento entre:
+  - `CompetenciaEdicaoModal.vue`
+  - `MapaModaisRoot.vue`
+  - `useCadastroAtividadesMutacoes.ts`
+- apagar compatibilidades e sobras assim que a consolidacao estabilizar
 
-- `frontend/src/constants/index.ts`
-- `frontend/src/constants/situacoes.ts`
-- `frontend/src/utils/styleUtils.ts`
-
-### Exports mortos pequenos
-
-- `frontend/src/composables/useWebStorage.ts`
-  - `removerDoArmazenamento`
-  - `removerMultiplosDoArmazenamento`
-- `frontend/src/utils/date/validation.ts`
-  - `ehDataValidaEFutura`
-- `frontend/src/utils/index.ts`
-  - re-export de `flattenTree`
-- `frontend/src/services/processo/types.ts`
-  - `Subprocesso`
-  - `SubprocessoElegivel`
-  - `UnidadeParticipante`
-
-## Prioridade 1 - hotspots fortes e ainda vivos
+## Prioridade 1 - hotspots fortes confirmados pelo `fallow health`
 
 ### 1. `frontend/src/utils/apiError/normalizer.ts`
 
-- hotspot mais forte restante
-- `normalizarErro` segue com alta complexidade
-- alvo bom para separar:
+- `normalizarErro` segue como hotspot mais forte
+- melhor corte:
   - classificacao
-  - normalizacao
   - leitura de payload
+  - normalizacao final
 
 ### 2. `frontend/src/utils/date/parsing.ts`
 
-- `analisarData` e `analisarStringData` ainda seguem quentes
-- o fatiamento melhorou a fronteira, mas o miolo ainda esta pesado
+- `analisarData` e `analisarStringData` continuam quentes
+- fronteira boa para separar parse, validacao e heuristicas
 
 ### 3. `frontend/src/views/ProcessoCadastroView.vue`
 
-- ainda e hotspot real
-- `handleApiErrors` segue concentrando ramificacao
-- ainda aparece em duplicacao com `UnidadesView.vue`
+- `handleApiErrors` segue pesado
+- ainda conversa com duplicacoes e fluxo de cadastro
 
 ### 4. `frontend/src/axios-setup.ts`
 
-- continua grande e com hotspot em `handleResponseError`
-- segue com waiver
+- `handleResponseError` continua grande
+- alvo bom para cortar sem mudar contrato HTTP
 
 ### 5. `frontend/src/views/cadastroDisponibilizacao.ts`
 
-- `disponibilizarCadastro` segue quente
-- bom alvo para separar pre-validacao, erro e execucao
+- `disponibilizarCadastro` ainda concentra pre-validacao, execucao e tratamento
 
-## Prioridade 2 - waivers grandes ainda ativos
+### 6. `frontend/src/components/processo/ProcessoFormFields.vue`
+
+- `focarPrimeiroErro` apareceu como hotspot critico
+- corte pequeno pode melhorar bastante sem espalhar regra
+
+### 7. `frontend/src/views/LoginView.vue`
+
+- `performInitialLogin` entrou no topo do health
+- vale revisar depois dos hotspots acima
+
+## Prioridade 2 - duplicacoes reais ainda abertas
+
+Atacar so quando houver corte pequeno e contrato claro.
+
+### Boas candidatas
+
+- `frontend/src/components/mapa/modais/MapaDevolucaoModal.vue`
+  x `frontend/src/components/mapa/modais/MapaSugestoesEnvioModal.vue`
+- `frontend/src/services/relatoriosService.ts`
+  - dois blocos repetidos internos
+- `frontend/src/services/processo/types.ts`
+  x `frontend/src/types/processo.ts`
+
+### Candidatas com cuidado
+
+- `frontend/src/views/ProcessoCadastroView.vue`
+  x `frontend/src/views/UnidadesView.vue`
+- `frontend/src/components/unidade/ArvoreUnidades.vue`
+  x `frontend/src/views/ProcessoCadastroView.vue`
+- `frontend/src/components/cadastro/CadastroObservacaoModal.vue`
+  x `frontend/src/components/cadastro/cadastroObservacaoModalModel.ts`
+  - duplicacao pequena; so mexer se cair junto com outra rodada
+
+## Prioridade 3 - waivers e hotspots estruturais ainda vivos
 
 ### Views
 
@@ -172,79 +228,29 @@ O `fallow` ainda acusa estes arquivos como mortos:
 - `frontend/src/composables/useCadastroRevisaoSemMudancas.ts`
 - `frontend/src/composables/useFluxoMapa.ts`
 - `frontend/src/axios-setup.ts`
-- `frontend/src/types/dtos.ts`
 - `frontend/src/constants/textos.ts`
 - `frontend/src/utils/treeUtils.ts`
 - `frontend/src/App.vue`
 
-## Prioridade 3 - duplicacoes apontadas pelo fallow
+## Nao e mais prioridade
 
-Atacar so quando houver corte pequeno e contrato claro.
+Esses itens saem do backlog ativo porque ja foram resolvidos nesta campanha:
 
-### Boas candidatas
-
-- consolidacao dos modais do mapa
-  - rodada ja esta em andamento
-- `frontend/src/services/painelService.ts`
-  - dois blocos repetidos
-- `frontend/src/services/relatoriosService.ts`
-  - dois blocos repetidos
-
-### Candidatas com cuidado
-
-- `frontend/src/views/ProcessoCadastroView.vue`
-  x `frontend/src/views/UnidadesView.vue`
-- `frontend/src/components/unidade/ArvoreUnidades.vue`
-  x `frontend/src/views/ProcessoCadastroView.vue`
-
-## Prioridade 4 - limpeza dirigida de services e types
-
-Esses pontos ainda nao devem ser removidos no escuro, mas merecem auditoria dedicada:
-
-- `frontend/src/services/analiseService.ts`
-  - `listarAnalisesValidacao`
-- `frontend/src/services/atividadeService.ts`
-  - `listarAtividades`
-  - `obterAtividadePorCodigo`
-  - `listarConhecimentos`
-- `frontend/src/services/atribuicaoTemporariaService.ts`
-  - `buscarTodasAtribuicoes`
-- `frontend/src/services/painelService.ts`
-  - `listarAlertas`
-- `frontend/src/services/subprocessoServiceContexto.ts`
-  - `listarAtividades`
-  - `obterStatus`
-  - `buscarSubprocessoDetalhe`
-  - `buscarSubprocessoPorProcessoEUnidade`
-  - `listarAnalisesCadastro`
-  - `listarAnalisesValidacao`
-- `frontend/src/services/subprocessoServiceMapa.ts`
-  - `obterMapaAjuste`
-  - `aceitarCadastroEmBloco`
-  - `homologarCadastroEmBloco`
-  - `aceitarValidacaoEmBloco`
-  - `homologarValidacaoEmBloco`
-  - `disponibilizarMapaEmBloco`
-- `frontend/src/types/dtos.ts`
-  - `ImpactoMapaDto`
-  - `AlertaDto`
-  - `UsuarioDto`
-  - `AtividadeOperacaoResponseDto`
-- `frontend/src/types/mapa-modelos.ts`
-  - `MapaVisualizacao`
-- `frontend/src/types/organizacao.ts`
-  - `AtribuicaoTemporaria`
+- dead files restantes em `constants/` e `styleUtils.ts`
+- exports mortos pequenos de `useWebStorage`, `date/validation`, `utils/index`, `services/processo/types`
+- auditoria de services orfos (`analiseService`, `atividadeService`, `atribuicaoTemporariaService`, `painelService`, `subprocessoServiceContexto`, `subprocessoServiceMapa`)
+- limpeza de tipos mortos em `types/dtos.ts`, `types/mapa-modelos.ts`, `types/organizacao.ts`
 
 ## Ordem recomendada de execucao
 
-1. fechar a rodada em andamento dos modais do mapa
-2. remover os dead files restantes (`constants/index.ts`, `situacoes.ts`, `styleUtils.ts`)
-3. podar `apiError/normalizer.ts`
-4. podar `date/parsing.ts`
-5. atacar `ProcessoCadastroView.vue`
-6. atacar `axios-setup.ts`
-7. limpar exports mortos pequenos em `useWebStorage`, `date/validation`, `services/processo/types`
-8. seguir para services e types ainda sinalizados pelo `fallow`
+1. fechar a rodada viva dos modais do mapa
+2. podar `apiError/normalizer.ts`
+3. podar `date/parsing.ts`
+4. atacar `ProcessoCadastroView.vue`
+5. atacar `axios-setup.ts`
+6. atacar `cadastroDisponibilizacao.ts`
+7. resolver duplicacoes pequenas de `relatoriosService.ts` e `services/processo/types.ts`
+8. voltar aos waivers grandes ainda ativos
 
 ## Comandos uteis
 
@@ -259,10 +265,8 @@ pnpm -C frontend run test:unit
 
 ## Leitura curta do momento
 
-- a campanha esta indo **bem**
-- houve queda real de score e reducao de waivers
-- o backlog anterior estava **otimista demais**
-- o foco agora nao e mais apagar obviedades; e fechar:
-  - rodada viva dos modais do mapa
-  - dead files pequenos que sobraram
-  - hotspots ainda quentes de parsing, erro e cadastro
+- a campanha esta indo **muito bem**
+- a rodada ampla acabou de remover o grosso das APIs orfas e dos tipos mortos
+- o `fallow dead-code` ficou **zerado**
+- o backlog agora sai do modo "apagar sobra obvia" e entra em modo "fechar fronteiras vivas e hotspots reais"
+- o proximo passo natural e **fechar a rodada dos modais do mapa** sem conflitar com o trabalho vivo nessa area

@@ -11,7 +11,7 @@ vi.mock('@/axios-setup', () => ({
 }));
 
 vi.mock('@/utils/apiError', () => ({
-  normalizarErro: vi.fn((err) => ({ kind: 'inesperado', message: 'Erro' }))
+  normalizarErro: vi.fn(() => ({ kind: 'inesperado', message: 'Erro' }))
 }));
 
 describe('subprocessoService', () => {
