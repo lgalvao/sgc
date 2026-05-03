@@ -1,20 +1,20 @@
 # Auditoria de cheiros de codigo
 
-Gerado em: 2026-05-02T16:18:56.589Z
-Pontuacao: 1660 (critico)
+Gerado em: 2026-05-03T20:25:09.649Z
+Pontuacao: 1637 (critico)
 
 ## Contagens
 
 | Sinal | Total | Delta | Peso |
 |---|---:|---:|---:|
-| Backend DTOs com @Nullable | 122 | +122 | 5 |
-| Backend checks explicitos de null | 229 | +229 | 2 |
-| Backend Objects.isNull/nonNull | 8 | +8 | 2 |
-| Frontend producao com any explicito | 1 | +1 | 4 |
-| Frontend testes com any explicito | 502 | +502 | 1 |
+| Backend DTOs com @Nullable | 123 | +1 | 5 |
+| Backend checks explicitos de null | 235 | +6 | 2 |
+| Backend Objects.isNull/nonNull | 8 | 0 | 2 |
+| Frontend producao com any explicito | 0 | -1 | 4 |
+| Frontend testes com any explicito | 472 | -30 | 1 |
 | Frontend catch tipado como any | 0 | 0 | 3 |
-| Frontend checks explicitos de null | 25 | +25 | 2 |
-| Frontend fallbacks defensivos com || | 20 | +20 | 1 |
+| Frontend checks explicitos de null | 23 | -2 | 2 |
+| Frontend fallbacks defensivos com || | 18 | -2 | 1 |
 
 ## Hotspots
 
@@ -34,10 +34,10 @@ Pontuacao: 1660 (critico)
 | backend/src/main/java/sgc/alerta/dto/AlertaDto.java | 25 | backend_nullable_dto: 5 |
 | backend/src/main/java/sgc/subprocesso/dto/SubprocessoListagemDto.java | 25 | backend_nullable_dto: 5 |
 | frontend/src/components/__tests__/ArvoreUnidades.spec.ts | 25 | frontend_any_testes: 25 |
-| frontend/src/views/__tests__/MapaViewUncovered.spec.ts | 25 | frontend_any_testes: 25 |
+| backend/src/main/java/sgc/alerta/EnfileirarNotificacaoCommand.java | 20 | backend_nullable_dto: 4 |
 
 ## Escopos
 
-- backend: 1084 ponto(s)
-- frontend: 74 ponto(s)
-- frontend_testes: 502 ponto(s)
+- backend: 1101 ponto(s)
+- frontend: 64 ponto(s)
+- frontend_testes: 472 ponto(s)

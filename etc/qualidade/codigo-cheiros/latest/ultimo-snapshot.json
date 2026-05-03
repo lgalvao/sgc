@@ -1,34 +1,34 @@
 {
-  "geradoEm": "2026-05-02T16:18:56.589Z",
+  "geradoEm": "2026-05-03T20:25:09.649Z",
   "base": "/Users/leonardo/sgc",
   "pontuacao": {
-    "total": 1660,
+    "total": 1637,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 1084,
-      "frontend": 74,
-      "frontend_testes": 502
+      "backend": 1101,
+      "frontend": 64,
+      "frontend_testes": 472
     }
   },
   "contagens": {
-    "backend_nullable_dto": 122,
-    "backend_null_checks": 229,
+    "backend_nullable_dto": 123,
+    "backend_null_checks": 235,
     "backend_objects_null": 8,
-    "frontend_any_producao": 1,
-    "frontend_any_testes": 502,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": 472,
     "frontend_catch_any": 0,
-    "frontend_null_checks": 25,
-    "frontend_fallback_or": 20
+    "frontend_null_checks": 23,
+    "frontend_fallback_or": 18
   },
   "deltas": {
-    "backend_nullable_dto": 122,
-    "backend_null_checks": 229,
-    "backend_objects_null": 8,
-    "frontend_any_producao": 1,
-    "frontend_any_testes": 502,
+    "backend_nullable_dto": 1,
+    "backend_null_checks": 6,
+    "backend_objects_null": 0,
+    "frontend_any_producao": -1,
+    "frontend_any_testes": -30,
     "frontend_catch_any": 0,
-    "frontend_null_checks": 25,
-    "frontend_fallback_or": 20
+    "frontend_null_checks": -2,
+    "frontend_fallback_or": -2
   },
   "hotspots": [
     {
@@ -137,10 +137,10 @@
       }
     },
     {
-      "arquivo": "frontend/src/views/__tests__/MapaViewUncovered.spec.ts",
-      "pontuacao": 25,
+      "arquivo": "backend/src/main/java/sgc/alerta/EnfileirarNotificacaoCommand.java",
+      "pontuacao": 20,
       "categorias": {
-        "frontend_any_testes": 25
+        "backend_nullable_dto": 4
       }
     }
   ]

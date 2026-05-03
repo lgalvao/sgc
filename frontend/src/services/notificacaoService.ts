@@ -26,17 +26,7 @@ export interface Notificacao {
     ultimoErro?: string;
 }
 
-export const STATUS_NOTIFICACAO_INFO: Record<StatusNotificacao, { label: string; variant: string; prioridade: number }> = {
-    ENVIADO:          { label: "Enviado",          variant: "success",   prioridade: 4 },
-    PENDENTE:         { label: "Pendente",         variant: "secondary", prioridade: 2 },
-    ENVIANDO:         { label: "Enviando...",       variant: "primary",   prioridade: 3 },
-    FALHA_TEMPORARIA: { label: "Falha temporária", variant: "warning",   prioridade: 1 },
-    FALHA_DEFINITIVA: { label: "Falha definitiva", variant: "danger",    prioridade: 0 },
-};
-
-export function obterStatusNotificacao(status: StatusNotificacao) {
-    return STATUS_NOTIFICACAO_INFO[status];
-}
+export { STATUS_NOTIFICACAO_INFO, getNotificacaoStatusInfo as obterStatusNotificacao } from "@/utils/statusHelpers";
 
 export interface ReenvioNotificacaoResponse {
     codigo: number;

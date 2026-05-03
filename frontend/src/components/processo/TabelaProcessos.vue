@@ -10,12 +10,7 @@ import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/fo
 type CampoOrdenacaoProcesso = keyof ProcessoResumo | "dataFinalizacao";
 type EventoLinhaProcesso = ProcessoResumo | { item: ProcessoResumo };
 
-function getBadgeVariant(situacao: SituacaoProcesso | string) {
-  if (situacao === SituacaoProcesso.FINALIZADO) return "success";
-  if (situacao === SituacaoProcesso.EM_ANDAMENTO) return "primary";
-  if (situacao === SituacaoProcesso.CRIADO) return "secondary";
-  return "dark";
-}
+import {getProcessoBadgeVariant} from "@/utils/statusHelpers";
 
 const props = withDefaults(defineProps<{
   processos: ProcessoResumo[];
@@ -127,7 +122,7 @@ defineExpose({fields});
       </template>
 
       <template #cell(situacao)="{ item }">
-        <BBadge :variant="getBadgeVariant(item.situacao)" data-testid="badge-situacao">
+        <BBadge :variant="getProcessoBadgeVariant(item.situacao)" data-testid="badge-situacao">
           {{ formatSituacaoProcesso(item.situacao) }}
         </BBadge>
       </template>
