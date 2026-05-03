@@ -1,21 +1,21 @@
 {
-  "geradoEm": "2026-05-03T21:31:55.357Z",
+  "geradoEm": "2026-05-03T21:52:12.936Z",
   "base": "/Users/leonardo/sgc",
   "pontuacao": {
-    "total": 1645,
+    "total": 1636,
     "faixa": "critico",
     "porEscopo": {
       "backend": 1101,
-      "frontend": 72,
-      "frontend_testes": 472
+      "frontend": 64,
+      "frontend_testes": 471
     }
   },
   "contagens": {
     "backend_nullable_dto": 123,
     "backend_null_checks": 235,
     "backend_objects_null": 8,
-    "frontend_any_producao": 2,
-    "frontend_any_testes": 472,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": 471,
     "frontend_catch_any": 0,
     "frontend_null_checks": 23,
     "frontend_fallback_or": 18
@@ -24,8 +24,8 @@
     "backend_nullable_dto": 0,
     "backend_null_checks": 0,
     "backend_objects_null": 0,
-    "frontend_any_producao": 1,
-    "frontend_any_testes": 0,
+    "frontend_any_producao": -2,
+    "frontend_any_testes": -1,
     "frontend_catch_any": 0,
     "frontend_null_checks": 0,
     "frontend_fallback_or": 0

@@ -65,6 +65,7 @@ const {
 } = useArvoreSelecao(props, emit);
 
 const {
+  expandedUnits,
   isExpanded,
   toggleExpand,
   expandirRecursivo,
