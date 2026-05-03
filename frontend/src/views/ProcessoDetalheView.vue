@@ -142,8 +142,6 @@ const {
   loadingFinalizacao,
   modalBlocoRef,
   mostrarModalFinalizacao,
-  obterIdBotaoAcao,
-  obterTestIdBotaoAcao,
   processandoAcaoBloco,
   unidadesElegiveis,
 } = useProcessoAcoes({

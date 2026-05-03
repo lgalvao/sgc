@@ -107,12 +107,11 @@
     },
     {
       "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
-
-      "camada": "view",
-      "maxLinhas": 312,
+      "camada": "composable",
+      "maxLinhas": 174,
       "responsavel": "frontend",
-      "justificativa": "Tela ainda agrega busca, formulario e listagem.",
-      "criterioRemocao": "Extrair formulario e listagem da atribuicao temporaria."
+      "justificativa": "Composable ainda concentra fluxo amplo do subprocesso.",
+      "criterioRemocao": "Separar bootstrap, navegacao e mutacoes do subprocesso."
     },
     {
       "arquivo": "frontend/src/stores/perfil.ts",
@@ -123,28 +122,12 @@
       "criterioRemocao": "Reduzir fronteira de sessao e mover ponte de unidade atual."
     },
     {
-      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
-      "camada": "composable",
-      "maxLinhas": 174,
-      "responsavel": "frontend",
-      "justificativa": "Composable ainda concentra fluxo amplo do subprocesso.",
-      "criterioRemocao": "Separar bootstrap, navegacao e mutacoes do subprocesso."
-    },
-    {
       "arquivo": "frontend/src/components/processo/ModalAcaoBloco.vue",
       "camada": "component",
       "maxLinhas": 234,
       "responsavel": "frontend",
       "justificativa": "Modal ainda combina variacoes de acoes em bloco.",
       "criterioRemocao": "Extrair formulario e conteudo especifico de cada acao."
-    },
-    {
-      "arquivo": "frontend/src/components/processo/ProcessoFormFields.vue",
-      "camada": "component",
-      "maxLinhas": 229,
-      "responsavel": "frontend",
-      "justificativa": "Componente de formulario ainda concentra muitos campos e regras.",
-      "criterioRemocao": "Separar campos basicos, unidades e datas do processo."
     },
     {
       "arquivo": "frontend/src/composables/useMapaCompetenciasMutacoes.ts",

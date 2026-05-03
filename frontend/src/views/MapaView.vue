@@ -269,9 +269,6 @@ const {
   fecharModalVerSugestoes,
   abrirModalSugestoes,
   handleConfirmarSugestoes,
-  sincronizarSugestoesMapa,
-  carregarSugestoesParaVisualizacao,
-  carregarSugestoesParaEdicao
 } = useMapaSugestoes({
   codigoSubprocesso,
   notify,
@@ -306,9 +303,7 @@ const {
   abrirModalAceitar,
   fecharModalAceitar,
   abrirModalValidar,
-  fecharModalValidar,
   abrirModalDevolucao,
-  fecharModalDevolucao,
   confirmarValidacao,
   confirmarAceitacao,
   handleConfirmarDevolucao,
@@ -397,10 +392,6 @@ function aplicarErroNormalizado(error: ReturnType<typeof normalizarErro> | null)
   sincronizarErrosAtividades();
 }
 
-function handleErrors(store: { lastError: unknown }) {
-  aplicarErroNormalizado(store.lastError as ReturnType<typeof normalizarErro> | null);
-}
-
 const {
   competenciaSendoEditada,
   mostrarModalCriarNovaCompetencia,
@@ -415,7 +406,6 @@ const {
   excluirCompetencia,
   confirmarExclusaoCompetencia,
   removerAtividadeAssociada,
-  fecharModalExcluirCompetencia,
 } = useMapaCompetenciasMutacoes({
   codigoSubprocesso,
   competencias,
@@ -427,7 +417,6 @@ const {
 });
 
 const {
-  podeConfirmarDisponibilizacao,
   erroValidacaoMapa,
   loadingDisponibilizacao,
   notificacaoDisponibilizacao,

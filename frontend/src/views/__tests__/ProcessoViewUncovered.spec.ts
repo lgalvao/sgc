@@ -67,10 +67,6 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
 
         const vm = wrapper.vm as any;
         
-        // Obter ids dinamicos default
-        expect(vm.obterIdBotaoAcao("default-acao")).toBe("btn-default-acao");
-        expect(vm.obterTestIdBotaoAcao("default-acao")).toBe("btn-processo-default-acao");
-
         // Testar executarAcaoBloco sem processo
         await vm.executarAcaoBloco({ ids: [1], dataLimite: "2025-01-01" });
         expect(processoService.executarAcaoEmBloco).not.toHaveBeenCalled();

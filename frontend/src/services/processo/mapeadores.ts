@@ -1,6 +1,5 @@
 import {SituacaoSubprocesso, type UnidadeParticipante} from "@/types/tipos";
-import type {UnidadeParticipanteDto} from "@/types/dtos";
-import type {Processo, ProcessoDetalheResponseBackend} from "./types";
+import type {UnidadeParticipanteDto, Processo, ProcessoDetalheResponseBackend} from "./types";
 
 export function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {
     return {

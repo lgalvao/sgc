@@ -8,7 +8,6 @@ import {
     TipoProcesso,
     type UnidadeImportacao
 } from "@/types/tipos";
-import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
 
 export type {
     AcaoBlocoProcesso,
@@ -18,6 +17,32 @@ export type {
     ProcessoResumo,
     UnidadeImportacao
 };
+
+export interface UnidadeParticipanteDto {
+    codUnidade: number;
+    codUnidadeSuperior?: number;
+    sigla?: string;
+    nome?: string;
+    codSubprocesso?: number;
+    situacaoSubprocesso?: string;
+    dataLimite?: string;
+    mapaCodigo?: number;
+    localizacaoAtualCodigo?: number;
+    filhos?: UnidadeParticipanteDto[];
+}
+
+export interface ProcessoDetalheDto {
+    codigo?: number;
+    tipo?: string;
+    situacao?: string;
+    dataCriacao?: string;
+    dataInicio?: string;
+    dataFinalizacao?: string;
+    unidades?: UnidadeParticipanteDto[];
+    acoesBloco?: unknown[];
+
+    [key: string]: unknown; // Para campos adicionais do spread
+}
 
 export interface ProcessoDetalheResponseBackend extends ProcessoDetalheDto {
     codigo: number;

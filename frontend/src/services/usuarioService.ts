@@ -1,7 +1,43 @@
-import type {FluxoLoginResponseDto, PerfilUnidadeDto, PermissoesSessaoDto, SessaoLoginDto} from "@/types/dtos";
 import type {FluxoLogin, PerfilUnidade, PermissoesSessao, SessaoLogin} from "@/types/autenticacao";
 import {Perfil, type UsuarioPesquisa} from "@/types/tipos";
 import {apiGet, apiPost} from "@/utils/apiUtils";
+
+interface UnidadeDto {
+    codigo: number;
+    nome: string;
+    sigla: string;
+}
+
+interface PerfilUnidadeDto {
+    perfil: string;
+    unidade: UnidadeDto;
+    siglaUnidade: string;
+}
+
+interface SessaoLoginDto {
+    tituloEleitoral: string;
+    nome: string;
+    perfil: string;
+    unidadeCodigo: number;
+    permissoes: PermissoesSessaoDto;
+}
+
+interface PermissoesSessaoDto {
+    mostrarCriarProcesso: boolean;
+    mostrarArvoreCompletaUnidades: boolean;
+    mostrarCtaPainelVazio: boolean;
+    mostrarDiagnosticoOrganizacional: boolean;
+    mostrarMenuConfiguracoes: boolean;
+    mostrarMenuAdministradores: boolean;
+    mostrarCriarAtribuicaoTemporaria: boolean;
+}
+
+interface FluxoLoginResponseDto {
+    autenticado: boolean;
+    requerSelecaoPerfil: boolean;
+    perfisUnidades: PerfilUnidadeDto[];
+    sessao: SessaoLoginDto | null;
+}
 
 interface AutenticacaoRequest {
     tituloEleitoral: string;

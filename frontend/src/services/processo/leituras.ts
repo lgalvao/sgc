@@ -1,5 +1,6 @@
-import type {Processo, ProcessoResumo, UnidadeImportacao, ProcessoDetalheResponseBackend} from "./types";
+import type {Processo, ProcessoResumo, UnidadeImportacao, ProcessoDetalheResponseBackend, UnidadeParticipanteDto} from "./types";
 import {mapearProcessoDetalhe} from "./mapeadores";
+import {SituacaoSubprocesso} from "@/types/tipos";
 import apiClient from "@/axios-setup";
 
 const CAMINHO_PROCESSOS = "/processos";
@@ -23,7 +24,7 @@ export async function buscarProcessosParaImportacao(): Promise<ProcessoResumo[]>
 }
 
 export async function buscarUnidadesParaImportacao(codProcesso: number): Promise<UnidadeImportacao[]> {
-    const response = await apiClient.get<any[]>(
+    const response = await apiClient.get<UnidadeParticipanteDto[]>(
         caminhoProcesso(codProcesso, "/unidades-importacao"),
     );
     return response.data.map((dto) => ({
@@ -32,7 +33,7 @@ export async function buscarUnidadesParaImportacao(codProcesso: number): Promise
         codUnidade: dto.codUnidade,
         codSubprocesso: dto.codSubprocesso ?? 0,
         codUnidadeSuperior: dto.codUnidadeSuperior,
-        situacaoSubprocesso: dto.situacaoSubprocesso,
+        situacaoSubprocesso: dto.situacaoSubprocesso as SituacaoSubprocesso | undefined,
         dataLimite: dto.dataLimite,
         mapaCodigo: dto.mapaCodigo,
         localizacaoAtualCodigo: dto.localizacaoAtualCodigo,

@@ -218,7 +218,6 @@ const {
   confirmarAlteracaoDataLimite,
   abrirModalReabrirCadastro,
   abrirModalReabrirRevisao,
-  fecharModalReabrir,
   confirmarReabertura,
   confirmarEnviarLembrete,
   enviarLembreteConfirmado,
