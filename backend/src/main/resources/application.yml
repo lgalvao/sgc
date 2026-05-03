@@ -164,6 +164,10 @@ spring:
     init:
       mode: never
       platform: oracle
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
 
 aplicacao:
   cors:
@@ -180,12 +184,6 @@ aplicacao:
 springdoc:
   api-docs.enabled: true
   swagger-ui.enabled: true
-
-spring:
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 6MB
 
 sgc:
   feedback:
