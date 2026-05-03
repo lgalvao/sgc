@@ -4,7 +4,7 @@ import {ref} from 'vue';
 import SubprocessoCards from '@/components/processo/SubprocessoCards.vue';
 import {TipoProcesso} from '@/types/tipos';
 import {createTestingPinia} from '@pinia/testing';
-import * as useAcessoModule from '@/composables/useAcesso';
+import * as useAcessoModule from '@/composables/acesso';
 
 const pushMock = vi.fn();
 vi.mock('vue-router', () => ({

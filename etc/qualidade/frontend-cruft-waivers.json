@@ -90,36 +90,12 @@
       "criterioRemocao": "Extrair acoes inline e blocos condicionais do item."
     },
     {
-      "arquivo": "frontend/src/utils/apiError.ts",
-      "camada": "utils",
-      "maxLinhas": 175,
-      "responsavel": "frontend",
-      "justificativa": "Utilitario central ainda combina classificacao e formatacao de erro.",
-      "criterioRemocao": "Separar mapeamento de erro HTTP da formatacao para UI."
-    },
-    {
       "arquivo": "frontend/src/stores/mapas.ts",
       "camada": "store",
       "maxLinhas": 184,
       "responsavel": "frontend",
       "justificativa": "Store ainda agrega estado, carga e invalidacao do mapa.",
       "criterioRemocao": "Separar leitura de mapa completo das operacoes derivadas."
-    },
-    {
-      "arquivo": "frontend/src/services/processoService.ts",
-      "camada": "service",
-      "maxLinhas": 194,
-      "responsavel": "frontend",
-      "justificativa": "Service de processo ainda concentra chamadas heterogeneas.",
-      "criterioRemocao": "Fatiar acoes de processo e leituras de contexto."
-    },
-    {
-      "arquivo": "frontend/src/composables/useAcesso.ts",
-      "camada": "composable",
-      "maxLinhas": 189,
-      "responsavel": "frontend",
-      "justificativa": "Composable ainda agrega muitos derivados de permissao.",
-      "criterioRemocao": "Separar acesso de cadastro, mapa e acoes em bloco."
     },
     {
       "arquivo": "frontend/src/utils/treeUtils.ts",

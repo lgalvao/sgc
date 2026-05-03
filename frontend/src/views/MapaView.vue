@@ -161,7 +161,7 @@ import MapaSomenteLeitura from "@/components/mapa/MapaSomenteLeitura.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {computed, onMounted, reactive, ref, toRefs, unref} from "vue";
 import {useRouter} from "vue-router";
-import {useAcesso} from "@/composables/useAcesso";
+import {useAcesso} from "@/composables/acesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useMapaCompetenciasMutacoes} from "@/composables/useMapaCompetenciasMutacoes";

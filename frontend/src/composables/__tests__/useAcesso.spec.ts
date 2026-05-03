@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {useAcesso} from '../useAcesso';
+import {useAcesso} from '../acesso';
 import {ref} from 'vue';
 import type {PermissoesSubprocesso, SubprocessoDetalhe} from '@/types/tipos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';

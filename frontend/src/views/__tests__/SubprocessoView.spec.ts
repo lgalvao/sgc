@@ -5,7 +5,7 @@ import SubprocessoView from '@/views/SubprocessoView.vue';
 import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processo';
-import * as useAcessoModule from '@/composables/useAcesso';
+import * as useAcessoModule from '@/composables/acesso';
 import {TEXTOS} from "@/constants/textos";
 
 vi.mock('vue-router', () => ({

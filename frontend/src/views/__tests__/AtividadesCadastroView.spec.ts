@@ -11,7 +11,7 @@ import CadastroView from "@/views/CadastroView.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
-import * as useAcessoModule from '@/composables/useAcesso';
+import * as useAcessoModule from '@/composables/acesso';
 import {TEXTOS} from "@/constants/textos";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";

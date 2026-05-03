@@ -124,7 +124,7 @@
 import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {computed} from "vue";
-import {useAcesso} from "@/composables/useAcesso";
+import {useAcesso} from "@/composables/acesso";
 import {type Mapa, type MapaCompleto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 

@@ -102,7 +102,7 @@ import {useNotification} from "@/composables/useNotification";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {enviarLembrete as enviarLembreteService} from "@/services/processo";
 
-import {useAcesso} from "@/composables/useAcesso";
+import {useAcesso} from "@/composables/acesso";
 import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatarDataBR, analisarData} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";

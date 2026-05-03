@@ -154,7 +154,7 @@ import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useAcesso} from "@/composables/useAcesso";
+import {useAcesso} from "@/composables/acesso";
 import {useCadastroAtividadesMutacoes} from "@/composables/useCadastroAtividadesMutacoes";
 import {useCadastroRevisaoSemMudancas} from "@/composables/useCadastroRevisaoSemMudancas";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";

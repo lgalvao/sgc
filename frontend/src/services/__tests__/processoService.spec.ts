@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import * as processoService from '../processoService';
+import * as processoService from '../processo';
 import apiClient from '@/axios-setup';
 import {AtualizarProcessoRequest, CriarProcessoRequest, TipoProcesso} from '@/types/tipos';
 
@@ -118,17 +118,6 @@ describe('processoService', () => {
         expect(apiClient.post).toHaveBeenCalledWith(`/processos/${codProcesso}/finalizar`);
     });
 
-    it('obterProcessoPorCodigo deve fazer requisição GET', async () => {
-        const codProcesso = 1;
-        const responseData = {codigo: 1, descricao: 'Teste'};
-        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
-
-        const result = await processoService.obterProcessoPorCodigo(codProcesso);
-
-        expect(apiClient.get).toHaveBeenCalledWith(`/processos/${codProcesso}`);
-        expect(result).toEqual(responseData);
-    });
-
     it('atualizarProcesso deve fazer requisição POST', async () => {
         const codProcesso = 1;
         const request: AtualizarProcessoRequest = {
@@ -181,28 +170,6 @@ describe('processoService', () => {
             acao: 'ACEITAR',
             dataLimite: '2026-12-31'
         });
-    });
-
-    it('buscarSubprocessosElegiveis deve fazer requisição GET', async () => {
-        const codProcesso = 1;
-        const responseData = [{codSubprocesso: 1, siglaUnidade: 'U1'}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
-
-        const result = await processoService.buscarSubprocessosElegiveis(codProcesso);
-
-        expect(apiClient.get).toHaveBeenCalledWith(`/processos/${codProcesso}/subprocessos-elegiveis`);
-        expect(result).toEqual(responseData);
-    });
-
-    it('buscarSubprocessos deve fazer requisição GET', async () => {
-        const codProcesso = 1;
-        const responseData = [{codigo: 1, situacao: 'CRIADO'}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
-
-        const result = await processoService.buscarSubprocessos(codProcesso);
-
-        expect(apiClient.get).toHaveBeenCalledWith(`/processos/${codProcesso}/subprocessos`);
-        expect(result).toEqual(responseData);
     });
 
     it('buscarContextoCompleto deve fazer requisição GET', async () => {

@@ -4,7 +4,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as analiseService from "@/services/analiseService";
 import * as subprocessoService from "@/services/subprocessoService";
-import * as useAcessoModule from "@/composables/useAcesso";
+import * as useAcessoModule from "@/composables/acesso";
 import * as useMapasModule from "@/composables/useMapas";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import MapaView from "../MapaView.vue";

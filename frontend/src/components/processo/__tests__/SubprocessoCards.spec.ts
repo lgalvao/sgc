@@ -5,7 +5,7 @@ import {createTestingPinia} from "@pinia/testing";
 import type {PermissoesSubprocesso, SubprocessoDetalhe} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {ref} from "vue";
-import * as useAcessoModule from "@/composables/useAcesso";
+import * as useAcessoModule from "@/composables/acesso";
 
 const {pushMock} = vi.hoisted(() => ({ pushMock: vi.fn() }));
 
