@@ -213,7 +213,9 @@ import {TEXTOS} from "@/constants/textos";
 import {
   listarNotificacoesAdmin,
   type Notificacao,
+  obterStatusNotificacao,
   reenviarNotificacao,
+  STATUS_NOTIFICACAO_INFO,
   type StatusNotificacao,
 } from "@/services/notificacaoService";
 import {formatarDataHoraBR} from "@/utils";
@@ -268,17 +270,7 @@ const camposTabela = [
 
 const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
 
-const STATUS_NOTIFICACAO: Record<StatusNotificacao, {label: string; variant: string; prioridade: number}> = {
-  ENVIADO:          {label: "Enviado",          variant: "success",   prioridade: 4},
-  PENDENTE:         {label: "Pendente",         variant: "secondary", prioridade: 2},
-  ENVIANDO:         {label: "Enviando...",       variant: "primary",   prioridade: 3},
-  FALHA_TEMPORARIA: {label: "Falha temporária", variant: "warning",   prioridade: 1},
-  FALHA_DEFINITIVA: {label: "Falha definitiva", variant: "danger",    prioridade: 0},
-};
 
-function obterStatusNotificacao(status: StatusNotificacao) {
-  return STATUS_NOTIFICACAO[status];
-}
 
 function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";
@@ -326,7 +318,7 @@ function formatarQuando(item: Notificacao): string {
 }
 
 function compararNotificacoes(a: Notificacao, b: Notificacao): number {
-  const prioridade = STATUS_NOTIFICACAO[a.situacao].prioridade - STATUS_NOTIFICACAO[b.situacao].prioridade;
+  const prioridade = STATUS_NOTIFICACAO_INFO[a.situacao].prioridade - STATUS_NOTIFICACAO_INFO[b.situacao].prioridade;
   if (prioridade !== 0) {
     return prioridade;
   }

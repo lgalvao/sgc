@@ -31,6 +31,8 @@ vi.mock('@/axios-setup', () => ({
     default: {post: mockPost},
 }))
 
+import logger from '@/utils/logger'
+
 describe('useFeedback', () => {
     beforeEach(() => {
         initPinia()
@@ -90,9 +92,7 @@ describe('useFeedback', () => {
     })
 
     it('deve continuar sem screenshot quando html2canvas falha', async () => {
-        const loggerMock = {error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn()}
-        vi.doMock('@/utils', () => ({logger: loggerMock, formatarDataHoraBR: vi.fn()}))
-
+        const spyError = vi.spyOn(logger, 'error').mockImplementation(() => {})
         const html2canvas = await import('html2canvas')
         vi.mocked(html2canvas.default).mockRejectedValueOnce(new Error('canvas error'))
 
@@ -101,12 +101,11 @@ describe('useFeedback', () => {
 
         await fb.capturarTela()
         expect(fb.captura.value).toBeNull()
-        expect(loggerMock.error).toHaveBeenCalledWith(
+        expect(spyError).toHaveBeenCalledWith(
             expect.stringContaining('[Feedback] Captura de tela falhou'),
             expect.any(Error)
         )
-
-        vi.doUnmock('@/utils')
+        spyError.mockRestore()
     })
 
     it('deve definir enviando como true durante o envio e false ao finalizar', async () => {

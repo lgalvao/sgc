@@ -12,8 +12,6 @@ export interface MetadadosFeedback {
   usuarioCodigo: string
   /** Nome de exibição do usuário */
   usuarioNome: string
-  /** E-mail do usuário, se disponível na sessão */
-  usuarioEmail: string
 
   /** Nome da rota Vue Router atual */
   rotaNome: string

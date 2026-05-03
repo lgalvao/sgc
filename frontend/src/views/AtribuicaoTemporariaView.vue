@@ -266,23 +266,7 @@ function resetarFormularioAtribuicao() {
   erroFormulario.value = "";
 }
 
-defineExpose({
-  router,
-  codUnidade: props.codUnidade,
-  unidade,
-  termoUsuario,
-  usuarioSelecionado,
-  dataInicio,
-  dataTermino,
-  justificativa,
-  isLoading,
-  erroUsuario,
-  erroFormulario,
-  validacaoSubmetida,
-  criarAtribuicao,
-  notify,
-  clear
-});
+
 </script>
 
 <style scoped>

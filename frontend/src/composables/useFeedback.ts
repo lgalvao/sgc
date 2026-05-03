@@ -45,7 +45,6 @@ export function useFeedback() {
         return {
             usuarioCodigo: perfilStore.usuarioCodigo ?? '',
             usuarioNome: perfilStore.usuarioNome ?? '',
-            usuarioEmail: '',
             rotaNome: String(route.name ?? ''),
             rotaCaminho: route.fullPath,
             rotaQuery: JSON.stringify(route.query),
