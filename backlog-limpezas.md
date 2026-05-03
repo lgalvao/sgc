@@ -35,6 +35,7 @@
 - limpeza de exports em `frontend/src/utils/index.ts`
 - consolidação dos modais do mapa em `frontend/src/components/mapa/modais/`
 - remoção de `BFormRadioGroup` não usado em `FeedbackModal.vue`
+- testes unitários para `frontend/src/utils/date/parsing.ts` (19 testes, cobertura completa de branches)
 
 ### Fatiamentos estruturais concluídos
 
@@ -59,9 +60,7 @@
 
 ### Prioridade 2 — testes faltantes em hotspots
 
-- `frontend/src/utils/date/parsing.ts`
-  - funções `analisarData` e `analisarStringData` sem cobertura de testes
-  - adicionar testes antes de modificar
+- ~~`frontend/src/utils/date/parsing.ts`~~ ✅ coberto (19 testes)
 
 - `frontend/src/components/mapa/modais/CompetenciaEdicaoModal.vue`
   - 3 funções complexas sem cobertura de testes
