@@ -1,4 +1,4 @@
-import {computed, reactive, ref, toRefs, type ComputedRef, type Ref} from "vue";
+import {computed, type ComputedRef, reactive, ref, type Ref, toRefs} from "vue";
 import type {VarianteAlerta} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
 import type {SubprocessoDetalhe} from "@/types/tipos";

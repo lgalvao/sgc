@@ -1,4 +1,4 @@
-import {describe, it, expect, beforeEach, vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import {useCadastroAtividadesMutacoes} from "../useCadastroAtividadesMutacoes";
 import * as atividadeService from "@/services/atividadeService";

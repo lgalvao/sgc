@@ -178,10 +178,7 @@ import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
 import {useMapaAnaliseFluxo} from "@/views/mapaAnaliseFluxo";
 import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
 import {normalizeError} from "@/utils/apiError";
-import type {
-  Analise,
-  MapaCompleto,
-} from "@/types/tipos";
+import type {Analise, MapaCompleto,} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();

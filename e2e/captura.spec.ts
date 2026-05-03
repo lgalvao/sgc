@@ -8,7 +8,12 @@ import {
     iniciarProcessoPeloCadastro,
     obterAcaoBloco
 } from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {
+    navegarParaSubprocesso,
+    obterAcaoCabecalhoSubprocesso,
+    verificarAppAlert,
+    verificarPaginaPainel
+} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -22,8 +27,8 @@ import {
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
-import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
+import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';

@@ -16,7 +16,13 @@ import {
     disponibilizarCadastro,
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
-import {abrirAcaoPrincipalMapa, abrirValidacaoMapa, criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
+import {
+    abrirAcaoPrincipalMapa,
+    abrirValidacaoMapa,
+    criarCompetencia,
+    disponibilizarMapa,
+    navegarParaMapa,
+} from './helpers/helpers-mapas.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 

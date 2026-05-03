@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {mount, flushPromises} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import AtribuicaoTemporariaView from '../AtribuicaoTemporariaView.vue';
 import {buscarUnidadePorCodigo} from '@/services/unidadeService';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';

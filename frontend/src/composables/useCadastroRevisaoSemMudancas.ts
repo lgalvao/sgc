@@ -1,4 +1,4 @@
-import {computed, ref, type ComputedRef, watch} from "vue";
+import {computed, type ComputedRef, ref, watch} from "vue";
 import {SituacaoSubprocesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 

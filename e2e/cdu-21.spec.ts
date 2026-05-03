@@ -6,7 +6,11 @@ import {
     validarProcessoFixture
 } from './fixtures/index.js';
 import {acessarDetalhesProcesso, verificarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {
+    navegarParaSubprocesso,
+    obterAcaoCabecalhoSubprocesso,
+    verificarPaginaPainel
+} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {

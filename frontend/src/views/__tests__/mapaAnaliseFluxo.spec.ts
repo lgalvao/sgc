@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest'
-import {ref, computed} from 'vue'
+import {computed, ref} from 'vue'
 import {useMapaAnaliseFluxo} from '../mapaAnaliseFluxo'
 import {TEXTOS} from "@/constants/textos"
 

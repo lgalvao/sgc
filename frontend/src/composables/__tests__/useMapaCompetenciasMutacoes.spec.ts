@@ -1,5 +1,5 @@
-import {describe, it, expect, beforeEach, vi} from "vitest";
-import {ref, computed} from "vue";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {computed, ref} from "vue";
 import {useMapaCompetenciasMutacoes} from "../useMapaCompetenciasMutacoes";
 
 describe("useMapaCompetenciasMutacoes", () => {

@@ -9,8 +9,8 @@ import {
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
 import {
-    abrirHistoricoAnalise,
     abrirAcaoCadastroDevolver,
+    abrirHistoricoAnalise,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     fecharHistoricoAnalise,

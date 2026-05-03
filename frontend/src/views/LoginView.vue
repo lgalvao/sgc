@@ -77,13 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BCard,
-  BCol,
-  BContainer,
-  BForm,
-  BRow,
-} from "bootstrap-vue-next";
+import {BCard, BCol, BContainer, BForm, BRow,} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import LoadingButton from "@/components/comum/LoadingButton.vue";

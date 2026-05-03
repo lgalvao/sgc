@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest'
 import {computed, defineComponent, h} from 'vue'
-import {mount, flushPromises} from '@vue/test-utils'
+import {flushPromises, mount} from '@vue/test-utils'
 import {useSubprocessoCarregamento} from '../subprocessoCarregamento'
 
 describe('subprocessoCarregamento.ts', () => {

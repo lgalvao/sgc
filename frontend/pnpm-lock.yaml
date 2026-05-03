@@ -75,6 +75,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^6.0.6
         version: 6.0.6(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4))(vue@3.5.33(typescript@5.9.3))
+      '@vitest/browser':
+        specifier: ^4.1.5
+        version: 4.1.5(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4))(vitest@4.1.5)
       '@vitest/browser-preview':
         specifier: ^4.1.5
         version: 4.1.5(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4))(vitest@4.1.5)
@@ -126,6 +129,9 @@ importers:
       playwright:
         specifier: ^1.59.1
         version: 1.59.1
+      rollup:
+        specifier: ^4.60.2
+        version: 4.60.2
       storybook:
         specifier: ^10.3.6
         version: 10.3.6(@testing-library/dom@10.4.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)

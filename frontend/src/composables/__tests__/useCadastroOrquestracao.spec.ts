@@ -1,4 +1,4 @@
-import {describe, it, expect, beforeEach, vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import {useCadastroOrquestracao} from "../useCadastroOrquestracao";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";

@@ -1,5 +1,3 @@
-import type {UnidadeSelecao} from "./subprocesso";
-
 export interface Unidade {
   codigo: number;
   nome: string;

@@ -3,9 +3,9 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/index.js';
 import {esperarAtividadesSomenteLeitura, navegarParaCadastro} from './helpers/helpers-atividades.js';
 import {
-    abrirHistoricoAnalise,
     abrirAcaoCadastroDevolver,
     abrirAcaoCadastroPrincipal,
+    abrirHistoricoAnalise,
     aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,

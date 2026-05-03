@@ -1,16 +1,19 @@
 import {defineStore} from "pinia";
 import {ref, type Ref} from "vue";
-import type {
-    ContextoCadastroAtividadesSubprocesso,
-    ContextoEdicaoSubprocesso,
-} from "@/types/tipos";
+import type {ContextoCadastroAtividadesSubprocesso, ContextoEdicaoSubprocesso,} from "@/types/tipos";
 import {
     buscarContextoCadastroAtividades as serviceBuscarContextoCadastroAtividades,
     buscarContextoCadastroAtividadesPorProcessoEUnidade as serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade,
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarContextoEdicaoPorProcessoEUnidade as serviceBuscarContextoEdicaoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
-import {atualizarDetalhesContexto, type ContextoSubprocesso, dadosValidos, type AtualizacaoStatusLocal, registrarContexto} from "@/stores/subprocessoStoreHelpers";
+import {
+    type AtualizacaoStatusLocal,
+    atualizarDetalhesContexto,
+    type ContextoSubprocesso,
+    dadosValidos,
+    registrarContexto
+} from "@/stores/subprocessoStoreHelpers";
 import {logger} from "@/utils";
 import {type NormalizedError, normalizeError} from "@/utils/apiError";
 

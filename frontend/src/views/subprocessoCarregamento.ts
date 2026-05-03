@@ -1,4 +1,4 @@
-import {onActivated, onMounted, ref, watch, type ComputedRef} from "vue";
+import {type ComputedRef, onActivated, onMounted, ref, watch} from "vue";
 
 type ContextoEdicaoDireto = { detalhes: { codigo: number } } | null;
 type ContextoEdicaoPorProcesso = { codigo: number } | null;

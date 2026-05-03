@@ -1,5 +1,5 @@
 import {storeToRefs} from "pinia";
-import {computed, toValue, type MaybeRefOrGetter, type Ref} from "vue";
+import {computed, type MaybeRefOrGetter, type Ref, toValue} from "vue";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useMapasStore} from "@/stores/mapas";

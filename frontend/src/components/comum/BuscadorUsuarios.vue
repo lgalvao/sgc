@@ -46,12 +46,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
-import { BFormInput, BListGroup, BListGroupItem, BSpinner } from 'bootstrap-vue-next';
-import { pesquisarUsuarios } from '@/services/usuarioService';
-import type { UsuarioPesquisa } from '@/types/tipos';
-import { logger } from '@/utils';
-import { useNotification } from '@/composables/useNotification';
+import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
+import {BFormInput, BListGroup, BListGroupItem, BSpinner} from 'bootstrap-vue-next';
+import {pesquisarUsuarios} from '@/services/usuarioService';
+import type {UsuarioPesquisa} from '@/types/tipos';
+import {logger} from '@/utils';
+import {useNotification} from '@/composables/useNotification';
 
 const termo = defineModel<string>('termo', { default: '' });
 const selecionado = defineModel<string | null>('selecionado', { default: null });

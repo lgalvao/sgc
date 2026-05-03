@@ -1,5 +1,5 @@
 import {ref, type Ref} from "vue";
-import {obterSugestoesMapa, apresentarSugestoes} from "@/services/subprocessoService";
+import {apresentarSugestoes, obterSugestoesMapa} from "@/services/subprocessoService";
 import logger from "@/utils/logger";
 import {TEXTOS} from "@/constants/textos";
 import type {VarianteAlerta} from "@/composables/useNotification";

@@ -2,11 +2,11 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade,
+    buscarCodigosUnidadesComMapaVigente,
+    buscarDiagnosticoOrganizacional,
     buscarReferenciaMapaVigente,
     buscarTodasUnidades,
-    buscarUnidadePorCodigo,
-    buscarDiagnosticoOrganizacional,
-    buscarCodigosUnidadesComMapaVigente
+    buscarUnidadePorCodigo
 } from '../unidadeService';
 import * as apiUtils from '@/utils/apiUtils';
 

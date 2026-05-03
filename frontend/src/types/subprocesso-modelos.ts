@@ -1,5 +1,5 @@
 import type {Atividade} from "./mapa";
-import type {Usuario, Unidade} from "./organizacao";
+import type {Unidade, Usuario} from "./organizacao";
 
 export enum SituacaoSubprocesso {
   NAO_INICIADO = "NAO_INICIADO",

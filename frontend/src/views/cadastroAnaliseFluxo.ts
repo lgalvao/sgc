@@ -1,10 +1,5 @@
-import {computed, ref, type ComputedRef, type Ref} from "vue";
-import type {
-    AceitarCadastroRequest,
-    Analise,
-    DevolverCadastroRequest,
-    HomologarCadastroRequest,
-} from "@/types/tipos";
+import {computed, type ComputedRef, ref, type Ref} from "vue";
+import type {AceitarCadastroRequest, Analise, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
 
 type AcaoPrincipalCadastro = {
     codigo: "ACEITAR" | "HOMOLOGAR";

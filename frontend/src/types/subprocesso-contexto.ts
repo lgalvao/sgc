@@ -1,6 +1,6 @@
 import type {TipoProcesso} from "./comum";
 import type {Atividade, MapaCompleto, MapaResumo} from "./mapa";
-import type {Usuario, Unidade} from "./organizacao";
+import type {Unidade, Usuario} from "./organizacao";
 import type {Movimentacao, ResponsavelDto, SituacaoSubprocesso, Subprocesso} from "./subprocesso-modelos";
 
 export interface PermissoesSubprocesso {

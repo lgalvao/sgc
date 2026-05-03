@@ -1,5 +1,5 @@
-import {describe, it, expect, beforeEach, vi} from "vitest";
-import {setActivePinia, createPinia} from "pinia";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {createPinia, setActivePinia} from "pinia";
 import {useHistoricoStore} from "../historico";
 import * as processoService from "@/services/processoService";
 

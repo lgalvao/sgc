@@ -1,9 +1,9 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import {
-  buscarArvoreUnidade,
-  buscarArvoreComElegibilidade,
-  buscarReferenciaMapaVigente
+    buscarArvoreComElegibilidade,
+    buscarArvoreUnidade,
+    buscarReferenciaMapaVigente
 } from "@/services/unidadeService";
 import type {MapaVigenteReferencia, Unidade} from "@/types/tipos";
 import {logger} from "@/utils";

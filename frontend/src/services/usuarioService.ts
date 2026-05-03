@@ -1,9 +1,4 @@
-import type {
-    FluxoLoginResponseDto,
-    PerfilUnidadeDto,
-    PermissoesSessaoDto,
-    SessaoLoginDto
-} from "@/types/dtos";
+import type {FluxoLoginResponseDto, PerfilUnidadeDto, PermissoesSessaoDto, SessaoLoginDto} from "@/types/dtos";
 import type {FluxoLogin, PerfilUnidade, PermissoesSessao, SessaoLogin} from "@/types/autenticacao";
 import {Perfil, type UsuarioPesquisa} from "@/types/tipos";
 import {apiGet, apiPost} from "@/utils/apiUtils";

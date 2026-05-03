@@ -1,11 +1,11 @@
 import {describe, expect, it} from 'vitest';
 import {
-  formatDateBR,
-  isDateStrictlyFuture,
-  isDateValidAndFuture,
-  obterAmanhaFormatado,
-  obterHojeFormatado,
-  parseDate
+    formatDateBR,
+    isDateStrictlyFuture,
+    isDateValidAndFuture,
+    obterAmanhaFormatado,
+    obterHojeFormatado,
+    parseDate
 } from '../dateUtils';
 
 describe('dateUtils', () => {

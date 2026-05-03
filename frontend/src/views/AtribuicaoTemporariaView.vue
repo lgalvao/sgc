@@ -138,16 +138,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BButton,
-  BCol,
-  BForm,
-  BFormGroup,
-  BFormInvalidFeedback,
-  BFormTextarea,
-  BRow
-} from "bootstrap-vue-next";
+import {BAlert, BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BFormTextarea, BRow} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";

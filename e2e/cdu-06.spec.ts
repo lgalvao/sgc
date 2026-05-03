@@ -16,9 +16,9 @@ import {
 } from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {
-    obterAcaoCabecalhoSubprocesso,
     esperarPaginaDetalhesProcesso,
     navegarParaSubprocesso,
+    obterAcaoCabecalhoSubprocesso,
     verificarPaginaPainel
 } from './helpers/helpers-navegacao.js';
 

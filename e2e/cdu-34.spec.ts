@@ -1,6 +1,10 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
-import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {
+    navegarParaSubprocesso,
+    obterAcaoCabecalhoSubprocesso,
+    verificarPaginaPainel
+} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 

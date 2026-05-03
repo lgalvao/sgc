@@ -3,11 +3,11 @@ import path from "node:path";
 import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {
+    analisarCruftFrontend,
     CAMINHO_BUDGET_PADRAO,
     CAMINHO_WAIVERS_PADRAO,
-    DIRETORIO_SAIDA_PADRAO,
-    analisarCruftFrontend,
     carregarWaivers,
+    DIRETORIO_SAIDA_PADRAO,
     gravarSnapshotAuditoria
 } from "./cruft-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";

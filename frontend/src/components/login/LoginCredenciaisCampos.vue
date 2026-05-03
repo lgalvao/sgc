@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  BAlert,
-  BButton,
-  BFormGroup,
-  BFormInput,
-  BFormInvalidFeedback,
-  BInputGroup,
-} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormGroup, BFormInput, BFormInvalidFeedback, BInputGroup,} from "bootstrap-vue-next";
 import {TEXTOS} from "@/constants/textos";
 
 interface Props {

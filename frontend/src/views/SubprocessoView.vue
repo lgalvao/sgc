@@ -89,11 +89,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BButton,
-  useToast
-} from "bootstrap-vue-next";
+import {BAlert, BButton, useToast} from "bootstrap-vue-next";
 import {computed} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";

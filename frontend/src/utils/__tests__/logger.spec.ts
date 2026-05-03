@@ -1,8 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
+import {getLogLevel} from '../logger';
 
 vi.unmock("@/utils/logger");
-
-import {getLogLevel} from '../logger';
 
 describe('logger', () => {
   describe('getLogLevel', () => {

@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
 import {BCard, BCardBody, BCardTitle} from "bootstrap-vue-next";
+
 interface LinhaRelatorioAndamento {
   siglaUnidade: string;
   nomeUnidade: string;

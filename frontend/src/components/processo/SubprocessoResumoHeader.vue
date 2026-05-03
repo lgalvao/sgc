@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {computed, unref, type Ref} from "vue";
-import {BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
+import {computed, type Ref, unref} from "vue";
+import {BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import type {ResponsavelDto, SubprocessoDetalhe} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";

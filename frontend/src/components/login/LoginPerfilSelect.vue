@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import {
-  BFormGroup,
-  BFormInvalidFeedback,
-  BFormSelect,
-  BFormSelectOption,
-} from "bootstrap-vue-next";
+import {BFormGroup, BFormInvalidFeedback, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
 import type {PerfilUnidade} from "@/types/autenticacao";
 import {TEXTOS} from "@/constants/textos";
 

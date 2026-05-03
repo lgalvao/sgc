@@ -1,4 +1,4 @@
-import {describe, it, expect, beforeEach, vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useFluxoSubprocesso} from "../useFluxoSubprocesso";
 import * as cadastroService from "@/services/cadastroService";
 import * as subprocessoService from "@/services/subprocessoService";

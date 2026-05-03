@@ -1,6 +1,6 @@
 import {
-    adicionarCompetencia as adicionarCompetenciaService,
     aceitarValidacao as aceitarValidacaoService,
+    adicionarCompetencia as adicionarCompetenciaService,
     atualizarCompetencia as atualizarCompetenciaService,
     devolverValidacao as devolverValidacaoService,
     disponibilizarMapa as disponibilizarMapaService,

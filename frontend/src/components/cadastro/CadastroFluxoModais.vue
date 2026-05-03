@@ -7,11 +7,7 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalAceiteCadastro from "@/components/cadastro/ModalAceiteCadastro.vue";
 import ModalDevolucaoCadastro from "@/components/cadastro/ModalDevolucaoCadastro.vue";
-import type {
-  Analise,
-  AtividadeOperacaoResponse,
-  ImpactoMapa,
-} from "@/types/tipos";
+import type {Analise, AtividadeOperacaoResponse, ImpactoMapa,} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 interface DadosRemocao {

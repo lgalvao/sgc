@@ -1,4 +1,4 @@
-import {describe, it, expect, beforeEach, vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useInvalidacaoNavegacao} from "../useInvalidacaoNavegacao";
 import {usePainelStore} from "@/stores/painel";
 import {useProcessoStore} from "@/stores/processo";

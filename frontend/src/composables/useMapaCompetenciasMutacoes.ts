@@ -1,4 +1,4 @@
-import {ref, type ComputedRef, type Ref} from "vue";
+import {type ComputedRef, ref, type Ref} from "vue";
 import type {Competencia, MapaCompleto, SalvarCompetenciaRequest} from "@/types/tipos";
 import type {NormalizedError} from "@/utils/apiError";
 import {normalizeError} from "@/utils/apiError";

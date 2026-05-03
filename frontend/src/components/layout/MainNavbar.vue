@@ -121,7 +121,17 @@
 </template>
 
 <script lang="ts" setup>
-import {BCollapse, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BNavItem, BNavItemDropdown, BDropdownItem, vBTooltip} from "bootstrap-vue-next";
+import {
+  BCollapse,
+  BDropdownItem,
+  BNavbar,
+  BNavbarBrand,
+  BNavbarNav,
+  BNavbarToggle,
+  BNavItem,
+  BNavItemDropdown,
+  vBTooltip
+} from "bootstrap-vue-next";
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";

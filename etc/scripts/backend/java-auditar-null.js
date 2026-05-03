@@ -4,7 +4,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {imprimirCabecalho, escreverLinha} from "../lib/saida.js";
+import {escreverLinha, imprimirCabecalho} from "../lib/saida.js";
 import {globby} from "globby";
 
 const SOURCE_DIR = resolverNaRaiz('backend/src/main/java/sgc');

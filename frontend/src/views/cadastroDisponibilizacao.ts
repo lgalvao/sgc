@@ -1,4 +1,4 @@
-import {computed, ref, type ComputedRef, type Ref} from "vue";
+import {computed, type ComputedRef, ref, type Ref} from "vue";
 import type {Atividade, ErroValidacao} from "@/types/tipos";
 import {SituacaoSubprocesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
