@@ -36,7 +36,7 @@
     {
       "arquivo": "frontend/src/views/NotificacoesAdminView.vue",
       "camada": "view",
-      "maxLinhas": 490,
+      "maxLinhas": 462,
       "responsavel": "frontend",
       "justificativa": "Tela administrativa ainda combina filtros, fluxo e tabela extensa.",
       "criterioRemocao": "Separar busca, listagem e acoes de notificacao."
@@ -44,7 +44,7 @@
     {
       "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
       "camada": "view",
-      "maxLinhas": 470,
+      "maxLinhas": 466,
       "responsavel": "frontend",
       "justificativa": "Tela de cadastro de processo ainda centraliza formulario e orquestracao.",
       "criterioRemocao": "Extrair secoes do formulario e bootstrap de dados."
@@ -52,7 +52,7 @@
     {
       "arquivo": "frontend/src/views/AtribuicaoTemporariaView.vue",
       "camada": "view",
-      "maxLinhas": 312,
+      "maxLinhas": 285,
       "responsavel": "frontend",
       "justificativa": "Tela ainda agrega busca, formulario e listagem.",
       "criterioRemocao": "Extrair formulario e listagem da atribuicao temporaria."
@@ -84,7 +84,7 @@
     {
       "arquivo": "frontend/src/components/atividades/AtividadeItem.vue",
       "camada": "component",
-      "maxLinhas": 303,
+      "maxLinhas": 304,
       "responsavel": "frontend",
       "justificativa": "Item de atividade ainda concentra varios modos de edicao e exibicao.",
       "criterioRemocao": "Extrair acoes inline e blocos condicionais do item."
@@ -108,7 +108,7 @@
     {
       "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
       "camada": "composable",
-      "maxLinhas": 174,
+      "maxLinhas": 225,
       "responsavel": "frontend",
       "justificativa": "Composable ainda concentra fluxo amplo do subprocesso.",
       "criterioRemocao": "Separar bootstrap, navegacao e mutacoes do subprocesso."

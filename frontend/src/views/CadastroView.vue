@@ -362,6 +362,7 @@ const {
   scrollParaPrimeiroErro,
   validarCadastro: fluxoSubprocesso.validarCadastro,
   disponibilizarCadastroFluxo: fluxoSubprocesso.disponibilizarCadastro,
+  disponibilizarRevisaoCadastroFluxo: fluxoSubprocesso.disponibilizarRevisaoCadastro,
 });
 
 const erroGlobalFormatado = computed(() =>

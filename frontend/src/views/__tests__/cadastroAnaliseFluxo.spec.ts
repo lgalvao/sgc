@@ -21,8 +21,11 @@ describe('cadastroAnaliseFluxo.ts', () => {
     focarPrimeiroErroInvalido: vi.fn().mockResolvedValue(undefined),
     listarAnalisesCadastro: vi.fn().mockResolvedValue([{dataHora: '2023-01-01', observacoes: 'teste'}]),
     homologarCadastro: vi.fn().mockResolvedValue(true),
+    homologarRevisaoCadastro: vi.fn().mockResolvedValue(true),
     aceitarCadastro: vi.fn().mockResolvedValue(true),
+    aceitarRevisaoCadastro: vi.fn().mockResolvedValue(true),
     devolverCadastro: vi.fn().mockResolvedValue(true),
+    devolverRevisaoCadastro: vi.fn().mockResolvedValue(true),
   })
 
   it('deve abrir o histórico e carregar as análises', async () => {
@@ -55,7 +58,7 @@ describe('cadastroAnaliseFluxo.ts', () => {
       observacaoValidacao.value = 'Obs Teste'
       await confirmarValidacaoAnalise()
 
-      expect(deps.aceitarCadastro).toHaveBeenCalledWith(123, {observacoes: 'Obs Teste'}, false, {
+      expect(deps.aceitarCadastro).toHaveBeenCalledWith(123, {observacoes: 'Obs Teste'}, {
         mensagemSucesso: 'Sucesso'
       })
       expect(deps.mostrarModalValidarAnalise.value).toBe(false)
@@ -73,7 +76,7 @@ describe('cadastroAnaliseFluxo.ts', () => {
       const {confirmarValidacaoAnalise} = useCadastroAnaliseFluxo(deps)
       await confirmarValidacaoAnalise()
 
-      expect(deps.homologarCadastro).toHaveBeenCalledWith(123, {observacoes: ''}, false, {
+      expect(deps.homologarCadastro).toHaveBeenCalledWith(123, {observacoes: ''}, {
         mensagemSucesso: 'Homologado',
         redirecionarParaPainel: false,
         redirecionarPara: {name: 'Subprocesso', params: {codProcesso: 1, siglaUnidade: 'TEST'}}
@@ -92,12 +95,26 @@ describe('cadastroAnaliseFluxo.ts', () => {
       const {confirmarValidacaoAnalise} = useCadastroAnaliseFluxo(deps)
       await confirmarValidacaoAnalise()
 
-      expect(deps.homologarCadastro).toHaveBeenCalledWith(123, {observacoes: ''}, false, {
+      expect(deps.homologarCadastro).toHaveBeenCalledWith(123, {observacoes: ''}, {
         mensagemSucesso: 'Homologado',
         redirecionarParaPainel: true,
         redirecionarPara: undefined
       })
     })
+
+    it('deve chamar aceitarRevisaoCadastro quando isRevisao for true', async () => {
+        const deps = criarDependencias()
+        deps.isRevisao = computed(() => true)
+        const {confirmarValidacaoAnalise, observacaoValidacao} = useCadastroAnaliseFluxo(deps)
+        
+        observacaoValidacao.value = 'Obs Revisão'
+        await confirmarValidacaoAnalise()
+  
+        expect(deps.aceitarRevisaoCadastro).toHaveBeenCalledWith(123, {observacoes: 'Obs Revisão'}, {
+          mensagemSucesso: 'Sucesso'
+        })
+        expect(deps.aceitarCadastro).not.toHaveBeenCalled()
+      })
   })
 
   describe('confirmarDevolucaoAnalise', () => {
@@ -121,10 +138,22 @@ describe('cadastroAnaliseFluxo.ts', () => {
       observacaoDevolucao.value = 'Obs Devolução'
       await confirmarDevolucaoAnalise()
 
-      expect(deps.devolverCadastro).toHaveBeenCalledWith(123, {observacoes: 'Obs Devolução'}, false)
+      expect(deps.devolverCadastro).toHaveBeenCalledWith(123, {observacoes: 'Obs Devolução'})
       expect(deps.mostrarModalDevolverAnalise.value).toBe(false)
       expect(observacaoDevolucao.value).toBe('')
     })
+
+    it('deve chamar devolverRevisaoCadastro quando isRevisao for true', async () => {
+        const deps = criarDependencias()
+        deps.isRevisao = computed(() => true)
+        const {confirmarDevolucaoAnalise, observacaoDevolucao} = useCadastroAnaliseFluxo(deps)
+        
+        observacaoDevolucao.value = 'Obs Devolução Revisão'
+        await confirmarDevolucaoAnalise()
+  
+        expect(deps.devolverRevisaoCadastro).toHaveBeenCalledWith(123, {observacoes: 'Obs Devolução Revisão'})
+        expect(deps.devolverCadastro).not.toHaveBeenCalled()
+      })
   })
 
   it('deve limpar observações ao fechar modais', () => {

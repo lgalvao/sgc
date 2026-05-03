@@ -235,6 +235,7 @@ const {
   exibirToastPendente,
   alterarDataLimiteSubprocesso: fluxoSubprocesso.alterarDataLimiteSubprocesso,
   reabrirCadastro: fluxoSubprocesso.reabrirCadastro,
+  reabrirRevisaoCadastro: fluxoSubprocesso.reabrirRevisaoCadastro,
   enviarLembrete: enviarLembreteService,
   garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
 });

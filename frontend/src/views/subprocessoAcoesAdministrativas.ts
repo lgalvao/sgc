@@ -18,7 +18,8 @@ type DependenciasSubprocessoAcoesAdministrativas = {
     atualizarSubprocessoAtual: () => Promise<void>;
     exibirToastPendente: () => void;
     alterarDataLimiteSubprocesso: (codigoSubprocesso: number, payload: { novaData: string }) => Promise<unknown>;
-    reabrirCadastro: (codigoSubprocesso: number, justificativa: string, isRevisao: boolean) => Promise<boolean>;
+    reabrirCadastro: (codigoSubprocesso: number, justificativa: string) => Promise<boolean>;
+    reabrirRevisaoCadastro: (codigoSubprocesso: number, justificativa: string) => Promise<boolean>;
     enviarLembrete: (codProcesso: number, unidadeCodigo: number) => Promise<unknown>;
     garantirContextoEdicao: (codigoSubprocesso: number, limpar: boolean) => Promise<unknown>;
 };
@@ -37,6 +38,7 @@ export function useSubprocessoAcoesAdministrativas({
     exibirToastPendente,
     alterarDataLimiteSubprocesso,
     reabrirCadastro,
+    reabrirRevisaoCadastro,
     enviarLembrete,
     garantirContextoEdicao,
 }: DependenciasSubprocessoAcoesAdministrativas) {
@@ -113,21 +115,22 @@ export function useSubprocessoAcoesAdministrativas({
     }
 
     async function confirmarReabertura() {
-        const codigo = codigoSubprocesso.value;
-        if (!codigo) return;
-
-        if (!validarSubmissao(Boolean(justificativaReabertura.value.trim()))) {
+        if (!validarSubmissao(!!justificativaReabertura.value.trim())) {
             void focarPrimeiroErroInvalido();
             return;
         }
 
-        await executarComCarregamento(loadingReabertura, async () => {
-            const sucesso = await reabrirCadastro(codigo, justificativaReabertura.value, tipoReabertura.value === "revisao");
-            if (!sucesso) return;
+        const codigo = codigoSubprocesso.value;
+        if (!codigo) return;
 
-            fecharModalReabrir();
-            exibirToastPendente();
-            await atualizarSubprocessoAtual();
+        await executarComCarregamento(loadingReabertura, async () => {
+            const fn = tipoReabertura.value === "revisao" ? reabrirRevisaoCadastro : reabrirCadastro;
+            const sucesso = await fn(codigo, justificativaReabertura.value);
+            if (sucesso) {
+                fecharModalReabrir();
+                exibirToastPendente();
+                await atualizarSubprocessoAtual();
+            }
         });
     }
 

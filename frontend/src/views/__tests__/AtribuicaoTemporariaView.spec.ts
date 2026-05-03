@@ -6,7 +6,6 @@ import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService'
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {createPinia, setActivePinia} from 'pinia';
 import type {Unidade} from '@/types/tipos';
-import {TEXTOS} from "@/constants/textos";
 
 const unidadeMinima: Unidade = {codigo: 1, sigla: 'TESTE', nome: 'Unidade de Teste'};
 

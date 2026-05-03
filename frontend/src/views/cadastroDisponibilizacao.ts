@@ -22,7 +22,8 @@ type DependenciasCadastroDisponibilizacao = {
     nextTick: typeof import("vue").nextTick;
     scrollParaPrimeiroErro: () => void;
     validarCadastro: (codigoSubprocesso: number) => Promise<ResultadoValidacaoCadastro | null | undefined>;
-    disponibilizarCadastroFluxo: (codigoSubprocesso: number, isRevisao: boolean) => Promise<unknown>;
+    disponibilizarCadastroFluxo: (codigoSubprocesso: number) => Promise<unknown>;
+    disponibilizarRevisaoCadastroFluxo: (codigoSubprocesso: number) => Promise<unknown>;
 };
 
 export function useCadastroDisponibilizacao({
@@ -37,6 +38,7 @@ export function useCadastroDisponibilizacao({
     scrollParaPrimeiroErro,
     validarCadastro,
     disponibilizarCadastroFluxo,
+    disponibilizarRevisaoCadastroFluxo,
 }: DependenciasCadastroDisponibilizacao) {
     const loadingValidacao = ref(false);
     const loadingDisponibilizacao = ref(false);
@@ -49,7 +51,7 @@ export function useCadastroDisponibilizacao({
         errosValidacao.value.forEach((erro) => {
             if (!erro.atividadeCodigo) return;
             const atividade = atividades.value.find((item) => item.codigo === erro.atividadeCodigo);
-            if (!atividade || !atividade.conhecimentos || atividade.conhecimentos.length === 0) {
+            if (!atividade?.conhecimentos || atividade.conhecimentos.length === 0) {
                 mapa.set(erro.atividadeCodigo, erro.mensagem);
             }
         });
@@ -149,7 +151,8 @@ export function useCadastroDisponibilizacao({
 
         loadingDisponibilizacao.value = true;
         try {
-            await disponibilizarCadastroFluxo(codigo, isRevisao.value);
+            const fn = isRevisao.value ? disponibilizarRevisaoCadastroFluxo : disponibilizarCadastroFluxo;
+            await fn(codigo);
         } finally {
             loadingDisponibilizacao.value = false;
         }
