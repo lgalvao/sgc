@@ -201,7 +201,6 @@ const {
   siglaUnidade: props.siglaUnidade,
   codSubprocesso: props.codSubprocesso,
   erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
-  dadosValidosEdicao: subprocessoStore.dadosValidosEdicao,
   garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
   garantirContextoEdicaoPorProcessoEUnidade: subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade,
   invalidarMapa: mapasStore.invalidar,

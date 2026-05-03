@@ -170,15 +170,14 @@ describe("subprocesso store (cache e dedupe)", () => {
         it("deve validar dados de edicao", () => {
             const store = useSubprocessoStore();
             store.contextoEdicao = { detalhes: { codigo: 10 } } as any;
-            expect(store.dadosValidosEdicao(10)).toBe(true);
-            expect(store.dadosValidosEdicao(20)).toBe(false);
+            store.invalidar();
+            expect(store.contextoEdicao?.detalhes.codigo).toBe(10);
         });
 
         it("deve validar dados de cadastro", () => {
             const store = useSubprocessoStore();
             store.contextoCadastro = { detalhes: { codigo: 10 } } as any;
-            expect(store.dadosValidosCadastro(10)).toBe(true);
-            expect(store.dadosValidosCadastro(20)).toBe(false);
+            expect(store.contextoCadastro?.detalhes.codigo).toBe(10);
         });
     });
 
@@ -261,8 +260,6 @@ describe("subprocesso store (cache e dedupe)", () => {
 
             expect(store.contextoEdicao?.detalhes.codigo).toBe(1);
             expect(store.contextoCadastro?.detalhes.codigo).toBe(2);
-            expect(store.dadosValidosEdicao(1)).toBe(false);
-            expect(store.dadosValidosCadastro(2)).toBe(false);
             expect(store.erroIntegracaoContexto).toBeNull();
         });
 

@@ -83,8 +83,6 @@ const subprocessoStoreMock = reactive({
     garantirContextoEdicao: vi.fn(),
     invalidar: vi.fn(),
     limparErroIntegracao: vi.fn(),
-    dadosValidosEdicao: vi.fn().mockReturnValue(false),
-    dadosValidosCadastro: vi.fn().mockReturnValue(false),
 });
 
 vi.mock('@/composables/useFluxoSubprocesso', () => ({
@@ -261,21 +259,12 @@ describe('SubprocessoView.vue', () => {
         expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true);
     });
 
-    it('recarrega dados ao reativar a view em keepAlive apenas se dados forem inválidos', async () => {
+    it('recarrega dados ao reativar a view em keepAlive', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
 
         const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
-        
-        subprocessoStoreMock.dadosValidosEdicao.mockReturnValue(true);
-        for (const hook of hooks) {
-            await hook.call(wrapper.vm);
-        }
-        await flushPromises();
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
-
-        subprocessoStoreMock.dadosValidosEdicao.mockReturnValue(false);
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }

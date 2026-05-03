@@ -8,7 +8,6 @@ type DependenciasSubprocessoCarregamento = {
     siglaUnidade: string;
     codSubprocesso?: number;
     erroIntegracaoContexto: ComputedRef<unknown>;
-    dadosValidosEdicao: (codigoSubprocesso: number) => boolean;
     garantirContextoEdicao: (codigoSubprocesso: number, limpar: boolean) => Promise<ContextoEdicaoDireto>;
     garantirContextoEdicaoPorProcessoEUnidade: (
         codProcesso: number,
@@ -24,7 +23,6 @@ export function useSubprocessoCarregamento({
     siglaUnidade,
     codSubprocesso,
     erroIntegracaoContexto,
-    dadosValidosEdicao,
     garantirContextoEdicao,
     garantirContextoEdicaoPorProcessoEUnidade,
     invalidarMapa,
@@ -80,7 +78,6 @@ export function useSubprocessoCarregamento({
     onActivated(async () => {
         exibirToastPendente();
         if (!carregamentoInicialConcluido.value) return;
-        if (codigoSubprocesso.value && dadosValidosEdicao(codigoSubprocesso.value)) return;
         await carregarSubprocesso();
     });
 

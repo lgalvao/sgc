@@ -62,12 +62,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         erroIntegracaoContexto.value = null;
     }
 
-    function limparContextoSeNecessario(limparAntes: boolean): void {
-        if (limparAntes) {
-            limparContextoAtual();
-        }
-    }
-
     function invalidar(): void {
         carregamentos.clear();
         contextoEdicaoInvalido.value = contextoEdicao.value !== null;
@@ -130,7 +124,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         limparAntes: boolean,
         config: ConfigContexto<T>,
     ): Promise<T | null> {
-        limparContextoSeNecessario(limparAntes);
+        if (limparAntes) limparContextoAtual();
         if (dadosValidos(config.contextoRef, config.contextoInvalidoRef, codigoSubprocesso)) {
             return config.contextoRef.value;
         }
@@ -153,7 +147,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         limparAntes: boolean,
         config: ConfigContexto<T>,
     ): Promise<{ codigo: number; contexto: T } | null> {
-        limparContextoSeNecessario(limparAntes);
+        if (limparAntes) limparContextoAtual();
         const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
         const codigoMapeado = config.codigosPorProcessoUnidade.get(chaveProcessoUnidade);
         if (typeof codigoMapeado === "number") {
@@ -240,14 +234,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         atualizarDetalhesContexto(contextoCadastro, contextoCadastroInvalido, status);
     }
 
-    function dadosValidosEdicao(codigoSubprocesso: number): boolean {
-        return dadosValidos(contextoEdicao, contextoEdicaoInvalido, codigoSubprocesso);
-    }
-
-    function dadosValidosCadastro(codigoSubprocesso: number): boolean {
-        return dadosValidos(contextoCadastro, contextoCadastroInvalido, codigoSubprocesso);
-    }
-
     return {
         contextoEdicao,
         contextoCadastro,
@@ -261,7 +247,5 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         garantirContextoCadastroAtividades,
         garantirContextoCadastroAtividadesPorProcessoEUnidade,
         atualizarStatusLocal,
-        dadosValidosEdicao,
-        dadosValidosCadastro,
     };
 });

@@ -17,7 +17,6 @@ describe('subprocessoCarregamento.ts', () => {
     siglaUnidade: 'TEST',
     codSubprocesso: undefined as number | undefined,
     erroIntegracaoContexto: computed(() => null),
-    dadosValidosEdicao: vi.fn(() => true),
     garantirContextoEdicao: vi.fn().mockResolvedValue(null),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn().mockResolvedValue(null),
     invalidarMapa: vi.fn(),
@@ -99,16 +98,8 @@ describe('subprocessoCarregamento.ts', () => {
     const wrapper = mount(TestComponent(deps))
     await flushPromises()
     
-    // Caso 1: Dados já são válidos (não deve recarregar)
     deps.garantirContextoEdicaoPorProcessoEUnidade.mockClear()
-    deps.dadosValidosEdicao.mockReturnValue(true)
-    
-    // @ts-expect-error - Acessando hook privado do vue para simular ativação
-    await wrapper.vm.$.a?.[0]() 
-    expect(deps.garantirContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled()
-    
-    // Caso 2: Dados inválidos (deve recarregar)
-    deps.dadosValidosEdicao.mockReturnValue(false)
+
     // @ts-expect-error - Acessando hook privado do vue para simular ativação
     await wrapper.vm.$.a?.[0]()
     expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false)
