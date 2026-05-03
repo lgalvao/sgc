@@ -23,7 +23,8 @@ export default defineConfig({
         env: {
             ...process.env,
             SGC_PERFIL: 'e2e',
-            SGC_LIFECYCLE_REUTILIZAR_EXISTENTE: 'off'
+            SGC_LIFECYCLE_REUTILIZAR_EXISTENTE: 'off',
+            VITE_FEEDBACK_WIDGET: 'true'
         },
         url: `http://localhost:${frontendPort}`,
         reuseExistingServer: false,
