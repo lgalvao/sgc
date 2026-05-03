@@ -23,7 +23,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api/feedback")
-@Profile("hom")
+@Profile({"hom", "e2e"})
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
 public class FeedbackController {

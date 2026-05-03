@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
-import {useToast} from 'bootstrap-vue-next'
+import {BOrchestrator, useToast} from 'bootstrap-vue-next'
 import FeedbackButton from './FeedbackButton.vue'
 import FeedbackModal from './FeedbackModal.vue'
 import {useFeedback} from '@/composables/useFeedback'
@@ -61,6 +61,7 @@ function aoFechar() {
 </script>
 
 <template>
+    <BOrchestrator />
     <Teleport to="body">
         <FeedbackButton
             :estado="enviando ? 'carregando' : estadoBotao"

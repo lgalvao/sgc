@@ -15,6 +15,8 @@ const TIMEOUT_CAPTURA_MS = 5_000
 export function useFeedback() {
     const captura = ref<Blob | null>(null)
     const enviando = ref(false)
+    const route = useRoute()
+    const perfilStore = usePerfilStore()
 
     async function capturarTela(): Promise<void> {
         try {
@@ -39,8 +41,7 @@ export function useFeedback() {
     }
 
     function montarMetadados(): MetadadosFeedback {
-        const route = useRoute()
-        const perfilStore = usePerfilStore()
+
 
         return {
             usuarioCodigo: perfilStore.usuarioCodigo ?? '',
@@ -76,7 +77,7 @@ export function useFeedback() {
                 form.append('screenshot', captura.value, 'screenshot.webp')
             }
 
-            await apiClient.post('/api/feedback', form, {
+            await apiClient.post('/feedback', form, {
                 headers: {'Content-Type': 'multipart/form-data'},
             })
         } finally {

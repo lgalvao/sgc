@@ -66,11 +66,13 @@ function abrirCapturaEmNovaAba() {
 <template>
     <BModal
         :model-value="visivel"
-        title="Enviar feedback"
         hide-footer
         data-testid="feedback-modal"
         @hide="emit('fechar')"
     >
+        <template #title>
+            <span data-testid="feedback-modal-title">Enviar feedback</span>
+        </template>
         <form @submit.prevent="submeter">
             <!-- Prévia da captura de tela -->
             <div v-if="urlCaptura" class="mb-3">
@@ -86,12 +88,14 @@ function abrirCapturaEmNovaAba() {
                             :src="urlCaptura"
                             alt="Prévia da captura de tela"
                             class="img-thumbnail feedback-thumbnail"
+                            data-testid="feedback-thumbnail"
                             style="max-width: 200px"
                         />
                     </button>
                     <button
                         class="btn btn-sm btn-link text-danger p-0"
                         type="button"
+                        data-testid="feedback-btn-remover-captura"
                         @click="emit('removerCaptura')"
                     >
                         Remover captura
@@ -101,12 +105,22 @@ function abrirCapturaEmNovaAba() {
 
             <!-- Classificação -->
             <BFormGroup class="mb-3" label="Tipo de feedback">
-                <BFormRadioGroup
-                    v-model="tipo"
-                    :options="opcoesType"
-                    data-testid="feedback-tipo"
-                    stacked
-                />
+                <div class="d-flex flex-column gap-2">
+                    <div v-for="opcao in opcoesType" :key="opcao.value" class="form-check">
+                        <input
+                            :id="'tipo-' + opcao.value"
+                            v-model="tipo"
+                            class="form-check-input"
+                            type="radio"
+                            :name="'feedback-tipo'"
+                            :value="opcao.value"
+                            :data-testid="'feedback-tipo-' + opcao.value"
+                        />
+                        <label class="form-check-label" :for="'tipo-' + opcao.value">
+                            {{ opcao.text }}
+                        </label>
+                    </div>
+                </div>
             </BFormGroup>
 
             <!-- Nota / descrição -->
@@ -136,6 +150,7 @@ function abrirCapturaEmNovaAba() {
                     class="btn btn-secondary"
                     type="button"
                     :disabled="enviando"
+                    data-testid="feedback-btn-cancelar"
                     @click="emit('fechar')"
                 >
                     Cancelar

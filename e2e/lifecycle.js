@@ -325,7 +325,8 @@ function startBackend() {
             `--sgc.monitoramento.tempo-minimo-java-ms=${TEMPO_MINIMO_JAVA_MS}`,
             `--sgc.monitoramento.tempo-http-lento-ms=${TEMPO_MINIMO_HTTP_MS}`,
             `--logging.level.sgc=${NIVEL_LOG_MONITORAMENTO}`,
-            `--logging.level.sgc.monitoramento=INFO`
+            `--logging.level.sgc.monitoramento=INFO`,
+            `--sgc.feedback.screenshot-dir=./build/e2e-feedback-screenshots`
         ].join(' ');
     const argsGradle = isWindows ? `--args="${argsAplicacao}"` : `--args=${argsAplicacao}`;
 
