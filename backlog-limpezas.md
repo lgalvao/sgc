@@ -25,13 +25,8 @@ Este documento reflete o estado atual do sistema após rodadas de refatoração 
 
 ## 🚀 Próximas Ações
 
-### P2 - Próximos Passos
+### Próximos Passos
 - [ ] **Ajuste de Cobertura (Gaps)**: Atacar arquivos com baixa cobertura de funções (ex: `UnidadeView.vue` e `analiseFluxo.ts`) para atingir os 90%.
 
-### P2 - Qualidade e Ratcheting
-- [x] **Ratcheting de Waivers**: Reduzir os limites em `frontend-cruft-waivers.json`.
-    - [x] `ArvoreUnidades.vue`: Refatorado (de 471 para 194 linhas). Waiver reduzido para 200.
-    - [x] `useArvoreSelecao.ts`: Limpeza estrutural realizada (de 214 para 166 linhas). Waiver removido (dentro do budget).
-    - [x] `axios-setup.ts`: Reduzido para 250 (atual: 248).
-    - [x] `ProcessoCadastroView.vue`: Reduzido para 460 (atual: 456).
+### Qualidade
 - [ ] **Simplificação de Erros**: Unificar redundância no `useErrorHandler.ts` entre erros de rede e de negócio via `normalizarErro`.

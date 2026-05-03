@@ -52,6 +52,7 @@ logging:
     org:
       hibernate: ERROR
       springframework: ERROR
+      springframework.boot.devtools.restart.RestartApplicationListener: ERROR
     com.zaxxer.hikari: ERROR
 
 aplicacao:
@@ -130,6 +131,7 @@ logging:
     org:
       hibernate: ERROR
       springframework: ERROR
+      springframework.boot.devtools.restart.RestartApplicationListener: ERROR
     com.zaxxer.hikari: ERROR
 
 springdoc:
@@ -194,6 +196,7 @@ logging:
   level:
     org.hibernate: WARN
     org.springframework: WARN
+    org.springframework.boot.devtools.restart.RestartApplicationListener: ERROR
 
 ---
 spring:
@@ -229,6 +232,7 @@ logging:
   level:
     org.hibernate: WARN
     org.springframework: WARN
+    org.springframework.boot.devtools.restart.RestartApplicationListener: ERROR
 
 ---
 spring:

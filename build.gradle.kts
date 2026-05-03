@@ -1,6 +1,11 @@
 plugins {
-    alias(libs.plugins.spring.boot)
-    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spring.dependency.management) apply false
+    alias(libs.plugins.spotbugs) apply false
+    alias(libs.plugins.open.rewrite) apply false
+    java
+    jacoco
+    idea
 }
 
 allprojects {
@@ -33,10 +38,10 @@ subprojects {
     plugins.withId("java") {
         configure<JavaPluginExtension> {
             toolchain {
-                languageVersion.set(JavaLanguageVersion.of(21))
+                languageVersion.set(JavaLanguageVersion.of(25))
             }
-            sourceCompatibility = JavaVersion.VERSION_21
-            targetCompatibility = JavaVersion.VERSION_21
+            sourceCompatibility = JavaVersion.VERSION_25
+            targetCompatibility = JavaVersion.VERSION_25
         }
     }
 }

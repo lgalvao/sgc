@@ -55,6 +55,7 @@ logging:
     "[com.zaxxer.hikari]": WARN
     "[org.springframework.boot.autoconfigure.orm.jpa]": WARN
     "[org.springframework]": WARN
+    "[org.springframework.boot.devtools.restart.RestartApplicationListener]": ERROR
     "[org.hibernate.tool.schema.internal.SchemaDropperImpl]": WARN
     sgc: INFO
     "[sgc.infraestrutura.monitoramento]": WARN

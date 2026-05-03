@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BForm} from "bootstrap-vue-next";
+import {BButton, BForm} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
