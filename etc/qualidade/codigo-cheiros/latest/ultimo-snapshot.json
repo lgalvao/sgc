@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-05-03T21:52:12.936Z",
+  "geradoEm": "2026-05-03T21:54:26.074Z",
   "base": "/Users/leonardo/sgc",
   "pontuacao": {
     "total": 1636,
@@ -24,8 +24,8 @@
     "backend_nullable_dto": 0,
     "backend_null_checks": 0,
     "backend_objects_null": 0,
-    "frontend_any_producao": -2,
-    "frontend_any_testes": -1,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": 0,
     "frontend_catch_any": 0,
     "frontend_null_checks": 0,
     "frontend_fallback_or": 0
