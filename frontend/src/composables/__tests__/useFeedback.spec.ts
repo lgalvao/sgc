@@ -117,7 +117,7 @@ describe('useFeedback', () => {
 
         const fb = useFeedback()
 
-        const promessa = fb.enviarFeedback('elogio', 'Sistema muito bom, parabéns ao time')
+        const promessa = fb.enviarFeedback('sugestao', 'Sistema muito bom, parabéns ao time')
         expect(fb.enviando.value).toBe(true)
 
         resolverPost!({data: {id: '1'}})

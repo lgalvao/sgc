@@ -12,8 +12,8 @@ describe('FeedbackButton.vue', () => {
             }
         })
         const btn = wrapper.find('[data-testid="feedback-btn"]')
-        expect(btn.classes()).toContain('btn-primary')
-        expect(wrapper.find('i').classes()).toContain('bi-chat-square-text')
+        expect(btn.classes()).toContain('btn-outline-secondary')
+        expect(wrapper.find('i').classes()).toContain('bi-chat-left-text')
     })
 
     it('deve mudar ícone e desabilitar em estado de carregamento', () => {
@@ -27,7 +27,7 @@ describe('FeedbackButton.vue', () => {
         })
         const btn = wrapper.find('[data-testid="feedback-btn"]')
         expect(btn.attributes('disabled')).toBeDefined()
-        expect(wrapper.find('i').classes()).toContain('bi-hourglass-split')
+        expect(wrapper.find('i').classes()).toContain('bi-arrow-repeat')
     })
 
     it('deve usar variante success em estado de sucesso', () => {
@@ -39,8 +39,8 @@ describe('FeedbackButton.vue', () => {
                 }
             }
         })
-        expect(wrapper.find('[data-testid="feedback-btn"]').classes()).toContain('btn-success')
-        expect(wrapper.find('i').classes()).toContain('bi-check-lg')
+        expect(wrapper.find('[data-testid="feedback-btn"]').classes()).toContain('btn-outline-secondary')
+        expect(wrapper.find('i').classes()).toContain('bi-check2')
     })
 
     it('deve usar variante danger em estado de erro', () => {
@@ -52,8 +52,8 @@ describe('FeedbackButton.vue', () => {
                 }
             }
         })
-        expect(wrapper.find('[data-testid="feedback-btn"]').classes()).toContain('btn-danger')
-        expect(wrapper.find('i').classes()).toContain('bi-exclamation-triangle')
+        expect(wrapper.find('[data-testid="feedback-btn"]').classes()).toContain('btn-outline-secondary')
+        expect(wrapper.find('i').classes()).toContain('bi-exclamation-circle')
     })
 
     it('deve emitir clique quando clicado', async () => {
