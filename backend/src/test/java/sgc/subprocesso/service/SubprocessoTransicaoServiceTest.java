@@ -194,8 +194,10 @@ class SubprocessoTransicaoServiceTest {
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(sp.getUnidade());
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
 
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
@@ -208,9 +210,11 @@ class SubprocessoTransicaoServiceTest {
             sp.setMapa(new sgc.mapa.model.Mapa());
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(sp.getUnidade());
 
             SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Justificativa", null, List.of());
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
 
             service.submeterMapaAjustado(1L, req);
 
@@ -237,7 +241,8 @@ class SubprocessoTransicaoServiceTest {
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
             when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
 
             service.devolverValidacao(1L, "Justif");
 
@@ -308,7 +313,8 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
 
             service.disponibilizarMapa(1L, req);
 

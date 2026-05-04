@@ -333,11 +333,6 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_VALIDADO);
 
         SituacaoSubprocesso novaSituacao = sp.getSituacao();
-        if (novaSituacao == MAPEAMENTO_MAPA_COM_SUGESTOES) {
-            novaSituacao = MAPEAMENTO_MAPA_CRIADO;
-        } else if (novaSituacao == REVISAO_MAPA_COM_SUGESTOES) {
-            novaSituacao = REVISAO_MAPA_AJUSTADO;
-        }
         registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand.aceiteValidacao(
                 sp,
                 novaSituacao,

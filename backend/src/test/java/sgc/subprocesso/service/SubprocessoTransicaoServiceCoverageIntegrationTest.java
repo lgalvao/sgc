@@ -22,7 +22,7 @@ import java.time.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = Sgc.class)
+@SpringBootTest(classes = sgc.Sgc.class)
 @ActiveProfiles("test")
 @Transactional
 class SubprocessoTransicaoServiceCoverageIntegrationTest {
@@ -84,14 +84,14 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
     }
 
     private Usuario criarUsuarioPersistido(Unidade unidade) {
-        Usuario usuario = usuarioRepo.getReferenceById("111111111111");
+        Usuario usuario = usuarioRepo.findById("111111111111").orElseThrow();
         usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
-        return usuario;
+        return usuarioRepo.saveAndFlush(usuario);
     }
 
     private void registrarMovimentacaoInicial(Subprocesso subprocesso) {
         Usuario usuario = usuarioRepo.getReferenceById("111111111111");
-        movimentacaoRepo.save(Movimentacao.builder()
+        movimentacaoRepo.saveAndFlush(Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(subprocesso.getUnidade())
                 .unidadeDestino(subprocesso.getUnidade())
@@ -417,7 +417,8 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             subprocessoRepo.saveAndFlush(sp);
 
-            Usuario user = criarUsuarioPersistido(uSp);
+            // IMPORTANTE: O usuário que devolve deve estar na unidade de análise (onde o subprocesso está localizado)
+            Usuario user = criarUsuarioPersistido(uAnalise);
 
             when(unidadeService.buscarPorSigla("U6")).thenReturn(uSp);
             when(hierarquiaService.isSubordinada(uSp, uAnalise)).thenReturn(true);

@@ -337,7 +337,11 @@ class ProcessoServiceCoverageTest {
         sp.setUnidade(u);
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
-        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+        Usuario usuario = new Usuario();
+        usuario.setUnidadeAtivaCodigo(10L);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        
+        when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
         target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
         verify(cadastroFluxoService).homologarCadastroEmBloco(anyList());
@@ -408,7 +412,11 @@ class ProcessoServiceCoverageTest {
         spValidacao.setUnidade(u2);
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(spCadastro, spValidacao));
-        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+        Usuario usuario = new Usuario();
+        usuario.setUnidadeAtivaCodigo(10L);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        
+        when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
         target.executarAcaoEmBloco(codProc, req);
 

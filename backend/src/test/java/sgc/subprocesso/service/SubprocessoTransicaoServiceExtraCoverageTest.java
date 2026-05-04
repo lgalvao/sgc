@@ -105,7 +105,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
+        Usuario usuario = new Usuario();
+        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.apresentarSugestoes(100L, "sugestoes");
 
@@ -135,7 +138,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
+        Usuario usuario = new Usuario();
+        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.validarMapa(100L);
 
@@ -166,7 +172,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
+        Usuario usuario = new Usuario();
+        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.aceitarValidacao(100L, "obs");
 
@@ -190,7 +199,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
+        Usuario usuario = new Usuario();
+        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.disponibilizarMapa(1L, req);
 

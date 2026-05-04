@@ -117,6 +117,8 @@ class ProcessoServiceTest {
         when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                 .thenReturn(List.of(subNaoElegivel));
 
+        when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
+
         processoService.executarAcaoEmBloco(codProcesso, req);
 
         verify(cadastroFluxoService, never()).aceitarCadastroEmBloco(any());
@@ -681,6 +683,8 @@ class ProcessoServiceTest {
 
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList()))
                     .thenReturn(List.of(sCad, sVal));
+            
+            when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
             // Teste ACEITAR
             ProcessarAnaliseEmBlocoCommand reqAceitar = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), ACEITAR);

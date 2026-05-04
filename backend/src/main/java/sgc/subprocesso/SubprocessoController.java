@@ -484,8 +484,7 @@ public class SubprocessoController {
         return ResponseEntity.ok().build();
     }
 
-    private @org.jspecify.annotations.Nullable String sanitizarTextoOpcional(
-            @org.jspecify.annotations.Nullable TextoOpcionalRequest request) {
+    private @Nullable String sanitizarTextoOpcional(@Nullable TextoOpcionalRequest request) {
         if (request == null || request.texto() == null) {
             return null;
         }
@@ -527,7 +526,7 @@ public class SubprocessoController {
     }
 
     @PostMapping("/{codSubprocesso}/analises-cadastro")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_CADASTRO')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
     public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
@@ -536,7 +535,7 @@ public class SubprocessoController {
     }
 
     @PostMapping("/{codSubprocesso}/analises-validacao")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_MAPA')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
     public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
