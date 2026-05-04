@@ -213,7 +213,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         service.disponibilizarMapa(1L, req);
 
-        assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 1, 1, 0, 0));
+        assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 1, 15, 0, 0));
     }
 
     @Test
