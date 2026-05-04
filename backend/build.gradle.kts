@@ -211,6 +211,13 @@ jacoco {
     toolVersion = libs.versions.jacoco.get()
 }
 
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
 spotbugs {
     toolVersion.set(libs.versions.spotbugs.get())
     ignoreFailures.set(false)
