@@ -8,7 +8,7 @@ import java.time.*;
 import java.util.*;
 
 /**
- * Entidade que persiste um registro de feedback enviado durante UAT.
+ * Entidade que persiste um registro de feedback enviado durante homologação.
  */
 @Entity
 @Table(name = "SGC_FEEDBACK", schema = "sgc")

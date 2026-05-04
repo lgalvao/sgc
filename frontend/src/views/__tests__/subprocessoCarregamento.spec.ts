@@ -21,6 +21,7 @@ describe('subprocessoCarregamento.ts', () => {
         garantirContextoEdicaoPorProcessoEUnidade: vi.fn().mockResolvedValue(null),
         invalidarMapa: vi.fn(),
         exibirToastPendente: vi.fn(),
+        dadosEdicaoValidos: vi.fn().mockReturnValue(false),
         ...overrides
     })
 
@@ -104,6 +105,6 @@ describe('subprocessoCarregamento.ts', () => {
 
         // @ts-expect-error - Acessando hook privado do vue para simular ativação
         await wrapper.vm.$.a?.[0]()
-        expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false)
+        expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true)
     })
 })

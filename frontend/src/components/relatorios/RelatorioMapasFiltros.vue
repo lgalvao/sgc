@@ -3,7 +3,7 @@
     <div class="d-flex flex-column gap-3">
       <BFormGroup label-for="arvore-unidades-mapas">
         <template #label>
-          Unidades participantes <span aria-hidden="true" class="text-danger">*</span>
+          Selecione as unidades
         </template>
         <div class="border rounded p-3 container-arvore" data-testid="container-arvore-unidades-mapas">
           <ArvoreUnidades

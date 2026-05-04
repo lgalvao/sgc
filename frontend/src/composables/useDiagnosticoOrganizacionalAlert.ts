@@ -96,6 +96,7 @@ export function useDiagnosticoOrganizacionalAlert(
         unidadesSemResponsavel,
         exibirAlertaDiagnostico,
         dispensarAlertaDiagnostico,
+        alertaDiagnosticoDispensado,
     };
 }
 
@@ -104,7 +105,7 @@ function extrairSiglaUnidade(ocorrencia: string): string | null {
         return null;
     }
 
-    const correspondencia = ocorrencia.match(/^sigla=([^,]+?)(?:,\s|$)/);
+    const correspondencia = new RegExp(/^sigla=([^,]+?)(?:,\s|$)/).exec(ocorrencia);
     return correspondencia?.[1]?.trim() || null;
 }
 

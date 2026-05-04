@@ -103,7 +103,18 @@ describe("FeedbacksAdminView", () => {
                 codigo: "abc",
                 tipo: "SUGESTAO",
                 nota: "Melhorar <strong>contraste</strong>",
-                metadataJson: "{\"userAgent\":\"Mozilla/5.0\",\"rotaCaminho\":\"/painel\"}",
+        metadataJson: JSON.stringify({
+            userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+            rotaNome: "Painel",
+            rotaCaminho: "/subprocesso/123",
+            rotaQuery: JSON.stringify({tab: "atividades"}),
+            dataEvento: "2026-05-04T10:00:00Z",
+            larguraTela: 1920,
+            alturaTela: 1080,
+            fusoHorario: -180,
+            perfilAtivo: "ADMIN",
+            unidadeAtiva: "SESEL"
+        }),
                 caminhoScreenshot: "c:/tmp/a.webp",
                 screenshotDisponivel: true,
                 usuarioCodigo: "123",
@@ -121,16 +132,26 @@ describe("FeedbacksAdminView", () => {
         const modal = wrapper.find("[data-testid='modal-detalhes-feedback']");
         expect(modal.exists()).toBe(true);
         expect(modal.html()).toContain("Melhorar <strong>contraste</strong>");
-        expect(modal.text()).not.toContain("NOVO"); // Status removido
         
-        // Verifica se metadados estão na tabela
-        expect(modal.text()).toContain("userAgent");
-        expect(modal.text()).toContain("Mozilla/5.0");
+        expect(modal.text()).not.toContain("Mozilla/5.0");
+        expect(modal.text()).not.toContain("rotaNome");
+        expect(modal.text()).toContain("Rota");
+        expect(modal.text()).toContain("/subprocesso/123?tab=atividades");
+        expect(modal.text()).toContain("Resolução");
+        expect(modal.text()).toContain("1920x1080");
+        expect(modal.text()).not.toContain("fusoHorario");
+        expect(modal.text()).toContain("Acesso");
+        expect(modal.text()).toContain("ADMIN - SESEL");
+        expect(modal.text()).toContain("04/05/2026 07:00"); // Formato BR
+        expect(modal.text()).not.toContain("2026-05-04T10:00:00Z");
         
-        // Verifica se a captura é exibida
-        const img = modal.find("img");
-        expect(img.exists()).toBe(true);
-        expect(img.attributes("src")).toBe("http://localhost:8080/api/feedback/abc/screenshot");
+        // Clica na thumbnail para ampliar
+        const thumbnailBtn = modal.find("button");
+        expect(thumbnailBtn.exists()).toBe(true);
+        await thumbnailBtn.trigger("click");
+        
+        expect(wrapper.vm.mostrarImagemAmpliada).toBe(true);
+        expect(wrapper.vm.urlImagemAmpliada).toBe("http://localhost:8080/api/feedback/abc/screenshot");
     });
 
     it("exibe erro ao falhar no carregamento", async () => {

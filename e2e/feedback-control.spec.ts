@@ -34,7 +34,7 @@ test.describe('Feedback Control - Widget de Feedback UAT', () => {
         await page.getByTestId('feedback-tipo-sugestao').check();
         await page.getByTestId('feedback-btn-enviar').click();
 
-        await expect(page.getByText('Feedback enviado com sucesso. Obrigado!')).toBeVisible();
+        await expect(page.getByText('Feedback enviado')).toBeVisible();
         await expect(page.getByTestId('feedback-modal')).toBeHidden();
     });
 
@@ -48,6 +48,6 @@ test.describe('Feedback Control - Widget de Feedback UAT', () => {
         await page.getByTestId('feedback-nota').fill('Feedback sem captura de tela');
         await page.getByTestId('feedback-btn-enviar').click();
 
-        await expect(page.getByText('Feedback enviado com sucesso. Obrigado!')).toBeVisible();
+        await expect(page.getByText('Feedback enviado')).toBeVisible();
     });
 });

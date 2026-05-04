@@ -262,8 +262,13 @@ public class UnidadeHierarquiaService {
 
     private UnidadeDto copiarComResponsavelAtual(UnidadeDto dto, Long codigo) {
         UnidadeDto copia = copiarArvore(dto);
-        Unidade unidadeComResponsavel = unidadeService.buscarPorCodigo(codigo);
-        copia.setResponsavel(UnidadeDto.fromEntityObrigatoria(unidadeComResponsavel).getResponsavel());
+        Unidade unidadeCompleta = unidadeService.buscarPorCodigo(codigo);
+        UnidadeDto dtoCompleto = UnidadeDto.fromEntityObrigatoria(unidadeCompleta);
+        
+        copia.setResponsavel(dtoCompleto.getResponsavel());
+        copia.setTitular(dtoCompleto.getTitular());
+        copia.setTipoResponsabilidade(dtoCompleto.getTipoResponsabilidade());
+        
         return copia;
     }
 
@@ -284,6 +289,8 @@ public class UnidadeHierarquiaService {
                 .tituloTitular(dto.getTituloTitular())
                 .isElegivel(dto.isElegivel())
                 .responsavel(dto.getResponsavel())
+                .titular(dto.getTitular())
+                .tipoResponsabilidade(dto.getTipoResponsabilidade())
                 .build();
     }
 

@@ -195,9 +195,19 @@ const dadosFormatadosSubordinadas = computed(() => formatarDadosParaArvore(subor
 
 const responsavelExibivel = computed<Usuario | Responsavel | null>(() => {
   const responsavel = unidade.value?.responsavel;
-  if (!responsavel || unidade.value?.tipoResponsabilidade === 'TITULAR') {
+  const titular = unidade.value?.titular;
+  
+  // Se não houver responsável, não exibe nada
+  if (!responsavel) {
     return null;
   }
+
+  // Se o responsável for a mesma pessoa que o titular, não exibe o campo "Responsável" (mostra apenas "Titular")
+  // Compara pelo título eleitoral para garantir que é a mesma pessoa
+  if (titular && responsavel.tituloEleitoral === titular.tituloEleitoral) {
+    return null;
+  }
+
   return responsavel;
 });
 

@@ -32,7 +32,7 @@ public class FeedbackController {
     private final ObjectMapper objectMapper;
 
     /**
-     * Registra um novo feedback enviado pelo widget UAT.
+     * Registra um novo feedback enviado pelo widget.
      *
      * @param data       payload JSON serializado (campo {@code data} do formulário multipart)
      * @param screenshot captura de tela opcional (campo {@code screenshot})

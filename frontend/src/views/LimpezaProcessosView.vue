@@ -15,10 +15,6 @@
     </BAlert>
 
     <BCard class="mt-3">
-      <p class="mb-3">
-        {{ TEXTOS.administracao.LIMPEZA_DESCRICAO }}
-      </p>
-
       <BFormGroup
           :state="mensagemErroCodigo ? false : null"
           label-for="codigoProcesso"
@@ -29,7 +25,6 @@
         <BFormInput
             id="codigoProcesso"
             v-model="codigoProcesso"
-            :placeholder="TEXTOS.administracao.LIMPEZA_PLACEHOLDER_CODIGO"
             :state="mensagemErroCodigo ? false : null"
             data-testid="input-codigo-processo"
             min="1"

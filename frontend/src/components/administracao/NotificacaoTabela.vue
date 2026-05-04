@@ -3,6 +3,7 @@
     <EmptyState
         v-if="items.length === 0"
         :title="TEXTOS.administracao.NOTIFICACOES_SEM_REGISTROS"
+        description="Notificações por e-mail enviadas durante processos ativos aparecem aqui."
         data-testid="alert-notificacoes-sem-registros"
         icon="bi-info-circle"
     />

@@ -41,7 +41,7 @@
     >
       <template #cell(tipo)="{ item }">
         <BBadge :variant="obterVarianteTipo(item.tipo)">
-          <i :class="['bi', iconesTipo[item.tipo], 'me-1']"></i>
+          <i :class="['bi', iconesTipo[item.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
           {{ formatarTipo(item.tipo) }}
         </BBadge>
       </template>
@@ -75,8 +75,10 @@
     <BModal
         v-model="mostrarDetalhes"
         :title="TEXTOS.administracao.FEEDBACKS_MODAL_TITULO"
+        :ok-title="TEXTOS.comum.BOTAO_FECHAR"
+        ok-only
+        ok-variant="secondary"
         data-testid="modal-detalhes-feedback"
-        hide-footer
         scrollable
         size="lg"
     >
@@ -85,7 +87,7 @@
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO }}</dt>
           <dd class="col-sm-9">
             <BBadge :variant="obterVarianteTipo(feedbackSelecionado.tipo)">
-              <i :class="['bi', iconesTipo[feedbackSelecionado.tipo], 'me-1']"></i>
+              <i :class="['bi', iconesTipo[feedbackSelecionado.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
               {{ formatarTipo(feedbackSelecionado.tipo) }}
             </BBadge>
           </dd>
@@ -109,7 +111,6 @@
                     class="img-fluid border rounded feedback-thumbnail shadow-sm"
                 />
               </button>
-              <div class="small text-muted mt-1">Clique para ampliar</div>
             </div>
             <span v-else class="text-muted">Não disponível no servidor</span>
           </dd>
@@ -144,8 +145,10 @@
     <BModal
         v-model="mostrarImagemAmpliada"
         :title="TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA"
+        :ok-title="TEXTOS.comum.BOTAO_FECHAR"
+        ok-only
+        ok-variant="secondary"
         centered
-        hide-footer
         size="xl"
     >
       <div class="text-center">
@@ -183,32 +186,34 @@ const campos = [
   {key: "acoes", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ACOES},
 ];
 
-function formatarTipo(tipo: FeedbackAdmin["tipo"]): string {
-  const tipos: Record<FeedbackAdmin["tipo"], string> = {
+function formatarTipo(tipo: string): string {
+  const t = (tipo || "").toUpperCase();
+  const tipos: Record<string, string> = {
     BUG: "Bug",
     SUGESTAO: "Sugestão",
     QUESTAO: "Questão",
     ELOGIO: "Elogio",
   };
-  return tipos[tipo] ?? tipo;
+  return tipos[t] ?? (t.charAt(0) + t.slice(1).toLowerCase());
 }
 
-const iconesTipo: Record<FeedbackAdmin["tipo"], string> = {
-  BUG: "bi-bug",
-  SUGESTAO: "bi-lightbulb",
-  QUESTAO: "bi-question-circle",
-  ELOGIO: "bi-emoji-smile",
-};
-
-function obterVarianteTipo(tipo: FeedbackAdmin["tipo"]): string {
-  const variantes: Record<FeedbackAdmin["tipo"], string> = {
+function obterVarianteTipo(tipo: string): string {
+  const t = (tipo || "").toUpperCase();
+  const variantes: Record<string, string> = {
     BUG: "danger",
     SUGESTAO: "primary",
     QUESTAO: "info",
     ELOGIO: "success",
   };
-  return variantes[tipo] ?? "secondary";
+  return variantes[t] ?? "secondary";
 }
+
+const iconesTipo: Record<string, string> = {
+  BUG: "bi-bug",
+  SUGESTAO: "bi-lightbulb",
+  QUESTAO: "bi-question-circle",
+  ELOGIO: "bi-emoji-smile",
+};
 
 function resumirNota(nota: string): string {
   if (!nota) return "";
@@ -231,10 +236,93 @@ function abrirImagemAmpliada(codigo: string) {
   mostrarImagemAmpliada.value = true;
 }
 
+function extrairNavegadorAmigavel(ua: string): string {
+  if (!ua) return "Desconhecido";
+  let navegador = "Outro";
+  let so = "Desconhecido";
+
+  if (ua.includes("Firefox")) navegador = "Firefox";
+  else if (ua.includes("Edg")) navegador = "Edge";
+  else if (ua.includes("Chrome")) navegador = "Chrome";
+  else if (ua.includes("Safari")) navegador = "Safari";
+
+  if (ua.includes("Windows NT")) so = "Windows";
+  else if (ua.includes("Android")) so = "Android";
+  else if (ua.includes("iPhone") || ua.includes("iPad")) so = "iOS";
+  else if (ua.includes("Macintosh")) so = "macOS";
+  else if (ua.includes("Linux")) so = "Linux";
+
+  return `${navegador} no ${so}`;
+}
+
 function formatarMetadados(json?: string | null): Record<string, any> {
   if (!json) return {};
   try {
-    return JSON.parse(json);
+    const raw = JSON.parse(json);
+    const filtrado: Record<string, any> = {};
+    const chavesIgnorar = ["rotaNome", "fusoHorario", "usuarioNome", "usuarioCodigo"];
+
+    const mapaTraducoes: Record<string, string> = {
+      tituloPagina: "Título da página",
+      dataHora: "Data do evento",
+      idioma: "Idioma",
+      userAgent: "Navegador",
+    };
+
+    // Compactação de rota e query
+    if (raw.rotaCaminho) {
+      let rotaCompleta = raw.rotaCaminho;
+      if (raw.rotaQuery && raw.rotaQuery !== "{}" && raw.rotaQuery !== "null") {
+        try {
+          const query = JSON.parse(raw.rotaQuery);
+          const params = new URLSearchParams(query).toString();
+          if (params) rotaCompleta += `?${params}`;
+        } catch {
+          // Se falhar o parse da query, ignora e usa só o caminho
+        }
+      }
+      filtrado["Rota"] = rotaCompleta;
+      chavesIgnorar.push("rotaCaminho", "rotaQuery");
+    }
+
+    // Compactação de perfil e unidade
+    if (raw.perfilAtivo || raw.unidadeAtiva) {
+      const perfil = raw.perfilAtivo || "-";
+      const unidade = raw.unidadeAtiva || "-";
+      filtrado["Acesso"] = `${perfil} - ${unidade}`;
+      chavesIgnorar.push("perfilAtivo", "unidadeAtiva");
+    }
+
+    // Compactação de resolução
+    if (raw.larguraTela && raw.alturaTela) {
+      filtrado["Resolução"] = `${raw.larguraTela}x${raw.alturaTela}`;
+      chavesIgnorar.push("larguraTela", "alturaTela");
+    }
+
+    Object.entries(raw).forEach(([chave, valor]) => {
+      if (chavesIgnorar.includes(chave)) return;
+
+      const label = mapaTraducoes[chave] || (chave.charAt(0).toUpperCase() + chave.slice(1));
+
+      if (chave === "userAgent") {
+        filtrado[label] = extrairNavegadorAmigavel(valor as string);
+        return;
+      }
+
+      // Formatação de data/hora se o valor parecer um ISO string
+      if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(valor)) {
+        try {
+          filtrado[label] = formatarDataHoraBR(valor);
+          return;
+        } catch {
+          // Mantém original se falhar
+        }
+      }
+
+      filtrado[label] = valor;
+    });
+
+    return filtrado;
   } catch (e) {
     return {erro: "JSON inválido", valor: json};
   }

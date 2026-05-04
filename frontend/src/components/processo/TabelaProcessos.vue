@@ -19,6 +19,8 @@ const props = withDefaults(defineProps<{
   compacto?: boolean;
   mostrarCtaVazio?: boolean;
   textoCtaVazio?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }>(), {
   showSituacao: true,
   textoCtaVazio: "",
@@ -132,20 +134,11 @@ defineExpose({fields});
   </div>
   <EmptyState
       v-else
-      :description="TEXTOS.tabelaProcessos.EMPTY_DESCRIPTION"
-      :title="TEXTOS.tabelaProcessos.EMPTY_TITLE"
+      :description="emptyDescription || TEXTOS.tabelaProcessos.EMPTY_DESCRIPTION"
+      :title="emptyTitle || TEXTOS.tabelaProcessos.EMPTY_TITLE"
       class="mb-0"
       data-testid="empty-state-processos"
       icon="bi-folder2-open"
   >
-    <BButton
-        v-if="mostrarCtaVazio"
-        data-testid="btn-empty-state-criar-processo"
-        size="sm"
-        variant="outline-primary"
-        @click="emit('ctaVazio')"
-    >
-      {{ textoCtaVazio || 'Criar processo' }}
-    </BButton>
   </EmptyState>
 </template>

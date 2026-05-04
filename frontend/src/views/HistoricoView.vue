@@ -9,6 +9,8 @@
         :compacto="true"
         :criterio-ordenacao="criterio"
         :direcao-ordenacao-asc="asc"
+        :empty-description="TEXTOS.historico.EMPTY_DESCRIPTION(diasInativacao)"
+        :empty-title="TEXTOS.historico.EMPTY_TITLE"
         :processos="processosOrdenados"
         :show-data-finalizacao="true"
         :show-situacao="false"
@@ -26,14 +28,20 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {useHistoricoStore} from '@/stores/historico';
+import {useConfiguracoes} from '@/composables/useConfiguracoes';
+import {TEXTOS} from '@/constants/textos';
 import type {ProcessoResumo} from "@/types/tipos";
 
 const router = useRouter();
 const historicoStore = useHistoricoStore();
+const {carregarConfiguracoes, getDiasInativacaoProcesso} = useConfiguracoes();
+
 const loading = computed(() => historicoStore.carregando);
 
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
 const asc = ref(false);
+
+const diasInativacao = computed(() => getDiasInativacaoProcesso());
 
 const processosOrdenados = computed(() => {
   const lista = [...historicoStore.processos];
@@ -74,14 +82,22 @@ function verDetalhes(proc: ProcessoResumo | undefined) {
 // recarregamento duplo nesse caso.
 let montadoUmaVez = false;
 
-onMounted(() => {
+onMounted(async () => {
   montadoUmaVez = true;
-  void historicoStore.garantirDados();
+  await Promise.all([
+    historicoStore.garantirDados(),
+    carregarConfiguracoes()
+  ]);
 });
 
-onActivated(() => {
+onActivated(async () => {
   if (!montadoUmaVez) return;
-  if (historicoStore.dadosValidos()) return;
-  void historicoStore.garantirDados();
+  const promises = [];
+  if (!historicoStore.dadosValidos()) {
+    promises.push(historicoStore.garantirDados());
+  }
+  // Sempre garante configs atualizadas ao voltar para a tela
+  promises.push(carregarConfiguracoes());
+  await Promise.all(promises);
 });
 </script>

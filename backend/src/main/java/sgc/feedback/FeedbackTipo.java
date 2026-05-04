@@ -3,7 +3,7 @@ package sgc.feedback;
 import com.fasterxml.jackson.annotation.*;
 
 /**
- * Tipo do feedback enviado pelo usuário durante UAT.
+ * Tipo do feedback enviado pelo usuário durante homologação.
  */
 public enum FeedbackTipo {
     BUG,

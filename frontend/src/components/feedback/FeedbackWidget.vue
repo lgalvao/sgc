@@ -28,7 +28,7 @@ async function aoEnviar(tipo: FeedbackTipo, nota: string) {
     estadoBotao.value = 'sucesso'
     criarToast({
       props: {
-        body: 'Feedback enviado com sucesso. Obrigado!',
+        body: 'Feedback enviado',
         variant: 'success',
         modelValue: 4000,
         pos: 'bottom-end',

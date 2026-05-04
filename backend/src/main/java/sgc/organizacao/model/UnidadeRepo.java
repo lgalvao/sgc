@@ -69,6 +69,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("""
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
+            LEFT JOIN FETCH u.titular
             LEFT JOIN FETCH u.responsabilidade
             LEFT JOIN FETCH u.responsabilidade.usuario
             WHERE u.codigo = :codigo
@@ -79,6 +80,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("""
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
+            LEFT JOIN FETCH u.titular
             WHERE u.codigo = :codigo
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
@@ -87,6 +89,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("""
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
+            LEFT JOIN FETCH u.titular
             LEFT JOIN FETCH u.responsabilidade
             LEFT JOIN FETCH u.responsabilidade.usuario
             WHERE UPPER(u.sigla) = UPPER(:sigla)
@@ -97,6 +100,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("""
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
+            LEFT JOIN FETCH u.titular
             WHERE UPPER(u.sigla) = UPPER(:sigla)
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
