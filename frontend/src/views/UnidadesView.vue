@@ -27,33 +27,14 @@
       </template>
     </PageHeader>
 
-    <div v-if="exibirAlertaDiagnostico" class="mb-3 pt-2">
-      <BAlert
-          :model-value="true"
-          dismissible
-          variant="warning"
-          @dismissed="dispensarAlertaDiagnostico"
-      >
-        <div v-if="erroDiagnosticoOrganizacional" class="mt-1">{{ erroDiagnosticoOrganizacional }}</div>
-        <div v-else-if="unidadesSemResponsavel.length > 0" class="mt-1">
-          {{ prefixoMensagemUnidadesSemResponsavel }}
-          <template v-for="(unidade, indice) in unidadesSemResponsavel" :key="unidade.sigla">
-            <span v-if="indice > 0">{{ separadorListaUnidades(indice, unidadesSemResponsavel.length) }}</span>
-            <RouterLink
-                v-if="unidade.codigo !== null"
-                :to="`/unidade/${unidade.codigo}`"
-                :data-testid="`link-unidade-sem-responsavel-${indice}`"
-            >
-              <strong>{{ unidade.sigla }}</strong>
-            </RouterLink>
-            <strong v-else>{{ unidade.sigla }}</strong>
-          </template>
-          {{ sufixoMensagemUnidadesSemResponsavel }} A responsabilidade
-          deve ser definida externamente, no SGRH, ou por atribuição temporária no próprio sistema.
-        </div>
-        <div v-else class="mt-1">{{ resumoDiagnostico }}</div>
-      </BAlert>
-    </div>
+    <ProcessoDiagnosticoAlert
+        :carregando="carregandoDiagnosticoOrganizacional"
+        :exibir="exibirAlertaDiagnostico"
+        :grupos="gruposDiagnostico"
+        :resumo="resumoDiagnostico"
+        :unidades-sem-responsavel="unidadesSemResponsavel"
+        @dismiss="dispensarAlertaDiagnostico"
+    />
 
     <BAlert
         v-if="erroUnidades"
@@ -103,17 +84,18 @@
 <script lang="ts" setup>
 import {computed, onActivated, onMounted, ref} from "vue";
 import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
-import {RouterLink, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
+import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoAlert.vue";
 import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
+import {useDiagnosticoOrganizacionalAlert} from "@/composables/useDiagnosticoOrganizacionalAlert";
 import {usePerfil} from "@/composables/usePerfil";
-import {useOrganizacaoStore} from "@/stores/organizacao";
 
 type LinhaUnidadeArvore = {
   codigo: number;
@@ -134,50 +116,20 @@ const unidades = ref<Unidade[]>([]);
 const treeTableRef = ref<TreeTableRef | null>(null);
 const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
-const organizacaoStore = useOrganizacaoStore();
-const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
-const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
+const {
+  carregandoDiagnosticoOrganizacional,
+  gruposDiagnostico,
+  resumoDiagnostico,
+  unidadesSemResponsavel,
+  exibirAlertaDiagnostico,
+  dispensarAlertaDiagnostico,
+} = useDiagnosticoOrganizacionalAlert(unidades, mostrarDiagnosticoOrganizacional);
 const router = useRouter();
 const carregamentoInicialConcluido = ref(false);
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
 );
-const resumoDiagnostico = computed(() =>
-    erroDiagnosticoOrganizacional.value
-    ?? diagnosticoOrganizacional.value?.resumo
-    ?? ""
-);
-const unidadesSemResponsavel = computed(() => {
-  const grupo = diagnosticoOrganizacional.value?.grupos.find((item) => item.tipo === "Unidade sem responsável");
-  if (!grupo || grupo.ocorrencias.length === 0) {
-    return [];
-  }
-
-  return grupo.ocorrencias
-      .map(extrairSiglaUnidade)
-      .filter((sigla): sigla is string => Boolean(sigla))
-      .map((sigla) => ({
-        sigla,
-        codigo: buscarCodigoUnidadePorSigla(unidades.value, sigla),
-      }));
-});
-const prefixoMensagemUnidadesSemResponsavel = computed(() =>
-    unidadesSemResponsavel.value.length > 1 ? "As unidades " : "A unidade "
-);
-const sufixoMensagemUnidadesSemResponsavel = computed(() =>
-    unidadesSemResponsavel.value.length > 1
-        ? " estão atualmente sem responsável. Enquanto isso, não poderão participar de processos."
-        : " está atualmente sem responsável. Enquanto isso, não poderá participar de processos."
-);
-
-const alertaDiagnosticoDispensado = ref(false);
-const exibirAlertaDiagnostico = computed(() =>
-    mostrarDiagnosticoOrganizacional.value
-    && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
-    && !alertaDiagnosticoDispensado.value
-);
-
 const colunas = [
   {key: "unidade", label: TEXTOS.subprocesso.COLUNA_UNIDADE, width: "100%"},
 ];
@@ -204,48 +156,12 @@ function clearError() {
   erro.value = null;
 }
 
-function dispensarAlertaDiagnostico() {
-  alertaDiagnosticoDispensado.value = true;
-}
-
 function expandirTodasLinhas() {
   treeTableRef.value?.expandAll();
 }
 
 function recolherTodasLinhas() {
   treeTableRef.value?.collapseAll();
-}
-
-function extrairSiglaUnidade(ocorrencia: string): string | null {
-  if (!ocorrencia) {
-    return null;
-  }
-
-  const correspondencia = ocorrencia.match(/^sigla=([^,]+?)(?:,\s|$)/);
-  return correspondencia?.[1]?.trim() || null;
-}
-
-function separadorListaUnidades(indice: number, total: number): string {
-  if (indice === total - 1) {
-    return total === 2 ? " e " : ", e ";
-  }
-
-  return ", ";
-}
-
-function buscarCodigoUnidadePorSigla(unidadesOrigem: Unidade[], sigla: string): number | null {
-  for (const unidade of unidadesOrigem) {
-    if (unidade.sigla === sigla) {
-      return unidade.codigo;
-    }
-
-    const codigoFilha = buscarCodigoUnidadePorSigla(unidade.filhas ?? [], sigla);
-    if (codigoFilha !== null) {
-      return codigoFilha;
-    }
-  }
-
-  return null;
 }
 
 async function carregarUnidades() {

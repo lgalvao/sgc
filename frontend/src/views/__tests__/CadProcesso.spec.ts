@@ -20,6 +20,7 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
     return {
         ...actual,
         buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
+        buscarTodasUnidades: vi.fn().mockResolvedValue([]),
         buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
             possuiViolacoes: false,
             resumo: '',
@@ -50,6 +51,11 @@ vi.mock('vue-router', () => {
     return {
         useRouter: () => ({push: mockPush}),
         useRoute: () => mockRoute,
+        RouterLink: {
+            name: "RouterLink",
+            props: ["to"],
+            template: "<a :href=\"typeof to === 'string' ? to : to.path\"><slot /></a>"
+        },
         createRouter: vi.fn(() => ({
             beforeEach: vi.fn(),
             afterEach: vi.fn(),
@@ -164,6 +170,47 @@ describe('ProcessoCadastroView.vue', () => {
         await flushPromises();
 
         expect(wrapper.find('page-header-stub').attributes('title')).toBe(TEXTOS.processo.cadastro.TITULO);
+    });
+
+    it('mantém link para unidade inconsistente mesmo fora da árvore de elegibilidade', async () => {
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
+            {codigo: 10, sigla: 'U1', nome: 'Unidade Elegível', isElegivel: true, filhas: []}
+        ]);
+        const unidadeService = await import('@/services/unidadeService');
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce([
+            {codigo: 43, sigla: '43ª Z.E.', nome: 'Zona 43', filhas: []}
+        ] as any);
+
+        const {wrapper} = createWrapper({
+            perfil: {permissoesSessao: permissoesAdmin},
+            organizacao: {
+                diagnostico: {
+                    possuiViolacoes: true,
+                    resumo: 'Há inconsistências organizacionais.',
+                    quantidadeTiposViolacao: 1,
+                    quantidadeOcorrencias: 1,
+                    grupos: [
+                        {
+                            tipo: 'Unidade sem responsável',
+                            quantidadeOcorrencias: 1,
+                            ocorrencias: ['sigla=43ª Z.E., tipo=OPERACIONAL']
+                        }
+                    ]
+                },
+                erroDiagnostico: null,
+                carregado: true,
+                carregando: false
+            }
+        });
+
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        await nextTick();
+        await flushPromises();
+
+        const link = wrapper.find('[data-testid="link-unidade-sem-responsavel-0"]');
+        expect(link.exists()).toBe(true);
+        expect(link.text()).toContain('43ª Z.E.');
+        expect(wrapper.text()).not.toContain('tipo=OPERACIONAL');
     });
 
     it('loads process details when codProcesso is present in query', async () => {

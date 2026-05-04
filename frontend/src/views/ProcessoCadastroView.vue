@@ -4,9 +4,11 @@
       <PageHeader :title="TEXTOS.processo.cadastro.TITULO"/>
 
       <ProcessoDiagnosticoAlert
+          :carregando="carregandoDiagnosticoOrganizacional"
           :exibir="exibirAlertaDiagnostico"
           :grupos="gruposDiagnostico"
           :resumo="resumoDiagnostico"
+          :unidades-sem-responsavel="unidadesSemResponsavel"
           @dismiss="dispensarAlertaDiagnostico"
       />
 
@@ -100,6 +102,7 @@ import ProcessoCadastroModais from "@/components/processo/ProcessoCadastroModais
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
 import {deveNotificarGlobalmente, ehErroAxios, extrairErrosGenericos, normalizarErro} from "@/utils/apiError";
+import {useDiagnosticoOrganizacionalAlert} from "@/composables/useDiagnosticoOrganizacionalAlert";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
@@ -158,27 +161,16 @@ const {focarPrimeiroErroInvalido} = useValidacaoFormulario();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
-const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
-const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
-
-const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
-const resumoDiagnostico = computed(() =>
-    erroDiagnosticoOrganizacional.value
-    ?? diagnosticoOrganizacional.value?.resumo
-    ?? ""
-);
-const alertaDiagnosticoDispensado = ref(false);
-const exibirAlertaDiagnostico = computed(() =>
-    mostrarDiagnosticoOrganizacional.value
-    && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
-    && !alertaDiagnosticoDispensado.value
-);
+const {
+  carregandoDiagnosticoOrganizacional,
+  gruposDiagnostico,
+  resumoDiagnostico,
+  unidadesSemResponsavel,
+  exibirAlertaDiagnostico,
+  dispensarAlertaDiagnostico
+} = useDiagnosticoOrganizacionalAlert(unidades, mostrarDiagnosticoOrganizacional);
 const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value);
 const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoading.value || isLoadingData.value);
-
-function dispensarAlertaDiagnostico() {
-  alertaDiagnosticoDispensado.value = true;
-}
 
 function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
   const codigosElegiveis = new Set<number>();
