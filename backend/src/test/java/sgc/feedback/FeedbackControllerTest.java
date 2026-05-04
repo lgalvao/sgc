@@ -150,4 +150,18 @@ class FeedbackControllerTest {
                 .andExpect(jsonPath("$[0].codigo").value(codigo.toString()))
                 .andExpect(jsonPath("$[0].tipo").value("bug"));
     }
+
+    @Test
+    @DisplayName("GET /api/feedback/{id}/screenshot - deve retornar bytes da imagem para admin")
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornarScreenshotParaAdmin() throws Exception {
+        UUID id = UUID.randomUUID();
+        byte[] imagem = "fake-image-bytes".getBytes();
+        when(feedbackService.obterScreenshot(id)).thenReturn(imagem);
+
+        mockMvc.perform(get(URL + "/" + id + "/screenshot"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("image/webp"))
+                .andExpect(content().bytes(imagem));
+    }
 }

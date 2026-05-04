@@ -7,6 +7,7 @@ import {listarFeedbacksAdmin} from "@/services/feedbackAdminService";
 
 vi.mock("@/services/feedbackAdminService", () => ({
     listarFeedbacksAdmin: vi.fn(),
+    obterUrlScreenshot: vi.fn().mockReturnValue("http://localhost:8080/api/feedback/abc/screenshot"),
 }));
 
 const router = createRouter({
@@ -77,13 +78,13 @@ describe("FeedbacksAdminView", () => {
         expect(wrapper.text()).toContain("Existe um erro na tela de painel");
     });
 
-    it("abre modal de detalhes", async () => {
+    it("abre modal de detalhes e exibe metadados formatados e captura", async () => {
         vi.mocked(listarFeedbacksAdmin).mockResolvedValue([
             {
                 codigo: "abc",
                 tipo: "SUGESTAO",
                 nota: "Melhorar contraste",
-                metadataJson: "{\"rotaCaminho\":\"/painel\"}",
+                metadataJson: "{\"userAgent\":\"Mozilla/5.0\",\"rotaCaminho\":\"/painel\"}",
                 caminhoScreenshot: "c:/tmp/a.webp",
                 usuarioCodigo: "123",
                 usuarioNome: "João",
@@ -97,8 +98,19 @@ describe("FeedbacksAdminView", () => {
         await flushPromises();
         await wrapper.find("[data-testid='btn-feedback-detalhes-abc']").trigger("click");
 
-        expect(wrapper.find("[data-testid='modal-detalhes-feedback']").exists()).toBe(true);
-        expect(wrapper.text()).toContain("Melhorar contraste");
+        const modal = wrapper.find("[data-testid='modal-detalhes-feedback']");
+        expect(modal.exists()).toBe(true);
+        expect(modal.text()).toContain("Melhorar contraste");
+        expect(modal.text()).not.toContain("NOVO"); // Status removido
+        
+        // Verifica se metadados estão na tabela
+        expect(modal.text()).toContain("userAgent");
+        expect(modal.text()).toContain("Mozilla/5.0");
+        
+        // Verifica se a captura é exibida
+        const img = modal.find("img");
+        expect(img.exists()).toBe(true);
+        expect(img.attributes("src")).toBe("http://localhost:8080/api/feedback/abc/screenshot");
     });
 
     it("exibe erro ao falhar no carregamento", async () => {

@@ -77,6 +77,36 @@ public class FeedbackService {
                 .toList();
     }
 
+    /**
+     * Recupera os bytes da screenshot de um feedback.
+     *
+     * @param id identificador do feedback
+     * @return bytes da imagem
+     * @throws ErroEntidadeNaoEncontrada se o feedback ou a imagem não existirem
+     */
+    @Transactional(readOnly = true)
+    public byte[] obterScreenshot(UUID id) {
+        FeedbackRegistro registro = repo.findById(id)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Feedback", id));
+
+        String caminho = registro.getCaminhoScreenshot();
+        if (caminho == null || caminho.isBlank()) {
+            throw new ErroEntidadeNaoEncontrada("Screenshot não disponível para este feedback");
+        }
+
+        try {
+            Path path = Path.of(caminho);
+            if (!Files.exists(path)) {
+                log.error("Arquivo de screenshot não encontrado no disco: {}", caminho);
+                throw new ErroEntidadeNaoEncontrada("Arquivo de screenshot não encontrado no servidor");
+            }
+            return Files.readAllBytes(path);
+        } catch (IOException e) {
+            log.error("Erro ao ler screenshot: {}", e.getMessage());
+            throw new ErroInconsistenciaInterna("Erro ao ler arquivo de screenshot");
+        }
+    }
+
     private void validarNota(String nota) {
         if (nota == null || nota.isBlank()) {
             throw new ErroValidacao("nota não pode estar em branco");

@@ -22,3 +22,9 @@ export async function listarFeedbacksAdmin(limite = 100): Promise<FeedbackAdmin[
     });
     return response.data;
 }
+
+export function obterUrlScreenshot(codigo: string): string {
+    const baseUrl = apiClient.defaults.baseURL || "/api";
+    const base = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+    return `${base}/feedback/${codigo}/screenshot`;
+}

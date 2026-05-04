@@ -237,4 +237,48 @@ class FeedbackServiceTest {
                         && pageable.getSort().getOrderFor("enviadoEm").isDescending()
         ));
     }
+
+    @Test
+    @DisplayName("deve retornar bytes da screenshot quando existe")
+    void deveRetornarBytesDaScreenshot() throws IOException {
+        UUID id = UUID.randomUUID();
+        Path tempFile = Files.createTempFile("screenshot-", ".webp");
+        Files.write(tempFile, "fake-image-bytes".getBytes());
+
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot(tempFile.toString())
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        byte[] resultado = service.obterScreenshot(id);
+
+        assertThat(resultado).isEqualTo("fake-image-bytes".getBytes());
+        Files.deleteIfExists(tempFile);
+    }
+
+    @Test
+    @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando feedback não existe")
+    void deveLancarErroQuandoFeedbackNaoExiste() {
+        UUID id = UUID.randomUUID();
+        when(repo.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando screenshot não está disponível")
+    void deveLancarErroQuandoScreenshotNaoDisponivel() {
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot(null)
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Screenshot não disponível");
+    }
 }

@@ -40,12 +40,9 @@
         striped
     >
       <template #cell(tipo)="{ item }">
-        <span class="fw-semibold">{{ formatarTipo(item.tipo) }}</span>
-      </template>
-
-      <template #cell(status)="{ item }">
-        <BBadge :variant="obterVarianteStatus(item.status)">
-          {{ item.status }}
+        <BBadge :variant="obterVarianteTipo(item.tipo)">
+          <i :class="['bi', iconesTipo[item.tipo], 'me-1']"></i>
+          {{ formatarTipo(item.tipo) }}
         </BBadge>
       </template>
 
@@ -63,7 +60,8 @@
       </template>
 
       <template #cell(caminhoScreenshot)="{ item }">
-        {{ item.caminhoScreenshot ? "Sim" : "Não" }}
+        <i v-if="item.caminhoScreenshot" class="bi bi-image text-primary" title="Possui captura"></i>
+        <span v-else class="text-muted">-</span>
       </template>
 
       <template #cell(acoes)="{ item }">
@@ -74,7 +72,7 @@
             variant="outline-secondary"
             @click="abrirDetalhes(item)"
         >
-          {{ TEXTOS.administracao.NOTIFICACOES_DETALHES }}
+          <i class="bi bi-eye"></i>
         </BButton>
       </template>
     </BTable>
@@ -90,29 +88,58 @@
       <div v-if="feedbackSelecionado" class="p-2">
         <dl class="row mb-0">
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO }}</dt>
-          <dd class="col-sm-9">{{ formatarTipo(feedbackSelecionado.tipo) }}</dd>
-
-          <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.STATUS }}</dt>
-          <dd class="col-sm-9">{{ feedbackSelecionado.status }}</dd>
+          <dd class="col-sm-9">
+            <BBadge :variant="obterVarianteTipo(feedbackSelecionado.tipo)">
+              <i :class="['bi', iconesTipo[feedbackSelecionado.tipo], 'me-1']"></i>
+              {{ formatarTipo(feedbackSelecionado.tipo) }}
+            </BBadge>
+          </dd>
 
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.USUARIO }}</dt>
           <dd class="col-sm-9">{{ feedbackSelecionado.usuarioNome }} ({{ feedbackSelecionado.usuarioCodigo }})</dd>
 
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.ROTA }}</dt>
-          <dd class="col-sm-9 text-break">{{ feedbackSelecionado.rota }}</dd>
+          <dd class="col-sm-9 text-break"><code>{{ feedbackSelecionado.rota }}</code></dd>
 
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.ENVIADO_EM }}</dt>
           <dd class="col-sm-9">{{ formatarDataHoraBR(feedbackSelecionado.enviadoEm) }}</dd>
 
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA }}</dt>
-          <dd class="col-sm-9">{{ feedbackSelecionado.caminhoScreenshot ? "Enviada" : "Não enviada" }}</dd>
+          <dd class="col-sm-9">
+            <div v-if="feedbackSelecionado.caminhoScreenshot">
+              <a :href="obterUrlScreenshot(feedbackSelecionado.codigo)" target="_blank" class="d-inline-block">
+                <img
+                    :src="obterUrlScreenshot(feedbackSelecionado.codigo)"
+                    alt="Captura de tela"
+                    class="img-fluid border rounded feedback-thumbnail shadow-sm"
+                />
+              </a>
+              <div class="small text-muted mt-1">Clique para abrir em nova aba</div>
+            </div>
+            <span v-else class="text-muted">Não enviada</span>
+          </dd>
 
-          <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA }}</dt>
-          <dd class="col-sm-9 text-break">{{ feedbackSelecionado.nota }}</dd>
+          <dt class="col-sm-3 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA }}</dt>
+          <dd class="col-sm-9 mt-3 text-break shadow-none bg-light p-3 border rounded">{{ feedbackSelecionado.nota }}</dd>
 
-          <dt v-if="feedbackSelecionado.metadataJson" class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.METADADOS }}</dt>
-          <dd v-if="feedbackSelecionado.metadataJson" class="col-sm-9">
-            <pre class="feedback-metadados">{{ feedbackSelecionado.metadataJson }}</pre>
+          <dt v-if="feedbackSelecionado.metadataJson" class="col-sm-12 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.METADADOS }}</dt>
+          <dd v-if="feedbackSelecionado.metadataJson" class="col-sm-12">
+            <div class="table-responsive border rounded mt-2">
+              <table class="table table-sm table-striped mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-2">Chave</th>
+                    <th>Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(valor, chave) in formatarMetadados(feedbackSelecionado.metadataJson)" :key="chave">
+                    <td class="small fw-semibold ps-2" style="width: 30%">{{ chave }}</td>
+                    <td class="small text-break">{{ valor }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </dd>
         </dl>
       </div>
@@ -127,7 +154,7 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
-import {type FeedbackAdmin, listarFeedbacksAdmin} from "@/services/feedbackAdminService";
+import {type FeedbackAdmin, listarFeedbacksAdmin, obterUrlScreenshot} from "@/services/feedbackAdminService";
 import {formatarDataHoraBR} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
 
@@ -139,11 +166,10 @@ const feedbackSelecionado = ref<FeedbackAdmin | null>(null);
 
 const campos = [
   {key: "tipo", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO},
-  {key: "status", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.STATUS},
   {key: "usuarioNome", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.USUARIO},
   {key: "rota", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ROTA},
   {key: "nota", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA},
-  {key: "caminhoScreenshot", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA},
+  {key: "caminhoScreenshot", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA, class: "text-center"},
   {key: "enviadoEm", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ENVIADO_EM},
   {key: "acoes", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ACOES},
 ];
@@ -158,14 +184,21 @@ function formatarTipo(tipo: FeedbackAdmin["tipo"]): string {
   return tipos[tipo] ?? tipo;
 }
 
-function obterVarianteStatus(status: FeedbackAdmin["status"]): string {
-  const variantes: Record<FeedbackAdmin["status"], string> = {
-    NOVO: "warning",
-    REVISADO: "info",
-    RESOLVIDO: "success",
-    DESCARTADO: "secondary",
+const iconesTipo: Record<FeedbackAdmin["tipo"], string> = {
+  BUG: "bi-bug",
+  SUGESTAO: "bi-lightbulb",
+  QUESTAO: "bi-question-circle",
+  ELOGIO: "bi-emoji-smile",
+};
+
+function obterVarianteTipo(tipo: FeedbackAdmin["tipo"]): string {
+  const variantes: Record<FeedbackAdmin["tipo"], string> = {
+    BUG: "danger",
+    SUGESTAO: "primary",
+    QUESTAO: "info",
+    ELOGIO: "success",
   };
-  return variantes[status] ?? "secondary";
+  return variantes[tipo] ?? "secondary";
 }
 
 function resumirNota(nota: string): string {
@@ -178,6 +211,15 @@ function resumirNota(nota: string): string {
 function abrirDetalhes(item: FeedbackAdmin) {
   feedbackSelecionado.value = item;
   mostrarDetalhes.value = true;
+}
+
+function formatarMetadados(json?: string | null): Record<string, any> {
+  if (!json) return {};
+  try {
+    return JSON.parse(json);
+  } catch (e) {
+    return {erro: "JSON inválido", valor: json};
+  }
 }
 
 async function carregar() {
@@ -198,18 +240,19 @@ onMounted(carregar);
 <style scoped>
 .feedback-resumo {
   display: inline-block;
-  max-width: 30rem;
+  max-width: 20rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.feedback-metadados {
-  margin: 0;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  background: var(--bs-tertiary-bg);
-  white-space: pre-wrap;
-  word-break: break-word;
+.feedback-thumbnail {
+  max-height: 200px;
+  cursor: zoom-in;
+  transition: transform 0.2s;
+}
+
+.feedback-thumbnail:hover {
+  transform: scale(1.02);
 }
 </style>

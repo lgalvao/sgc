@@ -62,6 +62,15 @@ public class FeedbackController {
         return ResponseEntity.ok(feedbackService.listarRecentes(limite));
     }
 
+    @GetMapping("/{id}/screenshot")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<byte[]> exibirScreenshot(@PathVariable UUID id) {
+        byte[] imagem = feedbackService.obterScreenshot(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("image/webp"))
+                .body(imagem);
+    }
+
     private void validar(FeedbackPayloadDto payload) {
         var violations = obterViolacoes(payload);
         if (!violations.isEmpty()) {
