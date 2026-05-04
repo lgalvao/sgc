@@ -162,8 +162,14 @@ const chaveSessao = computed(() =>
   line-height: 1.2;
 }
 
-.toast {
+.orchestrator-container .toast-container {
+  width: auto !important;
+}
+
+.orchestrator-container .toast {
+  width: auto !important;
   max-width: 22rem;
+  display: inline-flex;
 }
 
 .toast .toast-body {
