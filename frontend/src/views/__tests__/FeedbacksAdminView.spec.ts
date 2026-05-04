@@ -61,6 +61,7 @@ describe("FeedbacksAdminView", () => {
                 nota: "Existe um erro na tela de painel",
                 metadataJson: null,
                 caminhoScreenshot: null,
+                screenshotDisponivel: false,
                 usuarioCodigo: "123",
                 usuarioNome: "João",
                 enviadoEm: "2026-05-04T10:00:00Z",
