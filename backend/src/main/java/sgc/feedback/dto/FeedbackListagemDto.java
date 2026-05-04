@@ -12,19 +12,21 @@ public record FeedbackListagemDto(
         String nota,
         @Nullable String metadataJson,
         @Nullable String caminhoScreenshot,
+        boolean screenshotDisponivel,
         String usuarioCodigo,
         String usuarioNome,
         OffsetDateTime enviadoEm,
         String rota,
         FeedbackStatus status
 ) {
-    public static FeedbackListagemDto from(FeedbackRegistro registro) {
+    public static FeedbackListagemDto from(FeedbackRegistro registro, boolean screenshotDisponivel) {
         return new FeedbackListagemDto(
                 registro.getId(),
                 registro.getTipo(),
                 registro.getNota(),
                 registro.getMetadataJson(),
                 registro.getCaminhoScreenshot(),
+                screenshotDisponivel,
                 registro.getUsuarioId(),
                 registro.getUsuarioNome(),
                 registro.getEnviadoEm(),

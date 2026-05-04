@@ -60,7 +60,7 @@
       </template>
 
       <template #cell(caminhoScreenshot)="{ item }">
-        <i v-if="item.caminhoScreenshot" class="bi bi-image text-primary" title="Possui captura"></i>
+        <i v-if="item.screenshotDisponivel" class="bi bi-image text-primary" title="Possui captura"></i>
         <span v-else class="text-muted">-</span>
       </template>
 
@@ -106,7 +106,7 @@
 
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA }}</dt>
           <dd class="col-sm-9">
-            <div v-if="feedbackSelecionado.caminhoScreenshot">
+            <div v-if="feedbackSelecionado.screenshotDisponivel">
               <a :href="obterUrlScreenshot(feedbackSelecionado.codigo)" target="_blank" class="d-inline-block">
                 <img
                     :src="obterUrlScreenshot(feedbackSelecionado.codigo)"
@@ -116,7 +116,7 @@
               </a>
               <div class="small text-muted mt-1">Clique para abrir em nova aba</div>
             </div>
-            <span v-else class="text-muted">Não enviada</span>
+            <span v-else class="text-muted">Não disponível no servidor</span>
           </dd>
 
           <dt class="col-sm-3 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA }}</dt>

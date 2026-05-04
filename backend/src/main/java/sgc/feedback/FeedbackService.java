@@ -73,7 +73,14 @@ public class FeedbackService {
         int limiteNormalizado = Math.min(Math.max(limite, 1), 200);
         var page = PageRequest.of(0, limiteNormalizado, Sort.by(Sort.Direction.DESC, "enviadoEm"));
         return repo.findAll(page).stream()
-                .map(FeedbackListagemDto::from)
+                .map(registro -> {
+                    boolean disponivel = false;
+                    String pathStr = registro.getCaminhoScreenshot();
+                    if (pathStr != null && !pathStr.isBlank()) {
+                        disponivel = Files.exists(resolverCaminho(pathStr));
+                    }
+                    return FeedbackListagemDto.from(registro, disponivel);
+                })
                 .toList();
     }
 
@@ -89,15 +96,15 @@ public class FeedbackService {
         FeedbackRegistro registro = repo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Feedback", id));
 
-        String caminho = registro.getCaminhoScreenshot();
-        if (caminho == null || caminho.isBlank()) {
+        String nomeOuCaminho = registro.getCaminhoScreenshot();
+        if (nomeOuCaminho == null || nomeOuCaminho.isBlank()) {
             throw new ErroEntidadeNaoEncontrada("Screenshot não disponível para este feedback");
         }
 
         try {
-            Path path = Path.of(caminho);
+            Path path = resolverCaminho(nomeOuCaminho);
             if (!Files.exists(path)) {
-                log.error("Arquivo de screenshot não encontrado no disco: {}", caminho);
+                log.error("Arquivo de screenshot não encontrado: {}", path);
                 throw new ErroEntidadeNaoEncontrada("Arquivo de screenshot não encontrado no servidor");
             }
             return Files.readAllBytes(path);
@@ -105,6 +112,20 @@ public class FeedbackService {
             log.error("Erro ao ler screenshot: {}", e.getMessage());
             throw new ErroInconsistenciaInterna("Erro ao ler arquivo de screenshot");
         }
+    }
+
+    private Path resolverCaminho(String nomeOuCaminho) {
+        // Se for um caminho absoluto antigo (contém separadores de diretório), tenta usá-lo diretamente
+        if (nomeOuCaminho.contains("/") || nomeOuCaminho.contains("\\")) {
+            return Path.of(nomeOuCaminho);
+        }
+
+        // Caso contrário, resolve contra o diretório configurado (comportamento novo e portátil)
+        String dir = propriedades.screenshotDir();
+        if (dir == null || dir.isBlank()) {
+            dir = "./feedbacks/screenshots";
+        }
+        return Path.of(dir).resolve(nomeOuCaminho).normalize();
     }
 
     private void validarNota(String nota) {
@@ -148,9 +169,10 @@ public class FeedbackService {
         try {
             Files.createDirectories(diretorioBase);
             Files.write(destino, screenshot.getBytes());
-            return destino.toString();
+            log.info("Screenshot salva com sucesso em: {}", destino);
+            return nomeArquivo; // Salva apenas o nome do arquivo para garantir portabilidade
         } catch (IOException e) {
-            log.error("Falha ao salvar screenshot: {}", e.getMessage());
+            log.error("Falha ao salvar screenshot em {}: {}", destino, e.getMessage());
             return null;
         }
     }

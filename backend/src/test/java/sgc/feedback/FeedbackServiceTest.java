@@ -97,11 +97,21 @@ class FeedbackServiceTest {
                 .status(FeedbackStatus.NOVO)
                 .enviadoEm(java.time.OffsetDateTime.now())
                 .build();
-        when(repo.save(any())).thenReturn(registroSalvo);
+        when(repo.save(any())).thenAnswer(invocation -> {
+            FeedbackRegistro r = invocation.getArgument(0);
+            registroSalvo.setCaminhoScreenshot(r.getCaminhoScreenshot());
+            return registroSalvo;
+        });
 
         service.registrar(payload, screenshot);
 
-        verify(repo).save(argThat(r -> r.getCaminhoScreenshot() != null && r.getCaminhoScreenshot().endsWith(".webp")));
+        ArgumentCaptor<FeedbackRegistro> captor = ArgumentCaptor.forClass(FeedbackRegistro.class);
+        verify(repo).save(captor.capture());
+        String caminho = captor.getValue().getCaminhoScreenshot();
+        
+        assertThat(caminho).isNotNull().endsWith(".webp");
+        assertThat(Path.of(caminho)).exists();
+        assertThat(Files.readAllBytes(Path.of(caminho))).isEqualTo(imagemFake);
     }
 
     @Test

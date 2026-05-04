@@ -9,6 +9,7 @@ export interface FeedbackAdmin {
     nota: string;
     metadataJson?: string | null;
     caminhoScreenshot?: string | null;
+    screenshotDisponivel: boolean;
     usuarioCodigo: string;
     usuarioNome: string;
     enviadoEm: string;
