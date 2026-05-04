@@ -40,8 +40,7 @@ etc/scripts/.vitest/
 /backend/.apt_generated_tests
 
 # Privacidade/segurança
-.env.hom
-/dados/
+!.env.hom
 
 # Reports de testes
 backend/build/reports/tests/test/
@@ -49,8 +48,6 @@ frontend/coverage/coverage-final.json
 
 # Jqwik
 .jqwik-database
-
-!cobertura_lacunas.json
 
 # Artefatos gerados pelos scripts de análise de mensagens
 mensagens-extraidas.json

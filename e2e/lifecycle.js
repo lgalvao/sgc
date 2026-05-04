@@ -357,6 +357,15 @@ function startBackend() {
 
 function startFrontend() {
     const pnpmExecutable = isWindows ? 'pnpm.cmd' : 'pnpm';
+    const argumentosFrontend = ['run', 'dev', '--'];
+
+    if (modoHomologacao()) {
+        argumentosFrontend.push('--mode', 'hom');
+    } else if (modoE2e()) {
+        argumentosFrontend.push('--mode', 'e2e');
+    }
+
+    argumentosFrontend.push('--port', String(FRONTEND_PORT));
 
     const spawnOptions = {
         cwd: FRONTEND_DIR,
@@ -372,7 +381,7 @@ function startFrontend() {
 
     const frontendProcess = spawn(
         pnpmExecutable,
-        ['run', 'dev', '--', '--port', String(FRONTEND_PORT)],
+        argumentosFrontend,
         spawnOptions
     );
     frontendProcessos.push(frontendProcess);
