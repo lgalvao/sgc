@@ -106,7 +106,7 @@ export const SemConhecimentos: Story = {
     },
 };
 
-export const MultiplasCometenciasEAtividades: Story = {
+export const MultiplasCompetenciasEAtividades: Story = {
     args: {
         mapa: mapaCompleto,
     },
