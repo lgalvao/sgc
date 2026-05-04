@@ -2,6 +2,8 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 import {ref} from "vue";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
+import * as service from "@/services/subprocessoService";
+import {useMapas} from "../useMapas";
 
 vi.mock("@/services/subprocessoService", () => ({
     obterMapaCompleto: vi.fn(),
@@ -15,7 +17,6 @@ describe("useMapas", () => {
     });
 
     it("deve inicializar com valores nulos", async () => {
-        const {useMapas} = await import("../useMapas");
         const mapas = useMapas();
 
         expect(mapas.mapaCompleto.value).toBeNull();
@@ -23,8 +24,6 @@ describe("useMapas", () => {
     });
 
     it("deve buscar mapa completo com sucesso", async () => {
-        const {useMapas} = await import("../useMapas");
-        const service = await import("@/services/subprocessoService");
         const mapas = useMapas();
         const mockMapa: MapaCompleto = {
             codigo: 1,
@@ -43,8 +42,6 @@ describe("useMapas", () => {
     });
 
     it("deve reaproveitar o cache do mapa por subprocesso ao reativar a view", async () => {
-        const {useMapas} = await import("../useMapas");
-        const service = await import("@/services/subprocessoService");
         const mapas = useMapas();
         const mockMapa: MapaCompleto = {
             codigo: 1,
@@ -64,8 +61,6 @@ describe("useMapas", () => {
     });
 
     it("deve definir erro em caso de falha ao buscar mapa completo", async () => {
-        const {useMapas} = await import("../useMapas");
-        const service = await import("@/services/subprocessoService");
         const mapas = useMapas();
         vi.mocked(service.obterMapaCompleto).mockRejectedValue(new Error("Failed"));
 
@@ -75,8 +70,6 @@ describe("useMapas", () => {
     });
 
     it("deve buscar impacto do mapa com sucesso", async () => {
-        const {useMapas} = await import("../useMapas");
-        const service = await import("@/services/subprocessoService");
         const mapas = useMapas();
         const mockImpacto: ImpactoMapa = {
             temImpactos: true,
@@ -98,8 +91,6 @@ describe("useMapas", () => {
     });
 
     it("deve manter snapshots separados por subprocesso em views keepAlive", async () => {
-        const {useMapas} = await import("../useMapas");
-        const service = await import("@/services/subprocessoService");
         const codigoAtual = ref<number | null>(1);
         const mapas = useMapas(codigoAtual);
         const mapaUm: MapaCompleto = {
@@ -132,8 +123,6 @@ describe("useMapas", () => {
     });
 
     it("não deve buscar impacto se codSubprocesso for zero", async () => {
-        const {useMapas} = await import("../useMapas");
-        const service = await import("@/services/subprocessoService");
         const mapas = useMapas();
 
         await mapas.buscarImpactoMapa(0);
@@ -142,8 +131,6 @@ describe("useMapas", () => {
     });
 
     it("deve invalidar o impacto quando o mapa do mesmo subprocesso é atualizado", async () => {
-        const {useMapas} = await import("../useMapas");
-        const service = await import("@/services/subprocessoService");
         const mapas = useMapas();
         const mockImpacto: ImpactoMapa = {
             temImpactos: true,
@@ -172,5 +159,5 @@ describe("useMapas", () => {
         await mapas.buscarMapaCompleto(1);
         expect(mapas.impactoMapa.value).toBeNull();
     });
-
 });
+

@@ -17,18 +17,20 @@ vi.mock('vue-router', () => ({
     }),
 }))
 
-const mockPerfilStore = {
-    usuarioCodigo: '12345',
-    usuarioNome: 'João Testador',
-    perfilSelecionado: 'CHEFE',
-    unidadeSelecionadaSigla: 'SENIC',
-}
+const {mockPerfilStore, mockPost} = vi.hoisted(() => ({
+    mockPerfilStore: {
+        usuarioCodigo: '12345',
+        usuarioNome: 'João Testador',
+        perfilSelecionado: 'CHEFE',
+        unidadeSelecionadaSigla: 'SENIC',
+    },
+    mockPost: vi.fn().mockResolvedValue({data: {id: 'uuid-123'}})
+}))
 
 vi.mock('@/stores/perfil', () => ({
     usePerfilStore: () => mockPerfilStore,
 }))
 
-const mockPost = vi.fn().mockResolvedValue({data: {id: 'uuid-123'}})
 vi.mock('@/axios-setup', () => ({
     default: {post: mockPost},
 }))
