@@ -194,7 +194,7 @@ class SubprocessoTransicaoServiceTest {
 
         assertThat(subprocesso.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 4, 25, 0, 0));
         verify(subprocessoRepo).save(subprocesso);
-        verify(notificacaoService).notificarAlteracaoDataLimite(eq(subprocesso), eq("25/04/2026"), eq(2));
+        verify(notificacaoService).notificarAlteracaoDataLimite(subprocesso, "25/04/2026", 2);
     }
 
     private Subprocesso criarSubprocesso(TipoProcesso tipoProcesso, SituacaoSubprocesso situacao, Unidade unidade) {

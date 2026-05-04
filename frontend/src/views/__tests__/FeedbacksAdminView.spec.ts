@@ -37,11 +37,9 @@ describe("FeedbacksAdminView", () => {
                           <table data-testid="tbl-feedbacks">
                             <tr v-for="item in items" :key="item.codigo">
                               <slot name="cell(tipo)" :item="item" />
-                              <slot name="cell(status)" :item="item" />
                               <slot name="cell(usuarioNome)" :item="item" />
                               <slot name="cell(nota)" :item="item" />
                               <slot name="cell(enviadoEm)" :item="item" />
-                              <slot name="cell(caminhoScreenshot)" :item="item" />
                               <slot name="cell(acoes)" :item="item" />
                             </tr>
                           </table>`,
@@ -79,12 +77,32 @@ describe("FeedbacksAdminView", () => {
         expect(wrapper.text()).toContain("Existe um erro na tela de painel");
     });
 
+    it("limpa tags HTML e entidades da descrição na listagem", async () => {
+        vi.mocked(listarFeedbacksAdmin).mockResolvedValue([
+            {
+                codigo: "html",
+                tipo: "QUESTAO",
+                nota: "<p>Dúvida sobre <strong>acesso</strong>&nbsp;ao sistema.</p>",
+                usuarioNome: "Maria",
+                enviadoEm: "2026-05-04T11:00:00Z",
+                rota: "/home"
+            }
+        ] as any);
+
+        const wrapper = montarComponente();
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("Dúvida sobre acesso ao sistema.");
+        expect(wrapper.text()).not.toContain("<p>");
+        expect(wrapper.text()).not.toContain("&nbsp;");
+    });
+
     it("abre modal de detalhes e exibe metadados formatados e captura", async () => {
         vi.mocked(listarFeedbacksAdmin).mockResolvedValue([
             {
                 codigo: "abc",
                 tipo: "SUGESTAO",
-                nota: "Melhorar contraste",
+                nota: "Melhorar <strong>contraste</strong>",
                 metadataJson: "{\"userAgent\":\"Mozilla/5.0\",\"rotaCaminho\":\"/painel\"}",
                 caminhoScreenshot: "c:/tmp/a.webp",
                 screenshotDisponivel: true,
@@ -102,7 +120,7 @@ describe("FeedbacksAdminView", () => {
 
         const modal = wrapper.find("[data-testid='modal-detalhes-feedback']");
         expect(modal.exists()).toBe(true);
-        expect(modal.text()).toContain("Melhorar contraste");
+        expect(modal.html()).toContain("Melhorar <strong>contraste</strong>");
         expect(modal.text()).not.toContain("NOVO"); // Status removido
         
         // Verifica se metadados estão na tabela

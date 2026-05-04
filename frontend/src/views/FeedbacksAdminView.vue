@@ -59,11 +59,6 @@
         {{ formatarDataHoraBR(item.enviadoEm) }}
       </template>
 
-      <template #cell(caminhoScreenshot)="{ item }">
-        <i v-if="item.screenshotDisponivel" class="bi bi-image text-primary" title="Possui captura"></i>
-        <span v-else class="text-muted">-</span>
-      </template>
-
       <template #cell(acoes)="{ item }">
         <BButton
             :aria-label="`Ver detalhes do feedback ${item.codigo}`"
@@ -107,20 +102,20 @@
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA }}</dt>
           <dd class="col-sm-9">
             <div v-if="feedbackSelecionado.screenshotDisponivel">
-              <a :href="obterUrlScreenshot(feedbackSelecionado.codigo)" target="_blank" class="d-inline-block">
+              <button class="btn p-0 border-0 d-inline-block" @click="abrirImagemAmpliada(feedbackSelecionado.codigo)">
                 <img
                     :src="obterUrlScreenshot(feedbackSelecionado.codigo)"
                     alt="Captura de tela"
                     class="img-fluid border rounded feedback-thumbnail shadow-sm"
                 />
-              </a>
-              <div class="small text-muted mt-1">Clique para abrir em nova aba</div>
+              </button>
+              <div class="small text-muted mt-1">Clique para ampliar</div>
             </div>
             <span v-else class="text-muted">Não disponível no servidor</span>
           </dd>
 
           <dt class="col-sm-3 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA }}</dt>
-          <dd class="col-sm-9 mt-3 text-break shadow-none bg-light p-3 border rounded">{{ feedbackSelecionado.nota }}</dd>
+          <dd class="col-sm-9 mt-3 text-break shadow-none bg-light p-3 border rounded" v-html="feedbackSelecionado.nota"></dd>
 
           <dt v-if="feedbackSelecionado.metadataJson" class="col-sm-12 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.METADADOS }}</dt>
           <dd v-if="feedbackSelecionado.metadataJson" class="col-sm-12">
@@ -144,6 +139,19 @@
         </dl>
       </div>
     </BModal>
+
+    <!-- Modal de Imagem Ampliada -->
+    <BModal
+        v-model="mostrarImagemAmpliada"
+        :title="TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA"
+        centered
+        hide-footer
+        size="xl"
+    >
+      <div class="text-center">
+        <img :src="urlImagemAmpliada" alt="Captura ampliada" class="img-fluid rounded shadow"/>
+      </div>
+    </BModal>
   </LayoutPadrao>
 </template>
 
@@ -163,13 +171,14 @@ const carregando = ref(true);
 const erro = ref<string | null>(null);
 const mostrarDetalhes = ref(false);
 const feedbackSelecionado = ref<FeedbackAdmin | null>(null);
+const mostrarImagemAmpliada = ref(false);
+const urlImagemAmpliada = ref("");
 
 const campos = [
   {key: "tipo", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO},
   {key: "usuarioNome", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.USUARIO},
-  {key: "rota", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ROTA},
   {key: "nota", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA},
-  {key: "caminhoScreenshot", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA, class: "text-center"},
+  {key: "rota", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ROTA},
   {key: "enviadoEm", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ENVIADO_EM},
   {key: "acoes", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ACOES},
 ];
@@ -202,15 +211,24 @@ function obterVarianteTipo(tipo: FeedbackAdmin["tipo"]): string {
 }
 
 function resumirNota(nota: string): string {
-  if (nota.length <= 120) {
-    return nota;
+  if (!nota) return "";
+  const doc = new DOMParser().parseFromString(nota, "text/html");
+  const textoLimpo = (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+
+  if (textoLimpo.length <= 120) {
+    return textoLimpo;
   }
-  return `${nota.slice(0, 117)}...`;
+  return `${textoLimpo.slice(0, 117)}...`;
 }
 
 function abrirDetalhes(item: FeedbackAdmin) {
   feedbackSelecionado.value = item;
   mostrarDetalhes.value = true;
+}
+
+function abrirImagemAmpliada(codigo: string) {
+  urlImagemAmpliada.value = obterUrlScreenshot(codigo);
+  mostrarImagemAmpliada.value = true;
 }
 
 function formatarMetadados(json?: string | null): Record<string, any> {

@@ -293,7 +293,7 @@ export const TEXTOS = {
             USUARIO: "Usuário",
             ROTA: "Rota",
             ENVIADO_EM: "Enviado em",
-            NOTA: "Mensagem",
+            NOTA: "Descrição",
             CAPTURA: "Captura",
             METADADOS: "Metadados",
             ACOES: "Ações",
