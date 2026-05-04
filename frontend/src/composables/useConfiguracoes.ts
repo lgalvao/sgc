@@ -1,5 +1,6 @@
 import {computed, ref} from "vue";
 import {useAsyncAction} from "@/composables/useAsyncAction";
+import {useLocalStorage} from "@/composables/useLocalStorage";
 import type {Parametro} from "@/services/configuracaoService";
 import {
     buscarConfiguracoes as serviceBuscarConfiguracoes,
@@ -9,6 +10,7 @@ import {
 export type {Parametro};
 
 const configuracoes = ref<Parametro[]>([]);
+const temaEscuro = useLocalStorage<boolean>("temaEscuro", false);
 
 export function useConfiguracoes() {
     const {carregando, erro, executarSilencioso} = useAsyncAction();
@@ -48,7 +50,11 @@ export function useConfiguracoes() {
     }
 
     function getTemaEscuro(): boolean {
-        return getValor("TEMA_ESCURO", "false") === "true";
+        return temaEscuro.value;
+    }
+
+    function setTemaEscuro(novoValor: boolean) {
+        temaEscuro.value = novoValor;
     }
 
     return {
@@ -61,5 +67,6 @@ export function useConfiguracoes() {
         getDiasInativacaoProcesso,
         getDiasAlertaNovo,
         getTemaEscuro,
+        setTemaEscuro,
     };
 }

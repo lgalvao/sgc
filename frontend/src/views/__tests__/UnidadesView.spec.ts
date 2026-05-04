@@ -234,10 +234,10 @@ describe("Unidades.vue", () => {
         expect(wrapper.text()).toContain("estão atualmente sem responsável");
         expect(wrapper.text()).toContain("não poderão participar de processos");
         expect(wrapper.text()).toContain("A responsabilidade deve ser definida externamente, no SGRH, ou por atribuição temporária no próprio sistema.");
-        const links = wrapper.findAll('a[href^="/unidade/"]');
+        const links = wrapper.findAll('[data-testid^="link-unidade-sem-responsavel-"]');
         expect(links).toHaveLength(2);
-        expect(links[0].attributes("href")).toBe("/unidade/43");
-        expect(links[1].attributes("href")).toBe("/unidade/45");
+        expect(links[0].text()).toContain("43ª Z.E.");
+        expect(links[1].text()).toContain("45ª Z.E.");
     });
 
     it("deve exibir spinner durante carregamento", async () => {

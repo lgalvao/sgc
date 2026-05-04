@@ -10,6 +10,7 @@ vi.mock('@/services/configuracaoService', () => ({
 describe('useConfiguracoes', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        localStorage.clear();
     });
 
     it('carregarConfiguracoes deve preencher configuracoes em caso de sucesso', async () => {
@@ -104,5 +105,17 @@ describe('useConfiguracoes', () => {
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: 'xyz'}
         ];
         expect(composable.getDiasAlertaNovo()).toBe(3);
+    });
+
+    it('deve persistir tema escuro no localStorage', () => {
+        const composable = useConfiguracoes();
+
+        expect(composable.getTemaEscuro()).toBe(false);
+
+        composable.setTemaEscuro(true);
+        expect(composable.getTemaEscuro()).toBe(true);
+
+        const novoComposable = useConfiguracoes();
+        expect(novoComposable.getTemaEscuro()).toBe(true);
     });
 });

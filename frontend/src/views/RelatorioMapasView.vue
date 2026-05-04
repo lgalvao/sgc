@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Relatório: Mapas vigentes">
+    <PageHeader title="Mapas vigentes">
       <template #actions>
         <BButton to="/relatorios" variant="outline-secondary">
           <i class="bi bi-arrow-left me-1"/> Voltar

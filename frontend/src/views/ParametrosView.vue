@@ -97,7 +97,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive, ref} from 'vue';
+import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {BAlert, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormInvalidFeedback, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
@@ -116,7 +116,8 @@ const {
   salvarConfiguracoes,
   getDiasInativacaoProcesso,
   getDiasAlertaNovo,
-  getTemaEscuro
+  getTemaEscuro,
+  setTemaEscuro
 } = useConfiguracoes();
 const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
@@ -132,6 +133,7 @@ const form = reactive({
   diasAlertaNovo: 3,
   temaEscuro: false
 });
+const temaEscuroInicializado = ref(false);
 
 const diasInativacaoInvalido = computed(() => Number(form.diasInativacao) < 1);
 const diasAlertaNovoInvalido = computed(() => Number(form.diasAlertaNovo) < 1);
@@ -146,9 +148,11 @@ const mensagemErroDiasAlertaNovo = computed(() =>
 );
 
 function atualizarFormulario() {
+  temaEscuroInicializado.value = false;
   form.diasInativacao = getDiasInativacaoProcesso();
   form.diasAlertaNovo = getDiasAlertaNovo();
   form.temaEscuro = getTemaEscuro();
+  temaEscuroInicializado.value = true;
 }
 
 async function carregar() {
@@ -168,12 +172,10 @@ async function salvar() {
 
   const pInativacao = findParametro('DIAS_INATIVACAO_PROCESSO');
   const pAlertaNovo = findParametro('DIAS_ALERTA_NOVO');
-  const pTemaEscuro = findParametro('TEMA_ESCURO');
 
   const ausentes = [];
   if (!pInativacao) ausentes.push('DIAS_INATIVACAO_PROCESSO');
   if (!pAlertaNovo) ausentes.push('DIAS_ALERTA_NOVO');
-  if (!pTemaEscuro) ausentes.push('TEMA_ESCURO');
 
   if (ausentes.length > 0) {
     notify(`Os seguintes parâmetros não foram encontrados no banco de dados: ${ausentes.join(', ')}. Certifique-se de executar o script de migração SQL.`, 'danger');
@@ -183,8 +185,7 @@ async function salvar() {
 
   const paramsToSave: Parametro[] = [
     {...pInativacao!, valor: form.diasInativacao.toString()},
-    {...pAlertaNovo!, valor: form.diasAlertaNovo.toString()},
-    {...pTemaEscuro!, valor: form.temaEscuro.toString()}
+    {...pAlertaNovo!, valor: form.diasAlertaNovo.toString()}
   ];
 
   const sucesso = await salvarConfiguracoes(paramsToSave);
@@ -205,5 +206,13 @@ onMounted(async () => {
   } else {
     atualizarFormulario();
   }
+});
+
+watch(() => form.temaEscuro, (novoValor) => {
+  if (!temaEscuroInicializado.value) {
+    return;
+  }
+
+  setTemaEscuro(novoValor);
 });
 </script>

@@ -16,14 +16,14 @@ describe('ParametrosView', () => {
         configuracoesStore = {
             configuracoes: ref(storeParams ?? [
                 {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
-                {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'},
-                {codigo: 3, chave: 'TEMA_ESCURO', valor: 'false', descricao: 'Desc 3'}
+                {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
             ]),
             loading: ref(loading),
             error: ref(error),
             getDiasInativacaoProcesso: vi.fn().mockReturnValue(30),
             getDiasAlertaNovo: vi.fn().mockReturnValue(5),
             getTemaEscuro: vi.fn().mockReturnValue(false),
+            setTemaEscuro: vi.fn(),
             carregarConfiguracoes: vi.fn().mockResolvedValue([]),
             salvarConfiguracoes: vi.fn().mockResolvedValue(true)
         };
@@ -44,6 +44,11 @@ describe('ParametrosView', () => {
                         name: 'BFormInput',
                         props: ['modelValue'],
                         template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+                    },
+                    BFormCheckbox: {
+                        name: 'BFormCheckbox',
+                        props: ['modelValue'],
+                        template: '<input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" />'
                     },
                     LoadingButton: {
                         template: '<button :disabled="loading" class="loading-button-stub" @click="$emit(\'click\')">{{ text }}<slot /></button>',
@@ -73,6 +78,16 @@ describe('ParametrosView', () => {
         await wrapper.find('form').trigger('submit.prevent');
         expect(configuracoesStore.salvarConfiguracoes).toHaveBeenCalled();
         expect(wrapper.text()).toContain('Configurações salvas.');
+    });
+
+    it('deve aplicar tema escuro imediatamente ao alternar o checkbox', async () => {
+        setupWrapper();
+        await wrapper.vm.$nextTick();
+
+        const checkbox = wrapper.find('input[type="checkbox"]');
+        await checkbox.setValue(true);
+
+        expect(configuracoesStore.setTemaEscuro).toHaveBeenCalledWith(true);
     });
 
     it('deve mostrar erro ao falhar ao salvar', async () => {
