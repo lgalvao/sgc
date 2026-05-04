@@ -59,7 +59,7 @@ node etc/scripts/sgc.js qa dashboard servir --porta 4179
 
 ### Gestão do Projeto
 ```bash
-node etc/scripts/sgc.js projeto doctor --json
+node etc/scripts/sgc.js projeto doctor --json  # Diagnóstico completo (versões, portas, conectividade)
 node etc/scripts/sgc.js projeto limpar --confirmar
 node etc/scripts/sgc.js projeto setup --instalar-dependencias
 ```

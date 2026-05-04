@@ -51,7 +51,7 @@ O projeto possui uma CLI de automação centralizada que deve ser utilizada para
 
 * **Ponto de Entrada:** `node etc/scripts/sgc.js`
 * **Comandos Essenciais:**
-    * **`projeto doctor`**: Valida a saúde do ambiente (Node, Java, dependências).
+    * **`projeto doctor`**: Valida a saúde do ambiente (Node, Java, dependências, portas e conectividade).
     * **`qa snapshot coletar`**: Orquestra toda a suíte de qualidade (testes, lint, cobertura).
     * **`backend testes analisar`**: Identifica classes sem testes e lacunas de cobertura.
     * **`codigo smells auditar`**: Detecta complexidade acidental e padrões desencorajados.
