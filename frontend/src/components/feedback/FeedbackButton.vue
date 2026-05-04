@@ -18,24 +18,24 @@ const desabilitado = computed(() => props.estado === 'carregando')
 const icone = computed(() => {
   switch (props.estado) {
     case 'carregando':
-      return 'bi-hourglass-split'
+      return 'bi-arrow-repeat'
     case 'sucesso':
-      return 'bi-check-lg'
+      return 'bi-check2'
     case 'erro':
-      return 'bi-exclamation-triangle'
+      return 'bi-exclamation-circle'
     default:
-      return 'bi-chat-square-text'
+      return 'bi-chat-left-text'
   }
 })
 
 const classeVariante = computed(() => {
   switch (props.estado) {
     case 'sucesso':
-      return 'btn-success'
+      return 'btn-outline-secondary'
     case 'erro':
-      return 'btn-danger'
+      return 'btn-outline-secondary'
     default:
-      return 'btn-primary'
+      return 'btn-outline-secondary'
   }
 })
 </script>
@@ -66,5 +66,29 @@ const classeVariante = computed(() => {
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
+  background: rgba(var(--bs-body-bg-rgb), 0.92);
+  border-width: 1px;
+  backdrop-filter: blur(6px);
+}
+
+.feedback-btn :deep(.bi) {
+  line-height: 1;
+}
+
+.feedback-btn:disabled {
+  opacity: 0.8;
+}
+
+.bi-arrow-repeat {
+  animation: feedback-spin 0.9s linear infinite;
+}
+
+@keyframes feedback-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

@@ -92,9 +92,9 @@ describe('FeedbackWidget.vue', () => {
 
         // Simular o evento 'enviar' do modal
         const modal = wrapper.findComponent(FeedbackModal)
-        await modal.vm.$emit('enviar', 'ELOGIO', '5')
+        await modal.vm.$emit('enviar', 'sugestao', '5')
 
-        expect(mockUseFeedback.enviarFeedback).toHaveBeenCalledWith('ELOGIO', '5')
+        expect(mockUseFeedback.enviarFeedback).toHaveBeenCalledWith('sugestao', '5')
         expect(mockCriarToast).toHaveBeenCalledWith(expect.objectContaining({
             props: expect.objectContaining({variant: 'success'})
         }))
@@ -119,7 +119,7 @@ describe('FeedbackWidget.vue', () => {
         })
 
         const modal = wrapper.findComponent(FeedbackModal)
-        await modal.vm.$emit('enviar', 'BUG', '1')
+        await modal.vm.$emit('enviar', 'bug', '1')
 
         expect(mockCriarToast).toHaveBeenCalledWith(expect.objectContaining({
             props: expect.objectContaining({variant: 'danger'})
