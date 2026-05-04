@@ -202,6 +202,7 @@ const {
   erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
   garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
   garantirContextoEdicaoPorProcessoEUnidade: subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade,
+  dadosEdicaoValidos: subprocessoStore.dadosEdicaoValidos,
   invalidarMapa: mapasStore.invalidar,
   exibirToastPendente,
 });

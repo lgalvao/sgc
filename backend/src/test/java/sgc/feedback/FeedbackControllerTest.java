@@ -124,4 +124,30 @@ class FeedbackControllerTest {
                         .with(csrf()))
                 .andExpect(status().is(org.hamcrest.Matchers.is(422)));
     }
+
+    @Test
+    @DisplayName("GET /api/feedback/listar - deve retornar lista para admin")
+    @WithMockUser(roles = "ADMIN")
+    void deveListarFeedbacksParaAdmin() throws Exception {
+        UUID codigo = UUID.randomUUID();
+        when(feedbackService.listarRecentes(100)).thenReturn(List.of(
+                new FeedbackListagemDto(
+                        codigo,
+                        FeedbackTipo.BUG,
+                        "Bug relatado",
+                        null,
+                        null,
+                        "123",
+                        "João",
+                        OffsetDateTime.now(),
+                        "/painel",
+                        FeedbackStatus.NOVO
+                )
+        ));
+
+        mockMvc.perform(get(URL + "/listar"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigo").value(codigo.toString()))
+                .andExpect(jsonPath("$[0].tipo").value("bug"));
+    }
 }

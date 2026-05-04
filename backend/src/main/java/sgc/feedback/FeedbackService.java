@@ -9,6 +9,7 @@ import org.springframework.web.multipart.*;
 import sgc.comum.erros.*;
 import sgc.feedback.dto.*;
 import sgc.organizacao.*;
+import org.springframework.data.domain.*;
 import tools.jackson.databind.*;
 
 import java.io.*;
@@ -65,6 +66,15 @@ public class FeedbackService {
         FeedbackRegistro salvo = repo.save(registro);
         log.info("Feedback registrado: id={} tipo={} usuario={}", salvo.getId(), salvo.getTipo(), salvo.getUsuarioId());
         return new FeedbackRespostaDto(salvo.getId(), salvo.getEnviadoEm());
+    }
+
+    @Transactional(readOnly = true)
+    public List<FeedbackListagemDto> listarRecentes(int limite) {
+        int limiteNormalizado = Math.min(Math.max(limite, 1), 200);
+        var page = PageRequest.of(0, limiteNormalizado, Sort.by(Sort.Direction.DESC, "enviadoEm"));
+        return repo.findAll(page).stream()
+                .map(FeedbackListagemDto::from)
+                .toList();
     }
 
     private void validarNota(String nota) {

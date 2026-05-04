@@ -90,6 +90,12 @@
             <span aria-hidden="true" class="d-lg-none">Ações Especiais</span>
           </template>
           <BDropdownItem
+              data-testid="btn-nav-feedbacks"
+              to="/administracao/feedbacks"
+          >
+            <i aria-hidden="true" class="bi bi-chat-left-text me-2"></i> {{ TEXTOS.comum.MENU_FEEDBACKS }}
+          </BDropdownItem>
+          <BDropdownItem
               data-testid="btn-nav-limpeza-processos"
               to="/administracao/limpeza-processos"
               variant="danger"

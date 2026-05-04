@@ -31,10 +31,13 @@ vi.mock("@/composables/useErrorHandler", () => ({
     })
 }));
 
+const subprocessoStoreMock = {
+    garantirContextoCadastroAtividades: vi.fn(),
+    limparContextoAtual: vi.fn()
+};
+
 vi.mock("@/stores/subprocesso", () => ({
-    useSubprocessoStore: () => ({
-        garantirContextoCadastroAtividades: vi.fn()
-    })
+    useSubprocessoStore: () => subprocessoStoreMock
 }));
 
 vi.mock("@/stores/toast", () => ({
@@ -58,6 +61,8 @@ vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
 describe("useFluxoSubprocesso", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        subprocessoStoreMock.garantirContextoCadastroAtividades.mockReset();
+        subprocessoStoreMock.limparContextoAtual.mockReset();
     });
 
     it("deve validar cadastro", async () => {
@@ -78,6 +83,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
+        expect(subprocessoStoreMock.limparContextoAtual).toHaveBeenCalled();
     });
 
     it("deve iniciar revisão de cadastro", async () => {

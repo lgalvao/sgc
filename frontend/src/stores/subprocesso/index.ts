@@ -3,6 +3,7 @@ import {ref} from "vue";
 import type {ContextoCadastroAtividadesSubprocesso, ContextoEdicaoSubprocesso} from "@/types/tipos";
 import {
     type AtualizacaoStatusLocal,
+    dadosValidos,
     atualizarDetalhesContexto,
     registrarContexto
 } from "@/stores/subprocessoStoreHelpers";
@@ -59,6 +60,8 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         contextoEdicao,
         contextoCadastro,
         erroIntegracaoContexto,
+        dadosEdicaoValidos: (codigoSubprocesso: number) => dadosValidos(contextoEdicao, contextoEdicaoInvalido, codigoSubprocesso),
+        dadosCadastroValidos: (codigoSubprocesso: number) => dadosValidos(contextoCadastro, contextoCadastroInvalido, codigoSubprocesso),
         invalidar,
         resetar,
         limparContextoAtual,

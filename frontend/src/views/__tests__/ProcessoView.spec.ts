@@ -519,6 +519,8 @@ describe("Processo.vue", () => {
             acao: 'HOMOLOGAR',
             dataLimite: undefined,
         });
+        expect(wrapper.vm.processo).toBeNull();
+        expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve usar textos de CDU-23 quando houver apenas cadastro elegível para homologacao", async () => {

@@ -77,6 +77,7 @@ export function useProcessoAcoes({
             await processoService.finalizarProcesso(codProcesso);
             toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
             invalidarCachesProcesso();
+            processo.value = null;
             historicoStore.invalidar();
             await router.push("/painel");
         } catch (error) {
@@ -114,6 +115,7 @@ export function useProcessoAcoes({
             if (redirecionarPainel) {
                 toastStore.setPending(mensagemSucesso);
                 invalidarCachesProcesso();
+                processo.value = null;
                 await router.push("/painel");
                 return;
             }

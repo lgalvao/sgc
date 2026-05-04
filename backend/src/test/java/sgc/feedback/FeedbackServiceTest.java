@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.mock.web.*;
+import org.springframework.data.domain.*;
 import sgc.comum.erros.*;
 import sgc.feedback.dto.*;
 import sgc.organizacao.*;
@@ -199,5 +200,41 @@ class FeedbackServiceTest {
 
         // usuarioId deve ser o do security context (12345), não o dos metadados (99999)
         verify(repo).save(argThat(r -> "12345".equals(r.getUsuarioId())));
+    }
+
+    @Test
+    @DisplayName("deve listar feedbacks mais recentes em ordem decrescente")
+    void deveListarFeedbacksMaisRecentes() {
+        var maisRecente = FeedbackRegistro.builder()
+                .id(UUID.randomUUID())
+                .tipo(FeedbackTipo.BUG)
+                .nota("Mais recente")
+                .usuarioId("1")
+                .usuarioNome("A")
+                .rota("/painel")
+                .status(FeedbackStatus.NOVO)
+                .enviadoEm(java.time.OffsetDateTime.now())
+                .build();
+        var maisAntigo = FeedbackRegistro.builder()
+                .id(UUID.randomUUID())
+                .tipo(FeedbackTipo.SUGESTAO)
+                .nota("Mais antigo")
+                .usuarioId("2")
+                .usuarioNome("B")
+                .rota("/historico")
+                .status(FeedbackStatus.REVISADO)
+                .enviadoEm(java.time.OffsetDateTime.now().minusDays(1))
+                .build();
+        when(repo.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(maisRecente, maisAntigo)));
+
+        var resposta = service.listarRecentes(50);
+
+        assertThat(resposta).hasSize(2);
+        assertThat(resposta.getFirst().nota()).isEqualTo("Mais recente");
+        verify(repo).findAll(argThat((Pageable pageable) ->
+                pageable.getPageSize() == 50
+                        && pageable.getSort().getOrderFor("enviadoEm") != null
+                        && pageable.getSort().getOrderFor("enviadoEm").isDescending()
+        ));
     }
 }

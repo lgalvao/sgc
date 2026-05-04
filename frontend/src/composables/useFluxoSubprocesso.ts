@@ -41,8 +41,10 @@ export function useFluxoSubprocesso() {
                 }
 
                 if (options.redirecionarParaPainel) {
+                    subprocessoStore.limparContextoAtual();
                     await router.push("/painel");
                 } else if (options.redirecionarPara) {
+                    subprocessoStore.limparContextoAtual();
                     await router.push(options.redirecionarPara);
                 }
             });

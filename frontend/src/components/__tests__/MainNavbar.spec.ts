@@ -90,6 +90,9 @@ describe("MainNavbar.vue", () => {
         } else {
             expect(notificacoesNavItem.attributes("to")).toBe("/administracao/notificacoes");
         }
+
+        const feedbacksNavItem = ctx.wrapper.find('[data-testid="btn-nav-feedbacks"]');
+        expect(feedbacksNavItem.exists()).toBe(true);
     });
 
     it("deve navegar para a unidade do usuário ao clicar em 'Minha unidade' (não-ADMIN)", async () => {

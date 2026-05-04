@@ -9,13 +9,14 @@ vi.mock('@/views/ParametrosView.vue', () => ({default: {name: 'ParametrosView'}}
 vi.mock('@/views/AdministradoresView.vue', () => ({default: {name: 'AdministradoresView'}}));
 vi.mock('@/views/LimpezaProcessosView.vue', () => ({default: {name: 'LimpezaProcessosView'}}));
 vi.mock('@/views/NotificacoesAdminView.vue', () => ({default: {name: 'NotificacoesAdminView'}}));
+vi.mock('@/views/FeedbacksAdminView.vue', () => ({default: {name: 'FeedbacksAdminView'}}));
 vi.mock('@/views/RelatorioAndamentoView.vue', () => ({default: {name: 'RelatorioAndamentoView'}}));
 vi.mock('@/views/RelatorioMapasView.vue', () => ({default: {name: 'RelatorioMapasView'}}));
 vi.mock('@/views/ErroGeralView.vue', () => ({default: {name: 'ErroGeralView'}}));
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(12);
+        expect(mainRoutes).toHaveLength(13);
     });
 
     it("deve conter a rota RelatorioAndamento", async () => {
@@ -138,6 +139,18 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/administracao/notificacoes");
         expect(route?.meta?.title).toBe("Notificações");
+
+        if (typeof route?.component === "function") {
+            const component = await (route.component as () => Promise<any>)();
+            expect(component.default).toBeDefined();
+        }
+    }, 30000);
+
+    it("deve conter a rota FeedbacksAdmin", async () => {
+        const route = mainRoutes.find((r) => r.name === "FeedbacksAdmin");
+        expect(route).toBeDefined();
+        expect(route?.path).toBe("/administracao/feedbacks");
+        expect(route?.meta?.title).toBe("Feedbacks");
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();

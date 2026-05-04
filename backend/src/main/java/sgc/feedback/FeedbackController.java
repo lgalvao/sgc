@@ -54,6 +54,14 @@ public class FeedbackController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
+    @GetMapping("/listar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<FeedbackListagemDto>> listar(
+            @RequestParam(defaultValue = "100") int limite
+    ) {
+        return ResponseEntity.ok(feedbackService.listarRecentes(limite));
+    }
+
     private void validar(FeedbackPayloadDto payload) {
         var violations = obterViolacoes(payload);
         if (!violations.isEmpty()) {

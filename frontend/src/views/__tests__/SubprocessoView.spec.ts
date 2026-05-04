@@ -82,6 +82,7 @@ const subprocessoStoreMock = reactive({
     erroIntegracaoContexto: null as { message: string; details?: string } | null,
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
     garantirContextoEdicao: vi.fn(),
+    dadosEdicaoValidos: vi.fn(),
     invalidar: vi.fn(),
     limparErroIntegracao: vi.fn(),
 });
@@ -188,6 +189,7 @@ describe('SubprocessoView.vue', () => {
             subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
             return {detalhes: mockSubprocesso};
         });
+        subprocessoStoreMock.dadosEdicaoValidos = vi.fn().mockReturnValue(false);
         subprocessoStoreMock.limparErroIntegracao = vi.fn();
     });
 
@@ -265,13 +267,29 @@ describe('SubprocessoView.vue', () => {
         const {wrapper} = mountComponent();
         await flushPromises();
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
+        subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(false);
 
         const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }
         await flushPromises();
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false);
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true);
+    });
+
+    it('não recarrega ao reativar quando o contexto atual ainda é válido', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
+        subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(true);
+
+        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
+        for (const hook of hooks) {
+            await hook.call(wrapper.vm);
+        }
+        await flushPromises();
+
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it('mantem orçamento enxuto de chamadas no carregamento inicial do detalhe', async () => {
