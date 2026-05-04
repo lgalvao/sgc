@@ -5,7 +5,7 @@
  * e é excluído pelo tree-shaker em builds de produção.
  */
 
-export type FeedbackTipo = 'bug' | 'sugestao' | 'questao' | 'elogio'
+export type FeedbackTipo = 'bug' | 'sugestao' | 'questao'
 
 export interface MetadadosFeedback {
     /** Código/título eleitoral do usuário autenticado */

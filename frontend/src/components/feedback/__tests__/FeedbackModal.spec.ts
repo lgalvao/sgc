@@ -25,6 +25,12 @@ describe('FeedbackModal.vue', () => {
         }
     }
 
+    function definirConteudoEditor(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
+        const editor = wrapper.find('[data-testid="feedback-nota"]')
+        ;(editor.element as HTMLDivElement).innerHTML = conteudoHtml
+        return editor.trigger('input')
+    }
+
     it('deve renderizar o título correto', () => {
         const wrapper = mount(FeedbackModal, {
             props: defaultProps,
@@ -58,8 +64,7 @@ describe('FeedbackModal.vue', () => {
             }
         })
 
-        const input = wrapper.find('[data-testid="feedback-nota"]')
-        await input.setValue('Curto')
+        await definirConteudoEditor(wrapper, '<p>Curto</p>')
         await wrapper.find('form').trigger('submit')
 
         expect(wrapper.text()).toContain('Descreva o problema com pelo menos 10 caracteres.')
@@ -75,16 +80,16 @@ describe('FeedbackModal.vue', () => {
             }
         })
 
-        await wrapper.find('[data-testid="feedback-nota"]').setValue('Esta é uma descrição longa o suficiente.')
+        await definirConteudoEditor(wrapper, '<p>Esta é uma descrição longa o suficiente.</p>')
         // Para rádio buttons em Vue, precisamos encontrar o input correto e dar set no valor do v-model manualmente se o trigger não funcionar bem
         // Mas o setValue no rádio deve funcionar se o value bater.
-        const radio = wrapper.find('[data-testid="feedback-tipo-elogio"]')
+        const radio = wrapper.find('[data-testid="feedback-tipo-sugestao"]')
         await radio.setValue(true)
 
         await wrapper.find('form').trigger('submit')
 
         expect(wrapper.emitted('enviar')).toBeTruthy()
-        expect(wrapper.emitted('enviar')![0]).toEqual(['elogio', 'Esta é uma descrição longa o suficiente.'])
+        expect(wrapper.emitted('enviar')![0]).toEqual(['sugestao', '<p>Esta é uma descrição longa o suficiente.</p>'])
     })
 
     it('deve emitir removerCaptura ao clicar no botão correspondente', async () => {
@@ -101,19 +106,15 @@ describe('FeedbackModal.vue', () => {
         expect(wrapper.emitted('removerCaptura')).toBeTruthy()
     })
 
-    it('deve abrir captura em nova aba ao clicar na imagem', async () => {
-        const blob = new Blob(['test'], {type: 'image/png'})
-        const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
-
+    it('não deve exibir a opção de elogio', () => {
         const wrapper = mount(FeedbackModal, {
-            props: {...defaultProps, captura: blob},
+            props: defaultProps,
             global: {
                 plugins: [createTestingPinia()],
                 stubs
             }
         })
 
-        await wrapper.find('button.btn.p-0.border-0').trigger('click')
-        expect(windowOpenSpy).toHaveBeenCalledWith('blob:url', '_blank')
+        expect(wrapper.find('[data-testid="feedback-tipo-elogio"]').exists()).toBe(false)
     })
 })

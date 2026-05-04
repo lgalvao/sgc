@@ -357,6 +357,15 @@ function startBackend() {
 
 function startFrontend() {
     const pnpmExecutable = isWindows ? 'pnpm.cmd' : 'pnpm';
+    const argumentosFrontend = ['exec', 'vite'];
+
+    if (modoHomologacao()) {
+        argumentosFrontend.push('--mode', 'hom');
+    } else if (modoE2e()) {
+        argumentosFrontend.push('--mode', 'e2e');
+    }
+
+    argumentosFrontend.push('--port', String(FRONTEND_PORT));
 
     const spawnOptions = {
         cwd: FRONTEND_DIR,
@@ -372,7 +381,7 @@ function startFrontend() {
 
     const frontendProcess = spawn(
         pnpmExecutable,
-        ['run', 'dev', '--', '--port', String(FRONTEND_PORT)],
+        argumentosFrontend,
         spawnOptions
     );
     frontendProcessos.push(frontendProcess);
@@ -513,6 +522,11 @@ function descreverBackends() {
     return `Backend: ${portaBackend()} (perfil ${PERFIL_LIFECYCLE})`;
 }
 
+function descreverFeedbackWidget() {
+    const ativado = modoE2e() || modoHomologacao();
+    return `Feedback: ${ativado ? 'ativado' : 'desativado'}`;
+}
+
 try {
     validarPerfilLifecycle();
     validarModoMonitoramento();
@@ -527,7 +541,7 @@ try {
     await subirInfra();
     lifecycleLogger.info(
         `>>> Infra ${PERFIL_LIFECYCLE.toUpperCase()} no ar. Frontend: ${FRONTEND_PORT}. ` +
-        `${descreverBackends()}. Monitoramento: ${MODO_MONITORAMENTO}.`
+        `${descreverBackends()}. ${descreverFeedbackWidget()}. Monitoramento: ${MODO_MONITORAMENTO}.`
     );
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);
