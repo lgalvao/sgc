@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, watch} from "vue";
 import {useRoute} from "vue-router";
-import {BOrchestrator} from "bootstrap-vue-next";
+import {BOrchestrator, BSpinner} from "bootstrap-vue-next";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
@@ -63,9 +63,11 @@ watch(
 const devePrecarregarDiagnostico = computed(
     () => perfilStore.permissoesSessao?.mostrarDiagnosticoOrganizacional === true
 );
+const rotaExigeDiagnosticoOrganizacional = computed(() =>
+    route.path === "/unidades" || route.path === "/processo/cadastro"
+);
 const aguardandoDiagnosticoOrganizacional = computed(() =>
-    route.path !== "/login"
-    && route.path !== "/erro"
+    rotaExigeDiagnosticoOrganizacional.value
     && Boolean(perfilStore.usuarioCodigo)
     && devePrecarregarDiagnostico.value
     && !organizacaoStore.carregado
@@ -121,6 +123,7 @@ const chaveSessao = computed(() =>
           v-if="aguardandoDiagnosticoOrganizacional"
           class="container py-4 text-center text-body-secondary"
       >
+        <BSpinner class="me-2" variant="primary"/>
         Carregando informações organizacionais...
       </div>
       <router-view v-slot="{ Component, route: currentRoute }">
