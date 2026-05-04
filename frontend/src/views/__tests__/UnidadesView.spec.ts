@@ -10,6 +10,11 @@ const mockPush = vi.fn();
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({push: mockPush}),
+    RouterLink: {
+        name: "RouterLink",
+        props: ["to"],
+        template: "<a :href=\"typeof to === 'string' ? to : to.path\"><slot /></a>"
+    }
 }));
 
 vi.mock("@/composables/usePerfil", () => ({
@@ -169,7 +174,7 @@ describe("Unidades.vue", () => {
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
 
-    it("deve exibir alerta fixo com resumo do diagnostico para ADMIN", async () => {
+    it("deve exibir alerta com links para todas as unidades sem responsável", async () => {
         // Pré-popula a organizacaoStore via initialState (evita dependência da chamada HTTP)
         const diagMock = {
             possuiViolacoes: true,
@@ -184,8 +189,8 @@ describe("Unidades.vue", () => {
                 },
                 {
                     tipo: "Unidade sem responsável",
-                    quantidadeOcorrencias: 1,
-                    ocorrencias: ["sigla=43ª Z.E."]
+                    quantidadeOcorrencias: 2,
+                    ocorrencias: ["sigla=43ª Z.E.", "sigla=45ª Z.E."]
                 }
             ]
         };
@@ -209,12 +214,30 @@ describe("Unidades.vue", () => {
                 }
             )
         });
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce([
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 43, sigla: "43ª Z.E.", nome: "Zona 43", filhas: []},
+                    {codigo: 45, sigla: "45ª Z.E.", nome: "Zona 45", filhas: []}
+                ]
+            }
+        ] as any);
         await flushPromises();
         const wrapper = context.wrapper;
 
-        expect(wrapper.text()).toContain("Há unidades sem responsável atual.");
-        expect(wrapper.text()).toContain("VW_USUARIO com titulo duplicado: 2 ocorrência(s)");
-        expect(wrapper.text()).toContain("Unidade sem responsável: 1 ocorrência(s)");
+        expect(wrapper.text()).toContain("As unidades");
+        expect(wrapper.text()).toContain("43ª Z.E.");
+        expect(wrapper.text()).toContain("45ª Z.E.");
+        expect(wrapper.text()).toContain("estão atualmente sem responsável");
+        expect(wrapper.text()).toContain("não poderão participar de processos");
+        expect(wrapper.text()).toContain("A responsabilidade deve ser definida externamente, no SGRH, ou por atribuição temporária no próprio sistema.");
+        const links = wrapper.findAll('a[href^="/unidade/"]');
+        expect(links).toHaveLength(2);
+        expect(links[0].attributes("href")).toBe("/unidade/43");
+        expect(links[1].attributes("href")).toBe("/unidade/45");
     });
 
     it("deve exibir spinner durante carregamento", async () => {

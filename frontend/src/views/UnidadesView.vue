@@ -34,13 +34,24 @@
           variant="warning"
           @dismissed="dispensarAlertaDiagnostico"
       >
-        <strong>Há unidades sem responsável atual.</strong>
-        <div class="mt-1">{{ resumoDiagnostico }}</div>
-        <ul v-if="gruposDiagnostico.length > 0" class="mb-0 mt-2 ps-3">
-          <li v-for="grupo in gruposDiagnostico" :key="grupo.tipo">
-            {{ grupo.tipo }}: {{ grupo.quantidadeOcorrencias }} ocorrência(s)
-          </li>
-        </ul>
+        <div v-if="erroDiagnosticoOrganizacional" class="mt-1">{{ erroDiagnosticoOrganizacional }}</div>
+        <div v-else-if="unidadesSemResponsavel.length > 0" class="mt-1">
+          {{ prefixoMensagemUnidadesSemResponsavel }}
+          <template v-for="(unidade, indice) in unidadesSemResponsavel" :key="unidade.sigla">
+            <span v-if="indice > 0">{{ separadorListaUnidades(indice, unidadesSemResponsavel.length) }}</span>
+            <RouterLink
+                v-if="unidade.codigo !== null"
+                :to="`/unidade/${unidade.codigo}`"
+                :data-testid="`link-unidade-sem-responsavel-${indice}`"
+            >
+              <strong>{{ unidade.sigla }}</strong>
+            </RouterLink>
+            <strong v-else>{{ unidade.sigla }}</strong>
+          </template>
+          {{ sufixoMensagemUnidadesSemResponsavel }} A responsabilidade
+          deve ser definida externamente, no SGRH, ou por atribuição temporária no próprio sistema.
+        </div>
+        <div v-else class="mt-1">{{ resumoDiagnostico }}</div>
       </BAlert>
     </div>
 
@@ -90,15 +101,16 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onActivated, onMounted, ref} from "vue";
+import {computed, onActivated, onMounted, ref, watch} from "vue";
 import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
-import {useRouter} from "vue-router";
+import {RouterLink, useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
+import type {DiagnosticoOrganizacional} from "@/types/diagnostico";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {usePerfil} from "@/composables/usePerfil";
@@ -128,20 +140,50 @@ const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagno
 const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
 const router = useRouter();
 const carregamentoInicialConcluido = ref(false);
+const diagnosticoOrganizacionalPersistido = ref<DiagnosticoOrganizacional | null>(null);
+const erroDiagnosticoPersistido = ref<string | null>(null);
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
 );
-const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
+const diagnosticoOrganizacionalEfetivo = computed(() =>
+    diagnosticoOrganizacional.value ?? diagnosticoOrganizacionalPersistido.value
+);
+const erroDiagnosticoOrganizacionalEfetivo = computed(() =>
+    erroDiagnosticoOrganizacional.value ?? erroDiagnosticoPersistido.value
+);
 const resumoDiagnostico = computed(() =>
-    erroDiagnosticoOrganizacional.value
-    ?? diagnosticoOrganizacional.value?.resumo
+    erroDiagnosticoOrganizacionalEfetivo.value
+    ?? diagnosticoOrganizacionalEfetivo.value?.resumo
     ?? ""
 );
+const unidadesSemResponsavel = computed(() => {
+  const grupo = diagnosticoOrganizacionalEfetivo.value?.grupos.find((item) => item.tipo === "Unidade sem responsável");
+  if (!grupo || grupo.ocorrencias.length === 0) {
+    return [];
+  }
+
+  return grupo.ocorrencias
+      .map(extrairSiglaUnidade)
+      .filter((sigla): sigla is string => Boolean(sigla))
+      .map((sigla) => ({
+        sigla,
+        codigo: buscarCodigoUnidadePorSigla(unidades.value, sigla),
+      }));
+});
+const prefixoMensagemUnidadesSemResponsavel = computed(() =>
+    unidadesSemResponsavel.value.length > 1 ? "As unidades " : "A unidade "
+);
+const sufixoMensagemUnidadesSemResponsavel = computed(() =>
+    unidadesSemResponsavel.value.length > 1
+        ? " estão atualmente sem responsável. Enquanto isso, não poderão participar de processos."
+        : " está atualmente sem responsável. Enquanto isso, não poderá participar de processos."
+);
+
 const alertaDiagnosticoDispensado = ref(false);
 const exibirAlertaDiagnostico = computed(() =>
     mostrarDiagnosticoOrganizacional.value
-    && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
+    && (!!erroDiagnosticoOrganizacionalEfetivo.value || diagnosticoOrganizacionalEfetivo.value?.possuiViolacoes === true)
     && !alertaDiagnosticoDispensado.value
 );
 
@@ -183,6 +225,38 @@ function recolherTodasLinhas() {
   treeTableRef.value?.collapseAll();
 }
 
+function extrairSiglaUnidade(ocorrencia: string): string | null {
+  if (!ocorrencia) {
+    return null;
+  }
+
+  const correspondencia = ocorrencia.match(/^sigla=([^,]+?)(?:,\s|$)/);
+  return correspondencia?.[1]?.trim() || null;
+}
+
+function separadorListaUnidades(indice: number, total: number): string {
+  if (indice === total - 1) {
+    return total === 2 ? " e " : ", e ";
+  }
+
+  return ", ";
+}
+
+function buscarCodigoUnidadePorSigla(unidadesOrigem: Unidade[], sigla: string): number | null {
+  for (const unidade of unidadesOrigem) {
+    if (unidade.sigla === sigla) {
+      return unidade.codigo;
+    }
+
+    const codigoFilha = buscarCodigoUnidadePorSigla(unidade.filhas ?? [], sigla);
+    if (codigoFilha !== null) {
+      return codigoFilha;
+    }
+  }
+
+  return null;
+}
+
 async function carregarUnidades() {
   await executarSilencioso(async () => {
     unidades.value = await buscarTodasUnidades();
@@ -213,6 +287,18 @@ function abrirDetalheUnidade(item: unknown) {
   const unidade = item as LinhaUnidadeArvore;
   void router.push({path: `/unidade/${unidade.codigo}`});
 }
+
+watch(diagnosticoOrganizacional, (novoDiagnostico) => {
+  if (novoDiagnostico) {
+    diagnosticoOrganizacionalPersistido.value = novoDiagnostico;
+  }
+}, {immediate: true});
+
+watch(erroDiagnosticoOrganizacional, (novoErro) => {
+  if (novoErro) {
+    erroDiagnosticoPersistido.value = novoErro;
+  }
+}, {immediate: true});
 
 onMounted(() => {
   void carregarDiagnostico();

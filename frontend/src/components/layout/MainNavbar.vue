@@ -1,6 +1,6 @@
 <template>
-  <BNavbar class="border-bottom sticky-top bg-body-tertiary" toggleable="lg">
-    <BNavbarBrand class="fw-bold fs-5 me-4 text-body" to="/painel">
+  <BNavbar class="border-bottom sticky-top navbar-principal-sgc navbar-dark" toggleable="lg">
+    <BNavbarBrand class="fw-bold fs-5 me-4 navbar-principal-sgc__marca" to="/painel">
       {{ TEXTOS.comum.NOME_SISTEMA }}
     </BNavbarBrand>
 
@@ -27,7 +27,7 @@
             v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: isMobile }"
             class="me-2 user-profile-item"
         >
-          <div class="d-flex align-items-center text-body-secondary">
+          <div class="d-flex align-items-center navbar-principal-sgc__texto-secundario">
             <i aria-hidden="true" class="bi bi-person-circle me-2"/>
             <div class="user-info-text">
               <span class="d-lg-inline">{{ isAdmin ? 'ADMIN' : `${perfilSelecionado} - ${unidadeSelecionada}` }}</span>
@@ -108,7 +108,7 @@
         >
           <template #default>
             <span class="visually-hidden">Sair</span>
-            <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1 text-danger"/>
+            <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1"/>
             <span aria-hidden="true" class="d-lg-none">Sair</span>
           </template>
         </BNavItem>
@@ -165,6 +165,69 @@ async function handleLogout() {
 </script>
 
 <style scoped>
+.navbar-principal-sgc {
+  background-color: #1f2937;
+  border-bottom-color: #374151 !important;
+  --bs-navbar-color: #e5e7eb;
+  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-active-color: #ffffff;
+  --bs-navbar-brand-color: #f8fafc;
+  --bs-navbar-brand-hover-color: #ffffff;
+  --bs-navbar-disabled-color: #94a3b8;
+  --bs-navbar-toggler-border-color: rgba(248, 250, 252, 0.35);
+  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28248, 250, 252, 0.95%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.navbar-principal-sgc__marca {
+  color: #f8fafc !important;
+}
+
+.navbar-principal-sgc__texto-secundario {
+  color: #cbd5e1;
+}
+
+:deep(.navbar-principal-sgc .navbar-brand),
+:deep(.navbar-principal-sgc .navbar-brand *),
+:deep(.navbar-principal-sgc a),
+:deep(.navbar-principal-sgc a *),
+:deep(.navbar-principal-sgc .nav-link),
+:deep(.navbar-principal-sgc .nav-link *),
+:deep(.navbar-principal-sgc .dropdown-toggle),
+:deep(.navbar-principal-sgc .dropdown-toggle *),
+:deep(.navbar-principal-sgc .navbar-nav .nav-item),
+:deep(.navbar-principal-sgc .navbar-nav .nav-item *),
+:deep(.navbar-principal-sgc i) {
+  color: #e5e7eb !important;
+}
+
+:deep(.navbar-principal-sgc .navbar-toggler) {
+  border-color: rgba(248, 250, 252, 0.35);
+}
+
+:deep(.navbar-principal-sgc .nav-link:hover),
+:deep(.navbar-principal-sgc .nav-link:focus),
+:deep(.navbar-principal-sgc .nav-link:hover *),
+:deep(.navbar-principal-sgc .nav-link:focus *),
+:deep(.navbar-principal-sgc a:hover),
+:deep(.navbar-principal-sgc a:focus),
+:deep(.navbar-principal-sgc a:hover *),
+:deep(.navbar-principal-sgc a:focus *),
+:deep(.navbar-principal-sgc .dropdown-toggle:hover),
+:deep(.navbar-principal-sgc .dropdown-toggle:focus),
+:deep(.navbar-principal-sgc .dropdown-toggle:hover *),
+:deep(.navbar-principal-sgc .dropdown-toggle:focus *),
+:deep(.navbar-principal-sgc i:hover),
+:deep(.navbar-principal-sgc i:focus) {
+  color: #ffffff !important;
+}
+
+:deep(.navbar-principal-sgc .router-link-active),
+:deep(.navbar-principal-sgc .router-link-active *),
+:deep(.navbar-principal-sgc .active),
+:deep(.navbar-principal-sgc .active *) {
+  color: #ffffff !important;
+}
+
 .user-info-text {
   font-size: 0.875rem;
   max-width: 200px;
