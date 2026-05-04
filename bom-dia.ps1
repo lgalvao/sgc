@@ -9,7 +9,6 @@ if (-not $isAdmin) {
 }
 
 $ErrorActionPreference = 'Stop'
-
 function Invoke-Passo {
     param([string]$Label, [scriptblock]$Action)
     Write-Host "`n==> $Label" -ForegroundColor Cyan
@@ -32,13 +31,12 @@ if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
 
 Invoke-Passo 'Atualizar pnpm'    { pnpm self-update --silent}
 Invoke-Passo 'Atualizar globais' { pnpm update -g }
-Invoke-Passo 'Atualizar raiz'    { pnpm update }
-
+Invoke-Passo 'Raiz install'      { pnpm install && pnpm update}
 Invoke-Passo 'Typecheck'         { pnpm run typecheck }
 Invoke-Passo 'Lint'              { pnpm run lint }
 
 Push-Location frontend
-Invoke-Passo 'Frontend deps'     { pnpm update }
+Invoke-Passo 'Frontend install'  { pnpm install && pnpm update}
 Invoke-Passo 'Testes frontend'   { pnpm exec vitest run }
 Pop-Location
 

@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# SGC Good Morning Script - Bash version for macOS/Linux/GitBash
 set -euo pipefail
 
-# Configuração de cores
 CYAN='\033[0;36m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -34,7 +32,6 @@ if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || -n "${WINDIR:-}" ]]; then
     fi
 fi
 
-# Limpar tela
 clear
 
 invoke_passo 'git pull' git pull
@@ -49,8 +46,8 @@ invoke_passo 'Atualizar pnpm' corepack prepare pnpm@latest --activate
 invoke_passo 'Atualizar globais' pnpm update -g
 invoke_passo 'Atualizar raiz' pnpm update
 
-invoke_passo 'Typecheck' pnpm run typecheck
-invoke_passo 'Lint' pnpm run lint
+invoke_passo 'typecheck' pnpm run typecheck
+invoke_passo 'lint' pnpm run lint
 
 # Frontend
 if [ -d "frontend" ]; then

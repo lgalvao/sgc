@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
     alias(libs.plugins.spring.boot) apply false
     alias(libs.plugins.spring.dependency.management) apply false
@@ -10,7 +12,6 @@ plugins {
 
 allprojects {
     group = "sgc"
-    version = "1.0.0"
     repositories {
         mavenCentral {
             mavenContent {
@@ -47,6 +48,13 @@ subprojects {
 }
 
 // Delegation tasks for convenience
+tasks.register<Exec>("incrementVersion") {
+    group = "versioning"
+    description = "Incrementa a versão global usando release-it"
+    val pnpm = if (Os.isFamily(Os.FAMILY_WINDOWS)) "pnpm.cmd" else "pnpm"
+    commandLine(pnpm, "release", "--ci", "--patch")
+}
+
 tasks.register("installFrontend") {
     group = "setup"
     description = "Instala as dependências do frontend (NPM)"

@@ -1,7 +1,7 @@
 {
   "name": "sgc",
   "description": "Sistema de Gestão de Conhecimentos",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "test": "pnpm -C frontend test",
@@ -17,6 +17,7 @@
     "qa:dashboard:serve": "node etc/scripts/sgc.js qa dashboard servir --porta 4179",
     "lint:ox": "oxlint .",
     "lint": "pnpm run lint:ox && pnpm exec eslint . --fix",
+    "release": "release-it",
     "sast": "semgrep scan --config p/java --config p/typescript --config p/javascript --config p/owasp-top-ten --config p/security-audit --config p/secrets --metrics=off"
   },
   "devDependencies": {
@@ -34,6 +35,7 @@
     "fallow": "^2.63.0",
     "globals": "^17.6.0",
     "oxlint": "^1.62.0",
+    "release-it": "^20.0.1",
     "smtp-server": "^3.18.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.1",

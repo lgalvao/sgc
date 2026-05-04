@@ -1,0 +1,19 @@
+{
+  "github": {
+    "release": false
+  },
+  "git": {
+    "tagName": "v${version}",
+    "commitMessage": "chore(release): ${version}",
+    "requireCleanWorkingDir": true
+  },
+  "npm": {
+    "publish": false
+  },
+  "hooks": {
+    "after:bump": [
+      "pnpm -C frontend version ${version} --no-git-tag-version",
+      "powershell -Command \"(Get-Content gradle.properties) -replace '^version=.*', 'version=${version}' | Set-Content gradle.properties\""
+    ]
+  }
+}
