@@ -54,6 +54,7 @@ function deveIgnorarAvisoBootstrapVueNext(warning: RollupLog): boolean {
 }
 
 export default defineConfig({
+    envDir: "../",
     plugins: [
         vue(),
         tsconfigPaths(),
