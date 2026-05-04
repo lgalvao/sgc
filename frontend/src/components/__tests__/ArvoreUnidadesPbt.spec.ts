@@ -181,7 +181,7 @@ describe('ArvoreUnidades Property-Based tests', () => {
                     });
                 }
             ),
-            { numRuns: 40 }
+            {numRuns: 40}
         );
     }, 30000);
 
@@ -215,7 +215,7 @@ describe('ArvoreUnidades Property-Based tests', () => {
 
                 expect(stateAfterFirst).toEqual(stateAfterSecond);
             }),
-            { numRuns: 40 }
+            {numRuns: 40}
         );
     }, 30000);
 });

@@ -39,6 +39,12 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     private CompetenciaRepo competenciaRepo;
 
     private Subprocesso subprocesso;
+    @Autowired
+    private sgc.organizacao.model.UsuarioRepo usuarioRepo;
+    @Autowired
+    private sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
+    @MockitoBean
+    private UsuarioFacade usuarioFacade;
 
     @BeforeEach
     void setUp() {
@@ -73,15 +79,6 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         mapaRepo.save(mapa);
         subprocesso.setMapa(mapa);
     }
-
-    @Autowired
-    private sgc.organizacao.model.UsuarioRepo usuarioRepo;
-
-    @Autowired
-    private sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
-
-    @MockitoBean
-    private UsuarioFacade usuarioFacade;
 
     @Test
     @DisplayName("criarParaDiagnostico: deve criar subprocesso com copia de mapa")
@@ -141,9 +138,9 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
                         um,
                         subprocesso.getUnidade()
                 ));
-        
+
         List<Subprocesso> lista = subprocessoRepo.findAll();
-        assertThat(lista).anyMatch(sp -> sp.getProcesso().getCodigo().equals(procDiag.getCodigo()) 
+        assertThat(lista).anyMatch(sp -> sp.getProcesso().getCodigo().equals(procDiag.getCodigo())
                 && sp.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
     }
 

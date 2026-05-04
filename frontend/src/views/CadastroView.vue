@@ -1,99 +1,99 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="carregandoInicial" />
+    <CarregamentoPagina v-if="carregandoInicial"/>
     <template v-else>
       <CadastroAcoesHeader
-          :unidade="unidade"
-          :cod-subprocesso="codigoSubprocesso"
-          :permissoes="permissoesUI"
-          :mostrar-devolver-cadastro="mostrarDevolverCadastro"
-          :mostrar-importar-atividades="mostrarImportarAtividades"
-          :mostrar-disponibilizar-cadastro="mostrarDisponibilizarCadastro"
           :acao-principal-cadastro="acaoPrincipalCadastro"
+          :cod-subprocesso="codigoSubprocesso"
           :loading-validacao="loadingValidacao"
+          :mostrar-devolver-cadastro="mostrarDevolverCadastro"
+          :mostrar-disponibilizar-cadastro="mostrarDisponibilizarCadastro"
+          :mostrar-importar-atividades="mostrarImportarAtividades"
+          :permissoes="permissoesUI"
           :pode-visualizar-impacto="podeVisualizarImpacto"
+          :unidade="unidade"
+          @disponibilizar="disponibilizarCadastro"
           @abrir-historico="abrirModalHistorico"
           @abrir-devolver="abrirModalDevolverAnalise"
           @abrir-validar="abrirModalValidarAnalise"
           @abrir-impacto="abrirModalImpacto"
           @abrir-importar="mostrarModalImportar = true"
-          @disponibilizar="disponibilizarCadastro"
       />
 
-    <div v-if="podeEditarCadastro && isRevisao" class="mt-3 mb-2">
-      <BFormCheckbox
-          v-model="disponibilizacaoSemMudancas"
-          :disabled="checkboxSemMudancasDesabilitado"
-          data-testid="chk-disponibilizacao-sem-mudancas"
-      >
-        {{ TEXTOS.atividades.CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS }}
-      </BFormCheckbox>
-      <div
-          v-if="loadingInicioRevisao"
-          class="d-inline-flex align-items-center mt-1"
-          data-testid="cad-atividades__spinner-iniciando-revisao"
-      >
-        <BSpinner small />
+      <div v-if="podeEditarCadastro && isRevisao" class="mt-3 mb-2">
+        <BFormCheckbox
+            v-model="disponibilizacaoSemMudancas"
+            :disabled="checkboxSemMudancasDesabilitado"
+            data-testid="chk-disponibilizacao-sem-mudancas"
+        >
+          {{ TEXTOS.atividades.CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS }}
+        </BFormCheckbox>
+        <div
+            v-if="loadingInicioRevisao"
+            class="d-inline-flex align-items-center mt-1"
+            data-testid="cad-atividades__spinner-iniciando-revisao"
+        >
+          <BSpinner small/>
+        </div>
       </div>
-    </div>
 
-    <BAlert
-        v-if="erroGlobalFormatado"
-        :key="erroTick"
-        :model-value="true"
-        no-fade
-        show
-        variant="danger"
-        dismissible
-        data-testid="alerta-erro-global"
-        @dismissed="erroGlobal = null"
-    >
-      {{ erroGlobalFormatado.mensagem }}
-    </BAlert>
+      <BAlert
+          v-if="erroGlobalFormatado"
+          :key="erroTick"
+          :model-value="true"
+          data-testid="alerta-erro-global"
+          dismissible
+          no-fade
+          show
+          variant="danger"
+          @dismissed="erroGlobal = null"
+      >
+        {{ erroGlobalFormatado.mensagem }}
+      </BAlert>
 
-    <AppAlert
-        v-if="notificacao"
-        :mensagem="notificacao.mensagem"
-        :variante="notificacao.variante"
-        :dispensavel="notificacao.dispensavel ?? true"
-        @dismissed="clear()"
-    />
-
-    <CadAtividadeForm
-        v-if="podeEditarCadastro"
-        ref="atividadeFormRef"
-        v-model="novaAtividade"
-        :disabled="!codigoSubprocesso || !habilitarEditarCadastro"
-        :erro="erroNovaAtividade"
-        :loading="loadingAdicionar"
-        @submit="handleAdicionarAtividade"
-    />
-
-    <EmptyState
-        v-if="atividades?.length === 0"
-        :description="podeEditarCadastro ? TEXTOS.atividades.EMPTY_DESCRIPTION : TEXTOS.treeTable.EMPTY_DESCRIPTION"
-        data-testid="cad-atividades-empty-state"
-        icon="bi-list-check"
-        :title="podeEditarCadastro ? TEXTOS.atividades.EMPTY_TITLE : TEXTOS.treeTable.EMPTY_TITLE"
-    />
-
-    <div
-        v-for="atividade in atividadesOrdenadas"
-        :key="atividade.codigo"
-        :ref="el => setAtividadeRef(atividade.codigo, el)"
-    >
-      <AtividadeItem
-          :atividade="atividade"
-          :erro-validacao="obterErroParaAtividade(atividade.codigo)"
-          :pode-editar="podeEditarCadastro"
-          :habilitar-edicao="habilitarEditarCadastro"
-          @atualizar-atividade="(desc: string) => salvarEdicaoAtividade(atividade.codigo, desc)"
-          @remover-atividade="() => removerAtividade(atividade.codigo)"
-          @adicionar-conhecimento="(desc: string) => adicionarConhecimento(atividade.codigo, desc)"
-          @atualizar-conhecimento="(idC: number, desc: string) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
-          @remover-conhecimento="(idC: number) => removerConhecimento(atividade.codigo, idC)"
+      <AppAlert
+          v-if="notificacao"
+          :dispensavel="notificacao.dispensavel ?? true"
+          :mensagem="notificacao.mensagem"
+          :variante="notificacao.variante"
+          @dismissed="clear()"
       />
-    </div>
+
+      <CadAtividadeForm
+          v-if="podeEditarCadastro"
+          ref="atividadeFormRef"
+          v-model="novaAtividade"
+          :disabled="!codigoSubprocesso || !habilitarEditarCadastro"
+          :erro="erroNovaAtividade"
+          :loading="loadingAdicionar"
+          @submit="handleAdicionarAtividade"
+      />
+
+      <EmptyState
+          v-if="atividades?.length === 0"
+          :description="podeEditarCadastro ? TEXTOS.atividades.EMPTY_DESCRIPTION : TEXTOS.treeTable.EMPTY_DESCRIPTION"
+          :title="podeEditarCadastro ? TEXTOS.atividades.EMPTY_TITLE : TEXTOS.treeTable.EMPTY_TITLE"
+          data-testid="cad-atividades-empty-state"
+          icon="bi-list-check"
+      />
+
+      <div
+          v-for="atividade in atividadesOrdenadas"
+          :key="atividade.codigo"
+          :ref="el => setAtividadeRef(atividade.codigo, el)"
+      >
+        <AtividadeItem
+            :atividade="atividade"
+            :erro-validacao="obterErroParaAtividade(atividade.codigo)"
+            :habilitar-edicao="habilitarEditarCadastro"
+            :pode-editar="podeEditarCadastro"
+            @atualizar-atividade="(desc: string) => salvarEdicaoAtividade(atividade.codigo, desc)"
+            @remover-atividade="() => removerAtividade(atividade.codigo)"
+            @adicionar-conhecimento="(desc: string) => adicionarConhecimento(atividade.codigo, desc)"
+            @atualizar-conhecimento="(idC: number, desc: string) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
+            @remover-conhecimento="(idC: number) => removerConhecimento(atividade.codigo, idC)"
+        />
+      </div>
 
       <CadastroFluxoModais
           :acao-principal-cadastro="acaoPrincipalCadastro"
@@ -117,12 +117,12 @@
           :mostrar-modal-validar-analise="mostrarModalValidarAnalise"
           :observacao-devolucao="observacaoDevolucao"
           :observacao-validacao="observacaoValidacao"
+          @importar="handleImportAtividades"
           @confirmar-devolucao-analise="confirmarDevolucaoAnalise"
           @confirmar-disponibilizacao="confirmarDisponibilizacao"
           @confirmar-remocao="confirmarRemocao"
           @confirmar-validacao-analise="confirmarValidacaoAnalise"
           @fechar-impacto="fecharModalImpacto"
-          @importar="handleImportAtividades"
           @update:mostrar-modal-confirmacao="mostrarModalConfirmacao = $event"
           @update:mostrar-modal-confirmacao-remocao="mostrarModalConfirmacaoRemocao = $event"
           @update:mostrar-modal-devolver-analise="mostrarModalDevolverAnalise = $event"
@@ -222,15 +222,12 @@ const permissoesUI = computed<PermissoesSubprocesso>(() => ({
 }));
 
 
-
 const assinaturaCadastroAtual = computed(() => calcularAssinaturaCadastro(atividades.value));
 const houveAlteracaoCadastro = computed(() => assinaturaCadastroAtual.value !== atividadesSnapshotInicial.value);
 
 const atividadesOrdenadas = computed(() => {
   return [...atividades.value].sort((a, b) => (b.codigo || 0) - (a.codigo || 0));
 });
-
-
 
 
 const situacaoAtual = computed(() => subprocesso.value?.situacao);

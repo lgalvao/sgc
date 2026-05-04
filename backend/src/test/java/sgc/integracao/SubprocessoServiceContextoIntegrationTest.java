@@ -77,7 +77,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
                 .usuario(admin)
                 .descricao("Movimentação inicial de teste")
                 .build());
-        
+
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);
         mapaRepo.save(mapa);
@@ -271,7 +271,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("obterPermissoesUI: Deve testar visualização de impacto em REVISAO")
     void obterPermissoesUI_VisualizarImpacto() {
-       
+
         admin.setPerfilAtivo(Perfil.ADMIN);
         processo.setTipo(TipoProcesso.REVISAO);
         processoRepo.saveAndFlush(processo);

@@ -4,13 +4,13 @@
         :id="id"
         ref="inputRef"
         :aria-required="required ? 'true' : undefined"
-        :model-value="modelValue"
-        :state="state"
+        :class="inputClass"
         :data-testid="dataTestid"
         :max="max"
         :min="min"
+        :model-value="modelValue"
+        :state="state"
         type="date"
-        :class="inputClass"
         @update:model-value="(val) => $emit('update:modelValue', String(val))"
     />
     <BInputGroupText class="cursor-pointer" @click="abrirCalendario">

@@ -93,7 +93,8 @@ describe('useFeedback', () => {
     })
 
     it('deve continuar sem screenshot quando html2canvas falha', async () => {
-        const spyError = vi.spyOn(logger, 'error').mockImplementation(() => {})
+        const spyError = vi.spyOn(logger, 'error').mockImplementation(() => {
+        })
         const html2canvas = (await import('html2canvas')).default
         vi.mocked(html2canvas).mockRejectedValueOnce(new Error('canvas error'))
 

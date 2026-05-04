@@ -1,5 +1,5 @@
 <template>
-  <BCard class="relatorio-mapas__card shadow-sm" no-body data-testid="card-mapa-vigente">
+  <BCard class="relatorio-mapas__card shadow-sm" data-testid="card-mapa-vigente" no-body>
     <BCardBody>
       <BCardTitle class="mb-3 relatorio-mapas__cabecalho">
         <span class="relatorio-mapas__titulo">{{ mapa.siglaUnidade }}</span>
@@ -32,7 +32,7 @@
   </BCard>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BCard, BCardBody, BCardTitle} from "bootstrap-vue-next";
 
 interface Conhecimento {

@@ -229,8 +229,9 @@ export async function homologarCadastroMapeamento(page: Page, observacao: string
     await page.getByTestId('inp-aceite-cadastro-obs').fill(observacao);
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    
+
     // Aguarda o redirecionamento para a tela do subprocesso
     await expect(page).toHaveURL(/\/processo\/\d+\/(\w+)(?:\?.*)?$/);
 }
+
 export {fazerLogout, verificarPaginaPainel} from './helpers-navegacao.js';

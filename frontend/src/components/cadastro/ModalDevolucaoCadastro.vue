@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue';
 import CadastroObservacaoModal from "@/components/cadastro/CadastroObservacaoModal.vue";
 import {useCadastroObservacaoModalModel} from "@/components/cadastro/cadastroObservacaoModalModel";
@@ -39,10 +39,10 @@ const estadoObservacao = computed(() => {
       :label="TEXTOS.comum.OBSERVACAO"
       :label-obrigatoria="true"
       :loading="loading"
-      :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
       :ok-title="TEXTOS.comum.BOTAO_DEVOLVER"
       :test-codigo-confirmar="'btn-devolucao-cadastro-confirmar'"
       :texto="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DEVOLVER_TEXTO"
+      :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
       variant="danger"
       @confirmar="$emit('confirmar')"
   />

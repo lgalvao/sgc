@@ -1,7 +1,9 @@
 {
   "uid": "sgc-overview",
   "title": "SGC - Visão Geral",
-  "tags": ["sgc"],
+  "tags": [
+    "sgc"
+  ],
   "timezone": "America/Recife",
   "schemaVersion": 39,
   "refresh": "30s",
@@ -14,7 +16,12 @@
       "id": 1,
       "type": "stat",
       "title": "Status da Aplicação",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
       "targets": [
         {
           "expr": "up{job=\"sgc\"}",
@@ -28,12 +35,28 @@
         "textMode": "auto",
         "thresholds": {
           "steps": [
-            { "color": "red", "value": 0 },
-            { "color": "green", "value": 1 }
+            {
+              "color": "red",
+              "value": 0
+            },
+            {
+              "color": "green",
+              "value": 1
+            }
           ]
         },
         "mappings": [
-          { "options": { "0": { "text": "OFFLINE" }, "1": { "text": "ONLINE" } }, "type": "value" }
+          {
+            "options": {
+              "0": {
+                "text": "OFFLINE"
+              },
+              "1": {
+                "text": "ONLINE"
+              }
+            },
+            "type": "value"
+          }
         ]
       }
     },
@@ -41,7 +64,12 @@
       "id": 2,
       "type": "stat",
       "title": "Tempo Ativo (JVM)",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
       "targets": [
         {
           "expr": "process_uptime_seconds{job=\"sgc\"}",
@@ -58,7 +86,12 @@
       "id": 3,
       "type": "stat",
       "title": "Heap JVM Usado",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
       "targets": [
         {
           "expr": "jvm_memory_used_bytes{job=\"sgc\", area=\"heap\"}",
@@ -75,7 +108,12 @@
       "id": 4,
       "type": "stat",
       "title": "Threads Ativas",
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
       "targets": [
         {
           "expr": "jvm_threads_live_threads{job=\"sgc\"}",
@@ -91,7 +129,12 @@
       "id": 5,
       "type": "timeseries",
       "title": "Requisições HTTP por Segundo",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_count{job=\"sgc\"}[1m])",
@@ -99,17 +142,26 @@
         }
       ],
       "options": {
-        "tooltip": { "mode": "multi" }
+        "tooltip": {
+          "mode": "multi"
+        }
       },
       "fieldConfig": {
-        "defaults": { "unit": "reqps" }
+        "defaults": {
+          "unit": "reqps"
+        }
       }
     },
     {
       "id": 6,
       "type": "timeseries",
       "title": "Latência HTTP (p95)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
       "targets": [
         {
           "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{job=\"sgc\"}[5m]))",
@@ -117,14 +169,21 @@
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "s" }
+        "defaults": {
+          "unit": "s"
+        }
       }
     },
     {
       "id": 7,
       "type": "timeseries",
       "title": "Uso de Memória JVM",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
       "targets": [
         {
           "expr": "jvm_memory_used_bytes{job=\"sgc\"}",
@@ -132,14 +191,21 @@
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "bytes" }
+        "defaults": {
+          "unit": "bytes"
+        }
       }
     },
     {
       "id": 8,
       "type": "timeseries",
       "title": "Conexões de Banco (HikariCP)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
       "targets": [
         {
           "expr": "hikaricp_connections_active{job=\"sgc\"}",
@@ -155,14 +221,21 @@
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "short" }
+        "defaults": {
+          "unit": "short"
+        }
       }
     },
     {
       "id": 9,
       "type": "timeseries",
       "title": "Erros HTTP (4xx / 5xx)",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_count{job=\"sgc\", status=~\"4..\"}[1m])",
@@ -174,14 +247,21 @@
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "reqps" }
+        "defaults": {
+          "unit": "reqps"
+        }
       }
     },
     {
       "id": 10,
       "type": "timeseries",
       "title": "GC - Tempo de Pausa",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_sum{job=\"sgc\"}[1m])",
@@ -189,7 +269,9 @@
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "s" }
+        "defaults": {
+          "unit": "s"
+        }
       }
     }
   ]

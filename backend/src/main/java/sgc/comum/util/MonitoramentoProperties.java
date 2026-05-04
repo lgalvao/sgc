@@ -7,11 +7,6 @@ import org.springframework.boot.context.properties.*;
 @Getter
 @Setter
 public class MonitoramentoProperties {
-    public enum Modo {
-        SIM,
-        NAO
-    }
-
     private Modo modo = Modo.NAO;
     private long tempoMinimoJavaMs = 500;
     private long tempoHttpLentoMs = 100;
@@ -22,6 +17,11 @@ public class MonitoramentoProperties {
 
     public boolean isMonitoramentoJavaLentoAtivo() {
         return modo == Modo.SIM;
+    }
+
+    public enum Modo {
+        SIM,
+        NAO
     }
 
 }

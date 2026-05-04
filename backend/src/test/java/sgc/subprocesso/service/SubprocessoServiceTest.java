@@ -64,7 +64,6 @@ class SubprocessoServiceTest {
     private SubprocessoService service;
 
 
-
     @Test
     @DisplayName("criarEntidade deve persistir subprocesso e mapa associado")
     void criarEntidadeDevePersistirSubprocessoEMapaAssociado() {

@@ -87,13 +87,13 @@ export function useFluxoMapa() {
 
     async function aceitarMapa(codSubprocesso: number, dados: { observacao: string }): Promise<void> {
         await executar(async () => {
-            await aceitarValidacaoService(codSubprocesso, { texto: dados.observacao });
+            await aceitarValidacaoService(codSubprocesso, {texto: dados.observacao});
         }, "Erro ao aceitar mapa.");
     }
 
     async function homologarMapa(codSubprocesso: number, dados: { observacao: string }): Promise<void> {
         await executar(async () => {
-            await homologarValidacaoService(codSubprocesso, { texto: dados.observacao });
+            await homologarValidacaoService(codSubprocesso, {texto: dados.observacao});
         }, "Erro ao homologar mapa.");
     }
 

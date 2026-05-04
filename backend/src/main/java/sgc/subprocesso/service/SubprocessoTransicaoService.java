@@ -29,21 +29,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 @Transactional
 public class SubprocessoTransicaoService {
-    private final SubprocessoRepo subprocessoRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
-    private final AnaliseRepo analiseRepo;
-    private final SubprocessoConsultaService consultaService;
-    private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
-    private final SubprocessoValidacaoService validacaoService;
-    private final SubprocessoNotificacaoService notificacaoService;
-    private final UnidadeService unidadeService;
-    private final HierarquiaService hierarquiaService;
-    private final UnidadeHierarquiaService unidadeHierarquiaService;
-    private final UsuarioFacade usuarioFacade;
-    private final MapaManutencaoService mapaManutencaoService;
-
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = Map.of(
             MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO,
             REVISAO, REVISAO_MAPA_DISPONIBILIZADO
@@ -60,60 +46,18 @@ public class SubprocessoTransicaoService {
             MAPEAMENTO, MAPEAMENTO_MAPA_HOMOLOGADO,
             REVISAO, REVISAO_MAPA_HOMOLOGADO
     );
-
-    @Builder
-    private record RegistrarWorkflowInternoCommand(
-            Subprocesso sp,
-            SituacaoSubprocesso novaSituacao,
-            TipoTransicao tipoTransicao,
-            TipoAnalise tipoAnalise,
-            TipoAcaoAnalise tipoAcaoAnalise,
-            @Nullable Unidade unidadeAnalise,
-            @Nullable Unidade unidadeDestino,
-            Usuario usuario,
-            @Nullable String motivoAnalise,
-            @Nullable String observacoes
-    ) {
-        private static RegistrarWorkflowInternoCommand devolucaoValidacao(
-                Subprocesso sp,
-                SituacaoSubprocesso novaSituacao,
-                Unidade unidadeAnalise,
-                Unidade unidadeDevolucao,
-                Usuario usuario,
-                @Nullable String justificativa
-        ) {
-            return RegistrarWorkflowInternoCommand.builder()
-                    .sp(sp)
-                    .novaSituacao(novaSituacao)
-                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA)
-                    .tipoAnalise(TipoAnalise.VALIDACAO)
-                    .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                    .unidadeAnalise(unidadeAnalise)
-                    .unidadeDestino(unidadeDevolucao)
-                    .usuario(usuario)
-                    .motivoAnalise(justificativa)
-                    .observacoes(justificativa)
-                    .build();
-        }
-
-        private static RegistrarWorkflowInternoCommand aceiteValidacao(
-                Subprocesso sp,
-                SituacaoSubprocesso novaSituacao,
-                Usuario usuario,
-                @Nullable String observacoes
-        ) {
-            return RegistrarWorkflowInternoCommand.builder()
-                    .sp(sp)
-                    .novaSituacao(novaSituacao)
-                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
-                    .tipoAnalise(TipoAnalise.VALIDACAO)
-                    .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .usuario(usuario)
-                    .motivoAnalise("Aceite da validação")
-                    .observacoes(observacoes)
-                    .build();
-        }
-    }
+    private final SubprocessoRepo subprocessoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
+    private final AnaliseRepo analiseRepo;
+    private final SubprocessoConsultaService consultaService;
+    private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    private final SubprocessoValidacaoService validacaoService;
+    private final SubprocessoNotificacaoService notificacaoService;
+    private final UnidadeService unidadeService;
+    private final HierarquiaService hierarquiaService;
+    private final UnidadeHierarquiaService unidadeHierarquiaService;
+    private final UsuarioFacade usuarioFacade;
+    private final MapaManutencaoService mapaManutencaoService;
 
     private static @Nullable String normalizarTexto(@Nullable String texto) {
         if (!StringUtils.hasText(texto)) {
@@ -430,13 +374,13 @@ public class SubprocessoTransicaoService {
         Unidade unidadeSuperior = buscarSuperiorImediato(unidade.getCodigo());
         if (unidadeSuperior != null) {
             registrarTransicao(RegistrarTransicaoCommand.builder()
-                .sp(sp)
-                .tipo(tipoTransicao)
-                .origem(unidade)
-                .destino(unidadeSuperior)
-                .usuario(usuario)
-                .observacoes(observacoes)
-                .build());
+                    .sp(sp)
+                    .tipo(tipoTransicao)
+                    .origem(unidade)
+                    .destino(unidadeSuperior)
+                    .usuario(usuario)
+                    .observacoes(observacoes)
+                    .build());
         }
     }
 
@@ -552,7 +496,6 @@ public class SubprocessoTransicaoService {
         notificacaoService.notificarAlteracaoDataLimite(sp, novaDataFormatada, etapa);
     }
 
-
     private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {
         Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
         if (codigoPai == null) {
@@ -582,6 +525,60 @@ public class SubprocessoTransicaoService {
             throw new IllegalStateException("Tipo de processo %s sem situação configurada para %s".formatted(tipoProcesso, contexto));
         }
         return situacao;
+    }
+
+    @Builder
+    private record RegistrarWorkflowInternoCommand(
+            Subprocesso sp,
+            SituacaoSubprocesso novaSituacao,
+            TipoTransicao tipoTransicao,
+            TipoAnalise tipoAnalise,
+            TipoAcaoAnalise tipoAcaoAnalise,
+            @Nullable Unidade unidadeAnalise,
+            @Nullable Unidade unidadeDestino,
+            Usuario usuario,
+            @Nullable String motivoAnalise,
+            @Nullable String observacoes
+    ) {
+        private static RegistrarWorkflowInternoCommand devolucaoValidacao(
+                Subprocesso sp,
+                SituacaoSubprocesso novaSituacao,
+                Unidade unidadeAnalise,
+                Unidade unidadeDevolucao,
+                Usuario usuario,
+                @Nullable String justificativa
+        ) {
+            return RegistrarWorkflowInternoCommand.builder()
+                    .sp(sp)
+                    .novaSituacao(novaSituacao)
+                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA)
+                    .tipoAnalise(TipoAnalise.VALIDACAO)
+                    .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                    .unidadeAnalise(unidadeAnalise)
+                    .unidadeDestino(unidadeDevolucao)
+                    .usuario(usuario)
+                    .motivoAnalise(justificativa)
+                    .observacoes(justificativa)
+                    .build();
+        }
+
+        private static RegistrarWorkflowInternoCommand aceiteValidacao(
+                Subprocesso sp,
+                SituacaoSubprocesso novaSituacao,
+                Usuario usuario,
+                @Nullable String observacoes
+        ) {
+            return RegistrarWorkflowInternoCommand.builder()
+                    .sp(sp)
+                    .novaSituacao(novaSituacao)
+                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
+                    .tipoAnalise(TipoAnalise.VALIDACAO)
+                    .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .usuario(usuario)
+                    .motivoAnalise("Aceite da validação")
+                    .observacoes(observacoes)
+                    .build();
+        }
     }
 
 }

@@ -17,7 +17,7 @@
         sort-icon-left
     >
       <template #cell(destinatario)="{ item }">
-        <div class="fw-semibold" :title="item.destinatario">
+        <div :title="item.destinatario" class="fw-semibold">
           {{ formatarDestinatario(item) }}
         </div>
       </template>
@@ -27,7 +27,7 @@
       </template>
 
       <template #cell(assunto)="{ item }">
-        <div class="linha-assunto" :title="item.assunto">
+        <div :title="item.assunto" class="linha-assunto">
           <div class="fw-semibold">{{ formatarAssunto(item.assunto) }}</div>
           <div class="text-muted small">
             {{ resumirContexto(item) }}
@@ -48,22 +48,22 @@
       <template #cell(acoes)="{ item }">
         <div class="text-end d-flex justify-content-end align-items-center gap-2">
           <BButton
-              size="sm"
-              variant="outline-secondary"
-              class="btn-acao"
               :data-testid="`btn-detalhes-${item.codigo}`"
               :title="TEXTOS.administracao.NOTIFICACOES_DETALHES"
+              class="btn-acao"
+              size="sm"
+              variant="outline-secondary"
               @click="$emit('detalhes', item)"
           >
             <i aria-hidden="true" class="bi bi-info-circle"></i>
           </BButton>
           <BButton
               v-if="item.corpoHtml"
-              size="sm"
-              variant="outline-secondary"
-              class="btn-acao"
               :data-testid="`btn-preview-${item.codigo}`"
+              class="btn-acao"
+              size="sm"
               title="Ver conteúdo do e-mail"
+              variant="outline-secondary"
               @click="$emit('preview', item)"
           >
             <i aria-hidden="true" class="bi bi-eye"></i>
@@ -71,10 +71,10 @@
           <BButton
               v-if="item.situacao === 'FALHA_DEFINITIVA'"
               :data-testid="`btn-notificacoes-reenviar-${item.codigo}`"
-              size="sm"
-              variant="outline-dark"
               class="btn-acao"
+              size="sm"
               title="Tentar reenviar e-mail"
+              variant="outline-dark"
               @click="$emit('reenviar', item)"
           >
             <i aria-hidden="true" class="bi bi-send"></i>
@@ -110,21 +110,69 @@ defineEmits<{
 }>();
 
 const camposTabela = [
-  {key: "destinatario", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.DESTINATARIO, thClass: "col-destinatario", tdClass: "col-destinatario", sortable: true},
-  {key: "tipoNotificacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO, thClass: "col-tipo", tdClass: "col-tipo", sortable: true, formatter: ({value, item}: {value: unknown, item: Notificacao}) => formatarTipoNotificacao(typeof value === "string" ? value : item?.tipoNotificacao)},
-  {key: "assunto", label: "Assunto", sortable: true, formatter: ({value}: {value: unknown}) => formatarAssunto(typeof value === "string" ? value : undefined)},
-  {key: "situacao", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS, thClass: "col-status", tdClass: "col-status", sortable: true},
-  {key: "quando", label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.QUANDO, thClass: "col-data", tdClass: "col-data", sortable: true, formatter: ({item}: {item: Notificacao}) => item ? formatarQuando(item) : "-"},
+  {
+    key: "destinatario",
+    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.DESTINATARIO,
+    thClass: "col-destinatario",
+    tdClass: "col-destinatario",
+    sortable: true
+  },
+  {
+    key: "tipoNotificacao",
+    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO,
+    thClass: "col-tipo",
+    tdClass: "col-tipo",
+    sortable: true,
+    formatter: ({value, item}: {
+      value: unknown,
+      item: Notificacao
+    }) => formatarTipoNotificacao(typeof value === "string" ? value : item?.tipoNotificacao)
+  },
+  {
+    key: "assunto",
+    label: "Assunto",
+    sortable: true,
+    formatter: ({value}: { value: unknown }) => formatarAssunto(typeof value === "string" ? value : undefined)
+  },
+  {
+    key: "situacao",
+    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS,
+    thClass: "col-status",
+    tdClass: "col-status",
+    sortable: true
+  },
+  {
+    key: "quando",
+    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.QUANDO,
+    thClass: "col-data",
+    tdClass: "col-data",
+    sortable: true,
+    formatter: ({item}: { item: Notificacao }) => item ? formatarQuando(item) : "-"
+  },
   {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
 ];
 </script>
 
 <style scoped>
-:deep(.col-destinatario) { width: 12rem; }
-:deep(.col-tipo) { width: 14rem; }
-:deep(.col-status) { width: 10rem; }
-:deep(.col-data) { width: 10rem; }
-:deep(.col-acoes) { width: 8rem; }
+:deep(.col-destinatario) {
+  width: 12rem;
+}
+
+:deep(.col-tipo) {
+  width: 14rem;
+}
+
+:deep(.col-status) {
+  width: 10rem;
+}
+
+:deep(.col-data) {
+  width: 10rem;
+}
+
+:deep(.col-acoes) {
+  width: 8rem;
+}
 
 .linha-assunto {
   min-width: 0;

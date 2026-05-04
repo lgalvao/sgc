@@ -11,14 +11,14 @@
       @confirmar="disponibilizar"
       @fechar="fechar"
   >
-    <BAlert v-if="fieldErrors?.generic" :model-value="true" variant="danger" class="mb-3">
+    <BAlert v-if="fieldErrors?.generic" :model-value="true" class="mb-3" variant="danger">
       {{ fieldErrors.generic }}
     </BAlert>
     <BFormGroup
-        label-for="dataLimite"
-        :state="mensagemErroDataLimite ? false : null"
         :invalid-feedback="mensagemErroDataLimite"
+        :state="mensagemErroDataLimite ? false : null"
         class="mb-3"
+        label-for="dataLimite"
     >
       <template #label>
         Data limite para validação <span aria-hidden="true" class="text-danger">*</span>
@@ -26,10 +26,10 @@
       <InputData
           id="dataLimite"
           v-model="dataLimiteValidacao"
+          :min="dataMinimaPermitida"
           :state="mensagemErroDataLimite ? false : null"
           data-testid="inp-disponibilizar-mapa-data"
           max="2099-12-31"
-          :min="dataMinimaPermitida"
       />
       <BFormInvalidFeedback
           :state="mensagemErroDataLimite ? false : null"
@@ -41,19 +41,19 @@
     </BFormGroup>
 
     <BFormGroup
+        :invalid-feedback="fieldErrors?.observacoes"
+        :state="fieldErrors?.observacoes ? false : null"
+        class="mb-3"
         label="Observações"
         label-for="observacoes"
-        :state="fieldErrors?.observacoes ? false : null"
-        :invalid-feedback="fieldErrors?.observacoes"
-        class="mb-3"
     >
-        <BFormTextarea
-            id="observacoes"
-            v-model="observacoesDisponibilizacao"
-            :state="fieldErrors?.observacoes ? false : null"
-            data-testid="inp-disponibilizar-mapa-obs"
-            rows="3"
-        />
+      <BFormTextarea
+          id="observacoes"
+          v-model="observacoesDisponibilizacao"
+          :state="fieldErrors?.observacoes ? false : null"
+          data-testid="inp-disponibilizar-mapa-obs"
+          rows="3"
+      />
     </BFormGroup>
     <BAlert
         v-if="notificacao"
@@ -158,7 +158,7 @@ function fechar() {
 
 function disponibilizar() {
   const formularioValido = Boolean(dataLimiteValidacao.value) && !erroLocalDataLimite.value;
-  
+
   if (!validarSubmissao(formularioValido)) {
     void focarPrimeiroErroInvalido();
     return;

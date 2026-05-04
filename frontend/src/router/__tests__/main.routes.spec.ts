@@ -1,17 +1,17 @@
 import {describe, expect, it, vi} from "vitest";
 import mainRoutes from "../main.routes";
 
-vi.mock('@/views/LoginView.vue', () => ({ default: { name: 'LoginView' } }));
-vi.mock('@/views/PainelView.vue', () => ({ default: { name: 'PainelView' } }));
-vi.mock('@/views/HistoricoView.vue', () => ({ default: { name: 'HistoricoView' } }));
-vi.mock('@/views/RelatoriosView.vue', () => ({ default: { name: 'RelatoriosView' } }));
-vi.mock('@/views/ParametrosView.vue', () => ({ default: { name: 'ParametrosView' } }));
-vi.mock('@/views/AdministradoresView.vue', () => ({ default: { name: 'AdministradoresView' } }));
-vi.mock('@/views/LimpezaProcessosView.vue', () => ({ default: { name: 'LimpezaProcessosView' } }));
-vi.mock('@/views/NotificacoesAdminView.vue', () => ({ default: { name: 'NotificacoesAdminView' } }));
-vi.mock('@/views/RelatorioAndamentoView.vue', () => ({ default: { name: 'RelatorioAndamentoView' } }));
-vi.mock('@/views/RelatorioMapasView.vue', () => ({ default: { name: 'RelatorioMapasView' } }));
-vi.mock('@/views/ErroGeralView.vue', () => ({ default: { name: 'ErroGeralView' } }));
+vi.mock('@/views/LoginView.vue', () => ({default: {name: 'LoginView'}}));
+vi.mock('@/views/PainelView.vue', () => ({default: {name: 'PainelView'}}));
+vi.mock('@/views/HistoricoView.vue', () => ({default: {name: 'HistoricoView'}}));
+vi.mock('@/views/RelatoriosView.vue', () => ({default: {name: 'RelatoriosView'}}));
+vi.mock('@/views/ParametrosView.vue', () => ({default: {name: 'ParametrosView'}}));
+vi.mock('@/views/AdministradoresView.vue', () => ({default: {name: 'AdministradoresView'}}));
+vi.mock('@/views/LimpezaProcessosView.vue', () => ({default: {name: 'LimpezaProcessosView'}}));
+vi.mock('@/views/NotificacoesAdminView.vue', () => ({default: {name: 'NotificacoesAdminView'}}));
+vi.mock('@/views/RelatorioAndamentoView.vue', () => ({default: {name: 'RelatorioAndamentoView'}}));
+vi.mock('@/views/RelatorioMapasView.vue', () => ({default: {name: 'RelatorioMapasView'}}));
+vi.mock('@/views/ErroGeralView.vue', () => ({default: {name: 'ErroGeralView'}}));
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);

@@ -196,7 +196,11 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
     });
 
-    test('GESTOR devolve validação do mapa e sistema registra efeito visível no subprocesso', async ({_resetAutomatico, request, page}) => {
+    test('GESTOR devolve validação do mapa e sistema registra efeito visível no subprocesso', async ({
+                                                                                                         _resetAutomatico,
+                                                                                                         request,
+                                                                                                         page
+                                                                                                     }) => {
         await resetDatabase(request);
         const processo = await criarProcessoMapaValidadoFixture(request, {
             unidade: UNIDADE_ALVO,
@@ -316,7 +320,10 @@ test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com suge
         await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
     });
 
-    test('ADMIN vê ações corretas quando o mapa permanece com sugestões após aceite do GESTOR', async ({_resetAutomatico, page}) => {
+    test('ADMIN vê ações corretas quando o mapa permanece com sugestões após aceite do GESTOR', async ({
+                                                                                                           _resetAutomatico,
+                                                                                                           page
+                                                                                                       }) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);

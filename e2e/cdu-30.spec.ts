@@ -16,7 +16,11 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
     const TITULO_NOVO_ADMIN = '555555';
     const NOME_NOVO_ADMIN = 'David Bowie';
 
-    test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({
+                                                                                                _resetAutomatico,
+                                                                                                page,
+                                                                                                _autenticadoComoAdmin
+                                                                                            }) => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
@@ -61,7 +65,11 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await expect(tabela.getByText(NOME_NOVO_ADMIN)).toBeVisible();
     });
 
-    test('Cenário 3: ADMIN remove administrador adicionado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenário 3: ADMIN remove administrador adicionado', async ({
+                                                                        _resetAutomatico,
+                                                                        page,
+                                                                        _autenticadoComoAdmin
+                                                                    }) => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
@@ -88,7 +96,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
                                                                                                       _resetAutomatico,
                                                                                                       page,
                                                                                                       _autenticadoComoAdmin
-}) => {
+                                                                                                  }) => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
@@ -107,10 +115,10 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
     });
 
     test('Cenário 5: ADMIN tenta adicionar usuário que já é administrador e recebe erro de validação', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                                  _resetAutomatico,
+                                                                                                                  page,
+                                                                                                                  _autenticadoComoAdmin
+                                                                                                              }) => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
@@ -136,7 +144,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
                                                                                        _resetAutomatico,
                                                                                        page,
                                                                                        _autenticadoComoAdmin
-    }) => {
+                                                                                   }) => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
@@ -169,7 +177,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
                                                                                           _resetAutomatico,
                                                                                           page,
                                                                                           _autenticadoComoAdmin
-    }) => {
+                                                                                      }) => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 

@@ -10,7 +10,7 @@
             <p class="text-muted mb-4" data-testid="txt-erro-geral-descricao">
               {{ TEXTOS.erroGeral.DESCRICAO }}
             </p>
-            <BButton to="/login" variant="primary" data-testid="btn-erro-geral-voltar">
+            <BButton data-testid="btn-erro-geral-voltar" to="/login" variant="primary">
               {{ TEXTOS.erroGeral.ACAO }}
             </BButton>
           </div>
@@ -20,7 +20,7 @@
   </BContainer>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BButton, BCard, BCol, BContainer, BRow} from "bootstrap-vue-next";
 import {TEXTOS} from "@/constants/textos";
 </script>

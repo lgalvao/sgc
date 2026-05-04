@@ -143,7 +143,8 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
    11.2. O sistema abre um modal de confirmação (título "Homologação do cadastro") com a
    pergunta "Confirma a homologação?" e os botões `Confirmar` ou `Cancelar`.
 
-   11.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro, permanecendona mesma tela.
+   11.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro,
+   permanecendona mesma tela.
 
    11.4. Usuário escolhe `Confirmar`.
 

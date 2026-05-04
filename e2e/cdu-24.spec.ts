@@ -44,10 +44,10 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
      * existir ao menos um subprocesso em MAPEAMENTO_MAPA_CRIADO ou REVISAO_MAPA_AJUSTADO.
      */
     test('Botão "Disponibilizar em bloco" deve estar desabilitado quando nenhum mapa foi criado', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                             _resetAutomatico,
+                                                                                                             page,
+                                                                                                             _autenticadoComoAdmin
+                                                                                                         }) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
         const btnDisponibilizar = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
@@ -55,7 +55,11 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await expect(btnDisponibilizar).toBeDisabled();
     });
 
-    test('ADMIN visualiza erro ao tentar disponibilizar mapa com atividade sem competência', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('ADMIN visualiza erro ao tentar disponibilizar mapa com atividade sem competência', async ({
+                                                                                                        _resetAutomatico,
+                                                                                                        page,
+                                                                                                        _autenticadoComoAdmin
+                                                                                                    }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
@@ -65,12 +69,16 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
 
         await criarCompetencia(page, competencia1, [atividade1, atividade2]);
-        
+
         await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA)).toBeVisible();
     });
 
-    test('ADMIN abre modal de disponibilização em bloco e cancela operação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('ADMIN abre modal de disponibilização em bloco e cancela operação', async ({
+                                                                                        _resetAutomatico,
+                                                                                        page,
+                                                                                        _autenticadoComoAdmin
+                                                                                    }) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
         const btnDisponibilizar = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
@@ -89,7 +97,11 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
 
-    test('ADMIN disponibiliza mapas em bloco após associar todas as atividades', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('ADMIN disponibiliza mapas em bloco após associar todas as atividades', async ({
+                                                                                            _resetAutomatico,
+                                                                                            page,
+                                                                                            _autenticadoComoAdmin
+                                                                                        }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
@@ -98,7 +110,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         // Retornar para tela do processo para ação em bloco
         await page.goto('/painel');
         await acessarDetalhesProcesso(page, descProcesso);
-        
+
         // Validação da UI da ação em bloco
         const btnDisponibilizar = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
         await expect(btnDisponibilizar).toBeEnabled();
@@ -120,10 +132,10 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Cenario 4: Disponibilização em bloco registra movimentação e alerta com data/hora', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                         _resetAutomatico,
+                                                                                                         page,
+                                                                                                         _autenticadoComoAdmin
+                                                                                                     }) => {
         // O processo foi disponibilizado no Cenario 3 — verificar movimentação e alerta
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);

@@ -39,23 +39,23 @@ const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 type AtividadeMinima = {
     codigo: number;
     descricao?: string;
-    conhecimentos?: Array<{codigo: number; descricao?: string}>;
+    conhecimentos?: Array<{ codigo: number; descricao?: string }>;
 };
 
 
 type CadastroViewVm = {
     codigoSubprocesso: number | null;
-    unidade: {sigla: string; nome: string} | null;
+    unidade: { sigla: string; nome: string } | null;
     atividades: AtividadeMinima[];
     atividadesSnapshotInicial: string;
     disponibilizacaoSemMudancas: boolean;
     mostrarModalConfirmacao: boolean;
     mostrarModalImportar: boolean;
     mostrarModalConfirmacaoRemocao: boolean;
-    dadosRemocao: {tipo: string; index?: number; conhecimentoCodigo?: number} | null;
+    dadosRemocao: { tipo: string; index?: number; conhecimentoCodigo?: number } | null;
     erroGlobal: string | null;
     erroNovaAtividade?: string | null;
-    errosValidacao?: Array<{atividadeCodigo?: number; mensagem: string}>;
+    errosValidacao?: Array<{ atividadeCodigo?: number; mensagem: string }>;
     notificacao: unknown;
     novaAtividade: string;
     podeHomologarCadastro?: boolean;
@@ -63,7 +63,7 @@ type CadastroViewVm = {
     disponibilizarCadastro: () => Promise<void>;
     adicionarAtividade: () => Promise<void>;
     confirmarRemocao: () => Promise<void>;
-    processarRespostaLocal: (payload: {atividadesAtualizadas?: unknown[]}) => void;
+    processarRespostaLocal: (payload: { atividadesAtualizadas?: unknown[] }) => void;
     notify: (mensagem: string, variante: string) => void;
     carregarContextoInicial: () => Promise<void>;
     $nextTick: () => Promise<void>;
@@ -79,12 +79,12 @@ type FluxoSubprocessoMock = {
 
 type SubprocessoStoreMock = {
     contextoCadastro: ContextoCadastroAtividadesSubprocesso | null;
-    erroIntegracaoContexto: {message: string} | null;
+    erroIntegracaoContexto: { message: string } | null;
     subprocessoDetalhe: {
         codigo: number;
         situacao: SituacaoSubprocesso | string;
         tipoProcesso: TipoProcesso | string;
-        unidade?: {sigla: string};
+        unidade?: { sigla: string };
         permissoes?: PermissoesSubprocesso;
     } | null;
     buscarContextoCadastroAtividadesPorProcessoEUnidade: ReturnType<typeof vi.fn>;
@@ -97,13 +97,20 @@ type SubprocessoStoreMock = {
     buscarSubprocessoDetalhe: ReturnType<typeof vi.fn>;
     atualizarStatusLocal: ReturnType<typeof vi.fn>;
     invalidar: ReturnType<typeof vi.fn>;
-    lastError: {message: string} | null;
+    lastError: { message: string } | null;
     clearError: ReturnType<typeof vi.fn>;
     limparErroIntegracao: ReturnType<typeof vi.fn>;
 };
 
 function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
-    const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
+    const unidade: Unidade = {
+        codigo: 1,
+        sigla: "TESTE",
+        nome: "Teste",
+        filhas: [],
+        usuarioCodigo: 0,
+        responsavel: null
+    };
     const mapa: MapaResumo = {codigo: 100, subprocessoCodigo: 123};
     const detalhes: SubprocessoDetalhe = {
         codigo: 123,
@@ -126,7 +133,11 @@ function criarContextoEdicao(): ContextoCadastroAtividadesSubprocesso {
     return {
         detalhes,
         mapa,
-        atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}],
+        atividadesDisponiveis: [{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }],
         assinaturaCadastroReferencia: calcularAssinaturaCadastro([
             {codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}
         ]),
@@ -167,7 +178,7 @@ const subprocessosMock = reactive({
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
     invalidar: vi.fn(),
-    erroIntegracaoContexto: null as {message: string} | null,
+    erroIntegracaoContexto: null as { message: string } | null,
     lastError: null as SubprocessoStoreMock["lastError"],
     clearError: vi.fn(),
     limparErroIntegracao: vi.fn(),
@@ -240,12 +251,18 @@ const stubs = {
     BSpinner: {template: '<span data-testid="spinner"></span>'},
     BDropdown: {template: '<div><slot /></div>'},
     BDropdownItem: {template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>'},
-    BAlert: {template: '<div><slot /><button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>', props: ['modelValue']},
-    AppAlert: {template: '<div><button data-testid="btn-dismiss-app-alert" @click="$emit(\'dismissed\')">x</button></div>', props: ['message', 'variant', 'dismissible']},
+    BAlert: {
+        template: '<div><slot /><button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
+        props: ['modelValue']
+    },
+    AppAlert: {
+        template: '<div><button data-testid="btn-dismiss-app-alert" @click="$emit(\'dismissed\')">x</button></div>',
+        props: ['message', 'variant', 'dismissible']
+    },
     ErrorAlert: {template: '<div></div>'},
     CadAtividadeForm: {
         name: 'CadAtividadeForm',
-        template: '<div data-testid="cad-atividade-form"></div>', 
+        template: '<div data-testid="cad-atividade-form"></div>',
         props: ['modelValue'],
         expose: ['inputRef'],
         setup() {
@@ -261,7 +278,7 @@ const stubs = {
     EmptyState: {template: '<div><slot /></div>'},
     AtividadeItem: {
         name: 'AtividadeItem',
-        template: '<div data-testid="atividade-item"></div>', 
+        template: '<div data-testid="atividade-item"></div>',
         props: ['atividade', 'pode-editar', 'erro-validacao']
     },
     ImportarAtividadesModal: {template: '<div></div>', props: ['mostrar']},
@@ -470,7 +487,11 @@ describe("CadastroView.vue", () => {
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
         vm.atividades = [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}];
-        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }]);
         vm.disponibilizacaoSemMudancas = false;
         await wrapper.vm.$nextTick();
 
@@ -587,7 +608,11 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }]);
         await flushPromises();
 
         const checkbox = wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]');
@@ -612,7 +637,11 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }]);
         vm.disponibilizacaoSemMudancas = true;
         await flushPromises();
 
@@ -632,7 +661,11 @@ describe("CadastroView.vue", () => {
             unidade: {sigla: "TESTE"},
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
-        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }]);
         vm.atividades = [{
             codigo: 1,
             descricao: "Ativ 1 alterada",
@@ -656,7 +689,11 @@ describe("CadastroView.vue", () => {
             unidade: {sigla: "TESTE"},
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
-        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }]);
         vm.atividades = [{
             codigo: 1,
             descricao: "Ativ 1 alterada",
@@ -694,7 +731,11 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }]);
         await flushPromises();
 
         await wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]').setValue(true);
@@ -738,7 +779,11 @@ describe("CadastroView.vue", () => {
             descricao: "Ativ 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
-        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}]);
+        vm.atividadesSnapshotInicial = calcularAssinaturaCadastro([{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }]);
         vm.disponibilizacaoSemMudancas = true;
         await flushPromises();
 
@@ -797,20 +842,32 @@ describe("CadastroView.vue", () => {
                     podeDisponibilizarCadastro: true,
                 },
             },
-            atividadesDisponiveis: [{codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}],
+            atividadesDisponiveis: [{
+                codigo: 2,
+                descricao: "Atividade importada",
+                conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]
+            }],
         });
 
         const vm = wrapper.vm as unknown as CadastroViewVm;
         await vm.handleImportAtividades({
             subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
             permissoes: criarContextoEdicao().detalhes.permissoes,
-            atividadesAtualizadas: [{codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}],
+            atividadesAtualizadas: [{
+                codigo: 2,
+                descricao: "Atividade importada",
+                conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]
+            }],
             aviso: null,
         });
 
         expect(subprocessosStore.buscarContextoCadastroAtividades).not.toHaveBeenCalled();
         expect(vm.atividades).toEqual([
-            {codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}
+            {
+                codigo: 2,
+                descricao: "Atividade importada",
+                conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]
+            }
         ]);
     });
 
@@ -864,10 +921,10 @@ describe("CadastroView.vue", () => {
         // @fechar events (114, 130, 136)
         const importModal = wrapper.findComponent({name: 'ImportarAtividadesModal'});
         if (importModal.exists()) await importModal.vm.$emit('fechar');
-        
+
         const confirmModal = wrapper.findComponent({name: 'ConfirmacaoDisponibilizacaoModal'});
         if (confirmModal.exists()) await confirmModal.vm.$emit('fechar');
-        
+
         const histModal = wrapper.findComponent({name: 'HistoricoAnaliseModal'});
         if (histModal.exists()) await histModal.vm.$emit('fechar');
 
@@ -894,7 +951,7 @@ describe("CadastroView.vue", () => {
         } as AtividadeOperacaoResponse);
         vm.dadosRemocao = {tipo: "atividade", index: 0};
         await vm.confirmarRemocao();
-        
+
         // 291 (processarRespostaLocal branch)
         vm.processarRespostaLocal({atividadesAtualizadas: [{codigo: 1}]});
     });
@@ -949,12 +1006,12 @@ describe("CadastroView.vue", () => {
 
         vm.atividades = [{codigo: 1, descricao: "A1", conhecimentos: [{codigo: 1, descricao: "C1"}]}];
         await vm.$nextTick();
-        
+
         // Mock de scroll para evitar erro
         (vm as any).scrollParaPrimeiroErro = vi.fn();
 
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
-        
+
         // 1. Primeira tentativa (falha)
         fluxoSubprocesso.validarCadastro.mockResolvedValueOnce({
             valido: false,
@@ -963,7 +1020,7 @@ describe("CadastroView.vue", () => {
 
         await vm.disponibilizarCadastro();
         await vm.$nextTick();
-        
+
         expect(vm.erroGlobal).toBe("Erro de validação");
         const alert = wrapper.find('[data-testid="btn-dismiss-alert"]');
         expect(alert.exists()).toBe(true);

@@ -10,6 +10,7 @@ import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
 import java.time.*;
+
 @Entity
 @Table(name = "ALERTA", schema = "sgc")
 @Getter

@@ -36,7 +36,13 @@ describe("usePerfilStore", () => {
             autenticado: true,
             requerSelecaoPerfil: false,
             perfisUnidades: [{perfil: Perfil.GESTOR, unidade: {codigo: 1, sigla: "U1", nome: "Unidade 1"}}],
-            sessao: {perfil: Perfil.GESTOR, unidadeCodigo: 1, tituloEleitoral: "123", nome: "Teste", permissoes: {acoes: []}}
+            sessao: {
+                perfil: Perfil.GESTOR,
+                unidadeCodigo: 1,
+                tituloEleitoral: "123",
+                nome: "Teste",
+                permissoes: {acoes: []}
+            }
         };
         vi.mocked(usuarioService.login).mockResolvedValue(mockFluxo as any);
 
@@ -54,7 +60,7 @@ describe("usePerfilStore", () => {
 
     it("deve propagar erro 404 no login", async () => {
         const store = usePerfilStore();
-        vi.mocked(usuarioService.login).mockRejectedValue({ response: { status: 404 } });
+        vi.mocked(usuarioService.login).mockRejectedValue({response: {status: 404}});
 
         await expect(store.iniciarLogin("123", "senha")).rejects.toEqual({response: {status: 404}});
     });
@@ -68,10 +74,16 @@ describe("usePerfilStore", () => {
 
     it("deve concluir login com perfil", async () => {
         const store = usePerfilStore();
-        const mockSessao = { perfil: Perfil.GESTOR, unidadeCodigo: 1, tituloEleitoral: "123", nome: "Teste", permissoes: { acoes: [] } };
+        const mockSessao = {
+            perfil: Perfil.GESTOR,
+            unidadeCodigo: 1,
+            tituloEleitoral: "123",
+            nome: "Teste",
+            permissoes: {acoes: []}
+        };
         vi.mocked(usuarioService.entrar).mockResolvedValue(mockSessao as any);
 
-        await store.concluirLoginComPerfil({ perfil: Perfil.GESTOR, unidade: { codigo: 1, sigla: "U1" } } as any);
+        await store.concluirLoginComPerfil({perfil: Perfil.GESTOR, unidade: {codigo: 1, sigla: "U1"}} as any);
         expect(store.perfilSelecionado).toBe(Perfil.GESTOR);
         expect(store.usuarioCodigo).toBe("123");
     });
@@ -82,9 +94,9 @@ describe("usePerfilStore", () => {
         store.usuarioCodigo = "123" as any;
         organizacaoStore.diagnostico = {possuiViolacoes: true} as any;
         organizacaoStore.carregado = true as any;
-        
+
         await store.logout();
-        
+
         expect(store.usuarioCodigo).toBeNull();
         expect(usuarioService.logout).toHaveBeenCalled();
         expect(organizacaoStore.diagnostico).toBeNull();
@@ -95,11 +107,11 @@ describe("usePerfilStore", () => {
         const store = usePerfilStore();
         store.perfilSelecionado = Perfil.GESTOR as any;
         store.unidadeSelecionada = 50 as any;
-        
+
         expect(store.unidadeAtual).toBe(50);
-        
+
         store.unidadeSelecionada = null as any;
-        store.perfisUnidades = [{ perfil: Perfil.GESTOR, unidade: { codigo: 60 } }] as any;
+        store.perfisUnidades = [{perfil: Perfil.GESTOR, unidade: {codigo: 60}}] as any;
         expect(store.unidadeAtual).toBe(60);
     });
 });

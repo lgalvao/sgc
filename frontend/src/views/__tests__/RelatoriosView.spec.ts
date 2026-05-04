@@ -5,9 +5,9 @@ import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentT
 
 const mockPush = vi.fn();
 vi.mock("vue-router", () => ({
-  useRouter: () => ({
-    push: mockPush,
-  }),
+    useRouter: () => ({
+        push: mockPush,
+    }),
 }));
 
 describe('RelatoriosView.vue', () => {

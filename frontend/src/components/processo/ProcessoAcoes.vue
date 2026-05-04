@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BButton, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
@@ -36,8 +36,8 @@ const emit = defineEmits<{
     <template #actions>
       <BButton
           v-if="mostrarFinalizarProcesso"
-          data-testid="btn-processo-finalizar"
           :disabled="!podeFinalizar"
+          data-testid="btn-processo-finalizar"
           variant="danger"
           @click="emit('finalizar')"
       >
@@ -46,8 +46,8 @@ const emit = defineEmits<{
 
       <BDropdown
           v-if="usarMenuAcoesBloco"
-          data-testid="btn-processo-acoes-bloco"
           :text="TEXTOS.processo.ACOES_EM_BLOCO"
+          data-testid="btn-processo-acoes-bloco"
           toggle-class="text-nowrap"
           variant="secondary">
         <BDropdownItemButton

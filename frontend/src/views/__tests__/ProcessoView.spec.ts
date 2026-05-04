@@ -364,7 +364,7 @@ describe("Processo.vue", () => {
         await flushPromises();
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
 
-        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
+        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }
@@ -943,7 +943,7 @@ describe("Processo.vue", () => {
         expect(vm.mostrarModalFinalizacao).toBe(true);
 
         // notificacao cover (9-16)
-        vm.notificacao = { message: "Msg", variant: "info" };
+        vm.notificacao = {message: "Msg", variant: "info"};
         await nextTick();
         wrapper.find('[data-testid="app-alert"]');
         // If app-alert is covered via BAlert stub or real AppAlert
@@ -964,7 +964,8 @@ describe("Processo.vue", () => {
 
         // loading state (77-80)
         wrapper.unmount();
-        vi.mocked(processoService.buscarContextoCompleto).mockReturnValue(new Promise(() => {}) as any);
+        vi.mocked(processoService.buscarContextoCompleto).mockReturnValue(new Promise(() => {
+        }) as any);
         wrapper = createWrapper();
         await nextTick();
         expect(wrapper.findComponent(BSpinnerStub).exists()).toBe(true);

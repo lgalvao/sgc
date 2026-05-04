@@ -28,6 +28,59 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
         this.monitoramentoProperties = monitoramentoProperties;
     }
 
+    public static String obterCorrelacaoIdAtual() {
+        String correlacaoIdMdc = MDC.get(MDC_CORRELACAO_ID);
+        if (StringUtils.hasText(correlacaoIdMdc)) {
+            return correlacaoIdMdc;
+        }
+
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
+            Object correlacaoId = servletRequestAttributes.getRequest().getAttribute(ATRIBUTO_CORRELACAO_ID);
+            if (correlacaoId instanceof String valor && StringUtils.hasText(valor)) {
+                return valor;
+            }
+        }
+
+        return UUID.randomUUID().toString();
+    }
+
+    public static String obterDescricaoHttpAtual() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            Object metodo = request.getAttribute(ATRIBUTO_HTTP_METODO);
+            Object caminho = request.getAttribute(ATRIBUTO_HTTP_CAMINHO);
+            if (metodo instanceof String metodoAtual
+                    && StringUtils.hasText(metodoAtual)
+                    && caminho instanceof String caminhoAtual
+                    && StringUtils.hasText(caminhoAtual)) {
+                return metodoAtual + " " + caminhoAtual;
+            }
+        }
+        return "sem-http";
+    }
+
+    public static void registrarJavaLento(String classe, String metodo, double duracaoMs) {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
+            Object javaLentos = servletRequestAttributes.getRequest().getAttribute(ATRIBUTO_JAVA_LENTOS);
+            if (javaLentos instanceof List<?> lista) {
+                @SuppressWarnings("unchecked")
+                List<String> entradas = (List<String>) lista;
+                entradas.add(String.format(Locale.US, "java %s.%s %.2fms", obterNomeSimples(classe), metodo, duracaoMs));
+            }
+        }
+    }
+
+    private static String obterNomeSimples(String classe) {
+        int indice = classe.lastIndexOf('.');
+        if (indice < 0 || indice == classe.length() - 1) {
+            return classe;
+        }
+        return classe.substring(indice + 1);
+    }
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         return !request.getRequestURI().startsWith("/api/");
@@ -87,51 +140,6 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
         return String.format("http %s %s %d %dms", request.getMethod(), caminho, status, duracaoMs);
     }
 
-    public static String obterCorrelacaoIdAtual() {
-        String correlacaoIdMdc = MDC.get(MDC_CORRELACAO_ID);
-        if (StringUtils.hasText(correlacaoIdMdc)) {
-            return correlacaoIdMdc;
-        }
-
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
-            Object correlacaoId = servletRequestAttributes.getRequest().getAttribute(ATRIBUTO_CORRELACAO_ID);
-            if (correlacaoId instanceof String valor && StringUtils.hasText(valor)) {
-                return valor;
-            }
-        }
-
-        return UUID.randomUUID().toString();
-    }
-
-    public static String obterDescricaoHttpAtual() {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
-            HttpServletRequest request = servletRequestAttributes.getRequest();
-            Object metodo = request.getAttribute(ATRIBUTO_HTTP_METODO);
-            Object caminho = request.getAttribute(ATRIBUTO_HTTP_CAMINHO);
-            if (metodo instanceof String metodoAtual
-                    && StringUtils.hasText(metodoAtual)
-                    && caminho instanceof String caminhoAtual
-                    && StringUtils.hasText(caminhoAtual)) {
-                return metodoAtual + " " + caminhoAtual;
-            }
-        }
-        return "sem-http";
-    }
-
-    public static void registrarJavaLento(String classe, String metodo, double duracaoMs) {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
-            Object javaLentos = servletRequestAttributes.getRequest().getAttribute(ATRIBUTO_JAVA_LENTOS);
-            if (javaLentos instanceof List<?> lista) {
-                @SuppressWarnings("unchecked")
-                List<String> entradas = (List<String>) lista;
-                entradas.add(String.format(Locale.US, "java %s.%s %.2fms", obterNomeSimples(classe), metodo, duracaoMs));
-            }
-        }
-    }
-
     private void logarJavaLento(HttpServletRequest request) {
         Object javaLentos = request.getAttribute(ATRIBUTO_JAVA_LENTOS);
         if (!(javaLentos instanceof List<?> entradas) || entradas.isEmpty()) {
@@ -141,14 +149,6 @@ public class FiltroMonitoramentoHttp extends OncePerRequestFilter {
         entradas.stream()
                 .map(String.class::cast)
                 .forEach(LOG_MONITORAMENTO::info);
-    }
-
-    private static String obterNomeSimples(String classe) {
-        int indice = classe.lastIndexOf('.');
-        if (indice < 0 || indice == classe.length() - 1) {
-            return classe;
-        }
-        return classe.substring(indice + 1);
     }
 
     private String obterOuGerarCorrelacaoId(HttpServletRequest request) {

@@ -8,18 +8,23 @@ Ator: ADMIN
 
 ## Fluxo principal
 
-1. No painel ADMIN escolhe um processo na tela Detalhes do processo clica em uma unidade operacional ou interoperacional com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
+1. No painel ADMIN escolhe um processo na tela Detalhes do processo clica em uma unidade operacional ou interoperacional
+   com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
 
 2. O sistema mostra a tela `Detalhes do subprocesso`.
 
 3. O usuário clica no card `Mapa de competências`.
 
-4. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa da unidade, com os seguintes elementos visuais:
+4. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa da unidade, com os seguintes elementos
+   visuais:
 
     - Um bloco para cada competência criada, cujo título é a descrição da competência
     - Ao lado da descrição da competência, botões de ação (ícones), para editar e para excluir a competência.
-    - Dentro de cada bloco de uma competência, mostrar as descrições das atividades associadas em blocos internos flexíveis.
-    - Exibir a lista de conhecimentos de cada atividade logo abaixo de sua descrição (inline). A interface deve garantir que o texto seja quebrado corretamente sem estourar os limites dos cards, mantendo a visibilidade total da informação para busca e tecnologias assistivas.
+    - Dentro de cada bloco de uma competência, mostrar as descrições das atividades associadas em blocos internos
+      flexíveis.
+    - Exibir a lista de conhecimentos de cada atividade logo abaixo de sua descrição (inline). A interface deve garantir
+      que o texto seja quebrado corretamente sem estourar os limites dos cards, mantendo a visibilidade total da
+      informação para busca e tecnologias assistivas.
     - Botões `Criar competência` e `Disponibilizar` alinhados no canto superior direito.
 
 5. **<<Início de fluxo de criação de competências>>** ADMIN clica no botão Criar competência.
@@ -29,29 +34,31 @@ Ator: ADMIN
     - Lista das atividades cadastradas pela unidade, cada uma podendo ser selecionada para inclusão na competência.
     - Botões `Cancelar` e `Salvar`.
 
-7. O usuário informa a descrição da competência que será criada, seleciona uma ou mais atividades para associar a ela e clica em `Salvar` para confirmar as mudanças.
+7. O usuário informa a descrição da competência que será criada, seleciona uma ou mais atividades para associar a ela e
+   clica em `Salvar` para confirmar as mudanças.
 
 8. O sistema armazena internamente a competência e o vínculo desta com as atividades selecionadas
 
 9. O sistema insere a competência criada no mapa de competências.
 
-10. Se a situação do subprocesso da unidade ainda for 'Cadastro homologado', o sistema altera a situação para 'Mapa criado'. **<< Término de fluxo de criação de competências >>**
+10. Se a situação do subprocesso da unidade ainda for 'Cadastro homologado', o sistema altera a situação para 'Mapa
+    criado'. **<< Término de fluxo de criação de competências >>**
 
 11. O usuário repete o fluxo de criação de competências até que o mapa esteja completo.
-''
+    ''
 
 Se desejar **editar** uma competência criada:
 
 12.1. O usuário clica no botão de ação de editar no cabeçalho do bloco correspondente à competência.
 
-12.2. O sistema exibe a tela `Edição de competência` preenchida com a descrição da competência e apresenta selecionadas as atividades atualmente associadas à competência.
+12.2. O sistema exibe a tela `Edição de competência` preenchida com a descrição da competência e apresenta selecionadas
+as atividades atualmente associadas à competência.
 
 12.3. O usuário altera a descrição ou a associação com as atividades e clica no botão `Salvar`.
 
 12.4. O sistema armazena a nova descrição da competência e os vínculos com as atividades.
 
 12.5. O sistema retorna para a tela `Edição do mapa`, exibindo o bloco da competência correspondente atualizado.
-
 
 Se desejar **excluir** uma competência criada:
 

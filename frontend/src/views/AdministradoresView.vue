@@ -15,7 +15,7 @@
     </PageHeader>
 
     <div v-if="carregandoAdmins" class="text-center py-4">
-      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary" />
+      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary"/>
     </div>
 
     <BAlert v-else-if="erroAdmins" :model-value="true" variant="danger">
@@ -25,8 +25,8 @@
     <div v-else-if="administradores.length === 0">
       <EmptyState
           :description="TEXTOS.administracao.EMPTY_DESCRIPTION"
-          icon="bi-people"
           :title="TEXTOS.administracao.EMPTY_TITLE"
+          icon="bi-people"
       />
     </div>
 
@@ -34,19 +34,19 @@
         v-else
         :fields="camposAdmins"
         :items="administradores"
-        striped
         hover
         responsive
+        striped
     >
       <template #cell(acoes)="{ item }">
         <div class="text-end">
           <LoadingButton
               :loading="removendoAdmin === item.tituloEleitoral"
+              :title="TEXTOS.comum.BOTAO_REMOVER"
+              class="text-secondary"
               icon="trash"
               size="sm"
               variant="link"
-              class="text-secondary"
-              :title="TEXTOS.comum.BOTAO_REMOVER"
               @click="confirmarRemocao(item)"
           />
         </div>
@@ -68,8 +68,8 @@
         {{ erroAdicionarAdmin }}
       </BAlert>
       <BFormGroup
-          label-for="tituloEleitoral"
           class="mb-3"
+          label-for="tituloEleitoral"
       >
         <template #label>
           {{ TEXTOS.administracao.LABEL_TITULO }} <span aria-hidden="true" class="text-danger">*</span>
@@ -77,10 +77,10 @@
         <BuscadorUsuarios
             id="tituloEleitoral"
             ref="inputTituloRef"
-            v-model:termo="termoUsuario"
             v-model:selecionado="usuarioSelecionado"
-            :state="mensagemErroNovoAdmin ? false : null"
+            v-model:termo="termoUsuario"
             :placeholder="TEXTOS.administracao.PLACEHOLDER_TITULO"
+            :state="mensagemErroNovoAdmin ? false : null"
             @keydown.enter.prevent="adicionarAdmin"
         />
         <BFormInvalidFeedback :state="mensagemErroNovoAdmin ? false : null">

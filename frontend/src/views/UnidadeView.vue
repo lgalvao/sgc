@@ -3,14 +3,14 @@
     <BAlert
         v-if="!carregandoPagina && lastError"
         :model-value="true"
-        variant="danger"
         dismissible
+        variant="danger"
         @dismissed="clearError()"
     >
       {{ lastError }}
     </BAlert>
 
-    <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO" />
+    <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO"/>
     <template v-else>
       <div v-if="unidade">
         <PageHeader :subtitle="unidade.nome" :title="unidade.sigla">
@@ -40,16 +40,16 @@
           <BCardBody>
             <UnidadeContatoInfo
                 :contato="unidade.titular"
-                data-testid="unidade-titular-info"
-                detalhes-class="ms-3 mb-2"
                 :label="TEXTOS.unidade.LABEL_TITULAR"
                 :nome-fallback="TEXTOS.unidade.NAO_INFORMADO"
+                data-testid="unidade-titular-info"
+                detalhes-class="ms-3 mb-2"
             />
             <UnidadeContatoInfo
                 v-if="responsavelExibivel"
                 :contato="responsavelExibivel"
-                data-testid="unidade-responsavel-info"
                 :label="TEXTOS.unidade.LABEL_RESPONSAVEL"
+                data-testid="unidade-responsavel-info"
             />
           </BCardBody>
         </BCard>
@@ -57,8 +57,8 @@
       <EmptyState
           v-else
           :description="TEXTOS.unidade.EMPTY_DESCRIPTION"
-          icon="bi-building"
           :title="TEXTOS.unidade.EMPTY_TITLE"
+          icon="bi-building"
       />
 
       <div
@@ -206,6 +206,7 @@ interface UnidadeFormatada {
   nome: string;
   expanded: boolean;
   children?: UnidadeFormatada[];
+
   [key: string]: unknown;
 }
 

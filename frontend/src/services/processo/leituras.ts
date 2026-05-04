@@ -1,4 +1,10 @@
-import type {Processo, ProcessoResumo, UnidadeImportacao, ProcessoDetalheResponseBackend, UnidadeParticipanteDto} from "./types";
+import type {
+    Processo,
+    ProcessoDetalheResponseBackend,
+    ProcessoResumo,
+    UnidadeImportacao,
+    UnidadeParticipanteDto
+} from "./types";
 import {mapearProcessoDetalhe} from "./mapeadores";
 import {SituacaoSubprocesso} from "@/types/tipos";
 import apiClient from "@/axios-setup";

@@ -19,7 +19,8 @@ $perfis = @{
     frontend = @('frontendCobertura', 'frontendLint', 'frontendTypecheck')
 }
 
-function ConverterEm-CaminhoRelativo {
+function ConverterEm-CaminhoRelativo
+{
     param([string]$Caminho)
 
     $uriBase = New-Object System.Uri(($diretorioRaiz.TrimEnd('\') + '\'))
@@ -27,15 +28,18 @@ function ConverterEm-CaminhoRelativo {
     return [System.Uri]::UnescapeDataString($uriBase.MakeRelativeUri($uriAlvo).ToString())
 }
 
-function Novo-DiretorioSeNecessario {
+function Novo-DiretorioSeNecessario
+{
     param([string]$Caminho)
 
-    if (-not (Test-Path $Caminho)) {
+    if (-not (Test-Path $Caminho))
+    {
         New-Item -ItemType Directory -Path $Caminho | Out-Null
     }
 }
 
-function Nova-Execucao {
+function Nova-Execucao
+{
     param(
         [string]$Codigo,
         [string]$Nome,
@@ -53,13 +57,14 @@ function Nova-Execucao {
         comando = $Comando
         diretorio = $Diretorio
         sumario = ''
-        metricas = @{}
+        metricas = @{ }
         erros = @()
         artefatos = @()
     }
 }
 
-function Executar-ComandoCapturando {
+function Executar-ComandoCapturando
+{
     param(
         [string]$Arquivo,
         [string[]]$Argumentos,
@@ -69,22 +74,29 @@ function Executar-ComandoCapturando {
 
     $inicio = Get-Date
     $argumentosEscapados = @($Argumentos | ForEach-Object {
-        if ($_ -match '\s') {
+        if ($_ -match '\s')
+        {
             '"' + $_.Replace('"', '\"') + '"'
-        } else {
+        }
+        else
+        {
             $_
         }
     }) -join ' '
     $comandoCompleto = '"' + $Arquivo + '" ' + $argumentosEscapados + ' > "' + $ArquivoLog + '" 2>&1'
 
     Push-Location $DiretorioTrabalho
-    try {
+    try
+    {
         & cmd.exe /d /s /c $comandoCompleto | Out-Null
         $codigo = $LASTEXITCODE
-        if ($null -eq $codigo) {
+        if ($null -eq $codigo)
+        {
             $codigo = 0
         }
-    } finally {
+    }
+    finally
+    {
         Pop-Location
     }
 
@@ -93,18 +105,27 @@ function Executar-ComandoCapturando {
         codigo = [int]$codigo
         duracaoMs = $duracaoMs
         log = $ArquivoLog
-        texto = if (Test-Path $ArquivoLog) { Get-Content $ArquivoLog -Raw } else { '' }
+        texto = if (Test-Path $ArquivoLog)
+        {
+            Get-Content $ArquivoLog -Raw
+        }
+        else
+        {
+            ''
+        }
         inicio = $inicio
     }
 }
 
-function Testar-ArtefatoFresco {
+function Testar-ArtefatoFresco
+{
     param(
         [string]$Caminho,
         [datetime]$InicioExecucao
     )
 
-    if (-not (Test-Path $Caminho)) {
+    if (-not (Test-Path $Caminho))
+    {
         return $false
     }
 
@@ -112,21 +133,24 @@ function Testar-ArtefatoFresco {
     return $item.LastWriteTime -ge $InicioExecucao
 }
 
-function Extrair-LinhasFinaisLog {
+function Extrair-LinhasFinaisLog
+{
     param(
         [string]$Texto,
         [int]$Limite = 12
     )
 
     $linhas = $Texto -split "`r?`n" | Where-Object { $_.Trim() -ne '' }
-    if ($linhas.Count -le $Limite) {
+    if ($linhas.Count -le $Limite)
+    {
         return @($linhas)
     }
 
     return @($linhas[($linhas.Count - $Limite)..($linhas.Count - 1)])
 }
 
-function Consolidar-JUnit {
+function Consolidar-JUnit
+{
     param([string]$Diretorio)
 
     $resultado = @{
@@ -138,15 +162,18 @@ function Consolidar-JUnit {
         arquivosXml = @()
     }
 
-    if (-not (Test-Path $Diretorio)) {
+    if (-not (Test-Path $Diretorio))
+    {
         return $resultado
     }
 
     $arquivos = Get-ChildItem -Path $Diretorio -Filter '*.xml' -File
-    foreach ($arquivo in $arquivos) {
+    foreach ($arquivo in $arquivos)
+    {
         [xml]$xml = Get-Content $arquivo.FullName
         $suite = $xml.testsuite
-        if ($null -eq $suite) {
+        if ($null -eq $suite)
+        {
             continue
         }
 
@@ -161,43 +188,50 @@ function Consolidar-JUnit {
     return $resultado
 }
 
-function Obter-Percentual {
+function Obter-Percentual
+{
     param(
         [double]$Cobertos,
         [double]$Perdidos
     )
 
     $total = $Cobertos + $Perdidos
-    if ($total -le 0) {
+    if ($total -le 0)
+    {
         return 0
     }
 
     return [math]::Round(($Cobertos / $total) * 100, 2)
 }
 
-function Obter-ValorOuPadrao {
+function Obter-ValorOuPadrao
+{
     param(
         $Valor,
         $Padrao
     )
 
-    if ($null -eq $Valor) {
+    if ($null -eq $Valor)
+    {
         return $Padrao
     }
 
     return $Valor
 }
 
-function Extrair-CoberturaJacoco {
+function Extrair-CoberturaJacoco
+{
     param([string]$ArquivoXml)
 
-    if (-not (Test-Path $ArquivoXml)) {
-        throw "Relatorio JaCoCo nao encontrado em $(ConverterEm-CaminhoRelativo $ArquivoXml)"
+    if (-not (Test-Path $ArquivoXml))
+    {
+        throw "Relatorio JaCoCo nao encontrado em $( ConverterEm-CaminhoRelativo $ArquivoXml )"
     }
 
     [xml]$xml = Get-Content $ArquivoXml
-    $counters = @{}
-    foreach ($counter in $xml.report.counter) {
+    $counters = @{ }
+    foreach ($counter in $xml.report.counter)
+    {
         $counters[$counter.type] = @{
             cobertos = [int]$counter.covered
             perdidos = [int]$counter.missed
@@ -206,8 +240,10 @@ function Extrair-CoberturaJacoco {
     }
 
     $classes = @()
-    foreach ($package in $xml.report.package) {
-        foreach ($class in $package.class) {
+    foreach ($package in $xml.report.package)
+    {
+        foreach ($class in $package.class)
+        {
             $line = $class.counter | Where-Object { $_.type -eq 'LINE' } | Select-Object -First 1
             $branch = $class.counter | Where-Object { $_.type -eq 'BRANCH' } | Select-Object -First 1
             $classes += [pscustomobject]@{
@@ -219,19 +255,49 @@ function Extrair-CoberturaJacoco {
     }
 
     return @{
-        linhas = if ($counters.ContainsKey('LINE')) { $counters.LINE } else { @{ cobertos = 0; perdidos = 0; percentual = 0 } }
-        branches = if ($counters.ContainsKey('BRANCH')) { $counters.BRANCH } else { @{ cobertos = 0; perdidos = 0; percentual = 0 } }
-        instrucoes = if ($counters.ContainsKey('INSTRUCTION')) { $counters.INSTRUCTION } else { @{ cobertos = 0; perdidos = 0; percentual = 0 } }
-        metodos = if ($counters.ContainsKey('METHOD')) { $counters.METHOD } else { @{ cobertos = 0; perdidos = 0; percentual = 0 } }
+        linhas = if ( $counters.ContainsKey('LINE'))
+        {
+            $counters.LINE
+        }
+        else
+        {
+            @{ cobertos = 0; perdidos = 0; percentual = 0 }
+        }
+        branches = if ( $counters.ContainsKey('BRANCH'))
+        {
+            $counters.BRANCH
+        }
+        else
+        {
+            @{ cobertos = 0; perdidos = 0; percentual = 0 }
+        }
+        instrucoes = if ( $counters.ContainsKey('INSTRUCTION'))
+        {
+            $counters.INSTRUCTION
+        }
+        else
+        {
+            @{ cobertos = 0; perdidos = 0; percentual = 0 }
+        }
+        metodos = if ( $counters.ContainsKey('METHOD'))
+        {
+            $counters.METHOD
+        }
+        else
+        {
+            @{ cobertos = 0; perdidos = 0; percentual = 0 }
+        }
         classes = @($classes | Sort-Object linhasPercentual | Select-Object -First 20)
     }
 }
 
-function Extrair-CoberturaFrontend {
+function Extrair-CoberturaFrontend
+{
     param([string]$ArquivoJson)
 
-    if (-not (Test-Path $ArquivoJson)) {
-        throw "Relatorio V8 nao encontrado em $(ConverterEm-CaminhoRelativo $ArquivoJson)"
+    if (-not (Test-Path $ArquivoJson))
+    {
+        throw "Relatorio V8 nao encontrado em $( ConverterEm-CaminhoRelativo $ArquivoJson )"
     }
 
     $json = Get-Content $ArquivoJson -Raw | ConvertFrom-Json
@@ -243,7 +309,8 @@ function Extrair-CoberturaFrontend {
         lines = @{ cobertos = 0; total = 0 }
     }
 
-    foreach ($entrada in $json.PSObject.Properties) {
+    foreach ($entrada in $json.PSObject.Properties)
+    {
         $dados = $entrada.Value
         $statementTotal = @($dados.s.PSObject.Properties).Count
         $statementCobertos = @($dados.s.PSObject.Properties | Where-Object { $_.Value -gt 0 }).Count
@@ -252,7 +319,8 @@ function Extrair-CoberturaFrontend {
 
         $branchTotal = 0
         $branchCobertos = 0
-        foreach ($branch in $dados.b.PSObject.Properties) {
+        foreach ($branch in $dados.b.PSObject.Properties)
+        {
             $valores = @($branch.Value)
             $branchTotal += $valores.Count
             $branchCobertos += @($valores | Where-Object { $_ -gt 0 }).Count
@@ -272,10 +340,38 @@ function Extrair-CoberturaFrontend {
 
         $arquivos += [pscustomobject]@{
             arquivo = ConverterEm-CaminhoRelativo $entrada.Name
-            statementsPercentual = if ($statementTotal -gt 0) { [math]::Round(($statementCobertos / $statementTotal) * 100, 2) } else { 0 }
-            branchesPercentual = if ($branchTotal -gt 0) { [math]::Round(($branchCobertos / $branchTotal) * 100, 2) } else { 0 }
-            functionsPercentual = if ($functionTotal -gt 0) { [math]::Round(($functionCobertos / $functionTotal) * 100, 2) } else { 0 }
-            linesPercentual = if ($lineTotal -gt 0) { [math]::Round(($lineCobertos / $lineTotal) * 100, 2) } else { 0 }
+            statementsPercentual = if ($statementTotal -gt 0)
+            {
+                [math]::Round(($statementCobertos / $statementTotal) * 100, 2)
+            }
+            else
+            {
+                0
+            }
+            branchesPercentual = if ($branchTotal -gt 0)
+            {
+                [math]::Round(($branchCobertos / $branchTotal) * 100, 2)
+            }
+            else
+            {
+                0
+            }
+            functionsPercentual = if ($functionTotal -gt 0)
+            {
+                [math]::Round(($functionCobertos / $functionTotal) * 100, 2)
+            }
+            else
+            {
+                0
+            }
+            linesPercentual = if ($lineTotal -gt 0)
+            {
+                [math]::Round(($lineCobertos / $lineTotal) * 100, 2)
+            }
+            else
+            {
+                0
+            }
         }
     }
 
@@ -283,34 +379,84 @@ function Extrair-CoberturaFrontend {
         statements = @{
             cobertos = $totais.statements.cobertos
             total = $totais.statements.total
-            percentual = if ($totais.statements.total -gt 0) { [math]::Round(($totais.statements.cobertos / $totais.statements.total) * 100, 2) } else { 0 }
+            percentual = if ($totais.statements.total -gt 0)
+            {
+                [math]::Round(($totais.statements.cobertos / $totais.statements.total) * 100, 2)
+            }
+            else
+            {
+                0
+            }
         }
         branches = @{
             cobertos = $totais.branches.cobertos
             total = $totais.branches.total
-            percentual = if ($totais.branches.total -gt 0) { [math]::Round(($totais.branches.cobertos / $totais.branches.total) * 100, 2) } else { 0 }
+            percentual = if ($totais.branches.total -gt 0)
+            {
+                [math]::Round(($totais.branches.cobertos / $totais.branches.total) * 100, 2)
+            }
+            else
+            {
+                0
+            }
         }
         functions = @{
             cobertos = $totais.functions.cobertos
             total = $totais.functions.total
-            percentual = if ($totais.functions.total -gt 0) { [math]::Round(($totais.functions.cobertos / $totais.functions.total) * 100, 2) } else { 0 }
+            percentual = if ($totais.functions.total -gt 0)
+            {
+                [math]::Round(($totais.functions.cobertos / $totais.functions.total) * 100, 2)
+            }
+            else
+            {
+                0
+            }
         }
         lines = @{
             cobertos = $totais.lines.cobertos
             total = $totais.lines.total
-            percentual = if ($totais.lines.total -gt 0) { [math]::Round(($totais.lines.cobertos / $totais.lines.total) * 100, 2) } else { 0 }
+            percentual = if ($totais.lines.total -gt 0)
+            {
+                [math]::Round(($totais.lines.cobertos / $totais.lines.total) * 100, 2)
+            }
+            else
+            {
+                0
+            }
         }
         arquivos = @($arquivos | Sort-Object linesPercentual | Select-Object -First 20)
     }
 }
 
-function Extrair-ResumoVitest {
+function Extrair-ResumoVitest
+{
     param([string]$Texto)
 
     $textoNormalizado = [string]$Texto
-    $passados = if ($textoNormalizado -match '(\d+)\s+passed') { [int]$matches[1] } else { 0 }
-    $falhas = if ($textoNormalizado -match '(\d+)\s+failed') { [int]$matches[1] } else { 0 }
-    $ignorados = if ($textoNormalizado -match '(\d+)\s+skipped') { [int]$matches[1] } else { 0 }
+    $passados = if ($textoNormalizado -match '(\d+)\s+passed')
+    {
+        [int]$matches[1]
+    }
+    else
+    {
+        0
+    }
+    $falhas = if ($textoNormalizado -match '(\d+)\s+failed')
+    {
+        [int]$matches[1]
+    }
+    else
+    {
+        0
+    }
+    $ignorados = if ($textoNormalizado -match '(\d+)\s+skipped')
+    {
+        [int]$matches[1]
+    }
+    else
+    {
+        0
+    }
 
     return @{
         testes = $passados + $falhas + $ignorados
@@ -320,18 +466,34 @@ function Extrair-ResumoVitest {
     }
 }
 
-function Extrair-ResumoLint {
+function Extrair-ResumoLint
+{
     param([string]$Texto)
 
-    $problemas = if ($Texto -match '(\d+)\s+problems?') { [int]$matches[1] } else { 0 }
-    $avisos = if ($Texto -match '(\d+)\s+warnings?') { [int]$matches[1] } else { 0 }
+    $problemas = if ($Texto -match '(\d+)\s+problems?')
+    {
+        [int]$matches[1]
+    }
+    else
+    {
+        0
+    }
+    $avisos = if ($Texto -match '(\d+)\s+warnings?')
+    {
+        [int]$matches[1]
+    }
+    else
+    {
+        0
+    }
     return @{
         erros = $problemas
         avisos = $avisos
     }
 }
 
-function Extrair-ResumoTypecheck {
+function Extrair-ResumoTypecheck
+{
     param([string]$Texto)
 
     $linhas = $Texto -split "`r?`n"
@@ -341,7 +503,8 @@ function Extrair-ResumoTypecheck {
     }
 }
 
-function Extrair-ResumoPlaywright {
+function Extrair-ResumoPlaywright
+{
     param([string]$Texto)
 
     $json = $Texto | ConvertFrom-Json
@@ -360,28 +523,33 @@ function Extrair-ResumoPlaywright {
     }
 }
 
-function Obter-StatusExecucao {
+function Obter-StatusExecucao
+{
     param(
         [int]$CodigoSaida,
         [hashtable]$Metricas
     )
 
-    if ($CodigoSaida -ne 0) {
+    if ($CodigoSaida -ne 0)
+    {
         return 'falha'
     }
 
-    if (([int](Obter-ValorOuPadrao $Metricas.falhas 0) -gt 0) -or ([int](Obter-ValorOuPadrao $Metricas.erros 0) -gt 0)) {
+    if (([int](Obter-ValorOuPadrao $Metricas.falhas 0) -gt 0) -or ([int](Obter-ValorOuPadrao $Metricas.erros 0) -gt 0))
+    {
         return 'falha'
     }
 
-    if (([int](Obter-ValorOuPadrao $Metricas.avisos 0) -gt 0) -or ([int](Obter-ValorOuPadrao $Metricas.flaky 0) -gt 0)) {
+    if (([int](Obter-ValorOuPadrao $Metricas.avisos 0) -gt 0) -or ([int](Obter-ValorOuPadrao $Metricas.flaky 0) -gt 0))
+    {
         return 'alerta'
     }
 
     return 'sucesso'
 }
 
-function Obter-Git {
+function Obter-Git
+{
     $branch = (git rev-parse --abbrev-ref HEAD).Trim()
     $commit = (git rev-parse HEAD).Trim()
     $commitCurto = (git rev-parse --short HEAD).Trim()
@@ -395,18 +563,19 @@ function Obter-Git {
     }
 }
 
-function Gerar-ResumoMarkdown {
+function Gerar-ResumoMarkdown
+{
     param([hashtable]$Snapshot)
 
     $linhas = @(
         '# Resumo do Dashboard de QA',
         '',
-        "- Gerado em: $($Snapshot.metadados.geradoEm)",
-        "- Perfil: $($Snapshot.metadados.perfilExecucao)",
-        "- Branch: $($Snapshot.metadados.git.branch)",
-        "- Commit: $($Snapshot.metadados.git.commitCurto)",
-        "- Status geral: $($Snapshot.resumo.statusGeral)",
-        "- Indice de saude: $($Snapshot.resumo.indiceSaude)",
+        "- Gerado em: $( $Snapshot.metadados.geradoEm )",
+        "- Perfil: $( $Snapshot.metadados.perfilExecucao )",
+        "- Branch: $( $Snapshot.metadados.git.branch )",
+        "- Commit: $( $Snapshot.metadados.git.commitCurto )",
+        "- Status geral: $( $Snapshot.resumo.statusGeral )",
+        "- Indice de saude: $( $Snapshot.resumo.indiceSaude )",
         '',
         '## Verificacoes',
         '',
@@ -414,27 +583,33 @@ function Gerar-ResumoMarkdown {
         '| --- | --- | ---: | --- |'
     )
 
-    foreach ($verificacao in $Snapshot.verificacoes) {
+    foreach ($verificacao in $Snapshot.verificacoes)
+    {
         $duracaoSegundos = [math]::Round($verificacao.duracaoMs / 1000, 2)
-        $linhas += "| $($verificacao.nome) | $($verificacao.status) | $duracaoSegundos | $($verificacao.sumario) |"
+        $linhas += "| $( $verificacao.nome ) | $( $verificacao.status ) | $duracaoSegundos | $( $verificacao.sumario ) |"
     }
 
     $linhas += ''
     $linhas += '## Hotspots'
     $linhas += ''
 
-    if ($Snapshot.hotspots.Count -eq 0) {
+    if ($Snapshot.hotspots.Count -eq 0)
+    {
         $linhas += 'Sem hotspots calculados.'
-    } else {
-        foreach ($hotspot in ($Snapshot.hotspots | Select-Object -First 10)) {
-            $linhas += "- $($hotspot.nome): risco $($hotspot.risco)"
+    }
+    else
+    {
+        foreach ($hotspot in ($Snapshot.hotspots | Select-Object -First 10))
+        {
+            $linhas += "- $( $hotspot.nome ): risco $( $hotspot.risco )"
         }
     }
 
     return ($linhas -join "`n") + "`n"
 }
 
-function Obter-MetricasNulasFrontend {
+function Obter-MetricasNulasFrontend
+{
     return @{
         functions = $null
         lines = $null
@@ -444,7 +619,8 @@ function Obter-MetricasNulasFrontend {
     }
 }
 
-function Escrever-ArquivoComRetry {
+function Escrever-ArquivoComRetry
+{
     param(
         [string]$Caminho,
         [string]$Conteudo,
@@ -453,11 +629,15 @@ function Escrever-ArquivoComRetry {
     )
 
     for ($tentativa = 1; $tentativa -le $Tentativas; $tentativa++) {
-        try {
+        try
+        {
             [System.IO.File]::WriteAllText($Caminho, $Conteudo, [System.Text.Encoding]::UTF8)
             return
-        } catch {
-            if ($tentativa -eq $Tentativas) {
+        }
+        catch
+        {
+            if ($tentativa -eq $Tentativas)
+            {
                 throw
             }
             Start-Sleep -Milliseconds $EsperaMs
@@ -480,8 +660,15 @@ $adaptadores = @{
         $execucao.status = Obter-StatusExecucao $saida.codigo $metricas
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = "$($metricas.sucessos)/$($metricas.testes) testes aprovados no backend unitario."
-        $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
+        $execucao.sumario = "$( $metricas.sucessos )/$( $metricas.testes ) testes aprovados no backend unitario."
+        $execucao.erros = if ($saida.codigo -eq 0)
+        {
+            @()
+        }
+        else
+        {
+            @(Extrair-LinhasFinaisLog $saida.texto)
+        }
         $execucao.artefatos = @($metricas.arquivosXml + (ConverterEm-CaminhoRelativo $saida.log))
         return $execucao
     }
@@ -492,8 +679,15 @@ $adaptadores = @{
         $execucao.status = Obter-StatusExecucao $saida.codigo $metricas
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = "$($metricas.sucessos)/$($metricas.testes) testes aprovados no backend integracao."
-        $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
+        $execucao.sumario = "$( $metricas.sucessos )/$( $metricas.testes ) testes aprovados no backend integracao."
+        $execucao.erros = if ($saida.codigo -eq 0)
+        {
+            @()
+        }
+        else
+        {
+            @(Extrair-LinhasFinaisLog $saida.texto)
+        }
         $execucao.artefatos = @($metricas.arquivosXml + (ConverterEm-CaminhoRelativo $saida.log))
         return $execucao
     }
@@ -502,21 +696,33 @@ $adaptadores = @{
         $saida = Executar-ComandoCapturando '.\gradlew.bat' @(':backend:jacocoTestReport') $diretorioRaiz (Join-Path $diretorioExecucao 'backend-cobertura.log')
         $arquivoXml = Join-Path $diretorioRaiz 'backend\build\reports\jacoco\test\jacocoTestReport.xml'
         $metricas = $null
-        if (($saida.codigo -eq 0) -and (Testar-ArtefatoFresco $arquivoXml $saida.inicio)) {
+        if (($saida.codigo -eq 0) -and (Testar-ArtefatoFresco $arquivoXml $saida.inicio))
+        {
             $metricas = Extrair-CoberturaJacoco $arquivoXml
         }
 
-        $execucao.status = Obter-StatusExecucao $saida.codigo @{}
+        $execucao.status = Obter-StatusExecucao $saida.codigo @{ }
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = if ($null -ne $metricas) {
-            "Cobertura backend: $($metricas.linhas.percentual)% de linhas e $($metricas.branches.percentual)% de branches."
-        } else {
+        $execucao.sumario = if ($null -ne $metricas)
+        {
+            "Cobertura backend: $( $metricas.linhas.percentual )% de linhas e $( $metricas.branches.percentual )% de branches."
+        }
+        else
+        {
             'Cobertura backend indisponivel nesta execucao.'
         }
-        $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
+        $execucao.erros = if ($saida.codigo -eq 0)
+        {
+            @()
+        }
+        else
+        {
+            @(Extrair-LinhasFinaisLog $saida.texto)
+        }
         $execucao.artefatos = @()
-        if ($null -ne $metricas) {
+        if ($null -ne $metricas)
+        {
             $execucao.artefatos += (ConverterEm-CaminhoRelativo $arquivoXml)
         }
         $execucao.artefatos += (ConverterEm-CaminhoRelativo $saida.log)
@@ -527,7 +733,8 @@ $adaptadores = @{
         $saida = Executar-ComandoCapturando 'pnpm.cmd' @('-C', 'frontend', 'run', 'coverage:unit') $diretorioRaiz (Join-Path $diretorioExecucao 'frontend-cobertura.log')
         $arquivoJson = Join-Path $diretorioRaiz 'frontend\coverage\coverage-final.json'
         $cobertura = $null
-        if (($saida.codigo -eq 0) -and (Testar-ArtefatoFresco $arquivoJson $saida.inicio)) {
+        if (($saida.codigo -eq 0) -and (Testar-ArtefatoFresco $arquivoJson $saida.inicio))
+        {
             $cobertura = Extrair-CoberturaFrontend $arquivoJson
         }
         $testes = Extrair-ResumoVitest $saida.texto
@@ -538,14 +745,25 @@ $adaptadores = @{
         $execucao.status = Obter-StatusExecucao $saida.codigo $testes
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = if ($null -ne $cobertura) {
-            "Cobertura frontend: $($cobertura.lines.percentual)% de linhas com $($testes.sucessos) testes aprovados."
-        } else {
-            "Cobertura frontend indisponivel nesta execucao com $($testes.sucessos) testes aprovados."
+        $execucao.sumario = if ($null -ne $cobertura)
+        {
+            "Cobertura frontend: $( $cobertura.lines.percentual )% de linhas com $( $testes.sucessos ) testes aprovados."
         }
-        $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
+        else
+        {
+            "Cobertura frontend indisponivel nesta execucao com $( $testes.sucessos ) testes aprovados."
+        }
+        $execucao.erros = if ($saida.codigo -eq 0)
+        {
+            @()
+        }
+        else
+        {
+            @(Extrair-LinhasFinaisLog $saida.texto)
+        }
         $execucao.artefatos = @()
-        if ($null -ne $cobertura) {
+        if ($null -ne $cobertura)
+        {
             $execucao.artefatos += (ConverterEm-CaminhoRelativo $arquivoJson)
         }
         $execucao.artefatos += (ConverterEm-CaminhoRelativo $saida.log)
@@ -558,8 +776,22 @@ $adaptadores = @{
         $execucao.status = Obter-StatusExecucao $saida.codigo $metricas
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = if ($metricas.erros -gt 0) { "Lint frontend encontrou $($metricas.erros) problemas." } else { 'Lint frontend sem problemas.' }
-        $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
+        $execucao.sumario = if ($metricas.erros -gt 0)
+        {
+            "Lint frontend encontrou $( $metricas.erros ) problemas."
+        }
+        else
+        {
+            'Lint frontend sem problemas.'
+        }
+        $execucao.erros = if ($saida.codigo -eq 0)
+        {
+            @()
+        }
+        else
+        {
+            @(Extrair-LinhasFinaisLog $saida.texto)
+        }
         $execucao.artefatos = @((ConverterEm-CaminhoRelativo $saida.log))
         return $execucao
     }
@@ -570,8 +802,22 @@ $adaptadores = @{
         $execucao.status = Obter-StatusExecucao $saida.codigo $metricas
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = if ($metricas.erros -gt 0) { "Typecheck frontend encontrou $($metricas.erros) erros." } else { 'Typecheck frontend sem erros.' }
-        $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
+        $execucao.sumario = if ($metricas.erros -gt 0)
+        {
+            "Typecheck frontend encontrou $( $metricas.erros ) erros."
+        }
+        else
+        {
+            'Typecheck frontend sem erros.'
+        }
+        $execucao.erros = if ($saida.codigo -eq 0)
+        {
+            @()
+        }
+        else
+        {
+            @(Extrair-LinhasFinaisLog $saida.texto)
+        }
         $execucao.artefatos = @((ConverterEm-CaminhoRelativo $saida.log))
         return $execucao
     }
@@ -582,8 +828,15 @@ $adaptadores = @{
         $execucao.status = Obter-StatusExecucao $saida.codigo $metricas
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = "$($metricas.sucessos)/$($metricas.testes) testes E2E aprovados."
-        $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
+        $execucao.sumario = "$( $metricas.sucessos )/$( $metricas.testes ) testes E2E aprovados."
+        $execucao.erros = if ($saida.codigo -eq 0)
+        {
+            @()
+        }
+        else
+        {
+            @(Extrair-LinhasFinaisLog $saida.texto)
+        }
         $execucao.artefatos = @((ConverterEm-CaminhoRelativo $saida.log))
         return $execucao
     }
@@ -591,7 +844,8 @@ $adaptadores = @{
 
 $inicio = Get-Date
 $verificacoes = @()
-foreach ($adaptador in $perfis[$Perfil]) {
+foreach ($adaptador in $perfis[$Perfil])
+{
     Write-Host "Executando $adaptador..."
     $verificacoes += & $adaptadores[$adaptador]
 }
@@ -618,10 +872,10 @@ $qualidade = @{
 
 $confiabilidade = @{
     testesIgnorados = (
-        ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'backend-unitario' } | Select-Object -First 1).metricas.ignorados) 0)) +
-        ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'backend-integracao' } | Select-Object -First 1).metricas.ignorados) 0)) +
-        ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'frontend-cobertura' } | Select-Object -First 1).metricas.testes.ignorados) 0)) +
-        ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'e2e-playwright' } | Select-Object -First 1).metricas.ignorados) 0))
+    ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'backend-unitario' } | Select-Object -First 1).metricas.ignorados) 0)) +
+            ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'backend-integracao' } | Select-Object -First 1).metricas.ignorados) 0)) +
+            ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'frontend-cobertura' } | Select-Object -First 1).metricas.testes.ignorados) 0)) +
+            ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'e2e-playwright' } | Select-Object -First 1).metricas.ignorados) 0))
     )
     testesFlaky = ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'e2e-playwright' } | Select-Object -First 1).metricas.flaky) 0))
     suitesLentas = @($verificacoes | Sort-Object { [int]$_.duracaoMs } -Descending | Select-Object -First 5 | ForEach-Object {
@@ -634,29 +888,43 @@ $confiabilidade = @{
 }
 
 $hotspots = @()
-foreach ($classe in $cobertura.backend.itensCriticos) {
-    if (($classe.nome -match 'Builder$') -or ($classe.nome -match '\$.*Builder') -or ($classe.nome -match '\.dto\.') -or ($classe.nome -eq 'sgc.comum.ComumDtos')) {
+foreach ($classe in $cobertura.backend.itensCriticos)
+{
+    if (($classe.nome -match 'Builder$') -or ($classe.nome -match '\$.*Builder') -or ($classe.nome -match '\.dto\.') -or ($classe.nome -eq 'sgc.comum.ComumDtos'))
+    {
         continue
     }
     $hotspots += [pscustomobject]@{
-        codigo = "backend:$($classe.nome)"
+        codigo = "backend:$( $classe.nome )"
         nome = $classe.nome
         risco = [math]::Round(100 - $classe.linhasPercentual, 2)
-        motivos = @("Cobertura backend baixa: $($classe.linhasPercentual)%")
+        motivos = @("Cobertura backend baixa: $( $classe.linhasPercentual )%")
     }
 }
-foreach ($arquivo in $cobertura.frontend.itensCriticos) {
+foreach ($arquivo in $cobertura.frontend.itensCriticos)
+{
     $hotspots += [pscustomobject]@{
-        codigo = "frontend:$($arquivo.arquivo)"
+        codigo = "frontend:$( $arquivo.arquivo )"
         nome = $arquivo.arquivo
         risco = [math]::Round(100 - $arquivo.linesPercentual, 2)
-        motivos = @("Cobertura frontend baixa: $($arquivo.linesPercentual)%")
+        motivos = @("Cobertura frontend baixa: $( $arquivo.linesPercentual )%")
     }
 }
 $hotspots = @($hotspots | Sort-Object risco -Descending | Select-Object -First 15)
 
 $resumo = @{
-    statusGeral = if (@($verificacoes | Where-Object { $_.status -eq 'falha' }).Count -gt 0) { 'vermelho' } elseif (@($verificacoes | Where-Object { $_.status -eq 'alerta' }).Count -gt 0) { 'amarelo' } else { 'verde' }
+    statusGeral = if (@($verificacoes | Where-Object { $_.status -eq 'falha' }).Count -gt 0)
+    {
+        'vermelho'
+    }
+    elseif (@($verificacoes | Where-Object { $_.status -eq 'alerta' }).Count -gt 0)
+    {
+        'amarelo'
+    }
+    else
+    {
+        'verde'
+    }
     indiceSaude = 0
     totais = @{
         verificacoes = $verificacoes.Count
@@ -677,7 +945,7 @@ $snapshot = [ordered]@{
         perfilExecucao = $Perfil
         duracaoTotalMs = [math]::Round(((Get-Date) - $inicio).TotalMilliseconds, 0)
         maquina = $env:COMPUTERNAME
-        sistemaOperacional = "$($PSVersionTable.OS)"
+        sistemaOperacional = "$( $PSVersionTable.OS )"
         git = (Obter-Git)
     }
     resumo = $resumo
@@ -700,5 +968,5 @@ $conteudoResumo | Set-Content -Path $arquivoResumo -Encoding UTF8
 Escrever-ArquivoComRetry -Caminho $arquivoUltimoSnapshot -Conteudo $jsonSnapshot
 Escrever-ArquivoComRetry -Caminho $arquivoUltimoResumo -Conteudo $conteudoResumo
 
-Write-Host "Snapshot gerado em $(ConverterEm-CaminhoRelativo $arquivoSnapshot)"
-Write-Host "Resumo gerado em $(ConverterEm-CaminhoRelativo $arquivoResumo)"
+Write-Host "Snapshot gerado em $( ConverterEm-CaminhoRelativo $arquivoSnapshot )"
+Write-Host "Resumo gerado em $( ConverterEm-CaminhoRelativo $arquivoResumo )"

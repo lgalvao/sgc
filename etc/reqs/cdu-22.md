@@ -5,25 +5,31 @@
 ## Pré-condições
 
 - Usuário logado com perfil GESTOR
-- Existência de processo de mapeamento ou de revisão, em andamento, com pelo menos uma unidade subordinada cujo subprocesso tenha localização atual na unidade do usuário com situação 'Cadastro disponibilizado', para processos de mapeamento (ou 'Revisão do cadastro disponibilizada', para processos de revisão).
+- Existência de processo de mapeamento ou de revisão, em andamento, com pelo menos uma unidade subordinada cujo
+  subprocesso tenha localização atual na unidade do usuário com situação 'Cadastro disponibilizado', para processos de
+  mapeamento (ou 'Revisão do cadastro disponibilizada', para processos de revisão).
 
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de mapeamento ou revisão em andamento.
 
-2. O sistema mostra a tela `Detalhes do processo` com uma tabela um resumo de todas unidades participantes do processo, que sejam iguais ou subordinadas à unidade do gestor. 
+2. O sistema mostra a tela `Detalhes do processo` com uma tabela um resumo de todas unidades participantes do processo,
+   que sejam iguais ou subordinadas à unidade do gestor.
 
-3. Caso existam unidades com subprocessos elegíveis para aceite em bloco do cadastro de atividades (de acordo com as pré-condições), o sistema habilita o botão `Aceitar cadastro em bloco`.
+3. Caso existam unidades com subprocessos elegíveis para aceite em bloco do cadastro de atividades (de acordo com as
+   pré-condições), o sistema habilita o botão `Aceitar cadastro em bloco`.
 
 4. O usuário clica no botão `Aceitar cadastro em bloco`.
 
 5. O sistema abre modal de confirmação, com os elementos a seguir:
     - Título "Aceite de cadastro em bloco";
     - Texto "Selecione as unidades cujos cadastros deverão ser aceitos"
-    - Lista das unidades operacionais ou interoperacionais subordinadas **elegíveis**, sendo apresentadas com um checkbox (selecionado por padrão), a sigla e o nome da unidade
+    - Lista das unidades operacionais ou interoperacionais subordinadas **elegíveis**, sendo apresentadas com um
+      checkbox (selecionado por padrão), a sigla e o nome da unidade
     - Botões `Cancelar` e `Registrar aceite`.
 
-6. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.
+6. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela
+   `Detalhes do processo`.
 
 7. O usuário clica em `Registrar aceite`.
 

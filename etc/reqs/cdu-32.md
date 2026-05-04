@@ -6,11 +6,12 @@
 
 - Login realizado com perfil ADMIN
 - Processo do tipo Mapeamento ou Revisão
-- Ao menos um subprocesso que tenha passado da situação 'Mapa homologado'  
+- Ao menos um subprocesso que tenha passado da situação 'Mapa homologado'
 
 ## Fluxo principal
 
-1. O usuário acessa o `Painel` e acessa o subprocesso de uma unidade que esteja com a situação 'Mapa homologado ou posterior' (ver situações de subprocessos no arquivo **_intro.md**).
+1. O usuário acessa o `Painel` e acessa o subprocesso de uma unidade que esteja com a situação 'Mapa homologado ou
+   posterior' (ver situações de subprocessos no arquivo **_intro.md**).
 
 2. O usuário clica no botão `Reabrir cadastro`.
 
@@ -22,10 +23,10 @@
 
 6. sistema registra uma movimentação para o subprocesso com os campos:
 
-   - `Data/hora`: Data/hora atual
-   - `Unidade origem`: ADMIN
-   - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-   - `Descrição`: 'Reabertura de cadastro'
+    - `Data/hora`: Data/hora atual
+    - `Unidade origem`: ADMIN
+    - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Descrição`: 'Reabertura de cadastro'
 
 1. O sistema envia notificações por e-mail para a unidade do subprocesso e para a sua unidade superior na hierarquia.
 
@@ -73,4 +74,4 @@
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-3. O sistema mostra  mensagem de sucesso "Cadastro reaberto".
+3. O sistema mostra mensagem de sucesso "Cadastro reaberto".

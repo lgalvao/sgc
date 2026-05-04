@@ -94,7 +94,7 @@ async function extrairCoberturaJacoco(caminhoRelativo = "backend/build/reports/j
 
     for (const pacote of relatorio.report.package ?? []) {
         const nomePacote = pacote.$.name.replaceAll("/", ".");
-        
+
         for (const sourceFile of pacote.sourcefile ?? []) {
             const nomeArquivo = sourceFile.$.name;
             const nomeClasse = `${nomePacote}.${nomeArquivo.replace(".java", "")}`;
@@ -143,7 +143,7 @@ async function extrairCoberturaJacoco(caminhoRelativo = "backend/build/reports/j
             const linhasPerdidasCount = totalLinhas - linhasCobertas;
             const branchesPerdidosCount = totalBranches - branchesCobertos;
             const temLacunas = linhasPerdidasCount > 0 || branchesPerdidosCount > 0;
-            
+
             totais.totalArquivos++;
             totais.totalLinhas += totalLinhas;
             totais.linhasCobertas += linhasCobertas;
@@ -154,7 +154,7 @@ async function extrairCoberturaJacoco(caminhoRelativo = "backend/build/reports/j
                 const sourceFileCounters = sourceFile.counter || [];
                 const complexidadeCounter = sourceFileCounters.find(c => c.$.type === 'COMPLEXITY');
                 const complexidade = complexidadeCounter ? extrairInteiroCounter(complexidadeCounter, 'covered') + extrairInteiroCounter(complexidadeCounter, 'missed') : 0;
-                
+
                 const linhasPercentual = calcularPercentual(linhasCobertas, linhasPerdidasCount);
                 const branchesPercentual = totalBranches > 0 ? calcularPercentual(branchesCobertos, branchesPerdidosCount) : 100;
 
@@ -183,8 +183,8 @@ async function extrairCoberturaJacoco(caminhoRelativo = "backend/build/reports/j
     }
 
     totais.coberturaGlobalLinhas = calcularPercentual(totais.linhasCobertas, totais.totalLinhas - totais.linhasCobertas);
-    totais.coberturaGlobalBranches = totais.totalBranches > 0 
-        ? calcularPercentual(totais.branchesCobertos, totais.totalBranches - totais.branchesCobertos) 
+    totais.coberturaGlobalBranches = totais.totalBranches > 0
+        ? calcularPercentual(totais.branchesCobertos, totais.totalBranches - totais.branchesCobertos)
         : 100;
 
     return {

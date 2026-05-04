@@ -121,8 +121,8 @@ class LocalizacaoSubprocessoServiceTest {
         Map<Long, Unidade> res = service.obterLocalizacoesAtuais(List.of(spNaoPersistido, spNaoIniciado, spComMov, spOutroComMov));
 
         assertThat(res).containsEntry(2L, uniOriginal)
-                       .containsEntry(3L, uniDestino1)
-                       .containsEntry(4L, uniDestino2);
+                .containsEntry(3L, uniDestino1)
+                .containsEntry(4L, uniDestino2);
         assertThat(res.keySet()).doesNotContainNull();
     }
 }

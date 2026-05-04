@@ -1,5 +1,5 @@
 <template>
-  <BCard no-body class="relatorio-andamento__card shadow-sm" data-testid="card-resultado-andamento">
+  <BCard class="relatorio-andamento__card shadow-sm" data-testid="card-resultado-andamento" no-body>
     <BCardBody>
       <BCardTitle class="mb-3 relatorio-andamento__cabecalho">
         <span class="relatorio-andamento__titulo">{{ item.siglaUnidade }}</span>
@@ -48,7 +48,8 @@
                   <span class="relatorio-andamento__info-label">Data limite</span>
                   <span class="relatorio-andamento__info-valor">
                     {{ item.dataLimiteEtapa2 }}
-                    <small v-if="item.mostraPrazoAjustado" class="text-muted fst-italic fw-normal">(Prazo ajustado)</small>
+                    <small v-if="item.mostraPrazoAjustado"
+                           class="text-muted fst-italic fw-normal">(Prazo ajustado)</small>
                   </span>
                 </div>
                 <div class="relatorio-andamento__info-item">
@@ -77,7 +78,7 @@
   </BCard>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BCard, BCardBody, BCardTitle} from "bootstrap-vue-next";
 
 interface LinhaRelatorioAndamento {
@@ -94,6 +95,7 @@ interface LinhaRelatorioAndamento {
   responsavel: string;
   mostraPrazoAjustado: boolean;
 }
+
 defineProps<{ item: LinhaRelatorioAndamento }>();
 </script>
 

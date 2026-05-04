@@ -108,6 +108,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
     }
+
     @Test
     @DisplayName("Não deve criar competência sem atividades")
     void naoDeveCriarCompetenciaSemAtividades() {

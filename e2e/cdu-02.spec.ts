@@ -9,7 +9,11 @@ import {
 
 test.describe('CDU-02 - Visualizar painel', () => {
     test.describe('Como ADMIN', () => {
-        test('Deve exibir estrutura básica do painel e testar ordenação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        test('Deve exibir estrutura básica do painel e testar ordenação', async ({
+                                                                                     _resetAutomatico,
+                                                                                     page,
+                                                                                     _autenticadoComoAdmin
+                                                                                 }) => {
             const descricaoProcesso = `Processo estrutura painel - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -55,7 +59,11 @@ test.describe('CDU-02 - Visualizar painel', () => {
             });
         });
 
-        test('Deve criar processo e visualizá-lo na tabela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        test('Deve criar processo e visualizá-lo na tabela', async ({
+                                                                        _resetAutomatico,
+                                                                        page,
+                                                                        _autenticadoComoAdmin
+                                                                    }) => {
             const descricaoProcesso = `Processo E2E - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -82,7 +90,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
                                                                                _resetAutomatico,
                                                                                page,
                                                                                _autenticadoComoAdmin
-}) => {
+                                                                           }) => {
             const descricaoProcesso = `Processo criado - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -115,7 +123,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
                                                                                _resetAutomatico,
                                                                                page,
                                                                                _autenticadoComoAdmin
-}) => {
+                                                                           }) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -167,10 +175,10 @@ test.describe('CDU-02 - Visualizar painel', () => {
         });
 
         test('Deve abrir Cadastro de processo ao clicar em processo Criado como ADMIN', async ({
-                                                                                                  _resetAutomatico,
-                                                                                                  page,
-                                                                                                  _autenticadoComoAdmin
-}) => {
+                                                                                                   _resetAutomatico,
+                                                                                                   page,
+                                                                                                   _autenticadoComoAdmin
+                                                                                               }) => {
             const descricaoProcesso = `Processo criado clicável - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -191,10 +199,10 @@ test.describe('CDU-02 - Visualizar painel', () => {
         });
 
         test('Deve respeitar regra de clique por perfil em processo Em andamento', async ({
-                                                                                             _resetAutomatico,
-                                                                                             page,
-                                                                                             _autenticadoComoAdmin
-}) => {
+                                                                                              _resetAutomatico,
+                                                                                              page,
+                                                                                              _autenticadoComoAdmin
+                                                                                          }) => {
             const descricaoProcesso = `Processo clique perfis - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -231,7 +239,11 @@ test.describe('CDU-02 - Visualizar painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {
+        test('Deve validar visualização, alertas e ordenação', async ({
+                                                                          _resetAutomatico,
+                                                                          page,
+                                                                          _autenticadoComoGestor
+                                                                      }) => {
             await test.step('Verificar restrições de botões e mensagens de tabela vazia', async () => {
                 await expect(page.getByTestId('btn-painel-criar-processo')).toBeHidden();
                 // A tabela não é renderizada se estiver vazia (EmptyState substitui)
@@ -250,7 +262,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
                                                                                                                        _resetAutomatico,
                                                                                                                        page,
                                                                                                                        _autenticadoComoAdmin
-}) => {
+                                                                                                                   }) => {
             const descricaoProcesso = `Processo alerta painel - ${Date.now()}`;
 
             await criarProcesso(page, {

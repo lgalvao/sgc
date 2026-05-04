@@ -50,12 +50,12 @@ watch(
 watch(
     () => perfilStore.usuarioCodigo,
     (codigo, _codigoAnterior, aoLimpar) => {
-        if (!codigo) {
-            return;
-        }
+      if (!codigo) {
+        return;
+      }
 
-        const encerrarSincronizacao = useCacheSync();
-        aoLimpar(encerrarSincronizacao);
+      const encerrarSincronizacao = useCacheSync();
+      aoLimpar(encerrarSincronizacao);
     },
     {immediate: true}
 );

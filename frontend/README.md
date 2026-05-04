@@ -83,14 +83,15 @@ pnpm run test:e2e
 
 ## Autenticação
 
-A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo `axios-setup.ts`.
+A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo
+`axios-setup.ts`.
 
 ## Builds
 
-| Comando | Destino |
-|---|---|
-| `pnpm run build` | Build padrão (desenvolvimento) |
-| `pnpm run build:hom` | Build para homologação (habilita widget de feedback) |
-| `pnpm run build:prod` | Build para produção |
+| Comando               | Destino                                              |
+|-----------------------|------------------------------------------------------|
+| `pnpm run build`      | Build padrão (desenvolvimento)                       |
+| `pnpm run build:hom`  | Build para homologação (habilita widget de feedback) |
+| `pnpm run build:prod` | Build para produção                                  |
 
 Para convenções de código, veja o arquivo **[AGENTS.md](../AGENTS.md)** na raiz do projeto.

@@ -50,8 +50,9 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     });
 
     test('Deve exibir barra de navegação com restrições para GESTOR', async ({
-                                                                                page
-                                                                            , _autenticadoComoGestor}) => {
+                                                                                 page
+                                                                                 , _autenticadoComoGestor
+                                                                             }) => {
         await expect(page.getByRole('link', {name: TEXTOS.comum.NOME_SISTEMA})).toBeVisible();
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_PAINEL})).toBeVisible();
 
@@ -66,7 +67,8 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
     test('Deve exibir barra de navegação com restrições para CHEFE', async ({
                                                                                 page
-                                                                            , _autenticadoComoChefeSecao111}) => {
+                                                                                , _autenticadoComoChefeSecao111
+                                                                            }) => {
         await expect(page.getByRole('link', {name: TEXTOS.comum.NOME_SISTEMA})).toBeVisible();
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_PAINEL})).toBeVisible();
 
@@ -80,8 +82,9 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     });
 
     test('Deve exibir barra de navegação com restrições para SERVIDOR', async ({
-                                                                                  page
-                                                                              , _autenticadoComoServidor}) => {
+                                                                                   page
+                                                                                   , _autenticadoComoServidor
+                                                                               }) => {
         await expect(page.getByRole('link', {name: TEXTOS.comum.NOME_SISTEMA})).toBeVisible();
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_PAINEL})).toBeVisible();
 

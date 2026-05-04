@@ -5,81 +5,116 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 # Configuração de cores e estilos
 $COLORS = @{
     Success = "Green"
-    Error   = "Red"
+    Error = "Red"
     Warning = "Yellow"
-    Info    = "Cyan"
+    Info = "Cyan"
     Neutral = "Gray"
 }
 
 $SUMMARY = @()
 
-function Obter-UltimaCaptura {
+function Obter-UltimaCaptura
+{
     param(
         [object[]]$Linhas,
         [string]$Padrao
     )
 
     $capturas = @($Linhas | Select-String $Padrao | ForEach-Object { $_.Matches.Groups[1].Value })
-    if ($capturas.Count -gt 0) {
+    if ($capturas.Count -gt 0)
+    {
         return $capturas[-1]
     }
 
     return $null
 }
 
-function Run-Step {
+function Run-Step
+{
     param(
         [string]$Name,
         [scriptblock]$Script,
         [string]$ErrorDetailMsg = ""
     )
 
-    $logFile = Join-Path $PSScriptRoot ".smoke_test_$($Name -replace ' ', '_').log"
-    
+    $logFile = Join-Path $PSScriptRoot ".smoke_test_$( $Name -replace ' ', '_' ).log"
+
     Write-Host "$Name... " -NoNewline -ForegroundColor $COLORS.Warning
 
     Push-Location $PSScriptRoot
-    try {
+    try
+    {
         $result = @(& $Script 2>&1 | Tee-Object -FilePath $logFile)
-        $exitCode = if ($null -ne $LASTEXITCODE) { [int]$LASTEXITCODE }
-        elseif ($?) { 0 }
-        else { 1 }
+        $exitCode = if ($null -ne $LASTEXITCODE)
+        {
+            [int]$LASTEXITCODE
+        }
+        elseif ($?)
+        {
+            0
+        }
+        else
+        {
+            1
+        }
     }
-    catch {
+    catch
+    {
         $_ | Out-File -FilePath $logFile -Encoding utf8
         $result = @((Get-Content $logFile -ErrorAction SilentlyContinue))
         $exitCode = 1
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 
-    if ($exitCode -eq 0) {
+    if ($exitCode -eq 0)
+    {
         Write-Host "OK    " -ForegroundColor $COLORS.Success
-        
+
         # Extração de métricas básicas para o resumo
-        if ($Name -eq "junit") {
+        if ($Name -eq "junit")
+        {
             $passed = Obter-UltimaCaptura -Linhas $result -Padrao "\+ Passed: (\d+)"
             $total = Obter-UltimaCaptura -Linhas $result -Padrao "Total: (\d+)"
-            if ($passed -and $total) { $SUMMARY += "  - Backend JUnit: $passed/$total testes OK" }
-            else { $SUMMARY += "  - Backend JUnit: Finalizado (Cache ou 0 executados)" }
+            if ($passed -and $total)
+            {
+                $SUMMARY += "  - Backend JUnit: $passed/$total testes OK"
+            }
+            else
+            {
+                $SUMMARY += "  - Backend JUnit: Finalizado (Cache ou 0 executados)"
+            }
         }
-        elseif ($Name -eq "vitest") {
+        elseif ($Name -eq "vitest")
+        {
             $passed = Obter-UltimaCaptura -Linhas $result -Padrao "Tests\s+(\d+)\s+passed"
-            if ($passed) { $SUMMARY += "  - Frontend Vitest: $passed testes OK" }
+            if ($passed)
+            {
+                $SUMMARY += "  - Frontend Vitest: $passed testes OK"
+            }
         }
-        elseif ($Name -eq "e2e") {
+        elseif ($Name -eq "e2e")
+        {
             $passed = Obter-UltimaCaptura -Linhas $result -Padrao "(\d+)\s+passed"
-            if ($passed) { $SUMMARY += "  - E2E Playwright: $passed fluxos validados" }
+            if ($passed)
+            {
+                $SUMMARY += "  - E2E Playwright: $passed fluxos validados"
+            }
         }
     }
-    else {
+    else
+    {
         Write-Host "FALHOU" -ForegroundColor $COLORS.Error
         Write-Host "`n--- Detalhes do erro ($Name) ---" -ForegroundColor $COLORS.Error
         $result | Select-Object -Last 20 | Write-Host -ForegroundColor $COLORS.Neutral
         Write-Host "---------------------------------" -ForegroundColor $COLORS.Error
-        if ($ErrorDetailMsg) { Write-Host $ErrorDetailMsg -ForegroundColor $COLORS.Warning }
-        
+        if ($ErrorDetailMsg)
+        {
+            Write-Host $ErrorDetailMsg -ForegroundColor $COLORS.Warning
+        }
+
         # Cleanup e fail fast
         Get-ChildItem -Path $PSScriptRoot -Filter ".smoke_test_*.log" | Remove-Item -ErrorAction SilentlyContinue
         exit 1
@@ -101,9 +136,15 @@ Run-Step "e2e"        { npx playwright test captura jornada --reporter=dot } -Er
 # Resumo Final
 Write-Host "`n-----------------------------------------" -ForegroundColor $COLORS.Info
 Write-Host "=== RESUMO DA EXECUÇÃO ===" -ForegroundColor $COLORS.Info
-if ($SUMMARY.Count -gt 0) {
-    foreach ($line in $SUMMARY) { Write-Host $line -ForegroundColor $COLORS.Neutral }
-} else {
+if ($SUMMARY.Count -gt 0)
+{
+    foreach ($line in $SUMMARY)
+    {
+        Write-Host $line -ForegroundColor $COLORS.Neutral
+    }
+}
+else
+{
     Write-Host "  Processamento concluído com sucesso." -ForegroundColor $COLORS.Neutral
 }
 Write-Host "-----------------------------------------" -ForegroundColor $COLORS.Info

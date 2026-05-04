@@ -146,7 +146,7 @@ export async function verificarProcessoTabela(page: Page, options: {
 }): Promise<void> {
     const tabela = page.locator('[data-testid="tbl-processos"]');
     await expect(tabela).toBeVisible();
-    
+
     // Localizar a linha que contém a descrição do processo
     const linhaProcesso = tabela.locator('tr').filter({hasText: options.descricao}).first();
     await expect(linhaProcesso).toBeVisible();

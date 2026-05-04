@@ -5,11 +5,10 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
 import {type ProcessoResumo} from "@/types/tipos";
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/formatters";
+import {getProcessoBadgeVariant} from "@/utils/statusHelpers";
 
 type CampoOrdenacaoProcesso = keyof ProcessoResumo | "dataFinalizacao";
 type EventoLinhaProcesso = ProcessoResumo | { item: ProcessoResumo };
-
-import {getProcessoBadgeVariant} from "@/utils/statusHelpers";
 
 const props = withDefaults(defineProps<{
   processos: ProcessoResumo[];
@@ -133,11 +132,11 @@ defineExpose({fields});
   </div>
   <EmptyState
       v-else
+      :description="TEXTOS.tabelaProcessos.EMPTY_DESCRIPTION"
+      :title="TEXTOS.tabelaProcessos.EMPTY_TITLE"
       class="mb-0"
       data-testid="empty-state-processos"
       icon="bi-folder2-open"
-      :description="TEXTOS.tabelaProcessos.EMPTY_DESCRIPTION"
-      :title="TEXTOS.tabelaProcessos.EMPTY_TITLE"
   >
     <BButton
         v-if="mostrarCtaVazio"

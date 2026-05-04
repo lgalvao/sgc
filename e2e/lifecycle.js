@@ -132,7 +132,7 @@ const LOG_FILTERS = [
     /NotificacaoEmailServiceMock.*ATIVADO/,
     /E-mails serão mockados/,
 
-     
+
     /^\s*$/
 ];
 

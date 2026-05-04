@@ -99,13 +99,13 @@ async function fixNullChecks(results) {
 
             for (const match of matches) {
                 const varName = match[1];
-                
+
                 // Buscar a declaração do método mais próximo antes desta linha
                 for (let i = item.line - 2; i >= 0; i--) {
                     const methodLine = lines[i];
                     if ((methodLine.includes('public') || methodLine.includes('private') || methodLine.includes('protected')) &&
                         methodLine.includes('(') && methodLine.includes(varName)) {
-                        
+
                         const paramRegex = new RegExp(`\\\\b([a-zA-Z0-9_<>[\\\\\\]]+)\\\\s+${varName}\\\\b`);
                         const paramMatch = methodLine.match(paramRegex);
 
@@ -113,7 +113,7 @@ async function fixNullChecks(results) {
                             lines[i] = methodLine.replace(paramRegex, `@org.jspecify.annotations.Nullable $1 ${varName}`);
                             modified = true;
                             fixedCount++;
-                            
+
                             const hasImport = lines.some(l => l.includes('org.jspecify.annotations.Nullable'));
                             if (!hasImport) {
                                 const packageIdx = lines.findIndex(l => l.startsWith('package '));
@@ -162,7 +162,7 @@ async function main() {
     escreverLinha('Escaneando arquivos...');
     const data = await scanFiles();
     escreverLinha(`Verificações encontradas em ${Object.keys(data).length} arquivos.`);
-    
+
     await generateReport(data);
     escreverLinha(`Relatórios gerados: ${pc.dim(AUDIT_FILE)}, ${pc.dim(ANALYSIS_FILE)}`);
 

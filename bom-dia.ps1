@@ -3,17 +3,20 @@
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-if (-not $isAdmin) {
+if (-not $isAdmin)
+{
     Start-Process pwsh -Verb RunAs -ArgumentList "-NoExit -File `"$PSCommandPath`""
     exit
 }
 
 $ErrorActionPreference = 'Stop'
-function Invoke-Passo {
+function Invoke-Passo
+{
     param([string]$Label, [scriptblock]$Action)
     Write-Host "`n==> $Label" -ForegroundColor Cyan
     & $Action
-    if ($LASTEXITCODE -ne 0) {
+    if ($LASTEXITCODE -ne 0)
+    {
         Write-Host "FALHA: $Label (exit $LASTEXITCODE)" -ForegroundColor Red
         exit $LASTEXITCODE
     }
@@ -25,18 +28,19 @@ Invoke-Passo 'git pull'          { git pull }
 Invoke-Passo 'Testes backend'    { gradle backend:test }
 
 # Garantir que pnpm está instalado
-if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue))
+{
     Invoke-Passo 'Instalar pnpm' { npm install -g pnpm }
 }
 
-Invoke-Passo 'Atualizar pnpm'    { pnpm self-update --silent}
+Invoke-Passo 'Atualizar pnpm'    { pnpm self-update --silent }
 Invoke-Passo 'Atualizar globais' { pnpm update -g }
-Invoke-Passo 'Raiz install'      { pnpm install && pnpm update}
+Invoke-Passo 'Raiz install'      { pnpm install && pnpm update }
 Invoke-Passo 'Typecheck'         { pnpm run typecheck }
 Invoke-Passo 'Lint'              { pnpm run lint }
 
 Push-Location frontend
-Invoke-Passo 'Frontend install'  { pnpm install && pnpm update}
+Invoke-Passo 'Frontend install'  { pnpm install && pnpm update }
 Invoke-Passo 'Testes frontend'   { pnpm exec vitest run }
 Pop-Location
 

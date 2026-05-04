@@ -66,7 +66,7 @@ class ResponsavelUnidadeServiceCoverageTest {
         String sigla = "U10";
         Long codigo = 10L;
         when(unidadeRepo.buscarCodigoAtivoPorSigla(sigla)).thenReturn(Optional.of(codigo));
-        
+
         ResponsabilidadeUnidadeLeitura leitura = mock(ResponsabilidadeUnidadeLeitura.class);
         when(leitura.usuarioTitulo()).thenReturn("123");
         when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(codigo)).thenReturn(Optional.of(leitura));

@@ -39,8 +39,8 @@
         >
           <template #first>
             <BFormSelectOption
-                disabled
                 :value="null"
+                disabled
             >
               Selecione
             </BFormSelectOption>
@@ -74,8 +74,8 @@
         >
           <template #first>
             <BFormSelectOption
-                disabled
                 :value="null"
+                disabled
             >
               Selecione
             </BFormSelectOption>
@@ -298,9 +298,9 @@ async function importar() {
   try {
     importando.value = true;
     resultadoImportacao.value = await subprocessoService.importarAtividades(
-      props.codSubprocessoDestino,
-      unidadeSelecionada.value.codSubprocesso,
-      idsAtividades,
+        props.codSubprocessoDestino,
+        unidadeSelecionada.value.codSubprocesso,
+        idsAtividades,
     );
     emit("importar", resultadoImportacao.value);
     fechar();

@@ -33,7 +33,11 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         validarProcessoFixture(processo, descProcesso);
     });
 
-    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({
+                                                                                        _resetAutomatico,
+                                                                                        page,
+                                                                                        _autenticadoComoAdmin
+                                                                                    }) => {
         // CT-00 e CT-01: Acessar edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -72,7 +76,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         const cardCompetencia = page.locator('.competencia-card', {hasText: compDesc});
         const itemAtividade = cardCompetencia.locator('.atividade-associada-card-item', {hasText: ATIVIDADE_1});
         await expect(itemAtividade).toBeVisible();
-        
+
         // Verifica o texto do conhecimento (fixture 1 tem 'Conhecimento fixture 1')
         await expect(itemAtividade.locator('.conhecimento-item')).toContainText(/Conhecimento fixture/i);
 

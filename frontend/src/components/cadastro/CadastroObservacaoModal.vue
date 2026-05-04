@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue';
 import {BFormGroup, BFormInvalidFeedback, BFormTextarea} from 'bootstrap-vue-next';
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -61,9 +61,9 @@ const observacaoModel = computed({
       :variante="variant"
       @confirmar="$emit('confirmar')"
   >
-    <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger" />
+    <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
     <p>{{ texto }}</p>
-    <BFormGroup class="mb-3" :label="labelObrigatoria ? undefined : label" :label-for="inputId">
+    <BFormGroup :label="labelObrigatoria ? undefined : label" :label-for="inputId" class="mb-3">
       <template v-if="labelObrigatoria" #label>
         {{ label }} <span aria-hidden="true" class="text-danger">*</span>
       </template>

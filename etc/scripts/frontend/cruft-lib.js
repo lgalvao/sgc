@@ -215,7 +215,10 @@ async function analisarCruftFrontend({base = DIRETORIO_RAIZ, caminhoBudget = CAM
 
         const ehProducao = ehArquivoProducaoFrontend(caminhoRelativo);
         const camada = classificarCamada(caminhoRelativo);
-        const definicaoBudget = budget.camadas?.[camada] ?? budget.camadas?.outro ?? {target: Number.POSITIVE_INFINITY, hard: Number.POSITIVE_INFINITY};
+        const definicaoBudget = budget.camadas?.[camada] ?? budget.camadas?.outro ?? {
+            target: Number.POSITIVE_INFINITY,
+            hard: Number.POSITIVE_INFINITY
+        };
         const contagens = {
             anyExplicito: contarOcorrencias(conteudo, PADROES.anyExplicito),
             checksNull: contarOcorrencias(conteudo, PADROES.checksNull),

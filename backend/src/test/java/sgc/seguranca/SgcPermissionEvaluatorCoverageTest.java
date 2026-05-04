@@ -20,14 +20,22 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("NullAway.Init")
 class SgcPermissionEvaluatorCoverageTest {
 
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private MovimentacaoRepo movimentacaoRepo;
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private MapaRepo mapaRepo;
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private HierarquiaService hierarquiaService;
-    @Mock private LocalizacaoSubprocessoService localizacaoSubprocessoService;
-    @Mock private Authentication authentication;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private HierarquiaService hierarquiaService;
+    @Mock
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @Mock
+    private Authentication authentication;
 
     @InjectMocks
     private SgcPermissionEvaluator evaluator;
@@ -46,13 +54,13 @@ class SgcPermissionEvaluatorCoverageTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .build();
         when(authentication.getPrincipal()).thenReturn(usuario);
-        
+
         Subprocesso sp1 = mock(Subprocesso.class);
         Subprocesso sp2 = mock(Subprocesso.class);
         // ADMINISTRADOR: verificarSubprocesso chama sp.getProcesso() e depois retorna true para leitura
         when(sp1.getProcesso()).thenReturn(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
         when(sp2.getProcesso()).thenReturn(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
-        
+
         boolean result = evaluator.hasPermission(authentication, java.util.List.of(sp1, sp2), "VISUALIZAR_SUBPROCESSO");
         assertThat(result).isTrue();
     }
@@ -64,11 +72,11 @@ class SgcPermissionEvaluatorCoverageTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .build();
         when(authentication.getPrincipal()).thenReturn(usuario);
-        
+
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
         sp.setUnidade(Unidade.builder().codigo(1L).build());
-        
+
         when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(anyLong())).thenReturn(java.util.Optional.of(sp));
 
         boolean result = evaluator.hasPermission(authentication, (java.io.Serializable) java.util.List.of(1L, 2L), "Subprocesso", "VISUALIZAR_SUBPROCESSO");
@@ -114,7 +122,7 @@ class SgcPermissionEvaluatorCoverageTest {
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(p);
         sp.setUnidade(Unidade.builder().codigo(1L).build());
-        
+
         Mapa m = new Mapa();
         m.setSubprocesso(sp);
         when(mapaRepo.findById(1L)).thenReturn(java.util.Optional.of(m));
@@ -124,7 +132,7 @@ class SgcPermissionEvaluatorCoverageTest {
         a.setMapa(m);
         when(atividadeRepo.findById(1L)).thenReturn(java.util.Optional.of(a));
         assertThat(evaluator.hasPermission(authentication, 1L, "Atividade", "VISUALIZAR_SUBPROCESSO")).isTrue();
-        
+
         when(processoRepo.buscarPorCodigoComParticipantes(999L)).thenReturn(java.util.Optional.empty());
         assertThat(evaluator.hasPermission(authentication, 999L, "Processo", "VISUALIZAR_PROCESSO")).isFalse();
     }
@@ -135,7 +143,7 @@ class SgcPermissionEvaluatorCoverageTest {
         Usuario usuario = Usuario.builder()
                 .perfilAtivo(Perfil.CHEFE)
                 .build();
-        
+
         Processo p = Processo.builder().situacao(SituacaoProcesso.FINALIZADO).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(p);
@@ -150,7 +158,7 @@ class SgcPermissionEvaluatorCoverageTest {
         Usuario usuario = Usuario.builder()
                 .perfilAtivo(Perfil.CHEFE)
                 .build();
-        
+
         Processo p = Processo.builder().situacao(SituacaoProcesso.FINALIZADO).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(p);
@@ -166,7 +174,7 @@ class SgcPermissionEvaluatorCoverageTest {
         Usuario usuario = Usuario.builder()
                 .perfilAtivo(Perfil.CHEFE)
                 .build();
-        
+
         Processo p = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(p);
@@ -182,7 +190,7 @@ class SgcPermissionEvaluatorCoverageTest {
                 .perfilAtivo(Perfil.GESTOR)
                 .unidadeAtivaCodigo(1L)
                 .build();
-        
+
         Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
@@ -200,7 +208,7 @@ class SgcPermissionEvaluatorCoverageTest {
                 .unidadeAtivaCodigo(1L)
                 .tituloEleitoral("1111111111")
                 .build();
-        
+
         Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
@@ -216,13 +224,13 @@ class SgcPermissionEvaluatorCoverageTest {
         Usuario usuario = Usuario.builder()
                 .perfilAtivo(Perfil.ADMIN)
                 .build();
-        
+
         Processo p = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
         assertThat(evaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).isTrue();
-        
+
         p.setSituacao(SituacaoProcesso.FINALIZADO);
         assertThat(evaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).isFalse();
-        
+
         usuario.setPerfilAtivo(Perfil.GESTOR);
         assertThat(evaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).isFalse();
     }
@@ -232,9 +240,9 @@ class SgcPermissionEvaluatorCoverageTest {
     void acaoInvalida() {
         Usuario usuario = new Usuario();
         when(authentication.getPrincipal()).thenReturn(usuario);
-        
-        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> 
-            evaluator.hasPermission(authentication, 1L, "Subprocesso", "ACAO_INEXISTENTE")
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () ->
+                evaluator.hasPermission(authentication, 1L, "Subprocesso", "ACAO_INEXISTENTE")
         );
     }
 
@@ -277,7 +285,7 @@ class SgcPermissionEvaluatorCoverageTest {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123456789012");
         usuario.setUnidadeAtivaCodigo(1L);
-        
+
         Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
@@ -292,7 +300,7 @@ class SgcPermissionEvaluatorCoverageTest {
         Usuario usuario = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
         Processo p1 = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
         Processo p2 = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
-        
+
         assertThat(evaluator.verificarPermissao(usuario, java.util.List.of(p1, p2), AcaoPermissao.VISUALIZAR_PROCESSO)).isTrue();
     }
 
@@ -303,7 +311,7 @@ class SgcPermissionEvaluatorCoverageTest {
                 .perfilAtivo(Perfil.CHEFE)
                 .unidadeAtivaCodigo(1L)
                 .build();
-        
+
         Processo pFinal = Processo.builder().situacao(SituacaoProcesso.FINALIZADO).build();
         Subprocesso sp1 = new Subprocesso();
         sp1.setProcesso(pFinal);
@@ -334,7 +342,7 @@ class SgcPermissionEvaluatorCoverageTest {
     void verificarProcessoOutrasAcoes() {
         Usuario usuario = Usuario.builder().perfilAtivo(Perfil.GESTOR).build();
         Processo p = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
-       
+
         assertThat(evaluator.verificarPermissao(usuario, p, AcaoPermissao.DEVOLVER_CADASTRO)).isTrue();
     }
 
@@ -344,7 +352,7 @@ class SgcPermissionEvaluatorCoverageTest {
         Usuario usuarioMock = new Usuario();
         usuarioMock.setTituloEleitoral("123456789012");
         usuarioMock.setUnidadeAtivaCodigo(1L);
-        
+
         Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());

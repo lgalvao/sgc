@@ -22,11 +22,10 @@ import sgc.comum.config.*;
 @Slf4j
 public class AgendadorRefreshCache {
 
+    private static final long INTERVALO_REFRESH_MS = 600_000;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheManager cacheManager;
     private final RegistroSseEmitter registroSseEmitter;
-
-    private static final long INTERVALO_REFRESH_MS = 600_000;
 
     @Scheduled(fixedDelay = INTERVALO_REFRESH_MS)
     public void atualizarTudo() {

@@ -109,7 +109,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
 
         return switch (alvo) {
-            case Collection<?> colecao -> colecao.stream().allMatch(item -> verificarPermissao(usuario, item, acao, logarNegacao));
+            case Collection<?> colecao ->
+                    colecao.stream().allMatch(item -> verificarPermissao(usuario, item, acao, logarNegacao));
             case Subprocesso sp -> verificarSubprocesso(usuario, sp, acao, logarNegacao);
             case Processo processo -> verificarProcesso(usuario, processo, acao);
             case null, default -> false;

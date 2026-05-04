@@ -20,10 +20,10 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
 test.describe('CDU-04 - Iniciar processo', () => {
 
     test('Deve marcar unidade sem responsável efetivo como inelegível na árvore', async ({
-                                                                                              _resetAutomatico,
-                                                                                              page,
-                                                                                              _autenticadoComoAdmin
-    }) => {
+                                                                                             _resetAutomatico,
+                                                                                             page,
+                                                                                             _autenticadoComoAdmin
+                                                                                         }) => {
         await page.goto('/painel');
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -42,7 +42,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
                                                                                             page,
                                                                                             browser,
                                                                                             _autenticadoComoAdmin
-}) => {
+                                                                                        }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,
@@ -94,14 +94,14 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await esperarPaginaSubprocesso(page, 'ASSESSORIA_11');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
 
-        
+
         const timeline = page.getByTestId('tbl-movimentacoes');
         await expect(timeline.getByText(TEXTOS.movimentacao.PROCESSO_INICIADO)).toBeVisible();
 
         const contextoChefeAss11 = await browser.newContext();
         const paginaChefeAss11 = await contextoChefeAss11.newPage();
         await login(paginaChefeAss11, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
-        
+
         const tabelaAlertasAss11 = paginaChefeAss11.getByTestId('tbl-alertas');
         await expect(tabelaAlertasAss11.locator('tr', {hasText: descricao})
             .filter({hasText: 'Início do processo'})
@@ -137,5 +137,6 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await expect(tabelaAlertasSec1Gestor.locator('tr', {hasText: descricao})
             .filter({hasText: 'Início do processo em unidade(s) subordinada(s)'})
         ).toBeVisible();
-        await contextoGestorSec1.close();    });
+        await contextoGestorSec1.close();
+    });
 });

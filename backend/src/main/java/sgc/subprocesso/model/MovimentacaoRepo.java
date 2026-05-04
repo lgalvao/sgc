@@ -23,7 +23,7 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             ORDER BY m.dataHora DESC, m.codigo DESC
             """)
     List<Movimentacao> listarPorSubprocessoOrdenadasPorDataHoraDesc(@Param("subprocessoCodigo") Long subprocessoCodigo);
-    
+
     @Query("""
             SELECT m FROM Movimentacao m
             LEFT JOIN FETCH m.unidadeOrigem

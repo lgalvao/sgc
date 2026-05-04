@@ -1,4 +1,5 @@
 import apiClient from "@/axios-setup";
+import {STATUS_NOTIFICACAO_INFO} from "@/utils/statusHelpers";
 
 export type StatusNotificacao =
     "PENDENTE"
@@ -26,8 +27,7 @@ export interface Notificacao {
     ultimoErro?: string;
 }
 
-export { STATUS_NOTIFICACAO_INFO, getNotificacaoStatusInfo as obterStatusNotificacao } from "@/utils/statusHelpers";
-import { STATUS_NOTIFICACAO_INFO } from "@/utils/statusHelpers";
+export {STATUS_NOTIFICACAO_INFO, getNotificacaoStatusInfo as obterStatusNotificacao} from "@/utils/statusHelpers";
 
 export interface ReenvioNotificacaoResponse {
     codigo: number;
@@ -36,7 +36,7 @@ export interface ReenvioNotificacaoResponse {
 
 export async function listarNotificacoesAdmin(limite = 50): Promise<Notificacao[]> {
     const response = await apiClient.get<Notificacao[]>("/admin/notificacoes/listar", {
-        params: { limite }
+        params: {limite}
     });
     return response.data;
 }
@@ -57,9 +57,9 @@ export function obterTimestampOrdenacao(item: Notificacao): number {
 export function compararNotificacoes(a: Notificacao, b: Notificacao): number {
     const infoA = STATUS_NOTIFICACAO_INFO[a.situacao];
     const infoB = STATUS_NOTIFICACAO_INFO[b.situacao];
-    
+
     if (!infoA || !infoB) return 0;
-    
+
     const prioridade = infoA.prioridade - infoB.prioridade;
     if (prioridade !== 0) {
         return prioridade;

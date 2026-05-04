@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from "vue";
 import {BButton, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -98,56 +98,56 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
         <LoadingButton
             v-if="podeVisualizarImpacto"
             :loading="loadingImpacto"
+            :text="TEXTOS.mapa.BOTAO_IMPACTO"
             data-testid="cad-mapa__btn-impactos-mapa"
             icon="arrow-right-circle"
-            :text="TEXTOS.mapa.BOTAO_IMPACTO"
             variant="outline-secondary"
             @click="$emit('abrir-impacto')"
         />
 
         <BDropdown
             v-if="usarMenuAcoesMapa"
-            data-testid="btn-mapa-acoes"
             :text="TEXTOS.mapa.BOTAO_ACOES"
+            data-testid="btn-mapa-acoes"
             toggle-class="text-nowrap"
             variant="success"
         >
           <BDropdownItemButton
               v-if="mostrarApresentarSugestoes"
-              data-testid="btn-mapa-acao-sugestoes"
               :disabled="!habilitarApresentarSugestoes"
+              data-testid="btn-mapa-acao-sugestoes"
               @click="$emit('abrir-sugestoes')"
           >
             {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarValidarMapa"
-              data-testid="btn-mapa-acao-validar"
               :disabled="!habilitarValidarMapa"
+              data-testid="btn-mapa-acao-validar"
               @click="$emit('abrir-validar')"
           >
             {{ TEXTOS.mapa.BOTAO_VALIDAR }}
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarDisponibilizarMapa"
-              data-testid="btn-mapa-acao-disponibilizar"
               :disabled="!habilitarDisponibilizarMapa || loadingDisponibilizacao"
+              data-testid="btn-mapa-acao-disponibilizar"
               @click="$emit('abrir-disponibilizar')"
           >
             {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarDevolverMapa"
-              data-testid="btn-mapa-acao-devolver"
               :disabled="!habilitarDevolverMapa"
+              data-testid="btn-mapa-acao-devolver"
               @click="$emit('abrir-devolver')"
           >
             {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarAcaoPrincipalMapa"
-              data-testid="btn-mapa-acao-homologar-aceite"
               :disabled="!habilitarAcaoPrincipalMapa"
+              data-testid="btn-mapa-acao-homologar-aceite"
               @click="$emit('abrir-acao-principal')"
           >
             {{ rotuloAcaoPrincipalMapa }}

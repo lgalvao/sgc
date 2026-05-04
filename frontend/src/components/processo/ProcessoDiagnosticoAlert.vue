@@ -2,9 +2,9 @@
   <div v-if="exibir" class="mb-3 pt-2">
     <BAlert
         :model-value="true"
+        data-testid="alert-diagnostico-organizacional"
         dismissible
         variant="warning"
-        data-testid="alert-diagnostico-organizacional"
         @dismissed="$emit('dismiss')"
     >
       <div class="d-flex align-items-start gap-2">

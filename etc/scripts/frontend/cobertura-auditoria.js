@@ -29,7 +29,7 @@ function obterPrioridade(score) {
 async function gerarRelatorioMarkdown(dados, caminho) {
     const {totais, hotspots} = dados;
     let md = "# Auditoria de Cobertura Frontend - SGC\n\n";
-    
+
     md += "## Resumo Geral\n";
     md += `- **Cobertura de Linhas:** ${totais.lines.percentual}%\n`;
     md += `- **Cobertura de Statements:** ${totais.statements.percentual}%\n`;
@@ -47,7 +47,7 @@ async function gerarRelatorioMarkdown(dados, caminho) {
     });
 
     md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;
-    
+
     await fs.writeFile(caminho, md, "utf8");
     return caminho;
 }

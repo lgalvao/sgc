@@ -43,7 +43,7 @@ public class MonitoramentoAspect {
             return joinPoint.proceed();
         } finally {
             stopWatch.stop();
-            double tempoTotal = stopWatch.getTotalTimeNanos()/1_000_000d;
+            double tempoTotal = stopWatch.getTotalTimeNanos() / 1_000_000d;
             Signature assinatura = joinPoint.getSignature();
             String classe = assinatura != null ? assinatura.getDeclaringTypeName() : joinPoint.getClass().getName();
             String metodo = assinatura != null ? assinatura.getName() : "desconhecido";

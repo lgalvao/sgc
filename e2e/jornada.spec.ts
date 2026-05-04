@@ -250,7 +250,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
             await expect(modal).toBeHidden();
             await verificarToast(page, new RegExp(`${TEXTOS.sucesso.ACEITE_REGISTRADO}|${TEXTOS.mapa.SUCESSO_HOMOLOGACAO}`, 'i'));
-            
+
             await page.goto('/painel');
             await ProcessoHelpers.acessarDetalhesProcesso(page, descricaoMapeamento);
             await ProcessoHelpers.finalizarProcesso(page);

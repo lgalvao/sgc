@@ -34,7 +34,7 @@ class EventosControllerTest {
         when(registroSseEmitter.registrar()).thenReturn(emitter);
 
         mockMvc.perform(get("/api/eventos")
-                .accept(MediaType.TEXT_EVENT_STREAM_VALUE))
+                        .accept(MediaType.TEXT_EVENT_STREAM_VALUE))
                 .andExpect(status().isOk());
 
         verify(registroSseEmitter).registrar();

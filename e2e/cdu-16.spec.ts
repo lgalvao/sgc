@@ -23,7 +23,11 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         validarProcessoFixture(processo, descProcessoRevisao);
     });
 
-    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({
+                                                                               _resetAutomatico,
+                                                                               page,
+                                                                               _autenticadoComoAdmin
+                                                                           }) => {
         await test.step('Cenário 1: Navegação para o Mapa', async () => {
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaMapa(page);

@@ -117,11 +117,15 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve extrair siglas e codigos dos participantes")
         void deveExtrairSiglasECodigos() {
-            UnidadeProcesso u1 = new UnidadeProcesso(); u1.setUnidadeCodigo(10L); u1.setSigla("SIGLA1");
-            UnidadeProcesso u2 = new UnidadeProcesso(); u2.setUnidadeCodigo(20L); u2.setSigla("SIGLA2");
-            
+            UnidadeProcesso u1 = new UnidadeProcesso();
+            u1.setUnidadeCodigo(10L);
+            u1.setSigla("SIGLA1");
+            UnidadeProcesso u2 = new UnidadeProcesso();
+            u2.setUnidadeCodigo(20L);
+            u2.setSigla("SIGLA2");
+
             processo.setParticipantes(List.of(u1, u2));
-            
+
             assertThat(processo.getCodigosParticipantes()).containsExactly(10L, 20L);
             assertThat(processo.getSiglasParticipantes()).isEqualTo("SIGLA1, SIGLA2");
         }
@@ -129,15 +133,24 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve sincronizar participantes corretamente")
         void deveSincronizarParticipantes() {
-            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSituacao(SituacaoUnidade.ATIVA); u1.setTipo(TipoUnidade.OPERACIONAL);
-            Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSituacao(SituacaoUnidade.ATIVA); u2.setTipo(TipoUnidade.OPERACIONAL);
-            Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSituacao(SituacaoUnidade.ATIVA); u3.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade u1 = new Unidade();
+            u1.setCodigo(1L);
+            u1.setSituacao(SituacaoUnidade.ATIVA);
+            u1.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade u2 = new Unidade();
+            u2.setCodigo(2L);
+            u2.setSituacao(SituacaoUnidade.ATIVA);
+            u2.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade u3 = new Unidade();
+            u3.setCodigo(3L);
+            u3.setSituacao(SituacaoUnidade.ATIVA);
+            u3.setTipo(TipoUnidade.OPERACIONAL);
 
             processo.adicionarParticipantes(Set.of(u1, u2));
             assertThat(processo.getParticipantes()).hasSize(2);
 
             processo.sincronizarParticipantes(Set.of(u2, u3));
-            
+
             assertThat(processo.getParticipantes()).hasSize(2);
             assertThat(processo.getParticipantes())
                     .extracting(UnidadeProcesso::getUnidadeCodigo)

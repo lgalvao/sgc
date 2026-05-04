@@ -1,7 +1,7 @@
 <template>
   <LayoutPadrao>
     <div class="col-lg-8 col-md-9 col-12">
-      <PageHeader :title="TEXTOS.processo.cadastro.TITULO" />
+      <PageHeader :title="TEXTOS.processo.cadastro.TITULO"/>
 
       <ProcessoDiagnosticoAlert
           :exibir="exibirAlertaDiagnostico"
@@ -43,9 +43,9 @@
           <LoadingButton
               v-if="processoEditando"
               :disabled="isLoading"
+              :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
               data-testid="btn-processo-remover-rodape"
               icon="trash"
-              :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
               variant="outline-danger"
               @click="abrirModalRemocao"
           />
@@ -53,10 +53,10 @@
           <LoadingButton
               :disabled="salvarDesabilitado"
               :loading="isLoading"
+              :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
               data-testid="btn-processo-salvar-rodape"
               icon="save"
               loading-text="Salvando..."
-              :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
               type="button"
               variant="outline-primary"
               @click="salvarProcesso"
@@ -64,9 +64,9 @@
 
           <LoadingButton
               :disabled="iniciarDesabilitado"
+              :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
               data-testid="btn-processo-iniciar-rodape"
               icon="play-fill"
-              :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
               variant="success"
               @click="abrirModalConfirmacao"
           />
@@ -99,7 +99,7 @@ import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoA
 import ProcessoCadastroModais from "@/components/processo/ProcessoCadastroModais.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
-import {ehErroAxios, normalizarErro, extrairErrosGenericos, deveNotificarGlobalmente} from "@/utils/apiError";
+import {deveNotificarGlobalmente, ehErroAxios, extrairErrosGenericos, normalizarErro} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
@@ -164,8 +164,8 @@ const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagno
 const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
 const resumoDiagnostico = computed(() =>
     erroDiagnosticoOrganizacional.value
-        ?? diagnosticoOrganizacional.value?.resumo
-        ?? ""
+    ?? diagnosticoOrganizacional.value?.resumo
+    ?? ""
 );
 const alertaDiagnosticoDispensado = ref(false);
 const exibirAlertaDiagnostico = computed(() =>

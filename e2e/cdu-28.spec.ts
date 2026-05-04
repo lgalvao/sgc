@@ -60,7 +60,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         const inputBusca = page.getByTestId('input-busca-usuario');
         await inputBusca.click();
         await inputBusca.pressSequentially(TITULO_USUARIO_ALVO, {delay: 100});
-        
+
         const listaResultados = page.getByTestId('lista-usuarios-pesquisa');
         await expect(listaResultados).toBeVisible();
 
@@ -79,7 +79,11 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByTestId('tbl-tree')).toBeVisible();
     });
 
-    test('Cenario 1: ADMIN navega pela árvore e acessa detalhes da unidade', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+    test('Cenario 1: ADMIN navega pela árvore e acessa detalhes da unidade', async ({
+                                                                                        _resetAutomatico,
+                                                                                        _autenticadoComoAdmin,
+                                                                                        page
+                                                                                    }) => {
         await validarRamoUnidade(page, 'SECRETARIA_1', SIGLAS_SUBARVORE_SECRETARIA_1);
         await validarRamoUnidade(page, 'SECRETARIA_2', SIGLAS_SUBARVORE_SECRETARIA_2);
         await validarRamoUnidade(page, 'SECRETARIA_3', SIGLAS_SUBARVORE_SECRETARIA_3);
@@ -96,7 +100,11 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();
     });
 
-    test('Cenario 2: tela de atribuição expõe os campos e ações exigidos pelo requisito', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+    test('Cenario 2: tela de atribuição expõe os campos e ações exigidos pelo requisito', async ({
+                                                                                                     _resetAutomatico,
+                                                                                                     _autenticadoComoAdmin,
+                                                                                                     page
+                                                                                                 }) => {
         await abrirTelaCriacaoAtribuicao(page);
 
         await expect(page.getByRole('heading', {name: TEXTOS.atribuicaoTemporaria.TITULO})).toBeVisible();
@@ -113,7 +121,11 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByTestId('cad-atribuicao__btn-criar-atribuicao')).toBeVisible();
     });
 
-    test('Cenario 3: o formulário exibe erros de validação ao tentar criar incompleto', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+    test('Cenario 3: o formulário exibe erros de validação ao tentar criar incompleto', async ({
+                                                                                                   _resetAutomatico,
+                                                                                                   _autenticadoComoAdmin,
+                                                                                                   page
+                                                                                               }) => {
         await abrirTelaCriacaoAtribuicao(page);
 
         const btnCriar = page.getByTestId('cad-atribuicao__btn-criar-atribuicao');
@@ -125,7 +137,11 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByText('Informe a justificativa.')).toBeVisible();
     });
 
-    test('Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+    test('Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade', async ({
+                                                                                           _resetAutomatico,
+                                                                                           _autenticadoComoAdmin,
+                                                                                           page
+                                                                                       }) => {
         await abrirTelaCriacaoAtribuicao(page);
 
         await page.getByTestId('btn-cancelar-atribuicao').click();
@@ -133,7 +149,11 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
     });
 
-    test('Cenario 5: ADMIN cria atribuição e usuário destino recebe perfil temporário', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+    test('Cenario 5: ADMIN cria atribuição e usuário destino recebe perfil temporário', async ({
+                                                                                                   _resetAutomatico,
+                                                                                                   _autenticadoComoAdmin,
+                                                                                                   page
+                                                                                               }) => {
         await abrirTelaCriacaoAtribuicao(page);
 
         await selecionarUsuarioAlvo(page);

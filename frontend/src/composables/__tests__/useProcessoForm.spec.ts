@@ -104,7 +104,7 @@ describe("useProcessoForm", () => {
         form.descricao.value = "Teste";
         form.tipo.value = TipoProcesso.MAPEAMENTO;
         form.unidadesSelecionadas.value = [1];
-        
+
         form.dataLimite.value = "202"; // Incompleta
         await flushPromises();
         expect(form.isFormInvalid.value).toBe(true);

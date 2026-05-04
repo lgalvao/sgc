@@ -269,17 +269,17 @@ public class E2eController {
     public Processo criarProcessoFinalizadoComAtividades(@RequestBody ProcessoFixtureRequest request) {
         Processo processo = executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
         Long codProcesso = processo.getCodigo();
-        
+
         Long codUnidade = unidadeService.buscarCodigoPorSigla(request.unidadeSigla());
 
         Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
-        
+
         Long codMapa = mapaRepo.buscarPorSubprocesso(codSubprocesso)
                 .map(Mapa::getCodigo)
                 .orElseThrow();
-        
+
         // Atividades com conhecimentos associados
         jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", codMapa, "Atividade origem A - " + codProcesso);
         jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", codMapa, "Atividade origem B - " + codProcesso);
@@ -486,7 +486,7 @@ public class E2eController {
                 codMapa, "Competência fixture" + sufixo);
         jdbcTemplate.update("INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (?, ?)",
                 codAtividade, codCompetencia);
-        
+
         setSituacaoSubprocesso(codSubprocesso, SituacaoSubprocesso.valueOf(situacaoSubprocesso));
 
         // Definir localização baseada na situação para que os botões de ação apareçam para o ator correto:

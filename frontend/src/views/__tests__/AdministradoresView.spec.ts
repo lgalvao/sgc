@@ -64,8 +64,10 @@ describe("AdministradoresView.vue", () => {
                         template: '<div><input class="buscador-input" :value="termo" @input="$emit(\'update:termo\', $event.target.value)" /></div>',
                         emits: ['update:termo', 'update:selecionado'],
                         methods: {
-                            focus() {},
-                            limparResultadosPesquisaUsuarios() {}
+                            focus() {
+                            },
+                            limparResultadosPesquisaUsuarios() {
+                            }
                         }
                     },
                     BFormInvalidFeedback: {template: '<div><slot /></div>'},
@@ -139,7 +141,7 @@ describe("AdministradoresView.vue", () => {
         // Tentativa de adicionar administrador com termo vazio
         vm.termoUsuario = "";
         await vm.adicionarAdmin();
-        
+
         // Tratamento de erro na adição de administrador
         vm.termoUsuario = "123";
         vi.mocked(administradorService.adicionarAdministrador).mockRejectedValue(new Error("Erro add"));

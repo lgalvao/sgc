@@ -1,55 +1,55 @@
 <template>
   <EmptyState
       v-if="!mapa || mapa.competencias.length === 0"
-      :title="TEXTOS.mapaVisualizacao.EMPTY_TITLE"
       :description="TEXTOS.mapaVisualizacao.EMPTY_DESCRIPTION"
+      :title="TEXTOS.mapaVisualizacao.EMPTY_TITLE"
       icon="bi-journal-x"
   />
   <template v-else>
+    <BCard
+        v-for="competencia in mapa.competencias"
+        :key="competencia.codigo"
+        class="mb-2 competencia-card"
+        data-testid="mapa-visualizacao__card-competencia"
+        no-body
+    >
+      <BCardHeader>
+        <BCardTitle class="fs-5 mb-0">
+          <strong
+              class="competencia-descricao"
+              data-testid="mapa-visualizacao__txt-competencia-descricao"
+          >{{ competencia.descricao }}</strong>
+        </BCardTitle>
+      </BCardHeader>
+      <BCardBody>
+        <div class="d-flex flex-wrap gap-2">
           <BCard
-              v-for="competencia in mapa.competencias"
-              :key="competencia.codigo"
-              class="mb-2 competencia-card"
-              data-testid="mapa-visualizacao__card-competencia"
+              v-for="atividade in competencia.atividades"
+              :key="atividade.codigo"
+              class="atividade-associada-card-item d-flex"
               no-body
           >
-            <BCardHeader>
-              <BCardTitle class="fs-5 mb-0">
-                <strong
-                    class="competencia-descricao"
-                    data-testid="mapa-visualizacao__txt-competencia-descricao"
-                >{{ competencia.descricao }}</strong>
-              </BCardTitle>
-            </BCardHeader>
-            <BCardBody>
-              <div class="d-flex flex-wrap gap-2">
-                <BCard
-                    v-for="atividade in competencia.atividades"
-                    :key="atividade.codigo"
-                    class="atividade-associada-card-item d-flex"
-                    no-body
-                >
-                  <BCardBody class="p-2">
+            <BCardBody class="p-2">
                     <span class="atividade-associada-descricao fw-bold text-break d-block mb-1">
                       {{ atividade.descricao }}
                     </span>
-                    <div v-if="(atividade.conhecimentos?.length ?? 0) > 0" class="conhecimentos-inline mt-1">
-                      <ul class="conhecimentos-lista mb-0 small text-muted border-top pt-1">
-                        <li
-                            v-for="conhecimento in atividade.conhecimentos"
-                            :key="conhecimento.codigo"
-                            class="conhecimento-item text-break"
-                            data-testid="txt-conhecimento-item"
-                        >
-                          {{ conhecimento.descricao }}
-                        </li>
-                      </ul>
-                    </div>
-                  </BCardBody>
-                </BCard>
+              <div v-if="(atividade.conhecimentos?.length ?? 0) > 0" class="conhecimentos-inline mt-1">
+                <ul class="conhecimentos-lista mb-0 small text-muted border-top pt-1">
+                  <li
+                      v-for="conhecimento in atividade.conhecimentos"
+                      :key="conhecimento.codigo"
+                      class="conhecimento-item text-break"
+                      data-testid="txt-conhecimento-item"
+                  >
+                    {{ conhecimento.descricao }}
+                  </li>
+                </ul>
               </div>
             </BCardBody>
           </BCard>
+        </div>
+      </BCardBody>
+    </BCard>
   </template>
 </template>
 

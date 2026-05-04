@@ -29,7 +29,7 @@ public class AlertaService {
     }
 
     /**
-     * Regra CDU-02: Para o perfil SERVIDOR, lista apenas os alertas destinados 
+     * Regra CDU-02: Para o perfil SERVIDOR, lista apenas os alertas destinados
      * individualmente ao seu título de eleitor.
      */
     public List<Alerta> listarParaServidor(String usuarioTitulo) {
@@ -37,7 +37,7 @@ public class AlertaService {
     }
 
     /**
-     * Regra CDU-02: Para os demais perfis, lista alertas coletivos da unidade 
+     * Regra CDU-02: Para os demais perfis, lista alertas coletivos da unidade
      * E alertas individuais do usuário.
      */
     public List<Alerta> listarParaGestao(Long codigoUnidade, String usuarioTitulo) {

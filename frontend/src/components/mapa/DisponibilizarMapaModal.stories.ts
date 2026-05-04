@@ -30,11 +30,11 @@ export const Default: Story = {
             return {args, show};
         },
         template: `
-      <div>
-        <button class="btn btn-primary" @click="show = true">Disponibilizar mapa</button>
-        <DisponibilizarMapaModal v-bind="args" :mostrar="show" @fechar="show = false" />
-      </div>
-    `,
+          <div>
+            <button class="btn btn-primary" @click="show = true">Disponibilizar mapa</button>
+            <DisponibilizarMapaModal v-bind="args" :mostrar="show" @fechar="show = false"/>
+          </div>
+        `,
     }),
 };
 

@@ -45,7 +45,7 @@ function ehErroHttpMonitoradoEsperado(args: unknown[]): boolean {
             return false;
         }
 
-        const payload = arg as {url?: string; status?: number; metodo?: string};
+        const payload = arg as { url?: string; status?: number; metodo?: string };
         return payload.url === '/usuarios/login'
             && payload.status === 401
             && String(payload.metodo || '').toUpperCase() === 'POST';
@@ -125,8 +125,8 @@ export const test = base.extend<{
                             code?: string;
                             isAxiosError?: boolean;
                             message?: string;
-                            config?: {url?: string; method?: string};
-                            response?: {status?: number; data?: unknown};
+                            config?: { url?: string; method?: string };
+                            response?: { status?: number; data?: unknown };
                         };
                         // Se for um erro do Axios, tenta extrair detalhes úteis
                         if (objeto.code === 'ERR_BAD_REQUEST'
@@ -219,7 +219,7 @@ export const test = base.extend<{
                 const networkLog = `[NETWORK ERROR] ${response.status()} ${response.request().method()} ${response.url()}`;
                 logs.push(networkLog);
                 logger.warn(networkLog);
-                
+
                 if (body && body.length < 2000) {
                     logs.push(`[NETWORK BODY] ${body}`);
                     logger.info(`[NETWORK BODY] ${body}`);
@@ -256,7 +256,7 @@ export const test = base.extend<{
             }
             const filePath = path.join(testInfo.outputDir, 'error-context.md');
             fs.writeFileSync(filePath, contextContent);
-            
+
             // Registra o arquivo como um anexo para aparecer no report do Playwright
             testInfo.attachments.push({
                 name: 'error-context',

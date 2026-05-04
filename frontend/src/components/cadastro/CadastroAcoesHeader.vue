@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue';
 import {BButton, BDropdown, BDropdownItemButton} from 'bootstrap-vue-next';
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -53,7 +53,9 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
 <template>
   <PageHeader :title="TEXTOS.atividades.TITULO">
     <template #default>
-      <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ unidade.sigla }}</span>
+      <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{
+          unidade.sigla
+        }}</span>
     </template>
     <template #actions>
       <div class="d-flex gap-2">
@@ -67,31 +69,31 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         </BButton>
         <BDropdown
             v-if="codSubprocesso && usarDropdownAcoes"
-            data-testid="btn-cadastro-acoes"
             :text="TEXTOS.mapa.BOTAO_ACOES"
+            data-testid="btn-cadastro-acoes"
             toggle-class="text-nowrap"
             variant="success"
         >
           <BDropdownItemButton
               v-if="mostrarDevolverCadastro"
-              data-testid="btn-cadastro-acao-devolver"
               :disabled="!permissoes.habilitarDevolverCadastro"
+              data-testid="btn-cadastro-acao-devolver"
               @click="$emit('abrir-devolver')"
           >
             {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="acaoPrincipalCadastro?.mostrar"
-              data-testid="btn-cadastro-acao-principal"
               :disabled="!acaoPrincipalCadastro.habilitar"
+              data-testid="btn-cadastro-acao-principal"
               @click="$emit('abrir-validar')"
           >
             {{ acaoPrincipalCadastro.rotuloBotao }}
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarDisponibilizarCadastro"
-              data-testid="btn-cadastro-acao-disponibilizar"
               :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
+              data-testid="btn-cadastro-acao-disponibilizar"
               @click="$emit('disponibilizar')"
           >
             {{ TEXTOS.atividades.BOTAO_DISPONIBILIZAR }}
@@ -99,9 +101,9 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         </BDropdown>
         <BButton
             v-else-if="codSubprocesso && mostrarDevolverCadastro"
-            data-testid="btn-acao-devolver"
             :disabled="!permissoes.habilitarDevolverCadastro"
             :title="TEXTOS.atividades.BOTAO_DEVOLVER"
+            data-testid="btn-acao-devolver"
             variant="secondary"
             @click="$emit('abrir-devolver')"
         >
@@ -109,9 +111,9 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         </BButton>
         <BButton
             v-else-if="codSubprocesso && acaoPrincipalCadastro?.mostrar"
-            data-testid="btn-acao-analisar-principal"
             :disabled="!acaoPrincipalCadastro.habilitar"
             :title="acaoPrincipalCadastro.rotuloBotao"
+            data-testid="btn-acao-analisar-principal"
             variant="success"
             @click="$emit('abrir-validar')"
         >
@@ -121,10 +123,10 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
             v-else-if="codSubprocesso && mostrarDisponibilizarCadastro"
             :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
             :loading="loadingValidacao"
-            data-testid="btn-cad-atividades-disponibilizar"
-            icon="check-lg"
             :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
             :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
+            data-testid="btn-cad-atividades-disponibilizar"
+            icon="check-lg"
             variant="success"
             @click="$emit('disponibilizar')"
         />
@@ -141,8 +143,8 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         </BButton>
         <BButton
             v-if="codSubprocesso && mostrarImportarAtividades"
-            data-testid="btn-cad-atividades-importar"
             :disabled="!permissoes.habilitarEditarCadastro"
+            data-testid="btn-cad-atividades-importar"
             variant="outline-secondary"
             @click="$emit('abrir-importar')"
         >

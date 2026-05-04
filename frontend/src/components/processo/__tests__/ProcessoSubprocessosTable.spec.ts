@@ -35,12 +35,12 @@ describe("ProcessoSubprocessosTable.vue", () => {
 
         // O mapeamentoHierarquia é uma computed, podemos verificar via vm (em teste unitário)
         // ou verificando as propriedades passadas para o TreeTable
-        const treeTable = wrapper.findComponent({ name: 'TreeTable' });
+        const treeTable = wrapper.findComponent({name: 'TreeTable'});
         const data = treeTable.props('data') as Array<{
             sigla: string;
             clickable: boolean;
             codSubprocesso: number;
-            children: Array<{sigla: string; clickable: boolean; codSubprocesso: number}>;
+            children: Array<{ sigla: string; clickable: boolean; codSubprocesso: number }>;
         }>;
 
         const admin = data.find((u) => u.sigla === "ADMIN");
@@ -58,7 +58,7 @@ describe("ProcessoSubprocessosTable.vue", () => {
             }
         });
 
-        const treeTable = wrapper.findComponent({ name: 'TreeTable' });
+        const treeTable = wrapper.findComponent({name: 'TreeTable'});
         const data = treeTable.props('data');
         const sec = data[0].children[0];
 

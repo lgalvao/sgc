@@ -3,27 +3,27 @@
       :id="id"
       v-model="mostrar"
       :loading="processando"
+      :texto-acao="rotuloBotao"
       :titulo="titulo"
       data-testid="mdl-acao-bloco"
       tamanho="lg"
       test-codigo-cancelar="btn-acao-bloco-cancelar"
       test-codigo-confirmar="btn-acao-bloco-confirmar"
-      :texto-acao="rotuloBotao"
       variant-acao="success"
       @confirmar="confirmar"
       @fechar="fechar"
   >
     <p class="mb-3">{{ texto }}</p>
 
-    <BAlert v-if="erro" :model-value="true" variant="danger" class="mb-3">
+    <BAlert v-if="erro" :model-value="true" class="mb-3" variant="danger">
       {{ erro }}
     </BAlert>
 
     <div v-if="mostrarDataLimite" class="mb-3">
       <BFormGroup
-          label-for="dataLimiteBloco"
-          :state="mensagemErroDataLimite ? false : null"
           :invalid-feedback="mensagemErroDataLimite"
+          :state="mensagemErroDataLimite ? false : null"
+          label-for="dataLimiteBloco"
       >
         <template #label>
           Data limite <span aria-hidden="true" class="text-danger">*</span>
@@ -31,10 +31,10 @@
         <InputData
             id="dataLimiteBloco"
             v-model="dataLimite"
-            data-testid="inp-data-limite-bloco"
-            max="2099-12-31"
             :min="dataMinimaPermitida"
             :state="mensagemErroDataLimite ? false : null"
+            data-testid="inp-data-limite-bloco"
+            max="2099-12-31"
         />
         <template #description>
           <div class="mt-1">
@@ -45,13 +45,13 @@
     </div>
 
     <BTable
-        :items="unidades"
+        :class="{ 'border border-danger rounded': mensagemErroSelecao }"
         :fields="campos"
-        small
+        :items="unidades"
         hover
         responsive
+        small
         sticky-header="300px"
-        :class="{ 'border border-danger rounded': mensagemErroSelecao }"
     >
       <template #head(selecao)>
         <BFormCheckbox
@@ -78,7 +78,7 @@ import {computed, ref, watch} from 'vue';
 import {BAlert, BFormCheckbox, BFormGroup, BTable} from 'bootstrap-vue-next';
 import InputData from '@/components/comum/InputData.vue';
 import ModalPadrao from '@/components/comum/ModalPadrao.vue';
-import {formatarDataBR, ehDataEstritamenteFutura, obterAmanhaFormatado} from "@/utils/date";
+import {ehDataEstritamenteFutura, formatarDataBR, obterAmanhaFormatado} from "@/utils/date";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import type {UnidadeSelecao} from "@/types/tipos";
 
@@ -153,9 +153,9 @@ watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) 
 });
 
 const campos = [
-  { key: 'selecao', label: '', thStyle: { width: '40px' } },
-  { key: 'sigla', label: 'Unidade' },
-  { key: 'situacao', label: 'Situação' }
+  {key: 'selecao', label: '', thStyle: {width: '40px'}},
+  {key: 'sigla', label: 'Unidade'},
+  {key: 'situacao', label: 'Situação'}
 ];
 
 const todosSelecionados = computed({
@@ -229,5 +229,5 @@ defineExpose({
 
 watch(() => props.unidadesPreSelecionadas, (newVal) => {
   selecionadosLocal.value = [...newVal];
-}, { immediate: true });
+}, {immediate: true});
 </script>

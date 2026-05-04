@@ -24,17 +24,28 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @SuppressWarnings("NullAway.Init")
 class CadastroFluxoServiceTest {
 
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private MovimentacaoRepo movimentacaoRepo;
-    @Mock private SubprocessoConsultaService consultaService;
-    @Mock private LocalizacaoSubprocessoService localizacaoSubprocessoService;
-    @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private UsuarioFacade usuarioFacade;
-    @Mock private UnidadeService unidadeService;
-    @Mock private HierarquiaService hierarquiaService;
-    @Mock private UnidadeHierarquiaService unidadeHierarquiaService;
-    @Mock private AlertaFacade alertaService;
-    @Mock private SubprocessoTransicaoService transicaoService;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private SubprocessoConsultaService consultaService;
+    @Mock
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
+    @Mock
+    private UsuarioFacade usuarioFacade;
+    @Mock
+    private UnidadeService unidadeService;
+    @Mock
+    private HierarquiaService hierarquiaService;
+    @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock
+    private AlertaFacade alertaService;
+    @Mock
+    private SubprocessoTransicaoService transicaoService;
 
     @InjectMocks
     private CadastroFluxoService service;
@@ -105,9 +116,15 @@ class CadastroFluxoServiceTest {
     @DisplayName("Deve homologar cadastro em bloco para diferentes tipos de processo")
     void deveHomologarCadastroEmBlocoDiferentesTipos() {
         Subprocesso spMap = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
-        Unidade uMap = new Unidade(); uMap.setCodigo(1L); uMap.setSigla("U"); spMap.setUnidade(uMap);
+        Unidade uMap = new Unidade();
+        uMap.setCodigo(1L);
+        uMap.setSigla("U");
+        spMap.setUnidade(uMap);
         Subprocesso spRev = criarSubprocesso(REVISAO, REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
-        Unidade uRev = new Unidade(); uRev.setCodigo(2L); uRev.setSigla("V"); spRev.setUnidade(uRev);
+        Unidade uRev = new Unidade();
+        uRev.setCodigo(2L);
+        uRev.setSigla("V");
+        spRev.setUnidade(uRev);
 
         when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());

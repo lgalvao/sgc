@@ -9,8 +9,8 @@ import {ref} from "vue";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
 
-const mockRoute = { query: {} };
-const mockRouter = { push: vi.fn() };
+const mockRoute = {query: {}};
+const mockRouter = {push: vi.fn()};
 
 vi.mock("vue-router", () => ({
     useRoute: () => mockRoute,
@@ -68,7 +68,7 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
 
     it("cobre AppAlert clear e ModalConfirmacao v-model", async () => {
         const wrapper = mount(ProcessoCadastroView, {
-            global: { plugins: [pinia], stubs }
+            global: {plugins: [pinia], stubs}
         });
         await flushPromises();
         const vm = wrapper.vm as any;
@@ -90,28 +90,29 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
 
     it("cobre dispensarAlertaDiagnostico", async () => {
         const wrapper = mount(ProcessoCadastroView, {
-            global: { plugins: [pinia], stubs }
+            global: {plugins: [pinia], stubs}
         });
         await flushPromises();
         const vm = wrapper.vm as any;
-        
+
         vm.dispensarAlertaDiagnostico();
         expect(vm.alertaDiagnosticoDispensado).toBe(true);
     });
 
     it("cobre erro ao buscar unidades", async () => {
-        const loggerErrorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+        const loggerErrorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {
+        });
         const unidadeStore = useUnidadeStore(pinia);
         unidadeStore.garantirArvoreElegibilidade = vi.fn().mockRejectedValue(new Error("Erro de busca"));
 
         const wrapper = mount(ProcessoCadastroView, {
-            global: { plugins: [pinia], stubs }
+            global: {plugins: [pinia], stubs}
         });
         await flushPromises();
-        
+
         const vm = wrapper.vm as any;
         await vm.buscarUnidadesParaProcesso("MAPEAMENTO");
-        
+
         expect(loggerErrorSpy).toHaveBeenCalledWith("Erro ao buscar unidades:", expect.any(Error));
         loggerErrorSpy.mockRestore();
     });
@@ -136,7 +137,7 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
         unidadeStore.garantirArvoreElegibilidade = vi.fn().mockResolvedValue([]);
 
         mount(ProcessoCadastroView, {
-            global: { plugins: [pinia], stubs }
+            global: {plugins: [pinia], stubs}
         });
         await flushPromises();
 
@@ -145,17 +146,17 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
 
     it("cobre confirmarIniciarProcesso sem tipo", async () => {
         const wrapper = mount(ProcessoCadastroView, {
-            global: { plugins: [pinia], stubs }
+            global: {plugins: [pinia], stubs}
         });
         await flushPromises();
         const vm = wrapper.vm as any;
 
         // Force tipo to be falsy inside the component
-        vm.formData = { ...vm.formData, tipo: null };
+        vm.formData = {...vm.formData, tipo: null};
 
         vm.abrirModalConfirmacao();
         await vm.confirmarIniciarProcesso();
-        
+
         expect(vm.mostrarModalConfirmacao).toBe(false);
         expect(vm.notificacao.mensagem).toBe(TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
     });
@@ -178,20 +179,20 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
         } as any);
 
         const wrapper = mount(ProcessoCadastroView, {
-            global: { plugins: [pinia], stubs }
+            global: {plugins: [pinia], stubs}
         });
         await flushPromises();
         const vm = wrapper.vm as any;
 
-        vm.processoEditando = { codigo: 1, descricao: "Teste" };
-        
+        vm.processoEditando = {codigo: 1, descricao: "Teste"};
+
         vi.mocked(processoService.excluirProcesso).mockImplementation(async () => {
             vm.processoEditando = null; // simulate the service deleting it and we clearing it concurrently?
             return {} as any;
         });
 
         await vm.confirmarRemocao();
-        
+
         expect(limparMock).toHaveBeenCalled();
     });
 });

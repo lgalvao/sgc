@@ -16,7 +16,16 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, size: 10, first: true, last: true, empty: true};
+const mockPageVazia = {
+    content: [],
+    totalPages: 0,
+    totalElements: 0,
+    number: 0,
+    size: 10,
+    first: true,
+    last: true,
+    empty: true
+};
 
 vi.mock("@/services/painelService", () => ({
     obterBootstrap: vi.fn(),
@@ -192,17 +201,17 @@ describe("PainelView.vue", () => {
         // abrirDetalhesProcesso
         await (wrapper.vm as any).abrirDetalhesProcesso(null);
         expect(routerPushMock).not.toHaveBeenCalled();
-        
-        await (wrapper.vm as any).abrirDetalhesProcesso({ codigo: 1 }); // without linkDestino
+
+        await (wrapper.vm as any).abrirDetalhesProcesso({codigo: 1}); // without linkDestino
         expect(routerPushMock).not.toHaveBeenCalled();
 
         // rowClassAlerta
         expect((wrapper.vm as any).rowClassAlerta(null)).toBe("");
-        expect((wrapper.vm as any).rowClassAlerta({ dataHoraLeitura: "2023-01-01" })).toBe("");
-        expect((wrapper.vm as any).rowClassAlerta({ dataHoraLeitura: null })).toBe("fw-bold");
+        expect((wrapper.vm as any).rowClassAlerta({dataHoraLeitura: "2023-01-01"})).toBe("");
+        expect((wrapper.vm as any).rowClassAlerta({dataHoraLeitura: null})).toBe("fw-bold");
 
         // rowAttrAlerta
         expect((wrapper.vm as any).rowAttrAlerta(null)).toEqual({});
-        expect((wrapper.vm as any).rowAttrAlerta({ codigo: 123 })).toEqual({ 'data-testid': 'row-alerta-123' });
+        expect((wrapper.vm as any).rowAttrAlerta({codigo: 123})).toEqual({'data-testid': 'row-alerta-123'});
     });
 });

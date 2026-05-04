@@ -49,7 +49,11 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
     });
 
-    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({
+                                                                         _resetAutomatico,
+                                                                         page,
+                                                                         _autenticadoComoAdmin
+                                                                     }) => {
         const textoJustificativa = 'Ajuste necessário';
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -99,7 +103,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
                                                                                                               _resetAutomatico,
                                                                                                               page,
                                                                                                               _autenticadoComoChefeSecao212
-    }) => {
+                                                                                                          }) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descRevisao);
@@ -108,10 +112,10 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
     test('Cenário complementar: unidade superior visualiza alerta de reabertura de revisão no painel', async ({
-                                                                                                                   _resetAutomatico,
-                                                                                                                   page,
-                                                                                                                   _autenticadoComoGestorCoord21
-    }) => {
+                                                                                                                  _resetAutomatico,
+                                                                                                                  page,
+                                                                                                                  _autenticadoComoGestorCoord21
+                                                                                                              }) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descRevisao);

@@ -21,8 +21,8 @@ const routerViewStub = {
     render(this: {
         $slots: {
             default?: (props: {
-                Component: {name: string; template: string};
-                route: {meta: Record<string, unknown>; fullPath: string};
+                Component: { name: string; template: string };
+                route: { meta: Record<string, unknown>; fullPath: string };
             }) => unknown;
         };
     }) {

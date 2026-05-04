@@ -17,16 +17,16 @@ type DependenciasMapaDisponibilizacao = {
 };
 
 export function useMapaDisponibilizacao({
-    competencias,
-    existeCompetenciaSemAtividade,
-    atividadesSemCompetencia,
-    mostrarModalDisponibilizar,
-    clearErrors,
-    executarComSubprocesso,
-    disponibilizarMapaFluxo,
-    concluirAcaoPainel,
-    aplicarErroNormalizado,
-}: DependenciasMapaDisponibilizacao) {
+                                            competencias,
+                                            existeCompetenciaSemAtividade,
+                                            atividadesSemCompetencia,
+                                            mostrarModalDisponibilizar,
+                                            clearErrors,
+                                            executarComSubprocesso,
+                                            disponibilizarMapaFluxo,
+                                            concluirAcaoPainel,
+                                            aplicarErroNormalizado,
+                                        }: DependenciasMapaDisponibilizacao) {
     const notificacaoDisponibilizacao = ref("");
     const erroValidacaoMapa = ref("");
     const loadingDisponibilizacao = ref(false);

@@ -28,7 +28,8 @@ Fluxo principal:
 8. O sistema muda a situação do processo para 'Em andamento';
 
 9. O sistema cria internamente um subprocesso para cada unidade participante, que seja do tipo Operacional ou
-   Interoperacional (unidade do tipo Intermediária nunca participam diretamente), com os seguintes campos e valores iniciais:
+   Interoperacional (unidade do tipo Intermediária nunca participam diretamente), com os seguintes campos e valores
+   iniciais:
 
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.
     - `Situação`: 'Não iniciado'
@@ -59,7 +60,8 @@ Fluxo principal:
         O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
     ```
 
-    12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das unidades operacionais e interoperacionais subordinadas a elas, segundo o modelo:
+    12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
+    unidades operacionais e interoperacionais subordinadas a elas, segundo o modelo:
      ```text
         Assunto: SGC: Início de processo de mapeamento de competências em unidades subordinadas
         
@@ -86,4 +88,5 @@ Fluxo principal:
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE].
 
-    13.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de unidade intermediária, como especificado acima.
+    13.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de
+    unidade intermediária, como especificado acima.

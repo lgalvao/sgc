@@ -33,10 +33,6 @@ public class SubprocessoNotificacaoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UnidadeService unidadeService;
 
-    private enum OrigemNotificacao {
-        DIRETO, RESPONSAVEL, SUPERIOR
-    }
-
     public void registrarComunicacoesTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
         if (tipoTransicao.geraAlerta()) {
@@ -248,6 +244,11 @@ public class SubprocessoNotificacaoService {
         }
     }
 
-    private record EmailGerado(String destinatario, String assunto, String corpo, OrigemNotificacao origem, @Nullable String unidadeSigla, @Nullable String usuarioTitulo) {
+    private enum OrigemNotificacao {
+        DIRETO, RESPONSAVEL, SUPERIOR
+    }
+
+    private record EmailGerado(String destinatario, String assunto, String corpo, OrigemNotificacao origem,
+                               @Nullable String unidadeSigla, @Nullable String usuarioTitulo) {
     }
 }

@@ -1,11 +1,11 @@
 export interface AceitarCadastroRequest {
-  observacoes: string;
+    observacoes: string;
 }
 
 export interface DevolverCadastroRequest {
-  observacoes: string;
+    observacoes: string;
 }
 
 export interface HomologarCadastroRequest {
-  observacoes: string;
+    observacoes: string;
 }

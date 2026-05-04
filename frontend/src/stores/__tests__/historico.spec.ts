@@ -49,9 +49,9 @@ describe("useHistoricoStore", () => {
     it("não deve carregar novamente se já estiver carregado e não forçado", async () => {
         const store = useHistoricoStore();
         store.definirDados([]);
-        
+
         await store.garantirDados();
-        
+
         expect(processoService.buscarProcessosFinalizados).not.toHaveBeenCalled();
     });
 

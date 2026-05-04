@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
@@ -47,15 +47,15 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
   />
 
   <ModalConfirmacao
-      :model-value="mostrarModalReabrir"
       :auto-close="false"
       :loading="loadingReabertura"
-      :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
+      :model-value="mostrarModalReabrir"
       :ok-title="TEXTOS.comum.BOTAO_REABRIR"
+      :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
       test-codigo-confirmar="btn-confirmar-reabrir"
       variant="success"
-      @update:model-value="$emit('update:mostrarModalReabrir', $event)"
       @confirmar="$emit('confirmar-reabertura')"
+      @update:model-value="$emit('update:mostrarModalReabrir', $event)"
   >
     <p>{{ TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PREFIXO }} {{
         tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.CADASTRO : TEXTOS.subprocesso.REVISAO_CADASTRO
@@ -63,9 +63,9 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
     <BFormTextarea
         id="justificativaReabertura"
         :model-value="justificativaReabertura"
+        :placeholder="TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PLACEHOLDER"
         :state="mensagemErroJustificativa ? false : null"
         data-testid="inp-justificativa-reabrir"
-        :placeholder="TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PLACEHOLDER"
         rows="3"
         @update:model-value="atualizarJustificativaReabertura"
     />
@@ -79,15 +79,15 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
   </ModalConfirmacao>
 
   <ModalConfirmacao
-      :model-value="modalLembreteAberto"
       :auto-close="false"
       :loading="loadingLembrete"
+      :model-value="modalLembreteAberto"
       :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
-      test-codigo-confirmar="btn-confirmar-enviar-lembrete"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
+      test-codigo-confirmar="btn-confirmar-enviar-lembrete"
       variant="success"
-      @update:model-value="$emit('update:modalLembreteAberto', $event)"
       @confirmar="$emit('confirmar-enviar-lembrete')"
+      @update:model-value="$emit('update:modalLembreteAberto', $event)"
   >
     <p data-testid="txt-modelo-lembrete">
       {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(siglaUnidade) }}

@@ -115,7 +115,7 @@ class RestExceptionHandlerTest {
     @DisplayName("Deve tratar ErroInterno (500)")
     void deveTratarErroInterno() throws Exception {
         Mockito.doThrow(new ErroInterno("Falha interna") {
-        })
+                })
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")

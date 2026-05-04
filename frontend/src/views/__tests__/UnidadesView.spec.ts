@@ -9,7 +9,7 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 const mockPush = vi.fn();
 
 vi.mock("vue-router", () => ({
-    useRouter: () => ({ push: mockPush }),
+    useRouter: () => ({push: mockPush}),
 }));
 
 vi.mock("@/composables/usePerfil", () => ({
@@ -144,7 +144,7 @@ describe("Unidades.vue", () => {
         vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockClear();
 
-        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
+        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }
@@ -160,7 +160,7 @@ describe("Unidades.vue", () => {
         await flushPromises();
         vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
 
-        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
+        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }
@@ -219,7 +219,8 @@ describe("Unidades.vue", () => {
 
     it("deve exibir spinner durante carregamento", async () => {
         // Mock que nunca resolve para manter isLoading = true
-        vi.mocked(unidadeService.buscarTodasUnidades).mockReturnValueOnce(new Promise(() => {}));
+        vi.mocked(unidadeService.buscarTodasUnidades).mockReturnValueOnce(new Promise(() => {
+        }));
         const wrapper = createWrapper();
         // Aguarda um tick para o DOM refletir isLoading = true
         await wrapper.vm.$nextTick();

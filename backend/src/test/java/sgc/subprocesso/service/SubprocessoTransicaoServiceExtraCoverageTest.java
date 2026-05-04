@@ -23,13 +23,11 @@ import static org.springframework.test.util.ReflectionTestUtils.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoTransicaoService Extra Coverage Test")
 class SubprocessoTransicaoServiceExtraCoverageTest {
-    @InjectMocks
-    private SubprocessoTransicaoService service;
-
     private static final String ADMIN = "ADMIN";
     private static final String SITUACAO = "situacao";
     private static final String OBTER_ULTIMA_DATA_LIMITE = "obterUltimaDataLimite";
-
+    @InjectMocks
+    private SubprocessoTransicaoService service;
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
@@ -75,9 +73,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(p);
-        
+
         Map<TipoProcesso, SituacaoSubprocesso> situacoes = Map.of(TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
-        
+
         assertThatThrownBy(() -> invokeMethod(service, "obterSituacaoObrigatoria", situacoes, sp, "contexto"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("sem situação configurada");
@@ -88,7 +86,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void apresentarSugestoes_ComSuperior() {
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        
+
         Unidade u = new Unidade();
         u.setCodigo(1L);
         Unidade admin = new Unidade();
@@ -119,7 +117,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void validarMapa_ComSuperior() {
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        
+
         Unidade u = new Unidade();
         u.setCodigo(1L);
         Unidade admin = new Unidade();
@@ -149,7 +147,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void aceitarValidacao_ComSuperior() {
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        
+
         Unidade u = new Unidade();
         u.setCodigo(1L);
         Unidade admin = new Unidade();
@@ -180,12 +178,16 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @Test
     @DisplayName("executarDisponibilizacaoMapa - valida data limite igual")
     void disponibilizarMapa_DataIgual() {
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); 
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        Processo p = new Processo(); p.setTipo(TipoProcesso.MAPEAMENTO); sp.setProcesso(p);
-        sp.setMapa(new sgc.mapa.model.Mapa()); sp.getMapa().setCodigo(100L);
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setProcesso(p);
+        sp.setMapa(new sgc.mapa.model.Mapa());
+        sp.getMapa().setCodigo(100L);
         sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
-        
+
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
@@ -239,11 +241,11 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setProcesso(Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build());
         sp.setMapa(new sgc.mapa.model.Mapa());
         sp.setDataLimiteEtapa1(LocalDateTime.now());
-        
+
         DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(java.time.LocalDate.now().plusDays(1), "Obs");
-        
+
         service.disponibilizarMapaEmBloco(List.of(sp), req, new Usuario());
-        
+
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
     }
 

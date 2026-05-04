@@ -61,7 +61,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-
     /**
      * Trata todas as exceções de negócio que estendem {@link ErroNegocioBase}.
      * O status HTTP e código de erro são definidos na própria exceção.

@@ -85,7 +85,7 @@ export default [
                 {
                     components: [],
                     controlComponents: ["BFormInput", "BFormSelect", "BFormTextarea", "BFormCheckbox", "BFormRadio"],
-                    required: { some: ["nesting", "id"] },
+                    required: {some: ["nesting", "id"]},
                     allowChildren: false,
                 },
             ],

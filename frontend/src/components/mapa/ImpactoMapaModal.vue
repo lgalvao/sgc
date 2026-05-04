@@ -1,12 +1,12 @@
 <template>
   <BModal
       v-model="mostrarComputado"
+      :title="TEXTOS.mapa.impacto.TITULO_MODAL"
       centered
       size="lg"
-      :title="TEXTOS.mapa.impacto.TITULO_MODAL"
       @hide="fechar">
     <div v-if="loading" class="text-center p-4">
-      <BSpinner label="Carregando..." variant="primary" />
+      <BSpinner label="Carregando..." variant="primary"/>
       <p class="mt-2 text-muted">
         {{ TEXTOS.mapa.impacto.VERIFICANDO }}
       </p>
@@ -14,7 +14,7 @@
 
     <div v-else-if="impacto" class="impacto-container" data-testid="modal-impacto-body">
       <BAlert v-if="!impacto.temImpactos" :model-value="true" variant="success">
-        <i aria-hidden="true" class="bi bi-check-circle me-2"/> 
+        <i aria-hidden="true" class="bi bi-check-circle me-2"/>
         {{ TEXTOS.mapa.impacto.SEM_IMPACTOS }}
       </BAlert>
 
@@ -44,29 +44,30 @@
               <template #header>
                 <div class="fw-bold">{{ comp.descricao }}</div>
               </template>
-                <BCardBody class="p-3">
-                  <div class="impact-details">
-                    <div
+              <BCardBody class="p-3">
+                <div class="impact-details">
+                  <div
                       v-for="(msg, idx) in comp.atividadesAfetadas"
-                      :key="idx" 
-                      class="d-flex align-items-start"
+                      :key="idx"
                       :class="{
                            'mb-1': true,
                            'ms-4 fst-italic text-muted': msg.startsWith('  ') || msg.startsWith('Descrição') || msg.startsWith('Conhecimento'),
                            'mt-3': idx > 0 && !msg.startsWith('  ') && !msg.startsWith('Descrição') && !msg.startsWith('Conhecimento')
-                         }">
-                      
-                      <!-- Ícone apenas para a linha principal da atividade -->
-                      <template v-if="!msg.startsWith('  ') && !msg.startsWith('Descrição') && !msg.startsWith('Conhecimento')">
-                        <i v-if="msg.includes('removida')" class="bi bi-dash-circle text-danger me-2"></i>
-                        <i v-else-if="msg.includes('alterada')" class="bi bi-pencil text-primary me-2"></i>
-                        <i v-else class="bi bi-dot text-secondary me-1"></i>
-                      </template>
+                         }"
+                      class="d-flex align-items-start">
 
-                      <span class="small">{{ msg }}</span>
-                    </div>
+                    <!-- Ícone apenas para a linha principal da atividade -->
+                    <template
+                        v-if="!msg.startsWith('  ') && !msg.startsWith('Descrição') && !msg.startsWith('Conhecimento')">
+                      <i v-if="msg.includes('removida')" class="bi bi-dash-circle text-danger me-2"></i>
+                      <i v-else-if="msg.includes('alterada')" class="bi bi-pencil text-primary me-2"></i>
+                      <i v-else class="bi bi-dot text-secondary me-1"></i>
+                    </template>
+
+                    <span class="small">{{ msg }}</span>
                   </div>
-                </BCardBody>
+                </div>
+              </BCardBody>
             </BCard>
           </div>
         </section>
@@ -113,7 +114,9 @@ const emit = defineEmits<(e: "fechar") => void>();
 
 const mostrarComputado = computed({
   get: () => props.mostrar,
-  set: (val) => { if (!val) emit("fechar"); }
+  set: (val) => {
+    if (!val) emit("fechar");
+  }
 });
 
 function fechar() {

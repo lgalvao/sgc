@@ -42,7 +42,11 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         expect(processoCodigo).toBeGreaterThan(0);
     });
 
-    test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
+    test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({
+                                                                              _resetAutomatico,
+                                                                              page,
+                                                                              _autenticadoComoGestorCoord22
+                                                                          }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 
@@ -64,7 +68,11 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(page.getByTestId('processo-info')).toBeVisible();
     });
 
-    test('Cenario 3a: Botão desabilitado quando item está com gestor subordinado', async ({_resetAutomatico, page, _autenticadoComoGestorSecretaria2}) => {
+    test('Cenario 3a: Botão desabilitado quando item está com gestor subordinado', async ({
+                                                                                              _resetAutomatico,
+                                                                                              page,
+                                                                                              _autenticadoComoGestorSecretaria2
+                                                                                          }) => {
         // autenticadoComoGestorSecretaria2 já logou como GESTOR SECRETARIA_2
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('processo-info')).toBeVisible();
@@ -74,7 +82,11 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(btnAceitar).toBeDisabled();
     });
 
-    test('Cenario 3b: Botão habilitado após gestor subordinado aceitar', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
+    test('Cenario 3b: Botão habilitado após gestor subordinado aceitar', async ({
+                                                                                    _resetAutomatico,
+                                                                                    page,
+                                                                                    _autenticadoComoGestorCoord22
+                                                                                }) => {
         // autenticadoComoGestorCoord22 já logou como GESTOR COORD_22
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('processo-info')).toBeVisible();
@@ -90,7 +102,11 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(await obterAcaoBloco(page, 'btn-processo-aceitar-bloco')).toBeEnabled();
     });
 
-    test('Cenario 4: Botão desabilitado para gestor superior quando item está com intermediário', async ({_resetAutomatico, request, page}) => {
+    test('Cenario 4: Botão desabilitado para gestor superior quando item está com intermediário', async ({
+                                                                                                             _resetAutomatico,
+                                                                                                             request,
+                                                                                                             page
+                                                                                                         }) => {
         const timestamp4 = Date.now();
         await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: `CDU-22-C4 ${timestamp4}`,
@@ -108,10 +124,10 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
     test('Cenario 5: Aceite em bloco registra movimentação e alerta com data/hora', async ({
-        _resetAutomatico,
-        request,
-        page
-    }) => {
+                                                                                               _resetAutomatico,
+                                                                                               request,
+                                                                                               page
+                                                                                           }) => {
         // Reseta o banco para evitar conflito com unidade já em processo ativo dos cenários anteriores
         await resetDatabase(request);
         const descIsolada = `CDU-22 alerta ${Date.now()}`;
@@ -169,7 +185,11 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
         expect(processoCodigo).toBeGreaterThan(0);
     });
 
-    test('Cenario REVISAO: GESTOR aceita revisão de cadastro em bloco', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
+    test('Cenario REVISAO: GESTOR aceita revisão de cadastro em bloco', async ({
+                                                                                   _resetAutomatico,
+                                                                                   page,
+                                                                                   _autenticadoComoGestorCoord22
+                                                                               }) => {
         await acessarDetalhesProcesso(page, descProcessoRevisao);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 

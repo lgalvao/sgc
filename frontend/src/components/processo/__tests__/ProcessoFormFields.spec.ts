@@ -53,7 +53,7 @@ describe("ProcessoFormFields.vue", () => {
     });
 
     it("pula foco do tipo no JSDOM mas foca em outros", async () => {
-         // Como o tipo está dando problemas no contain, focamos nos outros e apenas verificamos se a função não quebra para o tipo
+        // Como o tipo está dando problemas no contain, focamos nos outros e apenas verificamos se a função não quebra para o tipo
         const wrapper = criarWrapper({fieldErrors: {tipo: "Erro"}});
         await nextTick();
         (wrapper.vm as any).focarPrimeiroErro();
@@ -75,10 +75,10 @@ describe("ProcessoFormFields.vue", () => {
     it("foca no campo correto quando focarPrimeiroErro é chamado manualmente para dataLimite", async () => {
         const wrapper = criarWrapper({fieldErrors: {dataLimite: "Erro"}});
         await nextTick();
-        
+
         (wrapper.vm as any).focarPrimeiroErro();
         await nextTick();
-        
+
         const inputDataLimite = wrapper.find('[data-testid="inp-processo-data-limite"]');
         expect(inputDataLimite.element.contains(document.activeElement)).toBe(true);
     });

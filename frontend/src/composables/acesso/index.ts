@@ -10,7 +10,7 @@ export * from './tipos';
 
 /**
  * Composable para acessar permissões calculadas pelo backend.
- * 
+ *
  * O backend é a fonte única de verdade para regras de segurança e workflow.
  * Este composable simplifica o acesso a essas regras nos componentes Vue.
  */
@@ -19,7 +19,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const obterPermissoes = () => obterSubprocesso()?.permissoes;
     const ehRevisao = computed(() => obterSubprocesso()?.tipoProcesso === TipoProcesso.REVISAO);
     const permissoes = computed<PermissoesSubprocesso>(() => obterPermissoes() ?? PERMISSOES_SUBPROCESSO_VAZIAS);
-    
+
     // Acessos básicos baseados em flags booleanas simples
     const acessosPermissao = criarAcessosPermissao(permissoes);
 

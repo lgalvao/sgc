@@ -39,18 +39,18 @@ unidade.
 
 Rotas que pertencem a um subprocesso específico de uma unidade.
 
-| Rota                                                | Nome                   | Breadcrumbs (ADMIN/GESTOR)                                       |
-|-----------------------------------------------------|------------------------|------------------------------------------------------------------|
-| `/processo/:codProcesso/:siglaUnidade`              | Subprocesso            | 🏠 > Detalhes do processo > [SIGLA]                              |
-| `/processo/:codProcesso/:siglaUnidade/mapa`         | SubprocessoMapa        | 🏠 > Detalhes do processo > [SIGLA] > Mapa de competências       |
-| `/processo/:codProcesso/:siglaUnidade/cadastro`     | SubprocessoCadastro    | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
+| Rota                                            | Nome                | Breadcrumbs (ADMIN/GESTOR)                                       |
+|-------------------------------------------------|---------------------|------------------------------------------------------------------|
+| `/processo/:codProcesso/:siglaUnidade`          | Subprocesso         | 🏠 > Detalhes do processo > [SIGLA]                              |
+| `/processo/:codProcesso/:siglaUnidade/mapa`     | SubprocessoMapa     | 🏠 > Detalhes do processo > [SIGLA] > Mapa de competências       |
+| `/processo/:codProcesso/:siglaUnidade/cadastro` | SubprocessoCadastro | 🏠 > Detalhes do processo > [SIGLA] > Atividades e conhecimentos |
 
 Para CHEFE e SERVIDOR, o "Detalhes do processo" é omitido:
 
-| Rota                                                | Breadcrumbs (CHEFE/SERVIDOR)              |
-|-----------------------------------------------------|-------------------------------------------|
-| `/processo/:codProcesso/:siglaUnidade`              | 🏠 > [SIGLA]                              |
-| `/processo/:codProcesso/:siglaUnidade/cadastro`     | 🏠 > [SIGLA] > Atividades e conhecimentos |
+| Rota                                            | Breadcrumbs (CHEFE/SERVIDOR)              |
+|-------------------------------------------------|-------------------------------------------|
+| `/processo/:codProcesso/:siglaUnidade`          | 🏠 > [SIGLA]                              |
+| `/processo/:codProcesso/:siglaUnidade/cadastro` | 🏠 > [SIGLA] > Atividades e conhecimentos |
 
 ### Rotas de Unidade
 

@@ -1,7 +1,7 @@
 import type {AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import axios, {AxiosHeaders} from "axios";
 import type {Router} from "vue-router";
-import {normalizarErro, deveNotificarGlobalmente} from '@/utils/apiError';
+import {deveNotificarGlobalmente, normalizarErro} from '@/utils/apiError';
 import logger from "@/utils/logger";
 
 let routerInstance: Router | null = null;

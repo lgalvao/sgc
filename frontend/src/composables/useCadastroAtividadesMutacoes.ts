@@ -23,15 +23,15 @@ interface UseCadastroAtividadesMutacoesParams {
 }
 
 export function useCadastroAtividadesMutacoes({
-    atividades,
-    codigoSubprocesso,
-    codMapa,
-    withErrorHandling,
-    lastError,
-    notify,
-    processarRespostaLocal,
-    adicionarAtividadeAction,
-}: UseCadastroAtividadesMutacoesParams) {
+                                                  atividades,
+                                                  codigoSubprocesso,
+                                                  codMapa,
+                                                  withErrorHandling,
+                                                  lastError,
+                                                  notify,
+                                                  processarRespostaLocal,
+                                                  adicionarAtividadeAction,
+                                              }: UseCadastroAtividadesMutacoesParams) {
     const erroNovaAtividade = ref<string | null>(null);
     const dadosRemocao = ref<DadosRemocaoCadastro>(null);
     const loadingRemocao = ref(false);
@@ -53,7 +53,11 @@ export function useCadastroAtividadesMutacoes({
         mostrarModalConfirmacaoRemocao.value = true;
     };
 
-    const {adicionarConhecimento, removerConhecimento, salvarEdicaoConhecimento} = useConhecimentoMutacoes(codigoSubprocesso, executarAtualizacao, prepararRemocao);
+    const {
+        adicionarConhecimento,
+        removerConhecimento,
+        salvarEdicaoConhecimento
+    } = useConhecimentoMutacoes(codigoSubprocesso, executarAtualizacao, prepararRemocao);
 
     async function adicionarAtividade(): Promise<boolean> {
         if (!codMapa.value || !codigoSubprocesso.value) return false;
@@ -91,12 +95,23 @@ export function useCadastroAtividadesMutacoes({
     async function salvarEdicaoAtividade(codigo: number, descricao: string) {
         if (!descricao.trim() || !codigoSubprocesso.value) return;
         const atividade = atividades.value.find((a) => a.codigo === codigo);
-        if (atividade) await executarAtualizacao(() => atividadeService.atualizarAtividade(codigo, {...atividade, descricao: descricao.trim()}), TEXTOS.atividades.ERRO_SALVAR_ATIVIDADE);
+        if (atividade) await executarAtualizacao(() => atividadeService.atualizarAtividade(codigo, {
+            ...atividade,
+            descricao: descricao.trim()
+        }), TEXTOS.atividades.ERRO_SALVAR_ATIVIDADE);
     }
 
     return {
-        erroNovaAtividade, dadosRemocao, loadingRemocao, mostrarModalConfirmacaoRemocao,
-        adicionarAtividade, removerAtividade: (c: number) => prepararRemocao("atividade", c), confirmarRemocao, salvarEdicaoAtividade,
-        adicionarConhecimento, removerConhecimento, salvarEdicaoConhecimento,
+        erroNovaAtividade,
+        dadosRemocao,
+        loadingRemocao,
+        mostrarModalConfirmacaoRemocao,
+        adicionarAtividade,
+        removerAtividade: (c: number) => prepararRemocao("atividade", c),
+        confirmarRemocao,
+        salvarEdicaoAtividade,
+        adicionarConhecimento,
+        removerConhecimento,
+        salvarEdicaoConhecimento,
     };
 }

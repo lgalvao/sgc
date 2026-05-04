@@ -66,11 +66,11 @@
                 <i aria-hidden="true" class="bi bi-trash"/>
               </BButton>
             </div>
-            
+
             <div v-if="(atividade.conhecimentos?.length ?? 0) > 0" class="conhecimentos-inline mt-1">
               <ul class="conhecimentos-lista mb-0 small text-muted border-top pt-1">
-                <li 
-                    v-for="c in (getAtividadeCompleta(atividade.codigo)?.conhecimentos ?? [])" 
+                <li
+                    v-for="c in (getAtividadeCompleta(atividade.codigo)?.conhecimentos ?? [])"
                     :key="c.codigo"
                     class="conhecimento-item text-break"
                 >

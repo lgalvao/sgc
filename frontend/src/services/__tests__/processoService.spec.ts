@@ -51,13 +51,13 @@ describe('processoService', () => {
                 codSubprocesso: 0,
             }
         ];
-        
+
         vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.buscarUnidadesParaImportacao(codProcesso);
 
         expect(apiClient.get).toHaveBeenCalledWith(`/processos/${codProcesso}/unidades-importacao`);
-        
+
         expect(result[0].nome).toBe('Unidade 1');
         expect(result[0].sigla).toBe('U1');
         expect(result[0].codSubprocesso).toBe(10);

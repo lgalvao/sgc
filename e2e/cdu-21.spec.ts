@@ -31,7 +31,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     // TESTES PRINCIPAIS - CDU-21
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para detalhes do processo', async ({
+                                                                         _resetAutomatico,
+                                                                         page,
+                                                                         _autenticadoComoAdmin
+                                                                     }) => {
         // CDU-21: Passos 1-2
 
         await acessarDetalhesProcesso(page, descProcesso);
@@ -42,7 +46,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({
+                                                                                _resetAutomatico,
+                                                                                page,
+                                                                                _autenticadoComoAdmin
+                                                                            }) => {
 
 
         await acessarDetalhesProcesso(page, descProcesso);
@@ -87,7 +95,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // (Processo finalizado não aparece na lista de processos ativos)
     });
 
-    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({
+                                                                                      _resetAutomatico,
+                                                                                      page,
+                                                                                      _autenticadoComoAdmin
+                                                                                  }) => {
         // Garantir que botões de ação não aparecem para processos finalizados
 
         await page.goto(`/processo/${codProcesso}`);
@@ -128,7 +140,11 @@ test.describe.serial('CDU-21 - Processo com mapas não homologados', () => {
         validarProcessoFixture(processo, descProcessoErro);
     });
 
-    test('Cenario 5: ADMIN não vê botão Finalizar quando mapas não estão todos homologados', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 5: ADMIN não vê botão Finalizar quando mapas não estão todos homologados', async ({
+                                                                                                        _resetAutomatico,
+                                                                                                        page,
+                                                                                                        _autenticadoComoAdmin
+                                                                                                    }) => {
         // CDU-21 Passos 4-5: sistema verifica situação dos subprocessos e bloqueia finalização
         await acessarDetalhesProcesso(page, descProcessoErro);
         await expect(page.getByTestId('processo-info')).toBeVisible();
@@ -155,7 +171,11 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
         validarProcessoFixture(processo, descProcessoRevisao);
     });
 
-    test('Cenario 1: ADMIN finaliza processo de revisão com sucesso', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN finaliza processo de revisão com sucesso', async ({
+                                                                                 _resetAutomatico,
+                                                                                 page,
+                                                                                 _autenticadoComoAdmin
+                                                                             }) => {
         await acessarDetalhesProcesso(page, descProcessoRevisao);
 
         // Verificar que é processo de revisão
@@ -178,7 +198,11 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
     });
 
-    test('Cenario 2: Verificar ausência de botões em processo de revisão finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 2: Verificar ausência de botões em processo de revisão finalizado', async ({
+                                                                                                 _resetAutomatico,
+                                                                                                 page,
+                                                                                                 _autenticadoComoAdmin
+                                                                                             }) => {
         await page.goto(`/processo/${codProcessoRevisao}`);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 

@@ -10,7 +10,7 @@
   >
     <div data-testid="modal-historico-body">
       <div v-if="loading" class="text-center py-4">
-        <BSpinner label="Carregando dados" variant="primary" />
+        <BSpinner label="Carregando dados" variant="primary"/>
       </div>
       <template v-else>
         <BAlert

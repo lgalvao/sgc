@@ -30,13 +30,11 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @RequiredArgsConstructor
 @Slf4j
 public class ValidadorDadosOrganizacionais {
-    boolean logado = false;
-
     private static final Set<TipoUnidade> TIPOS_PARTICIPANTES = Set.of(OPERACIONAL, INTERMEDIARIA, INTEROPERACIONAL);
-
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final UsuarioRepo usuarioRepo;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    boolean logado = false;
 
     @Cacheable(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, sync = true)
     @Transactional(readOnly = true)

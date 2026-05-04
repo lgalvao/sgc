@@ -44,6 +44,8 @@ public class ProcessoDetalheDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AcaoBlocoDto {
+        @Builder.Default
+        private final List<SubprocessoElegivelDto> unidades = new ArrayList<>();
         private String codigo;
         private AcaoProcesso acao;
         private boolean mostrar;
@@ -55,9 +57,6 @@ public class ProcessoDetalheDto {
         private String texto;
         private String rotuloBotao;
         private String mensagemSucesso;
-
-        @Builder.Default
-        private final List<SubprocessoElegivelDto> unidades = new ArrayList<>();
     }
 
     @Getter
@@ -99,14 +98,6 @@ public class ProcessoDetalheDto {
             );
         }
 
-        public void preencherComSubprocesso(Subprocesso subprocesso, Unidade localizacaoAtual) {
-            this.situacaoSubprocesso = subprocesso.getSituacao();
-            this.dataLimite = subprocesso.getDataLimiteEtapa1();
-            this.codSubprocesso = subprocesso.getCodigo();
-            this.mapaCodigo = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
-            this.localizacaoAtualCodigo = localizacaoAtual.getCodigo();
-        }
-
         private static UnidadeParticipanteDto criarBase(
                 String nome,
                 String sigla,
@@ -120,6 +111,14 @@ public class ProcessoDetalheDto {
                     .codUnidadeSuperior(codUnidadeSuperior)
                     .filhos(new ArrayList<>())
                     .build();
+        }
+
+        public void preencherComSubprocesso(Subprocesso subprocesso, Unidade localizacaoAtual) {
+            this.situacaoSubprocesso = subprocesso.getSituacao();
+            this.dataLimite = subprocesso.getDataLimiteEtapa1();
+            this.codSubprocesso = subprocesso.getCodigo();
+            this.mapaCodigo = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
+            this.localizacaoAtualCodigo = localizacaoAtual.getCodigo();
         }
     }
 }

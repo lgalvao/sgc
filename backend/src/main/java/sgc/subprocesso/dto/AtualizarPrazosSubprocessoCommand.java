@@ -14,4 +14,5 @@ public record AtualizarPrazosSubprocessoCommand(
         Optional<LocalDateTime> dataFimEtapa1,
         Optional<LocalDateTime> dataLimiteEtapa2,
         Optional<LocalDateTime> dataFimEtapa2
-) {}
+) {
+}

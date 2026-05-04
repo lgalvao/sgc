@@ -197,9 +197,9 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     @DisplayName("listarAtividadesSubprocesso: Deve listar atividades do subprocesso")
     void listarAtividadesSubprocesso_Sucesso() {
         subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), List.of());
-        
+
         List<sgc.mapa.dto.AtividadeDto> atividades = consultaService.listarAtividadesSubprocesso(subprocessoDestino.getCodigo());
-        
+
         assertThat(atividades).hasSize(1);
         assertThat(atividades.getFirst().descricao()).isEqualTo("Atividade importada");
     }

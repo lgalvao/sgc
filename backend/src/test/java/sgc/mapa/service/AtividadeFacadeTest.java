@@ -386,7 +386,7 @@ class AtividadeFacadeTest {
             when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(false);
 
             assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
-                atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
+                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
         }
 
         @Test
@@ -403,7 +403,7 @@ class AtividadeFacadeTest {
             when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(true);
 
             assertThrows(sgc.comum.erros.ErroValidacao.class, () ->
-                atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
+                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
         }
     }
 }

@@ -401,6 +401,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("A análise já pode ser realizada no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
+
     @Test
     @DisplayName("Deve renderizar cadastro reaberto conforme CDU-32")
     void deveRenderizarCadastroReaberto() {

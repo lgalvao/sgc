@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
 import sgc.feedback.dto.*;
 import sgc.seguranca.*;
+
 import java.time.*;
 import java.util.*;
 
@@ -27,16 +28,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("FeedbackController")
 class FeedbackControllerTest {
 
+    private static final String URL = "/api/feedback";
     @Autowired
     private MockMvc mockMvc;
-
     @MockitoBean
     private FeedbackService feedbackService;
-
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
-
-    private static final String URL = "/api/feedback";
 
     @Test
     @DisplayName("POST /api/feedback - deve registrar feedback e retornar 201")

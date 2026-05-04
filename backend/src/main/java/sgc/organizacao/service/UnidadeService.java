@@ -21,6 +21,7 @@ public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final CacheOrganizacaoService cacheOrganizacaoService;
+
     public Unidade buscarPorCodigo(Long codigo) {
         return unidadeRepo.buscarPorCodigoComResponsavel(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));

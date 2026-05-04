@@ -23,12 +23,20 @@ type DependenciasCadastroAnaliseFluxo = {
     homologarCadastro: (
         codigoSubprocesso: number,
         request: HomologarCadastroRequest,
-        opcoes: { mensagemSucesso: string; redirecionarParaPainel: boolean; redirecionarPara?: { name: string; params: { codProcesso: number | string; siglaUnidade: string } } },
+        opcoes: {
+            mensagemSucesso: string;
+            redirecionarParaPainel: boolean;
+            redirecionarPara?: { name: string; params: { codProcesso: number | string; siglaUnidade: string } }
+        },
     ) => Promise<boolean>;
     homologarRevisaoCadastro: (
         codigoSubprocesso: number,
         request: HomologarCadastroRequest,
-        opcoes: { mensagemSucesso: string; redirecionarParaPainel: boolean; redirecionarPara?: { name: string; params: { codProcesso: number | string; siglaUnidade: string } } },
+        opcoes: {
+            mensagemSucesso: string;
+            redirecionarParaPainel: boolean;
+            redirecionarPara?: { name: string; params: { codProcesso: number | string; siglaUnidade: string } }
+        },
     ) => Promise<boolean>;
     aceitarCadastro: (
         codigoSubprocesso: number,
@@ -51,25 +59,25 @@ type DependenciasCadastroAnaliseFluxo = {
 };
 
 export function useCadastroAnaliseFluxo({
-    codigoSubprocesso,
-    codProcesso,
-    sigla,
-    isRevisao,
-    acaoPrincipalCadastro,
-    mostrarModalHistorico,
-    mostrarModalValidarAnalise,
-    mostrarModalDevolverAnalise,
-    resetarValidacao,
-    validarSubmissao,
-    focarPrimeiroErroInvalido,
-    listarAnalisesCadastro,
-    homologarCadastro,
-    homologarRevisaoCadastro,
-    aceitarCadastro,
-    aceitarRevisaoCadastro,
-    devolverCadastro,
-    devolverRevisaoCadastro,
-}: DependenciasCadastroAnaliseFluxo) {
+                                            codigoSubprocesso,
+                                            codProcesso,
+                                            sigla,
+                                            isRevisao,
+                                            acaoPrincipalCadastro,
+                                            mostrarModalHistorico,
+                                            mostrarModalValidarAnalise,
+                                            mostrarModalDevolverAnalise,
+                                            resetarValidacao,
+                                            validarSubmissao,
+                                            focarPrimeiroErroInvalido,
+                                            listarAnalisesCadastro,
+                                            homologarCadastro,
+                                            homologarRevisaoCadastro,
+                                            aceitarCadastro,
+                                            aceitarRevisaoCadastro,
+                                            devolverCadastro,
+                                            devolverRevisaoCadastro,
+                                        }: DependenciasCadastroAnaliseFluxo) {
     const analisesCadastro = ref<Analise[]>([]);
     const historicoAnalises = computed(() => analisesCadastro.value);
     const loadingAnaliseCadastro = ref(false);
@@ -85,7 +93,10 @@ export function useCadastroAnaliseFluxo({
         mostrarModalHistorico.value = true;
     }
 
-    function abrirModalValidarAnalise() { mostrarModalValidarAnalise.value = true; }
+    function abrirModalValidarAnalise() {
+        mostrarModalValidarAnalise.value = true;
+    }
+
     function fecharModalValidarAnalise() {
         mostrarModalValidarAnalise.value = false;
         observacaoValidacao.value = "";
@@ -114,7 +125,7 @@ export function useCadastroAnaliseFluxo({
                 const redirecionarPara = acao.redirecionarParaPainel
                     ? undefined
                     : {name: "Subprocesso", params: {codProcesso, siglaUnidade: sigla}};
-                
+
                 const fn = isRevisao.value ? homologarRevisaoCadastro : homologarCadastro;
                 const sucesso = await fn(codigo, req, {
                     mensagemSucesso: acao.mensagemSucesso,

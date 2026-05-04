@@ -9,9 +9,13 @@
 
 ## 1. Overview
 
-A persistent floating button is available during UAT builds, allowing any logged-in user to submit contextual feedback about any page in the system. When activated, the widget captures a screenshot of the current view (before the modal opens), collects a user note and a severity tag, enriches the submission with automatic contextual metadata, and posts the result to a dedicated backend endpoint.
+A persistent floating button is available during UAT builds, allowing any logged-in user to submit contextual feedback
+about any page in the system. When activated, the widget captures a screenshot of the current view (before the modal
+opens), collects a user note and a severity tag, enriches the submission with automatic contextual metadata, and posts
+the result to a dedicated backend endpoint.
 
-The feature must be **entirely absent from production builds** — not hidden, not disabled at runtime, but structurally excluded from the compiled output.
+The feature must be **entirely absent from production builds** — not hidden, not disabled at runtime, but structurally
+excluded from the compiled output.
 
 -----
 
@@ -31,7 +35,9 @@ VITE_FEEDBACK_WIDGET=true
 # VITE_FEEDBACK_WIDGET is intentionally absent
 ```
 
-The widget is registered in the application only when the flag is present and true. Because `import.meta.env.VITE_FEEDBACK_WIDGET` is resolved at compile time, Rollup’s tree-shaker will drop the entire import graph (component + `html2canvas`) from the production bundle.
+The widget is registered in the application only when the flag is present and true. Because
+`import.meta.env.VITE_FEEDBACK_WIDGET` is resolved at compile time, Rollup’s tree-shaker will drop the entire import
+graph (component + `html2canvas`) from the production bundle.
 
 **File:** `src/main.ts` (or the root layout component)
 
@@ -59,16 +65,17 @@ Alternatively, mount the component directly in the dynamic import block using a 
 public class FeedbackController { ... }
 ```
 
-With `spring.profiles.active=production`, Spring does not instantiate this bean. The endpoint does not exist and returns 404 for any probe.
+With `spring.profiles.active=production`, Spring does not instantiate this bean. The endpoint does not exist and returns
+404 for any probe.
 
 **Active profile is set in deployment configuration, not in source code.**
 
 ### 2.3 Build Pipeline Convention
 
-|Environment|Vite mode          |Spring profile|
-|-----------|-------------------|--------------|
-|UAT        |`--mode uat`       |`uat`         |
-|Production |`--mode production`|`production`  |
+| Environment | Vite mode           | Spring profile |
+|-------------|---------------------|----------------|
+| UAT         | `--mode uat`        | `uat`          |
+| Production  | `--mode production` | `production`   |
 
 CI must enforce that `--mode production` is always used for releases to the production environment.
 
@@ -116,11 +123,11 @@ A `<BModal>` (BootstrapVueNext) opened programmatically. It must not appear in t
 
 **Form fields:**
 
-|Field               |Type               |Required|Notes                                                                  |
-|--------------------|-------------------|--------|-----------------------------------------------------------------------|
-|`note`              |`<BFormTextarea>`  |Yes     |Min 10 chars. Label: “Descreva o problema ou sugestão”. Rows: 4.       |
-|`type`              |`<BFormRadioGroup>`|Yes     |Options: `bug` · `suggestion` · `question` · `praise`. Default: `bug`. |
-|`screenshotIncluded`|Read-only indicator|—       |Shows thumbnail of captured screenshot with a “Remover” link to opt out|
+| Field                | Type                | Required | Notes                                                                   |
+|----------------------|---------------------|----------|-------------------------------------------------------------------------|
+| `note`               | `<BFormTextarea>`   | Yes      | Min 10 chars. Label: “Descreva o problema ou sugestão”. Rows: 4.        |
+| `type`               | `<BFormRadioGroup>` | Yes      | Options: `bug` · `suggestion` · `question` · `praise`. Default: `bug`.  |
+| `screenshotIncluded` | Read-only indicator | —        | Shows thumbnail of captured screenshot with a “Remover” link to opt out |
 
 **Actions:**
 
@@ -145,7 +152,8 @@ A `<BModal>` (BootstrapVueNext) opened programmatically. It must not appear in t
 1. The resulting canvas is converted to a `Blob` via `canvas.toBlob('image/webp', 0.85)`
 1. The blob is stored in a `ref<Blob | null>` inside the composable
 1. Only after the blob is stored does the modal open
-1. If capture fails (rejection or timeout > 5 s), proceed without a screenshot and log a warning; do not block the user from submitting
+1. If capture fails (rejection or timeout > 5 s), proceed without a screenshot and log a warning; do not block the user
+   from submitting
 
 **Why this order matters:** opening the modal first would capture the overlay instead of the underlying page.
 
@@ -190,7 +198,9 @@ export interface FeedbackPayload {
 ```
 
 **Store fields to read:**  
-The composable must read the currently active profile/unit and year from whichever Pinia store SGC uses for session/navigation context. The exact store and field names must be verified against the actual codebase before implementation.
+The composable must read the currently active profile/unit and year from whichever Pinia store SGC uses for
+session/navigation context. The exact store and field names must be verified against the actual codebase before
+implementation.
 
 ### 3.6 Submission
 
@@ -213,7 +223,8 @@ async function submitFeedback(
 
 **Error handling:**
 
-- Network or server errors: display a `useToastStore` error toast (use SGC’s existing notification pattern), keep the modal open
+- Network or server errors: display a `useToastStore` error toast (use SGC’s existing notification pattern), keep the
+  modal open
 - Success: display a `useToastStore` success toast, close the modal, clear the stored screenshot
 
 -----
@@ -242,10 +253,10 @@ src/main/java/.../feedback/
 
 **Request parts:**
 
-|Part name   |Type           |Required|Description                 |
-|------------|---------------|--------|----------------------------|
-|`data`      |`String` (JSON)|Yes     |Serialized `FeedbackPayload`|
-|`screenshot`|`MultipartFile`|No      |WebP image, max 5 MB        |
+| Part name    | Type            | Required | Description                  |
+|--------------|-----------------|----------|------------------------------|
+| `data`       | `String` (JSON) | Yes      | Serialized `FeedbackPayload` |
+| `screenshot` | `MultipartFile` | No       | WebP image, max 5 MB         |
 
 **Response — success (`201 Created`):**
 
@@ -332,7 +343,8 @@ sgc:
 
 **Naming convention:** `{feedbackId}_{timestamp}.webp`
 
-The `FeedbackService` must validate that the resolved path remains within `screenshot-dir` before writing (path traversal prevention).
+The `FeedbackService` must validate that the resolved path remains within `screenshot-dir` before writing (path
+traversal prevention).
 
 ### 4.5 FeedbackService Responsibilities
 
@@ -344,7 +356,8 @@ The `FeedbackService` must validate that the resolved path remains within `scree
 1. Persist the `FeedbackRecord` to Oracle
 1. Return the created record’s `id` and `submittedAt`
 
-**The userId and userName stored in the record must come from the Spring Security context, not from the client-submitted metadata.** The metadata copy is kept for diagnostic purposes only.
+**The userId and userName stored in the record must come from the Spring Security context, not from the client-submitted
+metadata.** The metadata copy is kept for diagnostic purposes only.
 
 ### 4.6 Database Migration
 
@@ -410,9 +423,9 @@ sgc:
 
 ### Frontend
 
-|Package      |Purpose                 |Install                  |
-|-------------|------------------------|-------------------------|
-|`html2canvas`|DOM-to-canvas screenshot|`npm install html2canvas`|
+| Package       | Purpose                  | Install                   |
+|---------------|--------------------------|---------------------------|
+| `html2canvas` | DOM-to-canvas screenshot | `npm install html2canvas` |
 
 No other new dependencies. The modal uses `BModal` from BootstrapVueNext. Submission uses the existing Axios instance.
 

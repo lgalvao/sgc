@@ -100,211 +100,6 @@ class ProcessoServiceExtraCoverageTest {
         return processo;
     }
 
-    @Nested
-    @DisplayName("buscarPorCodigoComParticipantes")
-    class BuscarPorCodigoComParticipantes {
-        @Test
-        @DisplayName("deve lancar excecao se nao encontrar")
-        void deveLancarExcecao() {
-            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.empty());
-
-            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> processoService.buscarPorCodigoComParticipantes(1L));
-        }
-
-        @Test
-        @DisplayName("deve retornar se encontrar")
-        void deveRetornar() {
-            Processo p = new Processo();
-            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
-
-            Processo res = processoService.buscarPorCodigoComParticipantes(1L);
-
-            assertThat(res).isEqualTo(p);
-        }
-    }
-
-    @Nested
-    @DisplayName("listarFinalizados")
-    class ListarFinalizados {
-        @Test
-        @DisplayName("deve retornar listarPorSituacaoComParticipantes se admin")
-        void admin() {
-            Usuario u = new Usuario();
-            u.setPerfilAtivo(Perfil.ADMIN);
-            when(usuarioService.usuarioAutenticado()).thenReturn(u);
-
-            Processo p = new Processo();
-            when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO)).thenReturn(List.of(p));
-
-            List<Processo> res = processoService.listarFinalizados();
-
-            assertThat(res).containsExactly(p);
-        }
-
-        @Test
-        @DisplayName("deve retornar listarPorSituacaoEUnidadeCodigos se nao admin")
-        void naoAdmin() {
-            Usuario u = new Usuario();
-            u.setPerfilAtivo(Perfil.GESTOR);
-            u.setUnidadeAtivaCodigo(1L);
-            when(usuarioService.usuarioAutenticado()).thenReturn(u);
-
-            Unidade uni = new Unidade();
-            uni.setCodigo(1L);
-            when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
-
-            Processo p = new Processo();
-            when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.FINALIZADO), anyList())).thenReturn(List.of(p));
-
-            List<Processo> res = processoService.listarFinalizados();
-
-            assertThat(res).containsExactly(p);
-        }
-    }
-
-    @Nested
-    @DisplayName("atualizar")
-    class Atualizar {
-        @Test
-        @DisplayName("deve lancar erro se nao estiver em criacao")
-        void situacaoInvalida() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of());
-
-            assertThrows(ErroValidacao.class, () -> processoService.atualizar(1L, req));
-        }
-
-        @Test
-        @DisplayName("deve lancar erro se unidade invalida")
-        void unidadeInvalida() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            Unidade u = new Unidade();
-            u.setTipo(TipoUnidade.INTERMEDIARIA);
-            when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(u));
-
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of(1L));
-
-            assertThrows(ErroValidacao.class, () -> processoService.atualizar(1L, req));
-        }
-
-        @Test
-        @DisplayName("deve atualizar com sucesso")
-        void sucesso() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            Unidade u = criarUnidadeValida(1L);
-            when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(u));
-            mockarResponsaveisEfetivos();
-
-            when(processoRepo.saveAndFlush(p)).thenReturn(p);
-
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc2", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of(1L));
-
-            Processo res = processoService.atualizar(1L, req);
-
-            assertThat(res.getDescricao()).isEqualTo("desc2");
-        }
-    }
-
-    @Nested
-    @DisplayName("apagar")
-    class Apagar {
-        @Test
-        @DisplayName("deve lancar erro se nao estiver em criacao")
-        void situacaoInvalida() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            assertThrows(ErroValidacao.class, () -> processoService.apagar(1L));
-        }
-
-        @Test
-        @DisplayName("deve apagar com sucesso")
-        void sucesso() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            processoService.apagar(1L);
-
-            verify(processoRepo).deleteById(1L);
-        }
-    }
-
-    @Nested
-    @DisplayName("iniciar")
-    class Iniciar {
-        @Test
-        @DisplayName("deve lancar erro se nao estiver em criacao")
-        void situacaoInvalida() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            List<Long> unidades = List.of();
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
-        }
-
-        @Test
-        @DisplayName("deve lancar erro se revisao sem unidades")
-        void revisaoSemUnidades() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            p.setTipo(TipoProcesso.REVISAO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            List<Long> unidades = List.of();
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
-        }
-
-        @Test
-        @DisplayName("deve lancar erro se mapeamento sem participantes")
-        void mapeamentoSemParticipantes() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            List<Long> unidades = List.of();
-            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
-        }
-    }
-
-    @Nested
-    @DisplayName("finalizar")
-    class Finalizar {
-        @Test
-        @DisplayName("deve lancar erro se nao em andamento")
-        void naoAndamento() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            assertThrows(ErroValidacao.class, () -> processoService.finalizar(1L));
-        }
-
-        @Test
-        @DisplayName("deve lancar erro se nao validado")
-        void naoValidado() {
-            Processo p = new Processo();
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-
-            when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofInvalido("Erro de validacao"));
-
-            assertThrows(ErroValidacao.class, () -> processoService.finalizar(1L));
-        }
-    }
-
     @Test
     @DisplayName("enviarLembrete deve falhar quando processo estiver sem data limite")
     void enviarLembreteDeveFalharSemDataLimite() {
@@ -587,6 +382,211 @@ class ProcessoServiceExtraCoverageTest {
     }
 
     @Nested
+    @DisplayName("buscarPorCodigoComParticipantes")
+    class BuscarPorCodigoComParticipantes {
+        @Test
+        @DisplayName("deve lancar excecao se nao encontrar")
+        void deveLancarExcecao() {
+            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.empty());
+
+            assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class, () -> processoService.buscarPorCodigoComParticipantes(1L));
+        }
+
+        @Test
+        @DisplayName("deve retornar se encontrar")
+        void deveRetornar() {
+            Processo p = new Processo();
+            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+
+            Processo res = processoService.buscarPorCodigoComParticipantes(1L);
+
+            assertThat(res).isEqualTo(p);
+        }
+    }
+
+    @Nested
+    @DisplayName("listarFinalizados")
+    class ListarFinalizados {
+        @Test
+        @DisplayName("deve retornar listarPorSituacaoComParticipantes se admin")
+        void admin() {
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO)).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarFinalizados();
+
+            assertThat(res).containsExactly(p);
+        }
+
+        @Test
+        @DisplayName("deve retornar listarPorSituacaoEUnidadeCodigos se nao admin")
+        void naoAdmin() {
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.GESTOR);
+            u.setUnidadeAtivaCodigo(1L);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
+
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.FINALIZADO), anyList())).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarFinalizados();
+
+            assertThat(res).containsExactly(p);
+        }
+    }
+
+    @Nested
+    @DisplayName("atualizar")
+    class Atualizar {
+        @Test
+        @DisplayName("deve lancar erro se nao estiver em criacao")
+        void situacaoInvalida() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of());
+
+            assertThrows(ErroValidacao.class, () -> processoService.atualizar(1L, req));
+        }
+
+        @Test
+        @DisplayName("deve lancar erro se unidade invalida")
+        void unidadeInvalida() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            Unidade u = new Unidade();
+            u.setTipo(TipoUnidade.INTERMEDIARIA);
+            when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(u));
+
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of(1L));
+
+            assertThrows(ErroValidacao.class, () -> processoService.atualizar(1L, req));
+        }
+
+        @Test
+        @DisplayName("deve atualizar com sucesso")
+        void sucesso() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            Unidade u = criarUnidadeValida(1L);
+            when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(u));
+            mockarResponsaveisEfetivos();
+
+            when(processoRepo.saveAndFlush(p)).thenReturn(p);
+
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc2", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of(1L));
+
+            Processo res = processoService.atualizar(1L, req);
+
+            assertThat(res.getDescricao()).isEqualTo("desc2");
+        }
+    }
+
+    @Nested
+    @DisplayName("apagar")
+    class Apagar {
+        @Test
+        @DisplayName("deve lancar erro se nao estiver em criacao")
+        void situacaoInvalida() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            assertThrows(ErroValidacao.class, () -> processoService.apagar(1L));
+        }
+
+        @Test
+        @DisplayName("deve apagar com sucesso")
+        void sucesso() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            processoService.apagar(1L);
+
+            verify(processoRepo).deleteById(1L);
+        }
+    }
+
+    @Nested
+    @DisplayName("iniciar")
+    class Iniciar {
+        @Test
+        @DisplayName("deve lancar erro se nao estiver em criacao")
+        void situacaoInvalida() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            List<Long> unidades = List.of();
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
+        }
+
+        @Test
+        @DisplayName("deve lancar erro se revisao sem unidades")
+        void revisaoSemUnidades() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.REVISAO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            List<Long> unidades = List.of();
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
+        }
+
+        @Test
+        @DisplayName("deve lancar erro se mapeamento sem participantes")
+        void mapeamentoSemParticipantes() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            List<Long> unidades = List.of();
+            assertThrows(ErroValidacao.class, () -> processoService.iniciar(1L, unidades));
+        }
+    }
+
+    @Nested
+    @DisplayName("finalizar")
+    class Finalizar {
+        @Test
+        @DisplayName("deve lancar erro se nao em andamento")
+        void naoAndamento() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            assertThrows(ErroValidacao.class, () -> processoService.finalizar(1L));
+        }
+
+        @Test
+        @DisplayName("deve lancar erro se nao validado")
+        void naoValidado() {
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofInvalido("Erro de validacao"));
+
+            assertThrows(ErroValidacao.class, () -> processoService.finalizar(1L));
+        }
+    }
+
+    @Nested
     @DisplayName("enviarLembrete")
     class EnviarLembrete {
         @Test
@@ -667,7 +667,7 @@ class ProcessoServiceExtraCoverageTest {
         @DisplayName("deve retornar falso se nao autenticado")
         void naoAutenticado() {
             assertThat(processoService.checarAcesso(null, 1L)).isFalse();
-            
+
             Authentication auth = mock(Authentication.class);
             when(auth.isAuthenticated()).thenReturn(false);
             assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
@@ -765,7 +765,7 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.DIAGNOSTICO);
             p.setDataLimite(LocalDateTime.now().plusDays(30));
-            
+
             UnidadeProcesso up = new UnidadeProcesso();
             up.setUnidadeCodigo(10L);
             p.setParticipantes(new ArrayList<>(List.of(up)));
@@ -806,7 +806,7 @@ class ProcessoServiceExtraCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            
+
             when(permissionEvaluator.verificarPermissaoSilenciosa(u, sp, sgc.seguranca.AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
 
             // Chamando via listarSubprocessosElegiveis para testar o metodo privado
@@ -828,7 +828,7 @@ class ProcessoServiceExtraCoverageTest {
             Usuario u = new Usuario();
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
-            
+
             u.setPerfilAtivo(Perfil.ADMIN);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));

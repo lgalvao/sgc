@@ -42,7 +42,7 @@ public class AlertaController {
     public ResponseEntity<Map<String, String>> marcarComoLidos(@RequestBody List<Long> codigos) {
         ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
         alertaFacade.marcarComoLidos(contextoUsuario, codigos);
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("message", "Alertas marcados como lidos.");
         return ResponseEntity.ok(response);

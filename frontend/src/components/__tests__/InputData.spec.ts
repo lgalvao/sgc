@@ -96,7 +96,7 @@ describe("InputData.vue", () => {
         const input = wrapper.get('[data-testid="input-data"]').element as HTMLInputElement;
         const focusSpy = vi.spyOn(input, "focus");
 
-        (wrapper.vm as unknown as {focus: () => void}).focus();
+        (wrapper.vm as unknown as { focus: () => void }).focus();
 
         expect(focusSpy).toHaveBeenCalledTimes(1);
     });
@@ -104,7 +104,7 @@ describe("InputData.vue", () => {
     it("deve manter os reexports do barrel de utils disponíveis", () => {
         expect(typeof logger.info).toBe("function");
         expect(obterHojeFormatado()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-        expect(flattenTree([{codigo: 1, subordinadas: [{codigo: 2}]}]).map((item: {codigo: number}) => item.codigo))
+        expect(flattenTree([{codigo: 1, subordinadas: [{codigo: 2}]}]).map((item: { codigo: number }) => item.codigo))
             .toEqual([1, 2]);
     });
 });

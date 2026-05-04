@@ -5,11 +5,11 @@
       data-testid="empty-state"
   >
     <div class="empty-state-icon-wrapper mb-2">
-        <i
-            v-if="icon"
-            :class="`bi ${icon} d-block`"
-            aria-hidden="true"
-        />
+      <i
+          v-if="icon"
+          :class="`bi ${icon} d-block`"
+          aria-hidden="true"
+      />
     </div>
     <h2
         v-if="title"

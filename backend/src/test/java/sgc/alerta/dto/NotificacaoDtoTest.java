@@ -17,7 +17,7 @@ class NotificacaoDtoTest {
     void shouldCreateNotificacaoDtoFromEntity() {
         // Given
         LocalDateTime now = LocalDateTime.now();
-        
+
         Unidade unidade = Unidade.builder().sigla("SIGLA").build();
         Processo processo = Processo.builder().descricao("Descricao Processo").build();
         Subprocesso subprocesso = Subprocesso.builder()

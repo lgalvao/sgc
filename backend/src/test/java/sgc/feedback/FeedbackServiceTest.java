@@ -72,9 +72,9 @@ class FeedbackServiceTest {
         assertThat(resposta.id()).isEqualTo(registroSalvo.getId());
         verify(repo).save(argThat(r ->
                 r.getTipo() == FeedbackTipo.BUG &&
-                r.getNota().equals(payload.nota()) &&
-                r.getUsuarioId().equals("12345") &&
-                r.getStatus() == FeedbackStatus.NOVO
+                        r.getNota().equals(payload.nota()) &&
+                        r.getUsuarioId().equals("12345") &&
+                        r.getStatus() == FeedbackStatus.NOVO
         ));
     }
 

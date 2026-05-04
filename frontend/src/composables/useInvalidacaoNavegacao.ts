@@ -27,7 +27,7 @@ export function useInvalidacaoNavegacao() {
         mapasStore.invalidar();
     }
 
-    function invalidarCachesSubprocesso(opcoes?: {incluirPainel?: boolean; incluirProcesso?: boolean}): void {
+    function invalidarCachesSubprocesso(opcoes?: { incluirPainel?: boolean; incluirProcesso?: boolean }): void {
         if (opcoes?.incluirPainel ?? false) {
             painelStore.invalidar();
         }

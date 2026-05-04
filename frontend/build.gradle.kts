@@ -29,7 +29,7 @@ tasks.register<Exec>("buildVue") {
     description = "Gera o build de produção do frontend Vue"
     dependsOn("install")
     workingDir = projectDir
-    
+
     // Otimização: Só roda se houver mudanças nestes arquivos/pastas
     inputs.dir("src")
     inputs.file("index.html")

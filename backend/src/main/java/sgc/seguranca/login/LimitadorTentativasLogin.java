@@ -53,7 +53,7 @@ public class LimitadorTentativasLogin {
             tentativasPorIp.remove(ipMaisAntigo);
             log.debug("Limitador de login cheio. Removida entrada mais antiga (IP: {}).", ipMaisAntigo);
         }
-        
+
 
         limparTentativasAntigas(ip);
 

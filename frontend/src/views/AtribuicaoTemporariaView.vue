@@ -1,14 +1,14 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="carregandoInicial" />
+    <CarregamentoPagina v-if="carregandoInicial"/>
     <div v-else class="col-lg-8 col-md-9 col-12">
       <PageHeader :title="TEXTOS.atribuicaoTemporaria.TITULO">
         <template v-if="unidade" #default>
           {{ unidade.sigla }}
         </template>
         <template #actions>
-          <BButton variant="outline-secondary" :to="`/unidade/${props.codUnidade}`">
-            <i class="bi bi-arrow-left me-1" /> {{ TEXTOS.comum.BOTAO_VOLTAR }}
+          <BButton :to="`/unidade/${props.codUnidade}`" variant="outline-secondary">
+            <i class="bi bi-arrow-left me-1"/> {{ TEXTOS.comum.BOTAO_VOLTAR }}
           </BButton>
         </template>
       </PageHeader>
@@ -31,8 +31,8 @@
       </BAlert>
       <BForm class="mt-4" @submit.prevent="criarAtribuicao">
         <BFormGroup
-            label-for="usuario"
             class="mb-3"
+            label-for="usuario"
         >
           <template #label>
             {{ TEXTOS.atribuicaoTemporaria.LABEL_USUARIO }} <span aria-hidden="true" class="text-danger">*</span>
@@ -43,10 +43,10 @@
           <BuscadorUsuarios
               id="usuario"
               ref="inputUsuarioRef"
-              v-model:termo="termoUsuario"
               v-model:selecionado="usuarioSelecionado"
-              :state="mensagemErroUsuario ? false : null"
+              v-model:termo="termoUsuario"
               :placeholder="TEXTOS.atribuicaoTemporaria.SELECIONE_USUARIO"
+              :state="mensagemErroUsuario ? false : null"
           />
           <BFormInvalidFeedback :state="mensagemErroUsuario ? false : null">
             {{ mensagemErroUsuario }}
@@ -54,18 +54,19 @@
         </BFormGroup>
 
         <BRow>
-          <BCol md="6" class="mb-3">
+          <BCol class="mb-3" md="6">
             <BFormGroup label-for="dataInicio">
               <template #label>
-                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO }} <span aria-hidden="true" class="text-danger">*</span>
+                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO }} <span aria-hidden="true"
+                                                                          class="text-danger">*</span>
               </template>
               <InputData
                   id="dataInicio"
                   v-model="dataInicio"
+                  :min="obterHojeFormatado()"
                   :state="mensagemErroDataInicio ? false : null"
                   data-testid="input-data-inicio"
                   max="2099-12-31"
-                  :min="obterHojeFormatado()"
               />
               <BFormInvalidFeedback :state="mensagemErroDataInicio ? false : null">
                 {{ mensagemErroDataInicio }}
@@ -73,18 +74,19 @@
             </BFormGroup>
           </BCol>
 
-          <BCol md="6" class="mb-3">
+          <BCol class="mb-3" md="6">
             <BFormGroup label-for="dataTermino">
               <template #label>
-                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO }} <span aria-hidden="true" class="text-danger">*</span>
+                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO }} <span aria-hidden="true"
+                                                                           class="text-danger">*</span>
               </template>
               <InputData
                   id="dataTermino"
                   v-model="dataTermino"
+                  :min="dataInicio || obterHojeFormatado()"
                   :state="mensagemErroDataTermino ? false : null"
                   data-testid="input-data-termino"
                   max="2099-12-31"
-                  :min="dataInicio || obterHojeFormatado()"
               />
               <BFormInvalidFeedback :state="mensagemErroDataTermino ? false : null">
                 {{ mensagemErroDataTermino }}
@@ -94,8 +96,8 @@
         </BRow>
 
         <BFormGroup
-            label-for="justificativa"
             class="mb-3"
+            label-for="justificativa"
         >
           <template #label>
             {{ TEXTOS.atribuicaoTemporaria.LABEL_JUSTIFICATIVA }} <span aria-hidden="true" class="text-danger">*</span>
@@ -113,8 +115,8 @@
 
         <div class="d-flex justify-content-end gap-2 mt-4">
           <BButton
-              class="btn-acao-footer"
               :disabled="isLoading"
+              class="btn-acao-footer"
               data-testid="btn-cancelar-atribuicao"
               variant="outline-secondary"
               @click="router.push(`/unidade/${props.codUnidade}`)"
@@ -122,12 +124,12 @@
             {{ TEXTOS.comum.BOTAO_CANCELAR }}
           </BButton>
           <LoadingButton
-              class="btn-acao-footer"
               :disabled="isLoading"
               :loading="isLoading"
-              data-testid="cad-atribuicao__btn-criar-atribuicao"
               :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
               :text="TEXTOS.comum.BOTAO_CRIAR"
+              class="btn-acao-footer"
+              data-testid="cad-atribuicao__btn-criar-atribuicao"
               variant="success"
               @click="criarAtribuicao"
           />

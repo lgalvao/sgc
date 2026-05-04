@@ -104,7 +104,7 @@ function detectarSemTeste(dados) {
 
 function fixOrphanConstants() {
     console.log(pc.cyan('🧹 Buscando constantes órfãs em textos.ts...'));
-    
+
     if (!fs.existsSync(TEXTOS_TS)) {
         console.error(pc.red(`❌ Arquivo não encontrado: ${TEXTOS_TS}`));
         return;
@@ -151,10 +151,10 @@ function fixOrphanConstants() {
                 const extensões = ['.ts', '.vue'];
                 const pastas = [path.join(RAIZ, 'frontend/src'), path.join(RAIZ, 'e2e')];
                 global.cacheArquivosFrontend = [];
-                
+
                 function carregar(dir) {
                     if (!fs.existsSync(dir)) return;
-                    const entradas = fs.readdirSync(dir, { withFileTypes: true });
+                    const entradas = fs.readdirSync(dir, {withFileTypes: true});
                     for (const e of entradas) {
                         const p = path.join(dir, e.name);
                         if (e.isDirectory()) carregar(p);
@@ -163,6 +163,7 @@ function fixOrphanConstants() {
                         }
                     }
                 }
+
                 pastas.forEach(carregar);
             }
 
@@ -181,7 +182,7 @@ function fixOrphanConstants() {
     }
 
     console.log(pc.yellow(`⚠️ Encontradas ${pc.bold(orphans.length)} constantes órfãs. Removendo...`));
-    
+
     // Passo 3: Remover do arquivo (de trás para frente para manter índices)
     const newLines = [...lines];
     // Agrupar por índice para remover blocos se sobrarem vazios (opcional, vamos manter simples)
@@ -198,7 +199,7 @@ function fixOrphanConstants() {
 
 function gerarRelatorio(dados) {
     const linhas = [];
-    const ts = new Date(dados.meta.geradoEm).toLocaleString('pt-BR', { timeZone: 'UTC' });
+    const ts = new Date(dados.meta.geradoEm).toLocaleString('pt-BR', {timeZone: 'UTC'});
 
     linhas.push('# Relatório de Análise de Mensagens — SGC', '', `> Gerado em: ${ts} UTC | Fonte: \`mensagens-extraidas.json\``, '');
 
@@ -263,7 +264,7 @@ function gerarRelatorio(dados) {
         }
     }
 
-    const { orfaosBackend, orfaosE2e } = detectarOrfaosEmTestes(dados);
+    const {orfaosBackend, orfaosE2e} = detectarOrfaosEmTestes(dados);
     linhas.push('## 4. Mensagens nos Testes sem Correspondência na Produção', '', '> Estas strings aparecem em testes mas não foram encontradas no código de produção.', '');
 
     if (orfaosBackend.length > 0) {
@@ -290,7 +291,7 @@ function gerarRelatorio(dados) {
         linhas.push('✅ Nenhuma mensagem de teste sem correspondência encontrada.', '');
     }
 
-    const { backendSemTeste, frontendSemTeste } = detectarSemTeste(dados);
+    const {backendSemTeste, frontendSemTeste} = detectarSemTeste(dados);
     linhas.push('## 5. Mensagens de Produção sem Cobertura de Teste', '', '> Estas strings existem no código de produção mas não aparecem em nenhum teste.', '');
 
     if (backendSemTeste.length > 0) {
@@ -317,10 +318,26 @@ function gerarRelatorio(dados) {
 
     linhas.push('## 6. Inventário Completo de Mensagens de Produção', '');
     const secoes = [
-        { titulo: '6.1 Validação de DTOs (Backend)', itens: dados.backend.validacao_dto, colunas: ['texto', 'anotacao', 'arquivo', 'linha'] },
-        { titulo: '6.2 Exceções de Negócio (Backend)', itens: dados.backend.excecao_negocio, colunas: ['texto', 'classe', 'arquivo', 'linha'] },
-        { titulo: '6.3 Mensagens de Sucesso / Toast (Frontend)', itens: dados.frontend.toast_sucesso, colunas: ['texto', 'arquivo', 'linha'] },
-        { titulo: '6.4 Notificações (Frontend)', itens: dados.frontend.notificacao_frontend, colunas: ['texto', 'arquivo', 'linha'] },
+        {
+            titulo: '6.1 Validação de DTOs (Backend)',
+            itens: dados.backend.validacao_dto,
+            colunas: ['texto', 'anotacao', 'arquivo', 'linha']
+        },
+        {
+            titulo: '6.2 Exceções de Negócio (Backend)',
+            itens: dados.backend.excecao_negocio,
+            colunas: ['texto', 'classe', 'arquivo', 'linha']
+        },
+        {
+            titulo: '6.3 Mensagens de Sucesso / Toast (Frontend)',
+            itens: dados.frontend.toast_sucesso,
+            colunas: ['texto', 'arquivo', 'linha']
+        },
+        {
+            titulo: '6.4 Notificações (Frontend)',
+            itens: dados.frontend.notificacao_frontend,
+            colunas: ['texto', 'arquivo', 'linha']
+        },
     ];
 
     for (const secao of secoes) {
@@ -329,7 +346,7 @@ function gerarRelatorio(dados) {
             linhas.push('*Nenhuma mensagem encontrada.*', '');
             continue;
         }
-        const { colunas } = secao;
+        const {colunas} = secao;
         linhas.push('| ' + colunas.join(' | ') + ' |', '| ' + colunas.map((c, i) => i === colunas.length - 1 ? '---:' : '---').join(' | ') + ' |');
         for (const msg of secao.itens) {
             const valores = colunas.map(c => {
@@ -379,8 +396,8 @@ function analisar() {
     const duplicatasVariadas = encontrarDuplicatas(todasProd)
         .filter(grupo => new Set(grupo.map(m => m.texto)).size > 1);
 
-    const { orfaosBackend, orfaosE2e } = detectarOrfaosEmTestes(dados);
-    const { backendSemTeste, frontendSemTeste } = detectarSemTeste(dados);
+    const {orfaosBackend, orfaosE2e} = detectarOrfaosEmTestes(dados);
+    const {backendSemTeste, frontendSemTeste} = detectarSemTeste(dados);
 
     console.log('\n📋 Resumo da análise:');
     console.log(`   Duplicatas com variações (produção): ${pc.bold(duplicatasVariadas.length)}`);

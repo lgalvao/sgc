@@ -92,7 +92,7 @@ export async function criarProcessoFixture(
 }
 
 /**
- * Cria um processo de mapeamento via API E2E que já nasce finalizado e com atividades, 
+ * Cria um processo de mapeamento via API E2E que já nasce finalizado e com atividades,
  * ignorando validações, perfeito para testes de importação.
  */
 export async function criarProcessoFinalizadoFixture(

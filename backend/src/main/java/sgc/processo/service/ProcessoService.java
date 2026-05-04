@@ -410,7 +410,8 @@ public class ProcessoService {
         List<String> invalidas = entidades.stream()
                 .filter(u -> u.getTipo() == TipoUnidade.INTERMEDIARIA)
                 .map(Unidade::getSigla).toList();
-        if (!invalidas.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_INTERMEDIARIA_INVALIDAS.formatted(String.join(", ", invalidas)));
+        if (!invalidas.isEmpty())
+            throw new ErroValidacao(Mensagens.UNIDADES_INTERMEDIARIA_INVALIDAS.formatted(String.join(", ", invalidas)));
 
         if (possuiUnidadeSemResponsavelEfetivo(entidades)) {
             throw new ErroValidacao(Mensagens.OPERACAO_NAO_PERMITIDA);
@@ -422,7 +423,8 @@ public class ProcessoService {
                     .filter(unidade -> !unidadesComMapa.contains(unidade.getCodigo()))
                     .map(Unidade::getSigla)
                     .toList();
-            if (!semMapa.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
+            if (!semMapa.isEmpty())
+                throw new ErroValidacao(Mensagens.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
         }
     }
 
@@ -727,22 +729,6 @@ public class ProcessoService {
                 .build();
     }
 
-    private record ElegibilidadeAcaoBloco(
-            boolean habilitarAceitarCadastroBloco,
-            boolean habilitarAceitarMapaBloco,
-            boolean habilitarHomologarCadastroBloco,
-            boolean habilitarHomologarMapaBloco,
-            boolean habilitarDisponibilizarMapaBloco
-    ) {
-        private boolean possuiAlgumaAcao() {
-            return habilitarAceitarCadastroBloco
-                    || habilitarAceitarMapaBloco
-                    || habilitarHomologarCadastroBloco
-                    || habilitarHomologarMapaBloco
-                    || habilitarDisponibilizarMapaBloco;
-        }
-    }
-
     private List<ProcessoDetalheDto.AcaoBlocoDto> montarAcoesBloco(
             Processo processo,
             List<SubprocessoElegivelDto> subprocessosElegiveis,
@@ -845,7 +831,6 @@ public class ProcessoService {
                 .unidades(new ArrayList<>(contexto.unidades()))
                 .build();
     }
-
 
     private List<SubprocessoElegivelDto> filtrarElegiveis(
             List<SubprocessoElegivelDto> subprocessosElegiveis,
@@ -1198,10 +1183,10 @@ public class ProcessoService {
 
     private boolean isSituacaoCadastro(SituacaoSubprocesso s) {
         return s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-               s == REVISAO_CADASTRO_DISPONIBILIZADA ||
-               s == REVISAO_CADASTRO_HOMOLOGADA;
+                s == REVISAO_CADASTRO_DISPONIBILIZADA ||
+                s == REVISAO_CADASTRO_HOMOLOGADA;
     }
-    
+
     // Check permission helper
     public boolean checarAcesso(@Nullable Authentication auth, Long cod) {
         if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario usuario)) return false;
@@ -1286,11 +1271,28 @@ public class ProcessoService {
         return dataLimite;
     }
 
+    private record ElegibilidadeAcaoBloco(
+            boolean habilitarAceitarCadastroBloco,
+            boolean habilitarAceitarMapaBloco,
+            boolean habilitarHomologarCadastroBloco,
+            boolean habilitarHomologarMapaBloco,
+            boolean habilitarDisponibilizarMapaBloco
+    ) {
+        private boolean possuiAlgumaAcao() {
+            return habilitarAceitarCadastroBloco
+                    || habilitarAceitarMapaBloco
+                    || habilitarHomologarCadastroBloco
+                    || habilitarHomologarMapaBloco
+                    || habilitarDisponibilizarMapaBloco;
+        }
+    }
+
     record ContextoInicioProcesso(
             TipoProcesso tipo,
             List<Long> codigosUnidades,
             Set<Unidade> unidadesParaProcessar
-    ) {}
+    ) {
+    }
 
     record InicioSubprocessosContexto(
             Processo processo,
@@ -1299,7 +1301,8 @@ public class ProcessoService {
             Set<Unidade> unidadesParaProcessar,
             List<UnidadeMapa> unidadesMapas,
             Unidade unidadeAdmin
-    ) {}
+    ) {
+    }
 
     @Builder
     private record AcaoBlocoContexto(
@@ -1315,5 +1318,6 @@ public class ProcessoService {
             String rotuloBotao,
             String mensagemSucesso,
             boolean processoAtivo
-    ) {}
+    ) {
+    }
 }

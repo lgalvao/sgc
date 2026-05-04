@@ -39,14 +39,14 @@ class PainelFacadeCoverageTest {
     void listarProcessos_SemParticipantes() {
         ContextoUsuarioAutenticado contexto = mock(ContextoUsuarioAutenticado.class);
         when(contexto.perfil()).thenReturn(Perfil.ADMIN);
-        
+
         Processo p = new Processo();
         p.setCodigo(1L);
         p.setDescricao("P1");
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setParticipantes(Collections.emptyList());
-        
+
         when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = target.listarProcessos(contexto, PageRequest.of(0, 10));

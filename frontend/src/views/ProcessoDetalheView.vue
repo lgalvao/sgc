@@ -24,15 +24,15 @@
           :processando-acao-bloco="processandoAcaoBloco"
           :processo="processo"
           :usar-menu-acoes-bloco="usarMenuAcoesBloco"
-          @abrir-acao-bloco="abrirModalBloco"
-          @finalizar="finalizarProcesso"/>
+          @finalizar="finalizarProcesso"
+          @abrir-acao-bloco="abrirModalBloco"/>
 
       <ProcessoSubprocessosTable
           :participantes-hierarquia="participantesHierarquia"
           @row-click="abrirDetalhesUnidade"/>
     </div>
 
-    <CarregamentoPagina v-else-if="!lastError" :mensagem="TEXTOS.processo.CARREGANDO_DETALHES" />
+    <CarregamentoPagina v-else-if="!lastError" :mensagem="TEXTOS.processo.CARREGANDO_DETALHES"/>
 
     <!-- Modal de Ação em Bloco -->
     <ModalAcaoBloco
@@ -50,9 +50,9 @@
         v-model="mostrarModalFinalizacao"
         :loading="loadingFinalizacao"
         :ok-title="TEXTOS.comum.BOTAO_FINALIZAR"
+        :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
         test-codigo-cancelar="btn-finalizar-processo-cancelar"
         test-codigo-confirmar="btn-finalizar-processo-confirmar"
-        :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
         variant="danger"
         @confirmar="confirmarFinalizacao">
       <p class="mb-2">

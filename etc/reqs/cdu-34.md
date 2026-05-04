@@ -8,11 +8,12 @@
 
 2. O usuário entra em um processo em andamento e escolhe uma unidade participante.
 
-3. O sistema mostra a tela `Detalhes do subprocesso` com as informações do subrocesso da unidade. 
- 
+3. O sistema mostra a tela `Detalhes do subprocesso` com as informações do subrocesso da unidade.
+
 4. O usuário clica em `Enviar lembrete`.
 
-5. O sistema mostra um modal de confirmação, com título "Enviar lembrete", e texto "Confirma envio de lembrete para a unidade [SIGLA_UNIDADE]?", e botões `Cancelar` e `Enviar`. 
+5. O sistema mostra um modal de confirmação, com título "Enviar lembrete", e texto "Confirma envio de lembrete para a
+   unidade [SIGLA_UNIDADE]?", e botões `Cancelar` e `Enviar`.
 
 6. O usuário confirma.
 

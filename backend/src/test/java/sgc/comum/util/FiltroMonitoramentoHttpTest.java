@@ -253,24 +253,41 @@ class FiltroMonitoramentoHttpTest {
                 new org.springframework.web.context.request.RequestAttributes() {
                     @Override
                     @NullUnmarked
-                    public Object getAttribute(@NonNull String name, int scope) { return null; }
+                    public Object getAttribute(@NonNull String name, int scope) {
+                        return null;
+                    }
+
                     @Override
                     public void setAttribute(String name, Object value, int scope) { /* dummy */ }
+
                     @Override
                     public void removeAttribute(String name, int scope) { /* dummy */ }
+
                     @Override
-                    public String[] getAttributeNames(int scope) { return new String[0]; }
+                    public String[] getAttributeNames(int scope) {
+                        return new String[0];
+                    }
+
                     @Override
                     public void registerDestructionCallback(String name, Runnable callback, int scope) { /* dummy */ }
+
                     @Override
                     @NullUnmarked
-                    public Object resolveReference(@NonNull String key) { return null; }
+                    public Object resolveReference(@NonNull String key) {
+                        return null;
+                    }
+
                     @Override
                     @NullUnmarked
-                    public String getSessionId() { return null; }
+                    public String getSessionId() {
+                        return null;
+                    }
+
                     @Override
                     @NullUnmarked
-                    public Object getSessionMutex() { return null; }
+                    public Object getSessionMutex() {
+                        return null;
+                    }
                 }
         );
         String id = FiltroMonitoramentoHttp.obterCorrelacaoIdAtual();

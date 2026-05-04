@@ -7,9 +7,9 @@
       <BFormInput
           id="descricao"
           ref="inputDescricaoRef"
-          aria-required="true"
           :model-value="descricao"
           :state="erroDescricao ? false : null"
+          aria-required="true"
           data-testid="inp-processo-descricao"
           placeholder="Descreva o processo"
           type="text"
@@ -26,11 +26,11 @@
       </template>
       <BFormSelect
           id="tipo"
-          aria-required="true"
           :disabled="isEdit"
           :model-value="tipo"
           :options="tipoOptions"
           :state="isEdit ? null : (erroTipo ? false : null)"
+          aria-required="true"
           data-testid="sel-processo-tipo"
           @update:model-value="$emit('update:tipo', $event as TipoProcesso)"
       >
@@ -46,13 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BFormGroup,
-  BFormInput,
-  BFormInvalidFeedback,
-  BFormSelect,
-  BFormSelectOption
-} from "bootstrap-vue-next";
+import {BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from "bootstrap-vue-next";
 import {ref} from "vue";
 import {TipoProcesso} from "@/types/tipos";
 

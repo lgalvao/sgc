@@ -32,6 +32,8 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 @Transactional
 public class SubprocessoService {
+    private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
+            NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
     private final ComumRepo repo;
     private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioFacade;
@@ -43,32 +45,6 @@ public class SubprocessoService {
     private final CopiaMapaService copiaMapaService;
     private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoConsultaService consultaService;
-
-    private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
-            NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
-
-    public record CriarSubprocessosMapeamentoCommand(
-            Processo processo,
-            Collection<Unidade> unidades,
-            Unidade unidadeOrigem
-    ) {
-        public CriarSubprocessosMapeamentoCommand {
-            unidades = List.copyOf(unidades);
-        }
-
-        @Override
-        public Collection<Unidade> unidades() {
-            return List.copyOf(unidades);
-        }
-    }
-
-    public record CriarSubprocessoComMapaCommand(
-            Processo processo,
-            Unidade unidade,
-            UnidadeMapa unidadeMapa,
-            Unidade unidadeOrigem
-    ) {
-    }
 
     @Transactional
     public Mapa salvarMapa(Long codSubprocesso, SalvarMapaRequest request) {
@@ -451,12 +427,6 @@ public class SubprocessoService {
         );
     }
 
-    public record ImportacaoAtividadesResultado(
-            Long codigoSubprocessoDestino,
-            boolean temDuplicatas
-    ) {
-    }
-
     private ImportacaoAtividadesContexto montarContextoImportacaoAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         Subprocesso subprocessoDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
         validarDestinoParaImportacao(subprocessoDestino);
@@ -543,6 +513,35 @@ public class SubprocessoService {
 
     private boolean houveDuplicidadeNaImportacao(int totalSolicitado, int totalImportado) {
         return totalSolicitado > 0 && totalImportado < totalSolicitado;
+    }
+
+    public record CriarSubprocessosMapeamentoCommand(
+            Processo processo,
+            Collection<Unidade> unidades,
+            Unidade unidadeOrigem
+    ) {
+        public CriarSubprocessosMapeamentoCommand {
+            unidades = List.copyOf(unidades);
+        }
+
+        @Override
+        public Collection<Unidade> unidades() {
+            return List.copyOf(unidades);
+        }
+    }
+
+    public record CriarSubprocessoComMapaCommand(
+            Processo processo,
+            Unidade unidade,
+            UnidadeMapa unidadeMapa,
+            Unidade unidadeOrigem
+    ) {
+    }
+
+    public record ImportacaoAtividadesResultado(
+            Long codigoSubprocessoDestino,
+            boolean temDuplicatas
+    ) {
     }
 
     @Builder

@@ -11,13 +11,13 @@ public enum FeedbackTipo {
     QUESTAO,
     ELOGIO;
 
-    @JsonValue
-    public String toJson() {
-        return name().toLowerCase();
-    }
-
     @JsonCreator
     public static FeedbackTipo fromJson(String valor) {
         return valueOf(valor.toUpperCase());
+    }
+
+    @JsonValue
+    public String toJson() {
+        return name().toLowerCase();
     }
 }

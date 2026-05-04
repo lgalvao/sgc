@@ -20,8 +20,8 @@ type ModalAcaoBlocoVm = {
 
 describe("ModalAcaoBloco.vue", () => {
     const mockUnidades: UnidadeSelecao[] = [
-        { codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente" },
-        { codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente" },
+        {codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente"},
+        {codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente"},
     ];
 
     const defaultProps = {
@@ -97,7 +97,7 @@ describe("ModalAcaoBloco.vue", () => {
     });
 
     it("deve inicializar com unidades pré-selecionadas", async () => {
-        const wrapper = createWrapper({ unidadesPreSelecionadas: [1] });
+        const wrapper = createWrapper({unidadesPreSelecionadas: [1]});
         obterVm(wrapper).abrir();
         await wrapper.vm.$nextTick();
 
@@ -108,7 +108,7 @@ describe("ModalAcaoBloco.vue", () => {
     });
 
     it("deve emitir 'confirmar' com os IDs selecionados", async () => {
-        const wrapper = createWrapper({ unidadesPreSelecionadas: [2] });
+        const wrapper = createWrapper({unidadesPreSelecionadas: [2]});
         obterVm(wrapper).abrir();
         await wrapper.vm.$nextTick();
 
@@ -134,7 +134,7 @@ describe("ModalAcaoBloco.vue", () => {
 
         await vm.confirmar();
         await wrapper.vm.$nextTick();
-        
+
         expect(wrapper.emitted('confirmar')).toBeFalsy();
         expect(vm.mensagemErroDataLimite).toBe("A data limite é obrigatória.");
         expect(wrapper.text()).toContain("A data limite é obrigatória.");
@@ -142,7 +142,7 @@ describe("ModalAcaoBloco.vue", () => {
         const amanha = obterAmanhaFormatado();
         vm.dataLimite = amanha;
         await wrapper.vm.$nextTick();
-        
+
         await vm.confirmar();
 
         expect(wrapper.emitted('confirmar')).toBeTruthy();

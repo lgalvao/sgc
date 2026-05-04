@@ -7,9 +7,9 @@
       >
         <BCard
             :class="['h-100', habilitarAcessoCadastro ? 'card-actionable' : 'card-disabled']"
-            data-testid="card-subprocesso-atividades"
             :role="habilitarAcessoCadastro ? 'button' : undefined"
             :tabindex="habilitarAcessoCadastro ? 0 : undefined"
+            data-testid="card-subprocesso-atividades"
             @click="habilitarAcessoCadastro && navegarPara('SubprocessoCadastro')"
             @keydown="habilitarAcessoCadastro && handleKeyDown($event, 'SubprocessoCadastro')"
         >
@@ -20,23 +20,23 @@
             <BCardText class="text-muted">
               {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TEXTO }}
             </BCardText>
-            </div>
-            </BCard>
-            </BCol>
+          </div>
+        </BCard>
+      </BCol>
 
-            <BCol
-            class="mb-3"
-            md="4"
-            >
-            <BCard
+      <BCol
+          class="mb-3"
+          md="4"
+      >
+        <BCard
             :class="['h-100', mapaHabilitado ? 'card-actionable' : 'card-disabled']"
             :data-testid="mapaHabilitado ? 'card-subprocesso-mapa' : 'card-subprocesso-mapa-desabilitado'"
             :role="mapaHabilitado ? 'button' : undefined"
             :tabindex="mapaHabilitado ? 0 : undefined"
             @click="mapaHabilitado && navegarPara('SubprocessoMapa')"
             @keydown="mapaHabilitado && handleKeyDown($event, 'SubprocessoMapa')"
-            >
-            <div class="card-click-area">
+        >
+          <div class="card-click-area">
             <BCardTitle :class="mapaHabilitado ? undefined : 'text-muted'">
               {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
             </BCardTitle>

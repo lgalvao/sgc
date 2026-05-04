@@ -13,7 +13,7 @@ type MapaViewVm = {
     mostrarModalDisponibilizar: boolean;
     fieldErrors: Record<string, string | undefined>;
     existeCompetenciaSemAtividade: boolean;
-    aplicarErroNormalizado: (error: {erros?: Array<{campo?: string; mensagem?: string}>} | null) => void;
+    aplicarErroNormalizado: (error: { erros?: Array<{ campo?: string; mensagem?: string }> } | null) => void;
     abrirModalImpacto: () => Promise<void>;
     fecharModalImpacto: () => void;
     removerAtividadeAssociada: (codigoCompetencia: number, codigoAtividade: number) => Promise<void> | void;
@@ -29,7 +29,7 @@ vi.mock('@/services/subprocessoService', () => ({
 }));
 const subprocessoStoreMock = {
     contextoEdicao: null as ContextoEdicaoSubprocesso | null,
-    erroIntegracaoContexto: null as {message: string} | null,
+    erroIntegracaoContexto: null as { message: string } | null,
     garantirContextoEdicao: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
     limparContextoAtual: vi.fn(),
@@ -65,7 +65,7 @@ describe('MapaView Coverage', () => {
         BAlert: {template: '<div />'}
     };
     const fluxoMapaMock = {
-        erro: null as {message: string} | null,
+        erro: null as { message: string } | null,
         adicionarCompetencia: vi.fn(),
         atualizarCompetencia: vi.fn(),
         removerCompetencia: vi.fn(),

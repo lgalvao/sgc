@@ -22,7 +22,6 @@
               v-if="item.children && item.children.length > 0"
               :aria-expanded="item.expanded"
               :aria-label="item.expanded ? 'Recolher' : 'Expandir'"
-              :data-testid="`btn-toggle-expand-${item.codigo}`"
               :class="[
                 'p-0',
                 'tree-table-toggle-slot',
@@ -31,6 +30,7 @@
                 'border-0',
                 item.expanded ? 'toggle-hit-area-recolher' : 'toggle-hit-area-expandir',
               ]"
+              :data-testid="`btn-toggle-expand-${item.codigo}`"
               variant="link"
               @click.stop="toggleExpand(item.codigo)"
               @keydown.enter.stop="toggleExpand(item.codigo)"

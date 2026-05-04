@@ -58,7 +58,11 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
     });
 
-    test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({
+                                                                                  _resetAutomatico,
+                                                                                  page,
+                                                                                  _autenticadoComoAdmin
+                                                                              }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await page.reload();
         await expect(page.getByTestId('processo-info')).toBeVisible();
@@ -81,7 +85,11 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page.getByTestId('processo-info')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({
+                                                                                          _resetAutomatico,
+                                                                                          page,
+                                                                                          _autenticadoComoAdmin
+                                                                                      }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-bloco');
         await expect(btnHomologar).toBeVisible();
@@ -101,10 +109,10 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     });
 
     test('Cenario 3: Homologação em bloco registra movimentação e alerta com data/hora', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                    _resetAutomatico,
+                                                                                                    page,
+                                                                                                    _autenticadoComoAdmin
+                                                                                                }) => {
         // Processo da suíte já foi homologado no Cenario 2 — verificar movimentação e alerta
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -158,7 +166,11 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
     });
 
-    test('Cenario 1: ADMIN não pode homologar em bloco após devolver para ajustes', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN não pode homologar em bloco após devolver para ajustes', async ({
+                                                                                               _resetAutomatico,
+                                                                                               page,
+                                                                                               _autenticadoComoAdmin
+                                                                                           }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaCadastro(page);
@@ -167,7 +179,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
         await acessarDetalhesProcesso(page, descProcesso);
         await page.reload();
         await expect(page.getByTestId('processo-info')).toBeVisible();
-        
+
         // Garante que o estado do subprocesso foi atualizado na UI antes de verificar botões de ação em bloco.
         // Como a devolução foi para uma unidade intermediária (SECRETARIA_2), a situação permanece "Cadastro disponibilizado".
         await expect(page.getByRole('row', {name: new RegExp(`${UNIDADE_1}.*Cadastro disponibilizado`, 'i')})).toBeVisible();

@@ -1,4 +1,4 @@
-import {describe, it, expect, vi, beforeEach} from 'vitest'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
 import {ref} from 'vue'
 import {mount} from '@vue/test-utils'
 import FeedbackWidget from '../FeedbackWidget.vue'
@@ -63,9 +63,9 @@ describe('FeedbackWidget.vue', () => {
                 }
             }
         })
-        
+
         await wrapper.find('button').trigger('click')
-        
+
         expect(mockUseFeedback.capturarTela).toHaveBeenCalled()
         // O modal deve estar visível (verificando a prop do componente stub)
         const modal = wrapper.findComponent(FeedbackModal)
@@ -74,7 +74,7 @@ describe('FeedbackWidget.vue', () => {
 
     it('deve fechar o modal e mostrar toast ao enviar com sucesso', async () => {
         mockUseFeedback.enviarFeedback.mockResolvedValueOnce(undefined)
-        
+
         const wrapper = mount(FeedbackWidget, {
             global: {
                 plugins: [createTestingPinia()],
@@ -89,11 +89,11 @@ describe('FeedbackWidget.vue', () => {
                 }
             }
         })
-        
+
         // Simular o evento 'enviar' do modal
         const modal = wrapper.findComponent(FeedbackModal)
         await modal.vm.$emit('enviar', 'ELOGIO', '5')
-        
+
         expect(mockUseFeedback.enviarFeedback).toHaveBeenCalledWith('ELOGIO', '5')
         expect(mockCriarToast).toHaveBeenCalledWith(expect.objectContaining({
             props: expect.objectContaining({variant: 'success'})
@@ -102,7 +102,7 @@ describe('FeedbackWidget.vue', () => {
 
     it('deve mostrar toast de erro se o envio falhar', async () => {
         mockUseFeedback.enviarFeedback.mockRejectedValueOnce(new Error('Falha'))
-        
+
         const wrapper = mount(FeedbackWidget, {
             global: {
                 plugins: [createTestingPinia()],
@@ -117,10 +117,10 @@ describe('FeedbackWidget.vue', () => {
                 }
             }
         })
-        
+
         const modal = wrapper.findComponent(FeedbackModal)
         await modal.vm.$emit('enviar', 'BUG', '1')
-        
+
         expect(mockCriarToast).toHaveBeenCalledWith(expect.objectContaining({
             props: expect.objectContaining({variant: 'danger'})
         }))

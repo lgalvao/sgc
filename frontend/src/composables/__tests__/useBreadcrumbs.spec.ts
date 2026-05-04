@@ -90,7 +90,10 @@ describe("useBreadcrumbs", () => {
 
         expect(breadcrumbs.value).toHaveLength(4);
         expect(breadcrumbs.value[2].label).toBe("UNIT1");
-        expect(breadcrumbs.value[2].to).toEqual({name: "Subprocesso", params: {codProcesso: "123", siglaUnidade: "UNIT1"}});
+        expect(breadcrumbs.value[2].to).toEqual({
+            name: "Subprocesso",
+            params: {codProcesso: "123", siglaUnidade: "UNIT1"}
+        });
         expect(breadcrumbs.value[3].label).toBe("Mapa de competências");
     });
 
@@ -188,7 +191,7 @@ describe("useBreadcrumbs", () => {
         const route = {
             name: "Qualquer",
             params: {},
-            matched: [{ meta: { breadcrumb: "Fim" }, name: "Fim" }]
+            matched: [{meta: {breadcrumb: "Fim"}, name: "Fim"}]
         } as any;
         const {breadcrumbs} = useBreadcrumbs(route);
         expect(breadcrumbs.value.at(-1)?.to).toBeUndefined();

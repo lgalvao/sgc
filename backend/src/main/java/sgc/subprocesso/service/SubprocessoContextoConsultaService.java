@@ -66,5 +66,6 @@ public class SubprocessoContextoConsultaService {
             boolean mesmaUnidadeAlvo,
             boolean unidadeAlvoNaHierarquiaUsuario,
             boolean temMapaVigente
-    ) {}
+    ) {
+    }
 }

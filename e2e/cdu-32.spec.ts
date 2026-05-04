@@ -67,7 +67,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
                                                                                                                _resetAutomatico,
                                                                                                                page,
                                                                                                                _autenticadoComoChefeSecao221
-    }) => {
+                                                                                                           }) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);
@@ -76,10 +76,10 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenário complementar: unidade superior visualiza alerta de reabertura no painel', async ({
-                                                                                                        _resetAutomatico,
-                                                                                                        page,
-                                                                                                        _autenticadoComoGestorCoord22
-    }) => {
+                                                                                                       _resetAutomatico,
+                                                                                                       page,
+                                                                                                       _autenticadoComoGestorCoord22
+                                                                                                   }) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);

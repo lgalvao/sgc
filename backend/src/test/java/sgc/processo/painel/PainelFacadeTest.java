@@ -272,10 +272,10 @@ class PainelFacadeTest {
         hierarquia.put(0L, List.of(2L));
         hierarquia.put(2L, List.of(1L));
         hierarquia.put(1L, new ArrayList<>());
-        
+
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
-        
+
         when(unidadeService.buscarSiglasPorCodigos(List.of(2L))).thenReturn(List.of("U2"));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
@@ -348,8 +348,8 @@ class PainelFacadeTest {
         doReturn(null).when(unidadeService).buscarSiglaPorCodigo(10L);
 
         assertThatThrownBy(() -> painelFacade.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Sigla da unidade do usuário ausente");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Sigla da unidade do usuário ausente");
     }
 
     @Test
@@ -364,8 +364,8 @@ class PainelFacadeTest {
         when(unidadeService.buscarSiglaPorCodigo(10L)).thenReturn("  ");
 
         assertThatThrownBy(() -> painelFacade.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Sigla da unidade do usuário ausente");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Sigla da unidade do usuário ausente");
     }
 
     @Test
@@ -441,7 +441,7 @@ class PainelFacadeTest {
 
         Pageable sorted = PageRequest.of(0, 10, Sort.by("descricao"));
         painelFacade.listarProcessos(CONTEXTO_ADMIN, sorted);
-        
+
         verify(processoService).listarTodos(sorted);
     }
 
@@ -459,7 +459,7 @@ class PainelFacadeTest {
         UnidadeProcesso up2 = new UnidadeProcesso();
         up2.setUnidadeCodigo(2L);
         up2.setSigla("U2");
-        
+
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
         Map<Long, List<Long>> hierarquia = new HashMap<>();
@@ -467,7 +467,7 @@ class PainelFacadeTest {
         hierarquia.put(3L, List.of(1L, 2L));
         hierarquia.put(1L, new ArrayList<>());
         hierarquia.put(2L, new ArrayList<>());
-        
+
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 

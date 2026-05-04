@@ -52,24 +52,24 @@ class AtribuicaoTemporariaViewsE2eAspectIntegrationTest {
         );
         Integer perfisChefeNovoResponsavel = jdbcTemplate.queryForObject(
                 """
-                SELECT COUNT(*)
-                FROM sgc.vw_usuario_perfil_unidade
-                WHERE usuario_titulo = ?
-                  AND unidade_codigo = ?
-                  AND perfil = 'CHEFE'
-                """,
+                        SELECT COUNT(*)
+                        FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil = 'CHEFE'
+                        """,
                 Integer.class,
                 "232323",
                 3L
         );
         Integer perfisChefeTitularAnterior = jdbcTemplate.queryForObject(
                 """
-                SELECT COUNT(*)
-                FROM sgc.vw_usuario_perfil_unidade
-                WHERE usuario_titulo = ?
-                  AND unidade_codigo = ?
-                  AND perfil = 'CHEFE'
-                """,
+                        SELECT COUNT(*)
+                        FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil = 'CHEFE'
+                        """,
                 Integer.class,
                 "555555",
                 3L

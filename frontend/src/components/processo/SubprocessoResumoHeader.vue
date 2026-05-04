@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, type Ref, unref} from "vue";
 import {BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -58,15 +58,15 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
       <template #actions>
         <BDropdown
             v-if="mostrarAcoesCabecalhoNormalizado"
-            data-testid="btn-subprocesso-acoes"
             :text="TEXTOS.mapa.BOTAO_ACOES"
+            data-testid="btn-subprocesso-acoes"
             toggle-class="text-nowrap"
             variant="outline-secondary"
         >
           <BDropdownItemButton
               v-if="mostrarAlterarDataLimiteNormalizado"
-              data-testid="btn-alterar-data-limite"
               :disabled="!habilitarAlterarDataLimiteNormalizado"
+              data-testid="btn-alterar-data-limite"
               @click="$emit('abrir-alterar-data-limite')"
           >
             <i aria-hidden="true" class="bi bi-calendar me-1"/>
@@ -74,8 +74,8 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarReabrirCadastroNormalizado"
-              data-testid="btn-reabrir-cadastro"
               :disabled="!habilitarReabrirCadastroNormalizado"
+              data-testid="btn-reabrir-cadastro"
               @click="$emit('abrir-reabrir-cadastro')"
           >
             <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
@@ -83,8 +83,8 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarReabrirRevisaoNormalizado"
-              data-testid="btn-reabrir-revisao"
               :disabled="!habilitarReabrirRevisaoNormalizado"
+              data-testid="btn-reabrir-revisao"
               @click="$emit('abrir-reabrir-revisao')"
           >
             <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
@@ -92,8 +92,8 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
           </BDropdownItemButton>
           <BDropdownItemButton
               v-if="mostrarEnviarLembreteNormalizado"
-              data-testid="btn-enviar-lembrete"
               :disabled="!habilitarEnviarLembreteNormalizado"
+              data-testid="btn-enviar-lembrete"
               @click="$emit('confirmar-enviar-lembrete')"
           >
             <i aria-hidden="true" class="bi bi-bell me-1"/>
@@ -110,7 +110,9 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
         </p>
         <p>
           <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_SITUACAO }}:</span>
-          <span data-testid="subprocesso-header__txt-situacao">{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</span>
+          <span data-testid="subprocesso-header__txt-situacao">{{
+              formatSituacaoSubprocesso(subprocesso.situacao)
+            }}</span>
         </p>
         <p>
           <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_LOCALIZACAO }}:</span>
@@ -120,7 +122,8 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
           <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_PRAZO_ETAPA }}:</span>
           <span data-testid="subprocesso-header__txt-prazo">{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
         </p>
-        <p class="mt-2"><strong>{{ TEXTOS.subprocesso.LABEL_TITULAR }}:</strong> {{ subprocesso.titular?.nome || '' }}</p>
+        <p class="mt-2"><strong>{{ TEXTOS.subprocesso.LABEL_TITULAR }}:</strong> {{ subprocesso.titular?.nome || '' }}
+        </p>
         <p class="ms-3 mb-2">
           <span v-if="subprocesso.titular?.ramal" class="me-3">
             <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
@@ -131,9 +134,12 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
             <a :href="`mailto:${subprocesso.titular.email}`">{{ subprocesso.titular.email }}</a>
           </span>
         </p>
-        <template v-if="subprocesso.responsavel?.usuario?.nome && subprocesso.responsavel.usuario.nome !== subprocesso.titular?.nome">
+        <template
+            v-if="subprocesso.responsavel?.usuario?.nome && subprocesso.responsavel.usuario.nome !== subprocesso.titular?.nome">
           <p class="mt-2">
-            <strong>{{ TEXTOS.subprocesso.LABEL_RESPONSAVEL }}:</strong> {{ subprocesso.responsavel.usuario.nome || '' }}
+            <strong>{{ TEXTOS.subprocesso.LABEL_RESPONSAVEL }}:</strong> {{
+              subprocesso.responsavel.usuario.nome || ''
+            }}
             <span v-if="subprocesso.responsavel.tipo" class="ms-1">
               - {{ formatTipoResponsabilidade(subprocesso.responsavel) }}
             </span>
@@ -145,7 +151,9 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
             </span>
             <span v-if="subprocesso.responsavel.usuario.email">
               <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-              <a :href="`mailto:${subprocesso.responsavel.usuario.email}`">{{ subprocesso.responsavel.usuario.email }}</a>
+              <a :href="`mailto:${subprocesso.responsavel.usuario.email}`">{{
+                  subprocesso.responsavel.usuario.email
+                }}</a>
             </span>
           </p>
         </template>

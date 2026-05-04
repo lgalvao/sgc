@@ -186,7 +186,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @DisplayName("CDU-02: Usuário deve ver alertas coletivos da sua unidade ativa (se não for SERVIDOR)")
         void testListarAlertasUsuarioVeAlertasDaSuaUnidade() throws Exception {
             setupSecurityContext("99005", unidadeRaiz, GESTOR);
-            
+
             Alerta alerta = AlertaFixture.alertaParaUnidade(processoRaiz, unidadeRaiz);
             alerta.setCodigo(null);
             alerta.setDescricao("Alerta unidade raiz");
@@ -201,7 +201,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @DisplayName("CDU-02: SERVIDOR NÃO deve ver alertas da unidade, apenas os pessoais")
         void testListarAlertasServidorNaoVeAlertasDaUnidade() throws Exception {
             Usuario usuario = setupSecurityContext("99007", unidadeRaiz, Perfil.SERVIDOR);
-            
+
             Alerta alertaUnidade = AlertaFixture.alertaParaUnidade(processoRaiz, unidadeRaiz);
             alertaUnidade.setCodigo(null);
             alertaUnidade.setDescricao("Alerta unidade SERVIDOR");

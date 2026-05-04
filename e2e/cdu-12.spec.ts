@@ -36,7 +36,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         validarProcessoFixture(processo, descProcessoRevisao);
     });
 
-    test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({_resetAutomatico, page, _autenticadoComoChefeSecao121}) => {
+    test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({
+                                                                             _resetAutomatico,
+                                                                             page,
+                                                                             _autenticadoComoChefeSecao121
+                                                                         }) => {
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaCadastro(page);
 
@@ -59,7 +63,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         // 8 e 9. Fechar modal
         await fecharModalImpacto(page);
-        
+
         // Disponibilizar para permitir teste dos próximos atores
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
@@ -75,10 +79,10 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         await verificarBotaoImpactoDireto(page);
         await abrirModalImpacto(page);
-        
+
         const modal = page.getByRole('dialog');
         await expect(modal.getByRole('heading', {name: /Atividades inseridas/i})).toBeVisible();
-        
+
         await fecharModalImpacto(page);
     });
 });

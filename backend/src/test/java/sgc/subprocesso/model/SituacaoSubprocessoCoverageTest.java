@@ -20,11 +20,11 @@ class SituacaoSubprocessoCoverageTest {
 
     @ParameterizedTest
     @CsvSource({
-        "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, true",
-        "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO, true",
-        "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, true",
-        "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
-        "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false"
+            "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, true",
+            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO, true",
+            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, true",
+            "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
+            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false"
     })
     @DisplayName("podeTransicionarPara: Deve validar início do processo conforme o tipo")
     void inicioProcesso(SituacaoSubprocesso de, SituacaoSubprocesso para, TipoProcesso tipo, boolean esperado) {
@@ -37,7 +37,7 @@ class SituacaoSubprocessoCoverageTest {
         // Mapeamento -> Revisao (Incompatível)
         assertThat(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
                 .podeTransicionarPara(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
-        
+
         // Revisao -> Mapeamento (Incompatível)
         assertThat(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
                 .podeTransicionarPara(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
@@ -56,7 +56,7 @@ class SituacaoSubprocessoCoverageTest {
     void mapeamentoCompleto() {
         for (SituacaoSubprocesso s : SituacaoSubprocesso.values()) {
             if (!s.name().startsWith("MAPEAMENTO")) continue;
-            
+
             // Testar transição para todas as outras situações de mapeamento
             for (SituacaoSubprocesso para : SituacaoSubprocesso.values()) {
                 if (!para.name().startsWith("MAPEAMENTO")) continue;
@@ -72,7 +72,7 @@ class SituacaoSubprocessoCoverageTest {
     void revisaoCompleta() {
         for (SituacaoSubprocesso s : SituacaoSubprocesso.values()) {
             if (!s.name().startsWith("REVISAO")) continue;
-            
+
             for (SituacaoSubprocesso para : SituacaoSubprocesso.values()) {
                 if (!para.name().startsWith("REVISAO")) continue;
                 s.podeTransicionarPara(para, TipoProcesso.REVISAO);
@@ -86,7 +86,7 @@ class SituacaoSubprocessoCoverageTest {
     void diagnosticoCompleto() {
         for (SituacaoSubprocesso s : SituacaoSubprocesso.values()) {
             if (!s.name().startsWith("DIAGNOSTICO")) continue;
-            
+
             for (SituacaoSubprocesso para : SituacaoSubprocesso.values()) {
                 if (!para.name().startsWith("DIAGNOSTICO")) continue;
                 s.podeTransicionarPara(para, TipoProcesso.DIAGNOSTICO);

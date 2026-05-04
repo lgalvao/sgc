@@ -50,7 +50,7 @@ class NotificacaoControllerTest {
     private NotificacaoEmail notificacao() {
         Unidade unidade = Unidade.builder().sigla("SEC").build();
         Subprocesso subprocesso = Subprocesso.builder().codigo(60000L).unidade(unidade).build();
-        
+
         return NotificacaoEmail.builder()
                 .codigo(10L)
                 .subprocesso(subprocesso)

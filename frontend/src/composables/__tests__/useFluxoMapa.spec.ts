@@ -34,7 +34,10 @@ describe("useFluxoMapa", () => {
 
         const resultado = await fluxoMapa.adicionarCompetencia(10, {descricao: "Comp", atividadesCodigos: []});
 
-        expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(10, {descricao: "Comp", atividadesCodigos: []});
+        expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(10, {
+            descricao: "Comp",
+            atividadesCodigos: []
+        });
         expect(resultado).toEqual(resposta);
     });
 
@@ -45,7 +48,10 @@ describe("useFluxoMapa", () => {
 
         const resultado = await fluxoMapa.atualizarCompetencia(10, 20, {descricao: "Comp", atividadesCodigos: [1]});
 
-        expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {descricao: "Comp", atividadesCodigos: [1]});
+        expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {
+            descricao: "Comp",
+            atividadesCodigos: [1]
+        });
         expect(resultado).toEqual(resposta);
     });
 
@@ -66,7 +72,10 @@ describe("useFluxoMapa", () => {
 
         await fluxoMapa.disponibilizarMapa(10, {dataLimite: "2026-05-01", observacoes: "obs"});
 
-        expect(subprocessoService.disponibilizarMapa).toHaveBeenCalledWith(10, {dataLimite: "2026-05-01", observacoes: "obs"});
+        expect(subprocessoService.disponibilizarMapa).toHaveBeenCalledWith(10, {
+            dataLimite: "2026-05-01",
+            observacoes: "obs"
+        });
     });
 
     it("deve salvar mapa completo", async () => {
@@ -100,20 +109,20 @@ describe("useFluxoMapa", () => {
 
         it("deve aceitar mapa", async () => {
             const fluxoMapa = useFluxoMapa();
-            await fluxoMapa.aceitarMapa(10, { observacao: "ok" });
-            expect(subprocessoService.aceitarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
+            await fluxoMapa.aceitarMapa(10, {observacao: "ok"});
+            expect(subprocessoService.aceitarValidacao).toHaveBeenCalledWith(10, {texto: "ok"});
         });
 
         it("deve homologar mapa", async () => {
             const fluxoMapa = useFluxoMapa();
-            await fluxoMapa.homologarMapa(10, { observacao: "ok" });
-            expect(subprocessoService.homologarValidacao).toHaveBeenCalledWith(10, { texto: "ok" });
+            await fluxoMapa.homologarMapa(10, {observacao: "ok"});
+            expect(subprocessoService.homologarValidacao).toHaveBeenCalledWith(10, {texto: "ok"});
         });
 
         it("deve devolver mapa", async () => {
             const fluxoMapa = useFluxoMapa();
-            await fluxoMapa.devolverMapa(10, { justificativa: "ajustar" });
-            expect(subprocessoService.devolverValidacao).toHaveBeenCalledWith(10, { justificativa: "ajustar" });
+            await fluxoMapa.devolverMapa(10, {justificativa: "ajustar"});
+            expect(subprocessoService.devolverValidacao).toHaveBeenCalledWith(10, {justificativa: "ajustar"});
         });
     });
 
@@ -124,7 +133,7 @@ describe("useFluxoMapa", () => {
                     {
                         codigo: 20,
                         descricao: "Comp 20",
-                        atividades: [{ codigo: 100 }, { codigo: 101 }]
+                        atividades: [{codigo: 100}, {codigo: 101}]
                     }
                 ]
             };
@@ -143,7 +152,7 @@ describe("useFluxoMapa", () => {
 
         it("deve lançar erro se competencia não for encontrada", async () => {
             vi.mocked(useMapasStore).mockReturnValue({
-                obterMapaCompletoCache: vi.fn().mockReturnValue({ competencias: [] })
+                obterMapaCompletoCache: vi.fn().mockReturnValue({competencias: []})
             } as any);
 
             const fluxoMapa = useFluxoMapa();

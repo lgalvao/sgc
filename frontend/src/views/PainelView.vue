@@ -1,7 +1,7 @@
 <template>
   <LayoutPadrao>
     <h1 class="visually-hidden">{{ TEXTOS.painel.TITULO }}</h1>
-    <CarregamentoPagina v-if="carregandoPainel" data-testid="painel-carregando" />
+    <CarregamentoPagina v-if="carregandoPainel" data-testid="painel-carregando"/>
     <template v-else>
       <!-- Tabela de Processos -->
       <div class="mb-5">
@@ -35,13 +35,13 @@
           <BTable
               :fields="camposAlertas"
               :items="alertas"
-              :tbody-tr-props="rowAttrAlerta"
               :tbody-tr-class="rowClassAlerta"
+              :tbody-tr-props="rowAttrAlerta"
               aria-label="Alertas"
               data-testid="tbl-alertas"
               responsive
-              stacked="md"
               small
+              stacked="md"
           >
             <template #cell(mensagem)="data">
               <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">{{ TEXTOS.comum.NAO_LIDO }}</span>
@@ -51,11 +51,11 @@
         </div>
         <EmptyState
             v-else
+            :description="TEXTOS.painel.ALERTAS_VAZIO_DESCRICAO"
+            :title="TEXTOS.painel.ALERTAS_VAZIO_TITULO"
             class="mb-0"
             data-testid="empty-state-alertas"
             icon="bi-bell-slash"
-            :description="TEXTOS.painel.ALERTAS_VAZIO_DESCRICAO"
-            :title="TEXTOS.painel.ALERTAS_VAZIO_TITULO"
         />
       </div>
     </template>
@@ -132,7 +132,8 @@ async function carregarDados() {
         .map((a: Alerta) => a.codigo);
     if (codigosNaoLidos.length > 0) {
       painelStore.registrarLeitura(codigosNaoLidos);
-      painelService.marcarAlertasLidos(codigosNaoLidos).catch(() => {/* silencioso: não crítico para a UI */});
+      painelService.marcarAlertasLidos(codigosNaoLidos).catch(() => {/* silencioso: não crítico para a UI */
+      });
     }
   } finally {
     carregandoPainel.value = false;
@@ -190,7 +191,12 @@ function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
 }
 
 const camposAlertas = [
-  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: false, formatter: ({value}: {value: unknown}) => formatarDataHoraBR(value as string | Date)},
+  {
+    key: "dataHora",
+    label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA,
+    sortable: false,
+    formatter: ({value}: { value: unknown }) => formatarDataHoraBR(value as string | Date)
+  },
   {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
   {key: "processo", label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO, sortable: false},
   {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},

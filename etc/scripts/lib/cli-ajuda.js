@@ -1,11 +1,11 @@
 function exibirAjudaComando({
-    comandoSgc,
-    scriptDireto,
-    descricao,
-    argumentos = null,
-    opcoes = [],
-    exemplos = []
-}) {
+                                comandoSgc,
+                                scriptDireto,
+                                descricao,
+                                argumentos = null,
+                                opcoes = [],
+                                exemplos = []
+                            }) {
     const linhas = [];
     linhas.push(`Uso recomendado: node etc/scripts/sgc.js ${comandoSgc}${argumentos ? ` ${argumentos}` : ''}`);
 

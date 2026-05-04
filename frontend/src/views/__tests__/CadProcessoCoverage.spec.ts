@@ -64,7 +64,7 @@ const ModalConfirmacaoStub = {
     emits: ['update:modelValue', 'confirmar']
 };
 
-function criarErroApi(mensagem: string, erros: Array<{campo?: string | null; mensagem?: string}> = []) {
+function criarErroApi(mensagem: string, erros: Array<{ campo?: string | null; mensagem?: string }> = []) {
     return {
         isAxiosError: true,
         response: {

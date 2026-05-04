@@ -317,9 +317,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             proc = processoRepo.saveAndFlush(proc);
 
             sgc.subprocesso.dto.DisponibilizarMapaRequest request = sgc.subprocesso.dto.DisponibilizarMapaRequest.builder()
-                .observacoes("novas observacoes")
-                .dataLimite(proc.getDataCriacao().toLocalDate().plusDays(1))
-                .build();
+                    .observacoes("novas observacoes")
+                    .dataLimite(proc.getDataCriacao().toLocalDate().plusDays(1))
+                    .build();
 
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
 
@@ -363,9 +363,9 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             Usuario user = criarUsuarioPersistido(uSp);
 
             sgc.subprocesso.dto.SubmeterMapaAjustadoRequest request = sgc.subprocesso.dto.SubmeterMapaAjustadoRequest.builder()
-                .justificativa("ajustes realizados")
-                .dataLimiteEtapa2(java.time.LocalDateTime.of(2025, 12, 31, 0, 0))
-                .build();
+                    .justificativa("ajustes realizados")
+                    .dataLimiteEtapa2(java.time.LocalDateTime.of(2025, 12, 31, 0, 0))
+                    .build();
 
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
 

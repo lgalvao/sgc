@@ -28,7 +28,7 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     List<Alerta> buscarAlertasExclusivosDoUsuario(@Param("usuarioTitulo") String usuarioTitulo);
 
     /**
-     * Busca alertas visíveis para perfis de gestão: alertas da unidade (sem destino individual) 
+     * Busca alertas visíveis para perfis de gestão: alertas da unidade (sem destino individual)
      * OU alertas exclusivos do próprio usuário.
      */
     @Query("""
@@ -41,7 +41,7 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
             ORDER BY a.dataHora DESC
             """)
     List<Alerta> buscarAlertasDaUnidadeEIndividuais(
-            @Param("codUnidade") Long codUnidade, 
+            @Param("codUnidade") Long codUnidade,
             @Param("usuarioTitulo") String usuarioTitulo);
 
     /**
@@ -62,8 +62,8 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
                        OR (a.unidadeDestino.codigo = :codUnidade AND a.usuarioDestinoTitulo IS NULL)
                     """)
     Page<Alerta> buscarAlertasDaUnidadeEIndividuais(
-            @Param("codUnidade") Long codUnidade, 
-            @Param("usuarioTitulo") String usuarioTitulo, 
+            @Param("codUnidade") Long codUnidade,
+            @Param("usuarioTitulo") String usuarioTitulo,
             Pageable pageable);
 
     /**
@@ -82,6 +82,6 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
                     WHERE a.usuarioDestinoTitulo = :usuarioTitulo
                     """)
     Page<Alerta> buscarAlertasExclusivosDoUsuario(
-            @Param("usuarioTitulo") String usuarioTitulo, 
+            @Param("usuarioTitulo") String usuarioTitulo,
             Pageable pageable);
 }

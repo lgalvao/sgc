@@ -149,6 +149,37 @@ class SubprocessoTransicaoServiceTest {
         verify(notificacaoService).notificarAlteracaoDataLimite(eq(subprocesso), eq("25/04/2026"), eq(2));
     }
 
+    private Subprocesso criarSubprocesso(TipoProcesso tipoProcesso, SituacaoSubprocesso situacao, Unidade unidade) {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setProcesso(criarProcesso(tipoProcesso));
+        subprocesso.setSituacaoForcada(situacao);
+        return subprocesso;
+    }
+
+    private Processo criarProcesso(TipoProcesso tipoProcesso) {
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
+        processo.setTipo(tipoProcesso);
+        return processo;
+    }
+
+    private Unidade criarUnidade(Long codigo, String sigla, String nome) {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codigo);
+        unidade.setSigla(sigla);
+        unidade.setNome(nome);
+        return unidade;
+    }
+
+    private Usuario criarUsuario() {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+        usuario.setUnidadeAtivaCodigo(10L);
+        return usuario;
+    }
+
     @Nested
     @DisplayName("Cobertura Adicional de Branches")
     class CoberturaAdicional {
@@ -360,36 +391,5 @@ class SubprocessoTransicaoServiceTest {
                 assertThat(result).isNull();
             }
         }
-    }
-
-    private Subprocesso criarSubprocesso(TipoProcesso tipoProcesso, SituacaoSubprocesso situacao, Unidade unidade) {
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setCodigo(1L);
-        subprocesso.setUnidade(unidade);
-        subprocesso.setProcesso(criarProcesso(tipoProcesso));
-        subprocesso.setSituacaoForcada(situacao);
-        return subprocesso;
-    }
-
-    private Processo criarProcesso(TipoProcesso tipoProcesso) {
-        Processo processo = new Processo();
-        processo.setDescricao("Processo teste");
-        processo.setTipo(tipoProcesso);
-        return processo;
-    }
-
-    private Unidade criarUnidade(Long codigo, String sigla, String nome) {
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(codigo);
-        unidade.setSigla(sigla);
-        unidade.setNome(nome);
-        return unidade;
-    }
-
-    private Usuario criarUsuario() {
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-        usuario.setUnidadeAtivaCodigo(10L);
-        return usuario;
     }
 }

@@ -28,7 +28,12 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
 
-    test('Preparacao: Admin cria e inicia processo', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({
+                                                                _resetAutomatico,
+                                                                page,
+                                                                request,
+                                                                _autenticadoComoAdmin
+                                                            }) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -44,10 +49,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
 
     test('Cenario principal: ADMIN envia lembrete e sistema cria alerta sem alterar o workflow', async ({
-                                                                                                    _resetAutomatico,
-                                                                                                    page,
-                                                                                                    _autenticadoComoAdmin
-}) => {
+                                                                                                            _resetAutomatico,
+                                                                                                            page,
+                                                                                                            _autenticadoComoAdmin
+                                                                                                        }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 
@@ -80,10 +85,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
-                                                                                                        _resetAutomatico,
-                                                                                                        page,
-                                                                                                        _autenticadoComoChefeAssessoria22
-}) => {
+                                                                                                       _resetAutomatico,
+                                                                                                       page,
+                                                                                                       _autenticadoComoChefeAssessoria22
+                                                                                                   }) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);

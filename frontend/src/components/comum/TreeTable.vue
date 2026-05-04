@@ -339,11 +339,10 @@ defineExpose({
 
 :deep(.tree-row-transition-enter-active td),
 :deep(.tree-row-transition-leave-active td) {
-  transition:
-      opacity 0.18s ease,
-      transform 0.18s ease,
-      padding-top 0.18s ease,
-      padding-bottom 0.18s ease;
+  transition: opacity 0.18s ease,
+  transform 0.18s ease,
+  padding-top 0.18s ease,
+  padding-bottom 0.18s ease;
 }
 
 :deep(.tree-row-transition-enter-from td),

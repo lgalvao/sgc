@@ -52,7 +52,7 @@ describe('CadAtribuicao.vue', () => {
         nome: 'Unidade teste'
     };
 
-        const mockUsuarios = [
+    const mockUsuarios = [
         {codigo: 111, nome: 'Servidor 1', tituloEleitoral: '111'},
         {codigo: 222, nome: 'Servidor 2', tituloEleitoral: '222'}
     ];

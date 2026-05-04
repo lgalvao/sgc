@@ -20,8 +20,8 @@ export function criarErroSubprocessoNaoEncontrado(mensagemBase: string, erroNorm
 }
 
 export function registrarErroIntegracao(
-    erro: unknown, 
-    mensagemBase: string, 
+    erro: unknown,
+    mensagemBase: string,
     erroIntegracaoContexto: import('vue').Ref<ErroNormalizado | null>
 ): null {
     const erroNormalizado = normalizarErro(erro);

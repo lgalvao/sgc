@@ -54,8 +54,10 @@ class ProcessoControllerTest {
 
     @MockitoBean
     private SubprocessoService subprocessoService;
-    @MockitoBean private SubprocessoConsultaService consultaService;
-    @MockitoBean private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @MockitoBean
+    private SubprocessoConsultaService consultaService;
+    @MockitoBean
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
 
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
@@ -139,25 +141,25 @@ class ProcessoControllerTest {
         void deveRetornarCreatedQuandoProcessoValido() throws Exception {
 
             var req = new CriarProcessoRequest(
-                            NOVO_PROCESSO,
-                            TipoProcesso.MAPEAMENTO,
-                            LocalDateTime.now().plusDays(30),
-                            List.of(1L));
+                    NOVO_PROCESSO,
+                    TipoProcesso.MAPEAMENTO,
+                    LocalDateTime.now().plusDays(30),
+                    List.of(1L));
 
             var processo = Processo.builder()
-                            .codigo(1L)
-                            .dataCriacao(LocalDateTime.now())
-                            .descricao(NOVO_PROCESSO)
-                            .situacao(SituacaoProcesso.CRIADO)
-                            .tipo(TipoProcesso.MAPEAMENTO)
-                            .build();
+                    .codigo(1L)
+                    .dataCriacao(LocalDateTime.now())
+                    .descricao(NOVO_PROCESSO)
+                    .situacao(SituacaoProcesso.CRIADO)
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .build();
 
             when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(processo);
 
             mockMvc.perform(post(API_PROCESSOS)
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(req)))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith(API_PROCESSOS_1)))
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
@@ -176,9 +178,9 @@ class ProcessoControllerTest {
             var req = new CriarProcessoRequest("", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
 
             mockMvc.perform(post(API_PROCESSOS)
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(req)))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isBadRequest());
         }
     }
@@ -191,12 +193,12 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK quando processo existe")
         void deveRetornarOkQuandoProcessoExiste() throws Exception {
             var processo = Processo.builder()
-                            .codigo(1L)
-                            .dataCriacao(LocalDateTime.now())
-                            .descricao("Processo teste")
-                            .situacao(SituacaoProcesso.CRIADO)
-                            .tipo(TipoProcesso.MAPEAMENTO)
-                            .build();
+                    .codigo(1L)
+                    .dataCriacao(LocalDateTime.now())
+                    .descricao("Processo teste")
+                    .situacao(SituacaoProcesso.CRIADO)
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .build();
 
             when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
 
@@ -213,12 +215,12 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar detalhes do processo com 200 OK")
         void deveRetornarOkAoObterDetalhesQuandoProcessoExiste() throws Exception {
             var dto = ProcessoDetalheDto.builder()
-                            .codigo(1L)
-                            .descricao("Processo detalhado")
-                            .tipo(TipoProcesso.MAPEAMENTO.name())
-                            .situacao(SituacaoProcesso.CRIADO)
-                            .dataCriacao(LocalDateTime.now())
-                            .build();
+                    .codigo(1L)
+                    .descricao("Processo detalhado")
+                    .tipo(TipoProcesso.MAPEAMENTO.name())
+                    .situacao(SituacaoProcesso.CRIADO)
+                    .dataCriacao(LocalDateTime.now())
+                    .build();
 
             when(processoService.obterDetalhesCompleto(eq(1L), anyBoolean())).thenReturn(dto);
 
@@ -339,9 +341,9 @@ class ProcessoControllerTest {
             when(processoService.atualizar(eq(1L), any(AtualizarProcessoRequest.class))).thenReturn(processo);
 
             mockMvc.perform(post(API_PROCESSOS + "/1/atualizar")
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(req)))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(PROCESSO_ATUALIZADO));
@@ -442,9 +444,9 @@ class ProcessoControllerTest {
         @DisplayName("listarUnidadesParaImportacao deve retornar lista de participantes quando finalizado")
         void deveListarUnidadesParaImportacaoQuandoFinalizado() throws Exception {
             Processo processo = Processo.builder()
-                .codigo(1L)
-                .situacao(SituacaoProcesso.FINALIZADO)
-                .build();
+                    .codigo(1L)
+                    .situacao(SituacaoProcesso.FINALIZADO)
+                    .build();
 
             Unidade unidade = criarUnidadeParticipante();
             processo.adicionarParticipantes(Set.of(unidade));
@@ -452,12 +454,12 @@ class ProcessoControllerTest {
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
 
             Subprocesso sub = Subprocesso.builder()
-                .codigo(100L)
-                .processo(processo)
-                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                .unidade(unidade)
-                .dataLimiteEtapa1(LocalDateTime.now())
-                .build();
+                    .codigo(100L)
+                    .processo(processo)
+                    .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                    .unidade(unidade)
+                    .dataLimiteEtapa1(LocalDateTime.now())
+                    .build();
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
 
@@ -486,9 +488,9 @@ class ProcessoControllerTest {
         @DisplayName("listarUnidadesParaImportacao deve retornar lista de participantes quando finalizado com mapa e localizacao")
         void deveListarUnidadesParaImportacaoQuandoFinalizadoCompleto() throws Exception {
             Processo processo = Processo.builder()
-                .codigo(1L)
-                .situacao(SituacaoProcesso.FINALIZADO)
-                .build();
+                    .codigo(1L)
+                    .situacao(SituacaoProcesso.FINALIZADO)
+                    .build();
 
             Unidade unidade = criarUnidadeParticipante();
             processo.adicionarParticipantes(Set.of(unidade));
@@ -496,13 +498,13 @@ class ProcessoControllerTest {
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
 
             Subprocesso sub = Subprocesso.builder()
-                .codigo(100L)
-                .processo(processo)
-                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                .unidade(unidade)
-                .mapa(sgc.mapa.model.Mapa.builder().codigo(500L).build())
-                .dataLimiteEtapa1(LocalDateTime.now())
-                .build();
+                    .codigo(100L)
+                    .processo(processo)
+                    .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                    .unidade(unidade)
+                    .mapa(sgc.mapa.model.Mapa.builder().codigo(500L).build())
+                    .dataLimiteEtapa1(LocalDateTime.now())
+                    .build();
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
 
@@ -517,9 +519,9 @@ class ProcessoControllerTest {
         @DisplayName("listarUnidadesParaImportacao deve falhar se processo nao finalizado")
         void deveFalharListarUnidadesParaImportacaoSeNaoFinalizado() throws Exception {
             Processo processo = Processo.builder()
-                .codigo(1L)
-                .situacao(SituacaoProcesso.EM_ANDAMENTO)
-                .build();
+                    .codigo(1L)
+                    .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                    .build();
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
 
@@ -532,9 +534,9 @@ class ProcessoControllerTest {
         @DisplayName("listarUnidadesParaImportacao deve retornar lista mesmo com subprocesso nulo")
         void deveListarUnidadesParaImportacaoComSubprocessoNulo() throws Exception {
             Processo processo = Processo.builder()
-                .codigo(1L)
-                .situacao(SituacaoProcesso.FINALIZADO)
-                .build();
+                    .codigo(1L)
+                    .situacao(SituacaoProcesso.FINALIZADO)
+                    .build();
 
             Unidade unidade = criarUnidadeParticipante();
             processo.adicionarParticipantes(Set.of(unidade));
@@ -614,13 +616,17 @@ class ProcessoControllerTest {
     @Nested
     @DisplayName("Cobertura extra")
     class CoberturaExtra {
+        // Usar mocks manuais para testes isolados
+        private ProcessoController controller;
+        private ProcessoService processoServiceMock;
+
         @Test
         @DisplayName("listarUnidadesParaImportacao deve lancar ErroValidacao quando nao finalizado")
         void deveLancarErroValidacaoQuandoListarUnidadesParaImportacaoNaoFinalizado() {
             Processo processo = Processo.builder()
-                .codigo(1L)
-                .situacao(SituacaoProcesso.EM_ANDAMENTO)
-                .build();
+                    .codigo(1L)
+                    .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                    .build();
             when(processoServiceMock.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
 
             ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.listarUnidadesParaImportacao(1L));
@@ -635,10 +641,6 @@ class ProcessoControllerTest {
             verify(processoServiceMock).apagar(codigo);
             assertEquals(204, response.getStatusCode().value());
         }
-
-        // Usar mocks manuais para testes isolados
-        private ProcessoController controller;
-        private ProcessoService processoServiceMock;
 
         @BeforeEach
         void setUp() {

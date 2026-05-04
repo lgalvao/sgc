@@ -7,9 +7,6 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("EntidadeBaseTest")
 class EntidadeBaseTest {
 
-    private static class EntidadeTeste extends EntidadeBase {
-    }
-
     @Test
     @DisplayName("deve gerar toString com nome da classe e código")
     void deveGerarToStringComNomeClasseECodigo() {
@@ -28,8 +25,8 @@ class EntidadeBaseTest {
         segunda.setCodigo(42L);
 
         assertThat(primeira)
-            .isEqualTo(segunda)
-            .hasSameHashCodeAs(segunda);
+                .isEqualTo(segunda)
+                .hasSameHashCodeAs(segunda);
     }
 
     @Test
@@ -38,7 +35,10 @@ class EntidadeBaseTest {
         EntidadeTeste entidade = new EntidadeTeste();
 
         assertThat(entidade)
-            .isNotEqualTo(new Object())
-            .isNotEqualTo(new EntidadeTeste());
+                .isNotEqualTo(new Object())
+                .isNotEqualTo(new EntidadeTeste());
+    }
+
+    private static class EntidadeTeste extends EntidadeBase {
     }
 }

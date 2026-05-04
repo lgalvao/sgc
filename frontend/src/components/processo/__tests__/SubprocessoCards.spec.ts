@@ -7,7 +7,7 @@ import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/acesso";
 
-const {pushMock} = vi.hoisted(() => ({ pushMock: vi.fn() }));
+const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({
@@ -99,11 +99,11 @@ describe("SubprocessoCards.vue", () => {
             global: {
                 plugins: [pinia],
                 stubs: {
-                    BCard: { template: '<div @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>' },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' },
+                    BCard: {template: '<div @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>'},
+                    BCardTitle: {template: '<div><slot /></div>'},
+                    BCardText: {template: '<div><slot /></div>'},
+                    BRow: {template: '<div><slot /></div>'},
+                    BCol: {template: '<div><slot /></div>'},
                 }
             },
             props
@@ -175,7 +175,7 @@ describe("SubprocessoCards.vue", () => {
                 plugins: [createTestingPinia({
                     createSpy: vi.fn,
                     initialState: {
-                subprocessos: {
+                        subprocessos: {
                             subprocessoDetalhe: criarSubprocesso({
                                 codigo: 999,
                                 permissoes: criarPermissoes({
@@ -189,11 +189,11 @@ describe("SubprocessoCards.vue", () => {
                     }
                 })],
                 stubs: {
-                    BCard: { template: '<div @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>' },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' },
+                    BCard: {template: '<div @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>'},
+                    BCardTitle: {template: '<div><slot /></div>'},
+                    BCardText: {template: '<div><slot /></div>'},
+                    BRow: {template: '<div><slot /></div>'},
+                    BCol: {template: '<div><slot /></div>'},
                 }
             },
             props: {
@@ -292,7 +292,7 @@ describe("SubprocessoCards.vue", () => {
         });
 
         await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger("click");
-        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({ name: "AutoavaliacaoDiagnostico" }));
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({name: "AutoavaliacaoDiagnostico"}));
     });
 
     it("trata tecla Enter/Space nos cards", async () => {
@@ -307,15 +307,15 @@ describe("SubprocessoCards.vue", () => {
         });
 
         const card = wrapper.find('[data-testid="card-subprocesso-atividades"]');
-        await card.trigger("keydown", { key: "Enter" });
+        await card.trigger("keydown", {key: "Enter"});
         expect(pushMock).toHaveBeenCalled();
 
         pushMock.mockClear();
-        await card.trigger("keydown", { key: " " });
+        await card.trigger("keydown", {key: " "});
         expect(pushMock).toHaveBeenCalled();
 
         pushMock.mockClear();
-        await card.trigger("keydown", { key: "Escape" });
+        await card.trigger("keydown", {key: "Escape"});
         expect(pushMock).not.toHaveBeenCalled();
     });
 

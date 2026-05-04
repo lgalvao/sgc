@@ -1,11 +1,11 @@
 import {describe, expect, it, vi} from 'vitest';
 import processoRoutes from '@/router/processo.routes';
 
-vi.mock('@/views/ProcessoCadastroView.vue', () => ({ default: { name: 'ProcessoCadastroView' } }));
-vi.mock('@/views/ProcessoDetalheView.vue', () => ({ default: { name: 'ProcessoDetalheView' } }));
-vi.mock('@/views/SubprocessoView.vue', () => ({ default: { name: 'SubprocessoView' } }));
-vi.mock('@/views/MapaView.vue', () => ({ default: { name: 'MapaView' } }));
-vi.mock('@/views/CadastroView.vue', () => ({ default: { name: 'CadastroView' } }));
+vi.mock('@/views/ProcessoCadastroView.vue', () => ({default: {name: 'ProcessoCadastroView'}}));
+vi.mock('@/views/ProcessoDetalheView.vue', () => ({default: {name: 'ProcessoDetalheView'}}));
+vi.mock('@/views/SubprocessoView.vue', () => ({default: {name: 'SubprocessoView'}}));
+vi.mock('@/views/MapaView.vue', () => ({default: {name: 'MapaView'}}));
+vi.mock('@/views/CadastroView.vue', () => ({default: {name: 'CadastroView'}}));
 describe('processo.routes.ts', () => {
     it('deve definir as rotas corretamente', () => {
         expect(processoRoutes).toHaveLength(5);

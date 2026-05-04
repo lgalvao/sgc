@@ -50,26 +50,26 @@
                 @update:par-selecionado="parSelecionado = $event"
             />
 
-          <LoadingButton
-              :loading="isLoading"
-              :aria-label="TEXTOS.comum.BOTAO_ENTRAR"
-              class="w-100"
-              data-testid="btn-login-entrar"
-              icon="box-arrow-in-right"
-              :loading-text="TEXTOS.login.ENTRANDO"
-              :text="TEXTOS.comum.BOTAO_ENTRAR"
-              type="submit"
-              variant="primary"
-          />
-          <AppAlert
-              v-if="notificacao"
-              :dispensavel="notificacao.dispensavel ?? true"
-              :mensagem="notificacao.mensagem"
-              :variante="notificacao.variante"
-              class="mt-3"
-              @dismissed="clear()"
-          />
-        </BForm>
+            <LoadingButton
+                :aria-label="TEXTOS.comum.BOTAO_ENTRAR"
+                :loading="isLoading"
+                :loading-text="TEXTOS.login.ENTRANDO"
+                :text="TEXTOS.comum.BOTAO_ENTRAR"
+                class="w-100"
+                data-testid="btn-login-entrar"
+                icon="box-arrow-in-right"
+                type="submit"
+                variant="primary"
+            />
+            <AppAlert
+                v-if="notificacao"
+                :dispensavel="notificacao.dispensavel ?? true"
+                :mensagem="notificacao.mensagem"
+                :variante="notificacao.variante"
+                class="mt-3"
+                @dismissed="clear()"
+            />
+          </BForm>
         </BCard>
       </BCol>
     </BRow>
@@ -166,9 +166,9 @@ const performInitialLogin = async () => {
     if (fluxoLogin.autenticado) {
       resetarValidacao();
       await handlePostAuth();
-      } else {
-        notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
-      }
+    } else {
+      notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
+    }
   } catch (error: unknown) {
     const erroNormalizado = normalizarErro(error);
     if (erroNormalizado.tipo === 'inesperado') {

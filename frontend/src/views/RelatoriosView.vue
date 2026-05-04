@@ -1,17 +1,17 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.relatorios.TITULO" />
+    <PageHeader :title="TEXTOS.relatorios.TITULO"/>
 
     <BRow>
-      <BCol md="4" class="mb-4">
+      <BCol class="mb-4" md="4">
         <BCard
-          class="h-100 card-actionable"
-          data-testid="card-relatorio-andamento"
-          role="button"
-          tabindex="0"
-          @click="router.push('/relatorios/andamento')"
-          @keydown.enter="router.push('/relatorios/andamento')"
-          @keydown.space.prevent="router.push('/relatorios/andamento')"
+            class="h-100 card-actionable"
+            data-testid="card-relatorio-andamento"
+            role="button"
+            tabindex="0"
+            @click="router.push('/relatorios/andamento')"
+            @keydown.enter="router.push('/relatorios/andamento')"
+            @keydown.space.prevent="router.push('/relatorios/andamento')"
         >
           <div class="card-click-area">
             <BCardTitle>{{ TEXTOS.relatorios.ANDAMENTO_PROCESSO }}</BCardTitle>
@@ -22,15 +22,15 @@
         </BCard>
       </BCol>
 
-      <BCol md="4" class="mb-4">
+      <BCol class="mb-4" md="4">
         <BCard
-          class="h-100 card-actionable"
-          data-testid="card-relatorio-mapas"
-          role="button"
-          tabindex="0"
-          @click="router.push('/relatorios/mapas-vigentes')"
-          @keydown.enter="router.push('/relatorios/mapas-vigentes')"
-          @keydown.space.prevent="router.push('/relatorios/mapas-vigentes')"
+            class="h-100 card-actionable"
+            data-testid="card-relatorio-mapas"
+            role="button"
+            tabindex="0"
+            @click="router.push('/relatorios/mapas-vigentes')"
+            @keydown.enter="router.push('/relatorios/mapas-vigentes')"
+            @keydown.space.prevent="router.push('/relatorios/mapas-vigentes')"
         >
           <div class="card-click-area">
             <BCardTitle>Mapas vigentes</BCardTitle>

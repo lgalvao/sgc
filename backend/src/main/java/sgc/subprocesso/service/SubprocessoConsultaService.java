@@ -31,7 +31,7 @@ public class SubprocessoConsultaService {
     private final SubprocessoContextoConsultaService contextoConsultaService;
     private final SubprocessoAcessoService acessoService;
     private final SubprocessoVisualizacaoService visualizacaoService;
-    
+
     public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         return visualizacaoService.mapaParaVisualizacao(sp);

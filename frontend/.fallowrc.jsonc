@@ -1,5 +1,7 @@
-{  
-  "entry": ["src/main.ts"],
+{
+  "entry": [
+    "src/main.ts"
+  ],
   "production": {
     "deadCode": true,
     "dupes": true,

@@ -111,8 +111,20 @@ describe("ArvoreUnidades.vue", () => {
                     {codigo: 1_1, sigla: "GP", nome: "GABINETE DA PRESIDENCIA", filhas: [], tipo: "ADMINISTRATIVA"},
                     {codigo: 1_2, sigla: "SJ", nome: "SECRETARIA JUDICIARIA", filhas: [], tipo: "ADMINISTRATIVA"},
                     {codigo: 1_3, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
-                    {codigo: 1_4, sigla: "CAE01", nome: "CENTRAL DE ATENDIMENTO AO ELEITOR DA CAPITAL", filhas: [], tipo: "OPERACIONAL"},
-                    {codigo: 1_5, sigla: "SGP", nome: "SECRETARIA DE GESTAO DE PESSOAS", filhas: [], tipo: "ADMINISTRATIVA"},
+                    {
+                        codigo: 1_4,
+                        sigla: "CAE01",
+                        nome: "CENTRAL DE ATENDIMENTO AO ELEITOR DA CAPITAL",
+                        filhas: [],
+                        tipo: "OPERACIONAL"
+                    },
+                    {
+                        codigo: 1_5,
+                        sigla: "SGP",
+                        nome: "SECRETARIA DE GESTAO DE PESSOAS",
+                        filhas: [],
+                        tipo: "ADMINISTRATIVA"
+                    },
                     {codigo: 1_6, sigla: "AAA", nome: "ASSESSORIA DE APOIO", filhas: [], tipo: "OPERACIONAL"},
                     {codigo: 1_7, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
                 ],
@@ -144,7 +156,13 @@ describe("ArvoreUnidades.vue", () => {
                         tipo: "INTEROPERACIONAL",
                         filhas: [
                             {codigo: 101, sigla: "GP", nome: "GABINETE", filhas: [], tipo: "ADMINISTRATIVA"},
-                            {codigo: 102, sigla: "SA", nome: "SECRETARIA ADMINISTRATIVA", filhas: [], tipo: "ADMINISTRATIVA"},
+                            {
+                                codigo: 102,
+                                sigla: "SA",
+                                nome: "SECRETARIA ADMINISTRATIVA",
+                                filhas: [],
+                                tipo: "ADMINISTRATIVA"
+                            },
                             {codigo: 103, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
                             {codigo: 104, sigla: "AAA", nome: "ASSESSORIA DE APOIO", filhas: [], tipo: "OPERACIONAL"},
                             {codigo: 105, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", filhas: [], tipo: "OPERACIONAL"},
@@ -397,12 +415,30 @@ describe("ArvoreUnidades.vue", () => {
                 isElegivel: true,
                 tipo: "INTEROPERACIONAL",
                 filhas: [
-                    {codigo: 701, sigla: "COSIS", nome: "Coordenadoria de Sistemas", isElegivel: false, filhas: [
-                        {codigo: 702, sigla: "SEDIA", nome: "Secao de Dados", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
-                    ], tipo: "INTERMEDIARIA"},
-                    {codigo: 703, sigla: "COSINF", nome: "Coordenadoria de Infra", isElegivel: false, filhas: [
-                        {codigo: 704, sigla: "SENIC", nome: "Secao de Infra", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
-                    ], tipo: "INTERMEDIARIA"}
+                    {
+                        codigo: 701, sigla: "COSIS", nome: "Coordenadoria de Sistemas", isElegivel: false, filhas: [
+                            {
+                                codigo: 702,
+                                sigla: "SEDIA",
+                                nome: "Secao de Dados",
+                                isElegivel: true,
+                                filhas: [],
+                                tipo: "OPERACIONAL"
+                            }
+                        ], tipo: "INTERMEDIARIA"
+                    },
+                    {
+                        codigo: 703, sigla: "COSINF", nome: "Coordenadoria de Infra", isElegivel: false, filhas: [
+                            {
+                                codigo: 704,
+                                sigla: "SENIC",
+                                nome: "Secao de Infra",
+                                isElegivel: true,
+                                filhas: [],
+                                tipo: "OPERACIONAL"
+                            }
+                        ], tipo: "INTERMEDIARIA"
+                    }
                 ]
             }
         ];
@@ -692,9 +728,30 @@ describe("ArvoreUnidades.vue", () => {
                     isElegivel: false,
                     tipo: "INTERMEDIARIA",
                     filhas: [
-                        {codigo: 2002, sigla: "SEDESEV", nome: "Sede", isElegivel: false, filhas: [], tipo: "OPERACIONAL"},
-                        {codigo: 2003, sigla: "SEDIA", nome: "Dados", isElegivel: false, filhas: [], tipo: "OPERACIONAL"},
-                        {codigo: 2004, sigla: "SESEL", nome: "Selecao", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
+                        {
+                            codigo: 2002,
+                            sigla: "SEDESEV",
+                            nome: "Sede",
+                            isElegivel: false,
+                            filhas: [],
+                            tipo: "OPERACIONAL"
+                        },
+                        {
+                            codigo: 2003,
+                            sigla: "SEDIA",
+                            nome: "Dados",
+                            isElegivel: false,
+                            filhas: [],
+                            tipo: "OPERACIONAL"
+                        },
+                        {
+                            codigo: 2004,
+                            sigla: "SESEL",
+                            nome: "Selecao",
+                            isElegivel: true,
+                            filhas: [],
+                            tipo: "OPERACIONAL"
+                        }
                     ]
                 }
             ]

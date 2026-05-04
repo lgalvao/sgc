@@ -32,13 +32,13 @@ class AlertaFacadeCoverageTest {
     void obterMapaDataHoraLeitura_Duplicatas() {
         String usuario = "U1";
         Long codAlerta = 100L;
-        
+
         AlertaUsuario au1 = mock(AlertaUsuario.class);
         AlertaUsuario.Chave chave = mock(AlertaUsuario.Chave.class);
         when(chave.getAlertaCodigo()).thenReturn(codAlerta);
         when(au1.getCodigo()).thenReturn(chave);
         when(au1.getDataHoraLeitura()).thenReturn(LocalDateTime.now());
-        
+
         AlertaUsuario au2 = mock(AlertaUsuario.class);
         when(au2.getCodigo()).thenReturn(chave);
         when(au2.getDataHoraLeitura()).thenReturn(LocalDateTime.now().plusHours(1));
@@ -54,24 +54,26 @@ class AlertaFacadeCoverageTest {
     void marcarComoLidos_Duplicatas() {
         ContextoUsuarioAutenticado contexto = mock(ContextoUsuarioAutenticado.class);
         when(contexto.usuarioTitulo()).thenReturn("U1");
-        
+
         Long cod1 = 1L;
         Long cod2 = 2L;
-        
+
         // Simular duplicata em alertasUsuarios
         AlertaUsuario au1 = mock(AlertaUsuario.class);
         AlertaUsuario.Chave chave1 = mock(AlertaUsuario.Chave.class);
         when(chave1.getAlertaCodigo()).thenReturn(cod1);
         when(au1.getCodigo()).thenReturn(chave1);
-        
+
         AlertaUsuario au1Dup = mock(AlertaUsuario.class);
         when(au1Dup.getCodigo()).thenReturn(chave1);
 
         when(alertaService.alertasUsuarios(anyString(), anyList())).thenReturn(List.of(au1, au1Dup));
-        
+
         // Alerta 2 está ausente em existentes, vai para listarPorCodigos
-        Alerta a2 = new Alerta(); a2.setCodigo(cod2);
-        Alerta a2Dup = new Alerta(); a2Dup.setCodigo(cod2); // Duplicata proposital
+        Alerta a2 = new Alerta();
+        a2.setCodigo(cod2);
+        Alerta a2Dup = new Alerta();
+        a2Dup.setCodigo(cod2); // Duplicata proposital
 
         when(alertaService.listarPorCodigos(anyList())).thenReturn(List.of(a2, a2Dup));
         when(usuarioService.buscar("U1")).thenReturn(new Usuario());

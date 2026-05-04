@@ -6,22 +6,26 @@
 
 - Usuário logado com perfil GESTOR.
 - Processo de mapeamento ou de revisão iniciado que tenha a unidade como participante.
-- Existência de subprocessos de unidades da hierarquia do usuário (ou subordinadas, recursivamente), nas situações 'Mapa validado' ou 'Mapa com sugestões' e com localização atual na unidade do usuário.
+- Existência de subprocessos de unidades da hierarquia do usuário (ou subordinadas, recursivamente), nas situações 'Mapa
+  validado' ou 'Mapa com sugestões' e com localização atual na unidade do usuário.
 
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de mapeamento ou de revisão, que esteja na situação em andamento.
 
-2. O sistema mostra a tela `Detalhes do processo`, exibindo apenas os subprocessos das unidades que compõem a hierarquia do usuário (sua própria unidade e subordinadas recursivamente).
+2. O sistema mostra a tela `Detalhes do processo`, exibindo apenas os subprocessos das unidades que compõem a hierarquia
+   do usuário (sua própria unidade e subordinadas recursivamente).
 
-3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco e se houver mostra o botão `Aceitar mapas em bloco`.
+3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco e se
+   houver mostra o botão `Aceitar mapas em bloco`.
 
 4. O usuário clica no botão `Aceitar mapas em bloco`.
 
 5. O sistema abre um modal de confirmação, com os elementos a seguir:
     - Título "Aceite de mapas em bloco";
     - Texto "Selecione as unidades para aceite dos mapas correspondentes";
-    - Lista das unidades cujos mapas poderão ser aceitos (conforme pré-condições); devem ser apresentados para cada unidade um checkbox (selecionado por padrão) ao lado da sigla e nome; e
+    - Lista das unidades cujos mapas poderão ser aceitos (conforme pré-condições); devem ser apresentados para cada
+      unidade um checkbox (selecionado por padrão) ao lado da sigla e nome; e
     - Botão `Cancelar` e botão `Registrar aceite`.
 
 6. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.

@@ -27,7 +27,9 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         contextoCadastroInvalido.value = false;
     }
 
-    const limparErroIntegracao = () => { erroIntegracaoContexto.value = null; };
+    const limparErroIntegracao = () => {
+        erroIntegracaoContexto.value = null;
+    };
 
     function invalidar(): void {
         carregamentos.clear();
@@ -54,7 +56,13 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     );
 
     return {
-        contextoEdicao, contextoCadastro, erroIntegracaoContexto, invalidar, resetar, limparContextoAtual, limparErroIntegracao,
+        contextoEdicao,
+        contextoCadastro,
+        erroIntegracaoContexto,
+        invalidar,
+        resetar,
+        limparContextoAtual,
+        limparErroIntegracao,
         garantirContextoEdicao: (c: number, l = false) => orquestrador.garantirContextoPorCodigo(c, l, configEdicao),
         garantirContextoEdicaoPorProcessoEUnidade: (p: number, s: string, l = false) => orquestrador.garantirContextoPorProcessoEUnidade(p, s, l, configEdicao),
         garantirContextoCadastroAtividades: (c: number, l = false) => orquestrador.garantirContextoPorCodigo(c, l, configCadastro),

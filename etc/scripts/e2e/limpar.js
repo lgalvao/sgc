@@ -33,13 +33,13 @@ function cleanFile(filePath) {
     // Procura por padrões de desestruturação em assinaturas de teste
     content = content.replace(/async\s*\(\s*\{([^}]+)}\s*(:\s*\{[^}]+})?\s*\)\s*=>/g, (match, p1, p2) => {
         let args = p1.split(',').map(s => s.trim());
-        
+
         // Remove fixtures de auth
         let cleanedArgs = args.filter(arg => !AUTH_FIXTURES.includes(arg));
-        
+
         // Se mudou algo, reconstrói a assinatura sem a tipagem inline redundante
         if (cleanedArgs.length !== args.length || p2) {
-             return `async ({${cleanedArgs.join(', ')}}) =>`;
+            return `async ({${cleanedArgs.join(', ')}}) =>`;
         }
         return match;
     });

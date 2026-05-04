@@ -11,7 +11,12 @@ import {criarProcessoMapaHomologadoFixture} from './fixtures/index.js';
  */
 test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
-    test('Cenários CDU-36: ADMIN define filtros e gera PDF de mapas', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+    test('Cenários CDU-36: ADMIN define filtros e gera PDF de mapas', async ({
+                                                                                 _resetAutomatico,
+                                                                                 page,
+                                                                                 request,
+                                                                                 _autenticadoComoAdmin
+                                                                             }) => {
         test.slow();
         const descricaoProcesso = `Relatório CDU-36 ${Date.now()}`;
         await criarProcessoMapaHomologadoFixture(request, {
@@ -52,7 +57,12 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         expect(filename).toMatch(new RegExp(`relatorio-mapas-(vigentes-)?`));
     });
 
-    test('Cenário CDU-36: Seleciona unidade e gera PDF', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+    test('Cenário CDU-36: Seleciona unidade e gera PDF', async ({
+                                                                    _resetAutomatico,
+                                                                    page,
+                                                                    request,
+                                                                    _autenticadoComoAdmin
+                                                                }) => {
         test.slow();
         const descricaoProcesso = `Relatório CDU-36 filtro ${Date.now()}`;
         await criarProcessoMapaHomologadoFixture(request, {

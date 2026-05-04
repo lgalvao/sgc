@@ -7,24 +7,24 @@ import {createMemoryHistory, createRouter} from "vue-router";
 
 const router = createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: '/', component: {} }]
+    routes: [{path: '/', component: {}}]
 });
 
 const stubs = {
-    LayoutPadrao: { template: '<div><slot/></div>' },
-    PageHeader: { template: '<div><slot/></div>', props: ['title'] },
-    BCard: { template: '<div><slot/></div>' },
-    BCardBody: { template: '<div><slot/></div>' },
-    BTable: { template: '<table><slot name="cell(acoes)"/></table>', props: ['items', 'fields'] },
-    BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
-    BModal: { template: '<div><slot/></div>', props: ['modelValue'] },
-    BForm: { template: '<form><slot/></form>' },
-    BFormGroup: { template: '<div><slot/></div>' },
-    BFormInput: { template: '<input/>' },
-    BFormSelect: { template: '<select><slot/></select>', props: ['options', 'modelValue'] },
-    BFormTextarea: { template: '<textarea/>' },
-    BSpinner: { template: '<div></div>' },
-    AppAlert: { template: '<div></div>' },
+    LayoutPadrao: {template: '<div><slot/></div>'},
+    PageHeader: {template: '<div><slot/></div>', props: ['title']},
+    BCard: {template: '<div><slot/></div>'},
+    BCardBody: {template: '<div><slot/></div>'},
+    BTable: {template: '<table><slot name="cell(acoes)"/></table>', props: ['items', 'fields']},
+    BButton: {template: '<button @click="$emit(\'click\')"><slot/></button>'},
+    BModal: {template: '<div><slot/></div>', props: ['modelValue']},
+    BForm: {template: '<form><slot/></form>'},
+    BFormGroup: {template: '<div><slot/></div>'},
+    BFormInput: {template: '<input/>'},
+    BFormSelect: {template: '<select><slot/></select>', props: ['options', 'modelValue']},
+    BFormTextarea: {template: '<textarea/>'},
+    BSpinner: {template: '<div></div>'},
+    AppAlert: {template: '<div></div>'},
 };
 
 describe("Admin Views Basic Coverage", () => {

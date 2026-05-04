@@ -12,15 +12,15 @@
           :format-data-simples="formatDataSimples"
           :format-situacao-subprocesso="formatSituacaoSubprocesso"
           :format-tipo-responsabilidade="formatTipoResponsabilidade"
+          :habilitar-alterar-data-limite="habilitarAlterarDataLimite"
+          :habilitar-enviar-lembrete="habilitarEnviarLembrete"
+          :habilitar-reabrir-cadastro="habilitarReabrirCadastro"
+          :habilitar-reabrir-revisao="habilitarReabrirRevisao"
           :mostrar-acoes-cabecalho="mostrarAcoesCabecalho"
           :mostrar-alterar-data-limite="mostrarAlterarDataLimite"
           :mostrar-enviar-lembrete="mostrarEnviarLembrete"
           :mostrar-reabrir-cadastro="mostrarReabrirCadastro"
           :mostrar-reabrir-revisao="mostrarReabrirRevisao"
-          :habilitar-alterar-data-limite="habilitarAlterarDataLimite"
-          :habilitar-enviar-lembrete="habilitarEnviarLembrete"
-          :habilitar-reabrir-cadastro="habilitarReabrirCadastro"
-          :habilitar-reabrir-revisao="habilitarReabrirRevisao"
           :sigla-unidade-fallback="props.siglaUnidade"
           :subprocesso="subprocesso"
           @abrir-alterar-data-limite="abrirModalAlterarDataLimite"
@@ -40,13 +40,13 @@
           :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       />
 
-      <SubprocessoMovimentacoes :movimentacoes="movimentacoes" />
+      <SubprocessoMovimentacoes :movimentacoes="movimentacoes"/>
     </div>
     <div v-else-if="subprocessoStore.erroIntegracaoContexto" class="py-2">
       <BAlert
           :model-value="true"
-          variant="danger"
           dismissible
+          variant="danger"
           @dismissed="subprocessoStore.limparErroIntegracao()"
       >
         {{ subprocessoStore.erroIntegracaoContexto.mensagem }}
@@ -59,9 +59,9 @@
       <i class="bi bi-exclamation-triangle fs-1 text-warning mb-3 d-block"></i>
       <h3>{{ TEXTOS.subprocesso.NAO_ENCONTRADO_TITULO }}</h3>
       <p class="text-muted">{{ TEXTOS.subprocesso.NAO_ENCONTRADO_DESC }}</p>
-      <BButton to="/painel" variant="primary" class="mt-3">Voltar para o Painel</BButton>
+      <BButton class="mt-3" to="/painel" variant="primary">Voltar para o Painel</BButton>
     </div>
-    <CarregamentoPagina v-else class="py-5" />
+    <CarregamentoPagina v-else class="py-5"/>
   </LayoutPadrao>
 
   <SubprocessoFluxoModais
@@ -104,7 +104,7 @@ import {enviarLembrete as enviarLembreteService} from "@/services/processo";
 
 import {useAcesso} from "@/composables/acesso";
 import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
-import {formatarDataBR, analisarData} from "@/utils";
+import {analisarData, formatarDataBR} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -116,7 +116,9 @@ import {useSubprocessoCarregamento} from "@/views/subprocessoCarregamento";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
-function formatDataSimples(dataStr: string | null): string { return dataStr ? formatarDataBR(dataStr) : ''; }
+function formatDataSimples(dataStr: string | null): string {
+  return dataStr ? formatarDataBR(dataStr) : '';
+}
 
 function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
   if (!resp?.tipo) return '';
@@ -188,6 +190,7 @@ function exibirToastPendente() {
     });
   }
 }
+
 const {
   codigoSubprocesso,
   erroNaoEncontrado,

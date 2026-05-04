@@ -93,13 +93,23 @@ async function executarValidacaoFrontendCruft(opcoes = {}) {
                 violacoes.push(criarViolacao(
                     "arquivo_sem_waiver",
                     `Arquivo acima do target sem waiver: ${arquivo.arquivo} (${arquivo.linhas} linhas)`,
-                    {arquivo: arquivo.arquivo, camada: arquivo.camada, linhas: arquivo.linhas, target: arquivo.limites.target}
+                    {
+                        arquivo: arquivo.arquivo,
+                        camada: arquivo.camada,
+                        linhas: arquivo.linhas,
+                        target: arquivo.limites.target
+                    }
                 ));
             } else if (arquivo.linhas > waiver.maxLinhas) {
                 violacoes.push(criarViolacao(
                     "arquivo_cresceu",
                     `Arquivo excedeu o waiver de tamanho: ${arquivo.arquivo} (${arquivo.linhas} > ${waiver.maxLinhas})`,
-                    {arquivo: arquivo.arquivo, camada: arquivo.camada, linhas: arquivo.linhas, maxLinhas: waiver.maxLinhas}
+                    {
+                        arquivo: arquivo.arquivo,
+                        camada: arquivo.camada,
+                        linhas: arquivo.linhas,
+                        maxLinhas: waiver.maxLinhas
+                    }
                 ));
             }
         } else if (waiver) {

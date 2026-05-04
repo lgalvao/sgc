@@ -21,9 +21,9 @@ describe("usePainelStore", () => {
         const processos = [{codigo: 1, sigla: "P1"} as any];
         const alertas = [{codigo: 10, mensagem: "A1"} as any];
         const agora = Date.now();
-        
+
         store.definirDados(processos, alertas);
-        
+
         expect(store.processos).toEqual(processos);
         expect(store.alertas).toEqual(alertas);
         expect(store.carregado).toBe(true);
@@ -34,7 +34,7 @@ describe("usePainelStore", () => {
         const store = usePainelStore();
         store.definirDados([], []);
         expect(store.carregado).toBe(true);
-        
+
         store.invalidar();
         expect(store.carregado).toBe(false);
         expect(store.carregadoEm).toBeNull();
@@ -42,14 +42,14 @@ describe("usePainelStore", () => {
 
     it("deve verificar se dados são válidos baseados no TTL", () => {
         const store = usePainelStore();
-        
+
         // Caso 1: Não carregado
         expect(store.dadosValidos()).toBe(false);
-        
+
         // Caso 2: Carregado agora
         store.definirDados([], []);
         expect(store.dadosValidos()).toBe(true);
-        
+
         // Caso 3: Passado o TTL (5 minutos = 300000ms)
         vi.advanceTimersByTime(300001);
         expect(store.dadosValidos()).toBe(false);
@@ -57,9 +57,9 @@ describe("usePainelStore", () => {
 
     it("deve registrar e verificar leitura de alertas", () => {
         const store = usePainelStore();
-        
+
         expect(store.isMarcadoComoLido(1)).toBe(false);
-        
+
         store.registrarLeitura([1, 2]);
         expect(store.isMarcadoComoLido(1)).toBe(true);
         expect(store.isMarcadoComoLido(2)).toBe(true);

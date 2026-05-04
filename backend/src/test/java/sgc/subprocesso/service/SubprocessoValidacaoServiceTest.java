@@ -38,8 +38,8 @@ class SubprocessoValidacaoServiceTest {
         void erroSemMapa() {
             Subprocesso sp = new Subprocesso();
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(Mensagens.SUBPROCESSO_SEM_MAPA);
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.SUBPROCESSO_SEM_MAPA);
         }
 
         @Test
@@ -112,7 +112,6 @@ class SubprocessoValidacaoServiceTest {
             assertThat(dto.erros()).hasSize(1);
             assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
         }
-
 
 
         @Test
@@ -218,8 +217,8 @@ class SubprocessoValidacaoServiceTest {
             when(sp.getSituacao()).thenReturn(null);
 
             assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.NAO_INICIADO)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Situação do subprocesso não pode ser nula");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Situação do subprocesso não pode ser nula");
         }
 
         @Test
@@ -228,7 +227,7 @@ class SubprocessoValidacaoServiceTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
             assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of()))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -237,7 +236,7 @@ class SubprocessoValidacaoServiceTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
             assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)))
-                .isInstanceOf(ErroValidacao.class);
+                    .isInstanceOf(ErroValidacao.class);
         }
 
         @Test
@@ -254,7 +253,7 @@ class SubprocessoValidacaoServiceTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
             assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -263,8 +262,8 @@ class SubprocessoValidacaoServiceTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
             assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "Msg custom", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Msg custom");
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessage("Msg custom");
         }
     }
 

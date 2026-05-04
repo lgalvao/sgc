@@ -80,7 +80,8 @@ test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
 * Não é necessário subir frontend/backend manualmente para a suíte Playwright padrão.
 * Os testes iniciam a infraestrutura E2E automaticamente via `playwright.config.ts` e `e2e/lifecycle.js`.
 * Para paralelismo isolado, usamos frontend único e 1 backend por worker.
-* O `lifecycle.js` inicia em `e2e` por padrão. O modo `hom` é apenas para subir a aplicação apontando para homologação, sem
+* O `lifecycle.js` inicia em `e2e` por padrão. O modo `hom` é apenas para subir a aplicação apontando para homologação,
+  sem
   endpoints `/e2e`, sem `seed.sql` e sem rotinas de limpeza.
 
 ### Comandos
@@ -137,8 +138,8 @@ Para paralelismo com isolamento de estado, a infraestrutura E2E suporta:
 * 1 backend por worker.
 * Banco H2 em memória dedicado por worker (`sgc-e2e-w{index}`).
 * Portas dedicadas por worker:
-  * Backend: `10000 + workerIndex`
-  * Frontend único: `5173`
+    * Backend: `10000 + workerIndex`
+    * Frontend único: `5173`
 * Configuração validada até aqui: `2 workers`.
 
 ## 🤝 Padrões de Contribuição

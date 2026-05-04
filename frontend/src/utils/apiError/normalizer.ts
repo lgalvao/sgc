@@ -1,6 +1,6 @@
 import logger from '@/utils/logger';
 import {ehErroAxios} from "./classification";
-import type {PayloadErroApi, TipoErro, ErroSimples, ErroNormalizado} from "./types";
+import type {ErroNormalizado, ErroSimples, PayloadErroApi, TipoErro} from "./types";
 
 function obterStack(e: unknown): string | undefined {
     return typeof e === "object" && e !== null && "stack" in e ? (e as ErroSimples).stack : undefined;
@@ -11,17 +11,35 @@ function comoPayload(d: unknown): PayloadErroApi {
 }
 
 function mapearStatusParaTipo(s: number): TipoErro {
-    const tipos: Record<number, TipoErro> = {400: 'validacao', 422: 'validacao', 401: 'naoAutorizado', 403: 'proibido', 404: 'naoEncontrado', 409: 'conflito'};
+    const tipos: Record<number, TipoErro> = {
+        400: 'validacao',
+        422: 'validacao',
+        401: 'naoAutorizado',
+        403: 'proibido',
+        404: 'naoEncontrado',
+        409: 'conflito'
+    };
     return tipos[s] || 'inesperado';
 }
 
 function normalizarErroAxios(erro: import('axios').AxiosError): ErroNormalizado {
     if (erro.code === 'ERR_CANCELED' || erro.name === 'CanceledError') {
-        return {tipo: 'rede', mensagem: 'Requisição cancelada.', codigo: 'REQUEST_CANCELADA', stackTrace: obterStack(erro), erroOriginal: erro};
+        return {
+            tipo: 'rede',
+            mensagem: 'Requisição cancelada.',
+            codigo: 'REQUEST_CANCELADA',
+            stackTrace: obterStack(erro),
+            erroOriginal: erro
+        };
     }
 
     if (!erro.response) {
-        return {tipo: 'rede', mensagem: 'Não foi possível conectar ao servidor. Verifique sua conexão.', stackTrace: obterStack(erro), erroOriginal: erro};
+        return {
+            tipo: 'rede',
+            mensagem: 'Não foi possível conectar ao servidor. Verifique sua conexão.',
+            stackTrace: obterStack(erro),
+            erroOriginal: erro
+        };
     }
 
     const {status, data} = erro.response;

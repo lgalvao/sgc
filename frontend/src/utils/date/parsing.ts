@@ -29,7 +29,7 @@ export function analisarData(entrada: unknown): Date | null {
 
     // Suporte para objetos de contexto do BTable (bootstrap-vue-next)
     const valor = (typeof entrada === 'object' && !Array.isArray(entrada) && entrada !== null && 'value' in entrada)
-        ? (entrada as {value: unknown}).value
+        ? (entrada as { value: unknown }).value
         : entrada;
 
     if (valor instanceof Date) {

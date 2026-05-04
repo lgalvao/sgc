@@ -28,14 +28,14 @@
           :model-value="getEstadoSelecao(unidade) === true"
           class="unidade-checkbox"
           @update:model-value="(val) => onToggle(unidade, val as boolean)"
-        >
+      >
           <span
-             v-b-tooltip.hover="textoTooltip"
-             :title="textoTooltip"
+              v-b-tooltip.hover="textoTooltip"
               :class="{ 'text-muted': !isHabilitado(unidade) }"
               :style="!isHabilitado(unidade) ? { cursor: 'help' } : {}"
+              :title="textoTooltip"
               class="unidade-label"
-        >
+          >
           {{ textoPrincipalUnidade }}
         </span>
       </BFormCheckbox>
@@ -49,8 +49,8 @@
       >
         <span
             v-b-tooltip.hover="textoTooltip"
-            :title="textoTooltip"
             :style="textoTooltip ? { cursor: 'help' } : {}"
+            :title="textoTooltip"
             class="sigla"
         >{{ unidade.sigla }}</span>
         <span class="nome ms-2 text-muted small">- {{ unidade.nome }}</span>

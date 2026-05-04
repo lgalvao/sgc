@@ -44,12 +44,18 @@ class RelatorioFacadeCoverageTest {
     @DisplayName("obterRelatorioAndamento - deve cobrir substituto e titular diferente")
     void obterRelatorioAndamento_ComSubstituto() {
         Long cod = 1L;
-        Unidade u = new Unidade(); u.setCodigo(10L); u.setSigla("U1"); u.setNome("N1");
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(u); sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U1");
+        u.setNome("N1");
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(u);
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         sp.setProcesso(new Processo());
-        
+
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(java.util.List.of(sp));
-        
+
         UnidadeResponsavelDto resp = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(10L)
                 .titularNome("Titular")
@@ -68,21 +74,28 @@ class RelatorioFacadeCoverageTest {
     @DisplayName("gerarRelatorioAndamento - deve cobrir impressão de responsável diferente do titular")
     void gerarRelatorioAndamento_ComResponsavelDiferente() {
         Long cod = 1L;
-        Processo p = new Processo(); p.setCodigo(cod); p.setTipo(TipoProcesso.MAPEAMENTO);
-        Unidade u = new Unidade(); u.setCodigo(10L); u.setSigla("U1");
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(u); sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U1");
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(u);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setProcesso(p);
-        
+
         when(processoService.buscarPorCodigo(cod)).thenReturn(p);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, 
-            UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularNome("TIT").substitutoNome("SUB").build()));
-            
+        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L,
+                UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularNome("TIT").substitutoNome("SUB").build()));
+
         Document doc = mock(Document.class);
         when(pdfFactory.createDocument()).thenReturn(doc);
-        
+
         target.gerarRelatorioAndamento(cod, new ByteArrayOutputStream());
-        
+
         // Deve ter processado adicionarCartoesAndamento e deve ter passado pela linha 281
         verify(doc, atLeastOnce()).add(any());
     }
@@ -99,7 +112,7 @@ class RelatorioFacadeCoverageTest {
     @DisplayName("gerarRelatorioAndamento - deve cobrir erro de IO/Document")
     void gerarRelatorioAndamento_Erro() {
         when(pdfFactory.createDocument()).thenThrow(new RuntimeException("Erro proposital"));
-        
+
         assertThatThrownBy(() -> target.gerarRelatorioAndamento(1L, new ByteArrayOutputStream()))
                 .isInstanceOf(RuntimeException.class);
     }

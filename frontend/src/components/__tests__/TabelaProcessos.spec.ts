@@ -295,7 +295,7 @@ describe("TabelaProcessos.vue", () => {
             });
 
             const table = context.wrapper.findComponent({name: "BTable"});
-            const fields = table.props("fields") as Array<{key: string; sortable?: boolean}>;
+            const fields = table.props("fields") as Array<{ key: string; sortable?: boolean }>;
             const desc = fields.find(f => f.key === "descricao");
             expect(desc?.sortable).toBe(true);
         });
@@ -303,7 +303,7 @@ describe("TabelaProcessos.vue", () => {
         it("deve emitir evento de ordenação ao clicar no cabeçalho em modo compacto", async () => {
             context.wrapper = mount(TabelaProcessos, {
                 ...getCommonMountOptions({}, {
-                BTable: {
+                    BTable: {
                         ...BTableSortStub,
                     }
                 }),
@@ -315,7 +315,10 @@ describe("TabelaProcessos.vue", () => {
                 },
             });
 
-            await context.wrapper.findComponent({name: "BTable"}).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
+            await context.wrapper.findComponent({name: "BTable"}).vm.$emit("update:sort-by", [{
+                key: "tipo",
+                order: "asc"
+            }]);
 
             expect(context.wrapper.emitted("ordenar")).toBeTruthy();
             expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);

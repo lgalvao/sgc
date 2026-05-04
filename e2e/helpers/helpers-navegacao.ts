@@ -144,7 +144,7 @@ export async function esperarPaginaCadastroProcesso(page: Page): Promise<void> {
  * Aguarda a navegação para a página de detalhes de um processo.
  */
 export async function esperarPaginaDetalhesProcesso(page: Page, codigo?: number): Promise<void> {
-    const pattern = codigo 
+    const pattern = codigo
         ? String.raw`\/processo\/(?:cadastro\?codProcesso=)?${codigo}(?:\?.*)?$`
         : String.raw`\/processo\/(?:cadastro\?codProcesso=)?\d+(?:\?.*)?$`;
     await page.waitForURL(new RegExp(pattern));
@@ -155,8 +155,8 @@ export async function esperarPaginaDetalhesProcesso(page: Page, codigo?: number)
  * Aguarda a navegação para a página de detalhes de um subprocesso.
  */
 export async function esperarPaginaSubprocesso(page: Page, siglaUnidade?: string): Promise<void> {
-    const regex = siglaUnidade 
-        ? new RegExp(String.raw`\/processo\/\d+\/${siglaUnidade}(?:\?.*)?$`) 
+    const regex = siglaUnidade
+        ? new RegExp(String.raw`\/processo\/\d+\/${siglaUnidade}(?:\?.*)?$`)
         : /\/processo\/\d+\/[A-Z0-9_]+(?:\?.*)?$/;
     await page.waitForURL(regex);
 }

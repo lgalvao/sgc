@@ -3,67 +3,67 @@ import {mount} from '@vue/test-utils';
 import AppAlert from '../AppAlert.vue';
 
 describe('AppAlert.vue', () => {
-  it('deve renderizar a prop mensagem no modo simples', () => {
-    const wrapper = mount(AppAlert, {
-      props: {
-        mensagem: 'Alerta de erro simples'
-      }
-    });
-    expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(true);
-    expect(wrapper.text()).toContain('Alerta de erro simples');
-  });
-
-  it('deve renderizar o notificacao no modo estruturado e ocultar/exibir detalhes', async () => {
-    const wrapper = mount(AppAlert, {
-      props: {
-        notificacao: {
-          resumo: 'Resumo do erro',
-          detalhes: ['Erro 1', 'Erro 2']
-        }
-      }
+    it('deve renderizar a prop mensagem no modo simples', () => {
+        const wrapper = mount(AppAlert, {
+            props: {
+                mensagem: 'Alerta de erro simples'
+            }
+        });
+        expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(true);
+        expect(wrapper.text()).toContain('Alerta de erro simples');
     });
 
-    expect(wrapper.text()).toContain('Resumo do erro');
-    expect(wrapper.text()).toContain('Mostrar detalhes');
-    expect(wrapper.text()).not.toContain('Erro 1');
+    it('deve renderizar o notificacao no modo estruturado e ocultar/exibir detalhes', async () => {
+        const wrapper = mount(AppAlert, {
+            props: {
+                notificacao: {
+                    resumo: 'Resumo do erro',
+                    detalhes: ['Erro 1', 'Erro 2']
+                }
+            }
+        });
 
-    // Click to show details
-    await wrapper.find('button').trigger('click');
-    expect(wrapper.text()).toContain('Ocultar detalhes');
-    expect(wrapper.text()).toContain('Erro 1');
-    expect(wrapper.text()).toContain('Erro 2');
-  });
+        expect(wrapper.text()).toContain('Resumo do erro');
+        expect(wrapper.text()).toContain('Mostrar detalhes');
+        expect(wrapper.text()).not.toContain('Erro 1');
 
-  it('deve renderizar o stack trace quando em modo dev', async () => {
-    const wrapper = mount(AppAlert, {
-      props: {
-        mensagem: 'Erro com stack',
-        stackTrace: 'Error at line 1'
-      }
+        // Click to show details
+        await wrapper.find('button').trigger('click');
+        expect(wrapper.text()).toContain('Ocultar detalhes');
+        expect(wrapper.text()).toContain('Erro 1');
+        expect(wrapper.text()).toContain('Erro 2');
     });
 
-    expect(wrapper.text()).toContain('Mostrar detalhes técnicos');
+    it('deve renderizar o stack trace quando em modo dev', async () => {
+        const wrapper = mount(AppAlert, {
+            props: {
+                mensagem: 'Erro com stack',
+                stackTrace: 'Error at line 1'
+            }
+        });
 
-    // Múltiplos buttons podem existir se fosse notificação estruturada, mas é modo simples
-    await wrapper.find('button').trigger('click');
-    expect(wrapper.text()).toContain('Error at line 1');
-  });
+        expect(wrapper.text()).toContain('Mostrar detalhes técnicos');
 
-  it('nao deve renderizar se não houver mensagem ou notificacao', () => {
-    const wrapper = mount(AppAlert, {
-      props: {}
-    });
-    expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(false);
-  });
-
-  it('deve emitir o evento dismissed', async () => {
-    const wrapper = mount(AppAlert, {
-      props: {
-        mensagem: 'Erro'
-      }
+        // Múltiplos buttons podem existir se fosse notificação estruturada, mas é modo simples
+        await wrapper.find('button').trigger('click');
+        expect(wrapper.text()).toContain('Error at line 1');
     });
 
-    wrapper.vm.$emit('dismissed');
-    expect(wrapper.emitted().dismissed).toBeTruthy();
-  });
+    it('nao deve renderizar se não houver mensagem ou notificacao', () => {
+        const wrapper = mount(AppAlert, {
+            props: {}
+        });
+        expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(false);
+    });
+
+    it('deve emitir o evento dismissed', async () => {
+        const wrapper = mount(AppAlert, {
+            props: {
+                mensagem: 'Erro'
+            }
+        });
+
+        wrapper.vm.$emit('dismissed');
+        expect(wrapper.emitted().dismissed).toBeTruthy();
+    });
 });

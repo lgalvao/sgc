@@ -32,7 +32,7 @@ const OUTPUT_FILE = path.join(RAIZ, 'mensagens-extraidas.json');
 function listarArquivos(dirPath, extensao) {
     const resultado = [];
     if (!fs.existsSync(dirPath)) return resultado;
-    const entradas = fs.readdirSync(dirPath, { withFileTypes: true });
+    const entradas = fs.readdirSync(dirPath, {withFileTypes: true});
     for (const entrada of entradas) {
         const fullPath = path.join(dirPath, entrada.name);
         if (entrada.isDirectory()) {

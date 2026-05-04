@@ -122,9 +122,9 @@ class UsuarioControllerTest {
     @WithMockUser(roles = "ADMIN")
     void adicionarAdministrador_DeveValidarUsuarioTitulo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
                 .andExpect(status().isBadRequest());
     }
 

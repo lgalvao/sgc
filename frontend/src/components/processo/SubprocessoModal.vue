@@ -2,21 +2,21 @@
   <ModalPadrao
       :loading="loading"
       :model-value="mostrarModal"
-      texto-acao="Alterar"
-      variant-acao="success"
       data-testid="mdl-alterar-data-limite"
       test-codigo-cancelar="subprocesso-modal__btn-modal-cancelar"
       test-codigo-confirmar="btn-modal-confirmar"
+      texto-acao="Alterar"
       titulo="Alterar data limite"
+      variant-acao="success"
       @confirmar="confirmar"
       @fechar="$emit('fecharModal')"
   >
     <BFormGroup
+        :invalid-feedback="mensagemErroDataLimite"
+        :state="mensagemErroDataLimite ? false : null"
+        class="mb-3"
         description="Selecione uma data futura"
         label-for="novaDataLimite"
-        :state="mensagemErroDataLimite ? false : null"
-        :invalid-feedback="mensagemErroDataLimite"
-        class="mb-3"
     >
       <template #label>
         Nova data limite <span aria-hidden="true" class="text-danger">*</span>
@@ -43,7 +43,13 @@ import {BFormGroup} from "bootstrap-vue-next";
 import InputData from "@/components/comum/InputData.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {computed, nextTick, ref, watch} from "vue";
-import {formatarDataBR, formatarDataParaInput, ehDataEstritamenteFutura, obterAmanhaFormatado, analisarData,} from "@/utils";
+import {
+  analisarData,
+  ehDataEstritamenteFutura,
+  formatarDataBR,
+  formatarDataParaInput,
+  obterAmanhaFormatado,
+} from "@/utils";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 

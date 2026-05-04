@@ -10,12 +10,12 @@
     <InputData
         id="dataLimite"
         ref="inputRef"
+        :min="obterAmanhaFormatado()"
         :model-value="modelValue"
+        :required="true"
         :state="erro ? false : null"
         data-testid="inp-processo-data-limite"
         max="2099-12-31"
-        :min="obterAmanhaFormatado()"
-        :required="true"
         @update:model-value="(val) => $emit('update:modelValue', String(val))"
     />
 

@@ -15,8 +15,8 @@
       <p>{{ corpoModal }}</p>
 
       <BFormGroup
-          class="mb-0"
           :label="TEXTOS.comum.OBSERVACAO"
+          class="mb-0"
           label-for="observacaoAceiteMapa"
       >
         <BFormTextarea

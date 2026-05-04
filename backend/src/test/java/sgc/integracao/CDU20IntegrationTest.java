@@ -163,14 +163,15 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Verificação do histórico após aceite
         String responseAceite = mockMvc.perform(get("/api/subprocessos/{codigo}/historico-validacao", subprocesso.getCodigo())
-                                .with(user(usuarioGestor))
-                                .with(csrf()))
-                        .andExpect(status().isOk())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                        .with(user(usuarioGestor))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-        List<AnaliseHistoricoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<>() {});
+        List<AnaliseHistoricoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<>() {
+        });
         assertThat(historicoAceite).hasSize(2);
         assertThat(historicoAceite.getFirst().acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
@@ -190,7 +191,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 alertasAceite.stream().filter(a -> a.getUnidadeDestino()
                         .getSigla()
                         .equals(unidadeSuperiorSuperior.getSigla())).findFirst().orElseThrow(
-                                () -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
+                        () -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
 
         assertThat(alertaDeAceite.getDescricao())
                 .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");

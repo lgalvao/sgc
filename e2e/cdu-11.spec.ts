@@ -9,7 +9,7 @@ import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
-    
+
     test.describe('Em processo em Andamento', () => {
         const UNIDADE_ALVO = 'SECAO_111';
         const timestamp = Date.now();
@@ -23,7 +23,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             validarProcessoFixture(processo, descProcesso);
         });
 
-        test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({
+                                                                                         _resetAutomatico,
+                                                                                         page,
+                                                                                         _autenticadoComoAdmin
+                                                                                     }) => {
             await acessarDetalhesProcesso(page, descProcesso);
 
             // 2.1. O sistema mostra a tela Detalhes do processo
@@ -42,7 +46,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
 
-        test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({_resetAutomatico, page, _autenticadoComoChefeSecao111}) => {
+        test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({
+                                                                                                      _resetAutomatico,
+                                                                                                      page,
+                                                                                                      _autenticadoComoChefeSecao111
+                                                                                                  }) => {
             await acessarDetalhesProcesso(page, descProcesso);
 
             // 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário
@@ -69,7 +77,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             validarProcessoFixture(processo, descProcesso);
         });
 
-        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({
+                                                                          _resetAutomatico,
+                                                                          page,
+                                                                          _autenticadoComoAdmin
+                                                                      }) => {
 
             await acessarDetalhesProcesso(page, descProcesso);
 

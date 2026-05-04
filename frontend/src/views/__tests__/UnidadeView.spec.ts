@@ -5,7 +5,13 @@ import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-const {mockPush, mockUnidadeData, mockMapaVigente, mockObterUnidade, mockObterReferenciaMapaVigente} = vi.hoisted(() => {
+const {
+    mockPush,
+    mockUnidadeData,
+    mockMapaVigente,
+    mockObterUnidade,
+    mockObterReferenciaMapaVigente
+} = vi.hoisted(() => {
     const u = {
         codigo: 10,
         nome: 'Titular teste',

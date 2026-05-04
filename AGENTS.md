@@ -1,23 +1,29 @@
 # Guia para Agentes de Desenvolvimento - SGC
 
-Este documento resume as diretrizes essenciais para o desenvolvimento no projeto SGC. O foco está nas **convenções específicas** do projeto que diferem dos padrões genéricos.
+Este documento resume as diretrizes essenciais para o desenvolvimento no projeto SGC. O foco está nas **convenções
+específicas** do projeto que diferem dos padrões genéricos.
 
 ### Regras gerais
 
-* **Idioma:** Todo o código (variáveis, métodos), comentários, mensagens de erro e documentação deve ser em **Português brasileiro**.
+* **Idioma:** Todo o código (variáveis, métodos), comentários, mensagens de erro e documentação deve ser em **Português
+  brasileiro**.
 * **Identificadores:** Use sempre `codigo` em vez de `id` para chaves primárias e referências.
 * **Convenções de Nomenclatura:**
     * **Backend:** Classes `PascalCase`, métodos `camelCase`. Sufixos: `Controller`, `Service`, `Repo`, `Dto`, `Mapper`
     * Exceções iniciam com `Erro` (ex: `ErroNegocio`)
-    * **Frontend:** Componentes `PascalCase` (`ProcessoCard.vue`), arquivos TS `camelCase`. Stores seguem `use{Nome}Store`
+    * **Frontend:** Componentes `PascalCase` (`ProcessoCard.vue`), arquivos TS `camelCase`. Stores seguem
+      `use{Nome}Store`
 
 * **Qualidade de Código:**
-    * **Limite de Parâmetros:** Métodos devem ter no máximo **3 parâmetros**. Se ultrapassar, use um objeto de transporte (DTO de 'command').
-    * **Código depreciado:** Código marcado como `@Deprecated` deve ser removido sumariamente assim que não houver mais dependências internas (especialmente após consolidações arquiteturais).
+    * **Limite de Parâmetros:** Métodos devem ter no máximo **3 parâmetros**. Se ultrapassar, use um objeto de
+      transporte (DTO de 'command').
+    * **Código depreciado:** Código marcado como `@Deprecated` deve ser removido sumariamente assim que não houver mais
+      dependências internas (especialmente após consolidações arquiteturais).
 
 ### Referências e Padrões
 
 Para detalhes técnicos, consulte:
+
 * Regras de acesso /etc/docs/regras-acesso.md
 * Regras para ajustes em testes e2e e correção de bugs: /etc/docs/regras-e2e.md
 * README.md de cada camada para responsabilidades específicas
@@ -47,7 +53,8 @@ Para detalhes técnicos, consulte:
 
 ### Toolkit de Automação (sgc.js)
 
-O projeto possui uma CLI de automação centralizada que deve ser utilizada para diagnósticos, auditorias e tarefas de qualidade.
+O projeto possui uma CLI de automação centralizada que deve ser utilizada para diagnósticos, auditorias e tarefas de
+qualidade.
 
 * **Ponto de Entrada:** `node etc/scripts/sgc.js`
 * **Comandos Essenciais:**
@@ -57,7 +64,8 @@ O projeto possui uma CLI de automação centralizada que deve ser utilizada para
     * **`codigo smells auditar`**: Detecta complexidade acidental e padrões desencorajados.
     * **`projeto limpar`**: Remove artefatos transientes e relatórios antigos.
 
-**Regra:** Antes de realizar grandes refatorações ou após mudar de ambiente, execute o `projeto doctor` para garantir que o workspace está íntegro.
+**Regra:** Antes de realizar grandes refatorações ou após mudar de ambiente, execute o `projeto doctor` para garantir
+que o workspace está íntegro.
 
 ### Comandos e Testes
 

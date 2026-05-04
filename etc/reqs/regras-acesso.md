@@ -9,7 +9,8 @@ O sistema de acesso do SGC baseia-se em dois eixos:
 | **Hierarquia**  | Visualização (Leitura) | Unidade responsável do subprocesso |
 | **Localização** | Execução (Escrita)     | Localização atual do subprocesso   |
 
-**Regra de ouro:** O usuário só pode executar ações de escrita em um subprocesso se este estiver **localizado na sua unidade ativa** — incluindo o perfil ADMIN.
+**Regra de ouro:** O usuário só pode executar ações de escrita em um subprocesso se este estiver **localizado na sua
+unidade ativa** — incluindo o perfil ADMIN.
 
 ---
 
@@ -29,25 +30,31 @@ O sistema de acesso do SGC baseia-se em dois eixos:
 Validadas no método `checkHierarquia` do `SgcPermissionEvaluator`:
 
 - **ADMIN:** `return true` — acesso global.
-- **GESTOR:** `hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario)` — vê sua unidade e todas as subordinadas.
+- **GESTOR:** `hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario)` — vê sua unidade e todas as
+  subordinadas.
 - **CHEFE / SERVIDOR:** `usuario.getUnidadeAtivaCodigo() == unidadeAlvo.getCodigo()` — vê apenas sua própria unidade.
 
 ### Exceção: VERIFICAR_IMPACTOS
 
-A ação `VERIFICAR_IMPACTOS` **não depende de localização** no Evaluator (apenas retorna `true` se o perfil for CHEFE, GESTOR ou ADMIN). O controle fino de em quais situações cada perfil pode ver os impactos é feito no **serviço** (`ImpactoMapaService`), não no Evaluator.
+A ação `VERIFICAR_IMPACTOS` **não depende de localização** no Evaluator (apenas retorna `true` se o perfil for CHEFE,
+GESTOR ou ADMIN). O controle fino de em quais situações cada perfil pode ver os impactos é feito no **serviço** (
+`ImpactoMapaService`), não no Evaluator.
 
 ### Exceção: Alertas (Painel e Barra de Navegação)
 
-As regras de visualização de alertas **não seguem a hierarquia recursiva**. A visibilidade é determinada pelo perfil e pelo destino do alerta (CDU-02):
+As regras de visualização de alertas **não seguem a hierarquia recursiva**. A visibilidade é determinada pelo perfil e
+pelo destino do alerta (CDU-02):
 
 - **Perfil SERVIDOR:**
     * Vê **apenas** os alertas exclusivos (**pessoais**) direcionados ao seu título de eleitor.
     * **Não vê** alertas da unidade, mesmo que seja sua unidade ativa.
 - **Outros Perfis (ADMIN, GESTOR, CHEFE):**
     * Veem os alertas exclusivos (**pessoais**) direcionados a eles.
-    * Veem **também** alertas coletivos da sua **unidade ativa** (alertas que não possuem um usuário de destino específico).
+    * Veem **também** alertas coletivos da sua **unidade ativa** (alertas que não possuem um usuário de destino
+      específico).
 
-**Ordenação:** Os alertas são exibidos obrigatoriamente em ordem decrescente por **Data/Hora**, não sendo permitida a reordenação pelo usuário.
+**Ordenação:** Os alertas são exibidos obrigatoriamente em ordem decrescente por **Data/Hora**, não sendo permitida a
+reordenação pelo usuário.
 
 ---
 
@@ -89,34 +96,34 @@ Adicionalmente, o `checkPerfil` verifica se o perfil do usuário é compatível 
 
 Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 
-| Endpoint                                               | Ação                            | CDU   |
-|--------------------------------------------------------|---------------------------------|-------|
-| `POST /api/processos`                                  | Criar processo                  | 03    |
-| `POST /api/processos/{codigo}/atualizar`               | Editar processo                 | 03    |
-| `POST /api/processos/{codigo}/excluir`                 | Excluir processo                | 03    |
-| `POST /api/processos/{codigo}/iniciar`                 | Iniciar processo                | 04/05 |
-| `POST /api/processos/{codigo}/finalizar`               | Finalizar processo              | 21    |
-| `POST /api/processos/{codigo}/enviar-lembrete`         | Enviar lembrete de prazo        | 34    |
+| Endpoint                                                   | Ação                            | CDU   |
+|------------------------------------------------------------|---------------------------------|-------|
+| `POST /api/processos`                                      | Criar processo                  | 03    |
+| `POST /api/processos/{codigo}/atualizar`                   | Editar processo                 | 03    |
+| `POST /api/processos/{codigo}/excluir`                     | Excluir processo                | 03    |
+| `POST /api/processos/{codigo}/iniciar`                     | Iniciar processo                | 04/05 |
+| `POST /api/processos/{codigo}/finalizar`                   | Finalizar processo              | 21    |
+| `POST /api/processos/{codigo}/enviar-lembrete`             | Enviar lembrete de prazo        | 34    |
 | `POST /api/subprocessos/{codigo}/data-limite`              | Alterar data limite             | 27    |
 | `POST /api/subprocessos/{codigo}/reabrir-cadastro`         | Reabrir cadastro                | 32    |
 | `POST /api/subprocessos/{codigo}/reabrir-revisao-cadastro` | Reabrir revisão                 | 33    |
-| `POST /api/subprocessos`                               | Criar subprocesso               | —     |
+| `POST /api/subprocessos`                                   | Criar subprocesso               | —     |
 | `POST /api/subprocessos/{codigo}/atualizar`                | Atualizar subprocesso           | —     |
 | `POST /api/subprocessos/{codigo}/excluir`                  | Excluir subprocesso             | —     |
-| `GET /api/subprocessos`                                | Listar subprocessos             | —     |
-| `GET /api/configuracoes`                               | Listar configurações            | 31    |
-| `POST /api/configuracoes`                              | Atualizar configurações         | 31    |
-| `GET /api/usuarios/administradores`                    | Listar administradores          | 30    |
-| `POST /api/usuarios/administradores`                   | Adicionar administrador         | 30    |
-| `POST /api/usuarios/administradores/{titulo}/remover`  | Remover administrador           | 30    |
-| `POST /api/unidades/{codigo}/atribuicoes-temporarias`     | Criar atribuição temporária     | 28    |
-| `GET /api/unidades/atribuicoes`                        | Listar atribuições              | 28    |
-| `GET /api/relatorios/andamento/{codigo}`                  | Ver relatório de andamento      | 35    |
-| `GET /api/relatorios/andamento/{codigo}/exportar`         | Exportar relatório de andamento | 35    |
-| `GET /api/relatorios/mapas/{codigo}/exportar`             | Exportar relatório de mapas     | 36    |
-| `POST /api/mapas`                                      | Criar mapa                      | 15    |
-| `POST /api/mapas/{codigo}/atualizar`                      | Atualizar mapa                  | 15    |
-| `POST /api/mapas/{codigo}/excluir`                        | Excluir mapa                    | 15    |
+| `GET /api/subprocessos`                                    | Listar subprocessos             | —     |
+| `GET /api/configuracoes`                                   | Listar configurações            | 31    |
+| `POST /api/configuracoes`                                  | Atualizar configurações         | 31    |
+| `GET /api/usuarios/administradores`                        | Listar administradores          | 30    |
+| `POST /api/usuarios/administradores`                       | Adicionar administrador         | 30    |
+| `POST /api/usuarios/administradores/{titulo}/remover`      | Remover administrador           | 30    |
+| `POST /api/unidades/{codigo}/atribuicoes-temporarias`      | Criar atribuição temporária     | 28    |
+| `GET /api/unidades/atribuicoes`                            | Listar atribuições              | 28    |
+| `GET /api/relatorios/andamento/{codigo}`                   | Ver relatório de andamento      | 35    |
+| `GET /api/relatorios/andamento/{codigo}/exportar`          | Exportar relatório de andamento | 35    |
+| `GET /api/relatorios/mapas/{codigo}/exportar`              | Exportar relatório de mapas     | 36    |
+| `POST /api/mapas`                                          | Criar mapa                      | 15    |
+| `POST /api/mapas/{codigo}/atualizar`                       | Atualizar mapa                  | 15    |
+| `POST /api/mapas/{codigo}/excluir`                         | Excluir mapa                    | 15    |
 
 ---
 
@@ -137,7 +144,8 @@ Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 `POST /api/processos/{codigo}/acao-em-bloco` — protegido com `hasAnyRole('ADMIN', 'GESTOR')`.
 
 A `ProcessoFacade.executarAcaoEmBloco()` faz a verificação fina de permissão internamente via
-`permissionEvaluator.checkPermission()`, categorizando cada subprocesso na ação correta (aceitar cadastro, aceitar mapa, homologar cadastro, homologar mapa, ou disponibilizar mapa).
+`permissionEvaluator.checkPermission()`, categorizando cada subprocesso na ação correta (aceitar cadastro, aceitar mapa,
+homologar cadastro, homologar mapa, ou disponibilizar mapa).
 
 ### 5.3 Permissões no nível de Processo (checkProcesso)
 
@@ -173,10 +181,12 @@ O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conheci
 
 ## 7. Importação de Atividades
 
-- `POST /subprocessos/{codigo}/importar-atividades` — protegido com `hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')`.
+- `POST /subprocessos/{codigo}/importar-atividades` — protegido com
+  `hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')`.
 - `IMPORTAR_ATIVIDADES` exige perfil **CHEFE** + localização.
 - `GET /subprocessos/{codigo}/atividades-importacao` — protegido com `isAuthenticated()`.
-- A ação `CONSULTAR_PARA_IMPORTACAO` no Evaluator permite que CHEFE consulte subprocessos finalizados ou da sua hierarquia.
+- A ação `CONSULTAR_PARA_IMPORTACAO` no Evaluator permite que CHEFE consulte subprocessos finalizados ou da sua
+  hierarquia.
 
 ---
 
@@ -215,7 +225,8 @@ CRIADO → EM_ANDAMENTO → FINALIZADO
 As ações devem seguir essas diretrizes na UI:
 
 - **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar processo" para CHEFE).
-- **Desabilitar:** Se o perfil permite, mas a **situação** ou a **localização** atual impede (ex: botão "Disponibilizar" visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo).
+- **Desabilitar:** Se o perfil permite, mas a **situação** ou a **localização** atual impede (ex: botão "Disponibilizar"
+  visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo).
 
 ---
 
@@ -240,6 +251,7 @@ As ações devem seguir essas diretrizes na UI:
 ### Localização do Subprocesso
 
 A localização é obtida via `obterUnidadeLocalizacao()`:
+
 1. Se `sp.getLocalizacaoAtual()` não é null, usa este valor (cache).
 2. Senão, busca a última movimentação (`movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc`).
 3. Se não houver movimentação, assume a unidade do subprocesso (posição inicial).

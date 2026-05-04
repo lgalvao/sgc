@@ -71,7 +71,7 @@ class SubprocessoConsultaServiceCoverageTest {
         acessoService = new SubprocessoAcessoService(impactoMapaService);
         visualizacaoService = new SubprocessoVisualizacaoService(
                 usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
-        
+
         ReflectionTestUtils.setField(target, "acessoService", acessoService);
         ReflectionTestUtils.setField(target, "visualizacaoService", visualizacaoService);
 
@@ -277,7 +277,7 @@ class SubprocessoConsultaServiceCoverageTest {
         uni.setNome("Unidade 10");
         sp.setUnidade(uni);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        
+
         when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("tit", 20L, Perfil.CHEFE));
         Unidade u20 = new Unidade();
         u20.setCodigo(20L);

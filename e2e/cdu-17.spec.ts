@@ -40,7 +40,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
                                                                                               _resetAutomatico,
                                                                                               page,
                                                                                               _autenticadoComoAdmin
-}) => {
+                                                                                          }) => {
 
         // Cenario 1: Navegação
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();

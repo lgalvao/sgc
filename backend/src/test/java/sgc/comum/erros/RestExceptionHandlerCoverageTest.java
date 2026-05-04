@@ -32,10 +32,10 @@ class RestExceptionHandlerCoverageTest {
     @DisplayName("Deve cobrir descreverRequisicao quando não for ServletWebRequest")
     void deveCobrirDescreverRequisicaoNaoServlet() {
         WebRequest mockRequest = mock(WebRequest.class);
-        
+
         ResponseEntity<Object> response = target.handleHttpMessageNotWritable(
                 createEx(), null, HttpStatus.INTERNAL_SERVER_ERROR, mockRequest);
-                
+
         assertThat(response).isNotNull();
     }
 
@@ -44,13 +44,13 @@ class RestExceptionHandlerCoverageTest {
     void deveCobrirDescreverRequisicaoServlet() {
         ServletWebRequest mockRequest = mock(ServletWebRequest.class);
         HttpServletRequest mockHttpRequest = mock(HttpServletRequest.class);
-        
+
         when(mockRequest.getRequest()).thenReturn(mockHttpRequest);
         when(mockHttpRequest.getMethod()).thenReturn("POST");
         when(mockHttpRequest.getRequestURI()).thenReturn("/api/teste");
-        
+
         target.handleHttpMessageNotWritable(createEx(), null, HttpStatus.INTERNAL_SERVER_ERROR, mockRequest);
-        
+
         verify(mockRequest).getRequest();
     }
 
@@ -61,11 +61,11 @@ class RestExceptionHandlerCoverageTest {
         Exception causaMeio = new RuntimeException("Meio", causaRaiz);
         Exception ex = new RuntimeException("Topo", causaMeio);
         WebRequest request = mock(WebRequest.class);
-        
+
         ResponseEntity<Object> response = target.handleHttpMessageNotWritable(
-                new HttpMessageNotWritableException("Erro", ex), 
+                new HttpMessageNotWritableException("Erro", ex),
                 null, HttpStatus.INTERNAL_SERVER_ERROR, request);
-                
+
         assertThat(response).isNotNull();
     }
 
@@ -75,15 +75,16 @@ class RestExceptionHandlerCoverageTest {
     void deveCobrirHandleErroNegocio4xxComDetalhes() {
         Map<String, String> details = new HashMap<>();
         details.put("campo", "erro no campo");
-        
-        ErroNegocioBase ex = new ErroNegocioBase("Mensagem Erro", "COD_400", HttpStatus.BAD_REQUEST, details) {};
-        
+
+        ErroNegocioBase ex = new ErroNegocioBase("Mensagem Erro", "COD_400", HttpStatus.BAD_REQUEST, details) {
+        };
+
         ResponseEntity<ErroApi> response = target.handleErroNegocio(ex);
         ErroApi corpo = Objects.requireNonNull(response.getBody());
-        
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(corpo.getMessage()).isEqualTo("Mensagem Erro");
-        
+
         Map<String, Object> responseDetails = (Map<String, Object>) corpo.getDetails();
         assertThat(responseDetails).containsEntry("campo", "erro no campo");
     }
@@ -91,21 +92,22 @@ class RestExceptionHandlerCoverageTest {
     @Test
     @DisplayName("Deve cobrir handleErroNegocio com erro 5xx")
     void deveCobrirHandleErroNegocio5xx() {
-        ErroNegocioBase ex = new ErroNegocioBase("Erro Crítico", "COD_500", HttpStatus.INTERNAL_SERVER_ERROR) {};
-        
+        ErroNegocioBase ex = new ErroNegocioBase("Erro Crítico", "COD_500", HttpStatus.INTERNAL_SERVER_ERROR) {
+        };
+
         ResponseEntity<ErroApi> response = target.handleErroNegocio(ex);
-        
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     @DisplayName("Deve cobrir handleGenericException com mensagem nula")
     void deveCobrirHandleGenericExceptionMensagemNula() {
-        Exception ex = new NullPointerException(); 
-        
+        Exception ex = new NullPointerException();
+
         ResponseEntity<ErroApi> response = target.handleGenericException(ex);
         ErroApi corpo = Objects.requireNonNull(response.getBody());
-        
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(corpo.getMessage()).isEqualTo("Erro inesperado. Consulte o suporte com o código de rastreamento.");
     }

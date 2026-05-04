@@ -54,9 +54,9 @@ describe("useCadastroAtividadesMutacoes", () => {
     it("deve retornar falso se codMapa ou codigoSubprocesso forem nulos", async () => {
         codMapa.value = null;
         const {adicionarAtividade} = setup();
-        
+
         const result = await adicionarAtividade();
-        
+
         expect(result).toBe(false);
         expect(adicionarAtividadeAction).not.toHaveBeenCalled();
     });
@@ -84,9 +84,9 @@ describe("useCadastroAtividadesMutacoes", () => {
 
     it("deve preparar remoção de atividade", () => {
         const {removerAtividade, dadosRemocao, mostrarModalConfirmacaoRemocao} = setup();
-        
+
         removerAtividade(1);
-        
+
         expect(dadosRemocao.value).toEqual({tipo: "atividade", atividadeCodigo: 1});
         expect(mostrarModalConfirmacaoRemocao.value).toBe(true);
     });

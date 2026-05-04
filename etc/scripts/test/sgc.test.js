@@ -533,18 +533,28 @@ describe("CLI raiz do toolkit", () => {
             categorias: {
                 Services: {
                     untested: [
-                        {caminho_relativo: "sgc/mapa/service/MapaCriticoService.java", evidencia_qualidade: "sem_evidencia_no_escopo"}
+                        {
+                            caminho_relativo: "sgc/mapa/service/MapaCriticoService.java",
+                            evidencia_qualidade: "sem_evidencia_no_escopo"
+                        }
                     ]
                 },
                 DTOs: {
                     untested: [
-                        {caminho_relativo: "sgc/mapa/dto/MapaRuidoCommand.java", evidencia_qualidade: "ruido_dto_estrutural", dto_ruido_ignorado: true}
+                        {
+                            caminho_relativo: "sgc/mapa/dto/MapaRuidoCommand.java",
+                            evidencia_qualidade: "ruido_dto_estrutural",
+                            dto_ruido_ignorado: true
+                        }
                     ]
                 },
                 Others: {
                     untested: [
                         {caminho_relativo: "sgc/comum/Mensagens.java", evidencia_qualidade: "fora_escopo_jacoco"},
-                        {caminho_relativo: "sgc/seguranca/AcaoPermissao.java", evidencia_qualidade: "cobertura_indireta"}
+                        {
+                            caminho_relativo: "sgc/seguranca/AcaoPermissao.java",
+                            evidencia_qualidade: "cobertura_indireta"
+                        }
                     ]
                 }
             }

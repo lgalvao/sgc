@@ -1,49 +1,49 @@
 import type {Unidade} from "./organizacao";
 
 export interface Conhecimento {
-  codigo: number;
-  descricao: string;
+    codigo: number;
+    descricao: string;
 }
 
 export interface Atividade {
-  codigo: number;
-  descricao: string;
-  conhecimentos: Conhecimento[];
-  mapaCodigo?: number;
+    codigo: number;
+    descricao: string;
+    conhecimentos: Conhecimento[];
+    mapaCodigo?: number;
 }
 
 export interface Competencia {
-  codigo: number;
-  descricao: string;
-  atividades: Atividade[];
+    codigo: number;
+    descricao: string;
+    atividades: Atividade[];
 }
 
 export interface Mapa {
-  codigo: number;
-  descricao: string;
-  unidade: Unidade;
-  codProcesso: number;
-  competencias: Competencia[];
-  situacao: string;
-  dataCriacao: string;
-  dataDisponibilizacao?: string;
-  dataFinalizacao?: string;
+    codigo: number;
+    descricao: string;
+    unidade: Unidade;
+    codProcesso: number;
+    competencias: Competencia[];
+    situacao: string;
+    dataCriacao: string;
+    dataDisponibilizacao?: string;
+    dataFinalizacao?: string;
 }
 
 export interface MapaResumo {
-  codigo: number;
-  subprocessoCodigo: number;
-  dataHoraDisponibilizado?: string | null;
-  observacoesDisponibilizacao?: string | null;
-  sugestoes?: string | null;
-  dataHoraHomologado?: string | null;
+    codigo: number;
+    subprocessoCodigo: number;
+    dataHoraDisponibilizado?: string | null;
+    observacoesDisponibilizacao?: string | null;
+    sugestoes?: string | null;
+    dataHoraHomologado?: string | null;
 }
 
 export interface MapaCompleto {
-  codigo: number;
-  subprocessoCodigo: number;
-  observacoes: string;
-  competencias: Competencia[];
-  atividades: Atividade[];
-  situacao: string;
+    codigo: number;
+    subprocessoCodigo: number;
+    observacoes: string;
+    competencias: Competencia[];
+    atividades: Atividade[];
+    situacao: string;
 }

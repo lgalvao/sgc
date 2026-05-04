@@ -131,7 +131,7 @@ export async function excluirCompetenciaConfirmando(page: Page, descricao: strin
     await expect(modal).toContainText(descricao);
 
     const btnConfirmar = modal.getByTestId('btn-confirmar-exclusao-competencia');
-    await btnConfirmar.waitFor({ state: 'visible'});
+    await btnConfirmar.waitFor({state: 'visible'});
     await btnConfirmar.scrollIntoViewIfNeeded();
     await btnConfirmar.click();
     await expect(modal).toBeHidden();

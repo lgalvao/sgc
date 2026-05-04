@@ -60,7 +60,11 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     });
 
 
-    test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({
+                                                                            _resetAutomatico,
+                                                                            page,
+                                                                            _autenticadoComoAdmin
+                                                                        }) => {
         // CDU-27: Passos 1-2
 
 
@@ -71,7 +75,11 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN pode cancelar a alteração da data limite sem persistir mudanças', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN pode cancelar a alteração da data limite sem persistir mudanças', async ({
+                                                                                                        _resetAutomatico,
+                                                                                                        page,
+                                                                                                        _autenticadoComoAdmin
+                                                                                                    }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
@@ -90,7 +98,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
         const inputData = page.getByTestId('input-nova-data-limite');
         await expect(inputData).toBeVisible();
-        
+
         // BUG FIX VERIFICATION: Verificar se o modal inicia com a data do prazo (não criação)
         const dataInicialModal = await inputData.inputValue();
         // Converter data do modal (yyyy-mm-dd) para formato brasileiro (dd/mm/yyyy) para comparar
@@ -111,7 +119,11 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(modal).toBeHidden();
     });
 
-    test('Cenario 3: ADMIN altera data limite e recebe confirmação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 3: ADMIN altera data limite e recebe confirmação', async ({
+                                                                                _resetAutomatico,
+                                                                                page,
+                                                                                _autenticadoComoAdmin
+                                                                            }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
 

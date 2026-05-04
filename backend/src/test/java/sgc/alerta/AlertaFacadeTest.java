@@ -43,85 +43,6 @@ class AlertaFacadeTest {
     @Captor
     private ArgumentCaptor<List<AlertaUsuario>> alertaUsuarioListCaptor;
 
-    @Nested
-    @DisplayName("Listagem de Alertas")
-    class ListagemAlertas {
-
-        @Test
-        @DisplayName("Deve listar alertas para Servidor chamando o método expressivo correto")
-        void deveListarParaServidor() {
-            String titulo = "123";
-            when(alertaService.listarParaServidor(titulo)).thenReturn(Collections.emptyList());
-
-            alertaFacade.alertasPorUsuario(CONTEXTO_SERVIDOR);
-
-            verify(alertaService).listarParaServidor(titulo);
-            verify(alertaService, never()).listarParaGestao(anyLong(), anyString());
-        }
-
-        @Test
-        @DisplayName("Deve listar alertas para Gestão chamando o método expressivo correto")
-        void deveListarParaGestao() {
-            String titulo = "123";
-            Long codUnidade = 1L;
-            when(alertaService.listarParaGestao(codUnidade, titulo)).thenReturn(Collections.emptyList());
-
-            alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
-
-            verify(alertaService).listarParaGestao(codUnidade, titulo);
-            verify(alertaService, never()).listarParaServidor(anyString());
-        }
-
-        @Test
-        @DisplayName("Deve listar alertas não lidos filtrando corretamente")
-        void deveListarNaoLidos() {
-            String titulo = "123";
-            Alerta a1 = new Alerta();
-            a1.setCodigo(1L);
-            Alerta a2 = new Alerta();
-            a2.setCodigo(2L);
-
-            when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(a1, a2));
-
-            AlertaUsuario au1 = new AlertaUsuario();
-            au1.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
-            au1.setDataHoraLeitura(LocalDateTime.now());
-
-            when(alertaService.alertasUsuarios(eq(titulo), anyList())).thenReturn(List.of(au1));
-
-            List<Alerta> resultado = alertaFacade.listarNaoLidos(CONTEXTO_GESTAO);
-
-            assertThat(resultado).hasSize(1);
-            assertThat(resultado.getFirst().getCodigo()).isEqualTo(2L);
-        }
-    }
-
-    @Nested
-    @DisplayName("Paginação")
-    class Paginacao {
-        @Test
-        @DisplayName("Listar por unidade paginado (Gestão)")
-        void listarPorUnidadePaginadoGestao() {
-            Pageable p = Pageable.unpaged();
-            when(alertaService.listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class))).thenReturn(Page.empty());
-
-            alertaFacade.listarPorUnidade(CONTEXTO_GESTAO, p);
-
-            verify(alertaService).listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class));
-        }
-
-        @Test
-        @DisplayName("Listar por unidade paginado (Servidor)")
-        void listarPorUnidadePaginadoServidor() {
-            Pageable p = Pageable.unpaged();
-            when(alertaService.listarParaServidorPaginado(anyString(), any(Pageable.class))).thenReturn(Page.empty());
-
-            alertaFacade.listarPorUnidade(CONTEXTO_SERVIDOR, p);
-
-            verify(alertaService).listarParaServidorPaginado(anyString(), any(Pageable.class));
-        }
-    }
-
     @Test
     @DisplayName("Deve lançar erro quando unidade obrigatória estiver ausente")
     void deveLancarErroQuandoUnidadeObrigatoriaAusente() throws Exception {
@@ -222,78 +143,6 @@ class AlertaFacadeTest {
         verify(alertaService).salvar(alerta);
     }
 
-    @Nested
-    @DisplayName("Marcação de Lidos")
-    class MarcacaoLidos {
-        @Test
-        @DisplayName("Não deve fazer nada se lista de códigos for vazia")
-        void naoDeveFazerNadaSeVazia() {
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, Collections.emptyList());
-
-            verify(alertaService, never()).alertasUsuarios(anyString(), anyList());
-            verify(alertaService, never()).salvarAlertasUsuarios(anyList());
-        }
-
-        @Test
-        @DisplayName("Deve atualizar data e salvar quando leitura for nula e houver alerta existente")
-        void deveAtualizarDataQuandoLeituraNula() {
-            AlertaUsuario alertaUsuario = new AlertaUsuario();
-            alertaUsuario.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).build());
-            alertaUsuario.setDataHoraLeitura(null);
-
-            when(alertaService.alertasUsuarios("123", List.of(1L))).thenReturn(List.of(alertaUsuario));
-
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L));
-
-            assertThat(alertaUsuario.getDataHoraLeitura()).isNotNull();
-            verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.contains(alertaUsuario)));
-        }
-
-        @Test
-        @DisplayName("Deve criar novo alertaUsuario quando não existir na base e salvar")
-        void deveCriarNovoQuandoNaoExistir() {
-            when(alertaService.alertasUsuarios("123", List.of(2L))).thenReturn(Collections.emptyList());
-
-            Alerta alerta = new Alerta();
-            alerta.setCodigo(2L);
-            when(alertaService.listarPorCodigos(List.of(2L))).thenReturn(List.of(alerta));
-
-            Usuario usuario = new Usuario();
-            usuario.setTituloEleitoral("123");
-            when(usuarioService.buscar("123")).thenReturn(usuario);
-
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(2L));
-
-            verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.stream().anyMatch(au -> au.getCodigo().getAlertaCodigo() == 2L)));
-        }
-
-        @Test
-        @DisplayName("Deve ignorar se o alerta não for encontrado ao criar novo")
-        void deveIgnorarSeAlertaNaoEncontrado() {
-            when(alertaService.alertasUsuarios("123", List.of(3L))).thenReturn(Collections.emptyList());
-            when(alertaService.listarPorCodigos(List.of(3L))).thenReturn(Collections.emptyList());
-
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(3L));
-
-            verify(alertaService, never()).salvarAlertasUsuarios(anyList());
-        }
-
-        @Test
-        @DisplayName("Deve capturar DataIntegrityViolationException silenciosamente")
-        void deveCapturarExcecaoSilenciosamente() {
-            AlertaUsuario alertaUsuario = new AlertaUsuario();
-            alertaUsuario.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).build());
-            alertaUsuario.setDataHoraLeitura(null);
-
-            when(alertaService.alertasUsuarios("123", List.of(1L))).thenReturn(List.of(alertaUsuario));
-            doThrow(new org.springframework.dao.DataIntegrityViolationException("Simulação de concorrência"))
-                    .when(alertaService).salvarAlertasUsuarios(anyList());
-
-            assertThatCode(() -> alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L)))
-                    .doesNotThrowAnyException();
-        }
-    }
-
     @Test
     @DisplayName("Deve criar alerta para participante do tipo raiz")
     void deveCriarAlertaParaParticipanteRaiz() {
@@ -366,7 +215,7 @@ class AlertaFacadeTest {
         alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos);
 
         verify(alertaService).salvarAlertasUsuarios(alertaUsuarioListCaptor.capture());
-        
+
         List<AlertaUsuario> salvos = alertaUsuarioListCaptor.getValue();
         assertThat(salvos)
                 .hasSize(2) // au1 atualizado e nova entrada para a3
@@ -394,15 +243,166 @@ class AlertaFacadeTest {
         String titulo = "123";
         List<Long> codigos = List.of(1L);
         when(usuarioService.buscar(titulo)).thenReturn(new Usuario());
-        
+
         Alerta a1 = new Alerta();
         a1.setCodigo(1L);
         when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(Collections.emptyList());
         when(alertaService.listarPorCodigos(List.of(1L))).thenReturn(List.of(a1));
-        
+
         doThrow(new DataIntegrityViolationException("Erro fake")).when(alertaService).salvarAlertasUsuarios(anyList());
 
         assertThatCode(() -> alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos))
                 .doesNotThrowAnyException();
+    }
+
+    @Nested
+    @DisplayName("Listagem de Alertas")
+    class ListagemAlertas {
+
+        @Test
+        @DisplayName("Deve listar alertas para Servidor chamando o método expressivo correto")
+        void deveListarParaServidor() {
+            String titulo = "123";
+            when(alertaService.listarParaServidor(titulo)).thenReturn(Collections.emptyList());
+
+            alertaFacade.alertasPorUsuario(CONTEXTO_SERVIDOR);
+
+            verify(alertaService).listarParaServidor(titulo);
+            verify(alertaService, never()).listarParaGestao(anyLong(), anyString());
+        }
+
+        @Test
+        @DisplayName("Deve listar alertas para Gestão chamando o método expressivo correto")
+        void deveListarParaGestao() {
+            String titulo = "123";
+            Long codUnidade = 1L;
+            when(alertaService.listarParaGestao(codUnidade, titulo)).thenReturn(Collections.emptyList());
+
+            alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
+
+            verify(alertaService).listarParaGestao(codUnidade, titulo);
+            verify(alertaService, never()).listarParaServidor(anyString());
+        }
+
+        @Test
+        @DisplayName("Deve listar alertas não lidos filtrando corretamente")
+        void deveListarNaoLidos() {
+            String titulo = "123";
+            Alerta a1 = new Alerta();
+            a1.setCodigo(1L);
+            Alerta a2 = new Alerta();
+            a2.setCodigo(2L);
+
+            when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(a1, a2));
+
+            AlertaUsuario au1 = new AlertaUsuario();
+            au1.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
+            au1.setDataHoraLeitura(LocalDateTime.now());
+
+            when(alertaService.alertasUsuarios(eq(titulo), anyList())).thenReturn(List.of(au1));
+
+            List<Alerta> resultado = alertaFacade.listarNaoLidos(CONTEXTO_GESTAO);
+
+            assertThat(resultado).hasSize(1);
+            assertThat(resultado.getFirst().getCodigo()).isEqualTo(2L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Paginação")
+    class Paginacao {
+        @Test
+        @DisplayName("Listar por unidade paginado (Gestão)")
+        void listarPorUnidadePaginadoGestao() {
+            Pageable p = Pageable.unpaged();
+            when(alertaService.listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class))).thenReturn(Page.empty());
+
+            alertaFacade.listarPorUnidade(CONTEXTO_GESTAO, p);
+
+            verify(alertaService).listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class));
+        }
+
+        @Test
+        @DisplayName("Listar por unidade paginado (Servidor)")
+        void listarPorUnidadePaginadoServidor() {
+            Pageable p = Pageable.unpaged();
+            when(alertaService.listarParaServidorPaginado(anyString(), any(Pageable.class))).thenReturn(Page.empty());
+
+            alertaFacade.listarPorUnidade(CONTEXTO_SERVIDOR, p);
+
+            verify(alertaService).listarParaServidorPaginado(anyString(), any(Pageable.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("Marcação de Lidos")
+    class MarcacaoLidos {
+        @Test
+        @DisplayName("Não deve fazer nada se lista de códigos for vazia")
+        void naoDeveFazerNadaSeVazia() {
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, Collections.emptyList());
+
+            verify(alertaService, never()).alertasUsuarios(anyString(), anyList());
+            verify(alertaService, never()).salvarAlertasUsuarios(anyList());
+        }
+
+        @Test
+        @DisplayName("Deve atualizar data e salvar quando leitura for nula e houver alerta existente")
+        void deveAtualizarDataQuandoLeituraNula() {
+            AlertaUsuario alertaUsuario = new AlertaUsuario();
+            alertaUsuario.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).build());
+            alertaUsuario.setDataHoraLeitura(null);
+
+            when(alertaService.alertasUsuarios("123", List.of(1L))).thenReturn(List.of(alertaUsuario));
+
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L));
+
+            assertThat(alertaUsuario.getDataHoraLeitura()).isNotNull();
+            verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.contains(alertaUsuario)));
+        }
+
+        @Test
+        @DisplayName("Deve criar novo alertaUsuario quando não existir na base e salvar")
+        void deveCriarNovoQuandoNaoExistir() {
+            when(alertaService.alertasUsuarios("123", List.of(2L))).thenReturn(Collections.emptyList());
+
+            Alerta alerta = new Alerta();
+            alerta.setCodigo(2L);
+            when(alertaService.listarPorCodigos(List.of(2L))).thenReturn(List.of(alerta));
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+            when(usuarioService.buscar("123")).thenReturn(usuario);
+
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(2L));
+
+            verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.stream().anyMatch(au -> au.getCodigo().getAlertaCodigo() == 2L)));
+        }
+
+        @Test
+        @DisplayName("Deve ignorar se o alerta não for encontrado ao criar novo")
+        void deveIgnorarSeAlertaNaoEncontrado() {
+            when(alertaService.alertasUsuarios("123", List.of(3L))).thenReturn(Collections.emptyList());
+            when(alertaService.listarPorCodigos(List.of(3L))).thenReturn(Collections.emptyList());
+
+            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(3L));
+
+            verify(alertaService, never()).salvarAlertasUsuarios(anyList());
+        }
+
+        @Test
+        @DisplayName("Deve capturar DataIntegrityViolationException silenciosamente")
+        void deveCapturarExcecaoSilenciosamente() {
+            AlertaUsuario alertaUsuario = new AlertaUsuario();
+            alertaUsuario.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).build());
+            alertaUsuario.setDataHoraLeitura(null);
+
+            when(alertaService.alertasUsuarios("123", List.of(1L))).thenReturn(List.of(alertaUsuario));
+            doThrow(new org.springframework.dao.DataIntegrityViolationException("Simulação de concorrência"))
+                    .when(alertaService).salvarAlertasUsuarios(anyList());
+
+            assertThatCode(() -> alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L)))
+                    .doesNotThrowAnyException();
+        }
     }
 }

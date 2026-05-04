@@ -29,7 +29,16 @@ vi.mock("bootstrap-vue-next", async () => {
     };
 });
 
-const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, size: 10, first: true, last: true, empty: true};
+const mockPageVazia = {
+    content: [],
+    totalPages: 0,
+    totalElements: 0,
+    number: 0,
+    size: 10,
+    first: true,
+    last: true,
+    empty: true
+};
 
 vi.mock("@/services/painelService", () => ({
     obterBootstrap: vi.fn(),
@@ -132,38 +141,38 @@ describe('PainelView Coverage', () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
-                perfil: { perfilSelecionado: 'GESTOR', unidadeSelecionada: 1 },
-                processos: { processosPainel: [] },
+                perfil: {perfilSelecionado: 'GESTOR', unidadeSelecionada: 1},
+                processos: {processosPainel: []},
             }
         });
-        const wrapper = mount(PainelView, { global: { plugins: [pinia], stubs: commonStubs } });
+        const wrapper = mount(PainelView, {global: {plugins: [pinia], stubs: commonStubs}});
         await flushPromises();
-        
+
         // Chamando a função via emit no stub pelo nome
-        await wrapper.findComponent({ name: 'TabelaProcessos' }).vm.$emit('cta-vazio');
-        expect(routerPushMock).toHaveBeenCalledWith({ name: 'CadProcesso' });
+        await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('cta-vazio');
+        expect(routerPushMock).toHaveBeenCalledWith({name: 'CadProcesso'});
     });
 
     it('exibe toast pendente e recarrega dados onActivated', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
-                perfil: { perfilSelecionado: 'GESTOR', unidadeSelecionada: 1, usuarioCodigo: 1 },
-                processos: { processosPainel: [] },
+                perfil: {perfilSelecionado: 'GESTOR', unidadeSelecionada: 1, usuarioCodigo: 1},
+                processos: {processosPainel: []},
             }
         });
         const toastStore = useToastStore(pinia);
-        toastStore.consumePending = vi.fn().mockReturnValue({ body: 'Teste Pendente' });
+        toastStore.consumePending = vi.fn().mockReturnValue({body: 'Teste Pendente'});
         mockUseToast.create.mockClear();
 
-        const wrapper = mount(PainelView, { global: { plugins: [pinia], stubs: commonStubs } });
+        const wrapper = mount(PainelView, {global: {plugins: [pinia], stubs: commonStubs}});
         await wrapper.vm.$nextTick();
-        
+
         expect(toastStore.consumePending).toHaveBeenCalled();
         expect(mockUseToast.create).toHaveBeenCalledWith(expect.objectContaining({
-            props: expect.objectContaining({ body: 'Teste Pendente', variant: 'success' })
+            props: expect.objectContaining({body: 'Teste Pendente', variant: 'success'})
         }));
-        
+
         // Simular onActivated
         const activated = wrapper.vm.$options.activated;
         if (activated) {

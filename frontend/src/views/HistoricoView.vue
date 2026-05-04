@@ -2,7 +2,7 @@
   <LayoutPadrao>
     <PageHeader title="Histórico"/>
 
-    <CarregamentoPagina v-if="loading" />
+    <CarregamentoPagina v-if="loading"/>
 
     <TabelaProcessos
         v-else

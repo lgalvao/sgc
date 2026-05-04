@@ -1,4 +1,4 @@
-import {computed, onBeforeUnmount, ref, watch, type Ref} from 'vue';
+import {computed, onBeforeUnmount, ref, type Ref, watch} from 'vue';
 import {pesquisarUsuarios} from '@/services/usuarioService';
 import type {UsuarioPesquisa} from '@/types/tipos';
 import {logger} from '@/utils';
@@ -72,7 +72,7 @@ export function useBuscadorUsuarios(
         mostrarResultadosUsuarios.value = termoPesquisaMinimaAtingida.value;
         indiceUsuarioDestacado.value = -1;
         atualizarUsuarioSelecionadoPorNome(novoTermo);
-        
+
         if (timeoutPesquisa) clearTimeout(timeoutPesquisa);
 
         if (!termoPesquisaMinimaAtingida.value || !novoTermo.trim()) {
@@ -109,7 +109,15 @@ export function useBuscadorUsuarios(
     };
 
     return {
-        usuariosEncontrados, pesquisandoUsuarios, mostrarResultadosUsuarios, indiceUsuarioDestacado, termoPesquisaMinimaAtingida,
-        aoAlterarTermo, selecionarUsuario, agendarOcultacao, limparResultados, calcularProximoIndice,
+        usuariosEncontrados,
+        pesquisandoUsuarios,
+        mostrarResultadosUsuarios,
+        indiceUsuarioDestacado,
+        termoPesquisaMinimaAtingida,
+        aoAlterarTermo,
+        selecionarUsuario,
+        agendarOcultacao,
+        limparResultados,
+        calcularProximoIndice,
     };
 }

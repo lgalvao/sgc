@@ -37,7 +37,8 @@ Fluxo principal:
     - `Observações`: Campo de texto formatado reservado para registro de informações futuras pelo perfil ADMIN.
 
 10. O sistema cria internamente uma cópia do mapa de competências vigente, juntamente com as suas respectivas atividades
-    e conhecimentos, para cada unidade operacional ou interoperacional participante, vinculando cada cópia ao subprocesso
+    e conhecimentos, para cada unidade operacional ou interoperacional participante, vinculando cada cópia ao
+    subprocesso
     da unidade correspondente.
 
 11. O sistema registra uma movimentação para cada subprocesso criado com os campos:

@@ -66,14 +66,14 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
         await flushPromises();
 
         const vm = wrapper.vm as any;
-        
+
         // Testar executarAcaoBloco sem processo
-        await vm.executarAcaoBloco({ ids: [1], dataLimite: "2025-01-01" });
+        await vm.executarAcaoBloco({ids: [1], dataLimite: "2025-01-01"});
         expect(processoService.executarAcaoEmBloco).not.toHaveBeenCalled();
 
         // Testar executarAcaoBloco sem acaoBlocoAtual
-        vm.processo = { codigo: 1, descricao: "Teste" }; // fake processo
-        await vm.executarAcaoBloco({ ids: [1], dataLimite: "2025-01-01" });
+        vm.processo = {codigo: 1, descricao: "Teste"}; // fake processo
+        await vm.executarAcaoBloco({ids: [1], dataLimite: "2025-01-01"});
         expect(processoService.executarAcaoEmBloco).not.toHaveBeenCalled();
     });
 
@@ -108,8 +108,10 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
 
         const KeepAliveWrapper = {
             template: '<keep-alive><ProcessoView v-if="show" /></keep-alive>',
-            components: { ProcessoView },
-            data() { return { show: true } }
+            components: {ProcessoView},
+            data() {
+                return {show: true}
+            }
         };
 
         const wrapper = mount(KeepAliveWrapper, {
@@ -129,7 +131,7 @@ describe("ProcessoDetalheView Uncovered Branches", () => {
 
         store.contextoCompleto = {codigo: 1, descricao: "Teste"} as any;
         store.codProcessoCarregado = 1;
-        const contextoAtualizado = { codigo: 1, descricao: "Atualizado" } as any;
+        const contextoAtualizado = {codigo: 1, descricao: "Atualizado"} as any;
         store.garantirContextoCompleto = vi.fn().mockResolvedValue(contextoAtualizado);
 
         // Reactivate sem invalidação: não recarrega

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import CadastroObservacaoModal from "@/components/cadastro/CadastroObservacaoModal.vue";
 import {useCadastroObservacaoModalModel} from "@/components/cadastro/cadastroObservacaoModalModel";
 import {TEXTOS} from "@/constants/textos";

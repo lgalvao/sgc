@@ -4,7 +4,7 @@ import html2canvas from 'html2canvas'
 import apiClient from '@/axios-setup'
 import {usePerfilStore} from '@/stores/perfil'
 import {logger} from '@/utils'
-import type {MetadadosFeedback, PayloadFeedback, FeedbackTipo} from '@/types/feedback'
+import type {FeedbackTipo, MetadadosFeedback, PayloadFeedback} from '@/types/feedback'
 
 const TIMEOUT_CAPTURA_MS = 5_000
 

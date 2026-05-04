@@ -29,12 +29,12 @@ type SubprocessoDetalheMock = {
     situacaoLabel: string;
     processoDescricao: string;
     tipoProcesso: TipoProcesso;
-    unidade: {codigo: number; sigla: string; nome: string};
+    unidade: { codigo: number; sigla: string; nome: string };
     responsavel: {
         codigo: number;
         nome: string;
         tituloEleitoral: string;
-        unidade: {codigo: number; sigla: string; nome: string};
+        unidade: { codigo: number; sigla: string; nome: string };
         email: string;
         ramal: string;
     } | null;
@@ -42,7 +42,7 @@ type SubprocessoDetalheMock = {
         codigo: number;
         nome: string;
         tituloEleitoral: string;
-        unidade: {codigo: number; sigla: string; nome: string};
+        unidade: { codigo: number; sigla: string; nome: string };
         email: string;
         ramal: string;
     } | null;
@@ -52,7 +52,7 @@ type SubprocessoDetalheMock = {
     isEmAndamento: boolean;
     elementosProcesso: unknown[];
     movimentacoes: unknown[];
-    permissoes?: {podeEditarCadastro?: boolean};
+    permissoes?: { podeEditarCadastro?: boolean };
 };
 
 const SubprocessoCardsStub = {
@@ -78,8 +78,8 @@ const fluxoSubprocessoMock = {
     clearError: vi.fn(),
 };
 const subprocessoStoreMock = reactive({
-    contextoEdicao: null as {detalhes: SubprocessoDetalheMock} | null,
-    erroIntegracaoContexto: null as {message: string; details?: string} | null,
+    contextoEdicao: null as { detalhes: SubprocessoDetalheMock } | null,
+    erroIntegracaoContexto: null as { message: string; details?: string } | null,
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
     garantirContextoEdicao: vi.fn(),
     invalidar: vi.fn(),
@@ -162,7 +162,7 @@ describe('SubprocessoView.vue', () => {
         },
         BAlert: {
             name: 'BAlert',
-            template: '<div><slot /><button @click="$emit(\'dismissed\')">x</button></div>', 
+            template: '<div><slot /><button @click="$emit(\'dismissed\')">x</button></div>',
             props: ['variant', 'dismissible', 'modelValue']
         },
         BSpinner: {template: '<div></div>'},
@@ -266,7 +266,7 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
 
-        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
+        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }
@@ -523,7 +523,7 @@ describe('SubprocessoView.vue', () => {
 
         // Gerenciamento de erros de subprocesso
         subprocessoStoreMock.contextoEdicao = null;
-        subprocessoStoreMock.erroIntegracaoContexto = { message: "Erro" };
+        subprocessoStoreMock.erroIntegracaoContexto = {message: "Erro"};
         await vm.$nextTick();
         const bAlert = wrapper.findComponent({name: 'BAlert'});
         if (bAlert.exists()) await bAlert.vm.$emit('dismissed');
@@ -538,7 +538,7 @@ describe('SubprocessoView.vue', () => {
 
         // Validação de entrada nula para alteração de data limite
         expect(await vm.confirmarAlteracaoDataLimite(null)).toBeUndefined();
-        
+
         // Exibição de toast pendente ao montar componente
         const {useToastStore} = await import("@/stores/toast");
         const toastStore = useToastStore();
@@ -568,7 +568,7 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = null;
-        (wrapper.vm as unknown as {erroNaoEncontrado: boolean}).erroNaoEncontrado = true;
+        (wrapper.vm as unknown as { erroNaoEncontrado: boolean }).erroNaoEncontrado = true;
         await wrapper.vm.$nextTick();
 
         expect(wrapper.text()).toContain(TEXTOS.subprocesso.NAO_ENCONTRADO_TITULO);
@@ -583,7 +583,7 @@ describe('SubprocessoView.vue', () => {
             detalhes: 'Connection timeout'
         } as any;
         await wrapper.vm.$nextTick();
-        
+
         expect(wrapper.text()).toContain('Erro de Banco');
         expect(wrapper.text()).toContain('Detalhes: Connection timeout');
     });
@@ -591,7 +591,7 @@ describe('SubprocessoView.vue', () => {
     it('renderiza EmptyState quando não há movimentações', async () => {
         const {wrapper} = mountComponent({movimentacoes: []});
         await flushPromises();
-        
+
         expect(wrapper.find('[data-testid="empty-state-movimentacoes"]').exists()).toBe(true);
     });
 });

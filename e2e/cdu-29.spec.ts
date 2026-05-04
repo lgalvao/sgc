@@ -15,7 +15,11 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
 
     // CENÁRIO 1: Navegação para página de histórico
 
-    test('Cenario 1: ADMIN navega para página de histórico', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para página de histórico', async ({
+                                                                        _resetAutomatico,
+                                                                        page,
+                                                                        _autenticadoComoAdmin
+                                                                    }) => {
         // CDU-29: Passos 1-2
 
 

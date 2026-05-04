@@ -17,18 +17,18 @@
       <div class="d-flex flex-wrap gap-2">
         <BButton
             :disabled="carregando || !codProcessoSelecionado"
-            variant="success"
             data-testid="btn-gerar-andamento"
+            variant="success"
             @click="$emit('gerar')"
         >
-          <BSpinner v-if="carregando" small class="me-1"/>
+          <BSpinner v-if="carregando" class="me-1" small/>
           <i v-else class="bi bi-search me-1"/>
           {{ TEXTOS.relatorios.BOTAO_GERAR }}
         </BButton>
         <BButton
             :disabled="carregando || !codProcessoSelecionado"
-            variant="outline-danger"
             data-testid="btn-exportar-andamento"
+            variant="outline-danger"
             @click="$emit('exportar')"
         >
           <i class="bi bi-file-earmark-pdf me-1"/>
@@ -39,7 +39,7 @@
   </BCard>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BButton, BCard, BFormGroup, BFormSelect, BSpinner} from "bootstrap-vue-next";
 import {TEXTOS} from "@/constants/textos";
 

@@ -30,7 +30,7 @@ vi.mock('@/services/usuarioService', () => ({
     buscarUsuariosPorUnidade: vi.fn().mockResolvedValue([]),
 }));
 
-function criarWrapper(props: {codUnidade: number} = {codUnidade: 1}) {
+function criarWrapper(props: { codUnidade: number } = {codUnidade: 1}) {
     return mount(CadAtribuicao, {
         ...getCommonMountOptions(),
         props,
@@ -64,7 +64,8 @@ describe('CadAtribuicao Coverage', () => {
 
     it('deve lidar com erro no onMounted', async () => {
         vi.mocked(unidadeService.buscarUnidadePorCodigo).mockRejectedValueOnce(new Error('Erro ao buscar unidade'));
-        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.spyOn(console, 'error').mockImplementation(() => {
+        });
 
         const wrapper = criarWrapper();
         await flushPromises();

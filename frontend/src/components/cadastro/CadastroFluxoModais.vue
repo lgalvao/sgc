@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from "vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
@@ -119,10 +119,10 @@ const observacaoDevolucaoModel = computed({
   />
 
   <ConfirmacaoDisponibilizacaoModal
+      :erro="erroFluxo"
       :is-revisao="isRevisao"
       :loading="loadingDisponibilizacao"
       :mostrar="mostrarModalConfirmacaoModel"
-      :erro="erroFluxo"
       @confirmar="$emit('confirmar-disponibilizacao')"
       @fechar="mostrarModalConfirmacaoModel = false"
   />
@@ -146,18 +146,18 @@ const observacaoDevolucaoModel = computed({
   <ModalAceiteCadastro
       v-model="mostrarModalValidarAnaliseModel"
       v-model:observacao="observacaoValidacaoModel"
-      :loading="loadingAnaliseCadastro"
       :acao="acaoPrincipalCadastro"
       :erro="erroFluxo"
+      :loading="loadingAnaliseCadastro"
       @confirmar="$emit('confirmar-validacao-analise')"
   />
 
   <ModalDevolucaoCadastro
       v-model="mostrarModalDevolverAnaliseModel"
       v-model:observacao="observacaoDevolucaoModel"
-      :loading="loadingDevolucaoAnalise"
-      :is-revisao="isRevisao"
       :erro="erroFluxo"
+      :is-revisao="isRevisao"
+      :loading="loadingDevolucaoAnalise"
       @confirmar="$emit('confirmar-devolucao-analise')"
   />
 </template>

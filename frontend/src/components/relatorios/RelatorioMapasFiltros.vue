@@ -18,22 +18,22 @@
       <div class="d-flex flex-wrap gap-2">
         <BButton
             :disabled="carregando || !temUnidadesSelecionadas"
-            variant="success"
             data-testid="btn-gerar-html-mapas"
+            variant="success"
             @click="$emit('gerar')"
         >
-          <BSpinner v-if="carregando" small class="me-1" />
-          <i v-else class="bi bi-search me-1" />
+          <BSpinner v-if="carregando" class="me-1" small/>
+          <i v-else class="bi bi-search me-1"/>
           {{ TEXTOS.relatorios.BOTAO_GERAR }}
         </BButton>
         <BButton
             :disabled="carregando || !temUnidadesSelecionadas"
-            variant="outline-danger"
             data-testid="btn-gerar-mapas"
+            variant="outline-danger"
             @click="$emit('exportar')"
         >
-          <BSpinner v-if="carregando" small class="me-1" />
-          <i v-else class="bi bi-file-earmark-pdf me-1" />
+          <BSpinner v-if="carregando" class="me-1" small/>
+          <i v-else class="bi bi-file-earmark-pdf me-1"/>
           PDF
         </BButton>
       </div>
@@ -41,7 +41,7 @@
   </BCard>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BButton, BCard, BFormGroup, BSpinner} from "bootstrap-vue-next";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import {TEXTOS} from "@/constants/textos";

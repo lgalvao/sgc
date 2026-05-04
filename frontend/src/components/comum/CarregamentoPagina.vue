@@ -1,6 +1,6 @@
 <template>
   <div class="text-center py-5" data-testid="pagina-carregando">
-    <BSpinner :label="mensagemExibicao" variant="primary" />
+    <BSpinner :label="mensagemExibicao" variant="primary"/>
     <p class="mt-2 mb-0 text-muted">{{ mensagemExibicao }}</p>
   </div>
 </template>

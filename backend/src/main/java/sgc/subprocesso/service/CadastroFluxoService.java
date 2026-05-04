@@ -29,6 +29,8 @@ import static sgc.subprocesso.model.TipoTransicao.*;
 @Transactional
 public class CadastroFluxoService {
 
+    private static final String ETAPA_REVISAO = "revisão";
+    private static final String ETAPA_CADASTRO = "cadastro";
     private final SubprocessoRepo subprocessoRepo;
     private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoConsultaService consultaService;
@@ -40,88 +42,6 @@ public class CadastroFluxoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final AlertaFacade alertaService;
     private final SubprocessoTransicaoService transicaoService;
-
-    private static final String ETAPA_REVISAO = "revisão";
-    private static final String ETAPA_CADASTRO = "cadastro";
-
-    @Builder
-    private record FluxoCadastroContexto(
-            String etapa,
-            SituacaoSubprocesso situacaoDisponibilizada,
-            SituacaoSubprocesso situacaoEmAndamento,
-            SituacaoSubprocesso situacaoHomologada,
-            TipoTransicao transicaoDevolucao,
-            TipoTransicao transicaoAceite,
-            TipoTransicao transicaoHomologacao,
-            TipoAcaoAnalise acaoDevolucao,
-            TipoAcaoAnalise acaoAceite
-    ) {
-        private static FluxoCadastroContexto revisao() {
-            return FluxoCadastroContexto.builder()
-                    .etapa(ETAPA_REVISAO)
-                    .situacaoDisponibilizada(REVISAO_CADASTRO_DISPONIBILIZADA)
-                    .situacaoEmAndamento(REVISAO_CADASTRO_EM_ANDAMENTO)
-                    .situacaoHomologada(REVISAO_CADASTRO_HOMOLOGADA)
-                    .transicaoDevolucao(REVISAO_CADASTRO_DEVOLVIDA)
-                    .transicaoAceite(REVISAO_CADASTRO_ACEITA)
-                    .transicaoHomologacao(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA)
-                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
-                    .acaoAceite(TipoAcaoAnalise.ACEITE_REVISAO)
-                    .build();
-        }
-
-        private static FluxoCadastroContexto mapeamento() {
-            return FluxoCadastroContexto.builder()
-                    .etapa(ETAPA_CADASTRO)
-                    .situacaoDisponibilizada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
-                    .situacaoEmAndamento(MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
-                    .situacaoHomologada(MAPEAMENTO_CADASTRO_HOMOLOGADO)
-                    .transicaoDevolucao(CADASTRO_DEVOLVIDO)
-                    .transicaoAceite(CADASTRO_ACEITO)
-                    .transicaoHomologacao(TipoTransicao.CADASTRO_HOMOLOGADO)
-                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                    .acaoAceite(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .build();
-        }
-    }
-
-    private record ReaberturaCommand(
-            Long codigo,
-            String justificativa,
-            SituacaoSubprocesso situacaoMinima,
-            SituacaoSubprocesso novaSituacao,
-            TipoTransicao tipoTransicao,
-            boolean revisao
-    ) {
-        private static ReaberturaCommand cadastro(Long codigo, String justificativa) {
-            return new ReaberturaCommand(
-                    codigo,
-                    justificativa,
-                    MAPEAMENTO_MAPA_HOMOLOGADO,
-                    MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                    TipoTransicao.CADASTRO_REABERTO,
-                    false
-            );
-        }
-
-        private static ReaberturaCommand revisao(Long codigo, String justificativa) {
-            return new ReaberturaCommand(
-                    codigo,
-                    justificativa,
-                    REVISAO_MAPA_HOMOLOGADO,
-                    REVISAO_CADASTRO_EM_ANDAMENTO,
-                    REVISAO_CADASTRO_REABERTA,
-                    true
-            );
-        }
-    }
-
-    private record AlertaReaberturaContexto(
-            Processo processo,
-            Unidade unidadeOrigem,
-            String justificativa,
-            boolean revisao
-    ) {}
 
     private static @Nullable String normalizarTexto(@Nullable String texto) {
         if (texto == null || texto.isBlank()) {
@@ -399,5 +319,85 @@ public class CadastroFluxoService {
             default -> throw new IllegalStateException(
                     "Tipo %s sem fluxo de cadastro definido".formatted(sp.getProcesso().getTipo()));
         };
+    }
+
+    @Builder
+    private record FluxoCadastroContexto(
+            String etapa,
+            SituacaoSubprocesso situacaoDisponibilizada,
+            SituacaoSubprocesso situacaoEmAndamento,
+            SituacaoSubprocesso situacaoHomologada,
+            TipoTransicao transicaoDevolucao,
+            TipoTransicao transicaoAceite,
+            TipoTransicao transicaoHomologacao,
+            TipoAcaoAnalise acaoDevolucao,
+            TipoAcaoAnalise acaoAceite
+    ) {
+        private static FluxoCadastroContexto revisao() {
+            return FluxoCadastroContexto.builder()
+                    .etapa(ETAPA_REVISAO)
+                    .situacaoDisponibilizada(REVISAO_CADASTRO_DISPONIBILIZADA)
+                    .situacaoEmAndamento(REVISAO_CADASTRO_EM_ANDAMENTO)
+                    .situacaoHomologada(REVISAO_CADASTRO_HOMOLOGADA)
+                    .transicaoDevolucao(REVISAO_CADASTRO_DEVOLVIDA)
+                    .transicaoAceite(REVISAO_CADASTRO_ACEITA)
+                    .transicaoHomologacao(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA)
+                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
+                    .acaoAceite(TipoAcaoAnalise.ACEITE_REVISAO)
+                    .build();
+        }
+
+        private static FluxoCadastroContexto mapeamento() {
+            return FluxoCadastroContexto.builder()
+                    .etapa(ETAPA_CADASTRO)
+                    .situacaoDisponibilizada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                    .situacaoEmAndamento(MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                    .situacaoHomologada(MAPEAMENTO_CADASTRO_HOMOLOGADO)
+                    .transicaoDevolucao(CADASTRO_DEVOLVIDO)
+                    .transicaoAceite(CADASTRO_ACEITO)
+                    .transicaoHomologacao(TipoTransicao.CADASTRO_HOMOLOGADO)
+                    .acaoDevolucao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                    .acaoAceite(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .build();
+        }
+    }
+
+    private record ReaberturaCommand(
+            Long codigo,
+            String justificativa,
+            SituacaoSubprocesso situacaoMinima,
+            SituacaoSubprocesso novaSituacao,
+            TipoTransicao tipoTransicao,
+            boolean revisao
+    ) {
+        private static ReaberturaCommand cadastro(Long codigo, String justificativa) {
+            return new ReaberturaCommand(
+                    codigo,
+                    justificativa,
+                    MAPEAMENTO_MAPA_HOMOLOGADO,
+                    MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                    TipoTransicao.CADASTRO_REABERTO,
+                    false
+            );
+        }
+
+        private static ReaberturaCommand revisao(Long codigo, String justificativa) {
+            return new ReaberturaCommand(
+                    codigo,
+                    justificativa,
+                    REVISAO_MAPA_HOMOLOGADO,
+                    REVISAO_CADASTRO_EM_ANDAMENTO,
+                    REVISAO_CADASTRO_REABERTA,
+                    true
+            );
+        }
+    }
+
+    private record AlertaReaberturaContexto(
+            Processo processo,
+            Unidade unidadeOrigem,
+            String justificativa,
+            boolean revisao
+    ) {
     }
 }

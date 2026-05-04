@@ -95,7 +95,12 @@ describe("ImportarAtividadesModal.vue", () => {
 
     it("carrega unidades ao selecionar processo", async () => {
         const wrapper = createWrapper();
-        const mockUnidades: UnidadeImportacao[] = [{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}];
+        const mockUnidades: UnidadeImportacao[] = [{
+            codUnidade: 10,
+            sigla: "U1",
+            codSubprocesso: 100,
+            nome: "Unidade 1"
+        }];
         vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue(mockUnidades);
         await flushPromises();
 
@@ -109,7 +114,12 @@ describe("ImportarAtividadesModal.vue", () => {
 
     it("carrega atividades ao selecionar unidade", async () => {
         const wrapper = createWrapper();
-        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{
+            codUnidade: 10,
+            sigla: "U1",
+            codSubprocesso: 100,
+            nome: "Unidade 1"
+        }]);
         await flushPromises();
 
         await wrapper.find('select#processo-select').setValue("1");
@@ -127,7 +137,12 @@ describe("ImportarAtividadesModal.vue", () => {
 
     it("executa importação com sucesso", async () => {
         const wrapper = createWrapper();
-        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{
+            codUnidade: 10,
+            sigla: "U1",
+            codSubprocesso: 100,
+            nome: "Unidade 1"
+        }]);
         await flushPromises();
 
         await wrapper.find('select#processo-select').setValue("1");
@@ -193,7 +208,12 @@ describe("ImportarAtividadesModal.vue", () => {
         expect(vm.atividadesSelecionadas.length).toBe(1);
 
         // Troca para processo 2 - seleções devem ser limpas
-        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 20, sigla: "U2", codSubprocesso: 200, nome: "Unidade 2"}]);
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{
+            codUnidade: 20,
+            sigla: "U2",
+            codSubprocesso: 200,
+            nome: "Unidade 2"
+        }]);
         await wrapper.find('select#processo-select').setValue("2");
         await flushPromises();
 
@@ -234,8 +254,13 @@ describe("ImportarAtividadesModal.vue", () => {
         const wrapper = createWrapper();
         const vm = obterVm(wrapper) as any;
         await flushPromises();
-        
-        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{
+            codUnidade: 10,
+            sigla: "U1",
+            codSubprocesso: 100,
+            nome: "Unidade 1"
+        }]);
         vm.processoSelecionadoId = 1;
         await flushPromises();
 
@@ -257,8 +282,13 @@ describe("ImportarAtividadesModal.vue", () => {
         const wrapper = createWrapper();
         const vm = obterVm(wrapper) as any;
         await flushPromises();
-        
-        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{
+            codUnidade: 10,
+            sigla: "U1",
+            codSubprocesso: 100,
+            nome: "Unidade 1"
+        }]);
         vm.processoSelecionadoId = 1;
         await flushPromises();
         expect(vm.unidadesParticipantes.length).toBe(1);
@@ -272,8 +302,13 @@ describe("ImportarAtividadesModal.vue", () => {
         const wrapper = createWrapper();
         const vm = obterVm(wrapper) as any;
         await flushPromises();
-        
-        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{
+            codUnidade: 10,
+            sigla: "U1",
+            codSubprocesso: 100,
+            nome: "Unidade 1"
+        }]);
         vm.processoSelecionadoId = 1;
         await flushPromises();
 
@@ -288,8 +323,13 @@ describe("ImportarAtividadesModal.vue", () => {
         const wrapper = createWrapper();
         const vm = obterVm(wrapper) as any;
         await flushPromises();
-        
-        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"}]);
+
+        vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([{
+            codUnidade: 10,
+            sigla: "U1",
+            codSubprocesso: 100,
+            nome: "Unidade 1"
+        }]);
         vm.processoSelecionadoId = 1;
         await flushPromises();
 
@@ -307,11 +347,11 @@ describe("ImportarAtividadesModal.vue", () => {
     });
 
     it("cobre tentativa de importacao com destino nulo", async () => {
-        const wrapper = createWrapper({ codSubprocessoDestino: null });
+        const wrapper = createWrapper({codSubprocessoDestino: null});
         const vm = obterVm(wrapper) as any;
-        
+
         vm.unidadeSelecionada = {codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"};
-        
+
         await vm.importar();
         expect(subprocessoService.importarAtividades).not.toHaveBeenCalled();
     });

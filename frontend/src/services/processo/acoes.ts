@@ -1,4 +1,4 @@
-import type {CriarProcessoRequest, AtualizarProcessoRequest, Processo} from "./types";
+import type {AtualizarProcessoRequest, CriarProcessoRequest, Processo} from "./types";
 import apiClient from "@/axios-setup";
 
 const CAMINHO_PROCESSOS = "/processos";

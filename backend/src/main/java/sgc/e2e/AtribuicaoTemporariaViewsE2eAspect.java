@@ -44,11 +44,11 @@ public class AtribuicaoTemporariaViewsE2eAspect {
         );
 
         jdbcTemplate.update("""
-                MERGE INTO sgc.vw_responsabilidade
-                (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio, data_fim)
-                KEY(unidade_codigo)
-                VALUES (?, ?, ?, 'ATRIBUICAO_TEMPORARIA', ?, ?)
-                """,
+                        MERGE INTO sgc.vw_responsabilidade
+                        (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio, data_fim)
+                        KEY(unidade_codigo)
+                        VALUES (?, ?, ?, 'ATRIBUICAO_TEMPORARIA', ?, ?)
+                        """,
                 codUnidade,
                 request.tituloEleitoralUsuario(),
                 matriculaUsuario,
@@ -66,11 +66,11 @@ public class AtribuicaoTemporariaViewsE2eAspect {
         }
 
         jdbcTemplate.update("""
-                DELETE FROM sgc.vw_usuario_perfil_unidade
-                WHERE usuario_titulo = ?
-                  AND unidade_codigo = ?
-                  AND perfil IN ('CHEFE', 'GESTOR')
-                """,
+                        DELETE FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil IN ('CHEFE', 'GESTOR')
+                        """,
                 tituloAnterior,
                 codUnidade
         );
@@ -78,11 +78,11 @@ public class AtribuicaoTemporariaViewsE2eAspect {
 
     private void sincronizarPerfisDaUnidade(String usuarioTitulo, Long codUnidade, String tipoUnidade) {
         jdbcTemplate.update("""
-                DELETE FROM sgc.vw_usuario_perfil_unidade
-                WHERE usuario_titulo = ?
-                  AND unidade_codigo = ?
-                  AND perfil IN ('CHEFE', 'GESTOR')
-                """,
+                        DELETE FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil IN ('CHEFE', 'GESTOR')
+                        """,
                 usuarioTitulo,
                 codUnidade
         );
@@ -98,11 +98,11 @@ public class AtribuicaoTemporariaViewsE2eAspect {
 
     private void inserirPerfil(String usuarioTitulo, Long codUnidade, String perfil) {
         jdbcTemplate.update("""
-                MERGE INTO sgc.vw_usuario_perfil_unidade
-                (usuario_titulo, unidade_codigo, perfil)
-                KEY(usuario_titulo, unidade_codigo, perfil)
-                VALUES (?, ?, ?)
-                """,
+                        MERGE INTO sgc.vw_usuario_perfil_unidade
+                        (usuario_titulo, unidade_codigo, perfil)
+                        KEY(usuario_titulo, unidade_codigo, perfil)
+                        VALUES (?, ?, ?)
+                        """,
                 usuarioTitulo,
                 codUnidade,
                 perfil

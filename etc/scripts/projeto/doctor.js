@@ -2,7 +2,7 @@ import path from "node:path";
 import net from "node:net";
 import which from "which";
 import fs from "fs-extra";
-import { execa } from "execa";
+import {execa} from "execa";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {escreverLinha, formatarStatus, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
@@ -20,20 +20,56 @@ const RECURSOS = [
     {tipo: "comando", nome: "git", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
     {tipo: "comando", nome: "java", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoEsperada: "25"},
     {tipo: "comando", nome: "keytool", obrigatorio: false, categoria: CATEGORIAS.AMBIENTE},
-    
+
     {tipo: "arquivo", nome: "gradlew", caminho: "gradlew", obrigatorio: true, categoria: CATEGORIAS.CONFIGURACAO},
-    {tipo: "arquivo", nome: "package.json raiz", caminho: "package.json", obrigatorio: true, categoria: CATEGORIAS.CONFIGURACAO},
-    {tipo: "arquivo", nome: "frontend/package.json", caminho: "frontend/package.json", obrigatorio: true, categoria: CATEGORIAS.CONFIGURACAO},
-    {tipo: "arquivo", nome: "backend/build.gradle.kts", caminho: "backend/build.gradle.kts", obrigatorio: true, categoria: CATEGORIAS.CONFIGURACAO},
+    {
+        tipo: "arquivo",
+        nome: "package.json raiz",
+        caminho: "package.json",
+        obrigatorio: true,
+        categoria: CATEGORIAS.CONFIGURACAO
+    },
+    {
+        tipo: "arquivo",
+        nome: "frontend/package.json",
+        caminho: "frontend/package.json",
+        obrigatorio: true,
+        categoria: CATEGORIAS.CONFIGURACAO
+    },
+    {
+        tipo: "arquivo",
+        nome: "backend/build.gradle.kts",
+        caminho: "backend/build.gradle.kts",
+        obrigatorio: true,
+        categoria: CATEGORIAS.CONFIGURACAO
+    },
     {tipo: "arquivo", nome: ".env.e2e", caminho: ".env.e2e", obrigatorio: false, categoria: CATEGORIAS.CONFIGURACAO},
-    
+
     {tipo: "porta", nome: "Backend (10000)", porta: 10000, obrigatorio: false, categoria: CATEGORIAS.INFRA},
     {tipo: "porta", nome: "Frontend (5173)", porta: 5173, portaPadrao: true, categoria: CATEGORIAS.INFRA},
     {tipo: "porta", nome: "QA Dashboard (4179)", porta: 4179, portaPadrao: true, categoria: CATEGORIAS.INFRA},
-    {tipo: "conectividade", nome: "Internet (google.com)", host: "google.com", obrigatorio: false, categoria: CATEGORIAS.INFRA},
+    {
+        tipo: "conectividade",
+        nome: "Internet (google.com)",
+        host: "google.com",
+        obrigatorio: false,
+        categoria: CATEGORIAS.INFRA
+    },
 
-    {tipo: "diretorio", nome: "node_modules raiz", caminho: "node_modules", obrigatorio: false, categoria: CATEGORIAS.DEPENDENCIAS},
-    {tipo: "diretorio", nome: "frontend/node_modules", caminho: "frontend/node_modules", obrigatorio: false, categoria: CATEGORIAS.DEPENDENCIAS}
+    {
+        tipo: "diretorio",
+        nome: "node_modules raiz",
+        caminho: "node_modules",
+        obrigatorio: false,
+        categoria: CATEGORIAS.DEPENDENCIAS
+    },
+    {
+        tipo: "diretorio",
+        nome: "frontend/node_modules",
+        caminho: "frontend/node_modules",
+        obrigatorio: false,
+        categoria: CATEGORIAS.DEPENDENCIAS
+    }
 ];
 
 function determinarStatus(sucesso, obrigatorio) {
@@ -107,7 +143,7 @@ async function verificarComando(recurso) {
         }
     }
 
-    return { ...recurso, status, detalhe };
+    return {...recurso, status, detalhe};
 }
 
 async function verificarRecurso(recurso, diretorioBase) {

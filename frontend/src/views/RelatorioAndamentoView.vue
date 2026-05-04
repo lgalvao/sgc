@@ -2,7 +2,7 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.relatorios.ANDAMENTO_PROCESSO">
       <template #actions>
-        <BButton variant="outline-secondary" to="/relatorios">
+        <BButton to="/relatorios" variant="outline-secondary">
           <i class="bi bi-arrow-left me-1"/> Voltar
         </BButton>
       </template>

@@ -16,7 +16,7 @@ describe("useInvalidacaoNavegacao", () => {
         const processo = useProcessoStore();
         const subprocesso = useSubprocessoStore();
         const mapas = useMapasStore();
-        
+
         vi.spyOn(painel, 'invalidar');
         vi.spyOn(processo, 'invalidar');
         vi.spyOn(subprocesso, 'invalidar');
@@ -35,13 +35,13 @@ describe("useInvalidacaoNavegacao", () => {
         const painel = usePainelStore();
         const processo = useProcessoStore();
         const subprocesso = useSubprocessoStore();
-        
+
         vi.spyOn(painel, 'invalidar');
         vi.spyOn(processo, 'invalidar');
         vi.spyOn(subprocesso, 'invalidar');
 
         const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
-        
+
         invalidarCachesSubprocesso({incluirPainel: true, incluirProcesso: false});
 
         expect(painel.invalidar).toHaveBeenCalled();

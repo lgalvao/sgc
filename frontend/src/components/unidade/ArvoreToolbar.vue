@@ -5,9 +5,9 @@
         <BButton
             aria-label="Selecionar todas as unidades elegíveis"
             class="arvore-unidades__botao"
+            data-testid="btn-arvore-selecionar-todos"
             size="sm"
             variant="outline-secondary"
-            data-testid="btn-arvore-selecionar-todos"
             @click="$emit('selecionar-todos')">
           <i aria-hidden="true" class="bi bi-check-all me-1"/>
           Todos
@@ -16,9 +16,9 @@
         <BButton
             aria-label="Desmarcar todas as unidades"
             class="arvore-unidades__botao arvore-unidades__botao--secundario"
+            data-testid="btn-arvore-limpar-selecao"
             size="sm"
             variant="outline-secondary"
-            data-testid="btn-arvore-limpar-selecao"
             @click="$emit('limpar-selecao')">
           <i aria-hidden="true" class="bi bi-x-lg me-1"/>
           Limpar
@@ -31,10 +31,10 @@
           :model-value="termoBusca"
           aria-label="Buscar unidade por sigla"
           class="arvore-unidades__input"
+          data-testid="inp-arvore-busca"
           placeholder="Filtrar..."
           size="sm"
           type="search"
-          data-testid="inp-arvore-busca"
           @update:model-value="$emit('update:termoBusca', String($event ?? ''))"
       />
       <i

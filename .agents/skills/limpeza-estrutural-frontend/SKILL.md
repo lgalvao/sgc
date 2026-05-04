@@ -5,9 +5,11 @@ description: Use quando o objetivo for reduzir cruft e complexidade acidental no
 
 # Limpeza Estrutural do Frontend no SGC
 
-Use este skill quando a pergunta real for "qual é o menor corte seguro para deixar o frontend mais coeso, uniforme e simples sem quebrar contrato?".
+Use este skill quando a pergunta real for "qual é o menor corte seguro para deixar o frontend mais coeso, uniforme e
+simples sem quebrar contrato?".
 
-Ele é focado em rodadas incrementais de limpeza estrutural no frontend Vue/TypeScript do SGC, guiadas por evidência do gate de cruft e por hotspots reais do código.
+Ele é focado em rodadas incrementais de limpeza estrutural no frontend Vue/TypeScript do SGC, guiadas por evidência do
+gate de cruft e por hotspots reais do código.
 
 ## Fontes de verdade
 
@@ -36,7 +38,8 @@ Use este skill quando houver:
 Não use este skill quando:
 
 - o problema principal for performance medida em fluxo real; nesse caso prefira `otimizacao-por-monitoramento`;
-- a tarefa exigir simplificação full-stack de regra de negócio atravessando backend e frontend; nesse caso prefira `simplificacao-codigo`.
+- a tarefa exigir simplificação full-stack de regra de negócio atravessando backend e frontend; nesse caso prefira
+  `simplificacao-codigo`.
 
 ## Objetivo
 
@@ -51,22 +54,26 @@ Reduzir complexidade acidental no frontend preservando:
 ## Princípios
 
 1. Escolher a menor fronteira segura.
-Comece por blocos visuais ou fluxos locais coesos: header, ações, filtros, modais, seções de tela, helpers privados.
+   Comece por blocos visuais ou fluxos locais coesos: header, ações, filtros, modais, seções de tela, helpers privados.
 
 2. Não deslocar o problema de camada.
-Se a lógica é local de uma view, prefira componente da própria feature ou helper local da view antes de criar um novo composable/store que só muda a violação de lugar.
+   Se a lógica é local de uma view, prefira componente da própria feature ou helper local da view antes de criar um novo
+   composable/store que só muda a violação de lugar.
 
 3. Preservar contratos úteis.
-Não renomeie `data-testid`, props públicas, barrels ou rotas sem evidência de que o contrato antigo realmente ficou sem uso.
+   Não renomeie `data-testid`, props públicas, barrels ou rotas sem evidência de que o contrato antigo realmente ficou
+   sem uso.
 
 4. Remover compatibilidade artificial.
-Se a decisão da rodada for simplificar, não mantenha alias, nomes paralelos, branches legados ou defaults silenciosos só para acomodar código velho.
+   Se a decisão da rodada for simplificar, não mantenha alias, nomes paralelos, branches legados ou defaults silenciosos
+   só para acomodar código velho.
 
 5. Apagar sobra imediatamente.
-Remova waiver obsoleto, teste sem sentido, helper órfão e código morto na mesma rodada em que eles deixarem de ser necessários.
+   Remova waiver obsoleto, teste sem sentido, helper órfão e código morto na mesma rodada em que eles deixarem de ser
+   necessários.
 
 6. Validar em passos pequenos.
-Faça um corte curto, rode validação focada, estabilize, só então passe ao próximo hotspot.
+   Faça um corte curto, rode validação focada, estabilize, só então passe ao próximo hotspot.
 
 ## Loop padrão
 

@@ -47,11 +47,11 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     const UNIDADE_ALVO_3 = 'SECAO_221';
 
     test('Deve exibir detalhes do subprocesso em mapeamento para ADMIN, GESTOR, CHEFE e SERVIDOR', async ({
-        _resetAutomatico,
-        _autenticadoComoAdmin,
-        request,
-        page
-    }) => {
+                                                                                                              _resetAutomatico,
+                                                                                                              _autenticadoComoAdmin,
+                                                                                                              request,
+                                                                                                              page
+                                                                                                          }) => {
         const processo = await criarProcessoFixture(request, {
             unidade: UNIDADE_ALVO,
             iniciar: true,
@@ -172,11 +172,11 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     });
 
     test('Deve habilitar os cards conforme o avanço do subprocesso', async ({
-        _resetAutomatico,
-        _autenticadoComoAdmin,
-        request,
-        page
-    }) => {
+                                                                                _resetAutomatico,
+                                                                                _autenticadoComoAdmin,
+                                                                                request,
+                                                                                page
+                                                                            }) => {
         const processoCadastroDisponibilizado = await criarProcessoCadastroDisponibilizadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: `Fixture CDU-07 CAD DISP ${Date.now()}`
@@ -279,10 +279,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     });
 
     test('Deve manter o acesso de visualização no processo finalizado para servidor da própria unidade', async ({
-        _resetAutomatico,
-        request,
-        page
-    }) => {
+                                                                                                                    _resetAutomatico,
+                                                                                                                    request,
+                                                                                                                    page
+                                                                                                                }) => {
         const processoFinalizado = await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: `Fixture CDU-07 FINAL ${Date.now()}`
@@ -316,11 +316,11 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     });
 
     test('Deve exibir cards com rotas corretas ao navegar entre subprocessos distintos na mesma sessão', async ({
-        _resetAutomatico,
-        _autenticadoComoAdmin,
-        request,
-        page
-    }) => {
+                                                                                                                    _resetAutomatico,
+                                                                                                                    _autenticadoComoAdmin,
+                                                                                                                    request,
+                                                                                                                    page
+                                                                                                                }) => {
         // Cenário: o CHEFE visita primeiro um subprocesso somente leitura e depois outro editável.
         // O card é o mesmo, mas o texto/acionabilidade precisam refletir o estado atual sem reaproveitar cache antigo.
         const ts = Date.now();
@@ -353,10 +353,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     });
 
     test('Deve exibir os cards do ramo de diagnóstico na tela de detalhes do subprocesso', async ({
-        _resetAutomatico,
-        _autenticadoComoAdmin,
-        page
-    }) => {
+                                                                                                      _resetAutomatico,
+                                                                                                      _autenticadoComoAdmin,
+                                                                                                      page
+                                                                                                  }) => {
         const descricao = `Processo CDU-07 DIAGNOSTICO ${Date.now()}`;
 
         await criarProcesso(page, {
@@ -381,10 +381,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     });
 
     test('Regressão - cache de sessão no subprocesso: deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                                                                      _resetAutomatico,
+                                                                                                                                                      page,
+                                                                                                                                                      _autenticadoComoAdmin
+                                                                                                                                                  }) => {
         const descricao = `Regressao cache subprocesso ${Date.now()}`;
         const unidade = 'ASSESSORIA_12';
 

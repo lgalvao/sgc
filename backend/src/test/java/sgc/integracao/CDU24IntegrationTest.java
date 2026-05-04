@@ -192,7 +192,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 
-                mockMvc.perform(
+        mockMvc.perform(
                         post("/api/subprocessos/disponibilizar-mapa-bloco")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)

@@ -1,9 +1,9 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.configuracoes.TITULO" />
+    <PageHeader :title="TEXTOS.configuracoes.TITULO"/>
 
     <div v-if="loading" class="text-center py-4">
-      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary" />
+      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary"/>
     </div>
 
     <BAlert v-else-if="error" :model-value="true" variant="danger">
@@ -21,8 +21,8 @@
 
       <BForm @submit.prevent="salvar">
         <BFormGroup
-            label-for="diasInativacao"
             class="mb-3"
+            label-for="diasInativacao"
         >
           <template #label>
             {{ TEXTOS.configuracoes.LABEL_DIAS_INATIVACAO }} <span aria-hidden="true" class="text-danger">*</span>
@@ -33,9 +33,9 @@
           <BFormInput
               id="diasInativacao"
               v-model="form.diasInativacao"
+              :state="mensagemErroDiasInativacao ? false : null"
               aria-required="true"
               min="1"
-              :state="mensagemErroDiasInativacao ? false : null"
               type="number"
           />
           <BFormInvalidFeedback :state="mensagemErroDiasInativacao ? false : null">
@@ -44,8 +44,8 @@
         </BFormGroup>
 
         <BFormGroup
-            label-for="diasAlertaNovo"
             class="mb-3"
+            label-for="diasAlertaNovo"
         >
           <template #label>
             {{ TEXTOS.configuracoes.LABEL_DIAS_ALERTA_NOVO }} <span aria-hidden="true" class="text-danger">*</span>
@@ -56,9 +56,9 @@
           <BFormInput
               id="diasAlertaNovo"
               v-model="form.diasAlertaNovo"
+              :state="mensagemErroDiasAlertaNovo ? false : null"
               aria-required="true"
               min="1"
-              :state="mensagemErroDiasAlertaNovo ? false : null"
               type="number"
           />
           <BFormInvalidFeedback :state="mensagemErroDiasAlertaNovo ? false : null">
@@ -67,8 +67,8 @@
         </BFormGroup>
 
         <BFormGroup
-            label-for="temaEscuro"
             class="mb-4"
+            label-for="temaEscuro"
         >
           <BFormCheckbox
               id="temaEscuro"
@@ -85,8 +85,8 @@
         <div class="d-flex justify-content-end">
           <LoadingButton
               :loading="salvando"
-              icon="check-lg"
               :text="TEXTOS.configuracoes.BOTAO_SALVAR"
+              icon="check-lg"
               type="submit"
               variant="success"
           />
@@ -182,9 +182,9 @@ async function salvar() {
   }
 
   const paramsToSave: Parametro[] = [
-    { ...pInativacao!, valor: form.diasInativacao.toString() },
-    { ...pAlertaNovo!, valor: form.diasAlertaNovo.toString() },
-    { ...pTemaEscuro!, valor: form.temaEscuro.toString() }
+    {...pInativacao!, valor: form.diasInativacao.toString()},
+    {...pAlertaNovo!, valor: form.diasAlertaNovo.toString()},
+    {...pTemaEscuro!, valor: form.temaEscuro.toString()}
   ];
 
   const sucesso = await salvarConfiguracoes(paramsToSave);

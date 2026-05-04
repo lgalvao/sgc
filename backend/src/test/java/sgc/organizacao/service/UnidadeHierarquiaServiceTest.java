@@ -227,6 +227,45 @@ class UnidadeHierarquiaServiceTest {
         verifyNoInteractions(unidadeService);
     }
 
+    private Responsabilidade criarResponsabilidade(Long codigoUnidade) {
+        Responsabilidade responsabilidade = new Responsabilidade();
+        responsabilidade.setUnidadeCodigo(codigoUnidade);
+        responsabilidade.setUsuarioTitulo("RESP-" + codigoUnidade);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("RESP-" + codigoUnidade);
+        usuario.setNome("Responsável " + codigoUnidade);
+        responsabilidade.setUsuario(usuario);
+        return responsabilidade;
+    }
+
+    private List<UnidadeHierarquiaLeitura> hierarquiaBasica() {
+        return List.of(
+                toLeitura(unidadeRaiz),
+                toLeitura(unidadeIntermediaria),
+                toLeitura(unidadeOperacional)
+        );
+    }
+
+    private List<ResponsabilidadeLeitura> responsabilidadesBasicas() {
+        return List.of(
+                new ResponsabilidadeLeitura(1L, "RESP-1"),
+                new ResponsabilidadeLeitura(2L, "RESP-2"),
+                new ResponsabilidadeLeitura(3L, "RESP-3")
+        );
+    }
+
+    private UnidadeHierarquiaLeitura toLeitura(Unidade unidade) {
+        return new UnidadeHierarquiaLeitura(
+                unidade.getCodigo(),
+                unidade.getNome(),
+                unidade.getSigla(),
+                unidade.getTituloTitular(),
+                unidade.getTipo(),
+                unidade.getSituacao(),
+                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
+        );
+    }
+
     @Nested
     @DisplayName("Cobertura Adicional de Casos de Borda")
     class CoberturaAdicional {
@@ -236,9 +275,9 @@ class UnidadeHierarquiaServiceTest {
         void deveRetornarDtoSemSubunidadesQuandoFilhasNull() {
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).sigla("U1").build();
             Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>(); // Não tem a chave 1L
-            
+
             UnidadeDto resultado = service.montarComSubunidades(dto, mapaFilhas);
-            
+
             assertThat(resultado.getSubunidades()).isEmpty();
         }
 
@@ -248,7 +287,7 @@ class UnidadeHierarquiaServiceTest {
             List<Unidade> subordinadas = new ArrayList<>();
             subordinadas.add(null);
             when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(subordinadas);
-            
+
             assertThatThrownBy(() -> service.buscarSubordinadas(999L))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("Unidade ausente");
@@ -265,7 +304,7 @@ class UnidadeHierarquiaServiceTest {
             when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(responsabilidadesBasicas());
             // Mockar que apenas a raiz tem mapa
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(unidadeRaiz.getCodigo()));
-            
+
             // Caso 1: Requer mapa, mas só a raiz tem
             List<UnidadeDto> res1 = service.buscarArvoreComElegibilidade(true, Set.of());
             assertThat(res1.getFirst().isElegivel()).isTrue(); // RAIZ tem mapa
@@ -314,44 +353,5 @@ class UnidadeHierarquiaServiceTest {
             UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
             assertThat(operacionalDto.isElegivel()).isFalse();
         }
-    }
-
-    private Responsabilidade criarResponsabilidade(Long codigoUnidade) {
-        Responsabilidade responsabilidade = new Responsabilidade();
-        responsabilidade.setUnidadeCodigo(codigoUnidade);
-        responsabilidade.setUsuarioTitulo("RESP-" + codigoUnidade);
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("RESP-" + codigoUnidade);
-        usuario.setNome("Responsável " + codigoUnidade);
-        responsabilidade.setUsuario(usuario);
-        return responsabilidade;
-    }
-
-    private List<UnidadeHierarquiaLeitura> hierarquiaBasica() {
-        return List.of(
-                toLeitura(unidadeRaiz),
-                toLeitura(unidadeIntermediaria),
-                toLeitura(unidadeOperacional)
-        );
-    }
-
-    private List<ResponsabilidadeLeitura> responsabilidadesBasicas() {
-        return List.of(
-                new ResponsabilidadeLeitura(1L, "RESP-1"),
-                new ResponsabilidadeLeitura(2L, "RESP-2"),
-                new ResponsabilidadeLeitura(3L, "RESP-3")
-        );
-    }
-
-    private UnidadeHierarquiaLeitura toLeitura(Unidade unidade) {
-        return new UnidadeHierarquiaLeitura(
-                unidade.getCodigo(),
-                unidade.getNome(),
-                unidade.getSigla(),
-                unidade.getTituloTitular(),
-                unidade.getTipo(),
-                unidade.getSituacao(),
-                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
-        );
     }
 }

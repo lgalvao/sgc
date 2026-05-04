@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="carregandoInicial" />
+    <CarregamentoPagina v-if="carregandoInicial"/>
     <template v-else>
       <MapaAcoesHeader
           :codigo-subprocesso="codigoSubprocesso"
@@ -36,10 +36,10 @@
           v-if="erroMapaExibido"
           :key="erroMapaExibido"
           :model-value="true"
+          dismissible
           no-fade
           show
           variant="danger"
-          dismissible
           @dismissed="limparErroMapa"
       >
         {{ erroMapaExibido }}
@@ -47,7 +47,7 @@
 
       <div v-if="unidade">
         <div v-if="modoSomenteLeitura" class="mb-4 mt-3">
-          <MapaSomenteLeitura :mapa="mapaSomenteLeitura" />
+          <MapaSomenteLeitura :mapa="mapaSomenteLeitura"/>
         </div>
 
         <template v-else>
@@ -64,8 +64,8 @@
 
           <div v-if="competencias.length === 0" class="mb-4 mt-3">
             <EmptyState
-                :title="TEXTOS.mapa.EMPTY_TITLE"
                 :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
+                :title="TEXTOS.mapa.EMPTY_TITLE"
                 class="mb-0"
                 icon="bi-journal-plus"
             />
@@ -100,11 +100,10 @@
           :historico-analise="historicoAnalise"
           :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
           :impactos="impactos ?? null"
-          :pode-apresentar-sugestoes="podeApresentarSugestoes"
           :loading-competencia="loadingCompetencia"
+          :loading-disponibilizacao="loadingDisponibilizacao"
           :loading-exclusao="loadingExclusao"
           :loading-impacto="loadingImpacto"
-          :loading-disponibilizacao="loadingDisponibilizacao"
           :loading-sugestoes-envio="loadingSugestoesEnvio"
           :mensagem-erro-devolucao="mensagemErroDevolucao"
           :mensagem-erro-sugestoes="mensagemErroSugestoes"
@@ -121,15 +120,16 @@
           :mostrar-modal-ver-sugestoes="mostrarModalVerSugestoes"
           :notificacao-disponibilizacao="notificacaoDisponibilizacao"
           :observacao-devolucao="observacaoDevolucao"
+          :pode-apresentar-sugestoes="podeApresentarSugestoes"
           :sugestoes="sugestoes"
           :sugestoes-visualizacao="sugestoesVisualizacao"
           :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
+          @disponibilizar="disponibilizarMapa"
           @confirmar-aceitacao="confirmarAceitacao"
           @confirmar-devolucao="handleConfirmarDevolucao"
           @confirmar-exclusao-competencia="confirmarExclusaoCompetencia"
           @confirmar-sugestoes="handleConfirmarSugestoes"
           @confirmar-validacao="confirmarValidacao"
-          @disponibilizar="disponibilizarMapa"
           @fechar-aceite="fecharModalAceitar"
           @fechar-criar-competencia="fecharModalCriarNovaCompetencia"
           @fechar-disponibilizar="fecharModalDisponibilizar"

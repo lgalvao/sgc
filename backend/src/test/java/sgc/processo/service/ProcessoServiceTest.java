@@ -88,6 +88,41 @@ class ProcessoServiceTest {
         return unidade;
     }
 
+    @Test
+    @DisplayName("executarAcaoEmBloco nao executa transicoes quando subprocesso nao eh elegivel")
+    void executarAcaoEmBloco_NaoExecutaTransicoesQuandoNaoElegivel() {
+        Long codProcesso = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
+                List.of(10L),
+                ACEITAR
+        );
+
+        Usuario usuario = new Usuario();
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+        Subprocesso sub = Subprocesso.builder()
+                .codigo(100L)
+                .unidade(Unidade.builder().codigo(10L).build())
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                .build();
+
+        when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+                .thenReturn(List.of(sub));
+
+        Subprocesso subNaoElegivel = Subprocesso.builder()
+                .codigo(101L)
+                .unidade(Unidade.builder().codigo(10L).build())
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
+        when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+                .thenReturn(List.of(subNaoElegivel));
+
+        processoService.executarAcaoEmBloco(codProcesso, req);
+
+        verify(cadastroFluxoService, never()).aceitarCadastroEmBloco(any());
+        verify(cadastroFluxoService, never()).homologarCadastroEmBloco(any());
+    }
+
     @Nested
     @DisplayName("Cobertura e Casos de Borda")
     class CoverageTests {
@@ -116,17 +151,17 @@ class ProcessoServiceTest {
             Unidade adm = new Unidade();
             adm.setCodigo(999L);
 
-            java.lang.reflect.Method metodo = ProcessoService.class.getDeclaredMethod("efetivarInicioSubprocessos", 
-                ProcessoService.InicioSubprocessosContexto.class);
+            java.lang.reflect.Method metodo = ProcessoService.class.getDeclaredMethod("efetivarInicioSubprocessos",
+                    ProcessoService.InicioSubprocessosContexto.class);
             metodo.setAccessible(true);
 
             ProcessoService.InicioSubprocessosContexto contexto = new ProcessoService.InicioSubprocessosContexto(
-                processo,
-                TipoProcesso.DIAGNOSTICO,
-                List.of(10L),
-                Set.of(unidade),
-                List.of(um),
-                adm
+                    processo,
+                    TipoProcesso.DIAGNOSTICO,
+                    List.of(10L),
+                    Set.of(unidade),
+                    List.of(um),
+                    adm
             );
 
             metodo.invoke(processoService, contexto);
@@ -134,42 +169,6 @@ class ProcessoServiceTest {
             verify(subprocessoService).criarParaDiagnostico(any());
         }
     }
-
-
-        @Test
-        @DisplayName("executarAcaoEmBloco nao executa transicoes quando subprocesso nao eh elegivel")
-        void executarAcaoEmBloco_NaoExecutaTransicoesQuandoNaoElegivel() {
-            Long codProcesso = 1L;
-            ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
-                    List.of(10L),
-                    ACEITAR
-            );
-
-            Usuario usuario = new Usuario();
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-
-            Subprocesso sub = Subprocesso.builder()
-                    .codigo(100L)
-                    .unidade(Unidade.builder().codigo(10L).build())
-                    .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
-                    .build();
-
-            when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
-                    .thenReturn(List.of(sub));
-
-            Subprocesso subNaoElegivel = Subprocesso.builder()
-                    .codigo(101L)
-                    .unidade(Unidade.builder().codigo(10L).build())
-                    .situacao(SituacaoSubprocesso.NAO_INICIADO)
-                    .build();
-            when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
-                    .thenReturn(List.of(subNaoElegivel));
-
-            processoService.executarAcaoEmBloco(codProcesso, req);
-
-            verify(cadastroFluxoService, never()).aceitarCadastroEmBloco(any());
-            verify(cadastroFluxoService, never()).homologarCadastroEmBloco(any());
-        }
 
     @Nested
     @DisplayName("Segurança e Controle de Acesso")
@@ -190,7 +189,7 @@ class ProcessoServiceTest {
         @DisplayName("Deve iniciar mapeamento com sucesso e salvar")
         void deveIniciarMapeamentoComSucesso() {
             Long id = 100L;
-            
+
             Processo p = new Processo();
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
@@ -198,7 +197,7 @@ class ProcessoServiceTest {
             p.setDataLimite(LocalDateTime.now().plusDays(30));
             Unidade uni = criarUnidadeValida(10L);
             p.adicionarParticipantes(Set.of(uni));
-            
+
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             Unidade uniAdmin = new Unidade();
             uniAdmin.setSituacao(SituacaoUnidade.ATIVA);
@@ -226,7 +225,7 @@ class ProcessoServiceTest {
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
-            
+
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);
             when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
@@ -437,7 +436,7 @@ class ProcessoServiceTest {
             Unidade unidade = criarUnidadeValida(10L);
             unidade.setSigla("SECAO");
             p.adicionarParticipantes(Set.of(unidade));
-            
+
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidade));
             when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
@@ -445,7 +444,7 @@ class ProcessoServiceTest {
                     .thenReturn("<html>finalizado</html>");
             when(validacaoService.validarSubprocessosParaFinalizacao(id))
                     .thenReturn(ResultadoValidacao.ofValido());
-            
+
             processoService.finalizar(id);
 
             verify(processoRepo).save(p);
@@ -1097,7 +1096,7 @@ class ProcessoServiceTest {
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
-            
+
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);
             when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
@@ -1138,7 +1137,7 @@ class ProcessoServiceTest {
             sp.setUnidade(u);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             sp.setMapa(null); // Explicitly null
-            
+
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
@@ -1171,7 +1170,7 @@ class ProcessoServiceTest {
             Mapa mapa = new Mapa();
             mapa.setCodigo(500L);
             sp.setMapa(mapa);
-            
+
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
@@ -1314,9 +1313,9 @@ class ProcessoServiceTest {
         @DisplayName("processarAcoesBlocoAceiteHomologacao - fall-through branch")
         void deveNaoFazerNadaQuandoAcaoNaoForAceitarOuHomologar() {
             ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(), AcaoProcesso.DISPONIBILIZAR);
-            
+
             assertThatCode(() -> invokeMethod(processoService, "processarAcoesBlocoAceiteHomologacao", req, List.of()))
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 }

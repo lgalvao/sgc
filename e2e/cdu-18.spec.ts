@@ -17,7 +17,11 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
 
-    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({
+                                                                                _resetAutomatico,
+                                                                                page,
+                                                                                _autenticadoComoAdmin
+                                                                            }) => {
         await test.step('1. Login como ADMIN', async () => {
             // Já autenticado via fixture
         });
@@ -65,7 +69,11 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         });
     });
 
-    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({_resetAutomatico, page, _autenticadoComoChefeAssessoria12}) => {
+    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({
+                                                                          _resetAutomatico,
+                                                                          page,
+                                                                          _autenticadoComoChefeAssessoria12
+                                                                      }) => {
         await test.step('1. Login como CHEFE_ASSESSORIA_12', async () => {
             // Já autenticado via fixture
         });

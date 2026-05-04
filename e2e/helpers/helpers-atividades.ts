@@ -72,9 +72,9 @@ export async function editarAtividade(page: Page, descricaoAtual: string | RegEx
     await editButton.click();
 
     const input = page.getByTestId('inp-editar-atividade');
-    await input.waitFor({ state: 'visible' });
+    await input.waitFor({state: 'visible'});
     await input.fill(novaDescricao);
-    
+
     await page.getByTestId('btn-salvar-edicao-atividade').click();
     await expect(page.getByText(novaDescricao)).toBeVisible();
 }
@@ -86,9 +86,9 @@ export async function cancelarEdicaoAtividade(page: Page, descricaoAtual: string
     await editButton.click();
 
     const input = page.getByTestId('inp-editar-atividade');
-    await input.waitFor({ state: 'visible' });
+    await input.waitFor({state: 'visible'});
     await input.fill(textoCancelado);
-    
+
     await page.getByTestId('btn-cancelar-edicao-atividade').click();
     await expect(page.getByText(descricaoAtual)).toBeVisible();
 }
@@ -118,7 +118,7 @@ export async function editarConhecimento(page: Page, atividadeDescricao: string 
     await btnEditar.click();
 
     const input = card.getByTestId('inp-editar-conhecimento');
-    await input.waitFor({ state: 'visible' });
+    await input.waitFor({state: 'visible'});
     await input.fill(novoConhecimento);
     await card.getByTestId('btn-salvar-edicao-conhecimento').click();
 
@@ -135,9 +135,9 @@ export async function cancelarEdicaoConhecimento(page: Page, atividadeDescricao:
     await btnEditar.click();
 
     const input = card.getByTestId('inp-editar-conhecimento');
-    await input.waitFor({ state: 'visible' });
+    await input.waitFor({state: 'visible'});
     await input.fill(textoCancelado);
-    
+
     await card.getByTestId('btn-cancelar-edicao-conhecimento').click();
     await expect(card.getByText(conhecimentoAtual)).toBeVisible();
 }
@@ -179,7 +179,8 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
     const modal = page.getByRole('dialog');
     const alert = page.getByTestId('app-alert');
 
-    await modal.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
+    await modal.waitFor({state: 'visible', timeout: 1000}).catch(() => {
+    });
 
     if (!(await modal.isVisible()) && await alert.isVisible()) {
         atividadeExtraCriada = `Atividade complementar ${Date.now()}`;
@@ -248,22 +249,22 @@ async function preencherFormularioImportacao(page: Page, processoOrigemDescricao
     const selectUnidade = modal.getByTestId('select-unidade');
 
     // 1. Aguardar o processo aparecer no select e selecionar
-    await expect(selectProcesso.locator('option', { hasText: processoOrigemDescricao })).toBeAttached();
-    
-    const respostaUnidades = page.waitForResponse(r => 
+    await expect(selectProcesso.locator('option', {hasText: processoOrigemDescricao})).toBeAttached();
+
+    const respostaUnidades = page.waitForResponse(r =>
         r.url().includes('/unidades-importacao')
     );
-    await selectProcesso.selectOption({ label: processoOrigemDescricao });
+    await selectProcesso.selectOption({label: processoOrigemDescricao});
     await respostaUnidades;
 
     // 2. Aguardar a unidade aparecer no select e selecionar
     await expect(selectUnidade).toBeEnabled();
-    await expect(selectUnidade.locator('option', { hasText: unidadeOrigemSigla })).toBeAttached();
+    await expect(selectUnidade.locator('option', {hasText: unidadeOrigemSigla})).toBeAttached();
 
     const respostaAtividades = page.waitForResponse(r =>
         r.url().includes('/atividades-importacao')
     );
-    await selectUnidade.selectOption({ label: unidadeOrigemSigla });
+    await selectUnidade.selectOption({label: unidadeOrigemSigla});
     await respostaAtividades;
 
     // 3. Aguardar as atividades aparecerem (checkboxes) ou o estado vazio
@@ -273,7 +274,7 @@ async function preencherFormularioImportacao(page: Page, processoOrigemDescricao
 
     // 4. Selecionar as atividades solicitadas
     for (const desc of atividadesDescricoes) {
-        const checkbox = modal.getByLabel(desc, { exact: true }).first();
+        const checkbox = modal.getByLabel(desc, {exact: true}).first();
         await expect(checkbox).toBeVisible();
         await checkbox.check();
     }
@@ -308,7 +309,7 @@ export async function importarAtividades(page: Page,
     await expect(modal).toBeHidden();
 
     for (const desc of atividadesDescricoes) {
-        await expect(page.getByText(desc, { exact: true }).first()).toBeVisible();
+        await expect(page.getByText(desc, {exact: true}).first()).toBeVisible();
     }
 }
 
@@ -325,7 +326,7 @@ export async function importarAtividadesVazia(page: Page,
     await expect(modal).toBeHidden();
 
     for (const desc of atividadesDescricoes) {
-        await expect(page.getByText(desc, { exact: true }).first()).toBeVisible();
+        await expect(page.getByText(desc, {exact: true}).first()).toBeVisible();
     }
 }
 
@@ -350,18 +351,18 @@ async function realizarVerificacaoOpcoesImportacao(
 
     for (const opcao of opcoesEsperadas) {
         // Aguardar cada processo aparecer como opção — auto-wait sem poll
-        await expect(selectProcesso.locator('option', { hasText: opcao.processo })).toBeAttached();
-        
-        const respostaUnidades = page.waitForResponse(r => 
+        await expect(selectProcesso.locator('option', {hasText: opcao.processo})).toBeAttached();
+
+        const respostaUnidades = page.waitForResponse(r =>
             r.url().includes('/unidades-importacao')
         );
-        await selectProcesso.selectOption({ label: opcao.processo });
+        await selectProcesso.selectOption({label: opcao.processo});
         await respostaUnidades;
 
         await expect(selectUnidade).toBeEnabled();
 
         for (const unidade of opcao.unidades) {
-            await expect(selectUnidade.locator('option', { hasText: unidade })).toBeAttached();
+            await expect(selectUnidade.locator('option', {hasText: unidade})).toBeAttached();
         }
     }
 

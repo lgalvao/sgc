@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.administracao.LIMPEZA_TITULO" />
+    <PageHeader :title="TEXTOS.administracao.LIMPEZA_TITULO"/>
 
     <AppAlert
         v-if="notificacao"
@@ -20,8 +20,8 @@
       </p>
 
       <BFormGroup
-          label-for="codigoProcesso"
           :state="mensagemErroCodigo ? false : null"
+          label-for="codigoProcesso"
       >
         <template #label>
           {{ TEXTOS.administracao.LIMPEZA_LABEL_CODIGO }} <span aria-hidden="true" class="text-danger">*</span>
@@ -29,10 +29,10 @@
         <BFormInput
             id="codigoProcesso"
             v-model="codigoProcesso"
-            data-testid="input-codigo-processo"
-            min="1"
             :placeholder="TEXTOS.administracao.LIMPEZA_PLACEHOLDER_CODIGO"
             :state="mensagemErroCodigo ? false : null"
+            data-testid="input-codigo-processo"
+            min="1"
             type="number"
             @keydown.enter.prevent="abrirConfirmacao"
         />
@@ -43,10 +43,10 @@
 
       <div class="d-flex justify-content-end mt-3">
         <LoadingButton
-            data-testid="btn-excluir-processo-completo"
             :loading="excluindo"
-            icon="trash"
             :text="TEXTOS.administracao.LIMPEZA_BOTAO_ABRIR"
+            data-testid="btn-excluir-processo-completo"
+            icon="trash"
             variant="danger"
             @click="abrirConfirmacao"
         />

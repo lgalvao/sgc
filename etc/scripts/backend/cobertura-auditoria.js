@@ -17,9 +17,9 @@ function calcularScoreImpacto(classe) {
     const pesoLinhas = 1.0;
     const pesoBranches = 1.5;
 
-    return (classe.complexidade * pesoComplexidade) + 
-           (classe.linhasPerdidas * pesoLinhas) + 
-           (classe.branchesPerdidos * pesoBranches);
+    return (classe.complexidade * pesoComplexidade) +
+        (classe.linhasPerdidas * pesoLinhas) +
+        (classe.branchesPerdidos * pesoBranches);
 }
 
 function obterPrioridade(score) {
@@ -31,7 +31,7 @@ function obterPrioridade(score) {
 async function gerarRelatorioMarkdown(dados, caminho) {
     const {totais, hotspots} = dados;
     let md = `# Auditoria de Cobertura Backend - SGC\n\n`;
-    
+
     md += `## Resumo Geral\n`;
     md += `- **Cobertura Global (Instruções):** ${totais.instrucoes.percentual}%\n`;
     md += `- **Cobertura de Linhas:** ${totais.linhas.percentual}%\n`;
@@ -49,7 +49,7 @@ async function gerarRelatorioMarkdown(dados, caminho) {
     });
 
     md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;
-    
+
     await fs.writeFile(caminho, md, "utf8");
     return caminho;
 }

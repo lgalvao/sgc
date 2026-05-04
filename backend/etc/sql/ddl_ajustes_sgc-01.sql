@@ -2,10 +2,10 @@ DECLARE
     v_nullable USER_TAB_COLUMNS.NULLABLE%TYPE;
 BEGIN
     SELECT nullable
-      INTO v_nullable
-      FROM user_tab_columns
-     WHERE table_name = 'ALERTA'
-       AND column_name = 'PROCESSO_CODIGO';
+    INTO v_nullable
+    FROM user_tab_columns
+    WHERE table_name = 'ALERTA'
+      AND column_name = 'PROCESSO_CODIGO';
 
     IF v_nullable = 'N' THEN
         EXECUTE IMMEDIATE 'ALTER TABLE ALERTA MODIFY (processo_codigo NULL)';
@@ -17,9 +17,9 @@ DECLARE
     v_count NUMBER;
 BEGIN
     SELECT COUNT(*)
-      INTO v_count
-      FROM user_tables
-     WHERE table_name = 'NOTIFICACAO';
+    INTO v_count
+    FROM user_tables
+    WHERE table_name = 'NOTIFICACAO';
 
     IF v_count > 0 THEN
         EXECUTE IMMEDIATE 'DROP TABLE NOTIFICACAO CASCADE CONSTRAINTS';
@@ -31,10 +31,10 @@ DECLARE
     v_nullable USER_TAB_COLUMNS.NULLABLE%TYPE;
 BEGIN
     SELECT nullable
-      INTO v_nullable
-      FROM user_tab_columns
-     WHERE table_name = 'ALERTA'
-       AND column_name = 'UNIDADE_DESTINO_CODIGO';
+    INTO v_nullable
+    FROM user_tab_columns
+    WHERE table_name = 'ALERTA'
+      AND column_name = 'UNIDADE_DESTINO_CODIGO';
 
     IF v_nullable = 'N' THEN
         EXECUTE IMMEDIATE 'ALTER TABLE ALERTA MODIFY (unidade_destino_codigo NULL)';
@@ -48,9 +48,9 @@ DECLARE
     v_count NUMBER;
 BEGIN
     SELECT COUNT(*)
-      INTO v_count
-      FROM user_constraints
-     WHERE constraint_name = 'CK_ALERTA_DESTINO';
+    INTO v_count
+    FROM user_constraints
+    WHERE constraint_name = 'CK_ALERTA_DESTINO';
 
     IF v_count = 0 THEN
         EXECUTE IMMEDIATE 'ALTER TABLE ALERTA ADD CONSTRAINT ck_alerta_destino CHECK (unidade_destino_codigo IS NOT NULL OR usuario_destino_titulo IS NOT NULL)';
@@ -62,43 +62,22 @@ DECLARE
     v_count NUMBER;
 BEGIN
     SELECT COUNT(*)
-      INTO v_count
-      FROM user_tables
-     WHERE table_name = 'NOTIFICACAO_EMAIL';
+    INTO v_count
+    FROM user_tables
+    WHERE table_name = 'NOTIFICACAO_EMAIL';
 
     IF v_count = 0 THEN
         EXECUTE IMMEDIATE q'[
-            CREATE TABLE NOTIFICACAO_EMAIL
-            (
-                codigo                 NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
-                subprocesso_codigo     NUMBER                            NULL,
-                tipo_notificacao       VARCHAR2(80)                      NULL,
-                usuario_destino_titulo VARCHAR2(12)                      NULL,
-                unidade_destino_sigla  VARCHAR2(20)                      NULL,
-                destinatario           VARCHAR2(255)                     NOT NULL,
-                assunto                VARCHAR2(500)                     NOT NULL,
-                corpo_html             CLOB                              NOT NULL,
-                situacao               VARCHAR2(30) DEFAULT 'PENDENTE'   NOT NULL,
-                tentativas             NUMBER(5)    DEFAULT 0            NOT NULL,
-                proxima_tentativa_em   TIMESTAMP                         NULL,
-                data_hora_criacao      TIMESTAMP    DEFAULT SYSTIMESTAMP NOT NULL,
-                data_hora_envio        TIMESTAMP                         NULL,
-                ultimo_erro            VARCHAR2(2000)                    NULL,
-                chave_idempotencia     VARCHAR2(255)                     NOT NULL,
-                CONSTRAINT pk_notif_email PRIMARY KEY (codigo),
-                CONSTRAINT uk_notif_email_chave UNIQUE (chave_idempotencia),
-                CONSTRAINT ck_notif_email_situacao CHECK (
-                    situacao IN (
-                        'PENDENTE',
-                        'ENVIANDO',
-                        'ENVIADO',
-                        'FALHA_TEMPORARIA',
-                        'FALHA_DEFINITIVA'
+        CREATE TABLE NOTIFICACAO_EMAIL
+            (codigo NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL, subprocesso_codigo NUMBER NULL, tipo_notificacao VARCHAR2(80) NULL, usuario_destino_titulo VARCHAR2(12) NULL, unidade_destino_sigla VARCHAR2(20) NULL, destinatario VARCHAR2(255) NOT NULL, assunto VARCHAR2(500) NOT NULL, corpo_html CLOB NOT NULL, situacao VARCHAR2(30) DEFAULT 'PENDENTE' NOT NULL, tentativas NUMBER(5) DEFAULT 0 NOT NULL, proxima_tentativa_em TIMESTAMP NULL, data_hora_criacao TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL, data_hora_envio TIMESTAMP NULL, ultimo_erro VARCHAR2(2000) NULL, chave_idempotencia VARCHAR2(255) NOT NULL, CONSTRAINT pk_notif_email PRIMARY KEY (codigo), CONSTRAINT uk_notif_email_chave UNIQUE (chave_idempotencia), CONSTRAINT ck_notif_email_situacao CHECK (
+                situacao IN (
+                    'PENDENTE',
+                    'ENVIANDO',
+                    'ENVIADO',
+                    'FALHA_TEMPORARIA',
+                    'FALHA_DEFINITIVA'
                     )
-                ),
-                CONSTRAINT ck_notif_email_tentativas CHECK (tentativas >= 0),
-                CONSTRAINT fk_notif_email_subproc FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
-            )
+                ), CONSTRAINT ck_notif_email_tentativas CHECK (tentativas >= 0), CONSTRAINT fk_notif_email_subproc FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo))
         ]';
     ELSE
         -- Se a tabela ja existe, garante as novas colunas e remove alerta_codigo (legado)
@@ -106,22 +85,38 @@ BEGIN
             v_col_count NUMBER;
         BEGIN
             -- Coluna legada
-            SELECT COUNT(*) INTO v_col_count FROM user_tab_columns WHERE table_name = 'NOTIFICACAO_EMAIL' AND column_name = 'ALERTA_CODIGO';
+            SELECT COUNT(*)
+            INTO v_col_count
+            FROM user_tab_columns
+            WHERE table_name = 'NOTIFICACAO_EMAIL'
+              AND column_name = 'ALERTA_CODIGO';
             IF v_col_count > 0 THEN
-                FOR r IN (SELECT constraint_name FROM user_constraints WHERE table_name = 'NOTIFICACAO_EMAIL' AND constraint_name = 'FK_NOTIF_EMAIL_ALERTA') LOOP
-                    EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL DROP CONSTRAINT ' || r.constraint_name;
-                END LOOP;
+                FOR r IN (SELECT constraint_name
+                          FROM user_constraints
+                          WHERE table_name = 'NOTIFICACAO_EMAIL'
+                            AND constraint_name = 'FK_NOTIF_EMAIL_ALERTA')
+                    LOOP
+                        EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL DROP CONSTRAINT ' || r.constraint_name;
+                    END LOOP;
                 EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL DROP COLUMN alerta_codigo';
             END IF;
 
             -- Nova coluna: unidade_destino_sigla
-            SELECT COUNT(*) INTO v_col_count FROM user_tab_columns WHERE table_name = 'NOTIFICACAO_EMAIL' AND column_name = 'UNIDADE_DESTINO_SIGLA';
+            SELECT COUNT(*)
+            INTO v_col_count
+            FROM user_tab_columns
+            WHERE table_name = 'NOTIFICACAO_EMAIL'
+              AND column_name = 'UNIDADE_DESTINO_SIGLA';
             IF v_col_count = 0 THEN
                 EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL ADD (unidade_destino_sigla VARCHAR2(20) NULL)';
             END IF;
 
             -- Nova coluna: usuario_destino_titulo
-            SELECT COUNT(*) INTO v_col_count FROM user_tab_columns WHERE table_name = 'NOTIFICACAO_EMAIL' AND column_name = 'USUARIO_DESTINO_TITULO';
+            SELECT COUNT(*)
+            INTO v_col_count
+            FROM user_tab_columns
+            WHERE table_name = 'NOTIFICACAO_EMAIL'
+              AND column_name = 'USUARIO_DESTINO_TITULO';
             IF v_col_count = 0 THEN
                 EXECUTE IMMEDIATE 'ALTER TABLE NOTIFICACAO_EMAIL ADD (usuario_destino_titulo VARCHAR2(12) NULL)';
             END IF;
@@ -191,27 +186,14 @@ DECLARE
     v_count NUMBER;
 BEGIN
     SELECT COUNT(*)
-      INTO v_count
-      FROM user_tables
-     WHERE table_name = 'SGC_FEEDBACK';
+    INTO v_count
+    FROM user_tables
+    WHERE table_name = 'SGC_FEEDBACK';
 
     IF v_count = 0 THEN
         EXECUTE IMMEDIATE q'[
-            CREATE TABLE SGC_FEEDBACK (
-                id                     RAW(16)                        NOT NULL,
-                tipo                   VARCHAR2(20)                   NOT NULL,
-                nota                   VARCHAR2(2000)                 NOT NULL,
-                metadata_json          CLOB,
-                caminho_screenshot     VARCHAR2(500),
-                usuario_id             VARCHAR2(100)                  NOT NULL,
-                usuario_nome           VARCHAR2(200)                  NOT NULL,
-                enviado_em             TIMESTAMP WITH TIME ZONE       NOT NULL,
-                rota                   VARCHAR2(500)                  NOT NULL,
-                status                 VARCHAR2(20) DEFAULT 'NOVO'    NOT NULL,
-                CONSTRAINT pk_sgc_feedback PRIMARY KEY (id),
-                CONSTRAINT ck_feedback_tipo CHECK (tipo in ('BUG', 'SUGESTAO', 'QUESTAO', 'ELOGIO')),
-                CONSTRAINT ck_feedback_status CHECK (status in ('NOVO', 'REVISADO', 'RESOLVIDO', 'DESCARTADO'))
-            )
+        CREATE TABLE SGC_FEEDBACK
+            (id RAW(16) NOT NULL, tipo VARCHAR2(20) NOT NULL, nota VARCHAR2(2000) NOT NULL, metadata_json CLOB, caminho_screenshot VARCHAR2(500), usuario_id VARCHAR2(100) NOT NULL, usuario_nome VARCHAR2(200) NOT NULL, enviado_em TIMESTAMP WITH TIME ZONE NOT NULL, rota VARCHAR2(500) NOT NULL, status VARCHAR2(20) DEFAULT 'NOVO' NOT NULL, CONSTRAINT pk_sgc_feedback PRIMARY KEY (id), CONSTRAINT ck_feedback_tipo CHECK (tipo in ('BUG', 'SUGESTAO', 'QUESTAO', 'ELOGIO')), CONSTRAINT ck_feedback_status CHECK (status in ('NOVO', 'REVISADO', 'RESOLVIDO', 'DESCARTADO')))
         ]';
     END IF;
 END;
@@ -234,7 +216,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO v_count FROM user_indexes WHERE index_name = 'IDX_FEEDBACK_STATUS';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_status ON SGC_FEEDBACK(status)';
+        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_status ON SGC_FEEDBACK (status)';
     END IF;
 END;
 /
@@ -244,7 +226,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO v_count FROM user_indexes WHERE index_name = 'IDX_FEEDBACK_USER';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_usuario ON SGC_FEEDBACK(usuario_id)';
+        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_usuario ON SGC_FEEDBACK (usuario_id)';
     END IF;
 END;
 /
@@ -254,7 +236,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO v_count FROM user_indexes WHERE index_name = 'IDX_FEEDBACK_DATE';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_data ON SGC_FEEDBACK(enviado_em)';
+        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_data ON SGC_FEEDBACK (enviado_em)';
     END IF;
 END;
 /

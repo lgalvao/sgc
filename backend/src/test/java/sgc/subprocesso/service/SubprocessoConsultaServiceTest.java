@@ -50,10 +50,10 @@ class SubprocessoConsultaServiceTest {
         AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService);
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
         ReflectionTestUtils.setField(service, "contextoConsultaService", contextoConsultaService);
-        
+
         SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
         ReflectionTestUtils.setField(service, "acessoService", acessoService);
-        
+
         SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
                 usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
         ReflectionTestUtils.setField(service, "visualizacaoService", visualizacaoService);

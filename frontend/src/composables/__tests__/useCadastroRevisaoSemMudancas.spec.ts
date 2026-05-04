@@ -36,9 +36,9 @@ describe("useCadastroRevisaoSemMudancas", () => {
 
     it("deve iniciar revisão se necessário", async () => {
         const {iniciarRevisaoSeNecessario, loadingInicioRevisao} = setup();
-        
+
         await iniciarRevisaoSeNecessario();
-        
+
         expect(fluxoSubprocesso.iniciarRevisaoCadastro).toHaveBeenCalledWith(100);
         expect(loadingInicioRevisao.value).toBe(false);
     });
@@ -46,26 +46,26 @@ describe("useCadastroRevisaoSemMudancas", () => {
     it("deve cancelar início da revisão se necessário", async () => {
         situacaoAtual.value = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
         const {cancelarInicioRevisaoSeNecessario} = setup();
-        
+
         await cancelarInicioRevisaoSeNecessario();
-        
+
         expect(fluxoSubprocesso.cancelarInicioRevisaoCadastro).toHaveBeenCalledWith(100);
     });
 
     it("deve atualizar checkbox silenciosamente", () => {
         const {disponibilizacaoSemMudancas, atualizarCheckboxSemMudancasSilenciosamente} = setup();
-        
+
         atualizarCheckboxSemMudancasSilenciosamente(true);
-        
+
         expect(disponibilizacaoSemMudancas.value).toBe(true);
     });
 
     it("deve sincronizar estado inicial", () => {
         situacaoAtual.value = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
         const {disponibilizacaoSemMudancas, sincronizarDisponibilizacaoSemMudancasInicial} = setup();
-        
+
         sincronizarDisponibilizacaoSemMudancasInicial();
-        
+
         expect(disponibilizacaoSemMudancas.value).toBe(true);
     });
 
@@ -78,9 +78,9 @@ describe("useCadastroRevisaoSemMudancas", () => {
     it("deve lidar com falha ao iniciar revisão", async () => {
         const {iniciarRevisaoSeNecessario} = setup();
         fluxoSubprocesso.iniciarRevisaoCadastro.mockResolvedValue(false);
-        
+
         await iniciarRevisaoSeNecessario();
-        
+
         expect(fluxoSubprocesso.iniciarRevisaoCadastro).toHaveBeenCalled();
     });
 
@@ -88,9 +88,9 @@ describe("useCadastroRevisaoSemMudancas", () => {
         situacaoAtual.value = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
         const {cancelarInicioRevisaoSeNecessario} = setup();
         fluxoSubprocesso.cancelarInicioRevisaoCadastro.mockResolvedValue(false);
-        
+
         await cancelarInicioRevisaoSeNecessario();
-        
+
         expect(fluxoSubprocesso.cancelarInicioRevisaoCadastro).toHaveBeenCalled();
     });
 });

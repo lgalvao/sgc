@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref} from "vue";
 import {BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -48,7 +48,7 @@ function focar() {
       @shown="focar"
   >
     <p>Confirma a devolução da validação do mapa para ajustes?</p>
-    <BFormGroup label-for="observacaoDevolucao" :state="erro ? false : null" class="mb-3">
+    <BFormGroup :state="erro ? false : null" class="mb-3" label-for="observacaoDevolucao">
       <template #label>Observação: <span aria-hidden="true" class="text-danger">*</span></template>
       <BFormTextarea
           id="observacaoDevolucao" ref="inputRef" v-model="observacaoModel" :state="erro ? false : null"

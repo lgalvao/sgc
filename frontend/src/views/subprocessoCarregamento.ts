@@ -19,15 +19,15 @@ type DependenciasSubprocessoCarregamento = {
 };
 
 export function useSubprocessoCarregamento({
-    codProcesso,
-    siglaUnidade,
-    codSubprocesso,
-    erroIntegracaoContexto,
-    garantirContextoEdicao,
-    garantirContextoEdicaoPorProcessoEUnidade,
-    invalidarMapa,
-    exibirToastPendente,
-}: DependenciasSubprocessoCarregamento) {
+                                               codProcesso,
+                                               siglaUnidade,
+                                               codSubprocesso,
+                                               erroIntegracaoContexto,
+                                               garantirContextoEdicao,
+                                               garantirContextoEdicaoPorProcessoEUnidade,
+                                               invalidarMapa,
+                                               exibirToastPendente,
+                                           }: DependenciasSubprocessoCarregamento) {
     const codigoSubprocesso = ref<number | null>(null);
     const erroNaoEncontrado = ref(false);
     const carregamentoInicialConcluido = ref(false);

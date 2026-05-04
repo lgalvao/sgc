@@ -25,6 +25,19 @@ class LimitadorTentativasLoginCoverageTest {
     private RelogioMutavel relogio;
     private LimitadorTentativasLogin target;
 
+    private static Object acessarCampo(Object alvo) throws Exception {
+        Field campo = alvo.getClass().getDeclaredField("tentativasPorIp");
+        campo.setAccessible(true);
+        return campo.get(alvo);
+    }
+
+    private static Object invocarMetodo(
+            Object alvo, String nomeMetodo, Class<?>[] tiposParametros, Object[] argumentos) throws Exception {
+        var metodo = alvo.getClass().getDeclaredMethod(nomeMetodo, tiposParametros);
+        metodo.setAccessible(true);
+        return metodo.invoke(alvo, argumentos);
+    }
+
     @BeforeEach
     void setUp() {
         relogio = new RelogioMutavel();
@@ -192,19 +205,6 @@ class LimitadorTentativasLoginCoverageTest {
                 new Object[]{"10.0.0.11"});
 
         assertThat(cacheInterno).doesNotContainKey("10.0.0.11");
-    }
-
-    private static Object acessarCampo(Object alvo) throws Exception {
-        Field campo = alvo.getClass().getDeclaredField("tentativasPorIp");
-        campo.setAccessible(true);
-        return campo.get(alvo);
-    }
-
-    private static Object invocarMetodo(
-            Object alvo, String nomeMetodo, Class<?>[] tiposParametros, Object[] argumentos) throws Exception {
-        var metodo = alvo.getClass().getDeclaredMethod(nomeMetodo, tiposParametros);
-        metodo.setAccessible(true);
-        return metodo.invoke(alvo, argumentos);
     }
 
     private static final class RelogioMutavel extends Clock {

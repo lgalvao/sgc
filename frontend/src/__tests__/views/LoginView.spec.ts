@@ -89,7 +89,7 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const usuarioInput = wrapper.find<HTMLInputElement>('[data-testid="inp-login-usuario"]');
         const senhaInput = wrapper.find<HTMLInputElement>('[data-testid="inp-login-senha"]');
-        
+
         expect(usuarioInput.element.value).toBe("");
         expect(senhaInput.element.value).toBe("");
     });
@@ -241,10 +241,11 @@ describe("LoginView.vue", () => {
         const perfilStore = usePerfilStore();
 
         const fakeError = new Error("API Failure");
-        (fakeError as any).config = { data: JSON.stringify({ tituloEleitoral: "123", senha: "senhasupersecreta" }) };
+        (fakeError as any).config = {data: JSON.stringify({tituloEleitoral: "123", senha: "senhasupersecreta"})};
         perfilStore.iniciarLogin = vi.fn().mockRejectedValue(fakeError);
 
-        const loggerSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+        const loggerSpy = vi.spyOn(logger, 'error').mockImplementation(() => {
+        });
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("senhasupersecreta");
@@ -253,7 +254,7 @@ describe("LoginView.vue", () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(loggerSpy).toHaveBeenCalledWith("Erro interno no login:", "API Failure");
-        
+
         loggerSpy.mockRestore();
     });
 
@@ -298,15 +299,15 @@ describe("LoginView.vue", () => {
         const perfilStore = usePerfilStore();
         const fakeAxiosError = {
             isAxiosError: true,
-            response: { status: 401, data: { message: "Unauthorized" } }
+            response: {status: 401, data: {message: "Unauthorized"}}
         };
         perfilStore.iniciarLogin = vi.fn().mockRejectedValue(fakeAxiosError);
-        
+
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
         await flushPromises();
-        
+
         expect(wrapper.text()).toContain(TEXTOS.login.ERRO_CREDENCIAIS);
     });
 
@@ -315,15 +316,15 @@ describe("LoginView.vue", () => {
         const perfilStore = usePerfilStore();
         const fakeAxiosError = {
             isAxiosError: true,
-            response: { status: 400, data: { message: "Bad Request" } }
+            response: {status: 400, data: {message: "Bad Request"}}
         };
         perfilStore.iniciarLogin = vi.fn().mockRejectedValue(fakeAxiosError);
-        
+
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
         await flushPromises();
-        
+
         expect(wrapper.text()).toContain(TEXTOS.login.ERRO_GENERICO);
     });
 
@@ -354,10 +355,10 @@ describe("LoginView.vue", () => {
             perfisUnidades: MOCK_PERFIS,
             sessao: null
         });
-        
+
         const fakeAxiosError = {
             isAxiosError: true,
-            response: { status: 400, data: { message: "Bad Request" } }
+            response: {status: 400, data: {message: "Bad Request"}}
         };
         perfilStore.concluirLoginComPerfil = vi.fn().mockRejectedValue(fakeAxiosError);
         perfilStore.perfisUnidades = MOCK_PERFIS;

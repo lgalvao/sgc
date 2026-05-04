@@ -6,8 +6,11 @@ import logger from "@/utils/logger";
 
 interface FluxoMapaCompetencias {
     adicionarCompetencia(codigoSubprocesso: number, request: SalvarCompetenciaRequest): Promise<MapaCompleto | undefined>;
+
     atualizarCompetencia(codigoSubprocesso: number, codigoCompetencia: number, request: SalvarCompetenciaRequest): Promise<MapaCompleto | undefined>;
+
     removerCompetencia(codigoSubprocesso: number, codigoCompetencia: number): Promise<MapaCompleto | undefined>;
+
     removerAtividadeDaCompetencia(codigoSubprocesso: number, codigoCompetencia: number, codigoAtividade: number): Promise<MapaCompleto | undefined>;
 }
 
@@ -22,14 +25,14 @@ interface UseMapaCompetenciasMutacoesParams {
 }
 
 export function useMapaCompetenciasMutacoes({
-    codigoSubprocesso,
-    competencias,
-    fluxoMapa,
-    notify,
-    clearErrors,
-    aplicarErroNormalizado,
-    sincronizarMapa,
-}: UseMapaCompetenciasMutacoesParams) {
+                                                codigoSubprocesso,
+                                                competencias,
+                                                fluxoMapa,
+                                                notify,
+                                                clearErrors,
+                                                aplicarErroNormalizado,
+                                                sincronizarMapa,
+                                            }: UseMapaCompetenciasMutacoesParams) {
     const competenciaSendoEditada = ref<Competencia | null>(null);
     const mostrarModalCriarNovaCompetencia = ref(false);
     const mostrarModalExcluirCompetencia = ref(false);

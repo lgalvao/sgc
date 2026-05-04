@@ -133,7 +133,10 @@ function carregarPendencias(caminhoEntrada) {
     const pendencias = caminhoEntrada.endsWith('.json')
         ? extrairPendenciasDeJson(caminhoEntrada)
         : extrairPendenciasDeMarkdown(caminhoEntrada);
-    return pendencias.map(item => typeof item === 'string' ? {caminho_relativo: item, evidencia_qualidade: 'desconhecida'} : item);
+    return pendencias.map(item => typeof item === 'string' ? {
+        caminho_relativo: item,
+        evidencia_qualidade: 'desconhecida'
+    } : item);
 }
 
 function priorizar(caminhoEntrada) {

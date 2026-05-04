@@ -35,8 +35,10 @@ class SubprocessoControllerTest {
 
     @MockitoBean
     private SubprocessoService subprocessoService;
-    @MockitoBean private SubprocessoConsultaService consultaService;
-    @MockitoBean private AnaliseHistoricoService analiseHistoricoService;
+    @MockitoBean
+    private SubprocessoConsultaService consultaService;
+    @MockitoBean
+    private AnaliseHistoricoService analiseHistoricoService;
 
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
@@ -77,10 +79,10 @@ class SubprocessoControllerTest {
             un.setTituloTitular("Diretor");
 
             Subprocesso sp = Subprocesso.builder()
-                .codigo(1L)
-                .processo(proc)
-                .unidade(un)
-                .build();
+                    .codigo(1L)
+                    .processo(proc)
+                    .unidade(un)
+                    .build();
             sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
             when(consultaService.listarTodos()).thenReturn(List.of(sp));
 
@@ -145,14 +147,14 @@ class SubprocessoControllerTest {
             when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).thenReturn(true);
 
             SubprocessoResumoDto spResumo = SubprocessoResumoDto.builder()
-                .codigo(100L)
-                .build();
+                    .codigo(100L)
+                    .build();
             SubprocessoDetalheResponse spResponse = SubprocessoDetalheResponse.builder()
-                .subprocesso(spResumo)
-                .build();
+                    .subprocesso(spResumo)
+                    .build();
             ContextoEdicaoResponse response = ContextoEdicaoResponse.builder()
-                .detalhes(spResponse)
-                .build();
+                    .detalhes(spResponse)
+                    .build();
             when(consultaService.obterContextoEdicao(subprocesso)).thenReturn(response);
 
             mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")

@@ -55,15 +55,15 @@ vi.mock("axios", () => {
     class AxiosHeadersMock {
         private readonly valores: Record<string, string> = {};
 
-        set(nome: string, valor: string) {
-            this.valores[nome] = valor;
-            (this as unknown as Record<string, string>)[nome] = valor;
-        }
-
         static from(headers: Record<string, string>) {
             const instancia = new AxiosHeadersMock();
             Object.entries(headers || {}).forEach(([nome, valor]) => instancia.set(nome, valor));
             return instancia;
+        }
+
+        set(nome: string, valor: string) {
+            this.valores[nome] = valor;
+            (this as unknown as Record<string, string>)[nome] = valor;
         }
     }
 
@@ -102,7 +102,7 @@ describe("axios-setup", () => {
             responseSuccessInterceptor = responseUseCalls[0][0];
             responseErrorInterceptor = responseUseCalls[0][1];
         }
-    }, 10000); 
+    }, 10000);
 
     beforeEach(async () => {
         setActivePinia(createPinia());
@@ -149,7 +149,7 @@ describe("axios-setup", () => {
     });
 
     it("interceptor de requisicao deve marcar monitoramento quando ativado por URL", () => {
-        vi.stubGlobal('location', { search: '?monitoramento=1' });
+        vi.stubGlobal('location', {search: '?monitoramento=1'});
 
         const config = requestInterceptor({method: 'get', url: '/processos', headers: {}});
 
@@ -158,12 +158,12 @@ describe("axios-setup", () => {
     });
 
     it("definirHeader deve lidar com headers nulos e headers sem metodo set", () => {
-        const config: any = { headers: null };
+        const config: any = {headers: null};
         requestInterceptor(config); // Isso chama isMonitoramentoAtivo e gerarCorrelacaoId, e entao definirHeader
         expect(config.headers).toBeDefined();
         expect(config.headers['X-Correlacao-Id']).toBe('corr-123');
 
-        const config2: any = { headers: {} }; // Object literal sem .set
+        const config2: any = {headers: {}}; // Object literal sem .set
         requestInterceptor(config2);
         expect(config2.headers['X-Correlacao-Id']).toBe('corr-123');
     });

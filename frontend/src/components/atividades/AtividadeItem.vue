@@ -14,9 +14,9 @@
         <InlineEditor
             :can-edit="podeEditar"
             :edit-enabled="habilitarEdicao"
-            mensagem-erro-obrigatoria="Informe a atividade."
             :model-value="atividade.descricao"
             aria-label="Editar atividade"
+            mensagem-erro-obrigatoria="Informe a atividade."
             test-codigo-cancelar="btn-cancelar-edicao-atividade"
             test-codigo-editar="btn-editar-atividade"
             test-codigo-input="inp-editar-atividade"
@@ -33,11 +33,11 @@
           <template #extra-actions>
             <BButton
                 :aria-label="'Remover atividade: ' + atividade.descricao"
-                data-testid="btn-remover-atividade"
                 :disabled="!habilitarEdicao"
+                class="btn-compacto"
+                data-testid="btn-remover-atividade"
                 size="sm"
                 title="Remover"
-                class="btn-compacto"
                 variant="outline-secondary"
                 @click="$emit('remover-atividade')"
             >
@@ -67,38 +67,38 @@
             @submit.prevent="adicionarConhecimento"
         >
           <BRow class="g-2 align-items-center">
-          <BCol>
-            <BFormInput
-                v-model="novoConhecimento"
-                aria-label="Novo conhecimento"
-                :disabled="!habilitarEdicao"
-                data-testid="inp-novo-conhecimento"
-                placeholder="Novo conhecimento"
-                size="sm"
-                :state="mensagemErroNovoConhecimento ? false : null"
-                type="text"
-            />
-            <BFormInvalidFeedback :state="mensagemErroNovoConhecimento ? false : null">
-              {{ mensagemErroNovoConhecimento }}
-            </BFormInvalidFeedback>
-          </BCol>
-          <BCol cols="auto">
-            <BButton
-                aria-label="Adicionar conhecimento"
-                data-testid="btn-adicionar-conhecimento"
-                :disabled="!habilitarEdicao"
-                size="sm"
-                title="Adicionar conhecimento"
-                type="submit"
-                class="btn-compacto"
-                variant="outline-secondary"
-            >
-              <i
-                  aria-hidden="true"
-                  class="bi bi-plus-lg"
+            <BCol>
+              <BFormInput
+                  v-model="novoConhecimento"
+                  :disabled="!habilitarEdicao"
+                  :state="mensagemErroNovoConhecimento ? false : null"
+                  aria-label="Novo conhecimento"
+                  data-testid="inp-novo-conhecimento"
+                  placeholder="Novo conhecimento"
+                  size="sm"
+                  type="text"
               />
-            </BButton>
-          </BCol>
+              <BFormInvalidFeedback :state="mensagemErroNovoConhecimento ? false : null">
+                {{ mensagemErroNovoConhecimento }}
+              </BFormInvalidFeedback>
+            </BCol>
+            <BCol cols="auto">
+              <BButton
+                  :disabled="!habilitarEdicao"
+                  aria-label="Adicionar conhecimento"
+                  class="btn-compacto"
+                  data-testid="btn-adicionar-conhecimento"
+                  size="sm"
+                  title="Adicionar conhecimento"
+                  type="submit"
+                  variant="outline-secondary"
+              >
+                <i
+                    aria-hidden="true"
+                    class="bi bi-plus-lg"
+                />
+              </BButton>
+            </BCol>
           </BRow>
         </BForm>
 
@@ -111,9 +111,9 @@
           <InlineEditor
               :can-edit="podeEditar"
               :edit-enabled="habilitarEdicao"
-              mensagem-erro-obrigatoria="Informe o conhecimento."
               :model-value="conhecimento.descricao"
               aria-label="Editar conhecimento"
+              mensagem-erro-obrigatoria="Informe o conhecimento."
               size="sm"
               test-codigo-cancelar="btn-cancelar-edicao-conhecimento"
               test-codigo-editar="btn-editar-conhecimento"
@@ -126,12 +126,12 @@
             <template #extra-actions>
               <BButton
                   :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
-                  data-testid="btn-remover-conhecimento"
                   :disabled="!habilitarEdicao"
+                  class="btn-compacto"
+                  data-testid="btn-remover-conhecimento"
                   size="sm"
                   title="Remover"
-                  class="btn-compacto"
-                variant="outline-secondary"
+                  variant="outline-secondary"
                   @click="$emit('remover-conhecimento', conhecimento.codigo)"
               >
                 <i aria-hidden="true" class="bi bi-trash"/>

@@ -7,11 +7,7 @@ import type {
     SalvarMapaRequest,
 } from "@/types/tipos";
 import apiClient from "../axios-setup";
-import {
-    caminhoSubprocesso,
-    type ImpactoMapaResponse,
-    mapearPayloadCompetencia,
-} from "./subprocessoServiceBase";
+import {caminhoSubprocesso, type ImpactoMapaResponse, mapearPayloadCompetencia,} from "./subprocessoServiceBase";
 
 const obter = async <T>(caminho: string): Promise<T> => (await apiClient.get<T>(caminho)).data;
 const postarDados = async <T>(caminho: string, payload?: object): Promise<T> =>
@@ -24,8 +20,13 @@ const postar = async (caminho: string, payload?: object): Promise<void> => {
     await apiClient.post(caminho, payload);
 };
 
-export async function obterSugestoesMapa(codSubprocesso: number): Promise<string> { return (await obter<{sugestoes: string}>(caminhoSubprocesso(codSubprocesso, "/sugestoes"))).sugestoes; }
-export async function apresentarSugestoes(codSubprocesso: number, dados: { sugestoes: string }): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/apresentar-sugestoes"), {texto: dados.sugestoes}); }
+export async function obterSugestoesMapa(codSubprocesso: number): Promise<string> {
+    return (await obter<{ sugestoes: string }>(caminhoSubprocesso(codSubprocesso, "/sugestoes"))).sugestoes;
+}
+
+export async function apresentarSugestoes(codSubprocesso: number, dados: { sugestoes: string }): Promise<void> {
+    await postar(caminhoSubprocesso(codSubprocesso, "/apresentar-sugestoes"), {texto: dados.sugestoes});
+}
 
 export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
     const data = await obter<ImpactoMapaResponse>(caminhoSubprocesso(codSubprocesso, "/impactos-mapa"));
@@ -42,14 +43,37 @@ export async function verificarImpactosMapa(codSubprocesso: number): Promise<Imp
     };
 }
 
-export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> { return obter<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo")); }
-export async function salvarMapaCompleto(codSubprocesso: number, data: SalvarMapaRequest): Promise<MapaCompleto> { return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo"), data); }
-export async function salvarMapaAjuste(codSubprocesso: number, data: SalvarAjustesRequest): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/mapa-ajuste/atualizar"), data); }
-export async function disponibilizarMapa(codSubprocesso: number, data: DisponibilizarMapaRequest): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/disponibilizar-mapa"), data); }
-export async function validarMapa(codSubprocesso: number): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/validar-mapa")); }
-export async function homologarValidacao(codSubprocesso: number, dados: { texto: string }): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/homologar-validacao"), dados); }
-export async function aceitarValidacao(codSubprocesso: number, dados: { texto: string }): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/aceitar-validacao"), dados); }
-export async function devolverValidacao(codSubprocesso: number, dados: { justificativa: string }): Promise<void> { await postar(caminhoSubprocesso(codSubprocesso, "/devolver-validacao"), dados); }
+export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> {
+    return obter<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo"));
+}
+
+export async function salvarMapaCompleto(codSubprocesso: number, data: SalvarMapaRequest): Promise<MapaCompleto> {
+    return postarDados<MapaCompleto>(caminhoSubprocesso(codSubprocesso, "/mapa-completo"), data);
+}
+
+export async function salvarMapaAjuste(codSubprocesso: number, data: SalvarAjustesRequest): Promise<void> {
+    await postar(caminhoSubprocesso(codSubprocesso, "/mapa-ajuste/atualizar"), data);
+}
+
+export async function disponibilizarMapa(codSubprocesso: number, data: DisponibilizarMapaRequest): Promise<void> {
+    await postar(caminhoSubprocesso(codSubprocesso, "/disponibilizar-mapa"), data);
+}
+
+export async function validarMapa(codSubprocesso: number): Promise<void> {
+    await postar(caminhoSubprocesso(codSubprocesso, "/validar-mapa"));
+}
+
+export async function homologarValidacao(codSubprocesso: number, dados: { texto: string }): Promise<void> {
+    await postar(caminhoSubprocesso(codSubprocesso, "/homologar-validacao"), dados);
+}
+
+export async function aceitarValidacao(codSubprocesso: number, dados: { texto: string }): Promise<void> {
+    await postar(caminhoSubprocesso(codSubprocesso, "/aceitar-validacao"), dados);
+}
+
+export async function devolverValidacao(codSubprocesso: number, dados: { justificativa: string }): Promise<void> {
+    await postar(caminhoSubprocesso(codSubprocesso, "/devolver-validacao"), dados);
+}
 
 export async function adicionarCompetencia(
     codSubprocesso: number,

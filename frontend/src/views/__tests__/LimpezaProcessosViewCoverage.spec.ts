@@ -6,102 +6,105 @@ import {createMemoryHistory, createRouter} from 'vue-router';
 import * as processoService from '@/services/processo';
 
 vi.mock('@/services/processo', () => ({
-  excluirProcessoCompleto: vi.fn()
+    excluirProcessoCompleto: vi.fn()
 }));
 
 const router = createRouter({
-  history: createMemoryHistory(),
-  routes: [{ path: '/', component: {} }]
+    history: createMemoryHistory(),
+    routes: [{path: '/', component: {}}]
 });
 
 describe('LimpezaProcessosView Coverage', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  const mountComponent = () => {
-    return mount(LimpezaProcessosView, {
-      global: {
-        plugins: [createTestingPinia({ createSpy: vi.fn }), router],
-        stubs: {
-          LayoutPadrao: { template: '<div><slot/></div>' },
-          PageHeader: { template: '<div><slot name="actions"/></div>', props: ['title'] },
-          BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
-          AppAlert: true,
-          BSpinner: true,
-          BCard: true,
-          BFormGroup: true,
-          BFormInput: { template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" :data-testid="dataTestid" />', props: ['modelValue', 'dataTestid', 'id'] },
-          BFormInvalidFeedback: { template: '<div><slot/></div>' },
-          BCol: true,
-          BRow: true,
-          LoadingButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
-          ModalConfirmacao: { template: '<div><slot/></div>', props: ['modelValue', 'mostrarModal'] },
-          EmptyState: true
-        }
-      }
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
-  };
 
-  it('renders correctly', async () => {
-    const wrapper = mountComponent();
-    await flushPromises();
-    expect(wrapper.exists()).toBe(true);
-  });
+    const mountComponent = () => {
+        return mount(LimpezaProcessosView, {
+            global: {
+                plugins: [createTestingPinia({createSpy: vi.fn}), router],
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot/></div>'},
+                    PageHeader: {template: '<div><slot name="actions"/></div>', props: ['title']},
+                    BButton: {template: '<button @click="$emit(\'click\')"><slot/></button>'},
+                    AppAlert: true,
+                    BSpinner: true,
+                    BCard: true,
+                    BFormGroup: true,
+                    BFormInput: {
+                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" :data-testid="dataTestid" />',
+                        props: ['modelValue', 'dataTestid', 'id']
+                    },
+                    BFormInvalidFeedback: {template: '<div><slot/></div>'},
+                    BCol: true,
+                    BRow: true,
+                    LoadingButton: {template: '<button @click="$emit(\'click\')"><slot/></button>'},
+                    ModalConfirmacao: {template: '<div><slot/></div>', props: ['modelValue', 'mostrarModal']},
+                    EmptyState: true
+                }
+            }
+        });
+    };
 
-  it('handles delete process permanently', async () => {
-    vi.mocked(processoService.excluirProcessoCompleto).mockResolvedValueOnce({} as any);
+    it('renders correctly', async () => {
+        const wrapper = mountComponent();
+        await flushPromises();
+        expect(wrapper.exists()).toBe(true);
+    });
 
-    const wrapper = mountComponent();
-    await flushPromises();
+    it('handles delete process permanently', async () => {
+        vi.mocked(processoService.excluirProcessoCompleto).mockResolvedValueOnce({} as any);
 
-    const vm = wrapper.vm as any;
-    // Simulate user entering a process id
-    vm.codigoProcesso = '123';
+        const wrapper = mountComponent();
+        await flushPromises();
 
-    // Test validation bypass manually
-    vm.abrirConfirmacao();
-    expect(vm.mostrarConfirmacao).toBe(true);
+        const vm = wrapper.vm as any;
+        // Simulate user entering a process id
+        vm.codigoProcesso = '123';
 
-    await vm.confirmarExclusao();
-    await flushPromises();
+        // Test validation bypass manually
+        vm.abrirConfirmacao();
+        expect(vm.mostrarConfirmacao).toBe(true);
 
-    expect(processoService.excluirProcessoCompleto).toHaveBeenCalledWith(123);
-  });
+        await vm.confirmarExclusao();
+        await flushPromises();
 
-  it('covers handling api errors', async () => {
-    vi.mocked(processoService.excluirProcessoCompleto).mockRejectedValueOnce(new Error('Test error'));
+        expect(processoService.excluirProcessoCompleto).toHaveBeenCalledWith(123);
+    });
 
-    const wrapper = mountComponent();
-    await flushPromises();
+    it('covers handling api errors', async () => {
+        vi.mocked(processoService.excluirProcessoCompleto).mockRejectedValueOnce(new Error('Test error'));
 
-    const vm = wrapper.vm as any;
-    vm.codigoProcesso = '123';
+        const wrapper = mountComponent();
+        await flushPromises();
 
-    await vm.confirmarExclusao();
-    await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codigoProcesso = '123';
 
-    // The component uses notify to show error. If it didn't throw, it was handled
-    expect(processoService.excluirProcessoCompleto).toHaveBeenCalled();
-  });
+        await vm.confirmarExclusao();
+        await flushPromises();
 
-  it('covers validation failure when opening confirmation', async () => {
-    const wrapper = mountComponent();
-    const vm = wrapper.vm as any;
-    vm.codigoProcesso = ''; // Invalid
+        // The component uses notify to show error. If it didn't throw, it was handled
+        expect(processoService.excluirProcessoCompleto).toHaveBeenCalled();
+    });
 
-    await vm.abrirConfirmacao();
-    
-    expect(vm.mostrarConfirmacao).toBe(false);
-  });
+    it('covers validation failure when opening confirmation', async () => {
+        const wrapper = mountComponent();
+        const vm = wrapper.vm as any;
+        vm.codigoProcesso = ''; // Invalid
 
-  it('covers early return in confirm deletion if code is missing', async () => {
-    const wrapper = mountComponent();
-    const vm = wrapper.vm as any;
-    vm.codigoProcesso = ''; // Nullifies codigoConfirmacao
+        await vm.abrirConfirmacao();
 
-    await vm.confirmarExclusao();
-    
-    expect(processoService.excluirProcessoCompleto).not.toHaveBeenCalled();
-  });
+        expect(vm.mostrarConfirmacao).toBe(false);
+    });
+
+    it('covers early return in confirm deletion if code is missing', async () => {
+        const wrapper = mountComponent();
+        const vm = wrapper.vm as any;
+        vm.codigoProcesso = ''; // Nullifies codigoConfirmacao
+
+        await vm.confirmarExclusao();
+
+        expect(processoService.excluirProcessoCompleto).not.toHaveBeenCalled();
+    });
 });

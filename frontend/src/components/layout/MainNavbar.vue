@@ -8,7 +8,7 @@
 
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav class="me-auto">
-        <BNavItem to="/painel" data-testid="nav-link-painel">
+        <BNavItem data-testid="nav-link-painel" to="/painel">
           <i aria-hidden="true" class="bi bi-house-door me-1"/> {{ TEXTOS.comum.MENU_PAINEL }}
         </BNavItem>
         <BNavItem :to="linkUnidade">
@@ -81,8 +81,8 @@
             v-if="isAdmin"
             class="me-lg-1"
             data-testid="dropdown-acoes-especiais"
-            right
             no-caret
+            right
         >
           <template #button-content>
             <span class="visually-hidden">Ações Especiais</span>

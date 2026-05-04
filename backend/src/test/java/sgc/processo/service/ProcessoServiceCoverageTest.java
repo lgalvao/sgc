@@ -36,22 +36,39 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @DisplayName("ProcessoService - Cobertura de Testes")
 @SuppressWarnings("NullAway.Init")
 class ProcessoServiceCoverageTest {
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private ComumRepo repo;
-    @Mock private UnidadeHierarquiaService unidadeHierarquiaService;
-    @Mock private UnidadeService unidadeService;
-    @Mock private ResponsavelUnidadeService responsavelUnidadeService;
-    @Mock private UsuarioFacade usuarioService;
-    @Mock private SubprocessoService subprocessoService; @Mock private SubprocessoConsultaService consultaService;
-    @Mock private LocalizacaoSubprocessoService localizacaoSubprocessoService;
-    @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private AlertaFacade servicoAlertas;
-    @Mock private SgcPermissionEvaluator permissionEvaluator;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private ComumRepo repo;
+    @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock
+    private UnidadeService unidadeService;
+    @Mock
+    private ResponsavelUnidadeService responsavelUnidadeService;
+    @Mock
+    private UsuarioFacade usuarioService;
+    @Mock
+    private SubprocessoService subprocessoService;
+    @Mock
+    private SubprocessoConsultaService consultaService;
+    @Mock
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
+    @Mock
+    private AlertaFacade servicoAlertas;
+    @Mock
+    private SgcPermissionEvaluator permissionEvaluator;
 
-    @Mock private NotificacaoService notificacaoService;
-    @Mock private EmailModelosService emailModelosService;
-    @Mock private SubprocessoTransicaoService transicaoService;
-    @Mock private CadastroFluxoService cadastroFluxoService;
+    @Mock
+    private NotificacaoService notificacaoService;
+    @Mock
+    private EmailModelosService emailModelosService;
+    @Mock
+    private SubprocessoTransicaoService transicaoService;
+    @Mock
+    private CadastroFluxoService cadastroFluxoService;
 
     @InjectMocks
     private ProcessoService target;
@@ -191,7 +208,7 @@ class ProcessoServiceCoverageTest {
         UnidadeProcesso up = new UnidadeProcesso();
         up.setUnidadeCodigo(unidadeCodigo);
         p.setParticipantes(new ArrayList<>(List.of(up)));
-        
+
         when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
         when(unidadeService.buscarPorCodigo(unidadeCodigo)).thenReturn(new Unidade());
 
@@ -208,20 +225,20 @@ class ProcessoServiceCoverageTest {
         p.setCodigo(cod);
         p.setTipo(REVISAO);
         p.setSituacao(CRIADO);
-        
+
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        
+
         Unidade uni = new Unidade();
         uni.setCodigo(10L);
         uni.setSigla("U10");
         uni.setNome("Unidade 10");
         uni.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
         uni.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
-        
+
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
         when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(new ArrayList<>());
         mockarResponsaveisEfetivos();
-        
+
         Unidade admin = new Unidade();
         admin.setCodigo(99L);
         admin.setSigla("ADMIN");
@@ -237,6 +254,195 @@ class ProcessoServiceCoverageTest {
                 .hasMessageContaining("sem mapa vigente");
     }
 
+    @Test
+    @DisplayName("iniciar deve suportar tipo DIAGNOSTICO")
+    void iniciarDiagnostico() {
+        Long cod = 1L;
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setTipo(DIAGNOSTICO);
+        p.setSituacao(CRIADO);
+        p.setDataLimite(LocalDateTime.now().plusDays(30));
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        u.setSigla("U10");
+        u.setSituacao(SituacaoUnidade.ATIVA);
+        p.adicionarParticipantes(Set.of(u));
+
+        Unidade admin = new Unidade();
+        admin.setCodigo(99L);
+        admin.setSigla("ADMIN");
+        admin.setSituacao(SituacaoUnidade.ATIVA);
+
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        when(unidadeService.buscarPorCodigos(any())).thenReturn(List.of(u));
+        UnidadeMapa um = new UnidadeMapa();
+        um.setUnidadeCodigo(10L);
+        when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        mockarResponsaveisEfetivos();
+
+        // when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario()); - desnecessário
+        target.iniciar(cod, List.of(10L)); // branch 419 (DIAGNOSTICO)
+        verify(subprocessoService).criarParaDiagnostico(any());
+    }
+
+    @Test
+    @DisplayName("iniciar deve lançar IllegalStateException quando unidade obrigatória está ausente")
+    void iniciarUnidadeObrigatoriaAusente() {
+        Long cod = 1L;
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setTipo(REVISAO);
+        p.setSituacao(CRIADO);
+
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+
+        Unidade u10 = new Unidade();
+        u10.setCodigo(10L);
+        u10.setSigla("U10");
+        u10.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        u10.setSituacao(SituacaoUnidade.ATIVA);
+
+        // Retorna apenas U10, mas vamos pedir 10 e 11
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(u10));
+
+        UnidadeMapa um10 = new UnidadeMapa();
+        um10.setUnidadeCodigo(10L);
+        UnidadeMapa um11 = new UnidadeMapa();
+        um11.setUnidadeCodigo(11L);
+        when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um10, um11));
+
+        mockarResponsaveisEfetivos();
+        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+        List<Long> codigos = List.of(10L, 11L);
+        // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário
+        assertThatThrownBy(() -> target.iniciar(cod, codigos))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");
+    }
+
+    @Test
+    @DisplayName("executarAcaoEmBloco - acao HOMOLOGAR")
+    void executarAcaoEmBloco_Homologar() {
+        Long codProc = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.HOMOLOGAR);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        sp.setUnidade(u);
+
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
+        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+
+        target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
+        verify(cadastroFluxoService).homologarCadastroEmBloco(anyList());
+    }
+
+    @Test
+    @DisplayName("enviarLembrete - sucesso")
+    void enviarLembreteSucesso() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setDescricao("Processo Teste");
+        p.setDataLimite(java.time.LocalDateTime.now().plusDays(1));
+
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U1");
+        u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+        u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+
+        p.adicionarParticipantes(Set.of(u));
+
+        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+        when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+        when(emailModelosService.criarEmailLembretePrazo(any(), any(), any())).thenReturn("<html></html>");
+
+        target.enviarLembrete(1L, 10L);
+
+        verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "u1@tre-pe.jus.br".equals(cmd.destinatario())
+                        && cmd.tipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO
+                        && "U1".equals(cmd.unidadeDestinoSigla())
+                        && cmd.chaveIdempotencia().startsWith("processo:1:lembrete:unidade:10:dia:")
+        ));
+    }
+
+    @Test
+    @DisplayName("obterUltimaDataLimite - apenas etapa 1 deve retornar data 1")
+    void obterUltimaDataLimiteApenasEtapa1() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        LocalDateTime d1 = LocalDateTime.now();
+        sp.setDataLimiteEtapa1(d1);
+        sp.setDataLimiteEtapa2(null);
+
+        LocalDateTime res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "obterUltimaDataLimite", sp);
+        assertThat(res).isEqualTo(d1);
+    }
+
+    @Test
+    @DisplayName("executarAcaoEmBloco - deve executar ACEITAR")
+    void executarAcaoEmBloco_DeveExecutarAceitar() {
+        Long codProc = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), AcaoProcesso.ACEITAR);
+
+        Subprocesso spCadastro = new Subprocesso();
+        spCadastro.setCodigo(100L);
+        spCadastro.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        spCadastro.setUnidade(u1);
+
+        Subprocesso spValidacao = new Subprocesso();
+        spValidacao.setCodigo(200L);
+        spValidacao.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(20L);
+        spValidacao.setUnidade(u2);
+
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(spCadastro, spValidacao));
+        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+
+        target.executarAcaoEmBloco(codProc, req);
+
+        verify(cadastroFluxoService).aceitarCadastroEmBloco(List.of(100L));
+        verify(transicaoService).aceitarValidacaoEmBloco(List.of(200L));
+    }
+
+    @Test
+    @DisplayName("listarIniciadosPorParticipantes - deve retornar pagina normal")
+    void listarIniciadosPorParticipantes_Sucesso() {
+        when(processoRepo.listarCodigosPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), any()))
+                .thenReturn(new PageImpl<>(List.of(1L)));
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        when(processoRepo.listarPorCodigosComParticipantes(anyList())).thenReturn(List.of(p));
+
+        Page<Processo> result = target.listarIniciadosPorParticipantes(List.of(10L), PageRequest.of(0, 10));
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("validarDadosBasicosParticipante - deve lancar excecao quando nome ou sigla em branco")
+    void validarDadosBasicosParticipante_Erro() {
+        UnidadeParticipanteDto dto = UnidadeParticipanteDto.builder().codUnidade(10L).nome("").sigla("S").build();
+        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Snapshot inconsistente");
+
+        UnidadeParticipanteDto dto2 = UnidadeParticipanteDto.builder().codUnidade(10L).nome("N").sigla("").build();
+        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto2))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Snapshot inconsistente");
+    }
+
     @Nested
     @DisplayName("Gaps de Data Limite no DTO")
     class DataLimiteGaps {
@@ -250,7 +456,7 @@ class ProcessoServiceCoverageTest {
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             u.setUnidadeAtivaCodigo(10L);
-            
+
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
@@ -260,7 +466,7 @@ class ProcessoServiceCoverageTest {
             uni.setSigla("U10");
             sp.setUnidade(uni);
             sp.setDataLimiteEtapa2(java.time.LocalDateTime.now());
-            
+
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
@@ -283,7 +489,7 @@ class ProcessoServiceCoverageTest {
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             u.setUnidadeAtivaCodigo(10L);
-            
+
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
@@ -295,7 +501,7 @@ class ProcessoServiceCoverageTest {
             java.time.LocalDateTime now = java.time.LocalDateTime.now();
             sp.setDataLimiteEtapa1(now.plusDays(2));
             sp.setDataLimiteEtapa2(now.plusDays(1));
-            
+
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
@@ -307,7 +513,7 @@ class ProcessoServiceCoverageTest {
             assertThat(res.getElegiveis()).isNotEmpty();
             assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(sp.getDataLimiteEtapa2());
         }
-        
+
         @Test
         @DisplayName("obterDetalhesCompleto deve retornar dataLimite2 quando válida via elegíveis")
         void etapa2Valida() {
@@ -318,7 +524,7 @@ class ProcessoServiceCoverageTest {
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             u.setUnidadeAtivaCodigo(10L);
-            
+
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
@@ -331,7 +537,7 @@ class ProcessoServiceCoverageTest {
             java.time.LocalDateTime d2 = java.time.LocalDateTime.now().plusDays(2);
             sp.setDataLimiteEtapa1(d1);
             sp.setDataLimiteEtapa2(d2);
-            
+
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
@@ -348,16 +554,26 @@ class ProcessoServiceCoverageTest {
         @DisplayName("obterDetalhesCompleto deve tratar subprocesso sem mapa")
         void subprocessoSemMapa() {
             Long cod = 1L;
-            Processo p = new Processo(); p.setCodigo(cod); p.setTipo(MAPEAMENTO);
-            Usuario u = new Usuario(); u.setPerfilAtivo(Perfil.ADMIN); u.setUnidadeAtivaCodigo(10L);
-            
-            Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            Unidade uni = new Unidade(); uni.setCodigo(10L); 
-            uni.setSigla("U10"); uni.setNome("Unidade 10"); uni.setTipo(TipoUnidade.OPERACIONAL); uni.setSituacao(SituacaoUnidade.ATIVA);
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setSigla("U10");
+            uni.setNome("Unidade 10");
+            uni.setTipo(TipoUnidade.OPERACIONAL);
+            uni.setSituacao(SituacaoUnidade.ATIVA);
             sp.setUnidade(uni);
             sp.setDataLimiteEtapa1(java.time.LocalDateTime.now());
             sp.setMapa(null); // branch 441
-            
+
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
@@ -373,86 +589,23 @@ class ProcessoServiceCoverageTest {
         }
     }
 
-    @Test
-    @DisplayName("iniciar deve suportar tipo DIAGNOSTICO")
-    void iniciarDiagnostico() {
-        Long cod = 1L;
-        Processo p = new Processo(); p.setCodigo(cod); p.setTipo(DIAGNOSTICO); p.setSituacao(CRIADO);
-        p.setDataLimite(LocalDateTime.now().plusDays(30));
-        Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
-        u.setSigla("U10"); u.setSituacao(SituacaoUnidade.ATIVA);
-        p.adicionarParticipantes(Set.of(u));
-
-        Unidade admin = new Unidade(); admin.setCodigo(99L); admin.setSigla("ADMIN"); admin.setSituacao(SituacaoUnidade.ATIVA);
-
-        when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        when(unidadeService.buscarPorCodigos(any())).thenReturn(List.of(u));
-        UnidadeMapa um = new UnidadeMapa(); um.setUnidadeCodigo(10L); 
-        when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
-        when(unidadeService.buscarAdmin()).thenReturn(admin);
-        mockarResponsaveisEfetivos();
-
-        // when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario()); - desnecessário
-        target.iniciar(cod, List.of(10L)); // branch 419 (DIAGNOSTICO)
-        verify(subprocessoService).criarParaDiagnostico(any());
-    }
-
-    @Test
-    @DisplayName("iniciar deve lançar IllegalStateException quando unidade obrigatória está ausente")
-    void iniciarUnidadeObrigatoriaAusente() {
-        Long cod = 1L;
-        Processo p = new Processo(); p.setCodigo(cod); p.setTipo(REVISAO); p.setSituacao(CRIADO);
-        
-        when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        
-        Unidade u10 = new Unidade(); u10.setCodigo(10L); u10.setSigla("U10"); u10.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u10.setSituacao(SituacaoUnidade.ATIVA);
-        
-        // Retorna apenas U10, mas vamos pedir 10 e 11
-        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(u10));
-        
-        UnidadeMapa um10 = new UnidadeMapa(); um10.setUnidadeCodigo(10L);
-        UnidadeMapa um11 = new UnidadeMapa(); um11.setUnidadeCodigo(11L);
-        when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um10, um11));
-        
-        mockarResponsaveisEfetivos();
-        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
-
-        List<Long> codigos = List.of(10L, 11L);
-        // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário
-        assertThatThrownBy(() -> target.iniciar(cod, codigos))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");
-    }
-
-    @Test
-    @DisplayName("executarAcaoEmBloco - acao HOMOLOGAR")
-    void executarAcaoEmBloco_Homologar() {
-        Long codProc = 1L;
-        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.HOMOLOGAR);
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
-
-        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
-        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
-
-        target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
-        verify(cadastroFluxoService).homologarCadastroEmBloco(anyList());
-    }
-
     @Nested
     @DisplayName("Elegibilidade e Hierarquia")
     class ElegibilidadeHierarquia {
         @Test
         @DisplayName("buscarDescendentes com ciclo ou repetição")
         void buscarDescendentesRepeticao() {
-            Unidade u1 = new Unidade(); u1.setCodigo(1L);
-            Unidade u2 = new Unidade(); u2.setCodigo(2L);
+            Unidade u1 = new Unidade();
+            u1.setCodigo(1L);
+            Unidade u2 = new Unidade();
+            u2.setCodigo(2L);
             u2.setUnidadeSuperior(u1);
-            Unidade u3 = new Unidade(); u3.setCodigo(2L); // mesma unidade 2
+            Unidade u3 = new Unidade();
+            u3.setCodigo(2L); // mesma unidade 2
             u3.setUnidadeSuperior(u1);
 
             when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
-            
+
             List<Long> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "buscarDescendentes", 1L);
             assertThat(res).containsExactlyInAnyOrder(1L, 2L); // branch 357 (result.add(codFilho) == false)
         }
@@ -463,7 +616,7 @@ class ProcessoServiceCoverageTest {
             Usuario user = new Usuario();
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(NAO_INICIADO);
-            
+
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isFalse();
         }
@@ -474,10 +627,10 @@ class ProcessoServiceCoverageTest {
             Usuario user = new Usuario();
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            
+
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
-            
+
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isTrue();
         }
@@ -502,10 +655,10 @@ class ProcessoServiceCoverageTest {
             Usuario user = new Usuario();
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
-            
+
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
-            
+
             Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isTrue();
         }
@@ -551,103 +704,11 @@ class ProcessoServiceCoverageTest {
         @Test
         @DisplayName("isSituacaoCadastro - branches 577")
         void isSituacaoCadastro_Branches() {
-            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_CADASTRO_DISPONIBILIZADO)).isTrue();
-            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_DISPONIBILIZADA)).isTrue();
-            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_HOMOLOGADA)).isTrue();
-            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_MAPA_DISPONIBILIZADO)).isFalse();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_CADASTRO_DISPONIBILIZADO)).isTrue();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_DISPONIBILIZADA)).isTrue();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_HOMOLOGADA)).isTrue();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_MAPA_DISPONIBILIZADO)).isFalse();
         }
-    }
-
-    @Test
-    @DisplayName("enviarLembrete - sucesso")
-    void enviarLembreteSucesso() {
-        Processo p = new Processo();
-        p.setCodigo(1L);
-        p.setDescricao("Processo Teste");
-        p.setDataLimite(java.time.LocalDateTime.now().plusDays(1));
-        
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        u.setSigla("U1");
-        u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
-        u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
-        
-        p.adicionarParticipantes(Set.of(u));
-
-        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
-        when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-        when(emailModelosService.criarEmailLembretePrazo(any(), any(), any())).thenReturn("<html></html>");
-
-        target.enviarLembrete(1L, 10L);
-
-        verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
-        verify(notificacaoService).enfileirar(argThat(cmd ->
-                "u1@tre-pe.jus.br".equals(cmd.destinatario())
-                        && cmd.tipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO
-                        && "U1".equals(cmd.unidadeDestinoSigla())
-                        && cmd.chaveIdempotencia().startsWith("processo:1:lembrete:unidade:10:dia:")
-        ));
-    }
-
-    @Test
-    @DisplayName("obterUltimaDataLimite - apenas etapa 1 deve retornar data 1")
-    void obterUltimaDataLimiteApenasEtapa1() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(100L);
-        LocalDateTime d1 = LocalDateTime.now();
-        sp.setDataLimiteEtapa1(d1);
-        sp.setDataLimiteEtapa2(null);
-
-        LocalDateTime res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "obterUltimaDataLimite", sp);
-        assertThat(res).isEqualTo(d1);
-    }
-
-    @Test
-    @DisplayName("executarAcaoEmBloco - deve executar ACEITAR")
-    void executarAcaoEmBloco_DeveExecutarAceitar() {
-        Long codProc = 1L;
-        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), AcaoProcesso.ACEITAR);
-        
-        Subprocesso spCadastro = new Subprocesso(); spCadastro.setCodigo(100L); spCadastro.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        Unidade u1 = new Unidade(); u1.setCodigo(10L); spCadastro.setUnidade(u1);
-        
-        Subprocesso spValidacao = new Subprocesso(); spValidacao.setCodigo(200L); spValidacao.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        Unidade u2 = new Unidade(); u2.setCodigo(20L); spValidacao.setUnidade(u2);
-
-        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(spCadastro, spValidacao));
-        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
-
-        target.executarAcaoEmBloco(codProc, req);
-
-        verify(cadastroFluxoService).aceitarCadastroEmBloco(List.of(100L));
-        verify(transicaoService).aceitarValidacaoEmBloco(List.of(200L));
-    }
-
-    @Test
-    @DisplayName("listarIniciadosPorParticipantes - deve retornar pagina normal")
-    void listarIniciadosPorParticipantes_Sucesso() {
-        when(processoRepo.listarCodigosPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), any()))
-                .thenReturn(new PageImpl<>(List.of(1L)));
-        Processo p = new Processo();
-        p.setCodigo(1L);
-        when(processoRepo.listarPorCodigosComParticipantes(anyList())).thenReturn(List.of(p));
-        
-        Page<Processo> result = target.listarIniciadosPorParticipantes(List.of(10L), PageRequest.of(0, 10));
-        assertThat(result).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("validarDadosBasicosParticipante - deve lancar excecao quando nome ou sigla em branco")
-    void validarDadosBasicosParticipante_Erro() {
-        UnidadeParticipanteDto dto = UnidadeParticipanteDto.builder().codUnidade(10L).nome("").sigla("S").build();
-        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Snapshot inconsistente");
-                
-        UnidadeParticipanteDto dto2 = UnidadeParticipanteDto.builder().codUnidade(10L).nome("N").sigla("").build();
-        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto2))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Snapshot inconsistente");
     }
 
 }

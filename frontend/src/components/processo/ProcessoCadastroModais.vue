@@ -2,17 +2,17 @@
   <div>
     <!-- Modal de confirmação cadastro -->
     <ModalConfirmacao
-        :model-value="mostrarConfirmacao"
         :auto-close="false"
-        :loading="isLoading"
         :cancel-title="TEXTOS.comum.BOTAO_CANCELAR"
+        :loading="isLoading"
+        :model-value="mostrarConfirmacao"
         :ok-title="TEXTOS.comum.BOTAO_INICIAR"
-        variant="success"
+        :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
         test-codigo-cancelar="btn-iniciar-processo-cancelar"
         test-codigo-confirmar="btn-iniciar-processo-confirmar"
-        :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
-        @update:model-value="$emit('update:mostrarConfirmacao', $event)"
+        variant="success"
         @confirmar="$emit('confirmar-iniciar')"
+        @update:model-value="$emit('update:mostrarConfirmacao', $event)"
     >
       <div class="confirmacao-resumo">
         <p><strong>Descrição:</strong> {{ descricao }}</p>
@@ -27,14 +27,14 @@
 
     <!-- Modal de confirmação de remoção -->
     <ModalConfirmacao
-        :model-value="mostrarRemocao"
         :auto-close="false"
         :loading="isLoading"
+        :model-value="mostrarRemocao"
         :ok-title="TEXTOS.processo.cadastro.BOTAO_REMOVER"
         :titulo="TEXTOS.processo.cadastro.REMOVER_TITULO"
         variant="danger"
-        @update:model-value="$emit('update:mostrarRemocao', $event)"
         @confirmar="$emit('confirmar-remocao')"
+        @update:model-value="$emit('update:mostrarRemocao', $event)"
     >
       <p class="mb-0">{{ TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao) }}</p>
     </ModalConfirmacao>

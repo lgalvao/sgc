@@ -33,9 +33,9 @@ describe("useMapaCompetenciasMutacoes", () => {
 
     it("deve abrir modal de criação", () => {
         const {abrirModalCriarNovaCompetencia, mostrarModalCriarNovaCompetencia, competenciaSendoEditada} = setup();
-        
+
         abrirModalCriarNovaCompetencia();
-        
+
         expect(mostrarModalCriarNovaCompetencia.value).toBe(true);
         expect(competenciaSendoEditada.value).toBeNull();
         expect(clearErrors).toHaveBeenCalled();
@@ -54,9 +54,9 @@ describe("useMapaCompetenciasMutacoes", () => {
     it("deve abrir modal de edição", () => {
         const {iniciarEdicaoCompetencia, competenciaSendoEditada} = setup();
         const comp = {codigo: 1} as any;
-        
+
         iniciarEdicaoCompetencia(comp);
-        
+
         expect(competenciaSendoEditada.value).toEqual(comp);
     });
 
@@ -122,7 +122,11 @@ describe("useMapaCompetenciasMutacoes", () => {
 
     it("deve iniciar exclusão de competência", () => {
         const localCompetencias = ref([{codigo: 50, descricao: "C"}] as any);
-        const {excluirCompetencia, mostrarModalExcluirCompetencia, competenciaParaExcluir} = useMapaCompetenciasMutacoes({
+        const {
+            excluirCompetencia,
+            mostrarModalExcluirCompetencia,
+            competenciaParaExcluir
+        } = useMapaCompetenciasMutacoes({
             codigoSubprocesso,
             competencias: localCompetencias as any,
             fluxoMapa,
@@ -140,7 +144,11 @@ describe("useMapaCompetenciasMutacoes", () => {
 
     it("deve confirmar exclusão de competência com sucesso", async () => {
         const localCompetencias = ref([{codigo: 50, descricao: "C"}] as any);
-        const {excluirCompetencia, confirmarExclusaoCompetencia, mostrarModalExcluirCompetencia} = useMapaCompetenciasMutacoes({
+        const {
+            excluirCompetencia,
+            confirmarExclusaoCompetencia,
+            mostrarModalExcluirCompetencia
+        } = useMapaCompetenciasMutacoes({
             codigoSubprocesso,
             competencias: localCompetencias as any,
             fluxoMapa,

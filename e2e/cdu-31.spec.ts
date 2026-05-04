@@ -11,7 +11,11 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
  */
 test.describe.serial('CDU-31 - Configurar sistema', () => {
 
-    test('Cenários CDU-31: ADMIN navega, valida entradas e persiste alterações de configurações', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenários CDU-31: ADMIN navega, valida entradas e persiste alterações de configurações', async ({
+                                                                                                             _resetAutomatico,
+                                                                                                             page,
+                                                                                                             _autenticadoComoAdmin
+                                                                                                         }) => {
         await page.getByTestId('btn-configuracoes').click();
         await expect(page).toHaveURL(/\/configuracoes/);
         await expect(page.getByRole('heading', {name: TEXTOS.configuracoes.TITULO, exact: true})).toBeVisible();

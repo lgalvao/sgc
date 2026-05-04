@@ -27,19 +27,19 @@ type DependenciasCadastroDisponibilizacao = {
 };
 
 export function useCadastroDisponibilizacao({
-    atividades,
-    codigoSubprocesso,
-    situacaoAtual,
-    isRevisao,
-    houveAlteracaoCadastro,
-    disponibilizacaoSemMudancas,
-    mostrarModalConfirmacao,
-    nextTick,
-    scrollParaPrimeiroErro,
-    validarCadastro,
-    disponibilizarCadastroFluxo,
-    disponibilizarRevisaoCadastroFluxo,
-}: DependenciasCadastroDisponibilizacao) {
+                                                atividades,
+                                                codigoSubprocesso,
+                                                situacaoAtual,
+                                                isRevisao,
+                                                houveAlteracaoCadastro,
+                                                disponibilizacaoSemMudancas,
+                                                mostrarModalConfirmacao,
+                                                nextTick,
+                                                scrollParaPrimeiroErro,
+                                                validarCadastro,
+                                                disponibilizarCadastroFluxo,
+                                                disponibilizarRevisaoCadastroFluxo,
+                                            }: DependenciasCadastroDisponibilizacao) {
     const loadingValidacao = ref(false);
     const loadingDisponibilizacao = ref(false);
     const errosValidacao = ref<ErroValidacao[]>([]);

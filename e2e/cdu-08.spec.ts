@@ -14,11 +14,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
     test('Cenário 1: Processo de Mapeamento (Fluxo completo + Importação + Auto-save)', async ({
-                                                                                        _resetAutomatico,
-                                                                                        page,
-                                                                                        request,
-                                                                                        _autenticadoComoAdmin
-}) => {
+                                                                                                   _resetAutomatico,
+                                                                                                   page,
+                                                                                                   request,
+                                                                                                   _autenticadoComoAdmin
+                                                                                               }) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
         const processoOrigemDescricao = `Processo base FINALIZADO ${timestamp}`;
@@ -28,7 +28,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         let atividadeB = '';
 
         await test.step('1. Setup: Criar processos origem e Mapeamento alvo', async () => {
-            
+
             // Criar processos finalizados via Fixture (para importação)
             const procOrigem = await criarProcessoFinalizadoFixture(request, {
                 unidade: UNIDADE_ORIGEM,
@@ -63,17 +63,17 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         await test.step('2.1 Verificar estado inicial do mapeamento', async () => {
             await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();
             const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
-            await btnDisponibilizar.waitFor({ state: 'visible' });
+            await btnDisponibilizar.waitFor({state: 'visible'});
             await expect(btnDisponibilizar).toBeDisabled();
         });
 
         await test.step('3. Importar atividades (Fluxo múltiplo e Negativo)', async () => {
             atividadeA = `Atividade origem A - ${processoOrigemId}`;
             atividadeB = `Atividade origem B - ${processoOrigemId}`;
-            
+
             await AtividadeHelpers.verificarOpcoesImportacaoVazia(page, [
-                { processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] },
-                { processo: processoOrigem2Descricao, unidades: ['ASSESSORIA_21'] }
+                {processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM]},
+                {processo: processoOrigem2Descricao, unidades: ['ASSESSORIA_21']}
             ]);
 
             await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
@@ -104,17 +104,17 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await page.reload();
 
             // Ao recarregar, tudo o que foi inserido precisa estar lá
-            await expect(page.getByText(atividadeManual, { exact: true }).first()).toBeVisible();
-            await expect(page.getByText(atividadeManual2, { exact: true }).first()).toBeVisible();
-            await expect(page.locator('.group-conhecimento', { hasText: conhecimento1 }).first()).toBeVisible();
-            await expect(page.locator('.group-conhecimento', { hasText: conhecimento2 }).first()).toBeVisible();
-            await expect(page.getByText(atividadeA, { exact: true }).first()).toBeVisible();
+            await expect(page.getByText(atividadeManual, {exact: true}).first()).toBeVisible();
+            await expect(page.getByText(atividadeManual2, {exact: true}).first()).toBeVisible();
+            await expect(page.locator('.group-conhecimento', {hasText: conhecimento1}).first()).toBeVisible();
+            await expect(page.locator('.group-conhecimento', {hasText: conhecimento2}).first()).toBeVisible();
+            await expect(page.getByText(atividadeA, {exact: true}).first()).toBeVisible();
         });
 
         await test.step('5. Editar e Remover (Com cancelamentos visuais)', async () => {
             const atividadeEditada = `${atividadeManual} EDITADA`;
             const atividadeCancelada = `${atividadeManual} CANCELADA`;
-            
+
             await AtividadeHelpers.cancelarEdicaoAtividade(page, atividadeManual, atividadeCancelada);
             await AtividadeHelpers.editarAtividade(page, atividadeManual, atividadeEditada);
 
@@ -134,7 +134,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await expect(linhaConhPosEdicao.getByTestId('btn-remover-conhecimento')).toBeVisible();
 
             await AtividadeHelpers.removerConhecimento(page, atividadeEditada, conhecimento1Editado);
-            
+
             await AtividadeHelpers.removerAtividade(page, atividadeEditada);
         });
 
@@ -177,18 +177,18 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.verificarBotaoImpactoDropdown(page);
             await AtividadeHelpers.abrirModalImpacto(page);
             await AtividadeHelpers.fecharModalImpacto(page);
-            
+
             // Verificar botão histórico de análise no modo de revisão (Seção 5)
             await AtividadeHelpers.verificarBotaoHistoricoAnalise(page);
         });
     });
 
     test('Cenário 3: Seleções limpas ao trocar processo/unidade no modal de importação', async ({
-        _resetAutomatico,
-        page,
-        request,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                    _resetAutomatico,
+                                                                                                    page,
+                                                                                                    request,
+                                                                                                    _autenticadoComoAdmin
+                                                                                                }) => {
         const timestamp = Date.now();
         const UNIDADE_ALVO = 'ASSESSORIA_11';
         const CHEFE_ALVO = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
@@ -238,7 +238,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             // Troca para o processo B sem confirmar → deve limpar seleções anteriores
             const modal = page.getByRole('dialog');
-            await modal.getByTestId('select-processo').selectOption({ label: descOrigemB });
+            await modal.getByTestId('select-processo').selectOption({label: descOrigemB});
 
             // Ao trocar de processo, as seleções anteriores devem ser limpas.
             // Sem unidade selecionada no novo processo, o clique exibe erro de unidade.
@@ -246,7 +246,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await expect(page.getByText("Selecione a unidade de origem.")).toBeVisible();
 
             // Cancela e fecha o modal
-            await modal.getByRole('button', { name: /Cancelar/i }).click();
+            await modal.getByRole('button', {name: /Cancelar/i}).click();
             await expect(modal).toBeHidden();
 
             // Verificar que nenhuma atividade foi importada (seleções do processo A foram descartadas)

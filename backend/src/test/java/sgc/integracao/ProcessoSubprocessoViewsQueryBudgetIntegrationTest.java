@@ -51,6 +51,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     private Usuario usuarioAdmin;
     private Usuario usuarioChefe;
     private Subprocesso subprocesso;
+
     @BeforeEach
     void setUp() {
         Unidade unidadeRaiz = criarUnidade("UNR", "Unidade raiz budget", null);

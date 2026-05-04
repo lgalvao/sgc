@@ -21,12 +21,18 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("NullAway.Init")
 class MapaManutencaoServiceCoverageExtraTest {
 
-    @Mock private AtividadeRepo atividadeRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private ConhecimentoRepo conhecimentoRepo;
-    @Mock private MapaRepo mapaRepo;
-    @Mock private ComumRepo repo;
-    @Mock private SubprocessoSituacaoService subprocessoSituacaoService;
+    @Mock
+    private AtividadeRepo atividadeRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private ConhecimentoRepo conhecimentoRepo;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private ComumRepo repo;
+    @Mock
+    private SubprocessoSituacaoService subprocessoSituacaoService;
 
     @InjectMocks
     private MapaManutencaoService mapaService;

@@ -2,7 +2,7 @@
   <LayoutPadrao>
     <PageHeader title="Relatório: Mapas vigentes">
       <template #actions>
-        <BButton variant="outline-secondary" to="/relatorios">
+        <BButton to="/relatorios" variant="outline-secondary">
           <i class="bi bi-arrow-left me-1"/> Voltar
         </BButton>
       </template>
@@ -46,7 +46,7 @@ import {useNotification} from "@/composables/useNotification";
 import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
 
 const relatoriosStore = useRelatoriosStore();
-const { notify } = useNotification();
+const {notify} = useNotification();
 
 const unidadesDisponiveis = ref<Unidade[]>([]);
 const unidadesSelecionadas = ref<number[]>([]);
@@ -87,8 +87,8 @@ async function carregarUnidades() {
       buscarCodigosUnidadesComMapaVigente()
     ]);
     const unidadesComElegibilidade = aplicarElegibilidadeMapaVigente(
-      arvore,
-      new Set(codigosComMapa)
+        arvore,
+        new Set(codigosComMapa)
     );
     unidadesDisponiveis.value = filtrarArvorePorMapaVigente(unidadesComElegibilidade);
   } catch {

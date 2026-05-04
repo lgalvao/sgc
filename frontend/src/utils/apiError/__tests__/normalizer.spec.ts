@@ -50,7 +50,7 @@ describe('normalizer.ts', () => {
             isAxiosError: true,
             response: {
                 status: 401,
-                data: { message: 'Token expirado' }
+                data: {message: 'Token expirado'}
             }
         };
         const resultado = normalizarErro(erro);

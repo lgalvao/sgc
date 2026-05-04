@@ -18,6 +18,14 @@ class TituloEleitoralValidationTest {
     private ValidatorFactory factory;
     private Validator validator;
 
+    private static Stream<Arguments> fornecerTitulosInvalidos() {
+        return Stream.of(
+                Arguments.of(null, "O título eleitoral é obrigatório."),
+                Arguments.of("1234567890123", "O título eleitoral deve ter no máximo 12 caracteres."),
+                Arguments.of("1234ABCD", "O título eleitoral deve conter apenas números.")
+        );
+    }
+
     @BeforeEach
     void setUp() {
         factory = Validation.buildDefaultValidatorFactory();
@@ -52,14 +60,6 @@ class TituloEleitoralValidationTest {
         assertThat(violations)
                 .extracting(ConstraintViolation::getMessage)
                 .containsExactly(mensagemEsperada);
-    }
-
-    private static Stream<Arguments> fornecerTitulosInvalidos() {
-        return Stream.of(
-                Arguments.of(null, "O título eleitoral é obrigatório."),
-                Arguments.of("1234567890123", "O título eleitoral deve ter no máximo 12 caracteres."),
-                Arguments.of("1234ABCD", "O título eleitoral deve conter apenas números.")
-        );
     }
 
     @Test

@@ -24,39 +24,52 @@ type DependenciasMapaAnaliseFluxo = {
     notify: (mensagem: string, variante: VarianteAlerta) => void;
     listarAnalisesCadastro: (codigoSubprocesso: number) => Promise<Analise[]>;
     validarMapa: (codigoSubprocesso: number) => Promise<void>;
-    homologarMapa: (codigoSubprocesso: number, dados: {observacao: string}) => Promise<void>;
-    aceitarMapa: (codigoSubprocesso: number, dados: {observacao: string}) => Promise<void>;
-    devolverMapa: (codigoSubprocesso: number, dados: {justificativa: string}) => Promise<void>;
+    homologarMapa: (codigoSubprocesso: number, dados: { observacao: string }) => Promise<void>;
+    aceitarMapa: (codigoSubprocesso: number, dados: { observacao: string }) => Promise<void>;
+    devolverMapa: (codigoSubprocesso: number, dados: { justificativa: string }) => Promise<void>;
 };
 
 export function useMapaAnaliseFluxo({
-    codigoSubprocesso,
-    acaoPrincipalMapa,
-    mostrarModalAceitar,
-    mostrarModalValidar,
-    mostrarModalDevolucao,
-    mostrarModalHistorico,
-    observacaoDevolucao,
-    analisesCadastro,
-    resetarValidacao,
-    validarSubmissao,
-    focarPrimeiroErroInvalido,
-    concluirAcaoPainel,
-    notify,
-    listarAnalisesCadastro,
-    validarMapa,
-    homologarMapa,
-    aceitarMapa,
-    devolverMapa,
-}: DependenciasMapaAnaliseFluxo) {
-    function abrirModalAceitar() { mostrarModalAceitar.value = true; }
-    function fecharModalAceitar() { mostrarModalAceitar.value = false; }
-    function abrirModalValidar() { mostrarModalValidar.value = true; }
-    function fecharModalValidar() { mostrarModalValidar.value = false; }
+                                        codigoSubprocesso,
+                                        acaoPrincipalMapa,
+                                        mostrarModalAceitar,
+                                        mostrarModalValidar,
+                                        mostrarModalDevolucao,
+                                        mostrarModalHistorico,
+                                        observacaoDevolucao,
+                                        analisesCadastro,
+                                        resetarValidacao,
+                                        validarSubmissao,
+                                        focarPrimeiroErroInvalido,
+                                        concluirAcaoPainel,
+                                        notify,
+                                        listarAnalisesCadastro,
+                                        validarMapa,
+                                        homologarMapa,
+                                        aceitarMapa,
+                                        devolverMapa,
+                                    }: DependenciasMapaAnaliseFluxo) {
+    function abrirModalAceitar() {
+        mostrarModalAceitar.value = true;
+    }
+
+    function fecharModalAceitar() {
+        mostrarModalAceitar.value = false;
+    }
+
+    function abrirModalValidar() {
+        mostrarModalValidar.value = true;
+    }
+
+    function fecharModalValidar() {
+        mostrarModalValidar.value = false;
+    }
+
     function abrirModalDevolucao() {
         resetarValidacao();
         mostrarModalDevolucao.value = true;
     }
+
     function fecharModalDevolucao() {
         mostrarModalDevolucao.value = false;
         observacaoDevolucao.value = "";
@@ -112,8 +125,13 @@ export function useMapaAnaliseFluxo({
         mostrarModalHistorico.value = true;
     }
 
-    function fecharModalHistorico() { mostrarModalHistorico.value = false; }
-    function verHistorico() { void abrirModalHistorico(); }
+    function fecharModalHistorico() {
+        mostrarModalHistorico.value = false;
+    }
+
+    function verHistorico() {
+        void abrirModalHistorico();
+    }
 
     return {
         abrirModalAceitar,

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BAlert, BButton, BFormGroup, BFormInput, BFormInvalidFeedback, BInputGroup,} from "bootstrap-vue-next";
 import {TEXTOS} from "@/constants/textos";
 
@@ -39,8 +39,8 @@ function atualizarSenha(valor: string | number | null) {
 
 <template>
   <BFormGroup
-      label-for="titulo"
       class="mb-3"
+      label-for="titulo"
   >
     <template #label>
       <i
@@ -52,17 +52,17 @@ function atualizarSenha(valor: string | number | null) {
     <!-- eslint-disable vuejs-accessibility/no-autofocus -->
     <BFormInput
         id="titulo"
-        :model-value="titulo"
-        aria-required="true"
-        :readonly="loginBloqueado"
         :disabled="isLoading"
+        :model-value="titulo"
+        :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
+        :readonly="loginBloqueado"
+        :state="mensagemErroTitulo ? false : null"
+        aria-required="true"
         autocomplete="username"
         autofocus
         data-testid="inp-login-usuario"
         inputmode="numeric"
         name="titulo"
-        :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
-        :state="mensagemErroTitulo ? false : null"
         type="text"
         @update:model-value="atualizarTitulo"
     />
@@ -73,8 +73,8 @@ function atualizarSenha(valor: string | number | null) {
   </BFormGroup>
 
   <BFormGroup
-      label-for="senha"
       class="mb-3"
+      label-for="senha"
   >
     <template #label>
       <i
@@ -86,19 +86,19 @@ function atualizarSenha(valor: string | number | null) {
     <BInputGroup>
       <BFormInput
           id="senha"
-          :model-value="senha"
-          aria-required="true"
           :autocomplete="showPassword ? 'off' : 'current-password'"
-          :readonly="loginBloqueado"
           :disabled="isLoading"
+          :model-value="senha"
+          :placeholder="TEXTOS.login.PLACEHOLDER_SENHA"
+          :readonly="loginBloqueado"
           :state="mensagemErroSenha ? false : null"
           :type="showPassword ? 'text' : 'password'"
+          aria-required="true"
           data-testid="inp-login-senha"
           name="senha"
-          :placeholder="TEXTOS.login.PLACEHOLDER_SENHA"
-          @update:model-value="atualizarSenha"
           @keydown="emit('verificar-caps-lock', $event)"
           @keyup="emit('verificar-caps-lock', $event)"
+          @update:model-value="atualizarSenha"
       />
       <template #append>
         <BButton
@@ -121,9 +121,9 @@ function atualizarSenha(valor: string | number | null) {
     <BAlert
         v-if="capsLockAtivado"
         :model-value="true"
-        variant="warning"
         class="small mt-1 py-1 px-2 mb-0"
         data-testid="alert-caps-lock"
+        variant="warning"
     >
       <i
           aria-hidden="true"

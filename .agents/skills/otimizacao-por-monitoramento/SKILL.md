@@ -5,7 +5,8 @@ description: Use quando o objetivo for identificar e reduzir gargalos reais no S
 
 # Otimização por Monitoramento no SGC
 
-Use este skill quando a pergunta real for "onde o fluxo está gastando tempo ou round-trips?" e a resposta precise vir de evidência de execução, não de inspeção estática isolada.
+Use este skill quando a pergunta real for "onde o fluxo está gastando tempo ou round-trips?" e a resposta precise vir de
+evidência de execução, não de inspeção estática isolada.
 
 ## Fontes de verdade
 
@@ -28,7 +29,8 @@ Use este skill quando houver:
 - dúvida se o gargalo está no backend, no frontend ou na navegação;
 - necessidade de provar ganho com antes/depois.
 
-Não use este skill quando o problema já for evidentemente local e determinístico, como um algoritmo interno isolado sem dependência de fluxo real.
+Não use este skill quando o problema já for evidentemente local e determinístico, como um algoritmo interno isolado sem
+dependência de fluxo real.
 
 ## Objetivo
 
@@ -59,15 +61,19 @@ SGC_MONITORAMENTO=sim SGC_MONITORAMENTO_TEMPO_MINIMO_HTTP_MS=0 SGC_MONITORAMENTO
 ```
 
 > [!IMPORTANT]
-> **Use o nível INFO**: Por padrão, o monitoramento pode estar em `WARN`. Para ver todas as chamadas HTTP e Java, garanta que o nível está em `info` (padrão se omitido).
-> **Zere os thresholds**: O threshold padrão de 100ms/500ms oculta chamadas rápidas que, se repetidas, causam impacto. Use `0` para auditoria completa.
+> **Use o nível INFO**: Por padrão, o monitoramento pode estar em `WARN`. Para ver todas as chamadas HTTP e Java,
+> garanta que o nível está em `info` (padrão se omitido).
+> **Zere os thresholds**: O threshold padrão de 100ms/500ms oculta chamadas rápidas que, se repetidas, causam impacto.
+> Use `0` para auditoria completa.
 
-Se o caso de uso depender de preparação serial, rode o arquivo inteiro. Se houver um cenário isolável sem perder fidelidade, rode o recorte mínimo suficiente.
+Se o caso de uso depender de preparação serial, rode o arquivo inteiro. Se houver um cenário isolável sem perder
+fidelidade, rode o recorte mínimo suficiente.
 
 ### 1.1 Ativar telemetria do frontend quando o alvo inclui navegação/round-trip do navegador
 
 No lifecycle E2E atual do SGC, o frontend pode subir com `VITE_MONITORAMENTO_MODO='off'`.
-Se a hipótese envolver custo percebido no frontend, sequência de chamadas, navegação SPA ou round-trips redundantes, **não aceite isso como limitação do cenário**.
+Se a hipótese envolver custo percebido no frontend, sequência de chamadas, navegação SPA ou round-trips redundantes, *
+*não aceite isso como limitação do cenário**.
 
 Antes de tirar conclusões:
 
@@ -75,7 +81,8 @@ Antes de tirar conclusões:
 2. garanta que o artefato único realmente capture também a telemetria HTTP do navegador;
 3. só então compare antes/depois.
 
-Em outras palavras: se a skill for usada para performance de frontend, o agente deve **ativar o monitoramento do Vite/navegador primeiro** em vez de analisar apenas o lado backend e chamar isso de suficiente.
+Em outras palavras: se a skill for usada para performance de frontend, o agente deve **ativar o monitoramento do
+Vite/navegador primeiro** em vez de analisar apenas o lado backend e chamar isso de suficiente.
 
 ### 2. Analisar um artefato só
 
@@ -162,24 +169,30 @@ Depois de cada rodada:
 
 ### Toasts e Persistência em Navegação
 
-Se a ação do usuário dispara um redirecionamento (ex: `router.push('/painel')`), a mensagem de sucesso disparada na View original será destruída com ela.
+Se a ação do usuário dispara um redirecionamento (ex: `router.push('/painel')`), a mensagem de sucesso disparada na View
+original será destruída com ela.
 No SGC, use o `ToastStore` para mensagens que devem sobreviver à navegação:
 
 - ✅ USE: `toastStore.setPending(mensagem)` antes do redirecionamento.
-- ✅ VERIFIQUE: A View de destino (ex: `PainelView`) deve consumir isso no `onMounted/onActivated` via `exibirToastPendente()`.
+- ✅ VERIFIQUE: A View de destino (ex: `PainelView`) deve consumir isso no `onMounted/onActivated` via
+  `exibirToastPendente()`.
 
 ### Compatibilidade E2E (BOrchestrator)
 
 O sistema de testes Playwright do SGC utiliza seletores semânticos para toasts.
-O componente `BOrchestrator` no `App.vue` **DEVE** ter a classe `.orchestrator-container`. Se for removida, o helper `verificarToast` falhará com "element not found".
+O componente `BOrchestrator` no `App.vue` **DEVE** ter a classe `.orchestrator-container`. Se for removida, o helper
+`verificarToast` falhará com "element not found".
 
 ### Otimização de Payload (Bloat e Redundância)
 
 Identifique JSONs que carregam o "passado" desnecessariamente:
 
-- **Movimentações**: Em contextos de edição/mapeamento, limite o histórico para as 10-15 mais recentes. O histórico completo deve ser sob demanda.
-- **Atividades e Conhecimentos**: Evite enviar a árvore completa de conhecimentos em listagens onde apenas o ID/Descrição da atividade é necessário (ex: seleção de atividades para competência).
-- **Duplicação**: Se o `mapa` já traz atividades associadas, o campo `atividadesDisponiveis` não deve repetir os dados completos dessas mesmas atividades.
+- **Movimentações**: Em contextos de edição/mapeamento, limite o histórico para as 10-15 mais recentes. O histórico
+  completo deve ser sob demanda.
+- **Atividades e Conhecimentos**: Evite enviar a árvore completa de conhecimentos em listagens onde apenas o
+  ID/Descrição da atividade é necessário (ex: seleção de atividades para competência).
+- **Duplicação**: Se o `mapa` já traz atividades associadas, o campo `atividadesDisponiveis` não deve repetir os dados
+  completos dessas mesmas atividades.
 
 ### Tornar referência explícita
 

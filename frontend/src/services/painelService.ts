@@ -28,7 +28,7 @@ export interface ListarParams<T = string> {
 export async function listarProcessos(
     params: ListarParams<keyof ProcessoResumo> = {}
 ): Promise<Page<ProcessoResumo>> {
-    const { codUnidade, page = 0, size = 20, sort, order } = params;
+    const {codUnidade, page = 0, size = 20, sort, order} = params;
     const queryParams: Record<string, string | number> = {
         page,
         size,

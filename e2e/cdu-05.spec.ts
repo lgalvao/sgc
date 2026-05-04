@@ -80,7 +80,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
                                                                             _resetAutomatico,
                                                                             page,
                                                                             _autenticadoComoAdmin
-}) => {
+                                                                        }) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
@@ -157,7 +157,11 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+(?:\?.*)?$/);
     });
 
-    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({
+                                                                                  _resetAutomatico,
+                                                                                  page,
+                                                                                  _autenticadoComoAdmin
+                                                                              }) => {
 
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -273,7 +277,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     test('Fase 2.1: Verificar alertas do processo de Revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await verificarPaginaPainel(page);
-        
+
         const tabelaAlertasChefe = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertasChefe.locator('tr', {hasText: descProcRevisao})
             .filter({hasText: 'Início do processo'})
@@ -290,7 +294,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         ).toBeVisible();
     });
 
-    test('Fase 2.2: CHEFE acessa o cadastro editavel da Revisão pelo card do subprocesso', async ({_resetAutomatico, page}) => {
+    test('Fase 2.2: CHEFE acessa o cadastro editavel da Revisão pelo card do subprocesso', async ({
+                                                                                                      _resetAutomatico,
+                                                                                                      page
+                                                                                                  }) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
 
@@ -301,7 +308,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 
-    test('Fase 2.2b: primeiro clique no card da Revisão abre cadastro mesmo após visitar subprocesso em visualização', async ({_resetAutomatico, page}) => {
+    test('Fase 2.2b: primeiro clique no card da Revisão abre cadastro mesmo após visitar subprocesso em visualização', async ({
+                                                                                                                                  _resetAutomatico,
+                                                                                                                                  page
+                                                                                                                              }) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
@@ -317,9 +327,9 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 2.2c: CHEFE da secretaria interoperacional acessa o subprocesso da própria secretaria na Revisão', async ({
-        _resetAutomatico,
-        page
-    }) => {
+                                                                                                                             _resetAutomatico,
+                                                                                                                             page
+                                                                                                                         }) => {
         const descricaoRevisaoSecretaria = `Revisão secretaria interoperacional ${Date.now()}`;
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -347,9 +357,9 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 2.2d: Revisão de unidade subordinada sob secretaria interoperacional não aparece para o chefe da secretaria', async ({
-        _resetAutomatico,
-        page
-    }) => {
+                                                                                                                                        _resetAutomatico,
+                                                                                                                                        page
+                                                                                                                                    }) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await criarProcesso(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,

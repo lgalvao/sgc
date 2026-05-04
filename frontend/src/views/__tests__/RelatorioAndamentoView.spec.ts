@@ -83,7 +83,7 @@ describe('RelatorioAndamentoView', () => {
 
     it('deve exibir cards com informações formatadas do relatório', async () => {
         const wrapper = mount(RelatorioAndamentoView, {
-            global: { stubs }
+            global: {stubs}
         });
 
         await flushPromises();
@@ -104,16 +104,16 @@ describe('RelatorioAndamentoView', () => {
 
     it('cobre falha em carregarProcessos', async () => {
         vi.mocked(painelService.listarProcessos).mockRejectedValue(new Error("Erro simulado"));
-        mount(RelatorioAndamentoView, { global: { stubs } });
+        mount(RelatorioAndamentoView, {global: {stubs}});
         await flushPromises();
         expect(notify).toHaveBeenCalledWith("Erro ao carregar processos", "danger");
     });
 
     it('cobre gerarRelatorio com e sem erro', async () => {
-        const wrapper = mount(RelatorioAndamentoView, { global: { stubs } });
+        const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
         await flushPromises();
         const vm = wrapper.vm as any;
-        
+
         // return early
         await vm.gerarRelatorio();
         expect(buscarRelatorioAndamento).not.toHaveBeenCalled();
@@ -130,7 +130,7 @@ describe('RelatorioAndamentoView', () => {
     });
 
     it('cobre exportarPdf com e sem erro', async () => {
-        const wrapper = mount(RelatorioAndamentoView, { global: { stubs } });
+        const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
         await flushPromises();
         const vm = wrapper.vm as any;
 

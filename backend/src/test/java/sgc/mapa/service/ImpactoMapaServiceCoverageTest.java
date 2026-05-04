@@ -24,6 +24,12 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 class ImpactoMapaServiceCoverageTest {
     @InjectMocks
     private ImpactoMapaService target;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private SgcPermissionEvaluator permissionEvaluator;
+    @Mock
+    private UsuarioFacade usuarioFacade;
 
     private Subprocesso criarSubprocesso() {
         Subprocesso sp = new Subprocesso();
@@ -32,10 +38,6 @@ class ImpactoMapaServiceCoverageTest {
         sp.setProcesso(p);
         return sp;
     }
-
-    @Mock private MapaRepo mapaRepo;
-    @Mock private SgcPermissionEvaluator permissionEvaluator;
-    @Mock private UsuarioFacade usuarioFacade;
 
     @Test
     @DisplayName("verificarImpactos deve lançar ErroAcessoNegado quando sem permissão")
@@ -54,14 +56,14 @@ class ImpactoMapaServiceCoverageTest {
     void verificarImpactosSemMapaVigente() {
         Usuario user = new Usuario();
         user.setPerfilAtivo(Perfil.ADMIN);
-        
+
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        
+
         Subprocesso sp = criarSubprocesso();
         sp.setUnidade(u);
         sp.setSituacaoForcada(NAO_INICIADO);
-        
+
         when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.empty());
@@ -75,15 +77,15 @@ class ImpactoMapaServiceCoverageTest {
     void verificarImpactosSemMapaSubprocesso() {
         Usuario user = new Usuario();
         user.setPerfilAtivo(Perfil.ADMIN);
-        
+
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        
+
         Subprocesso sp = criarSubprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u);
         sp.setSituacaoForcada(NAO_INICIADO);
-        
+
         when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new Mapa()));
@@ -91,6 +93,57 @@ class ImpactoMapaServiceCoverageTest {
 
         assertThatThrownBy(() -> target.verificarImpactos(sp))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("detectarAlteradas - deve considerar atividades com conhecimentos diferentes")
+    void detectarAlteradasDiferentes() {
+        Atividade v = new Atividade();
+        v.setCodigo(1L);
+        v.setDescricao("A1");
+        Conhecimento c1 = new Conhecimento();
+        c1.setDescricao("C1");
+        v.setConhecimentos(Set.of(c1));
+
+        Atividade a = new Atividade();
+        a.setCodigo(2L);
+        a.setDescricao("A1");
+        Conhecimento c2 = new Conhecimento();
+        c2.setDescricao("C2");
+        a.setConhecimentos(Set.of(c2));
+
+        Map<String, Atividade> vigentesMap = Map.of("A1", v);
+        List<AtividadeImpactadaDto> res = ReflectionTestUtils.invokeMethod(target, "detectarAlteradas", List.of(a), vigentesMap, Map.of());
+
+        assertThat(res).hasSize(1);
+        assertThat(res.getFirst().tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA);
+    }
+
+    @Test
+    @DisplayName("conhecimentosDiferentes - casos de borda")
+    void conhecimentosDiferentesBorda() {
+        Boolean res1 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(), List.of());
+        assertThat(res1).isNotNull().isFalse();
+
+        Conhecimento c1 = new Conhecimento();
+        c1.setDescricao("C1");
+        Conhecimento c2 = new Conhecimento();
+        c2.setDescricao("C2");
+
+        Boolean res2 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c1, c2));
+        assertThat(res2).isNotNull().isTrue();
+
+        Boolean res3 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c2));
+        assertThat(res3).isNotNull().isTrue();
+    }
+
+    @Test
+    @DisplayName("construirMapaAtividadeCompetencias - ignora competências sem atividades")
+    void construirMapaSemAtividades() {
+        Competencia comp = new Competencia();
+        comp.setAtividades(Set.of());
+        Map<Long, List<Competencia>> res = ReflectionTestUtils.invokeMethod(target, "construirMapaAtividadeCompetencias", List.of(comp));
+        assertThat(res).isEmpty();
     }
 
     @Nested
@@ -137,54 +190,5 @@ class ImpactoMapaServiceCoverageTest {
 
             assertThat(target.podeVisualizarImpactos(sp)).isEqualTo(expected);
         }
-    }
-
-    @Test
-    @DisplayName("detectarAlteradas - deve considerar atividades com conhecimentos diferentes")
-    void detectarAlteradasDiferentes() {
-        Atividade v = new Atividade();
-        v.setCodigo(1L);
-        v.setDescricao("A1");
-        Conhecimento c1 = new Conhecimento();
-        c1.setDescricao("C1");
-        v.setConhecimentos(Set.of(c1));
-
-        Atividade a = new Atividade();
-        a.setCodigo(2L);
-        a.setDescricao("A1");
-        Conhecimento c2 = new Conhecimento();
-        c2.setDescricao("C2");
-        a.setConhecimentos(Set.of(c2));
-
-        Map<String, Atividade> vigentesMap = Map.of("A1", v);
-        List<AtividadeImpactadaDto> res = ReflectionTestUtils.invokeMethod(target, "detectarAlteradas", List.of(a), vigentesMap, Map.of());
-        
-        assertThat(res).hasSize(1);
-        assertThat(res.getFirst().tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA);
-    }
-
-    @Test
-    @DisplayName("conhecimentosDiferentes - casos de borda")
-    void conhecimentosDiferentesBorda() {
-        Boolean res1 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(), List.of());
-        assertThat(res1).isNotNull().isFalse();
-
-        Conhecimento c1 = new Conhecimento(); c1.setDescricao("C1");
-        Conhecimento c2 = new Conhecimento(); c2.setDescricao("C2");
-
-        Boolean res2 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c1, c2));
-        assertThat(res2).isNotNull().isTrue();
-
-        Boolean res3 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c2));
-        assertThat(res3).isNotNull().isTrue();
-    }
-
-    @Test
-    @DisplayName("construirMapaAtividadeCompetencias - ignora competências sem atividades")
-    void construirMapaSemAtividades() {
-        Competencia comp = new Competencia();
-        comp.setAtividades(Set.of());
-        Map<Long, List<Competencia>> res = ReflectionTestUtils.invokeMethod(target, "construirMapaAtividadeCompetencias", List.of(comp));
-        assertThat(res).isEmpty();
     }
 }

@@ -79,8 +79,8 @@ function parseJsonSeguro(conteudo, fallback = {}) {
 async function consolidarJUnit(diretorioRelatorio) {
     const entries = await fs.readdir(diretorioRelatorio, {withFileTypes: true}).catch(() => []);
     const arquivos = entries.filter(e => e.isFile() && e.name.endsWith(".xml")).map(e => path.join(diretorioRelatorio, e.name));
-    
-    const totais = { testes: 0, falhas: 0, ignorados: 0, tempoSegundos: 0 };
+
+    const totais = {testes: 0, falhas: 0, ignorados: 0, tempoSegundos: 0};
     for (const arquivo of arquivos) {
         const conteudo = await fs.readFile(arquivo, "utf-8");
         totais.testes += Number(conteudo.match(/tests="(\d+)"/)?.[1] ?? 0);
@@ -96,7 +96,11 @@ async function consolidarJUnit(diretorioRelatorio) {
 const ADAPTADORES = {
     async backendUnitario() {
         const execucao = criarExecucao("backend-unitario", "Backend unitario", "teste", "./gradlew :backend:unitTest", "backend");
-        const saida = await executarComando({comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew", args: [":backend:unitTest"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew",
+            args: [":backend:unitTest"],
+            cwd: DIRETORIO_RAIZ
+        });
         const relatorio = await consolidarJUnit(path.join(DIRETORIO_RAIZ, "backend", "build", "test-results", "unitTest"));
         execucao.status = saida.code === 0 && relatorio.falhas === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -106,7 +110,11 @@ const ADAPTADORES = {
     },
     async backendIntegracao() {
         const execucao = criarExecucao("backend-integracao", "Backend integracao", "teste", "./gradlew :backend:integrationTest", "backend");
-        const saida = await executarComando({comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew", args: [":backend:integrationTest"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew",
+            args: [":backend:integrationTest"],
+            cwd: DIRETORIO_RAIZ
+        });
         const relatorio = await consolidarJUnit(path.join(DIRETORIO_RAIZ, "backend", "build", "test-results", "integrationTest"));
         execucao.status = saida.code === 0 && relatorio.falhas === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -116,7 +124,11 @@ const ADAPTADORES = {
     },
     async backendCobertura() {
         const execucao = criarExecucao("backend-cobertura", "Backend cobertura", "cobertura", "./gradlew :backend:jacocoTestReport", "backend");
-        const saida = await executarComando({comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew", args: [":backend:jacocoTestReport"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew",
+            args: [":backend:jacocoTestReport"],
+            cwd: DIRETORIO_RAIZ
+        });
         const cobertura = await extrairCoberturaJacoco();
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -126,7 +138,11 @@ const ADAPTADORES = {
     },
     async frontendCobertura() {
         const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "pnpm -C frontend run coverage:unit:collect", "frontend");
-        const saida = await executarComando({comando: "pnpm", args: ["-C", "frontend", "run", "coverage:unit:collect"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: "pnpm",
+            args: ["-C", "frontend", "run", "coverage:unit:collect"],
+            cwd: DIRETORIO_RAIZ
+        });
         const cobertura = await extrairCoberturaFrontend();
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -136,7 +152,11 @@ const ADAPTADORES = {
     },
     async frontendLint() {
         const execucao = criarExecucao("frontend-lint", "Frontend lint", "qualidade", "npx eslint .", "frontend");
-        const saida = await executarComando({comando: "npx", args: ["eslint", ".", "--max-warnings", "0"], cwd: path.join(DIRETORIO_RAIZ, "frontend")});
+        const saida = await executarComando({
+            comando: "npx",
+            args: ["eslint", ".", "--max-warnings", "0"],
+            cwd: path.join(DIRETORIO_RAIZ, "frontend")
+        });
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
         execucao.sumario = saida.code === 0 ? "Lint sem problemas." : "Problemas de lint encontrados.";
@@ -144,7 +164,11 @@ const ADAPTADORES = {
     },
     async frontendTypecheck() {
         const execucao = criarExecucao("frontend-typecheck", "Frontend typecheck", "qualidade", "pnpm -C frontend run typecheck", "frontend");
-        const saida = await executarComando({comando: "pnpm", args: ["-C", "frontend", "run", "typecheck"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: "pnpm",
+            args: ["-C", "frontend", "run", "typecheck"],
+            cwd: DIRETORIO_RAIZ
+        });
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
         execucao.sumario = saida.code === 0 ? "Typecheck sem erros." : "Erros de tipagem encontrados.";
@@ -152,7 +176,11 @@ const ADAPTADORES = {
     },
     async frontendCruft() {
         const execucao = criarExecucao("frontend-cruft", "Frontend cruft", "qualidade", "node etc/scripts/sgc.js frontend cruft validar --json-resumido", ".");
-        const saida = await executarComando({comando: "node", args: ["etc/scripts/sgc.js", "frontend", "cruft", "validar", "--json-resumido"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: "node",
+            args: ["etc/scripts/sgc.js", "frontend", "cruft", "validar", "--json-resumido"],
+            cwd: DIRETORIO_RAIZ
+        });
         const resultado = parseJsonSeguro(saida.stdout, {});
         execucao.status = saida.code === 0 && resultado.status === "ok" ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -170,7 +198,11 @@ const ADAPTADORES = {
     },
     async frontendTestIds() {
         const execucao = criarExecucao("frontend-test-ids", "Frontend Test IDs", "qualidade", "node etc/scripts/sgc.js frontend test-ids listar-duplicados", ".");
-        const saida = await executarComando({comando: "node", args: ["etc/scripts/sgc.js", "frontend", "test-ids", "listar-duplicados"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: "node",
+            args: ["etc/scripts/sgc.js", "frontend", "test-ids", "listar-duplicados"],
+            cwd: DIRETORIO_RAIZ
+        });
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
         execucao.sumario = saida.code === 0 ? "Nenhum test-id duplicado." : "Test-ids duplicados encontrados.";
@@ -178,7 +210,11 @@ const ADAPTADORES = {
     },
     async sincroniaValidacoes() {
         const execucao = criarExecucao("sincronia-validacoes", "Sincronia de Validações", "qualidade", "node etc/scripts/sgc.js frontend validacoes auditar", ".");
-        const saida = await executarComando({comando: "node", args: ["etc/scripts/sgc.js", "frontend", "validacoes", "auditar"], cwd: DIRETORIO_RAIZ});
+        const saida = await executarComando({
+            comando: "node",
+            args: ["etc/scripts/sgc.js", "frontend", "validacoes", "auditar"],
+            cwd: DIRETORIO_RAIZ
+        });
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
         execucao.sumario = saida.code === 0 ? "Auditoria de validações concluída." : "Divergências de validação encontradas.";
@@ -186,7 +222,12 @@ const ADAPTADORES = {
     },
     async e2ePlaywright() {
         const execucao = criarExecucao("e2e-playwright", "E2E Playwright", "teste", "npx playwright test", ".");
-        const saida = await executarComando({comando: "npx", args: ["playwright", "test", "--reporter=json"], cwd: DIRETORIO_RAIZ, env: {CI: "1"}});
+        const saida = await executarComando({
+            comando: "npx",
+            args: ["playwright", "test", "--reporter=json"],
+            cwd: DIRETORIO_RAIZ,
+            env: {CI: "1"}
+        });
         const stats = JSON.parse(saida.stdout || "{}").stats || {};
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
         execucao.duracaoMs = saida.duracaoMs;
@@ -199,7 +240,7 @@ const ADAPTADORES = {
 async function coletarGit() {
     const branch = (await execa("git", ["rev-parse", "--abbrev-ref", "HEAD"])).stdout.trim();
     const commit = (await execa("git", ["rev-parse", "HEAD"])).stdout.trim();
-    return { branch, commit };
+    return {branch, commit};
 }
 
 async function main() {

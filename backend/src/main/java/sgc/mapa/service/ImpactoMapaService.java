@@ -183,6 +183,7 @@ public class ImpactoMapaService {
         }
         return removidas;
     }
+
     private List<AtividadeImpactadaDto> detectarAlteradas(
             List<Atividade> atuais,
             Map<String, Atividade> vigentesMap,
@@ -210,15 +211,15 @@ public class ImpactoMapaService {
                     List<String> removidos = descVigentes.stream().filter(d -> !descAtuais.contains(d)).toList();
 
                     alteradas.add(AtividadeImpactadaDto.builder()
-                                    .codigo(atual.getCodigo())
-                                    .descricao(atual.getDescricao())
-                                    .tipoImpacto(TipoImpactoAtividade.ALTERADA)
-                                    .descricaoAnterior(vigente.getDescricao())
-                                    .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
-                                    .conhecimentosAdicionados(adicionados)
-                                    .conhecimentosRemovidos(removidos)
-                                    .competenciasVinculadas(obterNomesCompetencias(vigente.getCodigo(), codAtividadeParaCompetenciasVigentes))
-                                    .build());
+                            .codigo(atual.getCodigo())
+                            .descricao(atual.getDescricao())
+                            .tipoImpacto(TipoImpactoAtividade.ALTERADA)
+                            .descricaoAnterior(vigente.getDescricao())
+                            .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
+                            .conhecimentosAdicionados(adicionados)
+                            .conhecimentosRemovidos(removidos)
+                            .competenciasVinculadas(obterNomesCompetencias(vigente.getCodigo(), codAtividadeParaCompetenciasVigentes))
+                            .build());
                 }
             }
         }
@@ -264,7 +265,7 @@ public class ImpactoMapaService {
                             .conhecimentosRemovidos(removidos)
                             .competenciasVinculadas(obterNomesCompetencias(vigente.getCodigo(), codAtividadeParaCompetenciasVigentes))
                             .build());
-                    
+
                     descAtuaisEncontradasNoVigente.add(atual.getDescricao());
                     descVigentesEncontradasNoAtual.add(vigente.getDescricao());
                     break;
@@ -344,11 +345,11 @@ public class ImpactoMapaService {
                             adicionarImpacto(mapaImpactos, comp, "Descrição alterada para %s".formatted(dto.descricao()), TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
                         }
 
-                        dto.conhecimentosAdicionados().forEach(c -> 
-                            adicionarImpacto(mapaImpactos, comp, "Conhecimento %s adicionado".formatted(c), TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
-                        
-                        dto.conhecimentosRemovidos().forEach(c -> 
-                            adicionarImpacto(mapaImpactos, comp, "Conhecimento %s removido".formatted(c), TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
+                        dto.conhecimentosAdicionados().forEach(c ->
+                                adicionarImpacto(mapaImpactos, comp, "Conhecimento %s adicionado".formatted(c), TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
+
+                        dto.conhecimentosRemovidos().forEach(c ->
+                                adicionarImpacto(mapaImpactos, comp, "Conhecimento %s removido".formatted(c), TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
                     });
                 });
     }

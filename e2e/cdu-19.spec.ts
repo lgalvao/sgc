@@ -33,7 +33,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
                                                                                        _resetAutomatico,
                                                                                        page,
                                                                                        _autenticadoComoChefeSecao221
-}) => {
+                                                                                   }) => {
         // Cenario 1: Navegação para visualização do mapa
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await acessarDetalhesProcesso(page, descProcesso);
@@ -91,7 +91,11 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         validarProcessoFixture(processo, descProcesso);
     });
 
-    test('Cenario 1: CHEFE apresenta sugestões com sucesso', async ({_resetAutomatico, page, _autenticadoComoChefeSecao221}) => {
+    test('Cenario 1: CHEFE apresenta sugestões com sucesso', async ({
+                                                                        _resetAutomatico,
+                                                                        page,
+                                                                        _autenticadoComoChefeSecao221
+                                                                    }) => {
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await acessarDetalhesProcesso(page, descProcesso);
 
@@ -151,10 +155,10 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
     });
 
     test('Cenario 3: CHEFE reabre modal com pré-preenchimento das sugestões anteriores', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoChefeSecao221
-    }) => {
+                                                                                                    _resetAutomatico,
+                                                                                                    page,
+                                                                                                    _autenticadoComoChefeSecao221
+                                                                                                }) => {
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await acessarDetalhesProcesso(page, descProcesso);
 

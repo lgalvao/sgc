@@ -87,7 +87,7 @@ public class RelatorioFacade {
                     relatorios.size(),
                     processo.getDataLimite()
             ));
-            
+
             adicionarCartoesAndamento(document, relatorios);
         } catch (DocumentException | IOException e) {
             throw new RuntimeException("Erro ao gerar PDF", e);
@@ -200,7 +200,7 @@ public class RelatorioFacade {
     ) {
         Unidade unidade = sp.getUnidade();
         UnidadeResponsavelDto respDto = responsaveisPorUnidade.get(unidade.getCodigo());
-        
+
         String titular = respDto != null && respDto.titularNome() != null ? respDto.titularNome() : "Não designado";
         String responsavel = titular;
         if (respDto != null && respDto.substitutoNome() != null) {
@@ -208,7 +208,7 @@ public class RelatorioFacade {
         }
 
         String localizacao = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getSigla() : "-";
-        
+
         LocalDateTime ultimaMov = sp.getDataFimEtapa2() != null ? sp.getDataFimEtapa2() : (sp.getDataFimEtapa1() != null ? sp.getDataFimEtapa1() : sp.getDataLimiteEtapa1());
 
         return RelatorioAndamentoDto.builder()
@@ -253,16 +253,16 @@ public class RelatorioFacade {
         celulaTexto.addElement(criarParagrafo(NOME_SISTEMA, FONTE_SUBTITULO, 0f));
         celulaTexto.addElement(criarParagrafo(cabecalho.titulo(), FONTE_TITULO, 0f));
         celulaTexto.addElement(criarParagrafo("%s: %s".formatted(cabecalho.rotuloSubtitulo(), cabecalho.subtitulo()), FONTE_TEXTO, 0f));
-        
+
         if (cabecalho.tipoProcesso() != null) {
             String subtituloDetalhe = "TIPO: %s | UNIDADES: %d | DATA LIMITE GERAL: %s".formatted(
-                cabecalho.tipoProcesso(),
-                cabecalho.quantidadeUnidades(),
-                formatarData(cabecalho.dataLimiteGeral())
+                    cabecalho.tipoProcesso(),
+                    cabecalho.quantidadeUnidades(),
+                    formatarData(cabecalho.dataLimiteGeral())
             );
             celulaTexto.addElement(criarParagrafo(subtituloDetalhe, FONTE_TEXTO_SUAVE, 0f));
         }
-        
+
         celulaTexto.addElement(criarParagrafo("Gerado em: %s".formatted(formatarDataHora(cabecalho.dataGeracao())), FONTE_TEXTO_SUAVE, 0f));
         tabelaCabecalho.addCell(celulaTexto);
 
@@ -288,7 +288,7 @@ public class RelatorioFacade {
             Paragraph titulo = new Paragraph("▌ " + relatorio.siglaUnidade() + " - " + relatorio.nomeUnidade(), FONTE_SECAO);
             titulo.setSpacingAfter(4f);
             cardCell.addElement(titulo);
-            
+
             PdfPTable linhaDiv = new PdfPTable(1);
             linhaDiv.setWidthPercentage(100f);
             PdfPCell celDiv = new PdfPCell();
@@ -303,14 +303,14 @@ public class RelatorioFacade {
             infoGeral.addCell(criarCelulaRotuloValor("Situação:", formatarSituacaoPdf(relatorio.situacaoAtual())));
             infoGeral.addCell(criarCelulaRotuloValor("Localização:", relatorio.localizacao()));
             cardCell.addElement(infoGeral);
-            
+
             Paragraph ultMov = criarParagrafoRotuloValor("Última movimentação:", formatarDataHora(relatorio.dataUltimaMovimentacao()));
             ultMov.setSpacingAfter(10f);
             cardCell.addElement(ultMov);
 
             PdfPTable etapas = new PdfPTable(new float[]{1f, 1f});
             etapas.setWidthPercentage(100f);
-            
+
             PdfPCell celEtapa1 = new PdfPCell();
             celEtapa1.setBorder(Rectangle.NO_BORDER);
             Paragraph tituloEtapa1 = new Paragraph("ETAPA 1: CADASTRO", FONTE_TEXTO_NEGRITO);
@@ -351,7 +351,7 @@ public class RelatorioFacade {
             document.add(cartao);
         }
     }
-    
+
     private PdfPCell criarCelulaRotuloValor(String rotulo, String valor) {
         PdfPCell celula = new PdfPCell();
         celula.setBorder(Rectangle.NO_BORDER);
@@ -362,7 +362,7 @@ public class RelatorioFacade {
         celula.addElement(p);
         return celula;
     }
-    
+
     private Paragraph criarParagrafoRotuloValor(String rotulo, String valor) {
         Paragraph p = new Paragraph();
         p.setSpacingAfter(4f);

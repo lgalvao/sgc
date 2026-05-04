@@ -29,16 +29,26 @@ import static org.mockito.Mockito.*;
 @DisplayName("E2eController - Cobertura adicional")
 @SuppressWarnings("NullAway.Init")
 class E2eControllerCoverageTest {
-    @Mock private JdbcTemplate jdbcTemplate;
-    @Mock private NamedParameterJdbcTemplate namedJdbcTemplate;
-    @Mock private ProcessoService processoService;
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private MapaRepo mapaRepo;
-    @Mock private UnidadeService unidadeService;
-    @Mock private UsuarioFacade usuarioFacade;
-    @Mock private ResourceLoader resourceLoader;
-    @Mock private CacheManager cacheManager;
+    @Mock
+    private JdbcTemplate jdbcTemplate;
+    @Mock
+    private NamedParameterJdbcTemplate namedJdbcTemplate;
+    @Mock
+    private ProcessoService processoService;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private UnidadeService unidadeService;
+    @Mock
+    private UsuarioFacade usuarioFacade;
+    @Mock
+    private ResourceLoader resourceLoader;
+    @Mock
+    private CacheManager cacheManager;
 
     @InjectMocks
     private E2eController controller;

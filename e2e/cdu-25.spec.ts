@@ -16,7 +16,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     const descProcesso = `Mapeamento CDU-25 ${Date.now()}`;
 
     test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {
-        
+
         await test.step('Setup: Criar dados e realizar login', async () => {
             const processo = await criarProcessoMapaValidadoFixture(request, {
                 unidade: UNIDADE_1,
@@ -45,7 +45,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
             await expect(modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO})).toBeVisible();
             await modal.getByRole('button', {name: /Cancelar/i}).click();
-            
+
             await expect(modal).toBeHidden();
             await expect(page.getByTestId('processo-info')).toBeVisible();
         });
@@ -56,10 +56,10 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
             const modal = page.getByRole('dialog');
             await expect(modal).toBeVisible();
-            
+
             await expect(modal.getByText(TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO)).toBeVisible();
-            
-            const linhaUnidade = modal.locator('tr', { hasText: UNIDADE_1 });
+
+            const linhaUnidade = modal.locator('tr', {hasText: UNIDADE_1});
             await expect(linhaUnidade).toBeVisible();
             await expect(linhaUnidade.locator('input[type="checkbox"]')).toBeChecked();
 
@@ -71,10 +71,10 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     });
 
     test('Cenario 4: Aceite em bloco registra movimentação e alerta com data/hora', async ({
-        _resetAutomatico,
-        request,
-        page
-    }) => {
+                                                                                               _resetAutomatico,
+                                                                                               request,
+                                                                                               page
+                                                                                           }) => {
         // Reseta o banco para evitar conflito com unidade já em processo ativo dos cenários anteriores
         await resetDatabase(request);
         const descIsolada = `Mapeamento CDU-25 alerta ${Date.now()}`;

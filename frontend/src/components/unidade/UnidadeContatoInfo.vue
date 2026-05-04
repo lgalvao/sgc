@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="mt-2" :data-testid="dataTestid">
+    <p :data-testid="dataTestid" class="mt-2">
       <strong>{{ label }}</strong> {{ nomeExibido }}
     </p>
     <p v-if="contato" :class="detalhesClass">
@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from "vue";
 import type {Responsavel, Usuario} from "@/types/tipos";
 

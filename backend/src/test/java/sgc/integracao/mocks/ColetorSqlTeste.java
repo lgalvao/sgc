@@ -14,12 +14,6 @@ public class ColetorSqlTeste implements StatementInspector {
 
     private static final ThreadLocal<List<String>> SQLS = ThreadLocal.withInitial(ArrayList::new);
 
-    @Override
-    public String inspect(String sql) {
-        SQLS.get().add(sql);
-        return sql;
-    }
-
     public static void limpar() {
         SQLS.get().clear();
     }
@@ -49,5 +43,11 @@ public class ColetorSqlTeste implements StatementInspector {
 
     private static boolean contemViewOrganizacional(String sql) {
         return VIEWS_ORGANIZACIONAIS.stream().anyMatch(sql::contains);
+    }
+
+    @Override
+    public String inspect(String sql) {
+        SQLS.get().add(sql);
+        return sql;
     }
 }

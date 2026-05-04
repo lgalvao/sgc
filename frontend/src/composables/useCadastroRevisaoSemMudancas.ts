@@ -4,6 +4,7 @@ import logger from "@/utils/logger";
 
 interface FluxoRevisaoCadastro {
     iniciarRevisaoCadastro(codigoSubprocesso: number): Promise<boolean>;
+
     cancelarInicioRevisaoCadastro(codigoSubprocesso: number): Promise<boolean>;
 }
 
@@ -16,12 +17,12 @@ interface UseCadastroRevisaoSemMudancasParams {
 }
 
 export function useCadastroRevisaoSemMudancas({
-    codigoSubprocesso,
-    isRevisao,
-    situacaoAtual,
-    houveAlteracaoCadastro,
-    fluxoSubprocesso,
-}: UseCadastroRevisaoSemMudancasParams) {
+                                                  codigoSubprocesso,
+                                                  isRevisao,
+                                                  situacaoAtual,
+                                                  houveAlteracaoCadastro,
+                                                  fluxoSubprocesso,
+                                              }: UseCadastroRevisaoSemMudancasParams) {
     const disponibilizacaoSemMudancas = ref(false);
     const loadingInicioRevisao = ref(false);
 

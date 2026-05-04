@@ -1,10 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {
-    formatarDataBR,
-    formatarDataParaInput,
-    formatarDataHoraBR,
-    analisarData,
-} from "@/utils";
+import {analisarData, formatarDataBR, formatarDataHoraBR, formatarDataParaInput,} from "@/utils";
 
 describe("utilitários", () => {
     describe("analisarData", () => {

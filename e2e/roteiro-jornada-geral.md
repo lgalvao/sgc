@@ -1,6 +1,8 @@
 # Roteiro da Jornada Geral do SGC
 
-Este documento descreve uma jornada ponta a ponta do sistema, escrita para ser compreendida por pessoas técnicas e não técnicas. O objetivo é servir como base para um futuro teste e2e mais semântico, cobrindo o ciclo completo desde a criação de um processo de mapeamento até a finalização do processo correspondente de revisão.
+Este documento descreve uma jornada ponta a ponta do sistema, escrita para ser compreendida por pessoas técnicas e não
+técnicas. O objetivo é servir como base para um futuro teste e2e mais semântico, cobrindo o ciclo completo desde a
+criação de um processo de mapeamento até a finalização do processo correspondente de revisão.
 
 ## Objetivo
 
@@ -18,15 +20,19 @@ Validar que o SGC permite:
 - O roteiro privilegia o fluxo principal de negócio, sem entrar em detalhes de implementação.
 - Sempre que possível, cada passo informa também o resultado esperado.
 - Validações importantes do sistema aparecem como 'checkpoints' ao longo da jornada.
-- Fluxos alternativos importantes, mas mutuamente exclusivos com o fluxo principal, ficam listados ao final como cenários complementares.
+- Fluxos alternativos importantes, mas mutuamente exclusivos com o fluxo principal, ficam listados ao final como
+  cenários complementares.
 
 ## Premissas do cenário
 
 - O cenário adotado neste roteiro é a hierarquia `SECAO_111` -> `COORD_11` -> `SECRETARIA_1`.
 - O cadastro e a validação do mapa devem percorrer toda a hierarquia antes de chegar ao `ADMIN`.
-- O processo de revisão deve usar a mesma `SECAO_111` que acabou de concluir o mapeamento, para garantir a existência de mapa vigente.
-- Na revisão, a alteração no cadastro deve produzir impacto real no mapa. Para isso, incluir uma nova atividade ou alterar uma atividade já associada a competência, em vez de usar um caso sem impacto.
-- O fluxo deve passar por dois níveis reais de gestão antes da homologação final: primeiro `COORD_11`, depois `SECRETARIA_1`.
+- O processo de revisão deve usar a mesma `SECAO_111` que acabou de concluir o mapeamento, para garantir a existência de
+  mapa vigente.
+- Na revisão, a alteração no cadastro deve produzir impacto real no mapa. Para isso, incluir uma nova atividade ou
+  alterar uma atividade já associada a competência, em vez de usar um caso sem impacto.
+- O fluxo deve passar por dois níveis reais de gestão antes da homologação final: primeiro `COORD_11`, depois
+  `SECRETARIA_1`.
 
 ## Preparação do cenário
 
@@ -90,7 +96,8 @@ Justificativas para esta escolha:
 
 - a cadeia hierárquica está presente de forma clara no `seed`;
 - os usuários já existem e já são usados em outros testes e capturas;
-- o usuário da `SECRETARIA_1` já está mapeado para login com seleção explícita de perfil `GESTOR`, o que ajuda a tornar o cenário mais representativo;
+- o usuário da `SECRETARIA_1` já está mapeado para login com seleção explícita de perfil `GESTOR`, o que ajuda a tornar
+  o cenário mais representativo;
 - essa combinação evita depender de novos dados ou de ampliação imediata dos helpers.
 
 ## Papéis envolvidos
@@ -98,7 +105,8 @@ Justificativas para esta escolha:
 - `ADMIN_1_PERFIL`: cria processos, homologa cadastros, cria ou ajusta mapas, disponibiliza mapas e finaliza processos.
 - `CHEFE_SECAO_111`: cadastra e revisa atividades e conhecimentos da `SECAO_111`; valida o mapa disponibilizado.
 - `GESTOR_COORD`: faz a primeira análise do cadastro e da validação do mapa da `SECAO_111`, no contexto da `COORD_11`.
-- `GESTOR_SECRETARIA_1`: faz a segunda análise do cadastro e da validação do mapa, no contexto da `SECRETARIA_1`, antes da homologação final pelo `ADMIN_1_PERFIL`.
+- `GESTOR_SECRETARIA_1`: faz a segunda análise do cadastro e da validação do mapa, no contexto da `SECRETARIA_1`, antes
+  da homologação final pelo `ADMIN_1_PERFIL`.
 
 ## Roteiro principal
 
@@ -108,10 +116,12 @@ Justificativas para esta escolha:
    Resultado esperado: o processo nasce na situação `Criado`.
 
 2. O `ADMIN_1_PERFIL` inicia o processo de mapeamento.
-   Resultado esperado: o processo passa para `Em andamento` e o subprocesso da `SECAO_111` passa a existir na situação `Não iniciado`.
+   Resultado esperado: o processo passa para `Em andamento` e o subprocesso da `SECAO_111` passa a existir na situação
+   `Não iniciado`.
 
 3. O `CHEFE_SECAO_111` acessa o subprocesso da sua unidade.
-   Resultado esperado: o card `Atividades e conhecimentos` está disponível; o card `Mapa de competências` ainda não está liberado para uso normal pela `SECAO_111`.
+   Resultado esperado: o card `Atividades e conhecimentos` está disponível; o card `Mapa de competências` ainda não está
+   liberado para uso normal pela `SECAO_111`.
 
 ### Fase 2 - Cadastrar atividades e conhecimentos no mapeamento
 
@@ -128,21 +138,24 @@ Justificativas para esta escolha:
    Resultado esperado: o cadastro segue para homologação final pelo `ADMIN_1_PERFIL`.
 
 8. O `ADMIN_1_PERFIL` acessa o cadastro e faz a homologação.
-   Resultado esperado: o subprocesso muda para `Cadastro homologado` e o card `Mapa de competências` passa a ficar disponível para o `ADMIN_1_PERFIL`.
+   Resultado esperado: o subprocesso muda para `Cadastro homologado` e o card `Mapa de competências` passa a ficar
+   disponível para o `ADMIN_1_PERFIL`.
 
 Checkpoint importante desta fase:
 
 - o sistema deve impedir a disponibilização se existir atividade sem conhecimento associado;
-- o histórico e as movimentações do subprocesso devem refletir o percurso entre `SECAO_111`, `COORD_11`, `SECRETARIA_1` e `ADMIN`;
+- o histórico e as movimentações do subprocesso devem refletir o percurso entre `SECAO_111`, `COORD_11`, `SECRETARIA_1`
+  e `ADMIN`;
 - o `CHEFE_SECAO_111` não precisa executar ação de salvar manualmente.
 
 ### Fase 3 - Criar, disponibilizar e homologar o mapa do mapeamento
 
 9. O `ADMIN_1_PERFIL` abre o card `Mapa de competências` e monta o primeiro mapa da `SECAO_111`.
-   Resultado esperado: o `ADMIN_1_PERFIL` consegue criar ao menos uma competência e associá-la às atividades cadastradas.
+   Resultado esperado: o `ADMIN_1_PERFIL` consegue criar ao menos uma competência e associá-la às atividades
+   cadastradas.
 
 10. O `ADMIN_1_PERFIL` disponibiliza o mapa para validação da `SECAO_111`.
-   Resultado esperado: o subprocesso muda para `Mapa disponibilizado`.
+    Resultado esperado: o subprocesso muda para `Mapa disponibilizado`.
 
 11. O `CHEFE_SECAO_111` acessa o mapa disponibilizado e faz a validação.
     Resultado esperado: o subprocesso muda para `Mapa validado`.
@@ -168,13 +181,16 @@ Checkpoint importante desta fase:
 ### Fase 4 - Criar e iniciar o processo de revisão correspondente
 
 16. O `ADMIN_1_PERFIL` cria um novo processo do tipo `Revisão` para a mesma `SECAO_111`.
-    Resultado esperado: a criação é permitida porque a `SECAO_111` já passou por um mapeamento finalizado e possui mapa vigente.
+    Resultado esperado: a criação é permitida porque a `SECAO_111` já passou por um mapeamento finalizado e possui mapa
+    vigente.
 
 17. O `ADMIN_1_PERFIL` inicia o processo de revisão.
-    Resultado esperado: o processo passa para `Em andamento` e o subprocesso nasce com uma cópia do mapa vigente da `SECAO_111`.
+    Resultado esperado: o processo passa para `Em andamento` e o subprocesso nasce com uma cópia do mapa vigente da
+    `SECAO_111`.
 
 18. O `CHEFE_SECAO_111` acessa a revisão da `SECAO_111`.
-    Resultado esperado: a tela de `Atividades e conhecimentos` já aparece preenchida com o cadastro vigente e exibe o botão `Impactos no mapa`.
+    Resultado esperado: a tela de `Atividades e conhecimentos` já aparece preenchida com o cadastro vigente e exibe o
+    botão `Impactos no mapa`.
 
 ### Fase 5 - Revisar o cadastro e homologar a revisão do cadastro
 
@@ -187,7 +203,8 @@ Checkpoint importante desta fase:
 21. O `CHEFE_SECAO_111` disponibiliza a revisão do cadastro.
     Resultado esperado: o subprocesso muda para `Revisão do cadastro disponibilizada`.
 
-22. O `GESTOR_COORD` acessa, pela `COORD_11`, a revisão disponibilizada da `SECAO_111`, consulta os impactos e registra aceite.
+22. O `GESTOR_COORD` acessa, pela `COORD_11`, a revisão disponibilizada da `SECAO_111`, consulta os impactos e registra
+    aceite.
     Resultado esperado: a revisão segue para a `SECRETARIA_1`.
 
 23. O `GESTOR_SECRETARIA_1` acessa a revisão disponibilizada, consulta os impactos e registra novo aceite.
@@ -198,8 +215,10 @@ Checkpoint importante desta fase:
 
 Checkpoint importante desta fase:
 
-- o sistema deve impedir a disponibilização da revisão quando não houver mudança real, salvo no caso explícito de disponibilização sem mudanças;
-- o botão `Impactos no mapa` deve estar disponível para `CHEFE_SECAO_111`, `GESTOR_COORD`, `GESTOR_SECRETARIA_1` e `ADMIN_1_PERFIL` nos pontos previstos do fluxo;
+- o sistema deve impedir a disponibilização da revisão quando não houver mudança real, salvo no caso explícito de
+  disponibilização sem mudanças;
+- o botão `Impactos no mapa` deve estar disponível para `CHEFE_SECAO_111`, `GESTOR_COORD`, `GESTOR_SECRETARIA_1` e
+  `ADMIN_1_PERFIL` nos pontos previstos do fluxo;
 - a revisão não deve seguir direto para conclusão do processo se houver impacto no mapa.
 
 ### Fase 6 - Ajustar, disponibilizar e homologar o mapa revisado
@@ -208,7 +227,8 @@ Checkpoint importante desta fase:
     Resultado esperado: o impacto identificado no cadastro revisado aparece também como subsídio para o ajuste do mapa.
 
 26. O `ADMIN_1_PERFIL` ajusta o mapa para refletir o novo cadastro revisado.
-    Resultado esperado: novas atividades ficam associadas a competências e o mapa passa a representar corretamente a revisão.
+    Resultado esperado: novas atividades ficam associadas a competências e o mapa passa a representar corretamente a
+    revisão.
 
 27. O `ADMIN_1_PERFIL` disponibiliza o mapa ajustado.
     Resultado esperado: o subprocesso muda para `Mapa disponibilizado`.
@@ -228,10 +248,13 @@ Checkpoint importante desta fase:
 ### Fase 7 - Finalizar o processo de revisão
 
 32. O `ADMIN_1_PERFIL` finaliza o processo de revisão.
-    Resultado esperado: o processo passa para `Finalizado` e o mapa revisado se torna o novo mapa vigente da `SECAO_111`.
+    Resultado esperado: o processo passa para `Finalizado` e o mapa revisado se torna o novo mapa vigente da
+    `SECAO_111`.
 
-33. O `CHEFE_SECAO_111`, o `GESTOR_COORD`, o `GESTOR_SECRETARIA_1` e o `ADMIN_1_PERFIL` podem consultar o resultado final do processo.
-    Resultado esperado: o processo e o mapa final ficam acessíveis em modo de consulta, respeitando as permissões de cada perfil.
+33. O `CHEFE_SECAO_111`, o `GESTOR_COORD`, o `GESTOR_SECRETARIA_1` e o `ADMIN_1_PERFIL` podem consultar o resultado
+    final do processo.
+    Resultado esperado: o processo e o mapa final ficam acessíveis em modo de consulta, respeitando as permissões de
+    cada perfil.
 
 ## Resultado final esperado da jornada
 
@@ -240,11 +263,13 @@ Ao fim do roteiro:
 - o processo de mapeamento está `Finalizado`;
 - o processo de revisão correspondente também está `Finalizado`;
 - o mapa vigente da `SECAO_111` reflete o conteúdo revisado;
-- todas as transições principais de cadastro e mapa foram exercitadas com participação de `CHEFE_SECAO_111`, `GESTOR_COORD`, `GESTOR_SECRETARIA_1` e `ADMIN_1_PERFIL`.
+- todas as transições principais de cadastro e mapa foram exercitadas com participação de `CHEFE_SECAO_111`,
+  `GESTOR_COORD`, `GESTOR_SECRETARIA_1` e `ADMIN_1_PERFIL`.
 
 ## Lacunas atuais em relação ao teste `jornada.spec.ts`
 
-O teste atual já cobre partes importantes desta jornada, mas ainda não cobre o ciclo completo de revisão. Em especial, ainda falta consolidar de forma explícita:
+O teste atual já cobre partes importantes desta jornada, mas ainda não cobre o ciclo completo de revisão. Em especial,
+ainda falta consolidar de forma explícita:
 
 - a finalização do processo de mapeamento como pré-condição da revisão;
 - o uso de uma revisão com impacto real no mapa;
@@ -254,7 +279,8 @@ O teste atual já cobre partes importantes desta jornada, mas ainda não cobre o
 
 ## Cenários complementares importantes
 
-Os itens abaixo são relevantes para a cobertura funcional do sistema, mas não precisam fazer parte do mesmo roteiro principal:
+Os itens abaixo são relevantes para a cobertura funcional do sistema, mas não precisam fazer parte do mesmo roteiro
+principal:
 
 - devolução do cadastro por `GESTOR_COORD`, `GESTOR_SECRETARIA_1` ou `ADMIN_1_PERFIL` para ajustes;
 - apresentação de sugestões no mapa, em vez de validação direta;

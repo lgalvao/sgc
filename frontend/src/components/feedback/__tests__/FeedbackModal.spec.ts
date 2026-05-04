@@ -1,4 +1,4 @@
-import {describe, it, expect, vi, beforeEach} from 'vitest'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
 import {mount} from '@vue/test-utils'
 import FeedbackModal from '../FeedbackModal.vue'
 import {createTestingPinia} from '@pinia/testing'
@@ -57,11 +57,11 @@ describe('FeedbackModal.vue', () => {
                 stubs
             }
         })
-        
+
         const input = wrapper.find('[data-testid="feedback-nota"]')
         await input.setValue('Curto')
         await wrapper.find('form').trigger('submit')
-        
+
         expect(wrapper.text()).toContain('Descreva o problema com pelo menos 10 caracteres.')
         expect(wrapper.emitted('enviar')).toBeFalsy()
     })
@@ -74,15 +74,15 @@ describe('FeedbackModal.vue', () => {
                 stubs
             }
         })
-        
+
         await wrapper.find('[data-testid="feedback-nota"]').setValue('Esta é uma descrição longa o suficiente.')
         // Para rádio buttons em Vue, precisamos encontrar o input correto e dar set no valor do v-model manualmente se o trigger não funcionar bem
         // Mas o setValue no rádio deve funcionar se o value bater.
         const radio = wrapper.find('[data-testid="feedback-tipo-elogio"]')
         await radio.setValue(true)
-        
+
         await wrapper.find('form').trigger('submit')
-        
+
         expect(wrapper.emitted('enviar')).toBeTruthy()
         expect(wrapper.emitted('enviar')![0]).toEqual(['elogio', 'Esta é uma descrição longa o suficiente.'])
     })
@@ -96,7 +96,7 @@ describe('FeedbackModal.vue', () => {
                 stubs
             }
         })
-        
+
         await wrapper.find('[data-testid="feedback-btn-remover-captura"]').trigger('click')
         expect(wrapper.emitted('removerCaptura')).toBeTruthy()
     })
@@ -104,7 +104,7 @@ describe('FeedbackModal.vue', () => {
     it('deve abrir captura em nova aba ao clicar na imagem', async () => {
         const blob = new Blob(['test'], {type: 'image/png'})
         const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
-        
+
         const wrapper = mount(FeedbackModal, {
             props: {...defaultProps, captura: blob},
             global: {
@@ -112,7 +112,7 @@ describe('FeedbackModal.vue', () => {
                 stubs
             }
         })
-        
+
         await wrapper.find('button.btn.p-0.border-0').trigger('click')
         expect(windowOpenSpy).toHaveBeenCalledWith('blob:url', '_blank')
     })

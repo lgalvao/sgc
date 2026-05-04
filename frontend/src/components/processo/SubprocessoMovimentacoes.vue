@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BTable} from "bootstrap-vue-next";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import type {Movimentacao} from "@/types/tipos";
@@ -30,18 +30,18 @@ function rowAttrMovimentacao(item: Movimentacao | null) {
         :tbody-tr-props="rowAttrMovimentacao"
         data-testid="tbl-movimentacoes"
         primary-key="codigo"
-        small
         responsive
         show-empty
+        small
         stacked="md"
     >
       <template #empty>
         <EmptyState
+            :description="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TEXTO"
+            :title="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TITULO"
             class="mb-0"
             data-testid="empty-state-movimentacoes"
-            :description="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TEXTO"
             icon="bi-arrow-left-right"
-            :title="TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TITULO"
         />
       </template>
       <template #cell(dataHora)="data">

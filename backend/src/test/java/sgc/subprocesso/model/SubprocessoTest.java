@@ -70,24 +70,24 @@ class SubprocessoTest {
     }
 
     @Test
-        @DisplayName("Deve permitir mudar situação se processo for nulo")
-        void devePermitirMudarSituacaoSeProcessoNulo() {
-            Subprocesso sp = new Subprocesso();
-            ReflectionTestUtils.setField(sp, "processo", null);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        }
+    @DisplayName("Deve permitir mudar situação se processo for nulo")
+    void devePermitirMudarSituacaoSeProcessoNulo() {
+        Subprocesso sp = new Subprocesso();
+        ReflectionTestUtils.setField(sp, "processo", null);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
 
     @Test
     @DisplayName("Deve permitir mudar situação se situação atual for nula")
-        void devePermitirMudarSituacaoSeSituacaoAtualNula() {
-            Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(p);
-            ReflectionTestUtils.setField(sp, "situacao", null);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        }
+    void devePermitirMudarSituacaoSeSituacaoAtualNula() {
+        Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(p);
+        ReflectionTestUtils.setField(sp, "situacao", null);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
 
     @Test
     @DisplayName("Deve permitir mudar situação se for a mesma")

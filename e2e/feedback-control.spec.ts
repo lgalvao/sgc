@@ -11,7 +11,7 @@ test.describe('Feedback Control - Widget de Feedback UAT', () => {
 
     test('Deve abrir o modal ao clicar no botão de feedback', async ({page}) => {
         await page.getByTestId('feedback-btn').click();
-        
+
         await expect(page.getByTestId('feedback-modal')).toBeVisible();
         await expect(page.getByTestId('feedback-modal-title')).toBeVisible();
         await expect(page.getByTestId('feedback-nota')).toBeVisible();
@@ -19,10 +19,10 @@ test.describe('Feedback Control - Widget de Feedback UAT', () => {
 
     test('Deve validar nota mínima de 10 caracteres', async ({page}) => {
         await page.getByTestId('feedback-btn').click();
-        
+
         await page.getByTestId('feedback-nota').fill('curto');
         await page.getByTestId('feedback-btn-enviar').click();
-        
+
         await expect(page.locator('.invalid-feedback')).toContainText('Descreva o problema com pelo menos 10 caracteres.');
     });
 
@@ -41,7 +41,7 @@ test.describe('Feedback Control - Widget de Feedback UAT', () => {
     test('Deve permitir remover captura antes de enviar', async ({page}) => {
         await page.getByTestId('feedback-btn').click();
         await expect(page.getByTestId('feedback-thumbnail')).toBeVisible();
-        
+
         await page.getByTestId('feedback-btn-remover-captura').click();
         await expect(page.getByTestId('feedback-thumbnail')).toBeHidden();
 

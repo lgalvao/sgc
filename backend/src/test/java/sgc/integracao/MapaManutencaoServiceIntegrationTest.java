@@ -25,6 +25,24 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
+    private Subprocesso criarSubprocessoSemMapa() {
+        Processo processo = processoRepo.saveAndFlush(Processo.builder()
+                .descricao("Processo temporário mapa manutenção")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(10))
+                .build());
+
+        Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
+
+        return subprocessoRepo.saveAndFlush(Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(5))
+                .build());
+    }
+
     @Nested
     @DisplayName("Cenários de Leitura (Atividade e Mapa)")
     class LeituraTests {
@@ -256,23 +274,5 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             assertThat(service.conhecimentosCodigoAtividade(atividade.getCodigo())).isEmpty();
         }
-    }
-
-    private Subprocesso criarSubprocessoSemMapa() {
-        Processo processo = processoRepo.saveAndFlush(Processo.builder()
-                .descricao("Processo temporário mapa manutenção")
-                .tipo(TipoProcesso.MAPEAMENTO)
-                .situacao(SituacaoProcesso.EM_ANDAMENTO)
-                .dataLimite(LocalDateTime.now().plusDays(10))
-                .build());
-
-        Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
-
-        return subprocessoRepo.saveAndFlush(Subprocesso.builder()
-                .processo(processo)
-                .unidade(unidade)
-                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
-                .dataLimiteEtapa1(LocalDateTime.now().plusDays(5))
-                .build());
     }
 }

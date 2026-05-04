@@ -138,7 +138,7 @@ class LimitadorTentativasLoginTest {
 
         // O cache deve continuar com o tamanho limite
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
-        
+
         // Verifica se o Ip0 (mais antigo) foi removido
         // (Ao verificar IpNovo, Ip0 foi removido. Se verificarmos Ip0 agora, ele deve ser adicionado novamente sem erro)
         assertDoesNotThrow(() -> limitadorTeste.verificar("Ip0"));

@@ -102,7 +102,7 @@ class UsuarioFacadeTest {
             Authentication auth = mock(AnonymousAuthenticationToken.class);
             when(auth.isAuthenticated()).thenReturn(true);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            
+
             assertThatThrownBy(() -> facade.usuarioAutenticado())
                     .isInstanceOf(ErroAcessoNegado.class);
             SecurityContextHolder.clearContext();
@@ -234,14 +234,14 @@ class UsuarioFacadeTest {
             String titulo = "123";
             Usuario user = criarUsuario(titulo);
             when(usuarioService.buscar(titulo)).thenReturn(user);
-            
+
             when(usuarioService.buscarAutorizacoesPerfil(titulo)).thenReturn(List.of(
                     new UsuarioPerfilAutorizacaoLeitura(titulo, Perfil.CHEFE, 1L, "U1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA),
                     new UsuarioPerfilAutorizacaoLeitura(titulo, Perfil.GESTOR, 2L, "U2", "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.INATIVA)
             ));
-            
+
             List<PerfilDto> result = facade.buscarPerfisUsuario(titulo);
-            
+
             assertThat(result).hasSize(1);
             assertThat(result.getFirst().unidadeCodigo()).isEqualTo(1L);
         }

@@ -47,8 +47,8 @@
     <BAlert
         v-if="erroUnidades"
         :model-value="true"
-        variant="danger"
         dismissible
+        variant="danger"
         @dismissed="clearError()"
     >
       {{ erroUnidades.message }}
@@ -74,8 +74,8 @@
     <EmptyState
         v-else
         :description="TEXTOS.unidades.EMPTY_DESCRIPTION"
-        icon="bi-diagram-3"
         :title="TEXTOS.unidades.EMPTY_TITLE"
+        icon="bi-diagram-3"
     >
       <BButton
           data-testid="btn-unidades-recarregar"
@@ -135,8 +135,8 @@ const erroUnidades = computed(() =>
 const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
 const resumoDiagnostico = computed(() =>
     erroDiagnosticoOrganizacional.value
-        ?? diagnosticoOrganizacional.value?.resumo
-        ?? ""
+    ?? diagnosticoOrganizacional.value?.resumo
+    ?? ""
 );
 const alertaDiagnosticoDispensado = ref(false);
 const exibirAlertaDiagnostico = computed(() =>

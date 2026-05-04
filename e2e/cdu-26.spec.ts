@@ -35,7 +35,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         validarProcessoFixture(processo, descProcesso);
     });
 
-    test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({
+                                                                                 _resetAutomatico,
+                                                                                 page,
+                                                                                 _autenticadoComoAdmin
+                                                                             }) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 
@@ -44,7 +48,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await expect(btnHomologar).toBeEnabled();
     });
 
-    test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({
+                                                                                   _resetAutomatico,
+                                                                                   page,
+                                                                                   _autenticadoComoAdmin
+                                                                               }) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
@@ -62,7 +70,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await modal.getByRole('button', {name: /Cancelar/i}).click();
     });
 
-    test('Cenario 3: Cancelar homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 3: Cancelar homologação de mapa em bloco', async ({
+                                                                        _resetAutomatico,
+                                                                        page,
+                                                                        _autenticadoComoAdmin
+                                                                    }) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
@@ -78,7 +90,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await expect(page.getByTestId('processo-info')).toBeVisible();
     });
 
-    test('Cenario 4: ADMIN confirma homologação em bloco e é redirecionado ao painel', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 4: ADMIN confirma homologação em bloco e é redirecionado ao painel', async ({
+                                                                                                  _resetAutomatico,
+                                                                                                  page,
+                                                                                                  _autenticadoComoAdmin
+                                                                                              }) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
         const btnHomologar = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
@@ -102,11 +118,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 5: Homologação em bloco registra movimentação com data/hora e origem/destino ADMIN', async ({
-                                                                                                                   _resetAutomatico,
-                                                                                                                   request,
-                                                                                                                   page,
-                                                                                                                   _autenticadoComoAdmin
-}) => {
+                                                                                                                  _resetAutomatico,
+                                                                                                                  request,
+                                                                                                                  page,
+                                                                                                                  _autenticadoComoAdmin
+                                                                                                              }) => {
         const descricaoIsolada = `Mapeamento CDU-26 mov ${Date.now()}`;
         const unidadeIsolada = 'SECRETARIA_1';
         const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
@@ -140,11 +156,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 6: Homologação em bloco registra alerta com data/hora para unidade do subprocesso', async ({
-        _resetAutomatico,
-        request,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                                 _resetAutomatico,
+                                                                                                                 request,
+                                                                                                                 page,
+                                                                                                                 _autenticadoComoAdmin
+                                                                                                             }) => {
         const descIsolada = `Mapeamento CDU-26 alerta ${Date.now()}`;
         const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
             descricao: descIsolada,

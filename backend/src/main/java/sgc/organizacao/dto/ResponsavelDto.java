@@ -10,4 +10,5 @@ public record ResponsavelDto(
         String tipo,
         LocalDateTime dataInicio,
         LocalDateTime dataFim
-) {}
+) {
+}

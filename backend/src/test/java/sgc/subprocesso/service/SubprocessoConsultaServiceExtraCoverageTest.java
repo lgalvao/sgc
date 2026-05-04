@@ -489,13 +489,15 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         void obterPermissoesUI_GestorSubordinada() {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            Unidade uAlvo = new Unidade(); uAlvo.setCodigo(10L);
+            Unidade uAlvo = new Unidade();
+            uAlvo.setCodigo(10L);
             sp.setUnidade(uAlvo);
 
             Usuario user = criarUsuarioMock();
             user.setUnidadeAtivaCodigo(20L);
             user.setPerfilAtivo(Perfil.GESTOR);
-            Unidade uGestor = new Unidade(); uGestor.setCodigo(20L);
+            Unidade uGestor = new Unidade();
+            uGestor.setCodigo(20L);
 
             when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(uGestor);
             when(hierarquiaService.ehMesmaOuSubordinada(uAlvo, uGestor)).thenReturn(true);
@@ -511,13 +513,15 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         void obterPermissoesUI_ServidorDiferente() {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            Unidade uAlvo = new Unidade(); uAlvo.setCodigo(10L);
+            Unidade uAlvo = new Unidade();
+            uAlvo.setCodigo(10L);
             sp.setUnidade(uAlvo);
 
             Usuario user = criarUsuarioMock();
             user.setUnidadeAtivaCodigo(20L);
             user.setPerfilAtivo(Perfil.SERVIDOR);
-            Unidade uUser = new Unidade(); uUser.setCodigo(20L);
+            Unidade uUser = new Unidade();
+            uUser.setCodigo(20L);
 
             when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(uUser);
             stubUltimaMovimentacaoNaUnidade(sp);
@@ -532,16 +536,20 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         void obterPermissoesUI_SituacoesRevisaoVisualizacao() {
             Subprocesso sp = criarSubprocessoComMapa(1L, TipoProcesso.REVISAO);
             sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
-            Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            sp.setUnidade(u);
 
-            Usuario user = criarUsuarioMock(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
+            Usuario user = criarUsuarioMock();
+            user.setPerfilAtivo(Perfil.ADMIN);
+            user.setUnidadeAtivaCodigo(10L);
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
 
             stubContextoAutenticado(user);
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp);
             assertTrue(res.habilitarAcessoCadastro()); // branch 685 (REVISAO)
-            
+
             sp.setSituacaoForcada(REVISAO_MAPA_DISPONIBILIZADO);
             res = consultaService.obterPermissoesUI(sp);
             assertTrue(res.habilitarAcessoMapa()); // branch 695 (REVISAO)
@@ -551,8 +559,12 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         @DisplayName("obterPermissoesUI podeDisponibilizarMapa varied situations")
         void obterPermissoesUI_PodeDisponibilizarMapa() {
             Subprocesso sp = criarSubprocessoComMapa(1L);
-            Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
-            Usuario user = criarUsuarioMock(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            sp.setUnidade(u);
+            Usuario user = criarUsuarioMock();
+            user.setPerfilAtivo(Perfil.ADMIN);
+            user.setUnidadeAtivaCodigo(10L);
             when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
             stubContextoAutenticado(user);
@@ -569,7 +581,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         void obterPermissoesUI_ChefeAnalise() {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            sp.setUnidade(u);
 
             Usuario user = criarUsuarioMock();
             user.setPerfilAtivo(Perfil.CHEFE);
@@ -667,9 +681,11 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         @Test
         @DisplayName("listarHistoricoValidacao filtra analises de validacao")
         void listarHistoricoValidacaoFiltraAnalises() {
-            Analise a1 = new Analise(); a1.setTipo(TipoAnalise.CADASTRO);
+            Analise a1 = new Analise();
+            a1.setTipo(TipoAnalise.CADASTRO);
             a1.setUnidadeCodigo(10L);
-            Analise a2 = new Analise(); a2.setTipo(TipoAnalise.VALIDACAO);
+            Analise a2 = new Analise();
+            a2.setTipo(TipoAnalise.VALIDACAO);
             a2.setUnidadeCodigo(10L);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
@@ -682,8 +698,12 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         @Test
         @DisplayName("listarHistoricoCadastro e Validacao")
         void listarHistoricos() {
-            Analise a1 = new Analise(); a1.setTipo(TipoAnalise.CADASTRO); a1.setUnidadeCodigo(10L);
-            Analise a2 = new Analise(); a2.setTipo(TipoAnalise.VALIDACAO); a2.setUnidadeCodigo(10L);
+            Analise a1 = new Analise();
+            a1.setTipo(TipoAnalise.CADASTRO);
+            a1.setUnidadeCodigo(10L);
+            Analise a2 = new Analise();
+            a2.setTipo(TipoAnalise.VALIDACAO);
+            a2.setUnidadeCodigo(10L);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
                     new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
@@ -701,9 +721,10 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         @DisplayName("obterLocalizacaoAtual - varios branches")
         void obterLocalizacaoAtual_Branches() {
             Subprocesso sp = new Subprocesso();
-            Unidade u = new Unidade(); sp.setUnidade(u);
+            Unidade u = new Unidade();
+            sp.setUnidade(u);
             sp.setSituacaoForcada(NAO_INICIADO);
-            
+
             // Branch: localização resolvida para a própria unidade
             assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
 
@@ -728,7 +749,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         @DisplayName("obterLocalizacaoAtual deve falhar para subprocesso persistido sem movimentação fora de NAO_INICIADO")
         void obterLocalizacaoAtual_DeveFalharSemMovimentacaoForaEstadoInicial() {
             Subprocesso sp = new Subprocesso();
-            Unidade u = new Unidade(); sp.setUnidade(u);
+            Unidade u = new Unidade();
+            sp.setUnidade(u);
             sp.setCodigo(1L);
             sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 

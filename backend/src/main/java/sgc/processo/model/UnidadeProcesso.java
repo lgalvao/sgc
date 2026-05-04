@@ -87,18 +87,18 @@ public class UnidadeProcesso implements Serializable {
         return codigo != null ? codigo.getUnidadeCodigo() : null;
     }
 
+    public void setUnidadeCodigo(Long unidadeCodigo) {
+        if (codigo == null) {
+            codigo = new UnidadeProcessoId();
+        }
+        codigo.setUnidadeCodigo(unidadeCodigo);
+    }
+
     public Long getUnidadeCodigoPersistido() {
         Long unidadeCodigo = getUnidadeCodigo();
         if (unidadeCodigo == null) {
             throw new IllegalStateException("Snapshot de unidade sem codigo persistido");
         }
         return unidadeCodigo;
-    }
-
-    public void setUnidadeCodigo(Long unidadeCodigo) {
-        if (codigo == null) {
-            codigo = new UnidadeProcessoId();
-        }
-        codigo.setUnidadeCodigo(unidadeCodigo);
     }
 }

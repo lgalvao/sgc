@@ -8,10 +8,10 @@
       <BFormInput
           ref="inputRef"
           v-model="modelValue"
-          aria-required="true"
           :disabled="loading"
           :state="estadoInput"
           aria-label="Nova atividade"
+          aria-required="true"
           data-testid="inp-nova-atividade"
           placeholder="Nova atividade"
           type="text"

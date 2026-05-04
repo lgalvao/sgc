@@ -10,20 +10,20 @@ describe("notificacaoService", () => {
     });
 
     it("listarNotificacoesAdmin deve chamar endpoint administrativo", async () => {
-        const dados = [{ codigo: 1, destinatario: "teste@teste.com", situacao: "PENDENTE" }];
-        vi.mocked(apiClient.get).mockResolvedValue({ data: dados });
+        const dados = [{codigo: 1, destinatario: "teste@teste.com", situacao: "PENDENTE"}];
+        vi.mocked(apiClient.get).mockResolvedValue({data: dados});
 
         const resultado = await service.listarNotificacoesAdmin(20);
 
         expect(apiClient.get).toHaveBeenCalledWith("/admin/notificacoes/listar", {
-            params: { limite: 20 }
+            params: {limite: 20}
         });
         expect(resultado).toEqual(dados);
     });
 
     it("reenviarNotificacao deve chamar endpoint de reenvio por código", async () => {
-        const resposta = { codigo: 123, reenfileiradas: 1 };
-        vi.mocked(apiClient.post).mockResolvedValue({ data: resposta });
+        const resposta = {codigo: 123, reenfileiradas: 1};
+        vi.mocked(apiClient.post).mockResolvedValue({data: resposta});
 
         const resultado = await service.reenviarNotificacao(123);
 

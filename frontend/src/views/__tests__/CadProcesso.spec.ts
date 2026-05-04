@@ -83,7 +83,7 @@ const ProcessoFormFieldsStub = {
     }
 };
 
-function criarErroApi(mensagem: string, erros: Array<{campo?: string | null; mensagem?: string}> = []) {
+function criarErroApi(mensagem: string, erros: Array<{ campo?: string | null; mensagem?: string }> = []) {
     return {
         isAxiosError: true,
         response: {
@@ -131,7 +131,10 @@ describe('ProcessoCadastroView.vue', () => {
                     },
                     BFormCheckbox: {template: '<input type="checkbox" />', props: ['modelValue']},
                     BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
-                    BAlert: {template: '<div v-if="modelValue" class="alert"><slot /></div>', props: ['modelValue', 'variant', 'dismissible']},
+                    BAlert: {
+                        template: '<div v-if="modelValue" class="alert"><slot /></div>',
+                        props: ['modelValue', 'variant', 'dismissible']
+                    },
                     BSpinner: {template: '<span>Loading...</span>'},
                     PageHeader: true,
                     LoadingButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
@@ -165,8 +168,15 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('loads process details when codProcesso is present in query', async () => {
         mockRoute.query = {codProcesso: '123'};
-        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', situacao: 'CRIADO', unidades: []};
-        
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2024-12-31',
+            situacao: 'CRIADO',
+            unidades: []
+        };
+
         const {wrapper} = createWrapper({
             perfil: {permissoes: permissoesAdmin},
             processos: {processoDetalhe: mockProcesso}
@@ -206,7 +216,14 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('updates existing process successfully', async () => {
         mockRoute.query = {codProcesso: '123'};
-        const mockProcesso = {codigo: 123, descricao: 'P1', tipo: 'MAPEAMENTO', dataLimite: '2099-12-31T00:00:00', situacao: 'CRIADO', unidades: [{codUnidade: 1}]};
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2099-12-31T00:00:00',
+            situacao: 'CRIADO',
+            unidades: [{codUnidade: 1}]
+        };
         unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
             {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
         ]);
@@ -319,7 +336,8 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('shows loading spinner when units are loading', async () => {
-        unidadeStoreMock.garantirArvoreElegibilidade.mockReturnValueOnce(new Promise(() => {}));
+        unidadeStoreMock.garantirArvoreElegibilidade.mockReturnValueOnce(new Promise(() => {
+        }));
         const {wrapper} = createWrapper();
         wrapper.vm.tipo = 'MAPEAMENTO';
         await nextTick();
@@ -336,10 +354,17 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('handles confirmRemove correctly', async () => {
         mockRoute.query = {codProcesso: '123'};
-        const mockProcesso = {codigo: 123, descricao: 'P1', situacao: 'CRIADO', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: []};
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            situacao: 'CRIADO',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2024-12-31',
+            unidades: []
+        };
         const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
         await flushPromises();
-        
+
         vi.mocked(processoService.excluirProcesso).mockResolvedValue({} as any);
 
         await wrapper.vm.confirmarRemocao();
@@ -351,10 +376,17 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('handles startProcess correctly', async () => {
         mockRoute.query = {codProcesso: '123'};
-        const mockProcesso = {codigo: 123, descricao: 'P1', situacao: 'CRIADO', tipo: 'MAPEAMENTO', dataLimite: '2024-12-31', unidades: []};
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            situacao: 'CRIADO',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2024-12-31',
+            unidades: []
+        };
         const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
         await flushPromises();
-        
+
         vi.mocked(processoService.iniciarProcesso).mockResolvedValue({} as any);
 
         await wrapper.vm.confirmarIniciarProcesso();
@@ -373,7 +405,14 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('clears units when type changes', async () => {
-        const mockProcesso = {codigo: 123, tipo: 'MAPEAMENTO', situacao: 'CRIADO', descricao: 'P1', dataLimite: '2099-12-31T00:00:00', unidades: [{codUnidade: 1}]};
+        const mockProcesso = {
+            codigo: 123,
+            tipo: 'MAPEAMENTO',
+            situacao: 'CRIADO',
+            descricao: 'P1',
+            dataLimite: '2099-12-31T00:00:00',
+            unidades: [{codUnidade: 1}]
+        };
         const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
         await flushPromises();
 

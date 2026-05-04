@@ -35,9 +35,11 @@ class SubprocessoControllerCoverageExtraTest {
 
     @MockitoBean
     private SubprocessoService subprocessoService;
-    @MockitoBean private SubprocessoConsultaService consultaService;
-    @MockitoBean private AnaliseHistoricoService analiseHistoricoService;
-    
+    @MockitoBean
+    private SubprocessoConsultaService consultaService;
+    @MockitoBean
+    private AnaliseHistoricoService analiseHistoricoService;
+
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
 
@@ -110,9 +112,9 @@ class SubprocessoControllerCoverageExtraTest {
         when(subprocessoService.salvarMapa(eq(1L), any())).thenReturn(new Mapa());
 
         mockMvc.perform(post("/api/subprocessos/1/mapa-completo")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
         verify(subprocessoService).salvarMapa(eq(1L), any());
@@ -128,9 +130,9 @@ class SubprocessoControllerCoverageExtraTest {
         when(permissionEvaluator.hasPermission(any(), any(), eq("Subprocesso"), eq("DISPONIBILIZAR_MAPA"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/disponibilizar-mapa-bloco")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
         verify(transicaoService).disponibilizarMapaEmBloco(eq(List.of(1L)), any());
@@ -185,9 +187,9 @@ class SubprocessoControllerCoverageExtraTest {
                 "obs"));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-validacao")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("VALIDACAO"));
 
@@ -196,6 +198,7 @@ class SubprocessoControllerCoverageExtraTest {
         verify(analiseHistoricoService).converter(a);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
+
     @Test
     @DisplayName("criarAnaliseCadastro - deve registrar análise de cadastro")
     @WithMockUser(roles = {"GESTOR"})
@@ -215,9 +218,9 @@ class SubprocessoControllerCoverageExtraTest {
                 "obs"));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("CADASTRO"));
 
@@ -249,9 +252,9 @@ class SubprocessoControllerCoverageExtraTest {
         SalvarAjustesRequest req = new SalvarAjustesRequest(List.of(new CompetenciaAjusteDto(1L, "desc", List.of())));
 
         mockMvc.perform(post("/api/subprocessos/1/mapa-ajuste/atualizar")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
         verify(subprocessoService).salvarAjustesMapa(eq(1L), any());
@@ -266,9 +269,9 @@ class SubprocessoControllerCoverageExtraTest {
         TextoRequest req = new TextoRequest("Sugestao");
 
         mockMvc.perform(post("/api/subprocessos/1/apresentar-sugestoes")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
         verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestao"));

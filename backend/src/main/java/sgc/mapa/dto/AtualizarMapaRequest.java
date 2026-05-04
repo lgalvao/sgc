@@ -4,6 +4,7 @@ import lombok.*;
 import org.jspecify.annotations.*;
 
 import java.time.*;
+
 @Builder
 public record AtualizarMapaRequest(
         @Nullable LocalDateTime dataHoraDisponibilizado,

@@ -17,23 +17,33 @@ Ator: CHEFE
 
 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos`, preenchida com os dados cadastrados até o momento.
 
-5. Se o subprocesso já tiver sido disponibilizado anteriormente e estiver localizado em unidade diferente da unidade ativa do usuário, o sistema mostra uma mensagem no topo da tela com o texto "Cadastro disponibilizado para análise pelas unidades superiores." e não permite edição ou disponibilização.
+5. Se o subprocesso já tiver sido disponibilizado anteriormente e estiver localizado em unidade diferente da unidade
+   ativa do usuário, o sistema mostra uma mensagem no topo da tela com o texto "Cadastro disponibilizado para análise
+   pelas unidades superiores." e não permite edição ou disponibilização.
 
-6. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da tela, o botão `Histórico de análise`.
+6. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da
+   tela, o botão `Histórico de análise`.
 
-   6.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do cadastro realizadas pelas unidades superiores desde a última disponibilização.
+   6.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
+   cadastro realizadas pelas unidades superiores desde a última disponibilização.
 
-   6.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro pelo usuário, antes da realização de nova disponibilização.
+   6.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('
+   Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro
+   pelo usuário, antes da realização de nova disponibilização.
 
 7. O usuário escolhe `Disponibilizar`.
 
 8. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
 
-   8.1. Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela.
+   8.1. Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de
+   conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela.
 
-9. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades superiores", além dos botões `Confirmar` e `Cancelar`.
+9. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a
+   disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades
+   superiores", além dos botões `Confirmar` e `Cancelar`.
 
-   9.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
+   9.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma
+   tela.
 
 10. O usuário escolhe `Confirmar`.
 

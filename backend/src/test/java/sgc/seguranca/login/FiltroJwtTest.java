@@ -92,9 +92,9 @@ class FiltroJwtTest {
     void deveProcessarJwtViaCookie() throws ServletException, IOException {
         Cookie cookie = new Cookie("jwtToken", "token-cookie");
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        
+
         filtro.doFilterInternal(request, response, filterChain);
-        
+
         verify(jwtService).validarToken("token-cookie");
         verify(filterChain).doFilter(request, response);
     }
@@ -104,9 +104,9 @@ class FiltroJwtTest {
     void deveLidarComCookiesNulos() throws ServletException, IOException {
         when(request.getCookies()).thenReturn(null);
         when(request.getHeader("Authorization")).thenReturn(null);
-        
+
         filtro.doFilterInternal(request, response, filterChain);
-        
+
         verify(filterChain).doFilter(request, response);
     }
 

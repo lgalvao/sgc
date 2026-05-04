@@ -29,8 +29,8 @@ describe("subprocesso store (cache e dedupe)", () => {
     describe("limpeza de contexto", () => {
         it("deve limpar contexto atual", () => {
             const store = useSubprocessoStore();
-            store.contextoEdicao = { detalhes: { codigo: 1 } } as any;
-            store.contextoCadastro = { detalhes: { codigo: 2 } } as any;
+            store.contextoEdicao = {detalhes: {codigo: 1}} as any;
+            store.contextoCadastro = {detalhes: {codigo: 2}} as any;
             store.limparContextoAtual();
             expect(store.contextoEdicao).toBeNull();
             expect(store.contextoCadastro).toBeNull();
@@ -41,14 +41,16 @@ describe("subprocesso store (cache e dedupe)", () => {
         it("deve deduplicar requisições em paralelo para o mesmo código", async () => {
             const store = useSubprocessoStore();
             let resolver!: (valor: any) => void;
-            const promessa = new Promise<any>((resolve) => { resolver = resolve; });
+            const promessa = new Promise<any>((resolve) => {
+                resolver = resolve;
+            });
             vi.mocked(subprocessoService.buscarContextoEdicao).mockReturnValue(promessa);
 
             const req1 = store.garantirContextoEdicao(10);
             const req2 = store.garantirContextoEdicao(10);
 
             expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledTimes(1);
-            resolver({ detalhes: { codigo: 10, situacao: "TESTE" }, mapa: null });
+            resolver({detalhes: {codigo: 10, situacao: "TESTE"}, mapa: null});
 
             const res1 = await req1;
             const res2 = await req2;
@@ -58,7 +60,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve sincronizar detalhes ao carregar contexto de cadastro", async () => {
             const store = useSubprocessoStore();
-            const mockCadastro = { detalhes: { codigo: 10, situacao: "CADASTRO" }, atividades: [] };
+            const mockCadastro = {detalhes: {codigo: 10, situacao: "CADASTRO"}, atividades: []};
             vi.mocked(subprocessoService.buscarContextoCadastroAtividades).mockResolvedValue(mockCadastro as any);
 
             await store.garantirContextoCadastroAtividades(10);
@@ -70,7 +72,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve sincronizar detalhes ao carregar contexto de edicao", async () => {
             const store = useSubprocessoStore();
-            const mockMapa = { detalhes: { codigo: 10, situacao: "MAPA" }, mapa: {} };
+            const mockMapa = {detalhes: {codigo: 10, situacao: "MAPA"}, mapa: {}};
             vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(mockMapa as any);
 
             await store.garantirContextoEdicao(10);
@@ -82,7 +84,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve garantir contexto de edicao por processo e unidade", async () => {
             const store = useSubprocessoStore();
-            const mockMapa = { detalhes: { codigo: 10, situacao: "MAPA" }, mapa: {} };
+            const mockMapa = {detalhes: {codigo: 10, situacao: "MAPA"}, mapa: {}};
             vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue(mockMapa as any);
 
             const result = await store.garantirContextoEdicaoPorProcessoEUnidade(1, "UNIDADE");
@@ -105,7 +107,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve garantir contexto de cadastro por processo e unidade", async () => {
             const store = useSubprocessoStore();
-            const mockCadastro = { detalhes: { codigo: 10, situacao: "CADASTRO" }, atividades: [] };
+            const mockCadastro = {detalhes: {codigo: 10, situacao: "CADASTRO"}, atividades: []};
             vi.mocked(subprocessoService.buscarContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(mockCadastro as any);
 
             const result = await store.garantirContextoCadastroAtividadesPorProcessoEUnidade(1, "UNIDADE");
@@ -129,38 +131,50 @@ describe("subprocesso store (cache e dedupe)", () => {
     describe("atualização de status", () => {
         it("deve atualizar status local de edicao", () => {
             const store = useSubprocessoStore();
-            store.contextoEdicao = { detalhes: { codigo: 10, situacao: "ANTIGA" } } as any;
+            store.contextoEdicao = {detalhes: {codigo: 10, situacao: "ANTIGA"}} as any;
 
-            store.atualizarStatusLocal({ codigo: 10, situacao: "NOVA" as any });
+            store.atualizarStatusLocal({codigo: 10, situacao: "NOVA" as any});
 
             expect(store.contextoEdicao?.detalhes.situacao).toBe("NOVA");
         });
 
         it("deve atualizar status local de cadastro", () => {
             const store = useSubprocessoStore();
-            store.contextoCadastro = { detalhes: { codigo: 10, situacao: "ANTIGA" } } as any;
+            store.contextoCadastro = {detalhes: {codigo: 10, situacao: "ANTIGA"}} as any;
 
-            store.atualizarStatusLocal({ codigo: 10, situacao: "NOVA" as any });
+            store.atualizarStatusLocal({codigo: 10, situacao: "NOVA" as any});
 
             expect(store.contextoCadastro?.detalhes.situacao).toBe("NOVA");
         });
 
         it("deve atualizar permissoes se fornecidas", () => {
             const store = useSubprocessoStore();
-            store.contextoEdicao = { detalhes: { codigo: 10, situacao: "ANTIGA", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS } } as any;
-            const novasPermissoes = { habilitarEditar: true } as any;
+            store.contextoEdicao = {
+                detalhes: {
+                    codigo: 10,
+                    situacao: "ANTIGA",
+                    permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
+                }
+            } as any;
+            const novasPermissoes = {habilitarEditar: true} as any;
 
-            store.atualizarStatusLocal({ codigo: 10, situacao: "NOVA" as any, permissoes: novasPermissoes });
+            store.atualizarStatusLocal({codigo: 10, situacao: "NOVA" as any, permissoes: novasPermissoes});
 
             expect(store.contextoEdicao?.detalhes.permissoes).toEqual(novasPermissoes);
         });
 
         it("deve atualizar permissoes no contexto de cadastro se fornecidas", () => {
             const store = useSubprocessoStore();
-            store.contextoCadastro = { detalhes: { codigo: 10, situacao: "ANTIGA", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS } } as any;
-            const novasPermissoes = { habilitarEditar: true } as any;
+            store.contextoCadastro = {
+                detalhes: {
+                    codigo: 10,
+                    situacao: "ANTIGA",
+                    permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
+                }
+            } as any;
+            const novasPermissoes = {habilitarEditar: true} as any;
 
-            store.atualizarStatusLocal({ codigo: 10, situacao: "NOVA" as any, permissoes: novasPermissoes });
+            store.atualizarStatusLocal({codigo: 10, situacao: "NOVA" as any, permissoes: novasPermissoes});
 
             expect(store.contextoCadastro?.detalhes.permissoes).toEqual(novasPermissoes);
         });
@@ -169,14 +183,14 @@ describe("subprocesso store (cache e dedupe)", () => {
     describe("validação de dados", () => {
         it("deve validar dados de edicao", () => {
             const store = useSubprocessoStore();
-            store.contextoEdicao = { detalhes: { codigo: 10 } } as any;
+            store.contextoEdicao = {detalhes: {codigo: 10}} as any;
             store.invalidar();
             expect(store.contextoEdicao?.detalhes.codigo).toBe(10);
         });
 
         it("deve validar dados de cadastro", () => {
             const store = useSubprocessoStore();
-            store.contextoCadastro = { detalhes: { codigo: 10 } } as any;
+            store.contextoCadastro = {detalhes: {codigo: 10}} as any;
             expect(store.contextoCadastro?.detalhes.codigo).toBe(10);
         });
     });
@@ -194,7 +208,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve tratar erro 404 como erro inesperado com mensagem customizada", async () => {
             const store = useSubprocessoStore();
-            const erro404 = { response: { status: 404, data: { mensagem: "Não achei" } }, isAxiosError: true };
+            const erro404 = {response: {status: 404, data: {mensagem: "Não achei"}}, isAxiosError: true};
             vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue(erro404);
 
             await store.garantirContextoEdicao(10);
@@ -205,7 +219,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve tratar erro de request cancelada", async () => {
             const store = useSubprocessoStore();
-            const erroCancelado = { code: "ERR_CANCELED", isAxiosError: true };
+            const erroCancelado = {code: "ERR_CANCELED", isAxiosError: true};
             vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue(erroCancelado);
 
             await store.garantirContextoEdicao(10);
@@ -224,7 +238,7 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve limpar erro de integração", () => {
             const store = useSubprocessoStore();
-            store.erroIntegracaoContexto = { mensagem: "Erro" } as any;
+            store.erroIntegracaoContexto = {mensagem: "Erro"} as any;
             store.limparErroIntegracao();
             expect(store.erroIntegracaoContexto).toBeNull();
         });
@@ -253,8 +267,8 @@ describe("subprocesso store (cache e dedupe)", () => {
     describe("invalidação", () => {
         it("deve manter o último snapshot, mas marcá-lo como inválido", () => {
             const store = useSubprocessoStore();
-            store.contextoEdicao = { detalhes: { codigo: 1 } } as any;
-            store.contextoCadastro = { detalhes: { codigo: 2 }, atividades: [] } as any;
+            store.contextoEdicao = {detalhes: {codigo: 1}} as any;
+            store.contextoCadastro = {detalhes: {codigo: 2}, atividades: []} as any;
 
             store.invalidar();
 
@@ -265,11 +279,11 @@ describe("subprocesso store (cache e dedupe)", () => {
 
         it("deve resetar o estado completo", () => {
             const store = useSubprocessoStore();
-            store.contextoEdicao = { detalhes: { codigo: 1 } } as any;
-            store.erroIntegracaoContexto = { mensagem: "Erro" } as any;
-            
+            store.contextoEdicao = {detalhes: {codigo: 1}} as any;
+            store.erroIntegracaoContexto = {mensagem: "Erro"} as any;
+
             store.resetar();
-            
+
             expect(store.contextoEdicao).toBeNull();
             expect(store.erroIntegracaoContexto).toBeNull();
         });

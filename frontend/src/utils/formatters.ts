@@ -73,6 +73,6 @@ export function calcularAssinaturaCadastro(atividades: Atividade[]): string {
             .join("\u0001");
         return descricao + "\u0002" + conhecimentos;
     })
-    .sort((a, b) => a.localeCompare(b))
-    .join("\u0003");
+        .sort((a, b) => a.localeCompare(b))
+        .join("\u0003");
 }

@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ehErroAxios, normalizarErro, deveNotificarGlobalmente} from '@/utils/apiError';
+import {deveNotificarGlobalmente, ehErroAxios, normalizarErro} from '@/utils/apiError';
 import logger from '@/utils/logger';
 
 describe('apiError utils', () => {
@@ -100,5 +100,5 @@ describe('apiError utils', () => {
         expect(deveNotificarGlobalmente({tipo: 'validacao'} as any)).toBe(false);
         expect(deveNotificarGlobalmente({tipo: 'rede'} as any)).toBe(true);
         expect(deveNotificarGlobalmente({tipo: 'proibido'} as any)).toBe(false);
-        });
-        });
+    });
+});

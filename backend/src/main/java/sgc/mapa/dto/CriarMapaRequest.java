@@ -6,6 +6,7 @@ import org.jspecify.annotations.*;
 import sgc.comum.*;
 
 import java.time.*;
+
 @Builder
 public record CriarMapaRequest(
         @NotNull(message = Mensagens.CODIGO_SUBPROCESSO_OBRIGATORIO)

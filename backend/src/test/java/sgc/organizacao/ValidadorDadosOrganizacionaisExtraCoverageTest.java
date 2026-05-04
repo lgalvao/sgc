@@ -18,9 +18,12 @@ import static org.mockito.Mockito.*;
 @DisplayName("ValidadorDadosOrganizacionais - Cobertura Adicional")
 class ValidadorDadosOrganizacionaisExtraCoverageTest {
 
-    @Mock private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
-    @Mock private UsuarioRepo usuarioRepo;
-    @Mock private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @Mock
+    private CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
+    @Mock
+    private UsuarioRepo usuarioRepo;
+    @Mock
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @InjectMocks
     private ValidadorDadosOrganizacionais target;
@@ -30,11 +33,11 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
     void deveCobrirMergeResponsabilidadesDuplicadas() {
         UnidadeHierarquiaLeitura u = new UnidadeHierarquiaLeitura(1L, "Nome", "U1", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null);
         when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(u));
-        
+
         ResponsabilidadeLeitura r1 = new ResponsabilidadeLeitura(1L, "T1");
         ResponsabilidadeLeitura r2 = new ResponsabilidadeLeitura(1L, "T2");
         when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(r1, r2));
-        
+
         when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
         when(namedParameterJdbcTemplate.queryForList(anyString(), ArgumentMatchers.<Map<String, ?>>any())).thenReturn(Collections.emptyList());
 
@@ -60,17 +63,17 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
         UnidadeHierarquiaLeitura u2 = new UnidadeHierarquiaLeitura(2L, "OPE", "OPE", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L);
 
         when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(u1, u2));
-        
+
         ResponsabilidadeLeitura r1 = new ResponsabilidadeLeitura(1L, "GESTOR1");
         when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(r1));
-        
+
         when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
-        
+
         Map<String, Object> p1 = new HashMap<>();
         p1.put("USUARIO_TITULO", "GESTOR1");
         p1.put("PERFIL", "GESTOR");
         p1.put("UNIDADE_CODIGO", 1L);
-        
+
         when(namedParameterJdbcTemplate.queryForList(contains("vw_usuario_perfil_unidade"), ArgumentMatchers.<Map<String, ?>>any()))
                 .thenReturn(List.of(p1));
         when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario\n"), ArgumentMatchers.<Map<String, ?>>any()))

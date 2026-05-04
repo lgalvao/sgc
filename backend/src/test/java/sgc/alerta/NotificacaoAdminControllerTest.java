@@ -36,7 +36,7 @@ class NotificacaoAdminControllerTest {
                 .situacao(SituacaoNotificacao.ENVIADO)
                 .dataHoraCriacao(LocalDateTime.now())
                 .build();
-        
+
         when(notificacaoService.listarTodasAdmin(50)).thenReturn(List.of(notificacao));
 
         mockMvc.perform(get("/api/admin/notificacoes/listar").param("limite", "50"))

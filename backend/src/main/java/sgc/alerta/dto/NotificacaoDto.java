@@ -26,8 +26,8 @@ public record NotificacaoDto(
 ) {
     public static NotificacaoDto fromEntity(NotificacaoEmail notificacao) {
         Long subId = notificacao.getSubprocesso() != null ? notificacao.getSubprocesso().getCodigo() : null;
-        String desc = (notificacao.getSubprocesso() != null && notificacao.getSubprocesso().getProcesso() != null) 
-                ? notificacao.getSubprocesso().getProcesso().getDescricao() 
+        String desc = (notificacao.getSubprocesso() != null && notificacao.getSubprocesso().getProcesso() != null)
+                ? notificacao.getSubprocesso().getProcesso().getDescricao()
                 : null;
 
         return NotificacaoDto.builder()

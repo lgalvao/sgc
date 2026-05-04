@@ -3,8 +3,8 @@
     <PageHeader :title="TEXTOS.comum.MENU_NOTIFICACOES">
       <template #actions>
         <BButton
-            data-testid="btn-notificacoes-atualizar"
             :disabled="carregando"
+            data-testid="btn-notificacoes-atualizar"
             variant="outline-primary"
             @click="carregar"
         >
@@ -45,21 +45,24 @@
     <BModal
         v-model="mostrarPreview"
         :title="itemParaPreview?.assunto"
-        size="lg"
+        data-testid="modal-preview-email"
         hide-footer
         scrollable
-        data-testid="modal-preview-email"
+        size="lg"
     >
       <div v-if="itemParaPreview" class="p-3">
         <div class="mb-3 border-bottom pb-2">
-          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_DESTINATARIO }}:</strong> {{ itemParaPreview.destinatario }}<br>
-          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_CRIACAO }}:</strong> {{ formatarDataOuHifen(itemParaPreview.dataHoraCriacao) }}
+          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_DESTINATARIO }}:</strong> {{
+            itemParaPreview.destinatario
+          }}<br>
+          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_CRIACAO }}:</strong>
+          {{ formatarDataOuHifen(itemParaPreview.dataHoraCriacao) }}
         </div>
         <iframe
+            :srcdoc="montarPreviewHtml(itemParaPreview.corpoHtml)"
             class="email-content-preview"
             data-testid="iframe-preview-email"
             sandbox=""
-            :srcdoc="montarPreviewHtml(itemParaPreview.corpoHtml)"
             title="Preview do e-mail"
         />
       </div>
@@ -67,8 +70,8 @@
 
     <ModalPadrao
         v-model="mostrarDetalhes"
-        data-testid="modal-detalhes-notificacao"
         :mostrar-botao-acao="false"
+        data-testid="modal-detalhes-notificacao"
         tamanho="lg"
         texto-cancelar="Fechar"
         titulo="Detalhes da notificação"
@@ -107,8 +110,8 @@
         :auto-close="false"
         :loading="reenviando"
         :ok-title="TEXTOS.administracao.NOTIFICACOES_REENVIAR"
-        test-codigo-confirmar="btn-notificacoes-reenviar-confirmar"
         :titulo="TEXTOS.administracao.NOTIFICACOES_MODAL_REENVIAR_TITULO"
+        test-codigo-confirmar="btn-notificacoes-reenviar-confirmar"
         variant="danger"
         @confirmar="reenviar"
     >

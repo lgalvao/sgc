@@ -175,7 +175,7 @@ export function useFluxoSubprocesso() {
         );
     }
 
-    async function alterarDataLimiteSubprocesso(codigoSubprocesso: number, dados: {novaData: string}) {
+    async function alterarDataLimiteSubprocesso(codigoSubprocesso: number, dados: { novaData: string }) {
         return withErrorHandling(async () => {
             await subprocessoService.alterarDataLimiteSubprocesso(codigoSubprocesso, dados);
         });

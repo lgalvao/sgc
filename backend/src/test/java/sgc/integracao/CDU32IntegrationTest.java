@@ -82,9 +82,9 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                 "Necessário ajustar informações do cadastro");
 
         mockMvc.perform(post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         entityManager.flush();
@@ -146,9 +146,9 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         JustificativaRequest request = new JustificativaRequest("Tentativa sem permissão");
 
         mockMvc.perform(post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 
@@ -159,9 +159,9 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         JustificativaRequest request = new JustificativaRequest("");
 
         mockMvc.perform(post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 

@@ -87,8 +87,7 @@ public enum SituacaoSubprocesso {
                     nova == MAPEAMENTO_MAPA_DISPONIBILIZADO || nova == MAPEAMENTO_MAPA_HOMOLOGADO || nova == MAPEAMENTO_MAPA_CRIADO || nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
             case MAPEAMENTO_MAPA_VALIDADO ->
                     nova == MAPEAMENTO_MAPA_HOMOLOGADO || nova == MAPEAMENTO_MAPA_DISPONIBILIZADO || nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
-            case MAPEAMENTO_MAPA_HOMOLOGADO ->
-                    nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+            case MAPEAMENTO_MAPA_HOMOLOGADO -> nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
             default -> false;
         };
     }

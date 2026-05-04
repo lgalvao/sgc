@@ -23,8 +23,8 @@ function inferirCategoria(nomeClasse, caminhoRelativo) {
     return 'Others';
 }
 
-function lerConteudoFonte(backendSrc, caminhoRelativo) { 
-    return fs.readFileSync(path.join(backendSrc, caminhoRelativo), 'utf-8');      
+function lerConteudoFonte(backendSrc, caminhoRelativo) {
+    return fs.readFileSync(path.join(backendSrc, caminhoRelativo), 'utf-8');
 }
 
 function classificarPerfilDto(conteudoFonte) {
@@ -70,7 +70,7 @@ function classificarPerfilModel({nomeClasse, conteudoFonte}) {
     const possuiFluxoControle = /\b(for|if|switch|while)\s*\(/.test(conteudoSemComentarios);
     const possuiOperacaoColecao = /\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|removeIf\s*\(|anyMatch\s*\(/.test(conteudoSemComentarios);
     const possuiContratoExposto = /@JsonProperty\b|@JsonView\b/.test(conteudoSemComentarios);
-    const possuiDominio = /\bthrow\b|\breturn\b/.test(conteudoSemComentarios);    
+    const possuiDominio = /\bthrow\b|\breturn\b/.test(conteudoSemComentarios);
 
     if (possuiMetodoExplicito && (possuiFluxoControle || possuiOperacaoColecao || possuiContratoExposto || possuiDominio)) {
         return 'comportamental';
@@ -83,7 +83,7 @@ function classificarPerfilModel({nomeClasse, conteudoFonte}) {
     return 'estrutural_puro';
 }
 
-function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}) {   
+function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}) {
     const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
     const conteudoSemComentarios = conteudoFonte
         .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -109,7 +109,7 @@ function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}) {
     const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
     const possuiFluxoControle = /\b(for|if|switch|while)\s*\(/.test(conteudoSemComentarios);
     const possuiOperacaoColecao = /\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|removeIf\s*\(|anyMatch\s*\(/.test(conteudoSemComentarios);
-    const possuiDominio = /\bthrow\b|\breturn\b/.test(conteudoSemComentarios);    
+    const possuiDominio = /\bthrow\b|\breturn\b/.test(conteudoSemComentarios);
 
     if (possuiMetodoExplicito && (possuiFluxoControle || possuiOperacaoColecao || possuiDominio)) {
         return 'comportamental';
@@ -127,18 +127,18 @@ function construirNomeClasseCompleto(caminhoRelativo) {
 }
 
 function criarItemRelatorio({
-    arquivo,
-    perfilDto,
-    dtoEstrutural,
-    possuiTeste,
-    estaNoEscopoJacoco,
-    possuiCoberturaJacoco,
-    possuiCoberturaSomenteIndireta,
-    estaForaEscopoJacoco,
-    estrategia,
-    caminhos,
-    coberturaClasse
-}) {
+                                arquivo,
+                                perfilDto,
+                                dtoEstrutural,
+                                possuiTeste,
+                                estaNoEscopoJacoco,
+                                possuiCoberturaJacoco,
+                                possuiCoberturaSomenteIndireta,
+                                estaForaEscopoJacoco,
+                                estrategia,
+                                caminhos,
+                                coberturaClasse
+                            }) {
     const evidenciaQualidade = possuiTeste
         ? 'teste_dedicado'
         : (dtoEstrutural

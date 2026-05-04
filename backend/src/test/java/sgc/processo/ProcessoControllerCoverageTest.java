@@ -42,23 +42,24 @@ class ProcessoControllerCoverageTest {
         UnidadeProcesso up = new UnidadeProcesso();
         up.setUnidadeCodigo(10L);
         p.setParticipantes(List.of(up));
-        
+
         when(processoService.buscarPorCodigoComParticipantes(cod)).thenReturn(p);
-        
+
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
-        Unidade u = new Unidade(); u.setCodigo(10L);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
         sp.setUnidade(u);
-        
+
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-        
+
         // Simular que o mapa de localizações NÃO tem o subprocesso 100
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of());
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
 
         mockMvc.perform(get("/api/processos/" + cod + "/unidades-importacao"))
                 .andExpect(status().isOk());
-                
+
         verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
     }
 }

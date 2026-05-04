@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BFormGroup, BFormInvalidFeedback, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
 import type {PerfilUnidade} from "@/types/autenticacao";
 import {TEXTOS} from "@/constants/textos";
@@ -38,9 +38,9 @@ function valorSelecionadoModel() {
 <template>
   <BFormGroup
       v-if="mostrar"
-      label-for="par"
       class="mb-3"
       data-testid="sec-login-perfil"
+      label-for="par"
   >
     <template #label>
       {{ TEXTOS.login.SELECAO_PERFIL }} <span aria-hidden="true" class="text-danger">*</span>

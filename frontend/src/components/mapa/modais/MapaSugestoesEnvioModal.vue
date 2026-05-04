@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref} from "vue";
 import {BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -47,10 +47,12 @@ function focar() {
       @confirmar="$emit('confirmar')"
       @shown="focar"
   >
-    <BFormGroup label-for="sugestoesTextarea" :state="erro ? false : null" class="mb-3">
-      <template #label>Sugestões para o mapa de competências: <span aria-hidden="true" class="text-danger">*</span></template>
+    <BFormGroup :state="erro ? false : null" class="mb-3" label-for="sugestoesTextarea">
+      <template #label>Sugestões para o mapa de competências: <span aria-hidden="true" class="text-danger">*</span>
+      </template>
       <BFormTextarea
-          id="sugestoesTextarea" ref="inputRef" v-model="sugestoesModel" aria-required="true" :state="erro ? false : null"
+          id="sugestoesTextarea" ref="inputRef" v-model="sugestoesModel" :state="erro ? false : null"
+          aria-required="true"
           data-testid="inp-sugestoes-mapa-texto" rows="5"
       />
       <BFormInvalidFeedback :state="erro ? false : null">{{ erro }}</BFormInvalidFeedback>

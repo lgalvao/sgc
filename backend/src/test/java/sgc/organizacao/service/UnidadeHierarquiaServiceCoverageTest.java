@@ -38,12 +38,12 @@ class UnidadeHierarquiaServiceCoverageTest {
         UnidadeDto filho = new UnidadeDto();
         filho.setCodigo(2L);
         filho.setSigla("F1");
-        
+
         UnidadeDto pai = new UnidadeDto();
         pai.setCodigo(1L);
         pai.setSigla("P1");
         pai.setSubunidades(List.of(filho));
-        
+
         Optional<UnidadeDto> result = invokeMethod(target, "buscarNaHierarquiaPorSigla", List.of(pai), "F1");
         assertThat(result).isPresent();
         assertThat(result.get().getCodigo()).isEqualTo(2L);

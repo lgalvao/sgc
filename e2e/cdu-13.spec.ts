@@ -28,7 +28,7 @@ async function validarCabecalhosHistorico(modal: ReturnType<typeof abrirHistoric
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';
-    
+
     let descProcesso: string;
 
     test('1. Setup: Preparar processo e devoluções iniciais', async ({_resetAutomatico, request, page}) => {
@@ -160,7 +160,10 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
         expect(descProcessoCancelamento).toBeDefined();
     });
 
-    test('GESTOR cancela devolução e permanece na tela de atividades e conhecimentos', async ({_resetAutomatico, page}) => {
+    test('GESTOR cancela devolução e permanece na tela de atividades e conhecimentos', async ({
+                                                                                                  _resetAutomatico,
+                                                                                                  page
+                                                                                              }) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcessoCancelamento, UNIDADE_ALVO);
         await navegarParaCadastro(page);
@@ -180,7 +183,10 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
         });
     });
 
-    test('ADMIN cancela homologação e permanece na tela de atividades e conhecimentos', async ({_resetAutomatico, page}) => {
+    test('ADMIN cancela homologação e permanece na tela de atividades e conhecimentos', async ({
+                                                                                                   _resetAutomatico,
+                                                                                                   page
+                                                                                               }) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcessoCancelamento, UNIDADE_ALVO);
         await navegarParaCadastro(page);

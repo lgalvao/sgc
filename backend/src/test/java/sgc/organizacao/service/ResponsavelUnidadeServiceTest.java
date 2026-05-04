@@ -53,6 +53,35 @@ class ResponsavelUnidadeServiceTest {
     @InjectMocks
     private ResponsavelUnidadeService service;
 
+    @Test
+    @DisplayName("todasPossuemResponsavelEfetivo deve retornar false para responsável com título em branco")
+    void todasPossuemResponsavelEfetivoDeveRetornarFalseComTituloEmBranco() {
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
+                .thenReturn(List.of(new ResponsabilidadeLeitura(10L, " ")));
+
+        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L));
+
+        assertThat(resultado).isFalse();
+    }
+
+    @Test
+    @DisplayName("todasPossuemResponsavelEfetivo deve retornar false quando faltar unidade na resposta")
+    void todasPossuemResponsavelEfetivoDeveRetornarFalseQuandoFaltarUnidade() {
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
+                .thenReturn(List.of(new ResponsabilidadeLeitura(10L, "RESP")));
+
+        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L, 11L));
+
+        assertThat(resultado).isFalse();
+    }
+
+    @Test
+    @DisplayName("todasPossuemResponsavelEfetivo deve retornar true quando lista estiver vazia")
+    void todasPossuemResponsavelEfetivoDeveRetornarTrueQuandoListaVazia() {
+        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of());
+        assertThat(resultado).isTrue();
+    }
+
     @Nested
     @DisplayName("Buscar atribuições")
     class BuscarAtribuicoesTests {
@@ -445,34 +474,5 @@ class ResponsavelUnidadeServiceTest {
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("Titular oficial ausente");
         }
-    }
-
-    @Test
-    @DisplayName("todasPossuemResponsavelEfetivo deve retornar false para responsável com título em branco")
-    void todasPossuemResponsavelEfetivoDeveRetornarFalseComTituloEmBranco() {
-        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
-                .thenReturn(List.of(new ResponsabilidadeLeitura(10L, " ")));
-
-        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L));
-
-        assertThat(resultado).isFalse();
-    }
-
-    @Test
-    @DisplayName("todasPossuemResponsavelEfetivo deve retornar false quando faltar unidade na resposta")
-    void todasPossuemResponsavelEfetivoDeveRetornarFalseQuandoFaltarUnidade() {
-        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades())
-                .thenReturn(List.of(new ResponsabilidadeLeitura(10L, "RESP")));
-
-        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L, 11L));
-
-        assertThat(resultado).isFalse();
-    }
-
-    @Test
-    @DisplayName("todasPossuemResponsavelEfetivo deve retornar true quando lista estiver vazia")
-    void todasPossuemResponsavelEfetivoDeveRetornarTrueQuandoListaVazia() {
-        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of());
-        assertThat(resultado).isTrue();
     }
 }
