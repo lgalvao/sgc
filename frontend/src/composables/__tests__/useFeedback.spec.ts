@@ -1,5 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest'
-import {initPinia} from '@/test-utils/helpers'
+import {createPinia, setActivePinia} from 'pinia'
+import {useFeedback} from '../useFeedback'
+import logger from '@/utils/logger'
 
 vi.mock('html2canvas', () => ({
     default: vi.fn().mockResolvedValue({
@@ -31,21 +33,19 @@ vi.mock('@/axios-setup', () => ({
     default: {post: mockPost},
 }))
 
-import logger from '@/utils/logger'
-
 describe('useFeedback', () => {
     beforeEach(() => {
-        initPinia()
+        setActivePinia(createPinia())
         vi.clearAllMocks()
         mockPost.mockResolvedValue({data: {id: 'uuid-123'}})
     })
 
     it('deve montar metadados com dados do perfil e da rota', async () => {
-        const {useFeedback} = await import('../useFeedback')
         const {enviarFeedback} = useFeedback()
 
         await enviarFeedback('bug', 'Problema encontrado no sistema')
 
+        expect(mockPost).toHaveBeenCalled()
         const formData: FormData = mockPost.mock.calls[0][1] as FormData
         const dataJson = formData.get('data') as string
         const payload = JSON.parse(dataJson)
@@ -58,7 +58,6 @@ describe('useFeedback', () => {
     })
 
     it('deve incluir screenshot no FormData quando captura estiver disponível', async () => {
-        const {useFeedback} = await import('../useFeedback')
         const fb = useFeedback()
 
         await fb.capturarTela()
@@ -66,22 +65,22 @@ describe('useFeedback', () => {
 
         await fb.enviarFeedback('sugestao', 'Sugestão de melhoria para a tela')
 
+        expect(mockPost).toHaveBeenCalled()
         const formData: FormData = mockPost.mock.calls[0][1] as FormData
         expect(formData.has('screenshot')).toBe(true)
     })
 
     it('deve enviar sem screenshot quando captura estiver nula', async () => {
-        const {useFeedback} = await import('../useFeedback')
         const fb = useFeedback()
 
         await fb.enviarFeedback('questao', 'Dúvida sobre o funcionamento do sistema')
 
+        expect(mockPost).toHaveBeenCalled()
         const formData: FormData = mockPost.mock.calls[0][1] as FormData
         expect(formData.has('screenshot')).toBe(false)
     })
 
     it('deve limpar captura ao chamar removerCaptura', async () => {
-        const {useFeedback} = await import('../useFeedback')
         const fb = useFeedback()
 
         await fb.capturarTela()
@@ -93,10 +92,9 @@ describe('useFeedback', () => {
 
     it('deve continuar sem screenshot quando html2canvas falha', async () => {
         const spyError = vi.spyOn(logger, 'error').mockImplementation(() => {})
-        const html2canvas = await import('html2canvas')
-        vi.mocked(html2canvas.default).mockRejectedValueOnce(new Error('canvas error'))
+        const html2canvas = (await import('html2canvas')).default
+        vi.mocked(html2canvas).mockRejectedValueOnce(new Error('canvas error'))
 
-        const {useFeedback} = await import('../useFeedback')
         const fb = useFeedback()
 
         await fb.capturarTela()
@@ -109,19 +107,19 @@ describe('useFeedback', () => {
     })
 
     it('deve definir enviando como true durante o envio e false ao finalizar', async () => {
-        let resolverPost: () => void
-        mockPost.mockReturnValue(new Promise<void>((resolve) => {
+        let resolverPost: (v: any) => void
+        mockPost.mockReturnValue(new Promise((resolve) => {
             resolverPost = resolve
         }))
 
-        const {useFeedback} = await import('../useFeedback')
         const fb = useFeedback()
 
         const promessa = fb.enviarFeedback('elogio', 'Sistema muito bom, parabéns ao time')
         expect(fb.enviando.value).toBe(true)
 
-        resolverPost!()
+        resolverPost!({data: {id: '1'}})
         await promessa
         expect(fb.enviando.value).toBe(false)
     })
 })
+
