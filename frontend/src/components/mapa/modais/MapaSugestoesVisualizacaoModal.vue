@@ -31,11 +31,13 @@ const mostrar = computed({
   >
     <BFormGroup class="mb-3">
       <template #label>Sugestões registradas para o mapa de competências:</template>
-      <div v-if="!podeEditar" class="border rounded p-3 bg-body-tertiary white-space-pre-line"
+      <div
+v-if="!podeEditar" class="border rounded p-3 bg-body-tertiary white-space-pre-line"
            data-testid="txt-ver-sugestoes-mapa-texto">
         {{ sugestoes }}
       </div>
-      <BFormTextarea v-else id="sugestoesVisualizacao" :model-value="sugestoes" data-testid="txt-ver-sugestoes-mapa"
+      <BFormTextarea
+v-else id="sugestoesVisualizacao" :model-value="sugestoes" data-testid="txt-ver-sugestoes-mapa"
                      readonly rows="5"/>
     </BFormGroup>
   </ModalPadrao>

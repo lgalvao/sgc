@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {BBadge, BButton, BTable, type BTableSortBy, type ColorVariant} from "bootstrap-vue-next";
+import {BBadge, BTable, type BTableSortBy, type ColorVariant} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
@@ -24,6 +24,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   showSituacao: true,
   textoCtaVazio: "",
+  emptyTitle: "",
+  emptyDescription: "",
 });
 
 const emit = defineEmits<{
@@ -140,5 +142,14 @@ defineExpose({fields});
       data-testid="empty-state-processos"
       icon="bi-folder2-open"
   >
+    <button
+        v-if="mostrarCtaVazio"
+        class="btn btn-outline-primary"
+        data-testid="btn-empty-state-criar-processo"
+        type="button"
+        @click="emit('ctaVazio')"
+    >
+      {{ textoCtaVazio || TEXTOS.comum.BOTAO_CRIAR }}
+    </button>
   </EmptyState>
 </template>

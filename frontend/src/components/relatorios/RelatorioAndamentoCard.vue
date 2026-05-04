@@ -48,7 +48,8 @@
                   <span class="relatorio-andamento__info-label">Data limite</span>
                   <span class="relatorio-andamento__info-valor">
                     {{ item.dataLimiteEtapa2 }}
-                    <small v-if="item.mostraPrazoAjustado"
+                    <small
+v-if="item.mostraPrazoAjustado"
                            class="text-muted fst-italic fw-normal">(Prazo ajustado)</small>
                   </span>
                 </div>

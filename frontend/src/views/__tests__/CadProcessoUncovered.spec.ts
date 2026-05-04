@@ -96,7 +96,7 @@ describe("ProcessoCadastroView Uncovered Branches", () => {
         const vm = wrapper.vm as any;
 
         vm.dispensarAlertaDiagnostico();
-        expect(vm.alertaDiagnosticoDispensado).toBe(true);
+        expect(vm.exibirAlertaDiagnostico).toBe(false);
     });
 
     it("cobre erro ao buscar unidades", async () => {

@@ -86,11 +86,12 @@ function submeter() {
       <div class="feedback-modal__conteudo">
         <section class="feedback-modal__principal">
           <div class="feedback-modal__campo">
-            <label class="form-label feedback-modal__label">
+            <label class="form-label feedback-modal__label" for="feedback-nota-editor">
               Descreva o problema, a dúvida ou a sugestão
               <span aria-hidden="true" class="text-danger">*</span>
             </label>
             <EditorTextoRico
+                id="feedback-nota-editor"
                 v-model="nota"
                 :desabilitado="enviando"
                 class="feedback-modal__textarea"
@@ -130,7 +131,7 @@ function submeter() {
           <section class="feedback-modal__captura">
             <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
               <div>
-                <div class="form-label mb-0">Captura da tela</div>
+                <label class="form-label mb-0" for="feedback-captura-status">Captura da tela</label>
               </div>
               <button
                   v-if="urlCaptura"
@@ -147,13 +148,14 @@ function submeter() {
 
             <div v-if="urlCaptura" class="feedback-modal__captura-card">
               <img
+                  id="feedback-captura-status"
                   :src="urlCaptura"
                   alt="Prévia da captura de tela"
                   class="feedback-thumbnail"
                   data-testid="feedback-thumbnail"
               />
             </div>
-            <div v-else class="feedback-modal__captura-vazia small text-body-secondary">
+            <div v-else id="feedback-captura-status" class="feedback-modal__captura-vazia small text-body-secondary">
               Nenhuma captura anexada.
             </div>
           </section>

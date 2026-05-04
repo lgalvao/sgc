@@ -40,7 +40,7 @@
         striped
     >
       <template #cell(tipo)="{ item }">
-        <BBadge :variant="obterVarianteTipo(item.tipo)">
+        <BBadge :variant="(obterVarianteTipo(item.tipo) as ColorVariant)">
           <i :class="['bi', iconesTipo[item.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
           {{ formatarTipo(item.tipo) }}
         </BBadge>
@@ -86,7 +86,7 @@
         <dl class="row mb-0">
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO }}</dt>
           <dd class="col-sm-9">
-            <BBadge :variant="obterVarianteTipo(feedbackSelecionado.tipo)">
+            <BBadge :variant="(obterVarianteTipo(feedbackSelecionado.tipo) as ColorVariant)">
               <i :class="['bi', iconesTipo[feedbackSelecionado.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
               {{ formatarTipo(feedbackSelecionado.tipo) }}
             </BBadge>
@@ -160,7 +160,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref} from "vue";
-import {BAlert, BBadge, BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
+import {BAlert, BBadge, BButton, BModal, BSpinner, BTable, type ColorVariant} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
@@ -255,11 +255,11 @@ function extrairNavegadorAmigavel(ua: string): string {
   return `${navegador} no ${so}`;
 }
 
-function formatarMetadados(json?: string | null): Record<string, any> {
+function formatarMetadados(json?: string | null): Record<string, unknown> {
   if (!json) return {};
   try {
     const raw = JSON.parse(json);
-    const filtrado: Record<string, any> = {};
+    const filtrado: Record<string, unknown> = {};
     const chavesIgnorar = ["rotaNome", "fusoHorario", "usuarioNome", "usuarioCodigo"];
 
     const mapaTraducoes: Record<string, string> = {
@@ -323,7 +323,7 @@ function formatarMetadados(json?: string | null): Record<string, any> {
     });
 
     return filtrado;
-  } catch (e) {
+  } catch {
     return {erro: "JSON inválido", valor: json};
   }
 }
@@ -341,6 +341,11 @@ async function carregar() {
 }
 
 onMounted(carregar);
+
+defineExpose({
+  mostrarImagemAmpliada,
+  urlImagemAmpliada
+});
 </script>
 
 <style scoped>

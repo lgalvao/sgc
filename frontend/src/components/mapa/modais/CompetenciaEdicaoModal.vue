@@ -66,16 +66,19 @@ function salvar() {
     </BAlert>
     <div class="mb-4">
       <h5>Descrição <span aria-hidden="true" class="text-danger">*</span></h5>
-      <BFormTextarea id="descricao" ref="inputRef" v-model="novaComp.descricao" :state="erroDesc ? false : null"
+      <BFormTextarea
+id="descricao" ref="inputRef" v-model="novaComp.descricao" :state="erroDesc ? false : null"
                      data-testid="inp-criar-competencia-descricao" placeholder="Descreva a competência" rows="3"/>
       <BFormInvalidFeedback :state="erroDesc ? false : null">{{ erroDesc }}</BFormInvalidFeedback>
     </div>
     <div class="mb-4">
       <h5>Atividades <span aria-hidden="true" class="text-danger">*</span></h5>
-      <div id="atividades"
+      <div
+id="atividades"
            :class="['d-flex flex-wrap gap-2 p-2 border rounded', { 'border-danger is-invalid': erroAtv }]"
            tabindex="-1">
-        <CompetenciaAtividadeItem v-for="atv in atividades" :key="atv.codigo" v-model="selecionadas" :atividade="atv"
+        <CompetenciaAtividadeItem
+v-for="atv in atividades" :key="atv.codigo" v-model="selecionadas" :atividade="atv"
                                   :selecionadas="selecionadas"/>
       </div>
       <div v-if="erroAtv" class="text-danger small mt-1" data-testid="txt-criar-competencia-pendencia-atividades">
