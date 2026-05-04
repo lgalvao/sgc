@@ -1,15 +1,15 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest'
+import {ref} from 'vue'
 import {mount} from '@vue/test-utils'
 import FeedbackWidget from '../FeedbackWidget.vue'
 import {createTestingPinia} from '@pinia/testing'
 import * as useFeedbackModule from '@/composables/useFeedback'
-import * as bootstrapVueNext from 'bootstrap-vue-next'
 import FeedbackModal from '../FeedbackModal.vue'
 
 // Mock do composable useFeedback
 const mockUseFeedback = {
-    captura: {value: null},
-    enviando: {value: false},
+    captura: ref<Blob | null>(null),
+    enviando: ref(false),
     capturarTela: vi.fn(),
     enviarFeedback: vi.fn(),
     removerCaptura: vi.fn(),
