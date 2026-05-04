@@ -36,6 +36,7 @@ public class ProcessoDetalheDto {
     private boolean podeHomologarCadastro;
     private boolean podeHomologarMapa;
     private boolean podeAceitarCadastroBloco;
+    private boolean podeAceitarMapaBloco;
     private boolean podeDisponibilizarMapaBloco;
 
     @Getter
@@ -79,13 +80,12 @@ public class ProcessoDetalheDto {
         private @Nullable Long localizacaoAtualCodigo;
 
         public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
+            Unidade superior = unidade.getUnidadeSuperior();
             return criarBase(
                     unidade.getNome(),
                     unidade.getSigla(),
                     unidade.getCodigo(),
-                    unidade.getUnidadeSuperior() != null
-                            ? unidade.getUnidadeSuperior().getCodigo()
-                            : null
+                    superior != null ? superior.getCodigo() : null
             );
         }
 

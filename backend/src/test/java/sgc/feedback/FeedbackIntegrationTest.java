@@ -56,7 +56,7 @@ class FeedbackIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        UUID feedbackId = UUID.fromString(objectMapper.readTree(responseJson).get("id").textValue());
+        UUID feedbackId = UUID.fromString(objectMapper.treeToValue(objectMapper.readTree(responseJson).get("id"), String.class));
 
         // 2. Verificar se o registro aparece na listagem (como ADMIN)
         List<FeedbackListagemDto> listagem = feedbackService.listarRecentes(10);

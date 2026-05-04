@@ -294,6 +294,19 @@ public class ProcessoService {
             return;
         }
 
+        AcaoPermissao acaoRequerida = null;
+        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
+            acaoRequerida = switch (analise.acao()) {
+                case ACEITAR -> ACEITAR_MAPA;
+                case HOMOLOGAR -> HOMOLOGAR_MAPA;
+                default -> null;
+            };
+        }
+
+        if (acaoRequerida != null && !permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
+            throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
+        }
+
         processarAcoesBlocoAceiteHomologacao((ProcessarAnaliseEmBlocoCommand) command, subprocessos);
     }
 
@@ -320,6 +333,7 @@ public class ProcessoService {
                 .podeHomologarCadastro(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
                 .podeHomologarMapa(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                 .podeAceitarCadastroBloco(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
+                .podeAceitarMapaBloco(AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                 .podeDisponibilizarMapaBloco(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                 .unidades(new ArrayList<>())
                 .build();
@@ -756,7 +770,7 @@ public class ProcessoService {
                         .codigo("aceitar-mapa")
                         .acao(ACEITAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarMapaBloco))
-                        .perfilPermite(perfil == Perfil.GESTOR)
+                        .perfilPermite(AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(true)
                         .rotulo(Mensagens.LABEL_ACEITAR_MAPA_BLOCO)
@@ -815,11 +829,12 @@ public class ProcessoService {
     }
 
     private ProcessoDetalheDto.AcaoBlocoDto criarAcaoBloco(AcaoBlocoContexto contexto) {
-        boolean habilitar = contexto.perfilPermite() && contexto.processoAtivo() && !contexto.unidades().isEmpty();
+        boolean temUnidades = !contexto.unidades().isEmpty();
+        boolean habilitar = contexto.perfilPermite() && contexto.processoAtivo() && temUnidades;
         return ProcessoDetalheDto.AcaoBlocoDto.builder()
                 .codigo(contexto.codigo())
                 .acao(contexto.acao())
-                .mostrar(contexto.perfilPermite())
+                .mostrar(contexto.perfilPermite() && temUnidades)
                 .habilitar(habilitar)
                 .requerDataLimite(contexto.requerDataLimite())
                 .redirecionarPainel(contexto.redirecionarPainel())

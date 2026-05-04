@@ -276,6 +276,7 @@ public class SubprocessoTransicaoService {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validarSituacaoPermitidaParaDevolucao(usuario, sp);
+        validarLocalizacaoEscrita(sp, usuario);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
         Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
@@ -324,6 +325,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarAceiteValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
+        validarLocalizacaoEscrita(sp, usuario);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
                 MAPEAMENTO_MAPA_VALIDADO,
@@ -331,6 +333,11 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_VALIDADO);
 
         SituacaoSubprocesso novaSituacao = sp.getSituacao();
+        if (novaSituacao == MAPEAMENTO_MAPA_COM_SUGESTOES) {
+            novaSituacao = MAPEAMENTO_MAPA_CRIADO;
+        } else if (novaSituacao == REVISAO_MAPA_COM_SUGESTOES) {
+            novaSituacao = REVISAO_MAPA_AJUSTADO;
+        }
         registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand.aceiteValidacao(
                 sp,
                 novaSituacao,
@@ -344,6 +351,7 @@ public class SubprocessoTransicaoService {
     public void homologarValidacao(Long codSubprocesso, @Nullable String observacoes) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        validarLocalizacaoEscrita(sp, usuario);
         executarHomologacaoValidacao(sp, observacoes, usuario);
     }
 
@@ -387,19 +395,30 @@ public class SubprocessoTransicaoService {
     private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd) {
         Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(cmd.sp());
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
+
+        RegistrarWorkflowInternoCommand.RegistrarWorkflowInternoCommandBuilder builder = RegistrarWorkflowInternoCommand.builder()
+                .sp(cmd.sp())
+                .novaSituacao(cmd.novaSituacao())
+                .tipoTransicao(cmd.tipoTransicao())
+                .tipoAnalise(cmd.tipoAnalise())
+                .tipoAcaoAnalise(cmd.tipoAcaoAnalise())
+                .unidadeAnalise(unidadeAtual)
+                .usuario(cmd.usuario())
+                .motivoAnalise(cmd.motivoAnalise())
+                .observacoes(cmd.observacoes());
+
         if (unidadeDestino != null) {
-            registrarWorkflowComDestino(RegistrarWorkflowInternoCommand.builder()
-                    .sp(cmd.sp())
-                    .novaSituacao(cmd.novaSituacao())
-                    .tipoTransicao(cmd.tipoTransicao())
-                    .tipoAnalise(cmd.tipoAnalise())
-                    .tipoAcaoAnalise(cmd.tipoAcaoAnalise())
-                    .unidadeAnalise(unidadeAtual)
-                    .unidadeDestino(unidadeDestino)
-                    .usuario(cmd.usuario())
-                    .motivoAnalise(cmd.motivoAnalise())
-                    .observacoes(cmd.observacoes())
-                    .build());
+            registrarWorkflowComDestino(builder.unidadeDestino(unidadeDestino).build());
+        } else if (cmd.usuario().getPerfilAtivo() == Perfil.ADMIN) {
+            // ADMIN na raiz: registra transição interna para si mesmo para mudar a situação
+            registrarWorkflowComDestino(builder.unidadeDestino(unidadeAtual).build());
+        }
+    }
+
+    private void validarLocalizacaoEscrita(Subprocesso sp, Usuario usuario) {
+        Unidade localizacao = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
+        if (!Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo())) {
+            throw new ErroAcessoNegado("Operação não permitida: o subprocesso não está localizado na sua unidade ativa.");
         }
     }
 
