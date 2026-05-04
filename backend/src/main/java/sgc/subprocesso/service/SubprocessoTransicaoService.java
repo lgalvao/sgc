@@ -162,6 +162,8 @@ public class SubprocessoTransicaoService {
         Long codSubprocesso = sp.getCodigo();
         log.info("Disponibilizando mapa do subprocesso {}", codSubprocesso);
 
+        validarLocalizacaoEscrita(sp, usuario);
+
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_CADASTRO_HOMOLOGADO,
                 MAPEAMENTO_MAPA_CRIADO,
@@ -218,6 +220,7 @@ public class SubprocessoTransicaoService {
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        validarLocalizacaoEscrita(sp, usuario);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
@@ -242,6 +245,7 @@ public class SubprocessoTransicaoService {
     public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        validarLocalizacaoEscrita(sp, usuario);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_DISPONIBILIZADO,
                 REVISAO_MAPA_DISPONIBILIZADO);
@@ -262,7 +266,10 @@ public class SubprocessoTransicaoService {
     public void validarMapa(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
+        validarLocalizacaoEscrita(sp, usuario);
+        validacaoService.validarSituacaoPermitida(sp,
+                MAPEAMENTO_MAPA_DISPONIBILIZADO,
+                REVISAO_MAPA_DISPONIBILIZADO);
 
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_VALIDADO, sp, "validação de mapa"));
         sp.setDataFimEtapa2(LocalDateTime.now());
@@ -275,8 +282,8 @@ public class SubprocessoTransicaoService {
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validarSituacaoPermitidaParaDevolucao(usuario, sp);
         validarLocalizacaoEscrita(sp, usuario);
+        validarSituacaoPermitidaParaDevolucao(usuario, sp);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
         Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);

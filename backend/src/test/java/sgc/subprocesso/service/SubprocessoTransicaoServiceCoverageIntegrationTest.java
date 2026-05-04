@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
-import sgc.*;
 import sgc.alerta.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;

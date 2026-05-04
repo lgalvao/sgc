@@ -611,8 +611,6 @@ class ProcessoServiceTest {
             assertThat(result.getUnidades().getFirst().getFilhos()).isNotEmpty();
         }
 
-        // Teste deveFalharQuandoHouverSnapshotLegadoSemNomeOuSigla removido pois uma sigla de unidade jamais será nula ou vazia.
-
         @Test
         @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelMapa mas sem permissao ACEITAR ou HOMOLOGAR")
         void isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelMapaSemPermissoes() {
@@ -946,7 +944,7 @@ class ProcessoServiceTest {
                 Subprocesso sp2 = Subprocesso.builder().codigo(1002L).unidade(Unidade.builder().codigo(2L).build()).build();
                 Subprocesso sp3 = Subprocesso.builder().codigo(1003L).unidade(Unidade.builder().codigo(3L).build()).build();
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
-                doReturn(true).when(permissionEvaluator).verificarPermissao(eq(usuario), any(), eq(DISPONIBILIZAR_MAPA));
+                when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
 
                 processoService.executarAcaoEmBloco(100L, req);
 
@@ -989,6 +987,7 @@ class ProcessoServiceTest {
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
+                when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
                 ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L, 20L),
@@ -1014,6 +1013,7 @@ class ProcessoServiceTest {
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
                 ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L),
@@ -1043,6 +1043,7 @@ class ProcessoServiceTest {
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
                 ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L),
@@ -1068,6 +1069,7 @@ class ProcessoServiceTest {
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
                 ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L),

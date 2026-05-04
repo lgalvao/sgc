@@ -102,12 +102,12 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setMapa(new sgc.mapa.model.Mapa());
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
         Usuario usuario = new Usuario();
-        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        usuario.setUnidadeAtivaCodigo(1L);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.apresentarSugestoes(100L, "sugestoes");
@@ -135,12 +135,12 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         setField(sp, SITUACAO, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
         Usuario usuario = new Usuario();
-        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        usuario.setUnidadeAtivaCodigo(1L);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.validarMapa(100L);
@@ -166,15 +166,16 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setProcesso(p);
         sp.setUnidade(u);
         setField(sp, SITUACAO, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        sp.setDataLimiteEtapa1(LocalDateTime.now());
+        sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
         Usuario usuario = new Usuario();
-        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        usuario.setUnidadeAtivaCodigo(1L);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.aceitarValidacao(100L, "obs");
@@ -187,8 +188,11 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @Test
     @DisplayName("executarDisponibilizacaoMapa - valida data limite igual")
     void disponibilizarMapa_DataIgual() {
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
+        sp.setUnidade(u);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
@@ -196,12 +200,15 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setMapa(new sgc.mapa.model.Mapa());
         sp.getMapa().setCodigo(100L);
         sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
+        sp.setDataLimiteEtapa2(LocalDateTime.of(2026, 1, 10, 0, 0));
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(sp.getUnidade() != null ? sp.getUnidade() : new Unidade());
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 15), "Obs");
         Usuario usuario = new Usuario();
-        usuario.setUnidadeAtivaCodigo(sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null);
+        usuario.setUnidadeAtivaCodigo(1L);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
         service.disponibilizarMapa(1L, req);
@@ -224,6 +231,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void obterUltimaDataLimite_etapa2SemEtapa1() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(123L);
+        sp.setDataLimiteEtapa1(null);
         sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(5));
 
         assertThatThrownBy(() -> invokeMethod(service, OBTER_ULTIMA_DATA_LIMITE, sp))
@@ -247,16 +255,25 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @Test
     @DisplayName("disponibilizarMapaEmBloco - deve aceitar lista de subprocessos")
     void disponibilizarMapaEmBloco_ComListaDeSubprocessos() {
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
+        sp.setUnidade(u);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         sp.setProcesso(Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build());
         sp.setMapa(new sgc.mapa.model.Mapa());
-        sp.setDataLimiteEtapa1(LocalDateTime.now());
+        sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
+        sp.setDataLimiteEtapa2(LocalDateTime.of(2026, 1, 10, 0, 0));
 
-        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(java.time.LocalDate.now().plusDays(1), "Obs");
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 15), "Obs");
 
-        service.disponibilizarMapaEmBloco(List.of(sp), req, new Usuario());
+        Usuario usuario = new Usuario();
+        usuario.setUnidadeAtivaCodigo(1L);
+
+        service.disponibilizarMapaEmBloco(List.of(sp), req, usuario);
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
     }

@@ -27,7 +27,6 @@ import static sgc.subprocesso.model.TipoTransicao.*;
 @DisplayName("SubprocessoTransicaoService")
 @SuppressWarnings("NullAway.Init")
 class SubprocessoTransicaoServiceTest {
-    // ... (rest of mocks and InjectMocks)
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
@@ -104,6 +103,7 @@ class SubprocessoTransicaoServiceTest {
 
         Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
         Usuario usuario = criarUsuario();
+        usuario.setUnidadeAtivaCodigo(10L);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
@@ -128,6 +128,54 @@ class SubprocessoTransicaoServiceTest {
                         && cmd.unidadeDestino().equals(admin)
                         && "Aceite final".equals(cmd.observacoes())));
         assertThat(subprocesso.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_VALIDADO);
+    }
+
+    @Test
+    @DisplayName("apresentarSugestoes deve mudar situacao e salvar mapa")
+    void apresentarSugestoesDeveMudarSituacaoESalvarMapa() {
+        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
+        Unidade admin = criarUnidade(1L, "ADMIN", "Administração");
+        unidade.setUnidadeSuperior(admin);
+
+        Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO, unidade);
+        sp.setDataLimiteEtapa1(LocalDateTime.now());
+        sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
+        sp.setMapa(new sgc.mapa.model.Mapa());
+
+        Usuario usuario = criarUsuario();
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(1L);
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+        service.apresentarSugestoes(1L, "Novas sugestões");
+
+        assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_COM_SUGESTOES);
+        assertThat(sp.getMapa().getSugestoes()).isEqualTo("Novas sugestões");
+        verify(mapaManutencaoService).salvarMapa(sp.getMapa());
+    }
+
+    @Test
+    @DisplayName("validarMapa deve mudar situacao")
+    void validarMapaDeveMudarSituacao() {
+        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
+        Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO, unidade);
+        sp.setDataLimiteEtapa1(LocalDateTime.now());
+        sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
+
+        Usuario usuario = criarUsuario();
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+        service.validarMapa(1L);
+
+        assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_VALIDADO);
     }
 
     @Test
@@ -187,17 +235,20 @@ class SubprocessoTransicaoServiceTest {
         @Test
         @DisplayName("Deve lançar erro quando data limite é anterior à última data (disponibilizarMapa)")
         void deveLancarErroQuandoDataLimiteAnterior() {
-            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, new Unidade());
+            Unidade u = criarUnidade(10L, "U10", "Unidade 10");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, u);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+            sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(30)); // Requisito: sempre definida
             sp.setMapa(new sgc.mapa.model.Mapa());
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(sp.getUnidade());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
 
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
@@ -206,15 +257,17 @@ class SubprocessoTransicaoServiceTest {
         @Test
         @DisplayName("submeterMapaAjustado deve funcionar com data limite nula")
         void submeterMapaAjustadoDeveFuncionarComDataLimiteNula() {
-            Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, new Unidade());
+            Unidade u = criarUnidade(10L, "U10", "Unidade 10");
+            Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, u);
             sp.setMapa(new sgc.mapa.model.Mapa());
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(sp.getUnidade());
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
 
             SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Justificativa", null, List.of());
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
             service.submeterMapaAjustado(1L, req);
 
@@ -225,7 +278,7 @@ class SubprocessoTransicaoServiceTest {
         @DisplayName("devolverValidacao deve filtrar movimentacao por unidade de analise e hierarquia")
         void devolverValidacaoDeveFiltrarMovimentacaoPorUnidadeAnaliseEHierarquia() {
             Unidade uOrigem = criarUnidade(1L, "ORI", "Origem");
-            Unidade uAnalise = criarUnidade(2L, "ANA", "Analise");
+            Unidade uAnalise = criarUnidade(10L, "ANA", "Analise");
             Unidade outraUnidade = criarUnidade(3L, "OUT", "Outra");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, uOrigem);
 
@@ -241,8 +294,9 @@ class SubprocessoTransicaoServiceTest {
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
             when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
 
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
             service.devolverValidacao(1L, "Justif");
 
@@ -252,16 +306,20 @@ class SubprocessoTransicaoServiceTest {
         @Test
         @DisplayName("devolverValidacao deve rejeitar ADMIN quando o mapa estiver validado")
         void devolverValidacaoDeveRejeitarAdminQuandoMapaValidado() {
-            Unidade uOrigem = criarUnidade(1L, "ORI", "Origem");
+            Unidade uOrigem = criarUnidade(10L, "ORI", "Origem");
             Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_MAPA_VALIDADO, uOrigem);
+            sp.setDataLimiteEtapa1(LocalDateTime.now());
+            sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
             Usuario usuario = criarUsuario();
             usuario.setPerfilAtivo(Perfil.ADMIN);
+            usuario.setUnidadeAtivaCodigo(10L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uOrigem);
             when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
             doThrow(new sgc.comum.erros.ErroValidacao("Situação inválida"))
                     .when(validacaoService)
-                    .validarSituacaoPermitida(eq(sp), eq(MAPEAMENTO_MAPA_COM_SUGESTOES), eq(REVISAO_MAPA_COM_SUGESTOES));
+                    .validarSituacaoPermitida(eq(sp), any(SituacaoSubprocesso[].class));
 
             assertThatThrownBy(() -> service.devolverValidacao(1L, "Justif"))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
@@ -272,16 +330,20 @@ class SubprocessoTransicaoServiceTest {
         @Test
         @DisplayName("homologarValidacao deve rejeitar ADMIN quando o mapa tiver sugestões")
         void homologarValidacaoDeveRejeitarQuandoMapaComSugestoes() {
-            Unidade uOrigem = criarUnidade(1L, "ORI", "Origem");
+            Unidade uOrigem = criarUnidade(10L, "ORI", "Origem");
             Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_MAPA_COM_SUGESTOES, uOrigem);
+            sp.setDataLimiteEtapa1(LocalDateTime.now());
+            sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
             Usuario usuario = criarUsuario();
             usuario.setPerfilAtivo(Perfil.ADMIN);
+            usuario.setUnidadeAtivaCodigo(10L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uOrigem);
             when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
             doThrow(new sgc.comum.erros.ErroValidacao("Situação inválida"))
                     .when(validacaoService)
-                    .validarSituacaoPermitida(eq(sp), eq(MAPEAMENTO_MAPA_VALIDADO), eq(REVISAO_MAPA_VALIDADO));
+                    .validarSituacaoPermitida(eq(sp), any(SituacaoSubprocesso[].class));
 
             assertThatThrownBy(() -> service.homologarValidacao(1L, "Obs"))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
@@ -303,18 +365,21 @@ class SubprocessoTransicaoServiceTest {
         @Test
         @DisplayName("disponibilizarMapa deve funcionar quando não há data limite anterior")
         void disponibilizarMapaDeveFuncionarQuandoNaoHaDataLimiteAnterior() {
-            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, new Unidade());
-            sp.setDataLimiteEtapa1(null);
+            Unidade u = criarUnidade(10L, "U10", "Unidade 10");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, u);
+            sp.setDataLimiteEtapa1(LocalDateTime.now().minusDays(10)); // Sempre definida
             sp.setDataLimiteEtapa2(null);
             sp.setMapa(new sgc.mapa.model.Mapa());
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
             when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(criarUnidade(10L, "U10", "Unidade 10"));
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
 
             service.disponibilizarMapa(1L, req);
 
@@ -343,6 +408,7 @@ class SubprocessoTransicaoServiceTest {
 
             Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
             Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
