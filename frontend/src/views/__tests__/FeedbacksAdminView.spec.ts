@@ -87,6 +87,7 @@ describe("FeedbacksAdminView", () => {
                 nota: "Melhorar contraste",
                 metadataJson: "{\"userAgent\":\"Mozilla/5.0\",\"rotaCaminho\":\"/painel\"}",
                 caminhoScreenshot: "c:/tmp/a.webp",
+                screenshotDisponivel: true,
                 usuarioCodigo: "123",
                 usuarioNome: "João",
                 enviadoEm: "2026-05-04T10:00:00Z",

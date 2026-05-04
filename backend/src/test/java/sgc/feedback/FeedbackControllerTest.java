@@ -137,6 +137,7 @@ class FeedbackControllerTest {
                         "Bug relatado",
                         null,
                         null,
+                        false,
                         "123",
                         "João",
                         OffsetDateTime.now(),
