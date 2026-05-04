@@ -107,11 +107,12 @@ class FeedbackServiceTest {
 
         ArgumentCaptor<FeedbackRegistro> captor = ArgumentCaptor.forClass(FeedbackRegistro.class);
         verify(repo).save(captor.capture());
-        String caminho = captor.getValue().getCaminhoScreenshot();
+        String nomeArquivo = captor.getValue().getCaminhoScreenshot();
         
-        assertThat(caminho).isNotNull().endsWith(".webp");
-        assertThat(Path.of(caminho)).exists();
-        assertThat(Files.readAllBytes(Path.of(caminho))).isEqualTo(imagemFake);
+        assertThat(nomeArquivo).isNotNull().endsWith(".webp");
+        Path caminhoCompleto = Path.of(propriedades.screenshotDir()).resolve(nomeArquivo);
+        assertThat(caminhoCompleto).exists();
+        assertThat(Files.readAllBytes(caminhoCompleto)).isEqualTo(imagemFake);
     }
 
     @Test

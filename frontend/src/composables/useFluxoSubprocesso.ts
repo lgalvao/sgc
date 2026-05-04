@@ -15,6 +15,10 @@ interface WorkflowOptions {
         incluirPainel?: boolean;
     };
     redirecionarPara?: import("vue-router").RouteLocationRaw;
+    recarregarContexto?: {
+        codigoSubprocesso: number;
+        tipo: "cadastro" | "edicao";
+    };
 }
 
 export function useFluxoSubprocesso() {
@@ -46,6 +50,18 @@ export function useFluxoSubprocesso() {
                 } else if (options.redirecionarPara) {
                     subprocessoStore.limparContextoAtual();
                     await router.push(options.redirecionarPara);
+                } else if (options.recarregarContexto) {
+                    if (options.recarregarContexto.tipo === "cadastro") {
+                        await subprocessoStore.garantirContextoCadastroAtividades(
+                            options.recarregarContexto.codigoSubprocesso,
+                            true,
+                        );
+                    } else {
+                        await subprocessoStore.garantirContextoEdicao(
+                            options.recarregarContexto.codigoSubprocesso,
+                            true,
+                        );
+                    }
                 }
             });
 
@@ -82,17 +98,21 @@ export function useFluxoSubprocesso() {
     }
 
     async function iniciarRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcaoWorkflow(async () => {
-            await cadastroService.iniciarRevisaoCadastro(codigoSubprocesso);
-            await subprocessoStore.garantirContextoCadastroAtividades(codigoSubprocesso, true);
-        });
+        return executarAcaoWorkflow(
+            () => cadastroService.iniciarRevisaoCadastro(codigoSubprocesso),
+            {
+                recarregarContexto: {codigoSubprocesso, tipo: "cadastro"}
+            }
+        );
     }
 
     async function cancelarInicioRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcaoWorkflow(async () => {
-            await cadastroService.cancelarInicioRevisaoCadastro(codigoSubprocesso);
-            await subprocessoStore.garantirContextoCadastroAtividades(codigoSubprocesso, true);
-        });
+        return executarAcaoWorkflow(
+            () => cadastroService.cancelarInicioRevisaoCadastro(codigoSubprocesso),
+            {
+                recarregarContexto: {codigoSubprocesso, tipo: "cadastro"}
+            }
+        );
     }
 
     async function devolverCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {
@@ -188,6 +208,7 @@ export function useFluxoSubprocesso() {
             () => subprocessoService.reabrirCadastro(codigoSubprocesso, justificativa),
             {
                 mensagemSucesso: TEXTOS.subprocesso.SUCESSO_CADASTRO_REABERTO,
+                recarregarContexto: {codigoSubprocesso, tipo: "edicao"}
             }
         );
     }
@@ -197,6 +218,7 @@ export function useFluxoSubprocesso() {
             () => subprocessoService.reabrirRevisaoCadastro(codigoSubprocesso, justificativa),
             {
                 mensagemSucesso: TEXTOS.subprocesso.SUCESSO_REVISAO_REABERTA,
+                recarregarContexto: {codigoSubprocesso, tipo: "edicao"}
             }
         );
     }

@@ -33,6 +33,7 @@ vi.mock("@/composables/useErrorHandler", () => ({
 
 const subprocessoStoreMock = {
     garantirContextoCadastroAtividades: vi.fn(),
+    garantirContextoEdicao: vi.fn(),
     limparContextoAtual: vi.fn()
 };
 
@@ -62,6 +63,7 @@ describe("useFluxoSubprocesso", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         subprocessoStoreMock.garantirContextoCadastroAtividades.mockReset();
+        subprocessoStoreMock.garantirContextoEdicao.mockReset();
         subprocessoStoreMock.limparContextoAtual.mockReset();
     });
 
@@ -94,6 +96,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.iniciarRevisaoCadastro).toHaveBeenCalledWith(123);
+        expect(subprocessoStoreMock.garantirContextoCadastroAtividades).toHaveBeenCalledWith(123, true);
     });
 
     it("deve cancelar início de revisão", async () => {
@@ -104,6 +107,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.cancelarInicioRevisaoCadastro).toHaveBeenCalledWith(123);
+        expect(subprocessoStoreMock.garantirContextoCadastroAtividades).toHaveBeenCalledWith(123, true);
     });
 
     it("deve devolver cadastro", async () => {
@@ -157,6 +161,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(subprocessoService.reabrirCadastro).toHaveBeenCalledWith(123, "justificativa");
+        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(123, true);
     });
 
     it("deve lidar com erro na ação de workflow", async () => {

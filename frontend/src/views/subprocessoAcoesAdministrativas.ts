@@ -129,7 +129,6 @@ export function useSubprocessoAcoesAdministrativas({
             if (sucesso) {
                 fecharModalReabrir();
                 exibirToastPendente();
-                await atualizarSubprocessoAtual();
             }
         });
     }
