@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onActivated, onMounted, ref, watch} from "vue";
+import {computed, onActivated, onMounted, ref} from "vue";
 import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
 import {RouterLink, useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -110,7 +110,6 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
-import type {DiagnosticoOrganizacional} from "@/types/diagnostico";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {usePerfil} from "@/composables/usePerfil";
@@ -140,25 +139,17 @@ const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagno
 const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
 const router = useRouter();
 const carregamentoInicialConcluido = ref(false);
-const diagnosticoOrganizacionalPersistido = ref<DiagnosticoOrganizacional | null>(null);
-const erroDiagnosticoPersistido = ref<string | null>(null);
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
 );
-const diagnosticoOrganizacionalEfetivo = computed(() =>
-    diagnosticoOrganizacional.value ?? diagnosticoOrganizacionalPersistido.value
-);
-const erroDiagnosticoOrganizacionalEfetivo = computed(() =>
-    erroDiagnosticoOrganizacional.value ?? erroDiagnosticoPersistido.value
-);
 const resumoDiagnostico = computed(() =>
-    erroDiagnosticoOrganizacionalEfetivo.value
-    ?? diagnosticoOrganizacionalEfetivo.value?.resumo
+    erroDiagnosticoOrganizacional.value
+    ?? diagnosticoOrganizacional.value?.resumo
     ?? ""
 );
 const unidadesSemResponsavel = computed(() => {
-  const grupo = diagnosticoOrganizacionalEfetivo.value?.grupos.find((item) => item.tipo === "Unidade sem responsável");
+  const grupo = diagnosticoOrganizacional.value?.grupos.find((item) => item.tipo === "Unidade sem responsável");
   if (!grupo || grupo.ocorrencias.length === 0) {
     return [];
   }
@@ -183,7 +174,7 @@ const sufixoMensagemUnidadesSemResponsavel = computed(() =>
 const alertaDiagnosticoDispensado = ref(false);
 const exibirAlertaDiagnostico = computed(() =>
     mostrarDiagnosticoOrganizacional.value
-    && (!!erroDiagnosticoOrganizacionalEfetivo.value || diagnosticoOrganizacionalEfetivo.value?.possuiViolacoes === true)
+    && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
     && !alertaDiagnosticoDispensado.value
 );
 
@@ -263,10 +254,6 @@ async function carregarUnidades() {
   }, TEXTOS.comum.ERRO_OPERACAO);
 }
 
-async function carregarDiagnostico() {
-  await organizacaoStore.garantirDiagnostico(mostrarDiagnosticoOrganizacional.value);
-}
-
 function mapearUnidadeParaLinha(unidade: Unidade): LinhaUnidadeArvore {
   return {
     codigo: unidade.codigo,
@@ -288,20 +275,7 @@ function abrirDetalheUnidade(item: unknown) {
   void router.push({path: `/unidade/${unidade.codigo}`});
 }
 
-watch(diagnosticoOrganizacional, (novoDiagnostico) => {
-  if (novoDiagnostico) {
-    diagnosticoOrganizacionalPersistido.value = novoDiagnostico;
-  }
-}, {immediate: true});
-
-watch(erroDiagnosticoOrganizacional, (novoErro) => {
-  if (novoErro) {
-    erroDiagnosticoPersistido.value = novoErro;
-  }
-}, {immediate: true});
-
 onMounted(() => {
-  void carregarDiagnostico();
   void carregarUnidades();
   carregamentoInicialConcluido.value = true;
 });
@@ -311,7 +285,6 @@ onActivated(() => {
     return;
   }
 
-  void carregarDiagnostico();
   if (!dadosLocaisValidos()) {
     void carregarUnidades();
   }

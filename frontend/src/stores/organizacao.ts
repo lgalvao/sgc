@@ -35,6 +35,11 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
         await carregamentoEmAndamento;
     }
 
+    async function recarregarDiagnostico(deveExibir: boolean): Promise<void> {
+        invalidar();
+        await garantirDiagnostico(deveExibir);
+    }
+
     async function carregarDiagnostico(): Promise<void> {
         try {
             diagnostico.value = await buscarDiagnosticoOrganizacional();
@@ -60,5 +65,5 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
         invalidar();
     }
 
-    return {diagnostico, erroDiagnostico, carregado, dadosValidos, garantirDiagnostico, invalidar, $reset};
+    return {diagnostico, erroDiagnostico, carregado, dadosValidos, garantirDiagnostico, recarregarDiagnostico, invalidar, $reset};
 });

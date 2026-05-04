@@ -110,6 +110,31 @@ describe("organizacao store", () => {
             expect(context.store.dadosValidos()).toBe(false);
         });
 
+        it("deve recarregar diagnóstico explicitamente", async () => {
+            vi.mocked(unidadeService.buscarDiagnosticoOrganizacional)
+                .mockResolvedValueOnce({
+                    possuiViolacoes: false,
+                    resumo: "ANTIGO",
+                    grupos: [],
+                    quantidadeTiposViolacao: 0,
+                    quantidadeOcorrencias: 0
+                })
+                .mockResolvedValueOnce({
+                    possuiViolacoes: true,
+                    resumo: "NOVO",
+                    grupos: [],
+                    quantidadeTiposViolacao: 1,
+                    quantidadeOcorrencias: 1
+                });
+
+            await context.store.garantirDiagnostico(true);
+            await context.store.recarregarDiagnostico(true);
+
+            expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalledTimes(2);
+            expect(context.store.diagnostico?.resumo).toBe("NOVO");
+            expect(context.store.carregado).toBe(true);
+        });
+
         it("deve lidar com erro ao buscar diagnóstico", async () => {
             vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockRejectedValue(new Error("Erro de rede"));
 

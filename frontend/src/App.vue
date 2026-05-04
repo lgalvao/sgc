@@ -63,15 +63,22 @@ watch(
 const devePrecarregarDiagnostico = computed(
     () => perfilStore.permissoesSessao?.mostrarDiagnosticoOrganizacional === true
 );
+const aguardandoDiagnosticoOrganizacional = computed(() =>
+    route.path !== "/login"
+    && route.path !== "/erro"
+    && Boolean(perfilStore.usuarioCodigo)
+    && devePrecarregarDiagnostico.value
+    && !organizacaoStore.carregado
+);
 
 watch(
-    () => [perfilStore.usuarioCodigo, devePrecarregarDiagnostico.value, route.path],
-    ([codigo, deveExibir, path]) => {
-      if (!codigo || !deveExibir || path === "/login") {
+    () => [perfilStore.usuarioCodigo, devePrecarregarDiagnostico.value, organizacaoStore.carregado, route.path],
+    async ([codigo, deveExibir, carregado, path]) => {
+      if (!codigo || !deveExibir || carregado || path === "/login" || path === "/erro") {
         return;
       }
 
-      void organizacaoStore.garantirDiagnostico(true);
+      await organizacaoStore.garantirDiagnostico(true);
     },
     {immediate: true}
 );
@@ -110,17 +117,23 @@ const chaveSessao = computed(() =>
     </div>
 
     <main id="main-content" class="flex-grow-1 pb-3">
+      <div
+          v-if="aguardandoDiagnosticoOrganizacional"
+          class="container py-4 text-center text-body-secondary"
+      >
+        Carregando informações organizacionais...
+      </div>
       <router-view v-slot="{ Component, route: currentRoute }">
         <KeepAlive :max="maximoRotasEmCache">
           <component
               :is="Component"
-              v-if="currentRoute.meta?.keepAlive"
+              v-if="currentRoute.meta?.keepAlive && !aguardandoDiagnosticoOrganizacional"
               :key="`${chaveSessao}:${currentRoute.fullPath}`"
           />
         </KeepAlive>
         <component
             :is="Component"
-            v-if="!currentRoute.meta?.keepAlive"
+            v-if="!currentRoute.meta?.keepAlive && !aguardandoDiagnosticoOrganizacional"
             :key="`${chaveSessao}:${currentRoute.fullPath}`"
         />
       </router-view>

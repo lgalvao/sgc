@@ -36,11 +36,24 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
     return {
         ...actual,
         buscarUnidadePorCodigo: mockBuscarUnidade,
+        buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
+            possuiViolacoes: false,
+            resumo: '',
+            quantidadeTiposViolacao: 0,
+            quantidadeOcorrencias: 0,
+            grupos: [],
+        }),
     };
 });
 
 vi.mock('@/services/usuarioService', () => ({
     pesquisarUsuarios: mockPesquisarUsuarios,
+}));
+
+vi.mock('@/composables/usePerfil', () => ({
+    usePerfil: () => ({
+        mostrarDiagnosticoOrganizacional: {value: true}
+    })
 }));
 
 describe('CadAtribuicao.vue', () => {

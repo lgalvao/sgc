@@ -194,6 +194,17 @@ describe("Unidades.vue", () => {
                 }
             ]
         };
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce([
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 43, sigla: "43ª Z.E.", nome: "Zona 43", filhas: []},
+                    {codigo: 45, sigla: "45ª Z.E.", nome: "Zona 45", filhas: []}
+                ]
+            }
+        ] as any);
 
         context.wrapper = mount(Unidades, {
             ...getCommonMountOptions(
@@ -214,17 +225,6 @@ describe("Unidades.vue", () => {
                 }
             )
         });
-        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce([
-            {
-                codigo: 1,
-                sigla: "ROOT",
-                nome: "Raiz",
-                filhas: [
-                    {codigo: 43, sigla: "43ª Z.E.", nome: "Zona 43", filhas: []},
-                    {codigo: 45, sigla: "45ª Z.E.", nome: "Zona 45", filhas: []}
-                ]
-            }
-        ] as any);
         await flushPromises();
         const wrapper = context.wrapper;
 

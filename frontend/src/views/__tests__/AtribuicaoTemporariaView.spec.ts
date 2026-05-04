@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import AtribuicaoTemporariaView from '../AtribuicaoTemporariaView.vue';
-import {buscarUnidadePorCodigo} from '@/services/unidadeService';
+import {buscarDiagnosticoOrganizacional, buscarUnidadePorCodigo} from '@/services/unidadeService';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {createPinia, setActivePinia} from 'pinia';
@@ -14,6 +14,7 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
     return {
         ...actual,
         buscarUnidadePorCodigo: vi.fn(),
+        buscarDiagnosticoOrganizacional: vi.fn(),
     };
 });
 
@@ -33,6 +34,12 @@ vi.mock('@/composables/useNotification', () => ({
         notify: mockNotify,
         clear: mockClear,
     }),
+}));
+
+vi.mock('@/composables/usePerfil', () => ({
+    usePerfil: () => ({
+        mostrarDiagnosticoOrganizacional: {value: true}
+    })
 }));
 
 const router = createRouter({
@@ -92,6 +99,13 @@ describe('AtribuicaoTemporariaView', () => {
     beforeEach(() => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
+        vi.mocked(buscarDiagnosticoOrganizacional).mockResolvedValue({
+            possuiViolacoes: false,
+            resumo: 'OK',
+            quantidadeTiposViolacao: 0,
+            quantidadeOcorrencias: 0,
+            grupos: []
+        });
     });
 
     it('deve carregar a unidade corretamente no onMounted', async () => {
@@ -163,6 +177,7 @@ describe('AtribuicaoTemporariaView', () => {
             dataTermino: '2025-12-31',
             justificativa: 'Teste de justificativa'
         });
+        expect(buscarDiagnosticoOrganizacional).toHaveBeenCalled();
         expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'success');
 
         // Verifica se limpou (opcional, mas bom para garantir integridade)

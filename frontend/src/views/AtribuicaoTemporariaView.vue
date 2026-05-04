@@ -154,16 +154,20 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {usePerfil} from "@/composables/usePerfil";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/date";
 import {buscarUnidadePorCodigo} from "@/services/unidadeService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
+import {useOrganizacaoStore} from "@/stores/organizacao";
 
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
+const {mostrarDiagnosticoOrganizacional} = usePerfil();
+const organizacaoStore = useOrganizacaoStore();
 
 const unidade = ref<Unidade | null>(null);
 const usuarioSelecionado = ref<string | null>(null);
@@ -245,6 +249,7 @@ async function criarAtribuicao() {
       dataTermino: dataTermino.value,
       justificativa: justificativa.value
     });
+    await organizacaoStore.recarregarDiagnostico(mostrarDiagnosticoOrganizacional.value);
 
     notify(TEXTOS.atribuicaoTemporaria.SUCESSO, 'success');
     resetarFormularioAtribuicao();

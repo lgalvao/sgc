@@ -216,18 +216,12 @@ async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcess
   }
 }
 
-async function carregarDiagnosticoOrganizacional() {
-  await organizacaoStore.garantirDiagnostico(mostrarDiagnosticoOrganizacional.value);
-}
-
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<Processo | null>(null);
 const isLoadingData = ref(false);
 
 onMounted(async () => {
-  void carregarDiagnosticoOrganizacional();
-
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     await carregarProcessoParaEdicao(Number(codProcesso));
