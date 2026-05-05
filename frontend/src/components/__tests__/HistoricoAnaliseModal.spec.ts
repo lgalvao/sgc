@@ -10,7 +10,9 @@ const mockAnalises: any[] = [
         unidadeSigla: "TEST",
         unidadeNome: "Unidade teste",
         acao: "ACEITE_MAPEAMENTO",
+        acaoDescricao: "Aceite",
         analistaUsuarioTitulo: "123456",
+        usuarioNome: "Usuário com nome razoavelmente longo para truncamento visual",
         observacoes: "Tudo certo.",
         motivo: "",
         tipo: "CADASTRO"
@@ -20,7 +22,9 @@ const mockAnalises: any[] = [
         unidadeSigla: "TEST2",
         unidadeNome: "Unidade teste 2",
         acao: "DEVOLUCAO_MAPEAMENTO",
+        acaoDescricao: "Devolução",
         analistaUsuarioTitulo: "654321",
+        usuarioNome: "Usuário Dois",
         observacoes: "Faltou informação.",
         motivo: "Incompleto",
         tipo: "CADASTRO"
@@ -71,9 +75,12 @@ describe("HistoricoAnaliseModal", () => {
         const expectedDate = formatarDataBR(new Date(mockAnalises[0].dataHora));
         expect(rows[0].text()).toContain(expectedDate);
         expect(rows[0].text()).toContain("TEST");
-        expect(rows[0].text()).toContain("ACEITE_MAPEAMENTO");
-        expect(rows[0].text()).toContain("123456");
+        expect(rows[0].text()).toContain("Aceite");
+        expect(rows[0].text()).toContain("Usuário com nome razoavelmente longo para truncamento visual");
         expect(rows[0].text()).toContain("Tudo certo.");
+        expect(rows[1].text()).toContain("Devolução");
+        expect(context.wrapper.find('[data-testid="cell-usuario-0"]').attributes("title"))
+            .toContain("Usuário com nome razoavelmente longo");
     });
 
     it("deve emitir o evento fechar ao clicar no botão de fechar", async () => {

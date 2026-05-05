@@ -179,7 +179,9 @@ class SubprocessoControllerCoverageExtraTest {
         when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.VALIDACAO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                "Aceite",
                 "123456789012",
+                "Usuário Teste",
                 "SIGLA",
                 "Unidade teste",
                 LocalDateTime.now(),
@@ -210,7 +212,9 @@ class SubprocessoControllerCoverageExtraTest {
         when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.CADASTRO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                "Aceite",
                 "123456789012",
+                "Usuário Teste",
                 "SIGLA",
                 "Unidade teste",
                 LocalDateTime.now(),

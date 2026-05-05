@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.subprocesso.dto.*;
@@ -21,6 +22,8 @@ class AnaliseHistoricoServiceTest {
 
     @Mock
     private UnidadeService unidadeService;
+    @Mock
+    private UsuarioFacade usuarioFacade;
 
     @InjectMocks
     private AnaliseHistoricoService analiseHistoricoService;
@@ -49,15 +52,19 @@ class AnaliseHistoricoServiceTest {
 
         UnidadeResumoLeitura unidade = new UnidadeResumoLeitura(10L, "Unidade Teste", "UT", TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+        when(usuarioFacade.buscarUsuariosPorTitulos(List.of("analista1")))
+                .thenReturn(Map.of("analista1", criarUsuario("analista1", "Analista Um")));
 
         AnaliseHistoricoDto dto = analiseHistoricoService.converter(analise);
 
         assertThat(dto.dataHora()).isEqualTo(LocalDateTime.of(2025, 4, 10, 10, 0));
         assertThat(dto.observacoes()).isEqualTo("Tudo certo");
         assertThat(dto.acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(dto.acaoDescricao()).isEqualTo("Aceite");
         assertThat(dto.unidadeSigla()).isEqualTo("UT");
         assertThat(dto.unidadeNome()).isEqualTo("Unidade Teste");
         assertThat(dto.analistaUsuarioTitulo()).isEqualTo("analista1");
+        assertThat(dto.usuarioNome()).isEqualTo("Analista Um");
         assertThat(dto.motivo()).isEqualTo("Motivo A");
         assertThat(dto.tipo()).isEqualTo(TipoAnalise.CADASTRO);
     }
@@ -86,12 +93,19 @@ class AnaliseHistoricoServiceTest {
 
         when(unidadeService.buscarResumosPorCodigos(argThat(lista -> lista.containsAll(List.of(10L, 20L)))))
                 .thenReturn(List.of(unidade1, unidade2));
+        when(usuarioFacade.buscarUsuariosPorTitulos(argThat(lista -> lista.containsAll(List.of("analista1", "analista2")))))
+                .thenReturn(Map.of(
+                        "analista1", criarUsuario("analista1", "Analista Um"),
+                        "analista2", criarUsuario("analista2", "Analista Dois")
+                ));
 
         List<AnaliseHistoricoDto> resultado = analiseHistoricoService.converterLista(List.of(analise1, analise2));
 
         assertThat(resultado).hasSize(2);
         assertThat(resultado.get(0).unidadeSigla()).isEqualTo("UT1");
+        assertThat(resultado.get(0).usuarioNome()).isEqualTo("Analista Um");
         assertThat(resultado.get(1).unidadeSigla()).isEqualTo("UT2");
+        assertThat(resultado.get(1).acaoDescricao()).isEqualTo("Devolução");
     }
 
     @Test
@@ -106,5 +120,12 @@ class AnaliseHistoricoServiceTest {
         assertThatThrownBy(() -> analiseHistoricoService.converter(analise))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Unidade 99 ausente no histórico de análises");
+    }
+
+    private Usuario criarUsuario(String titulo, String nome) {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+        usuario.setNome(nome);
+        return usuario;
     }
 }

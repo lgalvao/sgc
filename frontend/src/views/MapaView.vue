@@ -171,7 +171,7 @@ import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
-import {listarAnalisesCadastro} from "@/services/analiseService";
+import {listarAnalisesValidacao} from "@/services/analiseService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
 import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
@@ -323,7 +323,7 @@ const {
   focarPrimeiroErroInvalido,
   concluirAcaoPainel,
   notify,
-  listarAnalisesCadastro,
+  listarAnalisesCadastro: listarAnalisesValidacao,
   validarMapa: fluxoMapa.validarMapa,
   homologarMapa: fluxoMapa.homologarMapa,
   aceitarMapa: fluxoMapa.aceitarMapa,

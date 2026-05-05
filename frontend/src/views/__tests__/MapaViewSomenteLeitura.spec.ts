@@ -26,7 +26,7 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/services/analiseService", () => ({
-    listarAnalisesCadastro: vi.fn(),
+    listarAnalisesValidacao: vi.fn(),
 }));
 
 vi.mock("@/services/subprocessoService", () => ({
@@ -143,7 +143,7 @@ describe("MapaView somente leitura", () => {
         });
 
         vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValue("Sugestão persistida");
-        vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
+        vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue([]);
         vi.mocked(subprocessoService.apresentarSugestoes).mockResolvedValue(undefined as never);
 
         const mapaMock = {
@@ -312,6 +312,6 @@ describe("MapaView somente leitura", () => {
         await wrapper.find('[data-testid="btn-mapa-historico"]').trigger("click");
         await flushPromises();
 
-        expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(123);
+        expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(123);
     });
 });

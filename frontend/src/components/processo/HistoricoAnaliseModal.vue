@@ -37,10 +37,10 @@
               <span data-testid="header-historico-unidade">Unidade</span>
             </template>
             <template #head(acao)>
-              <span data-testid="header-historico-resultado">Resultado</span>
+              <span data-testid="header-historico-acao">Ação</span>
             </template>
-            <template #head(analistaUsuarioTitulo)>
-              <span data-testid="header-historico-analista">Analista</span>
+            <template #head(usuarioNome)>
+              <span data-testid="header-historico-usuario">Usuário</span>
             </template>
             <template #head(observacoes)>
               <span data-testid="header-historico-observacao">Observação</span>
@@ -57,7 +57,16 @@
             </template>
             <template #cell(acao)="{ item, index }">
               <span :data-testid="`cell-resultado-${index}`">
-                {{ (item as Analise).acao }}
+                {{ (item as Analise).acaoDescricao || formatarAcaoAnalise((item as Analise).acao) }}
+              </span>
+            </template>
+            <template #cell(usuarioNome)="{ item, index }">
+              <span
+                  :data-testid="`cell-usuario-${index}`"
+                  :title="(item as Analise).usuarioNome || (item as Analise).analistaUsuarioTitulo"
+                  class="texto-truncado-usuario"
+              >
+                {{ (item as Analise).usuarioNome || (item as Analise).analistaUsuarioTitulo || "-" }}
               </span>
             </template>
             <template #cell(observacoes)="{ item, index }">
@@ -101,8 +110,8 @@ const emit = defineEmits(["fechar"]);
 const fields = [
   {key: "dataHora", label: "Data/Hora"},
   {key: "unidadeSigla", label: "Unidade"},
-  {key: "acao", label: "Resultado"},
-  {key: "analistaUsuarioTitulo", label: "Analista"},
+  {key: "acao", label: "Ação"},
+  {key: "usuarioNome", label: "Usuário"},
   {key: "observacoes", label: "Observação"},
 ];
 
@@ -111,6 +120,26 @@ const fields = [
  */
 function fechar() {
   emit("fechar");
+}
+
+function formatarAcaoAnalise(acao: string | null | undefined): string {
+  switch (acao) {
+    case "ACEITE_MAPEAMENTO":
+    case "ACEITE_REVISAO":
+      return "Aceite";
+    case "DEVOLUCAO_MAPEAMENTO":
+    case "DEVOLUCAO_REVISAO":
+      return "Devolução";
+    default:
+      if (!acao) {
+        return "-";
+      }
+      return acao
+          .toLowerCase()
+          .split("_")
+          .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+          .join(" ");
+  }
 }
 </script>
 
@@ -124,5 +153,14 @@ function fechar() {
 .btn-cancelar-link:hover {
   color: var(--bs-emphasis-color) !important;
   background-color: var(--bs-secondary-bg);
+}
+
+.texto-truncado-usuario {
+  display: inline-block;
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 </style>

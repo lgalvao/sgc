@@ -15,6 +15,16 @@ describe("analiseService", () => {
         expect(result).toEqual(dtoList);
     });
 
+    it("listarAnalisesValidacao deve buscar histórico de validação", async () => {
+        const dtoList = [{codigo: 2, observacoes: "Ajustar"}];
+        mockApi.get.mockResolvedValue({data: dtoList});
+
+        const result = await service.listarAnalisesValidacao(123);
+
+        expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/123/historico-validacao");
+        expect(result).toEqual(dtoList);
+    });
+
     describe("Tratamento de erros", () => {
         testErrorHandling(() => service.listarAnalisesCadastro(123));
     });

@@ -50,9 +50,11 @@ export interface Analise {
     dataHora: string;
     observacoes: string;
     acao: string;
+    acaoDescricao: string;
     unidadeSigla: string;
     unidadeNome: string;
     analistaUsuarioTitulo: string;
+    usuarioNome: string;
     motivo: string;
     tipo: string;
 }

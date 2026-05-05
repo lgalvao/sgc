@@ -55,7 +55,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     @BeforeEach
     void setUp() {
         localizacaoSubprocessoService = new LocalizacaoSubprocessoService(movimentacaoRepo);
-        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService);
+        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioFacade);
 
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
         ReflectionTestUtils.setField(consultaService, "contextoConsultaService", contextoConsultaService);
@@ -91,6 +91,13 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         user.setTituloEleitoral("12345678");
         user.setNome("Usuario Teste");
         return user;
+    }
+
+    private Usuario criarUsuario(String titulo, String nome) {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+        usuario.setNome(nome);
+        return usuario;
     }
 
     private void stubContextoAutenticado(Usuario usuario) {
@@ -667,12 +674,20 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Analise a1 = new Analise();
             a1.setTipo(TipoAnalise.CADASTRO);
             a1.setUnidadeCodigo(10L);
+            a1.setUsuarioTitulo("analista1");
+            a1.setAcao(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             Analise a2 = new Analise();
             a2.setTipo(TipoAnalise.VALIDACAO);
             a2.setUnidadeCodigo(10L);
+            a2.setUsuarioTitulo("analista2");
+            a2.setAcao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
                     new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
+            ));
+            when(usuarioFacade.buscarUsuariosPorTitulos(argThat(lista -> lista.contains("analista1")))).thenReturn(Map.of(
+                    "analista1", criarUsuario("analista1", "Analista 1"),
+                    "analista2", criarUsuario("analista2", "Analista 2")
             ));
 
             assertThat(consultaService.listarHistoricoCadastro(1L)).hasSize(1);
@@ -684,12 +699,20 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Analise a1 = new Analise();
             a1.setTipo(TipoAnalise.CADASTRO);
             a1.setUnidadeCodigo(10L);
+            a1.setUsuarioTitulo("analista1");
+            a1.setAcao(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             Analise a2 = new Analise();
             a2.setTipo(TipoAnalise.VALIDACAO);
             a2.setUnidadeCodigo(10L);
+            a2.setUsuarioTitulo("analista2");
+            a2.setAcao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
                     new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
+            ));
+            when(usuarioFacade.buscarUsuariosPorTitulos(argThat(lista -> lista.contains("analista2")))).thenReturn(Map.of(
+                    "analista1", criarUsuario("analista1", "Analista 1"),
+                    "analista2", criarUsuario("analista2", "Analista 2")
             ));
 
             assertThat(consultaService.listarHistoricoValidacao(1L)).hasSize(1);
@@ -701,12 +724,20 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Analise a1 = new Analise();
             a1.setTipo(TipoAnalise.CADASTRO);
             a1.setUnidadeCodigo(10L);
+            a1.setUsuarioTitulo("analista1");
+            a1.setAcao(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             Analise a2 = new Analise();
             a2.setTipo(TipoAnalise.VALIDACAO);
             a2.setUnidadeCodigo(10L);
+            a2.setUsuarioTitulo("analista2");
+            a2.setAcao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
                     new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
+            ));
+            when(usuarioFacade.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
+                    "analista1", criarUsuario("analista1", "Analista 1"),
+                    "analista2", criarUsuario("analista2", "Analista 2")
             ));
 
             assertThat(consultaService.listarHistoricoCadastro(1L)).hasSize(1);

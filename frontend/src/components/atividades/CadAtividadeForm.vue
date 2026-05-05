@@ -8,7 +8,7 @@
       <BFormInput
           ref="inputRef"
           v-model="modelValue"
-          :disabled="loading"
+          :disabled="loading || disabled"
           :state="estadoInput"
           aria-label="Nova atividade"
           aria-required="true"

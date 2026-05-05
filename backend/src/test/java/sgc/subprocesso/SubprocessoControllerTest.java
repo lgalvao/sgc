@@ -928,7 +928,9 @@ class SubprocessoControllerTest {
             when(analiseHistoricoService.converter(analise)).thenReturn(new AnaliseHistoricoDto(
                     TipoAnalise.VALIDACAO,
                     TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                    "Aceite",
                     "123456789012",
+                    "Usuário Teste",
                     "SIGLA",
                     "Unidade",
                     java.time.LocalDateTime.now(),

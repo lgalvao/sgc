@@ -11,9 +11,11 @@ import java.time.*;
 public record AnaliseHistoricoDto(
         TipoAnalise tipo,
         TipoAcaoAnalise acao,
+        String acaoDescricao,
 
         @TituloEleitoral
         String analistaUsuarioTitulo,
+        String usuarioNome,
 
         String unidadeSigla,
         String unidadeNome,

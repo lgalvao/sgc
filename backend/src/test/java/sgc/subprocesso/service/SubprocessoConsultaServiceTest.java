@@ -47,7 +47,7 @@ class SubprocessoConsultaServiceTest {
 
     @BeforeEach
     void configurarDependenciasAdicionais() {
-        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService);
+        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioFacade);
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
         ReflectionTestUtils.setField(service, "contextoConsultaService", contextoConsultaService);
 
@@ -153,19 +153,34 @@ class SubprocessoConsultaServiceTest {
         Analise analise1 = new Analise();
         analise1.setUnidadeCodigo(10L);
         analise1.setTipo(TipoAnalise.CADASTRO);
+        analise1.setUsuarioTitulo("analista1");
+        analise1.setAcao(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
 
         Analise analise2 = new Analise();
         analise2.setUnidadeCodigo(20L);
         analise2.setTipo(TipoAnalise.CADASTRO);
+        analise2.setUsuarioTitulo("analista2");
+        analise2.setAcao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
 
         when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(analise1, analise2));
         when(unidadeService.buscarResumosPorCodigos(List.of(10L, 20L))).thenReturn(List.of(
                 new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL),
                 new UnidadeResumoLeitura(20L, "Unidade 20", "U20", TipoUnidade.OPERACIONAL)
         ));
+        when(usuarioFacade.buscarUsuariosPorTitulos(List.of("analista1", "analista2"))).thenReturn(Map.of(
+                "analista1", criarUsuario("analista1", "Analista 1"),
+                "analista2", criarUsuario("analista2", "Analista 2")
+        ));
 
         assertThat(service.listarHistoricoCadastro(1L)).hasSize(2);
         verify(unidadeService).buscarResumosPorCodigos(List.of(10L, 20L));
         verify(unidadeService, never()).buscarPorCodigo(anyLong());
+    }
+
+    private Usuario criarUsuario(String titulo, String nome) {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+        usuario.setNome(nome);
+        return usuario;
     }
 }
