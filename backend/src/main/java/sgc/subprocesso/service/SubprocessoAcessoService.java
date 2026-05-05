@@ -58,65 +58,53 @@ public class SubprocessoAcessoService {
     private PermissoesSubprocessoDto construirPermissoes(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         SituacaoSubprocesso situacao = contexto.situacao();
         boolean mesmaUnidade = contexto.mesmaUnidade();
-        boolean habilitarAcessoCadastro = verificarAcessoCadastroHabilitado(contexto);
-        boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(contexto);
 
-        boolean podeEditarCadastro = contexto.isChefe();
-        boolean podeDisponibilizarCadastro = contexto.isChefe();
-        boolean podeDevolverCadastro = contexto.isGestorOuAdmin();
-        boolean podeAceitarCadastro = contexto.isGestor();
-        boolean podeHomologarCadastro = contexto.isAdmin();
-        boolean podeEditarMapa = contexto.isAdmin();
-        boolean podeDisponibilizarMapa = contexto.isAdmin();
-        boolean podeValidarMapa = contexto.isChefe();
-        boolean podeApresentarSugestoes = contexto.isChefe();
-        boolean podeVerSugestoes = contexto.isGestorOuAdmin() && SITUACOES_COM_SUGESTOES_MAPA.contains(situacao);
-        boolean podeDevolverMapa = contexto.isAdmin() || contexto.isGestor();
-        boolean podeAceitarMapa = contexto.isGestor();
-        boolean podeHomologarMapa = contexto.isAdmin();
-        boolean podeVisualizarImpacto = verificarVisualizarImpacto(contexto);
-
-        return PermissoesSubprocessoDto.builder()
-                .podeEditarCadastro(podeEditarCadastro)
-                .podeDisponibilizarCadastro(podeDisponibilizarCadastro)
-                .podeDevolverCadastro(podeDevolverCadastro)
-                .podeAceitarCadastro(podeAceitarCadastro)
-                .podeHomologarCadastro(podeHomologarCadastro)
-                .podeEditarMapa(podeEditarMapa)
-                .podeDisponibilizarMapa(podeDisponibilizarMapa)
-                .podeValidarMapa(podeValidarMapa)
-                .podeApresentarSugestoes(podeApresentarSugestoes)
-                .podeVerSugestoes(podeVerSugestoes)
-                .podeDevolverMapa(podeDevolverMapa)
-                .podeAceitarMapa(podeAceitarMapa)
-                .podeHomologarMapa(podeHomologarMapa)
-                .podeVisualizarImpacto(podeVisualizarImpacto)
+        PermissoesSubprocessoDto.PermissoesSubprocessoDtoBuilder builder = PermissoesSubprocessoDto.builder()
+                .podeEditarCadastro(contexto.isChefe())
+                .podeDisponibilizarCadastro(contexto.isChefe())
+                .podeDevolverCadastro(contexto.isGestorOuAdmin())
+                .podeAceitarCadastro(contexto.isGestor())
+                .podeHomologarCadastro(contexto.isAdmin())
+                .podeEditarMapa(contexto.isAdmin())
+                .podeDisponibilizarMapa(contexto.isAdmin())
+                .podeValidarMapa(contexto.isChefe())
+                .podeApresentarSugestoes(contexto.isChefe())
+                .podeVerSugestoes(contexto.isGestorOuAdmin() && SITUACOES_COM_SUGESTOES_MAPA.contains(situacao))
+                .podeDevolverMapa(contexto.isAdmin() || contexto.isGestor())
+                .podeAceitarMapa(contexto.isGestor())
+                .podeHomologarMapa(contexto.isAdmin())
+                .podeVisualizarImpacto(verificarVisualizarImpacto(contexto))
                 .podeAlterarDataLimite(contexto.isAdmin())
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
                 .mesmaUnidade(mesmaUnidade)
-                .habilitarAcessoCadastro(habilitarAcessoCadastro)
-                .habilitarAcessoMapa(habilitarAcessoMapa)
-                .habilitarEditarCadastro(podeEditarCadastro && SITUACOES_EDICAO_CADASTRO.contains(situacao) && mesmaUnidade)
-                .habilitarDisponibilizarCadastro(podeDisponibilizarCadastro && SITUACOES_DISPONIBILIZACAO_CADASTRO.contains(situacao) && mesmaUnidade)
-                .habilitarDevolverCadastro(podeDevolverCadastro && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
-                .habilitarAceitarCadastro(podeAceitarCadastro && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
-                .habilitarHomologarCadastro(podeHomologarCadastro && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
-                .habilitarEditarMapa(podeEditarMapa && SITUACOES_EDICAO_MAPA.contains(situacao) && mesmaUnidade)
-                .habilitarDisponibilizarMapa(podeDisponibilizarMapa && SITUACOES_DISPONIBILIZACAO_MAPA.contains(situacao) && mesmaUnidade)
-                .habilitarValidarMapa(podeValidarMapa && SITUACOES_ANALISE_MAPA.contains(situacao) && mesmaUnidade)
-                .habilitarApresentarSugestoes(podeApresentarSugestoes && SITUACOES_ANALISE_MAPA.contains(situacao) && mesmaUnidade)
-                .habilitarDevolverMapa(verificarDevolverMapa(contexto) && mesmaUnidade)
-                .habilitarAceitarMapa(podeAceitarMapa && SITUACOES_GESTAO_MAPA.contains(situacao) && mesmaUnidade)
-                .habilitarHomologarMapa(verificarHomologarMapa(contexto) && mesmaUnidade)
+                .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(contexto))
+                .habilitarAcessoMapa(verificarAcessoMapaHabilitado(contexto))
                 .habilitarAlterarDataLimite(contexto.isAdmin())
-                .habilitarReabrirCadastro(contexto.isAdmin()
-                        && isSituacaoMapeamentoAPartirDe(contexto.situacao(), MAPEAMENTO_MAPA_HOMOLOGADO))
-                .habilitarReabrirRevisao(contexto.isAdmin()
-                        && isSituacaoRevisaoAPartirDe(contexto.situacao(), REVISAO_MAPA_HOMOLOGADO))
-                .habilitarEnviarLembrete(contexto.isAdmin())
-                .build();
+                .habilitarEnviarLembrete(contexto.isAdmin());
+
+        // Habilitação de ações de cadastro
+        builder.habilitarEditarCadastro(contexto.isChefe() && SITUACOES_EDICAO_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarDisponibilizarCadastro(contexto.isChefe() && SITUACOES_DISPONIBILIZACAO_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarDevolverCadastro(contexto.isGestorOuAdmin() && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarAceitarCadastro(contexto.isGestor() && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarHomologarCadastro(contexto.isAdmin() && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade);
+
+        // Habilitação de ações de mapa
+        builder.habilitarEditarMapa(contexto.isAdmin() && SITUACOES_EDICAO_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarDisponibilizarMapa(contexto.isAdmin() && SITUACOES_DISPONIBILIZACAO_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarValidarMapa(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarApresentarSugestoes(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarDevolverMapa(verificarDevolverMapa(contexto) && mesmaUnidade)
+                .habilitarAceitarMapa(contexto.isGestor() && SITUACOES_GESTAO_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarHomologarMapa(verificarHomologarMapa(contexto) && mesmaUnidade);
+
+        // Reaberturas
+        builder.habilitarReabrirCadastro(contexto.isAdmin() && isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_MAPA_HOMOLOGADO))
+                .habilitarReabrirRevisao(contexto.isAdmin() && isSituacaoRevisaoAPartirDe(situacao, REVISAO_MAPA_HOMOLOGADO));
+
+        return builder.build();
     }
 
     private PermissoesSubprocessoDto construirPermissoesProcessoFinalizado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {

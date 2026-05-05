@@ -71,12 +71,12 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             atividadeA = `Atividade origem A - ${processoOrigemId}`;
             atividadeB = `Atividade origem B - ${processoOrigemId}`;
 
-            await AtividadeHelpers.verificarOpcoesImportacaoVazia(page, [
+            await AtividadeHelpers.verificarOpcoesImportacao(page, [
                 {processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM]},
                 {processo: processoOrigem2Descricao, unidades: ['ASSESSORIA_21']}
             ]);
 
-            await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
+            await AtividadeHelpers.importarAtividades(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
 
             // A importação deve habilitar a disponibilização imediatamente
             await AtividadeHelpers.verificarBotaoDisponibilizar(page, true);
@@ -232,7 +232,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.navegarParaCadastro(page);
 
             // Abre o modal de importação e seleciona atividade do processo A
-            await AtividadeHelpers.selecionarAtividadesParaImportacaoVazia(
+            await AtividadeHelpers.selecionarAtividadesParaImportacao(
                 page, descOrigemA, UNIDADE_ORIGEM_A, [atividadeDeA]
             );
 

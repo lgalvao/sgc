@@ -121,7 +121,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(btnDisponibilizar).toBeVisible();
             await expect(btnDisponibilizar).toBeDisabled();
 
-            await AtividadeHelpers.importarAtividadesVazia(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
+            await AtividadeHelpers.importarAtividades(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
             await AtividadeHelpers.disponibilizarCadastro(page);
 
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);

@@ -23,8 +23,10 @@ export async function esperarAtividadesEditaveis(page: Page) {
 }
 
 export async function esperarSemAcoesEdicaoCadastro(page: Page) {
-    await expect(page.getByTestId('inp-nova-atividade')).toBeHidden();
-    await expect(page.getByTestId('btn-adicionar-atividade')).toBeHidden();
+    await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+    await expect(page.getByTestId('inp-nova-atividade')).toBeDisabled();
+    await expect(page.getByTestId('btn-adicionar-atividade')).toBeVisible();
+    await expect(page.getByTestId('btn-adicionar-atividade')).toBeDisabled();
 
     const botaoImportar = page.getByTestId('btn-cad-atividades-importar');
     if (await botaoImportar.count() > 0) {
@@ -288,13 +290,6 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
     await preencherFormularioImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
 }
 
-export async function selecionarAtividadesParaImportacaoVazia(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
-    await Promise.all([
-        page.waitForResponse(r => r.url().includes('/para-importacao')),
-        abrirModalImportacao(page)
-    ]);
-    await preencherFormularioImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
-}
 
 export async function importarAtividades(page: Page,
                                          processoOrigemDescricao: string,
@@ -313,22 +308,6 @@ export async function importarAtividades(page: Page,
     }
 }
 
-export async function importarAtividadesVazia(page: Page,
-                                              processoOrigemDescricao: string,
-                                              unidadeOrigemSigla: string,
-                                              atividadesDescricoes: string[]) {
-
-    await selecionarAtividadesParaImportacaoVazia(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
-
-    const modal = page.getByRole('dialog');
-    await modal.getByTestId('btn-importar').click();
-
-    await expect(modal).toBeHidden();
-
-    for (const desc of atividadesDescricoes) {
-        await expect(page.getByText(desc, {exact: true}).first()).toBeVisible();
-    }
-}
 
 export async function importarAtividadesComAvisoDuplicidade(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
     await selecionarAtividadesParaImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
@@ -379,15 +358,6 @@ export async function verificarOpcoesImportacao(
     await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
 }
 
-export async function verificarOpcoesImportacaoVazia(
-    page: Page,
-    opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
-) {
-    const respostaProcessos = page.waitForResponse(r => r.url().includes('/para-importacao'));
-    await abrirModalImportacao(page);
-    await respostaProcessos;
-    await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
-}
 
 async function abrirModalImportacao(page: Page) {
     const botaoCabecalho = page.getByTestId('btn-cad-atividades-importar');
