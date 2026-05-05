@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
-import {page, userEvent} from '@vitest/browser/context';
+import {page} from '@vitest/browser/context';
 import {ref} from 'vue';
 import EditorTextoRico from './EditorTextoRico.vue';
 
