@@ -1,5 +1,15 @@
-*
+.git
+.gradle
+.idea
+.vscode
+**/build/
+**/dist/
+**/node_modules/
+**/target/
+**/bin/
+**/out/
+.env*
+!.env.hom
 !Dockerfile
-!sgc.jar
 !deploy/
 !deploy/*.cer
