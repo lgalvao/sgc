@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = sgc.Sgc.class)
 @ActiveProfiles("test")
 @Transactional
-class SubprocessoTransicaoServiceCoverageIntegrationTest {
+class SubprocessoTransicaoServiceIntegrationTest {
 
     @Autowired
     private SubprocessoTransicaoService transicaoService;
