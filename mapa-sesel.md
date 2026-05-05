@@ -1,7 +1,102 @@
 # Mapa de Competências Técnicas - Unidade SESEL (Simulado)
 
-Este documento apresenta uma simulação do mapa de competências da unidade **SESEL (Seção de Suporte Eleitoral)**, com
-conhecimentos específicos e listados individualmente por atividade.
+Este documento serve como especificação do exemplo completo que será materializado por um script SQL para
+homologação. A base do cenário é a unidade **SESEL (Seção de Sistemas Eleitorais)** e o objetivo é ter um mapa
+integro do começo ao fim, com os registros de apoio necessários para navegação, histórico e notificações.
+
+## Objetivo do script
+
+Criar um conjunto de dados consistente para demonstrar o ciclo completo de um mapa:
+
+* processo criado e vinculado à unidade;
+* subprocesso em estágio compatível com o mapa exibido;
+* mapa com competências, atividades e conhecimentos;
+* movimentações que representem a evolução do fluxo;
+* alertas relacionados ao processo e aos destinatários corretos;
+* notificações de e-mail coerentes com o estado do subprocesso;
+* vínculos de responsabilidade, perfis e unidade vigente preservados.
+
+## Fontes de referência
+
+Os dois arquivos abaixo são a melhor base para construir o script:
+
+* `backend/src/test/resources/data.sql`
+* `e2e/setup/seed.sql`
+
+Uso esperado de cada um:
+
+* `data.sql` ajuda a identificar a estrutura mínima para a unidade SESEL, os usuários base, os perfis e os resets de
+  sequência.
+* `seed.sql` mostra o encadeamento completo de processo, subprocesso, mapa, movimentações, alertas e notificações,
+  além de exemplificar estados intermediários e finais.
+
+## Cenário alvo
+
+O cenário deve ser montado de forma a representar um mapa completo e apresentável para o usuário, com a SESEL como
+unidade principal e o restante da hierarquia já íntegra.
+
+### Elementos que precisam existir
+
+* Hierarquia de unidades suficiente para localizar a SESEL.
+* Usuários com `CHEFE`, `GESTOR`, `SERVIDOR` e, quando necessário, `ADMIN`.
+* Responsabilidades coerentes com os usuários e suas unidades.
+* Um processo de mapeamento ativo ou concluído, conforme o estado escolhido para a demonstração.
+* Um subprocesso da SESEL apontando para o mapa.
+* Um mapa com o conteúdo completo deste documento.
+* Movimentações que reflitam a progressão do fluxo.
+* Alertas para os destinatários corretos.
+* Registros em `NOTIFICACAO_EMAIL` para validar a caixa de saída administrativa.
+
+## Ordem sugerida de carga
+
+Para evitar chave estrangeira órfã e manter o histórico legível, o script deve seguir esta ordem:
+
+1. Limpeza das tabelas dependentes do mapa, na ordem inversa das dependências.
+2. Carga da hierarquia de unidades e da unidade SESEL.
+3. Carga de usuários, perfis e responsabilidades.
+4. Carga de administradores, se o cenário precisar mostrar a visão administrativa.
+5. Criação do processo e da `UNIDADE_PROCESSO`.
+6. Criação do `SUBPROCESSO` com a situação adequada ao estado final desejado.
+7. Criação do `MAPA` e do vínculo em `UNIDADE_MAPA`, quando a tela ou a regra depender disso.
+8. Inserção de `COMPETENCIA`, `ATIVIDADE` e `CONHECIMENTO`.
+9. Inserção de `COMPETENCIA_ATIVIDADE` para ligar as competências às atividades.
+10. Inserção de `MOVIMENTACAO` para registrar a trilha do processo.
+11. Inserção de `ALERTA` e `ALERTA_USUARIO` com destinatários consistentes.
+12. Inserção de `NOTIFICACAO_EMAIL` para simular o envio e falhas de notificação.
+13. Reset das sequences, se o banco de homologação usar geração automática nas próximas operações.
+
+## Regras de integridade
+
+O script não deve criar apenas o mapa isolado. Ele precisa garantir que:
+
+* o processo tenha unidade responsável;
+* a unidade do mapa exista na hierarquia;
+* o usuário que assina a movimentação exista e tenha perfil compatível;
+* cada alerta tenha um processo, uma unidade de origem e uma unidade de destino válidos;
+* cada notificação referencie um subprocesso que realmente exista;
+* os relacionamentos entre competência, atividade e conhecimento não fiquem vazios;
+* os códigos escolhidos não colidam com os usados em `data.sql` e `seed.sql`.
+
+## Estratégia prática
+
+Para manter o script seguro para homologação, o ideal é separar o trabalho em dois blocos:
+
+* **bloco base**: dados reutilizáveis do ambiente, como unidade SESEL, usuários, perfis, responsáveis e administrador;
+* **bloco do exemplo**: processo, subprocesso, mapa, competências, atividades, conhecimentos, movimentações, alertas e
+  notificações.
+
+Se o ambiente já contiver dados parecidos, o script deve usar uma abordagem idempotente ou ao menos limpar os códigos
+reservados antes de inserir novamente.
+
+## Validação esperada
+
+Depois de executar o script, a checagem manual deveria confirmar:
+
+* o mapa SESEL aparece para a unidade correta;
+* o histórico de movimentações mostra a trajetória completa;
+* os alertas aparecem para os destinatários esperados;
+* a outbox de e-mails contém registros coerentes com o estado do fluxo;
+* competências, atividades e conhecimentos exibidos correspondem ao texto abaixo.
 
 ---
 

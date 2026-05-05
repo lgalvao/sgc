@@ -80,7 +80,7 @@ export const Default: Story = {
     `,
     }),
     play: async () => {
-        const item = page.getByText('Presidência');
+        const item = page.getByText('PRES');
         await expect.element(item).toBeVisible();
     },
 };

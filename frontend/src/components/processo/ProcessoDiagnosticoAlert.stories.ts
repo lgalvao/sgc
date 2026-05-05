@@ -1,28 +1,12 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-// import {expect} from 'vitest';
-// import {page} from 'vitest/browser';
-import {createRouter, createMemoryHistory} from 'vue-router';
+import {expect} from 'vitest';
+import {page} from 'vitest/browser';
 import ProcessoDiagnosticoAlert from './ProcessoDiagnosticoAlert.vue';
-
-// Decorator que fornece o Vue Router para componentes que usam RouterLink
-const comRouter = (story: () => any, context: any) => {
-    const router = createRouter({
-        history: createMemoryHistory(),
-        routes: [
-            {path: '/', component: {template: '<div />'}},
-            {path: '/unidade/:codigo', component: {template: '<div />'}},
-        ],
-    });
-    // @ts-ignore – o parâmetro `app` está disponível em runtime
-    context.app?.use(router);
-    return story();
-};
 
 const meta: Meta<typeof ProcessoDiagnosticoAlert> = {
     title: 'Processo/ProcessoDiagnosticoAlert',
     component: ProcessoDiagnosticoAlert,
     tags: ['autodocs'],
-    decorators: [comRouter],
     argTypes: {
         exibir: {control: 'boolean'},
         carregando: {control: 'boolean'},
@@ -43,12 +27,10 @@ export const ComGrupos: Story = {
         ],
         unidadesSemResponsavel: [],
     },
-/*
     play: async () => {
         const alerta = page.getByTestId('alert-diagnostico-organizacional');
         await expect.element(alerta).toBeVisible();
     },
-*/
 };
 
 export const ComUnidadesSemResponsavel: Story = {
@@ -62,13 +44,11 @@ export const ComUnidadesSemResponsavel: Story = {
             {codigo: 3, sigla: 'CF'},
         ],
     },
-/*
     play: async () => {
         const alerta = page.getByTestId('alert-diagnostico-organizacional');
         await expect.element(alerta).toBeVisible();
         await expect.element(page.getByText(/PROEN/)).toBeVisible();
     },
-*/
 };
 
 export const ComUnicaUnidadeSemResponsavel: Story = {
@@ -103,11 +83,9 @@ export const Carregando: Story = {
         grupos: [],
         unidadesSemResponsavel: [],
     },
-/*
     play: async () => {
         await expect.element(page.getByText('Carregando informações organizacionais...')).toBeVisible();
     },
-*/
 };
 
 export const Oculto: Story = {

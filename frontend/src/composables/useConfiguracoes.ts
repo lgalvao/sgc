@@ -33,12 +33,11 @@ export function useConfiguracoes() {
     }
 
     async function salvarConfiguracoes(novosParametros: Parametro[]) {
-        try {
+        const resultado = await executarSilencioso(async () => {
             configuracoes.value = await serviceSalvarConfiguracoes(novosParametros);
             return true;
-        } catch {
-            return false;
-        }
+        }, "Não foi possível salvar as configurações.");
+        return resultado === true;
     }
 
     function getValor(chave: string, valorPadrao = ""): string {

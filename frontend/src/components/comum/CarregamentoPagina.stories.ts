@@ -27,7 +27,7 @@ export const ComMensagemPersonalizada: Story = {
         mensagem: 'Carregando mapa de competências...',
     },
     play: async () => {
-        await expect.element(page.getByText('Carregando mapa de competências...')).toBeVisible();
+        await expect.element(page.getByText('Carregando mapa de competências...', { exact: true }).last()).toBeVisible();
     },
 };
 
