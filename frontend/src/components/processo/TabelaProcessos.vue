@@ -24,6 +24,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   showSituacao: true,
   textoCtaVazio: "",
+  emptyTitle: "",
+  emptyDescription: "",
 });
 
 const emit = defineEmits<{
@@ -140,5 +142,13 @@ defineExpose({fields});
       data-testid="empty-state-processos"
       icon="bi-folder2-open"
   >
+    <BButton
+        v-if="mostrarCtaVazio"
+        variant="outline-primary"
+        data-testid="btn-empty-state-criar-processo"
+        @click="emit('ctaVazio')"
+    >
+      {{ textoCtaVazio || TEXTOS.comum.BOTAO_CRIAR }}
+    </BButton>
   </EmptyState>
 </template>

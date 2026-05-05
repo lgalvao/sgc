@@ -4,6 +4,7 @@ import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipo
 import TabelaProcessos from "../processo/TabelaProcessos.vue";
 import EmptyState from "../comum/EmptyState.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {TEXTOS} from "@/constants/textos";
 
 const BTableSortStub = {
     name: "BTable",
@@ -56,7 +57,7 @@ describe("TabelaProcessos.vue", () => {
 
         await context.wrapper.vm.$nextTick();
 
-        expect((context.wrapper.vm as any).fields).toEqual([
+        expect(context.wrapper.vm.fields).toEqual([
             {key: "descricao", label: "Descrição", sortable: true},
             {key: "tipo", label: "Tipo", sortable: true},
             {key: "unidadesParticipantes", label: "Unidades participantes", sortable: false},
@@ -244,7 +245,7 @@ describe("TabelaProcessos.vue", () => {
 
         expect(context.wrapper.find('[data-testid="empty-state-processos"]').exists()).toBe(true);
         expect(context.wrapper.find('[data-testid="tbl-processos"]').exists()).toBe(false);
-        expect(context.wrapper.text()).toContain("Painel sem processos");
+        expect(context.wrapper.text()).toContain(TEXTOS.tabelaProcessos.EMPTY_TITLE);
     });
 
     it("deve exibir CTA no estado vazio e emitir evento ao clicar", async () => {

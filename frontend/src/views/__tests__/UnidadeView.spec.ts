@@ -130,6 +130,10 @@ describe('UnidadeView.vue', () => {
     it('não exibe responsável quando for o titular', async () => {
         const unidadeTitular = {
             ...mockUnidadeData,
+            responsavel: {
+                ...mockUnidadeData.responsavel,
+                tituloEleitoral: mockUnidadeData.titular.tituloEleitoral
+            },
             tipoResponsabilidade: 'TITULAR'
         };
         mockObterUnidade.mockResolvedValueOnce(unidadeTitular);
