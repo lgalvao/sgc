@@ -58,7 +58,7 @@ const observacaoModel = computed({
       :ok-title="okTitle"
       :test-codigo-confirmar="testCodigoConfirmar"
       :titulo="titulo"
-      :variante="variant"
+      :variant="variant"
       @confirmar="$emit('confirmar')"
   >
     <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
