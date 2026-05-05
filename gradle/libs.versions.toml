@@ -95,3 +95,4 @@ spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugsPlugin" }
 open-rewrite = { id = "org.openrewrite.rewrite", version.ref = "openRewrite" }
+node = { id = "com.github.node-gradle.node", version = "7.1.0" }

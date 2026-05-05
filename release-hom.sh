@@ -170,7 +170,7 @@ fi
 
 if [[ "$SEM_BUILD" == false ]]; then
   echo "==> Executando build do frontend e do backend"
-  ./gradlew --no-daemon copyFrontend :backend:bootJar -x :backend:test
+  ./gradlew copyFrontend :backend:bootJar -x :backend:test
 else
   echo "==> Build Gradle ignorado por parametro"
 fi
@@ -178,7 +178,7 @@ fi
 if [[ -n "$TAG" ]]; then
   VERSAO="$TAG"
 else
-  VERSAO="$(./gradlew --no-daemon -q properties --property version | awk -F': ' '/^version:/ { print $2; exit }')"
+  VERSAO="$(./gradlew -q properties --property version | awk -F': ' '/^version:/ { print $2; exit }')"
   if [[ -z "$VERSAO" ]]; then
     echo "ERRO: nao foi possivel identificar a versao do projeto."
     exit 1

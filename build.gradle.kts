@@ -5,9 +5,16 @@ plugins {
     alias(libs.plugins.spring.dependency.management) apply false
     alias(libs.plugins.spotbugs) apply false
     alias(libs.plugins.open.rewrite) apply false
+    alias(libs.plugins.node)
     java
     jacoco
     idea
+}
+
+node {
+    download.set(true)
+    version.set("22.12.0")
+    pnpmVersion.set("10.33.3")
 }
 
 allprojects {
@@ -46,11 +53,20 @@ subprojects {
 }
 
 // Delegation tasks for convenience
-tasks.register<Exec>("incrementVersion") {
+tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("installRoot") {
+    group = "setup"
+    description = "Instala as dependências do root (pnpm install)"
+    pnpmCommand.set(listOf("install", "--frozen-lockfile"))
+    inputs.file("package.json")
+    inputs.file("pnpm-lock.yaml")
+    outputs.dir("node_modules")
+}
+
+tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("incrementVersion") {
     group = "versioning"
     description = "Incrementa a versão global usando release-it"
-    val pnpm = if (Os.isFamily(Os.FAMILY_WINDOWS)) "pnpm.cmd" else "pnpm"
-    commandLine(pnpm, "release", "--ci", "--patch")
+    dependsOn("installRoot")
+    pnpmCommand.set(listOf("run", "release", "--", "--ci", "--patch"))
 }
 
 tasks.register("installFrontend") {

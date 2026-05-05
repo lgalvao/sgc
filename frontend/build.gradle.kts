@@ -1,38 +1,35 @@
 plugins {
     base
+    alias(libs.plugins.node)
 }
 
-val isWindows = System.getProperty("os.name").lowercase().contains("win")
-
-// Auxiliar para comandos PNPM
-fun pnpmCommand(vararg args: String) = if (isWindows) {
-    listOf("cmd", "/c", "pnpm") + args
-} else {
-    listOf("pnpm") + args
+node {
+    // Garante a instalação do Node e PNPM no ambiente
+    download.set(true)
+    version.set("22.12.0")
+    pnpmVersion.set("10.33.3")
 }
 
-tasks.register<Exec>("install") {
+tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("install") {
     group = "setup"
     description = "Instala as dependências do frontend (pnpm install)"
-    workingDir = projectDir
+    pnpmCommand.set(listOf("install", "--frozen-lockfile"))
     inputs.file("package.json")
     inputs.file("pnpm-lock.yaml")
-    commandLine = pnpmCommand("install", "--frozen-lockfile")
+    outputs.dir("node_modules")
 }
 
-tasks.register<Exec>("dev") {
+tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("dev") {
     group = "application"
     description = "Inicia o servidor de desenvolvimento do frontend (Vite)"
     dependsOn("install")
-    workingDir = projectDir
-    commandLine = pnpmCommand("run", "dev")
+    pnpmCommand.set(listOf("run", "dev"))
 }
 
-tasks.register<Exec>("buildVue") {
+tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("buildVue") {
     group = "build"
     description = "Gera o build de produção do frontend Vue"
     dependsOn("install")
-    workingDir = projectDir
 
     // Otimização: Só roda se houver mudanças nestes arquivos/pastas
     inputs.dir("src")
@@ -42,28 +39,26 @@ tasks.register<Exec>("buildVue") {
     inputs.file("vite.config.ts")
     outputs.dir("dist")
 
-    commandLine = pnpmCommand("run", "build")
+    pnpmCommand.set(listOf("run", "build"))
 }
 
-tasks.register<Exec>("quality") {
+tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("quality") {
     group = "verification"
     description = "Executa verificações de qualidade do frontend (lint, tests, typecheck)"
     dependsOn("install")
-    workingDir = projectDir
-    commandLine = pnpmCommand("run", "quality:all")
-    isIgnoreExitValue = true
+    pnpmCommand.set(listOf("run", "quality:all"))
+    ignoreExitValue.set(true)
 }
 
-tasks.register<Exec>("test") {
+tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("test") {
     group = "verification"
     description = "Executa apenas os testes do frontend"
     dependsOn("install")
-    workingDir = projectDir
-    commandLine = pnpmCommand("run", "quality:test")
-    isIgnoreExitValue = true
+    pnpmCommand.set(listOf("run", "quality:test"))
+    ignoreExitValue.set(true)
 }
 
-// Estende a task padrão 'clean' do Gradle (se o plugin base/java estiver aplicado)
+// Estende a task padrão 'clean' do Gradle
 tasks.named<Delete>("clean") {
     delete("dist", "coverage")
 }
