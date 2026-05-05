@@ -4,7 +4,7 @@ set -euo pipefail
 NOME_SISTEMA="sgc"
 CONTAINER_CLI="${CONTAINER_CLI:-docker}"
 REGISTRY="${REGISTRY:-registry.tre-pe.gov.br/sesel}"
-PORTA_HOST="${PORTA_HOST:-8980}"
+PORTA_HOST="${PORTA_HOST:-8480}"
 PORTA_CONTAINER="${PORTA_CONTAINER:-10000}"
 DB_URL="${DB_URL:-jdbc:oracle:thin:@desenvolvimentobd.tre-pe.gov.br:1521:admdes2}"
 TAG="${TAG:-}"
@@ -177,12 +177,7 @@ fi
 if [[ -n "$TAG" ]]; then
   VERSAO="$TAG"
 else
-  # Precisamos extrair a versao para a tag da imagem
-  # Como nao queremos rodar o gradle local que depende de node/pnpm,
-  # vamos tentar pegar via grep simples no build.gradle.kts ou passar via parametro.
-  # Uma alternativa e rodar o gradle so para as propriedades, mas isso pode falhar se o node falhar.
-  # Vamos assumir que se falhar o properties, o usuario deve passar a --tag.
-  VERSAO="$(./gradlew -q properties --property version 2>/dev/null | awk -F': ' '/^version:/ { print $2; exit }' || echo "latest")"
+  VERSAO="$(./gradlew properties --property version 2>/dev/null | awk -F': ' '/^version:/ { print $2; exit }' || echo "latest")"
   if [[ "$VERSAO" == "latest" ]]; then
     echo "AVISO: Nao foi possivel identificar a versao via Gradle. Usando 'latest'."
   fi
