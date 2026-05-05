@@ -57,7 +57,8 @@
           <BCol class="mb-3" md="6">
             <BFormGroup label-for="dataInicio">
               <template #label>
-                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO }} <span aria-hidden="true"
+                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO }} <span
+aria-hidden="true"
                                                                           class="text-danger">*</span>
               </template>
               <InputData
@@ -77,7 +78,8 @@
           <BCol class="mb-3" md="6">
             <BFormGroup label-for="dataTermino">
               <template #label>
-                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO }} <span aria-hidden="true"
+                {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO }} <span
+aria-hidden="true"
                                                                            class="text-danger">*</span>
               </template>
               <InputData

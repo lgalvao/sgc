@@ -56,26 +56,41 @@ public class SubprocessoAcessoService {
     }
 
     private PermissoesSubprocessoDto construirPermissoes(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
-        PermissoesFluxo permissoesFluxo = calcularPermissoesFluxo(contexto);
+        SituacaoSubprocesso situacao = contexto.situacao();
         boolean mesmaUnidade = contexto.mesmaUnidade();
         boolean habilitarAcessoCadastro = verificarAcessoCadastroHabilitado(contexto);
         boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(contexto);
 
+        boolean podeEditarCadastro = contexto.isChefe();
+        boolean podeDisponibilizarCadastro = contexto.isChefe();
+        boolean podeDevolverCadastro = contexto.isGestorOuAdmin();
+        boolean podeAceitarCadastro = contexto.isGestor();
+        boolean podeHomologarCadastro = contexto.isAdmin();
+        boolean podeEditarMapa = contexto.isAdmin();
+        boolean podeDisponibilizarMapa = contexto.isAdmin();
+        boolean podeValidarMapa = contexto.isChefe();
+        boolean podeApresentarSugestoes = contexto.isChefe();
+        boolean podeVerSugestoes = contexto.isGestorOuAdmin();
+        boolean podeDevolverMapa = contexto.isAdmin() || contexto.isGestor();
+        boolean podeAceitarMapa = contexto.isGestor();
+        boolean podeHomologarMapa = contexto.isAdmin();
+        boolean podeVisualizarImpacto = verificarVisualizarImpacto(contexto);
+
         return PermissoesSubprocessoDto.builder()
-                .podeEditarCadastro(permissoesFluxo.podeEditarCadastro())
-                .podeDisponibilizarCadastro(permissoesFluxo.podeDisponibilizarCadastro())
-                .podeDevolverCadastro(permissoesFluxo.podeDevolverCadastro())
-                .podeAceitarCadastro(permissoesFluxo.podeAceitarCadastro())
-                .podeHomologarCadastro(permissoesFluxo.podeHomologarCadastro())
-                .podeEditarMapa(permissoesFluxo.podeEditarMapa())
-                .podeDisponibilizarMapa(permissoesFluxo.podeDisponibilizarMapa())
-                .podeValidarMapa(permissoesFluxo.podeValidarMapa())
-                .podeApresentarSugestoes(permissoesFluxo.podeApresentarSugestoes())
-                .podeVerSugestoes(permissoesFluxo.podeVerSugestoes())
-                .podeDevolverMapa(permissoesFluxo.podeDevolverMapa())
-                .podeAceitarMapa(permissoesFluxo.podeAceitarMapa())
-                .podeHomologarMapa(permissoesFluxo.podeHomologarMapa())
-                .podeVisualizarImpacto(permissoesFluxo.podeVisualizarImpacto())
+                .podeEditarCadastro(podeEditarCadastro)
+                .podeDisponibilizarCadastro(podeDisponibilizarCadastro)
+                .podeDevolverCadastro(podeDevolverCadastro)
+                .podeAceitarCadastro(podeAceitarCadastro)
+                .podeHomologarCadastro(podeHomologarCadastro)
+                .podeEditarMapa(podeEditarMapa)
+                .podeDisponibilizarMapa(podeDisponibilizarMapa)
+                .podeValidarMapa(podeValidarMapa)
+                .podeApresentarSugestoes(podeApresentarSugestoes)
+                .podeVerSugestoes(podeVerSugestoes)
+                .podeDevolverMapa(podeDevolverMapa)
+                .podeAceitarMapa(podeAceitarMapa)
+                .podeHomologarMapa(podeHomologarMapa)
+                .podeVisualizarImpacto(podeVisualizarImpacto)
                 .podeAlterarDataLimite(contexto.isAdmin())
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
@@ -83,17 +98,17 @@ public class SubprocessoAcessoService {
                 .mesmaUnidade(mesmaUnidade)
                 .habilitarAcessoCadastro(habilitarAcessoCadastro)
                 .habilitarAcessoMapa(habilitarAcessoMapa)
-                .habilitarEditarCadastro(permissoesFluxo.podeEditarCadastro() && mesmaUnidade)
-                .habilitarDisponibilizarCadastro(permissoesFluxo.podeDisponibilizarCadastro() && mesmaUnidade)
-                .habilitarDevolverCadastro(permissoesFluxo.podeDevolverCadastro() && mesmaUnidade)
-                .habilitarAceitarCadastro(permissoesFluxo.podeAceitarCadastro() && mesmaUnidade)
-                .habilitarHomologarCadastro(permissoesFluxo.podeHomologarCadastro() && mesmaUnidade)
-                .habilitarEditarMapa(permissoesFluxo.podeEditarMapa() && mesmaUnidade)
-                .habilitarDisponibilizarMapa(permissoesFluxo.podeDisponibilizarMapa() && mesmaUnidade)
-                .habilitarValidarMapa(permissoesFluxo.podeValidarMapa() && mesmaUnidade)
-                .habilitarApresentarSugestoes(permissoesFluxo.podeApresentarSugestoes() && mesmaUnidade)
-                .habilitarDevolverMapa(permissoesFluxo.podeDevolverMapa() && mesmaUnidade)
-                .habilitarAceitarMapa(permissoesFluxo.podeAceitarMapa() && mesmaUnidade)
+                .habilitarEditarCadastro(podeEditarCadastro && SITUACOES_EDICAO_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarDisponibilizarCadastro(podeDisponibilizarCadastro && SITUACOES_DISPONIBILIZACAO_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarDevolverCadastro(podeDevolverCadastro && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarAceitarCadastro(podeAceitarCadastro && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarHomologarCadastro(podeHomologarCadastro && SITUACOES_ANALISE_CADASTRO.contains(situacao) && mesmaUnidade)
+                .habilitarEditarMapa(podeEditarMapa && SITUACOES_EDICAO_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarDisponibilizarMapa(podeDisponibilizarMapa && SITUACOES_DISPONIBILIZACAO_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarValidarMapa(podeValidarMapa && SITUACOES_ANALISE_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarApresentarSugestoes(podeApresentarSugestoes && SITUACOES_ANALISE_MAPA.contains(situacao) && mesmaUnidade)
+                .habilitarDevolverMapa(verificarDevolverMapa(contexto) && mesmaUnidade)
+                .habilitarAceitarMapa(podeAceitarMapa && SITUACOES_GESTAO_MAPA.contains(situacao) && mesmaUnidade)
                 .habilitarHomologarMapa(verificarHomologarMapa(contexto) && mesmaUnidade)
                 .habilitarAlterarDataLimite(contexto.isAdmin())
                 .habilitarReabrirCadastro(contexto.isAdmin()
@@ -104,35 +119,29 @@ public class SubprocessoAcessoService {
                 .build();
     }
 
-    private PermissoesFluxo calcularPermissoesFluxo(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
-        SituacaoSubprocesso situacao = contexto.situacao();
-        return PermissoesFluxo.builder()
-                .podeEditarCadastro(contexto.isChefe() && SITUACOES_EDICAO_CADASTRO.contains(situacao))
-                .podeDisponibilizarCadastro(contexto.isChefe() && SITUACOES_DISPONIBILIZACAO_CADASTRO.contains(situacao))
-                .podeDevolverCadastro(contexto.isGestorOuAdmin() && SITUACOES_ANALISE_CADASTRO.contains(situacao))
-                .podeAceitarCadastro(contexto.isGestor() && SITUACOES_ANALISE_CADASTRO.contains(situacao))
-                .podeHomologarCadastro(contexto.isAdmin() && SITUACOES_ANALISE_CADASTRO.contains(situacao))
-                .podeEditarMapa(verificarEditarMapa(contexto))
-                .podeDisponibilizarMapa(contexto.isAdmin() && SITUACOES_DISPONIBILIZACAO_MAPA.contains(situacao))
-                .podeValidarMapa(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(situacao))
-                .podeApresentarSugestoes(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(situacao))
-                .podeVerSugestoes(contexto.isGestorOuAdmin() && SITUACOES_COM_SUGESTOES_MAPA.contains(situacao))
-                .podeDevolverMapa(verificarDevolverMapa(contexto))
-                .podeAceitarMapa(verificarGerirMapa(contexto.isGestor(), situacao))
-                .podeHomologarMapa(contexto.isAdmin() && SITUACOES_GESTAO_MAPA.contains(situacao))
-                .podeVisualizarImpacto(verificarVisualizarImpacto(contexto))
-                .build();
-    }
-
     private PermissoesSubprocessoDto construirPermissoesProcessoFinalizado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         return PermissoesSubprocessoDto.builder()
+                .podeEditarCadastro(contexto.isChefe())
+                .podeDisponibilizarCadastro(contexto.isChefe())
+                .podeDevolverCadastro(contexto.isGestorOuAdmin())
+                .podeAceitarCadastro(contexto.isGestor())
+                .podeHomologarCadastro(contexto.isAdmin())
+                .podeEditarMapa(contexto.isAdmin())
+                .podeDisponibilizarMapa(contexto.isAdmin())
+                .podeValidarMapa(contexto.isChefe())
+                .podeApresentarSugestoes(contexto.isChefe())
+                .podeVerSugestoes(contexto.isGestorOuAdmin())
+                .podeDevolverMapa(contexto.isAdmin() || contexto.isGestor())
+                .podeAceitarMapa(contexto.isGestor())
+                .podeHomologarMapa(contexto.isAdmin())
+                .podeVisualizarImpacto(verificarVisualizarImpacto(contexto))
                 .podeAlterarDataLimite(contexto.isAdmin())
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
+                .mesmaUnidade(contexto.mesmaUnidade())
                 .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(contexto))
                 .habilitarAcessoMapa(verificarAcessoMapaHabilitado(contexto))
-                .mesmaUnidade(contexto.mesmaUnidade())
                 .habilitarEditarCadastro(false)
                 .habilitarDisponibilizarCadastro(false)
                 .habilitarDevolverCadastro(false)
@@ -198,16 +207,12 @@ public class SubprocessoAcessoService {
                 && impactoMapaService.podeVisualizarImpactos(contexto.subprocesso());
     }
 
-    private boolean verificarEditarMapa(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
-        return contexto.isAdmin() && SITUACOES_EDICAO_MAPA.contains(contexto.situacao());
-    }
-
     private boolean verificarDevolverMapa(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         SituacaoSubprocesso situacao = contexto.situacao();
         if (contexto.isAdmin()) {
             return situacao == MAPEAMENTO_MAPA_COM_SUGESTOES || situacao == REVISAO_MAPA_COM_SUGESTOES;
         }
-        return verificarGerirMapa(contexto.isGestor(), situacao);
+        return contexto.isGestor() && SITUACOES_GESTAO_MAPA.contains(situacao);
     }
 
     private boolean verificarHomologarMapa(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
@@ -216,10 +221,6 @@ public class SubprocessoAcessoService {
             return false;
         }
         return situacao == MAPEAMENTO_MAPA_VALIDADO || situacao == REVISAO_MAPA_VALIDADO;
-    }
-
-    private boolean verificarGerirMapa(boolean isPermitido, SituacaoSubprocesso situacao) {
-        return isPermitido && SITUACOES_GESTAO_MAPA.contains(situacao);
     }
 
     private boolean isSituacaoMapeamentoAPartirDe(SituacaoSubprocesso situacaoAtual, SituacaoSubprocesso marcoInicial) {
@@ -236,24 +237,5 @@ public class SubprocessoAcessoService {
 
     private boolean isFluxoRevisao(SituacaoSubprocesso situacao) {
         return situacao.name().startsWith("REVISAO");
-    }
-
-    @Builder
-    private record PermissoesFluxo(
-            boolean podeEditarCadastro,
-            boolean podeDisponibilizarCadastro,
-            boolean podeDevolverCadastro,
-            boolean podeAceitarCadastro,
-            boolean podeHomologarCadastro,
-            boolean podeEditarMapa,
-            boolean podeDisponibilizarMapa,
-            boolean podeValidarMapa,
-            boolean podeApresentarSugestoes,
-            boolean podeVerSugestoes,
-            boolean podeDevolverMapa,
-            boolean podeAceitarMapa,
-            boolean podeHomologarMapa,
-            boolean podeVisualizarImpacto
-    ) {
     }
 }

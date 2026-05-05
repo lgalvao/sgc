@@ -15,7 +15,8 @@
         @keydown="aoPressionarTeclaUsuario"
         @update:model-value="aoAlterarTermo"
     />
-    <div v-if="mostrarResultadosUsuarios && termoPesquisaMinimaAtingida" class="usuario-dropdown overflow-auto"
+    <div
+v-if="mostrarResultadosUsuarios && termoPesquisaMinimaAtingida" class="usuario-dropdown overflow-auto"
          data-testid="lista-usuarios-pesquisa">
       <div v-if="pesquisandoUsuarios" class="p-2 text-muted small">
         <BSpinner aria-hidden="true" class="me-2" small/>

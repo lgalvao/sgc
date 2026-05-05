@@ -146,9 +146,16 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
-        assertThat(permissoes.podeEditarCadastro()).isFalse();
-        assertThat(permissoes.podeEditarMapa()).isFalse();
-        assertThat(permissoes.podeHomologarMapa()).isFalse();
+        // Como o perfil é ADMIN, as ações que o ADMIN "pode" devem ser true
+        assertThat(permissoes.podeHomologarCadastro()).isTrue();
+        assertThat(permissoes.podeEditarMapa()).isTrue();
+        assertThat(permissoes.podeHomologarMapa()).isTrue();
+        
+        // Porém, as ações devem estar desabilitadas por estar FINALIZADO
+        assertThat(permissoes.habilitarHomologarCadastro()).isFalse();
+        assertThat(permissoes.habilitarEditarMapa()).isFalse();
+        assertThat(permissoes.habilitarHomologarMapa()).isFalse();
+        
         assertThat(permissoes.podeReabrirCadastro()).isTrue();
         assertThat(permissoes.habilitarReabrirCadastro()).isFalse();
     }
@@ -231,7 +238,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
-        assertThat(permissoes.podeEditarCadastro()).isFalse();
+        assertThat(permissoes.podeEditarCadastro()).isFalse(); // GESTOR nunca edita cadastro
         assertThat(permissoes.podeAceitarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
         assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
@@ -247,8 +254,10 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
-        assertThat(permissoes.podeEditarCadastro()).isFalse();
-        assertThat(permissoes.podeDisponibilizarCadastro()).isFalse();
+        assertThat(permissoes.podeEditarCadastro()).isTrue(); // CHEFE podeEditar, mas situação não permite habilitar
+        assertThat(permissoes.habilitarEditarCadastro()).isFalse();
+        assertThat(permissoes.podeDisponibilizarCadastro()).isTrue();
+        assertThat(permissoes.habilitarDisponibilizarCadastro()).isFalse();
         assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
     }
 
@@ -263,8 +272,9 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
-        assertThat(permissoes.podeEditarCadastro()).isFalse();
-        assertThat(permissoes.podeHomologarCadastro()).isFalse();
+        assertThat(permissoes.podeEditarCadastro()).isFalse(); // ADMIN não edita
+        assertThat(permissoes.podeHomologarCadastro()).isTrue(); // ADMIN homologa, mas...
+        assertThat(permissoes.habilitarHomologarCadastro()).isFalse(); // está finalizado
         assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
     }
 
@@ -328,9 +338,9 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
-        assertThat(permissoes.podeEditarMapa()).isFalse();
+        assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.habilitarEditarMapa()).isFalse();
-        assertThat(permissoes.podeDevolverMapa()).isFalse();
+        assertThat(permissoes.podeDevolverMapa()).isTrue();
         assertThat(permissoes.habilitarDevolverMapa()).isFalse();
         assertThat(permissoes.podeHomologarMapa()).isTrue();
         assertThat(permissoes.habilitarHomologarMapa()).isTrue();

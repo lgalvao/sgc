@@ -17,7 +17,8 @@ const model = defineModel<number[]>();
       no-body
   >
     <BCardBody class="d-flex align-items-center">
-      <BFormCheckbox :id="`atv-${atividade.codigo}`" v-model="model" :value="atividade.codigo"
+      <BFormCheckbox
+:id="`atv-${atividade.codigo}`" v-model="model" :value="atividade.codigo"
                      data-testid="chk-criar-competencia-atividade">
         {{ atividade.descricao }}
       </BFormCheckbox>

@@ -178,9 +178,9 @@ class SubprocessoAcessoServiceTest {
 
         PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
 
-        assertThat(dto.podeEditarMapa()).isFalse();
+        assertThat(dto.podeEditarMapa()).isTrue();
         assertThat(dto.habilitarEditarMapa()).isFalse();
-        assertThat(dto.podeDevolverMapa()).isFalse();
+        assertThat(dto.podeDevolverMapa()).isTrue();
         assertThat(dto.habilitarDevolverMapa()).isFalse();
         assertThat(dto.podeHomologarMapa()).isTrue();
         assertThat(dto.habilitarHomologarMapa()).isTrue();
