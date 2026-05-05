@@ -111,6 +111,7 @@ import {TEXTOS} from '@/constants/textos';
 const {
   configuracoes,
   loading,
+  saving,
   error,
   carregarConfiguracoes,
   salvarConfiguracoes,
@@ -187,6 +188,18 @@ async function salvar() {
     {...pInativacao!, valor: form.diasInativacao.toString()},
     {...pAlertaNovo!, valor: form.diasAlertaNovo.toString()}
   ];
+
+  const houveMudanca = paramsToSave.some(parametro => {
+    const atual = findParametro(parametro.chave);
+    return atual?.valor !== parametro.valor;
+  });
+
+  if (!houveMudanca) {
+    resetarValidacao();
+    notify(TEXTOS.configuracoes.SUCESSO_SALVAR, 'success');
+    salvando.value = false;
+    return;
+  }
 
   const sucesso = await salvarConfiguracoes(paramsToSave);
 

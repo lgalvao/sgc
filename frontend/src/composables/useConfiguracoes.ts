@@ -14,6 +14,7 @@ const temaEscuro = useLocalStorage<boolean>("temaEscuro", false);
 
 export function useConfiguracoes() {
     const {carregando, erro, executarSilencioso} = useAsyncAction();
+    const carregandoConfiguracoes = ref(false);
 
     const configuracoesMap = computed(() =>
         new Map(configuracoes.value.map(parametro => [parametro.chave, parametro]))
@@ -21,17 +22,23 @@ export function useConfiguracoes() {
 
     async function carregarConfiguracoes() {
         configuracoes.value = [];
-        await executarSilencioso(async () => {
-            configuracoes.value = await serviceBuscarConfiguracoes();
-        }, "Não foi possível carregar as configurações.");
+        carregandoConfiguracoes.value = true;
+        try {
+            await executarSilencioso(async () => {
+                configuracoes.value = await serviceBuscarConfiguracoes();
+            }, "Não foi possível carregar as configurações.");
+        } finally {
+            carregandoConfiguracoes.value = false;
+        }
     }
 
     async function salvarConfiguracoes(novosParametros: Parametro[]) {
-        const result = await executarSilencioso(async () => {
+        try {
             configuracoes.value = await serviceSalvarConfiguracoes(novosParametros);
             return true;
-        }, "Não foi possível salvar as configurações.");
-        return result ?? false;
+        } catch {
+            return false;
+        }
     }
 
     function getValor(chave: string, valorPadrao = ""): string {
@@ -59,7 +66,8 @@ export function useConfiguracoes() {
 
     return {
         configuracoes,
-        loading: carregando,
+        loading: carregandoConfiguracoes,
+        saving: carregando,
         error: erro,
         carregarConfiguracoes,
         salvarConfiguracoes,

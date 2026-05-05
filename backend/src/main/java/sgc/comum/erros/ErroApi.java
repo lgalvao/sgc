@@ -22,7 +22,7 @@ public class ErroApi {
     private String message;
 
     @Builder.Default
-    private String code = "";
+    private String code;
 
     @Setter
     private @Nullable String traceId;
@@ -31,7 +31,7 @@ public class ErroApi {
 
     @Setter
     @Builder.Default
-    private @Nullable Map<String, ?> details = new HashMap<>();
+    private @Nullable Map<String, ?> details;
 
     public ErroApi(HttpStatusCode status, String message) {
         this.timestamp = LocalDateTime.now();

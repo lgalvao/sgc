@@ -111,7 +111,7 @@ public class E2eController {
             List<String> list = jdbcTemplate.queryForList(
                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE UPPER(TABLE_SCHEMA) = 'SGC'",
                     String.class);
-            List<String> tables = list.stream().flatMap(Stream::ofNullable).toList();
+            List<String> tables = new ArrayList<>(list);
 
             log.debug("Limpando {} tabelas no schema SGC", tables.size());
             for (String table : tables) {
@@ -196,9 +196,10 @@ public class E2eController {
         String sqlMapas =
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
         List<Long> listMapas = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo);
-        List<Long> codigosMapas = listMapas.stream()
-                .flatMap(Stream::ofNullable)
-                .toList();
+        List<Long> codigosMapas = new ArrayList<>();
+        for (Long cod : listMapas) {
+            codigosMapas.add(cod);
+        }
 
         jdbcTemplate.update(
                 "DELETE FROM sgc.analise WHERE subprocesso_codigo IN (SELECT codigo FROM"

@@ -34,8 +34,6 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "base")
-
     plugins.withId("java") {
         configure<JavaPluginExtension> {
             toolchain {

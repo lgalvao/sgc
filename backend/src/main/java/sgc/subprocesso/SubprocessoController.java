@@ -370,7 +370,7 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza mapas em bloco")
     public void disponibilizarMapaEmBloco(@RequestBody @Valid ProcessarEmBlocoRequest request) {
-        DisponibilizarMapaRequest dispoReq = null;
+        DisponibilizarMapaRequest dispoReq;
         dispoReq = DisponibilizarMapaRequest.builder()
                 .dataLimite(request.dataLimite())
                 .build();

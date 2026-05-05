@@ -19,6 +19,7 @@ describe('ParametrosView', () => {
                 {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
             ]),
             loading: ref(loading),
+            saving: ref(false),
             error: ref(error),
             getDiasInativacaoProcesso: vi.fn().mockReturnValue(30),
             getDiasAlertaNovo: vi.fn().mockReturnValue(5),
@@ -76,7 +77,7 @@ describe('ParametrosView', () => {
         setupWrapper();
         await wrapper.vm.$nextTick();
         await wrapper.find('form').trigger('submit.prevent');
-        expect(configuracoesStore.salvarConfiguracoes).toHaveBeenCalled();
+        expect(configuracoesStore.salvarConfiguracoes).not.toHaveBeenCalled();
         expect(wrapper.text()).toContain('Configurações salvas.');
     });
 
@@ -94,6 +95,7 @@ describe('ParametrosView', () => {
         setupWrapper();
         await wrapper.vm.$nextTick();
         configuracoesStore.salvarConfiguracoes.mockResolvedValue(false);
+        wrapper.vm.form.diasInativacao = 31;
         await wrapper.find('form').trigger('submit.prevent');
         expect(wrapper.text()).toContain('Erro ao salvar configurações.');
     });
@@ -127,5 +129,18 @@ describe('ParametrosView', () => {
         wrapper.vm.form.diasInativacao = 0;
         await wrapper.find('form').trigger('submit.prevent');
         expect(configuracoesStore.salvarConfiguracoes).not.toHaveBeenCalled();
+    });
+
+    it('deve salvar quando houver mudanças', async () => {
+        setupWrapper();
+        await wrapper.vm.$nextTick();
+
+        wrapper.vm.form.diasInativacao = 31;
+        await wrapper.find('form').trigger('submit.prevent');
+
+        expect(configuracoesStore.salvarConfiguracoes).toHaveBeenCalledWith([
+            {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '31', descricao: 'Desc 1'},
+            {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
+        ]);
     });
 });
