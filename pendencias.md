@@ -10,16 +10,7 @@ Finalizar documento intro do sistema (PDF)
 Criar script que criar o processo preenchido/finalizado da SESEL com base no doc sesel-mapa.md
 
 Na ordem:
-
-1 Limpar todos processos
-2 Executar script que criar o processo preenchido
+1 Rodar script que limpa todos os processos
+2 Rodar script que cria o processo preenchido
 3 Subir na brainiac e pegar url
-4 Enviar email com o pdf e url para JP
-
-
-Colegar perfis maiores antes do menores
-Toast largo demais
-
-Tela de subprocesso, compactar detalhes
-Atualizar os cdus
-As notificações deve ser limpadas ao finalizar um processo so depois de um prazo
+4 Enviar email com o pdf e url para SEDOC
