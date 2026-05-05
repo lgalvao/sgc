@@ -26,10 +26,10 @@
     "quality:all": "pnpm run quality:test && pnpm run quality:lint && pnpm run quality:typecheck && pnpm run cruft:check"
   },
   "dependencies": {
-    "axios": "1.15.1",
+    "axios": "1.16.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
-    "bootstrap-vue-next": "^0.44.7",
+    "bootstrap-vue-next": "^0.45.0",
     "date-fns": "^4.1.0",
     "html2canvas": "^1.4.1",
     "pinia": "^3.0.4",
@@ -58,7 +58,7 @@
     "consola": "^3.4.2",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-storybook": "10.3.5",
+    "eslint-plugin-storybook": "10.3.6",
     "eslint-plugin-vue": "^10.9.1",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
     "fast-check": "^4.7.0",

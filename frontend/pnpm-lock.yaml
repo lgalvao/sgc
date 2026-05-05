@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       axios:
-        specifier: 1.15.1
-        version: 1.15.1
+        specifier: 1.16.0
+        version: 1.16.0
       bootstrap:
         specifier: ^5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
@@ -21,8 +21,8 @@ importers:
         specifier: ^1.13.1
         version: 1.13.1
       bootstrap-vue-next:
-        specifier: ^0.44.7
-        version: 0.44.7(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3))
+        specifier: ^0.45.0
+        version: 0.45.0(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3))
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -103,8 +103,8 @@ importers:
         specifier: ^10.1.8
         version: 10.1.8(eslint@10.3.0)
       eslint-plugin-storybook:
-        specifier: 10.3.5
-        version: 10.3.5(eslint@10.3.0)(storybook@10.3.6(@testing-library/dom@10.4.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@5.9.3)
+        specifier: 10.3.6
+        version: 10.3.6(eslint@10.3.0)(storybook@10.3.6(@testing-library/dom@10.4.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@5.9.3)
       eslint-plugin-vue:
         specifier: ^10.9.1
         version: 10.9.1(@typescript-eslint/parser@8.59.2(eslint@10.3.0)(typescript@5.9.3))(eslint@10.3.0)(vue-eslint-parser@10.4.0(eslint@10.3.0))
@@ -1281,8 +1281,8 @@ packages:
     resolution: {integrity: sha512-KunSNx+TVpkAw/6ULfhnx+HWRecjqZGTOyquAoWHYLRSdK1tB5Ihce1ZW+UY3fj33bYAFWPu7W/GRSmmrCGuxA==}
     engines: {node: '>=4'}
 
-  axios@1.15.1:
-    resolution: {integrity: sha512-WOG+Jj8ZOvR0a3rAn+Tuf1UQJRxw5venr6DgdbJzngJE3qG7X0kL83CZGpdHMxEm+ZK3seAbvFsw4FfOfP9vxg==}
+  axios@1.16.0:
+    resolution: {integrity: sha512-6hp5CwvTPlN2A31g5dxnwAX0orzM7pmCRDLnZSX772mv8WDqICwFjowHuPs04Mc8deIld1+ejhtaMn5vp6b+1w==}
 
   babel-walk@3.0.0-canary-5:
     resolution: {integrity: sha512-GAwkz0AihzY5bkwIY5QDR+LvsRQgB/B+1foMPvi0FZPMl5fjD7ICiznUiBdLYMH1QYe6vqu4gWYytZOccLouFw==}
@@ -1311,8 +1311,8 @@ packages:
   bootstrap-icons@1.13.1:
     resolution: {integrity: sha512-ijombt4v6bv5CLeXvRWKy7CuM3TRTuPEuGaGKvTV5cz65rQSY8RQ2JcHt6b90cBBAC7s8fsf2EkQDldzCoXUjw==}
 
-  bootstrap-vue-next@0.44.7:
-    resolution: {integrity: sha512-da3EndWRzB+PVkcDszvv3HZJRnejcrC2J43BxX+e5yhflHnIEKFcpdJlRLDxxIva+FeJLqETC8IKl6/13VoLAg==}
+  bootstrap-vue-next@0.45.0:
+    resolution: {integrity: sha512-LWRmMwozow3ltgjnowoFTUPRbuFMaOHxEZ6qzy7RZfYdWJELU3PtB9LNuWVnS6SuD+wpvdPUpFx3PI5pPfFUaw==}
     peerDependencies:
       '@floating-ui/vue': '*'
       '@internationalized/date': '*'
@@ -1580,11 +1580,11 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-storybook@10.3.5:
-    resolution: {integrity: sha512-rEFkfU3ypF44GpB4tiJ9EFDItueoGvGi3+weLHZax2ON2MB7VIDsxdSUGvIU5tMURg+oWYlpzCyLm4TpDq2deA==}
+  eslint-plugin-storybook@10.3.6:
+    resolution: {integrity: sha512-8udrL+Rmp5LFaZvgRe4J226X1MYls25bWCyHuzR5X8s2qbFTryX+wKC+o/0Ato4A1AvwnDg8OOMPc6yWJ9JpcA==}
     peerDependencies:
       eslint: '>=8'
-      storybook: ^10.3.5
+      storybook: ^10.3.6
 
   eslint-plugin-vue@10.9.1:
     resolution: {integrity: sha512-cHB0Tf4Duvzwecwd/AqWzZvF/QszE13BhjVUpVXWCy9AeMR5GjkAjP3i85vqgLgOuTmkHR1OJ5oMeqLHtuw8zg==}
@@ -1862,8 +1862,8 @@ packages:
     resolution: {integrity: sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==}
     engines: {node: '>= 0.4'}
 
-  is-core-module@2.16.1:
-    resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==}
+  is-core-module@2.16.2:
+    resolution: {integrity: sha512-evOr8xfXKxE6qSR0hSXL2r3sd7ALj8+7jQEUvPYcm5sgZFdJ+AYzT6yNmJenvIYQBgIGwfwz08sL8zoL7yq2BA==}
     engines: {node: '>= 0.4'}
 
   is-date-object@1.1.0:
@@ -3956,7 +3956,7 @@ snapshots:
 
   axe-core@4.11.4: {}
 
-  axios@1.15.1:
+  axios@1.16.0:
     dependencies:
       follow-redirects: 1.16.0
       form-data: 4.0.5
@@ -3984,7 +3984,7 @@ snapshots:
 
   bootstrap-icons@1.13.1: {}
 
-  bootstrap-vue-next@0.44.7(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3)):
+  bootstrap-vue-next@0.45.0(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3)))(vue@3.5.33(typescript@5.9.3)):
     dependencies:
       '@floating-ui/core': 1.7.5
       bootstrap: 5.3.8(@popperjs/core@2.11.8)
@@ -4265,7 +4265,7 @@ snapshots:
     dependencies:
       eslint: 10.3.0
 
-  eslint-plugin-storybook@10.3.5(eslint@10.3.0)(storybook@10.3.6(@testing-library/dom@10.4.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@5.9.3):
+  eslint-plugin-storybook@10.3.6(eslint@10.3.0)(storybook@10.3.6(@testing-library/dom@10.4.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 8.59.2(eslint@10.3.0)(typescript@5.9.3)
       eslint: 10.3.0
@@ -4546,7 +4546,7 @@ snapshots:
 
   is-callable@1.2.7: {}
 
-  is-core-module@2.16.1:
+  is-core-module@2.16.2:
     dependencies:
       hasown: 2.0.3
 
@@ -5084,7 +5084,7 @@ snapshots:
   resolve@1.22.12:
     dependencies:
       es-errors: 1.3.0
-      is-core-module: 2.16.1
+      is-core-module: 2.16.2
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 

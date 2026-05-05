@@ -23,6 +23,14 @@ Os dois arquivos abaixo são a melhor base para construir o script:
 * `backend/src/test/resources/data.sql`
 * `e2e/setup/seed.sql`
 
+Para a versão Oracle de homologação, o exemplo precisa usar os usuários reais descritos em
+[`como_logar_hom.md`](como_logar_hom.md), principalmente:
+
+* `039703250884` e `025545511252` para o perfil `ADMIN`
+* `050290130841` para o perfil `GESTOR`
+* `045098980809` para o perfil `CHEFE`
+* `072233370809` e `083582140825` para o perfil `SERVIDOR`
+
 Uso esperado de cada um:
 
 * `data.sql` ajuda a identificar a estrutura mínima para a unidade SESEL, os usuários base, os perfis e os resets de

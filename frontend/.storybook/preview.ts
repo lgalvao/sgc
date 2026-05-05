@@ -15,6 +15,7 @@ const router = createRouter({
         {path: '/login', component: {template: '<div></div>'}},
         {path: '/painel', component: {template: '<div></div>'}},
         {path: '/unidade/:codigo', component: {template: '<div></div>'}},
+        {path: '/historico', component: {template: '<div></div>'}},
     ],
 });
 

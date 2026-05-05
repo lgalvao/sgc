@@ -80,7 +80,7 @@ export const Default: Story = {
     `,
     }),
     play: async () => {
-        const item = page.getByText('PRES');
+        const item = page.getByText('PRES', { exact: true });
         await expect.element(item).toBeVisible();
     },
 };

@@ -23,6 +23,7 @@ export const Default: Story = {
     args: {
         mostrarModal: true,
         dataLimiteAtual: dateFuture,
+        ultimaDataLimiteSubprocesso: dateToday,
         etapaAtual: 1,
         loading: false,
     },
@@ -35,7 +36,7 @@ export const Default: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Alterar data limite</button>
-        <SubprocessoModal v-bind="args" :mostrarModal="show" :data-limite-atual="args.dataLimiteAtual" :etapa-atual="args.etapaAtual" :ultima-data-limite-subprocesso="args.ultimaDataLimiteSubprocesso" @fecharModal="show = false" />
+        <SubprocessoModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
       </div>
     `,
     }),
@@ -45,6 +46,7 @@ export const Carregando: Story = {
     args: {
         mostrarModal: true,
         dataLimiteAtual: dateFuture,
+        ultimaDataLimiteSubprocesso: dateToday,
         etapaAtual: 1,
         loading: true,
     },
