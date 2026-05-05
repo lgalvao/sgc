@@ -1,8 +1,8 @@
 # Estágio 1: Build do Frontend
-FROM docker.io/library/node:22-bookworm AS build-frontend
+FROM docker.io/library/node:26-bookworm AS build-frontend
 WORKDIR /build
 # Instala o pnpm globalmente
-RUN npm install -g pnpm@10.33.3
+RUN npm install -g pnpm@11.0.0
 
 # Copia arquivos de dependências primeiro para cachear
 COPY frontend/package.json frontend/pnpm-lock.yaml ./ 
