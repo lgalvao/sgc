@@ -228,4 +228,23 @@ class SubprocessoServiceTest {
         assertThat(sp.getSituacao()).isEqualTo(situacaoFinal);
         verify(subprocessoRepo).save(sp);
     }
+
+    @Test
+    @DisplayName("atualizarEntidade - deve usar comandos vazios quando nulos")
+    void atualizarEntidade_ComandosNulos() {
+        Long cod = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(cod);
+        when(consultaService.buscarSubprocesso(cod)).thenReturn(sp);
+        when(subprocessoRepo.save(any())).thenReturn(sp);
+
+        AtualizarSubprocessoCommand command = AtualizarSubprocessoCommand.builder()
+                .vinculos(null)
+                .prazos(null)
+                .build();
+
+        service.atualizarEntidade(cod, command);
+
+        verify(subprocessoRepo).save(sp);
+    }
 }

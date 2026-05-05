@@ -24,7 +24,7 @@ import static org.springframework.test.util.ReflectionTestUtils.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("RelatorioFacade - Cobertura de Testes")
-class RelatorioFacadeCoverageTest {
+class RelatorioFacadeTest {
 
     @InjectMocks
     private RelatorioFacade target;
