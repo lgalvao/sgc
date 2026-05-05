@@ -15,41 +15,45 @@ const router = createRouter({
     routes: [{path: "/", component: {}}]
 });
 
+function montarComponente() {
+    return mount(FeedbacksAdminView, {
+        global: {
+            plugins: [createTestingPinia({createSpy: vi.fn}), router],
+            stubs: {
+                LayoutPadrao: {template: "<div><slot/></div>"},
+                PageHeader: {template: "<div><slot name='actions'/></div>", props: ["title"]},
+                EmptyState: {template: "<div class='empty-state-stub'></div>", props: ["title", "description", "icon"]},
+                BButton: {template: "<button @click=\"$emit('click')\"><slot/></button>", props: ["disabled", "variant", "size"]},
+                BAlert: {template: "<div><slot/></div>", props: ["modelValue", "variant"]},
+                BSpinner: true,
+                BBadge: {template: "<span><slot/></span>", props: ["variant"]},
+                BTable: {
+                    template: `
+                      <table data-testid="tbl-feedbacks">
+                        <tr v-for="item in items" :key="item.codigo">
+                          <slot name="cell(tipo)" :item="item" />
+                          <slot name="cell(usuarioNome)" :item="item" />
+                          <slot name="cell(nota)" :item="item" />
+                          <slot name="cell(enviadoEm)" :item="item" />
+                          <slot name="cell(acoes)" :item="item" />
+                        </tr>
+                      </table>`,
+                    props: ["fields", "items"]
+                },
+                BModal: {
+                    template: "<div v-if='modelValue' :data-testid='$attrs[\"data-testid\"] || \"modal-stub\"'><slot/></div>",
+                    props: ["modelValue", "title"],
+                    inheritAttrs: false
+                },
+            }
+        }
+    });
+}
+
 describe("FeedbacksAdminView", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
-
-    function montarComponente() {
-        return mount(FeedbacksAdminView, {
-            global: {
-                plugins: [createTestingPinia({createSpy: vi.fn}), router],
-                stubs: {
-                    LayoutPadrao: {template: "<div><slot/></div>"},
-                    PageHeader: {template: "<div><slot name='actions'/></div>", props: ["title"]},
-                    EmptyState: {template: "<div class='empty-state-stub'></div>", props: ["title", "description", "icon"]},
-                    BButton: {template: "<button @click=\"$emit('click')\"><slot/></button>", props: ["disabled", "variant", "size"]},
-                    BAlert: {template: "<div><slot/></div>", props: ["modelValue", "variant"]},
-                    BSpinner: true,
-                    BBadge: {template: "<span><slot/></span>", props: ["variant"]},
-                    BTable: {
-                        template: `
-                          <table data-testid="tbl-feedbacks">
-                            <tr v-for="item in items" :key="item.codigo">
-                              <slot name="cell(tipo)" :item="item" />
-                              <slot name="cell(usuarioNome)" :item="item" />
-                              <slot name="cell(nota)" :item="item" />
-                              <slot name="cell(enviadoEm)" :item="item" />
-                              <slot name="cell(acoes)" :item="item" />
-                            </tr>
-                          </table>`,
-                        props: ["fields", "items"]
-                    },
-                    BModal: {template: "<div v-if='modelValue' data-testid='modal-detalhes-feedback'><slot/></div>", props: ["modelValue", "title"]},
-                }
-            }
-        });
-    }
 
     it("renderiza a lista de feedbacks", async () => {
         vi.mocked(listarFeedbacksAdmin).mockResolvedValue([
@@ -150,8 +154,9 @@ describe("FeedbacksAdminView", () => {
         expect(thumbnailBtn.exists()).toBe(true);
         await thumbnailBtn.trigger("click");
         
-        expect(wrapper.vm.mostrarImagemAmpliada).toBe(true);
-        expect(wrapper.vm.urlImagemAmpliada).toBe("http://localhost:8080/api/feedback/abc/screenshot");
+        const modalImagem = wrapper.find("[data-testid='modal-imagem-ampliada']");
+        expect(modalImagem.exists()).toBe(true);
+        expect(modalImagem.find("img").attributes("src")).toBe("http://localhost:8080/api/feedback/abc/screenshot");
     });
 
     it("exibe erro ao falhar no carregamento", async () => {

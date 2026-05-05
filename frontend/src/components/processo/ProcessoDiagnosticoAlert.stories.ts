@@ -5,7 +5,7 @@ import {createRouter, createMemoryHistory} from 'vue-router';
 import ProcessoDiagnosticoAlert from './ProcessoDiagnosticoAlert.vue';
 
 // Decorator que fornece o Vue Router para componentes que usam RouterLink
-const comRouter = (story: Parameters<NonNullable<Meta['decorators']>[0]>[0], context: Parameters<NonNullable<Meta['decorators']>[0]>[1]) => {
+const comRouter = (story: () => any, context: any) => {
     const router = createRouter({
         history: createMemoryHistory(),
         routes: [
@@ -22,7 +22,7 @@ const meta: Meta<typeof ProcessoDiagnosticoAlert> = {
     title: 'Processo/ProcessoDiagnosticoAlert',
     component: ProcessoDiagnosticoAlert,
     tags: ['autodocs'],
-    decorators: [comRouter as NonNullable<Meta['decorators']>[0]],
+    decorators: [comRouter],
     argTypes: {
         exibir: {control: 'boolean'},
         carregando: {control: 'boolean'},

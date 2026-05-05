@@ -25,7 +25,6 @@ function Invoke-Passo
 Clear-Host
 
 Invoke-Passo 'git pull'          { git pull }
-Invoke-Passo 'Testes backend'    { gradle backend:test }
 
 # Garantir que pnpm está instalado
 if (-not (Get-Command pnpm -ErrorAction SilentlyContinue))
@@ -35,15 +34,19 @@ if (-not (Get-Command pnpm -ErrorAction SilentlyContinue))
 
 Invoke-Passo 'Atualizar pnpm'    { pnpm self-update --silent }
 Invoke-Passo 'Atualizar globais' { pnpm update -g }
-Invoke-Passo 'Raiz install'      { pnpm install && pnpm update }
+Invoke-Passo 'Raiz install'      { pnpm install }
+Invoke-Passo 'Raiz update'       { pnpm update }
 Invoke-Passo 'Typecheck'         { pnpm run typecheck }
 Invoke-Passo 'Lint'              { pnpm run lint }
 
 Push-Location frontend
-Invoke-Passo 'Frontend install'  { pnpm install && pnpm update }
-Invoke-Passo 'Testes frontend'   { pnpm exec vitest run }
+Invoke-Passo 'Frontend install'  { pnpm install }
+Invoke-Passo 'Frontend update'   { pnpm update }
+Invoke-Passo 'Frontend testes'   { pnpm exec vitest run }
 Pop-Location
 
-Invoke-Passo 'Testes e2e mínimos' { pnpm exec playwright test captura jornada }
+Invoke-Passo 'Backend testes'    { .\gradlew backend:test }
+
+Invoke-Passo 'Testes e2e' { pnpm exec playwright test captura jornada }
 
 Write-Host "`nTudo certo!" -ForegroundColor Green

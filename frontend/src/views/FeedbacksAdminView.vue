@@ -150,6 +150,7 @@
         ok-variant="secondary"
         centered
         size="xl"
+        data-testid="modal-imagem-ampliada"
     >
       <div class="text-center">
         <img :src="urlImagemAmpliada" alt="Captura ampliada" class="img-fluid rounded shadow"/>
@@ -197,9 +198,9 @@ function formatarTipo(tipo: string): string {
   return tipos[t] ?? (t.charAt(0) + t.slice(1).toLowerCase());
 }
 
-function obterVarianteTipo(tipo: string): string {
+function obterVarianteTipo(tipo: string): "danger" | "primary" | "info" | "success" | "secondary" {
   const t = (tipo || "").toUpperCase();
-  const variantes: Record<string, string> = {
+  const variantes: Record<string, "danger" | "primary" | "info" | "success" | "secondary"> = {
     BUG: "danger",
     SUGESTAO: "primary",
     QUESTAO: "info",
@@ -218,7 +219,7 @@ const iconesTipo: Record<string, string> = {
 function resumirNota(nota: string): string {
   if (!nota) return "";
   const doc = new DOMParser().parseFromString(nota, "text/html");
-  const textoLimpo = (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+  const textoLimpo = (doc.body.textContent || "").replaceAll(/\s+/g, " ").trim();
 
   if (textoLimpo.length <= 120) {
     return textoLimpo;
@@ -255,11 +256,11 @@ function extrairNavegadorAmigavel(ua: string): string {
   return `${navegador} no ${so}`;
 }
 
-function formatarMetadados(json?: string | null): Record<string, any> {
+function formatarMetadados(json?: string | null): Record<string, unknown> {
   if (!json) return {};
   try {
     const raw = JSON.parse(json);
-    const filtrado: Record<string, any> = {};
+    const filtrado: Record<string, unknown> = {};
     const chavesIgnorar = ["rotaNome", "fusoHorario", "usuarioNome", "usuarioCodigo"];
 
     const mapaTraducoes: Record<string, string> = {
@@ -323,7 +324,7 @@ function formatarMetadados(json?: string | null): Record<string, any> {
     });
 
     return filtrado;
-  } catch (e) {
+  } catch {
     return {erro: "JSON inválido", valor: json};
   }
 }
