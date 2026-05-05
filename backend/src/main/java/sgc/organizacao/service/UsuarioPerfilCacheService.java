@@ -30,7 +30,14 @@ public class UsuarioPerfilCacheService {
                         perfil.getUnidadeCodigo(),
                         perfil.getPerfil()
                 ))
-                .map(perfil -> paraAutorizacao(perfil, unidadesPorCodigo.get(perfil.unidadeCodigo())))
+                .map(perfil -> {
+                    UnidadeHierarquiaLeitura unidade = unidadesPorCodigo.get(perfil.unidadeCodigo());
+                    if (unidade == null) {
+                        return null;
+                    }
+                    return paraAutorizacao(perfil, unidade);
+                })
+                .filter(Objects::nonNull)
                 .toList();
     }
 

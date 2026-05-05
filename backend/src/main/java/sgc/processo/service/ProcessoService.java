@@ -679,6 +679,8 @@ public class ProcessoService {
     ) {
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         boolean elegivelDisponibilizacao = situacao == MAPEAMENTO_MAPA_CRIADO
+                || situacao == MAPEAMENTO_MAPA_COM_SUGESTOES
+                || situacao == REVISAO_MAPA_COM_SUGESTOES
                 || situacao == REVISAO_MAPA_AJUSTADO;
         return elegivelDisponibilizacao
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, DISPONIBILIZAR_MAPA, localizacoesPrecarregadas);

@@ -60,6 +60,13 @@ public class UsuarioService {
         return usuarioRepo.listarPorTitulosComUnidadeLotacao(titulos);
     }
 
+    public List<UsuarioConsultaLeitura> buscarConsultasPorTitulos(Collection<String> titulos) {
+        return cacheViewsOrganizacaoService.listarTodosUsuarios().stream()
+                .filter(usuario -> titulos.contains(usuario.tituloEleitoral()))
+                .toList();
+    }
+
+
     public List<UsuarioPesquisaDto> pesquisarPorNome(String termo) {
         String termoNormalizado = termo.trim();
         if (termoNormalizado.length() < 2) {

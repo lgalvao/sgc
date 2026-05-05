@@ -30,6 +30,8 @@ class SubprocessoConsultaServiceTest {
     @Mock
     private sgc.organizacao.UsuarioFacade usuarioFacade;
     @Mock
+    private sgc.organizacao.service.UsuarioService usuarioService;
+    @Mock
     private LocalizacaoSubprocessoService localizacaoSubprocessoService;
     @Mock
     private HierarquiaService hierarquiaService;
@@ -47,7 +49,7 @@ class SubprocessoConsultaServiceTest {
 
     @BeforeEach
     void configurarDependenciasAdicionais() {
-        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioFacade);
+        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioService);
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
         ReflectionTestUtils.setField(service, "contextoConsultaService", contextoConsultaService);
 
@@ -167,9 +169,9 @@ class SubprocessoConsultaServiceTest {
                 new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL),
                 new UnidadeResumoLeitura(20L, "Unidade 20", "U20", TipoUnidade.OPERACIONAL)
         ));
-        when(usuarioFacade.buscarUsuariosPorTitulos(List.of("analista1", "analista2"))).thenReturn(Map.of(
-                "analista1", criarUsuario("analista1", "Analista 1"),
-                "analista2", criarUsuario("analista2", "Analista 2")
+        when(usuarioService.buscarConsultasPorTitulos(anyCollection())).thenReturn(List.of(
+                new UsuarioConsultaLeitura("analista1", "mat1", "Analista 1", "email", "ramal", 10L, "U10", "U10", TipoUnidade.OPERACIONAL, "tit1", 10L),
+                new UsuarioConsultaLeitura("analista2", "mat2", "Analista 2", "email", "ramal", 20L, "U20", "U20", TipoUnidade.OPERACIONAL, "tit2", 20L)
         ));
 
         assertThat(service.listarHistoricoCadastro(1L)).hasSize(2);

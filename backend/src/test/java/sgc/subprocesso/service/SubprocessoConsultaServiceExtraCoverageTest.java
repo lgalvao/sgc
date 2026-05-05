@@ -41,6 +41,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     @Mock
     private UsuarioFacade usuarioFacade;
     @Mock
+    private UsuarioService usuarioService;
+    @Mock
     private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private HierarquiaService hierarquiaService;
@@ -55,7 +57,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     @BeforeEach
     void setUp() {
         localizacaoSubprocessoService = new LocalizacaoSubprocessoService(movimentacaoRepo);
-        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioFacade);
+        AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioService);
 
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
         ReflectionTestUtils.setField(consultaService, "contextoConsultaService", contextoConsultaService);
@@ -685,9 +687,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
                     new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
             ));
-            when(usuarioFacade.buscarUsuariosPorTitulos(argThat(lista -> lista.contains("analista1")))).thenReturn(Map.of(
-                    "analista1", criarUsuario("analista1", "Analista 1"),
-                    "analista2", criarUsuario("analista2", "Analista 2")
+            when(usuarioService.buscarConsultasPorTitulos(any())).thenReturn(List.of(
+                    new UsuarioConsultaLeitura("analista1", "mat1", "Analista 1", "email", "ramal", 10L, "U10", "U10", TipoUnidade.OPERACIONAL, "tit1", 10L),
+                    new UsuarioConsultaLeitura("analista2", "mat2", "Analista 2", "email", "ramal", 10L, "U10", "U10", TipoUnidade.OPERACIONAL, "tit1", 10L)
             ));
 
             assertThat(consultaService.listarHistoricoCadastro(1L)).hasSize(1);
@@ -710,9 +712,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
                     new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
             ));
-            when(usuarioFacade.buscarUsuariosPorTitulos(argThat(lista -> lista.contains("analista2")))).thenReturn(Map.of(
-                    "analista1", criarUsuario("analista1", "Analista 1"),
-                    "analista2", criarUsuario("analista2", "Analista 2")
+            when(usuarioService.buscarConsultasPorTitulos(any())).thenReturn(List.of(
+                    new UsuarioConsultaLeitura("analista1", "mat1", "Analista 1", "email", "ramal", 10L, "U10", "U10", TipoUnidade.OPERACIONAL, "tit1", 10L),
+                    new UsuarioConsultaLeitura("analista2", "mat2", "Analista 2", "email", "ramal", 10L, "U10", "U10", TipoUnidade.OPERACIONAL, "tit1", 10L)
             ));
 
             assertThat(consultaService.listarHistoricoValidacao(1L)).hasSize(1);
@@ -735,9 +737,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
                     new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
             ));
-            when(usuarioFacade.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
-                    "analista1", criarUsuario("analista1", "Analista 1"),
-                    "analista2", criarUsuario("analista2", "Analista 2")
+            when(usuarioService.buscarConsultasPorTitulos(anyCollection())).thenReturn(List.of(
+                    new UsuarioConsultaLeitura("analista1", "mat1", "Analista 1", "email", "ramal", 10L, "U10", "U10", TipoUnidade.OPERACIONAL, "tit1", 10L),
+                    new UsuarioConsultaLeitura("analista2", "mat2", "Analista 2", "email", "ramal", 10L, "U10", "U10", TipoUnidade.OPERACIONAL, "tit1", 10L)
             ));
 
             assertThat(consultaService.listarHistoricoCadastro(1L)).hasSize(1);

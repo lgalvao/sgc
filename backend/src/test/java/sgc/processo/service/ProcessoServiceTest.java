@@ -1213,6 +1213,34 @@ class ProcessoServiceTest {
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);
+            if (situacao == SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES) {
+                assertThat(result.getFirst().isHabilitarDisponibilizarMapaBloco()).isTrue();
+            }
+        }
+
+        @Test
+        @DisplayName("Deve habilitar disponibilização em bloco para mapa com sugestões")
+        void deveHabilitarDisponibilizacaoMapaBlocoQuandoMapaComSugestoes() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            sp.setUnidade(unidade);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissaoSilenciosa(any(), any(), any())).thenReturn(true);
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(List.of(sp))).thenReturn(Map.of(100L, unidade));
+
+            List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.getFirst().isHabilitarDisponibilizarMapaBloco()).isTrue();
         }
 
         @Test
