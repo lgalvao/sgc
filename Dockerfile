@@ -1,5 +1,5 @@
 # Estágio 1: Build do Frontend
-FROM docker.io/library/node:26 AS build-frontend
+FROM docker.io/library/node AS build-frontend
 WORKDIR /build
 # Instala o pnpm globalmente
 RUN npm install -g pnpm@11.0.0
