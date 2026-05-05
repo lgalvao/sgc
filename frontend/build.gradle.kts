@@ -6,10 +6,8 @@ plugins {
 }
 
 node {
-    // Garante a instalação do Node e PNPM no ambiente
-    download.set(true)
-    version.set("26.0.0")
-    pnpmVersion.set("11.0.0")
+    // Usa o Node e PNPM instalados no sistema (via nvm no Linux)
+    download.set(false)
 }
 
 tasks.register<PnpmTask>("install") {

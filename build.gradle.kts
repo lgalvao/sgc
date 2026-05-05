@@ -13,9 +13,7 @@ plugins {
 }
 
 node {
-    download.set(true)
-    version.set("26.0.0")
-    pnpmVersion.set("11.0.0")
+    download.set(false)
 }
 
 allprojects {
