@@ -4,20 +4,20 @@ plugins {
 
 val isWindows = System.getProperty("os.name").lowercase().contains("win")
 
-// Auxiliar para comandos NPM
-fun npmCommand(vararg args: String) = if (isWindows) {
-    listOf("cmd", "/c", "npm") + args
+// Auxiliar para comandos PNPM
+fun pnpmCommand(vararg args: String) = if (isWindows) {
+    listOf("cmd", "/c", "pnpm") + args
 } else {
-    listOf("npm") + args
+    listOf("pnpm") + args
 }
 
 tasks.register<Exec>("install") {
     group = "setup"
-    description = "Instala as dependências do frontend (npm install)"
+    description = "Instala as dependências do frontend (pnpm install)"
     workingDir = projectDir
     inputs.file("package.json")
-    inputs.file("package-lock.json")
-    commandLine = npmCommand("install")
+    inputs.file("pnpm-lock.yaml")
+    commandLine = pnpmCommand("install", "--frozen-lockfile")
 }
 
 tasks.register<Exec>("dev") {
@@ -25,7 +25,7 @@ tasks.register<Exec>("dev") {
     description = "Inicia o servidor de desenvolvimento do frontend (Vite)"
     dependsOn("install")
     workingDir = projectDir
-    commandLine = npmCommand("run", "dev")
+    commandLine = pnpmCommand("run", "dev")
 }
 
 tasks.register<Exec>("buildVue") {
@@ -42,7 +42,7 @@ tasks.register<Exec>("buildVue") {
     inputs.file("vite.config.ts")
     outputs.dir("dist")
 
-    commandLine = npmCommand("run", "build")
+    commandLine = pnpmCommand("run", "build")
 }
 
 tasks.register<Exec>("quality") {
@@ -50,7 +50,7 @@ tasks.register<Exec>("quality") {
     description = "Executa verificações de qualidade do frontend (lint, tests, typecheck)"
     dependsOn("install")
     workingDir = projectDir
-    commandLine = npmCommand("run", "quality:all")
+    commandLine = pnpmCommand("run", "quality:all")
     isIgnoreExitValue = true
 }
 
@@ -59,7 +59,7 @@ tasks.register<Exec>("test") {
     description = "Executa apenas os testes do frontend"
     dependsOn("install")
     workingDir = projectDir
-    commandLine = npmCommand("run", "quality:test")
+    commandLine = pnpmCommand("run", "quality:test")
     isIgnoreExitValue = true
 }
 

@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
-import {page} from '@vitest/browser/context';
+import {page} from 'vitest/browser';
 import SubprocessoResumoHeader from './SubprocessoResumoHeader.vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import type {SubprocessoDetalhe, ResponsavelDto} from '@/types/tipos';

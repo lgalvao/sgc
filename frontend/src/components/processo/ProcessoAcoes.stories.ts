@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
-import {page} from '@vitest/browser/context';
+import {page} from 'vitest/browser';
 import ProcessoAcoes from './ProcessoAcoes.vue';
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import type {Processo} from '@/types/tipos';

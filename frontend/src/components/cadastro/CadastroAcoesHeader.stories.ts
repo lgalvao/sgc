@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
-import {page} from '@vitest/browser/context';
+import {page} from 'vitest/browser';
 import CadastroAcoesHeader from './CadastroAcoesHeader.vue';
 import type {PermissoesSubprocesso, Unidade} from '@/types/tipos';
 

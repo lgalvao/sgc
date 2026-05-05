@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
-import {page, userEvent} from '@vitest/browser/context';
+import {page, userEvent} from 'vitest/browser';
 import FeedbackButton from './FeedbackButton.vue';
 
 const meta: Meta<typeof FeedbackButton> = {

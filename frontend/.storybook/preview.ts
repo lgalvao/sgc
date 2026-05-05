@@ -1,6 +1,6 @@
 import {setup} from '@storybook/vue3-vite';
 import {createPinia} from 'pinia';
-import {createBootstrap} from 'bootstrap-vue-next';
+import {createBootstrap, vBTooltip} from 'bootstrap-vue-next';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
@@ -11,6 +11,7 @@ const pinia = createPinia();
 setup((app) => {
     app.use(pinia);
     app.use(createBootstrap());
+    app.directive('b-tooltip', vBTooltip);
 });
 
 export const parameters = {

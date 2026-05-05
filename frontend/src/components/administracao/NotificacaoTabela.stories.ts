@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
-import {page} from '@vitest/browser/context';
+import {page} from 'vitest/browser';
 import NotificacaoTabela from './NotificacaoTabela.vue';
 import type {Notificacao} from '@/services/notificacaoService';
 

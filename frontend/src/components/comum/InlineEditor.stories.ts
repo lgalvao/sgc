@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
 import InlineEditor from './InlineEditor.vue';
 import {ref} from 'vue';
-import {page, userEvent} from '@vitest/browser/context';
+import {page, userEvent} from 'vitest/browser';
 
 const meta: Meta<typeof InlineEditor> = {
     title: 'Comum/InlineEditor',
