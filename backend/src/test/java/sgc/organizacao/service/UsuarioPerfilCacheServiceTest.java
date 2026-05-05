@@ -63,7 +63,9 @@ class UsuarioPerfilCacheServiceTest {
     @Test
     @DisplayName("Deve ignorar perfis de outros usuarios")
     void deveIgnorarPerfisDeOutrosUsuarios() {
-        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of());
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "U1", "U1", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null)
+        ));
         when(usuarioPerfilRepo.findByUsuarioTitulo("999")).thenReturn(List.of(
                 new UsuarioPerfil("999", 1L, Perfil.ADMIN)
         ));

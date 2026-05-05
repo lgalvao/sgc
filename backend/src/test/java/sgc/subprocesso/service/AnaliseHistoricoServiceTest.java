@@ -23,7 +23,7 @@ class AnaliseHistoricoServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioService usuarioService;
 
     @InjectMocks
     private AnaliseHistoricoService analiseHistoricoService;
@@ -52,8 +52,8 @@ class AnaliseHistoricoServiceTest {
 
         UnidadeResumoLeitura unidade = new UnidadeResumoLeitura(10L, "Unidade Teste", "UT", TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
-        when(usuarioFacade.buscarUsuariosPorTitulos(List.of("analista1")))
-                .thenReturn(Map.of("analista1", criarUsuario("analista1", "Analista Um")));
+        when(usuarioService.buscarConsultasPorTitulos(anyCollection()))
+                .thenReturn(List.of(new UsuarioConsultaLeitura("analista1", "mat1", "Analista Um", "email", "ramal", 10L, "UT", "UT", TipoUnidade.OPERACIONAL, "tit1", 10L)));
 
         AnaliseHistoricoDto dto = analiseHistoricoService.converter(analise);
 
@@ -93,10 +93,10 @@ class AnaliseHistoricoServiceTest {
 
         when(unidadeService.buscarResumosPorCodigos(argThat(lista -> lista.containsAll(List.of(10L, 20L)))))
                 .thenReturn(List.of(unidade1, unidade2));
-        when(usuarioFacade.buscarUsuariosPorTitulos(argThat(lista -> lista.containsAll(List.of("analista1", "analista2")))))
-                .thenReturn(Map.of(
-                        "analista1", criarUsuario("analista1", "Analista Um"),
-                        "analista2", criarUsuario("analista2", "Analista Dois")
+        when(usuarioService.buscarConsultasPorTitulos(anyCollection()))
+                .thenReturn(List.of(
+                        new UsuarioConsultaLeitura("analista1", "mat1", "Analista Um", "email", "ramal", 10L, "UT1", "UT1", TipoUnidade.OPERACIONAL, "tit1", 10L),
+                        new UsuarioConsultaLeitura("analista2", "mat2", "Analista Dois", "email", "ramal", 20L, "UT2", "UT2", TipoUnidade.INTERMEDIARIA, "tit2", 20L)
                 ));
 
         List<AnaliseHistoricoDto> resultado = analiseHistoricoService.converterLista(List.of(analise1, analise2));

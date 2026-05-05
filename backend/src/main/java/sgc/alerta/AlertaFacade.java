@@ -82,14 +82,15 @@ public class AlertaFacade {
         if (alertaCodigos.isEmpty()) {
             return Map.of();
         }
-        return alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos).stream()
-                .filter(alertaUsuario -> alertaUsuario.getDataHoraLeitura() != null)
-                .collect(java.util.stream.Collectors.toMap(
-                        alertaUsuario -> alertaUsuario.getCodigo().getAlertaCodigo(),
-                        alertaUsuario -> java.util.Objects.requireNonNull(alertaUsuario.getDataHoraLeitura()),
-                        (primeira, ignorada) -> primeira,
-                        HashMap::new
-                ));
+        List<AlertaUsuario> leituras = alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos);
+        Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
+        for (AlertaUsuario alertaUsuario : leituras) {
+            LocalDateTime dataHoraLeitura = alertaUsuario.getDataHoraLeitura();
+            if (dataHoraLeitura != null) {
+                mapaLeitura.put(alertaUsuario.getCodigo().getAlertaCodigo(), dataHoraLeitura);
+            }
+        }
+        return mapaLeitura;
     }
 
     public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
@@ -203,13 +204,10 @@ public class AlertaFacade {
         String usuarioTitulo = contextoUsuario.usuarioTitulo();
         Usuario usuario = usuarioService.buscar(usuarioTitulo);
         LocalDateTime agora = LocalDateTime.now();
-        Map<Long, AlertaUsuario> existentesPorCodigo = alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos).stream()
-                .collect(java.util.stream.Collectors.toMap(
-                        alertaUsuario -> alertaUsuario.getCodigo().getAlertaCodigo(),
-                        alertaUsuario -> alertaUsuario,
-                        (primeiro, ignorado) -> primeiro,
-                        HashMap::new
-                ));
+        Map<Long, AlertaUsuario> existentesPorCodigo = new HashMap<>();
+        for (AlertaUsuario au : alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos)) {
+            existentesPorCodigo.put(au.getCodigo().getAlertaCodigo(), au);
+        }
 
         List<AlertaUsuario> alertasUsuariosParaSalvar = new ArrayList<>();
         for (AlertaUsuario alertaUsuario : existentesPorCodigo.values()) {
@@ -223,13 +221,10 @@ public class AlertaFacade {
                 .filter(codigo -> !existentesPorCodigo.containsKey(codigo))
                 .toList();
         if (!codigosAusentes.isEmpty()) {
-            Map<Long, Alerta> alertasPorCodigo = alertaService.listarPorCodigos(codigosAusentes).stream()
-                    .collect(java.util.stream.Collectors.toMap(
-                            Alerta::getCodigo,
-                            alerta -> alerta,
-                            (primeiro, ignorado) -> primeiro,
-                            HashMap::new
-                    ));
+            Map<Long, Alerta> alertasPorCodigo = new HashMap<>();
+            for (Alerta a : alertaService.listarPorCodigos(codigosAusentes)) {
+                alertasPorCodigo.put(a.getCodigo(), a);
+            }
 
             codigosAusentes.forEach(codigo -> {
                 Alerta alerta = alertasPorCodigo.get(codigo);

@@ -206,12 +206,13 @@ public class ValidadorDadosOrganizacionais {
             return new ResultadoCargaPerfis(Map.of(), List.of());
         }
 
-        List<Map<String, Object>> linhas = namedParameterJdbcTemplate.queryForList("""
+        List<Map<String, Object>> result = namedParameterJdbcTemplate.queryForList("""
                 SELECT usuario_titulo, perfil, unidade_codigo
                 FROM sgc.vw_usuario_perfil_unidade
                 WHERE unidade_codigo IN (:codigos)
                    OR unidade_codigo IS NULL
                 """, Map.of("codigos", codigos));
+        List<Map<String, Object>> linhas = result.stream().flatMap(Stream::ofNullable).toList();
 
         List<PerfilInvalido> perfisInvalidos = new ArrayList<>();
         Map<Long, Set<PerfilUsuarioUnidade>> perfisPorUnidade = new LinkedHashMap<>();
@@ -239,13 +240,14 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private Set<String> diagnosticarTitulosDuplicados(List<String> titulos) {
-        List<Map<String, Object>> linhas = namedParameterJdbcTemplate.queryForList("""
+        List<Map<String, Object>> result = namedParameterJdbcTemplate.queryForList("""
                 SELECT titulo, COUNT(*) AS quantidade
                 FROM sgc.vw_usuario
                 WHERE titulo IN (:titulos)
                 GROUP BY titulo
                 HAVING COUNT(*) > 1
                 """, Map.of("titulos", titulos));
+        List<Map<String, Object>> linhas = result.stream().flatMap(Stream::ofNullable).toList();
 
         Set<String> titulosDuplicados = new TreeSet<>();
         for (Map<String, Object> linha : linhas) {

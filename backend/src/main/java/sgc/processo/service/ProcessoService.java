@@ -307,7 +307,10 @@ public class ProcessoService {
             throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
         }
 
-        processarAcoesBlocoAceiteHomologacao((ProcessarAnaliseEmBlocoCommand) command, subprocessos);
+        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
+            processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
+        }
+
     }
 
 

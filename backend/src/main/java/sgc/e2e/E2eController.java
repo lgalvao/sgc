@@ -108,9 +108,10 @@ public class E2eController {
             log.debug("Desabilitando integridade referencial");
             stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
-            List<String> tables = jdbcTemplate.queryForList(
+            List<String> list = jdbcTemplate.queryForList(
                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE UPPER(TABLE_SCHEMA) = 'SGC'",
-                    String.class).stream().flatMap(Stream::ofNullable).toList();
+                    String.class);
+            List<String> tables = list.stream().flatMap(Stream::ofNullable).toList();
 
             log.debug("Limpando {} tabelas no schema SGC", tables.size());
             for (String table : tables) {
@@ -194,7 +195,8 @@ public class E2eController {
     public void limparProcessoComDependentes(@PathVariable Long codigo) {
         String sqlMapas =
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
-        List<Long> codigosMapas = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo).stream()
+        List<Long> listMapas = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo);
+        List<Long> codigosMapas = listMapas.stream()
                 .flatMap(Stream::ofNullable)
                 .toList();
 

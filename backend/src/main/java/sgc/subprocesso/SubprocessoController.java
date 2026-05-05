@@ -371,11 +371,9 @@ public class SubprocessoController {
     @Operation(summary = "Disponibiliza mapas em bloco")
     public void disponibilizarMapaEmBloco(@RequestBody @Valid ProcessarEmBlocoRequest request) {
         DisponibilizarMapaRequest dispoReq = null;
-        if (request.dataLimite() != null) {
-            dispoReq = DisponibilizarMapaRequest.builder()
-                    .dataLimite(request.dataLimite())
-                    .build();
-        }
+        dispoReq = DisponibilizarMapaRequest.builder()
+                .dataLimite(request.dataLimite())
+                .build();
         transicaoService.disponibilizarMapaEmBloco(request.subprocessos(), dispoReq);
     }
 

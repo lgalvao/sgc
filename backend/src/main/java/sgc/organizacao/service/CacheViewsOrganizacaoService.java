@@ -85,6 +85,7 @@ public class CacheViewsOrganizacaoService {
 
         administradorRepo.findAll().stream()
                 .map(Administrador::getUsuarioTitulo)
+                .filter(Objects::nonNull)
                 .filter(usuariosPorTitulo::containsKey)
                 .map(titulo -> new UsuarioPerfilLeitura(titulo, 1L, Perfil.ADMIN))
                 .forEach(perfis::add);
