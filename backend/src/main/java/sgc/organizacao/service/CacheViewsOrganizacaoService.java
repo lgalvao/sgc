@@ -86,7 +86,11 @@ public class CacheViewsOrganizacaoService {
         administradorRepo.findAll().stream()
                 .map(Administrador::getUsuarioTitulo)
                 .filter(usuariosPorTitulo::containsKey)
-                .map(titulo -> new UsuarioPerfilLeitura(titulo, 1L, Perfil.ADMIN))
+                .map(titulo -> {
+                    if (titulo != null) {
+                        return new UsuarioPerfilLeitura(titulo, 1L, Perfil.ADMIN);
+                    }
+                })
                 .forEach(perfis::add);
 
         self.listarTodasResponsabilidades().forEach(responsabilidade -> {
@@ -106,7 +110,9 @@ public class CacheViewsOrganizacaoService {
             Long codigoUnidadeCompetencia = usuario.unidadeCompetenciaCodigo();
             UnidadeHierarquiaLeitura unidadeCompetencia = unidadesPorCodigo.get(codigoUnidadeCompetencia);
             if (unidadeCompetencia != null && !Objects.equals(usuario.tituloEleitoral(), unidadeCompetencia.tituloTitular())) {
-                perfis.add(new UsuarioPerfilLeitura(usuario.tituloEleitoral(), codigoUnidadeCompetencia, Perfil.SERVIDOR));
+                if (codigoUnidadeCompetencia != null) {
+                    perfis.add(new UsuarioPerfilLeitura(usuario.tituloEleitoral(), codigoUnidadeCompetencia, Perfil.SERVIDOR));
+                }
             }
         });
 
@@ -119,7 +125,6 @@ public class CacheViewsOrganizacaoService {
 
     private void mesclarPerfisViewCompatibilidade(Set<UsuarioPerfilLeitura> perfis) {
         usuarioPerfilRepo.findAll().stream()
-                .filter(Objects::nonNull)
                 .map(perfil -> new UsuarioPerfilLeitura(
                         perfil.getUsuarioTitulo(),
                         perfil.getUnidadeCodigo(),

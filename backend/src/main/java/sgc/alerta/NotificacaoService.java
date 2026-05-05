@@ -63,7 +63,7 @@ public class NotificacaoService {
 
     @Transactional(readOnly = true)
     public List<NotificacaoEmail> listarPorSubprocesso(Long subprocessoCodigo, int limite) {
-        int tamanho = Math.max(1, Math.min(limite, LIMITE_CONSULTA_MAXIMO));
+        int tamanho = Math.clamp(limite, 1, LIMITE_CONSULTA_MAXIMO);
         return notificacaoEmailRepo.findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(
                 subprocessoCodigo,
                 PageRequest.of(0, tamanho)
@@ -72,7 +72,7 @@ public class NotificacaoService {
 
     @Transactional(readOnly = true)
     public List<NotificacaoEmail> listarTodasAdmin(int limite) {
-        int tamanho = Math.max(1, Math.min(limite, LIMITE_CONSULTA_MAXIMO));
+        int tamanho = Math.clamp(limite, 1, LIMITE_CONSULTA_MAXIMO);
         // Busca as notificações mais recentes de processos em andamento
         return notificacaoEmailRepo.buscarRecentesDeProcessosEmAndamento(PageRequest.of(0, tamanho));
     }

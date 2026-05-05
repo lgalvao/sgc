@@ -148,7 +148,7 @@ function fixOrphanConstants() {
             // Para ser robusto e rápido, vamos carregar todos os arquivos de interesse em memória uma vez
             // ou usar uma ferramenta de shell. Como estamos no Node, vamos usar uma busca manual rápida.
             if (!global.cacheArquivosFrontend) {
-                const extensões = ['.ts', '.vue'];
+                const extensoes = ['.ts', '.vue'];
                 const pastas = [path.join(RAIZ, 'frontend/src'), path.join(RAIZ, 'e2e')];
                 global.cacheArquivosFrontend = [];
 
@@ -158,7 +158,7 @@ function fixOrphanConstants() {
                     for (const e of entradas) {
                         const p = path.join(dir, e.name);
                         if (e.isDirectory()) carregar(p);
-                        else if (extensões.includes(path.extname(p)) && !p.includes('textos.ts')) {
+                        else if (extensoes.includes(path.extname(p)) && !p.includes('textos.ts')) {
                             global.cacheArquivosFrontend.push(fs.readFileSync(p, 'utf-8'));
                         }
                     }

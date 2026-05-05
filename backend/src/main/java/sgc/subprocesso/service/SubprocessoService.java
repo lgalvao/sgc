@@ -257,7 +257,7 @@ public class SubprocessoService {
     }
 
     private void validarCompetenciaParaCriacao(CriarCompetenciaRequest request) {
-        if (request.atividadesCodigos() == null || request.atividadesCodigos().isEmpty()) {
+        if (request.atividadesCodigos().isEmpty()) {
             throw new ErroValidacao(Mensagens.COMPETENCIA_DEVE_TER_ATIVIDADE);
         }
     }

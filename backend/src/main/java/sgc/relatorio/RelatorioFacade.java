@@ -151,7 +151,6 @@ public class RelatorioFacade {
                 .map(UnidadeMapa::getMapaVigente)
                 .filter(Objects::nonNull)
                 .map(Mapa::getSubprocesso)
-                .filter(Objects::nonNull)
                 .toList();
     }
 

@@ -42,10 +42,10 @@ public class UsuarioPerfilCacheService {
                 perfil.usuarioTitulo(),
                 perfil.perfil(),
                 perfil.unidadeCodigo(),
-                unidade != null ? unidade.nome() : null,
-                unidade != null ? unidade.sigla() : null,
-                unidade != null ? unidade.tipo() : null,
-                unidade != null ? unidade.situacao() : null
+                unidade.nome(),
+                unidade.sigla(),
+                unidade.tipo(),
+                unidade.situacao()
         );
     }
 }

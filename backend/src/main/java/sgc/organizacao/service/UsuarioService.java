@@ -129,6 +129,6 @@ public class UsuarioService {
     }
 
     private boolean iniciaCom(String valor, String termoBusca) {
-        return valor != null && valor.toLowerCase(Locale.ROOT).startsWith(termoBusca);
+        return valor.toLowerCase(Locale.ROOT).startsWith(termoBusca);
     }
 }

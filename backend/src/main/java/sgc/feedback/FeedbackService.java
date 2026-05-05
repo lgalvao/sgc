@@ -70,7 +70,7 @@ public class FeedbackService {
 
     @Transactional(readOnly = true)
     public List<FeedbackListagemDto> listarRecentes(int limite) {
-        int limiteNormalizado = Math.min(Math.max(limite, 1), 200);
+        int limiteNormalizado = Math.clamp(limite, 1, 200);
         var page = PageRequest.of(0, limiteNormalizado, Sort.by(Sort.Direction.DESC, "enviadoEm"));
         return repo.findAll(page).stream()
                 .map(registro -> {
@@ -128,7 +128,7 @@ public class FeedbackService {
         return Path.of(dir).resolve(nomeOuCaminho).normalize();
     }
 
-    private void validarNota(String nota) {
+    private void validarNota(@Nullable String nota) {
         if (nota == null || nota.isBlank()) {
             throw new ErroValidacao("nota não pode estar em branco");
         }

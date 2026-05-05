@@ -1314,6 +1314,120 @@
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaServiceCoverageTest unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacadeCoverageTest unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoServiceCoverageTest unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaService acessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService acessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService administradorRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens ALERTA_CADASTRO_REABERTO" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens ALERTA_REVISAO_REABERTA" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService alertaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService alertaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService analiseHistoricoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService analiseRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail assunto" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens ATIVIDADES_DEVEM_TER_COMPETENCIA" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.AgendadorRefreshCache cacheManager" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheOrganizacaoService cacheManager" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService cacheOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService cacheOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService cacheOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.AgendadorRefreshCache cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheAquecimento cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioPerfilCacheService cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.ValidadorDadosOrganizacionais cacheViewsOrganizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService cadastroFluxoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController cadastroFluxoService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro caminhoScreenshot" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail chaveIdempotencia" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoService clock" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService configAplicacao" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService consultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaService contextoConsultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens CORPO_DATA_LIMITE_ALTERADA" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail corpoHtml" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail dataHoraCriacao" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail dataHoraEnvio" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackStatus DESCARTADO" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.TipoNotificacao descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail destinatario" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService emailModelosService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoWorker emailService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro enviadoEm" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService environment" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi erros" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackController feedbackService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoConsultaService hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro id" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAcessoService impactoMapaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService impactoMapaService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.SituacaoUnidade INATIVA" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoConsultaService localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoWorker loteWorker" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService mapaVisualizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro metadataJson" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties modo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService movimentacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro nota" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoService notificacaoEmailRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoAdminController notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoController notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoWorker notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackController objectMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackService objectMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController permissionEvaluator" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeAceitarMapaBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.TipoTransicao PROCESSO_INICIADO" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoExclusaoController processoExclusaoCompletaService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackService propriedades" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail proximaTentativaEm" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.AgendadorRefreshCache registroSseEmitter" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheOrganizacaoService registroSseEmitter" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackStatus RESOLVIDO" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackStatus REVISADO" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro rota" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.CacheViewsOrganizacaoService selfProvider" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro status" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail subprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.parametros.model.ConfiguracaoViews TEMA_ESCURO" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties tempoHttpLentoMs" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.util.MonitoramentoProperties tempoMinimoJavaMs" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail tentativas" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail tipoNotificacao" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto tipoResponsabilidade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade titular" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto titular" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService transicaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail ultimoErro" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario unidadeCompetenciaCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail unidadeDestinoSigla" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService unidadeHierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioFacade unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoConsultaService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.NotificacaoEmail usuarioDestinoTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.AnaliseHistoricoService usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackService usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoConsultaService usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro usuarioId" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro usuarioNome" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService validacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaService visualizacaoService" />
     </entry_points>
     <list size="3">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
@@ -4562,6 +4676,96 @@
     <pattern value="sgc.subprocesso.service.SubprocessoNotificacaoServiceCoverageTest" />
     <pattern value="sgc.subprocesso.service.SubprocessoServiceCoverageTest" />
     <pattern value="sgc.integracao.CDU05IntegrationTest" method="testIniciarProcessoRevisao_deveCriarSubprocessoParaInteroperacionalSelecionada" />
+    <pattern value="sgc.organizacao.dto.AdicionarAdministradorRequest" />
+    <pattern value="sgc.organizacao.dto.AdicionarAdministradorRequest" method="AdicionarAdministradorRequest" />
+    <pattern value="sgc.organizacao.service.AgendadorRefreshCache" />
+    <pattern value="sgc.subprocesso.dto.AtualizarCompetenciaRequest" />
+    <pattern value="sgc.subprocesso.dto.AtualizarCompetenciaRequest" method="AtualizarCompetenciaRequest" />
+    <pattern value="sgc.mapa.dto.AtualizarEstadoMapaCommand" />
+    <pattern value="sgc.mapa.dto.AtualizarEstadoMapaCommand" method="AtualizarEstadoMapaCommand" />
+    <pattern value="sgc.organizacao.service.AgendadorRefreshCache" method="atualizarTudo" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarCodigosUnidadesComMapaVigente" />
+    <pattern value="sgc.comum.model.ComumRepo" method="buscarPorSigla" />
+    <pattern value="sgc.organizacao.service.UsuarioService" method="buscarPorUnidadeLotacao" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarResponsabilidadeDetalhadaAtual" />
+    <pattern value="sgc.subprocesso.model.MovimentacaoRepo" method="buscarUltimaPorSubprocesso" />
+    <pattern value="sgc.organizacao.service.CacheAquecimento" />
+    <pattern value="sgc.organizacao.service.CacheOrganizacaoService" />
+    <pattern value="sgc.subprocesso.service.CadastroFluxoService" />
+    <pattern value="sgc.organizacao.service.UsuarioService" method="carregarAuthorities" />
+    <pattern value="sgc.subprocesso.service.SubprocessoContextoConsultaService.ContextoConsultaBase" />
+    <pattern value="sgc.subprocesso.service.SubprocessoContextoConsultaService.ContextoConsultaBase" method="ContextoConsultaBase" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaService.ContextoConsultaSubprocesso" />
+    <pattern value="sgc.subprocesso.service.SubprocessoConsultaService.ContextoConsultaSubprocesso" method="ContextoConsultaSubprocesso" />
+    <pattern value="sgc.subprocesso.dto.CriarCompetenciaRequest" />
+    <pattern value="sgc.subprocesso.dto.CriarCompetenciaRequest" method="CriarCompetenciaRequest" />
+    <pattern value="sgc.mapa.dto.CriarMapaCommand" />
+    <pattern value="sgc.mapa.dto.CriarMapaCommand" method="CriarMapaCommand" />
+    <pattern value="sgc.organizacao.service.UnidadeService" method="definirMapaVigente" />
+    <pattern value="sgc.alerta.EnfileirarNotificacaoCommand" />
+    <pattern value="sgc.alerta.EnfileirarNotificacaoCommand" method="EnfileirarNotificacaoCommand" />
+    <pattern value="sgc.processo.ProcessoExclusaoController" method="excluirCompleto" />
+    <pattern value="sgc.feedback.FeedbackController" method="exibirScreenshot" />
+    <pattern value="sgc.feedback.FeedbackController" />
+    <pattern value="sgc.feedback.FeedbackPropriedades" />
+    <pattern value="sgc.feedback.FeedbackPropriedades" method="FeedbackPropriedades" />
+    <pattern value="sgc.feedback.FeedbackRegistro" />
+    <pattern value="sgc.feedback.FeedbackRepo" />
+    <pattern value="sgc.feedback.FeedbackService" />
+    <pattern value="sgc.feedback.FeedbackStatus" />
+    <pattern value="sgc.feedback.FeedbackTipo" />
+    <pattern value="sgc.subprocesso.service.CadastroFluxoService.FluxoCadastroContexto" />
+    <pattern value="sgc.subprocesso.service.CadastroFluxoService.FluxoCadastroContexto" method="FluxoCadastroContexto" />
+    <pattern value="sgc.organizacao.dto.UnidadeDto" method="fromEntity" />
+    <pattern value="sgc.organizacao.dto.UnidadeDto" method="fromEntityResumoObrigatoria" />
+    <pattern value="sgc.feedback.FeedbackTipo" method="fromJson" />
+    <pattern value="sgc.comum.erros.ErroApi" method="getErros" />
+    <pattern value="sgc.comum.util.MonitoramentoProperties" method="isMonitoramentoHttpAtivo" />
+    <pattern value="sgc.comum.util.MonitoramentoProperties" method="isMonitoramentoJavaLentoAtivo" />
+    <pattern value="sgc.feedback.FeedbackController" method="listar" />
+    <pattern value="sgc.alerta.NotificacaoAdminController" method="listar" />
+    <pattern value="sgc.processo.service.ProcessoService" method="listarIniciadosPorParticipantes" />
+    <pattern value="sgc.processo.model.ProcessoRepo" method="listarPorParticipantesESituacaoDiferente" />
+    <pattern value="sgc.alerta.NotificacaoController" method="listarPorSubprocesso" />
+    <pattern value="sgc.alerta.NotificacaoService" method="listarResumoSubprocessosAtivos" />
+    <pattern value="sgc.seguranca.login.LoginController" method="logout" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="mapaComCompetenciasEAtividadesSubprocesso" />
+    <pattern value="sgc.alerta.NotificacaoAdminController" />
+    <pattern value="sgc.alerta.NotificacaoController" />
+    <pattern value="sgc.alerta.dto.NotificacaoDto" />
+    <pattern value="sgc.alerta.dto.NotificacaoDto" method="NotificacaoDto" />
+    <pattern value="sgc.alerta.model.NotificacaoEmail" />
+    <pattern value="sgc.alerta.NotificacaoService" />
+    <pattern value="sgc.alerta.dto.NotificacaoSubprocessoResumoQuery" />
+    <pattern value="sgc.alerta.dto.NotificacaoSubprocessoResumoQuery" method="NotificacaoSubprocessoResumoQuery" />
+    <pattern value="sgc.alerta.NotificacaoWorker" />
+    <pattern value="sgc.alerta.AlertaFacade" method="obterDataHoraLeitura" />
+    <pattern value="sgc.comum.util.FiltroMonitoramentoHttp" method="obterDescricaoHttpAtual" />
+    <pattern value="sgc.relatorio.RelatorioController" method="obterRelatorioMapas" />
+    <pattern value="sgc.alerta.NotificacaoWorker" method="processarPendentes" />
+    <pattern value="sgc.processo.ProcessoExclusaoController" />
+    <pattern value="sgc.alerta.NotificacaoService" method="reenfileirarFalhasDefinitivasPorSubprocesso" />
+    <pattern value="sgc.alerta.NotificacaoAdminController" method="reenviar" />
+    <pattern value="sgc.feedback.FeedbackController" method="registrar" />
+    <pattern value="sgc.organizacao.service.RegistroSseEmitter" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeLeitura" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeLeitura" method="ResponsabilidadeLeitura" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeUnidadeLeitura" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeUnidadeLeitura" method="ResponsabilidadeUnidadeLeitura" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeUnidadeResumoLeitura" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeUnidadeResumoLeitura" method="ResponsabilidadeUnidadeResumoLeitura" />
+    <pattern value="sgc.alerta.dto.SituacaoNotificacao" />
+    <pattern value="sgc.subprocesso.service.SubprocessoAcessoService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoContextoConsultaService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoVisualizacaoService" />
+    <pattern value="sgc.alerta.model.TipoNotificacao" />
+    <pattern value="sgc.feedback.FeedbackTipo" method="toJson" />
+    <pattern value="sgc.organizacao.model.UnidadeHierarquiaLeitura" />
+    <pattern value="sgc.organizacao.model.UnidadeHierarquiaLeitura" method="UnidadeHierarquiaLeitura" />
+    <pattern value="sgc.organizacao.model.UnidadeResumoLeitura" />
+    <pattern value="sgc.organizacao.model.UnidadeResumoLeitura" method="UnidadeResumoLeitura" />
+    <pattern value="sgc.organizacao.model.UsuarioConsultaLeitura" />
+    <pattern value="sgc.organizacao.model.UsuarioConsultaLeitura" method="UsuarioConsultaLeitura" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
