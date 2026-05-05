@@ -13,6 +13,9 @@ export default defineConfig({
   plugins: [vue() as Plugin, tsconfigPaths() as Plugin],
   test: {
     reporters: "dot",
+    onConsoleLog(log: string) {
+      if (log.includes('decodeEntities')) return false;
+    },
     coverage: {
       provider: "v8",
       reporter: ["json", "text", "html", "lcov"],

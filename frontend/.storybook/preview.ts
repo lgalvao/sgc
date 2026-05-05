@@ -15,7 +15,14 @@ const router = createRouter({
         {path: '/login', component: {template: '<div></div>'}},
         {path: '/painel', component: {template: '<div></div>'}},
         {path: '/unidade/:codigo', component: {template: '<div></div>'}},
+        {path: '/unidades', component: {template: '<div></div>'}},
+        {path: '/relatorios', component: {template: '<div></div>'}},
         {path: '/historico', component: {template: '<div></div>'}},
+        {path: '/configuracoes', component: {template: '<div></div>'}},
+        {path: '/administradores', component: {template: '<div></div>'}},
+        {path: '/administracao/notificacoes', component: {template: '<div></div>'}},
+        {path: '/administracao/feedbacks', component: {template: '<div></div>'}},
+        {path: '/administracao/limpeza-processos', component: {template: '<div></div>'}},
     ],
 });
 

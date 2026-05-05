@@ -80,7 +80,7 @@ export const Default: Story = {
     `,
     }),
     play: async () => {
-        const item = page.getByText('PRES', { exact: true });
+        const item = page.getByTestId('chk-arvore-unidade-PRES');
         await expect.element(item).toBeVisible();
     },
 };

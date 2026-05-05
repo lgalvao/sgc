@@ -96,6 +96,15 @@ Para manter o script seguro para homologação, o ideal é separar o trabalho em
 Se o ambiente já contiver dados parecidos, o script deve usar uma abordagem idempotente ou ao menos limpar os códigos
 reservados antes de inserir novamente.
 
+Para a homologação Oracle, a versão final do exemplo fica em
+[`backend/etc/sql/mapa-sesel-oracle.sql`](backend/etc/sql/mapa-sesel-oracle.sql) e deve ser tratada como script puro:
+
+* faz a limpeza do próprio exemplo no início;
+* busca a unidade SESEL e os usuários reais por `sigla` / `titulo`;
+* usa `ADMINISTRADOR` apenas para garantir o perfil administrativo dos títulos reais;
+* recria o processo, o subprocesso, o mapa, as movimentações, os alertas e a outbox sem depender de Java;
+* pode ser executado mais de uma vez sem deixar resíduos do exemplo anterior.
+
 ## Validação esperada
 
 Depois de executar o script, a checagem manual deveria confirmar:
