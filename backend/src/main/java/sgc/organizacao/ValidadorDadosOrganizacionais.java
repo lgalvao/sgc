@@ -212,12 +212,8 @@ public class ValidadorDadosOrganizacionais {
                 WHERE unidade_codigo IN (:codigos)
                    OR unidade_codigo IS NULL
                 """, Map.of("codigos", codigos));
-        List<Map<String, Object>> linhas = new ArrayList<>();
-        for (Map<String, Object> linha : result) {
-            if (linha != null) {
-                linhas.add(linha);
-            }
-        }
+
+        List<Map<String, Object>> linhas = new ArrayList<>(result);
 
         List<PerfilInvalido> perfisInvalidos = new ArrayList<>();
         Map<Long, Set<PerfilUsuarioUnidade>> perfisPorUnidade = new LinkedHashMap<>();
@@ -253,11 +249,7 @@ public class ValidadorDadosOrganizacionais {
                 HAVING COUNT(*) > 1
                 """, Map.of("titulos", titulos));
         List<Map<String, Object>> linhas = new ArrayList<>();
-        for (Map<String, Object> linha : result) {
-            if (linha != null) {
-                linhas.add(linha);
-            }
-        }
+        linhas.addAll(result);
 
         Set<String> titulosDuplicados = new TreeSet<>();
         for (Map<String, Object> linha : linhas) {

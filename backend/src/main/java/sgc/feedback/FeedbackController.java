@@ -83,8 +83,9 @@ public class FeedbackController {
     }
 
     private Set<ConstraintViolation<FeedbackPayloadDto>> obterViolacoes(FeedbackPayloadDto payload) {
-        var factory = Validation.buildDefaultValidatorFactory();
-        var validator = factory.getValidator();
-        return validator.validate(payload);
+        try (var factory = Validation.buildDefaultValidatorFactory()) {
+            var validator = factory.getValidator();
+            return validator.validate(payload);
+        }
     }
 }

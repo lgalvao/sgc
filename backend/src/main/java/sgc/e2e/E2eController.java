@@ -196,10 +196,7 @@ public class E2eController {
         String sqlMapas =
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
         List<Long> listMapas = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo);
-        List<Long> codigosMapas = new ArrayList<>();
-        for (Long cod : listMapas) {
-            codigosMapas.add(cod);
-        }
+        List<Long> codigosMapas = new ArrayList<>(listMapas);
 
         jdbcTemplate.update(
                 "DELETE FROM sgc.analise WHERE subprocesso_codigo IN (SELECT codigo FROM"

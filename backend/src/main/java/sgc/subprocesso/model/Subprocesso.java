@@ -35,7 +35,7 @@ public class Subprocesso extends EntidadeBase {
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Unidade unidade;
 
-    @OneToOne(mappedBy = "subprocesso", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "subprocesso")
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Mapa mapa;
 

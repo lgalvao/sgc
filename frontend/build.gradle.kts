@@ -1,3 +1,7 @@
+plugins {
+    base
+}
+
 val isWindows = System.getProperty("os.name").lowercase().contains("win")
 
 // Auxiliar para comandos NPM
