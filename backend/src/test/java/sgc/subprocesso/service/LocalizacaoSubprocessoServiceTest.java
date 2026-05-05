@@ -125,4 +125,30 @@ class LocalizacaoSubprocessoServiceTest {
                 .containsEntry(4L, uniDestino2);
         assertThat(res.keySet()).doesNotContainNull();
     }
+
+    @Test
+    @DisplayName("obterLocalizacoesAtuais - deve cobrir merge function com duplicatas")
+    void obterLocalizacoesAtuais_Duplicatas() {
+        Subprocesso sp1 = new Subprocesso();
+        sp1.setCodigo(1L);
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        Unidade u2 = new Unidade();
+        u2.setCodigo(20L);
+
+        Movimentacao m1 = mock(Movimentacao.class);
+        when(m1.getSubprocesso()).thenReturn(sp1);
+        when(m1.getUnidadeDestino()).thenReturn(u1);
+
+        Movimentacao m2 = mock(Movimentacao.class);
+        when(m2.getSubprocesso()).thenReturn(sp1);
+        when(m2.getUnidadeDestino()).thenReturn(u2);
+
+        when(movimentacaoRepo.listarUltimasPorSubprocessos(anyList())).thenReturn(List.of(m1, m2));
+
+        Map<Long, Unidade> result = service.obterLocalizacoesAtuais(List.of(sp1));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(1L)).isEqualTo(u1);
+    }
 }

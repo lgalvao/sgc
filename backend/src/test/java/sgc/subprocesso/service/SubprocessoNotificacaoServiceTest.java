@@ -443,4 +443,41 @@ class SubprocessoNotificacaoServiceTest {
         usuario.setEmail(email);
         return usuario;
     }
+
+    @Test
+    @DisplayName("criarNotificacaoSuperior - deve enviar apenas ao superior direto")
+    void criarNotificacaoSuperior_ApenasSuperiorDireto() {
+        Processo p = new Processo();
+        p.setDescricao("P");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(p);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U");
+        sp.setUnidade(u);
+        Unidade destino = new Unidade();
+        destino.setCodigo(99L);
+
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(sp)
+                .unidadeOrigem(u)
+                .unidadeDestino(destino)
+                .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
+                .build();
+
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
+
+        UnidadeResumoLeitura rl1 = mock(UnidadeResumoLeitura.class);
+        when(rl1.sigla()).thenReturn("S1");
+
+        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(rl1));
+        when(templateEngine.process(anyString(), any())).thenReturn("corpo");
+
+        invokeMethod(service, "criarNotificacaoSuperior", cmd, new HashMap<>());
+
+        verify(notificacaoService).enfileirar(argThat(cmdEmail ->
+                "s1@tre-pe.jus.br".equals(cmdEmail.destinatario())
+        ));
+    }
 }

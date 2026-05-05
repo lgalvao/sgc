@@ -992,4 +992,16 @@ class SubprocessoControllerTest {
             verify(transicaoService, never()).criarAnalise(any(), any(), any());
         }
     }
+
+    @Test
+    @DisplayName("obterContextoCadastroAtividades - deve retornar contexto")
+    @WithMockUser
+    void obterContextoCadastroAtividades_Sucesso() throws Exception {
+        Long cod = 1L;
+        when(permissionEvaluator.hasPermission(any(), eq(cod), eq("Subprocesso"), any())).thenReturn(true);
+        when(consultaService.obterContextoCadastroAtividades(cod)).thenReturn(mock(ContextoCadastroAtividadesResponse.class));
+
+        mockMvc.perform(get("/api/subprocessos/" + cod + "/contexto-cadastro-atividades"))
+                .andExpect(status().isOk());
+    }
 }

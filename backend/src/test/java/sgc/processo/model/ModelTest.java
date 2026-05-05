@@ -8,7 +8,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Modelos - Cobertura de Casos de Borda")
-class ModelCoverageTest {
+class ModelTest {
     @Test
     @DisplayName("Processo deve remover participantes que não estão mais na lista ao sincronizar")
     void deveRemoverParticipantesAoSincronizar() {

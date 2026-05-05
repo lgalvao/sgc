@@ -334,6 +334,38 @@ class AlertaFacadeTest {
         }
     }
 
+    @Test
+    @DisplayName("marcarComoLidos - deve cobrir merge function com duplicatas e alertas ausentes")
+    void marcarComoLidos_Duplicatas() {
+        ContextoUsuarioAutenticado contexto = mock(ContextoUsuarioAutenticado.class);
+        when(contexto.usuarioTitulo()).thenReturn("U1");
+
+        Long cod1 = 1L;
+        Long cod2 = 2L;
+
+        AlertaUsuario au1 = mock(AlertaUsuario.class);
+        AlertaUsuario.Chave chave1 = mock(AlertaUsuario.Chave.class);
+        when(chave1.getAlertaCodigo()).thenReturn(cod1);
+        when(au1.getCodigo()).thenReturn(chave1);
+
+        AlertaUsuario au1Dup = mock(AlertaUsuario.class);
+        when(au1Dup.getCodigo()).thenReturn(chave1);
+
+        when(alertaService.alertasUsuarios(anyString(), anyList())).thenReturn(List.of(au1, au1Dup));
+
+        Alerta a2 = new Alerta();
+        a2.setCodigo(cod2);
+        Alerta a2Dup = new Alerta();
+        a2Dup.setCodigo(cod2);
+
+        when(alertaService.listarPorCodigos(anyList())).thenReturn(List.of(a2, a2Dup));
+        when(usuarioService.buscar("U1")).thenReturn(new Usuario());
+
+        alertaFacade.marcarComoLidos(contexto, List.of(cod1, cod2));
+
+        verify(alertaService).salvarAlertasUsuarios(anyList());
+    }
+
     @Nested
     @DisplayName("Marcação de Lidos")
     class MarcacaoLidos {

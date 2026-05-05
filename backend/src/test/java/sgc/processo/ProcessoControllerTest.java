@@ -613,6 +613,36 @@ class ProcessoControllerTest {
         }
     }
 
+    @Test
+    @DisplayName("listarUnidadesParaImportacao - deve cobrir fallback de localização")
+    @WithMockUser(roles = "CHEFE")
+    void listarUnidadesParaImportacao_FallbackLocalizacao() throws Exception {
+        Long cod = 1L;
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.FINALIZADO);
+        UnidadeProcesso up = new UnidadeProcesso();
+        up.setUnidadeCodigo(10L);
+        p.setParticipantes(List.of(up));
+
+        when(processoService.buscarPorCodigoComParticipantes(cod)).thenReturn(p);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        sp.setUnidade(u);
+
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of());
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+
+        mockMvc.perform(get("/api/processos/" + cod + "/unidades-importacao"))
+                .andExpect(status().isOk());
+
+        verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
+    }
+
     @Nested
     @DisplayName("Cobertura extra")
     class CoberturaExtra {
