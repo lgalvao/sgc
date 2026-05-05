@@ -1,3 +1,5 @@
+import com.github.gradle.node.pnpm.task.PnpmTask
+
 plugins {
     base
     alias(libs.plugins.node)
@@ -6,11 +8,11 @@ plugins {
 node {
     // Garante a instalação do Node e PNPM no ambiente
     download.set(true)
-    version.set("22.12.0")
-    pnpmVersion.set("10.33.3")
+    version.set("26.0.0")
+    pnpmVersion.set("11.0.0")
 }
 
-tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("install") {
+tasks.register<PnpmTask>("install") {
     group = "setup"
     description = "Instala as dependências do frontend (pnpm install)"
     pnpmCommand.set(listOf("install", "--frozen-lockfile"))
@@ -19,14 +21,14 @@ tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("install") {
     outputs.dir("node_modules")
 }
 
-tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("dev") {
+tasks.register<PnpmTask>("dev") {
     group = "application"
     description = "Inicia o servidor de desenvolvimento do frontend (Vite)"
     dependsOn("install")
     pnpmCommand.set(listOf("run", "dev"))
 }
 
-tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("buildVue") {
+tasks.register<PnpmTask>("buildVue") {
     group = "build"
     description = "Gera o build de produção do frontend Vue"
     dependsOn("install")
@@ -42,7 +44,7 @@ tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("buildVue") {
     pnpmCommand.set(listOf("run", "build"))
 }
 
-tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("quality") {
+tasks.register<PnpmTask>("quality") {
     group = "verification"
     description = "Executa verificações de qualidade do frontend (lint, tests, typecheck)"
     dependsOn("install")
@@ -50,7 +52,7 @@ tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("quality") {
     ignoreExitValue.set(true)
 }
 
-tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("test") {
+tasks.register<PnpmTask>("test") {
     group = "verification"
     description = "Executa apenas os testes do frontend"
     dependsOn("install")

@@ -1,4 +1,5 @@
 import org.apache.tools.ant.taskdefs.condition.Os
+import com.github.gradle.node.pnpm.task.PnpmTask
 
 plugins {
     alias(libs.plugins.spring.boot) apply false
@@ -13,8 +14,8 @@ plugins {
 
 node {
     download.set(true)
-    version.set("22.12.0")
-    pnpmVersion.set("10.33.3")
+    version.set("26.0.0")
+    pnpmVersion.set("11.0.0")
 }
 
 allprojects {
@@ -53,7 +54,7 @@ subprojects {
 }
 
 // Delegation tasks for convenience
-tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("installRoot") {
+tasks.register<PnpmTask>("installRoot") {
     group = "setup"
     description = "Instala as dependências do root (pnpm install)"
     pnpmCommand.set(listOf("install", "--frozen-lockfile"))
@@ -62,7 +63,7 @@ tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("installRoot") {
     outputs.dir("node_modules")
 }
 
-tasks.register<com.github.node_gradle.node.pnpm.task.PnpmTask>("incrementVersion") {
+tasks.register<PnpmTask>("incrementVersion") {
     group = "versioning"
     description = "Incrementa a versão global usando release-it"
     dependsOn("installRoot")
