@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("ConfigOpenApi - Cobertura adicional")
-class ConfigOpenApiCoverageTest {
+class ConfigOpenApiTest {
 
     @Test
     @DisplayName("customOpenAPI deve usar valores default quando configurações forem nulas")

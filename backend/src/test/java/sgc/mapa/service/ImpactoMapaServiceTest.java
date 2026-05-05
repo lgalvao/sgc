@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.test.util.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -692,6 +693,162 @@ class ImpactoMapaServiceTest {
                     alteradas, descricaoParaCodVigente, codAtividadeParaCompetencias, mapaImpactos);
 
             assertTrue(mapaImpactos.isEmpty()); // branch 252 false
+        }
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve lançar ErroAcessoNegado quando sem permissão")
+    void verificarImpactosSemPermissao() {
+        Usuario user = new Usuario();
+        Subprocesso sp = criarSubprocessoPadrao();
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+        when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(false);
+
+        assertThrows(ErroAcessoNegado.class, () -> impactoMapaService.verificarImpactos(sp));
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve retornar sem impacto quando não há mapa vigente")
+    void verificarImpactosSemMapaVigente() {
+        Usuario user = new Usuario();
+        user.setPerfilAtivo(Perfil.ADMIN);
+
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+
+        Subprocesso sp = criarSubprocessoPadrao();
+        sp.setUnidade(u);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+        when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.empty());
+
+        ImpactoMapaResponse res = impactoMapaService.verificarImpactos(sp);
+        assertFalse(res.temImpactos());
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve lançar ErroEntidadeNaoEncontrada quando mapa do subprocesso não existe")
+    void verificarImpactosSemMapaSubprocesso() {
+        Usuario user = new Usuario();
+        user.setPerfilAtivo(Perfil.ADMIN);
+
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+
+        Subprocesso sp = criarSubprocessoPadrao();
+        sp.setCodigo(100L);
+        sp.setUnidade(u);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+        when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new Mapa()));
+        when(mapaRepo.buscarPorSubprocesso(100L)).thenReturn(Optional.empty());
+
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> impactoMapaService.verificarImpactos(sp));
+    }
+
+    @Test
+    @DisplayName("detectarAlteradas - deve considerar atividades com conhecimentos diferentes")
+    void detectarAlteradasDiferentes() {
+        Atividade v = new Atividade();
+        v.setCodigo(1L);
+        v.setDescricao("A1");
+        Conhecimento c1 = new Conhecimento();
+        c1.setDescricao("C1");
+        v.setConhecimentos(Set.of(c1));
+
+        Atividade a = new Atividade();
+        a.setCodigo(2L);
+        a.setDescricao("A1");
+        Conhecimento c2 = new Conhecimento();
+        c2.setDescricao("C2");
+        a.setConhecimentos(Set.of(c2));
+
+        Map<String, Atividade> vigentesMap = Map.of("A1", v);
+        List<AtividadeImpactadaDto> res = ReflectionTestUtils.invokeMethod(impactoMapaService, "detectarAlteradas", List.of(a), vigentesMap, Map.of());
+
+        assertNotNull(res);
+        assertEquals(1, res.size());
+        assertEquals(TipoImpactoAtividade.ALTERADA, res.getFirst().tipoImpacto());
+    }
+
+    @Test
+    @DisplayName("conhecimentosDiferentes - casos de borda")
+    void conhecimentosDiferentesBorda() {
+        Boolean res1 = ReflectionTestUtils.invokeMethod(impactoMapaService, "conhecimentosDiferentes", List.of(), List.of());
+        assertNotNull(res1);
+        assertFalse(res1);
+
+        Conhecimento c1 = new Conhecimento();
+        c1.setDescricao("C1");
+        Conhecimento c2 = new Conhecimento();
+        c2.setDescricao("C2");
+
+        Boolean res2 = ReflectionTestUtils.invokeMethod(impactoMapaService, "conhecimentosDiferentes", List.of(c1), List.of(c1, c2));
+        assertNotNull(res2);
+        assertTrue(res2);
+
+        Boolean res3 = ReflectionTestUtils.invokeMethod(impactoMapaService, "conhecimentosDiferentes", List.of(c1), List.of(c2));
+        assertNotNull(res3);
+        assertTrue(res3);
+    }
+
+    @Test
+    @DisplayName("construirMapaAtividadeCompetencias - ignora competências sem atividades")
+    void construirMapaSemAtividades() {
+        Competencia comp = new Competencia();
+        comp.setAtividades(Set.of());
+        Map<Long, List<Competencia>> res = ReflectionTestUtils.invokeMethod(impactoMapaService, "construirMapaAtividadeCompetencias", List.of(comp));
+        assertNotNull(res);
+        assertTrue(res.isEmpty());
+    }
+
+    @Nested
+    @DisplayName("Testes de Situação")
+    class CheckSituacaoTest {
+        @Test
+        @DisplayName("CHEFE - situações válidas")
+        void chefeSituacoesValidas() {
+            testCheckSituacao(Perfil.CHEFE, SituacaoSubprocesso.NAO_INICIADO, true);
+            testCheckSituacao(Perfil.CHEFE, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, true);
+            testCheckSituacao(Perfil.CHEFE, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, false);
+        }
+
+        @Test
+        @DisplayName("GESTOR - situação válida")
+        void gestorSituacoesValidas() {
+            testCheckSituacao(Perfil.GESTOR, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, true);
+            testCheckSituacao(Perfil.GESTOR, SituacaoSubprocesso.NAO_INICIADO, false);
+        }
+
+        @Test
+        @DisplayName("ADMIN - situações válidas")
+        void adminSituacoesValidas() {
+            testCheckSituacao(Perfil.ADMIN, SituacaoSubprocesso.NAO_INICIADO, true);
+            testCheckSituacao(Perfil.ADMIN, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, true);
+            testCheckSituacao(Perfil.ADMIN, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, true);
+            testCheckSituacao(Perfil.ADMIN, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, false);
+        }
+
+        @Test
+        @DisplayName("SERVIDOR - sempre bloqueado")
+        void servidorBloqueado() {
+            testCheckSituacao(Perfil.SERVIDOR, SituacaoSubprocesso.NAO_INICIADO, false);
+        }
+
+        private void testCheckSituacao(Perfil perfil, SituacaoSubprocesso situacao, boolean expected) {
+            Usuario user = new Usuario();
+            user.setPerfilAtivo(perfil);
+            Subprocesso sp = criarSubprocessoPadrao();
+            sp.setSituacaoForcada(situacao);
+
+            when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.VERIFICAR_IMPACTOS)).thenReturn(true);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+
+            assertEquals(expected, impactoMapaService.podeVisualizarImpactos(sp));
         }
     }
 }

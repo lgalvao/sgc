@@ -11,6 +11,7 @@ import sgc.alerta.*;
 import java.time.*;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -93,6 +94,15 @@ class EmailModelosServiceTest {
             assertEquals(siglasSubordinadas, context.getVariable("siglasSubordinadas"));
             assertEquals(true, context.getVariable("hasSubordinadas"));
         }
+    }
+
+    @Test
+    @DisplayName("Deve criar email de lembrete de prazo")
+    void criarEmailLembretePrazo() {
+        String res = emailModelosService.criarEmailLembretePrazo("U1", "P1", LocalDateTime.now());
+
+        assertEquals("lembrete-prazo", templateNameCaptor.getValue());
+        assertNotNull(res);
     }
 
     @Nested

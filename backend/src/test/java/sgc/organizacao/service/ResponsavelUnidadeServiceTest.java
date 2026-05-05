@@ -475,4 +475,56 @@ class ResponsavelUnidadeServiceTest {
                     .hasMessageContaining("Titular oficial ausente");
         }
     }
+
+    @Test
+    @DisplayName("buscarTodasAtribuicoes - deve retornar lista vazia quando não houver títulos")
+    void buscarTodasAtribuicoes_SemTitulos() {
+        when(atribuicaoTemporariaRepo.listarTodasComUnidade()).thenReturn(List.of());
+
+        List<AtribuicaoDto> result = service.buscarTodasAtribuicoes();
+
+        assertThat(result).isEmpty();
+        verify(usuarioRepo, never()).listarPorTitulosComUnidadeLotacao(anyList());
+    }
+
+    @Test
+    @DisplayName("buscarTodasAtribuicoes - deve lançar IllegalStateException quando usuário estiver ausente")
+    void buscarTodasAtribuicoes_UsuarioAusente() {
+        AtribuicaoTemporaria at = new AtribuicaoTemporaria();
+        at.setCodigo(1L);
+        at.setUsuarioTitulo("123456789012");
+        when(atribuicaoTemporariaRepo.listarTodasComUnidade()).thenReturn(List.of(at));
+        when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.buscarTodasAtribuicoes())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Usuário ausente");
+    }
+
+    @Test
+    @DisplayName("buscarResponsabilidadeDetalhadaAtual - deve buscar por sigla")
+    void buscarResponsabilidadeDetalhadaAtual_Sigla() {
+        String sigla = "U10";
+        Long codigo = 10L;
+        when(unidadeRepo.buscarCodigoAtivoPorSigla(sigla)).thenReturn(Optional.of(codigo));
+
+        ResponsabilidadeUnidadeLeitura leitura = mock(ResponsabilidadeUnidadeLeitura.class);
+        when(leitura.usuarioTitulo()).thenReturn("123");
+        when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(codigo)).thenReturn(Optional.of(leitura));
+        when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
+
+        service.buscarResponsabilidadeDetalhadaAtual(sigla);
+
+        verify(unidadeRepo).buscarCodigoAtivoPorSigla(sigla);
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelUnidade - deve lançar erro quando não houver responsável")
+    void buscarResponsavelUnidade_NaoEncontrado() {
+        Long codigo = 10L;
+        when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(codigo))).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.buscarResponsavelUnidade(codigo))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
 }

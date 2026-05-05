@@ -475,6 +475,27 @@ class PainelFacadeTest {
         verify(processoService).listarTodos(any());
     }
 
+    @Test
+    @DisplayName("listarProcessos - deve cobrir processo sem participantes")
+    void listarProcessos_SemParticipantes() {
+        ContextoUsuarioAutenticado contexto = mock(ContextoUsuarioAutenticado.class);
+        when(contexto.perfil()).thenReturn(Perfil.ADMIN);
+
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setDescricao("P1");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setParticipantes(Collections.emptyList());
+
+        when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(contexto, PageRequest.of(0, 10));
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().getFirst().unidadesParticipantes()).isEmpty();
+    }
+
     private Processo criarProcesso(Long codigo, SituacaoProcesso situacao) {
         Processo p = new Processo();
         p.setCodigo(codigo);

@@ -173,4 +173,83 @@ class SituacaoSubprocessoTest {
     private boolean invocarPodeIniciar(SituacaoSubprocesso target, SituacaoSubprocesso nova, TipoProcesso tipo) {
         return Boolean.TRUE.equals(ReflectionTestUtils.invokeMethod(target, "podeIniciar", nova, tipo));
     }
+
+    @Test
+    @DisplayName("podeTransicionarPara: Deve permitir transição para si mesma")
+    void mesmaSituacao() {
+        for (SituacaoSubprocesso s : SituacaoSubprocesso.values()) {
+            assertThat(s.podeTransicionarPara(s, TipoProcesso.MAPEAMENTO)).isTrue();
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, true",
+            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO, true",
+            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, true",
+            "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
+            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false"
+    })
+    @DisplayName("podeTransicionarPara: Deve validar início do processo conforme o tipo")
+    void inicioProcesso(SituacaoSubprocesso de, SituacaoSubprocesso para, TipoProcesso tipo, boolean esperado) {
+        assertThat(de.podeTransicionarPara(para, tipo)).isEqualTo(esperado);
+    }
+
+    @Test
+    @DisplayName("isSituacaoCompativel: Deve validar compatibilidade entre prefixos")
+    void compatibilidade() {
+        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+                .podeTransicionarPara(REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
+
+        assertThat(REVISAO_CADASTRO_EM_ANDAMENTO
+                .podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
+
+        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO
+                .podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
+
+        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+                .podeTransicionarPara(NAO_INICIADO, TipoProcesso.MAPEAMENTO)).isFalse();
+    }
+
+    @Test
+    @DisplayName("transicaoMapeamento: Deve validar todas as transições de mapeamento")
+    void mapeamentoCompleto() {
+        for (SituacaoSubprocesso s : SituacaoSubprocesso.values()) {
+            if (!s.name().startsWith("MAPEAMENTO")) continue;
+
+            for (SituacaoSubprocesso para : SituacaoSubprocesso.values()) {
+                if (!para.name().startsWith("MAPEAMENTO")) continue;
+                s.podeTransicionarPara(para, TipoProcesso.MAPEAMENTO);
+            }
+            s.podeTransicionarPara(NAO_INICIADO, TipoProcesso.MAPEAMENTO);
+        }
+    }
+
+    @Test
+    @DisplayName("transicaoRevisao: Deve validar todas as transições de revisão")
+    void revisaoCompleta() {
+        for (SituacaoSubprocesso s : SituacaoSubprocesso.values()) {
+            if (!s.name().startsWith("REVISAO")) continue;
+
+            for (SituacaoSubprocesso para : SituacaoSubprocesso.values()) {
+                if (!para.name().startsWith("REVISAO")) continue;
+                s.podeTransicionarPara(para, TipoProcesso.REVISAO);
+            }
+            s.podeTransicionarPara(NAO_INICIADO, TipoProcesso.REVISAO);
+        }
+    }
+
+    @Test
+    @DisplayName("transicaoDiagnostico: Deve validar todas as transições de diagnóstico")
+    void diagnosticoCompleto() {
+        for (SituacaoSubprocesso s : SituacaoSubprocesso.values()) {
+            if (!s.name().startsWith("DIAGNOSTICO")) continue;
+
+            for (SituacaoSubprocesso para : SituacaoSubprocesso.values()) {
+                if (!para.name().startsWith("DIAGNOSTICO")) continue;
+                s.podeTransicionarPara(para, TipoProcesso.DIAGNOSTICO);
+            }
+            s.podeTransicionarPara(NAO_INICIADO, TipoProcesso.DIAGNOSTICO);
+        }
+    }
 }

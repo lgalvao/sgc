@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 @Tag("integration")
 @Transactional
 @DisplayName("Integração: SubprocessoService - CDU-11/CDU-12 Validações de Mapa")
-class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
+class SubprocessoServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private SubprocessoValidacaoService validacaoService;
