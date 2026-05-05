@@ -169,19 +169,22 @@ if [[ ! -f "$ARQUIVO_COMPOSE" ]]; then
 fi
 
 if [[ "$SEM_BUILD" == false ]]; then
-  echo "==> Executando build do frontend e do backend"
-  ./gradlew copyFrontend :backend:bootJar -x :backend:test
+  echo "==> O build agora e realizado dentro do Docker (multi-stage)."
 else
-  echo "==> Build Gradle ignorado por parametro"
+  echo "==> Build ignorado por parametro (mas seria no Docker)"
 fi
 
 if [[ -n "$TAG" ]]; then
   VERSAO="$TAG"
 else
-  VERSAO="$(./gradlew -q properties --property version | awk -F': ' '/^version:/ { print $2; exit }')"
-  if [[ -z "$VERSAO" ]]; then
-    echo "ERRO: nao foi possivel identificar a versao do projeto."
-    exit 1
+  # Precisamos extrair a versao para a tag da imagem
+  # Como nao queremos rodar o gradle local que depende de node/pnpm,
+  # vamos tentar pegar via grep simples no build.gradle.kts ou passar via parametro.
+  # Uma alternativa e rodar o gradle so para as propriedades, mas isso pode falhar se o node falhar.
+  # Vamos assumir que se falhar o properties, o usuario deve passar a --tag.
+  VERSAO="$(./gradlew -q properties --property version 2>/dev/null | awk -F': ' '/^version:/ { print $2; exit }' || echo "latest")"
+  if [[ "$VERSAO" == "latest" ]]; then
+    echo "AVISO: Nao foi possivel identificar a versao via Gradle. Usando 'latest'."
   fi
 fi
 
@@ -189,15 +192,8 @@ TAG_VERSAO="$REGISTRY/$NOME_SISTEMA:$VERSAO"
 TAG_LATEST="$REGISTRY/$NOME_SISTEMA:latest"
 
 if [[ "$SEM_IMAGEM" == false ]]; then
-  JAR_ORIGEM="$(find backend/build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-plain.jar' | sort | head -n 1)"
-  if [[ -z "$JAR_ORIGEM" ]]; then
-    echo "ERRO: jar do backend nao encontrado em backend/build/libs. Rode sem --sem-build ou execute o build antes."
-    exit 1
-  fi
-
-  echo "==> Preparando artefato Docker: $JAR_ORIGEM"
-  cp "$JAR_ORIGEM" "$ARQUIVO_JAR_DOCKER"
-
+  echo "==> Construindo imagem multi-stage com $CONTAINER_CLI: $TAG_VERSAO"
+  
   ARGS_BUILD=(build -t "$TAG_VERSAO" -t "$TAG_LATEST")
   if [[ "$SEM_CACHE" == true ]]; then
     ARGS_BUILD+=(--no-cache)
@@ -207,7 +203,6 @@ if [[ "$SEM_IMAGEM" == false ]]; then
   fi
   ARGS_BUILD+=(.)
 
-  echo "==> Construindo imagem com $CONTAINER_CLI: $TAG_VERSAO"
   "$CONTAINER_CLI" "${ARGS_BUILD[@]}"
 else
   echo "==> Build da imagem ignorado por parametro"

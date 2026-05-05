@@ -1,3 +1,32 @@
+# Estágio 1: Build do Frontend
+FROM docker.io/library/node:22-bookworm AS build-frontend
+WORKDIR /build
+# Instala o pnpm globalmente
+RUN npm install -g pnpm@10.33.3
+
+# Copia arquivos de dependências primeiro para cachear
+COPY frontend/package.json frontend/pnpm-lock.yaml ./ 
+RUN pnpm install --frozen-lockfile
+
+# Copia o resto e gera o build
+COPY frontend/ ./ 
+RUN pnpm run build
+
+# Estágio 2: Build do Backend (Spring Boot Jar)
+FROM docker.io/library/amazoncorretto:25 AS build-backend
+WORKDIR /build
+
+# Copia o projeto inteiro
+COPY . . 
+
+# Copia o frontend gerado para a pasta de recursos estáticos do backend
+# O Gradle vai embutir isso automaticamente no Jar se estiver em src/main/resources/static
+COPY --from=build-frontend /build/dist/ ./backend/src/main/resources/static/
+
+# Executa o build do backend (pula o build do frontend via Gradle pois já fizemos)
+RUN ./gradlew :backend:bootJar -x test -x :frontend:buildVue -x :frontend:install
+
+# Estágio 3: Extrator (prepara as camadas do Spring Boot)
 FROM docker.io/library/amazoncorretto:25 AS extrator
 WORKDIR /aplicacao
 
@@ -5,10 +34,13 @@ COPY deploy/*.cer /tmp/certs/
 RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
     update-ca-trust extract
 
-COPY sgc.jar aplicacao.jar
+# Pega o JAR gerado no estágio anterior
+COPY --from=build-backend /build/backend/build/libs/*.jar aplicacao.jar
+
 RUN mkdir extraido && \
     java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
 
+# Estágio 4: Imagem Final (Runtime)
 FROM docker.io/library/amazoncorretto:25
 
 LABEL description="Sistema de Gestao de Competencias - SGC" \
@@ -43,10 +75,10 @@ RUN mkdir -p /var/log/sgc /aplicacao && \
 
 WORKDIR /aplicacao
 
-COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/dependencies/ ./
-COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/spring-boot-loader/ ./
-COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/snapshot-dependencies/ ./
-COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/application/ ./
+COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/dependencies/ ./ 
+COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/spring-boot-loader/ ./ 
+COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/snapshot-dependencies/ ./ 
+COPY --from=extrator --chown=sgc:sgc aplicacao/extraido/application/ ./ 
 
 USER sgc:sgc
 

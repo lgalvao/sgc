@@ -199,12 +199,11 @@ try
 
     if (-not $SemBuild)
     {
-        Write-Host "==> Executando build do frontend e do backend"
-        Invoke-Comando $Gradle copyFrontend ":backend:bootJar" -x ":backend:test"
+        Write-Host "==> O build agora e realizado dentro do Docker (multi-stage)."
     }
     else
     {
-        Write-Host "==> Build Gradle ignorado por parametro"
+        Write-Host "==> Build ignorado por parametro (mas seria no Docker)"
     }
 
     $Versao = if ($Tag)
@@ -213,17 +212,18 @@ try
     }
     else
     {
-        Get-VersaoProjeto $Gradle
+        try {
+            Get-VersaoProjeto $Gradle
+        } catch {
+            Write-Warning "Nao foi possivel identificar a versao via Gradle. Usando 'latest'."
+            "latest"
+        }
     }
     $TagVersao = "$Registry/${NomeSistema}:$Versao"
     $TagLatest = "$Registry/${NomeSistema}:latest"
 
     if (-not $SemImagem)
     {
-        $JarOrigem = Get-JarBackend
-        Write-Host "==> Preparando artefato Docker: $( $JarOrigem.FullName )"
-        Copy-Item -LiteralPath $JarOrigem.FullName -Destination $ArquivoJarDocker -Force
-
         $ArgsBuild = @("build", "-t", $TagVersao, "-t", $TagLatest)
         if ($SemCache)
         {
@@ -235,7 +235,7 @@ try
         }
         $ArgsBuild += "."
 
-        Write-Host "==> Construindo imagem com ${ContainerCli}: $TagVersao"
+        Write-Host "==> Construindo imagem multi-stage com ${ContainerCli}: $TagVersao"
         Invoke-Comando $ContainerCli @ArgsBuild
     }
     else
