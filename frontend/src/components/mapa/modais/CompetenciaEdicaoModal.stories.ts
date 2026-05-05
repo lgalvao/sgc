@@ -1,10 +1,10 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import CriarCompetenciaModal from './CriarCompetenciaModal.vue';
+import CompetenciaEdicaoModal from './CompetenciaEdicaoModal.vue';
 import {ref} from 'vue';
 
-const meta: Meta<typeof CriarCompetenciaModal> = {
-    title: 'Mapa/CriarCompetenciaModal',
-    component: CriarCompetenciaModal,
+const meta: Meta<typeof CompetenciaEdicaoModal> = {
+    title: 'Mapa/Modais/CompetenciaEdicaoModal',
+    component: CompetenciaEdicaoModal,
     tags: ['autodocs'],
     argTypes: {
         onFechar: {action: 'fechar'},
@@ -13,7 +13,7 @@ const meta: Meta<typeof CriarCompetenciaModal> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof CriarCompetenciaModal>;
+type Story = StoryObj<typeof CompetenciaEdicaoModal>;
 
 const mockAtividades = [
     {
@@ -43,7 +43,7 @@ export const Criacao: Story = {
         competenciaParaEditar: null,
     },
     render: (args) => ({
-        components: {CriarCompetenciaModal},
+        components: {CompetenciaEdicaoModal},
         setup() {
             const show = ref(args.mostrar);
             return {args, show};
@@ -51,7 +51,7 @@ export const Criacao: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Criar competência</button>
-        <CriarCompetenciaModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />
+        <CompetenciaEdicaoModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />
       </div>
     `,
     }),
@@ -68,12 +68,12 @@ export const Edicao: Story = {
         },
     },
     render: (args) => ({
-        components: {CriarCompetenciaModal},
+        components: {CompetenciaEdicaoModal},
         setup() {
             const show = ref(args.mostrar);
             return {args, show};
         },
-        template: '<CriarCompetenciaModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />',
+        template: '<CompetenciaEdicaoModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />',
     }),
 };
 
@@ -88,11 +88,11 @@ export const ComErros: Story = {
         },
     },
     render: (args) => ({
-        components: {CriarCompetenciaModal},
+        components: {CompetenciaEdicaoModal},
         setup() {
             const show = ref(args.mostrar);
             return {args, show};
         },
-        template: '<CriarCompetenciaModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />',
+        template: '<CompetenciaEdicaoModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />',
     }),
 };

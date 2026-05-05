@@ -1,10 +1,10 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import AceitarMapaModal from './AceitarMapaModal.vue';
+import MapaAceitacaoModal from './MapaAceitacaoModal.vue';
 import {ref} from 'vue';
 
-const meta: Meta<typeof AceitarMapaModal> = {
-    title: 'Mapa/AceitarMapaModal',
-    component: AceitarMapaModal,
+const meta: Meta<typeof MapaAceitacaoModal> = {
+    title: 'Mapa/Modais/MapaAceitacaoModal',
+    component: MapaAceitacaoModal,
     tags: ['autodocs'],
     argTypes: {
         onFecharModal: {action: 'fecharModal'},
@@ -13,7 +13,7 @@ const meta: Meta<typeof AceitarMapaModal> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof AceitarMapaModal>;
+type Story = StoryObj<typeof MapaAceitacaoModal>;
 
 export const Gestor: Story = {
     args: {
@@ -22,7 +22,7 @@ export const Gestor: Story = {
         loading: false,
     },
     render: (args) => ({
-        components: {AceitarMapaModal},
+        components: {MapaAceitacaoModal},
         setup() {
             const show = ref(args.mostrarModal);
             return {args, show};
@@ -30,7 +30,7 @@ export const Gestor: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Aceitar mapa (Gestor)</button>
-        <AceitarMapaModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
+        <MapaAceitacaoModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
       </div>
     `,
     }),
@@ -43,7 +43,7 @@ export const Admin: Story = {
         loading: false,
     },
     render: (args) => ({
-        components: {AceitarMapaModal},
+        components: {MapaAceitacaoModal},
         setup() {
             const show = ref(args.mostrarModal);
             return {args, show};
@@ -51,7 +51,7 @@ export const Admin: Story = {
         template: `
       <div>
         <button class="btn btn-success" @click="show = true">Homologar mapa (Admin)</button>
-        <AceitarMapaModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
+        <MapaAceitacaoModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
       </div>
     `,
     }),

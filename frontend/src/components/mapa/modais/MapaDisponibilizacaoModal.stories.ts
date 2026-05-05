@@ -1,12 +1,10 @@
-// noinspection JSUnusedGlobalSymbols
-
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import DisponibilizarMapaModal from './DisponibilizarMapaModal.vue';
+import MapaDisponibilizacaoModal from './MapaDisponibilizacaoModal.vue';
 import {ref} from 'vue';
 
-const meta: Meta<typeof DisponibilizarMapaModal> = {
-    title: 'Mapa/DisponibilizarMapaModal',
-    component: DisponibilizarMapaModal,
+const meta: Meta<typeof MapaDisponibilizacaoModal> = {
+    title: 'Mapa/Modais/MapaDisponibilizacaoModal',
+    component: MapaDisponibilizacaoModal,
     tags: ['autodocs'],
     argTypes: {
         onFechar: {action: 'fechar'},
@@ -15,7 +13,7 @@ const meta: Meta<typeof DisponibilizarMapaModal> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof DisponibilizarMapaModal>;
+type Story = StoryObj<typeof MapaDisponibilizacaoModal>;
 
 export const Default: Story = {
     args: {
@@ -24,7 +22,7 @@ export const Default: Story = {
         loading: false,
     },
     render: (args) => ({
-        components: {DisponibilizarMapaModal},
+        components: {MapaDisponibilizacaoModal},
         setup() {
             const show = ref(args.mostrar);
             return {args, show};
@@ -32,7 +30,7 @@ export const Default: Story = {
         template: `
           <div>
             <button class="btn btn-primary" @click="show = true">Disponibilizar mapa</button>
-            <DisponibilizarMapaModal v-bind="args" :mostrar="show" @fechar="show = false"/>
+            <MapaDisponibilizacaoModal v-bind="args" :mostrar="show" @fechar="show = false"/>
           </div>
         `,
     }),
@@ -48,12 +46,12 @@ export const ComErros: Story = {
         },
     },
     render: (args) => ({
-        components: {DisponibilizarMapaModal},
+        components: {MapaDisponibilizacaoModal},
         setup() {
             const show = ref(args.mostrar);
             return {args, show};
         },
-        template: '<DisponibilizarMapaModal v-bind="args" :mostrar="show" @fechar="show = false" />',
+        template: '<MapaDisponibilizacaoModal v-bind="args" :mostrar="show" @fechar="show = false" />',
     }),
 };
 

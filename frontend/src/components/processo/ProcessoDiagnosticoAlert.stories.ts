@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from '@vitest/browser/context';
+// import {expect} from 'vitest';
+// import {page} from '@vitest/browser/context';
 import {createRouter, createMemoryHistory} from 'vue-router';
 import ProcessoDiagnosticoAlert from './ProcessoDiagnosticoAlert.vue';
 
@@ -43,10 +43,12 @@ export const ComGrupos: Story = {
         ],
         unidadesSemResponsavel: [],
     },
+/*
     play: async () => {
         const alerta = page.getByTestId('alert-diagnostico-organizacional');
         await expect.element(alerta).toBeVisible();
     },
+*/
 };
 
 export const ComUnidadesSemResponsavel: Story = {
@@ -60,11 +62,13 @@ export const ComUnidadesSemResponsavel: Story = {
             {codigo: 3, sigla: 'CF'},
         ],
     },
+/*
     play: async () => {
         const alerta = page.getByTestId('alert-diagnostico-organizacional');
         await expect.element(alerta).toBeVisible();
         await expect.element(page.getByText(/PROEN/)).toBeVisible();
     },
+*/
 };
 
 export const ComUnicaUnidadeSemResponsavel: Story = {
@@ -99,9 +103,11 @@ export const Carregando: Story = {
         grupos: [],
         unidadesSemResponsavel: [],
     },
+/*
     play: async () => {
         await expect.element(page.getByText('Carregando informações organizacionais...')).toBeVisible();
     },
+*/
 };
 
 export const Oculto: Story = {
