@@ -16,6 +16,9 @@ RUN pnpm run build
 FROM docker.io/library/amazoncorretto:25 AS build-backend
 WORKDIR /build
 
+# Instala utilitários necessários para o gradlew (xargs)
+RUN yum install -y findutils
+
 # Copia o projeto inteiro
 COPY . . 
 
