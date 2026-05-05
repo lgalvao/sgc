@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+@SuppressWarnings("NullableProblems")
 @RestController
 @RequestMapping("/e2e")
 @Profile("e2e")

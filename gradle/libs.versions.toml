@@ -17,7 +17,7 @@ jjwt = "0.13.0"
 owaspSanitizer = "20260313.1"
 
 # Libs
-lombok = "1.18.44"
+lombok = "1.18.46"
 openpdf = "3.0.3"
 rhino = "1.9.1"
 caffeine = "3.1.8"
