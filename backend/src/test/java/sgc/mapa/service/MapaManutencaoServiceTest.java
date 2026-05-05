@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("MapaManutencaoService - Cobertura extra")
+@DisplayName("MapaManutencaoService - Testes")
 @SuppressWarnings("NullAway.Init")
-class MapaManutencaoServiceCoverageExtraTest {
+class MapaManutencaoServiceTest {
 
     @Mock
     private AtividadeRepo atividadeRepo;

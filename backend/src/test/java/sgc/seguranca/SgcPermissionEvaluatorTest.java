@@ -16,9 +16,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SgcPermissionEvaluator - Cobertura adicional")
+@DisplayName("SgcPermissionEvaluator - Testes")
 @SuppressWarnings("NullAway.Init")
-class SgcPermissionEvaluatorCoverageTest {
+class SgcPermissionEvaluatorTest {
 
     @Mock
     private SubprocessoRepo subprocessoRepo;

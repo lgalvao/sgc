@@ -8,6 +8,7 @@ import org.springframework.cache.*;
 import org.springframework.core.io.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.security.core.context.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.jdbc.*;
 import org.springframework.transaction.annotation.*;
@@ -506,6 +507,219 @@ class E2eControllerTest {
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Cobertura adicional - instâncias isoladas")
+    class CoberturaMockTest {
+        private JdbcTemplate jdbcTemplate;
+        private NamedParameterJdbcTemplate namedJdbcTemplate;
+        private ProcessoService processoService;
+        private ProcessoRepo processoRepo;
+        private SubprocessoRepo subprocessoRepo;
+        private MapaRepo mapaRepo;
+        private UnidadeService unidadeService;
+        private ResourceLoader resourceLoader;
+        private CacheManager cacheManager;
+        private E2eController controller;
+
+        @BeforeEach
+        void setUp() {
+            jdbcTemplate = mock(JdbcTemplate.class);
+            namedJdbcTemplate = mock(NamedParameterJdbcTemplate.class);
+            processoService = mock(ProcessoService.class);
+            processoRepo = mock(ProcessoRepo.class);
+            subprocessoRepo = mock(SubprocessoRepo.class);
+            mapaRepo = mock(MapaRepo.class);
+            unidadeService = mock(UnidadeService.class);
+            resourceLoader = mock(ResourceLoader.class);
+            cacheManager = mock(CacheManager.class);
+            SecurityContextHolder.clearContext();
+            controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
+        }
+
+        @Test
+        @DisplayName("resetDatabase deve retornar imediatamente se dataSource for nulo")
+        void deveRetornarSeDataSourceForNulo() {
+            when(jdbcTemplate.getDataSource()).thenReturn(null);
+            controller.resetDatabase();
+            verify(jdbcTemplate).getDataSource();
+        }
+
+        @Test
+        @DisplayName("criarProcessoMapeamento deve falhar se unidadeSigla for vazia")
+        void deveFalharSeUnidadeSiglaVazia() {
+            E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
+                    "desc", "", false, 30);
+            assertThatThrownBy(() -> controller.criarProcessoMapeamento(request))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessage("Unidade é obrigatória");
+        }
+
+        @Test
+        @DisplayName("criarProcessoRevisaoComMapaHomologado - erro validacao")
+        void deveFalharRevisaoHomologadoSemUnidade() {
+            E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest("desc", "", false, 30);
+            assertThatThrownBy(() -> controller.criarProcessoRevisaoComMapaHomologado(request))
+                    .isInstanceOf(ErroValidacao.class);
+        }
+
+        @Test
+        @DisplayName("criarProcessoRevisaoComCadastroHomologado - erro validacao")
+        void deveFalharRevisaoCadastroHomologadoSemUnidade() {
+            E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest("desc", " ", false, 30);
+            assertThatThrownBy(() -> controller.criarProcessoRevisaoComCadastroHomologado(request))
+                    .isInstanceOf(ErroValidacao.class);
+        }
+
+        @Test
+        @DisplayName("criarProcessoFinalizadoComAtividades: Deve criar processo e inserir atividades via SQL")
+        void deveCriarProcessoFinalizadoComAtividades() {
+            var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
+
+            when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+
+            Processo dto = Processo.builder().codigo(100L).build();
+            when(processoService.criar(any())).thenReturn(dto);
+            when(processoService.buscarPorCodigo(100L)).thenReturn(dto);
+
+            Subprocesso sub = new Subprocesso();
+            sub.setCodigo(200L);
+            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(sub));
+            when(subprocessoRepo.findById(200L)).thenReturn(Optional.of(sub));
+
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(300L);
+            when(mapaRepo.buscarPorSubprocesso(200L)).thenReturn(Optional.of(mapa));
+
+            when(processoRepo.findById(100L)).thenReturn(Optional.of(new Processo()));
+
+            Processo result = controller.criarProcessoFinalizadoComAtividades(req);
+
+            assertNotNull(result);
+            verify(jdbcTemplate, atLeastOnce()).update(anyString(), any(Object[].class));
+        }
+
+        @Test
+        @DisplayName("criarProcessoMapeamentoComMapaComSugestoes: Deve salvar sugestões no mapa")
+        void deveCriarProcessoMapeamentoComMapaComSugestoes() {
+            var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
+
+            when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            Unidade superior = new Unidade();
+            superior.setCodigo(5L);
+            unidade.setUnidadeSuperior(superior);
+            when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+
+            Processo dto = Processo.builder().codigo(100L).build();
+            when(processoService.criar(any())).thenReturn(dto);
+            when(processoService.buscarPorCodigo(100L)).thenReturn(dto);
+
+            Subprocesso sub = new Subprocesso();
+            sub.setCodigo(200L);
+            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(sub));
+            when(subprocessoRepo.findById(200L)).thenReturn(Optional.of(sub));
+
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(300L);
+            when(mapaRepo.buscarPorSubprocesso(200L)).thenReturn(Optional.of(mapa));
+            when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
+                    .thenReturn(400L);
+            when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.competencia"), eq(Long.class), any(), any()))
+                    .thenReturn(500L);
+
+            Processo result = controller.criarProcessoMapeamentoComMapaComSugestoes(req);
+
+            assertNotNull(result);
+            assertEquals("Sugestão de ajuste na competência via fixture E2E", mapa.getSugestoes());
+            verify(mapaRepo).save(mapa);
+        }
+
+        @Test
+        @DisplayName("criarProcessoRevisaoComCadastroDisponibilizado: Deve criar revisão e registrar movimentação")
+        void deveCriarProcessoRevisaoComCadastroDisponibilizado() {
+            var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
+
+            when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            Unidade superior = new Unidade();
+            superior.setCodigo(5L);
+            unidade.setUnidadeSuperior(superior);
+            when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+
+            Processo dto = Processo.builder().codigo(100L).build();
+            when(processoService.criar(any())).thenReturn(dto);
+            when(processoService.buscarPorCodigo(anyLong())).thenReturn(dto);
+
+            Subprocesso sub = new Subprocesso();
+            sub.setCodigo(200L);
+            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(anyLong(), anyLong())).thenReturn(Optional.of(sub));
+            when(subprocessoRepo.findById(anyLong())).thenReturn(Optional.of(sub));
+
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(300L);
+            when(mapaRepo.buscarPorSubprocesso(anyLong())).thenReturn(Optional.of(mapa));
+            when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
+                    .thenReturn(400L);
+
+            when(processoRepo.findById(anyLong())).thenReturn(Optional.of(new Processo()));
+
+            Processo result = controller.criarProcessoRevisaoComCadastroDisponibilizado(req);
+
+            assertNotNull(result);
+            verify(jdbcTemplate, atLeastOnce()).update(contains("INSERT INTO sgc.movimentacao"), any(), any(), any(), any(), any(), any());
+        }
+
+        @Test
+        @DisplayName("criarProcessoMapeamentoComCadastroDisponibilizado: Deve chamar criarProcessoNaSituacao")
+        void deveCriarProcessoMapeamentoComCadastroDisponibilizado() {
+            var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
+
+            when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            Unidade superior = new Unidade();
+            superior.setCodigo(5L);
+            unidade.setUnidadeSuperior(superior);
+            when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+
+            Processo dto = Processo.builder().codigo(100L).build();
+            when(processoService.criar(any())).thenReturn(dto);
+            when(processoService.buscarPorCodigo(anyLong())).thenReturn(dto);
+
+            Subprocesso sub = new Subprocesso();
+            sub.setCodigo(200L);
+            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(anyLong(), anyLong())).thenReturn(Optional.of(sub));
+            when(subprocessoRepo.findById(anyLong())).thenReturn(Optional.of(sub));
+
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(300L);
+            when(mapaRepo.buscarPorSubprocesso(anyLong())).thenReturn(Optional.of(mapa));
+            when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
+                    .thenReturn(400L);
+            when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.competencia"), eq(Long.class), any(), any()))
+                    .thenReturn(500L);
+
+            Processo result = controller.criarProcessoMapeamentoComCadastroDisponibilizado(req);
+
+            assertNotNull(result);
+            verify(subprocessoRepo).findByProcessoCodigoAndUnidadeCodigo(anyLong(), anyLong());
+        }
+
+        @Test
+        @DisplayName("limparTabela: Deve logar erro se falhar")
+        void deveCobrirErroAoLimparTabela() throws Exception {
+            Statement stmt = mock(Statement.class);
+            doThrow(new SQLException("Erro simulado")).when(stmt).execute(anyString());
+
+            var method = E2eController.class.getDeclaredMethod("limparTabela", Statement.class, String.class);
+            method.setAccessible(true);
+
+            assertDoesNotThrow(() -> method.invoke(controller, stmt, "TABELA"));
         }
     }
 }

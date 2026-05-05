@@ -143,4 +143,81 @@ class MapaVisualizacaoServiceTest {
         assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos().stream().findFirst())
                 .hasValueSatisfying(conhecimento -> assertThat(conhecimento.getDescricao()).isEqualTo("K1"));
     }
+
+    @Test
+    @DisplayName("Deve retornar resposta vazia se mapa não encontrado fora de etapa de mapa")
+    void deveRetornarVazioSeMapaNaoEncontradoForaDeEtapaDeMapa() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        Unidade u = new Unidade();
+        sub.setUnidade(u);
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
+
+        MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
+        assertThat(res).isNotNull();
+        assertThat(res.unidade()).isEqualTo(u);
+        assertThat(res.competencias()).isEmpty();
+        assertThat(res.atividadesSemCompetencia()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve falhar se mapa não encontrado em etapa de mapa")
+    void deveFalharSeMapaNaoEncontradoEmEtapaDeMapa() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        sub.setUnidade(new Unidade());
+        sub.setMapa(new Mapa());
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                .hasMessageContaining("sem mapa vinculado para visualizacao");
+    }
+
+    @Test
+    @DisplayName("Deve ignorar mapa pendurado no subprocesso quando o carregamento completo nao encontrar mapa")
+    void deveIgnorarMapaPenduradoQuandoCarregamentoCompletoNaoEncontrarMapa() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(3L);
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        sub.setUnidade(new Unidade());
+        Mapa mapaPendurado = new Mapa();
+        mapaPendurado.setCodigo(300L);
+        mapaPendurado.setAtividades(Set.of());
+        sub.setMapa(mapaPendurado);
+        when(mapaRepo.buscarCompletoPorSubprocesso(3L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                .hasMessageContaining("sem mapa vinculado para visualizacao");
+        verify(competenciaRepo, never()).findByMapa_Codigo(anyLong());
+    }
+
+    @Test
+    @DisplayName("Deve retornar atividades sem competência vazias quando mapa não possui atividades")
+    void deveRetornarAtividadesVaziasQuandoMapaSemAtividades() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(2L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(20L);
+        sub.setUnidade(unidade);
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(200L);
+        mapa.setAtividades(Set.of());
+        sub.setMapa(mapa);
+
+        when(mapaRepo.buscarCompletoPorSubprocesso(2L)).thenReturn(Optional.of(mapa));
+        when(competenciaRepo.findByMapa_Codigo(200L)).thenReturn(List.of());
+
+        MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
+
+        assertThat(res).isNotNull();
+        assertThat(res.unidade()).isEqualTo(unidade);
+        assertThat(res.atividadesSemCompetencia()).isEmpty();
+        assertThat(res.competencias()).isEmpty();
+    }
 }

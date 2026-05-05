@@ -464,4 +464,80 @@ class SubprocessoTransicaoServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("Cobertura Extra")
+    class CoberturaExtra {
+        @Test
+        @DisplayName("obterSituacaoObrigatoria - deve lançar IllegalStateException para situação não configurada")
+        void obterSituacaoObrigatoria_Inexistente() {
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            Subprocesso sp = new Subprocesso();
+            sp.setProcesso(p);
+
+            Map<TipoProcesso, SituacaoSubprocesso> situacoes = Map.of(TipoProcesso.REVISAO, REVISAO_MAPA_DISPONIBILIZADO);
+
+            assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterSituacaoObrigatoria", situacoes, sp, "contexto"))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("sem situação configurada");
+        }
+
+        @Test
+        @DisplayName("executarDisponibilizacaoMapa - valida data limite igual")
+        void disponibilizarMapa_DataIgual() {
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setUnidade(u);
+            sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Processo p = new Processo();
+            p.setTipo(MAPEAMENTO);
+            sp.setProcesso(p);
+            sp.setMapa(new sgc.mapa.model.Mapa());
+            sp.getMapa().setCodigo(100L);
+            sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
+            sp.setDataLimiteEtapa2(LocalDateTime.of(2026, 1, 10, 0, 0));
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.of(2026, 1, 15), "Obs");
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(1L);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+            service.disponibilizarMapa(1L, req);
+
+            assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 1, 15, 0, 0));
+        }
+
+        @Test
+        @DisplayName("disponibilizarMapaEmBloco - deve aceitar lista de subprocessos")
+        void disponibilizarMapaEmBloco_ComListaDeSubprocessos() {
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setUnidade(u);
+            sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            sp.setProcesso(Processo.builder().tipo(MAPEAMENTO).build());
+            sp.setMapa(new sgc.mapa.model.Mapa());
+            sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
+            sp.setDataLimiteEtapa2(LocalDateTime.of(2026, 1, 10, 0, 0));
+
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.of(2026, 1, 15), "Obs");
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(1L);
+
+            service.disponibilizarMapaEmBloco(List.of(sp), req, usuario);
+
+            assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        }
+    }
 }
