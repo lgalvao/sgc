@@ -86,11 +86,7 @@ public class CacheViewsOrganizacaoService {
         administradorRepo.findAll().stream()
                 .map(Administrador::getUsuarioTitulo)
                 .filter(usuariosPorTitulo::containsKey)
-                .map(titulo -> {
-                    if (titulo != null) {
-                        return new UsuarioPerfilLeitura(titulo, 1L, Perfil.ADMIN);
-                    }
-                })
+                .map(titulo -> new UsuarioPerfilLeitura(titulo, 1L, Perfil.ADMIN))
                 .forEach(perfis::add);
 
         self.listarTodasResponsabilidades().forEach(responsabilidade -> {
