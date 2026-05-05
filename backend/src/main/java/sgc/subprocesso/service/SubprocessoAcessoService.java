@@ -70,7 +70,7 @@ public class SubprocessoAcessoService {
         boolean podeDisponibilizarMapa = contexto.isAdmin();
         boolean podeValidarMapa = contexto.isChefe();
         boolean podeApresentarSugestoes = contexto.isChefe();
-        boolean podeVerSugestoes = contexto.isGestorOuAdmin();
+        boolean podeVerSugestoes = contexto.isGestorOuAdmin() && SITUACOES_COM_SUGESTOES_MAPA.contains(situacao);
         boolean podeDevolverMapa = contexto.isAdmin() || contexto.isGestor();
         boolean podeAceitarMapa = contexto.isGestor();
         boolean podeHomologarMapa = contexto.isAdmin();
@@ -130,7 +130,7 @@ public class SubprocessoAcessoService {
                 .podeDisponibilizarMapa(contexto.isAdmin())
                 .podeValidarMapa(contexto.isChefe())
                 .podeApresentarSugestoes(contexto.isChefe())
-                .podeVerSugestoes(contexto.isGestorOuAdmin())
+                .podeVerSugestoes(contexto.isGestorOuAdmin() && SITUACOES_COM_SUGESTOES_MAPA.contains(contexto.situacao()))
                 .podeDevolverMapa(contexto.isAdmin() || contexto.isGestor())
                 .podeAceitarMapa(contexto.isGestor())
                 .podeHomologarMapa(contexto.isAdmin())

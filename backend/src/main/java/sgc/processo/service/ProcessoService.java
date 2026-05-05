@@ -834,7 +834,7 @@ public class ProcessoService {
         return ProcessoDetalheDto.AcaoBlocoDto.builder()
                 .codigo(contexto.codigo())
                 .acao(contexto.acao())
-                .mostrar(contexto.perfilPermite() && temUnidades)
+                .mostrar(contexto.perfilPermite())
                 .habilitar(habilitar)
                 .requerDataLimite(contexto.requerDataLimite())
                 .redirecionarPainel(contexto.redirecionarPainel())
