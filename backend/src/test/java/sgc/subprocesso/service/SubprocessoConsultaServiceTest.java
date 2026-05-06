@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.test.util.*;
+import sgc.mapa.dto.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -408,6 +409,98 @@ class SubprocessoConsultaServiceTest {
 
             verify(mapaManutencaoService).mapaVigenteUnidade(10L);
             verify(mapaManutencaoService).atividadesMapaCodigoComConhecimentos(400L);
+        }
+
+        @Test
+        @DisplayName("obterContextoCadastroAtividades para REVISAO deve manter assinatura igual quando mapa do subprocesso espelha o vigente")
+        void obterContextoCadastroAtividadesRevisaoSemMudancasDeveManterAssinaturasIguais() {
+            Processo processo = new Processo();
+            processo.setCodigo(1L);
+            processo.setTipo(TipoProcesso.REVISAO);
+            processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            unidade.setSigla("U10");
+            unidade.setNome("Unidade 10");
+
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(100L);
+            subprocesso.setUnidade(unidade);
+            subprocesso.setProcesso(processo);
+            subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+
+            Mapa mapaSubprocesso = new Mapa();
+            mapaSubprocesso.setCodigo(300L);
+            mapaSubprocesso.setSubprocesso(subprocesso);
+            subprocesso.setMapa(mapaSubprocesso);
+
+            Mapa mapaVigente = new Mapa();
+            mapaVigente.setCodigo(400L);
+
+            Conhecimento conhecimentoAtualA1 = new Conhecimento();
+            conhecimentoAtualA1.setDescricao("Conhecimento B");
+            Conhecimento conhecimentoAtualA2 = new Conhecimento();
+            conhecimentoAtualA2.setDescricao("Conhecimento A");
+            Atividade atividadeAtualA = new Atividade();
+            atividadeAtualA.setCodigo(201L);
+            atividadeAtualA.setDescricao("Atividade 2");
+            atividadeAtualA.setConhecimentos(Set.of(conhecimentoAtualA1, conhecimentoAtualA2));
+
+            Conhecimento conhecimentoAtualB = new Conhecimento();
+            conhecimentoAtualB.setDescricao("Conhecimento Unico");
+            Atividade atividadeAtualB = new Atividade();
+            atividadeAtualB.setCodigo(202L);
+            atividadeAtualB.setDescricao("Atividade 1");
+            atividadeAtualB.setConhecimentos(Set.of(conhecimentoAtualB));
+
+            Conhecimento conhecimentoVigenteA1 = new Conhecimento();
+            conhecimentoVigenteA1.setDescricao("Conhecimento A");
+            Conhecimento conhecimentoVigenteA2 = new Conhecimento();
+            conhecimentoVigenteA2.setDescricao("Conhecimento B");
+            Atividade atividadeVigenteA = new Atividade();
+            atividadeVigenteA.setCodigo(101L);
+            atividadeVigenteA.setDescricao("Atividade 2");
+            atividadeVigenteA.setConhecimentos(Set.of(conhecimentoVigenteA1, conhecimentoVigenteA2));
+
+            Conhecimento conhecimentoVigenteB = new Conhecimento();
+            conhecimentoVigenteB.setDescricao("Conhecimento Unico");
+            Atividade atividadeVigenteB = new Atividade();
+            atividadeVigenteB.setCodigo(102L);
+            atividadeVigenteB.setDescricao("Atividade 1");
+            atividadeVigenteB.setConhecimentos(Set.of(conhecimentoVigenteB));
+
+            when(subprocessoRepo.buscarPorCodigoComMapa(100L)).thenReturn(Optional.of(subprocesso));
+            when(mapaManutencaoService.mapaVigenteUnidade(10L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(300L))
+                    .thenReturn(List.of(atividadeAtualA, atividadeAtualB));
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(400L))
+                    .thenReturn(List.of(atividadeVigenteB, atividadeVigenteA));
+
+            Usuario usuario = Usuario.builder()
+                    .tituloEleitoral("123456789012")
+                    .unidadeAtivaCodigo(10L)
+                    .perfilAtivo(Perfil.CHEFE)
+                    .build();
+            stubContextoAutenticado(usuario);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
+
+            ContextoCadastroAtividadesResponse res = target.obterContextoCadastroAtividades(100L);
+
+            String assinaturaAtual = res.atividadesDisponiveis().stream()
+                    .map(atividade -> {
+                        String conhecimentos = atividade.conhecimentos().stream()
+                                .map(ConhecimentoResumoDto::descricao)
+                                .sorted()
+                                .reduce((a, b) -> a + "\u0001" + b)
+                                .orElse("");
+                        return atividade.descricao().trim() + "\u0002" + conhecimentos;
+                    })
+                    .sorted()
+                    .reduce((a, b) -> a + "\u0003" + b)
+                    .orElse("");
+
+            assertThat(res.assinaturaCadastroReferencia()).isEqualTo(assinaturaAtual);
         }
 
         @Test
