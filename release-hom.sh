@@ -169,7 +169,7 @@ if [[ ! -f "$ARQUIVO_COMPOSE" ]]; then
 fi
 
 if [[ "$SEM_BUILD" == false ]]; then
-  echo "==> Build dentro do Docker (multi-stage)."
+  echo "==> Realizando build"
 else
   echo "==> Build ignorado por parametro"
 fi

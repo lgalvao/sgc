@@ -292,4 +292,31 @@ class FeedbackServiceTest {
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Screenshot não disponível");
     }
+
+    @Test
+    @DisplayName("deve normalizar limite de listagem para o intervalo permitido")
+    void deveNormalizarLimiteDeListagem() {
+        when(repo.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+        // Teste com valor abaixo do mínimo (1)
+        service.listarRecentes(0);
+        verify(repo, atLeastOnce()).findAll(argThat((Pageable p) -> p.getPageSize() == 1));
+
+        // Teste com valor acima do máximo (200)
+        service.listarRecentes(250);
+        verify(repo, atLeastOnce()).findAll(argThat((Pageable p) -> p.getPageSize() == 200));
+    }
+
+    @Test
+    @DisplayName("deve usar rota /desconhecido quando não informada nos metadados")
+    void deveUsarRotaDesconhecida() {
+        configurarUsuarioMock();
+        // Metadados sem rotaCaminho
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", objectMapper.createObjectNode());
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().id(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+
+        service.registrar(payload, null);
+
+        verify(repo).save(argThat(r -> "/desconhecido".equals(r.getRota())));
+    }
 }
