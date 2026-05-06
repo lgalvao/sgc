@@ -32,8 +32,8 @@ public class LoginController {
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
 
-    @Value("${aplicacao.ambiente-testes:false}")
-    private boolean ambienteTestes;
+    @Value("${aplicacao.cookies.secure:false}")
+    private boolean cookieSecure;
 
     /**
      * Inicia o fluxo de login. Se houver um único par perfil/unidade disponível,
@@ -137,7 +137,7 @@ public class LoginController {
     private void adicionarCookiePreAuth(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("SGC_PRE_AUTH", token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(!ambienteTestes);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(300);
         response.addCookie(cookie);
@@ -146,7 +146,7 @@ public class LoginController {
     private void adicionarCookieJwt(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("jwtToken", token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(!ambienteTestes);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(86400);
         response.addCookie(cookie);
@@ -155,7 +155,7 @@ public class LoginController {
     private void limparCookiePreAuth(HttpServletResponse response) {
         Cookie cookie = new Cookie("SGC_PRE_AUTH", "");
         cookie.setHttpOnly(true);
-        cookie.setSecure(!ambienteTestes);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
@@ -164,7 +164,7 @@ public class LoginController {
     private void limparCookieJwt(HttpServletResponse response) {
         Cookie cookie = new Cookie("jwtToken", "");
         cookie.setHttpOnly(true);
-        cookie.setSecure(!ambienteTestes);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);

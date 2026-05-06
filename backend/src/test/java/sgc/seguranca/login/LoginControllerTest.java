@@ -299,9 +299,9 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("cookies de login não devem ser secure em ambiente de testes")
-    void cookiesNaoDevemSerSecureEmAmbienteDeTestes() {
-        setField(loginController, "ambienteTestes", true);
+    @DisplayName("cookies de login não devem ser secure quando a configuração desabilitar Secure")
+    void cookiesNaoDevemSerSecureQuandoConfiguracaoDesabilitarSecure() {
+        setField(loginController, "cookieSecure", false);
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         invokeMethod(loginController, "adicionarCookiePreAuth", response, "token-pre-auth");
@@ -313,9 +313,9 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("cookies de login devem ser secure fora do ambiente de testes")
-    void cookiesDevemSerSecureForaDoAmbienteDeTestes() {
-        setField(loginController, "ambienteTestes", false);
+    @DisplayName("cookies de login devem ser secure quando a configuração habilitar Secure")
+    void cookiesDevemSerSecureQuandoConfiguracaoHabilitarSecure() {
+        setField(loginController, "cookieSecure", true);
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         invokeMethod(loginController, "adicionarCookiePreAuth", response, "token-pre-auth");

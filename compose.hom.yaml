@@ -12,6 +12,7 @@ services:
       SPRING_PROFILES_ACTIVE: hom
       SERVER_PORT: "${PORTA_CONTAINER:-10000}"
       DB_URL: "${DB_URL:-jdbc:oracle:thin:@desenvolvimentobd.tre-pe.gov.br:1521:admdes2}"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
       LOGGING_FILE_NAME: /var/log/sgc/sgc.log
     volumes:
       - log-data:/var/log/sgc

@@ -1,17 +1,17 @@
 {
-  "gerado_em": "2026-05-06T13:53:48.545Z",
+  "gerado_em": "2026-05-06T14:13:48.220Z",
   "backend_dir": "backend",
   "estatisticas": {
     "total_classes": 290,
-    "classes_com_teste_dedicado": 148,
+    "classes_com_teste_dedicado": 151,
     "classes_com_cobertura_indireta": 0,
-    "classes_sem_evidencia_no_escopo": 2,
-    "classes_fora_escopo_jacoco": 1,
+    "classes_sem_evidencia_no_escopo": 0,
+    "classes_fora_escopo_jacoco": 0,
     "classes_ruido_ignorado": 139,
-    "classes_sem_teste_dedicado": 142,
-    "cobertura_arquivos_percentual": 51.03,
-    "cobertura_backlog_real_percentual": 98.01,
-    "cobertura_observada_percentual": 51.03,
+    "classes_sem_teste_dedicado": 139,
+    "cobertura_arquivos_percentual": 52.07,
+    "cobertura_backlog_real_percentual": 100,
+    "cobertura_observada_percentual": 52.07,
     "correspondencias_ambiguas": 10,
     "jacoco_disponivel": true,
     "dtos_comportamentais": 30,
@@ -3374,6 +3374,28 @@
           "other_ruido_ignorado": false
         },
         {
+          "classe": "FeedbackListagemDto",
+          "caminho_relativo": "sgc/feedback/dto/FeedbackListagemDto.java",
+          "categoria": "DTOs",
+          "perfil_dto": "comportamental",
+          "dto_ruido_ignorado": false,
+          "possui_teste": true,
+          "esta_no_escopo_jacoco": false,
+          "possui_cobertura_jacoco": false,
+          "coberta_somente_indiretamente": false,
+          "fora_escopo_jacoco": false,
+          "evidencia_qualidade": "teste_dedicado",
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/feedback/dto/FeedbackListagemDtoTest.java"
+          ],
+          "cobertura": null,
+          "perfil_model": null,
+          "model_ruido_ignorado": false,
+          "perfil_other": null,
+          "other_ruido_ignorado": false
+        },
+        {
           "classe": "AtividadeDto",
           "caminho_relativo": "sgc/mapa/dto/AtividadeDto.java",
           "categoria": "DTOs",
@@ -4320,26 +4342,6 @@
             "branches_cobertos": 0,
             "branches_total": 0
           },
-          "perfil_model": null,
-          "model_ruido_ignorado": false,
-          "perfil_other": null,
-          "other_ruido_ignorado": false
-        },
-        {
-          "classe": "FeedbackListagemDto",
-          "caminho_relativo": "sgc/feedback/dto/FeedbackListagemDto.java",
-          "categoria": "DTOs",
-          "perfil_dto": "comportamental",
-          "dto_ruido_ignorado": false,
-          "possui_teste": false,
-          "esta_no_escopo_jacoco": false,
-          "possui_cobertura_jacoco": false,
-          "coberta_somente_indiretamente": false,
-          "fora_escopo_jacoco": true,
-          "evidencia_qualidade": "fora_escopo_jacoco",
-          "estrategia_correspondencia": "nenhum",
-          "testes_encontrados": [],
-          "cobertura": null,
           "perfil_model": null,
           "model_ruido_ignorado": false,
           "perfil_other": null,
@@ -6458,6 +6460,36 @@
           "other_ruido_ignorado": false
         },
         {
+          "classe": "FeedbackRepo",
+          "caminho_relativo": "sgc/feedback/FeedbackRepo.java",
+          "categoria": "Repositories",
+          "perfil_dto": null,
+          "dto_ruido_ignorado": false,
+          "possui_teste": true,
+          "esta_no_escopo_jacoco": true,
+          "possui_cobertura_jacoco": false,
+          "coberta_somente_indiretamente": false,
+          "fora_escopo_jacoco": false,
+          "evidencia_qualidade": "teste_dedicado",
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/feedback/FeedbackRepoTest.java"
+          ],
+          "cobertura": {
+            "nome_classe": "sgc.feedback.FeedbackRepo",
+            "cobertura_linhas_percentual": 0,
+            "linhas_cobertas": 0,
+            "linhas_total": 0,
+            "cobertura_branches_percentual": 100,
+            "branches_cobertos": 0,
+            "branches_total": 0
+          },
+          "perfil_model": null,
+          "model_ruido_ignorado": false,
+          "perfil_other": null,
+          "other_ruido_ignorado": false
+        },
+        {
           "classe": "AtividadeRepo",
           "caminho_relativo": "sgc/mapa/model/AtividadeRepo.java",
           "categoria": "Repositories",
@@ -6938,36 +6970,7 @@
           "other_ruido_ignorado": false
         }
       ],
-      "untested": [
-        {
-          "classe": "FeedbackRepo",
-          "caminho_relativo": "sgc/feedback/FeedbackRepo.java",
-          "categoria": "Repositories",
-          "perfil_dto": null,
-          "dto_ruido_ignorado": false,
-          "possui_teste": false,
-          "esta_no_escopo_jacoco": true,
-          "possui_cobertura_jacoco": false,
-          "coberta_somente_indiretamente": false,
-          "fora_escopo_jacoco": false,
-          "evidencia_qualidade": "sem_evidencia_no_escopo",
-          "estrategia_correspondencia": "nenhum",
-          "testes_encontrados": [],
-          "cobertura": {
-            "nome_classe": "sgc.feedback.FeedbackRepo",
-            "cobertura_linhas_percentual": 0,
-            "linhas_cobertas": 0,
-            "linhas_total": 0,
-            "cobertura_branches_percentual": 100,
-            "branches_cobertos": 0,
-            "branches_total": 0
-          },
-          "perfil_model": null,
-          "model_ruido_ignorado": false,
-          "perfil_other": null,
-          "other_ruido_ignorado": false
-        }
-      ]
+      "untested": []
     },
     "Others": {
       "tested": [
@@ -7210,6 +7213,36 @@
           "model_ruido_ignorado": false,
           "perfil_other": "estrutural_puro",
           "other_ruido_ignorado": true
+        },
+        {
+          "classe": "FeedbackTipo",
+          "caminho_relativo": "sgc/feedback/FeedbackTipo.java",
+          "categoria": "Others",
+          "perfil_dto": null,
+          "dto_ruido_ignorado": false,
+          "possui_teste": true,
+          "esta_no_escopo_jacoco": true,
+          "possui_cobertura_jacoco": false,
+          "coberta_somente_indiretamente": false,
+          "fora_escopo_jacoco": false,
+          "evidencia_qualidade": "teste_dedicado",
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/feedback/FeedbackTipoTest.java"
+          ],
+          "cobertura": {
+            "nome_classe": "sgc.feedback.FeedbackTipo",
+            "cobertura_linhas_percentual": 0,
+            "linhas_cobertas": 0,
+            "linhas_total": 7,
+            "cobertura_branches_percentual": 100,
+            "branches_cobertos": 0,
+            "branches_total": 0
+          },
+          "perfil_model": null,
+          "model_ruido_ignorado": false,
+          "perfil_other": "comportamental",
+          "other_ruido_ignorado": false
         },
         {
           "classe": "AgendadorRefreshCache",
@@ -8252,34 +8285,6 @@
           "model_ruido_ignorado": false,
           "perfil_other": "estrutural_puro",
           "other_ruido_ignorado": true
-        },
-        {
-          "classe": "FeedbackTipo",
-          "caminho_relativo": "sgc/feedback/FeedbackTipo.java",
-          "categoria": "Others",
-          "perfil_dto": null,
-          "dto_ruido_ignorado": false,
-          "possui_teste": false,
-          "esta_no_escopo_jacoco": true,
-          "possui_cobertura_jacoco": false,
-          "coberta_somente_indiretamente": false,
-          "fora_escopo_jacoco": false,
-          "evidencia_qualidade": "sem_evidencia_no_escopo",
-          "estrategia_correspondencia": "nenhum",
-          "testes_encontrados": [],
-          "cobertura": {
-            "nome_classe": "sgc.feedback.FeedbackTipo",
-            "cobertura_linhas_percentual": 0,
-            "linhas_cobertas": 0,
-            "linhas_total": 7,
-            "cobertura_branches_percentual": 100,
-            "branches_cobertos": 0,
-            "branches_total": 0
-          },
-          "perfil_model": null,
-          "model_ruido_ignorado": false,
-          "perfil_other": "comportamental",
-          "other_ruido_ignorado": false
         },
         {
           "classe": "ContextoUsuarioAutenticado",

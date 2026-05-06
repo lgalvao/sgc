@@ -203,7 +203,7 @@ try
     }
     else
     {
-        Write-Host "==> Build ignorado por parametro (mas seria no Docker)"
+        Write-Host "==> Build ignorado por parametro"
     }
 
     $Versao = if ($Tag)
