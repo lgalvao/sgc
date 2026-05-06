@@ -4,6 +4,7 @@ USER root
 WORKDIR /build
 ARG TARGETARCH
 ARG NODE_VERSION=26.0.0
+ARG COREPACK_VERSION=0.34.0
 ARG PNPM_VERSION=11.0.6
 ARG FRONTEND_BUILD_MODE=production
 ENV FRONTEND_BUILD_MODE=$FRONTEND_BUILD_MODE
@@ -20,7 +21,7 @@ ENV NODE_EXTRA_CA_CERTS=/tmp/certs/cert-combinados.pem
 
 # 2. Instala dependências do SO e o toolchain JavaScript de forma determinística
 RUN set -eux; \
-    microdnf install -y curl tar xz findutils; \
+    microdnf install -y curl tar xz findutils libatomic; \
     case "${TARGETARCH:-amd64}" in \
       amd64) arquitetura_node='x64' ;; \
       arm64) arquitetura_node='arm64' ;; \
@@ -31,6 +32,7 @@ RUN set -eux; \
     grep " node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz\$" SHASUMS256.txt | sha256sum -c -; \
     tar -xJf "node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz" -C /usr/local --strip-components=1 --no-same-owner; \
     rm -f "node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz" SHASUMS256.txt; \
+    npm install -g "corepack@${COREPACK_VERSION}"; \
     corepack enable; \
     corepack prepare "pnpm@${PNPM_VERSION}" --activate
 
