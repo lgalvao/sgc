@@ -17,6 +17,7 @@ import sgc.subprocesso.service.*;
 
 import java.time.*;
 import java.util.*;
+import java.util.stream.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -29,10 +30,19 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     private SubprocessoConsultaService consultaService;
 
     @Autowired
+    private SubprocessoService subprocessoService;
+
+    @Autowired
     private UsuarioRepo usuarioRepo;
 
     @Autowired
     private MapaManutencaoService mapaManutencaoService;
+
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
+
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
 
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
@@ -136,6 +146,72 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(contexto.detalhes().subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         assertThat(consultaService.buscarSubprocesso(subprocesso.getCodigo()).getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+    }
+
+    @Test
+    @DisplayName("obterContextoCadastroAtividades: Revisão criada a partir do mapa vigente deve manter assinatura idêntica")
+    void obterContextoCadastroAtividades_RevisaoCriadaDoMapaVigenteDeveManterAssinaturaIdentica() {
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.FINALIZADO);
+        processo.setDataFinalizacao(LocalDateTime.now().minusDays(1));
+        processoRepo.saveAndFlush(processo);
+
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        Atividade atividadeA = atividadeRepo.saveAndFlush(Atividade.builder()
+                .mapa(subprocesso.getMapa())
+                .descricao("Atividade vigente A")
+                .build());
+        Atividade atividadeB = atividadeRepo.saveAndFlush(Atividade.builder()
+                .mapa(subprocesso.getMapa())
+                .descricao("Atividade vigente B")
+                .build());
+
+        conhecimentoRepo.saveAndFlush(Conhecimento.builder()
+                .atividade(atividadeA)
+                .descricao("Conhecimento 2")
+                .build());
+        conhecimentoRepo.saveAndFlush(Conhecimento.builder()
+                .atividade(atividadeA)
+                .descricao("Conhecimento 1")
+                .build());
+        conhecimentoRepo.saveAndFlush(Conhecimento.builder()
+                .atividade(atividadeB)
+                .descricao("Conhecimento único")
+                .build());
+
+        unidadeMapaRepo.saveAndFlush(UnidadeMapa.builder()
+                .unidadeCodigo(subprocesso.getUnidade().getCodigo())
+                .mapaVigente(subprocesso.getMapa())
+                .build());
+
+        Processo processoRevisao = Processo.builder()
+                .descricao("Processo revisão contexto")
+                .tipo(TipoProcesso.REVISAO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(30))
+                .build();
+        processoRepo.saveAndFlush(processoRevisao);
+
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(subprocesso.getUnidade().getCodigo()).orElseThrow();
+
+        subprocessoService.criarParaRevisao(new SubprocessoService.CriarSubprocessoComMapaCommand(
+                processoRevisao,
+                subprocesso.getUnidade(),
+                unidadeMapa,
+                subprocesso.getUnidade()
+        ));
+
+        Subprocesso subprocessoRevisao = subprocessoRepo.listarPorProcessoComUnidade(processoRevisao.getCodigo())
+                .stream()
+                .findFirst()
+                .orElseThrow();
+
+        ContextoCadastroAtividadesResponse contexto = consultaService.obterContextoCadastroAtividades(subprocessoRevisao.getCodigo());
+
+        assertThat(contexto.atividadesDisponiveis()).isNotEmpty();
+        assertThat(contexto.assinaturaCadastroReferencia()).isEqualTo(calcularAssinatura(contexto.atividadesDisponiveis()));
     }
 
     @Test
@@ -290,6 +366,21 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 
         assertThat(permissoes.podeVisualizarImpacto()).isTrue();
+    }
+
+    private String calcularAssinatura(List<AtividadeDto> atividades) {
+        return atividades.stream()
+                .map(atividade -> {
+                    String descricao = atividade.descricao().trim();
+                    String conhecimentos = atividade.conhecimentos().stream()
+                            .map(ConhecimentoResumoDto::descricao)
+                            .map(String::trim)
+                            .sorted()
+                            .collect(Collectors.joining("\u0001"));
+                    return descricao + "\u0002" + conhecimentos;
+                })
+                .sorted()
+                .collect(Collectors.joining("\u0003"));
     }
 
     @Test
