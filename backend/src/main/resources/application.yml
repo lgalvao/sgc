@@ -222,8 +222,8 @@ logging:
 
 aplicacao:
   cors:
-    allowed-origins: http://localhost:5173,http://localhost:3000,http://localhost:8081
-    allowed-methods: GET,POST
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:${URL_ACESSO_HOM:http://localhost:5173}}
+    allowed-methods: GET,POST,OPTIONS
     allowed-headers: "*"
     allow-credentials: true
   ambiente-testes: false
