@@ -13,9 +13,11 @@ import org.springframework.http.converter.*;
 import org.springframework.security.access.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
+import org.springframework.mock.web.*;
 import org.springframework.validation.*;
 import org.springframework.web.bind.*;
 import org.springframework.web.context.request.*;
+import org.springframework.web.servlet.resource.*;
 import sgc.integracao.mocks.*;
 import sgc.seguranca.*;
 
@@ -374,5 +376,51 @@ class RestExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(corpo.getMessage()).isEqualTo("Erro inesperado. Consulte o suporte com o código de rastreamento.");
+    }
+
+    @Test
+    @DisplayName("Deve encaminhar rota da SPA para index ao tratar NoResourceFoundException")
+    void deveEncaminharRotaDaSpaParaIndexAoTratarNoResourceFoundException() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/painel");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, "/painel", "painel");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+
+        assertThat(resultado).isNull();
+        assertThat(response.getForwardedUrl()).isEqualTo("/index.html");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("Nao deve encaminhar rota da API ao tratar NoResourceFoundException")
+    void naoDeveEncaminharRotaDaApiAoTratarNoResourceFoundException() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/inexistente");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, "/api/inexistente", "/api/inexistente");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+
+        assertThat(resultado).isNotNull();
+        assertThat(response.getForwardedUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("Nao deve encaminhar recurso estatico ao tratar NoResourceFoundException")
+    void naoDeveEncaminharRecursoEstaticoAoTratarNoResourceFoundException() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/assets/inexistente.js");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, "/assets/inexistente.js", "assets/inexistente.js");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+
+        assertThat(resultado).isNotNull();
+        assertThat(response.getForwardedUrl()).isNull();
     }
 }

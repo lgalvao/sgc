@@ -1,5 +1,7 @@
 package sgc.comum.erros;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import jakarta.validation.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
@@ -9,9 +11,13 @@ import org.springframework.security.access.*;
 import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.*;
+import org.springframework.web.servlet.resource.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 import sgc.comum.util.*;
 import sgc.seguranca.sanitizacao.*;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * Handler centralizado para tratamento de exceções REST.
@@ -26,6 +32,13 @@ import sgc.seguranca.sanitizacao.*;
 @ControllerAdvice
 @NullUnmarked
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+    private static final List<String> PREFIXOS_FRONTEND_EXCLUIDOS = List.of(
+            "/api",
+            "/actuator",
+            "/assets",
+            "/swagger-ui",
+            "/v3"
+    );
 
     private String sanitizar(@Nullable String texto) {
         return UtilSanitizacao.sanitizar(texto);
@@ -157,6 +170,44 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .message(message)
                 .erros(erros)
                 .build());
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex,
+                                                                    HttpHeaders headers,
+                                                                    HttpStatusCode status,
+                                                                    WebRequest request) {
+        if (request instanceof ServletWebRequest servletWebRequest
+                && deveEncaminharParaFrontend(ex.getResourcePath())
+                && encaminharIndexHtml(servletWebRequest)) {
+            return null;
+        }
+
+        return super.handleNoResourceFoundException(ex, headers, status, request);
+    }
+
+    private boolean deveEncaminharParaFrontend(String caminho) {
+        return !caminho.isBlank()
+                && !caminho.contains(".")
+                && PREFIXOS_FRONTEND_EXCLUIDOS.stream().noneMatch(caminho::startsWith);
+    }
+
+    private boolean encaminharIndexHtml(ServletWebRequest servletWebRequest) {
+        HttpServletRequest request = servletWebRequest.getRequest();
+        HttpServletResponse response = servletWebRequest.getResponse();
+        if (response == null || !"GET".equalsIgnoreCase(request.getMethod())) {
+            return false;
+        }
+
+        try {
+            response.setStatus(HttpStatus.OK.value());
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/index.html");
+            requestDispatcher.forward(request, response);
+            return true;
+        } catch (ServletException | IOException e) {
+            log.error("Erro ao encaminhar rota do frontend para index.html: {}", request.getRequestURI(), e);
+            return false;
+        }
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
