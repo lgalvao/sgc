@@ -2,10 +2,6 @@
 FROM docker.io/library/gradle:jdk25-ubi AS build-base
 USER root
 WORKDIR /build
-ARG TARGETARCH
-ARG NODE_VERSION=26.0.0
-ARG COREPACK_VERSION=0.34.0
-ARG PNPM_VERSION=11.0.6
 ARG FRONTEND_BUILD_MODE=production
 ENV FRONTEND_BUILD_MODE=$FRONTEND_BUILD_MODE
 
@@ -16,25 +12,11 @@ RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
     keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-tre -file /tmp/certs/cert-tre.cer && \
     keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-for -file /tmp/certs/cert-for.cer
 
-# Configura certificados para o Node.js
+# Configura certificados para o Node.js baixado pelo plugin Gradle
 ENV NODE_EXTRA_CA_CERTS=/tmp/certs/cert-combinados.pem
 
-# 2. Instala dependências do SO e o toolchain JavaScript de forma determinística
-RUN set -eux; \
-    microdnf install -y curl tar xz findutils libatomic; \
-    case "${TARGETARCH:-amd64}" in \
-      amd64) arquitetura_node='x64' ;; \
-      arm64) arquitetura_node='arm64' ;; \
-      *) echo "Arquitetura não suportada para Node.js: ${TARGETARCH:-desconhecida}" >&2; exit 1 ;; \
-    esac; \
-    curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz"; \
-    curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt"; \
-    grep " node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz\$" SHASUMS256.txt | sha256sum -c -; \
-    tar -xJf "node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz" -C /usr/local --strip-components=1 --no-same-owner; \
-    rm -f "node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz" SHASUMS256.txt; \
-    npm install -g "corepack@${COREPACK_VERSION}"; \
-    corepack enable; \
-    corepack prepare "pnpm@${PNPM_VERSION}" --activate
+# 2. Instala apenas utilitários de SO usados durante o build
+RUN microdnf install -y findutils
 
 # Estágio de cache das dependências Java
 FROM build-base AS deps-java

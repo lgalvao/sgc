@@ -225,6 +225,7 @@ try
     if (-not $SemImagem)
     {
         $ArgsBuild = @("build", "-t", $TagVersao, "-t", $TagLatest)
+        $ArgsBuild += @("--build-arg", "FRONTEND_BUILD_MODE=hom")
         if ($SemCache)
         {
             $ArgsBuild += "--no-cache"
