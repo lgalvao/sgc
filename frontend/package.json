@@ -81,7 +81,10 @@
   "pnpm": {
     "overrides": {
       "glob": "^13.0.0"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "overrides": {
     "glob": "^13.0.0"
