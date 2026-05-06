@@ -23,7 +23,7 @@ DECLARE
     v_email_chefe VARCHAR2(255);
     v_email_servidor VARCHAR2(255);
     v_agora TIMESTAMP := SYSTIMESTAMP;
-    v_descricao_processo CONSTANT VARCHAR2(255) := 'Mapa SESEL - Exemplo Oracle';
+    v_descricao_processo CONSTANT VARCHAR2(255) := 'Mapeamento da SESEL';
     TYPE t_codigo_por_ordem IS TABLE OF NUMBER INDEX BY PLS_INTEGER;
     v_competencias t_codigo_por_ordem;
     v_atividades t_codigo_por_ordem;
