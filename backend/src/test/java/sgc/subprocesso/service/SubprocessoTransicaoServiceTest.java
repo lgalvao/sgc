@@ -539,5 +539,60 @@ class SubprocessoTransicaoServiceTest {
 
             assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_DISPONIBILIZADO);
         }
+        @Test
+        @DisplayName("executarAceiteValidacaoEmBloco - deve aceitar múltiplos subprocessos")
+        void executarAceiteValidacaoEmBloco() {
+            Unidade u = criarUnidade(10L, "U1", "Unidade 1");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, u);
+            sp.setMapa(new sgc.mapa.model.Mapa());
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+
+            when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(1L))).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(null); // Admin na raiz
+
+            service.aceitarValidacaoEmBloco(List.of(1L));
+
+            verify(analiseRepo).save(any());
+        }
+
+        @Test
+        @DisplayName("obterUnidadeDevolucao - deve lançar ErroInconsistenciaInterna quando histórico estiver vazio ou não bater")
+        void obterUnidadeDevolucao_Inconsistente() {
+            Unidade uAnalise = criarUnidade(10L, "ANA", "Analise");
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(99L);
+
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(99L)).thenReturn(List.of());
+
+            assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterUnidadeDevolucao", sp, uAnalise))
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                    .hasMessageContaining("Historico de movimentacoes inconsistente");
+        }
+
+        @Test
+        @DisplayName("registrarWorkflowParaSuperiorAtual - admin na raiz deve registrar para si mesmo")
+        void registrarWorkflowParaSuperiorAtual_AdminNaRaiz() {
+            Unidade u = criarUnidade(1L, "ROOT", "Root");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, u);
+            sp.setMapa(new sgc.mapa.model.Mapa());
+            Usuario usuario = criarUsuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            usuario.setUnidadeAtivaCodigo(1L);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(u);
+            when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(null);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(analiseRepo.save(any())).thenAnswer(i -> i.getArgument(0));
+
+            service.aceitarValidacao(1L, "Obs");
+
+            verify(analiseRepo).save(argThat(a -> a.getUnidadeCodigo().equals(1L)));
+            assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_VALIDADO);
+        }
     }
 }

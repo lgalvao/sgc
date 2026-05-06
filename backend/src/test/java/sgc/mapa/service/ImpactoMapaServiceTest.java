@@ -678,6 +678,118 @@ class ImpactoMapaServiceTest {
         }
 
         @Test
+        @DisplayName("verificarImpactos: Detectar alteração de descrição via heurística de competências")
+        void verificarImpactos_HeuristicaDescricao() {
+            mockAcessoLivre();
+            Subprocesso sp = criarSubprocessoPadrao();
+            sp.setCodigo(1L);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            Unidade u = new Unidade();
+            u.setCodigo(100L);
+            sp.setUnidade(u);
+
+            Mapa mapaVigente = new Mapa();
+            mapaVigente.setCodigo(20L);
+            Mapa mapaSub = new Mapa();
+            mapaSub.setCodigo(21L);
+
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaSub));
+
+            Competencia compVigente = new Competencia();
+            compVigente.setCodigo(50L);
+            compVigente.setDescricao("Competencia X");
+
+            Atividade aVigente = new Atividade();
+            aVigente.setCodigo(10L);
+            aVigente.setDescricao("Descrição Antiga");
+            aVigente.setConhecimentos(Set.of());
+            aVigente.setCompetencias(Set.of(compVigente));
+            compVigente.setAtividades(Set.of(aVigente));
+
+            Atividade aAtual = new Atividade();
+            aAtual.setCodigo(11L);
+            aAtual.setDescricao("Descrição Nova");
+            aAtual.setConhecimentos(Set.of());
+            aAtual.setCompetencias(Set.of(compVigente));
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L)).thenReturn(List.of(aVigente));
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L)).thenReturn(List.of(aAtual));
+            when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(compVigente));
+
+            mockUsuarioAutenticado(usuarioAdmin());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
+
+            assertEquals(1, response.alteradas().size());
+            AtividadeImpactadaDto alt = response.alteradas().getFirst();
+            assertEquals("Descrição Antiga", alt.descricaoAnterior());
+            assertEquals("Descrição Nova", alt.descricao());
+            assertEquals(TipoImpactoAtividade.ALTERADA, alt.tipoImpacto());
+
+            // Verifica se a competência foi impactada pela alteração de nome
+            assertEquals(1, response.competenciasImpactadas().size());
+            assertTrue(response.competenciasImpactadas().getFirst().atividadesAfetadas().stream()
+                    .anyMatch(d -> d.contains("Descrição alterada para Descrição Nova")));
+        }
+
+        @Test
+        @DisplayName("verificarImpactos: Registro de detalhes de conhecimentos adicionados e removidos")
+        void verificarImpactos_DetalhesConhecimentos() {
+            mockAcessoLivre();
+            Subprocesso sp = criarSubprocessoPadrao();
+            sp.setCodigo(1L);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            Unidade u = new Unidade();
+            u.setCodigo(100L);
+            sp.setUnidade(u);
+
+            Mapa mapaVigente = new Mapa();
+            mapaVigente.setCodigo(20L);
+            Mapa mapaSub = new Mapa();
+            mapaSub.setCodigo(21L);
+
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaSub));
+
+            Conhecimento cRemovido = new Conhecimento();
+            cRemovido.setDescricao("Java 8");
+            Conhecimento cAdicionado = new Conhecimento();
+            cAdicionado.setDescricao("Java 21");
+
+            Atividade aVigente = new Atividade();
+            aVigente.setCodigo(10L);
+            aVigente.setDescricao("Desenvolvimento");
+            aVigente.setConhecimentos(Set.of(cRemovido));
+
+            Atividade aAtual = new Atividade();
+            aAtual.setCodigo(10L); // Mesma atividade (ID fixo no DTO ou descrição igual)
+            aAtual.setDescricao("Desenvolvimento");
+            aAtual.setConhecimentos(Set.of(cAdicionado));
+
+            Competencia comp = new Competencia();
+            comp.setCodigo(50L);
+            comp.setDescricao("Comp Dev");
+            comp.setAtividades(Set.of(aVigente));
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L)).thenReturn(List.of(aVigente));
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L)).thenReturn(List.of(aAtual));
+            when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
+
+            mockUsuarioAutenticado(usuarioAdmin());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
+
+            assertEquals(1, response.alteradas().size());
+            AtividadeImpactadaDto alt = response.alteradas().getFirst();
+            assertTrue(alt.conhecimentosAdicionados().contains("Java 21"));
+            assertTrue(alt.conhecimentosRemovidos().contains("Java 8"));
+
+            assertEquals(1, response.competenciasImpactadas().size());
+            List<String> detalhes = response.competenciasImpactadas().getFirst().atividadesAfetadas();
+            assertTrue(detalhes.stream().anyMatch(d -> d.contains("Conhecimento Java 21 adicionado")));
+            assertTrue(detalhes.stream().anyMatch(d -> d.contains("Conhecimento Java 8 removido")));
+        }
+
+        @Test
         @DisplayName("processarAlteradas: Filtro de descrição inexistente")
         void processarAlteradas_DescricaoInexistenteNoFiltro() {
             // Este teste é artificial para atingir o branch do filter caso o Jacoco o exija,

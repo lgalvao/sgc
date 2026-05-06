@@ -34,10 +34,9 @@ Ator: CHEFE
    associado. Caso negativo, indica quais atividades precisam de conhecimentos e bloqueia a disponibilização.
 
 8. Se o usuário decidir disponibilizar sem mudanças, marca o checkbox `Disponibilização sem mudanças`. Este checkbox só
-   deve estar habilitado caso realmente não tenham sido feitas mudanças no cadastro.
+   deve estar habilitado caso realmente não tenham sido feitas mudanças no cadastro **em relação ao mapa vigente da unidade**.
 
-8. Se houver mudanças no cadastro, ou se o usuário clicar no checkbox, o sistema muda a situação do subprocesso para '
-   Revisão do cadastro em andamento' e habilita o botão `Disponibilizar`.
+8. Se houver mudanças, ou se o usuário clicar no checkbox, o sistema muda a situação do subprocesso para 'Revisão do cadastro em andamento' e habilita o botão `Disponibilizar`.
 
    8.1. Se o usuário, desmarcar o checkbox, o sistema muda a situação do subprocesso de volta a 'Não iniciado' e
    desativa o botão `Disponibilizar`, até que sejam feitas mudanças no cadastro (e o cadastro esteja válido).
