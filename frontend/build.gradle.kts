@@ -39,7 +39,19 @@ tasks.register<PnpmTask>("buildVue") {
     inputs.file("vite.config.ts")
     outputs.dir("dist")
 
-    pnpmCommand.set(listOf("run", "build"))
+    val modoBuildFrontend = (
+        System.getenv("FRONTEND_BUILD_MODE")
+            ?: project.findProperty("frontendBuildMode")?.toString()
+            ?: "production"
+        ).lowercase()
+
+    val scriptBuild = when (modoBuildFrontend) {
+        "hom" -> "build:hom"
+        "prod", "production" -> "build:prod"
+        else -> "build"
+    }
+
+    pnpmCommand.set(listOf("run", scriptBuild))
 }
 
 tasks.register<PnpmTask>("quality") {

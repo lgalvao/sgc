@@ -190,6 +190,7 @@ if [[ "$SEM_IMAGEM" == false ]]; then
   echo "==> Construindo imagem multi-stage com $CONTAINER_CLI: $TAG_VERSAO"
   
   ARGS_BUILD=(build -t "$TAG_VERSAO" -t "$TAG_LATEST")
+  ARGS_BUILD+=(--build-arg "FRONTEND_BUILD_MODE=hom")
   if [[ "$SEM_CACHE" == true ]]; then
     ARGS_BUILD+=(--no-cache)
   fi

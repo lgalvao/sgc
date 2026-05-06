@@ -2,6 +2,8 @@
 FROM docker.io/library/gradle:jdk25-ubi AS build-env
 USER root
 WORKDIR /build
+ARG FRONTEND_BUILD_MODE=production
+ENV FRONTEND_BUILD_MODE=$FRONTEND_BUILD_MODE
 
 # 1. Configura os certificados corporativos no nível do Sistema Operacional
 COPY deploy/*.cer deploy/cert-combinados.pem /tmp/certs/
