@@ -42,6 +42,26 @@ class ConfigCorsTest {
     }
 
     @Test
+    @DisplayName("Nao deve aplicar CORS para recursos estaticos")
+    void naoDeveAplicarCorsParaRecursosEstaticos() {
+        ConfigCorsProperties properties = new ConfigCorsProperties(
+                List.of("https://example.com"),
+                List.of("GET", "POST"),
+                List.of("*"),
+                true
+        );
+        ConfigCors config = new ConfigCors(properties);
+
+        CorsConfigurationSource source = config.corsConfigurationSource();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/assets/index.js");
+
+        CorsConfiguration configuration = source.getCorsConfiguration(request);
+
+        assertThat(configuration).isNull();
+    }
+
+    @Test
     @DisplayName("Deve usar valores padrão quando propriedades são null")
     void deveUsarValoresPadraoQuandoPropriedadesSaoNull() {
         // Compact constructor aplica valores default

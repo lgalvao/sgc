@@ -42,6 +42,7 @@ springdoc:
 
 server:
   port: 10000
+  forward-headers-strategy: framework
 
 management:
   endpoints:
