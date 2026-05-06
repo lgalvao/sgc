@@ -817,6 +817,21 @@ describe("CadastroView.vue", () => {
         expect(btn.exists()).toBe(false);
     });
 
+    it("oculta controles de edição para CHEFE quando a edição não estiver habilitada no workflow", async () => {
+        const wrapper = createWrapper({
+            perfil: {
+                perfilSelecionado: Perfil.CHEFE,
+            },
+        }, {
+            podeEditarCadastro: ref(true),
+            habilitarEditarCadastro: ref(false),
+            podeDisponibilizarCadastro: ref(false),
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="cad-atividade-form"]').exists()).toBe(false);
+    });
+
     it("oculta formulário de nova atividade quando o usuário não tem permissão para editar", async () => {
         const wrapper = createWrapper({}, {
             podeEditarCadastro: ref(false),

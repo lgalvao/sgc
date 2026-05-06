@@ -179,6 +179,18 @@ O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conheci
 
 ---
 
+
+### 6.1 Exceção de UX para controles de edição
+
+Mesmo quando o backend indicar que o perfil possui a ação estrutural de edição, o frontend deve **ocultar** os controles
+de edição (em vez de apenas desabilitar) nos casos abaixo, quando a situação do subprocesso não permitir edição no
+workflow atual:
+
+- **Cadastro de atividades:** perfil **CHEFE**.
+- **Cadastro de mapa:** perfil **ADMIN**.
+
+Essa exceção é intencional e restrita às telas de cadastro/edição citadas acima.
+
 ## 7. Importação de Atividades
 
 - `POST /subprocessos/{codigo}/importar-atividades` — protegido com
