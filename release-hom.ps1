@@ -13,7 +13,7 @@ else
 }
 else
 {
-    "registry.tre-pe.gov.br/sesel"
+    "registry.tre-pe.jus.br/sesel"
 } ),
     [string]$PortaHost = $( if ($env:PORTA_HOST)
 {
@@ -199,7 +199,7 @@ try
 
     if (-not $SemBuild)
     {
-        Write-Host "==> O build agora e realizado dentro do Docker (multi-stage)."
+        Write-Host "==> Realizando build"
     }
     else
     {

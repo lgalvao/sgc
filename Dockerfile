@@ -1,46 +1,54 @@
-# Estágio 1: Build do Frontend
-FROM docker.io/library/node AS build-frontend
+# Estágio 1: Build unificado (Backend + Frontend)
+FROM docker.io/library/gradle:jdk25-ubi AS build-env
+USER root
 WORKDIR /build
 
-# Copia arquivos de dependências primeiro para cachear
-COPY frontend/package.json frontend/package-lock.json ./ 
-RUN npm config set strict-ssl false && npm install
+# 1. Configura os certificados corporativos no nível do Sistema Operacional
+COPY deploy/*.cer deploy/cert-combinados.pem /tmp/certs/
+RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
+    update-ca-trust extract && \
+    keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-tre -file /tmp/certs/cert-tre.cer && \
+    keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-for -file /tmp/certs/cert-for.cer
 
-# Copia o resto e gera o build
-COPY frontend/ ./ 
-RUN npm run build
+# Configura certificados para o Node.js
+ENV NODE_EXTRA_CA_CERTS=/tmp/certs/cert-combinados.pem
 
-# Estágio 2: Build do Backend (Spring Boot Jar)
-FROM docker.io/library/amazoncorretto:25 AS build-backend
-WORKDIR /build
+# 2. Instala dependências do SO: Node.js (via setup script) e utilitários
+RUN curl -k -fsSL https://rpm.nodesource.com/setup_20.x | bash - && \
+    microdnf install -y nodejs findutils && \
+    npm install -g pnpm@10.33.3
 
-# Instala utilitários necessários para o gradlew (xargs)
-RUN yum install -y --setopt=sslverify=false findutils
+# 3. Copia arquivos de configuração para cachear dependências do Gradle e do Node
+COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
+COPY gradle/ gradle/
+COPY backend/build.gradle.kts backend/
+COPY frontend/build.gradle.kts frontend/package.json frontend/package-lock.json frontend/pnpm-lock.yaml frontend/
 
-# Copia o projeto inteiro
+# Baixa as dependências do Gradle (backend) para criar cache na camada do Docker
+RUN gradle :backend:dependencies --no-daemon
+
+# 4. Copia o projeto inteiro
 COPY . . 
 
-# Copia o frontend gerado para a pasta de recursos estáticos do backend
-COPY --from=build-frontend /build/dist/ ./backend/src/main/resources/static/
-
-# Executa o build do backend (pula o build do frontend via Gradle pois já fizemos)
-RUN ./gradlew :backend:bootJar -x test -x :frontend:buildVue -x :frontend:install
-
-# Estágio 3: Extrator (prepara as camadas do Spring Boot)
+# 5. Executa o build completo orquestrado pelo Gradle
+RUN gradle :backend:bootJar -x test
+# Estágio 2: Extrator (prepara as camadas do Spring Boot)
 FROM docker.io/library/amazoncorretto:25 AS extrator
 WORKDIR /aplicacao
 
+# Re-aplica certificados para o extrator
 COPY deploy/*.cer /tmp/certs/
 RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
     update-ca-trust extract
 
 # Pega o JAR gerado no estágio anterior
-COPY --from=build-backend /build/backend/build/libs/*.jar aplicacao.jar
+COPY --from=build-env /build/backend/build/libs/*-plain.jar /dev/null
+COPY --from=build-env /build/backend/build/libs/*.jar aplicacao.jar
 
 RUN mkdir extraido && \
     java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
 
-# Estágio 4: Imagem Final (Runtime)
+# Estágio 3: Imagem Final (Runtime)
 FROM docker.io/library/amazoncorretto:25
 
 LABEL description="Sistema de Gestao de Competencias - SGC" \

@@ -81,6 +81,10 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
+tasks.named("processResources") {
+    dependsOn(":copyFrontend")
+}
+
 tasks.withType<BootJar> {
     enabled = true
     mainClass.set("sgc.Sgc")
