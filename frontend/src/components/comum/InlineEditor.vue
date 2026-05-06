@@ -69,7 +69,7 @@ interface Props {
   modelValue: string;
   canEdit?: boolean;
   editEnabled?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'lg';
   ariaLabel?: string;
   ariaLabelSave?: string;
   ariaLabelCancel?: string;

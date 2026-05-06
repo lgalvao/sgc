@@ -6,7 +6,7 @@ RUN npm install -g pnpm@11.0.0
 
 # Copia arquivos de dependências primeiro para cachear
 COPY frontend/package.json frontend/pnpm-lock.yaml ./ 
-RUN pnpm install
+RUN pnpm config set only-allow-trusted-dependencies false && pnpm install
 
 # Copia o resto e gera o build
 COPY frontend/ ./ 
