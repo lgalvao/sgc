@@ -1,16 +1,14 @@
 # Estágio 1: Build do Frontend
 FROM docker.io/library/node AS build-frontend
 WORKDIR /build
-# Instala o pnpm globalmente
-RUN npm install -g pnpm@11.0.0
 
 # Copia arquivos de dependências primeiro para cachear
-COPY frontend/package.json frontend/pnpm-lock.yaml ./ 
-RUN pnpm install --ignore-scripts=false
+COPY frontend/package.json frontend/package-lock.json ./ 
+RUN npm ci
 
 # Copia o resto e gera o build
 COPY frontend/ ./ 
-RUN pnpm run build
+RUN npm run build
 
 # Estágio 2: Build do Backend (Spring Boot Jar)
 FROM docker.io/library/amazoncorretto:25 AS build-backend
