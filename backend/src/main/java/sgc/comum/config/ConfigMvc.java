@@ -30,12 +30,20 @@ public class ConfigMvc implements WebMvcConfigurer {
                             return requestedResource;
                         }
 
-                        // Se a rota começa com "api" ou "actuator", deixa o Spring tratar normalmente (ou dar 404/401)
+                        // Se a rota parece ser de um arquivo estático (contém ponto no último segmento)
+                        // mas não foi encontrado acima, não devemos retornar o index.html, pois
+                        // isso causaria erros de MIME type no navegador.
+                        String filename = requestedResource.getFilename();
+                        if (filename != null && filename.contains(".")) {
+                            return null;
+                        }
+
+                        // Se a rota começa com "api" ou "actuator", deixa o Spring tratar normalmente
                         if (resourcePath.startsWith("api") || resourcePath.startsWith("actuator")) {
                             return null;
                         }
 
-                        // Para qualquer outra rota (ex: /login, /mapas), serve o index.html para o Vue Router assumir
+                        // Para qualquer outra rota (ex: /login, /mapas), serve o index.html
                         return location.createRelative("index.html");
                     }
                 });

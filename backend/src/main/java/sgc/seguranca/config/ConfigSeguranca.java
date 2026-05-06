@@ -67,6 +67,12 @@ public class ConfigSeguranca {
                                                    FiltroJwt filtroJwt,
                                                    FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/assets/**",
+                                "/*.ico",
+                                "/*.png",
+                                "/*.svg",
                                 "/api/usuarios/login",
                                 "/api/usuarios/entrar",
                                 "/api/usuarios/logout",

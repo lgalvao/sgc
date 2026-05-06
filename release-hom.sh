@@ -169,9 +169,9 @@ if [[ ! -f "$ARQUIVO_COMPOSE" ]]; then
 fi
 
 if [[ "$SEM_BUILD" == false ]]; then
-  echo "==> O build agora e realizado dentro do Docker (multi-stage)."
+  echo "==> Build dentro do Docker (multi-stage)."
 else
-  echo "==> Build ignorado por parametro (mas seria no Docker)"
+  echo "==> Build ignorado por parametro"
 fi
 
 if [[ -n "$TAG" ]]; then

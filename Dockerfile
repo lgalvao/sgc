@@ -21,7 +21,6 @@ RUN yum install -y findutils
 COPY . . 
 
 # Copia o frontend gerado para a pasta de recursos estáticos do backend
-# O Gradle vai embutir isso automaticamente no Jar se estiver em src/main/resources/static
 COPY --from=build-frontend /build/dist/ ./backend/src/main/resources/static/
 
 # Executa o build do backend (pula o build do frontend via Gradle pois já fizemos)
