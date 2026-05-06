@@ -18,7 +18,7 @@ ENV NODE_EXTRA_CA_CERTS=/tmp/certs/cert-combinados.pem
 # 2. Instala dependências do SO: Node.js (via setup script) e utilitários
 RUN curl -k -fsSL https://rpm.nodesource.com/setup_20.x | bash - && \
     microdnf install -y nodejs findutils && \
-    npm install -g pnpm@10.33.3
+    npm install -g pnpm@11.0.6
 
 # Estágio de cache das dependências Java
 FROM build-base AS deps-java
@@ -26,9 +26,10 @@ FROM build-base AS deps-java
 COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
 COPY gradle/ gradle/
 COPY backend/build.gradle.kts backend/
+RUN mkdir -p frontend
 
 # Baixa dependências Java em camada separada para preservar cache quando só o frontend muda
-RUN gradle --no-daemon :backend:dependencies
+RUN gradle :backend:dependencies
 
 # Estágio de cache das dependências do frontend
 FROM deps-java AS deps-frontend
@@ -37,7 +38,7 @@ COPY frontend/build.gradle.kts frontend/
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/
 
 # Instala dependências do frontend, preservando a orquestração oficial do Gradle
-RUN gradle --no-daemon :frontend:install
+RUN gradle :frontend:install
 
 # Estágio 1: Build unificado (Backend + Frontend)
 FROM deps-frontend AS build-env
@@ -46,22 +47,20 @@ FROM deps-frontend AS build-env
 COPY . . 
 
 # 5. Executa o build completo orquestrado pelo Gradle
-RUN gradle --no-daemon :backend:bootJar -x test
+RUN gradle :backend:bootJar -x test
 # Estágio 2: Extrator (prepara as camadas do Spring Boot)
 FROM docker.io/library/amazoncorretto:25 AS extrator
 WORKDIR /aplicacao
 
 # Re-aplica certificados para o extrator
 COPY deploy/*.cer /tmp/certs/
-RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
-    update-ca-trust extract
+RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && update-ca-trust extract
 
 # Pega o JAR gerado no estágio anterior
 COPY --from=build-env /build/backend/build/libs/*-plain.jar /dev/null
 COPY --from=build-env /build/backend/build/libs/*.jar aplicacao.jar
 
-RUN mkdir extraido && \
-    java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
+RUN mkdir extraido && java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
 
 # Estágio 3: Imagem Final (Runtime)
 FROM docker.io/library/amazoncorretto:25
