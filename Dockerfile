@@ -27,7 +27,7 @@ COPY backend/build.gradle.kts backend/
 COPY frontend/build.gradle.kts frontend/package.json frontend/package-lock.json frontend/pnpm-lock.yaml frontend/
 
 # Baixa as dependências do Gradle (backend e frontend) para criar cache na camada do Docker
-RUN gradle :backend:dependencies :frontend:install --no-daemon
+RUN gradle :backend:dependencies :frontend:install
 
 # 4. Copia o projeto inteiro
 COPY . . 
