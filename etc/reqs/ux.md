@@ -17,6 +17,7 @@ específicos que funcionam melhor com tratamento próprio.
 - Se a ação nunca puder ser realizada pelo perfil atual, o botão ou controle não deve ser renderizado.
 - Se o perfil pode realizar a ação, mas a localização, situação de workflow, permissão contextual ou estado de
   carregamento impede a execução agora, o controle deve aparecer desabilitado.
+- **Exceção (cadastro de atividades / mapa):** quando o perfil CHEFE (cadastro) ou ADMIN (mapa) possui capacidade estrutural de edição, mas a situação do subprocesso impede a edição naquele momento, os controles de edição **devem ser ocultados** (não apenas desabilitados).
 - Ação desabilitada por workflow/localização deve ter motivo acessível e persistente quando o contexto não for óbvio.
 - Tooltip pode complementar o motivo, mas não deve ser o único canal quando a informação for essencial.
 - Erro corrigível de formulário não deve deixar a ação principal muda; a tentativa deve exibir validação inline ou

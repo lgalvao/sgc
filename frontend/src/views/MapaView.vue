@@ -170,6 +170,7 @@ import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
+import {usePerfilStore} from "@/stores/perfil";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {listarAnalisesValidacao} from "@/services/analiseService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
@@ -179,6 +180,7 @@ import {useMapaAnaliseFluxo} from "@/views/mapaAnaliseFluxo";
 import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
 import {normalizarErro} from "@/utils/apiError";
 import type {Analise, MapaCompleto,} from "@/types/tipos";
+import {Perfil} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();
@@ -188,6 +190,7 @@ const carregandoFluxoMapa = computed(() => unref(fluxoMapa.carregando) ?? false)
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
+const perfilStore = usePerfilStore();
 const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
 
@@ -215,7 +218,12 @@ const usarMenuAcoesMapa = computed(() => {
       || Boolean(acaoPrincipalMapa.value?.mostrar)
       || mostrarDisponibilizarMapa.value;
 });
-const modoSomenteLeitura = computed(() => !podeEditarMapa.value);
+const esconderEdicaoMapaParaAdmin = computed(() =>
+  perfilStore.perfilSelecionado === Perfil.ADMIN
+  && podeEditarMapa.value
+  && !habilitarEditarMapa.value
+);
+const modoSomenteLeitura = computed(() => !podeEditarMapa.value || esconderEdicaoMapaParaAdmin.value);
 const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?.mostrar));
 const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);
 const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);

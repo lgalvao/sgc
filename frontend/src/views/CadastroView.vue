@@ -20,7 +20,7 @@
           @abrir-importar="mostrarModalImportar = true"
       />
 
-      <div v-if="podeEditarCadastro && isRevisao" class="mt-3 mb-2">
+      <div v-if="mostrarControlesEdicaoCadastro && isRevisao" class="mt-3 mb-2">
         <BFormCheckbox
             v-model="disponibilizacaoSemMudancas"
             :disabled="checkboxSemMudancasDesabilitado"
@@ -60,7 +60,7 @@
       />
 
       <CadAtividadeForm
-          v-if="podeEditarCadastro"
+          v-if="mostrarControlesEdicaoCadastro"
           ref="atividadeFormRef"
           v-model="novaAtividade"
           :disabled="!codigoSubprocesso || !habilitarEditarCadastro"
@@ -71,8 +71,8 @@
 
       <EmptyState
           v-if="atividades?.length === 0"
-          :description="podeEditarCadastro ? TEXTOS.atividades.EMPTY_DESCRIPTION : TEXTOS.treeTable.EMPTY_DESCRIPTION"
-          :title="podeEditarCadastro ? TEXTOS.atividades.EMPTY_TITLE : TEXTOS.treeTable.EMPTY_TITLE"
+          :description="mostrarControlesEdicaoCadastro ? TEXTOS.atividades.EMPTY_DESCRIPTION : TEXTOS.treeTable.EMPTY_DESCRIPTION"
+          :title="mostrarControlesEdicaoCadastro ? TEXTOS.atividades.EMPTY_TITLE : TEXTOS.treeTable.EMPTY_TITLE"
           data-testid="cad-atividades-empty-state"
           icon="bi-list-check"
       />
@@ -86,7 +86,7 @@
             :atividade="atividade"
             :erro-validacao="obterErroParaAtividade(atividade.codigo)"
             :habilitar-edicao="habilitarEditarCadastro"
-            :pode-editar="podeEditarCadastro"
+            :pode-editar="mostrarControlesEdicaoCadastro"
             @atualizar-atividade="(desc: string) => salvarEdicaoAtividade(atividade.codigo, desc)"
             @remover-atividade="() => removerAtividade(atividade.codigo)"
             @adicionar-conhecimento="(desc: string) => adicionarConhecimento(atividade.codigo, desc)"
@@ -153,6 +153,7 @@ import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useSubprocessoStore} from "@/stores/subprocesso";
+import {usePerfilStore} from "@/stores/perfil";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useAcesso} from "@/composables/acesso";
 import {useCadastroAtividadesMutacoes} from "@/composables/useCadastroAtividadesMutacoes";
@@ -161,7 +162,7 @@ import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
 import {useCadastroAnaliseFluxo} from "@/views/cadastroAnaliseFluxo";
 import {useCadastroDisponibilizacao} from "@/views/cadastroDisponibilizacao";
-import {type Atividade, type AtividadeOperacaoResponse, type PermissoesSubprocesso, TipoProcesso} from "@/types/tipos";
+import {type Atividade, type AtividadeOperacaoResponse, type PermissoesSubprocesso, Perfil, TipoProcesso} from "@/types/tipos";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
 import {listarAnalisesCadastro} from "@/services/analiseService";
@@ -186,6 +187,7 @@ const {
 } = useCadastroOrquestracao(props, atividades);
 
 const subprocessoStore = useSubprocessoStore();
+const perfilStore = usePerfilStore();
 const mapasStore = useMapas(codigoSubprocesso);
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
@@ -212,6 +214,13 @@ const {
 } = acesso;
 
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
+const esconderEdicaoCadastroParaChefe = computed(() =>
+    perfilStore.perfilSelecionado === Perfil.CHEFE
+    && podeEditarCadastro.value
+    && !habilitarEditarCadastro.value
+);
+const mostrarControlesEdicaoCadastro = computed(() => podeEditarCadastro.value && !esconderEdicaoCadastroParaChefe.value);
+
 const permissoesUI = computed<PermissoesSubprocesso>(() => ({
   ...normalizarPermissoesSubprocesso(subprocesso.value?.permissoes),
   podeEditarCadastro: podeEditarCadastro.value,

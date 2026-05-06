@@ -240,6 +240,38 @@ describe("MapaView somente leitura", () => {
         expect(wrapper.find('[data-testid="btn-mapa-acao-homologar-aceite"]').attributes('disabled')).toBeDefined();
     });
 
+    it("força modo somente leitura para ADMIN quando edição do mapa não estiver habilitada", async () => {
+        vi.mocked(useAcessoModule.useAcesso).mockReturnValue({
+            podeVisualizarImpacto: ref(false),
+            podeApresentarSugestoes: ref(false),
+            podeEditarMapa: ref(true),
+            podeDisponibilizarMapa: ref(false),
+            mostrarApresentarSugestoes: ref(false),
+            mostrarValidarMapa: ref(false),
+            mostrarDisponibilizarMapa: ref(false),
+            mostrarDevolverMapa: ref(false),
+            habilitarApresentarSugestoes: ref(false),
+            habilitarEditarMapa: ref(false),
+            habilitarDisponibilizarMapa: ref(false),
+            podeValidarMapa: ref(false),
+            habilitarValidarMapa: ref(false),
+            podeVerSugestoes: ref(false),
+            podeAnalisarMapa: ref(false),
+            habilitarDevolverMapa: ref(false),
+            acaoPrincipalMapa: ref(null),
+        } as any);
+
+        const wrapper = mountComponent({
+            perfil: {
+                perfilSelecionado: 'ADMIN',
+            },
+        });
+        await flushPromises();
+
+        expect((wrapper.vm as any).modoSomenteLeitura).toBe(true);
+        expect(wrapper.find('[data-testid="btn-abrir-criar-competencia"]').exists()).toBe(false);
+    });
+
     it("agrupa ações no botão Ações quando for ADMIN e mapa com sugestões", async () => {
         subprocessoStoreCacheMock.contextoEdicao.detalhes.situacao = 'MAPEAMENTO_MAPA_COM_SUGESTOES';
 
