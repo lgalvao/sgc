@@ -116,6 +116,7 @@ tasks.named<BootRun>("bootRun") {
 tasks.withType<Test> {
     ignoreFailures = false
     useJUnitPlatform()
+    maxHeapSize = "2g"
 
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
