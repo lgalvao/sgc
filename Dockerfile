@@ -4,7 +4,7 @@ WORKDIR /build
 
 # Copia arquivos de dependências primeiro para cachear
 COPY frontend/package.json frontend/package-lock.json ./ 
-RUN npm install
+RUN npm config set strict-ssl false && npm install
 
 # Copia o resto e gera o build
 COPY frontend/ ./ 
@@ -15,7 +15,7 @@ FROM docker.io/library/amazoncorretto:25 AS build-backend
 WORKDIR /build
 
 # Instala utilitários necessários para o gradlew (xargs)
-RUN yum install -y findutils
+RUN yum install -y --setopt=sslverify=false findutils
 
 # Copia o projeto inteiro
 COPY . . 

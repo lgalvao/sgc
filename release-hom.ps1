@@ -5,7 +5,7 @@ param(
 }
 else
 {
-    "podman"
+    "docker"
 } ),
     [string]$Registry = $( if ($env:REGISTRY)
 {
