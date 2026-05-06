@@ -50,22 +50,28 @@ class SubprocessoConsultaServiceTest {
     private ImpactoMapaService impactoMapaService;
     @Mock
     private SubprocessoValidacaoService validacaoService;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
 
-    @InjectMocks
     private SubprocessoConsultaService service;
 
     @BeforeEach
     void configurarDependenciasAdicionais() {
         AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioService);
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
-        ReflectionTestUtils.setField(service, "contextoConsultaService", contextoConsultaService);
-
         SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
-        ReflectionTestUtils.setField(service, "acessoService", acessoService);
-
         SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
                 usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
-        ReflectionTestUtils.setField(service, "visualizacaoService", visualizacaoService);
+
+        service = new SubprocessoConsultaService(
+                subprocessoRepo,
+                mapaManutencaoService,
+                movimentacaoRepo,
+                validacaoService,
+                contextoConsultaService,
+                acessoService,
+                visualizacaoService
+        );
     }
 
     @Test

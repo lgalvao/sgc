@@ -1355,11 +1355,6 @@ class ProcessoServiceTest {
                     .doesNotThrowAnyException();
         }
     }
-
-    private void mockarResponsaveisEfetivos() {
-        when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
-    }
-
     @Test
     @DisplayName("executarAcaoEmBloco deve lançar ErroAcessoNegado quando não houver permissão")
     void deveLancarErroAcessoNegado() {
@@ -1375,7 +1370,7 @@ class ProcessoServiceTest {
 
         when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(List.class), any(AcaoPermissao.class))).thenReturn(false);
 
-        assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
+        assertThatThrownBy(() -> processoService.executarAcaoEmBloco(codProcesso, req))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
 
@@ -1422,7 +1417,7 @@ class ProcessoServiceTest {
         when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-        ProcessoDetalheDto resultado = target.obterDetalhesCompleto(cod, true);
+        ProcessoDetalheDto resultado = processoService.obterDetalhesCompleto(cod, true);
 
         assertThat(resultado.getElegiveis()).hasSize(1);
         verify(consultaService, times(1)).listarEntidadesPorProcesso(cod);
@@ -1453,7 +1448,7 @@ class ProcessoServiceTest {
         SubprocessoValidacaoService.ResultadoValidacao v = SubprocessoValidacaoService.ResultadoValidacao.ofValido();
         when(validacaoService.validarSubprocessosParaFinalizacao(codigo)).thenReturn(v);
 
-        target.finalizar(codigo);
+        processoService.finalizar(codigo);
 
         verify(p).setSituacao(FINALIZADO);
         verify(servicoAlertas).criarAlertaAdmin(p, uni, "Processo finalizado: Desc");
@@ -1478,7 +1473,7 @@ class ProcessoServiceTest {
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-        assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
+        assertThatThrownBy(() -> processoService.executarAcaoEmBloco(codProcesso, req))
                 .isInstanceOf(ErroValidacao.class);
     }
 
@@ -1495,7 +1490,7 @@ class ProcessoServiceTest {
         when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
         when(unidadeService.buscarPorCodigo(unidadeCodigo)).thenReturn(new Unidade());
 
-        assertThatThrownBy(() -> target.enviarLembrete(codProcesso, unidadeCodigo))
+        assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, unidadeCodigo))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("sem data limite");
     }
@@ -1532,7 +1527,7 @@ class ProcessoServiceTest {
 
         List<Long> unidadeCods = List.of(10L);
         // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário nesta versão
-        assertThatThrownBy(() -> target.iniciar(cod, unidadeCods))
+        assertThatThrownBy(() -> processoService.iniciar(cod, unidadeCods))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("sem mapa vigente");
     }
@@ -1567,7 +1562,7 @@ class ProcessoServiceTest {
         mockarResponsaveisEfetivos();
 
         // when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario()); - desnecessário
-        target.iniciar(cod, List.of(10L)); // branch 419 (DIAGNOSTICO)
+        processoService.iniciar(cod, List.of(10L)); // branch 419 (DIAGNOSTICO)
         verify(subprocessoService).criarParaDiagnostico(any());
     }
 
@@ -1602,7 +1597,7 @@ class ProcessoServiceTest {
 
         List<Long> codigos = List.of(10L, 11L);
         // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário
-        assertThatThrownBy(() -> target.iniciar(cod, codigos))
+        assertThatThrownBy(() -> processoService.iniciar(cod, codigos))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");
     }
@@ -1626,7 +1621,7 @@ class ProcessoServiceTest {
         
         when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
-        target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
+        processoService.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
         verify(cadastroFluxoService).homologarCadastroEmBloco(anyList());
     }
 
@@ -1650,7 +1645,7 @@ class ProcessoServiceTest {
         when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
         when(emailModelosService.criarEmailLembretePrazo(any(), any(), any())).thenReturn("<html></html>");
 
-        target.enviarLembrete(1L, 10L);
+        processoService.enviarLembrete(1L, 10L);
 
         verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
         verify(notificacaoService).enfileirar(argThat(cmd ->
@@ -1670,7 +1665,7 @@ class ProcessoServiceTest {
         sp.setDataLimiteEtapa1(d1);
         sp.setDataLimiteEtapa2(null);
 
-        LocalDateTime res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "obterUltimaDataLimite", sp);
+        LocalDateTime res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "obterUltimaDataLimite", sp);
         assertThat(res).isEqualTo(d1);
     }
 
@@ -1701,7 +1696,7 @@ class ProcessoServiceTest {
         
         when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
-        target.executarAcaoEmBloco(codProc, req);
+        processoService.executarAcaoEmBloco(codProc, req);
 
         verify(cadastroFluxoService).aceitarCadastroEmBloco(List.of(100L));
         verify(transicaoService).aceitarValidacaoEmBloco(List.of(200L));
@@ -1716,20 +1711,20 @@ class ProcessoServiceTest {
         p.setCodigo(1L);
         when(processoRepo.listarPorCodigosComParticipantes(anyList())).thenReturn(List.of(p));
 
-        Page<Processo> result = target.listarIniciadosPorParticipantes(List.of(10L), PageRequest.of(0, 10));
+        Page<Processo> result = processoService.listarIniciadosPorParticipantes(List.of(10L), PageRequest.of(0, 10));
         assertThat(result).isNotEmpty();
     }
 
     @Test
     @DisplayName("validarDadosBasicosParticipante - deve lancar excecao quando nome ou sigla em branco")
     void validarDadosBasicosParticipante_Erro() {
-        UnidadeParticipanteDto dto = UnidadeParticipanteDto.builder().codUnidade(10L).nome("").sigla("S").build();
-        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto))
+        ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.builder().codUnidade(10L).nome("").sigla("S").build();
+        assertThatThrownBy(() -> invokeMethod(processoService, "validarDadosBasicosParticipante", 1L, dto))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Snapshot inconsistente");
 
-        UnidadeParticipanteDto dto2 = UnidadeParticipanteDto.builder().codUnidade(10L).nome("N").sigla("").build();
-        assertThatThrownBy(() -> invokeMethod(target, "validarDadosBasicosParticipante", 1L, dto2))
+        ProcessoDetalheDto.UnidadeParticipanteDto dto2 = ProcessoDetalheDto.UnidadeParticipanteDto.builder().codUnidade(10L).nome("N").sigla("").build();
+        assertThatThrownBy(() -> invokeMethod(processoService, "validarDadosBasicosParticipante", 1L, dto2))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Snapshot inconsistente");
     }
@@ -1765,7 +1760,7 @@ class ProcessoServiceTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, true))
+            assertThatThrownBy(() -> processoService.obterDetalhesCompleto(cod, true))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("sem data limite da etapa 1");
         }
@@ -1800,7 +1795,7 @@ class ProcessoServiceTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);
+            ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
             assertThat(res.getElegiveis()).isNotEmpty();
             assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(sp.getDataLimiteEtapa2());
         }
@@ -1836,7 +1831,7 @@ class ProcessoServiceTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, true);
+            ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
             assertThat(res.getElegiveis()).isNotEmpty();
             assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(d2);
         }
@@ -1874,7 +1869,7 @@ class ProcessoServiceTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, false);
+            ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, false);
             assertThat(res.getUnidades()).hasSize(1);
             assertThat(res.getUnidades().getFirst().getMapaCodigo()).isNull();
         }
@@ -1897,7 +1892,7 @@ class ProcessoServiceTest {
 
             when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
 
-            List<Long> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "buscarDescendentes", 1L);
+            List<Long> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "buscarDescendentes", 1L);
             assertThat(res).containsExactlyInAnyOrder(1L, 2L); // branch 357 (result.add(codFilho) == false)
         }
 
@@ -1908,7 +1903,7 @@ class ProcessoServiceTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(NAO_INICIADO);
 
-            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isFalse();
         }
 
@@ -1922,7 +1917,7 @@ class ProcessoServiceTest {
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
 
-            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isTrue();
         }
 
@@ -1936,7 +1931,7 @@ class ProcessoServiceTest {
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
 
-            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isTrue();
         }
 
@@ -1950,7 +1945,7 @@ class ProcessoServiceTest {
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
 
-            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isTrue();
         }
 
@@ -1964,7 +1959,7 @@ class ProcessoServiceTest {
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
 
-            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isTrue();
         }
 
@@ -1975,7 +1970,7 @@ class ProcessoServiceTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
 
-            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isFalse();
         }
 
@@ -1988,17 +1983,17 @@ class ProcessoServiceTest {
 
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
 
-            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            Boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isNotNull().isTrue();
         }
 
         @Test
         @DisplayName("isSituacaoCadastro - branches 577")
         void isSituacaoCadastro_Branches() {
-            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_CADASTRO_DISPONIBILIZADO)).isTrue();
-            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_DISPONIBILIZADA)).isTrue();
-            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_HOMOLOGADA)).isTrue();
-            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_MAPA_DISPONIBILIZADO)).isFalse();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isSituacaoCadastro", MAPEAMENTO_CADASTRO_DISPONIBILIZADO)).isTrue();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isSituacaoCadastro", REVISAO_CADASTRO_DISPONIBILIZADA)).isTrue();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isSituacaoCadastro", REVISAO_CADASTRO_HOMOLOGADA)).isTrue();
+            assertThat((Boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(processoService, "isSituacaoCadastro", MAPEAMENTO_MAPA_DISPONIBILIZADO)).isFalse();
         }
     }
 
