@@ -4,7 +4,7 @@ WORKDIR /build
 
 # Copia arquivos de dependências primeiro para cachear
 COPY frontend/package.json frontend/package-lock.json ./ 
-RUN npm ci
+RUN npm install
 
 # Copia o resto e gera o build
 COPY frontend/ ./ 
