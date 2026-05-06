@@ -1,5 +1,5 @@
-# Estágio 1: Build unificado (Backend + Frontend)
-FROM docker.io/library/gradle:jdk25-ubi AS build-env
+# Estágio base de build (toolchain + certificados)
+FROM docker.io/library/gradle:jdk25-ubi AS build-base
 USER root
 WORKDIR /build
 ARG FRONTEND_BUILD_MODE=production
@@ -20,20 +20,33 @@ RUN curl -k -fsSL https://rpm.nodesource.com/setup_20.x | bash - && \
     microdnf install -y nodejs findutils && \
     npm install -g pnpm@10.33.3
 
-# 3. Copia arquivos de configuração para cachear dependências do Gradle e do Node
+# Estágio de cache das dependências Java
+FROM build-base AS deps-java
+
 COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
 COPY gradle/ gradle/
 COPY backend/build.gradle.kts backend/
-COPY frontend/build.gradle.kts frontend/package.json frontend/package-lock.json frontend/pnpm-lock.yaml frontend/
 
-# Baixa as dependências do Gradle (backend e frontend) para criar cache na camada do Docker
-RUN gradle :backend:dependencies :frontend:install
+# Baixa dependências Java em camada separada para preservar cache quando só o frontend muda
+RUN gradle --no-daemon :backend:dependencies
+
+# Estágio de cache das dependências do frontend
+FROM deps-java AS deps-frontend
+
+COPY frontend/build.gradle.kts frontend/
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/
+
+# Instala dependências do frontend, preservando a orquestração oficial do Gradle
+RUN gradle --no-daemon :frontend:install
+
+# Estágio 1: Build unificado (Backend + Frontend)
+FROM deps-frontend AS build-env
 
 # 4. Copia o projeto inteiro
 COPY . . 
 
 # 5. Executa o build completo orquestrado pelo Gradle
-RUN gradle :backend:bootJar -x test
+RUN gradle --no-daemon :backend:bootJar -x test
 # Estágio 2: Extrator (prepara as camadas do Spring Boot)
 FROM docker.io/library/amazoncorretto:25 AS extrator
 WORKDIR /aplicacao

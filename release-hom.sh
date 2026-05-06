@@ -14,7 +14,7 @@ SEM_PUSH=false
 SEM_DEPLOY=false
 SEM_CACHE=false
 SEM_PULL=false
-TIMEOUT_SUBIDA_SEGUNDOS="${TIMEOUT_SUBIDA_SEGUNDOS:-120}"
+TIMEOUT_SUBIDA_SEGUNDOS="${TIMEOUT_SUBIDA_SEGUNDOS:-60}"
 ARQUIVO_JAR_DOCKER="sgc.jar"
 ARQUIVO_ENV=".env.hom"
 ARQUIVO_COMPOSE="compose.hom.yaml"
@@ -40,6 +40,8 @@ Opcoes:
   -h, --help                       Mostra esta ajuda
 EOF_USO
 }
+
+git pull
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
