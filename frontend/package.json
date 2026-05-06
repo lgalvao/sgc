@@ -2,6 +2,7 @@
   "name": "sgc",
   "private": true,
   "version": "1.0.4",
+  "packageManager": "pnpm@11.0.6",
   "type": "module",
   "scripts": {
     "dev": "vite",

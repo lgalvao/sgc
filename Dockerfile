@@ -2,6 +2,9 @@
 FROM docker.io/library/gradle:jdk25-ubi AS build-base
 USER root
 WORKDIR /build
+ARG TARGETARCH
+ARG NODE_VERSION=26.0.0
+ARG PNPM_VERSION=11.0.6
 ARG FRONTEND_BUILD_MODE=production
 ENV FRONTEND_BUILD_MODE=$FRONTEND_BUILD_MODE
 
@@ -15,10 +18,21 @@ RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
 # Configura certificados para o Node.js
 ENV NODE_EXTRA_CA_CERTS=/tmp/certs/cert-combinados.pem
 
-# 2. Instala dependências do SO: Node.js (via setup script) e utilitários
-RUN curl -k -fsSL https://rpm.nodesource.com/setup_20.x | bash - && \
-    microdnf install -y nodejs findutils && \
-    npm install -g pnpm@11.0.6
+# 2. Instala dependências do SO e o toolchain JavaScript de forma determinística
+RUN set -eux; \
+    microdnf install -y curl tar xz findutils; \
+    case "${TARGETARCH:-amd64}" in \
+      amd64) arquitetura_node='x64' ;; \
+      arm64) arquitetura_node='arm64' ;; \
+      *) echo "Arquitetura não suportada para Node.js: ${TARGETARCH:-desconhecida}" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz"; \
+    curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt"; \
+    grep " node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz\$" SHASUMS256.txt | sha256sum -c -; \
+    tar -xJf "node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz" -C /usr/local --strip-components=1 --no-same-owner; \
+    rm -f "node-v${NODE_VERSION}-linux-${arquitetura_node}.tar.xz" SHASUMS256.txt; \
+    corepack enable; \
+    corepack prepare "pnpm@${PNPM_VERSION}" --activate
 
 # Estágio de cache das dependências Java
 FROM build-base AS deps-java
