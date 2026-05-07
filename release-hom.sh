@@ -127,7 +127,6 @@ aguardar_subida() {
   local inicio agora limite status reiniciando codigo_saida logs
   inicio="$(date +%s)"
   limite=$((inicio + TIMEOUT_SUBIDA_SEGUNDOS))
-  echo "==> Monitorando subida do container por ate $TIMEOUT_SUBIDA_SEGUNDOS segundos"
 
   while true; do
     agora="$(date +%s)"
@@ -151,7 +150,7 @@ aguardar_subida() {
 
     logs="$("$CONTAINER_CLI" logs --tail 120 "$NOME_SISTEMA" 2>/dev/null || true)"
     if grep -q "Started Sgc" <<< "$logs"; then
-      echo "==> Aplicacao iniciada com sucesso"
+      echo "==> Aplicacao iniciada"
       return
     fi
 

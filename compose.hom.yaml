@@ -27,7 +27,7 @@ services:
     container_name: sgc-mailpit
     restart: unless-stopped
     ports:
-      - "${MAILPIT_WEB_PORT:-8025}:8025"
+      - "${MAILPIT_WEB_PORT:-8580}:8025"
     environment:
       TZ: America/Recife
 
