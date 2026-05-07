@@ -168,8 +168,8 @@ import {
   type UnidadeImportacao,
 } from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
-import {normalizarErro} from "@/utils/apiError";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -187,6 +187,7 @@ const {
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
+const {withFallback} = useErrorHandler();
 
 const resultadoImportacao = ref<AtividadeOperacaoResponse | null>(null);
 const erroImportacao = ref<string | null>(null);
@@ -233,7 +234,10 @@ watch(
     async (mostrar) => {
       if (mostrar) {
         resetModal();
-        processosParaImportacao.value = await processoService.buscarProcessosParaImportacao() ?? [];
+        processosParaImportacao.value = await withFallback(
+            () => processoService.buscarProcessosParaImportacao(),
+            [],
+        );
       }
     },
     {immediate: true},
@@ -291,11 +295,9 @@ function limparSelecaoAtividades() {
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   atividadesSelecionadas.value = [];
-  if (processo) {
-    unidadesParticipantes.value = await processoService.buscarUnidadesParaImportacao(processo.codigo);
-  } else {
-    unidadesParticipantes.value = [];
-  }
+  unidadesParticipantes.value = processo
+      ? await withFallback(() => processoService.buscarUnidadesParaImportacao(processo.codigo), [])
+      : [];
   unidadeSelecionada.value = null;
   unidadeSelecionadaId.value = null;
 }
@@ -304,12 +306,11 @@ async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {
   atividadesSelecionadas.value = [];
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
-    try {
-      const atividadesDaOutraUnidade = await subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso);
-      atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : [];
-    } catch {
-      atividadesParaImportar.value = [];
-    }
+    const atividadesDaOutraUnidade = await withFallback(
+        () => subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso),
+        [],
+    );
+    atividadesParaImportar.value = [...atividadesDaOutraUnidade];
   } else {
     atividadesParaImportar.value = [];
   }
@@ -332,17 +333,22 @@ async function importar() {
 
   const idsAtividades = atividadesSelecionadas.value.map((a) => a.codigo);
 
+  importando.value = true;
   try {
-    importando.value = true;
-    resultadoImportacao.value = await subprocessoService.importarAtividades(
-        props.codSubprocessoDestino,
-        unidadeSelecionada.value.codSubprocesso,
-        idsAtividades,
+    resultadoImportacao.value = await withFallback(
+        () => subprocessoService.importarAtividades(
+            props.codSubprocessoDestino!,
+            unidadeSelecionada.value!.codSubprocesso,
+            idsAtividades,
+        ),
+        null,
+        (erro) => {
+          erroImportacao.value = erro.mensagem;
+        },
     );
+    if (!resultadoImportacao.value) return;
     emit("importar", resultadoImportacao.value);
     fechar();
-  } catch (error_) {
-    erroImportacao.value = normalizarErro(error_).mensagem;
   } finally {
     importando.value = false;
   }
