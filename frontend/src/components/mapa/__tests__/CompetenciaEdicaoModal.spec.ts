@@ -54,6 +54,7 @@ describe('CompetenciaEdicaoModal.vue', () => {
                 props: {mostrar: true, atividades},
             });
 
+            await wrapper.find('[data-testid="inp-criar-competencia-descricao"]').setValue('Nova competência');
             await wrapper.find('[data-testid="btn-competencia-selecionar-todas-atividades"]').trigger('click');
             await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger('click');
 
