@@ -44,13 +44,20 @@
                 @verificar-caps-lock="verificarCapsLock"
             />
 
-            <LoginPerfilSelect
-                :mensagem-erro-perfil="mensagemErroPerfil"
-                :mostrar="selecionandoPerfil && perfisUnidadesDisponiveis.length > 1"
-                :par-selecionado="parSelecionado"
-                :perfis-unidades-options="perfisUnidadesOptions"
-                @update:par-selecionado="parSelecionado = $event"
-            />
+            <Transition name="login-autorizacao">
+              <div
+                  v-if="mostrarBlocoAutorizacao"
+                  class="login-autorizacao-bloco"
+              >
+                <LoginPerfilSelect
+                    :mensagem-erro-perfil="mensagemErroPerfil"
+                    :mostrar="true"
+                    :par-selecionado="parSelecionado"
+                    :perfis-unidades-options="perfisUnidadesOptions"
+                    @update:par-selecionado="parSelecionado = $event"
+                />
+              </div>
+            </Transition>
 
             <LoadingButton
                 :aria-label="TEXTOS.comum.BOTAO_ENTRAR"
@@ -115,6 +122,7 @@ const {
 } = useValidacaoFormulario();
 
 const selecionandoPerfil = computed(() => loginStep.value > 1);
+const mostrarBlocoAutorizacao = computed(() => selecionandoPerfil.value && perfisUnidadesDisponiveis.value.length > 1);
 const credenciaisPreenchidas = computed(() => Boolean(titulo.value && senha.value));
 const mensagemErroTitulo = computed(() => deveExibirErro(!titulo.value) ? TEXTOS.login.ERRO_CAMPO_TITULO : "");
 const mensagemErroSenha = computed(() => deveExibirErro(!senha.value) ? TEXTOS.login.ERRO_CAMPO_SENHA : "");
@@ -241,3 +249,34 @@ const performProfileSelection = async () => {
   }
 };
 </script>
+
+<style scoped>
+.login-autorizacao-bloco {
+  overflow: hidden;
+}
+
+.login-autorizacao-enter-active,
+.login-autorizacao-leave-active {
+  transition:
+      max-height 0.28s ease,
+      opacity 0.22s ease,
+      transform 0.22s ease,
+      margin-bottom 0.22s ease;
+}
+
+.login-autorizacao-enter-from,
+.login-autorizacao-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-0.35rem);
+  margin-bottom: 0;
+}
+
+.login-autorizacao-enter-to,
+.login-autorizacao-leave-from {
+  max-height: 14rem;
+  opacity: 1;
+  transform: translateY(0);
+  margin-bottom: 0;
+}
+</style>
