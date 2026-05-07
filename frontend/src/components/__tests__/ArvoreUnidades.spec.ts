@@ -248,6 +248,31 @@ describe("ArvoreUnidades.vue", () => {
         expect(emitted![emitted!.length - 1][0]).toEqual([101, 102]);
     });
 
+    it("deve limpar a seleção após marcar apenas o grupo visual de zonas eleitorais", async () => {
+        const unidades: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 101, sigla: "1ª Z.E.", nome: "1ª ZONA ELEITORAL", isElegivel: true, filhas: []},
+                    {codigo: 102, sigla: "2ª Z.E.", nome: "2ª ZONA ELEITORAL", isElegivel: true, filhas: []},
+                ],
+            }
+        ];
+        const wrapper = createWrapper({unidades, ocultarRaiz: true, modelValue: [], modoSelecao: true});
+        const grupo = (wrapper.vm as any).unidadesExibidas[0];
+
+        (wrapper.vm as any).toggle(grupo, true);
+        await wrapper.vm.$nextTick();
+
+        await wrapper.find('button[aria-label="Desmarcar todas as unidades"]').trigger("click");
+
+        const emitted = wrapper.emitted("update:modelValue");
+        expect(emitted).toBeTruthy();
+        expect(emitted![emitted!.length - 1][0]).toEqual([]);
+    });
+
     it("deve iniciar com as unidades recolhidas", () => {
         const wrapper = createWrapper();
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});

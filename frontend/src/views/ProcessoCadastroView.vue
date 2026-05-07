@@ -196,12 +196,28 @@ function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
   }
 }
 
+function removerUnidadesSemEquipe(unidadesArvore: Unidade[]): Unidade[] {
+  return unidadesArvore.flatMap((unidade) => {
+    const filhasFiltradas = removerUnidadesSemEquipe(unidade.filhas ?? []);
+
+    if (unidade.tipo === "SEM_EQUIPE") {
+      return filhasFiltradas;
+    }
+
+    return [{
+      ...unidade,
+      filhas: filhasFiltradas
+    }];
+  });
+}
+
 async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcesso?: number) {
   isLoadingUnidades.value = true;
   try {
     const unidadesMapeadas = await unidadeStore.garantirArvoreElegibilidade(tipoProcesso, codProcesso);
-    unidades.value = unidadesMapeadas;
-    sincronizarUnidadesSelecionadasElegiveis(unidadesMapeadas);
+    const unidadesSemSemEquipe = removerUnidadesSemEquipe(unidadesMapeadas);
+    unidades.value = unidadesSemSemEquipe;
+    sincronizarUnidadesSelecionadasElegiveis(unidadesSemSemEquipe);
   } catch (error) {
     logger.error("Erro ao buscar unidades:", error);
   } finally {

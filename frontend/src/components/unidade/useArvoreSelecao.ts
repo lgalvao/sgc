@@ -152,9 +152,7 @@ export function useArvoreSelecao(props: {
     watch(
         unidadesSelecionadasLocal,
         (newValue) => {
-            if (JSON.stringify(newValue) !== JSON.stringify(props.modelValue)) {
-                emit("update:modelValue", newValue);
-            }
+            emit("update:modelValue", newValue);
         },
         {deep: true}
     );

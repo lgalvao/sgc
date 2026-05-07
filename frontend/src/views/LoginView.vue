@@ -31,11 +31,13 @@
                 :caps-lock-ativado="capsLockAtivado"
                 :is-loading="isLoading"
                 :login-bloqueado="selecionandoPerfil"
+                :mostrar-acao-trocar-titulo-eleitoral="selecionandoPerfil"
                 :mensagem-erro-senha="mensagemErroSenha"
                 :mensagem-erro-titulo="mensagemErroTitulo"
                 :senha="senha"
                 :show-password="showPassword"
                 :titulo="titulo"
+                @trocar-titulo-eleitoral="trocarTituloEleitoral"
                 @toggle-senha="alternarVisibilidadeSenha"
                 @update:senha="senha = $event"
                 @update:titulo="titulo = $event"
@@ -143,6 +145,16 @@ const verificarCapsLock = (event: KeyboardEvent) => {
 
 function alternarVisibilidadeSenha() {
   showPassword.value = !showPassword.value;
+}
+
+function trocarTituloEleitoral() {
+  perfilStore.cancelarFluxoLogin();
+  loginStep.value = 1;
+  parSelecionado.value = null;
+  senha.value = "";
+  capsLockAtivado.value = false;
+  clear();
+  resetarValidacao();
 }
 
 const handleLogin = async () => {

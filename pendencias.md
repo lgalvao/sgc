@@ -1,10 +1,10 @@
 # Plano pra release
 
 ## Bugs
-Config de modo escura para nao-admin
-Na tela de criação de processo na árvore de unidades, problemas:
-  - Unidades sem equipe aparecendo travadas, devem sair (ex: ASAME e GP)
-  - Ao selecionar o grupo ZONAS ELEITORIAIS comportamento errado
+OK Na tela de criação de processo na árvore de unidades, problemas:
+OK Unidades sem equipe aparecendo travadas, devem sair (ex: ASAME e GP)
+OK Ao selecionar o grupo ZONAS ELEITORIAIS comportamento errado
+
 No login, depois do primeiro passo, fico preso e nao posso e nao posso mudar o usuario sem refresh
 Breadcrumbs
 Atualização de cache no background pode estar zerando mapa
@@ -12,6 +12,7 @@ Tela de preview de email, botões Cancel e OK errados
 Administradores carregamento
 
 ## Melhorias
+Config de modo escuro para nao-admin
 Na tela unidades, adicionar filtro por sigla
 Decidir sobre breadcrumbs ou botao Voltar
 Script sql nao esta gerando historico de analises

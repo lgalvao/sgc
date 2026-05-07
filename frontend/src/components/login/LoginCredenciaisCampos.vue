@@ -6,6 +6,7 @@ interface Props {
   titulo: string;
   senha: string;
   loginBloqueado: boolean;
+  mostrarAcaoTrocarTituloEleitoral: boolean;
   isLoading: boolean;
   showPassword: boolean;
   capsLockAtivado: boolean;
@@ -20,6 +21,7 @@ const emit = defineEmits<{
   (e: "update:senha", valor: string): void;
   (e: "toggle-senha"): void;
   (e: "verificar-caps-lock", event: KeyboardEvent): void;
+  (e: "trocar-titulo-eleitoral"): void;
 }>();
 
 function atualizarTitulo(valor: string | number | null) {
@@ -49,24 +51,40 @@ function atualizarSenha(valor: string | number | null) {
       />
       {{ TEXTOS.login.LABEL_USUARIO }} <span aria-hidden="true" class="text-danger">*</span>
     </template>
-    <!-- eslint-disable vuejs-accessibility/no-autofocus -->
-    <BFormInput
-        id="titulo"
-        :disabled="isLoading"
-        :model-value="titulo"
-        :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
-        :readonly="loginBloqueado"
-        :state="mensagemErroTitulo ? false : null"
-        aria-required="true"
-        autocomplete="username"
-        autofocus
-        data-testid="inp-login-usuario"
-        inputmode="numeric"
-        name="titulo"
-        type="text"
-        @update:model-value="atualizarTitulo"
-    />
-    <!-- eslint-enable vuejs-accessibility/no-autofocus -->
+    <BInputGroup>
+      <!-- eslint-disable vuejs-accessibility/no-autofocus -->
+      <BFormInput
+          id="titulo"
+          :disabled="isLoading"
+          :model-value="titulo"
+          :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
+          :readonly="loginBloqueado"
+          :state="mensagemErroTitulo ? false : null"
+          aria-required="true"
+          autocomplete="username"
+          autofocus
+          data-testid="inp-login-usuario"
+          inputmode="numeric"
+          name="titulo"
+          type="text"
+          @update:model-value="atualizarTitulo"
+      />
+      <!-- eslint-enable vuejs-accessibility/no-autofocus -->
+      <template #append>
+        <BButton
+            v-if="mostrarAcaoTrocarTituloEleitoral"
+            :aria-label="'Trocar usuário'"
+            :disabled="isLoading"
+            :title="'Trocar usuário'"
+            class="login-input-acao"
+            data-testid="btn-login-trocar-titulo-eleitoral"
+            variant="link"
+            @click="emit('trocar-titulo-eleitoral')"
+        >
+          <i aria-hidden="true" class="bi bi-arrow-repeat"/>
+        </BButton>
+      </template>
+    </BInputGroup>
     <BFormInvalidFeedback :state="mensagemErroTitulo ? false : null">
       {{ mensagemErroTitulo }}
     </BFormInvalidFeedback>
@@ -104,7 +122,7 @@ function atualizarSenha(valor: string | number | null) {
         <BButton
             :aria-label="showPassword ? TEXTOS.login.OCULTAR_SENHA : TEXTOS.login.MOSTRAR_SENHA"
             :disabled="isLoading"
-            class="text-secondary border-0"
+            class="login-input-acao"
             variant="link"
             @click="emit('toggle-senha')"
         >
@@ -133,3 +151,32 @@ function atualizarSenha(valor: string | number | null) {
     </BAlert>
   </BFormGroup>
 </template>
+
+<style scoped>
+.login-input-acao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  padding-inline: 0.75rem;
+  color: var(--bs-secondary-color);
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  text-decoration: none;
+}
+
+.login-input-acao:hover,
+.login-input-acao:focus-visible {
+  color: var(--bs-body-color);
+  background-color: var(--bs-secondary-bg);
+}
+
+.login-input-acao:disabled {
+  color: var(--bs-secondary-color);
+  background-color: var(--bs-tertiary-bg);
+  opacity: 1;
+}
+</style>

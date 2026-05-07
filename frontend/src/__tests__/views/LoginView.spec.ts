@@ -196,6 +196,37 @@ describe("LoginView.vue", () => {
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
     });
 
+    it("deve permitir trocar o título eleitoral no passo 2", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: true,
+            requerSelecaoPerfil: true,
+            perfisUnidades: MOCK_PERFIS,
+            sessao: null
+        });
+        perfilStore.cancelarFluxoLogin = vi.fn(() => {
+            perfilStore.perfisUnidades = [];
+        });
+        perfilStore.perfisUnidades = MOCK_PERFIS;
+
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
+        await wrapper.find('form').trigger('submit');
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-login-trocar-titulo-eleitoral"]').exists()).toBe(true);
+
+        await wrapper.find('[data-testid="btn-login-trocar-titulo-eleitoral"]').trigger('click');
+        await flushPromises();
+
+        expect(perfilStore.cancelarFluxoLogin).toHaveBeenCalled();
+        expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(false);
+        expect((wrapper.find('[data-testid="inp-login-senha"]').element as HTMLInputElement).value).toBe("");
+    });
+
     it("deve selecionar perfil e logar no passo 2", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();

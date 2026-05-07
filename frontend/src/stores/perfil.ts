@@ -123,6 +123,10 @@ export const usePerfilStore = defineStore("perfil", () => {
         finalizarTransicaoSessao();
     }
 
+    function cancelarFluxoLogin() {
+        perfisUnidades.value = [];
+    }
+
     async function logout() {
         iniciarTransicaoSessao();
         cancelarRequisicoesPendentes();
@@ -149,6 +153,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         unidadeAtualDetalhes,
         iniciarLogin,
         concluirLoginComPerfil,
+        cancelarFluxoLogin,
         logout,
     };
 });
