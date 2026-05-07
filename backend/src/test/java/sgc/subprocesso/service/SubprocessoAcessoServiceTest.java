@@ -2,6 +2,8 @@ package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.mapa.service.*;
@@ -9,9 +11,12 @@ import sgc.organizacao.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
+import java.util.function.Function;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoAcessoServiceTest {
@@ -200,6 +205,82 @@ class SubprocessoAcessoServiceTest {
         assertThat(dto.habilitarHomologarMapa()).isFalse();
     }
 
+    @ParameterizedTest
+    @EnumSource(SituacaoSubprocesso.class)
+    void deveDesabilitarEscritaQuandoForaDaUnidade(SituacaoSubprocesso situacao) {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(situacao);
+
+        for (Perfil perfil : Perfil.values()) {
+            PermissoesSubprocessoDto permissoes = acessoService.resolverPermissoes(
+                    createContexto(subprocesso, perfil, false, false, false, false));
+
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarEditarCadastro, "editar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDisponibilizarCadastro, "disponibilizar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDevolverCadastro, "devolver cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarAceitarCadastro, "aceitar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarHomologarCadastro, "homologar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarEditarMapa, "editar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDisponibilizarMapa, "disponibilizar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarValidarMapa, "validar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarApresentarSugestoes, "apresentar sugestões", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDevolverMapa, "devolver mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarAceitarMapa, "aceitar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarHomologarMapa, "homologar mapa", situacao, perfil);
+        }
+    }
+
+    @Test
+    void devePermitirEditarCadastroApenasParaChefeNaUnidadeEmRascunho() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        assertThat(resolverPermissoes(subprocesso, Perfil.CHEFE, true, true, false, false).habilitarEditarCadastro()).isTrue();
+        assertThat(resolverPermissoes(subprocesso, Perfil.GESTOR, true, true, false, false).habilitarEditarCadastro()).isFalse();
+        assertThat(resolverPermissoes(subprocesso, Perfil.ADMIN, true, true, false, false).habilitarEditarCadastro()).isFalse();
+    }
+
+    @Test
+    void devePermitirValidacaoDeMapaApenasParaChefe() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+
+        PermissoesSubprocessoDto permissoesChefe = acessoService.resolverPermissoes(
+                createContexto(subprocesso, Perfil.CHEFE, true, true, false, false));
+        PermissoesSubprocessoDto permissoesGestor = acessoService.resolverPermissoes(
+                createContexto(subprocesso, Perfil.GESTOR, true, true, false, false));
+
+        assertThat(permissoesChefe.habilitarValidarMapa()).isTrue();
+        assertThat(permissoesChefe.habilitarApresentarSugestoes()).isTrue();
+        assertThat(permissoesGestor.habilitarValidarMapa()).isFalse();
+        assertThat(permissoesGestor.habilitarApresentarSugestoes()).isFalse();
+    }
+
+    @Test
+    void deveDesabilitarEscritaEmProcessoFinalizadoMasPermitirComandosAdmin() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
+
+        PermissoesSubprocessoDto permissoes = acessoService.resolverPermissoes(
+                createContexto(subprocesso, Perfil.ADMIN, true, true, true, false));
+
+        assertThat(permissoes.podeAlterarDataLimite())
+                .as("a ação continua visível para admin mesmo com o processo finalizado")
+                .isTrue();
+        assertThat(permissoes.podeReabrirCadastro())
+                .as("a reabertura continua disponível em tese para admin mesmo com o processo finalizado")
+                .isTrue();
+        assertThat(permissoes.habilitarAlterarDataLimite())
+                .as("processo finalizado deve bloquear a execução imediata da ação")
+                .isFalse();
+        assertThat(permissoes.habilitarReabrirCadastro())
+                .as("processo finalizado deve bloquear a execução imediata da reabertura")
+                .isFalse();
+        assertThat(permissoes.habilitarEditarCadastro()).isFalse();
+        assertThat(permissoes.habilitarDisponibilizarMapa()).isFalse();
+        assertThat(permissoes.habilitarHomologarMapa()).isFalse();
+    }
+
     private SubprocessoConsultaService.ContextoConsultaSubprocesso createContexto(
             Subprocesso subprocesso, Perfil perfil, boolean mesmaUnidade, boolean isHierarquia,
             boolean processoFinalizado, boolean temMapaVigente) {
@@ -214,5 +295,23 @@ class SubprocessoAcessoServiceTest {
                 isHierarquia,
                 temMapaVigente
         );
+    }
+
+    private PermissoesSubprocessoDto resolverPermissoes(
+            Subprocesso subprocesso, Perfil perfil, boolean mesmaUnidade, boolean isHierarquia,
+            boolean processoFinalizado, boolean temMapaVigente) {
+        return acessoService.resolverPermissoes(createContexto(
+                subprocesso, perfil, mesmaUnidade, isHierarquia, processoFinalizado, temMapaVigente));
+    }
+
+    private void assertPermissaoEscritaDesabilitada(
+            PermissoesSubprocessoDto permissoes,
+            Function<PermissoesSubprocessoDto, Boolean> extrator,
+            String nomePermissao,
+            SituacaoSubprocesso situacao,
+            Perfil perfil) {
+        assertThat(extrator.apply(permissoes))
+                .as("%s %s %s", nomePermissao, situacao, perfil)
+                .isFalse();
     }
 }

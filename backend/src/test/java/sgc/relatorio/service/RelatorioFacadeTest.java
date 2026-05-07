@@ -347,6 +347,54 @@ class RelatorioFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve normalizar códigos duplicados antes de buscar mapas")
+    void deveNormalizarCodigosDuplicadosAntesDeBuscarMapas() {
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of());
+
+        relatorioService.obterRelatorioMapas(List.of(1L, 1L, 2L));
+
+        verify(unidadeService).buscarMapasPorUnidades(List.of(1L, 2L));
+    }
+
+    @Test
+    @DisplayName("Deve ignorar unidades sem mapa vigente ao montar relatório de mapas")
+    void deveIgnorarUnidadesSemMapaVigenteAoMontarRelatorioDeMapas() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(2L);
+        unidade.setSigla("U2");
+        unidade.setNome("Unidade 2");
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setUnidade(unidade);
+        subprocesso.setMapa(new Mapa());
+        subprocesso.getMapa().setCodigo(20L);
+        subprocesso.getMapa().setSubprocesso(subprocesso);
+
+        UnidadeMapa mapaNulo = UnidadeMapa.builder()
+                .unidadeCodigo(1L)
+                .mapaVigente(null)
+                .build();
+        UnidadeMapa mapaValido = UnidadeMapa.builder()
+                .unidadeCodigo(2L)
+                .mapaVigente(subprocesso.getMapa())
+                .build();
+
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of(mapaNulo, mapaValido));
+        when(mapaManutencaoService.competenciasCodMapa(20L)).thenReturn(List.of());
+
+        List<RelatorioMapaDto> resultado = relatorioService.obterRelatorioMapas(List.of(1L, 2L));
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado)
+                .singleElement()
+                .satisfies(relatorio -> {
+                    assertThat(relatorio.codigoUnidade()).isEqualTo(2L);
+                    assertThat(relatorio.siglaUnidade()).isEqualTo("U2");
+                    assertThat(relatorio.totalCompetencias()).isZero();
+                });
+    }
+
+    @Test
     @DisplayName("Deve ignorar seleção vazia no relatório de mapas")
     void deveIgnorarSelecaoVaziaNoRelatorioMapas() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);

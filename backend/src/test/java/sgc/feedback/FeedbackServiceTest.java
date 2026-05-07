@@ -162,6 +162,33 @@ class FeedbackServiceTest {
     }
 
     @Test
+    @DisplayName("deve registrar feedback mesmo quando falhar serialização dos metadados")
+    void deveRegistrarFeedbackComFalhaDeSerializacao() throws Exception {
+        configurarUsuarioMock();
+        ObjectMapper objectMapperComFalha = mock(ObjectMapper.class);
+        when(objectMapperComFalha.writeValueAsString(any())).thenThrow(new RuntimeException("falha serializacao"));
+        FeedbackService servicoComFalhaNaSerializacao = new FeedbackService(
+                repo, propriedades, usuarioFacade, objectMapperComFalha);
+
+        JsonNode metadados = objectMapper.createObjectNode().put("rotaCaminho", "/painel");
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug no painel", metadados);
+        when(repo.save(any())).thenAnswer(invocation -> {
+            FeedbackRegistro registro = invocation.getArgument(0);
+            registro.setId(UUID.randomUUID());
+            registro.setEnviadoEm(OffsetDateTime.now());
+            return registro;
+        });
+
+        servicoComFalhaNaSerializacao.registrar(payload, null);
+
+        verify(repo).save(argThat(registro ->
+                registro.getMetadataJson() == null
+                        && "/painel".equals(registro.getRota())
+                        && "12345".equals(registro.getUsuarioId())
+        ));
+    }
+
+    @Test
     @DisplayName("deve ignorar screenshot quando screenshot-dir não está configurado")
     void deveIgnorarScreenshotSemDirConfigurado() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
@@ -292,6 +319,21 @@ class FeedbackServiceTest {
         assertThatThrownBy(() -> service.obterScreenshot(id))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Screenshot não disponível");
+    }
+
+    @Test
+    @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando arquivo de screenshot não existe")
+    void deveLancarErroQuandoArquivoDeScreenshotNaoExiste() {
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot("arquivo-inexistente.webp")
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
     }
 
     @Test
