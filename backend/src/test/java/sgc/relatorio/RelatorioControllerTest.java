@@ -64,10 +64,11 @@ class RelatorioControllerTest {
     @DisplayName("GET /api/relatorios/andamento/{codProcesso}/exportar - Deve gerar PDF")
     @WithMockUser(roles = "ADMIN")
     void deveGerarRelatorioAndamentoPdf() throws Exception {
+        String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
         mockMvc.perform(get("/api/relatorios/andamento/1/exportar"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_andamento.pdf"));
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-andamento-%s.pdf".formatted(dataAtual)));
 
         verify(relatorioFacade).gerarRelatorioAndamento(eq(1L), any());
     }
@@ -76,10 +77,11 @@ class RelatorioControllerTest {
     @DisplayName("GET /api/relatorios/mapas/exportar - Deve gerar PDF")
     @WithMockUser(roles = "ADMIN")
     void deveGerarRelatorioMapasPdf() throws Exception {
+        String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
         mockMvc.perform(get("/api/relatorios/mapas/exportar").param("codUnidade", "2").param("codUnidade", "3"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_mapas.pdf"));
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-mapas-%s.pdf".formatted(dataAtual)));
 
         verify(relatorioFacade).gerarRelatorioMapas(eq(List.of(2L, 3L)), any());
     }

@@ -84,8 +84,7 @@ public class RelatorioFacade {
                     processo.getDescricao(),
                     dataGeracao,
                     processo.getTipo().name(),
-                    relatorios.size(),
-                    processo.getDataLimite()
+                    relatorios.size()
             ));
 
             adicionarCartoesAndamento(document, relatorios);
@@ -108,8 +107,7 @@ public class RelatorioFacade {
                     "Unidades selecionadas",
                     dataGeracao,
                     null,
-                    0,
-                    null
+                    0
             ));
 
             for (Subprocesso sp : subprocessos) {
@@ -254,10 +252,9 @@ public class RelatorioFacade {
         celulaTexto.addElement(criarParagrafo("%s: %s".formatted(cabecalho.rotuloSubtitulo(), cabecalho.subtitulo()), FONTE_TEXTO, 0f));
 
         if (cabecalho.tipoProcesso() != null) {
-            String subtituloDetalhe = "TIPO: %s | UNIDADES: %d | DATA LIMITE GERAL: %s".formatted(
+            String subtituloDetalhe = "TIPO: %s | UNIDADES: %d".formatted(
                     cabecalho.tipoProcesso(),
-                    cabecalho.quantidadeUnidades(),
-                    formatarData(cabecalho.dataLimiteGeral())
+                    cabecalho.quantidadeUnidades()
             );
             celulaTexto.addElement(criarParagrafo(subtituloDetalhe, FONTE_TEXTO_SUAVE, 0f));
         }
@@ -278,13 +275,11 @@ public class RelatorioFacade {
 
             PdfPCell cardCell = new PdfPCell();
             cardCell.setBorder(Rectangle.NO_BORDER);
-            cardCell.setBorderWidthLeft(4f);
-            cardCell.setBorderColorLeft(COR_SECUNDARIA);
             cardCell.setPaddingLeft(10f);
-            cardCell.setPaddingTop(5f);
+            cardCell.setPaddingTop(6f);
             cardCell.setPaddingBottom(10f);
 
-            Paragraph titulo = new Paragraph("▌ " + relatorio.siglaUnidade() + " - " + relatorio.nomeUnidade(), FONTE_SECAO);
+            Paragraph titulo = new Paragraph(relatorio.siglaUnidade() + " - " + relatorio.nomeUnidade(), FONTE_SECAO);
             titulo.setSpacingAfter(4f);
             cardCell.addElement(titulo);
 
@@ -297,18 +292,17 @@ public class RelatorioFacade {
             cardCell.addElement(linhaDiv);
             cardCell.addElement(new Paragraph(" ", new Font(Font.HELVETICA, 4)));
 
-            PdfPTable infoGeral = new PdfPTable(new float[]{2f, 1f});
+            PdfPTable infoGeral = new PdfPTable(new float[]{1.2f, 1.2f, 1.6f});
             infoGeral.setWidthPercentage(100f);
             infoGeral.addCell(criarCelulaRotuloValor("Situação:", formatarSituacaoPdf(relatorio.situacaoAtual())));
             infoGeral.addCell(criarCelulaRotuloValor("Localização:", relatorio.localizacao()));
+            infoGeral.addCell(criarCelulaRotuloValor("Última movimentação:", formatarDataHora(relatorio.dataUltimaMovimentacao())));
             cardCell.addElement(infoGeral);
-
-            Paragraph ultMov = criarParagrafoRotuloValor("Última movimentação:", formatarDataHora(relatorio.dataUltimaMovimentacao()));
-            ultMov.setSpacingAfter(10f);
-            cardCell.addElement(ultMov);
 
             PdfPTable etapas = new PdfPTable(new float[]{1f, 1f});
             etapas.setWidthPercentage(100f);
+            etapas.setSpacingBefore(8f);
+            etapas.setSpacingAfter(8f);
 
             PdfPCell celEtapa1 = new PdfPCell();
             celEtapa1.setBorder(Rectangle.NO_BORDER);
@@ -339,7 +333,6 @@ public class RelatorioFacade {
             etapas.addCell(celEtapa2);
 
             cardCell.addElement(etapas);
-            cardCell.addElement(new Paragraph(" ", new Font(Font.HELVETICA, 6)));
 
             cardCell.addElement(criarParagrafoRotuloValor("Titular:", relatorio.titular()));
             if (!relatorio.titular().equals(relatorio.responsavel())) {
@@ -433,8 +426,7 @@ public class RelatorioFacade {
             String subtitulo,
             LocalDateTime dataGeracao,
             @Nullable String tipoProcesso,
-            int quantidadeUnidades,
-            @Nullable LocalDateTime dataLimiteGeral
+            int quantidadeUnidades
     ) {
     }
 }

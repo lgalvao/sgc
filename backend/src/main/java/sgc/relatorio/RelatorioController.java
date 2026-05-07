@@ -9,6 +9,8 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
+import java.time.*;
+import java.time.format.*;
 import java.util.*;
 
 @RestController
@@ -17,6 +19,7 @@ import java.util.*;
 @Tag(name = "Relatórios", description = "Endpoints para geração de relatórios em PDF")
 @PreAuthorize("isAuthenticated()")
 public class RelatorioController {
+    private static final DateTimeFormatter FORMATADOR_DATA_ARQUIVO = DateTimeFormatter.ISO_LOCAL_DATE;
     private final RelatorioFacade relatorioService;
 
     @GetMapping("/andamento/{codProcesso}")
@@ -31,7 +34,7 @@ public class RelatorioController {
     @Operation(summary = "Gera relatório de andamento do processo (CDU-35)")
     public void gerarRelatorioAndamentoPdf(@PathVariable Long codProcesso, HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_andamento.pdf");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioAndamento()));
         relatorioService.gerarRelatorioAndamento(codProcesso, response.getOutputStream());
     }
 
@@ -41,7 +44,7 @@ public class RelatorioController {
     public void gerarRelatorioMapasPdf(@RequestParam(name = "codUnidade") List<Long> codigosUnidades,
                                        HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_mapas.pdf");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioMapas()));
         relatorioService.gerarRelatorioMapas(codigosUnidades, response.getOutputStream());
     }
 
@@ -50,5 +53,13 @@ public class RelatorioController {
     @Operation(summary = "Gera a visualização em JSON do relatório consolidado de mapas (CDU-36)")
     public ResponseEntity<List<RelatorioMapaDto>> obterRelatorioMapas(@RequestParam(name = "codUnidade") List<Long> codigosUnidades) {
         return ResponseEntity.ok(relatorioService.obterRelatorioMapas(codigosUnidades));
+    }
+
+    private String nomeArquivoRelatorioAndamento() {
+        return "sgc-rel-andamento-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
+    }
+
+    private String nomeArquivoRelatorioMapas() {
+        return "sgc-rel-mapas-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
     }
 }

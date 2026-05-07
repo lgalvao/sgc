@@ -1,4 +1,5 @@
 import apiClient from "@/axios-setup";
+import {obterHojeFormatado} from "@/utils/date";
 
 function baixarPdf(blob: Blob, nomeArquivo: string): void {
     const url = window.URL.createObjectURL(blob);
@@ -8,6 +9,10 @@ function baixarPdf(blob: Blob, nomeArquivo: string): void {
     document.body.appendChild(link);
     link.click();
     link.remove();
+}
+
+function nomearArquivoRelatorio(prefixo: string): string {
+    return `${prefixo}-${obterHojeFormatado()}.pdf`;
 }
 
 export interface RelatorioAndamento {
@@ -68,7 +73,7 @@ export const relatoriosService = {
         const response = await apiClient.get(`/relatorios/andamento/${codProcesso}/exportar`, {
             responseType: 'blob'
         });
-        baixarPdf(new Blob([response.data]), `relatorio-andamento-${codProcesso}.pdf`);
+        baixarPdf(new Blob([response.data]), nomearArquivoRelatorio("sgc-rel-andamento"));
     },
 
     async downloadRelatorioMapasPdf(codigosUnidades: number[]): Promise<void> {
@@ -78,6 +83,6 @@ export const relatoriosService = {
             },
             responseType: 'blob'
         });
-        baixarPdf(new Blob([response.data]), 'relatorio-mapas-vigentes.pdf');
+        baixarPdf(new Blob([response.data]), nomearArquivoRelatorio("sgc-rel-mapas"));
     }
 };

@@ -51,22 +51,6 @@ Para detalhes técnicos, consulte:
 * **Estado:** **Pinia** utilizando "Setup stores" (com `ref` e `computed`).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
 
-### Toolkit de Automação (sgc.js)
-
-O projeto possui uma CLI de automação centralizada que deve ser utilizada para diagnósticos, auditorias e tarefas de
-qualidade.
-
-* **Ponto de Entrada:** `node etc/scripts/sgc.js`
-* **Comandos Essenciais:**
-    * **`projeto doctor`**: Valida a saúde do ambiente (Node, Java, dependências, portas e conectividade).
-    * **`qa snapshot coletar`**: Orquestra toda a suíte de qualidade (testes, lint, cobertura).
-    * **`backend testes analisar`**: Identifica classes sem testes e lacunas de cobertura.
-    * **`codigo smells auditar`**: Detecta complexidade acidental e padrões desencorajados.
-    * **`projeto limpar`**: Remove artefatos transientes e relatórios antigos.
-
-**Regra:** Antes de realizar grandes refatorações ou após mudar de ambiente, execute o `projeto doctor` para garantir
-que o workspace está íntegro.
-
 ### Comandos e Testes
 
 * **Backend:** `./gradlew :backend:test` (JUnit 6 + Mockito + H2).

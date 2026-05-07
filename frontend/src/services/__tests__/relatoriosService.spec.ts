@@ -8,6 +8,10 @@ vi.mock("@/axios-setup", () => ({
     },
 }));
 
+vi.mock("@/utils/date", () => ({
+    obterHojeFormatado: vi.fn(() => "2026-05-07"),
+}));
+
 describe("relatoriosService", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -68,7 +72,7 @@ describe("relatoriosService", () => {
             responseType: "blob",
         });
         expect(document.createElement).toHaveBeenCalledWith("a");
-        expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "relatorio-mapas-vigentes.pdf");
+        expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "sgc-rel-mapas-2026-05-07.pdf");
         expect(mockLink.click).toHaveBeenCalled();
         expect(mockLink.remove).toHaveBeenCalled();
     });
@@ -91,6 +95,6 @@ describe("relatoriosService", () => {
         expect(apiClient.get).toHaveBeenCalledWith("/relatorios/andamento/123/exportar", {
             responseType: "blob",
         });
-        expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "relatorio-andamento-123.pdf");
+        expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "sgc-rel-andamento-2026-05-07.pdf");
     });
 });

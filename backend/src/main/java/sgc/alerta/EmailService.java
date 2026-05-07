@@ -72,7 +72,7 @@ public class EmailService {
     }
 
     private void registrarEmailMockado(String destinatario, String assunto, String corpo, boolean html) {
-        log.info(
+        log.debug(
                 "E-mail mockado e descartado. destinatario={}, assunto={}, formato={}",
                 destinatario,
                 assunto,
@@ -83,7 +83,7 @@ public class EmailService {
 
     private String montarAssuntoCompleto(String prefixo, String assuntoBase) {
         String assuntoNormalizado = normalizarAssunto(assuntoBase);
-        String prefixoEfetivo = (prefixo == null || prefixo.isBlank()) ? "[SGC]" : prefixo.trim();
+        String prefixoEfetivo = prefixo.isBlank() ? "[SGC]" : prefixo.trim();
         if (assuntoNormalizado.isBlank()) {
             return prefixoEfetivo;
         }
@@ -91,9 +91,6 @@ public class EmailService {
     }
 
     private String normalizarAssunto(String assunto) {
-        if (assunto == null) {
-            return "";
-        }
         return PADRAO_PREFIXO_ASSUNTO.matcher(assunto.trim()).replaceFirst("").trim();
     }
 }

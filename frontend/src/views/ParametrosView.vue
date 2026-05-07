@@ -80,6 +80,8 @@
           </template>
         </BFormGroup>
 
+        <hr class="my-4">
+
         <div class="d-flex justify-content-end">
           <LoadingButton
               :loading="salvando"
