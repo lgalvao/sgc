@@ -77,7 +77,7 @@ class SgcPermissionEvaluatorTest {
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
         sp.setUnidade(Unidade.builder().codigo(1L).build());
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(anyLong())).thenReturn(java.util.Optional.of(sp));
+        when(subprocessoRepo.buscarPorCodigoComMapa(anyLong())).thenReturn(java.util.Optional.of(sp));
 
         boolean result = evaluator.hasPermission(authentication, (java.io.Serializable) java.util.List.of(1L, 2L), "Subprocesso", "VISUALIZAR_SUBPROCESSO");
         assertThat(result).isTrue();

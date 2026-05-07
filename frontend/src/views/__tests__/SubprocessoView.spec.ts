@@ -260,7 +260,7 @@ describe('SubprocessoView.vue', () => {
         mountComponent();
         await flushPromises();
 
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true);
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false);
     });
 
     it('recarrega dados ao reativar a view em keepAlive', async () => {
@@ -274,7 +274,7 @@ describe('SubprocessoView.vue', () => {
             await hook.call(wrapper.vm);
         }
         await flushPromises();
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true);
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false);
     });
 
     it('não recarrega ao reativar quando o contexto atual ainda é válido', async () => {
