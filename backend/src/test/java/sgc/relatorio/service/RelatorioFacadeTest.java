@@ -384,6 +384,7 @@ class RelatorioFacadeTest {
 
         List<RelatorioMapaDto> resultado = relatorioService.obterRelatorioMapas(List.of(1L, 2L));
 
+        assertThat(resultado).hasSize(1);
         assertThat(resultado)
                 .singleElement()
                 .satisfies(relatorio -> {

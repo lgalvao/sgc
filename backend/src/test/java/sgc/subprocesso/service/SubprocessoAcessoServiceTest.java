@@ -11,6 +11,8 @@ import sgc.organizacao.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
+import java.util.function.Function;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -213,19 +215,18 @@ class SubprocessoAcessoServiceTest {
             PermissoesSubprocessoDto permissoes = acessoService.resolverPermissoes(
                     createContexto(subprocesso, perfil, false, false, false, false));
 
-            assertThat(permissoes)
-                    .satisfies(dto -> assertThat(dto.habilitarEditarCadastro()).as("editar cadastro %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarDisponibilizarCadastro()).as("disponibilizar cadastro %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarDevolverCadastro()).as("devolver cadastro %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarAceitarCadastro()).as("aceitar cadastro %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarHomologarCadastro()).as("homologar cadastro %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarEditarMapa()).as("editar mapa %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarDisponibilizarMapa()).as("disponibilizar mapa %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarValidarMapa()).as("validar mapa %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarApresentarSugestoes()).as("apresentar sugestoes %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarDevolverMapa()).as("devolver mapa %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarAceitarMapa()).as("aceitar mapa %s %s", situacao, perfil).isFalse())
-                    .satisfies(dto -> assertThat(dto.habilitarHomologarMapa()).as("homologar mapa %s %s", situacao, perfil).isFalse());
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarEditarCadastro, "editar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDisponibilizarCadastro, "disponibilizar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDevolverCadastro, "devolver cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarAceitarCadastro, "aceitar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarHomologarCadastro, "homologar cadastro", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarEditarMapa, "editar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDisponibilizarMapa, "disponibilizar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarValidarMapa, "validar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarApresentarSugestoes, "apresentar sugestoes", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDevolverMapa, "devolver mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarAceitarMapa, "aceitar mapa", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarHomologarMapa, "homologar mapa", situacao, perfil);
         }
     }
 
@@ -263,10 +264,18 @@ class SubprocessoAcessoServiceTest {
         PermissoesSubprocessoDto permissoes = acessoService.resolverPermissoes(
                 createContexto(subprocesso, Perfil.ADMIN, true, true, true, false));
 
-        assertThat(permissoes.podeAlterarDataLimite()).isTrue();
-        assertThat(permissoes.podeReabrirCadastro()).isTrue();
-        assertThat(permissoes.habilitarAlterarDataLimite()).isFalse();
-        assertThat(permissoes.habilitarReabrirCadastro()).isFalse();
+        assertThat(permissoes.podeAlterarDataLimite())
+                .as("a ação continua visível para admin mesmo com o processo finalizado")
+                .isTrue();
+        assertThat(permissoes.podeReabrirCadastro())
+                .as("a reabertura continua disponível em tese para admin mesmo com o processo finalizado")
+                .isTrue();
+        assertThat(permissoes.habilitarAlterarDataLimite())
+                .as("processo finalizado deve bloquear a execução imediata da ação")
+                .isFalse();
+        assertThat(permissoes.habilitarReabrirCadastro())
+                .as("processo finalizado deve bloquear a execução imediata da reabertura")
+                .isFalse();
         assertThat(permissoes.habilitarEditarCadastro()).isFalse();
         assertThat(permissoes.habilitarDisponibilizarMapa()).isFalse();
         assertThat(permissoes.habilitarHomologarMapa()).isFalse();
@@ -293,5 +302,16 @@ class SubprocessoAcessoServiceTest {
             boolean processoFinalizado, boolean temMapaVigente) {
         return acessoService.resolverPermissoes(createContexto(
                 subprocesso, perfil, mesmaUnidade, isHierarquia, processoFinalizado, temMapaVigente));
+    }
+
+    private void assertPermissaoEscritaDesabilitada(
+            PermissoesSubprocessoDto permissoes,
+            Function<PermissoesSubprocessoDto, Boolean> extrator,
+            String nomePermissao,
+            SituacaoSubprocesso situacao,
+            Perfil perfil) {
+        assertThat(extrator.apply(permissoes))
+                .as("%s %s %s", nomePermissao, situacao, perfil)
+                .isFalse();
     }
 }
