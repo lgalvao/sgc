@@ -347,7 +347,9 @@ export const TEXTOS = {
         importacao: {
             NENHUM_PROCESSO: "Nenhum processo disponível para importação.",
             NENHUMA_ATIVIDADE: "Nenhuma atividade encontrada para esta unidade/processo.",
-            SELECIONE_ATIVIDADE: "Selecione ao menos uma atividade para importar."
+            SELECIONE_ATIVIDADE: "Selecione ao menos uma atividade para importar.",
+            BOTAO_SELECIONAR_TODAS: "Todas",
+            BOTAO_LIMPAR_SELECAO: "Limpar"
         }
     },
     unidade: {

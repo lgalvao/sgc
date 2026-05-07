@@ -355,4 +355,35 @@ describe("ImportarAtividadesModal.vue", () => {
         await vm.importar();
         expect(subprocessoService.importarAtividades).not.toHaveBeenCalled();
     });
+
+    it("seleciona todas as atividades disponíveis", async () => {
+        const wrapper = createWrapper();
+        const vm = obterVm(wrapper) as any;
+        const mockAtividades: Atividade[] = [
+            {codigo: 50, descricao: "Ativ 50", conhecimentos: []},
+            {codigo: 51, descricao: "Ativ 51", conhecimentos: []},
+        ];
+
+        vm.atividadesParaImportar = mockAtividades;
+        vm.selecionarTodasAtividades();
+        await flushPromises();
+
+        expect(vm.atividadesSelecionadas).toEqual(mockAtividades);
+    });
+
+    it("limpa seleção de atividades com ação de desmarcar todas", async () => {
+        const wrapper = createWrapper();
+        const vm = obterVm(wrapper) as any;
+        const mockAtividades: Atividade[] = [
+            {codigo: 50, descricao: "Ativ 50", conhecimentos: []},
+            {codigo: 51, descricao: "Ativ 51", conhecimentos: []},
+        ];
+
+        vm.atividadesParaImportar = mockAtividades;
+        vm.atividadesSelecionadas = [...mockAtividades];
+        vm.limparSelecaoAtividades();
+        await flushPromises();
+
+        expect(vm.atividadesSelecionadas).toEqual([]);
+    });
 });

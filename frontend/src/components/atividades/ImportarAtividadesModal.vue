@@ -9,6 +9,7 @@
       texto-acao="Importar"
       texto-acao-carregando="Importando..."
       titulo="Importação de atividades"
+      variant-acao="success"
       @confirmar="importar"
       @fechar="fechar"
   >
@@ -96,6 +97,34 @@
           <div
               v-if="atividadesParaImportar.length"
           >
+            <div class="d-flex gap-2 mb-2">
+              <BButton
+                  aria-label="Selecionar todas as atividades"
+                  data-testid="btn-selecionar-todas-atividades"
+                  size="sm"
+                  variant="outline-secondary"
+                  @click="selecionarTodasAtividades"
+              >
+                <i
+                    aria-hidden="true"
+                    class="bi bi-check-all me-1"
+                />
+                {{ TEXTOS.atividades.importacao.BOTAO_SELECIONAR_TODAS }}
+              </BButton>
+              <BButton
+                  aria-label="Desmarcar todas as atividades"
+                  data-testid="btn-limpar-selecao-atividades"
+                  size="sm"
+                  variant="outline-secondary"
+                  @click="limparSelecaoAtividades"
+              >
+                <i
+                    aria-hidden="true"
+                    class="bi bi-x-lg me-1"
+                />
+                {{ TEXTOS.atividades.importacao.BOTAO_LIMPAR_SELECAO }}
+              </BButton>
+            </div>
             <div
                 v-for="ativ in atividadesParaImportar"
                 :key="ativ.codigo"
@@ -127,7 +156,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormCheckbox, BFormInvalidFeedback, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormCheckbox, BFormInvalidFeedback, BFormSelect, BFormSelectOption,} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import * as processoService from "@/services/processo";
@@ -249,6 +278,14 @@ function resetModal() {
 
 function limparErroImportacao() {
   erroImportacao.value = null;
+}
+
+function selecionarTodasAtividades() {
+  atividadesSelecionadas.value = [...atividadesParaImportar.value];
+}
+
+function limparSelecaoAtividades() {
+  atividadesSelecionadas.value = [];
 }
 
 async function selecionarProcesso(processo: ProcessoResumo | null) {
