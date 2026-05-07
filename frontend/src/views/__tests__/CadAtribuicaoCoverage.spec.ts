@@ -22,7 +22,7 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/services/unidadeService')>();
     return {
         ...actual,
-        buscarUnidadePorCodigo: vi.fn(),
+        buscarArvoreUnidade: vi.fn(),
     };
 });
 
@@ -57,13 +57,13 @@ function criarWrapper(props: { codUnidade: number } = {codUnidade: 1}) {
 describe('CadAtribuicao Coverage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(unidadeService.buscarUnidadePorCodigo).mockResolvedValue({
+        vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue({
             codigo: 1, sigla: 'TEST', nome: 'Unidade teste'
         } as any);
     });
 
     it('deve lidar com erro no onMounted', async () => {
-        vi.mocked(unidadeService.buscarUnidadePorCodigo).mockRejectedValueOnce(new Error('Erro ao buscar unidade'));
+        vi.mocked(unidadeService.buscarArvoreUnidade).mockRejectedValueOnce(new Error('Erro ao buscar unidade'));
         vi.spyOn(console, 'error').mockImplementation(() => {
         });
 

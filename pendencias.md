@@ -1,11 +1,6 @@
 # Plano pra release
 
 ## Bugs
-OK Na tela de criação de processo na árvore de unidades, problemas:
-OK Unidades sem equipe aparecendo travadas, devem sair (ex: ASAME e GP)
-OK Ao selecionar o grupo ZONAS ELEITORIAIS comportamento errado
-
-No login, depois do primeiro passo, fico preso e nao posso e nao posso mudar o usuario sem refresh
 Breadcrumbs
 Atualização de cache no background pode estar zerando mapa
 Tela de preview de email, botões Cancel e OK errados
@@ -37,3 +32,7 @@ Rodar script que cria o processo preenchido
 - Criar Documento inicial com dados de login da arvore da SEDOC
 - Subir na brainiac e pegar url
 
+OK Na tela de criação de processo na árvore de unidades, problemas:
+OK Unidades sem equipe aparecendo travadas, devem sair (ex: ASAME e GP)
+OK Ao selecionar o grupo ZONAS ELEITORIAIS comportamento errado
+OK No login, depois do primeiro passo, fico preso e nao posso e nao posso mudar o usuario sem refresh

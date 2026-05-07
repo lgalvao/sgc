@@ -35,7 +35,7 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/services/unidadeService')>();
     return {
         ...actual,
-        buscarUnidadePorCodigo: mockBuscarUnidade,
+        buscarArvoreUnidade: mockBuscarUnidade,
         buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
             possuiViolacoes: false,
             resumo: '',
@@ -74,26 +74,39 @@ describe('CadAtribuicao.vue', () => {
         return mount(CadAtribuicao, {
             ...getCommonMountOptions(
                 {
-                    unidades: {
-                        unidadeSelecionada: mockUnidade
+                    unidade: {
+                        cacheUnidades: new Map()
                     }
                 },
                 {
                     LayoutPadrao: {template: '<div><slot /></div>'},
+                    PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina"></div>'},
                     BContainer: {template: '<div><slot /></div>'},
                     BForm: {template: '<form @submit.prevent="$emit(\'submit\', { preventDefault: () => {} })"><slot /></form>'},
                     BFormInput: {
-                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+                        template: '<input v-bind="$attrs" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                         props: ['modelValue']
                     },
                     BListGroup: {template: '<div><slot /></div>'},
                     BListGroupItem: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
                     BFormTextarea: {
-                        template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
+                        template: '<textarea v-bind="$attrs" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
                         props: ['modelValue']
                     },
-                    BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+                    BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BAlert: {template: '<div role="alert"><slot /></div>'},
+                    InputData: {
+                        props: ['modelValue'],
+                        emits: ['update:modelValue'],
+                        template: '<input v-bind="$attrs" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+                    },
+                    BuscadorUsuarios: {
+                        props: ['selecionado', 'termo'],
+                        emits: ['update:selecionado', 'update:termo'],
+                        template: '<input v-bind="$attrs" :value="termo" @input="$emit(\'update:termo\', $event.target.value)" />'
+                    },
+                    LoadingButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                 },
                 {stubActions: false} // Permite que as stores chamem os serviços mockados
             ),

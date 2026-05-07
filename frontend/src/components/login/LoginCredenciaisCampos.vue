@@ -6,7 +6,7 @@ interface Props {
   titulo: string;
   senha: string;
   loginBloqueado: boolean;
-  mostrarAcaoTrocarTituloEleitoral: boolean;
+  mostrarAcaoTrocarTituloEleitoral?: boolean;
   isLoading: boolean;
   showPassword: boolean;
   capsLockAtivado: boolean;
@@ -14,7 +14,9 @@ interface Props {
   mensagemErroSenha: string;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  mostrarAcaoTrocarTituloEleitoral: false
+});
 
 const emit = defineEmits<{
   (e: "update:titulo", valor: string): void;
