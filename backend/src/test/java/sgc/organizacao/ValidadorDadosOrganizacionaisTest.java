@@ -196,6 +196,7 @@ class ValidadorDadosOrganizacionaisTest {
         
         Map<String, Object> m2 = Map.of("TEST", "VAL");
         assertEquals("VAL", org.springframework.test.util.ReflectionTestUtils.invokeMethod(validador, "lerString", m2, "test"));
+        assertEquals("VAL", org.springframework.test.util.ReflectionTestUtils.invokeMethod(validador, "lerString", m2, "TEST"));
         
         assertNull(org.springframework.test.util.ReflectionTestUtils.invokeMethod(validador, "lerString", Map.of(), "missing"));
     }
