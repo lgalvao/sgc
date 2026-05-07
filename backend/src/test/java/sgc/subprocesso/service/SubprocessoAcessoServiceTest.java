@@ -2,6 +2,8 @@ package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.mapa.service.*;
@@ -12,6 +14,7 @@ import sgc.subprocesso.model.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoAcessoServiceTest {
@@ -198,6 +201,78 @@ class SubprocessoAcessoServiceTest {
 
         assertThat(dto.podeHomologarMapa()).isTrue();
         assertThat(dto.habilitarHomologarMapa()).isFalse();
+    }
+
+    @ParameterizedTest
+    @EnumSource(SituacaoSubprocesso.class)
+    void shouldNuncaHabilitarEscritaForaDaUnidade(SituacaoSubprocesso situacao) {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(situacao);
+
+        for (Perfil perfil : Perfil.values()) {
+            PermissoesSubprocessoDto permissoes = acessoService.resolverPermissoes(
+                    createContexto(subprocesso, perfil, false, false, false, false));
+
+            assertThat(permissoes)
+                    .satisfies(dto -> assertThat(dto.habilitarEditarCadastro()).as("editar cadastro %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarDisponibilizarCadastro()).as("disponibilizar cadastro %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarDevolverCadastro()).as("devolver cadastro %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarAceitarCadastro()).as("aceitar cadastro %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarHomologarCadastro()).as("homologar cadastro %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarEditarMapa()).as("editar mapa %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarDisponibilizarMapa()).as("disponibilizar mapa %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarValidarMapa()).as("validar mapa %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarApresentarSugestoes()).as("apresentar sugestoes %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarDevolverMapa()).as("devolver mapa %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarAceitarMapa()).as("aceitar mapa %s %s", situacao, perfil).isFalse())
+                    .satisfies(dto -> assertThat(dto.habilitarHomologarMapa()).as("homologar mapa %s %s", situacao, perfil).isFalse());
+        }
+    }
+
+    @Test
+    void shouldPermitirEditarCadastroApenasParaChefeNaUnidadeEmRascunho() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        assertThat(acessoService.resolverPermissoes(createContexto(subprocesso, Perfil.CHEFE, true, true, false, false))
+                .habilitarEditarCadastro()).isTrue();
+        assertThat(acessoService.resolverPermissoes(createContexto(subprocesso, Perfil.GESTOR, true, true, false, false))
+                .habilitarEditarCadastro()).isFalse();
+        assertThat(acessoService.resolverPermissoes(createContexto(subprocesso, Perfil.ADMIN, true, true, false, false))
+                .habilitarEditarCadastro()).isFalse();
+    }
+
+    @Test
+    void shouldPermitirValidacaoDeMapaApenasParaChefe() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+
+        PermissoesSubprocessoDto permissoesChefe = acessoService.resolverPermissoes(
+                createContexto(subprocesso, Perfil.CHEFE, true, true, false, false));
+        PermissoesSubprocessoDto permissoesGestor = acessoService.resolverPermissoes(
+                createContexto(subprocesso, Perfil.GESTOR, true, true, false, false));
+
+        assertThat(permissoesChefe.habilitarValidarMapa()).isTrue();
+        assertThat(permissoesChefe.habilitarApresentarSugestoes()).isTrue();
+        assertThat(permissoesGestor.habilitarValidarMapa()).isFalse();
+        assertThat(permissoesGestor.habilitarApresentarSugestoes()).isFalse();
+    }
+
+    @Test
+    void shouldManterComandosAdministrativosDisponiveisMasDesabilitarEscritaQuandoProcessoFinalizado() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
+
+        PermissoesSubprocessoDto permissoes = acessoService.resolverPermissoes(
+                createContexto(subprocesso, Perfil.ADMIN, true, true, true, false));
+
+        assertThat(permissoes.podeAlterarDataLimite()).isTrue();
+        assertThat(permissoes.podeReabrirCadastro()).isTrue();
+        assertThat(permissoes.habilitarAlterarDataLimite()).isFalse();
+        assertThat(permissoes.habilitarReabrirCadastro()).isFalse();
+        assertThat(permissoes.habilitarEditarCadastro()).isFalse();
+        assertThat(permissoes.habilitarDisponibilizarMapa()).isFalse();
+        assertThat(permissoes.habilitarHomologarMapa()).isFalse();
     }
 
     private SubprocessoConsultaService.ContextoConsultaSubprocesso createContexto(
