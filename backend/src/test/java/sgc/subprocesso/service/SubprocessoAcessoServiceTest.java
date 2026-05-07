@@ -234,12 +234,9 @@ class SubprocessoAcessoServiceTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        assertThat(acessoService.resolverPermissoes(createContexto(subprocesso, Perfil.CHEFE, true, true, false, false))
-                .habilitarEditarCadastro()).isTrue();
-        assertThat(acessoService.resolverPermissoes(createContexto(subprocesso, Perfil.GESTOR, true, true, false, false))
-                .habilitarEditarCadastro()).isFalse();
-        assertThat(acessoService.resolverPermissoes(createContexto(subprocesso, Perfil.ADMIN, true, true, false, false))
-                .habilitarEditarCadastro()).isFalse();
+        assertThat(resolverPermissoes(subprocesso, Perfil.CHEFE, true, true, false, false).habilitarEditarCadastro()).isTrue();
+        assertThat(resolverPermissoes(subprocesso, Perfil.GESTOR, true, true, false, false).habilitarEditarCadastro()).isFalse();
+        assertThat(resolverPermissoes(subprocesso, Perfil.ADMIN, true, true, false, false).habilitarEditarCadastro()).isFalse();
     }
 
     @Test
@@ -289,5 +286,12 @@ class SubprocessoAcessoServiceTest {
                 isHierarquia,
                 temMapaVigente
         );
+    }
+
+    private PermissoesSubprocessoDto resolverPermissoes(
+            Subprocesso subprocesso, Perfil perfil, boolean mesmaUnidade, boolean isHierarquia,
+            boolean processoFinalizado, boolean temMapaVigente) {
+        return acessoService.resolverPermissoes(createContexto(
+                subprocesso, perfil, mesmaUnidade, isHierarquia, processoFinalizado, temMapaVigente));
     }
 }

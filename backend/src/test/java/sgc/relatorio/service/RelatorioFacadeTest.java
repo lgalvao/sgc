@@ -348,7 +348,7 @@ class RelatorioFacadeTest {
 
     @Test
     @DisplayName("Deve normalizar códigos duplicados e ignorar unidades sem mapa vigente")
-    void deveNormalizarCodigosDuplicadosEIgnorarMapasNulos() {
+    void deveNormalizarCodigosDuplicadosEIgnorarUnidadesSemMapaVigente() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(2L);
         unidade.setSigla("U2");

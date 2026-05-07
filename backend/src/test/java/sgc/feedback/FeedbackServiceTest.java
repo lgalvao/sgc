@@ -167,7 +167,8 @@ class FeedbackServiceTest {
         configurarUsuarioMock();
         ObjectMapper objectMapperComFalha = mock(ObjectMapper.class);
         when(objectMapperComFalha.writeValueAsString(any())).thenThrow(new RuntimeException("falha serializacao"));
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapperComFalha);
+        FeedbackService servicoComFalhaNaSerializacao = new FeedbackService(
+                repo, propriedades, usuarioFacade, objectMapperComFalha);
 
         JsonNode metadados = objectMapper.createObjectNode().put("rotaCaminho", "/painel");
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug no painel", metadados);
@@ -178,7 +179,7 @@ class FeedbackServiceTest {
             return registro;
         });
 
-        service.registrar(payload, null);
+        servicoComFalhaNaSerializacao.registrar(payload, null);
 
         verify(repo).save(argThat(registro ->
                 registro.getMetadataJson() == null
