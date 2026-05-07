@@ -25,6 +25,9 @@ public class LocalizacaoSubprocessoService {
         if (subprocesso.getCodigo() == null) {
             return unidadeBase;
         }
+        if (subprocesso.getSituacao() == NAO_INICIADO) {
+            return unidadeBase;
+        }
 
         return movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(subprocesso.getCodigo(), PRIMEIRO_RESULTADO)
                 .stream()

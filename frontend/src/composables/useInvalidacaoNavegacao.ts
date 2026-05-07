@@ -27,7 +27,7 @@ export function useInvalidacaoNavegacao() {
         mapasStore.invalidar();
     }
 
-    function invalidarCachesSubprocesso(opcoes?: { incluirPainel?: boolean; incluirProcesso?: boolean }): void {
+    function invalidarCachesSubprocesso(opcoes?: { incluirPainel?: boolean; incluirProcesso?: boolean; incluirMapas?: boolean }): void {
         if (opcoes?.incluirPainel ?? false) {
             painelStore.invalidar();
         }
@@ -35,7 +35,9 @@ export function useInvalidacaoNavegacao() {
             processoStore.invalidar();
         }
         subprocessoStore.invalidar();
-        mapasStore.invalidar();
+        if (opcoes?.incluirMapas ?? true) {
+            mapasStore.invalidar();
+        }
     }
 
     return {

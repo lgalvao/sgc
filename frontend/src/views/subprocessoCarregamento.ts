@@ -15,7 +15,6 @@ type DependenciasSubprocessoCarregamento = {
         limpar: boolean,
     ) => Promise<ContextoEdicaoPorProcesso>;
     dadosEdicaoValidos: (codigoSubprocesso: number) => boolean;
-    invalidarMapa: () => void;
     exibirToastPendente: () => void;
 };
 
@@ -23,13 +22,12 @@ export function useSubprocessoCarregamento({
                                                codProcesso,
                                                siglaUnidade,
                                                codSubprocesso,
-                                               erroIntegracaoContexto,
-                                               garantirContextoEdicao,
-                                               garantirContextoEdicaoPorProcessoEUnidade,
-                                               dadosEdicaoValidos,
-                                               invalidarMapa,
-                                               exibirToastPendente,
-                                           }: DependenciasSubprocessoCarregamento) {
+                                                erroIntegracaoContexto,
+                                                garantirContextoEdicao,
+                                                garantirContextoEdicaoPorProcessoEUnidade,
+                                                dadosEdicaoValidos,
+                                                exibirToastPendente,
+                                            }: DependenciasSubprocessoCarregamento) {
     const codigoSubprocesso = ref<number | null>(null);
     const erroNaoEncontrado = ref(false);
     const carregamentoInicialConcluido = ref(false);
@@ -60,7 +58,6 @@ export function useSubprocessoCarregamento({
         const codigo = codigoSubprocesso.value;
         if (!codigo) return;
 
-        invalidarMapa();
         await garantirContextoEdicao(codigo, true);
     }
 

@@ -13,6 +13,7 @@ interface WorkflowOptions {
     redirecionarParaPainel?: boolean;
     invalidarCaches?: {
         incluirPainel?: boolean;
+        incluirMapas?: boolean;
     };
     redirecionarPara?: import("vue-router").RouteLocationRaw;
     recarregarContexto?: {
@@ -81,7 +82,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true}
+                invalidarCaches: {incluirPainel: true, incluirMapas: false}
             }
         );
     }
@@ -92,7 +93,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true}
+                invalidarCaches: {incluirPainel: true, incluirMapas: false}
             }
         );
     }
@@ -121,7 +122,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.DEVOLUCAO_REALIZADA,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true}
+                invalidarCaches: {incluirPainel: true, incluirMapas: false}
             }
         );
     }
@@ -132,7 +133,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.DEVOLUCAO_REALIZADA,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true}
+                invalidarCaches: {incluirPainel: true, incluirMapas: false}
             }
         );
     }
@@ -145,7 +146,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true}
+                invalidarCaches: {incluirPainel: true, incluirMapas: false}
             }
         );
     }
@@ -158,7 +159,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true}
+                invalidarCaches: {incluirPainel: true, incluirMapas: false}
             }
         );
     }
@@ -175,7 +176,7 @@ export function useFluxoSubprocesso() {
                 mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA,
                 redirecionarParaPainel,
                 redirecionarPara: options?.redirecionarPara,
-                invalidarCaches: redirecionarParaPainel ? {incluirPainel: true} : {}
+                invalidarCaches: redirecionarParaPainel ? {incluirPainel: true, incluirMapas: false} : {}
             }
         );
     }
@@ -192,7 +193,7 @@ export function useFluxoSubprocesso() {
                 mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA,
                 redirecionarParaPainel,
                 redirecionarPara: options?.redirecionarPara,
-                invalidarCaches: redirecionarParaPainel ? {incluirPainel: true} : {}
+                invalidarCaches: redirecionarParaPainel ? {incluirPainel: true, incluirMapas: false} : {}
             }
         );
     }

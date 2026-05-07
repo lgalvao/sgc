@@ -108,7 +108,6 @@ import {analisarData, formatarDataBR} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useMapasStore} from "@/stores/mapas";
 import {useToastStore} from "@/stores/toast";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useSubprocessoAcoesAdministrativas} from "@/views/subprocessoAcoesAdministrativas";
@@ -131,7 +130,6 @@ function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
 }
 
 const subprocessoStore = useSubprocessoStore();
-const mapasStore = useMapasStore();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
@@ -155,7 +153,6 @@ const {
   garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
   garantirContextoEdicaoPorProcessoEUnidade: subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade,
   dadosEdicaoValidos: subprocessoStore.dadosEdicaoValidos,
-  invalidarMapa: mapasStore.invalidar,
   exibirToastPendente,
 });
 

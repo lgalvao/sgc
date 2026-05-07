@@ -35,18 +35,21 @@ describe("useInvalidacaoNavegacao", () => {
         const painel = usePainelStore();
         const processo = useProcessoStore();
         const subprocesso = useSubprocessoStore();
+        const mapas = useMapasStore();
 
         vi.spyOn(painel, 'invalidar');
         vi.spyOn(processo, 'invalidar');
         vi.spyOn(subprocesso, 'invalidar');
+        vi.spyOn(mapas, 'invalidar');
 
         const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 
-        invalidarCachesSubprocesso({incluirPainel: true, incluirProcesso: false});
+        invalidarCachesSubprocesso({incluirPainel: true, incluirProcesso: false, incluirMapas: false});
 
         expect(painel.invalidar).toHaveBeenCalled();
         expect(processo.invalidar).not.toHaveBeenCalled();
         expect(subprocesso.invalidar).toHaveBeenCalled();
+        expect(mapas.invalidar).not.toHaveBeenCalled();
     });
 
     it("deve limpar estado do subprocesso atual", () => {

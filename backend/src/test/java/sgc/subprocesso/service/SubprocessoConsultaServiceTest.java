@@ -605,6 +605,7 @@ class SubprocessoConsultaServiceTest {
                 u2.setCodigo(2L);
                 Subprocesso sp = criarSubprocessoComMapa(100L);
                 sp.setUnidade(u1);
+                sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(100L), any()))
                         .thenReturn(List.of(u2));
 
@@ -626,8 +627,6 @@ class SubprocessoConsultaServiceTest {
                 Unidade u = new Unidade();
                 Subprocesso sp = criarSubprocessoComMapa(1L);
                 sp.setUnidade(u);
-                when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
-                        .thenReturn(List.of());
                 assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
             }
 
@@ -637,8 +636,6 @@ class SubprocessoConsultaServiceTest {
                 Unidade u = new Unidade();
                 Subprocesso sp = criarSubprocessoComMapa(2L);
                 sp.setUnidade(u);
-                when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(2L), any()))
-                        .thenReturn(List.of());
                 assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
             }
         }
@@ -1236,13 +1233,13 @@ class SubprocessoConsultaServiceTest {
                 assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
 
                 sp.setCodigo(1L);
+                sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 Unidade dest = new Unidade();
                 when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
                         .thenReturn(List.of(dest));
                 assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
 
-                when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any()))
-                        .thenReturn(List.of());
+                sp.setSituacaoForcada(NAO_INICIADO);
                 assertThat(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
             }
 
