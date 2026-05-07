@@ -190,7 +190,7 @@ class ValidadorDadosOrganizacionaisTest {
 
     @Test
     @DisplayName("lerString - deve ler colunas em caixa baixa e em caixa alta")
-    void lerString_ColunasEmCaixasSuportadas() {
+    void lerString_DeveLerColunasEmDiferentesCaixas() {
         Map<String, Object> m1 = Map.of("test", "val");
         assertEquals("val", org.springframework.test.util.ReflectionTestUtils.invokeMethod(validador, "lerString", m1, "test"));
         
