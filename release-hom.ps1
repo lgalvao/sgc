@@ -147,8 +147,6 @@ function Wait-Subida
 {
     $Inicio = Get-Date
     $Limite = $Inicio.AddSeconds($TimeoutSubidaSegundos)
-    Write-Host "==> Monitorando subida do container por ate $TimeoutSubidaSegundos segundos"
-
     while ((Get-Date) -lt $Limite)
     {
         $Status = Get-ValorContainer "{{.State.Status}}"
