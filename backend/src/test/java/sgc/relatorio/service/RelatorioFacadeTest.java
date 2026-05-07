@@ -379,7 +379,7 @@ class RelatorioFacadeTest {
                 .satisfies(relatorio -> {
                     assertThat(relatorio.codigoUnidade()).isEqualTo(2L);
                     assertThat(relatorio.siglaUnidade()).isEqualTo("U2");
-                    assertThat(relatorio.quantidadeCompetencias()).isZero();
+                    assertThat(relatorio.totalCompetencias()).isZero();
                 });
         verify(unidadeService).buscarMapasPorUnidades(List.of(1L, 2L));
     }
