@@ -31,12 +31,14 @@ vi.mock('@/services/usuarioService', () => ({
 }));
 
 function criarWrapper(props: { codUnidade: number } = {codUnidade: 1}) {
+    const common = getCommonMountOptions({}, {}, {stubActions: false});
     return mount(CadAtribuicao, {
-        ...getCommonMountOptions(),
+        ...common,
         props,
         global: {
-            plugins: [],
+            ...common.global,
             stubs: {
+                ...(common.global?.stubs ?? {}),
                 LayoutPadrao: true,
                 BContainer: true,
                 BCard: true,
