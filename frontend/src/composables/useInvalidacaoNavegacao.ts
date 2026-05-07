@@ -27,7 +27,12 @@ export function useInvalidacaoNavegacao() {
         mapasStore.invalidar();
     }
 
-    function invalidarCachesSubprocesso(opcoes?: { incluirPainel?: boolean; incluirProcesso?: boolean; incluirMapas?: boolean }): void {
+    function invalidarCachesSubprocesso(opcoes?: {
+        incluirPainel?: boolean;
+        incluirProcesso?: boolean;
+        incluirMapas?: boolean;
+        codigoSubprocessoMapa?: number;
+    }): void {
         if (opcoes?.incluirPainel ?? false) {
             painelStore.invalidar();
         }
@@ -35,8 +40,14 @@ export function useInvalidacaoNavegacao() {
             processoStore.invalidar();
         }
         subprocessoStore.invalidar();
-        if (opcoes?.incluirMapas ?? true) {
-            mapasStore.invalidar();
+        // Mapas são pesados e nem toda ação de subprocesso altera esse domínio.
+        // Mantemos opt-in explícito para evitar recarregamentos desnecessários.
+        if (opcoes?.incluirMapas ?? false) {
+            if (typeof opcoes?.codigoSubprocessoMapa === "number") {
+                mapasStore.invalidar(opcoes.codigoSubprocessoMapa);
+            } else {
+                mapasStore.invalidar();
+            }
         }
     }
 
