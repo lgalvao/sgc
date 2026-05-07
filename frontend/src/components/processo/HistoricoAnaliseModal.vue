@@ -20,7 +20,7 @@
             data-testid="alert-historico-vazio"
             variant="secondary"
         >
-          Nenhuma análise registrada para este subprocesso.
+          Nenhuma análise registrada para este mapa.
         </BAlert>
         <div v-else>
           <BTable

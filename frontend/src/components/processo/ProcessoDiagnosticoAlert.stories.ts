@@ -84,7 +84,7 @@ export const Carregando: Story = {
         unidadesSemResponsavel: [],
     },
     play: async () => {
-        await expect.element(page.getByText('Carregando informações organizacionais...')).toBeVisible();
+        await expect.element(page.getByText('Validando informações organizacionais...')).toBeVisible();
     },
 };
 

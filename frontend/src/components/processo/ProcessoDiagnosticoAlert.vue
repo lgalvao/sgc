@@ -11,7 +11,7 @@
         <BSpinner v-if="carregando" class="mt-1" small/>
         <i v-else class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
         <div>
-          <strong v-if="carregando">Carregando informações organizacionais...</strong>
+          <strong v-if="carregando">Validando informações organizacionais...</strong>
           <template v-else-if="unidadesSemResponsavel.length > 0">
             <div class="mt-1">
               {{ prefixoMensagemUnidadesSemResponsavel }}
