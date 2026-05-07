@@ -43,13 +43,13 @@ select uni_c.cd             as codigo_central,
        r.datainicio         as data_inicio_resp,
        r.datatermino        as data_fim_resp
 from (select cd, sigla_unid_tse from srh2.unidade_tse where sigla_unid_tse like 'CAE%' and sit_unid not like 'E%') uni_c
-         join corau.ct_central c on c.sigla like uni_c.sigla_unid_tse || '%'
+         join corau.ct_central c on uni_c.sigla_unid_tse = substr(c.sigla, 1, 5)
          left join (
             select rc.central_id, rc.zona_id, e.datainicio, e.datatermino
             from corau.evento e
             join corau.resp_central rc on e.id = rc.id
-            -- OTIMIZACAO SARGABLE: e.datainicio < trunc(sysdate)+1 AND e.datatermino >= trunc(sysdate)
-            where e.datainicio < trunc(sysdate) + 1 and e.datatermino >= trunc(sysdate)
+            -- OTIMIZACAO SARGABLE: e.datainicio < trunc(sysdate)+1 AND e.datatermino >= trunc(sysdate)-1
+            where e.datainicio < trunc(sysdate) + 1 and e.datatermino >= trunc(sysdate) - 1
          ) r on c.id = r.central_id
          left join corau.ct_zona z on r.zona_id = z.id
          left join (select cd, num_ze, sigla_unid_tse from srh2.unidade_tse where num_ze is not null and sit_unid not like 'E%') uni_z
@@ -71,7 +71,7 @@ WITH tb_unidade_base AS (
 tb_unidade AS (
     select b.cd, b.ds, b.sigla_unid_tse, b.sit_unid,
            case
-               when b.is_central = 'S' then (select codigo_zona_resp from vw_zona_resp_central where codigo_central = b.cd)
+               when b.is_central = 'S' then (select codigo_zona_resp from vw_zona_resp_central_2 where codigo_central = b.cd)
                when b.cod_unid_super in (6, 19, 37, 634, 635, 637) then 1
                else b.cod_unid_super 
            end as cod_unid_super
@@ -148,7 +148,7 @@ FROM (
 -- Otimização: Uso de CTE para evitar recalcular VW_UNIDADE para cada linha.
 CREATE OR REPLACE VIEW VW_USUARIO_2 (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
 WITH UnidadesPre (codigo, sigla, tipo, unidade_superior_codigo) AS (
-    select codigo, sigla, tipo, unidade_superior_codigo from vw_unidade
+    select codigo, sigla, tipo, unidade_superior_codigo from vw_unidade_2
 )
 select s.num_tit_ele                   as titulo,
        s.mat_servidor                  as matricula,
@@ -156,7 +156,7 @@ select s.num_tit_ele                   as titulo,
        s.e_mail                        as email,
        r.ramal_servidor                as ramal,
        l.cod_unid_tse                  as unidade_lot_codigo,
-       (select decode(u.tipo, 'SEM_EQUIPE',
+       (select decode(u.tipo, 'SEM EQUIPE',
                       decode(u.unidade_superior_codigo,
                              1, case
                                     when u.sigla = 'GP' then (select codigo from UnidadesPre where sigla = 'ASPRE' and tipo = 'OPERACIONAL')
@@ -191,7 +191,7 @@ select u.codigo                                                                a
        coalesce(a.data_inicio, s.dt_ini_subst, u.data_inicio_titularidade)     as data_inicio,
        coalesce(a.data_termino, s.dt_fim_subst)                                as data_fim
 from (select codigo, matricula_titular, titulo_titular, data_inicio_titularidade
-      from vw_unidade
+      from vw_unidade_2
       where situacao = 'ATIVA'
         and tipo in ('OPERACIONAL', 'INTEROPERACIONAL', 'INTERMEDIARIA')) u
          left join (select sub.mat_servidor, sub.mat_serv_com_subs, s.num_tit_ele, sub.dt_ini_subst, sub.dt_fim_subst
@@ -202,32 +202,32 @@ from (select codigo, matricula_titular, titulo_titular, data_inicio_titularidade
                              join srh2.servidor s on sub.mat_serv_com_subs = s.mat_servidor
                     where nvl(c.titular_com, 0) = 1
                       -- OTIMIZACAO SARGABLE
-                      and sub.dt_ini_subst < trunc(sysdate) + 1 and sub.dt_fim_subst >= trunc(sysdate) ) s
+                      and sub.dt_ini_subst < trunc(sysdate) + 1 and sub.dt_fim_subst >= trunc(sysdate) - 1 ) s
                    on u.matricula_titular = s.mat_servidor
          left join (select unidade_codigo, usuario_matricula, usuario_titulo, data_inicio, data_termino
                     from ATRIBUICAO_TEMPORARIA
                     -- OTIMIZACAO SARGABLE
-                    where data_inicio < trunc(sysdate) + 1 and data_termino >= trunc(sysdate) ) a
+                    where data_inicio < trunc(sysdate) + 1 and data_termino >= trunc(sysdate) - 1 ) a
                    on u.codigo = a.unidade_codigo;
 
 
 -- 6. View VW_USUARIO_PERFIL_UNIDADE
--- Otimização: Uso de UNION ALL para evitar sorteio/deduplicação desnecessária.
+-- Otimização: Uso de UNION ALL para evitar sorteio/deduplicação desnecessária. (REVERTIDO PARA UNION PARA PARIDADE)
 CREATE OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE_2 (usuario_titulo, perfil, unidade_codigo) AS
 select usuario_titulo, perfil, unidade_codigo
 from (select a.usuario_titulo, 'ADMIN' as perfil, 1 as unidade_codigo
       from administrador a
-               join vw_usuario u on u.titulo = a.usuario_titulo
-      union all
+               join vw_usuario_2 u on u.titulo = a.usuario_titulo
+      union
       select r.usuario_titulo, 'GESTOR' as perfil, r.unidade_codigo
-      from vw_responsabilidade r
-               join vw_unidade u on r.unidade_codigo = u.codigo and u.tipo in ('INTERMEDIARIA', 'INTEROPERACIONAL')
-      union all
+      from vw_responsabilidade_2 r
+               join vw_unidade_2 u on r.unidade_codigo = u.codigo and u.tipo in ('INTERMEDIARIA', 'INTEROPERACIONAL')
+      union
       select r.usuario_titulo, 'CHEFE' as perfil, r.unidade_codigo
-      from vw_responsabilidade r
-               join vw_unidade u on r.unidade_codigo = u.codigo and u.tipo in ('INTEROPERACIONAL', 'OPERACIONAL')
-      union all
+      from vw_responsabilidade_2 r
+               join vw_unidade_2 u on r.unidade_codigo = u.codigo and u.tipo in ('INTEROPERACIONAL', 'OPERACIONAL')
+      union
       select usu.titulo as usuario_titulo, 'SERVIDOR' as perfil, uni.codigo as unidade_codigo
       from vw_usuario usu
-               join vw_unidade uni on usu.unidade_comp_codigo = uni.codigo
+               join vw_unidade_2 uni on usu.unidade_comp_codigo = uni.codigo
       where usu.titulo <> uni.titulo_titular);
