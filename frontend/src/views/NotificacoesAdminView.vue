@@ -46,7 +46,6 @@
         v-model="mostrarPreview"
         :title="itemParaPreview?.assunto"
         data-testid="modal-preview-email"
-        hide-footer
         scrollable
         size="lg"
     >
@@ -66,6 +65,17 @@
             title="Preview do e-mail"
         />
       </div>
+      <template #footer>
+        <div class="d-flex justify-content-end w-100">
+          <BButton
+              data-testid="btn-fechar-preview-email"
+              variant="secondary"
+              @click="mostrarPreview = false"
+          >
+            Fechar
+          </BButton>
+        </div>
+      </template>
     </BModal>
 
     <ModalPadrao
