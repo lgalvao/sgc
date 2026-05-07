@@ -9,6 +9,7 @@
           <ArvoreUnidades
               id="arvore-unidades-mapas"
               :model-value="unidadesSelecionadas"
+              :superiores-nao-elegiveis-sempre-indeterminadas="true"
               :unidades="unidadesDisponiveis"
               @update:model-value="$emit('update:unidadesSelecionadas', $event)"
           />
@@ -23,8 +24,8 @@
             @click="$emit('gerar')"
         >
           <BSpinner v-if="carregando" class="me-1" small/>
-          <i v-else class="bi bi-search me-1"/>
-          {{ TEXTOS.relatorios.BOTAO_GERAR }}
+          <i v-else class="bi bi-eye me-1"/>
+          Visualizar
         </BButton>
         <BButton
             :disabled="carregando || !temUnidadesSelecionadas"

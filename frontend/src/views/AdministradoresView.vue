@@ -14,7 +14,7 @@
       </template>
     </PageHeader>
 
-    <div v-if="carregandoAdmins" class="text-center py-4">
+    <div v-if="carregandoInicial && carregandoAdmins" class="text-center py-4">
       <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary"/>
     </div>
 
@@ -34,10 +34,18 @@
         v-else
         :fields="camposAdmins"
         :items="administradores"
+        :busy="carregandoAdmins"
         hover
         responsive
         striped
     >
+      <template #table-busy>
+        <div class="text-center text-primary my-2">
+          <BSpinner class="align-middle me-2" small/>
+          <strong>{{ TEXTOS.comum.CARREGANDO }}</strong>
+        </div>
+      </template>
+
       <template #cell(acoes)="{ item }">
         <div class="text-end">
           <LoadingButton
@@ -136,6 +144,7 @@ const {carregando: carregandoAdmins, erro: erroAdmins, executarSilencioso} = use
 
 
 const administradores = ref<AdministradorDto[]>([]);
+const carregandoInicial = ref(true);
 const removendoAdmin = ref<string | null>(null);
 const mostrarModalAdicionarAdmin = ref(false);
 const mostrarModalRemoverAdmin = ref(false);
@@ -237,5 +246,6 @@ async function removerAdmin() {
 
 onMounted(async () => {
   await carregarAdministradores();
+  carregandoInicial.value = false;
 });
 </script>

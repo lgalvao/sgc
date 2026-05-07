@@ -6,6 +6,7 @@ export function useArvoreSelecao(props: {
     unidades: Unidade[];
     modelValue: number[];
     modoSelecao: boolean;
+    superioresNaoElegiveisSempreIndeterminadas: boolean;
 }, emit: (e: "update:modelValue", value: number[]) => void) {
     const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
@@ -43,6 +44,12 @@ export function useArvoreSelecao(props: {
         const estadosFilhas = unidade.filhas.map(filha => getEstadoSelecao(filha));
         const todasFilhasMarcadas = estadosFilhas.every(estado => estado === true);
         const algumaFilhaSelecionada = estadosFilhas.some(estado => estado !== false);
+
+        if (props.superioresNaoElegiveisSempreIndeterminadas &&
+            !unidade.isElegivel &&
+            algumaFilhaSelecionada) {
+            return "indeterminate";
+        }
 
         if (todasFilhasMarcadas) {
             return true;

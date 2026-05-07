@@ -167,4 +167,11 @@ const chaveSessao = computed(() =>
     flex-direction: column;
   }
 }
+
+button:disabled,
+.btn:disabled,
+.btn.disabled {
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+}
 </style>

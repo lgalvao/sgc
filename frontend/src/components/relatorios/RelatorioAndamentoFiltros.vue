@@ -3,7 +3,7 @@
     <div class="d-flex flex-column gap-3">
       <BFormGroup label-for="select-processo">
         <template #label>
-          {{ TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO }} <span aria-hidden="true" class="text-danger">*</span>
+          {{ TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO }}
         </template>
         <BFormSelect
             id="select-processo"
@@ -22,8 +22,8 @@
             @click="$emit('gerar')"
         >
           <BSpinner v-if="carregando" class="me-1" small/>
-          <i v-else class="bi bi-search me-1"/>
-          {{ TEXTOS.relatorios.BOTAO_GERAR }}
+          <i v-else class="bi bi-eye me-1"/>
+          Visualizar
         </BButton>
         <BButton
             :disabled="carregando || !codProcessoSelecionado"

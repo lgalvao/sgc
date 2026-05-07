@@ -6,13 +6,13 @@
         <span class="relatorio-mapas__subtitulo">{{ mapa.nomeUnidade }}</span>
       </BCardTitle>
 
-      <div class="d-flex flex-column gap-2">
+      <div class="d-flex flex-column gap-3">
         <section
             v-for="competencia in mapa.competencias"
             :key="competencia.codigo"
             class="relatorio-mapas__competencia"
         >
-          <h6 class="mb-2 relatorio-mapas__secao">{{ competencia.descricao }}</h6>
+          <h6 class="mb-3 relatorio-mapas__secao">{{ competencia.descricao }}</h6>
 
           <div
               v-for="atividade in competencia.atividades"
@@ -67,7 +67,7 @@ defineProps<{
 <style scoped>
 .relatorio-mapas__card {
   border: 1px solid var(--bs-border-color);
-  background: var(--bs-body-bg);
+  background: transparent;
 }
 
 .relatorio-mapas__cabecalho {
@@ -98,7 +98,7 @@ defineProps<{
   padding: 0.95rem 1rem;
   border: 1px solid var(--bs-border-color);
   border-radius: 0.65rem;
-  background: var(--bs-secondary-bg);
+  background: transparent;
 }
 
 .relatorio-mapas__secao {
@@ -106,6 +106,11 @@ defineProps<{
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.35;
+}
+
+.relatorio-mapas__atividade {
+  margin-left: 0.6rem;
+  padding-left: 0.9rem;
 }
 
 .relatorio-mapas__atividade + .relatorio-mapas__atividade {
@@ -120,9 +125,10 @@ defineProps<{
 }
 
 .relatorio-mapas__conhecimentos {
-  margin: 0.35rem 0 0;
-  padding-left: 1.2rem;
-  color: var(--bs-body-color);
+  margin: 0.45rem 0 0;
+  padding-left: 1.45rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.93rem;
 }
 
 .relatorio-mapas__conhecimentos li + li {
@@ -136,6 +142,11 @@ defineProps<{
 
   .relatorio-mapas__competencia {
     padding: 0.8rem 0.85rem;
+  }
+
+  .relatorio-mapas__atividade {
+    margin-left: 0.35rem;
+    padding-left: 0.7rem;
   }
 }
 </style>

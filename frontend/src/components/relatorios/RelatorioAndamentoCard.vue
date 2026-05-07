@@ -66,12 +66,16 @@ v-if="item.mostraPrazoAjustado"
       <div class="relatorio-andamento__responsaveis pt-3 border-top">
         <div class="row">
           <div class="col-md-6 mb-2 mb-md-0">
-            <span class="relatorio-andamento__info-label">Titular</span>
-            <span class="relatorio-andamento__info-valor fw-bold">{{ item.titular }}</span>
+            <div class="relatorio-andamento__info-item">
+              <span class="relatorio-andamento__info-label">Titular</span>
+              <span class="relatorio-andamento__info-valor">{{ item.titular }}</span>
+            </div>
           </div>
           <div v-if="item.titular !== item.responsavel" class="col-md-6">
-            <span class="relatorio-andamento__info-label">Responsável atual</span>
-            <span class="relatorio-andamento__info-valor fw-bold">{{ item.responsavel }}</span>
+            <div class="relatorio-andamento__info-item">
+              <span class="relatorio-andamento__info-label">Responsável atual</span>
+              <span class="relatorio-andamento__info-valor fw-bold">{{ item.responsavel }}</span>
+            </div>
           </div>
         </div>
       </div>

@@ -1,10 +1,12 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="carregandoInicial"/>
-    <div v-else class="col-lg-8 col-md-9 col-12">
+    <div class="col-lg-8 col-md-9 col-12">
       <PageHeader :title="TEXTOS.atribuicaoTemporaria.TITULO">
         <template v-if="unidade" #default>
           {{ unidade.sigla }}
+        </template>
+        <template v-else-if="carregandoInicial" #default>
+          <BSpinner small variant="secondary"/>
         </template>
         <template #actions>
           <BButton :to="`/unidade/${props.codUnidade}`" variant="outline-secondary">
@@ -12,6 +14,7 @@
           </BButton>
         </template>
       </PageHeader>
+
       <AppAlert
           v-if="notificacao"
           :dispensavel="notificacao.dispensavel ?? true"
@@ -19,6 +22,7 @@
           :variante="notificacao.variante"
           @dismissed="clear()"
       />
+
       <BAlert
           v-if="erroFormulario"
           :model-value="true"
@@ -29,7 +33,10 @@
       >
         {{ erroFormulario }}
       </BAlert>
-      <BForm class="mt-4" @submit.prevent="criarAtribuicao">
+
+      <CarregamentoPagina v-if="carregandoInicial && !unidade"/>
+
+      <BForm v-else class="mt-4" @submit.prevent="criarAtribuicao">
         <BFormGroup
             class="mb-3"
             label-for="usuario"
@@ -58,8 +65,8 @@
             <BFormGroup label-for="dataInicio">
               <template #label>
                 {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO }} <span
-aria-hidden="true"
-                                                                          class="text-danger">*</span>
+                  aria-hidden="true"
+                  class="text-danger">*</span>
               </template>
               <InputData
                   id="dataInicio"
@@ -79,8 +86,8 @@ aria-hidden="true"
             <BFormGroup label-for="dataTermino">
               <template #label>
                 {{ TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO }} <span
-aria-hidden="true"
-                                                                           class="text-danger">*</span>
+                  aria-hidden="true"
+                  class="text-danger">*</span>
               </template>
               <InputData
                   id="dataTermino"
@@ -142,8 +149,18 @@ aria-hidden="true"
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BFormTextarea, BRow} from "bootstrap-vue-next";
-import {computed, onMounted, ref} from "vue";
+import {
+  BAlert,
+  BButton,
+  BCol,
+  BForm,
+  BFormGroup,
+  BFormInvalidFeedback,
+  BFormTextarea,
+  BRow,
+  BSpinner
+} from "bootstrap-vue-next";
+import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
@@ -157,9 +174,9 @@ import BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {usePerfil} from "@/composables/usePerfil";
+import {useUnidadeStore} from "@/stores/unidade";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/date";
-import {buscarUnidadePorCodigo} from "@/services/unidadeService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import {useOrganizacaoStore} from "@/stores/organizacao";
@@ -169,6 +186,7 @@ const props = defineProps<{ codUnidade: number }>();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
+const unidadeStore = useUnidadeStore();
 const organizacaoStore = useOrganizacaoStore();
 
 const unidade = ref<Unidade | null>(null);
@@ -189,6 +207,7 @@ const {
   validarSubmissao,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
+
 const formularioValido = computed(() => {
   return Boolean(
       usuarioSelecionado.value
@@ -218,16 +237,26 @@ const mensagemErroJustificativa = computed(() =>
     deveExibirErro(!justificativa.value.trim()) ? "Informe a justificativa." : "",
 );
 
-onMounted(async () => {
+async function carregarDados() {
+  // Se já temos a unidade correta carregada, evitamos o spinner pesado
+  if (unidade.value?.codigo === props.codUnidade && unidadeStore.cacheUnidades.has(props.codUnidade)) {
+    carregandoInicial.value = false;
+    return;
+  }
+
+  carregandoInicial.value = true;
   try {
-    unidade.value = await buscarUnidadePorCodigo(props.codUnidade);
+    unidade.value = await unidadeStore.obterUnidade(props.codUnidade);
   } catch (error) {
     erroUsuario.value = TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
     logger.error(error);
   } finally {
     carregandoInicial.value = false;
   }
-});
+}
+
+onMounted(carregarDados);
+onActivated(carregarDados);
 
 async function criarAtribuicao() {
   const unidadeAtual = unidade.value;

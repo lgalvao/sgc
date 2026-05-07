@@ -42,7 +42,10 @@ const unidadeRoutes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             codUnidade: Number(route.params.codUnidade),
         }),
-        meta: {title: "Atribuição temporária"},
+        meta: {
+            title: "Atribuição temporária",
+            keepAlive: true,
+        },
     },
 ];
 
