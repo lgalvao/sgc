@@ -48,6 +48,26 @@ describe('CompetenciaEdicaoModal.vue', () => {
             expect(wrapper.text()).toContain('Selecione ao menos uma atividade.');
         });
 
+        it('permite marcar e desmarcar todas as atividades', async () => {
+            const atividades = [atividadeBase(1, 'Atv 1'), atividadeBase(2, 'Atv 2')];
+            const wrapper = mount(CompetenciaEdicaoModal, {
+                props: {mostrar: true, atividades},
+            });
+
+            await wrapper.find('[data-testid="btn-competencia-selecionar-todas-atividades"]').trigger('click');
+            await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger('click');
+
+            expect(wrapper.emitted('salvar')).toBeTruthy();
+            expect(wrapper.emitted('salvar')![0][0]).toMatchObject({
+                atividadesSelecionadas: [1, 2],
+            });
+
+            await wrapper.find('[data-testid="btn-competencia-limpar-selecao-atividades"]').trigger('click');
+            await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger('click');
+
+            expect(wrapper.text()).toContain('Selecione ao menos uma atividade.');
+        });
+
         it('emite fechar ao clicar em cancelar', async () => {
             const wrapper = mount(CompetenciaEdicaoModal, {
                 props: {mostrar: true, atividades: []},

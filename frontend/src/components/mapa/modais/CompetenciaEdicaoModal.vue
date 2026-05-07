@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import {BAlert, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import CompetenciaAtividadeItem from "./CompetenciaAtividadeItem.vue";
 import type {Atividade, Competencia} from "@/types/tipos";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{
   mostrar: boolean; atividades: Atividade[]; loading?: boolean; competenciaParaEditar?: Competencia | null;
@@ -50,6 +51,14 @@ function salvar() {
   }
   emit("salvar", {descricao: novaComp.value.descricao, atividadesSelecionadas: selecionadas.value});
 }
+
+function selecionarTodasAtividades() {
+  selecionadas.value = props.atividades.map((atv) => atv.codigo);
+}
+
+function limparSelecaoAtividades() {
+  selecionadas.value = [];
+}
 </script>
 
 <template>
@@ -73,13 +82,40 @@ id="descricao" ref="inputRef" v-model="novaComp.descricao" :state="erroDesc ? fa
     </div>
     <div class="mb-4">
       <h5>Atividades <span aria-hidden="true" class="text-danger">*</span></h5>
+      <div class="d-flex gap-2 mb-2">
+        <BButton
+            aria-label="Selecionar todas as atividades"
+            data-testid="btn-competencia-selecionar-todas-atividades"
+            size="sm"
+            variant="outline-secondary"
+            @click="selecionarTodasAtividades"
+        >
+          <i aria-hidden="true" class="bi bi-check-all me-1"/>
+          {{ TEXTOS.atividades.importacao.BOTAO_SELECIONAR_TODAS }}
+        </BButton>
+        <BButton
+            aria-label="Desmarcar todas as atividades"
+            data-testid="btn-competencia-limpar-selecao-atividades"
+            size="sm"
+            variant="outline-secondary"
+            @click="limparSelecaoAtividades"
+        >
+          <i aria-hidden="true" class="bi bi-x-lg me-1"/>
+          {{ TEXTOS.atividades.importacao.BOTAO_LIMPAR_SELECAO }}
+        </BButton>
+      </div>
       <div
-id="atividades"
-           :class="['d-flex flex-wrap gap-2 p-2 border rounded', { 'border-danger is-invalid': erroAtv }]"
-           tabindex="-1">
+          id="atividades"
+          :class="['lista-atividades p-2 border rounded', { 'border-danger is-invalid': erroAtv }]"
+          tabindex="-1"
+      >
         <CompetenciaAtividadeItem
-v-for="atv in atividades" :key="atv.codigo" v-model="selecionadas" :atividade="atv"
-                                  :selecionadas="selecionadas"/>
+            v-for="atv in atividades"
+            :key="atv.codigo"
+            v-model="selecionadas"
+            :atividade="atv"
+            :selecionadas="selecionadas"
+        />
       </div>
       <div v-if="erroAtv" class="text-danger small mt-1" data-testid="txt-criar-competencia-pendencia-atividades">
         {{ erroAtv }}
@@ -87,3 +123,13 @@ v-for="atv in atividades" :key="atv.codigo" v-model="selecionadas" :atividade="a
     </div>
   </ModalPadrao>
 </template>
+
+<style scoped>
+.lista-atividades {
+  max-height: 24rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+</style>
