@@ -106,7 +106,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         // 3. Verificar entrega do e-mail com GreenMail (destinatário, assunto e corpo)
         aguardarEmail(1);
         assertThat(algumEmailPara(notificacao.getDestinatario())).isTrue();
-        assertThat(algumEmailComAssunto("SGC: Data limite alterada")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Data limite alterada")).isTrue();
         assertThat(algumEmailContem("Processo CDU-27")).isTrue();
         assertThat(algumEmailContem("A data limite da etapa atual no processo")).isTrue();
     }

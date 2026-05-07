@@ -34,7 +34,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         );
 
         assertThat(html)
-                .contains("SGC: Início de processo de mapeamento de competências")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("Comunicamos o início do processo <strong>Mapeamento 2026</strong> para a sua unidade.")
                 .contains("cadastro de atividades e conhecimentos")
@@ -54,7 +53,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         );
 
         assertThat(html)
-                .contains("SGC: Início de processo de revisão do mapa de competências em unidades subordinadas")
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("Comunicamos o início do processo <strong>Revisão 2026</strong> nas unidades")
                 .contains("SESEL, STIC")
                 .contains("iniciar a revisão do cadastro de atividades e conhecimentos")
@@ -68,7 +67,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SESEL", "Processo final 2026");
 
         assertThat(html)
-                .contains("Finalização do processo Processo final 2026")
+                .contains("Prezado(a) responsável pela <span>SESEL</span>")
                 .contains("Comunicamos a finalização do processo <strong>Processo final 2026</strong> para a sua unidade.")
                 .contains("menu \"Minha unidade\"")
                 .contains("https://sgc.tre-pe.jus.br");
@@ -84,7 +83,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         );
 
         assertThat(html)
-                .contains("SGC: Lembrete de prazo - Processo prazo 2026")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("Processo prazo 2026")
                 .contains("10/06/2026")
@@ -105,7 +103,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("data-limite-alterada", context);
 
         assertThat(html)
-                .contains("SGC: Data limite alterada")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A data limite da etapa atual no processo <strong>Processo prazo 2026</strong>")
                 .contains("foi alterada para <strong>30/06/2026</strong>")
@@ -130,7 +127,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         );
 
         assertThat(html)
-                .contains("SGC: Atribuição de perfil CHEFE na unidade STIC")
                 .contains("Prezado(a) Maria da Silva,")
                 .contains("Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade")
                 .contains("21/04/2026")
@@ -151,7 +147,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("cadastro-disponibilizado", context);
 
         assertThat(html)
-                .contains("Cadastro de atividades e conhecimentos disponibilizado")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("A unidade <strong>SESEL</strong> disponibilizou o cadastro de atividades e")
                 .contains("conhecimentos do processo")
@@ -171,7 +166,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("cadastro-disponibilizado-superior", context);
 
         assertThat(html)
-                .contains("Cadastro disponibilizado em unidade subordinada")
                 .contains("Prezado(a) responsável pela <strong>STIC</strong>")
                 .contains("cadastro de atividades da unidade <strong>SESEL</strong>")
                 .contains("Processo cadastro 2026")
@@ -191,7 +185,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("cadastro-devolvido", context);
 
         assertThat(html)
-                .contains("Cadastro de atividades e conhecimentos devolvido para ajustes")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("O cadastro de atividades e conhecimentos da <strong>SESEL</strong> no processo")
                 .contains("Processo devolucao 2026")
@@ -212,7 +205,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("aceite-cadastro", context);
 
         assertThat(html)
-                .contains("Cadastro de atividades e conhecimentos submetido para análise")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("O cadastro de atividades e conhecimentos da")
                 .contains("<strong>SESEL</strong>")
@@ -233,7 +225,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("disponibilizacao-revisao-cadastro", context);
 
         assertThat(html)
-                .contains("Revisão do cadastro de atividades e conhecimentos disponibilizada")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("A unidade <strong>SESEL</strong> concluiu a revisão")
                 .contains("Processo revisao 2026")
@@ -253,7 +244,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("devolucao-revisao-cadastro", context);
 
         assertThat(html)
-                .contains("Revisão do cadastro de atividades e conhecimentos devolvida para ajustes")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A revisão do cadastro de atividades e conhecimentos da")
                 .contains("Processo revisao 2026")
@@ -273,7 +263,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("aceite-revisao-cadastro", context);
 
         assertThat(html)
-                .contains("Revisão do cadastro de atividades e conhecimentos submetida para análise")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("A revisão do cadastro de atividades e conhecimentos da")
                 .contains("Processo revisao 2026")
@@ -293,7 +282,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("mapa-disponibilizado", context);
 
         assertThat(html)
-                .contains("Mapa de competências disponibilizado")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("O mapa de competências de sua unidade foi disponibilizado")
                 .contains("Processo mapa 2026")
@@ -314,7 +302,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("mapa-disponibilizado-superior", context);
 
         assertThat(html)
-                .contains("Mapa de competências disponibilizado")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("O mapa de competências da <strong>SESEL</strong> foi disponibilizado")
                 .contains("Processo mapa 2026")
@@ -334,7 +321,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("sugestoes-mapa", context);
 
         assertThat(html)
-                .contains("Sugestões apresentadas para o mapa de competências")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("A unidade <strong>SESEL</strong> apresentou sugestões para o mapa de")
                 .contains("competências")
@@ -354,7 +340,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("validacao-mapa", context);
 
         assertThat(html)
-                .contains("Validação do mapa de competências submetida para análise")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("A unidade <strong>SESEL</strong> validou o mapa de competências")
                 .contains("Processo mapa 2026")
@@ -373,7 +358,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("devolucao-validacao", context);
 
         assertThat(html)
-                .contains("Validação do mapa de competências devolvida para ajustes")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A validação do mapa de competências da <strong>SESEL</strong>")
                 .contains("Processo mapa 2026")
@@ -393,7 +377,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("aceite-validacao", context);
 
         assertThat(html)
-                .contains("Validação do mapa de competências submetida para análise")
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("A validação do mapa de competências da <strong>SESEL</strong>")
                 .contains("Processo mapa 2026")
@@ -412,7 +395,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("cadastro-reaberto", context);
 
         assertThat(html)
-                .contains("Cadastro reaberto")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("foi reaberto para ajustes")
                 .contains("Ajustar atividades duplicadas.")
@@ -431,7 +413,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         String html = templateEngine.process("revisao-cadastro-reaberta", context);
 
         assertThat(html)
-                .contains("Revisão reaberta")
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A revisão do cadastro de atividades da sua unidade foi reaberta para ajustes")
                 .contains("<strong>Processo:</strong>")

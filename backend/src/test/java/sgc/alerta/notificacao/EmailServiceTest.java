@@ -28,10 +28,10 @@ class EmailServiceTest {
         ConfigAplicacao.Email emailConfig = new ConfigAplicacao.Email();
         emailConfig.setRemetente("noreply@test.com");
         emailConfig.setRemetenteNome("Remetente teste");
-        emailConfig.setAssuntoPrefixo("[Teste]");
+        emailConfig.setAssuntoPrefixo("[SGC]");
         when(config.getEmail()).thenReturn(emailConfig);
 
-        MimeMessage mimeMessage = mock(MimeMessage.class);
+        MimeMessage mimeMessage = new MimeMessage((jakarta.mail.Session) null);
         when(enviadorEmail.createMimeMessage()).thenReturn(mimeMessage);
     }
 
@@ -116,5 +116,29 @@ class EmailServiceTest {
         assertThatThrownBy(() -> notificacaoServico.enviarEmailHtml(DESTINATARIO, "Assunto", "<h1>Corpo</h1>"))
                 .isInstanceOf(MailSendException.class)
                 .hasMessageContaining("Erro ao enviar email");
+    }
+
+    @Test
+    @DisplayName("Deve manter prefixo único quando o assunto já vier com SGC")
+    void deveManterPrefixoUnicoQuandoAssuntoJaVierComSgc() throws Exception {
+        setupMockEmail();
+
+        notificacaoServico.enviarEmail(DESTINATARIO, "SGC: Início de processo de mapeamento", "Corpo");
+
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(enviadorEmail).send(captor.capture());
+        assertThat(captor.getValue().getSubject()).isEqualTo("[SGC] Início de processo de mapeamento");
+    }
+
+    @Test
+    @DisplayName("Deve aplicar prefixo SGC quando o assunto não tiver prefixo funcional")
+    void deveAplicarPrefixoSgcQuandoAssuntoNaoTiverPrefixoFuncional() throws Exception {
+        setupMockEmail();
+
+        notificacaoServico.enviarEmail(DESTINATARIO, "Aviso", "Corpo");
+
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(enviadorEmail).send(captor.capture());
+        assertThat(captor.getValue().getSubject()).isEqualTo("[SGC] Aviso");
     }
 }

@@ -6,6 +6,7 @@
         <h1 th:text="${titulo}">Processo iniciado</h1>
     </th:block>
     <th:block th:fragment="conteudo">
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}"></strong>,</p>
         <p>Um novo processo de <strong th:text="${tipoProcesso}"></strong> foi iniciado para sua unidade.</p>
         <div class="highlight-box">
             <p><strong>Unidade:</strong> <span th:text="${nomeUnidade}"></span></p>

@@ -2,7 +2,9 @@ import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
-val argumentosJvmSemAvisoUnsafe = listOf("")
+val argumentosJvmSemAvisoUnsafe = listOf(
+    "--sun-misc-unsafe-memory-access=allow"
+)
 
 plugins {
     java
@@ -82,12 +84,13 @@ dependencies {
 }
 
 tasks.named("processResources") {
-    dependsOn(":copyFrontend")
+    mustRunAfter(":copyFrontend")
 }
 
 tasks.withType<BootJar> {
     enabled = true
     mainClass.set("sgc.Sgc")
+    dependsOn(":copyFrontend")
 }
 
 springBoot {

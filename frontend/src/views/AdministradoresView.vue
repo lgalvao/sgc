@@ -14,9 +14,10 @@
       </template>
     </PageHeader>
 
-    <div v-if="carregandoInicial && carregandoAdmins" class="text-center py-4">
-      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary"/>
-    </div>
+    <CarregamentoPagina
+        v-if="carregandoInicial"
+        :mensagem="TEXTOS.comum.CARREGANDO_DADOS"
+    />
 
     <BAlert v-else-if="erroAdmins" :model-value="true" variant="danger">
       {{ erroAdmins }}
@@ -123,6 +124,7 @@ import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BSpinner, BTable} fro
 
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
+import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';

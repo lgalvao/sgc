@@ -256,8 +256,8 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         aguardarEmail(2);
         assertThat(algumEmailPara("u_rev@tre-pe.jus.br")).isTrue();
         assertThat(algumEmailPara("u_sup@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailComAssunto("SGC: Início de processo de revisão do mapa de competências")).isTrue();
-        assertThat(algumEmailComAssunto("SGC: Início de processo de revisão do mapa de competências em unidades subordinadas")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Início de processo de revisão do mapa de competências")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Início de processo de revisão do mapa de competências em unidades subordinadas")).isTrue();
         assertThat(algumEmailContem("Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos")).isTrue();
         assertThat(algumEmailContem("Estas unidades já podem iniciar a revisão")).isTrue();
         assertThat(algumEmailContem("Acompanhe o processo no Sistema de Gestão de Competências")).isTrue();

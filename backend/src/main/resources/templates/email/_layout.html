@@ -22,18 +22,11 @@
         }
 
         .header {
-            padding: 24px 24px 16px;
-            background-color: #ffffff;
-            border-bottom: 1px solid #d9e2ec;
-            text-align: left;
+            display: none;
         }
 
         .header h1 {
             margin: 0;
-            color: #102a43;
-            font-size: 22px;
-            line-height: 1.35;
-            font-weight: 700;
         }
 
         .content {
@@ -115,9 +108,6 @@
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <th:block th:replace="${cabecalho}"/>
-    </div>
     <div class="content">
         <th:block th:replace="${conteudo}"/>
     </div>

@@ -32,6 +32,7 @@ describe("AdministradoresView.vue", () => {
                         props: ['title'],
                         template: '<div><h1>{{ title }}</h1><slot name="actions" /></div>'
                     },
+                    CarregamentoPagina: {template: '<div data-testid="pagina-carregando"></div>'},
                     BButton: {template: `<button @click="$emit('click')"><slot /></button>`},
                     BAlert: {template: '<div><slot /></div>'},
                     EmptyState: true,
@@ -79,6 +80,8 @@ describe("AdministradoresView.vue", () => {
 
     it("deve carregar e exibir administradores", async () => {
         const wrapper = createWrapper();
+
+        expect(wrapper.find('[data-testid="pagina-carregando"]').exists()).toBe(true);
         await flushPromises();
 
         expect(wrapper.find('h1').text()).toBe(TEXTOS.administracao.TITULO);

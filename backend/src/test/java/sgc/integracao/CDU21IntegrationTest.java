@@ -119,7 +119,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
 
         aguardarEmail(1);
         assertThat(algumEmailPara("cdu21-und@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailComAssunto("SGC: Finalização do processo Processo CDU-21")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Finalização do processo Processo CDU-21")).isTrue();
         assertThat(algumEmailContem("Comunicamos a finalização do processo")).isTrue();
         assertThat(algumEmailContem("Processo CDU-21")).isTrue();
         assertThat(algumEmailContem("menu \"Minha unidade\"")).isTrue();

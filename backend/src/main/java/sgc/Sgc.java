@@ -15,7 +15,6 @@ import org.springframework.scheduling.annotation.*;
 })
 public class Sgc {
     public static void main(String[] args) {
-        System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(Sgc.class, args);
     }
 }

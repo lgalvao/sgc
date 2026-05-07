@@ -137,7 +137,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
         aguardarEmail(1);
         assertThat(algumEmailPara("u_livre_mapp@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailComAssunto("SGC: Início de processo de mapeamento de competências")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Início de processo de mapeamento de competências")).isTrue();
         assertThat(algumEmailContem("Comunicamos o início do processo")).isTrue();
         assertThat(algumEmailContem("Processo mapeamento teste CDU-04")).isTrue();
         assertThat(algumEmailContem("cadastro de atividades e conhecimentos")).isTrue();

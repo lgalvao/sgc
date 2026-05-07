@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import sgc.comum.config.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 
 @Service
@@ -18,6 +19,7 @@ import java.util.regex.*;
 @Slf4j
 public class EmailService {
     private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern PADRAO_PREFIXO_ASSUNTO = Pattern.compile("^(?:\\[SGC\\]|SGC\\s*[:\\-])\\s*", Pattern.CASE_INSENSITIVE);
 
     private final JavaMailSender enviadorEmail;
     private final ConfigAplicacao config;
@@ -53,8 +55,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
             helper.setFrom(new InternetAddress(emailConfig.getRemetente(), emailConfig.getRemetenteNome()));
             helper.setTo(destinatario);
-            String assuntoCompleto = "%s %s".formatted(emailConfig.getAssuntoPrefixo(), assunto);
-            helper.setSubject(assuntoCompleto);
+            helper.setSubject(montarAssuntoCompleto(emailConfig.getAssuntoPrefixo(), assunto));
             helper.setText(corpo, html);
             enviadorEmail.send(mensagem);
         } catch (MessagingException | UnsupportedEncodingException e) {
@@ -78,5 +79,21 @@ public class EmailService {
                 html ? "html" : "texto"
         );
         log.debug("Conteúdo do e-mail mockado: {}", corpo);
+    }
+
+    private String montarAssuntoCompleto(String prefixo, String assuntoBase) {
+        String assuntoNormalizado = normalizarAssunto(assuntoBase);
+        String prefixoEfetivo = (prefixo == null || prefixo.isBlank()) ? "[SGC]" : prefixo.trim();
+        if (assuntoNormalizado.isBlank()) {
+            return prefixoEfetivo;
+        }
+        return "%s %s".formatted(prefixoEfetivo, assuntoNormalizado);
+    }
+
+    private String normalizarAssunto(String assunto) {
+        if (assunto == null) {
+            return "";
+        }
+        return PADRAO_PREFIXO_ASSUNTO.matcher(assunto.trim()).replaceFirst("").trim();
     }
 }
