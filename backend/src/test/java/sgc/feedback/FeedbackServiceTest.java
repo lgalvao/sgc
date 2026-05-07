@@ -163,7 +163,7 @@ class FeedbackServiceTest {
 
     @Test
     @DisplayName("deve registrar feedback mesmo quando falhar serialização dos metadados")
-    void deveRegistrarFeedbackMesmoQuandoFalharSerializacaoDosMetadados() throws Exception {
+    void deveRegistrarFeedbackComFalhaDeSerializacao() throws Exception {
         configurarUsuarioMock();
         ObjectMapper objectMapperComFalha = mock(ObjectMapper.class);
         when(objectMapperComFalha.writeValueAsString(any())).thenThrow(new RuntimeException("falha serializacao"));

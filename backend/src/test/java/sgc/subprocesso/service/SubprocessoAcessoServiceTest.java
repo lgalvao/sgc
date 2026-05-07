@@ -223,7 +223,7 @@ class SubprocessoAcessoServiceTest {
             assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarEditarMapa, "editar mapa", situacao, perfil);
             assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDisponibilizarMapa, "disponibilizar mapa", situacao, perfil);
             assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarValidarMapa, "validar mapa", situacao, perfil);
-            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarApresentarSugestoes, "apresentar sugestoes", situacao, perfil);
+            assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarApresentarSugestoes, "apresentar sugestões", situacao, perfil);
             assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarDevolverMapa, "devolver mapa", situacao, perfil);
             assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarAceitarMapa, "aceitar mapa", situacao, perfil);
             assertPermissaoEscritaDesabilitada(permissoes, PermissoesSubprocessoDto::habilitarHomologarMapa, "homologar mapa", situacao, perfil);
