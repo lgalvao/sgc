@@ -39,6 +39,7 @@ interface Props {
   } | null;
   mostrarModalDevolverAnalise: boolean;
   observacaoDevolucao: string;
+  erroObservacaoDevolucao?: string;
   loadingDevolucaoAnalise: boolean;
 }
 
@@ -156,6 +157,7 @@ const observacaoDevolucaoModel = computed({
       v-model="mostrarModalDevolverAnaliseModel"
       v-model:observacao="observacaoDevolucaoModel"
       :erro="erroFluxo"
+      :erro-observacao="erroObservacaoDevolucao"
       :is-revisao="isRevisao"
       :loading="loadingDevolucaoAnalise"
       @confirmar="$emit('confirmar-devolucao-analise')"

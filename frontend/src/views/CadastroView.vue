@@ -116,6 +116,7 @@
           :mostrar-modal-importar="mostrarModalImportar"
           :mostrar-modal-validar-analise="mostrarModalValidarAnalise"
           :observacao-devolucao="observacaoDevolucao"
+          :erro-observacao-devolucao="mensagemErroObservacaoDevolucao"
           :observacao-validacao="observacaoValidacao"
           @importar="handleImportAtividades"
           @confirmar-devolucao-analise="confirmarDevolucaoAnalise"
@@ -194,6 +195,7 @@ const {notify, notificacao, clear} = useNotification();
 const {
   validarSubmissao,
   resetarValidacao,
+  deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 const {impactoMapa: impactos} = mapasStore;
@@ -373,6 +375,9 @@ const {
 
 const erroGlobalFormatado = computed(() =>
     erroGlobal.value ? {mensagem: erroGlobal.value} : null
+);
+const mensagemErroObservacaoDevolucao = computed(() =>
+    deveExibirErro(!observacaoDevolucao.value.trim()) ? TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA : ""
 );
 
 const {
