@@ -205,7 +205,7 @@ class SubprocessoAcessoServiceTest {
 
     @ParameterizedTest
     @EnumSource(SituacaoSubprocesso.class)
-    void deveNuncaHabilitarEscritaForaDaUnidade(SituacaoSubprocesso situacao) {
+    void deveDesabilitarEscritaQuandoForaDaUnidade(SituacaoSubprocesso situacao) {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(situacao);
 
@@ -256,7 +256,7 @@ class SubprocessoAcessoServiceTest {
     }
 
     @Test
-    void deveManterComandosAdministrativosDisponiveisMasDesabilitarEscritaQuandoProcessoFinalizado() {
+    void deveDesabilitarEscritaEmProcessoFinalizadoMasPermitirComandosAdmin() {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
 

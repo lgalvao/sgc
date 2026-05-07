@@ -347,8 +347,18 @@ class RelatorioFacadeTest {
     }
 
     @Test
-    @DisplayName("Deve normalizar códigos duplicados e ignorar unidades sem mapa vigente")
-    void deveNormalizarCodigosDuplicadosEIgnorarUnidadesSemMapaVigente() {
+    @DisplayName("Deve normalizar códigos duplicados antes de buscar mapas")
+    void deveNormalizarCodigosDuplicadosAntesDeBuscarMapas() {
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of());
+
+        relatorioService.obterRelatorioMapas(List.of(1L, 1L, 2L));
+
+        verify(unidadeService).buscarMapasPorUnidades(List.of(1L, 2L));
+    }
+
+    @Test
+    @DisplayName("Deve ignorar unidades sem mapa vigente ao montar relatório de mapas")
+    void deveIgnorarUnidadesSemMapaVigenteAoMontarRelatorioDeMapas() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(2L);
         unidade.setSigla("U2");
@@ -372,7 +382,7 @@ class RelatorioFacadeTest {
         when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of(mapaNulo, mapaValido));
         when(mapaManutencaoService.competenciasCodMapa(20L)).thenReturn(List.of());
 
-        List<RelatorioMapaDto> resultado = relatorioService.obterRelatorioMapas(List.of(1L, 1L, 2L));
+        List<RelatorioMapaDto> resultado = relatorioService.obterRelatorioMapas(List.of(1L, 2L));
 
         assertThat(resultado)
                 .singleElement()
@@ -381,7 +391,6 @@ class RelatorioFacadeTest {
                     assertThat(relatorio.siglaUnidade()).isEqualTo("U2");
                     assertThat(relatorio.totalCompetencias()).isZero();
                 });
-        verify(unidadeService).buscarMapasPorUnidades(List.of(1L, 2L));
     }
 
     @Test
