@@ -10,6 +10,7 @@ interface Props {
   isRevisao: boolean;
   observacao: string;
   erro?: string | null;
+  erroObservacao?: string;
 }
 
 const props = defineProps<Props>();
@@ -22,6 +23,7 @@ const emit = defineEmits<{
 const {model, observacaoModel} = useCadastroObservacaoModalModel(props, emit);
 
 const estadoObservacao = computed(() => {
+  if (props.erroObservacao) return false;
   if (observacaoModel.value.trim().length > 0) return true;
   return null;
 });
@@ -33,7 +35,7 @@ const estadoObservacao = computed(() => {
       v-model:observacao="observacaoModel"
       :erro="erro"
       :estado-observacao="estadoObservacao"
-      :feedback-observacao="TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA"
+      :feedback-observacao="erroObservacao || null"
       :input-data-testid="'inp-devolucao-cadastro-obs'"
       :input-id="'observacaoDevolucao'"
       :label="TEXTOS.comum.OBSERVACAO"
