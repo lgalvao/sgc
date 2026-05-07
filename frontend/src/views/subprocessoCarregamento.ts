@@ -31,8 +31,14 @@ export function useSubprocessoCarregamento({
     const codigoSubprocesso = ref<number | null>(null);
     const erroNaoEncontrado = ref(false);
     const carregamentoInicialConcluido = ref(false);
+    let carregamentoEmAndamento: Promise<void> | null = null;
 
     async function carregarSubprocesso(limpar = false) {
+        if (!limpar && carregamentoEmAndamento) {
+            await carregamentoEmAndamento;
+            return;
+        }
+        const tarefaCarregamento = (async () => {
         const resultadoDireto = typeof codSubprocesso === "number"
             ? await garantirContextoEdicao(codSubprocesso, limpar)
             : null;
@@ -52,6 +58,16 @@ export function useSubprocessoCarregamento({
 
         codigoSubprocesso.value = resultado.codigo;
         erroNaoEncontrado.value = false;
+        })();
+
+        carregamentoEmAndamento = tarefaCarregamento;
+        try {
+            await tarefaCarregamento;
+        } finally {
+            if (carregamentoEmAndamento === tarefaCarregamento) {
+                carregamentoEmAndamento = null;
+            }
+        }
     }
 
     async function atualizarSubprocessoAtual() {

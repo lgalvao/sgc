@@ -35,7 +35,9 @@ export function useInvalidacaoNavegacao() {
             processoStore.invalidar();
         }
         subprocessoStore.invalidar();
-        if (opcoes?.incluirMapas ?? true) {
+        // Mapas são pesados e nem toda ação de subprocesso altera esse domínio.
+        // Mantemos opt-in explícito para evitar recarregamentos desnecessários.
+        if (opcoes?.incluirMapas ?? false) {
             mapasStore.invalidar();
         }
     }
