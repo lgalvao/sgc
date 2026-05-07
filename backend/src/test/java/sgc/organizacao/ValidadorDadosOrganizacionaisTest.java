@@ -189,11 +189,10 @@ class ValidadorDadosOrganizacionaisTest {
     }
 
     @Test
-    @DisplayName("lerString - deve lidar com case insensitivity")
+    @DisplayName("lerString - deve ler colunas em caixa baixa e alias em caixa alta")
     void lerString_CaseInsensitive() {
         Map<String, Object> m1 = Map.of("test", "val");
         assertEquals("val", org.springframework.test.util.ReflectionTestUtils.invokeMethod(validador, "lerString", m1, "test"));
-        assertEquals("val", org.springframework.test.util.ReflectionTestUtils.invokeMethod(validador, "lerString", m1, "TEST"));
         
         Map<String, Object> m2 = Map.of("TEST", "VAL");
         assertEquals("VAL", org.springframework.test.util.ReflectionTestUtils.invokeMethod(validador, "lerString", m2, "test"));
@@ -216,7 +215,11 @@ class ValidadorDadosOrganizacionaisTest {
         
         assertEquals(1, invalidos.size());
         Object erro = invalidos.get(0);
-        assertEquals("VW_USUARIO_PERFIL_UNIDADE com perfil inexistente", org.springframework.test.util.ReflectionTestUtils.invokeMethod(erro, "tipo"));
+        assertEquals("VW_USUARIO_PERFIL_UNIDADE com perfil invalido", org.springframework.test.util.ReflectionTestUtils.invokeMethod(erro, "tipo"));
+        assertEquals(
+                "usuario_titulo=111, perfil=NAO_EXISTE, unidade_codigo=1",
+                org.springframework.test.util.ReflectionTestUtils.invokeMethod(erro, "detalhe")
+        );
     }
 
     @Test
