@@ -67,12 +67,10 @@ class LocalizacaoSubprocessoServiceTest {
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
                 .build();
 
-        when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(1L, PageRequest.of(0, 1)))
-                .thenReturn(List.of());
-
         Unidade localizacao = service.obterLocalizacaoAtual(subprocesso);
 
         assertThat(localizacao).isEqualTo(unidade);
+        verifyNoInteractions(movimentacaoRepo);
     }
 
     @Test

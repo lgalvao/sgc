@@ -19,7 +19,6 @@ describe('subprocessoCarregamento.ts', () => {
         erroIntegracaoContexto: computed(() => null),
         garantirContextoEdicao: vi.fn().mockResolvedValue(null),
         garantirContextoEdicaoPorProcessoEUnidade: vi.fn().mockResolvedValue(null),
-        invalidarMapa: vi.fn(),
         exibirToastPendente: vi.fn(),
         dadosEdicaoValidos: vi.fn().mockReturnValue(false),
         ...overrides
@@ -79,7 +78,6 @@ describe('subprocessoCarregamento.ts', () => {
         await flushPromises()
 
         await wrapper.vm.atualizarSubprocessoAtual()
-        expect(deps.invalidarMapa).toHaveBeenCalled()
         expect(deps.garantirContextoEdicao).toHaveBeenCalledWith(123, true)
     })
 
