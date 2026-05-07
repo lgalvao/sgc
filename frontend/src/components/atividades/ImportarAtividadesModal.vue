@@ -170,6 +170,7 @@ import {
 import {TEXTOS} from "@/constants/textos";
 import {normalizarErro} from "@/utils/apiError";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -187,6 +188,7 @@ const {
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
+const {withFallback} = useErrorHandler();
 
 const resultadoImportacao = ref<AtividadeOperacaoResponse | null>(null);
 const erroImportacao = ref<string | null>(null);
@@ -304,12 +306,11 @@ async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {
   atividadesSelecionadas.value = [];
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
-    try {
-      const atividadesDaOutraUnidade = await subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso);
-      atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : [];
-    } catch {
-      atividadesParaImportar.value = [];
-    }
+    const atividadesDaOutraUnidade = await withFallback(
+        () => subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso),
+        [],
+    );
+    atividadesParaImportar.value = [...atividadesDaOutraUnidade];
   } else {
     atividadesParaImportar.value = [];
   }

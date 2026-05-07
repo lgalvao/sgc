@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.*;
 import jakarta.validation.*;
 import lombok.*;
-import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
 import org.springframework.http.*;
 import org.springframework.security.access.*;
@@ -29,7 +28,6 @@ import java.util.*;
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 @Tag(name = "Subprocessos", description = "Endpoints unificados para gerenciamento de subprocessos, cadastro, mapa e validação")
-@Slf4j
 @PreAuthorize("isAuthenticated()")
 public class SubprocessoController {
 
@@ -347,12 +345,7 @@ public class SubprocessoController {
     @Operation(summary = "Obtém o mapa completo para edição/visualização")
     @Transactional(readOnly = true)
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codSubprocesso) {
-        try {
-            return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
-        } catch (Exception e) {
-            log.error("Erro ao buscar mapa completo para subprocesso {}: {}", codSubprocesso, e.getMessage(), e);
-            throw e;
-        }
+        return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/mapa-completo")
