@@ -84,7 +84,7 @@ export const TEXTOS = {
         BOTAO_IMPACTO: "Impacto no mapa",
         BOTAO_DISPONIBILIZAR: "Disponibilizar",
         BOTAO_CRIAR: "Criar competência",
-        EMPTY_TITLE: "Mapa ainda em branco",
+        EMPTY_TITLE: "Mapa vaziu",
         EMPTY_DESCRIPTION: "Adicione competências para começar a montar o mapa da unidade.",
         UNIDADE_NAO_ENCONTRADA: "Unidade não encontrada.",
         ERRO_MAPA_SEM_COMPETENCIAS: "O mapa deve ter pelo menos uma competência para ser disponibilizado.",
