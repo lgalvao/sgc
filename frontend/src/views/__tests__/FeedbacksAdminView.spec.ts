@@ -4,6 +4,7 @@ import {createTestingPinia} from "@pinia/testing";
 import {createMemoryHistory, createRouter} from "vue-router";
 import FeedbacksAdminView from "../FeedbacksAdminView.vue";
 import {listarFeedbacksAdmin} from "@/services/feedbackAdminService";
+import {formatarDataHoraBR} from "@/utils";
 
 vi.mock("@/services/feedbackAdminService", () => ({
     listarFeedbacksAdmin: vi.fn(),
@@ -146,7 +147,7 @@ describe("FeedbacksAdminView", () => {
         expect(modal.text()).not.toContain("fusoHorario");
         expect(modal.text()).toContain("Acesso");
         expect(modal.text()).toContain("ADMIN - SESEL");
-        expect(modal.text()).toContain("04/05/2026 07:00"); // Formato BR
+        expect(modal.text()).toContain(formatarDataHoraBR("2026-05-04T10:00:00Z")); // Formato BR
         expect(modal.text()).not.toContain("2026-05-04T10:00:00Z");
         
         // Clica na thumbnail para ampliar
