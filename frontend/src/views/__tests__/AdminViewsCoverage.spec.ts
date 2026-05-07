@@ -1,9 +1,25 @@
-import {describe, expect, it} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import NotificacoesAdminView from "../NotificacoesAdminView.vue";
 import ProcessoCadastroView from "../ProcessoCadastroView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {createMemoryHistory, createRouter} from "vue-router";
+
+vi.mock("@/services/notificacaoService", () => ({
+    listarNotificacoesAdmin: vi.fn().mockResolvedValue([]),
+    reenviarNotificacao: vi.fn(),
+    buscarUrlLeitorEmailTestes: vi.fn().mockResolvedValue(null),
+    compararNotificacoes: () => 0,
+    obterStatusNotificacao: () => ({label: "Pendente", variant: "secondary"})
+}));
+
+vi.mock("@/composables/useNotification", () => ({
+    useNotification: () => ({
+        notificacao: null,
+        notify: vi.fn(),
+        clear: vi.fn()
+    })
+}));
 
 const router = createRouter({
     history: createMemoryHistory(),
@@ -28,6 +44,10 @@ const stubs = {
 };
 
 describe("Admin Views Basic Coverage", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     it("deve montar NotificacoesAdminView", async () => {
         const wrapper = mount(NotificacoesAdminView, {
             global: {
