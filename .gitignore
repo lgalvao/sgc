@@ -40,8 +40,7 @@ etc/scripts/.vitest/
 /backend/.apt_generated_tests
 
 # Privacidade/segurança
-.env.hom
-/dados/
+!.env.hom
 
 # Reports de testes
 backend/build/reports/tests/test/

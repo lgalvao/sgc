@@ -67,7 +67,7 @@ const props = withDefaults(defineProps<{
   fade: false,
   centralizado: true,
   textoCancelar: "Cancelar",
-  textoAcao: "Enviar",
+  textoAcao: "Confirmar",
   textoAcaoCarregando: "Processando...",
   variantAcao: "success",
   loading: false,

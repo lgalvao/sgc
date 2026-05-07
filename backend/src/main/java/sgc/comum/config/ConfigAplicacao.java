@@ -23,6 +23,7 @@ public class ConfigAplicacao {
     private boolean ambienteTestes;
     private String urlAcessoHom;
     private String urlAcessoProd;
+    private String urlLeitorEmailTestes;
     @NestedConfigurationProperty
     private JwtProperties jwt;
 

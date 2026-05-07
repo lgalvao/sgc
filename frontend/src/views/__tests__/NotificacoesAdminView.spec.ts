@@ -3,7 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import NotificacoesAdminView from '../NotificacoesAdminView.vue';
 import {createTestingPinia} from '@pinia/testing';
 import {createMemoryHistory, createRouter} from 'vue-router';
-import {listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
+import {buscarUrlLeitorEmailTestes, listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
 import {formatarDestinatario} from "@/utils/notificacaoFormatters";
 
 vi.mock('@/services/notificacaoService', async (importActual) => {
@@ -11,7 +11,8 @@ vi.mock('@/services/notificacaoService', async (importActual) => {
     return {
         ...actual,
         listarNotificacoesAdmin: vi.fn(),
-        reenviarNotificacao: vi.fn()
+        reenviarNotificacao: vi.fn(),
+        buscarUrlLeitorEmailTestes: vi.fn()
     };
 });
 
@@ -34,6 +35,7 @@ const router = createRouter({
 describe('NotificacoesAdminView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(buscarUrlLeitorEmailTestes).mockResolvedValue(null);
     });
 
     const mountComponent = () => {
@@ -50,7 +52,7 @@ describe('NotificacoesAdminView', () => {
                         props: ['title', 'description', 'icon']
                     },
                     BButton: {
-                        template: '<button @click="$emit(\'click\')"><slot/></button>',
+                        template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot/></button>',
                         props: ['disabled', 'variant']
                     },
                     BAlert: {template: '<div><slot/></div>', props: ['modelValue', 'variant']},
@@ -118,6 +120,19 @@ describe('NotificacoesAdminView', () => {
         expect(wrapper.text()).toContain('PROCESSO_INICIADO');
         expect(wrapper.text()).toContain('MAPA_HOMOLOGADO');
         expect(wrapper.text()).toContain('SGC: Assunto Enviado');
+    });
+
+    it('exibe link do leitor de e-mail de testes quando configurado', async () => {
+        vi.mocked(listarNotificacoesAdmin).mockResolvedValue([] as any);
+        vi.mocked(buscarUrlLeitorEmailTestes).mockResolvedValue('https://seseldev05.tre-pe.gov.br:8025');
+
+        const wrapper = mountComponent();
+        await flushPromises();
+
+        const link = wrapper.find('[data-testid="link-leitor-email-testes"]');
+        expect(link.exists()).toBe(true);
+        expect(link.attributes('href')).toBe('https://seseldev05.tre-pe.gov.br:8025');
+        expect(link.text()).toContain('Leitor de e-mail de testes');
     });
 
     it('opens preview modal', async () => {

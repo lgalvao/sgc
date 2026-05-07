@@ -2,15 +2,28 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.comum.MENU_NOTIFICACOES">
       <template #actions>
-        <BButton
-            :disabled="carregando"
-            data-testid="btn-notificacoes-atualizar"
-            variant="outline-primary"
-            @click="carregar"
-        >
-          <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
-          {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
-        </BButton>
+        <div class="d-flex flex-wrap justify-content-end gap-2">
+          <a
+              v-if="urlLeitorEmailTestes"
+              :href="urlLeitorEmailTestes"
+              class="btn btn-outline-secondary"
+              data-testid="link-leitor-email-testes"
+              rel="noopener noreferrer"
+              target="_blank"
+          >
+            <i aria-hidden="true" class="bi bi-mailbox2 me-1"></i>
+            Leitor de e-mail de testes
+          </a>
+          <BButton
+              :disabled="carregando"
+              data-testid="btn-notificacoes-atualizar"
+              variant="outline-primary"
+              @click="carregar"
+          >
+            <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
+            {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
+          </BButton>
+        </div>
       </template>
     </PageHeader>
 
@@ -149,6 +162,7 @@ import {
   type Notificacao,
   obterStatusNotificacao,
   reenviarNotificacao,
+  buscarUrlLeitorEmailTestes,
 } from "@/services/notificacaoService";
 import {formatarDataHoraBR} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
@@ -166,6 +180,7 @@ const mostrarModalReenvio = ref(false);
 const mostrarPreview = ref(false);
 const mostrarDetalhes = ref(false);
 const reenviando = ref(false);
+const urlLeitorEmailTestes = ref<string | null>(null);
 
 const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
 
@@ -229,6 +244,14 @@ async function carregar() {
   }
 }
 
+async function carregarUrlLeitorEmailTestes() {
+  try {
+    urlLeitorEmailTestes.value = await buscarUrlLeitorEmailTestes();
+  } catch {
+    urlLeitorEmailTestes.value = null;
+  }
+}
+
 function abrirPreview(item: Notificacao) {
   itemParaPreview.value = item;
   mostrarPreview.value = true;
@@ -260,7 +283,10 @@ async function reenviar() {
   }
 }
 
-onMounted(carregar);
+onMounted(() => {
+  void carregar();
+  void carregarUrlLeitorEmailTestes();
+});
 </script>
 
 <style scoped>

@@ -34,6 +34,10 @@ export interface ReenvioNotificacaoResponse {
     reenfileiradas: number;
 }
 
+export interface UrlLeitorEmailTestesResponse {
+    url?: string | null;
+}
+
 export async function listarNotificacoesAdmin(limite = 50): Promise<Notificacao[]> {
     const response = await apiClient.get<Notificacao[]>("/admin/notificacoes/listar", {
         params: {limite}
@@ -46,6 +50,11 @@ export async function reenviarNotificacao(codigo: number): Promise<ReenvioNotifi
         `/admin/notificacoes/${codigo}/reenviar`
     );
     return response.data;
+}
+
+export async function buscarUrlLeitorEmailTestes(): Promise<string | null> {
+    const response = await apiClient.get<UrlLeitorEmailTestesResponse>("/admin/notificacoes/leitor-email-testes");
+    return response.data?.url?.trim() || null;
 }
 
 export function obterTimestampOrdenacao(item: Notificacao): number {

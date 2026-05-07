@@ -81,6 +81,7 @@ aplicacao:
   ambiente-testes: false
   url-acesso-hom: ${URL_ACESSO_HOM:http://localhost:5173}
   url-acesso-prod: ${URL_ACESSO_PROD:http://localhost:5173}
+  url-leitor-email-testes: ${URL_LEITOR_EMAIL_TESTES:}
   acesso-ad:
     base-url: https://sedesenvdev01.tre-pe.gov.br/acessoAD
     codigo-sistema: SGC
@@ -99,6 +100,7 @@ aplicacao:
 
 sgc:
   notificacao-email:
+    modo-envio: ${SGC_NOTIFICACAO_EMAIL_MODO_ENVIO:smtp}
     intervalo-worker-ms: ${SGC_NOTIFICACAO_EMAIL_INTERVALO_WORKER_MS:30000}
     lote-worker: ${SGC_NOTIFICACAO_EMAIL_LOTE_WORKER:20}
   monitoramento:
@@ -162,6 +164,10 @@ aplicacao:
   ambiente-testes: true
   jwt:
     secret: sgc-secret-key-change-this-in-production-minimum-64-chars-for-hs512
+
+sgc:
+  notificacao-email:
+    modo-envio: mock
 
 ---
 spring:
@@ -239,6 +245,8 @@ springdoc:
   swagger-ui.enabled: true
 
 sgc:
+  notificacao-email:
+    modo-envio: ${SGC_NOTIFICACAO_EMAIL_MODO_ENVIO:mock}
   feedback:
     screenshot-dir: ${SGC_FEEDBACK_SCREENSHOT_DIR:./feedbacks/screenshots}
     max-screenshot-size-bytes: 5242880

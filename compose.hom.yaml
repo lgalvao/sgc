@@ -14,9 +14,22 @@ services:
       DB_URL: "${DB_URL:-jdbc:oracle:thin:@desenvolvimentobd.tre-pe.gov.br:1521:admdes2}"
       COOKIE_SECURE: "${COOKIE_SECURE:-false}"
       LOGGING_FILE_NAME: /var/log/sgc/sgc.log
+      MAIL_HOST: "${MAIL_HOST:-mailpit}"
+      MAIL_PORT: "${MAIL_PORT:-1025}"
     volumes:
       - log-data:/var/log/sgc
       - feedback-data:/feedbacks/screenshots
+    depends_on:
+      - mailpit
+
+  mailpit:
+    image: docker.io/axllent/mailpit:v1.27
+    container_name: sgc-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+    environment:
+      TZ: America/Recife
 
 volumes:
   log-data:
