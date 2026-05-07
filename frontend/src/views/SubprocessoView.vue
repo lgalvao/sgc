@@ -143,9 +143,28 @@ const {
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 
-const subprocesso = computed<SubprocessoDetalhe | null>(
-    () => subprocessoStore.contextoEdicao?.detalhes ?? null,
-);
+const {
+  codigoSubprocesso,
+  erroNaoEncontrado,
+  atualizarSubprocessoAtual,
+} = useSubprocessoCarregamento({
+  codProcesso: props.codProcesso,
+  siglaUnidade: props.siglaUnidade,
+  codSubprocesso: props.codSubprocesso,
+  erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
+  garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
+  garantirContextoEdicaoPorProcessoEUnidade: subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade,
+  dadosEdicaoValidos: subprocessoStore.dadosEdicaoValidos,
+  invalidarMapa: mapasStore.invalidar,
+  exibirToastPendente,
+});
+
+const subprocesso = computed<SubprocessoDetalhe | null>(() => {
+  const detalhes = subprocessoStore.contextoEdicao?.detalhes ?? null;
+  if (!detalhes) return null;
+  if (typeof codigoSubprocesso.value !== "number") return null;
+  return detalhes.codigo === codigoSubprocesso.value ? detalhes : null;
+});
 
 const {
   habilitarAlterarDataLimite,
@@ -190,22 +209,6 @@ function exibirToastPendente() {
     });
   }
 }
-
-const {
-  codigoSubprocesso,
-  erroNaoEncontrado,
-  atualizarSubprocessoAtual,
-} = useSubprocessoCarregamento({
-  codProcesso: props.codProcesso,
-  siglaUnidade: props.siglaUnidade,
-  codSubprocesso: props.codSubprocesso,
-  erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
-  garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
-  garantirContextoEdicaoPorProcessoEUnidade: subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade,
-  dadosEdicaoValidos: subprocessoStore.dadosEdicaoValidos,
-  invalidarMapa: mapasStore.invalidar,
-  exibirToastPendente,
-});
 
 const {
   tipoReabertura,

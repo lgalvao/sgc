@@ -76,7 +76,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         AcaoPermissao acao = resolverAcao((String) permissao);
 
         return switch (tipoAlvo) {
-            case "Subprocesso" -> subprocessoRepo.buscarPorCodigoComMapaEAtividades((Long) codigoAlvo)
+            case "Subprocesso" -> subprocessoRepo.buscarPorCodigoComMapa((Long) codigoAlvo)
                     .map(sp -> verificarSubprocesso(usuario, sp, acao, true))
                     .orElse(false);
             case "Processo" -> processoRepo.buscarPorCodigoComParticipantes((Long) codigoAlvo)

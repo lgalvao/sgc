@@ -66,14 +66,14 @@ export function useSubprocessoCarregamento({
 
     onMounted(async () => {
         exibirToastPendente();
-        await carregarSubprocesso(true);
+        await carregarSubprocesso(false);
         carregamentoInicialConcluido.value = true;
     });
 
     watch(
         () => [codProcesso, siglaUnidade, codSubprocesso],
         async () => {
-            await carregarSubprocesso(true);
+            await carregarSubprocesso(false);
         },
     );
 
@@ -84,7 +84,7 @@ export function useSubprocessoCarregamento({
         if (typeof codigoAtual === "number" && dadosEdicaoValidos(codigoAtual)) {
             return;
         }
-        await carregarSubprocesso(true);
+        await carregarSubprocesso(false);
     });
 
     return {

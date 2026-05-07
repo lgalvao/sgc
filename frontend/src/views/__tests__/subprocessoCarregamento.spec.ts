@@ -44,7 +44,7 @@ describe('subprocessoCarregamento.ts', () => {
         await flushPromises() // Aguarda promessas do setup/onMounted
 
         expect(deps.exibirToastPendente).toHaveBeenCalled()
-        expect(deps.garantirContextoEdicao).toHaveBeenCalledWith(456, true)
+        expect(deps.garantirContextoEdicao).toHaveBeenCalledWith(456, false)
         expect(wrapper.vm.codigoSubprocesso).toBe(456)
         expect(wrapper.vm.erroNaoEncontrado).toBe(false)
     })
@@ -56,7 +56,7 @@ describe('subprocessoCarregamento.ts', () => {
         const wrapper = mount(TestComponent(deps))
         await flushPromises()
 
-        expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true)
+        expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false)
         expect(wrapper.vm.codigoSubprocesso).toBe(789)
     })
 
@@ -105,6 +105,6 @@ describe('subprocessoCarregamento.ts', () => {
 
         // @ts-expect-error - Acessando hook privado do vue para simular ativação
         await wrapper.vm.$.a?.[0]()
-        expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', true)
+        expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false)
     })
 })
