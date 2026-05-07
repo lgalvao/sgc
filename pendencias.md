@@ -20,6 +20,7 @@ Configs: linha antes do botão para org visual
 Relatorio andamento PDF com poluicao visual e campo DATA LIMITE GERAL inexistente e desalinhamentos
 Relatorios padronizar nome dos PDFs: sgc-rel-andamento-2026-05-05.pdf
 Administradores titulo do form.
+Ícones dos cards
 
 ## Fazer
 - Finalizar documento intro do sistema e converter para PDF

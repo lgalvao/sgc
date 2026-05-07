@@ -16,7 +16,7 @@
           <div class="card-click-area">
             <BCardTitle>{{ TEXTOS.relatorios.ANDAMENTO_PROCESSO }}</BCardTitle>
             <BCardText class="text-muted">
-              Visualize o status atual de cada unidade participante nos processos ativos.
+              Situação das unidades participantes em um processo ativo
             </BCardText>
           </div>
         </BCard>
@@ -35,7 +35,7 @@
           <div class="card-click-area">
             <BCardTitle>Mapas vigentes</BCardTitle>
             <BCardText class="text-muted">
-              Gere o documento consolidado de competências e atividades por unidade.
+              Detalhes de mapas de competências vigentes por unidade
             </BCardText>
           </div>
         </BCard>
