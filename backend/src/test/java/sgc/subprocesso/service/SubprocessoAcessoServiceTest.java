@@ -205,7 +205,7 @@ class SubprocessoAcessoServiceTest {
 
     @ParameterizedTest
     @EnumSource(SituacaoSubprocesso.class)
-    void shouldNuncaHabilitarEscritaForaDaUnidade(SituacaoSubprocesso situacao) {
+    void deveNuncaHabilitarEscritaForaDaUnidade(SituacaoSubprocesso situacao) {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(situacao);
 
@@ -230,7 +230,7 @@ class SubprocessoAcessoServiceTest {
     }
 
     @Test
-    void shouldPermitirEditarCadastroApenasParaChefeNaUnidadeEmRascunho() {
+    void devePermitirEditarCadastroApenasParaChefeNaUnidadeEmRascunho() {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
@@ -243,7 +243,7 @@ class SubprocessoAcessoServiceTest {
     }
 
     @Test
-    void shouldPermitirValidacaoDeMapaApenasParaChefe() {
+    void devePermitirValidacaoDeMapaApenasParaChefe() {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
@@ -259,7 +259,7 @@ class SubprocessoAcessoServiceTest {
     }
 
     @Test
-    void shouldManterComandosAdministrativosDisponiveisMasDesabilitarEscritaQuandoProcessoFinalizado() {
+    void deveManterComandosAdministrativosDisponiveisMasDesabilitarEscritaQuandoProcessoFinalizado() {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
 
