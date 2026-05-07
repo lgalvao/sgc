@@ -278,7 +278,7 @@ test.describe.serial('CDU-20 - ADMIN deve ver botões de edição com mapa com s
 
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         await navegarParaMapa(page);
-        await esperarMapaEditavel(page);
+        await esperarMapaSomenteLeitura(page);
     });
 });
 

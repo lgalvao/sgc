@@ -49,6 +49,11 @@
       </BAlert>
 
       <div v-if="dadosArvore.length > 0">
+        <ArvoreToolbar
+            v-model:termo-busca="termoBusca"
+            :modo-selecao="false"
+        />
+
         <TreeTable
             ref="treeTableRef"
             :columns="colunas"
@@ -89,6 +94,7 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoAlert.vue";
+import ArvoreToolbar from "@/components/unidade/ArvoreToolbar.vue";
 import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -125,6 +131,7 @@ const {
 } = useDiagnosticoOrganizacionalAlert(unidades, mostrarDiagnosticoOrganizacional);
 const router = useRouter();
 const carregamentoInicialConcluido = ref(false);
+const termoBusca = ref("");
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
@@ -145,7 +152,8 @@ const unidadesExibidas = computed(() => {
   return lista;
 });
 
-const dadosArvore = computed(() => mapearUnidadesParaLinhas(unidadesExibidas.value));
+const unidadesFiltradas = computed(() => filtrarUnidadesPorSigla(unidadesExibidas.value, termoBusca.value));
+const dadosArvore = computed(() => mapearUnidadesParaLinhas(unidadesFiltradas.value));
 
 function dadosLocaisValidos(): boolean {
   return unidades.value.length > 0 && !erro.value;
@@ -161,6 +169,30 @@ function expandirTodasLinhas() {
 
 function recolherTodasLinhas() {
   treeTableRef.value?.collapseAll();
+}
+
+function filtrarUnidadesPorSigla(unidadesOrigem: Unidade[], termo: string): Unidade[] {
+  const termoNormalizado = termo.trim().toLowerCase();
+  if (!termoNormalizado) {
+    return unidadesOrigem;
+  }
+
+  const resultado: Unidade[] = [];
+
+  for (const unidade of unidadesOrigem) {
+    const filhasFiltradas = filtrarUnidadesPorSigla(unidade.filhas ?? [], termo);
+    const siglaNormalizada = unidade.sigla.toLowerCase();
+    const corresponde = siglaNormalizada.includes(termoNormalizado);
+
+    if (corresponde || filhasFiltradas.length > 0) {
+      resultado.push({
+        ...unidade,
+        filhas: filhasFiltradas
+      });
+    }
+  }
+
+  return resultado;
 }
 
 async function carregarUnidades() {

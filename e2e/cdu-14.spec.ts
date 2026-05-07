@@ -25,8 +25,8 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
 async function validarCabecalhosHistorico(modal: ReturnType<typeof abrirHistoricoAnalise> extends Promise<infer T> ? T : never) {
     await expect(modal.getByTestId('header-historico-dataHora')).toBeVisible();
     await expect(modal.getByTestId('header-historico-unidade')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-resultado')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-analista')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-acao')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-usuario')).toBeVisible();
     await expect(modal.getByTestId('header-historico-observacao')).toBeVisible();
 }
 
@@ -121,7 +121,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         const modal = await abrirHistoricoAnalise(page);
         await validarCabecalhosHistorico(modal);
         await expect(modal.getByTestId('cell-dataHora-0')).not.toHaveText('');
-        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);
+        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Aceite/i);
         await fecharHistoricoAnalise(page);
     });
 });

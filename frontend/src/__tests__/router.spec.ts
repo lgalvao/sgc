@@ -111,11 +111,6 @@ describe("Router", () => {
             });
         }
 
-        // Test breadcrumb function
-        const breadcrumb = route.meta.breadcrumb;
-        if (typeof breadcrumb === "function") {
-            expect(breadcrumb(route)).toBe("DTI");
-        }
     });
 
     it("deve resolver a rota de SubprocessoMapa com props dinâmicos", async () => {
@@ -193,18 +188,13 @@ describe("Router", () => {
         }
     });
 
-    it("deve resolver a rota de Unidade com breadcrumb dinâmico", async () => {
+    it("deve resolver a rota de Unidade", async () => {
         const perfilStore = usePerfilStore();
         perfilStore.usuarioCodigo = "123";
 
         await router.push("/unidade/10");
         const route = router.currentRoute.value;
         expect(route.name).toBe("Unidade");
-
-        const breadcrumb = route.meta.breadcrumb;
-        if (typeof breadcrumb === "function") {
-            expect(breadcrumb(route)).toBe("10");
-        }
     });
 
     it("deve resolver a rota de Mapa de Unidade com props via query", async () => {

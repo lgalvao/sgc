@@ -21,8 +21,8 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
 async function validarCabecalhosHistorico(modal: ReturnType<typeof abrirHistoricoAnalise> extends Promise<infer T> ? T : never) {
     await expect(modal.getByTestId('header-historico-dataHora')).toBeVisible();
     await expect(modal.getByTestId('header-historico-unidade')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-resultado')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-analista')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-acao')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-usuario')).toBeVisible();
     await expect(modal.getByTestId('header-historico-observacao')).toBeVisible();
 }
 

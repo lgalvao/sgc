@@ -58,7 +58,7 @@ Rotas que exibem informações de uma unidade específica.
 
 | Rota                              | Nome                     | Breadcrumbs                          |
 |-----------------------------------|--------------------------|--------------------------------------|
-| `/unidade/:codUnidade`            | Unidade                  | 🏠 > [SIGLA] > Minha unidade         |
+| `/unidade/:codUnidade`            | Unidade                  | 🏠 > [SIGLA]                         |
 | `/unidade/:codUnidade/mapa`       | Mapa                     | 🏠 > [SIGLA] > Mapa de competências  |
 | `/unidade/:codUnidade/atribuicao` | AtribuicaoTemporariaForm | 🏠 > [SIGLA] > Atribuição temporária |
 
@@ -127,8 +127,8 @@ Para rotas de unidade, a hierarquia é:
 
 1. Usuário navega para `/unidade/1`
 2. Store de unidades carrega a unidade com sigla "SEDOC"
-3. Breadcrumbs exibidos: 🏠 > SEDOC > Minha unidade
-4. Se a unidade não estivesse carregada, mostraria: 🏠 > Unidade 1 > Minha unidade
+3. Breadcrumbs exibidos: 🏠 > SEDOC
+4. Se a unidade não estivesse carregada, mostraria: 🏠 > Unidade 1
 
 ### Cenário 4: Navegando para Atribuição temporária
 

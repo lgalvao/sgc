@@ -292,6 +292,40 @@ describe("Unidades.vue", () => {
         ]);
     });
 
+    it("deve filtrar unidades por sigla", async () => {
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce([
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 2, sigla: "DTI", nome: "Diretoria", filhas: []},
+                    {codigo: 3, sigla: "SGP", nome: "Gestao de Pessoas", filhas: []}
+                ]
+            }
+        ] as any);
+
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        const busca = wrapper.find('[data-testid="inp-arvore-busca"]');
+        await busca.setValue("dti");
+        await flushPromises();
+
+        const arvore = wrapper.findComponent({name: 'TreeTable'});
+        expect(arvore.props("data")).toEqual([
+            {
+                codigo: 2,
+                sigla: "DTI",
+                unidade: "DTI - Diretoria",
+                tipo: undefined,
+                children: [],
+                expanded: true,
+                clickable: true,
+            }
+        ]);
+    });
+
     it("deve exibir mensagem quando não houver unidades", async () => {
         const wrapper = createWrapper({unidades: []});
         await flushPromises();
