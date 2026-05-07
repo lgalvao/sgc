@@ -5,6 +5,7 @@ import {createTestingPinia} from '@pinia/testing';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {buscarUrlLeitorEmailTestes, listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
 import {formatarDestinatario} from "@/utils/notificacaoFormatters";
+import {ehModoProducao} from "@/utils/ambiente";
 
 vi.mock('@/services/notificacaoService', async (importActual) => {
     const actual = await importActual<typeof import('@/services/notificacaoService')>();
@@ -15,6 +16,10 @@ vi.mock('@/services/notificacaoService', async (importActual) => {
         buscarUrlLeitorEmailTestes: vi.fn()
     };
 });
+
+vi.mock('@/utils/ambiente', () => ({
+    ehModoProducao: vi.fn(() => false)
+}));
 
 const mockNotify = vi.fn();
 const mockClear = vi.fn();
@@ -36,6 +41,7 @@ describe('NotificacoesAdminView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(buscarUrlLeitorEmailTestes).mockResolvedValue(null);
+        vi.mocked(ehModoProducao).mockReturnValue(false);
     });
 
     const mountComponent = () => {
@@ -44,6 +50,7 @@ describe('NotificacoesAdminView', () => {
                 plugins: [createTestingPinia({createSpy: vi.fn}), router],
                 stubs: {
                     LayoutPadrao: {template: '<div><slot/></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="pagina-carregando"></div>'},
                     PageHeader: {template: '<div><slot name="actions"/></div>', props: ['title']},
                     ModalConfirmacao: {template: '<div><slot/></div>', props: ['modelValue']},
                     AppAlert: true,
@@ -79,7 +86,8 @@ describe('NotificacoesAdminView', () => {
         vi.mocked(listarNotificacoesAdmin).mockImplementation(() => new Promise(() => {
         }));
         const wrapper = mountComponent();
-        expect(wrapper.find('[data-testid="notificacoes-carregando"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="pagina-carregando"]').exists()).toBe(true);
+        expect(wrapper.text()).not.toContain('Notificações');
     });
 
     it('renders unified list of notifications', async () => {
@@ -124,15 +132,26 @@ describe('NotificacoesAdminView', () => {
 
     it('exibe link do leitor de e-mail de testes quando configurado', async () => {
         vi.mocked(listarNotificacoesAdmin).mockResolvedValue([] as any);
-        vi.mocked(buscarUrlLeitorEmailTestes).mockResolvedValue('https://seseldev05.tre-pe.gov.br:8025');
+        vi.mocked(buscarUrlLeitorEmailTestes).mockResolvedValue('https://seseldev06.tre-pe.gov.br/');
 
         const wrapper = mountComponent();
         await flushPromises();
 
         const link = wrapper.find('[data-testid="link-leitor-email-testes"]');
         expect(link.exists()).toBe(true);
-        expect(link.attributes('href')).toBe('https://seseldev05.tre-pe.gov.br:8025');
+        expect(link.attributes('href')).toBe('https://seseldev06.tre-pe.gov.br/');
         expect(link.text()).toContain('Leitor de e-mail de testes');
+    });
+
+    it('nao exibe link do leitor em producao', async () => {
+        vi.mocked(listarNotificacoesAdmin).mockResolvedValue([] as any);
+        vi.mocked(buscarUrlLeitorEmailTestes).mockResolvedValue('https://seseldev06.tre-pe.gov.br/');
+        vi.mocked(ehModoProducao).mockReturnValue(true);
+
+        const wrapper = mountComponent();
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="link-leitor-email-testes"]').exists()).toBe(false);
     });
 
     it('opens preview modal', async () => {

@@ -2,9 +2,7 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.configuracoes.TITULO"/>
 
-    <div v-if="loading" class="text-center py-4">
-      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary"/>
-    </div>
+    <CarregamentoPagina v-if="loading"/>
 
     <BAlert v-else-if="error" :model-value="true" variant="danger">
       {{ error }}
@@ -98,9 +96,10 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref, watch} from 'vue';
-import {BAlert, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormInvalidFeedback, BSpinner} from 'bootstrap-vue-next';
+import {BAlert, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormInvalidFeedback} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
+import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {type Parametro, useConfiguracoes} from '@/composables/useConfiguracoes';

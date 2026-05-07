@@ -1,58 +1,57 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.comum.MENU_NOTIFICACOES">
-      <template #actions>
-        <div class="d-flex flex-wrap justify-content-end gap-2">
-          <a
-              v-if="urlLeitorEmailTestes"
-              :href="urlLeitorEmailTestes"
-              class="btn btn-outline-secondary"
-              data-testid="link-leitor-email-testes"
-              rel="noopener noreferrer"
-              target="_blank"
-          >
-            <i aria-hidden="true" class="bi bi-mailbox2 me-1"></i>
-            Leitor de e-mail de testes
-          </a>
-          <BButton
-              :disabled="carregando"
-              data-testid="btn-notificacoes-atualizar"
-              variant="outline-primary"
-              @click="carregar"
-          >
-            <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
-            {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
-          </BButton>
-        </div>
-      </template>
-    </PageHeader>
-
-    <div v-if="carregando" class="text-center py-5" data-testid="notificacoes-carregando">
-      <BSpinner :label="TEXTOS.comum.CARREGANDO_DADOS" variant="primary"/>
-      <p class="mt-2 text-muted">{{ TEXTOS.comum.CARREGANDO_DADOS }}</p>
-    </div>
-
-    <BAlert v-else-if="erro" :model-value="true" variant="danger">
-      {{ erro }}
-    </BAlert>
+    <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
-      <AppAlert
-          v-if="notificacao"
-          :dispensavel="notificacao.dispensavel"
-          :mensagem="notificacao.mensagem"
-          :notification="notificacao.notificacao"
-          :stack-trace="notificacao.stackTrace"
-          :variante="notificacao.variante"
-          @dismissed="clear"
-      />
+      <PageHeader :title="TEXTOS.comum.MENU_NOTIFICACOES">
+        <template #actions>
+          <div class="d-flex flex-wrap justify-content-end gap-2">
+              <a
+                  v-if="mostrarLinkLeitorEmailTestes"
+                  :href="urlLeitorEmailTestes"
+                  class="btn btn-outline-secondary"
+                  data-testid="link-leitor-email-testes"
+                rel="noopener noreferrer"
+                target="_blank"
+            >
+              <i aria-hidden="true" class="bi bi-mailbox2 me-1"></i>
+              Leitor de e-mail de testes
+            </a>
+            <BButton
+                :disabled="carregando"
+                data-testid="btn-notificacoes-atualizar"
+                variant="outline-primary"
+                @click="carregar"
+            >
+              <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
+              {{ TEXTOS.administracao.NOTIFICACOES_ATUALIZAR }}
+            </BButton>
+          </div>
+        </template>
+      </PageHeader>
 
-      <NotificacaoTabela
-          :items="itensOrdenados"
-          @detalhes="abrirDetalhes"
-          @preview="abrirPreview"
-          @reenviar="confirmarReenvio"
-      />
+      <BAlert v-if="erro" :model-value="true" variant="danger">
+        {{ erro }}
+      </BAlert>
+
+      <template v-else>
+        <AppAlert
+            v-if="notificacao"
+            :dispensavel="notificacao.dispensavel"
+            :mensagem="notificacao.mensagem"
+            :notification="notificacao.notificacao"
+            :stack-trace="notificacao.stackTrace"
+            :variante="notificacao.variante"
+            @dismissed="clear"
+        />
+
+        <NotificacaoTabela
+            :items="itensOrdenados"
+            @detalhes="abrirDetalhes"
+            @preview="abrirPreview"
+            @reenviar="confirmarReenvio"
+        />
+      </template>
     </template>
 
     <BModal
@@ -147,9 +146,10 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BAlert, BButton, BModal, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton, BModal} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
@@ -165,6 +165,7 @@ import {
   buscarUrlLeitorEmailTestes,
 } from "@/services/notificacaoService";
 import {formatarDataHoraBR} from "@/utils";
+import {ehModoProducao} from "@/utils/ambiente";
 import {normalizarErro} from "@/utils/apiError";
 import {useNotification} from "@/composables/useNotification";
 
@@ -183,6 +184,7 @@ const reenviando = ref(false);
 const urlLeitorEmailTestes = ref<string | null>(null);
 
 const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
+const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
 
 function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";

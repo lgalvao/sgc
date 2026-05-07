@@ -1,32 +1,32 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Mapas vigentes">
-      <template #actions>
-        <BButton to="/relatorios" variant="outline-secondary">
-          <i class="bi bi-arrow-left me-1"/> Voltar
-        </BButton>
-      </template>
-    </PageHeader>
+    <CarregamentoPagina v-if="carregando && relatorioMapas.length === 0"/>
 
-    <RelatorioMapasFiltros
-        :carregando="carregando"
-        :tem-unidades-selecionadas="temUnidadesSelecionadas"
-        :unidades-disponiveis="unidadesDisponiveis"
-        :unidades-selecionadas="unidadesSelecionadas"
-        @exportar="exportarPdf"
-        @gerar="gerarRelatorio"
-        @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
+    <template v-else>
+      <PageHeader title="Mapas vigentes">
+        <template #actions>
+          <BButton to="/relatorios" variant="outline-secondary">
+            <i class="bi bi-arrow-left me-1"/> Voltar
+          </BButton>
+        </template>
+      </PageHeader>
 
-    <div v-if="carregando && relatorioMapas.length === 0" class="text-center py-5">
-      <BSpinner variant="primary"/>
-    </div>
+      <RelatorioMapasFiltros
+          :carregando="carregando"
+          :tem-unidades-selecionadas="temUnidadesSelecionadas"
+          :unidades-disponiveis="unidadesDisponiveis"
+          :unidades-selecionadas="unidadesSelecionadas"
+          @exportar="exportarPdf"
+          @gerar="gerarRelatorio"
+          @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
 
-    <template v-else-if="relatorioMapas.length > 0">
-      <div class="d-flex flex-column gap-3">
-        <RelatorioMapaVigenteCard
-            v-for="mapa in relatorioMapas"
-            :key="mapa.codigoUnidade"
-            :mapa="mapa"/>
+      <div v-if="relatorioMapas.length > 0">
+        <div class="d-flex flex-column gap-3">
+          <RelatorioMapaVigenteCard
+              v-for="mapa in relatorioMapas"
+              :key="mapa.codigoUnidade"
+              :mapa="mapa"/>
+        </div>
       </div>
     </template>
   </LayoutPadrao>
@@ -34,9 +34,10 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BSpinner} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import RelatorioMapasFiltros from "@/components/relatorios/RelatorioMapasFiltros.vue";
 import RelatorioMapaVigenteCard from "@/components/relatorios/RelatorioMapaVigenteCard.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";

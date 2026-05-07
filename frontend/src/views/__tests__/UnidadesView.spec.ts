@@ -247,8 +247,8 @@ describe("Unidades.vue", () => {
         const wrapper = createWrapper();
         // Aguarda um tick para o DOM refletir isLoading = true
         await wrapper.vm.$nextTick();
-        expect(wrapper.find(".spinner").exists()).toBe(true);
-        expect(wrapper.text()).toContain(TEXTOS.unidades.CARREGANDO_ARVORE);
+        expect(wrapper.find('[data-testid="pagina-carregando"]').exists()).toBe(true);
+        expect(wrapper.text()).not.toContain(TEXTOS.unidades.CARREGANDO_ARVORE);
     });
 
     it("deve exibir erro se houver erro ao carregar", async () => {

@@ -1,26 +1,24 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.relatorios.ANDAMENTO_PROCESSO">
-      <template #actions>
-        <BButton to="/relatorios" variant="outline-secondary">
-          <i class="bi bi-arrow-left me-1"/> Voltar
-        </BButton>
-      </template>
-    </PageHeader>
-
-    <RelatorioAndamentoFiltros
-        :carregando="carregando"
-        :cod-processo-selecionado="codProcessoSelecionado"
-        :opcoes-processos="opcoesProcessos"
-        @exportar="exportarPdf"
-        @gerar="gerarRelatorio"
-        @update:cod-processo-selecionado="codProcessoSelecionado = $event"/>
-
-    <div v-if="carregando && relatorioAndamento.length === 0" class="text-center py-5">
-      <BSpinner variant="primary"/>
-    </div>
+    <CarregamentoPagina v-if="carregando && relatorioAndamento.length === 0"/>
 
     <template v-else>
+      <PageHeader :title="TEXTOS.relatorios.ANDAMENTO_PROCESSO">
+        <template #actions>
+          <BButton to="/relatorios" variant="outline-secondary">
+            <i class="bi bi-arrow-left me-1"/> Voltar
+          </BButton>
+        </template>
+      </PageHeader>
+
+      <RelatorioAndamentoFiltros
+          :carregando="carregando"
+          :cod-processo-selecionado="codProcessoSelecionado"
+          :opcoes-processos="opcoesProcessos"
+          @exportar="exportarPdf"
+          @gerar="gerarRelatorio"
+          @update:cod-processo-selecionado="codProcessoSelecionado = $event"/>
+
       <div v-if="relatorioAndamento.length > 0" class="d-flex flex-column gap-3">
         <RelatorioAndamentoCard
             v-for="(item, index) in linhasRelatorioAndamento"
@@ -33,11 +31,12 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BSpinner} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 import RelatorioAndamentoCard from "@/components/relatorios/RelatorioAndamentoCard.vue";
 import RelatorioAndamentoFiltros from "@/components/relatorios/RelatorioAndamentoFiltros.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {TEXTOS} from "@/constants/textos";
 import * as painelService from "@/services/painelService";

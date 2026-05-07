@@ -1,12 +1,11 @@
 <template>
   <LayoutPadrao>
-    <div class="col-lg-8 col-md-9 col-12">
+    <CarregamentoPagina v-if="carregandoInicial && !unidade"/>
+
+    <div v-else class="col-lg-8 col-md-9 col-12">
       <PageHeader :title="TEXTOS.atribuicaoTemporaria.TITULO">
         <template v-if="unidade" #default>
           {{ unidade.sigla }}
-        </template>
-        <template v-else-if="carregandoInicial" #default>
-          <BSpinner small variant="secondary"/>
         </template>
         <template #actions>
           <BButton :to="`/unidade/${props.codUnidade}`" variant="outline-secondary">
@@ -33,8 +32,6 @@
       >
         {{ erroFormulario }}
       </BAlert>
-
-      <CarregamentoPagina v-if="carregandoInicial && !unidade"/>
 
       <BForm v-else class="mt-4" @submit.prevent="criarAtribuicao">
         <BFormGroup
@@ -157,8 +154,7 @@ import {
   BFormGroup,
   BFormInvalidFeedback,
   BFormTextarea,
-  BRow,
-  BSpinner
+  BRow
 } from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";

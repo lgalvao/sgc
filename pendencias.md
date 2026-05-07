@@ -3,10 +3,10 @@
 ## Bugs
 Breadcrumbs
 Atualização de cache no background pode estar zerando mapa
-Administradores carregamento
 Falta de padronização nas mensagens de carregamento. Melhor usar apenas o icone.
 
 ## Melhorias
+Administradores carregamento
 Tela de preview de email, botões Cancel e OK errados
 Config de modo escuro para nao-admin
 Na tela unidades, adicionar filtro por sigla

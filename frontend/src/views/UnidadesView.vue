@@ -1,92 +1,91 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.unidades.TITULO">
-      <template #description>
-        {{ TEXTOS.unidades.SUBTITULO }}
-      </template>
-      <template #actions>
+    <CarregamentoPagina v-if="isLoading"/>
+
+    <template v-else>
+      <PageHeader :title="TEXTOS.unidades.TITULO">
+        <template #description>
+          {{ TEXTOS.unidades.SUBTITULO }}
+        </template>
+        <template #actions>
+          <BButton
+              aria-label="Expandir todas as linhas"
+              class="me-2"
+              data-testid="btn-unidades-expandir-todas"
+              size="sm"
+              variant="outline-primary"
+              @click="expandirTodasLinhas"
+          >
+            <i aria-hidden="true" class="bi bi-arrows-expand"/>
+          </BButton>
+          <BButton
+              aria-label="Recolher todas as linhas"
+              data-testid="btn-unidades-recolher-todas"
+              size="sm"
+              variant="outline-secondary"
+              @click="recolherTodasLinhas"
+          >
+            <i aria-hidden="true" class="bi bi-arrows-collapse"/>
+          </BButton>
+        </template>
+      </PageHeader>
+      <ProcessoDiagnosticoAlert
+          :carregando="carregandoDiagnosticoOrganizacional"
+          :exibir="exibirAlertaDiagnostico"
+          :grupos="gruposDiagnostico"
+          :resumo="resumoDiagnostico"
+          :unidades-sem-responsavel="unidadesSemResponsavel"
+          @dismiss="dispensarAlertaDiagnostico"
+      />
+
+      <BAlert
+          v-if="erroUnidades"
+          :model-value="true"
+          dismissible
+          variant="danger"
+          @dismissed="clearError()"
+      >
+        {{ erroUnidades.message }}
+      </BAlert>
+
+      <div v-if="dadosArvore.length > 0">
+        <TreeTable
+            ref="treeTableRef"
+            :columns="colunas"
+            :data="dadosArvore"
+            :hide-controls="true"
+            :hide-headers="true"
+            :striped="false"
+            @row-click="abrirDetalheUnidade"
+        />
+      </div>
+
+      <EmptyState
+          v-else
+          :description="TEXTOS.unidades.EMPTY_DESCRIPTION"
+          :title="TEXTOS.unidades.EMPTY_TITLE"
+          icon="bi-diagram-3"
+      >
         <BButton
-            aria-label="Expandir todas as linhas"
-            class="me-2"
-            data-testid="btn-unidades-expandir-todas"
+            data-testid="btn-unidades-recarregar"
             size="sm"
             variant="outline-primary"
-            @click="expandirTodasLinhas"
+            @click="carregarUnidades"
         >
-          <i aria-hidden="true" class="bi bi-arrows-expand"/>
+          {{ TEXTOS.unidades.BOTAO_ATUALIZAR }}
         </BButton>
-        <BButton
-            aria-label="Recolher todas as linhas"
-            data-testid="btn-unidades-recolher-todas"
-            size="sm"
-            variant="outline-secondary"
-            @click="recolherTodasLinhas"
-        >
-          <i aria-hidden="true" class="bi bi-arrows-collapse"/>
-        </BButton>
-      </template>
-    </PageHeader>
-
-    <ProcessoDiagnosticoAlert
-        :carregando="carregandoDiagnosticoOrganizacional"
-        :exibir="exibirAlertaDiagnostico"
-        :grupos="gruposDiagnostico"
-        :resumo="resumoDiagnostico"
-        :unidades-sem-responsavel="unidadesSemResponsavel"
-        @dismiss="dispensarAlertaDiagnostico"
-    />
-
-    <BAlert
-        v-if="erroUnidades"
-        :model-value="true"
-        dismissible
-        variant="danger"
-        @dismissed="clearError()"
-    >
-      {{ erroUnidades.message }}
-    </BAlert>
-
-    <div v-if="isLoading" class="text-center py-5">
-      <BSpinner :label="TEXTOS.unidades.CARREGANDO" variant="primary"/>
-      <p class="mt-2 text-muted">{{ TEXTOS.unidades.CARREGANDO_ARVORE }}</p>
-    </div>
-
-    <div v-else-if="dadosArvore.length > 0">
-      <TreeTable
-          ref="treeTableRef"
-          :columns="colunas"
-          :data="dadosArvore"
-          :hide-controls="true"
-          :hide-headers="true"
-          :striped="false"
-          @row-click="abrirDetalheUnidade"
-      />
-    </div>
-
-    <EmptyState
-        v-else
-        :description="TEXTOS.unidades.EMPTY_DESCRIPTION"
-        :title="TEXTOS.unidades.EMPTY_TITLE"
-        icon="bi-diagram-3"
-    >
-      <BButton
-          data-testid="btn-unidades-recarregar"
-          size="sm"
-          variant="outline-primary"
-          @click="carregarUnidades"
-      >
-        {{ TEXTOS.unidades.BOTAO_ATUALIZAR }}
-      </BButton>
-    </EmptyState>
+      </EmptyState>
+    </template>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onActivated, onMounted, ref} from "vue";
-import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoAlert.vue";

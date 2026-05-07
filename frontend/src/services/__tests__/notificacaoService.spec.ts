@@ -32,11 +32,11 @@ describe("notificacaoService", () => {
     });
 
     it("buscarUrlLeitorEmailTestes deve chamar endpoint administrativo do leitor", async () => {
-        vi.mocked(apiClient.get).mockResolvedValue({data: {url: "https://seseldev05.tre-pe.gov.br:8025"}});
+        vi.mocked(apiClient.get).mockResolvedValue({data: {url: "https://seseldev06.tre-pe.gov.br/"}});
 
         const resultado = await service.buscarUrlLeitorEmailTestes();
 
         expect(apiClient.get).toHaveBeenCalledWith("/admin/notificacoes/leitor-email-testes");
-        expect(resultado).toBe("https://seseldev05.tre-pe.gov.br:8025");
+        expect(resultado).toBe("https://seseldev06.tre-pe.gov.br/");
     });
 });

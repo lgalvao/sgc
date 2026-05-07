@@ -1,120 +1,122 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.administracao.TITULO">
-      <template #actions>
-        <div class="d-flex gap-2">
-          <BButton
-              data-testid="btn-abrir-modal-add-admin"
-              variant="outline-primary"
-              @click="abrirModalAdicionarAdmin"
-          >
-            <i aria-hidden="true" class="bi bi-person-plus me-1"></i> {{ TEXTOS.administracao.BOTAO_ADICIONAR }}
-          </BButton>
-        </div>
-      </template>
-    </PageHeader>
-
     <CarregamentoPagina
         v-if="carregandoInicial"
         :mensagem="TEXTOS.comum.CARREGANDO_DADOS"
     />
 
-    <BAlert v-else-if="erroAdmins" :model-value="true" variant="danger">
-      {{ erroAdmins }}
-    </BAlert>
-
-    <div v-else-if="administradores.length === 0">
-      <EmptyState
-          :description="TEXTOS.administracao.EMPTY_DESCRIPTION"
-          :title="TEXTOS.administracao.EMPTY_TITLE"
-          icon="bi-people"
-      />
-    </div>
-
-    <BTable
-        v-else
-        :fields="camposAdmins"
-        :items="administradores"
-        :busy="carregandoAdmins"
-        hover
-        responsive
-        striped
-    >
-      <template #table-busy>
-        <div class="text-center text-primary my-2">
-          <BSpinner class="align-middle me-2" small/>
-          <strong>{{ TEXTOS.comum.CARREGANDO }}</strong>
-        </div>
-      </template>
-
-      <template #cell(acoes)="{ item }">
-        <div class="text-end">
-          <LoadingButton
-              :loading="removendoAdmin === item.tituloEleitoral"
-              :title="TEXTOS.comum.BOTAO_REMOVER"
-              class="text-secondary"
-              icon="trash"
-              size="sm"
-              variant="link"
-              @click="confirmarRemocao(item)"
-          />
-        </div>
-      </template>
-    </BTable>
-
-    <!-- Modal: Adicionar administrador -->
-    <ModalConfirmacao
-        v-model="mostrarModalAdicionarAdmin"
-        :auto-close="false"
-        :loading="adicionandoAdmin"
-        :ok-title="TEXTOS.comum.BOTAO_CRIAR"
-        :titulo="TEXTOS.administracao.MODAL_ADICIONAR_TITULO"
-        variant="success"
-        @confirmar="adicionarAdmin"
-        @shown="() => inputTituloRef?.focus()"
-    >
-      <BAlert v-if="erroAdicionarAdmin" :model-value="true" class="mb-3" variant="danger">
-        {{ erroAdicionarAdmin }}
-      </BAlert>
-      <BFormGroup
-          class="mb-3"
-          label-for="tituloEleitoral"
-      >
-        <template #label>
-          {{ TEXTOS.administracao.LABEL_TITULO }} <span aria-hidden="true" class="text-danger">*</span>
+    <template v-else>
+      <PageHeader :title="TEXTOS.administracao.TITULO">
+        <template #actions>
+          <div class="d-flex gap-2">
+            <BButton
+                data-testid="btn-abrir-modal-add-admin"
+                variant="outline-primary"
+                @click="abrirModalAdicionarAdmin"
+            >
+              <i aria-hidden="true" class="bi bi-person-plus me-1"></i> {{ TEXTOS.administracao.BOTAO_ADICIONAR }}
+            </BButton>
+          </div>
         </template>
-        <BuscadorUsuarios
-            id="tituloEleitoral"
-            ref="inputTituloRef"
-            v-model:selecionado="usuarioSelecionado"
-            v-model:termo="termoUsuario"
-            :placeholder="TEXTOS.administracao.PLACEHOLDER_TITULO"
-            :state="mensagemErroNovoAdmin ? false : null"
-            @keydown.enter.prevent="adicionarAdmin"
-        />
-        <BFormInvalidFeedback :state="mensagemErroNovoAdmin ? false : null">
-          {{ mensagemErroNovoAdmin }}
-        </BFormInvalidFeedback>
-      </BFormGroup>
-    </ModalConfirmacao>
+      </PageHeader>
 
-    <!-- Modal: Remover administrador -->
-    <ModalConfirmacao
-        v-model="mostrarModalRemoverAdmin"
-        :auto-close="false"
-        :loading="removendoAdmin !== null"
-        :ok-title="TEXTOS.comum.BOTAO_REMOVER"
-        :titulo="TEXTOS.administracao.MODAL_REMOVER_TITULO"
-        variant="danger"
-        @confirmar="removerAdmin"
-    >
-      <BAlert v-if="erroRemoverAdmin" :model-value="true" class="mb-3" variant="danger">
-        {{ erroRemoverAdmin }}
+      <BAlert v-if="erroAdmins" :model-value="true" variant="danger">
+        {{ erroAdmins }}
       </BAlert>
-      <p v-if="adminParaRemover">
-        {{ TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(adminParaRemover.nome) }}
-      </p>
-    </ModalConfirmacao>
+
+      <div v-else-if="administradores.length === 0">
+        <EmptyState
+            :description="TEXTOS.administracao.EMPTY_DESCRIPTION"
+            :title="TEXTOS.administracao.EMPTY_TITLE"
+            icon="bi-people"
+        />
+      </div>
+
+      <BTable
+          v-else
+          :fields="camposAdmins"
+          :items="administradores"
+          :busy="carregandoAdmins"
+          hover
+          responsive
+          striped
+      >
+        <template #table-busy>
+          <div class="text-center text-primary my-2">
+            <BSpinner class="align-middle me-2" small/>
+            <strong>{{ TEXTOS.comum.CARREGANDO }}</strong>
+          </div>
+        </template>
+
+        <template #cell(acoes)="{ item }">
+          <div class="text-end">
+            <LoadingButton
+                :loading="removendoAdmin === item.tituloEleitoral"
+                :title="TEXTOS.comum.BOTAO_REMOVER"
+                class="text-secondary"
+                icon="trash"
+                size="sm"
+                variant="link"
+                @click="confirmarRemocao(item)"
+            />
+          </div>
+        </template>
+      </BTable>
+
+      <!-- Modal: Adicionar administrador -->
+      <ModalConfirmacao
+          v-model="mostrarModalAdicionarAdmin"
+          :auto-close="false"
+          :loading="adicionandoAdmin"
+          :ok-title="TEXTOS.comum.BOTAO_CRIAR"
+          :titulo="TEXTOS.administracao.MODAL_ADICIONAR_TITULO"
+          variant="success"
+          @confirmar="adicionarAdmin"
+          @shown="() => inputTituloRef?.focus()"
+      >
+        <BAlert v-if="erroAdicionarAdmin" :model-value="true" class="mb-3" variant="danger">
+          {{ erroAdicionarAdmin }}
+        </BAlert>
+        <BFormGroup
+            class="mb-3"
+            label-for="tituloEleitoral"
+        >
+          <template #label>
+            {{ TEXTOS.administracao.LABEL_TITULO }} <span aria-hidden="true" class="text-danger">*</span>
+          </template>
+          <BuscadorUsuarios
+              id="tituloEleitoral"
+              ref="inputTituloRef"
+              v-model:selecionado="usuarioSelecionado"
+              v-model:termo="termoUsuario"
+              :placeholder="TEXTOS.administracao.PLACEHOLDER_TITULO"
+              :state="mensagemErroNovoAdmin ? false : null"
+              @keydown.enter.prevent="adicionarAdmin"
+          />
+          <BFormInvalidFeedback :state="mensagemErroNovoAdmin ? false : null">
+            {{ mensagemErroNovoAdmin }}
+          </BFormInvalidFeedback>
+        </BFormGroup>
+      </ModalConfirmacao>
+
+      <!-- Modal: Remover administrador -->
+      <ModalConfirmacao
+          v-model="mostrarModalRemoverAdmin"
+          :auto-close="false"
+          :loading="removendoAdmin !== null"
+          :ok-title="TEXTOS.comum.BOTAO_REMOVER"
+          :titulo="TEXTOS.administracao.MODAL_REMOVER_TITULO"
+          variant="danger"
+          @confirmar="removerAdmin"
+      >
+        <BAlert v-if="erroRemoverAdmin" :model-value="true" class="mb-3" variant="danger">
+          {{ erroRemoverAdmin }}
+        </BAlert>
+        <p v-if="adminParaRemover">
+          {{ TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(adminParaRemover.nome) }}
+        </p>
+      </ModalConfirmacao>
+    </template>
   </LayoutPadrao>
 </template>
 

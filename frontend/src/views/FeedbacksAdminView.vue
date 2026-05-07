@@ -1,76 +1,75 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.administracao.FEEDBACKS_TITULO">
-      <template #actions>
-        <BButton
-            :disabled="carregando"
-            data-testid="btn-feedbacks-atualizar"
-            variant="outline-primary"
-            @click="carregar"
-        >
-          <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
-          {{ TEXTOS.administracao.FEEDBACKS_ATUALIZAR }}
-        </BButton>
-      </template>
-    </PageHeader>
+    <CarregamentoPagina v-if="carregando"/>
 
-    <div v-if="carregando" class="text-center py-5" data-testid="feedbacks-carregando">
-      <BSpinner :label="TEXTOS.comum.CARREGANDO_DADOS" variant="primary"/>
-      <p class="mt-2 text-muted">{{ TEXTOS.comum.CARREGANDO_DADOS }}</p>
-    </div>
+    <template v-else>
+      <PageHeader :title="TEXTOS.administracao.FEEDBACKS_TITULO">
+        <template #actions>
+          <BButton
+              :disabled="carregando"
+              data-testid="btn-feedbacks-atualizar"
+              variant="outline-primary"
+              @click="carregar"
+          >
+            <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
+            {{ TEXTOS.administracao.FEEDBACKS_ATUALIZAR }}
+          </BButton>
+        </template>
+      </PageHeader>
 
-    <BAlert v-else-if="erro" :model-value="true" variant="danger">
-      {{ erro }}
-    </BAlert>
+      <BAlert v-if="erro" :model-value="true" variant="danger">
+        {{ erro }}
+      </BAlert>
 
-    <EmptyState
-        v-else-if="feedbacks.length === 0"
-        :description="TEXTOS.administracao.FEEDBACKS_SEM_REGISTROS"
-        :title="TEXTOS.administracao.FEEDBACKS_TITULO"
-        icon="bi-chat-left-text"
-    />
+      <EmptyState
+          v-else-if="feedbacks.length === 0"
+          :description="TEXTOS.administracao.FEEDBACKS_SEM_REGISTROS"
+          :title="TEXTOS.administracao.FEEDBACKS_TITULO"
+          icon="bi-chat-left-text"
+      />
 
-    <BTable
-        v-else
-        :fields="campos"
-        :items="feedbacks"
-        hover
-        responsive
-        small
-        striped
-    >
-      <template #cell(tipo)="{ item }">
-        <BBadge :variant="obterVarianteTipo(item.tipo)">
-          <i :class="['bi', iconesTipo[item.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
-          {{ formatarTipo(item.tipo) }}
-        </BBadge>
-      </template>
+      <BTable
+          v-else
+          :fields="campos"
+          :items="feedbacks"
+          hover
+          responsive
+          small
+          striped
+      >
+        <template #cell(tipo)="{ item }">
+          <BBadge :variant="obterVarianteTipo(item.tipo)">
+            <i :class="['bi', iconesTipo[item.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
+            {{ formatarTipo(item.tipo) }}
+          </BBadge>
+        </template>
 
-      <template #cell(usuarioNome)="{ item }">
-        <div class="fw-semibold">{{ item.usuarioNome }}</div>
-        <div class="small text-body-secondary">{{ item.usuarioCodigo }}</div>
-      </template>
+        <template #cell(usuarioNome)="{ item }">
+          <div class="fw-semibold">{{ item.usuarioNome }}</div>
+          <div class="small text-body-secondary">{{ item.usuarioCodigo }}</div>
+        </template>
 
-      <template #cell(nota)="{ item }">
-        <span class="feedback-resumo">{{ resumirNota(item.nota) }}</span>
-      </template>
+        <template #cell(nota)="{ item }">
+          <span class="feedback-resumo">{{ resumirNota(item.nota) }}</span>
+        </template>
 
-      <template #cell(enviadoEm)="{ item }">
-        {{ formatarDataHoraBR(item.enviadoEm) }}
-      </template>
+        <template #cell(enviadoEm)="{ item }">
+          {{ formatarDataHoraBR(item.enviadoEm) }}
+        </template>
 
-      <template #cell(acoes)="{ item }">
-        <BButton
-            :aria-label="`Ver detalhes do feedback ${item.codigo}`"
-            :data-testid="`btn-feedback-detalhes-${item.codigo}`"
-            size="sm"
-            variant="outline-secondary"
-            @click="abrirDetalhes(item)"
-        >
-          <i class="bi bi-eye"></i>
-        </BButton>
-      </template>
-    </BTable>
+        <template #cell(acoes)="{ item }">
+          <BButton
+              :aria-label="`Ver detalhes do feedback ${item.codigo}`"
+              :data-testid="`btn-feedback-detalhes-${item.codigo}`"
+              size="sm"
+              variant="outline-secondary"
+              @click="abrirDetalhes(item)"
+          >
+            <i class="bi bi-eye"></i>
+          </BButton>
+        </template>
+      </BTable>
+    </template>
 
     <BModal
         v-model="mostrarDetalhes"
@@ -161,9 +160,10 @@
 
 <script lang="ts" setup>
 import {onMounted, ref} from "vue";
-import {BAlert, BBadge, BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
+import {BAlert, BBadge, BButton, BModal, BTable} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
 import {type FeedbackAdmin, listarFeedbacksAdmin, obterUrlScreenshot} from "@/services/feedbackAdminService";
