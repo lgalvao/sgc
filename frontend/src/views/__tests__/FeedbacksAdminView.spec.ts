@@ -113,7 +113,7 @@ describe("FeedbacksAdminView", () => {
             rotaNome: "Painel",
             rotaCaminho: "/subprocesso/123",
             rotaQuery: JSON.stringify({tab: "atividades"}),
-            dataEvento: "2026-05-04T10:00:00Z",
+            dataHora: "2026-05-04T10:00:00Z",
             larguraTela: 1920,
             alturaTela: 1080,
             fusoHorario: -180,
@@ -147,7 +147,8 @@ describe("FeedbacksAdminView", () => {
         expect(modal.text()).not.toContain("fusoHorario");
         expect(modal.text()).toContain("Acesso");
         expect(modal.text()).toContain("ADMIN - SESEL");
-        expect(modal.text()).toContain(formatarDataHoraBR("2026-05-04T10:00:00Z")); // Formato BR
+        expect(modal.text()).not.toContain("Data do evento");
+        expect(modal.text()).toContain(formatarDataHoraBR("2026-05-04T10:00:00Z")); // Formato BR (do campo Enviado em)
         expect(modal.text()).not.toContain("2026-05-04T10:00:00Z");
         
         // Clica na thumbnail para ampliar

@@ -261,11 +261,10 @@ function formatarMetadados(json?: string | null): Record<string, unknown> {
   try {
     const raw = JSON.parse(json);
     const filtrado: Record<string, unknown> = {};
-    const chavesIgnorar = ["rotaNome", "fusoHorario", "usuarioNome", "usuarioCodigo"];
+    const chavesIgnorar = ["rotaNome", "fusoHorario", "usuarioNome", "usuarioCodigo", "dataHora"];
 
     const mapaTraducoes: Record<string, string> = {
       tituloPagina: "Título da página",
-      dataHora: "Data do evento",
       idioma: "Idioma",
       userAgent: "Navegador",
     };
