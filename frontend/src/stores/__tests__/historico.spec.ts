@@ -32,6 +32,19 @@ describe("useHistoricoStore", () => {
         store.definirDados([]);
         store.invalidar();
         expect(store.carregado).toBe(false);
+        expect(store.processos).toEqual([]);
+    });
+
+    it("resetar deve limpar completamente o estado", () => {
+        const store = useHistoricoStore();
+        const processos = [{codigo: 1} as any];
+        store.definirDados(processos);
+
+        store.resetar();
+
+        expect(store.processos).toEqual([]);
+        expect(store.carregado).toBe(false);
+        expect(store.dadosValidos()).toBe(false);
     });
 
     it("deve garantir dados carregando do serviço", async () => {
@@ -63,6 +76,21 @@ describe("useHistoricoStore", () => {
         await store.garantirDados(true);
 
         expect(processoService.buscarProcessosFinalizados).toHaveBeenCalledTimes(1);
+    });
+
+    it("deve deduplicar chamadas concorrentes a garantirDados", async () => {
+        const store = useHistoricoStore();
+        let resolver: (v: any) => void;
+        const promessa = new Promise<any>(r => { resolver = r; });
+        vi.mocked(processoService.buscarProcessosFinalizados).mockReturnValue(promessa);
+
+        const p1 = store.garantirDados();
+        const p2 = store.garantirDados();
+        resolver!([{codigo: 1}]);
+        await Promise.all([p1, p2]);
+
+        expect(processoService.buscarProcessosFinalizados).toHaveBeenCalledTimes(1);
+        expect(store.processos).toEqual([{codigo: 1}]);
     });
 
     it("deve propagar erro no carregamento", async () => {

@@ -1,5 +1,50 @@
 # Plano de Política de Cache e Invalidação no Frontend
 
+## Estado atual (atualizado em 2026-05-08)
+
+### Concluído
+
+| Item | O que foi feito |
+| --- | --- |
+| `mapas` store | contrato correto: `invalidar()` preserva snapshot, `resetar()` limpa tudo; testes |
+| `processo` store | contrato correto (já estava próximo); testes |
+| `subprocesso` store | contrato correto (já estava próximo); testes |
+| `useCacheSync` | `org-cache-refreshed` invalida apenas org/unidade/painel; testes |
+| `useInvalidacaoNavegacao` | testes |
+| `useMapaOrquestracao` | parâmetro `limpar = false` explícito; testes |
+| `useCadastroOrquestracao` | testes |
+| `ProcessoDetalheView` | erro de recarga não apaga snapshot; testes de cache |
+| `AtribuicaoTemporariaView` | overlap `onMounted` + `onActivated` cortado; testes |
+| `UnidadeView` | overlap `watch(immediate)` + `onActivated` cortado; testes |
+| `UnidadesView` | testes |
+| `subprocessoCarregamento` | testes de keepAlive (não recarrega quando válido, recarrega quando stale) |
+
+### Pendente
+
+#### 1. Contrato uniforme dos stores
+
+| Store | Problema | Correção |
+| --- | --- | --- |
+| `painel` | sem `resetar()` | adicionar `resetar()`: zera processos, alertas, carregadoEm, codigosMarcadosComoLidos |
+| `historico` | sem `resetar()`; `garantirDados()` sem dedupe | adicionar `resetar()` + dedupe com promessa em andamento |
+| `organizacao` | `invalidar()` apaga diagnostico (colapsada com reset); `$reset()` delega a `invalidar()` | `invalidar()` preserva diagnostico, só marca `carregado = false`; `resetar()` limpa tudo; remover `$reset()` |
+| `unidade` | método `invalidarCache()` (nome inconsistente); sem `resetar()` | renomear para `invalidar()` em todos os pontos de chamada (`useCacheSync.ts`, `perfil.ts`, testes); adicionar `resetar()` |
+
+Cada item exige atualização dos testes correspondentes. Sem aliases ou camadas de compatibilidade — renomear e atualizar todos os pontos de uma vez.
+
+#### 2. Invalidação fora de escopo
+
+| Arquivo | Linha | Problema | Correção |
+| --- | --- | --- | --- |
+| `stores/perfil.ts` | 54–61 | `invalidarDadosDaSessao()` chama `resetar()` em processo/subprocesso/mapas mas `invalidar()` em painel e organizacao; na troca de perfil os dados do painel pertencem ao perfil anterior e devem ser descartados por completo | trocar `painelStore.invalidar()` e `organizacaoStore.invalidar()` por `resetar()` nos dois |
+
+#### 3. Overlap de carga
+
+| Arquivo | Linha | Problema | Correção |
+| --- | --- | --- | --- |
+| `views/ProcessoCadastroView.vue` | 259–275 | `carregarProcessoParaEdicao` seta `tipo.value = processo.tipo`, o que dispara `watch(tipo)` que chama `buscarUnidadesParaProcesso` de novo; mas a própria função já chamou `buscarUnidadesParaProcesso` na linha anterior | suspender o watch durante a carga inicial com uma flag `inicializando` |
+| `views/PainelView.vue` | 161 | flag nomeada `montadoUmaVez` diverge do padrão `carregamentoInicialConcluido` adotado nas demais views críticas | renomear para `carregamentoInicialConcluido` (ref reativo) para consistência |
+
 ## Objetivo
 
 Tornar a política de cache, invalidação e carregamento de contexto do frontend consistente, previsível e uniforme,
@@ -219,6 +264,10 @@ Escopo esperado:
   - havia divergência entre comentário e comportamento real em erro de recarga;
 - `useCacheSync`
   - já invalidava domínios demais antes do corte do SSE organizacional.
+- `useFluxoSubprocesso`
+  - o caminho de homologação sem retorno ao painel ainda passava `invalidarCaches: {}`, o que acionava invalidação implícita de `subprocesso` por efeito colateral do helper.
+- `useImpactoMapaModal`
+  - permitia cliques repetidos dispararem buscas concorrentes do mesmo impacto enquanto o carregamento anterior ainda estava em andamento.
 
 ### Hotspots que merecem revisão imediata
 
@@ -230,6 +279,8 @@ Escopo esperado:
   - depende de bootstrap por rota e vários `watch`, então merece revisão para garantir que mutações locais não disparem recargas fora de hora;
 - `MapaView`
   - depende de bootstrap por rota e de mutações locais no mesmo contexto, então precisa revisão focada em overlap de refresh pós-workflow.
+- `useMapaOrquestracao`
+  - o bootstrap por `processo + unidade` não explicitava o parâmetro `limpar = false`, abrindo espaço para semântica divergente em relação aos outros resolvedores de contexto.
 
 ## Fases de execução
 

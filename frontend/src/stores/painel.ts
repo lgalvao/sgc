@@ -31,6 +31,14 @@ export const usePainelStore = defineStore("painel", () => {
         carregadoEm.value = null;
     }
 
+    function resetar() {
+        processos.value = [];
+        alertas.value = [];
+        carregado.value = false;
+        carregadoEm.value = null;
+        codigosMarcadosComoLidos.value = new Set();
+    }
+
     function dadosValidos(): boolean {
         if (!carregado.value || carregadoEm.value === null) {
             return false;
@@ -53,6 +61,7 @@ export const usePainelStore = defineStore("painel", () => {
         carregadoEm,
         definirDados,
         invalidar,
+        resetar,
         dadosValidos,
         registrarLeitura,
         isMarcadoComoLido

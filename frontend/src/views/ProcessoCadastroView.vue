@@ -230,6 +230,7 @@ const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<Processo | null>(null);
 const isLoadingData = ref(false);
+let inicializando = false;
 
 onMounted(async () => {
   const codProcesso = route.query.codProcesso;
@@ -247,6 +248,7 @@ onMounted(async () => {
 
 async function carregarProcessoParaEdicao(codProcesso: number) {
   isLoadingData.value = true;
+  inicializando = true;
   try {
     const processo = await processoService.obterDetalhesProcesso(codProcesso);
     if (processo.situacao !== 'CRIADO') {
@@ -266,10 +268,12 @@ async function carregarProcessoParaEdicao(codProcesso: number) {
     logger.error("Erro ao carregar processo:", error);
   } finally {
     isLoadingData.value = false;
+    inicializando = false;
   }
 }
 
 watch(tipo, async (novoTipo) => {
+  if (inicializando) return;
   const codProcesso = processoEditando.value ? processoEditando.value.codigo : undefined;
   if (novoTipo) {
     await buscarUnidadesParaProcesso(novoTipo, codProcesso);

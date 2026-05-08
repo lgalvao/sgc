@@ -52,12 +52,12 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     function invalidarDadosDaSessao() {
-        painelStore.invalidar();
+        painelStore.resetar();
         processoStore.resetar();
         subprocessoStore.resetar();
-        unidadeStore.invalidarCache();
+        unidadeStore.invalidar();
         mapasStore.resetar();
-        organizacaoStore.invalidar();
+        organizacaoStore.resetar();
     }
 
     function aplicarSessaoPerfil(dados: SessaoPerfil) {

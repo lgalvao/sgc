@@ -62,7 +62,7 @@ describe('useCacheSync', () => {
         mapasStore = useMapasStore();
         lastInstance = null;
         vi.clearAllMocks();
-        vi.spyOn(unidadeStore, 'invalidarCache');
+        vi.spyOn(unidadeStore, 'invalidar');
         vi.spyOn(organizacaoStore, 'invalidar');
         vi.spyOn(painelStore, 'invalidar');
         vi.spyOn(processoStore, 'invalidar');
@@ -81,7 +81,7 @@ describe('useCacheSync', () => {
 
         lastInstance?.emit('org-cache-refreshed', {});
 
-        expect(unidadeStore.invalidarCache).toHaveBeenCalled();
+        expect(unidadeStore.invalidar).toHaveBeenCalled();
         expect(organizacaoStore.invalidar).toHaveBeenCalled();
         expect(painelStore.invalidar).toHaveBeenCalled();
         expect(processoStore.invalidar).not.toHaveBeenCalled();

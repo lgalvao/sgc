@@ -157,17 +157,16 @@ function exibirToastPendente() {
   return false;
 }
 
-// Controla se o mount inicial já ocorreu para evitar double-load com onActivated
-let montadoUmaVez = false;
+const carregamentoInicialConcluido = ref(false);
 
 onMounted(async () => {
-  montadoUmaVez = true;
   exibirToastPendente();
   await carregarDados();
+  carregamentoInicialConcluido.value = true;
 });
 
 onActivated(async () => {
-  if (!montadoUmaVez) return;
+  if (!carregamentoInicialConcluido.value) return;
   exibirToastPendente();
   // Só recarrega se o cache foi invalidado (ex: após ação de workflow)
   if (painelStore.dadosValidos()) return;

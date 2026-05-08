@@ -21,7 +21,7 @@ export function useCacheSync() {
     const source = new EventSource("/api/eventos");
 
     source.addEventListener(EVENTO_CACHE_ATUALIZADO, () => {
-        unidadeStore.invalidarCache();
+        unidadeStore.invalidar();
         organizacaoStore.invalidar();
         painelStore.invalidar();
     });

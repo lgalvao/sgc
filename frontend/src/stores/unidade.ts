@@ -47,11 +47,15 @@ export const useUnidadeStore = defineStore("unidade", () => {
         return promessa;
     }
 
-    function invalidarCache() {
+    function invalidar() {
         cacheArvoreElegibilidade.value.clear();
         cacheUnidades.value.clear();
         cacheMapasVigentes.value.clear();
         carregandoPromessas.clear();
+    }
+
+    function resetar() {
+        invalidar();
     }
 
     async function obterUnidade(codigo: number, forcar = false): Promise<Unidade | null> {
@@ -85,6 +89,7 @@ export const useUnidadeStore = defineStore("unidade", () => {
         garantirArvoreElegibilidade,
         obterUnidade,
         obterReferenciaMapaVigente,
-        invalidarCache
+        invalidar,
+        resetar,
     };
 });

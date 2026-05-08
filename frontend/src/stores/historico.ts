@@ -14,6 +14,8 @@ export const useHistoricoStore = defineStore("historico", () => {
     const carregado = ref(false);
     const carregando = ref(false);
 
+    let carregamentoEmAndamento: Promise<void> | null = null;
+
     function definirDados(novosProcessos: ProcessoResumo[]) {
         processos.value = novosProcessos;
         carregado.value = true;
@@ -21,6 +23,12 @@ export const useHistoricoStore = defineStore("historico", () => {
 
     function invalidar() {
         carregado.value = false;
+    }
+
+    function resetar() {
+        processos.value = [];
+        carregado.value = false;
+        carregamentoEmAndamento = null;
     }
 
     function dadosValidos(): boolean {
@@ -32,13 +40,20 @@ export const useHistoricoStore = defineStore("historico", () => {
             return;
         }
 
-        carregando.value = true;
-        try {
-            processos.value = await buscarProcessosFinalizados() ?? [];
-            carregado.value = true;
-        } finally {
-            carregando.value = false;
+        if (!carregamentoEmAndamento) {
+            carregamentoEmAndamento = (async () => {
+                carregando.value = true;
+                try {
+                    processos.value = await buscarProcessosFinalizados() ?? [];
+                    carregado.value = true;
+                } finally {
+                    carregando.value = false;
+                    carregamentoEmAndamento = null;
+                }
+            })();
         }
+
+        await carregamentoEmAndamento;
     }
 
     return {
@@ -47,6 +62,7 @@ export const useHistoricoStore = defineStore("historico", () => {
         carregando,
         definirDados,
         invalidar,
+        resetar,
         dadosValidos,
         garantirDados,
     };

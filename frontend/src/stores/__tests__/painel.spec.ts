@@ -30,7 +30,7 @@ describe("usePainelStore", () => {
         expect(store.carregadoEm).toBeGreaterThanOrEqual(agora);
     });
 
-    it("deve invalidar dados", () => {
+    it("deve invalidar dados preservando snapshot", () => {
         const store = usePainelStore();
         const processos = [{codigo: 1, sigla: "P1"} as any];
         const alertas = [{codigo: 10, mensagem: "A1"} as any];
@@ -42,6 +42,21 @@ describe("usePainelStore", () => {
         expect(store.carregadoEm).toBeNull();
         expect(store.processos).toEqual(processos);
         expect(store.alertas).toEqual(alertas);
+    });
+
+    it("resetar deve limpar completamente o estado", () => {
+        const store = usePainelStore();
+        store.definirDados([{codigo: 1} as any], [{codigo: 2} as any]);
+        store.registrarLeitura([1]);
+
+        store.resetar();
+
+        expect(store.carregado).toBe(false);
+        expect(store.carregadoEm).toBeNull();
+        expect(store.processos).toEqual([]);
+        expect(store.alertas).toEqual([]);
+        expect(store.isMarcadoComoLido(1)).toBe(false);
+        expect(store.dadosValidos()).toBe(false);
     });
 
     it("deve verificar se dados são válidos baseados no TTL", () => {

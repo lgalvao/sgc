@@ -58,6 +58,11 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
     }
 
     function invalidar() {
+        carregado.value = false;
+        carregamentoEmAndamento = null;
+    }
+
+    function resetar() {
         diagnostico.value = null;
         erroDiagnostico.value = null;
         carregado.value = false;
@@ -65,9 +70,5 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
         carregamentoEmAndamento = null;
     }
 
-    function $reset() {
-        invalidar();
-    }
-
-    return {diagnostico, erroDiagnostico, carregado, carregando, dadosValidos, garantirDiagnostico, recarregarDiagnostico, invalidar, $reset};
+    return {diagnostico, erroDiagnostico, carregado, carregando, dadosValidos, garantirDiagnostico, recarregarDiagnostico, invalidar, resetar};
 });

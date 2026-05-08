@@ -75,7 +75,7 @@ describe("organizacao store", () => {
             expect(context.store.diagnostico).toEqual(mockDiagnostico);
         });
 
-        it("deve limpar carregamento em andamento no reset", async () => {
+        it("deve limpar carregamento em andamento no invalidar", async () => {
             vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
                 possuiViolacoes: false,
                 resumo: "OK",
@@ -85,13 +85,13 @@ describe("organizacao store", () => {
             });
 
             await context.store.garantirDiagnostico(true);
-            context.store.$reset();
+            context.store.invalidar();
             await context.store.garantirDiagnostico(true);
 
             expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalledTimes(2);
         });
 
-        it("deve invalidar o cache explicitamente", async () => {
+        it("deve invalidar o cache preservando o snapshot do diagnóstico", async () => {
             vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
                 possuiViolacoes: false,
                 resumo: "OK",
@@ -104,13 +104,47 @@ describe("organizacao store", () => {
 
             context.store.invalidar();
 
+            expect(context.store.diagnostico).toEqual(expect.objectContaining({resumo: "OK"}));
+            expect(context.store.carregado).toBe(false);
+            expect(context.store.dadosValidos()).toBe(false);
+        });
+
+        it("resetar deve limpar completamente o estado", async () => {
+            vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
+                possuiViolacoes: false,
+                resumo: "OK",
+                grupos: [],
+                quantidadeTiposViolacao: 0,
+                quantidadeOcorrencias: 0
+            });
+
+            await context.store.garantirDiagnostico(true);
+
+            context.store.resetar();
+
             expect(context.store.diagnostico).toBeNull();
             expect(context.store.erroDiagnostico).toBeNull();
             expect(context.store.carregado).toBe(false);
             expect(context.store.dadosValidos()).toBe(false);
         });
 
-        it("deve recarregar diagnóstico explicitamente", async () => {
+        it("deve limpar carregamento em andamento no resetar", async () => {
+            vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
+                possuiViolacoes: false,
+                resumo: "OK",
+                grupos: [],
+                quantidadeTiposViolacao: 0,
+                quantidadeOcorrencias: 0
+            });
+
+            await context.store.garantirDiagnostico(true);
+            context.store.resetar();
+            await context.store.garantirDiagnostico(true);
+
+            expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalledTimes(2);
+        });
+
+        it("deve recarregar ao chamar recarregarDiagnostico", async () => {
             vi.mocked(unidadeService.buscarDiagnosticoOrganizacional)
                 .mockResolvedValueOnce({
                     possuiViolacoes: false,

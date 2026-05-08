@@ -81,10 +81,17 @@ describe("useUnidadeStore", () => {
         expect(store.cacheUnidades.get(1)).toEqual(unidade);
     });
 
-    it("invalidarCache deve limpar tudo", () => {
+    it("invalidar deve limpar tudo", () => {
         const store = useUnidadeStore();
         store.cacheUnidades.set(1, {codigo: 1} as any);
-        store.invalidarCache();
+        store.invalidar();
+        expect(store.cacheUnidades.size).toBe(0);
+    });
+
+    it("resetar deve limpar tudo", () => {
+        const store = useUnidadeStore();
+        store.cacheUnidades.set(1, {codigo: 1} as any);
+        store.resetar();
         expect(store.cacheUnidades.size).toBe(0);
     });
 
