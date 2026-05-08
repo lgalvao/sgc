@@ -243,7 +243,7 @@ public class ValidadorDadosOrganizacionais {
     private Set<String> diagnosticarTitulosDuplicados(List<String> titulos) {
         List<Map<String, Object>> result = namedParameterJdbcTemplate.queryForList("""
                 SELECT titulo, COUNT(*) AS quantidade
-                FROM sgc.VW_USUARIO_BK
+                FROM sgc.VW_USUARIO
                 WHERE titulo IN (:titulos)
                 GROUP BY titulo
                 HAVING COUNT(*) > 1

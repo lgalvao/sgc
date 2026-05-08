@@ -3,15 +3,11 @@
 ## Bugs
 Breadcrumbs
 Atualização de cache no background pode estar zerando mapa
+Config de modo escuro estranho
 
 ## Melhorias
-Config de modo escuro para nao-admin
-Na tela unidades, adicionar filtro por sigla
 Decidir sobre breadcrumbs ou botao Voltar
 Script sql nao esta gerando historico de analises
-Configs: linha antes do botão para org visual
-Relatorio andamento PDF com poluicao visual e campo DATA LIMITE GERAL inexistente e desalinhamentos
-Relatorios padronizar nome dos PDFs: sgc-rel-andamento-2026-05-05.pdf
 Administradores titulo do form.
 Ícones dos cards
 
@@ -20,6 +16,10 @@ Administradores titulo do form.
 - Enviar email com o pdf e url para SEDOC
 
 ## Feitos
+Na tela unidades, adicionar filtro por sigla
+Relatorio andamento PDF com poluicao visual e campo DATA LIMITE GERAL inexistente e desalinhamentos
+Relatorios padronizar nome dos PDFs: sgc-rel-andamento-2026-05-05.pdf
+Configs: linha antes do botão para org visual
 Resolver historico de analises
 Criar script que cria o processo preenchido/finalizado da SESEL 
 Rodar script que limpa todos os processos
