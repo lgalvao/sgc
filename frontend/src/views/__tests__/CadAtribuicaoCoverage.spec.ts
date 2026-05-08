@@ -35,13 +35,13 @@ function criarWrapper(props: { codUnidade: number } = {codUnidade: 1}) {
     return mount(CadAtribuicao, {
         ...common,
         props,
-        global: {
-            ...common.global,
-            stubs: {
-                ...(common.global?.stubs ?? {}),
-                LayoutPadrao: true,
-                BContainer: true,
-                BCard: true,
+            global: {
+                ...common.global,
+                stubs: {
+                    ...common.global?.stubs,
+                    LayoutPadrao: true,
+                    BContainer: true,
+                    BCard: true,
                 BCardBody: true,
                 BForm: true,
                 BFormSelect: true,

@@ -119,7 +119,7 @@ type TreeTableRef = {
 
 const unidades = ref<Unidade[]>([]);
 const treeTableRef = ref<TreeTableRef | null>(null);
-const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
+const {carregando: isLoading, erro, executar} = useAsyncAction();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
 const {
   carregandoDiagnosticoOrganizacional,
@@ -196,9 +196,9 @@ function filtrarUnidadesPorSigla(unidadesOrigem: Unidade[], termo: string): Unid
 }
 
 async function carregarUnidades() {
-  await executarSilencioso(async () => {
+  await executar(async () => {
     unidades.value = await buscarTodasUnidades();
-  }, TEXTOS.comum.ERRO_OPERACAO);
+  }, TEXTOS.comum.ERRO_OPERACAO, {relancarErro: false});
 }
 
 function mapearUnidadeParaLinha(unidade: Unidade): LinhaUnidadeArvore {

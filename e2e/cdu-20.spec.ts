@@ -9,7 +9,6 @@ import {
     abrirAcaoPrincipalMapa,
     abrirDevolucaoMapa,
     abrirSugestoesMapa,
-    esperarMapaEditavel,
     esperarMapaSomenteLeitura,
     navegarParaMapa
 } from './helpers/helpers-mapas.js';

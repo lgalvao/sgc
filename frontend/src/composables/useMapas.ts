@@ -7,7 +7,7 @@ import {useMapasStore} from "@/stores/mapas";
 export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | undefined>) {
     const mapasStore = useMapasStore();
     const {mapaCompleto: mapaCompletoGlobal, impactoMapa: impactoMapaGlobal} = storeToRefs(mapasStore);
-    const {carregando, erro, executarSilencioso} = useAsyncAction();
+    const {carregando, erro, executar} = useAsyncAction();
     const mapaCompleto = codigoSubprocesso === undefined
         ? mapaCompletoGlobal
         : computed(() => {
@@ -26,9 +26,9 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         });
 
     async function buscarMapaCompleto(codSubprocesso: number) {
-        await executarSilencioso(async () => {
+        await executar(async () => {
             await mapasStore.garantirMapaCompleto(codSubprocesso);
-        }, "Erro ao carregar mapa completo.");
+        }, "Erro ao carregar mapa completo.", {relancarErro: false});
     }
 
     async function buscarImpactoMapa(codSubprocesso: number) {
@@ -36,9 +36,9 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
             return;
         }
 
-        await executarSilencioso(async () => {
+        await executar(async () => {
             await mapasStore.garantirImpactoMapa(codSubprocesso);
-        }, "Erro ao verificar impactos.");
+        }, "Erro ao verificar impactos.", {relancarErro: false});
     }
 
     return {

@@ -20,6 +20,10 @@ export function useAsyncAction() {
     const carregando = ref(false);
     const erro = ref<string | null>(null);
 
+    type OpcaoExecucao = {
+        relancarErro?: boolean;
+    };
+
     function obterMensagemErro(error: unknown, mensagemPadrao: string): string {
         if (error instanceof Error && error.message) {
             return error.message;
@@ -30,7 +34,17 @@ export function useAsyncAction() {
 
     async function executar<T>(
         acao: () => Promise<T>,
-        mensagemErro = "Erro na operação"
+        mensagemErro?: string
+    ): Promise<T>;
+    async function executar<T>(
+        acao: () => Promise<T>,
+        mensagemErro: string | undefined,
+        opcoes: {relancarErro: false}
+    ): Promise<T | undefined>;
+    async function executar<T>(
+        acao: () => Promise<T>,
+        mensagemErro = "Erro na operação",
+        opcoes: OpcaoExecucao = {}
     ): Promise<T | undefined> {
         carregando.value = true;
         erro.value = null;
@@ -38,31 +52,14 @@ export function useAsyncAction() {
             return await acao();
         } catch (error: unknown) {
             erro.value = obterMensagemErro(error, mensagemErro);
+            if (opcoes.relancarErro === false) {
+                return undefined;
+            }
             throw error;
         } finally {
             carregando.value = false;
         }
     }
 
-    /**
-     * Versão que captura erros silenciosamente (não relança).
-     * Útil para operações onde uma falha não deve interromper o fluxo.
-     */
-    async function executarSilencioso<T>(
-        acao: () => Promise<T>,
-        mensagemErro = "Erro na operação"
-    ): Promise<T | undefined> {
-        carregando.value = true;
-        erro.value = null;
-        try {
-            return await acao();
-        } catch (error: unknown) {
-            erro.value = obterMensagemErro(error, mensagemErro);
-            return undefined;
-        } finally {
-            carregando.value = false;
-        }
-    }
-
-    return {carregando, erro, executar, executarSilencioso};
+    return {carregando, erro, executar};
 }

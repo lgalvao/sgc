@@ -144,7 +144,7 @@ import {TEXTOS} from '@/constants/textos';
 import {useAsyncAction} from '@/composables/useAsyncAction';
 
 const {notify} = useNotification();
-const {carregando: carregandoAdmins, erro: erroAdmins, executarSilencioso} = useAsyncAction();
+const {carregando: carregandoAdmins, erro: erroAdmins, executar} = useAsyncAction();
 
 
 const administradores = ref<AdministradorDto[]>([]);
@@ -180,9 +180,9 @@ const mensagemErroNovoAdmin = computed(() => {
 });
 
 async function carregarAdministradores() {
-  await executarSilencioso(async () => {
+  await executar(async () => {
     administradores.value = await listarAdministradores();
-  }, TEXTOS.comum.ERRO_OPERACAO);
+  }, TEXTOS.comum.ERRO_OPERACAO, {relancarErro: false});
 }
 
 function abrirModalAdicionarAdmin() {

@@ -8,7 +8,7 @@
           <div class="d-flex flex-wrap justify-content-end gap-2">
               <a
                   v-if="mostrarLinkLeitorEmailTestes"
-                  :href="urlLeitorEmailTestes"
+                  :href="urlLeitorEmailTestesLink"
                   class="btn btn-outline-secondary"
                   data-testid="link-leitor-email-testes"
                 rel="noopener noreferrer"
@@ -185,6 +185,7 @@ const urlLeitorEmailTestes = ref<string | null>(null);
 
 const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
+const urlLeitorEmailTestesLink = computed(() => urlLeitorEmailTestes.value ?? undefined);
 
 function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";

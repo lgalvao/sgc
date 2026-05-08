@@ -13,7 +13,7 @@ const configuracoes = ref<Parametro[]>([]);
 const temaEscuro = useLocalStorage<boolean>("temaEscuro", false);
 
 export function useConfiguracoes() {
-    const {carregando, erro, executarSilencioso} = useAsyncAction();
+    const {carregando, erro, executar} = useAsyncAction();
     const carregandoConfiguracoes = ref(false);
 
     const configuracoesMap = computed(() =>
@@ -24,19 +24,19 @@ export function useConfiguracoes() {
         configuracoes.value = [];
         carregandoConfiguracoes.value = true;
         try {
-            await executarSilencioso(async () => {
+            await executar(async () => {
                 configuracoes.value = await serviceBuscarConfiguracoes();
-            }, "Não foi possível carregar as configurações.");
+            }, "Não foi possível carregar as configurações.", {relancarErro: false});
         } finally {
             carregandoConfiguracoes.value = false;
         }
     }
 
     async function salvarConfiguracoes(novosParametros: Parametro[]) {
-        const resultado = await executarSilencioso(async () => {
+        const resultado = await executar(async () => {
             configuracoes.value = await serviceSalvarConfiguracoes(novosParametros);
             return true;
-        }, "Não foi possível salvar as configurações.");
+        }, "Não foi possível salvar as configurações.", {relancarErro: false});
         return resultado === true;
     }
 

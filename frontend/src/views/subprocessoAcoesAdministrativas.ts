@@ -67,6 +67,20 @@ export function useSubprocessoAcoesAdministrativas({
         }
     }
 
+    async function executarComErroNotificado(
+        loading: Ref<boolean>,
+        mensagemErro: string,
+        acao: () => Promise<void>
+    ) {
+        await executarComCarregamento(loading, async () => {
+            try {
+                await acao();
+            } catch {
+                notify(mensagemErro, "danger");
+            }
+        });
+    }
+
     function abrirModalAlterarDataLimite() {
         if (habilitarAlterarDataLimite.value) {
             mostrarModalAlterarDataLimite.value = true;
@@ -83,15 +97,11 @@ export function useSubprocessoAcoesAdministrativas({
         const detalhe = subprocesso.value;
         if (!novaData || !detalhe) return;
 
-        await executarComCarregamento(loadingDataLimite, async () => {
-            try {
-                await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
-                fecharModalAlterarDataLimite();
-                notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, "success");
-                await atualizarSubprocessoAtual();
-            } catch {
-                notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, "danger");
-            }
+        await executarComErroNotificado(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, async () => {
+            await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
+            fecharModalAlterarDataLimite();
+            notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, "success");
+            await atualizarSubprocessoAtual();
         });
     }
 
@@ -143,17 +153,12 @@ export function useSubprocessoAcoesAdministrativas({
         const codigo = codigoSubprocesso.value;
         if (!detalhe || !codigo || loadingLembrete.value) return;
 
-        loadingLembrete.value = true;
-        try {
+        await executarComErroNotificado(loadingLembrete, TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, async () => {
             await enviarLembrete(codProcesso, detalhe.unidade.codigo);
             await garantirContextoEdicao(codigo, true);
             modalLembreteAberto.value = false;
             notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, "success");
-        } catch {
-            notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, "danger");
-        } finally {
-            loadingLembrete.value = false;
-        }
+        });
     }
 
     return {
