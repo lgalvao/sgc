@@ -14,7 +14,6 @@ import java.nio.charset.*;
 import java.util.function.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +44,8 @@ class ClienteAcessoAdTest {
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(String.class)).thenReturn("OK");
 
-        clienteAcessoAd.autenticar("123", "senha");
+        assertThatCode(() -> clienteAcessoAd.autenticar("123", "senha")).doesNotThrowAnyException();
+        verify(responseSpec).body(String.class);
     }
 
     @Test
@@ -105,7 +105,8 @@ class ClienteAcessoAdTest {
 
             var errorHandler = handlerCaptor.getValue();
             assertThatThrownBy(() -> errorHandler.handle(request, response))
-                    .isInstanceOf(ErroAutenticacao.class);
+                    .isInstanceOf(ErroAutenticacao.class)
+                    .hasMessageContaining("Falha na autenticação externa.");
         }
     }
 }

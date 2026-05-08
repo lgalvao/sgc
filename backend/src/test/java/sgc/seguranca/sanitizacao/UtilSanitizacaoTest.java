@@ -2,14 +2,14 @@ package sgc.seguranca.sanitizacao;
 
 import org.junit.jupiter.api.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 class UtilSanitizacaoTest {
     @Test
     @DisplayName("Deve manter texto limpo")
     void deveManterTextoLimpo() {
         String input = "Texto normal";
-        assertEquals(input, UtilSanitizacao.sanitizar(input));
+        assertThat(UtilSanitizacao.sanitizar(input)).isEqualTo(input);
     }
 
     @Test
@@ -17,7 +17,7 @@ class UtilSanitizacaoTest {
     void deveRemoverScriptTags() {
         String input = "Texto <script>alert('xss')</script>";
         String expected = "Texto ";
-        assertEquals(expected, UtilSanitizacao.sanitizar(input));
+        assertThat(UtilSanitizacao.sanitizar(input)).isEqualTo(expected);
     }
 
     @Test
@@ -25,6 +25,6 @@ class UtilSanitizacaoTest {
     void deveRemoverTagsHtml() {
         String input = "<b>Negrito</b>";
         String expected = "Negrito";
-        assertEquals(expected, UtilSanitizacao.sanitizar(input));
+        assertThat(UtilSanitizacao.sanitizar(input)).isEqualTo(expected);
     }
 }

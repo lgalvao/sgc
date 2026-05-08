@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 
 import java.time.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de Utilitário: FormatadorData")
 class FormatadorDataTest {
@@ -12,33 +12,33 @@ class FormatadorDataTest {
     @DisplayName("Deve formatar data corretamente")
     void deveFormatarDataCorretamente() {
         LocalDateTime data = LocalDateTime.of(2025, 12, 7, 14, 30);
-        assertEquals("07/12/2025", FormatadorData.formatarData(data));
+        assertThat(FormatadorData.formatarData(data)).isEqualTo("07/12/2025");
     }
 
     @Test
     @DisplayName("Deve formatar data e hora corretamente")
     void deveFormatarDataHoraCorretamente() {
         LocalDateTime data = LocalDateTime.of(2025, 12, 7, 14, 30);
-        assertEquals("07/12/2025 14:30", FormatadorData.formatarDataHora(data));
+        assertThat(FormatadorData.formatarDataHora(data)).isEqualTo("07/12/2025 14:30");
     }
 
     @Test
     @DisplayName("Deve retornar hífen quando data for null em formatarData")
     void deveRetornarHifenQuandoDataNullEmFormatarData() {
-        assertEquals("-", FormatadorData.formatarData(null));
+        assertThat(FormatadorData.formatarData(null)).isEqualTo("-");
     }
 
     @Test
     @DisplayName("Deve retornar hífen quando data for null em formatarDataHora")
     void deveRetornarHifenQuandoDataNullEmFormatarDataHora() {
-        assertEquals("-", FormatadorData.formatarDataHora(null));
+        assertThat(FormatadorData.formatarDataHora(null)).isEqualTo("-");
     }
 
     @Test
     @DisplayName("Deve formatar data com zeros à esquerda (padding)")
     void deveFormatarDataComZerosPadding() {
         LocalDateTime data = LocalDateTime.of(2025, 1, 5, 9, 5);
-        assertEquals("05/01/2025", FormatadorData.formatarData(data));
-        assertEquals("05/01/2025 09:05", FormatadorData.formatarDataHora(data));
+        assertThat(FormatadorData.formatarData(data)).isEqualTo("05/01/2025");
+        assertThat(FormatadorData.formatarDataHora(data)).isEqualTo("05/01/2025 09:05");
     }
 }
