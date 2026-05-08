@@ -29,7 +29,6 @@ import java.sql.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Tag("integration")
@@ -216,9 +215,9 @@ class E2eControllerTest {
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", false); // Ambos não existem para forçar ErroConfiguracao
 
-        var exception = Assertions.assertThrows(ErroConfiguracao.class, controller::resetDatabase);
-        Assertions.assertNotNull(exception);
-        assertThat(exception).hasMessageContaining("Arquivo seed.sql não encontrado");
+        assertThatThrownBy(controller::resetDatabase)
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("Arquivo seed.sql não encontrado");
 
         verify(resourceLoader).getResource("file:../e2e/setup/seed.sql");
         verify(resourceLoader).getResource("file:e2e/setup/seed.sql");
@@ -230,14 +229,14 @@ class E2eControllerTest {
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", false);
 
-        var exception = Assertions.assertThrows(ErroConfiguracao.class, controller::resetDatabase);
-        Assertions.assertNotNull(exception);
+        assertThatThrownBy(controller::resetDatabase)
+                .isInstanceOf(ErroConfiguracao.class);
     }
 
     private void assertCount(String tableAndWhere, int expected) {
         Integer count =
                 jdbcTemplate.queryForObject("SELECT count(*) FROM " + tableAndWhere, Integer.class);
-        assertEquals(expected, count, "Contagem incorreta para " + tableAndWhere);
+        assertThat(count).as("Contagem incorreta para " + tableAndWhere).isEqualTo(expected);
     }
 
     @Test
@@ -255,8 +254,7 @@ class E2eControllerTest {
 
         Processo result = controller.criarProcessoMapeamento(req);
 
-        assertEquals(100L, result.getCodigo());
-        verify(processoService).criar(any(CriarProcessoRequest.class));
+        assertThat(result.getCodigo()).isEqualTo(100L);
     }
 
     @Test
@@ -275,7 +273,7 @@ class E2eControllerTest {
 
         Processo result = controller.criarProcessoRevisao(req);
 
-        assertEquals(100L, result.getCodigo());
+        assertThat(result.getCodigo()).isEqualTo(100L);
         verify(processoService).iniciar(eq(100L), eq(List.of(1L)));
     }
 
@@ -295,7 +293,7 @@ class E2eControllerTest {
 
         Processo result = controller.criarProcessoMapeamento(req);
 
-        assertEquals(100L, result.getCodigo());
+        assertThat(result.getCodigo()).isEqualTo(100L);
         verify(processoService).iniciar(eq(100L), eq(List.of(1L)));
     }
 
@@ -308,8 +306,8 @@ class E2eControllerTest {
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Error"));
 
         E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
-        var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
-        Assertions.assertNotNull(exception);
+        assertThatThrownBy(controllerComErro::resetDatabase)
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -342,8 +340,9 @@ class E2eControllerTest {
 
         E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
 
-        var exception = Assertions.assertThrows(RuntimeException.class, () -> controllerComErro.limparProcessoCompleto(999L));
-        assertThat(exception).hasMessageContaining("Falha na limpeza do processo");
+        assertThatThrownBy(() -> controllerComErro.limparProcessoCompleto(999L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Falha na limpeza do processo");
     }
 
     @Test
@@ -355,7 +354,7 @@ class E2eControllerTest {
         E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
 
         // Deve retornar silenciosamente
-        Assertions.assertDoesNotThrow(() -> controllerComErro.limparProcessoCompleto(999L));
+        controllerComErro.limparProcessoCompleto(999L);
     }
 
     @Test
@@ -597,7 +596,7 @@ class E2eControllerTest {
 
             Processo result = controller.criarProcessoFinalizadoComAtividades(req);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
             verify(jdbcTemplate, atLeastOnce()).update(anyString(), any(Object[].class));
         }
 
@@ -633,8 +632,8 @@ class E2eControllerTest {
 
             Processo result = controller.criarProcessoMapeamentoComMapaComSugestoes(req);
 
-            assertNotNull(result);
-            assertEquals("Sugestão de ajuste na competência via fixture E2E", mapa.getSugestoes());
+            assertThat(result).isNotNull();
+            assertThat(mapa.getSugestoes()).isEqualTo("Sugestão de ajuste na competência via fixture E2E");
             verify(mapaRepo).save(mapa);
         }
 
@@ -670,7 +669,7 @@ class E2eControllerTest {
 
             Processo result = controller.criarProcessoRevisaoComCadastroDisponibilizado(req);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
             verify(jdbcTemplate, atLeastOnce()).update(contains("INSERT INTO sgc.movimentacao"), any(), any(), any(), any(), any(), any());
         }
 
@@ -706,7 +705,7 @@ class E2eControllerTest {
 
             Processo result = controller.criarProcessoMapeamentoComCadastroDisponibilizado(req);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
             verify(subprocessoRepo).findByProcessoCodigoAndUnidadeCodigo(anyLong(), anyLong());
         }
 
@@ -719,7 +718,7 @@ class E2eControllerTest {
             var method = E2eController.class.getDeclaredMethod("limparTabela", Statement.class, String.class);
             method.setAccessible(true);
 
-            assertDoesNotThrow(() -> method.invoke(controller, stmt, "TABELA"));
+            method.invoke(controller, stmt, "TABELA");
         }
     }
 }

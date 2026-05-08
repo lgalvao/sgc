@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.function.*;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -44,7 +45,7 @@ class ClienteAcessoAdTest {
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(String.class)).thenReturn("OK");
 
-        assertDoesNotThrow(() -> clienteAcessoAd.autenticar("123", "senha"));
+        clienteAcessoAd.autenticar("123", "senha");
     }
 
     @Test
@@ -57,8 +58,8 @@ class ClienteAcessoAdTest {
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(String.class)).thenThrow(new RuntimeException("Erro inesperado"));
 
-        var exception = assertThrows(ErroAutenticacao.class, () -> clienteAcessoAd.autenticar("123", "senha"));
-        assertNotNull(exception);
+        assertThatThrownBy(() -> clienteAcessoAd.autenticar("123", "senha"))
+                .isInstanceOf(ErroAutenticacao.class);
     }
 
     @Test
@@ -69,11 +70,11 @@ class ClienteAcessoAdTest {
         when(requestBodySpec.body(any(Object.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-
         when(responseSpec.body(String.class)).thenThrow(new ErroAutenticacao("Falha simulada"));
 
-        var exception = assertThrows(ErroAutenticacao.class, () -> clienteAcessoAd.autenticar("123", "senha"));
-        assertNotNull(exception);
+        assertThatThrownBy(() -> clienteAcessoAd.autenticar("123", "senha"))
+                .isInstanceOf(ErroAutenticacao.class)
+                .hasMessage("Falha simulada");
     }
 
     @SuppressWarnings("unchecked")
@@ -93,23 +94,18 @@ class ClienteAcessoAdTest {
 
         clienteAcessoAd.autenticar("123", "senha");
 
-        // Valida predicate
-        assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(400)));
-        assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(500)));
-        // Valida que 2xx retorna false
-        assertFalse(predicateCaptor.getValue().test(HttpStatusCode.valueOf(200)));
+        assertThat(predicateCaptor.getValue().test(HttpStatusCode.valueOf(400))).isTrue();
+        assertThat(predicateCaptor.getValue().test(HttpStatusCode.valueOf(500))).isTrue();
+        assertThat(predicateCaptor.getValue().test(HttpStatusCode.valueOf(200))).isFalse();
 
-        // Valida ErrorHandler
         HttpRequest request = mock(HttpRequest.class);
         try (ClientHttpResponse response = mock(ClientHttpResponse.class)) {
             when(response.getStatusCode()).thenReturn(HttpStatusCode.valueOf(400));
             when(response.getBody()).thenReturn(new ByteArrayInputStream("Erro detalhado".getBytes(StandardCharsets.UTF_8)));
 
             var errorHandler = handlerCaptor.getValue();
-            var exception = assertThrows(ErroAutenticacao.class, () ->
-                    errorHandler.handle(request, response)
-            );
-            assertNotNull(exception);
+            assertThatThrownBy(() -> errorHandler.handle(request, response))
+                    .isInstanceOf(ErroAutenticacao.class);
         }
     }
 }

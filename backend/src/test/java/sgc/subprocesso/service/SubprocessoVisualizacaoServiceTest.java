@@ -4,8 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.mapa.dto.*;
-import sgc.mapa.service.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
@@ -16,10 +14,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoVisualizacaoServiceTest {
-    @Mock
-    private MapaVisualizacaoService mapaVisualizacaoService;
-    @Mock
-    private ImpactoMapaService impactoMapaService;
     @Mock
     private SubprocessoAcessoService acessoService;
 
@@ -48,27 +42,7 @@ class SubprocessoVisualizacaoServiceTest {
     }
 
     @Test
-    void shouldDelegarMapaParaVisualizacao() {
-        MapaVisualizacaoResponse mockResponse = MapaVisualizacaoResponse.builder().build();
-        when(mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso)).thenReturn(mockResponse);
-
-        MapaVisualizacaoResponse result = service.mapaParaVisualizacao(subprocesso);
-
-        assertThat(result).isSameAs(mockResponse);
-    }
-
-    @Test
-    void shouldDelegarVerificarImpactos() {
-        ImpactoMapaResponse mockResponse = new ImpactoMapaResponse(false, java.util.List.of(), java.util.List.of(), java.util.List.of(), java.util.List.of(), 0, 0, 0, 0);
-        when(impactoMapaService.verificarImpactos(subprocesso)).thenReturn(mockResponse);
-
-        ImpactoMapaResponse result = service.verificarImpactos(subprocesso);
-
-        assertThat(result).isSameAs(mockResponse);
-    }
-
-    @Test
-    void shouldConstruirDetalheCadastro() {
+    void deveConstruirDetalheCadastro() {
         SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = new SubprocessoConsultaService.ContextoConsultaSubprocesso(
                 subprocesso, Perfil.SERVIDOR, unidade, false, true, true, true, false
         );

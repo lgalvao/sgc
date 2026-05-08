@@ -9,7 +9,7 @@ import sgc.parametros.model.*;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +27,7 @@ class ConfiguracaoServiceTest {
 
         List<Parametro> resultado = configuracaoService.buscarTodos();
 
-        assertFalse(resultado.isEmpty());
+        assertThat(resultado).isNotEmpty();
         verify(parametroRepo).findAll();
     }
 
@@ -41,8 +41,7 @@ class ConfiguracaoServiceTest {
 
         Parametro resultado = configuracaoService.buscarPorChave(chave);
 
-        assertNotNull(resultado);
-        assertEquals(chave, resultado.getChave());
+        assertThat(resultado.getChave()).isEqualTo(chave);
     }
 
     @Test
@@ -51,7 +50,8 @@ class ConfiguracaoServiceTest {
         String chave = "INEXISTENTE";
         when(parametroRepo.findByChave(chave)).thenReturn(Optional.empty());
 
-        assertThrows(ErroConfiguracao.class, () -> configuracaoService.buscarPorChave(chave));
+        assertThatThrownBy(() -> configuracaoService.buscarPorChave(chave))
+                .isInstanceOf(ErroConfiguracao.class);
     }
 
     @Test
@@ -62,7 +62,7 @@ class ConfiguracaoServiceTest {
 
         List<Parametro> resultado = configuracaoService.salvar(lista);
 
-        assertNotNull(resultado);
+        assertThat(resultado).isNotNull();
         verify(parametroRepo).saveAll(lista);
     }
 
@@ -80,7 +80,7 @@ class ConfiguracaoServiceTest {
 
         Parametro resultado = configuracaoService.atualizar(chave, novoValor);
 
-        assertEquals(novoValor, resultado.getValor());
+        assertThat(resultado.getValor()).isEqualTo(novoValor);
         verify(parametroRepo).save(parametro);
     }
 
@@ -91,7 +91,7 @@ class ConfiguracaoServiceTest {
         Parametro p = new Parametro();
         when(parametroRepo.findById(id)).thenReturn(Optional.of(p));
 
-        assertEquals(p, configuracaoService.buscarPorCodigo(id));
+        assertThat(configuracaoService.buscarPorCodigo(id)).isEqualTo(p);
     }
 
     @Test
@@ -100,6 +100,7 @@ class ConfiguracaoServiceTest {
         Long id = 1L;
         when(parametroRepo.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroConfiguracao.class, () -> configuracaoService.buscarPorCodigo(id));
+        assertThatThrownBy(() -> configuracaoService.buscarPorCodigo(id))
+                .isInstanceOf(ErroConfiguracao.class);
     }
 }
