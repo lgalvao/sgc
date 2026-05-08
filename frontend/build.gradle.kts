@@ -7,8 +7,8 @@ plugins {
 
 node {
     download.set(true)
-    version.set("22.22.0")
-    pnpmVersion.set("10.33.4")
+    version.set("26.1.0")
+    pnpmVersion.set("11.0.8")
 }
 
 tasks.register<PnpmTask>("install") {

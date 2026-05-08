@@ -16,7 +16,7 @@ RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
 ENV NODE_EXTRA_CA_CERTS=/tmp/certs/cert-combinados.pem
 
 # 2. Instala apenas utilitários de SO usados durante o build
-RUN microdnf install -y findutils
+RUN microdnf install -y findutils libatomic && microdnf clean all
 
 # Estágio de cache das dependências Java
 FROM build-base AS deps-java
@@ -28,7 +28,7 @@ RUN mkdir -p frontend
 
 # Baixa dependências Java em camada separada para preservar cache quando só o frontend muda
 RUN --mount=type=cache,target=/root/.gradle \
-    gradle :backend:dependencies
+    gradle :backend:dependencies --no-daemon --configuration-cache
 
 # Estágio de cache das dependências do frontend
 FROM deps-java AS deps-frontend
@@ -39,7 +39,7 @@ COPY frontend/package.json frontend/pnpm-lock.yaml frontend/
 # Instala dependências do frontend, preservando a orquestração oficial do Gradle
 RUN --mount=type=cache,target=/root/.gradle \
     --mount=type=cache,target=/root/.pnpm-store \
-    gradle :frontend:install
+    gradle :frontend:install --no-daemon --configuration-cache
 
 # Estágio 1: Build unificado (Backend + Frontend)
 FROM deps-frontend AS build-env
@@ -49,9 +49,9 @@ COPY . .
 
 # 5. Executa o build completo orquestrado pelo Gradle
 RUN --mount=type=cache,target=/root/.gradle \
-    gradle :backend:bootJar -x test
+    gradle :backend:bootJar -x test --no-daemon --configuration-cache
 # Estágio 2: Extrator (prepara as camadas do Spring Boot)
-FROM docker.io/library/amazoncorretto:25 AS extrator
+FROM docker.io/library/amazoncorretto:25-al2023-headless AS extrator
 WORKDIR /aplicacao
 
 # Re-aplica certificados para o extrator
@@ -65,7 +65,7 @@ COPY --from=build-env /build/backend/build/libs/*.jar aplicacao.jar
 RUN mkdir extraido && java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
 
 # Estágio 3: Imagem Final (Runtime)
-FROM docker.io/library/amazoncorretto:25
+FROM docker.io/library/amazoncorretto:25-al2023-headless
 
 LABEL description="Sistema de Gestao de Competencias - SGC" \
       maintainer="SESEL <sesel@tre-pe.jus.br>" \
@@ -75,16 +75,13 @@ COPY deploy/*.cer /tmp/certs/
 RUN set -eux; \
     cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/; \
     update-ca-trust extract; \
-    yum clean all; \
-    rm -rf /var/cache/yum; \
-    yum makecache; \
-    yum update -y; \
-    yum install -y shadow-utils tzdata; \
+    dnf update -y; \
+    dnf install -y shadow-utils tzdata; \
     groupadd --gid 333 sgc; \
     useradd --uid 333 --gid 333 --no-create-home --shell /sbin/nologin sgc; \
-    yum remove -y shadow-utils; \
-    yum clean all; \
-    rm -rf /var/cache/yum
+    dnf remove -y shadow-utils; \
+    dnf clean all; \
+    rm -rf /var/cache/dnf
 
 ENV TZ=America/Recife
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
