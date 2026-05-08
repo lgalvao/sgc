@@ -8,7 +8,7 @@
           <div class="d-flex flex-wrap justify-content-end gap-2">
               <a
                   v-if="mostrarLinkLeitorEmailTestes"
-                  :href="urlLeitorEmailTestesLink"
+                  :href="urlLeitorEmailTestes"
                   class="btn btn-outline-secondary"
                   data-testid="link-leitor-email-testes"
                 rel="noopener noreferrer"
@@ -181,11 +181,10 @@ const mostrarModalReenvio = ref(false);
 const mostrarPreview = ref(false);
 const mostrarDetalhes = ref(false);
 const reenviando = ref(false);
-const urlLeitorEmailTestes = ref<string | null>(null);
+const urlLeitorEmailTestes = ref<string>();
 
 const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
-const urlLeitorEmailTestesLink = computed(() => urlLeitorEmailTestes.value ?? undefined);
 
 function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";
@@ -249,9 +248,9 @@ async function carregar() {
 
 async function carregarUrlLeitorEmailTestes() {
   try {
-    urlLeitorEmailTestes.value = await buscarUrlLeitorEmailTestes();
+    urlLeitorEmailTestes.value = (await buscarUrlLeitorEmailTestes()) ?? undefined;
   } catch {
-    urlLeitorEmailTestes.value = null;
+    urlLeitorEmailTestes.value = undefined;
   }
 }
 
