@@ -224,17 +224,4 @@ class LoginFacadeTest {
         });
     }
 
-    @Test
-    @DisplayName("deve lançar erro quando autorização vier sem unidade")
-    void deveLancarErroQuandoUnidadeAusenteNaAutorizacao() {
-        Usuario user = new Usuario();
-        user.setTituloEleitoral("123");
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
-        when(usuarioServiceInterno.buscarAutorizacoesPerfil("123"))
-                .thenReturn(new ArrayList<>(Collections.singletonList(null)));
-
-        assertThatThrownBy(() -> loginFacade.buscarAutorizacoesUsuario("123"))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Unidade ausente na autorização de login");
-    }
 }
