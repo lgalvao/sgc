@@ -39,13 +39,11 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 
 * **`src/components/`**: Componentes reutilizáveis, organizados por funcionalidade.
 * **`src/composables/`**: Lógica de estado reutilizável (Composition API).
-* **`src/mappers/`**: Transformação de dados entre API e View.
 * **`src/services/`**: Encapsulamento de chamadas HTTP.
 * **`src/stores/`**: Gerenciamento de estado global (Pinia).
 * **`src/views/`**: Telas principais da aplicação.
 * **`src/utils/`**: Funções utilitárias e auxiliares.
 * **`src/types/`**: Definições de tipos e DTOs.
-* **`etc/`**: Scripts de automação e documentação adicional.
 
 ## Testes e Qualidade
 
