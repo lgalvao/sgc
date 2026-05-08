@@ -106,6 +106,7 @@ const mapaVigente = ref<MapaVigenteReferencia | null>(null);
 const lastError = ref<string | null>(null);
 const carregandoPagina = ref(true);
 const carregamentoInicialConcluido = ref(false);
+let carregamentoEmAndamento: Promise<void> | null = null;
 
 function clearError() {
   lastError.value = null;
@@ -123,29 +124,45 @@ function deveExibirCarregamento(forcar: boolean): boolean {
 }
 
 async function carregarDados(forcar = false) {
-  clearError();
-
-  if (deveExibirCarregamento(forcar)) {
-    carregandoPagina.value = true;
-    unidade.value = null;
-    mapaVigente.value = null;
+  if (carregamentoEmAndamento) {
+    await carregamentoEmAndamento;
+    return;
   }
 
-  try {
-    const [unidadeResp, mapaResp] = await Promise.all([
-      unidadeStore.obterUnidade(props.codUnidade, forcar),
-      unidadeStore.obterReferenciaMapaVigente(props.codUnidade, forcar),
-    ]);
+  clearError();
 
-    unidade.value = unidadeResp;
-    definirUnidadeAtual(unidade.value);
-    mapaVigente.value = mapaResp;
-  } catch (error: unknown) {
-    const err = error as Error;
-    lastError.value = err.message || TEXTOS.unidade.ERRO_CARREGAR;
-    logger.error("Erro ao carregar dados da unidade:", error);
+  const tarefaCarregamento = (async () => {
+    if (deveExibirCarregamento(forcar)) {
+      carregandoPagina.value = true;
+      unidade.value = null;
+      mapaVigente.value = null;
+    }
+
+    try {
+      const [unidadeResp, mapaResp] = await Promise.all([
+        unidadeStore.obterUnidade(props.codUnidade, forcar),
+        unidadeStore.obterReferenciaMapaVigente(props.codUnidade, forcar),
+      ]);
+
+      unidade.value = unidadeResp;
+      definirUnidadeAtual(unidade.value);
+      mapaVigente.value = mapaResp;
+    } catch (error: unknown) {
+      const err = error as Error;
+      lastError.value = err.message || TEXTOS.unidade.ERRO_CARREGAR;
+      logger.error("Erro ao carregar dados da unidade:", error);
+    } finally {
+      carregandoPagina.value = false;
+    }
+  })();
+
+  carregamentoEmAndamento = tarefaCarregamento;
+  try {
+    await tarefaCarregamento;
   } finally {
-    carregandoPagina.value = false;
+    if (carregamentoEmAndamento === tarefaCarregamento) {
+      carregamentoEmAndamento = null;
+    }
   }
 }
 

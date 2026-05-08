@@ -174,6 +174,23 @@ describe("Unidades.vue", () => {
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
 
+    it("não deve disparar uma segunda carga no primeiro ciclo quando o onActivated ocorrer antes da carga inicial terminar", async () => {
+        let resolver!: (valor: any[]) => void;
+        vi.mocked(unidadeService.buscarTodasUnidades).mockReturnValueOnce(new Promise((resolve) => {
+            resolver = resolve;
+        }) as any);
+
+        const wrapper = createWrapper();
+
+        const hook = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a)?.[0];
+        await hook?.call(wrapper.vm);
+
+        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
+
+        resolver([]);
+        await flushPromises();
+    });
+
     it("deve exibir alerta com links para todas as unidades sem responsável", async () => {
         // Pré-popula a organizacaoStore via initialState (evita dependência da chamada HTTP)
         const diagMock = {

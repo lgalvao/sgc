@@ -60,6 +60,8 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         const downloadPromise = page.waitForEvent('download');
         await botaoPdf.click();
         const download = await downloadPromise;
-        expect(download.suggestedFilename()).toContain(`relatorio-andamento-${processo.codigo}.pdf`);
+        // en-CA retorna YYYY-MM-DD respeitando o fuso local (evita erros de fuso do toISOString)
+        const hoje = new Date().toLocaleDateString('en-CA');
+        expect(download.suggestedFilename()).toBe(`sgc-rel-andamento-${hoje}.pdf`);
     });
 });

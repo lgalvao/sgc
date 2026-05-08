@@ -222,18 +222,18 @@ function abrirDetalheUnidade(item: unknown) {
   void router.push({path: `/unidade/${unidade.codigo}`});
 }
 
-onMounted(() => {
-  void carregarUnidades();
+onMounted(async () => {
+  await carregarUnidades();
   carregamentoInicialConcluido.value = true;
 });
 
-onActivated(() => {
+onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
 
   if (!dadosLocaisValidos()) {
-    void carregarUnidades();
+    await carregarUnidades();
   }
 });
 

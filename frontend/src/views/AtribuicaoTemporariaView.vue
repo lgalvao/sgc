@@ -194,6 +194,7 @@ const justificativa = ref("");
 const isLoading = ref(false);
 const carregandoInicial = ref(true);
 const inputUsuarioRef = ref<InstanceType<typeof BuscadorUsuarios> | null>(null);
+const carregamentoInicialConcluido = ref(false);
 
 const erroUsuario = ref("");
 const erroFormulario = ref("");
@@ -251,8 +252,17 @@ async function carregarDados() {
   }
 }
 
-onMounted(carregarDados);
-onActivated(carregarDados);
+onMounted(async () => {
+  await carregarDados();
+  carregamentoInicialConcluido.value = true;
+});
+
+onActivated(async () => {
+  if (!carregamentoInicialConcluido.value) {
+    return;
+  }
+  await carregarDados();
+});
 
 async function criarAtribuicao() {
   const unidadeAtual = unidade.value;

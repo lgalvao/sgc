@@ -53,8 +53,9 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await botaoGerar.click();
         const download = await downloadPromise;
 
-        const filename = download.suggestedFilename();
-        expect(filename).toMatch(new RegExp(`relatorio-mapas-(vigentes-)?`));
+        // en-CA retorna YYYY-MM-DD respeitando o fuso local (evita erros de fuso do toISOString)
+        const hoje = new Date().toLocaleDateString('en-CA');
+        expect(download.suggestedFilename()).toBe(`sgc-rel-mapas-${hoje}.pdf`);
     });
 
     test('Cenário CDU-36: Seleciona unidade e gera PDF', async ({
@@ -84,6 +85,9 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
         const downloadPromise = page.waitForEvent('download');
         await page.getByTestId('btn-gerar-mapas').click();
-        await downloadPromise;
+        const download = await downloadPromise;
+        // en-CA retorna YYYY-MM-DD respeitando o fuso local
+        const hoje = new Date().toLocaleDateString('en-CA');
+        expect(download.suggestedFilename()).toBe(`sgc-rel-mapas-${hoje}.pdf`);
     });
 });

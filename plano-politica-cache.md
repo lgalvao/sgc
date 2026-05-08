@@ -2,16 +2,19 @@
 
 ## Objetivo
 
-Tornar a política de cache e invalidação do frontend consistente, previsível e uniforme, reduzindo bugs em views
-`keepAlive`, recargas parciais e efeitos colaterais de eventos assíncronos como SSE.
+Tornar a política de cache, invalidação e carregamento de contexto do frontend consistente, previsível e uniforme,
+reduzindo bugs em views `keepAlive`, recargas parciais, bootstrap após refresh completo da página e efeitos colaterais
+de eventos assíncronos como SSE.
 
 Este plano cobre:
 
 - stores Pinia usados como cache de sessão;
+- orquestrações de carregamento inicial;
 - views reativadas por `KeepAlive`;
 - invalidações disparadas por workflow;
 - invalidações disparadas por eventos externos;
-- regras de renderização quando o dado está `stale`.
+- regras de renderização quando o dado está `stale`;
+- deduplicação e anti-overlap de recargas.
 
 ## Problema atual
 
@@ -19,8 +22,12 @@ Hoje coexistem estratégias diferentes e incompatíveis:
 
 - stores cujo `invalidar()` apenas marca o dado como inválido;
 - stores cujo `invalidar()` apaga imediatamente o snapshot atual;
+- bootstraps que recompõem o contexto pela rota;
+- bootstraps que dependem demais de estado já residente em memória;
 - views `keepAlive` com recarga explícita em `onActivated`;
 - views `keepAlive` que dependem apenas de `onMounted`;
+- telas com `onMounted` e `onActivated` sem guarda suficiente contra carga duplicada;
+- watchers que podem competir com bootstrap ou reidratação;
 - invalidação por domínio;
 - invalidação ampla por conveniência.
 
@@ -29,6 +36,8 @@ Os sintomas esperados desse cenário são:
 - contexto desaparecendo após um evento assíncrono;
 - erro de "não encontrado" antes de uma nova busca real;
 - mapa ou subprocesso sumindo ao voltar para uma view parada;
+- chamadas repetidas ao mesmo endpoint no primeiro ciclo de vida da tela;
+- recarga em cascata após ação de workflow;
 - dependência excessiva de refresh manual da página para voltar ao estado coerente.
 
 ## Política alvo
@@ -60,7 +69,18 @@ Toda view crítica reativada por `KeepAlive` deve seguir o mesmo padrão:
 - `onActivated`: se o contexto estiver inválido, reidratar;
 - durante reidratação, não interpretar ausência momentânea como "não encontrado".
 
-### 4. Regra de renderização
+### 4. Regra para carregamento
+
+Toda tela crítica deve deixar explícitos quatro caminhos distintos:
+
+- bootstrap inicial;
+- reidratação por `keepAlive`;
+- refresh completo da página reconstruindo pela rota;
+- recarga forçada após ação de workflow.
+
+Esses caminhos não devem competir entre si nem disparar chamadas redundantes ao backend.
+
+### 5. Regra de renderização
 
 Renderização deve tolerar o estado:
 
@@ -72,6 +92,19 @@ Nessa situação, a UI deve:
 
 - exibir loading incremental ou manter snapshot anterior de forma controlada;
 - só mostrar "não encontrado" depois de falha real de busca.
+
+## Frente de refatoração
+
+Esta rodada deixa de tratar apenas "cache" e passa a tratar "política de contexto e carregamento".
+
+Na prática, isso significa alinhar conjuntamente:
+
+- semântica dos stores;
+- bootstrap e reidratação das telas;
+- dedupe de requisições;
+- prevenção de overlap entre `onMounted`, `onActivated` e `watch`;
+- invalidação por domínio;
+- tratamento de erro sem apagar snapshot indevidamente.
 
 ## Classificação dos domínios
 
@@ -174,6 +207,29 @@ Escopo esperado:
 4. `processo` e `subprocesso` servem como referência local de contrato mais seguro.
 5. `ProcessoDetalheView` tinha um desvio sutil de política: em erro de recarga ela limpava o snapshot mesmo durante refresh em background. Esse tipo de divergência precisa ser coberto por teste de view.
 6. `CadastroView` e `MapaView` dependem mais do bootstrap por rota do que do `keepAlive`. Para essas telas, a robustez contra refresh completo da página precisa ser validada nas orquestrações (`useCadastroOrquestracao` e `useMapaOrquestracao`).
+7. `AtribuicaoTemporariaView` tinha `onMounted` e `onActivated` sem guarda suficiente. Em rota `keepAlive`, isso abre espaço para recarga duplicada logo no primeiro ciclo de vida.
+
+## Hotspots de overlap e duplicidade
+
+### Hotspots já confirmados
+
+- `AtribuicaoTemporariaView`
+  - havia `onMounted(carregarDados)` e `onActivated(carregarDados)` sem guarda do primeiro carregamento;
+- `ProcessoDetalheView`
+  - havia divergência entre comentário e comportamento real em erro de recarga;
+- `useCacheSync`
+  - já invalidava domínios demais antes do corte do SSE organizacional.
+
+### Hotspots que merecem revisão imediata
+
+- `UnidadeView`
+  - combina `watch(..., {immediate: true})` com `onActivated`, o que pode gerar recarga redundante quando a view volta do cache;
+- `UnidadesView`
+  - ainda recarrega diretamente no `onMounted` e no `onActivated`, sem store dedicado para dedupe;
+- `CadastroView`
+  - depende de bootstrap por rota e vários `watch`, então merece revisão para garantir que mutações locais não disparem recargas fora de hora;
+- `MapaView`
+  - depende de bootstrap por rota e de mutações locais no mesmo contexto, então precisa revisão focada em overlap de refresh pós-workflow.
 
 ## Fases de execução
 
@@ -217,7 +273,7 @@ Objetivos:
 - `resetar()` assumir limpeza real;
 - `dadosValidos(...)` ter semântica equivalente entre os três.
 
-## Fase 3: Reidratação das views `keepAlive`
+## Fase 3: Reidratação e bootstrap das views
 
 Padronizar:
 
@@ -235,6 +291,7 @@ Objetivos:
 
 - toda view crítica reidrata em `onActivated`;
 - nenhuma view depende apenas de `onMounted`;
+- refresh completo da página recompõe o contexto pela rota sem depender do estado anterior da SPA;
 - "não encontrado" só aparece após tentativa real de recarga.
 
 ## Fase 4: Invalidação por domínio
@@ -251,13 +308,28 @@ Objetivos:
 - remover invalidação transversal desnecessária;
 - manter escopo mínimo por evento.
 
+## Fase 5: Anti-overlap de carregamento
+
+Revisar:
+
+- telas com `onMounted` + `onActivated`;
+- telas com `watch(..., {immediate: true})` somado a reidratação;
+- fluxos que recarregam store e tela ao mesmo tempo após workflow.
+
+Objetivos:
+
+- eliminar carga duplicada no primeiro ciclo de vida;
+- deduplicar recargas concorrentes da mesma tela;
+- evitar refresh em cascata quando o store já foi reidratado pela ação anterior.
+
 ## Ordem recomendada
 
 1. inventariar stores e views;
 2. fixar contrato em `processo`, `subprocesso` e `mapas`;
-3. corrigir reidratação de `SubprocessoView` e `MapaView`;
+3. corrigir reidratação e bootstrap de `SubprocessoView`, `CadastroView` e `MapaView`;
 4. revisar SSE e helpers de invalidação;
-5. alinhar `painel`, `historico`, `unidade` e `organizacao`.
+5. cortar hotspots de overlap e duplicidade;
+6. alinhar `painel`, `historico`, `unidade` e `organizacao`.
 
 ## Trilhas iniciais de implementação
 
@@ -296,6 +368,20 @@ Objetivos:
 - reforçar testes para usar `subprocesso` como baseline de comportamento esperado;
 - só mexer no código se aparecer inconsistência real depois da trilha 1.
 
+### Trilha 3: cortar overlap de carregamento
+
+Escopo inicial:
+
+- `frontend/src/views/AtribuicaoTemporariaView.vue`
+- `frontend/src/views/UnidadeView.vue`
+- `frontend/src/views/UnidadesView.vue`
+
+Objetivos:
+
+- remover duplicidade entre `onMounted`, `onActivated` e `watch`;
+- deixar claro quando a tela usa cache local e quando força recarga;
+- evitar spinner e round-trip redundantes na volta para a tela.
+
 Arquivos prioritários para a primeira rodada:
 
 - `frontend/src/composables/useCacheSync.ts`
@@ -314,6 +400,7 @@ Considerar a política consistente quando:
 
 - `invalidar()` e `resetar()` tiverem semântica uniforme;
 - nenhuma view crítica `keepAlive` depender apenas de `onMounted`;
+- nenhuma tela crítica disparar a mesma carga duas vezes no primeiro ciclo de vida;
 - eventos organizacionais não apagarem contexto crítico;
 - contexto crítico inválido acionar reidratação em vez de desaparecimento abrupto;
 - "não encontrado" só surgir após busca real malsucedida.
@@ -329,6 +416,8 @@ Considerar a política consistente quando:
 ### Composables e views
 
 - reativação de view `keepAlive` com dado inválido dispara recarga;
+- bootstrap por rota recompõe o contexto após refresh completo da página;
+- `onMounted`, `onActivated` e `watch` não geram overlap indevido;
 - a UI não cai para "não encontrado" enquanto reidrata.
 
 ### SSE
@@ -366,12 +455,22 @@ Views `keepAlive` críticas devem provar:
 - recarregam quando o store está `stale`;
 - não caem em estado de "não encontrado" antes de uma falha real.
 
+### 4. Anti-overlap
+
+Telas com múltiplos gatilhos de carga devem provar:
+
+- nenhuma recarga duplicada no primeiro ciclo de vida;
+- retorno à tela com dados válidos não dispara round-trip desnecessário;
+- retorno à tela com dados inválidos dispara exatamente uma recarga.
+
 ### Priorização atual da suíte
 
 1. `useCacheSync`
 2. stores `processo`, `subprocesso`, `mapas`, `painel`
 3. `subprocessoCarregamento`
 4. `ProcessoDetalheView` e `SubprocessoView`
+5. orquestrações `useCadastroOrquestracao` e `useMapaOrquestracao`
+6. hotspots de overlap (`AtribuicaoTemporariaView`, `UnidadeView`, `UnidadesView`)
 
 ## Observação final
 

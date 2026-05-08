@@ -10,7 +10,8 @@ const {
     mockUnidadeData,
     mockMapaVigente,
     mockObterUnidade,
-    mockObterReferenciaMapaVigente
+    mockObterReferenciaMapaVigente,
+    mockUnidadeStore
 } = vi.hoisted(() => {
     const u = {
         codigo: 10,
@@ -46,7 +47,13 @@ const {
         },
         mockMapaVigente: {codProcesso: 99, codSubprocesso: 77},
         mockObterUnidade: vi.fn(),
-        mockObterReferenciaMapaVigente: vi.fn()
+        mockObterReferenciaMapaVigente: vi.fn(),
+        mockUnidadeStore: {
+            cacheUnidades: new Map<number, unknown>(),
+            cacheMapasVigentes: new Map<number, unknown>(),
+            obterUnidade: vi.fn(),
+            obterReferenciaMapaVigente: vi.fn(),
+        }
     };
 });
 
@@ -62,12 +69,7 @@ vi.mock('vue-router', async (importOriginal) => {
 
 vi.mock('@/stores/unidade', () => {
     return {
-        useUnidadeStore: () => ({
-            cacheUnidades: new Map<number, unknown>(),
-            cacheMapasVigentes: new Map<number, unknown>(),
-            obterUnidade: mockObterUnidade,
-            obterReferenciaMapaVigente: mockObterReferenciaMapaVigente,
-        }),
+        useUnidadeStore: () => mockUnidadeStore,
     };
 });
 
@@ -82,6 +84,10 @@ describe('UnidadeView.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        mockUnidadeStore.cacheUnidades.clear();
+        mockUnidadeStore.cacheMapasVigentes.clear();
+        mockUnidadeStore.obterUnidade = mockObterUnidade;
+        mockUnidadeStore.obterReferenciaMapaVigente = mockObterReferenciaMapaVigente;
         mockObterUnidade.mockResolvedValue(mockUnidadeData);
         mockObterReferenciaMapaVigente.mockResolvedValue(null);
     });
@@ -203,5 +209,33 @@ describe('UnidadeView.vue', () => {
         await flushPromises();
 
         expect(wrapper.findComponent(EmptyState).exists()).toBe(true);
+    });
+
+    it('não deve duplicar carregamento quando mudança de unidade e onActivated coincidirem', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+
+        let resolver!: (valor: unknown) => void;
+        mockObterUnidade.mockImplementationOnce(() => new Promise((resolve) => {
+            resolver = resolve;
+        }) as any);
+        mockObterReferenciaMapaVigente.mockResolvedValueOnce(null);
+
+        const trocaProps = wrapper.setProps({codUnidade: 2});
+        const hook = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a)?.[0];
+        const ativacao = hook?.call(wrapper.vm);
+
+        expect(mockObterUnidade).toHaveBeenCalledTimes(2);
+        expect(mockObterReferenciaMapaVigente).toHaveBeenCalledTimes(2);
+
+        resolver({
+            ...mockUnidadeData,
+            codigo: 2,
+            sigla: 'TEST2',
+            nome: 'Unidade 2'
+        });
+        await trocaProps;
+        await ativacao;
+        await flushPromises();
     });
 });

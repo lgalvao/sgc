@@ -32,4 +32,4 @@
 6. O usuário pode clicar no botão `PDF` para exportar o relatório.
 
 7. O sistema gera um arquivo PDF seguindo o mesmo layout visual (otimizado para impressão em preto e branco) e inicia o
-   download automaticamente com o padrão de nome `relatorio-andamento-[id-processo].pdf`.
+   download automaticamente com o padrão de nome `sgc-rel-andamento-YYYY-MM-DD.pdf`.
