@@ -105,4 +105,20 @@ describe('subprocessoCarregamento.ts', () => {
         await wrapper.vm.$.a?.[0]()
         expect(deps.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false)
     })
+
+    it('não deve recarregar no onActivated quando o contexto atual ainda for válido', async () => {
+        const deps = criarDependencias({
+            dadosEdicaoValidos: vi.fn().mockReturnValue(true),
+        })
+        deps.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({codigo: 123})
+
+        const wrapper = mount(TestComponent(deps))
+        await flushPromises()
+        deps.garantirContextoEdicaoPorProcessoEUnidade.mockClear()
+
+        // @ts-expect-error - Acessando hook privado do vue para simular ativação
+        await wrapper.vm.$.a?.[0]()
+
+        expect(deps.garantirContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled()
+    })
 })

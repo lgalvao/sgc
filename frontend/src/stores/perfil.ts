@@ -56,7 +56,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         processoStore.resetar();
         subprocessoStore.resetar();
         unidadeStore.invalidarCache();
-        mapasStore.invalidar();
+        mapasStore.resetar();
         organizacaoStore.invalidar();
     }
 

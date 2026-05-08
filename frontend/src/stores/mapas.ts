@@ -14,15 +14,17 @@ import {
  * - chave: código do subprocesso;
  * - validade: sem TTL; reaproveita ao reativar a view enquanto o subprocesso
  *   não for invalidado explicitamente;
- * - invalidação: logout, troca de perfil, SSE organizacional e qualquer ação
- *   de workflow/mutação que altere o mapa.
+ * - invalidação: qualquer ação de workflow/mutação que altere o mapa marca o
+ *   snapshot como stale, mas não o apaga imediatamente;
+ * - reset: logout, troca de perfil e limpeza explícita de sessão removem todo
+ *   o estado do store.
  *
  * Mantemos o último snapshot acessado em refs simples por compatibilidade com
  * testes e composables legados, mas o cache efetivo é indexado por subprocesso.
  */
 export const useMapasStore = defineStore("mapas", () => {
     const cacheMapaCompleto = ref<Map<number, MapaCompleto>>(new Map());
-    const cacheImpactoMapa = ref<Map<number, ImpactoMapa | null>>(new Map());
+    const codigosMapaInvalidos = ref<Set<number>>(new Set());
     const mapaCompleto = ref<MapaCompleto | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const codigoMapaAtual = ref<number | null>(null);
@@ -35,9 +37,9 @@ export const useMapasStore = defineStore("mapas", () => {
         mapaCompleto.value = codigo === null ? null : (cacheMapaCompleto.value.get(codigo) ?? null);
     }
 
-    function sincronizarImpactoAtual(codigo: number | null): void {
+    function sincronizarImpactoAtual(codigo: number | null, impacto: ImpactoMapa | null = null): void {
         codigoImpactoAtual.value = codigo;
-        impactoMapa.value = codigo === null ? null : (cacheImpactoMapa.value.get(codigo) ?? null);
+        impactoMapa.value = codigo === null ? null : impacto;
     }
 
     function obterMapaCompletoCache(codigoSubprocesso: number): MapaCompleto | null {
@@ -45,20 +47,20 @@ export const useMapasStore = defineStore("mapas", () => {
     }
 
     function obterImpactoMapaCache(codigoSubprocesso: number): ImpactoMapa | null {
-        return cacheImpactoMapa.value.get(codigoSubprocesso) ?? null;
+        return codigoImpactoAtual.value === codigoSubprocesso ? impactoMapa.value : null;
     }
 
     function dadosMapaValidos(codigoSubprocesso: number): boolean {
-        return cacheMapaCompleto.value.has(codigoSubprocesso);
+        return cacheMapaCompleto.value.has(codigoSubprocesso)
+            && !codigosMapaInvalidos.value.has(codigoSubprocesso);
     }
 
     function dadosImpactoValidos(codigoSubprocesso: number): boolean {
-        return cacheImpactoMapa.value.has(codigoSubprocesso);
+        return codigoImpactoAtual.value === codigoSubprocesso && impactoMapa.value !== null;
     }
 
     function invalidarImpacto(codigoSubprocesso?: number): void {
         if (typeof codigoSubprocesso === "number") {
-            cacheImpactoMapa.value.delete(codigoSubprocesso);
             carregamentosImpacto.delete(codigoSubprocesso);
             if (codigoImpactoAtual.value === codigoSubprocesso) {
                 sincronizarImpactoAtual(null);
@@ -66,7 +68,6 @@ export const useMapasStore = defineStore("mapas", () => {
             return;
         }
 
-        cacheImpactoMapa.value.clear();
         carregamentosImpacto.clear();
         sincronizarImpactoAtual(null);
     }
@@ -77,13 +78,13 @@ export const useMapasStore = defineStore("mapas", () => {
         } else {
             cacheMapaCompleto.value.delete(codigoSubprocesso);
         }
+        codigosMapaInvalidos.value.delete(codigoSubprocesso);
         invalidarImpacto(codigoSubprocesso);
         sincronizarMapaAtual(mapa ? codigoSubprocesso : null);
     }
 
     function definirImpactoMapa(codigoSubprocesso: number, impacto: ImpactoMapa | null): void {
-        cacheImpactoMapa.value.set(codigoSubprocesso, impacto);
-        sincronizarImpactoAtual(codigoSubprocesso);
+        sincronizarImpactoAtual(codigoSubprocesso, impacto);
     }
 
     async function garantirMapaCompleto(codigoSubprocesso: number): Promise<MapaCompleto> {
@@ -110,14 +111,8 @@ export const useMapasStore = defineStore("mapas", () => {
     }
 
     async function garantirImpactoMapa(codigoSubprocesso: number): Promise<ImpactoMapa> {
-        if (dadosImpactoValidos(codigoSubprocesso)) {
-            sincronizarImpactoAtual(codigoSubprocesso);
-            return cacheImpactoMapa.value.get(codigoSubprocesso)! as ImpactoMapa;
-        }
-
         const carregamentoExistente = carregamentosImpacto.get(codigoSubprocesso);
         if (carregamentoExistente) {
-            sincronizarImpactoAtual(codigoSubprocesso);
             return carregamentoExistente;
         }
 
@@ -134,24 +129,29 @@ export const useMapasStore = defineStore("mapas", () => {
 
     function invalidar(codigoSubprocesso?: number): void {
         if (typeof codigoSubprocesso === "number") {
-            cacheMapaCompleto.value.delete(codigoSubprocesso);
+            codigosMapaInvalidos.value.add(codigoSubprocesso);
             carregamentosMapa.delete(codigoSubprocesso);
-            if (codigoMapaAtual.value === codigoSubprocesso) {
-                sincronizarMapaAtual(null);
-            }
             invalidarImpacto(codigoSubprocesso);
             return;
         }
 
-        cacheMapaCompleto.value.clear();
+        codigosMapaInvalidos.value = new Set(cacheMapaCompleto.value.keys());
         carregamentosMapa.clear();
-        sincronizarMapaAtual(null);
         invalidarImpacto();
+    }
+
+    function resetar(): void {
+        cacheMapaCompleto.value.clear();
+        codigosMapaInvalidos.value.clear();
+        carregamentosMapa.clear();
+        carregamentosImpacto.clear();
+        sincronizarMapaAtual(null);
+        sincronizarImpactoAtual(null);
     }
 
     return {
         cacheMapaCompleto,
-        cacheImpactoMapa,
+        codigosMapaInvalidos,
         mapaCompleto,
         impactoMapa,
         codigoMapaAtual,
@@ -166,5 +166,6 @@ export const useMapasStore = defineStore("mapas", () => {
         garantirImpactoMapa,
         invalidarImpacto,
         invalidar,
+        resetar,
     };
 });
