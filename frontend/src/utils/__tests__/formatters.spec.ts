@@ -64,6 +64,18 @@ describe('formatters', () => {
             const assinatura = calcularAssinaturaCadastro(atividades);
             expect(assinatura).toBe('A\u0002\u0003B\u0002');
         });
+
+        it('deve manter ordenação binária compatível com backend', () => {
+            const atividades = [
+                {
+                    descricao: 'A',
+                    conhecimentos: [{descricao: 'a'}, {descricao: 'B'}]
+                }
+            ] as any;
+
+            const assinatura = calcularAssinaturaCadastro(atividades);
+            expect(assinatura).toBe('A\u0002B\u0001a');
+        });
     });
 
     describe('formatSituacaoProcesso', () => {

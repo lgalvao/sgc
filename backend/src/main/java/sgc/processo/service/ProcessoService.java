@@ -684,7 +684,8 @@ public class ProcessoService {
         boolean elegivelDisponibilizacao = situacao == MAPEAMENTO_MAPA_CRIADO
                 || situacao == MAPEAMENTO_MAPA_COM_SUGESTOES
                 || situacao == REVISAO_MAPA_COM_SUGESTOES
-                || situacao == REVISAO_MAPA_AJUSTADO;
+                || situacao == REVISAO_MAPA_AJUSTADO
+                || situacao == REVISAO_CADASTRO_HOMOLOGADA;
         return elegivelDisponibilizacao
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, DISPONIBILIZAR_MAPA, localizacoesPrecarregadas);
     }
