@@ -183,4 +183,16 @@ button:disabled,
   cursor: not-allowed !important;
   pointer-events: auto !important;
 }
+
+.link-discreto {
+  color: var(--bs-secondary-color);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.link-discreto:hover,
+.link-discreto:focus {
+  color: var(--bs-emphasis-color);
+  text-decoration: none;
+}
 </style>

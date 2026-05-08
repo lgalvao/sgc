@@ -131,7 +131,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
           </span>
           <span v-if="subprocesso.titular?.email">
             <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-            <a :href="`mailto:${subprocesso.titular.email}`">{{ subprocesso.titular.email }}</a>
+            <a :href="`mailto:${subprocesso.titular.email}`" class="link-discreto">{{ subprocesso.titular.email }}</a>
           </span>
         </p>
         <template
@@ -151,7 +151,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
             </span>
             <span v-if="subprocesso.responsavel.usuario.email">
               <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-              <a :href="`mailto:${subprocesso.responsavel.usuario.email}`">{{
+              <a :href="`mailto:${subprocesso.responsavel.usuario.email}`" class="link-discreto">{{
                   subprocesso.responsavel.usuario.email
                 }}</a>
             </span>

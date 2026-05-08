@@ -12,6 +12,7 @@
         <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
         <a
             :aria-label="`Enviar e-mail para ${contato.email}`"
+            class="link-discreto"
             :href="`mailto:${contato.email}`"
         >{{ contato.email }}</a>
       </span>
