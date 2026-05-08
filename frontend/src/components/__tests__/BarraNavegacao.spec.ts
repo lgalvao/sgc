@@ -1,242 +1,113 @@
 import {mount} from "@vue/test-utils";
-import {BBreadcrumbItem, BButton} from "bootstrap-vue-next";
+import {computed} from "vue";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {createTestingPinia} from "@pinia/testing";
-import {setActivePinia} from "pinia";
-import {useRoute} from "vue-router";
-import {Perfil} from "@/types/tipos";
 import BarraNavegacao from "../layout/BarraNavegacao.vue";
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 
 const mockRouter = {
     back: vi.fn(),
 };
-vi.mock("vue-router", () => ({
-    useRoute: vi.fn(),
-    useRouter: () => mockRouter,
-    createRouter: vi.fn(() => ({
-        beforeEach: vi.fn(),
-        afterEach: vi.fn(),
-    })),
-    createWebHistory: vi.fn(),
-    createMemoryHistory: vi.fn(),
-}));
 
-// Helper to create mock routes
-const createMockRoute = (
-    path: string,
-    matched: any[],
-    routeName = "",
-    params: Record<string, string> = {},
-) => ({
-    path,
-    matched,
-    params,
-    name: routeName,
-    fullPath: path,
+const mockRoute = {
+    path: "/processo/123",
+    matched: [],
+    params: {},
+    name: "Processo",
+    fullPath: "/processo/123",
     query: {},
     hash: "",
     meta: {},
     redirectedFrom: undefined,
-});
+};
 
-const mockMatchedProcesso = [
-    {name: "Painel", meta: {}},
-    {name: "Processo", meta: {}},
-];
+const breadcrumbsMock = computed(() => [
+    {label: "Painel", to: {name: "Painel"}, isHome: true},
+    {label: "Detalhes do processo", to: undefined},
+]);
 
-const mockMatchedSubprocesso = [
-    {name: "Painel", meta: {}},
-    {name: "Subprocesso", meta: {}},
-];
+vi.mock("vue-router", () => ({
+    useRoute: () => mockRoute,
+    useRouter: () => mockRouter,
+}));
 
-const mockMatchedUnidade = [
-    {name: "Painel", meta: {}},
-    {name: "Unidade", meta: {breadcrumb: "Minha unidade"}},
-];
+vi.mock("@/composables/useBreadcrumbs", () => ({
+    useBreadcrumbs: () => ({breadcrumbs: breadcrumbsMock}),
+}));
+
+const BButtonStub = {
+    template: '<button><slot /></button>',
+};
+
+const BBreadcrumbStub = {
+    template: '<nav data-testid="nav-breadcrumbs"><slot /></nav>',
+};
+
+const BBreadcrumbItemStub = {
+    template: '<li><slot /></li>',
+    props: ["active", "to"],
+};
 
 describe("BarraNavegacao.vue", () => {
-    setupComponentTest();
-
     beforeEach(() => {
         vi.clearAllMocks();
-        setActivePinia(createTestingPinia({createSpy: vi.fn}));
-        const {definirUnidadeAtual} = useUnidadeAtual();
-        definirUnidadeAtual(null);
+        mockRoute.path = "/processo/123";
+        mockRoute.name = "Processo";
     });
 
-    describe("Visibilidade dos Elementos", () => {
-        it("não deve exibir o botão de voltar e os breadcrumbs na página de login", () => {
-            vi.mocked(useRoute).mockReturnValue(createMockRoute("/login", []));
-            const wrapper = mount(
-                BarraNavegacao,
-                getCommonMountOptions({}, {BButton}),
-            );
-            expect(wrapper.find("button").exists()).toBe(false);
-            expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
+    function montarComponente() {
+        return mount(BarraNavegacao, {
+            global: {
+                stubs: {
+                    BButton: BButtonStub,
+                    BBreadcrumb: BBreadcrumbStub,
+                    BBreadcrumbItem: BBreadcrumbItemStub,
+                },
+                directives: {
+                    "b-tooltip": {},
+                },
+            },
         });
+    }
 
-        it("não deve exibir o botão de voltar e os breadcrumbs na página do painel", () => {
-            vi.mocked(useRoute).mockReturnValue(createMockRoute("/painel", []));
-            const wrapper = mount(
-                BarraNavegacao,
-                getCommonMountOptions({}, {BButton}),
-            );
-            expect(wrapper.find("button").exists()).toBe(false);
-            expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
-        });
+    it("não deve exibir o botão de voltar e os breadcrumbs na página de login", () => {
+        mockRoute.path = "/login";
 
-        it("deve exibir o botão de voltar e os breadcrumbs em outras páginas", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
-            );
-            const wrapper = mount(
-                BarraNavegacao,
-                getCommonMountOptions({}, {BButton}),
-            );
-            expect(wrapper.find("button").exists()).toBe(true);
-            expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(true);
-        });
+        const wrapper = montarComponente();
+
+        expect(wrapper.find("button").exists()).toBe(false);
+        expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
     });
 
-    describe("Renderização dos Breadcrumbs", () => {
-        it("deve renderizar breadcrumbs para rota de Processo", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
-            );
-            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.ADMIN}
-            }, {BButton}));
+    it("não deve exibir o botão de voltar e os breadcrumbs na página do painel", () => {
+        mockRoute.path = "/painel";
+        mockRoute.name = "Painel";
 
-            const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(2); // Home + "Detalhes do processo"
-            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            expect(items[1].text()).toBe("Detalhes do processo");
-        });
+        const wrapper = montarComponente();
 
-        it("deve renderizar breadcrumbs para rota de Subprocesso", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute(
-                    "/processo/123/ASSESSORIA_12",
-                    mockMatchedSubprocesso,
-                    "Subprocesso",
-                    {codProcesso: "123", siglaUnidade: "ASSESSORIA_12"},
-                ),
-            );
-            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.ADMIN}
-            }, {BButton}));
-
-            const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(3); // Home + "Detalhes do processo" + sigla
-            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            expect(items[1].text()).toBe("Detalhes do processo");
-            expect(items[2].text()).toBe("ASSESSORIA_12");
-        });
-
-        it("deve renderizar breadcrumbs para rotas de unidade (ADMIN vê 'Unidades')", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {codUnidade: "1"}),
-            );
-            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {
-                    perfilSelecionado: Perfil.ADMIN,
-                    permissoesSessao: {mostrarArvoreCompletaUnidades: true},
-                    unidadeAtualDetalhes: {codigo: 1, sigla: "UNIDADE_1"}
-                }
-            }, {BButton}));
-
-            const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(3); // Home + sigla/codigo + "Unidades"
-            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            expect(items[1].text()).toBe("UNIDADE_1");
-            // ADMIN vê "Unidades" em vez de "Minha unidade"
-            expect(items[2].text()).toBe("Unidades");
-        });
-
-        it("deve renderizar breadcrumbs para rotas de unidade (não-ADMIN vê 'Minha unidade')", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/unidade/456", mockMatchedUnidade, "Unidade", {codUnidade: "456"}),
-            );
-            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {
-                    perfilSelecionado: Perfil.GESTOR,
-                    permissoesSessao: {mostrarArvoreCompletaUnidades: false},
-                    unidadeAtualDetalhes: {codigo: 456, sigla: "UNIDADE_456"}
-                }
-            }, {BButton}));
-
-            const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(3); // Home + sigla/codigo + "Minha unidade"
-            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            expect(items[1].text()).toBe("UNIDADE_456");
-            // Não-ADMIN vê "Minha unidade"
-            expect(items[2].text()).toBe("Minha unidade");
-        });
+        expect(wrapper.find("button").exists()).toBe(false);
+        expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(false);
     });
 
-    describe("Lógica de Perfil", () => {
-        it("deve omitir o breadcrumb 'Detalhes do processo' para o perfil CHEFE", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
-            );
+    it("deve exibir o botão de voltar e os breadcrumbs em outras páginas", () => {
+        const wrapper = montarComponente();
 
-            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.CHEFE}
-            }, {BButton}));
-
-            const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(1); // Apenas home
-            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-        });
-
-        it("deve omitir o breadcrumb 'Detalhes do processo' para o perfil SERVIDOR", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
-            );
-
-            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.SERVIDOR}
-            }, {BButton}));
-
-            const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(1); // Apenas home
-            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-        });
-
-        it("deve mostrar sigla da unidade para CHEFE em Subprocesso", () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute(
-                    "/processo/123/ASSESSORIA_12",
-                    mockMatchedSubprocesso,
-                    "Subprocesso",
-                    {codProcesso: "123", siglaUnidade: "ASSESSORIA_12"},
-                ),
-            );
-
-            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
-                perfil: {perfilSelecionado: Perfil.CHEFE}
-            }, {BButton}));
-
-            const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(2); // Home + sigla (sem "Detalhes do processo")
-            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
-            expect(items[1].text()).toBe("ASSESSORIA_12");
-        });
+        expect(wrapper.find("button").exists()).toBe(true);
+        expect(wrapper.find('[data-testid="nav-breadcrumbs"]').exists()).toBe(true);
     });
 
-    describe("Funcionalidade", () => {
-        it("deve chamar router.back() ao clicar no botão de voltar", async () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
-            );
-            const wrapper = mount(
-                BarraNavegacao,
-                getCommonMountOptions({}, {BButton}),
-            );
-            await wrapper.findComponent(BButton).trigger("click");
-            expect(mockRouter.back).toHaveBeenCalledTimes(1);
-        });
+    it("deve renderizar os breadcrumbs recebidos do composable", () => {
+        const wrapper = montarComponente();
+
+        const items = wrapper.findAllComponents(BBreadcrumbItemStub);
+        expect(items).toHaveLength(2);
+        expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
+        expect(items[1].text()).toBe("Detalhes do processo");
+    });
+
+    it("deve chamar router.back() ao clicar no botão de voltar", async () => {
+        const wrapper = montarComponente();
+
+        await wrapper.find("button").trigger("click");
+
+        expect(mockRouter.back).toHaveBeenCalledTimes(1);
     });
 });

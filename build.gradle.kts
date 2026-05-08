@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import com.github.gradle.node.pnpm.task.PnpmTask
 
 plugins {
@@ -14,8 +13,8 @@ plugins {
 
 node {
     download.set(true)
-    version.set("22.22.0")
-    pnpmVersion.set("10.33.4")
+    version.set("26.1.0")
+    pnpmVersion.set("11.0.8")
 }
 
 allprojects {
@@ -57,7 +56,7 @@ subprojects {
 tasks.register<PnpmTask>("installRoot") {
     group = "setup"
     description = "Instala as dependências do root (pnpm install)"
-    pnpmCommand.set(listOf("install", "--frozen-lockfile"))
+    pnpmCommand.set(listOf("install"))
     inputs.file("package.json")
     inputs.file("pnpm-lock.yaml")
     outputs.dir("node_modules")

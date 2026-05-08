@@ -27,7 +27,8 @@ COPY backend/build.gradle.kts backend/
 RUN mkdir -p frontend
 
 # Baixa dependências Java em camada separada para preservar cache quando só o frontend muda
-RUN gradle :backend:dependencies
+RUN --mount=type=cache,target=/root/.gradle \
+    gradle :backend:dependencies --no-daemon
 
 # Estágio de cache das dependências do frontend
 FROM deps-java AS deps-frontend
@@ -36,7 +37,9 @@ COPY frontend/build.gradle.kts frontend/
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/
 
 # Instala dependências do frontend, preservando a orquestração oficial do Gradle
-RUN gradle :frontend:install
+RUN --mount=type=cache,target=/root/.gradle \
+    --mount=type=cache,target=/root/.pnpm-store \
+    gradle :frontend:install --no-daemon
 
 # Estágio 1: Build unificado (Backend + Frontend)
 FROM deps-frontend AS build-env
@@ -45,7 +48,8 @@ FROM deps-frontend AS build-env
 COPY . . 
 
 # 5. Executa o build completo orquestrado pelo Gradle
-RUN gradle :backend:bootJar -x test
+RUN --mount=type=cache,target=/root/.gradle \
+    gradle :backend:bootJar -x test --no-daemon
 # Estágio 2: Extrator (prepara as camadas do Spring Boot)
 FROM docker.io/library/amazoncorretto:25 AS extrator
 WORKDIR /aplicacao

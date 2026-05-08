@@ -3,7 +3,6 @@ import {type RouteLocationNamedRaw, type RouteLocationNormalizedLoaded} from 'vu
 import {usePerfilStore} from '@/stores/perfil';
 import {Perfil} from '@/types/tipos';
 import {useUnidadeAtual} from '@/composables/useUnidadeAtual';
-import {usePerfil} from '@/composables/usePerfil';
 
 export interface Breadcrumb {
     label: string;
@@ -11,10 +10,19 @@ export interface Breadcrumb {
     isHome?: boolean;
 }
 
+const TITULOS_PAGINA_SUBPROCESSO: Record<string, string> = {
+    SubprocessoMapa: "Mapa de competências",
+    SubprocessoCadastro: "Atividades e conhecimentos",
+};
+
+const TITULOS_PAGINA_UNIDADE: Record<string, string> = {
+    Mapa: "Mapa de competências",
+    AtribuicaoTemporariaForm: "Atribuição temporária",
+};
+
 export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     const perfil = usePerfilStore();
     const {unidadeAtual} = useUnidadeAtual();
-    const {mostrarArvoreCompletaUnidades} = usePerfil();
 
     const getProcessoBreadcrumbs = (
         codProcesso: string,
@@ -51,12 +59,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
                 },
             });
 
-            const pageTitles: Record<string, string> = {
-                SubprocessoMapa: "Mapa de competências",
-                SubprocessoCadastro: "Atividades e conhecimentos",
-            };
-
-            const pageTitle = pageTitles[routeName];
+            const pageTitle = TITULOS_PAGINA_SUBPROCESSO[routeName];
             if (pageTitle) {
                 crumbs.push({label: pageTitle});
             }
@@ -72,18 +75,11 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
         const crumbs: Breadcrumb[] = [];
         if (codUnidade && isUnidadeRoute) {
             crumbs.push({
-                label: unidadeAtual.value?.sigla ?? "",
+                label: unidadeAtual.value?.sigla ?? `Unidade ${codUnidade}`,
                 to: routeName === "Unidade" ? undefined : {name: "Unidade", params: {codUnidade}},
             });
 
-            const unidadeLabel = mostrarArvoreCompletaUnidades.value ? "Unidades" : "Minha unidade";
-            const unidadePageTitles: Record<string, string> = {
-                Unidade: unidadeLabel,
-                Mapa: "Mapa de competências",
-                AtribuicaoTemporariaForm: "Atribuição temporária",
-            };
-
-            const unidadePageTitle = unidadePageTitles[routeName];
+            const unidadePageTitle = TITULOS_PAGINA_UNIDADE[routeName];
             if (unidadePageTitle) {
                 crumbs.push({label: unidadePageTitle});
             }
@@ -112,9 +108,13 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     };
 
     const crumbs = computed((): Breadcrumb[] => {
-        const breadcrumbs: Breadcrumb[] = [{label: "Painel", to: {name: "Painel"}, isHome: true}];
-        const perfilUsuario = perfil.perfilSelecionado;
         const routeName = route.name as string;
+        const breadcrumbs: Breadcrumb[] = [{
+            label: "Painel",
+            to: routeName === "Painel" ? undefined : {name: "Painel"},
+            isHome: true
+        }];
+        const perfilUsuario = perfil.perfilSelecionado;
         const codProcesso = route.params.codProcesso as string;
         const siglaUnidade = route.params.siglaUnidade as string;
         const codUnidade = route.params.codUnidade as string;

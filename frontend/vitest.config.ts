@@ -29,7 +29,7 @@ export default defineConfig({
         environment: "jsdom",
         testTimeout: 15000,
         include: ["src/**/*.{test,spec}.{js,ts}"],
-        exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*"],
+        exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*", "**/*.stories.ts"],
         setupFiles: ["./vitest.setup.ts", "./src/test/a11y-setup.ts"]
       }
     }]

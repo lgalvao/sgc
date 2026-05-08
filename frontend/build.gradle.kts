@@ -14,7 +14,7 @@ node {
 tasks.register<PnpmTask>("install") {
     group = "setup"
     description = "Instala as dependências do frontend (pnpm install)"
-    pnpmCommand.set(listOf("install", "--frozen-lockfile", "--config.confirmModulesPurge=false"))
+    pnpmCommand.set(listOf("install", "--no-frozen-lockfile", "--config.confirmModulesPurge=false"))
     inputs.file("package.json")
     inputs.file("pnpm-lock.yaml")
     outputs.dir("node_modules")

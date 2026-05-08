@@ -1,7 +1,7 @@
 # Plano pra release
 
 ## Bugs
-Breadcrumbs
+Breadcrumbs quebrads
 Atualização de cache no background pode estar zerando mapa
 Config de modo escuro estranho
 
