@@ -92,6 +92,7 @@ import {useUnidadeStore} from "@/stores/unidade";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {logger} from "@/utils";
+import {normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{ codUnidade: number }>();
@@ -148,8 +149,7 @@ async function carregarDados(forcar = false) {
       definirUnidadeAtual(unidade.value);
       mapaVigente.value = mapaResp;
     } catch (error: unknown) {
-      const err = error as Error;
-      lastError.value = err.message || TEXTOS.unidade.ERRO_CARREGAR;
+      lastError.value = normalizarErro(error).mensagem || TEXTOS.unidade.ERRO_CARREGAR;
       logger.error("Erro ao carregar dados da unidade:", error);
     } finally {
       carregandoPagina.value = false;

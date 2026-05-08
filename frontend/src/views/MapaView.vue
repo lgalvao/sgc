@@ -342,7 +342,7 @@ async function executarComSubprocesso(
     callback: (id: number) => Promise<void>
 ) {
   const codSubp = codigoSubprocesso.value;
-  if (!codSubp) return;
+  if (!codSubp) throw new Error("Invariante violada: codigoSubprocesso não carregado");
   await callback(codSubp);
 }
 

@@ -44,7 +44,7 @@ export const useHistoricoStore = defineStore("historico", () => {
             carregamentoEmAndamento = (async () => {
                 carregando.value = true;
                 try {
-                    processos.value = await buscarProcessosFinalizados() ?? [];
+                    processos.value = await buscarProcessosFinalizados();
                     carregado.value = true;
                 } finally {
                     carregando.value = false;

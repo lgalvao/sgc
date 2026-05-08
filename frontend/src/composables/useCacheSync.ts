@@ -1,6 +1,7 @@
 import {useUnidadeStore} from "@/stores/unidade";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {usePainelStore} from "@/stores/painel";
+import {logger} from "@/utils";
 
 const EVENTO_CACHE_ATUALIZADO = "org-cache-refreshed";
 
@@ -26,8 +27,9 @@ export function useCacheSync() {
         painelStore.invalidar();
     });
 
-    source.addEventListener("error", () => {
-        // Mantém a conexão viva; o browser gerencia a reconexão automática do EventSource.
+    source.addEventListener("error", (event) => {
+        logger.warn("Erro na conexão SSE de sincronização de cache:", event);
+        // Browser gerencia reconexão automática do EventSource.
     });
 
     return () => {
