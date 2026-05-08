@@ -25,7 +25,7 @@ import sgc.subprocesso.service.*;
 import java.time.*;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -167,7 +167,7 @@ class ProcessoControllerTest {
 
             verify(processoService).criar(criarCaptor.capture());
             CriarProcessoRequest capturado = criarCaptor.getValue();
-            assertEquals(NOVO_PROCESSO, capturado.descricao());
+            assertThat(capturado.descricao()).isEqualTo(NOVO_PROCESSO);
         }
 
         @Test
@@ -350,7 +350,7 @@ class ProcessoControllerTest {
 
             verify(processoService).atualizar(eq(1L), atualizarCaptor.capture());
             AtualizarProcessoRequest capturado = atualizarCaptor.getValue();
-            assertEquals(PROCESSO_ATUALIZADO, capturado.descricao());
+            assertThat(capturado.descricao()).isEqualTo(PROCESSO_ATUALIZADO);
         }
     }
 
@@ -659,8 +659,9 @@ class ProcessoControllerTest {
                     .build();
             when(processoServiceMock.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
 
-            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.listarUnidadesParaImportacao(1L));
-            assertEquals(Mensagens.PROCESSO_DEVE_ESTAR_FINALIZADO, ex.getMessage());
+            assertThatThrownBy(() -> controller.listarUnidadesParaImportacao(1L))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessage(Mensagens.PROCESSO_DEVE_ESTAR_FINALIZADO);
         }
 
         @Test
@@ -669,7 +670,7 @@ class ProcessoControllerTest {
             Long codigo = 1L;
             ResponseEntity<Void> response = controller.excluir(codigo);
             verify(processoServiceMock).apagar(codigo);
-            assertEquals(204, response.getStatusCode().value());
+            assertThat(response.getStatusCode().value()).isEqualTo(204);
         }
 
         @BeforeEach
@@ -685,9 +686,13 @@ class ProcessoControllerTest {
             doThrow(new ErroValidacao("erro"))
                     .when(processoServiceMock).iniciar(anyLong(), anyList());
 
-            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req));
-            assertEquals(HttpStatus.UNPROCESSABLE_CONTENT, ex.getStatus());
-            assertEquals("erro", ex.getMessage());
+            assertThatThrownBy(() -> controller.iniciar(1L, req))
+                    .isInstanceOf(ErroValidacao.class)
+                    .satisfies(ex -> {
+                        ErroValidacao e = (ErroValidacao) ex;
+                        assertThat(e.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT);
+                        assertThat(e.getMessage()).isEqualTo("erro");
+                    });
         }
 
         @Test
@@ -698,7 +703,7 @@ class ProcessoControllerTest {
             ResponseEntity<Void> response = controller.executarAcaoEmBloco(codigo, req);
 
             verify(processoServiceMock).executarAcaoEmBloco(codigo, req.paraCommand());
-            assertEquals(200, response.getStatusCode().value());
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
         }
     }
 }

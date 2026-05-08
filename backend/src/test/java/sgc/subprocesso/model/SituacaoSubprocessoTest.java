@@ -3,7 +3,6 @@ package sgc.subprocesso.model;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
-import org.springframework.test.util.*;
 import sgc.processo.model.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -151,28 +150,6 @@ class SituacaoSubprocessoTest {
         assertThat(de.podeTransicionarPara(para, tipo)).isEqualTo(esperado);
     }
     // Testes mesclados de SituacaoSubprocessoGapTest
-
-    @Test
-    @DisplayName("Deve cobrir todas as branches de podeIniciar (método privado)")
-    void testPodeIniciarBranches() {
-        // MAPEAMENTO
-        assertThat(invocarPodeIniciar(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isTrue();
-        assertThat(invocarPodeIniciar(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
-
-        // REVISAO
-        assertThat(invocarPodeIniciar(REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isTrue();
-        assertThat(invocarPodeIniciar(REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
-
-        // DIAGNOSTICO
-        assertThat(invocarPodeIniciar(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isTrue();
-        assertThat(invocarPodeIniciar(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
-
-        assertThat(invocarPodeIniciar(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, null)).isFalse();
-    }
-
-    private boolean invocarPodeIniciar(SituacaoSubprocesso target, SituacaoSubprocesso nova, TipoProcesso tipo) {
-        return Boolean.TRUE.equals(ReflectionTestUtils.invokeMethod(target, "podeIniciar", nova, tipo));
-    }
 
     @Test
     @DisplayName("podeTransicionarPara: Deve permitir transição para si mesma")

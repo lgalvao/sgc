@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.test.util.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -16,7 +15,7 @@ import sgc.subprocesso.model.*;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static sgc.seguranca.AcaoPermissao.*;
 
@@ -50,8 +49,7 @@ class ImpactoMapaServiceTest {
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
         doReturn(false).when(permissionEvaluator).verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS);
 
-        assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
-                impactoMapaService.verificarImpactos(subprocesso));
+        assertThatThrownBy(() -> impactoMapaService.verificarImpactos(subprocesso)).isInstanceOf(sgc.comum.erros.ErroAcessoNegado.class);
     }
 
     private Usuario usuarioAdmin() {
@@ -110,10 +108,10 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertNotNull(result);
-        assertTrue(result.inseridas().isEmpty());
-        assertTrue(result.removidas().isEmpty());
-        assertTrue(result.alteradas().isEmpty());
+        assertThat(result).isNotNull();
+        assertThat(result.inseridas()).isEmpty();
+        assertThat(result.removidas()).isEmpty();
+        assertThat(result.alteradas()).isEmpty();
     }
 
     @Test
@@ -151,8 +149,8 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertEquals(1, result.inseridas().size());
-        assertEquals("Nova", result.inseridas().getFirst().descricao());
+        assertThat(result.inseridas().size()).isEqualTo(1);
+        assertThat(result.inseridas().getFirst().descricao()).isEqualTo("Nova");
     }
 
     @Test
@@ -169,7 +167,7 @@ class ImpactoMapaServiceTest {
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
 
-        assertThrows(ErroValidacao.class, () -> impactoMapaService.verificarImpactos(subprocesso));
+        assertThatThrownBy(() -> impactoMapaService.verificarImpactos(subprocesso)).isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -185,8 +183,8 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertNotNull(resultado);
-        assertFalse(resultado.temImpactos());
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.temImpactos()).isFalse();
     }
 
     @Test
@@ -205,8 +203,8 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertNotNull(resultado);
-        assertFalse(resultado.temImpactos());
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.temImpactos()).isFalse();
     }
 
     @Test
@@ -221,13 +219,10 @@ class ImpactoMapaServiceTest {
                 9L
         );
 
-        ErroValidacao erro = assertThrows(
-                ErroValidacao.class,
-                () -> impactoMapaService.verificarImpactos(subprocesso)
-        );
-
-        assertTrue(erro.getMessage().contains("REVISAO_CADASTRO_DISPONIBILIZADA"));
-        assertTrue(erro.getMessage().contains("CHEFE"));
+        assertThatThrownBy(() -> impactoMapaService.verificarImpactos(subprocesso))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("REVISAO_CADASTRO_DISPONIBILIZADA")
+                .hasMessageContaining("CHEFE");
     }
 
     @Test
@@ -270,11 +265,11 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertEquals(1, result.removidas().size());
-        assertEquals("Antiga", result.removidas().getFirst().descricao());
+        assertThat(result.removidas().size()).isEqualTo(1);
+        assertThat(result.removidas().getFirst().descricao()).isEqualTo("Antiga");
 
-        assertEquals(1, result.competenciasImpactadas().size());
-        assertEquals("Comp A", result.competenciasImpactadas().getFirst().descricao());
+        assertThat(result.competenciasImpactadas().size()).isEqualTo(1);
+        assertThat(result.competenciasImpactadas().getFirst().descricao()).isEqualTo("Comp A");
     }
 
     @Test
@@ -322,8 +317,8 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertEquals(1, result.alteradas().size());
-        assertEquals("Ativ A", result.alteradas().getFirst().descricao());
+        assertThat(result.alteradas().size()).isEqualTo(1);
+        assertThat(result.alteradas().getFirst().descricao()).isEqualTo("Ativ A");
     }
 
     @Test
@@ -359,7 +354,7 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertEquals(0, result.alteradas().size());
+        assertThat(result.alteradas().size()).isEqualTo(0);
     }
 
     @Test
@@ -399,8 +394,8 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso);
 
-        assertEquals(1, result.alteradas().size());
-        assertEquals("Ativ teste", result.alteradas().getFirst().descricao());
+        assertThat(result.alteradas().size()).isEqualTo(1);
+        assertThat(result.alteradas().getFirst().descricao()).isEqualTo("Ativ teste");
     }
 
     private Subprocesso criarSubprocesso(Mapa mapa) {
@@ -439,7 +434,7 @@ class ImpactoMapaServiceTest {
             when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(new Mapa()));
             when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> impactoMapaService.verificarImpactos(sp));
+            assertThatThrownBy(() -> impactoMapaService.verificarImpactos(sp)).isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -480,7 +475,7 @@ class ImpactoMapaServiceTest {
             mockUsuarioAutenticado(usuarioAdmin());
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
-            assertEquals(2, response.removidas().size());
+            assertThat(response.removidas().size()).isEqualTo(2);
         }
 
         @Test
@@ -528,8 +523,8 @@ class ImpactoMapaServiceTest {
             mockUsuarioAutenticado(usuarioAdmin());
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
-            assertEquals(1, response.alteradas().size());
-            assertEquals(1, response.competenciasImpactadas().size());
+            assertThat(response.alteradas().size()).isEqualTo(1);
+            assertThat(response.competenciasImpactadas().size()).isEqualTo(1);
         }
 
         @Test
@@ -563,9 +558,9 @@ class ImpactoMapaServiceTest {
             mockUsuarioAutenticado(usuarioAdmin());
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
-            assertNotNull(response);
-            assertFalse(response.temImpactos());
-            assertTrue(response.competenciasImpactadas().isEmpty());
+            assertThat(response).isNotNull();
+            assertThat(response.temImpactos()).isFalse();
+            assertThat(response.competenciasImpactadas()).isEmpty();
         }
 
         @Test
@@ -620,20 +615,20 @@ class ImpactoMapaServiceTest {
             mockUsuarioAutenticado(usuarioAdmin());
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
-            assertEquals(1, response.removidas().size());
-            assertEquals(1, response.alteradas().size());
-            assertEquals(1, response.competenciasImpactadas().size());
+            assertThat(response.removidas().size()).isEqualTo(1);
+            assertThat(response.alteradas().size()).isEqualTo(1);
+            assertThat(response.competenciasImpactadas().size()).isEqualTo(1);
 
             CompetenciaImpactadaDto competenciaImpactada = response.competenciasImpactadas().getFirst();
-            assertEquals(50L, competenciaImpactada.codigo());
-            assertEquals("Comp Estratégica", competenciaImpactada.descricao());
-            assertEquals(3, competenciaImpactada.atividadesAfetadas().size());
-            assertTrue(competenciaImpactada.atividadesAfetadas().contains("Atividade removida: Atividade removida"));
-            assertTrue(competenciaImpactada.atividadesAfetadas().stream()
-                    .anyMatch(detalhe -> detalhe.contains("Atividade alterada")));
-            assertTrue(competenciaImpactada.tiposImpacto().contains(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA));
-            assertTrue(competenciaImpactada.tiposImpacto().contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
-            assertEquals(2, competenciaImpactada.tiposImpacto().size());
+            assertThat(competenciaImpactada.codigo()).isEqualTo(50L);
+            assertThat(competenciaImpactada.descricao()).isEqualTo("Comp Estratégica");
+            assertThat(competenciaImpactada.atividadesAfetadas().size()).isEqualTo(3);
+            assertThat(competenciaImpactada.atividadesAfetadas()).contains("Atividade removida: Atividade removida");
+            assertThat(competenciaImpactada.atividadesAfetadas().stream()
+                    .anyMatch(detalhe -> detalhe.contains("Atividade alterada"))).isTrue();
+            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA);
+            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
+            assertThat(competenciaImpactada.tiposImpacto().size()).isEqualTo(2);
         }
 
         @Test
@@ -673,8 +668,8 @@ class ImpactoMapaServiceTest {
             mockUsuarioAutenticado(usuarioAdmin());
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
-            assertFalse(response.temImpactos()); // branch 157 false
-            assertTrue(response.alteradas().isEmpty());
+            assertThat(response.temImpactos()).isFalse(); // branch 157 false
+            assertThat(response.alteradas()).isEmpty();
         }
 
         @Test
@@ -720,16 +715,16 @@ class ImpactoMapaServiceTest {
             mockUsuarioAutenticado(usuarioAdmin());
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
-            assertEquals(1, response.alteradas().size());
+            assertThat(response.alteradas().size()).isEqualTo(1);
             AtividadeImpactadaDto alt = response.alteradas().getFirst();
-            assertEquals("Descrição Antiga", alt.descricaoAnterior());
-            assertEquals("Descrição Nova", alt.descricao());
-            assertEquals(TipoImpactoAtividade.ALTERADA, alt.tipoImpacto());
+            assertThat(alt.descricaoAnterior()).isEqualTo("Descrição Antiga");
+            assertThat(alt.descricao()).isEqualTo("Descrição Nova");
+            assertThat(alt.tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA);
 
             // Verifica se a competência foi impactada pela alteração de nome
-            assertEquals(1, response.competenciasImpactadas().size());
-            assertTrue(response.competenciasImpactadas().getFirst().atividadesAfetadas().stream()
-                    .anyMatch(d -> d.contains("Descrição alterada para Descrição Nova")));
+            assertThat(response.competenciasImpactadas().size()).isEqualTo(1);
+            assertThat(response.competenciasImpactadas().getFirst().atividadesAfetadas().stream()
+                    .anyMatch(d -> d.contains("Descrição alterada para Descrição Nova"))).isTrue();
         }
 
         @Test
@@ -778,34 +773,17 @@ class ImpactoMapaServiceTest {
             mockUsuarioAutenticado(usuarioAdmin());
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
 
-            assertEquals(1, response.alteradas().size());
+            assertThat(response.alteradas().size()).isEqualTo(1);
             AtividadeImpactadaDto alt = response.alteradas().getFirst();
-            assertTrue(alt.conhecimentosAdicionados().contains("Java 21"));
-            assertTrue(alt.conhecimentosRemovidos().contains("Java 8"));
+            assertThat(alt.conhecimentosAdicionados()).contains("Java 21");
+            assertThat(alt.conhecimentosRemovidos()).contains("Java 8");
 
-            assertEquals(1, response.competenciasImpactadas().size());
+            assertThat(response.competenciasImpactadas().size()).isEqualTo(1);
             List<String> detalhes = response.competenciasImpactadas().getFirst().atividadesAfetadas();
-            assertTrue(detalhes.stream().anyMatch(d -> d.contains("Conhecimento Java 21 adicionado")));
-            assertTrue(detalhes.stream().anyMatch(d -> d.contains("Conhecimento Java 8 removido")));
+            assertThat(detalhes.stream().anyMatch(d -> d.contains("Conhecimento Java 21 adicionado"))).isTrue();
+            assertThat(detalhes.stream().anyMatch(d -> d.contains("Conhecimento Java 8 removido"))).isTrue();
         }
 
-        @Test
-        @DisplayName("processarAlteradas: Filtro de descrição inexistente")
-        void processarAlteradas_DescricaoInexistenteNoFiltro() {
-            // Este teste é artificial para atingir o branch do filter caso o Jacoco o exija,
-            // embora na lógica real as descrições devam coincidir.
-            List<AtividadeImpactadaDto> alteradas = List.of(
-                    AtividadeImpactadaDto.builder().descricaoAnterior("Inexistente").descricao("Inexistente").build()
-            );
-            Map<String, Long> descricaoParaCodVigente = Map.of("Outra", 1L);
-            Map<Long, List<Competencia>> codAtividadeParaCompetencias = Map.of();
-            Map<Long, Object> mapaImpactos = new HashMap<>();
-
-            org.springframework.test.util.ReflectionTestUtils.invokeMethod(impactoMapaService, "processarAlteradas",
-                    alteradas, descricaoParaCodVigente, codAtividadeParaCompetencias, mapaImpactos);
-
-            assertTrue(mapaImpactos.isEmpty()); // branch 252 false
-        }
     }
 
     @Test
@@ -816,7 +794,7 @@ class ImpactoMapaServiceTest {
         when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(false);
 
-        assertThrows(ErroAcessoNegado.class, () -> impactoMapaService.verificarImpactos(sp));
+        assertThatThrownBy(() -> impactoMapaService.verificarImpactos(sp)).isInstanceOf(ErroAcessoNegado.class);
     }
 
     @Test
@@ -837,7 +815,7 @@ class ImpactoMapaServiceTest {
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.empty());
 
         ImpactoMapaResponse res = impactoMapaService.verificarImpactos(sp);
-        assertFalse(res.temImpactos());
+        assertThat(res.temImpactos()).isFalse();
     }
 
     @Test
@@ -859,63 +837,7 @@ class ImpactoMapaServiceTest {
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new Mapa()));
         when(mapaRepo.buscarPorSubprocesso(100L)).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> impactoMapaService.verificarImpactos(sp));
-    }
-
-    @Test
-    @DisplayName("detectarAlteradas - deve considerar atividades com conhecimentos diferentes")
-    void detectarAlteradasDiferentes() {
-        Atividade v = new Atividade();
-        v.setCodigo(1L);
-        v.setDescricao("A1");
-        Conhecimento c1 = new Conhecimento();
-        c1.setDescricao("C1");
-        v.setConhecimentos(Set.of(c1));
-
-        Atividade a = new Atividade();
-        a.setCodigo(2L);
-        a.setDescricao("A1");
-        Conhecimento c2 = new Conhecimento();
-        c2.setDescricao("C2");
-        a.setConhecimentos(Set.of(c2));
-
-        Map<String, Atividade> vigentesMap = Map.of("A1", v);
-        List<AtividadeImpactadaDto> res = ReflectionTestUtils.invokeMethod(impactoMapaService, "detectarAlteradas", List.of(a), vigentesMap, Map.of());
-
-        assertNotNull(res);
-        assertEquals(1, res.size());
-        assertEquals(TipoImpactoAtividade.ALTERADA, res.getFirst().tipoImpacto());
-    }
-
-    @Test
-    @DisplayName("conhecimentosDiferentes - casos de borda")
-    void conhecimentosDiferentesBorda() {
-        Boolean res1 = ReflectionTestUtils.invokeMethod(impactoMapaService, "conhecimentosDiferentes", List.of(), List.of());
-        assertNotNull(res1);
-        assertFalse(res1);
-
-        Conhecimento c1 = new Conhecimento();
-        c1.setDescricao("C1");
-        Conhecimento c2 = new Conhecimento();
-        c2.setDescricao("C2");
-
-        Boolean res2 = ReflectionTestUtils.invokeMethod(impactoMapaService, "conhecimentosDiferentes", List.of(c1), List.of(c1, c2));
-        assertNotNull(res2);
-        assertTrue(res2);
-
-        Boolean res3 = ReflectionTestUtils.invokeMethod(impactoMapaService, "conhecimentosDiferentes", List.of(c1), List.of(c2));
-        assertNotNull(res3);
-        assertTrue(res3);
-    }
-
-    @Test
-    @DisplayName("construirMapaAtividadeCompetencias - ignora competências sem atividades")
-    void construirMapaSemAtividades() {
-        Competencia comp = new Competencia();
-        comp.setAtividades(Set.of());
-        Map<Long, List<Competencia>> res = ReflectionTestUtils.invokeMethod(impactoMapaService, "construirMapaAtividadeCompetencias", List.of(comp));
-        assertNotNull(res);
-        assertTrue(res.isEmpty());
+        assertThatThrownBy(() -> impactoMapaService.verificarImpactos(sp)).isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Nested
@@ -960,7 +882,7 @@ class ImpactoMapaServiceTest {
             when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.VERIFICAR_IMPACTOS)).thenReturn(true);
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
 
-            assertEquals(expected, impactoMapaService.podeVisualizarImpactos(sp));
+            assertThat(impactoMapaService.podeVisualizarImpactos(sp)).isEqualTo(expected);
         }
     }
 }

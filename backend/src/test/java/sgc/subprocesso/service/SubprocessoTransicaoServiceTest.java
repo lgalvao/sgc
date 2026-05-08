@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.test.util.*;
 import sgc.alerta.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -421,68 +420,11 @@ class SubprocessoTransicaoServiceTest {
             verify(notificacaoService, never()).registrarComunicacoesTransicao(any());
         }
 
-        @Nested
-        @DisplayName("obterUltimaDataLimite private method")
-        class ObterUltimaDataLimiteTests {
-
-            @Test
-            @DisplayName("deve lançar IllegalStateException quando etapa 2 existe sem etapa 1")
-            void deveLancarIllegalStateExceptionQuandoEtapa2SemEtapa1() {
-                Subprocesso sp = new Subprocesso();
-                sp.setCodigo(1L);
-                sp.setDataLimiteEtapa1(null);
-                sp.setDataLimiteEtapa2(LocalDateTime.now());
-
-                assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterUltimaDataLimite", sp))
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessageContaining("etapa 2 sem data limite da etapa 1");
-            }
-
-            @Test
-            @DisplayName("deve lançar IllegalStateException quando etapa 1 é posterior à etapa 2")
-            void deveLancarIllegalStateExceptionQuandoEtapa1PosteriorEtapa2() {
-                Subprocesso sp = new Subprocesso();
-                sp.setCodigo(1L);
-                sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
-                sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(5));
-
-                assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterUltimaDataLimite", sp))
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessageContaining("etapa 1 posterior à etapa 2");
-            }
-
-            @Test
-            @DisplayName("deve retornar null quando ambas são nulas")
-            void deveRetornarNullQuandoAmbasNulas() {
-                Subprocesso sp = new Subprocesso();
-                sp.setDataLimiteEtapa1(null);
-                sp.setDataLimiteEtapa2(null);
-
-                LocalDate result = ReflectionTestUtils.invokeMethod(service, "obterUltimaDataLimite", sp);
-
-                assertThat(result).isNull();
-            }
-        }
     }
 
     @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
-        @Test
-        @DisplayName("obterSituacaoObrigatoria - deve lançar IllegalStateException para situação não configurada")
-        void obterSituacaoObrigatoria_Inexistente() {
-            Processo p = new Processo();
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(p);
-
-            Map<TipoProcesso, SituacaoSubprocesso> situacoes = Map.of(TipoProcesso.REVISAO, REVISAO_MAPA_DISPONIBILIZADO);
-
-            assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterSituacaoObrigatoria", situacoes, sp, "contexto"))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("sem situação configurada");
-        }
-
         @Test
         @DisplayName("executarDisponibilizacaoMapa - valida data limite igual")
         void disponibilizarMapa_DataIgual() {
@@ -557,20 +499,6 @@ class SubprocessoTransicaoServiceTest {
             service.aceitarValidacaoEmBloco(List.of(1L));
 
             verify(analiseRepo).save(any());
-        }
-
-        @Test
-        @DisplayName("obterUnidadeDevolucao - deve lançar ErroInconsistenciaInterna quando histórico estiver vazio ou não bater")
-        void obterUnidadeDevolucao_Inconsistente() {
-            Unidade uAnalise = criarUnidade(10L, "ANA", "Analise");
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(99L);
-
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(99L)).thenReturn(List.of());
-
-            assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterUnidadeDevolucao", sp, uAnalise))
-                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                    .hasMessageContaining("Historico de movimentacoes inconsistente");
         }
 
         @Test

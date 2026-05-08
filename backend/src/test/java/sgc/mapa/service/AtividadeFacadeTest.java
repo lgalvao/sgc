@@ -17,7 +17,7 @@ import sgc.subprocesso.service.*;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static sgc.seguranca.AcaoPermissao.*;
 
@@ -55,9 +55,9 @@ class AtividadeFacadeTest {
 
             AtividadeDto result = atividadeFacade.obterAtividadePorCodigo(atividadeCodigo);
 
-            assertNotNull(result);
-            assertEquals(expected.getCodigo(), result.codigo());
-            assertEquals(expected.getDescricao(), result.descricao());
+            assertThat(result).isNotNull();
+            assertThat(result.codigo()).isEqualTo(expected.getCodigo());
+            assertThat(result.descricao()).isEqualTo(expected.getDescricao());
             verify(mapaManutencaoService).atividadeCodigo(atividadeCodigo);
         }
     }
@@ -79,9 +79,9 @@ class AtividadeFacadeTest {
 
             List<ConhecimentoResumoDto> result = atividadeFacade.listarConhecimentosPorAtividade(atividadeCodigo);
 
-            assertNotNull(result);
-            assertEquals(2, result.size());
-            assertEquals("Conhecimento 1", result.getFirst().descricao());
+            assertThat(result).isNotNull();
+            assertThat(result).hasSize(2);
+            assertThat(result.getFirst().descricao()).isEqualTo("Conhecimento 1");
             verify(mapaManutencaoService).conhecimentosCodigoAtividade(atividadeCodigo);
         }
     }
@@ -123,7 +123,7 @@ class AtividadeFacadeTest {
 
             AtividadeOperacaoResponse result = atividadeFacade.criarAtividade(request);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
         }
 
         @Test
@@ -157,7 +157,8 @@ class AtividadeFacadeTest {
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> atividadeFacade.criarAtividade(request));
+            assertThatThrownBy(() -> atividadeFacade.criarAtividade(request))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 
@@ -198,7 +199,7 @@ class AtividadeFacadeTest {
 
             AtividadeOperacaoResponse result = atividadeFacade.atualizarAtividade(atividadeCodigo, request);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
             verify(mapaManutencaoService).atualizarAtividade(atividadeCodigo, request);
         }
     }
@@ -235,7 +236,7 @@ class AtividadeFacadeTest {
 
             AtividadeOperacaoResponse result = atividadeFacade.excluirAtividade(atividadeCodigo);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
             verify(mapaManutencaoService).excluirAtividade(atividadeCodigo);
         }
     }
@@ -283,8 +284,8 @@ class AtividadeFacadeTest {
 
             ResultadoOperacaoConhecimento result = atividadeFacade.criarConhecimento(atividadeCodigo, request);
 
-            assertNotNull(result);
-            assertEquals(500L, result.novoConhecimentoCodigo());
+            assertThat(result).isNotNull();
+            assertThat(result.novoConhecimentoCodigo()).isEqualTo(500L);
         }
     }
 
@@ -324,7 +325,7 @@ class AtividadeFacadeTest {
 
             AtividadeOperacaoResponse result = atividadeFacade.atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
             verify(mapaManutencaoService).atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
         }
     }
@@ -364,7 +365,7 @@ class AtividadeFacadeTest {
 
             AtividadeOperacaoResponse result = atividadeFacade.excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
 
-            assertNotNull(result);
+            assertThat(result).isNotNull();
             verify(mapaManutencaoService).excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
         }
     }
@@ -385,8 +386,9 @@ class AtividadeFacadeTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(false);
 
-            assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
-                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
+            assertThatThrownBy(() ->
+                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")))
+                    .isInstanceOf(sgc.comum.erros.ErroAcessoNegado.class);
         }
 
         @Test
@@ -402,8 +404,9 @@ class AtividadeFacadeTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(true);
 
-            assertThrows(sgc.comum.erros.ErroValidacao.class, () ->
-                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
+            assertThatThrownBy(() ->
+                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")))
+                    .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
         }
     }
 }

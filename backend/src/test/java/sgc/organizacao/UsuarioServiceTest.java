@@ -13,7 +13,7 @@ import sgc.organizacao.service.*;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @SpringBootTest
@@ -64,7 +64,8 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve falhar ao buscar usuario inexistente")
         void deveFalharAoBuscarUsuarioInexistente() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioServiceInternal.buscar("0000"));
+            assertThatThrownBy(() -> usuarioServiceInternal.buscar("0000"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -73,8 +74,8 @@ class UsuarioServiceTest {
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral(TITULO_ADMIN);
             usuarioServiceInternal.carregarAuthorities(usuario);
-            assertNotNull(usuario.getAuthorities());
-            assertFalse(usuario.getAuthorities().isEmpty());
+            assertThat(usuario.getAuthorities()).isNotNull();
+            assertThat(usuario.getAuthorities()).isNotEmpty();
         }
 
         @Test
@@ -83,9 +84,9 @@ class UsuarioServiceTest {
 
             Optional<Usuario> result = usuarioServiceInternal.buscarOpt(TITULO_ADMIN);
 
-            assertTrue(result.isPresent());
-            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
-            assertEquals(NOME_ADMIN, result.get().getNome());
+            assertThat(result).isPresent();
+            assertThat(result.get().getTituloEleitoral()).isEqualTo(TITULO_ADMIN);
+            assertThat(result.get().getNome()).isEqualTo(NOME_ADMIN);
         }
 
         @Test
@@ -94,8 +95,8 @@ class UsuarioServiceTest {
 
             var usuario = usuarioService.buscarPorLogin(TITULO_ADMIN);
 
-            assertNotNull(usuario);
-            assertEquals(TITULO_ADMIN, usuario.getTituloEleitoral());
+            assertThat(usuario).isNotNull();
+            assertThat(usuario.getTituloEleitoral()).isEqualTo(TITULO_ADMIN);
         }
 
         @Test
@@ -106,10 +107,10 @@ class UsuarioServiceTest {
 
             Map<String, Usuario> result = usuarioService.buscarUsuariosPorTitulos(titulos);
 
-            assertNotNull(result);
-            assertEquals(2, result.size());
-            assertTrue(result.containsKey(TITULO_CHEFE_UNIT2));
-            assertTrue(result.containsKey(TITULO_ADMIN));
+            assertThat(result).isNotNull();
+            assertThat(result.size()).isEqualTo(2);
+            assertThat(result).containsKey(TITULO_CHEFE_UNIT2);
+            assertThat(result).containsKey(TITULO_ADMIN);
         }
 
         @Test
@@ -117,9 +118,9 @@ class UsuarioServiceTest {
         void devePesquisarUsuariosPorNome() {
             List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("Admin");
 
-            assertNotNull(resultado);
-            assertFalse(resultado.isEmpty());
-            assertTrue(resultado.stream().anyMatch(usuario -> usuario.nome().contains("Admin")));
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).isNotEmpty();
+            assertThat(resultado.stream().anyMatch(usuario -> usuario.nome().contains("Admin"))).isTrue();
         }
 
         @Test
@@ -127,71 +128,71 @@ class UsuarioServiceTest {
         void devePesquisarUsuariosPorTituloEleitoral() {
             List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("17");
 
-            assertNotNull(resultado);
-            assertFalse(resultado.isEmpty());
-            assertTrue(resultado.stream().anyMatch(usuario -> "17".equals(usuario.tituloEleitoral())));
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).isNotEmpty();
+            assertThat(resultado.stream().anyMatch(usuario -> "17".equals(usuario.tituloEleitoral()))).isTrue();
         }
 
         @Test
         @DisplayName("Deve retornar vazio ao pesquisar termo curto")
         void deveRetornarVazioTermoCurto() {
             List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("a");
-            assertTrue(resultado.isEmpty());
+            assertThat(resultado).isEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar com Optional")
         void deveBuscarComOptional() {
             Optional<Usuario> res = usuarioServiceInternal.buscarOpt(TITULO_ADMIN);
-            assertTrue(res.isPresent());
+            assertThat(res).isPresent();
 
             Optional<Usuario> naoEncontrado = usuarioServiceInternal.buscarOpt("000");
-            assertTrue(naoEncontrado.isEmpty());
+            assertThat(naoEncontrado).isEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar Consulta de Leitura por titulo")
         void deveBuscarConsultaLeituraPorTitulo() {
             Optional<UsuarioConsultaLeitura> res = usuarioServiceInternal.buscarConsultaPorTitulo(TITULO_ADMIN);
-            assertTrue(res.isPresent());
+            assertThat(res).isPresent();
         }
 
         @Test
         @DisplayName("Deve buscar consultas de leitura por unidade lotação")
         void deveBuscarConsultasLeituraPorLotacao() {
             List<UsuarioConsultaLeitura> res = usuarioServiceInternal.buscarConsultasPorUnidadeLotacao(COD_UNIT_SEC1);
-            assertFalse(res.isEmpty());
+            assertThat(res).isNotEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar com Opt por titulo e lotacao")
         void deveBuscarComOptPorTituloELotacao() {
             Optional<Usuario> res = usuarioServiceInternal.buscarOptComUnidadeLotacao(TITULO_ADMIN);
-            assertTrue(res.isPresent());
+            assertThat(res).isPresent();
         }
 
         @Test
         @DisplayName("Deve buscar usuarios por titulos no Internal Service")
         void deveBuscarUsuariosPorTitulosInternal() {
             List<Usuario> res = usuarioServiceInternal.buscarPorTitulos(List.of(TITULO_ADMIN, TITULO_CHEFE_UNIT2));
-            assertFalse(res.isEmpty());
+            assertThat(res).isNotEmpty();
         }
 
         @Test
         @DisplayName("Deve buscar autorizacoes de perfil e perfis")
         void deveBuscarAutorizacoesEPerfis() {
             List<UsuarioPerfilAutorizacaoLeitura> auts = usuarioServiceInternal.buscarAutorizacoesPerfil(TITULO_ADMIN);
-            assertNotNull(auts);
+            assertThat(auts).isNotNull();
 
             List<Perfil> perfis = usuarioServiceInternal.buscarPerfisPorUsuarioTitulo(TITULO_ADMIN);
-            assertNotNull(perfis);
+            assertThat(perfis).isNotNull();
         }
 
         @Test
         @DisplayName("Deve buscar administradores")
         void deveBuscarAdministradores() {
             List<Administrador> admins = usuarioServiceInternal.buscarAdministradores();
-            assertFalse(admins.isEmpty());
+            assertThat(admins).isNotEmpty();
         }
     }
 
@@ -204,9 +205,9 @@ class UsuarioServiceTest {
 
             Unidade result = unidadeService2.buscarPorCodigo(COD_UNIT_SEC1);
 
-            assertNotNull(result);
-            assertEquals(COD_UNIT_SEC1, result.getCodigo());
-            assertEquals(NOME_UNIT_SEC1, result.getNome());
+            assertThat(result).isNotNull();
+            assertThat(result.getCodigo()).isEqualTo(COD_UNIT_SEC1);
+            assertThat(result.getNome()).isEqualTo(NOME_UNIT_SEC1);
         }
 
         @Test
@@ -214,8 +215,8 @@ class UsuarioServiceTest {
         void deveBuscarUnidadesAtivas() {
             List<UnidadeDto> result = hierarquiaService.buscarArvoreHierarquica();
 
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
+            assertThat(result).isNotNull();
+            assertThat(result).isNotEmpty();
         }
 
         @Test
@@ -224,10 +225,10 @@ class UsuarioServiceTest {
 
             List<UnidadeDto> result = hierarquiaService.buscarSubordinadas(COD_UNIT_SEC1);
 
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
+            assertThat(result).isNotNull();
+            assertThat(result).isNotEmpty();
             for (UnidadeDto unidade : result) {
-                assertEquals(COD_UNIT_SEC1, unidade.getCodigoPai());
+                assertThat(unidade.getCodigoPai()).isEqualTo(COD_UNIT_SEC1);
             }
         }
 
@@ -237,14 +238,14 @@ class UsuarioServiceTest {
 
             List<UnidadeDto> result = hierarquiaService.buscarArvoreHierarquica();
 
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
+            assertThat(result).isNotNull();
+            assertThat(result).isNotEmpty();
 
-            assertTrue(result.stream().anyMatch(u -> u.getCodigo().equals(1L)));
+            assertThat(result.stream().anyMatch(u -> u.getCodigo().equals(1L))).isTrue();
 
             for (UnidadeDto unidade : result) {
                 if (unidade.getCodigo().equals(1L)) {
-                    assertNull(unidade.getCodigoPai());
+                    assertThat(unidade.getCodigoPai()).isNull();
                 }
             }
         }
@@ -254,14 +255,16 @@ class UsuarioServiceTest {
         void deveBuscarPorUnidadeLotacao() {
 
             List<Usuario> res = usuarioServiceInternal.buscarPorUnidadeLotacao(2L);
-            assertFalse(res.isEmpty());
+            assertThat(res).isNotEmpty();
         }
 
         @Test
         @DisplayName("Deve lançar erro ao buscar unidade inexistente por código ou sigla")
         void deveRetornarErroAoBuscarUnidadeInexistente() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService2.buscarPorCodigo(9999L));
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService2.buscarPorSigla("SIGLA_NAO_EXISTE"));
+            assertThatThrownBy(() -> unidadeService2.buscarPorCodigo(9999L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+            assertThatThrownBy(() -> unidadeService2.buscarPorSigla("SIGLA_NAO_EXISTE"))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 
@@ -274,9 +277,9 @@ class UsuarioServiceTest {
 
             UnidadeResponsavelDto result = responsavelService.buscarResponsavelUnidade(2L);
 
-            assertNotNull(result);
-            assertEquals(2L, result.unidadeCodigo());
-            assertEquals(TITULO_CHEFE_UNIT2, result.titularTitulo());
+            assertThat(result).isNotNull();
+            assertThat(result.unidadeCodigo()).isEqualTo(2L);
+            assertThat(result.titularTitulo()).isEqualTo(TITULO_CHEFE_UNIT2);
         }
 
         @Test
@@ -285,9 +288,9 @@ class UsuarioServiceTest {
 
             List<Long> result = responsavelService.buscarUnidadesOndeEhResponsavel(TITULO_CHEFE_UNIT2);
 
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-            assertTrue(result.contains(2L));
+            assertThat(result).isNotNull();
+            assertThat(result).isNotEmpty();
+            assertThat(result).contains(2L);
         }
 
         @Test
@@ -298,15 +301,15 @@ class UsuarioServiceTest {
 
             Map<Long, UnidadeResponsavelDto> result = responsavelService.buscarResponsaveisUnidades(unidades);
 
-            assertNotNull(result);
-            assertTrue(result.containsKey(2L));
-            assertTrue(result.containsKey(9L));
+            assertThat(result).isNotNull();
+            assertThat(result).containsKey(2L);
+            assertThat(result).containsKey(9L);
             UnidadeResponsavelDto responsavel2 = result.get(2L);
             UnidadeResponsavelDto responsavel9 = result.get(9L);
-            assertNotNull(responsavel2);
-            assertNotNull(responsavel9);
-            assertEquals(TITULO_CHEFE_UNIT2, responsavel2.titularTitulo());
-            assertEquals("333333333333", responsavel9.titularTitulo());
+            assertThat(responsavel2).isNotNull();
+            assertThat(responsavel9).isNotNull();
+            assertThat(responsavel2.titularTitulo()).isEqualTo(TITULO_CHEFE_UNIT2);
+            assertThat(responsavel9.titularTitulo()).isEqualTo("333333333333");
         }
     }
 
@@ -319,10 +322,10 @@ class UsuarioServiceTest {
 
             List<PerfilDto> result = usuarioService.buscarPerfisUsuario(TITULO_CHEFE_UNIT2);
 
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-            assertTrue(result.stream()
-                    .anyMatch(p -> p.perfil().equals("CHEFE") && Objects.equals(p.unidadeCodigo(), 2L)));
+            assertThat(result).isNotNull();
+            assertThat(result).isNotEmpty();
+            assertThat(result.stream()
+                    .anyMatch(p -> p.perfil().equals("CHEFE") && Objects.equals(p.unidadeCodigo(), 2L))).isTrue();
         }
     }
 
@@ -334,7 +337,7 @@ class UsuarioServiceTest {
         void deveBuscarResponsaveisIgnorandoSemChefe() {
 
             Map<Long, UnidadeResponsavelDto> res = responsavelService.buscarResponsaveisUnidades(List.of(9999L));
-            assertTrue(res.isEmpty());
+            assertThat(res).isEmpty();
         }
     }
 
@@ -349,28 +352,27 @@ class UsuarioServiceTest {
 
             // Adicionar
             usuarioService.adicionarAdministrador(tituloNovoAdmin);
-            assertTrue(usuarioServiceInternal.isAdministrador(tituloNovoAdmin));
+            assertThat(usuarioServiceInternal.isAdministrador(tituloNovoAdmin)).isTrue();
 
             // Listar
             List<AdministradorDto> admins = usuarioService.listarAdministradores();
-            assertTrue(admins.stream().anyMatch(a -> a.tituloEleitoral().equals(tituloNovoAdmin)));
+            assertThat(admins.stream().anyMatch(a -> a.tituloEleitoral().equals(tituloNovoAdmin))).isTrue();
 
             // Falhar ao adicionar duplicado
-            assertThrows(ErroValidacao.class,
-                    () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
+            assertThatThrownBy(() -> usuarioService.adicionarAdministrador(tituloNovoAdmin))
+                    .isInstanceOf(ErroValidacao.class);
 
             // Remover
             autenticarComo();
             usuarioService.removerAdministrador(tituloNovoAdmin);
-            assertFalse(usuarioServiceInternal.isAdministrador(tituloNovoAdmin));
+            assertThat(usuarioServiceInternal.isAdministrador(tituloNovoAdmin)).isFalse();
         }
 
         @Test
         @DisplayName("Deve falhar ao remover a si mesmo")
         void deveFalharRemoverSiMesmo() {
             autenticarComo();
-            assertThrows(ErroValidacao.class,
-                    () -> usuarioService.removerAdministrador(TITULO_ADMIN));
+            assertThatThrownBy(() -> usuarioService.removerAdministrador(TITULO_ADMIN)).isInstanceOf(ErroValidacao.class);
         }
 
         @Test
@@ -381,8 +383,7 @@ class UsuarioServiceTest {
             usuarioService.removerAdministrador("6");
             usuarioService.removerAdministrador("999999999999");
 
-            assertThrows(ErroValidacao.class,
-                    () -> usuarioService.removerAdministrador(TITULO_ADMIN));
+            assertThatThrownBy(() -> usuarioService.removerAdministrador(TITULO_ADMIN)).isInstanceOf(ErroValidacao.class);
         }
     }
 }

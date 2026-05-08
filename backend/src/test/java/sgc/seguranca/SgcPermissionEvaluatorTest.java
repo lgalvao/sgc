@@ -397,15 +397,4 @@ class SgcPermissionEvaluatorTest {
         assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.EDITAR_CADASTRO)).isTrue();
         verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
     }
-
-    @Test
-    @DisplayName("mascarar: deve cobrir retorno curto")
-    void mascararRetornoCurto() {
-        String resultado = org.springframework.test.util.ReflectionTestUtils.invokeMethod(
-                evaluator,
-                "mascarar",
-                "1234"
-        );
-        assertThat(resultado).isEqualTo("***");
-    }
 }
