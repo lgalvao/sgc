@@ -36,9 +36,6 @@ export const useHistoricoStore = defineStore("historico", () => {
         try {
             processos.value = await buscarProcessosFinalizados() ?? [];
             carregado.value = true;
-        } catch {
-            // Não marca carregado=true; permite retry na próxima navegação
-            processos.value = [];
         } finally {
             carregando.value = false;
         }
