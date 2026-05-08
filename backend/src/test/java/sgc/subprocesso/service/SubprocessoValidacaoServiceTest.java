@@ -58,8 +58,6 @@ class SubprocessoValidacaoServiceTest {
             when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(atividade));
 
             validacaoService.validarExistenciaAtividades(sp);
-
-            verify(mapaManutencaoService).atividadesMapaCodigoComConhecimentos(1L);
         }
     }
 

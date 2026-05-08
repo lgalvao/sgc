@@ -24,7 +24,6 @@ import sgc.seguranca.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -182,10 +181,10 @@ class RestExceptionHandlerTest {
                 new HttpHeaders(),
                 HttpStatus.BAD_REQUEST,
                 Mockito.mock(WebRequest.class));
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Requisição JSON malformada", ((ErroApi) response.getBody()).getMessage());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(((ErroApi) response.getBody()).getMessage()).isEqualTo("Requisição JSON malformada");
     }
 
     @Test
@@ -203,10 +202,10 @@ class RestExceptionHandlerTest {
                 new HttpHeaders(),
                 HttpStatus.BAD_REQUEST,
                 Mockito.mock(WebRequest.class));
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("A requisição contém dados de entrada inválidos.", ((ErroApi) response.getBody()).getMessage());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(((ErroApi) response.getBody()).getMessage()).isEqualTo("A requisição contém dados de entrada inválidos.");
     }
 
     @Test
@@ -238,10 +237,10 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro base", "CODE", HttpStatus.BAD_REQUEST) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Erro base", ((ErroApi) response.getBody()).getMessage());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(((ErroApi) response.getBody()).getMessage()).isEqualTo("Erro base");
     }
 
     @Test
@@ -251,10 +250,10 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro com detalhe", "CODE", HttpStatus.BAD_REQUEST, details) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(details, ((ErroApi) response.getBody()).getDetails());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(((ErroApi) response.getBody()).getDetails()).isEqualTo(details);
     }
 
     @Test
@@ -276,7 +275,7 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro detalhe vazio", "CODE", HttpStatus.BAD_REQUEST, Collections.emptyMap()) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody())
                 .isInstanceOfSatisfying(ErroApi.class, erroApi -> assertThat(erroApi.getDetails()).isEmpty());
     }
@@ -287,7 +286,7 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro server", "CODE", HttpStatus.INTERNAL_SERVER_ERROR) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private HttpMessageNotWritableException criarExcecaoEscrita() {

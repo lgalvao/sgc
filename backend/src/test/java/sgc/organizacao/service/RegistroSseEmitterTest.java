@@ -7,7 +7,7 @@ import org.springframework.web.servlet.mvc.method.annotation.*;
 import java.io.*;
 import java.util.concurrent.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
@@ -28,16 +28,14 @@ class RegistroSseEmitterTest {
     @DisplayName("deve registrar emissor e limpar ao concluir")
     void deveRegistrarEmissor() {
         SseEmitter emitter = registroSseEmitter.registrar();
-        assertNotNull(emitter);
-
         CopyOnWriteArrayList<SseEmitter> emissores = obterEmissores();
 
-        assertTrue(emissores.contains(emitter));
+        assertThat(emissores).contains(emitter);
 
         emitter.complete();
 
         emissores.remove(emitter);
-        assertFalse(emissores.contains(emitter));
+        assertThat(emissores).doesNotContain(emitter);
     }
 
     @Test
@@ -46,10 +44,10 @@ class RegistroSseEmitterTest {
         SseEmitter emitter = registroSseEmitter.registrar();
 
         CopyOnWriteArrayList<SseEmitter> emissores = obterEmissores();
-        assertTrue(emissores.contains(emitter));
+        assertThat(emissores).contains(emitter);
 
         emissores.remove(emitter);
-        assertFalse(emissores.contains(emitter));
+        assertThat(emissores).doesNotContain(emitter);
     }
 
     @Test
@@ -63,7 +61,7 @@ class RegistroSseEmitterTest {
         registroSseEmitter.transmitir("meu-evento");
 
         verify(emitterMock).send(any(SseEmitter.SseEventBuilder.class));
-        assertTrue(emissores.contains(emitterMock)); // Ainda deve conter apos enviar com sucesso
+        assertThat(emissores).contains(emitterMock);
     }
 
     @Test
@@ -78,6 +76,6 @@ class RegistroSseEmitterTest {
         registroSseEmitter.transmitir("meu-evento");
 
         verify(emitterMock).send(any(SseEmitter.SseEventBuilder.class));
-        assertFalse(emissores.contains(emitterMock)); // Deve remover do cache se falhar
+        assertThat(emissores).doesNotContain(emitterMock);
     }
 }

@@ -10,7 +10,7 @@ import sgc.organizacao.model.*;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,14 +49,14 @@ class CacheViewsOrganizacaoServiceTest {
 
         List<UnidadeHierarquiaLeitura> result = cacheService.listarTodasUnidades();
 
-        assertEquals(1, result.size());
-        assertEquals(1L, result.getFirst().codigo());
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().codigo()).isEqualTo(1L);
     }
 
     @Test
     @DisplayName("deve evictar unidades sem erros")
     void evictarUnidades() {
-        assertDoesNotThrow(() -> cacheService.evictarUnidades());
+        cacheService.evictarUnidades();
     }
 
     @Test
@@ -77,15 +77,15 @@ class CacheViewsOrganizacaoServiceTest {
 
         List<UsuarioConsultaLeitura> result = cacheService.listarTodosUsuarios();
 
-        assertEquals(1, result.size());
-        assertEquals("12345", result.getFirst().tituloEleitoral());
-        assertEquals(1L, result.getFirst().unidadeCodigo());
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().tituloEleitoral()).isEqualTo("12345");
+        assertThat(result.getFirst().unidadeCodigo()).isEqualTo(1L);
     }
 
     @Test
     @DisplayName("deve evictar usuários sem erros")
     void evictarUsuarios() {
-        assertDoesNotThrow(() -> cacheService.evictarUsuarios());
+        cacheService.evictarUsuarios();
     }
 
     @Test
@@ -101,15 +101,15 @@ class CacheViewsOrganizacaoServiceTest {
 
         List<ResponsabilidadeLeitura> result = cacheService.listarTodasResponsabilidades();
 
-        assertEquals(1, result.size());
-        assertEquals(10L, result.getFirst().unidadeCodigo());
-        assertEquals("titulo1", result.getFirst().usuarioTitulo());
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().unidadeCodigo()).isEqualTo(10L);
+        assertThat(result.getFirst().usuarioTitulo()).isEqualTo("titulo1");
     }
 
     @Test
     @DisplayName("deve evictar responsabilidades sem erros")
     void evictarResponsabilidades() {
-        assertDoesNotThrow(() -> cacheService.evictarResponsabilidades());
+        cacheService.evictarResponsabilidades();
     }
 
     @Test
@@ -162,8 +162,8 @@ class CacheViewsOrganizacaoServiceTest {
 
         List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
 
-        assertEquals(6, result.size());
-        org.assertj.core.api.Assertions.assertThat(result)
+        assertThat(result).hasSize(6);
+        assertThat(result)
                 .contains(
                         new UsuarioPerfilLeitura("admin", 1L, Perfil.ADMIN),
                         new UsuarioPerfilLeitura("admin", 10L, Perfil.SERVIDOR),
@@ -188,15 +188,15 @@ class CacheViewsOrganizacaoServiceTest {
 
         List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
 
-        assertEquals(1, result.size());
-        assertEquals("titulo", result.getFirst().usuarioTitulo());
-        assertEquals(1L, result.getFirst().unidadeCodigo());
-        assertEquals(Perfil.ADMIN, result.getFirst().perfil());
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().usuarioTitulo()).isEqualTo("titulo");
+        assertThat(result.getFirst().unidadeCodigo()).isEqualTo(1L);
+        assertThat(result.getFirst().perfil()).isEqualTo(Perfil.ADMIN);
     }
 
     @Test
     @DisplayName("deve evictar perfis de unidade sem erros")
     void evictarPerfisUnidade() {
-        assertDoesNotThrow(() -> cacheService.evictarPerfisUnidade());
+        cacheService.evictarPerfisUnidade();
     }
 }
