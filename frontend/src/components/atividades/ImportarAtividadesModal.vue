@@ -170,6 +170,7 @@ import {
 import {TEXTOS} from "@/constants/textos";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {logger} from "@/utils/logger";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -293,7 +294,8 @@ async function executarComErroImportacao<T>(
     aplicarResultado(await withErrorHandling(acao, (erro) => {
       registrarErroImportacao(erro.mensagem);
     }));
-  } catch {
+  } catch (error) {
+    logger.error("Erro ao carregar dados de importação de atividades", error);
   }
 }
 
@@ -378,8 +380,9 @@ async function importar() {
     );
     emit("importar", resultadoImportacao.value);
     fechar();
-  } catch {
+  } catch (error) {
     resultadoImportacao.value = null;
+    logger.error("Erro ao importar atividades", error);
   } finally {
     importando.value = false;
   }

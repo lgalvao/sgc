@@ -2,6 +2,7 @@ import {computed, type ComputedRef, reactive, ref, type Ref, toRefs} from "vue";
 import type {VarianteAlerta} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
 import type {SubprocessoDetalhe} from "@/types/tipos";
+import {logger} from "@/utils/logger";
 
 type TipoReabertura = "cadastro" | "revisao";
 
@@ -75,7 +76,8 @@ export function useSubprocessoAcoesAdministrativas({
         await executarComCarregamento(loading, async () => {
             try {
                 await acao();
-            } catch {
+            } catch (error) {
+                logger.error(mensagemErro, error);
                 notify(mensagemErro, "danger");
             }
         });
