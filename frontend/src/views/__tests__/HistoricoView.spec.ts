@@ -80,7 +80,7 @@ describe('HistoricoView.vue', () => {
         wrapper = createWrapper();
 
         await flushPromises();
-        // shouldn't crash, error caught in try/catch block
+        // erro propaga ao error handler do Vue, componente permanece funcional com lista vazia
         expect(wrapper.find('[data-testid="tabela-processos"]').exists()).toBe(true);
     });
 

@@ -37,17 +37,6 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         return await obterSugestoesMapa(codigoSubprocesso.value);
     }
 
-    async function carregarSugestoesParaVisualizacao() {
-        try {
-            sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
-            return true;
-        } catch (error) {
-            logger.error(error);
-            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
-            return false;
-        }
-    }
-
     async function verSugestoes() {
         if (loadingSugestoesVisualizacao.value) {
             return;
@@ -57,10 +46,11 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         loadingSugestoesVisualizacao.value = true;
 
         try {
-            const carregou = await carregarSugestoesParaVisualizacao();
-            if (carregou) {
-                mostrarModalVerSugestoes.value = true;
-            }
+            sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
+            mostrarModalVerSugestoes.value = true;
+        } catch (error) {
+            logger.error(error);
+            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
         } finally {
             loadingSugestoesVisualizacao.value = false;
         }
@@ -125,7 +115,6 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         fecharModalSugestoes,
         handleConfirmarSugestoes,
         sincronizarSugestoesMapa,
-        carregarSugestoesParaVisualizacao,
         carregarSugestoesParaEdicao
     };
 }

@@ -9,10 +9,6 @@ vi.mock("../../services/unidadeService", () => ({
     buscarReferenciaMapaVigente: vi.fn(),
 }));
 
-vi.mock("@/utils", () => ({
-    logger: {error: vi.fn()}
-}));
-
 describe("useUnidadeStore", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
@@ -32,12 +28,11 @@ describe("useUnidadeStore", () => {
         expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledTimes(1);
     });
 
-    it("deve tratar erro na busca da arvore", async () => {
+    it("deve propagar erro na busca da arvore", async () => {
         const store = useUnidadeStore();
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockRejectedValue(new Error("Fail"));
 
-        const res = await store.garantirArvoreElegibilidade("T1", 1);
-        expect(res).toEqual([]);
+        await expect(store.garantirArvoreElegibilidade("T1", 1)).rejects.toThrow("Fail");
     });
 
     it("deve deduplicar requisicoes paralelas", async () => {

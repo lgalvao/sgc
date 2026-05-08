@@ -79,7 +79,6 @@ import {useProcessoAcoes} from "@/views/processoDetalheAcoes";
 import {usePerfil} from "@/composables/usePerfil";
 import {useProcessoStore} from "@/stores/processo";
 import type {Processo} from "@/types/tipos";
-import {logger} from "@/utils";
 import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
 
@@ -158,20 +157,16 @@ async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
     return;
   }
 
-  try {
-    await router.push({
-      name: "Subprocesso",
-      params: {
-        codProcesso: codProcesso.toString(),
-        siglaUnidade: row.sigla
-      },
-      query: typeof row.codSubprocesso === "number"
-          ? {codSubprocesso: String(row.codSubprocesso)}
-          : undefined,
-    });
-  } catch (error) {
-    logger.error(`Erro ao navegar para detalhes da unidade ${row.sigla}:`, error);
-  }
+  await router.push({
+    name: "Subprocesso",
+    params: {
+      codProcesso: codProcesso.toString(),
+      siglaUnidade: row.sigla
+    },
+    query: typeof row.codSubprocesso === "number"
+        ? {codSubprocesso: String(row.codSubprocesso)}
+        : undefined,
+  });
 }
 
 onMounted(async () => {

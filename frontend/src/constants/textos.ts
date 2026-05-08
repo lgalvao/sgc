@@ -421,6 +421,7 @@ export const TEXTOS = {
             REMOVER_TITULO: "Remover processo",
             REMOVER_CONFIRMACAO: (desc: string) => `Remover o processo '${desc}'? Esta ação não poderá ser desfeita.`,
             ERRO_CARREGAR_DETALHES: "Não foi possível carregar os detalhes do processo.",
+            ERRO_CARREGAR_UNIDADES: "Não foi possível carregar as unidades disponíveis.",
             ERRO_CRIAR_PARA_INICIAR: "Não foi possível criar o processo para iniciá-lo.",
             ERRO_INICIAR_PROCESSO: "Não foi possível iniciar o processo. Tente novamente.",
             ERRO_REMOVER_PROCESSO: "Não foi possível remover o processo. Tente novamente.",

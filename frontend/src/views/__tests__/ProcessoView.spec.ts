@@ -960,9 +960,11 @@ describe("Processo.vue", () => {
         await vm.abrirDetalhesUnidade({clickable: false});
         expect(mocks.push).not.toHaveBeenCalledWith(expect.objectContaining({name: "Subprocesso"}));
 
-        // branch 414-416 (navigation error)
+        // branch (navigation error - router.push pode rejeitar; erro propaga ao chamador)
         mocks.push.mockRejectedValueOnce(new Error("Nav error"));
-        await vm.abrirDetalhesUnidade({clickable: true, sigla: "ERR", codSubprocesso: 999});
+        await expect(
+            vm.abrirDetalhesUnidade({clickable: true, sigla: "ERR", codSubprocesso: 999})
+        ).rejects.toThrow("Nav error");
 
         // loading state (77-80)
         wrapper.unmount();
