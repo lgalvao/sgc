@@ -22,6 +22,7 @@
 
 <script lang="ts" setup>
 import {computed, onActivated, onMounted, ref} from 'vue';
+import logger from '@/utils/logger';
 import {useRouter} from 'vue-router';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
@@ -82,22 +83,27 @@ function verDetalhes(proc: ProcessoResumo | undefined) {
 // recarregamento duplo nesse caso.
 let montadoUmaVez = false;
 
+async function carregarDadosTela(deveRecarregarHistorico: boolean) {
+  const promessas = [];
+  if (deveRecarregarHistorico) {
+    promessas.push(historicoStore.garantirDados());
+  }
+  promessas.push(carregarConfiguracoes());
+
+  try {
+    await Promise.all(promessas);
+  } catch (erro) {
+    logger.error('Erro ao carregar dados da tela de histórico', erro);
+  }
+}
+
 onMounted(async () => {
   montadoUmaVez = true;
-  await Promise.all([
-    historicoStore.garantirDados(),
-    carregarConfiguracoes()
-  ]);
+  await carregarDadosTela(true);
 });
 
 onActivated(async () => {
   if (!montadoUmaVez) return;
-  const promises = [];
-  if (!historicoStore.dadosValidos()) {
-    promises.push(historicoStore.garantirDados());
-  }
-  // Sempre garante configs atualizadas ao voltar para a tela
-  promises.push(carregarConfiguracoes());
-  await Promise.all(promises);
+  await carregarDadosTela(!historicoStore.dadosValidos());
 });
 </script>

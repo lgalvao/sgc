@@ -65,13 +65,13 @@ describe("useHistoricoStore", () => {
         expect(processoService.buscarProcessosFinalizados).toHaveBeenCalledTimes(1);
     });
 
-    it("deve lidar com erro no carregamento", async () => {
+    it("deve propagar erro no carregamento", async () => {
         const store = useHistoricoStore();
         vi.mocked(processoService.buscarProcessosFinalizados).mockRejectedValue(new Error("Erro"));
 
-        await store.garantirDados();
+        await expect(store.garantirDados()).rejects.toThrow("Erro");
 
         expect(store.processos).toEqual([]);
-        expect(store.carregado).toBe(false); // não marca como carregado em falha — permite retry
+        expect(store.carregado).toBe(false);
     });
 });
