@@ -32,12 +32,16 @@ describe("usePainelStore", () => {
 
     it("deve invalidar dados", () => {
         const store = usePainelStore();
-        store.definirDados([], []);
+        const processos = [{codigo: 1, sigla: "P1"} as any];
+        const alertas = [{codigo: 10, mensagem: "A1"} as any];
+        store.definirDados(processos, alertas);
         expect(store.carregado).toBe(true);
 
         store.invalidar();
         expect(store.carregado).toBe(false);
         expect(store.carregadoEm).toBeNull();
+        expect(store.processos).toEqual(processos);
+        expect(store.alertas).toEqual(alertas);
     });
 
     it("deve verificar se dados são válidos baseados no TTL", () => {

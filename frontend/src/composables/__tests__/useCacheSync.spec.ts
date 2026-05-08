@@ -89,6 +89,38 @@ describe('useCacheSync', () => {
         expect(mapasStore.invalidar).not.toHaveBeenCalled();
     });
 
+    it('deve preservar snapshots críticos ao invalidar por SSE organizacional', () => {
+        processoStore.contextoCompleto = {codigo: 100, descricao: 'Processo'} as any;
+        processoStore.codProcessoCarregado = 100;
+        subprocessoStore.contextoEdicao = {detalhes: {codigo: 200, situacao: 'MAPA'}} as any;
+        mapasStore.definirMapaCompleto(200, {
+            codigo: 1,
+            subprocessoCodigo: 200,
+            observacoes: 'Mapa vivo',
+            competencias: [],
+            atividades: [],
+            situacao: 'EM_ANDAMENTO',
+        } as any);
+        painelStore.definirDados([{codigo: 1} as any], [{codigo: 2} as any]);
+
+        useCacheSync();
+        lastInstance?.emit('org-cache-refreshed', {});
+
+        expect(painelStore.dadosValidos()).toBe(false);
+        expect(painelStore.processos).toEqual([{codigo: 1}]);
+        expect(painelStore.alertas).toEqual([{codigo: 2}]);
+
+        expect(processoStore.contextoCompleto).toEqual(expect.objectContaining({codigo: 100}));
+        expect(subprocessoStore.contextoEdicao).toEqual(expect.objectContaining({
+            detalhes: expect.objectContaining({codigo: 200}),
+        }));
+        expect(mapasStore.obterMapaCompletoCache(200)).toEqual(expect.objectContaining({
+            subprocessoCodigo: 200,
+            observacoes: 'Mapa vivo',
+        }));
+        expect(mapasStore.dadosMapaValidos(200)).toBe(true);
+    });
+
     it('não deve fechar a conexão em caso de erro transitório', () => {
         useCacheSync();
 

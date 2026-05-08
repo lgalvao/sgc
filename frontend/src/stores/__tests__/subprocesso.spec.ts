@@ -275,6 +275,24 @@ describe("subprocesso store (cache e dedupe)", () => {
             expect(store.contextoEdicao?.detalhes.codigo).toBe(1);
             expect(store.contextoCadastro?.detalhes.codigo).toBe(2);
             expect(store.erroIntegracaoContexto).toBeNull();
+            expect(store.dadosEdicaoValidos(1)).toBe(false);
+            expect(store.dadosCadastroValidos(2)).toBe(false);
+        });
+
+        it("deve voltar a buscar contexto após invalidação explícita", async () => {
+            const store = useSubprocessoStore();
+            store.contextoEdicao = {detalhes: {codigo: 10, situacao: "ANTES"}} as any;
+            store.invalidar();
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+                detalhes: {codigo: 10, situacao: "DEPOIS"},
+                mapa: null,
+            } as any);
+
+            const resultado = await store.garantirContextoEdicao(10);
+
+            expect(subprocessoService.buscarContextoEdicao).toHaveBeenCalledWith(10);
+            expect(resultado?.detalhes.situacao).toBe("DEPOIS");
+            expect(store.dadosEdicaoValidos(10)).toBe(true);
         });
 
         it("deve resetar o estado completo", () => {
