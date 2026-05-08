@@ -109,6 +109,7 @@ function registrarErro(error: unknown) {
 
 async function carregarContextoCompleto() {
   clearError();
+  const snapshotAnterior = processo.value;
 
   try {
     const data = await processoStore.garantirContextoCompleto(codProcesso);
@@ -117,9 +118,10 @@ async function carregarContextoCompleto() {
     }
     return data;
   } catch (error) {
-    // Limpa os dados apenas em caso de erro para evitar exibir informações desatualizadas como válidas.
-    // Durante o recarregamento em background, os dados antigos permanecem visíveis (sem flash de spinner).
-    processo.value = null;
+    // No bootstrap inicial, não há snapshot útil para preservar.
+    // Em recargas em background, mantemos o último snapshot até que haja sucesso
+    // ou a pessoa usuária decida sair do contexto.
+    processo.value = snapshotAnterior;
     lastError.value = normalizarErro(error);
     throw error;
   }

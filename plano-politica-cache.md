@@ -172,6 +172,8 @@ Escopo esperado:
 2. O store `mapas` já preserva snapshot crítico ao invalidar; o foco agora é consolidar essa semântica em testes de contrato.
 3. A `MapaView` não está em `keepAlive`, então o sintoma de "mapa sumiu" aponta mais para invalidação destrutiva do store do que para ausência de `onActivated`.
 4. `processo` e `subprocesso` servem como referência local de contrato mais seguro.
+5. `ProcessoDetalheView` tinha um desvio sutil de política: em erro de recarga ela limpava o snapshot mesmo durante refresh em background. Esse tipo de divergência precisa ser coberto por teste de view.
+6. `CadastroView` e `MapaView` dependem mais do bootstrap por rota do que do `keepAlive`. Para essas telas, a robustez contra refresh completo da página precisa ser validada nas orquestrações (`useCadastroOrquestracao` e `useMapaOrquestracao`).
 
 ## Fases de execução
 
