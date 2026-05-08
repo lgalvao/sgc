@@ -41,7 +41,7 @@ export function useCadastroAtividadesMutacoes({
         | { sucesso: true; resultado: T }
         | { sucesso: false };
 
-    async function executarComTratamentoErro<T>(
+    async function executarOperacaoAtividade<T>(
         operacao: () => Promise<T>,
         aoFalhar: (erro: unknown) => void
     ): Promise<ResultadoExecucao<T>> {
@@ -57,13 +57,12 @@ export function useCadastroAtividadesMutacoes({
     }
 
     const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
-        const resultado = await executarComTratamentoErro(async () => {
+        const resultado = await executarOperacaoAtividade(async () => {
             processarRespostaLocal(await acao());
         },
             () => notify(msg, "danger"),
         );
-        if (!resultado.sucesso) return false;
-        return true;
+        return resultado.sucesso;
     };
 
     const prepararRemocao = (tipo: "atividade" | "conhecimento", atividadeCodigo: number, conhecimentoCodigo?: number) => {
@@ -80,7 +79,7 @@ export function useCadastroAtividadesMutacoes({
 
     async function adicionarAtividade(): Promise<boolean> {
         if (!codMapa.value || !codigoSubprocesso.value) return false;
-        const resultado = await executarComTratamentoErro(
+        const resultado = await executarOperacaoAtividade(
             () => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!),
             () => {
                 erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
@@ -97,7 +96,7 @@ export function useCadastroAtividadesMutacoes({
         const {tipo, atividadeCodigo, conhecimentoCodigo} = dadosRemocao.value;
         loadingRemocao.value = true;
         try {
-            const resultado = await executarComTratamentoErro(async () => {
+            const resultado = await executarOperacaoAtividade(async () => {
                 return tipo === "atividade"
                     ? await atividadeService.excluirAtividade(atividadeCodigo)
                     : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);

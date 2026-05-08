@@ -46,7 +46,7 @@ export function useMapaCompetenciasMutacoes({
         await callback(codigo);
     }
 
-    async function executarComTratamentoErro(
+    async function executarOperacaoCompetencia(
         operacao: () => Promise<void>,
         tratarErro: (error: unknown) => void
     ): Promise<void> {
@@ -92,7 +92,7 @@ export function useMapaCompetenciasMutacoes({
 
             loadingCompetencia.value = true;
             try {
-                await executarComTratamentoErro(async () => {
+                await executarOperacaoCompetencia(async () => {
                     if (competenciaSendoEditada.value) {
                         sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigo, competenciaSendoEditada.value.codigo, request));
                     } else {
@@ -120,7 +120,7 @@ export function useMapaCompetenciasMutacoes({
         await executarComSubprocesso(async (codigo) => {
             loadingExclusao.value = true;
             try {
-                await executarComTratamentoErro(async () => {
+                await executarOperacaoCompetencia(async () => {
                     sincronizarMapa(await fluxoMapa.removerCompetencia(codigo, competenciaParaExcluir.value!.codigo));
                     mostrarModalExcluirCompetencia.value = false;
                 }, (error) => notify(normalizarErro(error).mensagem, "danger"));
@@ -132,7 +132,7 @@ export function useMapaCompetenciasMutacoes({
 
     async function removerAtividadeAssociada(competenciaId: number, codigoAtividade: number) {
         await executarComSubprocesso(async (codigo) => {
-            await executarComTratamentoErro(async () => {
+            await executarOperacaoCompetencia(async () => {
                 sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigo, competenciaId, codigoAtividade));
             }, (error) => notify(normalizarErro(error).mensagem, "danger"));
         });

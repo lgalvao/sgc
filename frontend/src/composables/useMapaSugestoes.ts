@@ -30,7 +30,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     const mostrarModalSugestoes = ref(false);
     const mostrarModalVerSugestoes = ref(false);
 
-    async function executarComTratamentoErro(
+    async function executarOperacaoSugestoes(
         operacao: () => Promise<void>,
         mensagemErro: string
     ): Promise<boolean> {
@@ -60,7 +60,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         loadingSugestoesVisualizacao.value = true;
 
         try {
-            const sucesso = await executarComTratamentoErro(async () => {
+            const sucesso = await executarOperacaoSugestoes(async () => {
                 sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
             }, TEXTOS.mapa.ERRO_SUGESTOES);
             if (!sucesso) {
@@ -79,7 +79,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     }
 
     async function carregarSugestoesParaEdicao() {
-        const sucesso = await executarComTratamentoErro(async () => {
+        const sucesso = await executarOperacaoSugestoes(async () => {
             sugestoes.value = await sincronizarSugestoesMapa();
         }, TEXTOS.mapa.ERRO_SUGESTOES);
 
@@ -110,7 +110,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
 
         try {
             loadingSugestoesEnvio.value = true;
-            const sucesso = await executarComTratamentoErro(async () => {
+            const sucesso = await executarOperacaoSugestoes(async () => {
                 await apresentarSugestoes(codigoSubprocesso.value!, {sugestoes: sugestoes.value});
                 await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
             }, TEXTOS.mapa.ERRO_SUGESTOES);
