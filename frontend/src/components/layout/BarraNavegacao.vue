@@ -69,18 +69,19 @@ const shouldShowBreadcrumbs = computed(
 .barra-navegacao {
   font-size: 0.85rem;
   line-height: 1;
+  min-height: 1.75rem;
 }
 
 .btn-voltar {
-  padding: 0.4rem;
+  padding: 0.25rem 0.55rem;
   font-size: 0.75rem;
   border-color: var(--bs-border-color);
   color: var(--bs-secondary-color);
-  height: 24px;
+  min-width: 2.25rem;
+  height: 1.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 4px;
 }
 
 .btn-voltar:hover {
@@ -95,17 +96,44 @@ const shouldShowBreadcrumbs = computed(
   background: transparent;
   display: flex;
   align-items: center;
-  margin: 3px 0 0;
+  min-height: 1.75rem;
+  margin: 0;
 }
 
 :deep(.breadcrumb) {
   margin-bottom: 0 !important;
+  align-items: center;
+}
+
+:deep(.breadcrumb-item) {
+  display: inline-flex;
+  align-items: center;
+}
+
+:deep(.breadcrumb-item > a),
+:deep(.breadcrumb-item.active) {
+  display: inline-flex;
+  align-items: center;
+}
+
+:deep(.breadcrumb-item > a) {
+  color: var(--bs-secondary-color);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+:deep(.breadcrumb-item > a:hover),
+:deep(.breadcrumb-item > a:focus) {
+  color: var(--bs-emphasis-color);
+  text-decoration: none;
+}
+
+:deep(.breadcrumb-item.active) {
+  color: var(--bs-emphasis-color);
 }
 
 :deep(.bi-house-door) {
   color: var(--bs-secondary-color);
   font-size: 0.9rem;
-  vertical-align: middle;
-  margin-top: -2px;
 }
 </style>

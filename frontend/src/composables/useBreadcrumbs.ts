@@ -10,6 +10,11 @@ export interface Breadcrumb {
     isHome?: boolean;
 }
 
+interface MetaBreadcrumb {
+    breadcrumb?: string | ((route: RouteLocationNormalizedLoaded) => string);
+    title?: string;
+}
+
 const TITULOS_PAGINA_SUBPROCESSO: Record<string, string> = {
     SubprocessoMapa: "Mapa de competências",
     SubprocessoCadastro: "Atividades e conhecimentos",
@@ -90,14 +95,18 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     const addFallbackBreadcrumbs = (breadcrumbs: Breadcrumb[]) => {
         route.matched.forEach((routeRecord) => {
             const {meta, name} = routeRecord;
-            if (meta.breadcrumb) {
-                const label = typeof meta.breadcrumb === "function" ? meta.breadcrumb(route) : (meta.breadcrumb as string);
-                if (label && (breadcrumbs.length === 0 || breadcrumbs.at(-1)?.label !== label)) {
-                    breadcrumbs.push({
-                        label,
-                        to: {name: name as string, params: route.params},
-                    });
-                }
+            const metaBreadcrumb = meta as MetaBreadcrumb;
+            const label = metaBreadcrumb.breadcrumb
+                ? typeof metaBreadcrumb.breadcrumb === "function"
+                    ? metaBreadcrumb.breadcrumb(route)
+                    : metaBreadcrumb.breadcrumb
+                : metaBreadcrumb.title;
+
+            if (label && (breadcrumbs.length === 0 || breadcrumbs.at(-1)?.label !== label)) {
+                breadcrumbs.push({
+                    label,
+                    to: {name: name as string, params: route.params},
+                });
             }
         });
 

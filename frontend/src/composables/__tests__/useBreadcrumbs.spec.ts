@@ -139,6 +139,37 @@ describe("useBreadcrumbs", () => {
         expect(breadcrumbs.value[2].to).toBeUndefined();
     });
 
+    it("deve usar meta.title para páginas principais sem meta.breadcrumb", () => {
+        const route = {
+            name: "Historico",
+            params: {},
+            matched: [{
+                name: "Historico",
+                meta: {title: "Histórico"},
+            }]
+        } as any;
+        const {breadcrumbs} = useBreadcrumbs(route);
+
+        expect(breadcrumbs.value).toHaveLength(2);
+        expect(breadcrumbs.value[1].label).toBe("Histórico");
+        expect(breadcrumbs.value[1].to).toBeUndefined();
+    });
+
+    it("deve priorizar meta.breadcrumb sobre meta.title", () => {
+        const route = {
+            name: "Relatorios",
+            params: {},
+            matched: [{
+                name: "Relatorios",
+                meta: {breadcrumb: "Relatórios customizados", title: "Relatórios"},
+            }]
+        } as any;
+        const {breadcrumbs} = useBreadcrumbs(route);
+
+        expect(breadcrumbs.value).toHaveLength(2);
+        expect(breadcrumbs.value[1].label).toBe("Relatórios customizados");
+    });
+
     it("deve lidar com breadcrumb nulo no metadado", () => {
         const route = {
             name: "RotaSemBreadcrumb",

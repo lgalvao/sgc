@@ -1,5 +1,5 @@
 <template>
-  <BNavbar class="border-bottom sticky-top navbar-principal-sgc navbar-dark" toggleable="lg">
+  <BNavbar class="border-bottom navbar-principal-sgc navbar-dark" toggleable="lg">
     <BNavbarBrand class="fw-bold fs-5 me-4 navbar-principal-sgc__marca" to="/painel">
       {{ TEXTOS.comum.NOME_SISTEMA }}
     </BNavbarBrand>

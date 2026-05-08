@@ -99,13 +99,18 @@ const chaveSessao = computed(() =>
   <BOrchestrator class="orchestrator-container"/>
 
   <div class="d-flex flex-column min-vh-100">
-    <MainNavbar v-if="route.path !== '/login' && route.path !== '/erro'"/>
     <div
-        v-if="shouldShowNavBarExtras"
-        class="bg-body-tertiary border-bottom"
+        v-if="route.path !== '/login' && route.path !== '/erro'"
+        class="cabecalho-fixo sticky-top"
     >
-      <div class="container pt-1 pb-2">
-        <BarraNavegacao/>
+      <MainNavbar/>
+      <div
+          v-if="shouldShowNavBarExtras"
+          class="bg-body-tertiary border-bottom"
+      >
+        <div class="container py-1">
+          <BarraNavegacao/>
+        </div>
       </div>
     </div>
 
@@ -139,6 +144,10 @@ const chaveSessao = computed(() =>
 </template>
 
 <style>
+.cabecalho-fixo {
+  z-index: 1020;
+}
+
 .footer-app__conteudo {
   padding-top: 0.35rem;
   padding-bottom: 0.35rem;
