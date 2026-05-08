@@ -170,7 +170,7 @@ import {
 import {TEXTOS} from "@/constants/textos";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {logger} from "@/utils/logger";
+import logger from "@/utils/logger";
 
 const props = defineProps<{
   mostrar: boolean;

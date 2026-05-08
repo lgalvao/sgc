@@ -2,7 +2,7 @@ import type {ComputedRef, Ref} from "vue";
 import type {Analise} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import type {VarianteAlerta} from "@/composables/useNotification";
-import {logger} from "@/utils/logger";
+import logger from "@/utils/logger";
 
 type AcaoPrincipalMapa = {
     codigo: "ACEITAR" | "HOMOLOGAR";
