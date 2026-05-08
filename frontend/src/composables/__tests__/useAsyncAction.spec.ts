@@ -32,32 +32,32 @@ describe("useAsyncAction", () => {
         expect(erro.value).toBe("erro custom");
     });
 
-    it("deve executar silencioso com sucesso", async () => {
-        const {erro, executarSilencioso} = useAsyncAction();
+    it("deve executar sem relançar erro com sucesso", async () => {
+        const {erro, executar} = useAsyncAction();
         const acao = vi.fn().mockResolvedValue("ok");
 
-        const resultado = await executarSilencioso(acao);
+        const resultado = await executar(acao, undefined, {relancarErro: false});
 
         expect(resultado).toBe("ok");
         expect(erro.value).toBeNull();
     });
 
-    it("deve capturar erro silenciosamente", async () => {
-        const {carregando, erro, executarSilencioso} = useAsyncAction();
+    it("deve capturar erro sem relançar", async () => {
+        const {carregando, erro, executar} = useAsyncAction();
         const acao = vi.fn().mockRejectedValue(new Error("silencio"));
 
-        const resultado = await executarSilencioso(acao);
+        const resultado = await executar(acao, undefined, {relancarErro: false});
 
         expect(resultado).toBeUndefined();
         expect(carregando.value).toBe(false);
         expect(erro.value).toBe("silencio");
     });
 
-    it("deve usar mensagem padrao no silencioso se erro nao tiver mensagem", async () => {
-        const {erro, executarSilencioso} = useAsyncAction();
+    it("deve usar mensagem padrao quando não relança", async () => {
+        const {erro, executar} = useAsyncAction();
         const acao = vi.fn().mockRejectedValue({});
 
-        await executarSilencioso(acao, "padrao");
+        await executar(acao, "padrao", {relancarErro: false});
 
         expect(erro.value).toBe("padrao");
     });

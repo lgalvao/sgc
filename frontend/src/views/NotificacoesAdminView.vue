@@ -181,7 +181,7 @@ const mostrarModalReenvio = ref(false);
 const mostrarPreview = ref(false);
 const mostrarDetalhes = ref(false);
 const reenviando = ref(false);
-const urlLeitorEmailTestes = ref<string | null>(null);
+const urlLeitorEmailTestes = ref<string>();
 
 const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
@@ -248,9 +248,9 @@ async function carregar() {
 
 async function carregarUrlLeitorEmailTestes() {
   try {
-    urlLeitorEmailTestes.value = await buscarUrlLeitorEmailTestes();
+    urlLeitorEmailTestes.value = (await buscarUrlLeitorEmailTestes()) ?? undefined;
   } catch {
-    urlLeitorEmailTestes.value = null;
+    urlLeitorEmailTestes.value = undefined;
   }
 }
 

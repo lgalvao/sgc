@@ -38,22 +38,9 @@ export function useErrorHandler() {
         }
     }
 
-    async function withFallback<T>(
-        fn: () => Promise<T>,
-        valorPadrao: T,
-        onError?: (error: ErroNormalizado) => void
-    ): Promise<T> {
-        try {
-            return await withErrorHandling(fn, onError);
-        } catch {
-            return valorPadrao;
-        }
-    }
-
     return {
         lastError,
         clearError,
-        withErrorHandling,
-        withFallback
+        withErrorHandling
     };
 }

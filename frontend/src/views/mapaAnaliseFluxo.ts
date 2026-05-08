@@ -2,6 +2,7 @@ import type {ComputedRef, Ref} from "vue";
 import type {Analise} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import type {VarianteAlerta} from "@/composables/useNotification";
+import logger from "@/utils/logger";
 
 type AcaoPrincipalMapa = {
     codigo: "ACEITAR" | "HOMOLOGAR";
@@ -49,6 +50,18 @@ export function useMapaAnaliseFluxo({
                                         aceitarMapa,
                                         devolverMapa,
                                     }: DependenciasMapaAnaliseFluxo) {
+    async function executarComNotificacaoDeErro(
+        mensagemErro: string,
+        acao: () => Promise<void>
+    ) {
+        try {
+            await acao();
+        } catch (error) {
+            logger.error(mensagemErro, error);
+            notify(mensagemErro, "danger");
+        }
+    }
+
     function abrirModalAceitar() {
         mostrarModalAceitar.value = true;
     }
@@ -78,28 +91,24 @@ export function useMapaAnaliseFluxo({
     async function confirmarValidacao() {
         const codigo = codigoSubprocesso.value;
         if (!codigo) return;
-        try {
+        await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_VALIDAR, async () => {
             await validarMapa(codigo);
             await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
-        } catch {
-            notify(TEXTOS.mapa.ERRO_VALIDAR, "danger");
-        }
+        });
     }
 
     async function confirmarAceitacao(observacao = "") {
         const codigo = codigoSubprocesso.value;
         const acao = acaoPrincipalMapa.value;
         if (!codigo || !acao) return;
-        try {
+        await executarComNotificacaoDeErro(TEXTOS.comum.ERRO_OPERACAO, async () => {
             if (acao.codigo === "HOMOLOGAR") {
                 await homologarMapa(codigo, {observacao});
             } else {
                 await aceitarMapa(codigo, {observacao});
             }
             await concluirAcaoPainel(acao.mensagemSucesso, fecharModalAceitar);
-        } catch {
-            notify(TEXTOS.comum.ERRO_OPERACAO, "danger");
-        }
+        });
     }
 
     async function handleConfirmarDevolucao() {
@@ -109,12 +118,10 @@ export function useMapaAnaliseFluxo({
         }
         const codigo = codigoSubprocesso.value;
         if (!codigo) return;
-        try {
+        await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_DEVOLVER, async () => {
             await devolverMapa(codigo, {justificativa: observacaoDevolucao.value});
             await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
-        } catch {
-            notify(TEXTOS.mapa.ERRO_DEVOLVER, "danger");
-        }
+        });
     }
 
     async function abrirModalHistorico() {

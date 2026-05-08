@@ -170,6 +170,7 @@ import {
 import {TEXTOS} from "@/constants/textos";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import logger from "@/utils/logger";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -187,7 +188,7 @@ const {
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
-const {withFallback} = useErrorHandler();
+const {withErrorHandling} = useErrorHandler();
 
 const resultadoImportacao = ref<AtividadeOperacaoResponse | null>(null);
 const erroImportacao = ref<string | null>(null);
@@ -234,10 +235,7 @@ watch(
     async (mostrar) => {
       if (mostrar) {
         resetModal();
-        processosParaImportacao.value = await withFallback(
-            () => processoService.buscarProcessosParaImportacao(),
-            [],
-        );
+        await carregarProcessosParaImportacao();
       }
     },
     {immediate: true},
@@ -284,6 +282,33 @@ function limparErroImportacao() {
   erroImportacao.value = null;
 }
 
+function registrarErroImportacao(mensagem: string) {
+  erroImportacao.value = mensagem;
+}
+
+async function executarComTratamentoErro<T>(
+    acao: () => Promise<T>,
+    aplicarResultado: (resultado: T) => void,
+) {
+  try {
+    aplicarResultado(await withErrorHandling(acao, (erro) => {
+      registrarErroImportacao(erro.mensagem);
+    }));
+  } catch (error) {
+    logger.error("Erro ao carregar dados de importação de atividades", error);
+  }
+}
+
+async function carregarProcessosParaImportacao() {
+  processosParaImportacao.value = [];
+  await executarComTratamentoErro(
+      () => processoService.buscarProcessosParaImportacao(),
+      (processos) => {
+        processosParaImportacao.value = processos;
+      },
+  );
+}
+
 function selecionarTodasAtividades() {
   atividadesSelecionadas.value = [...atividadesParaImportar.value];
 }
@@ -295,9 +320,16 @@ function limparSelecaoAtividades() {
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   atividadesSelecionadas.value = [];
-  unidadesParticipantes.value = processo
-      ? await withFallback(() => processoService.buscarUnidadesParaImportacao(processo.codigo), [])
-      : [];
+  limparErroImportacao();
+  unidadesParticipantes.value = [];
+  if (processo) {
+    await executarComTratamentoErro(
+        () => processoService.buscarUnidadesParaImportacao(processo.codigo),
+        (unidades) => {
+          unidadesParticipantes.value = unidades;
+        },
+    );
+  }
   unidadeSelecionada.value = null;
   unidadeSelecionadaId.value = null;
 }
@@ -305,14 +337,15 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {
   atividadesSelecionadas.value = [];
   unidadeSelecionada.value = unidadePu;
+  limparErroImportacao();
+  atividadesParaImportar.value = [];
   if (unidadePu) {
-    const atividadesDaOutraUnidade = await withFallback(
+    await executarComTratamentoErro(
         () => subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso),
-        [],
+        (atividadesDaOutraUnidade) => {
+          atividadesParaImportar.value = [...atividadesDaOutraUnidade];
+        },
     );
-    atividadesParaImportar.value = [...atividadesDaOutraUnidade];
-  } else {
-    atividadesParaImportar.value = [];
   }
 }
 
@@ -335,20 +368,21 @@ async function importar() {
 
   importando.value = true;
   try {
-    resultadoImportacao.value = await withFallback(
+    resultadoImportacao.value = await withErrorHandling(
         () => subprocessoService.importarAtividades(
             props.codSubprocessoDestino!,
             unidadeSelecionada.value!.codSubprocesso,
             idsAtividades,
         ),
-        null,
         (erro) => {
-          erroImportacao.value = erro.mensagem;
+          registrarErroImportacao(erro.mensagem);
         },
     );
-    if (!resultadoImportacao.value) return;
     emit("importar", resultadoImportacao.value);
     fechar();
+  } catch (error) {
+    resultadoImportacao.value = null;
+    logger.error("Erro ao importar atividades", error);
   } finally {
     importando.value = false;
   }
