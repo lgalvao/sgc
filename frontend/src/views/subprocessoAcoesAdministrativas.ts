@@ -68,7 +68,7 @@ export function useSubprocessoAcoesAdministrativas({
         }
     }
 
-    async function executarComErroNotificado(
+    async function executarComNotificacaoDeErro(
         loading: Ref<boolean>,
         mensagemErro: string,
         acao: () => Promise<void>
@@ -99,7 +99,7 @@ export function useSubprocessoAcoesAdministrativas({
         const detalhe = subprocesso.value;
         if (!novaData || !detalhe) return;
 
-        await executarComErroNotificado(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, async () => {
+        await executarComNotificacaoDeErro(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, async () => {
             await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             fecharModalAlterarDataLimite();
             notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, "success");
@@ -155,7 +155,7 @@ export function useSubprocessoAcoesAdministrativas({
         const codigo = codigoSubprocesso.value;
         if (!detalhe || !codigo || loadingLembrete.value) return;
 
-        await executarComErroNotificado(loadingLembrete, TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, async () => {
+        await executarComNotificacaoDeErro(loadingLembrete, TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, async () => {
             await enviarLembrete(codProcesso, detalhe.unidade.codigo);
             await garantirContextoEdicao(codigo, true);
             modalLembreteAberto.value = false;

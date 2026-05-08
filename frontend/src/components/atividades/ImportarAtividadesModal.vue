@@ -286,7 +286,7 @@ function registrarErroImportacao(mensagem: string) {
   erroImportacao.value = mensagem;
 }
 
-async function executarComTratamentoErroImportacao<T>(
+async function executarComTratamentoErro<T>(
     acao: () => Promise<T>,
     aplicarResultado: (resultado: T) => void,
 ) {
@@ -301,7 +301,7 @@ async function executarComTratamentoErroImportacao<T>(
 
 async function carregarProcessosParaImportacao() {
   processosParaImportacao.value = [];
-  await executarComTratamentoErroImportacao(
+  await executarComTratamentoErro(
       () => processoService.buscarProcessosParaImportacao(),
       (processos) => {
         processosParaImportacao.value = processos;
@@ -323,7 +323,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
   limparErroImportacao();
   unidadesParticipantes.value = [];
   if (processo) {
-    await executarComTratamentoErroImportacao(
+    await executarComTratamentoErro(
         () => processoService.buscarUnidadesParaImportacao(processo.codigo),
         (unidades) => {
           unidadesParticipantes.value = unidades;
@@ -340,7 +340,7 @@ async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {
   limparErroImportacao();
   atividadesParaImportar.value = [];
   if (unidadePu) {
-    await executarComTratamentoErroImportacao(
+    await executarComTratamentoErro(
         () => subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso),
         (atividadesDaOutraUnidade) => {
           atividadesParaImportar.value = [...atividadesDaOutraUnidade];

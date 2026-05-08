@@ -50,7 +50,7 @@ export function useMapaAnaliseFluxo({
                                         aceitarMapa,
                                         devolverMapa,
                                     }: DependenciasMapaAnaliseFluxo) {
-    async function executarAcaoComFeedback(
+    async function executarComNotificacaoDeErro(
         mensagemErro: string,
         acao: () => Promise<void>
     ) {
@@ -91,7 +91,7 @@ export function useMapaAnaliseFluxo({
     async function confirmarValidacao() {
         const codigo = codigoSubprocesso.value;
         if (!codigo) return;
-        await executarAcaoComFeedback(TEXTOS.mapa.ERRO_VALIDAR, async () => {
+        await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_VALIDAR, async () => {
             await validarMapa(codigo);
             await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
         });
@@ -101,7 +101,7 @@ export function useMapaAnaliseFluxo({
         const codigo = codigoSubprocesso.value;
         const acao = acaoPrincipalMapa.value;
         if (!codigo || !acao) return;
-        await executarAcaoComFeedback(TEXTOS.comum.ERRO_OPERACAO, async () => {
+        await executarComNotificacaoDeErro(TEXTOS.comum.ERRO_OPERACAO, async () => {
             if (acao.codigo === "HOMOLOGAR") {
                 await homologarMapa(codigo, {observacao});
             } else {
@@ -118,7 +118,7 @@ export function useMapaAnaliseFluxo({
         }
         const codigo = codigoSubprocesso.value;
         if (!codigo) return;
-        await executarAcaoComFeedback(TEXTOS.mapa.ERRO_DEVOLVER, async () => {
+        await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_DEVOLVER, async () => {
             await devolverMapa(codigo, {justificativa: observacaoDevolucao.value});
             await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
         });

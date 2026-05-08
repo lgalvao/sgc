@@ -20,7 +20,7 @@ export function useAsyncAction() {
     const carregando = ref(false);
     const erro = ref<string | null>(null);
 
-    type OpcaoExecucao = {
+    type OpcoesExecucao = {
         relancarErro?: boolean;
     };
 
@@ -44,7 +44,7 @@ export function useAsyncAction() {
     async function executar<T>(
         acao: () => Promise<T>,
         mensagemErro = "Erro na operação",
-        opcoes: OpcaoExecucao = {}
+        opcoes: OpcoesExecucao = {}
     ): Promise<T | undefined> {
         carregando.value = true;
         erro.value = null;
