@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {computed} from "vue";
 import {BFormGroup, BFormTextarea} from "bootstrap-vue-next";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
@@ -24,7 +24,7 @@ const mostrar = computed({
   <ModalPadrao
       v-model="mostrar"
       :mostrar-botao-acao="false"
-      test-codigo-cancelar="btn-ver-sugestoes-mapa-fechar"
+      test-id-cancelar="btn-ver-sugestoes-mapa-fechar"
       texto-cancelar="Fechar"
       titulo="Sugestões sobre o mapa"
       @fechar="$emit('fechar')"
@@ -42,3 +42,4 @@ v-else id="sugestoesVisualizacao" :model-value="sugestoes" data-testid="txt-ver-
     </BFormGroup>
   </ModalPadrao>
 </template>
+

@@ -111,6 +111,10 @@ export const useMapasStore = defineStore("mapas", () => {
     }
 
     async function garantirImpactoMapa(codigoSubprocesso: number): Promise<ImpactoMapa> {
+        if (dadosImpactoValidos(codigoSubprocesso)) {
+            return impactoMapa.value!;
+        }
+
         const carregamentoExistente = carregamentosImpacto.get(codigoSubprocesso);
         if (carregamentoExistente) {
             return carregamentoExistente;

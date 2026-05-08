@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from "vitest";
+﻿import {describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import CadastroObservacaoModal from "../CadastroObservacaoModal.vue";
 import {createTestingPinia} from "@pinia/testing";
@@ -11,7 +11,7 @@ describe("CadastroObservacaoModal.vue", () => {
         okTitle: "Confirmar",
         texto: "Texto de ajuda",
         observacao: "",
-        testCodigoConfirmar: "btn-confirmar",
+        testIdConfirmar: "btn-confirmar",
         inputId: "input-obs",
         inputDataTestid: "inp-obs",
         label: "Observação"
@@ -79,3 +79,4 @@ describe("CadastroObservacaoModal.vue", () => {
         expect(wrapper.find(".text-danger").text()).toBe("*");
     });
 });
+

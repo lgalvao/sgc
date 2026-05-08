@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {BAlert, BButton, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
@@ -66,7 +66,7 @@ function limparSelecaoAtividades() {
       v-model="mostrarComp" :loading="loading" :texto-acao="textoAcao" :texto-acao-carregando="textoAcao"
       :titulo="editando ? 'Edição de competência' : 'Criação de competência'"
       data-testid="mdl-criar-competencia" tamanho="lg"
-      test-codigo-cancelar="btn-criar-competencia-cancelar" test-codigo-confirmar="btn-criar-competencia-salvar"
+      test-id-cancelar="btn-criar-competencia-cancelar" test-id-confirmar="btn-criar-competencia-salvar"
       @confirmar="salvar" @fechar="emit('fechar')" @shown="nextTick(() => inputRef?.$el?.focus())"
   >
     <BAlert v-if="fieldErrors?.generic" :model-value="true" class="mb-4" variant="danger">{{
@@ -133,3 +133,4 @@ id="descricao" ref="inputRef" v-model="novaComp.descricao" :state="erroDesc ? fa
   gap: 0.35rem;
 }
 </style>
+

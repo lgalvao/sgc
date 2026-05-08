@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <LayoutPadrao>
     <AppAlert
         v-if="lastError"
@@ -51,8 +51,8 @@
         :loading="loadingFinalizacao"
         :ok-title="TEXTOS.comum.BOTAO_FINALIZAR"
         :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
-        test-codigo-cancelar="btn-finalizar-processo-cancelar"
-        test-codigo-confirmar="btn-finalizar-processo-confirmar"
+        test-id-cancelar="btn-finalizar-processo-cancelar"
+        test-id-confirmar="btn-finalizar-processo-confirmar"
         variant="danger"
         @confirmar="confirmarFinalizacao">
       <p class="mb-2">
@@ -204,3 +204,4 @@ defineExpose({
   acoesBlocoVisiveis,
 });
 </script>
+

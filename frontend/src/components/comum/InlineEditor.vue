@@ -6,7 +6,7 @@
             ref="inputRef"
             v-model="editValue"
             :aria-label="ariaLabel"
-            :data-testid="testCodigoInput"
+            :data-testid="testIdInput"
             :size="size"
             :state="mensagemErroAtual ? false : null"
             @keydown.enter="save"
@@ -18,7 +18,7 @@
       </div>
       <BButton
           :aria-label="ariaLabelSave"
-          :data-testid="testCodigoSalvar"
+          :data-testid="testIdSalvar"
           :size="size"
           class="me-1"
           variant="outline-success"
@@ -28,7 +28,7 @@
       </BButton>
       <BButton
           :aria-label="ariaLabelCancel"
-          :data-testid="testCodigoCancelar"
+          :data-testid="testIdCancelar"
           :size="size"
           variant="outline-secondary"
           @click="cancel"
@@ -41,7 +41,7 @@
       <div v-if="canEdit" class="d-flex align-items-center gap-1 fade-controls me-2">
         <BButton
             :aria-label="ariaLabelEdit"
-            :data-testid="testCodigoEditar"
+            :data-testid="testIdEditar"
             :disabled="!editEnabled"
             :size="size"
             class="btn-compacto"
@@ -74,10 +74,10 @@ interface Props {
   ariaLabelSave?: string;
   ariaLabelCancel?: string;
   ariaLabelEdit?: string;
-  testCodigoInput?: string;
-  testCodigoSalvar?: string;
-  testCodigoCancelar?: string;
-  testCodigoEditar?: string;
+  testIdInput?: string;
+  testIdSalvar?: string;
+  testIdCancelar?: string;
+  testIdEditar?: string;
   mensagemErroObrigatoria?: string;
 }
 
@@ -89,10 +89,10 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabelSave: 'Salvar',
   ariaLabelCancel: 'Cancelar',
   ariaLabelEdit: 'Editar',
-  testCodigoInput: undefined,
-  testCodigoSalvar: undefined,
-  testCodigoCancelar: undefined,
-  testCodigoEditar: undefined,
+  testIdInput: undefined,
+  testIdSalvar: undefined,
+  testIdCancelar: undefined,
+  testIdEditar: undefined,
   mensagemErroObrigatoria: '',
 });
 

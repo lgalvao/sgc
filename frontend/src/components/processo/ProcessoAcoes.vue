@@ -25,7 +25,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <PageHeader :title="processo.descricao" title-test-codigo="processo-info">
+  <PageHeader :title="processo.descricao" title-test-id="processo-info">
     <template #default>
       <ProcessoInfo
           :show-data-limite="false"

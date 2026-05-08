@@ -80,6 +80,41 @@ describe("mapas store", () => {
         expect(context.store.dadosImpactoValidos(10)).toBe(false);
     });
 
+    it("garantirImpactoMapa deve reutilizar cache sem re-fetch quando dados são válidos", async () => {
+        const impacto = {
+            temImpactos: false,
+            totalAtividadesInseridas: 0,
+            totalAtividadesRemovidas: 0,
+            totalAtividadesAlteradas: 0,
+            totalCompetenciasImpactadas: 0,
+            atividadesInseridas: [],
+            atividadesRemovidas: [],
+            atividadesAlteradas: [],
+            competenciasImpactadas: [],
+        } as any;
+        vi.mocked(subprocessoService.verificarImpactosMapa).mockResolvedValue(impacto);
+
+        await context.store.garantirImpactoMapa(10);
+        await context.store.garantirImpactoMapa(10);
+
+        expect(subprocessoService.verificarImpactosMapa).toHaveBeenCalledTimes(1);
+    });
+
+    it("garantirImpactoMapa deve re-buscar após invalidação", async () => {
+        const impactoA = {temImpactos: false, totalAtividadesInseridas: 0, totalAtividadesRemovidas: 0, totalAtividadesAlteradas: 0, totalCompetenciasImpactadas: 0, atividadesInseridas: [], atividadesRemovidas: [], atividadesAlteradas: [], competenciasImpactadas: []} as any;
+        const impactoB = {temImpactos: true, totalAtividadesInseridas: 1, totalAtividadesRemovidas: 0, totalAtividadesAlteradas: 0, totalCompetenciasImpactadas: 0, atividadesInseridas: [], atividadesRemovidas: [], atividadesAlteradas: [], competenciasImpactadas: []} as any;
+        vi.mocked(subprocessoService.verificarImpactosMapa)
+            .mockResolvedValueOnce(impactoA)
+            .mockResolvedValueOnce(impactoB);
+
+        await context.store.garantirImpactoMapa(10);
+        context.store.invalidarImpacto(10);
+        const resultado = await context.store.garantirImpactoMapa(10);
+
+        expect(subprocessoService.verificarImpactosMapa).toHaveBeenCalledTimes(2);
+        expect(resultado.temImpactos).toBe(true);
+    });
+
     it("resetar deve limpar completamente o estado", () => {
         context.store.definirMapaCompleto(10, {
             codigo: 1,

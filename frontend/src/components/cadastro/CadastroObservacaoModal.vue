@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {computed} from 'vue';
 import {BFormGroup, BFormInvalidFeedback, BFormTextarea} from 'bootstrap-vue-next';
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -11,7 +11,7 @@ interface Props {
   okTitle?: string;
   texto?: string;
   observacao: string;
-  testCodigoConfirmar: string;
+  testIdConfirmar: string;
   inputId: string;
   inputDataTestid: string;
   label: string;
@@ -56,7 +56,7 @@ const observacaoModel = computed({
       :auto-close="false"
       :loading="loading"
       :ok-title="okTitle"
-      :test-codigo-confirmar="testCodigoConfirmar"
+      :test-id-confirmar="testIdConfirmar"
       :titulo="titulo"
       :variant="variant"
       @confirmar="$emit('confirmar')"
@@ -80,3 +80,4 @@ const observacaoModel = computed({
     </BFormGroup>
   </ModalConfirmacao>
 </template>
+

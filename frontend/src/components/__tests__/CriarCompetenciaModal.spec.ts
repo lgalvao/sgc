@@ -1,4 +1,4 @@
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+﻿import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {flushPromises, mount} from "@vue/test-utils";
 import {BCard, BFormCheckbox, BFormTextarea} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
@@ -8,11 +8,11 @@ const ModalPadraoStub = {
     template: `
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
-            <button :data-testid="testCodigoCancelar" @click="$emit('fechar')">Cancelar</button>
-            <button :data-testid="testCodigoConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ textoAcao }}</button>
+            <button :data-testid="testIdCancelar" @click="$emit('fechar')">Cancelar</button>
+            <button :data-testid="testIdConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ textoAcao }}</button>
         </div>
     `,
-    props: ["modelValue", "testCodigoCancelar", "testCodigoConfirmar", "textoAcao", "loading"],
+    props: ["modelValue", "testIdCancelar", "testIdConfirmar", "textoAcao", "loading"],
     emits: ["update:modelValue", "fechar", "confirmar", "shown"],
 };
 
@@ -165,3 +165,4 @@ describe("CriarCompetenciaModal.vue", () => {
     });
 
 });
+

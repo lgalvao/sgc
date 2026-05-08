@@ -1,10 +1,10 @@
-<template>
+﻿<template>
   <ModalPadrao
       :loading="loading"
       :model-value="mostrarModal"
       data-testid="mdl-alterar-data-limite"
-      test-codigo-cancelar="subprocesso-modal__btn-modal-cancelar"
-      test-codigo-confirmar="btn-modal-confirmar"
+      test-id-cancelar="subprocesso-modal__btn-modal-cancelar"
+      test-id-confirmar="btn-modal-confirmar"
       texto-acao="Alterar"
       titulo="Alterar data limite"
       variant-acao="success"
@@ -152,3 +152,4 @@ function confirmar() {
   emit('confirmarAlteracao', novaDataLimite.value);
 }
 </script>
+

@@ -1,4 +1,4 @@
-import {createTestingPinia} from "@pinia/testing";
+﻿import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
@@ -84,8 +84,8 @@ const stubs = {
     HistoricoAnaliseModal: {template: '<div v-if="mostrar"></div>', props: ['mostrar']},
     AceitarMapaModal: {template: '<div />'},
     ModalPadrao: {
-        props: ['modelValue', 'testCodigoCancelar'],
-        template: '<div v-if="modelValue"><slot /><button :data-testid="testCodigoCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
+        props: ['modelValue', 'testIdCancelar'],
+        template: '<div v-if="modelValue"><slot /><button :data-testid="testIdCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
     },
     ModalConfirmacao: {
         props: ['modelValue', 'titulo'],
@@ -347,3 +347,4 @@ describe("MapaView somente leitura", () => {
         expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(123);
     });
 });
+

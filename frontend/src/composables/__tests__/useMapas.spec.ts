@@ -91,9 +91,9 @@ describe("useMapas", () => {
         expect(mapas.impactoMapa.value).toEqual(mockImpacto);
     });
 
-    it("deve recalcular o impacto do mapa a cada nova busca", async () => {
+    it("deve reutilizar o cache de impacto ao buscar novamente sem invalidação", async () => {
         const mapas = useMapas();
-        const primeiroImpacto: ImpactoMapa = {
+        const impacto: ImpactoMapa = {
             temImpactos: true,
             totalAtividadesInseridas: 1,
             totalAtividadesRemovidas: 0,
@@ -104,19 +104,13 @@ describe("useMapas", () => {
             atividadesAlteradas: [],
             competenciasImpactadas: [],
         };
-        const segundoImpacto: ImpactoMapa = {
-            ...primeiroImpacto,
-            totalAtividadesInseridas: 2,
-        };
-        vi.mocked(service.verificarImpactosMapa)
-            .mockResolvedValueOnce(primeiroImpacto)
-            .mockResolvedValueOnce(segundoImpacto);
+        vi.mocked(service.verificarImpactosMapa).mockResolvedValue(impacto);
 
         await mapas.buscarImpactoMapa(1);
         await mapas.buscarImpactoMapa(1);
 
-        expect(service.verificarImpactosMapa).toHaveBeenCalledTimes(2);
-        expect(mapas.impactoMapa.value).toEqual(segundoImpacto);
+        expect(service.verificarImpactosMapa).toHaveBeenCalledTimes(1);
+        expect(mapas.impactoMapa.value).toEqual(impacto);
     });
 
     it("deve manter snapshots separados por subprocesso em views keepAlive", async () => {
@@ -172,7 +166,7 @@ describe("useMapas", () => {
             atividadesAlteradas: [],
             competenciasImpactadas: [],
         };
-        vi.mocked(service.verificarImpactosMapa).mockResolvedValue(mockImpacto);
+        vi.mocked(service.verificarImpactosMapa).mockReset().mockResolvedValue(mockImpacto);
         vi.mocked(service.obterMapaCompleto).mockResolvedValue({
             codigo: 1,
             subprocessoCodigo: 1,

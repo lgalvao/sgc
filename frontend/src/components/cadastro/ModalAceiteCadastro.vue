@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import CadastroObservacaoModal from "@/components/cadastro/CadastroObservacaoModal.vue";
 import {useCadastroObservacaoModalModel} from "@/components/cadastro/cadastroObservacaoModalModel";
 import {TEXTOS} from "@/constants/textos";
@@ -35,10 +35,11 @@ const {model, observacaoModel} = useCadastroObservacaoModalModel(props, emit);
       :label="TEXTOS.comum.OBSERVACAO"
       :loading="loading"
       :ok-title="acao?.rotuloConfirmacao"
-      :test-codigo-confirmar="'btn-aceite-cadastro-confirmar'"
+      :test-id-confirmar="'btn-aceite-cadastro-confirmar'"
       :texto="acao?.textoModal"
       :titulo="acao?.tituloModal"
       variant="success"
       @confirmar="$emit('confirmar')"
   />
 </template>
+

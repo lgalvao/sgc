@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {computed, ref} from "vue";
 import {BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -40,8 +40,8 @@ function focar() {
       :auto-close="false"
       :loading="loading"
       :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
-      test-codigo-cancelar="btn-devolucao-mapa-cancelar"
-      test-codigo-confirmar="btn-devolucao-mapa-confirmar"
+      test-id-cancelar="btn-devolucao-mapa-cancelar"
+      test-id-confirmar="btn-devolucao-mapa-confirmar"
       titulo="Devolver mapa"
       variant="danger"
       @confirmar="$emit('confirmar')"
@@ -58,3 +58,4 @@ function focar() {
     </BFormGroup>
   </ModalConfirmacao>
 </template>
+

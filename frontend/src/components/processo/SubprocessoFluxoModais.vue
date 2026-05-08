@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
@@ -52,7 +52,7 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
       :model-value="mostrarModalReabrir"
       :ok-title="TEXTOS.comum.BOTAO_REABRIR"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
-      test-codigo-confirmar="btn-confirmar-reabrir"
+      test-id-confirmar="btn-confirmar-reabrir"
       variant="success"
       @confirmar="$emit('confirmar-reabertura')"
       @update:model-value="$emit('update:mostrarModalReabrir', $event)"
@@ -84,7 +84,7 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
       :model-value="modalLembreteAberto"
       :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
-      test-codigo-confirmar="btn-confirmar-enviar-lembrete"
+      test-id-confirmar="btn-confirmar-enviar-lembrete"
       variant="success"
       @confirmar="$emit('confirmar-enviar-lembrete')"
       @update:model-value="$emit('update:modalLembreteAberto', $event)"
@@ -94,3 +94,4 @@ function atualizarJustificativaReabertura(valor: string | number | null) {
     </p>
   </ModalConfirmacao>
 </template>
+

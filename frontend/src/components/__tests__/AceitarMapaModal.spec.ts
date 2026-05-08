@@ -1,4 +1,4 @@
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+﻿import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
 import AceitarMapaModal from "@/components/mapa/modais/MapaAceitacaoModal.vue";
@@ -7,11 +7,11 @@ const ModalConfirmacaoStub = {
     template: `
         <div v-if="modelValue" :data-ok-title="okTitle" :data-titulo="titulo" data-testid="modal-stub">
             <slot />
-            <button :data-testid="testCodigoCancelar" :disabled="loading" @click="$emit('update:modelValue', false)">Cancelar</button>
-            <button :data-testid="testCodigoConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
+            <button :data-testid="testIdCancelar" :disabled="loading" @click="$emit('update:modelValue', false)">Cancelar</button>
+            <button :data-testid="testIdConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
         </div>
     `,
-    props: ["modelValue", "titulo", "okTitle", "testCodigoCancelar", "testCodigoConfirmar", "loading"],
+    props: ["modelValue", "titulo", "okTitle", "testIdCancelar", "testIdConfirmar", "loading"],
     emits: ["update:modelValue", "confirmar"],
 };
 
@@ -114,3 +114,4 @@ describe("AceitarMapaModal.vue", () => {
         expect(btnConfirmar.attributes("disabled")).toBeDefined();
     });
 });
+

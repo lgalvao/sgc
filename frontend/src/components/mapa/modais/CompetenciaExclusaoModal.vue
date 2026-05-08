@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {computed} from "vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
@@ -27,8 +27,9 @@ const mostrar = computed({
       :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(descricao)"
       :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
       data-testid="mdl-excluir-competencia"
-      test-codigo-confirmar="btn-confirmar-exclusao-competencia"
+      test-id-confirmar="btn-confirmar-exclusao-competencia"
       variant="danger"
       @confirmar="$emit('confirmar')"
   />
 </template>
+

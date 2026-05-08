@@ -1,4 +1,4 @@
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+﻿import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {mount} from "@vue/test-utils";
 import {BFormInput} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
@@ -10,7 +10,7 @@ const ModalPadraoStub = {
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
             <button
-                :data-testid="testCodigoCancelar || 'btn-modal-padrao-cancelar'"
+                :data-testid="testIdCancelar || 'btn-modal-padrao-cancelar'"
                 :disabled="loading"
                 @click="$emit('fechar')"
             >
@@ -19,7 +19,7 @@ const ModalPadraoStub = {
             <slot name="acao" />
         </div>
     `,
-    props: ["modelValue", "testCodigoCancelar", "loading"],
+    props: ["modelValue", "testIdCancelar", "loading"],
     emits: ["update:modelValue", "fechar", "confirmar"],
 };
 
@@ -153,3 +153,4 @@ describe("DisponibilizarMapaModal.vue", () => {
         expect((updatedObsTextarea.element as HTMLTextAreaElement).value).toBe("");
     });
 });
+

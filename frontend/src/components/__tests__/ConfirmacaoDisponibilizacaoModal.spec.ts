@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest'
+﻿import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
 import ConfirmacaoDisponibilizacaoModal from '../mapa/ConfirmacaoDisponibilizacaoModal.vue'
 
@@ -13,11 +13,11 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         template: `
             <div v-if="modelValue" :data-titulo="titulo" data-testid="modal-stub">
                 <slot />
-                <button :data-testid="testCodigoCancelar" @click="$emit('update:modelValue', false)">Cancelar</button>
-                <button :data-testid="testCodigoConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
+                <button :data-testid="testIdCancelar" @click="$emit('update:modelValue', false)">Cancelar</button>
+                <button :data-testid="testIdConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
             </div>
         `,
-        props: ['titulo', 'modelValue', 'testCodigoCancelar', 'testCodigoConfirmar', 'okTitle', 'loading'],
+        props: ['titulo', 'modelValue', 'testIdCancelar', 'testIdConfirmar', 'okTitle', 'loading'],
         emits: ['update:modelValue', 'confirmar']
     }
 
@@ -82,3 +82,4 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
     })
 
 })
+

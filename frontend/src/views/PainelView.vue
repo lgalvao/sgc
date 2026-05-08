@@ -5,7 +5,7 @@
     <template v-else>
       <!-- Tabela de Processos -->
       <div class="mb-5">
-        <PageHeader :title="TEXTOS.painel.PROCESSOS" title-test-codigo="txt-painel-titulo-processos">
+        <PageHeader :title="TEXTOS.painel.PROCESSOS" title-test-id="txt-painel-titulo-processos">
           <template #actions>
             <BButton
                 v-if="perfil.mostrarCriarProcesso.value"
@@ -30,7 +30,7 @@
       </div>
 
       <div>
-        <PageHeader :title="TEXTOS.painel.ALERTAS" title-test-codigo="txt-painel-titulo-alertas"/>
+        <PageHeader :title="TEXTOS.painel.ALERTAS" title-test-id="txt-painel-titulo-alertas"/>
         <div v-if="alertas.length > 0" class="table-responsive">
           <BTable
               :fields="camposAlertas"

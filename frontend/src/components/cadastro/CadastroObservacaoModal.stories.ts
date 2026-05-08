@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/vue3-vite';
+﻿import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect} from 'vitest';
 import {page} from 'vitest/browser';
 import {ref} from 'vue';
@@ -30,7 +30,7 @@ export const Aberto: Story = {
         okTitle: 'Devolver',
         texto: 'Informe o motivo da devolução do cadastro.',
         observacao: '',
-        testCodigoConfirmar: 'btn-modal-confirmar',
+        testIdConfirmar: 'btn-modal-confirmar',
         inputId: 'observacao-modal',
         inputDataTestid: 'inp-observacao-modal',
         label: 'Observação',
@@ -67,7 +67,7 @@ export const ComSucesso: Story = {
         okTitle: 'Aceitar',
         texto: 'Confirme o aceite do cadastro. Adicione uma observação se necessário.',
         observacao: '',
-        testCodigoConfirmar: 'btn-aceite-confirmar',
+        testIdConfirmar: 'btn-aceite-confirmar',
         inputId: 'observacao-aceite',
         inputDataTestid: 'inp-observacao-aceite',
         label: 'Observação (opcional)',
@@ -99,8 +99,8 @@ export const Carregando: Story = {
         titulo: 'Devolver Cadastro',
         okTitle: 'Devolver',
         texto: 'Aguarde enquanto processamos a devolução.',
-        observacao: 'Cadastro incompleto — faltam atividades essenciais.',
-        testCodigoConfirmar: 'btn-devolucao-confirmar',
+        observacao: 'Cadastro incompleto â€” faltam atividades essenciais.',
+        testIdConfirmar: 'btn-devolucao-confirmar',
         inputId: 'observacao-devolucao',
         inputDataTestid: 'inp-observacao-devolucao',
         label: 'Justificativa',
@@ -133,7 +133,7 @@ export const ComErro: Story = {
         okTitle: 'Devolver',
         texto: 'Informe o motivo da devolução.',
         observacao: '',
-        testCodigoConfirmar: 'btn-devolucao-confirmar',
+        testIdConfirmar: 'btn-devolucao-confirmar',
         inputId: 'observacao-devolucao-erro',
         inputDataTestid: 'inp-observacao-devolucao-erro',
         label: 'Justificativa',
@@ -160,3 +160,4 @@ export const ComErro: Story = {
         await expect.element(page.getByText('Não foi possível processar a solicitação. Tente novamente.')).toBeVisible();
     },
 };
+

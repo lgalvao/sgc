@@ -1,12 +1,12 @@
-<template>
+﻿<template>
   <ModalConfirmacao
       v-model="mostrarComputado"
       :auto-close="false"
       :loading="loading"
       :ok-title="TEXTOS.comum.BOTAO_DISPONIBILIZAR"
       :titulo="isRevisao ? TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TITULO : TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO"
-      test-codigo-cancelar="btn-disponibilizar-revisao-cancelar"
-      test-codigo-confirmar="btn-confirmar-disponibilizacao"
+      test-id-cancelar="btn-disponibilizar-revisao-cancelar"
+      test-id-confirmar="btn-confirmar-disponibilizacao"
       variant="success"
       @confirmar="confirmar"
   >
@@ -48,3 +48,4 @@ function confirmar() {
   emit('confirmar');
 }
 </script>
+

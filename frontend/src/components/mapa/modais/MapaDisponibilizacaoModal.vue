@@ -1,9 +1,9 @@
-<template>
+﻿<template>
   <ModalPadrao
       :loading="loading"
       :model-value="mostrar"
       data-testid="mdl-disponibilizar-mapa"
-      test-codigo-cancelar="btn-disponibilizar-mapa-cancelar"
+      test-id-cancelar="btn-disponibilizar-mapa-cancelar"
       texto-acao="Disponibilizar"
       texto-acao-carregando="Disponibilizando..."
       titulo="Disponibilização do mapa de competências"
@@ -174,3 +174,6 @@ function extrairData(data?: string) {
   return data?.split("T")[0] ?? "";
 }
 </script>
+
+
+

@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+﻿import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
@@ -134,8 +134,8 @@ describe('SubprocessoView.vue', () => {
         SubprocessoModal: SubprocessoModalStub,
         ModalConfirmacao: {
             name: 'ModalConfirmacao',
-            template: '<div><slot /><button :data-testid="testCodigoConfirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>',
-            props: ['modelValue', 'titulo', 'testCodigoConfirmar', 'okDisabled'],
+            template: '<div><slot /><button :data-testid="testIdConfirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>',
+            props: ['modelValue', 'titulo', 'testIdConfirmar', 'okDisabled'],
             emits: ['update:modelValue', 'confirmar']
         },
         AppAlert: {
@@ -613,3 +613,4 @@ describe('SubprocessoView.vue', () => {
         expect(wrapper.find('[data-testid="empty-state-movimentacoes"]').exists()).toBe(true);
     });
 });
+

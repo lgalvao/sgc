@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ModalPadrao
       :id="id"
       v-model="mostrar"
@@ -7,8 +7,8 @@
       :titulo="titulo"
       data-testid="mdl-acao-bloco"
       tamanho="lg"
-      test-codigo-cancelar="btn-acao-bloco-cancelar"
-      test-codigo-confirmar="btn-acao-bloco-confirmar"
+      test-id-cancelar="btn-acao-bloco-cancelar"
+      test-id-confirmar="btn-acao-bloco-confirmar"
       variant-acao="success"
       @confirmar="confirmar"
       @fechar="fechar"
@@ -231,3 +231,4 @@ watch(() => props.unidadesPreSelecionadas, (newVal) => {
   selecionadosLocal.value = [...newVal];
 }, {immediate: true});
 </script>
+

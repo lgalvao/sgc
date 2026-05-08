@@ -53,7 +53,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
     <PageHeader
         :subtitle="subprocesso.unidade?.nome ?? ''"
         :title="subprocesso.unidade?.sigla ?? siglaUnidadeFallback"
-        title-test-codigo="subprocesso-header__txt-header-unidade"
+        title-test-id="subprocesso-header__txt-header-unidade"
     >
       <template #actions>
         <BDropdown

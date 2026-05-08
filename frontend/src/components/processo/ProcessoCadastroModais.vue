@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <!-- Modal de confirmação cadastro -->
     <ModalConfirmacao
@@ -8,8 +8,8 @@
         :model-value="mostrarConfirmacao"
         :ok-title="TEXTOS.comum.BOTAO_INICIAR"
         :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
-        test-codigo-cancelar="btn-iniciar-processo-cancelar"
-        test-codigo-confirmar="btn-iniciar-processo-confirmar"
+        test-id-cancelar="btn-iniciar-processo-cancelar"
+        test-id-confirmar="btn-iniciar-processo-confirmar"
         variant="success"
         @confirmar="$emit('confirmar-iniciar')"
         @update:model-value="$emit('update:mostrarConfirmacao', $event)"
@@ -67,3 +67,4 @@ defineEmits<{
   margin-bottom: 0.5rem;
 }
 </style>
+

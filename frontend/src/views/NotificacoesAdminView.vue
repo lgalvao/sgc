@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <LayoutPadrao>
     <CarregamentoPagina v-if="carregando"/>
 
@@ -134,7 +134,7 @@
         :loading="reenviando"
         :ok-title="TEXTOS.administracao.NOTIFICACOES_REENVIAR"
         :titulo="TEXTOS.administracao.NOTIFICACOES_MODAL_REENVIAR_TITULO"
-        test-codigo-confirmar="btn-notificacoes-reenviar-confirmar"
+        test-id-confirmar="btn-notificacoes-reenviar-confirmar"
         variant="danger"
         @confirmar="reenviar"
     >
@@ -310,3 +310,4 @@ onMounted(() => {
   background: var(--bs-body-bg);
 }
 </style>
+
