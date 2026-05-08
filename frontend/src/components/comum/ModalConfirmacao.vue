@@ -21,7 +21,7 @@
       <div class="d-flex justify-content-end w-100 footer-confirmacao gap-3 align-items-center">
         <BButton
             ref="btnCancelar"
-            :data-testid="testCodigoCancelar || 'btn-modal-confirmacao-cancelar'"
+            :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
             :disabled="loading"
             class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
             variant="link"
@@ -30,7 +30,7 @@
           {{ cancelTitle }}
         </BButton>
         <BButton
-            :data-testid="testCodigoConfirmar || 'btn-modal-confirmacao-confirmar'"
+            :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
             :disabled="loading || okDisabled"
             :variant="((okVariant || variant || 'primary') as unknown as ButtonVariant)"
             @click="confirmar"
@@ -57,8 +57,8 @@ const props = withDefaults(defineProps<{
   titulo: string;
   mensagem?: string;
   variant?: string;
-  testCodigoConfirmar?: string;
-  testCodigoCancelar?: string;
+  testIdConfirmar?: string;
+  testIdCancelar?: string;
   loading?: boolean;
   okTitle?: string;
   cancelTitle?: string;
@@ -73,8 +73,8 @@ const props = withDefaults(defineProps<{
   okDisabled: false,
   autoClose: true,
   mensagem: '',
-  testCodigoConfirmar: '',
-  testCodigoCancelar: '',
+  testIdConfirmar: '',
+  testIdCancelar: '',
   okVariant: '',
 });
 

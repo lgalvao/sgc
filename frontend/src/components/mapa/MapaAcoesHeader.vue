@@ -92,7 +92,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
             variant="outline-secondary"
             @click="$emit('abrir-historico')"
         >
-          {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
+          <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
         </BButton>
 
         <LoadingButton

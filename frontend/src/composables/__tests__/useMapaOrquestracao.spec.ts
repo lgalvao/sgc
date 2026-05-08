@@ -43,7 +43,7 @@ describe("useMapaOrquestracao", () => {
         expect(codigoSubprocesso.value).toBe(123);
         expect(unidade.value).toEqual(expect.objectContaining({sigla: "TEST"}));
         expect(mapasStoreMock.definirMapaCompleto).toHaveBeenCalledWith(123, expect.objectContaining({codigo: 77}));
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST");
+        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST", false);
         expect(carregandoInicial.value).toBe(false);
     });
 

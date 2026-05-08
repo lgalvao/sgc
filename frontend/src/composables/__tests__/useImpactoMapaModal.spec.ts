@@ -37,4 +37,15 @@ describe("useImpactoMapaModal", () => {
         expect(composable.mostrarModalImpacto.value).toBe(false);
         expect(composable.loadingImpacto.value).toBe(true);
     });
+
+    it("nao deve disparar nova busca de impacto enquanto a anterior estiver carregando", async () => {
+        const buscarImpactoMapa = vi.fn().mockResolvedValue(undefined);
+        const composable = useImpactoMapaModal(ref<number | null>(123), buscarImpactoMapa);
+        composable.loadingImpacto.value = true;
+
+        await composable.abrirModalImpacto();
+
+        expect(composable.mostrarModalImpacto.value).toBe(true);
+        expect(buscarImpactoMapa).not.toHaveBeenCalled();
+    });
 });

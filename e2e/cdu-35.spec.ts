@@ -19,7 +19,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
                                                                                              }) => {
         test.slow();
         const descricaoProcesso = `Relatório CDU-35 ${Date.now()}`;
-        const processo = await criarProcessoFixture(request, {
+        await criarProcessoFixture(request, {
             descricao: descricaoProcesso,
             tipo: 'MAPEAMENTO',
             unidade: 'ASSESSORIA_12',

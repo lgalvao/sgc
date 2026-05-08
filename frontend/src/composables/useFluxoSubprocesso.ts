@@ -179,7 +179,7 @@ export function useFluxoSubprocesso() {
                 redirecionarPara: options?.redirecionarPara,
                 invalidarCaches: redirecionarParaPainel
                     ? {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
-                    : {}
+                    : undefined
             }
         );
     }
@@ -198,7 +198,7 @@ export function useFluxoSubprocesso() {
                 redirecionarPara: options?.redirecionarPara,
                 invalidarCaches: redirecionarParaPainel
                     ? {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
-                    : {}
+                    : undefined
             }
         );
     }

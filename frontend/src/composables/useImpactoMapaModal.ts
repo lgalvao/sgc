@@ -10,6 +10,10 @@ export function useImpactoMapaModal(
     async function abrirModalImpacto() {
         mostrarModalImpacto.value = true;
 
+        if (loadingImpacto.value) {
+            return;
+        }
+
         const codigo = toValue(codSubprocesso);
         if (!codigo) {
             return;

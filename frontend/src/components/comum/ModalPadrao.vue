@@ -13,7 +13,7 @@
     <template #footer>
       <div class="d-flex justify-content-end w-100 footer-modal-padrao gap-3 align-items-center">
         <BButton
-            :data-testid="testCodigoCancelar || 'btn-modal-padrao-cancelar'"
+            :data-testid="testIdCancelar || 'btn-modal-padrao-cancelar'"
             :disabled="loading"
             :class="variantCancelar === 'link' ? 'text-decoration-none text-secondary fw-medium btn-cancelar-link' : ''"
             :variant="variantCancelar"
@@ -24,7 +24,7 @@
         <slot name="acao">
           <BButton
               v-if="mostrarBotaoAcao"
-              :data-testid="testCodigoConfirmar || 'btn-modal-padrao-confirmar'"
+              :data-testid="testIdConfirmar || 'btn-modal-padrao-confirmar'"
               :disabled="loading || acaoDesabilitada"
               :variant="variantAcao"
               @click="emit('confirmar')"
@@ -61,8 +61,8 @@ const props = withDefaults(defineProps<{
   loading?: boolean;
   acaoDesabilitada?: boolean;
   mostrarBotaoAcao?: boolean;
-  testCodigoConfirmar?: string;
-  testCodigoCancelar?: string;
+  testIdConfirmar?: string;
+  testIdCancelar?: string;
 }>(), {
   tamanho: undefined,
   fade: false,
@@ -75,8 +75,8 @@ const props = withDefaults(defineProps<{
   loading: false,
   acaoDesabilitada: false,
   mostrarBotaoAcao: true,
-  testCodigoConfirmar: "",
-  testCodigoCancelar: "",
+  testIdConfirmar: "",
+  testIdCancelar: "",
 });
 
 const emit = defineEmits<{

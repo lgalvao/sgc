@@ -35,6 +35,7 @@ export function useMapaOrquestracao(
                 const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
                     Number(props.codProcesso),
                     props.sigla,
+                    false,
                 );
                 if (resultado) {
                     contexto = resultado.contexto;

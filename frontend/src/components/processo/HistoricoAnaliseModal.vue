@@ -82,7 +82,8 @@
       <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
         <BButton
             data-testid="btn-modal-fechar"
-            variant="secondary"
+            variant="link"
+            class="text-decoration-none text-secondary fw-medium btn-fechar-link"
             @click="fechar"
         >
           Fechar
@@ -143,6 +144,17 @@ function formatarAcaoAnalise(acao: string | null | undefined): string {
 </script>
 
 <style scoped>
+.btn-fechar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-fechar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
+}
+
 .texto-truncado-usuario {
   display: inline-block;
   max-width: 16rem;

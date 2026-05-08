@@ -52,8 +52,7 @@ Ator: GESTOR e ADMIN
     - `Resultado`: 'Devolução para ajustes'
     - `Observação`: A observação caso tenha sido fornecida.
 
-   8.6. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do
-   subprocesso.
+   8.6. O sistema identifica a unidade de devolução como sendo a *unidade de origem da última movimentação do subprocesso*.
 
    8.7. O sistema registra uma movimentação para o subprocesso com:
 
@@ -63,8 +62,8 @@ Ator: GESTOR e ADMIN
     - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
 
    8.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso
-   para 'Mapa disponibilizado' e apaga a data/hora de conclusão da etapa 2 do subprocesso da unidade.
-
+   para 'Mapa disponibilizado' e apaga a data/hora de conclusão da Etapa 2 do subprocesso da unidade.
+   
    8.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
    ```text

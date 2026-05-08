@@ -26,7 +26,6 @@ const mostrar = computed({
       :mostrar-botao-acao="false"
       test-codigo-cancelar="btn-ver-sugestoes-mapa-fechar"
       texto-cancelar="Fechar"
-      variant-cancelar="secondary"
       titulo="Sugestões sobre o mapa"
       @fechar="$emit('fechar')"
   >

@@ -83,7 +83,8 @@
         <BButton
             data-testid="btn-fechar-impacto"
             type="button"
-            variant="secondary"
+            variant="link"
+            class="text-decoration-none text-secondary fw-medium btn-fechar-link"
             @click="fechar"
         >
           {{ TEXTOS.comum.BOTAO_FECHAR }}
@@ -125,6 +126,17 @@ function fechar() {
 </script>
 
 <style scoped>
+.btn-fechar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-fechar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
+}
+
 .impacto-container {
   max-height: 60vh;
   overflow-y: auto;

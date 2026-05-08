@@ -20,7 +20,6 @@
             data-testid="btn-editar-competencia"
             size="sm"
             title="Editar"
-            variant="outline-secondary"
             @click="emit('editar', competencia)"
         >
           <i aria-hidden="true" class="bi bi-pencil"/>
@@ -33,7 +32,6 @@
             data-testid="btn-excluir-competencia"
             size="sm"
             title="Excluir"
-            variant="outline-secondary"
             @click="emit('excluir', competencia.codigo)"
         >
           <i aria-hidden="true" class="bi bi-trash"/>
@@ -59,8 +57,7 @@
                   class="botao-acao-inline"
                   data-testid="btn-remover-atividade-associada"
                   size="sm"
-                  title="Remover atividade"
-                  variant="outline-secondary"
+                  title="Excluir"
                   @click="emit('removerAtividade', competencia.codigo, atividade.codigo)"
               >
                 <i aria-hidden="true" class="bi bi-trash"/>
@@ -131,14 +128,28 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
 }
 
 .botao-acao {
-  width: 2rem;
-  height: 2rem;
+  width: 2.2rem;
+  height: 2.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  font-size: 1.1rem;
-  border-width: 2px;
+  font-size: 1rem;
+  border: none;
+  background-color: #e0e0e0;
+  color: var(--bs-secondary);
+  transition: all 0.2s;
+}
+
+.botao-acao:hover {
+  background-color: var(--bs-primary-bg-subtle);
+  color: var(--bs-primary);
+  transform: translateY(-1px);
+}
+
+.botao-acao[data-testid="btn-excluir-competencia"]:hover {
+  background-color: var(--bs-danger-bg-subtle);
+  color: var(--bs-danger);
 }
 
 .atividade-associada-card-item {
@@ -178,13 +189,23 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
 }
 
 .botao-acao-inline {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.6rem;
+  height: 1.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   font-size: 0.8rem;
-  border-width: 1px;
+  border: none;
+  background-color: #f0f0f0;
+  color: var(--bs-secondary);
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: 0.15rem;
+}
+
+.botao-acao-inline:hover {
+  background-color: var(--bs-danger-bg-subtle);
+  color: var(--bs-danger);
 }
 </style>

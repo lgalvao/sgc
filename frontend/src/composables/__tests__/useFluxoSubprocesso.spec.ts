@@ -37,6 +37,8 @@ const subprocessoStoreMock = {
     limparContextoAtual: vi.fn()
 };
 
+const invalidarCachesSubprocessoMock = vi.fn();
+
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => subprocessoStoreMock
 }));
@@ -55,7 +57,7 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
     useInvalidacaoNavegacao: () => ({
-        invalidarCachesSubprocesso: vi.fn()
+        invalidarCachesSubprocesso: invalidarCachesSubprocessoMock
     })
 }));
 
@@ -65,6 +67,7 @@ describe("useFluxoSubprocesso", () => {
         subprocessoStoreMock.garantirContextoCadastroAtividades.mockReset();
         subprocessoStoreMock.garantirContextoEdicao.mockReset();
         subprocessoStoreMock.limparContextoAtual.mockReset();
+        invalidarCachesSubprocessoMock.mockReset();
     });
 
     it("deve validar cadastro", async () => {
@@ -141,6 +144,19 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.homologarCadastro).toHaveBeenCalledWith(123, req);
+    });
+
+    it("não deve invalidar caches ao homologar cadastro sem redirecionar para o painel", async () => {
+        const {homologarCadastro} = useFluxoSubprocesso();
+        vi.mocked(cadastroService.homologarCadastro).mockResolvedValue({} as any);
+
+        const success = await homologarCadastro(123, {} as any, {
+            redirecionarParaPainel: false,
+            redirecionarPara: {name: "Subprocesso", params: {codProcesso: 1, siglaUnidade: "TEST"}}
+        });
+
+        expect(success).toBe(true);
+        expect(invalidarCachesSubprocessoMock).not.toHaveBeenCalled();
     });
 
     it("deve alterar data limite do subprocesso", async () => {
