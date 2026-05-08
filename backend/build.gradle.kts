@@ -49,7 +49,9 @@ dependencies {
     implementation(libs.h2)
     implementation(libs.springdoc.openapi)
 
-    developmentOnly(libs.spring.boot.devtools)
+    if (project.findProperty("ENV")?.toString() != "hom") {
+        developmentOnly(libs.spring.boot.devtools)
+    }
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.spring.boot.configuration.processor)
