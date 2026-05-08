@@ -103,22 +103,36 @@ tasks.named<BootRun>("bootRun") {
     mainClass.set("sgc.Sgc")
     val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "e2e"
     val envFile = rootProject.file(".env.$env")
+    val envLocalFile = rootProject.file(".env.$env.local")
     systemProperty("spring.profiles.active", env)
     println("Perfil Spring ativado: $env")
 
-    if (envFile.exists()) {
-        println("Carregando configurações de: .env.$env")
-        envFile.useLines { lines ->
+    fun carregarConfiguracoesEnv(arquivo: File, sobrescreverExistente: Boolean) {
+        println("Carregando configurações de: ${arquivo.name}")
+        arquivo.useLines { lines ->
             lines.filter { it.isNotBlank() && !it.trim().startsWith("#") }
                 .forEach { line ->
                     val parts = line.split("=", limit = 2)
                     if (parts.size == 2) {
-                        environment(parts[0].trim(), parts[1].trim())
+                        val chave = parts[0].trim()
+                        val valor = parts[1].trim()
+                        val jaDefinidoNoAmbiente = environment.containsKey(chave) || System.getenv().containsKey(chave)
+                        if (sobrescreverExistente || !jaDefinidoNoAmbiente) {
+                            environment(chave, valor)
+                        }
                     }
                 }
         }
+    }
+
+    if (envFile.exists()) {
+        carregarConfiguracoesEnv(envFile, false)
     } else {
         println("Arquivo .env.$env não encontrado, usando configurações padrão do application.yml")
+    }
+
+    if (envLocalFile.exists()) {
+        carregarConfiguracoesEnv(envLocalFile, true)
     }
 }
 

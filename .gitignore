@@ -41,6 +41,7 @@ etc/scripts/.vitest/
 
 # Privacidade/segurança
 !.env.hom
+.env.*.local
 
 # Reports de testes
 backend/build/reports/tests/test/

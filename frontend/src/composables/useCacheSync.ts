@@ -1,6 +1,6 @@
 import {useUnidadeStore} from "@/stores/unidade";
 import {useOrganizacaoStore} from "@/stores/organizacao";
-import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {usePainelStore} from "@/stores/painel";
 
 const EVENTO_CACHE_ATUALIZADO = "org-cache-refreshed";
 
@@ -16,14 +16,14 @@ const EVENTO_CACHE_ATUALIZADO = "org-cache-refreshed";
 export function useCacheSync() {
     const unidadeStore = useUnidadeStore();
     const organizacaoStore = useOrganizacaoStore();
-    const {invalidarCachesProcesso} = useInvalidacaoNavegacao();
+    const painelStore = usePainelStore();
 
     const source = new EventSource("/api/eventos");
 
     source.addEventListener(EVENTO_CACHE_ATUALIZADO, () => {
         unidadeStore.invalidarCache();
         organizacaoStore.invalidar();
-        invalidarCachesProcesso();
+        painelStore.invalidar();
     });
 
     source.addEventListener("error", () => {

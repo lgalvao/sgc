@@ -6,8 +6,7 @@ import {usePainelStore} from '@/stores/painel';
 import {useProcessoStore} from '@/stores/processo';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {useMapasStore} from '@/stores/mapas';
-import {createTestingPinia} from '@pinia/testing';
-import {setActivePinia} from 'pinia';
+import {createPinia, setActivePinia} from 'pinia';
 
 // Global to hold the last created instance
 let lastInstance: EventSourceMock | null = null;
@@ -54,9 +53,7 @@ describe('useCacheSync', () => {
     let mapasStore: any;
 
     beforeEach(() => {
-        setActivePinia(createTestingPinia({
-            createSpy: vi.fn,
-        }));
+        setActivePinia(createPinia());
         unidadeStore = useUnidadeStore();
         organizacaoStore = useOrganizacaoStore();
         painelStore = usePainelStore();
@@ -65,6 +62,12 @@ describe('useCacheSync', () => {
         mapasStore = useMapasStore();
         lastInstance = null;
         vi.clearAllMocks();
+        vi.spyOn(unidadeStore, 'invalidarCache');
+        vi.spyOn(organizacaoStore, 'invalidar');
+        vi.spyOn(painelStore, 'invalidar');
+        vi.spyOn(processoStore, 'invalidar');
+        vi.spyOn(subprocessoStore, 'invalidar');
+        vi.spyOn(mapasStore, 'invalidar');
     });
 
     it('deve conectar ao EventSource na URL correta', () => {
@@ -73,7 +76,7 @@ describe('useCacheSync', () => {
         closeSync();
     });
 
-    it('deve invalidar os caches quando receber o evento org-cache-refreshed', () => {
+    it('deve invalidar apenas os caches organizacionais quando receber o evento org-cache-refreshed', () => {
         useCacheSync();
 
         lastInstance?.emit('org-cache-refreshed', {});
@@ -81,9 +84,9 @@ describe('useCacheSync', () => {
         expect(unidadeStore.invalidarCache).toHaveBeenCalled();
         expect(organizacaoStore.invalidar).toHaveBeenCalled();
         expect(painelStore.invalidar).toHaveBeenCalled();
-        expect(processoStore.invalidar).toHaveBeenCalled();
-        expect(subprocessoStore.invalidar).toHaveBeenCalled();
-        expect(mapasStore.invalidar).toHaveBeenCalled();
+        expect(processoStore.invalidar).not.toHaveBeenCalled();
+        expect(subprocessoStore.invalidar).not.toHaveBeenCalled();
+        expect(mapasStore.invalidar).not.toHaveBeenCalled();
     });
 
     it('não deve fechar a conexão em caso de erro transitório', () => {
