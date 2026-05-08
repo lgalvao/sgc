@@ -62,11 +62,12 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         try {
             const sucesso = await executarComTratamentoErro(async () => {
                 sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
-                mostrarModalVerSugestoes.value = true;
             }, TEXTOS.mapa.ERRO_SUGESTOES);
             if (!sucesso) {
                 sugestoesVisualizacao.value = "";
+                return;
             }
+            mostrarModalVerSugestoes.value = true;
         } finally {
             loadingSugestoesVisualizacao.value = false;
         }
@@ -109,10 +110,13 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
 
         try {
             loadingSugestoesEnvio.value = true;
-            await executarComTratamentoErro(async () => {
+            const sucesso = await executarComTratamentoErro(async () => {
                 await apresentarSugestoes(codigoSubprocesso.value!, {sugestoes: sugestoes.value});
                 await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
             }, TEXTOS.mapa.ERRO_SUGESTOES);
+            if (!sucesso) {
+                return;
+            }
         } finally {
             loadingSugestoesEnvio.value = false;
         }

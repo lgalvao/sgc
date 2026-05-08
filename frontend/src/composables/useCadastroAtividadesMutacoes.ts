@@ -37,25 +37,32 @@ export function useCadastroAtividadesMutacoes({
     const loadingRemocao = ref(false);
     const mostrarModalConfirmacaoRemocao = ref(false);
 
+    type ResultadoExecucao<T> =
+        | { sucesso: true; resultado: T }
+        | { sucesso: false };
+
     async function executarComTratamentoErro<T>(
         operacao: () => Promise<T>,
         aoFalhar: (erro: unknown) => void
-    ): Promise<T | null> {
+    ): Promise<ResultadoExecucao<T>> {
         try {
-            return await withErrorHandling(operacao);
+            return {
+                sucesso: true,
+                resultado: await withErrorHandling(operacao),
+            };
         } catch (erro) {
             aoFalhar(erro);
-            return null;
+            return {sucesso: false};
         }
     }
 
     const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
-        const response = await executarComTratamentoErro(
-            () => acao(),
+        const resultado = await executarComTratamentoErro(async () => {
+            processarRespostaLocal(await acao());
+        },
             () => notify(msg, "danger"),
         );
-        if (!response) return false;
-        processarRespostaLocal(response);
+        if (!resultado.sucesso) return false;
         return true;
     };
 
@@ -73,14 +80,14 @@ export function useCadastroAtividadesMutacoes({
 
     async function adicionarAtividade(): Promise<boolean> {
         if (!codMapa.value || !codigoSubprocesso.value) return false;
-        const resp = await executarComTratamentoErro(
+        const resultado = await executarComTratamentoErro(
             () => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!),
             () => {
                 erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
             },
         );
-        if (!resp) return false;
-        processarRespostaLocal(resp);
+        if (!resultado.sucesso || !resultado.resultado) return false;
+        processarRespostaLocal(resultado.resultado);
         erroNovaAtividade.value = null;
         return true;
     }
@@ -90,11 +97,13 @@ export function useCadastroAtividadesMutacoes({
         const {tipo, atividadeCodigo, conhecimentoCodigo} = dadosRemocao.value;
         loadingRemocao.value = true;
         try {
-            const sucesso = await executarComTratamentoErro(async () => {
-                const resp = tipo === "atividade" ? await atividadeService.excluirAtividade(atividadeCodigo) : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
-                processarRespostaLocal(resp);
+            const resultado = await executarComTratamentoErro(async () => {
+                return tipo === "atividade"
+                    ? await atividadeService.excluirAtividade(atividadeCodigo)
+                    : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
             }, (erro) => notify(lastError.value?.mensagem || (erro as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger"));
-            if (sucesso) {
+            if (resultado.sucesso && resultado.resultado) {
+                processarRespostaLocal(resultado.resultado);
                 dadosRemocao.value = null;
             }
             mostrarModalConfirmacaoRemocao.value = false;
