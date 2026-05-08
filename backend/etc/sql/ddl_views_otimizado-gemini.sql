@@ -228,6 +228,6 @@ from (select a.usuario_titulo, 'ADMIN' as perfil, 1 as unidade_codigo
                join vw_unidade_2 u on r.unidade_codigo = u.codigo and u.tipo in ('INTEROPERACIONAL', 'OPERACIONAL')
       union
       select usu.titulo as usuario_titulo, 'SERVIDOR' as perfil, uni.codigo as unidade_codigo
-      from vw_usuario usu
+      from VW_USUARIO usu
                join vw_unidade_2 uni on usu.unidade_comp_codigo = uni.codigo
       where usu.titulo <> uni.titulo_titular);

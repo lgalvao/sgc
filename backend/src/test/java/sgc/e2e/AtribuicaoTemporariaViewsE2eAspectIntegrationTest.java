@@ -41,12 +41,12 @@ class AtribuicaoTemporariaViewsE2eAspectIntegrationTest {
         );
 
         String responsavelAtual = jdbcTemplate.queryForObject(
-                "SELECT usuario_titulo FROM sgc.vw_responsabilidade WHERE unidade_codigo = ?",
+                "SELECT usuario_titulo FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
                 String.class,
                 3L
         );
         String tipoResponsabilidade = jdbcTemplate.queryForObject(
-                "SELECT tipo FROM sgc.vw_responsabilidade WHERE unidade_codigo = ?",
+                "SELECT tipo FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
                 String.class,
                 3L
         );
@@ -104,7 +104,7 @@ class AtribuicaoTemporariaViewsE2eAspectIntegrationTest {
                 """);
 
         jdbcTemplate.update("""
-                MERGE INTO sgc.vw_responsabilidade
+                MERGE INTO sgc.VW_RESPONSABILIDADE
                 (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio, data_fim)
                 KEY(unidade_codigo)
                 VALUES (3, '555555', '00555555', 'TITULAR', CURRENT_TIMESTAMP, NULL)

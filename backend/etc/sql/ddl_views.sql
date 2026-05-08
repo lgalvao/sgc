@@ -211,16 +211,16 @@ select s.num_tit_ele                   as titulo,
                       decode(unidade_superior_codigo,
                              1, case
                                     when sigla = 'GP' then (select codigo
-                                                            from vw_unidade
+                                                            from VW_UNIDADE
                                                             where sigla = 'ASPRE'
                                                               and tipo = 'OPERACIONAL')
                                     else (select codigo
-                                          from vw_unidade
+                                          from VW_UNIDADE
                                           where sigla = 'SEDOC'
                                             and tipo = 'OPERACIONAL') end,
                              unidade_superior_codigo),
                       codigo)
-        from vw_unidade
+        from VW_UNIDADE
         where codigo = l.cod_unid_tse) as unidade_comp_codigo
 from srh2.servidor s
          join srh2.lotacao l on s.mat_servidor = l.mat_servidor and l.dt_fim_lotacao is null
@@ -247,7 +247,7 @@ select u.codigo                                                                a
        coalesce(a.data_inicio, s.dt_ini_subst, u.data_inicio_titularidade)     as data_inicio,
        coalesce(a.data_termino, s.dt_fim_subst)                                as data_fim
 from (select codigo, matricula_titular, titulo_titular, data_inicio_titularidade
-      from vw_unidade
+      from VW_UNIDADE
       where situacao = 'ATIVA'
         and tipo in ('OPERACIONAL', 'INTEROPERACIONAL', 'INTERMEDIARIA')) u
          left join (select sub.mat_servidor, sub.mat_serv_com_subs, s.num_tit_ele, sub.dt_ini_subst, sub.dt_fim_subst
@@ -271,17 +271,17 @@ CREATE OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidad
 select usuario_titulo, perfil, unidade_codigo
 from (select a.usuario_titulo, 'ADMIN' as perfil, 1 as unidade_codigo
       from administrador a
-               join vw_usuario u on u.titulo = a.usuario_titulo
+               join VW_USUARIO u on u.titulo = a.usuario_titulo
       union
       select r.usuario_titulo, 'GESTOR' as perfil, r.unidade_codigo
-      from vw_responsabilidade r
-               join vw_unidade u on r.unidade_codigo = u.codigo and u.tipo in ('INTERMEDIARIA', 'INTEROPERACIONAL')
+      from VW_RESPONSABILIDADE r
+               join VW_UNIDADE u on r.unidade_codigo = u.codigo and u.tipo in ('INTERMEDIARIA', 'INTEROPERACIONAL')
       union
       select r.usuario_titulo, 'CHEFE' as perfil, r.unidade_codigo
-      from vw_responsabilidade r
-               join vw_unidade u on r.unidade_codigo = u.codigo and u.tipo in ('INTEROPERACIONAL', 'OPERACIONAL')
+      from VW_RESPONSABILIDADE r
+               join VW_UNIDADE u on r.unidade_codigo = u.codigo and u.tipo in ('INTEROPERACIONAL', 'OPERACIONAL')
       union
       select usu.titulo as usuario_titulo, 'SERVIDOR' as perfil, uni.codigo as unidade_codigo
-      from vw_usuario usu
-               join vw_unidade uni on usu.unidade_comp_codigo = uni.codigo
+      from VW_USUARIO usu
+               join VW_UNIDADE uni on usu.unidade_comp_codigo = uni.codigo
       where usu.titulo <> uni.titulo_titular);

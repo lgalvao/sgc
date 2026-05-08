@@ -112,15 +112,15 @@ class E2eControllerTest {
         jdbcTemplate.execute("TRUNCATE TABLE sgc.alerta");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.alerta_usuario");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.unidade_processo");
-        jdbcTemplate.execute("TRUNCATE TABLE sgc.vw_unidade");
-        jdbcTemplate.execute("TRUNCATE TABLE sgc.vw_usuario");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.VW_UNIDADE");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.VW_USUARIO");
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
 
         jdbcTemplate.execute(
-                "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (999, 'Teste"
+                "INSERT INTO sgc.VW_UNIDADE (codigo, nome, sigla, tipo, situacao) VALUES (999, 'Teste"
                         + " Unit', 'TESTE', 'OPERACIONAL', 'ATIVA')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.vw_usuario (titulo, nome) VALUES ('123', 'User teste')");
+                "INSERT INTO sgc.VW_USUARIO (titulo, nome) VALUES ('123', 'User teste')");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo, data_criacao, data_limite) VALUES (100,"
                         + " 'Processo teste', 'CRIADO', 'MAPEAMENTO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + 30)");
@@ -181,7 +181,7 @@ class E2eControllerTest {
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
 
         jdbcTemplate.execute(
-                "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
+                "INSERT INTO sgc.VW_UNIDADE (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
                         + " Unit', 'RST', 'OPERACIONAL', 'ATIVA')");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo, data_criacao, data_limite)"

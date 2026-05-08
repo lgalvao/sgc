@@ -36,7 +36,7 @@ DELETE
 FROM SGC.ADMINISTRADOR;
 
 DELETE
-FROM SGC.VW_RESPONSABILIDADE;
+FROM SGC.VW_RESPONSABILIDADE_BK;
 
 DELETE
 FROM SGC.UNIDADE_MAPA;
@@ -319,25 +319,25 @@ VALUES ('202020202020', 'GESTOR', 2);
 -- -------------------------------------------------------------------------------------------------
 -- VW_RESPONSABILIDADE - simulada como tabela no H2
 -- -------------------------------------------------------------------------------------------------
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (2, '777', '00000777', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (1, '7', '00000007', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (200, '2', '00000002', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (5, '5', '00000005', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (8, '3', '00000003', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (9, '333333333333', '33333333', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (10, '1', '00000001', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (11, '12', '00000012', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (6, '666666666666', '66666666', 'TITULAR', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+INSERT INTO SGC.VW_RESPONSABILIDADE_BK (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (101, '222222222222', '22222222', 'TITULAR', CURRENT_TIMESTAMP);
 
 -- -------------------------------------------------------------------------------------------------

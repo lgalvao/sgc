@@ -28,7 +28,7 @@ public class AtribuicaoTemporariaViewsE2eAspect {
     @Transactional
     public void sincronizarViews(Long codUnidade, CriarAtribuicaoRequest request) {
         String tituloAnterior = jdbcTemplate.queryForList(
-                "SELECT usuario_titulo FROM sgc.vw_responsabilidade WHERE unidade_codigo = ?",
+                "SELECT usuario_titulo FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
                 String.class,
                 codUnidade
         ).stream().findFirst().orElse(null);
@@ -44,7 +44,7 @@ public class AtribuicaoTemporariaViewsE2eAspect {
         );
 
         jdbcTemplate.update("""
-                        MERGE INTO sgc.vw_responsabilidade
+                        MERGE INTO sgc.VW_RESPONSABILIDADE
                         (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio, data_fim)
                         KEY(unidade_codigo)
                         VALUES (?, ?, ?, 'ATRIBUICAO_TEMPORARIA', ?, ?)

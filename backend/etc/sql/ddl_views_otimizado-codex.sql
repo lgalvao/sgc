@@ -5,15 +5,15 @@
 --
 -- Objetivo desta versao:
 -- * manter os mesmos nomes e colunas das views atuais;
--- * reduzir regex, subconsultas correlacionadas e reprocessamento de VW_UNIDADE_2;
+-- * reduzir regex, subconsultas correlacionadas e reprocessamento de VW_UNIDADE;
 -- * tornar filtros temporais mais amigaveis a indices, sem TRUNC nas colunas.
 
--- 1. View VW_VINCULACAO_UNIDADE_2
+-- 1. View VW_VINCULACAO_UNIDADE
 -- Otimizacao: substitui SYS_CONNECT_BY_PATH + REGEXP por caminhada hierarquica direta
 -- a partir de cada unidade atual. LISTAGG ignora NULL, preservando NULL quando nao
 -- existem historicos alem da unidade anterior.
 
-CREATE OR REPLACE VIEW VW_VINCULACAO_UNIDADE_2
+CREATE OR REPLACE VIEW VW_VINCULACAO_UNIDADE
             (unidade_atual_codigo, unidade_anterior_codigo, demais_unidades_historicas) AS
 WITH hierarquia AS (
     SELECT CONNECT_BY_ROOT u.cd               AS unidade_atual_codigo,
@@ -35,12 +35,12 @@ FROM hierarquia
 GROUP BY unidade_atual_codigo, unidade_anterior_codigo;
 
 
--- 2. View VW_ZONA_RESP_CENTRAL_2
+-- 2. View VW_ZONA_RESP_CENTRAL
 -- Otimizacao: remove SELECT * intermediario e usa predicados temporais sargable.
 -- A condicao abaixo equivale ao intervalo legado baseado em TRUNC:
 -- sysdate between trunc(datainicio) and trunc(datatermino + 1).
 
-CREATE OR REPLACE VIEW VW_ZONA_RESP_CENTRAL_2
+CREATE OR REPLACE VIEW VW_ZONA_RESP_CENTRAL
             (codigo_central, sigla_central, codigo_zona_resp, sigla_zona_resp, data_inicio_resp, data_fim_resp) AS
 SELECT uni_c.cd             AS codigo_central,
        uni_c.sigla_unid_tse AS sigla_central,
@@ -79,18 +79,18 @@ FROM (
                    ON z.numero = uni_z.num_ze;
 
 
--- 3. View VW_UNIDADE_2
+-- 3. View VW_UNIDADE
 -- Otimizacao: calcula lotacao, quantidade de filhas, filhas complexas e titulares uma
 -- unica vez em CTEs agregadas. A regra de classificacao de tipo segue a view original.
 
-CREATE OR REPLACE VIEW VW_UNIDADE_2
+CREATE OR REPLACE VIEW VW_UNIDADE
             (codigo, nome, sigla, matricula_titular, titulo_titular, data_inicio_titularidade, tipo, situacao,
              unidade_superior_codigo)
 AS
 WITH zona_responsavel AS (
     SELECT codigo_central,
            MIN(codigo_zona_resp) AS codigo_zona_resp
-    FROM vw_zona_resp_central_2
+    FROM VW_ZONA_RESP_CENTRAL
     GROUP BY codigo_central
 ),
 tb_unidade AS (
@@ -227,18 +227,18 @@ FROM (
      );
 
 
--- 4. View VW_USUARIO_2
--- Otimizacao: substitui subconsulta por linha contra VW_UNIDADE_2 por joins sobre CTE
+-- 4. View VW_USUARIO
+-- Otimizacao: substitui subconsulta por linha contra VW_UNIDADE por joins sobre CTE
 -- materializavel pelo otimizador. O literal legado 'SEM EQUIPE' foi mantido para
 -- preservar a semantica da view original.
 
-CREATE OR REPLACE VIEW VW_USUARIO_2 (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
+CREATE OR REPLACE VIEW VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
 WITH unidade AS (
     SELECT codigo,
            sigla,
            tipo,
            unidade_superior_codigo
-    FROM vw_unidade_2
+    FROM VW_UNIDADE
 ),
 unidade_apoio AS (
     SELECT MIN(CASE WHEN sigla = 'ASPRE' AND tipo = 'OPERACIONAL' THEN codigo END) AS codigo_aspre,
@@ -284,10 +284,10 @@ FROM srh2.servidor s
          ) r;
 
 
--- 5. View VW_RESPONSABILIDADE_2
--- Otimizacao: reutiliza VW_UNIDADE_2 otimizada e torna os filtros de vigencia sargable.
+-- 5. View VW_RESPONSABILIDADE
+-- Otimizacao: reutiliza VW_UNIDADE otimizada e torna os filtros de vigencia sargable.
 
-CREATE OR REPLACE VIEW VW_RESPONSABILIDADE_2
+CREATE OR REPLACE VIEW VW_RESPONSABILIDADE
             (unidade_codigo, usuario_matricula, usuario_titulo, tipo, data_inicio, data_fim) AS
 SELECT u.codigo                                                                AS unidade_codigo,
        COALESCE(a.usuario_matricula, s.mat_serv_com_subs, u.matricula_titular) AS usuario_matricula,
@@ -301,7 +301,7 @@ SELECT u.codigo                                                                A
        COALESCE(a.data_termino, s.dt_fim_subst)                                AS data_fim
 FROM (
          SELECT codigo, matricula_titular, titulo_titular, data_inicio_titularidade
-         FROM vw_unidade_2
+         FROM VW_UNIDADE
          WHERE situacao = 'ATIVA'
            AND tipo IN ('OPERACIONAL', 'INTEROPERACIONAL', 'INTERMEDIARIA')
      ) u
@@ -336,33 +336,33 @@ FROM (
                    ON u.codigo = a.unidade_codigo;
 
 
--- 6. View VW_USUARIO_PERFIL_UNIDADE_2
+-- 6. View VW_USUARIO_PERFIL_UNIDADE
 -- Otimizacao: depende das views acima ja otimizadas. UNION foi preservado para manter
 -- a deduplicacao da view original.
 
-CREATE OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE_2 (usuario_titulo, perfil, unidade_codigo) AS
+CREATE OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) AS
 SELECT usuario_titulo, perfil, unidade_codigo
 FROM (
          SELECT a.usuario_titulo, 'ADMIN' AS perfil, 1 AS unidade_codigo
          FROM administrador a
-                  JOIN vw_usuario_2 u
+                  JOIN VW_USUARIO u
                        ON u.titulo = a.usuario_titulo
          UNION
          SELECT r.usuario_titulo, 'GESTOR' AS perfil, r.unidade_codigo
-         FROM vw_responsabilidade_2 r
-                  JOIN vw_unidade_2 u
+         FROM VW_RESPONSABILIDADE r
+                  JOIN VW_UNIDADE u
                        ON r.unidade_codigo = u.codigo
                       AND u.tipo IN ('INTERMEDIARIA', 'INTEROPERACIONAL')
          UNION
          SELECT r.usuario_titulo, 'CHEFE' AS perfil, r.unidade_codigo
-         FROM vw_responsabilidade_2 r
-                  JOIN vw_unidade_2 u
+         FROM VW_RESPONSABILIDADE r
+                  JOIN VW_UNIDADE u
                        ON r.unidade_codigo = u.codigo
                       AND u.tipo IN ('INTEROPERACIONAL', 'OPERACIONAL')
          UNION
          SELECT usu.titulo AS usuario_titulo, 'SERVIDOR' AS perfil, uni.codigo AS unidade_codigo
-         FROM vw_usuario_2 usu
-                  JOIN vw_unidade_2 uni
+         FROM VW_USUARIO usu
+                  JOIN VW_UNIDADE uni
                        ON usu.unidade_comp_codigo = uni.codigo
          WHERE usu.titulo <> uni.titulo_titular
      );
