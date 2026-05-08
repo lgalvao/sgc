@@ -30,6 +30,20 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     const mostrarModalSugestoes = ref(false);
     const mostrarModalVerSugestoes = ref(false);
 
+    async function executarOperacaoSugestoes(
+        operacao: () => Promise<void>,
+        mensagemErro: string
+    ): Promise<boolean> {
+        try {
+            await operacao();
+            return true;
+        } catch (error) {
+            logger.error(error);
+            notify(mensagemErro, 'danger');
+            return false;
+        }
+    }
+
     async function sincronizarSugestoesMapa(): Promise<string> {
         if (!codigoSubprocesso.value) {
             return "";
@@ -46,11 +60,14 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         loadingSugestoesVisualizacao.value = true;
 
         try {
-            sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
+            const sucesso = await executarOperacaoSugestoes(async () => {
+                sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
+            }, TEXTOS.mapa.ERRO_SUGESTOES);
+            if (!sucesso) {
+                sugestoesVisualizacao.value = "";
+                return;
+            }
             mostrarModalVerSugestoes.value = true;
-        } catch (error) {
-            logger.error(error);
-            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
         } finally {
             loadingSugestoesVisualizacao.value = false;
         }
@@ -62,11 +79,12 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     }
 
     async function carregarSugestoesParaEdicao() {
-        try {
+        const sucesso = await executarOperacaoSugestoes(async () => {
             sugestoes.value = await sincronizarSugestoesMapa();
-        } catch (error) {
-            logger.error(error);
-            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+        }, TEXTOS.mapa.ERRO_SUGESTOES);
+
+        if (!sucesso) {
+            sugestoes.value = "";
         }
     }
 
@@ -92,11 +110,13 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
 
         try {
             loadingSugestoesEnvio.value = true;
-            await apresentarSugestoes(codigoSubprocesso.value, {sugestoes: sugestoes.value});
-            await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
-        } catch (error) {
-            logger.error(error);
-            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+            const sucesso = await executarOperacaoSugestoes(async () => {
+                await apresentarSugestoes(codigoSubprocesso.value!, {sugestoes: sugestoes.value});
+                await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+            }, TEXTOS.mapa.ERRO_SUGESTOES);
+            if (!sucesso) {
+                return;
+            }
         } finally {
             loadingSugestoesEnvio.value = false;
         }

@@ -31,20 +31,38 @@ export function useCadastroAtividadesMutacoes({
                                                   notify,
                                                   processarRespostaLocal,
                                                   adicionarAtividadeAction,
-                                              }: UseCadastroAtividadesMutacoesParams) {
+                                               }: UseCadastroAtividadesMutacoesParams) {
     const erroNovaAtividade = ref<string | null>(null);
     const dadosRemocao = ref<DadosRemocaoCadastro>(null);
     const loadingRemocao = ref(false);
     const mostrarModalConfirmacaoRemocao = ref(false);
 
-    const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
+    type ResultadoExecucao<T> =
+        | { sucesso: true; resultado: T }
+        | { sucesso: false };
+
+    async function executarOperacaoAtividade<T>(
+        operacao: () => Promise<T>,
+        aoFalhar: (erro: unknown) => void
+    ): Promise<ResultadoExecucao<T>> {
         try {
-            await withErrorHandling(async () => processarRespostaLocal(await acao()));
-            return true;
-        } catch {
-            notify(msg, "danger");
-            return false;
+            return {
+                sucesso: true,
+                resultado: await withErrorHandling(operacao),
+            };
+        } catch (erro) {
+            aoFalhar(erro);
+            return {sucesso: false};
         }
+    }
+
+    const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
+        const resultado = await executarOperacaoAtividade(async () => {
+            processarRespostaLocal(await acao());
+        },
+            () => notify(msg, "danger"),
+        );
+        return resultado.sucesso;
     };
 
     const prepararRemocao = (tipo: "atividade" | "conhecimento", atividadeCodigo: number, conhecimentoCodigo?: number) => {
@@ -61,16 +79,16 @@ export function useCadastroAtividadesMutacoes({
 
     async function adicionarAtividade(): Promise<boolean> {
         if (!codMapa.value || !codigoSubprocesso.value) return false;
-        try {
-            const resp = await withErrorHandling(() => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!));
-            if (!resp) return false;
-            processarRespostaLocal(resp);
-            erroNovaAtividade.value = null;
-            return true;
-        } catch {
-            erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
-            return false;
-        }
+        const resultado = await executarOperacaoAtividade(
+            () => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!),
+            () => {
+                erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
+            },
+        );
+        if (!resultado.sucesso || !resultado.resultado) return false;
+        processarRespostaLocal(resultado.resultado);
+        erroNovaAtividade.value = null;
+        return true;
     }
 
     async function confirmarRemocao() {
@@ -78,14 +96,15 @@ export function useCadastroAtividadesMutacoes({
         const {tipo, atividadeCodigo, conhecimentoCodigo} = dadosRemocao.value;
         loadingRemocao.value = true;
         try {
-            await withErrorHandling(async () => {
-                const resp = tipo === "atividade" ? await atividadeService.excluirAtividade(atividadeCodigo) : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
-                processarRespostaLocal(resp);
-            });
-            mostrarModalConfirmacaoRemocao.value = false;
-            dadosRemocao.value = null;
-        } catch (e: unknown) {
-            notify(lastError.value?.mensagem || (e as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger");
+            const resultado = await executarOperacaoAtividade(async () => {
+                return tipo === "atividade"
+                    ? await atividadeService.excluirAtividade(atividadeCodigo)
+                    : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
+            }, (erro) => notify(lastError.value?.mensagem || (erro as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger"));
+            if (resultado.sucesso && resultado.resultado) {
+                processarRespostaLocal(resultado.resultado);
+                dadosRemocao.value = null;
+            }
             mostrarModalConfirmacaoRemocao.value = false;
         } finally {
             loadingRemocao.value = false;

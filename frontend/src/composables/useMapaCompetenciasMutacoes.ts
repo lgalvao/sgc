@@ -46,6 +46,18 @@ export function useMapaCompetenciasMutacoes({
         await callback(codigo);
     }
 
+    async function executarOperacaoCompetencia(
+        operacao: () => Promise<void>,
+        tratarErro: (error: unknown) => void
+    ): Promise<void> {
+        try {
+            await operacao();
+        } catch (error) {
+            logger.error(error);
+            tratarErro(error);
+        }
+    }
+
     function handleErrors(error: unknown) {
         aplicarErroNormalizado(normalizarErro(error) as ErroNormalizado);
     }
@@ -80,15 +92,14 @@ export function useMapaCompetenciasMutacoes({
 
             loadingCompetencia.value = true;
             try {
-                if (competenciaSendoEditada.value) {
-                    sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigo, competenciaSendoEditada.value.codigo, request));
-                } else {
-                    sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigo, request));
-                }
-                fecharModalCriarNovaCompetencia();
-            } catch (error) {
-                logger.error(error);
-                handleErrors(error);
+                await executarOperacaoCompetencia(async () => {
+                    if (competenciaSendoEditada.value) {
+                        sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigo, competenciaSendoEditada.value.codigo, request));
+                    } else {
+                        sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigo, request));
+                    }
+                    fecharModalCriarNovaCompetencia();
+                }, handleErrors);
             } finally {
                 loadingCompetencia.value = false;
             }
@@ -109,11 +120,10 @@ export function useMapaCompetenciasMutacoes({
         await executarComSubprocesso(async (codigo) => {
             loadingExclusao.value = true;
             try {
-                sincronizarMapa(await fluxoMapa.removerCompetencia(codigo, competenciaParaExcluir.value!.codigo));
-                mostrarModalExcluirCompetencia.value = false;
-            } catch (error) {
-                logger.error(error);
-                notify(normalizarErro(error).mensagem, "danger");
+                await executarOperacaoCompetencia(async () => {
+                    sincronizarMapa(await fluxoMapa.removerCompetencia(codigo, competenciaParaExcluir.value!.codigo));
+                    mostrarModalExcluirCompetencia.value = false;
+                }, (error) => notify(normalizarErro(error).mensagem, "danger"));
             } finally {
                 loadingExclusao.value = false;
             }
@@ -122,12 +132,9 @@ export function useMapaCompetenciasMutacoes({
 
     async function removerAtividadeAssociada(competenciaId: number, codigoAtividade: number) {
         await executarComSubprocesso(async (codigo) => {
-            try {
+            await executarOperacaoCompetencia(async () => {
                 sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigo, competenciaId, codigoAtividade));
-            } catch (error) {
-                logger.error(error);
-                notify(normalizarErro(error).mensagem, "danger");
-            }
+            }, (error) => notify(normalizarErro(error).mensagem, "danger"));
         });
     }
 

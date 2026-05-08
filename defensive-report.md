@@ -38,6 +38,26 @@ Nesta rodada, o foco foi reduzir:
 - Menos fragmentação de error handling no fluxo de histórico (erro não é mais absorvido na store).
 - Testes unitários mais leves e previsíveis (sem boot de provider browser/playwright).
 
+## Rodada adicional — simplificação de defensividade em cadastro/mapa
+
+1. **Cadastro de atividades com tratamento de erro consolidado**
+   - Arquivo: `frontend/src/composables/useCadastroAtividadesMutacoes.ts`
+   - Criado helper local único para executar operações assíncronas com `withErrorHandling`.
+   - Removida duplicação de `try/catch` em adição, atualização e remoção.
+   - Efeito: fluxo de falha mais previsível, com uma única estratégia por operação.
+
+2. **Mutações de competências com captura de erro centralizada**
+   - Arquivo: `frontend/src/composables/useMapaCompetenciasMutacoes.ts`
+   - Criado helper local para capturar erro, registrar log e delegar notificação/aplicação de erro normalizado.
+   - Reduzida repetição de blocos `try/catch` em três pontos de mutação.
+   - Efeito: menos branches acidentais e leitura mais linear das ações.
+
+3. **Sugestões de mapa com fluxo único de falha**
+   - Arquivo: `frontend/src/composables/useMapaSugestoes.ts`
+   - Criado helper local para encapsular `logger + notify`.
+   - Substituídos catches duplicados em visualização, carregamento para edição e envio.
+   - Efeito: previsibilidade maior e menor fragmentação de tratamento.
+
 ## Próxima rodada ampla sugerida
 
 1. Consolidar padrões repetidos de `try/catch + logger.error + notify(...)` em composables de mapa/cadastro com helper único por contexto.
