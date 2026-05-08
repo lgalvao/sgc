@@ -31,20 +31,32 @@ export function useCadastroAtividadesMutacoes({
                                                   notify,
                                                   processarRespostaLocal,
                                                   adicionarAtividadeAction,
-                                              }: UseCadastroAtividadesMutacoesParams) {
+                                               }: UseCadastroAtividadesMutacoesParams) {
     const erroNovaAtividade = ref<string | null>(null);
     const dadosRemocao = ref<DadosRemocaoCadastro>(null);
     const loadingRemocao = ref(false);
     const mostrarModalConfirmacaoRemocao = ref(false);
 
-    const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
+    async function executarComTratamentoErro<T>(
+        operacao: () => Promise<T>,
+        aoFalhar: (erro: unknown) => void
+    ): Promise<T | null> {
         try {
-            await withErrorHandling(async () => processarRespostaLocal(await acao()));
-            return true;
-        } catch {
-            notify(msg, "danger");
-            return false;
+            return await withErrorHandling(operacao);
+        } catch (erro) {
+            aoFalhar(erro);
+            return null;
         }
+    }
+
+    const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
+        const response = await executarComTratamentoErro(
+            () => acao(),
+            () => notify(msg, "danger"),
+        );
+        if (!response) return false;
+        processarRespostaLocal(response);
+        return true;
     };
 
     const prepararRemocao = (tipo: "atividade" | "conhecimento", atividadeCodigo: number, conhecimentoCodigo?: number) => {
@@ -61,16 +73,16 @@ export function useCadastroAtividadesMutacoes({
 
     async function adicionarAtividade(): Promise<boolean> {
         if (!codMapa.value || !codigoSubprocesso.value) return false;
-        try {
-            const resp = await withErrorHandling(() => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!));
-            if (!resp) return false;
-            processarRespostaLocal(resp);
-            erroNovaAtividade.value = null;
-            return true;
-        } catch {
-            erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
-            return false;
-        }
+        const resp = await executarComTratamentoErro(
+            () => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!),
+            () => {
+                erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
+            },
+        );
+        if (!resp) return false;
+        processarRespostaLocal(resp);
+        erroNovaAtividade.value = null;
+        return true;
     }
 
     async function confirmarRemocao() {
@@ -78,14 +90,13 @@ export function useCadastroAtividadesMutacoes({
         const {tipo, atividadeCodigo, conhecimentoCodigo} = dadosRemocao.value;
         loadingRemocao.value = true;
         try {
-            await withErrorHandling(async () => {
+            const sucesso = await executarComTratamentoErro(async () => {
                 const resp = tipo === "atividade" ? await atividadeService.excluirAtividade(atividadeCodigo) : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
                 processarRespostaLocal(resp);
-            });
-            mostrarModalConfirmacaoRemocao.value = false;
-            dadosRemocao.value = null;
-        } catch (e: unknown) {
-            notify(lastError.value?.mensagem || (e as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger");
+            }, (erro) => notify(lastError.value?.mensagem || (erro as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger"));
+            if (sucesso) {
+                dadosRemocao.value = null;
+            }
             mostrarModalConfirmacaoRemocao.value = false;
         } finally {
             loadingRemocao.value = false;

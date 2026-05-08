@@ -30,6 +30,20 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     const mostrarModalSugestoes = ref(false);
     const mostrarModalVerSugestoes = ref(false);
 
+    async function executarComTratamentoErro(
+        operacao: () => Promise<void>,
+        mensagemErro: string
+    ): Promise<boolean> {
+        try {
+            await operacao();
+            return true;
+        } catch (error) {
+            logger.error(error);
+            notify(mensagemErro, 'danger');
+            return false;
+        }
+    }
+
     async function sincronizarSugestoesMapa(): Promise<string> {
         if (!codigoSubprocesso.value) {
             return "";
@@ -46,11 +60,13 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         loadingSugestoesVisualizacao.value = true;
 
         try {
-            sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
-            mostrarModalVerSugestoes.value = true;
-        } catch (error) {
-            logger.error(error);
-            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+            const sucesso = await executarComTratamentoErro(async () => {
+                sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
+                mostrarModalVerSugestoes.value = true;
+            }, TEXTOS.mapa.ERRO_SUGESTOES);
+            if (!sucesso) {
+                sugestoesVisualizacao.value = "";
+            }
         } finally {
             loadingSugestoesVisualizacao.value = false;
         }
@@ -62,11 +78,12 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     }
 
     async function carregarSugestoesParaEdicao() {
-        try {
+        const sucesso = await executarComTratamentoErro(async () => {
             sugestoes.value = await sincronizarSugestoesMapa();
-        } catch (error) {
-            logger.error(error);
-            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+        }, TEXTOS.mapa.ERRO_SUGESTOES);
+
+        if (!sucesso) {
+            sugestoes.value = "";
         }
     }
 
@@ -92,11 +109,10 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
 
         try {
             loadingSugestoesEnvio.value = true;
-            await apresentarSugestoes(codigoSubprocesso.value, {sugestoes: sugestoes.value});
-            await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
-        } catch (error) {
-            logger.error(error);
-            notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+            await executarComTratamentoErro(async () => {
+                await apresentarSugestoes(codigoSubprocesso.value!, {sugestoes: sugestoes.value});
+                await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+            }, TEXTOS.mapa.ERRO_SUGESTOES);
         } finally {
             loadingSugestoesEnvio.value = false;
         }
