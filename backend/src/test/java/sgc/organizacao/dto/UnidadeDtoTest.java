@@ -3,8 +3,6 @@ package sgc.organizacao.dto;
 import org.junit.jupiter.api.*;
 import sgc.organizacao.model.*;
 
-import java.lang.reflect.*;
-
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("UnidadeDto")
@@ -90,12 +88,9 @@ class UnidadeDtoTest {
 
     @Test
     @DisplayName("deve falhar ao mapear unidade resumida nula")
-    void deveFalharAoMapearUnidadeResumidaNula() throws Exception {
-        Method metodo = UnidadeDto.class.getDeclaredMethod("fromEntityResumoObrigatoria", Unidade.class);
-        assertThatThrownBy(() -> metodo.invoke(null, new Object[]{null}))
-                .isInstanceOf(InvocationTargetException.class)
-                .hasCauseInstanceOf(NullPointerException.class)
-                .rootCause()
+    void deveFalharAoMapearUnidadeResumidaNula() {
+        assertThatThrownBy(() -> UnidadeDto.fromEntityResumoObrigatoria(null))
+                .isInstanceOf(NullPointerException.class)
                 .hasMessage("Unidade obrigatoria para resumo");
     }
 }

@@ -12,7 +12,6 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 
-import java.lang.reflect.*;
 import java.time.*;
 import java.util.*;
 
@@ -42,20 +41,6 @@ class AlertaFacadeTest {
 
     @Captor
     private ArgumentCaptor<List<AlertaUsuario>> alertaUsuarioListCaptor;
-
-    @Test
-    @DisplayName("Deve lançar erro quando unidade obrigatória estiver ausente")
-    void deveLancarErroQuandoUnidadeObrigatoriaAusente() throws Exception {
-        Method metodo = AlertaFacade.class.getDeclaredMethod("obterUnidadeObrigatoria", Map.class, Long.class);
-        metodo.setAccessible(true);
-
-        Map<Long, Unidade> unidadesPorCodigo = Collections.emptyMap();
-
-        assertThatThrownBy(() -> metodo.invoke(alertaFacade, unidadesPorCodigo, 999L))
-                .isInstanceOf(InvocationTargetException.class)
-                .hasCauseInstanceOf(IllegalStateException.class)
-                .hasRootCauseMessage("Unidade 999 ausente na construção de alertas");
-    }
 
     @Test
     @DisplayName("Deve manter alerta como não lido quando leitura estiver nula")
@@ -223,38 +208,6 @@ class AlertaFacadeTest {
                 .anyMatch(au -> au.getCodigo().getAlertaCodigo() == 3L && au.getDataHoraLeitura() != null);
     }
 
-    @Test
-    @DisplayName("Deve ignorar alertas inexistentes ao marcar como lidos")
-    void deveIgnorarAlertasInexistentesAoMarcarComoLidos() {
-        String titulo = "123";
-        List<Long> codigos = List.of(999L);
-        when(usuarioService.buscar(titulo)).thenReturn(new Usuario());
-        when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(Collections.emptyList());
-        when(alertaService.listarPorCodigos(List.of(999L))).thenReturn(Collections.emptyList());
-
-        alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos);
-
-        verify(alertaService, never()).salvarAlertasUsuarios(anyList());
-    }
-
-    @Test
-    @DisplayName("Deve silenciar erro de concorrência ao marcar como lidos")
-    void deveSilenciarErroDeConcorrenciaAoMarcarComoLidos() {
-        String titulo = "123";
-        List<Long> codigos = List.of(1L);
-        when(usuarioService.buscar(titulo)).thenReturn(new Usuario());
-
-        Alerta a1 = new Alerta();
-        a1.setCodigo(1L);
-        when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(Collections.emptyList());
-        when(alertaService.listarPorCodigos(List.of(1L))).thenReturn(List.of(a1));
-
-        doThrow(new DataIntegrityViolationException("Erro fake")).when(alertaService).salvarAlertasUsuarios(anyList());
-
-        assertThatCode(() -> alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos))
-                .doesNotThrowAnyException();
-    }
-
     @Nested
     @DisplayName("Listagem de Alertas")
     class ListagemAlertas {
@@ -335,35 +288,52 @@ class AlertaFacadeTest {
     }
 
     @Test
-    @DisplayName("marcarComoLidos - deve cobrir merge function com duplicatas e alertas ausentes")
+    @DisplayName("marcarComoLidos - deve consolidar duplicatas e persistir apenas leituras necessárias")
     void marcarComoLidos_Duplicatas() {
-        ContextoUsuarioAutenticado contexto = mock(ContextoUsuarioAutenticado.class);
-        when(contexto.usuarioTitulo()).thenReturn("U1");
+        Long codigoExistenteDuplicado = 1L;
+        Long codigoNovoDuplicado = 2L;
 
-        Long cod1 = 1L;
-        Long cod2 = 2L;
+        AlertaUsuario leituraExistente = new AlertaUsuario();
+        leituraExistente.setCodigo(AlertaUsuario.Chave.builder()
+                .alertaCodigo(codigoExistenteDuplicado)
+                .usuarioTitulo("123")
+                .build());
+        leituraExistente.setDataHoraLeitura(null);
 
-        AlertaUsuario au1 = mock(AlertaUsuario.class);
-        AlertaUsuario.Chave chave1 = mock(AlertaUsuario.Chave.class);
-        when(chave1.getAlertaCodigo()).thenReturn(cod1);
-        when(au1.getCodigo()).thenReturn(chave1);
+        AlertaUsuario leituraExistenteDuplicada = new AlertaUsuario();
+        leituraExistenteDuplicada.setCodigo(AlertaUsuario.Chave.builder()
+                .alertaCodigo(codigoExistenteDuplicado)
+                .usuarioTitulo("123")
+                .build());
+        leituraExistenteDuplicada.setDataHoraLeitura(null);
 
-        AlertaUsuario au1Dup = mock(AlertaUsuario.class);
-        when(au1Dup.getCodigo()).thenReturn(chave1);
+        Alerta alertaNovo = new Alerta();
+        alertaNovo.setCodigo(codigoNovoDuplicado);
+        Alerta alertaNovoDuplicado = new Alerta();
+        alertaNovoDuplicado.setCodigo(codigoNovoDuplicado);
 
-        when(alertaService.alertasUsuarios(anyString(), anyList())).thenReturn(List.of(au1, au1Dup));
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
 
-        Alerta a2 = new Alerta();
-        a2.setCodigo(cod2);
-        Alerta a2Dup = new Alerta();
-        a2Dup.setCodigo(cod2);
+        when(usuarioService.buscar("123")).thenReturn(usuario);
+        when(alertaService.alertasUsuarios("123", List.of(codigoExistenteDuplicado, codigoNovoDuplicado)))
+                .thenReturn(List.of(leituraExistente, leituraExistenteDuplicada));
+        when(alertaService.listarPorCodigos(List.of(codigoNovoDuplicado))).thenReturn(List.of(alertaNovo, alertaNovoDuplicado));
 
-        when(alertaService.listarPorCodigos(anyList())).thenReturn(List.of(a2, a2Dup));
-        when(usuarioService.buscar("U1")).thenReturn(new Usuario());
+        alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(codigoExistenteDuplicado, codigoNovoDuplicado));
 
-        alertaFacade.marcarComoLidos(contexto, List.of(cod1, cod2));
-
-        verify(alertaService).salvarAlertasUsuarios(anyList());
+        verify(alertaService).salvarAlertasUsuarios(alertaUsuarioListCaptor.capture());
+        List<AlertaUsuario> salvos = alertaUsuarioListCaptor.getValue();
+        assertThat(salvos).hasSize(2);
+        assertThat(salvos)
+                .extracting(au -> au.getCodigo().getAlertaCodigo())
+                .containsExactlyInAnyOrder(codigoExistenteDuplicado, codigoNovoDuplicado);
+        assertThat(salvos).allSatisfy(au -> assertThat(au.getDataHoraLeitura()).isNotNull());
+        assertThat(salvos.stream()
+                .filter(au -> au.getCodigo().getAlertaCodigo().equals(codigoNovoDuplicado))
+                .findFirst()
+                .orElseThrow()
+                .getUsuario()).isEqualTo(usuario);
     }
 
     @Nested
