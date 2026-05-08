@@ -4,7 +4,6 @@ import {SituacaoSubprocesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {normalizarErro} from "@/utils/apiError";
-import logger from "@/utils/logger";
 
 type ResultadoValidacaoCadastro = {
     valido: boolean;
@@ -133,11 +132,7 @@ export function useCadastroDisponibilizacao({
             if (resultado.valido) return;
 
             await nextTick();
-            try {
-                scrollParaPrimeiroErro();
-            } catch (erroDom) {
-                logger.warn("Falha ao executar scroll para erro", erroDom);
-            }
+            scrollParaPrimeiroErro();
         } catch (error) {
             erroGlobal.value = normalizarErro(error).mensagem;
         } finally {

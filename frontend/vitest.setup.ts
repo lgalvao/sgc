@@ -76,3 +76,4 @@ Object.defineProperty(globalThis, "location", {
 });
 
 window.scrollTo = vi.fn();
+Element.prototype.scrollIntoView = vi.fn();

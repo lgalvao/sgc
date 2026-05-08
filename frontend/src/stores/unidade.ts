@@ -6,7 +6,6 @@ import {
     buscarReferenciaMapaVigente
 } from "@/services/unidadeService";
 import type {MapaVigenteReferencia, Unidade} from "@/types/tipos";
-import {logger} from "@/utils";
 
 /**
  * Store de cache para dados da estrutura organizacional.
@@ -37,18 +36,12 @@ export const useUnidadeStore = defineStore("unidade", () => {
             return promessaExistente;
         }
 
-        const promessa = (async () => {
-            try {
-                const unidades = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
+        const promessa = buscarArvoreComElegibilidade(tipoProcesso, codProcesso)
+            .then(unidades => {
                 cacheArvoreElegibilidade.value.set(key, unidades);
                 return unidades;
-            } catch (error) {
-                logger.error(`Erro ao buscar árvore de unidades (${key}):`, error);
-                return [];
-            } finally {
-                carregandoPromessas.delete(key);
-            }
-        })();
+            })
+            .finally(() => carregandoPromessas.delete(key));
 
         carregandoPromessas.set(key, promessa);
         return promessa;

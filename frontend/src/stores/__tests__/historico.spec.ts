@@ -72,6 +72,6 @@ describe("useHistoricoStore", () => {
         await store.garantirDados();
 
         expect(store.processos).toEqual([]);
-        expect(store.carregado).toBe(true); // O código define como true mesmo no erro
+        expect(store.carregado).toBe(false); // não marca como carregado em falha — permite retry
     });
 });

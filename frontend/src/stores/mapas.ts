@@ -5,7 +5,6 @@ import {
     obterMapaCompleto as serviceObterMapaCompleto,
     verificarImpactosMapa as serviceVerificarImpactosMapa,
 } from "@/services/subprocessoService";
-import {logger} from "@/utils";
 
 /**
  * Store de cache de sessão para dados do mapa de competências.
@@ -99,18 +98,12 @@ export const useMapasStore = defineStore("mapas", () => {
             return carregamentoExistente;
         }
 
-        const promessaCarregamento = (async () => {
-            try {
-                const mapa = await serviceObterMapaCompleto(codigoSubprocesso);
+        const promessaCarregamento = serviceObterMapaCompleto(codigoSubprocesso)
+            .then(mapa => {
                 definirMapaCompleto(codigoSubprocesso, mapa);
                 return mapa;
-            } catch (erro) {
-                logger.error(`Erro ao carregar mapa completo do subprocesso ${codigoSubprocesso}:`, erro);
-                throw erro;
-            } finally {
-                carregamentosMapa.delete(codigoSubprocesso);
-            }
-        })();
+            })
+            .finally(() => carregamentosMapa.delete(codigoSubprocesso));
 
         carregamentosMapa.set(codigoSubprocesso, promessaCarregamento);
         return promessaCarregamento;
@@ -128,18 +121,12 @@ export const useMapasStore = defineStore("mapas", () => {
             return carregamentoExistente;
         }
 
-        const promessaCarregamento = (async () => {
-            try {
-                const impacto = await serviceVerificarImpactosMapa(codigoSubprocesso);
+        const promessaCarregamento = serviceVerificarImpactosMapa(codigoSubprocesso)
+            .then(impacto => {
                 definirImpactoMapa(codigoSubprocesso, impacto);
                 return impacto;
-            } catch (erro) {
-                logger.error(`Erro ao verificar impactos do mapa ${codigoSubprocesso}:`, erro);
-                throw erro;
-            } finally {
-                carregamentosImpacto.delete(codigoSubprocesso);
-            }
-        })();
+            })
+            .finally(() => carregamentosImpacto.delete(codigoSubprocesso));
 
         carregamentosImpacto.set(codigoSubprocesso, promessaCarregamento);
         return promessaCarregamento;
