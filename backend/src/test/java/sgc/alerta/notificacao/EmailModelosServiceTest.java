@@ -12,7 +12,6 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,15 +52,15 @@ class EmailModelosServiceTest {
 
         emailModelosService.criarEmailAtribuicaoTemporaria(command);
 
-        assertEquals("atribuicao-temporaria", templateNameCaptor.getValue());
+        assertThat(templateNameCaptor.getValue()).isEqualTo("atribuicao-temporaria");
         Context context = contextCaptor.getValue();
-        assertEquals(command.assunto(), context.getVariable("titulo"));
-        assertEquals(command.nomeServidor(), context.getVariable("nomeServidor"));
-        assertEquals(command.siglaUnidade(), context.getVariable("siglaUnidade"));
-        assertEquals("21/04/2026", context.getVariable("dataInicio"));
-        assertEquals("21/05/2026", context.getVariable("dataTermino"));
-        assertEquals(command.justificativa(), context.getVariable("justificativa"));
-        assertEquals(command.urlSistema(), context.getVariable("urlSistema"));
+        assertThat(context.getVariable("titulo")).isEqualTo(command.assunto());
+        assertThat(context.getVariable("nomeServidor")).isEqualTo(command.nomeServidor());
+        assertThat(context.getVariable("siglaUnidade")).isEqualTo(command.siglaUnidade());
+        assertThat(context.getVariable("dataInicio")).isEqualTo("21/04/2026");
+        assertThat(context.getVariable("dataTermino")).isEqualTo("21/05/2026");
+        assertThat(context.getVariable("justificativa")).isEqualTo(command.justificativa());
+        assertThat(context.getVariable("urlSistema")).isEqualTo(command.urlSistema());
     }
 
     @Nested
@@ -82,17 +81,17 @@ class EmailModelosServiceTest {
                     siglasSubordinadas
             );
 
-            assertEquals("email-inicio-processo-consolidado", templateNameCaptor.getValue());
+            assertThat(templateNameCaptor.getValue()).isEqualTo("email-inicio-processo-consolidado");
             Context context = contextCaptor.getValue();
-            assertEquals("SGC: Início de processo de mapeamento de competências em unidades subordinadas",
-                    context.getVariable("titulo"));
-            assertEquals("UT", context.getVariable("siglaUnidade"));
-            assertEquals("Processo teste", context.getVariable("nomeProcesso"));
-            assertEquals("30/04/2026", context.getVariable("dataLimite"));
-            assertEquals("MAPEAMENTO", context.getVariable("tipoProcesso"));
-            assertEquals(false, context.getVariable("isParticipante"));
-            assertEquals(siglasSubordinadas, context.getVariable("siglasSubordinadas"));
-            assertEquals(true, context.getVariable("hasSubordinadas"));
+            assertThat(context.getVariable("titulo"))
+                    .isEqualTo("SGC: Início de processo de mapeamento de competências em unidades subordinadas");
+            assertThat(context.getVariable("siglaUnidade")).isEqualTo("UT");
+            assertThat(context.getVariable("nomeProcesso")).isEqualTo("Processo teste");
+            assertThat(context.getVariable("dataLimite")).isEqualTo("30/04/2026");
+            assertThat(context.getVariable("tipoProcesso")).isEqualTo("MAPEAMENTO");
+            assertThat(context.getVariable("isParticipante")).isEqualTo(false);
+            assertThat(context.getVariable("siglasSubordinadas")).isEqualTo(siglasSubordinadas);
+            assertThat(context.getVariable("hasSubordinadas")).isEqualTo(true);
         }
     }
 
@@ -101,8 +100,8 @@ class EmailModelosServiceTest {
     void criarEmailLembretePrazo() {
         String res = emailModelosService.criarEmailLembretePrazo("U1", "P1", LocalDateTime.now());
 
-        assertEquals("lembrete-prazo", templateNameCaptor.getValue());
-        assertNotNull(res);
+        assertThat(templateNameCaptor.getValue()).isEqualTo("lembrete-prazo");
+        assertThat(res).isNotNull();
     }
 
     @Nested
@@ -118,11 +117,11 @@ class EmailModelosServiceTest {
             emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                     siglaUnidade, nomeProcesso);
 
-            assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
+            assertThat(templateNameCaptor.getValue()).isEqualTo("processo-finalizado-por-unidade");
             Context context = contextCaptor.getValue();
-            assertEquals("Finalização do processo " + nomeProcesso, context.getVariable("titulo"));
-            assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
-            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
+            assertThat(context.getVariable("titulo")).isEqualTo("Finalização do processo " + nomeProcesso);
+            assertThat(context.getVariable("siglaUnidade")).isEqualTo(siglaUnidade);
+            assertThat(context.getVariable("nomeProcesso")).isEqualTo(nomeProcesso);
         }
 
         @Test
@@ -136,14 +135,13 @@ class EmailModelosServiceTest {
             emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
                     siglaUnidade, nomeProcesso, siglas);
 
-            assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
+            assertThat(templateNameCaptor.getValue()).isEqualTo("processo-finalizado-unidades-subordinadas");
             Context context = contextCaptor.getValue();
-            assertEquals(
-                    "Finalização do processo " + nomeProcesso + " em unidades subordinadas",
-                    context.getVariable("titulo"));
-            assertEquals(siglaUnidade, context.getVariable("siglaUnidade"));
-            assertEquals(nomeProcesso, context.getVariable("nomeProcesso"));
-            assertEquals(siglas, context.getVariable("siglasUnidadesSubordinadas"));
+            assertThat(context.getVariable("titulo"))
+                    .isEqualTo("Finalização do processo " + nomeProcesso + " em unidades subordinadas");
+            assertThat(context.getVariable("siglaUnidade")).isEqualTo(siglaUnidade);
+            assertThat(context.getVariable("nomeProcesso")).isEqualTo(nomeProcesso);
+            assertThat(context.getVariable("siglasUnidadesSubordinadas")).isEqualTo(siglas);
         }
     }
 }

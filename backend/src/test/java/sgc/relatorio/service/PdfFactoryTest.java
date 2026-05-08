@@ -3,7 +3,7 @@ package sgc.relatorio.service;
 import org.junit.jupiter.api.*;
 import sgc.relatorio.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 class PdfFactoryTest {
 
@@ -13,6 +13,6 @@ class PdfFactoryTest {
     @DisplayName("Deve criar documento")
     void deveCriarDocumento() {
         var document = pdfFactory.createDocument();
-        assertNotNull(document);
+        assertThat(document).isNotNull();
     }
 }
