@@ -44,7 +44,7 @@ class ClienteAcessoAdTest {
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(String.class)).thenReturn("OK");
 
-        assertThatCode(() -> clienteAcessoAd.autenticar("123", "senha")).doesNotThrowAnyException();
+        clienteAcessoAd.autenticar("123", "senha");
         verify(responseSpec).body(String.class);
     }
 

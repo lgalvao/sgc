@@ -332,7 +332,7 @@ class AlertaFacadeTest {
         assertThat(salvos.stream()
                 .filter(au -> au.getCodigo().getAlertaCodigo().equals(codigoNovoDuplicado))
                 .findFirst()
-                .orElseThrow()
+                .orElseThrow(() -> new AssertionError("Alerta com código %d não encontrado".formatted(codigoNovoDuplicado)))
                 .getUsuario()).isEqualTo(usuario);
     }
 
