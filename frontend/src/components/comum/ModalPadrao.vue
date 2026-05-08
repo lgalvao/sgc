@@ -15,8 +15,8 @@
         <BButton
             :data-testid="testCodigoCancelar || 'btn-modal-padrao-cancelar'"
             :disabled="loading"
-            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
-            variant="link"
+            :class="variantCancelar === 'link' ? 'text-decoration-none text-secondary fw-medium btn-cancelar-link' : ''"
+            :variant="variantCancelar"
             @click="fechar"
         >
           {{ textoCancelar }}
@@ -57,6 +57,7 @@ const props = withDefaults(defineProps<{
   textoAcao?: string;
   textoAcaoCarregando?: string;
   variantAcao?: "primary" | "secondary" | "success" | "danger";
+  variantCancelar?: "link" | "secondary" | "outline-secondary";
   loading?: boolean;
   acaoDesabilitada?: boolean;
   mostrarBotaoAcao?: boolean;
@@ -70,6 +71,7 @@ const props = withDefaults(defineProps<{
   textoAcao: "Confirmar",
   textoAcaoCarregando: "Processando...",
   variantAcao: "success",
+  variantCancelar: "link",
   loading: false,
   acaoDesabilitada: false,
   mostrarBotaoAcao: true,

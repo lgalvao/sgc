@@ -83,7 +83,7 @@
         <BButton
             data-testid="btn-fechar-impacto"
             type="button"
-            variant="primary"
+            variant="secondary"
             @click="fechar"
         >
           {{ TEXTOS.comum.BOTAO_FECHAR }}

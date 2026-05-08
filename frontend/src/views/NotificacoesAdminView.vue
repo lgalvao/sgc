@@ -96,6 +96,7 @@
         data-testid="modal-detalhes-notificacao"
         tamanho="lg"
         texto-cancelar="Fechar"
+        variant-cancelar="secondary"
         titulo="Detalhes da notificação"
     >
       <div v-if="itemParaDetalhes" class="p-3">

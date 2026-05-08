@@ -26,9 +26,17 @@ export function useCadastroRevisaoSemMudancas({
     const disponibilizacaoSemMudancas = ref(false);
     const loadingInicioRevisao = ref(false);
 
-    const checkboxSemMudancasDesabilitado = computed(() =>
-        loadingInicioRevisao.value || houveAlteracaoCadastro.value
-    );
+    const checkboxSemMudancasDesabilitado = computed(() => {
+        if (loadingInicioRevisao.value || !isRevisao.value) {
+            return true;
+        }
+
+        if (situacaoAtual.value !== SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
+            return false;
+        }
+
+        return houveAlteracaoCadastro.value;
+    });
 
     const precisaIniciarRevisao = computed(() =>
         isRevisao.value && situacaoAtual.value === SituacaoSubprocesso.NAO_INICIADO

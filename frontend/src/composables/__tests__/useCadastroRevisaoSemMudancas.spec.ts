@@ -70,6 +70,7 @@ describe("useCadastroRevisaoSemMudancas", () => {
     });
 
     it("deve desabilitar checkbox quando houver alteração", () => {
+        situacaoAtual.value = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
         houveAlteracaoCadastro.value = true;
         const {checkboxSemMudancasDesabilitado} = setup();
         expect(checkboxSemMudancasDesabilitado.value).toBe(true);
