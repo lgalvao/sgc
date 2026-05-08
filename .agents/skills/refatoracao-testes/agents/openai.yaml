@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refatoração de Testes"
+  short_description: "Melhorar qualidade dos testes do SGC substituindo reflexão por comportamento e padronizando AssertJ"
+  default_prompt: "Use $refatoracao-testes para melhorar a qualidade dos testes deste arquivo, substituindo testes de métodos privados por testes comportamentais e padronizando as assertions com AssertJ."

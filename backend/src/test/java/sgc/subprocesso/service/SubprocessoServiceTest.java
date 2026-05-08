@@ -23,7 +23,6 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
@@ -570,7 +569,7 @@ class SubprocessoServiceTest {
                 when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(false);
 
                 List<Long> itens = List.of();
-                assertThrows(ErroAcessoNegado.class, () -> service.importarAtividades(1L, 2L, itens));
+                assertThatThrownBy(() -> service.importarAtividades(1L, 2L, itens)).isInstanceOf(ErroAcessoNegado.class);
             }
 
             @Test
@@ -637,7 +636,7 @@ class SubprocessoServiceTest {
                 when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(false);
 
                 List<Long> itens = List.of();
-                assertThrows(ErroAcessoNegado.class, () -> service.importarAtividades(1L, 2L, itens));
+                assertThatThrownBy(() -> service.importarAtividades(1L, 2L, itens)).isInstanceOf(ErroAcessoNegado.class);
             }
         }
     }

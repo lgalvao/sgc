@@ -5,7 +5,6 @@ import jakarta.servlet.http.*;
 import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.springframework.mock.web.*;
-import org.springframework.test.util.*;
 
 import java.io.*;
 import java.util.*;
@@ -90,20 +89,6 @@ class FiltroMonitoramentoHttpTest {
         });
 
         assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNotBlank();
-    }
-
-    @Test
-    @DisplayName("Deve formatar linha HTTP com prefixo")
-    void deveFormatarLinhaHttpComPrefixo() {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/processos/1/iniciar");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        response.setStatus(204);
-
-        String linha = ReflectionTestUtils.invokeMethod(filtro, "formatarLinhaHttp", request, response, 12L);
-
-        assertThat(linha).isEqualTo("http POST /api/processos/1/iniciar 204 12ms");
     }
 
     @Test

@@ -13,7 +13,6 @@ import sgc.subprocesso.service.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,8 +58,8 @@ class MapaManutencaoServiceTest {
 
         Map<Long, Set<Long>> result = mapaService.codigosAssociacoesCompetenciaAtividade(1L);
 
-        assertEquals(1, result.size());
-        assertEquals(2, result.getOrDefault(1L, Set.of()).size());
+        assertThat(result).hasSize(1);
+        assertThat(result.getOrDefault(1L, Set.of())).hasSize(2);
     }
 
     @Test
@@ -91,7 +90,8 @@ class MapaManutencaoServiceTest {
 
         CriarAtividadeRequest req = new CriarAtividadeRequest(1L, "desc");
 
-        assertThrows(ErroValidacao.class, () -> mapaService.criarAtividade(req));
+        assertThatThrownBy(() -> mapaService.criarAtividade(req))
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -102,7 +102,8 @@ class MapaManutencaoServiceTest {
 
         CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "desc");
 
-        assertThrows(ErroValidacao.class, () -> mapaService.criarConhecimento(1L, req));
+        assertThatThrownBy(() -> mapaService.criarConhecimento(1L, req))
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test

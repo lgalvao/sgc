@@ -21,7 +21,6 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
@@ -985,7 +984,7 @@ class SubprocessoConsultaServiceTest {
 
                 stubContextoAutenticado(user);
                 PermissoesSubprocessoDto res = service.obterPermissoesUI(sp);
-                assertTrue(res.habilitarAcessoCadastro());
+                assertThat(res.habilitarAcessoCadastro()).isTrue();
             }
 
             @Test
@@ -1008,7 +1007,7 @@ class SubprocessoConsultaServiceTest {
 
                 stubContextoAutenticado(user);
                 PermissoesSubprocessoDto res = service.obterPermissoesUI(sp);
-                assertFalse(res.habilitarAcessoMapa());
+                assertThat(res.habilitarAcessoMapa()).isFalse();
             }
 
             @Test
@@ -1028,11 +1027,11 @@ class SubprocessoConsultaServiceTest {
 
                 stubContextoAutenticado(user);
                 PermissoesSubprocessoDto res = service.obterPermissoesUI(sp);
-                assertTrue(res.habilitarAcessoCadastro());
+                assertThat(res.habilitarAcessoCadastro()).isTrue();
 
                 sp.setSituacaoForcada(REVISAO_MAPA_DISPONIBILIZADO);
                 res = service.obterPermissoesUI(sp);
-                assertTrue(res.habilitarAcessoMapa());
+                assertThat(res.habilitarAcessoMapa()).isTrue();
             }
 
             @Test
@@ -1051,7 +1050,7 @@ class SubprocessoConsultaServiceTest {
 
                 for (SituacaoSubprocesso s : List.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_MAPA_AJUSTADO)) {
                     sp.setSituacaoForcada(s);
-                    assertTrue(service.obterPermissoesUI(sp).podeDisponibilizarMapa());
+                    assertThat(service.obterPermissoesUI(sp).podeDisponibilizarMapa()).isTrue();
                 }
             }
 
@@ -1108,7 +1107,7 @@ class SubprocessoConsultaServiceTest {
                 Processo p = sp.getProcesso();
                 p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
                 when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-                assertThrows(ErroValidacao.class, () -> service.listarAtividadesParaImportacao(1L));
+                assertThatThrownBy(() -> service.listarAtividadesParaImportacao(1L)).isInstanceOf(ErroValidacao.class);
             }
 
             @Test
@@ -1117,7 +1116,7 @@ class SubprocessoConsultaServiceTest {
                 Subprocesso sp = new Subprocesso();
                 sp.setProcesso(null);
                 when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-                assertThrows(ErroValidacao.class, () -> service.listarAtividadesParaImportacao(1L));
+                assertThatThrownBy(() -> service.listarAtividadesParaImportacao(1L)).isInstanceOf(ErroValidacao.class);
             }
 
             @Test

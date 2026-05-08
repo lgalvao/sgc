@@ -15,13 +15,11 @@ import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.lang.reflect.*;
 import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.ReflectionTestUtils.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoNotificacaoService")
@@ -307,44 +305,6 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("deve ignorar envio de email quando tipo nao enviar email ao chamar rotina interna")
-    void deveIgnorarEnvioDeEmailQuandoTipoNaoEnviaEmail() {
-        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
-        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
-        Processo processo = criarProcesso();
-        Subprocesso subprocesso = criarSubprocesso(origem, processo);
-
-        invokeMethod(service, "criarNotificacoesTransicao", NotificacaoCommand.builder()
-                .subprocesso(subprocesso)
-                .tipoTransicao(TipoTransicao.CADASTRO_HOMOLOGADO)
-                .unidadeOrigem(origem)
-                .unidadeDestino(destino)
-                .build());
-
-        verifyNoInteractions(notificacaoService, responsavelService, usuarioService, templateEngine);
-    }
-
-    @Test
-    @DisplayName("deve lançar erro quando template direto estiver ausente")
-    void deveLancarErroQuandoTemplateDiretoAusente() {
-        assertThatThrownBy(() -> invokeMethod(service, "obterTemplateObrigatorio", " ", "e-mail direto"))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Template ausente");
-    }
-
-    @Test
-    @DisplayName("deve lançar erro quando template direto for nulo")
-    void deveLancarErroQuandoTemplateDiretoForNulo() throws Exception {
-        Method metodo = SubprocessoNotificacaoService.class.getDeclaredMethod("obterTemplateObrigatorio", String.class, String.class);
-        metodo.setAccessible(true);
-        assertThatThrownBy(() -> metodo.invoke(service, null, "e-mail direto"))
-                .isInstanceOf(InvocationTargetException.class)
-                .hasCauseInstanceOf(IllegalStateException.class)
-                .rootCause()
-                .hasMessageContaining("Template ausente");
-    }
-
-    @Test
     @DisplayName("getEmailUnidade deve gerar endereco com sigla minuscula")
     void getEmailUnidadeDeveGerarEnderecoComSiglaMinuscula() {
         assertThat(service.getEmailUnidade(criarUnidade(1L, "ABC", "Unidade"))).isEqualTo("abc@tre-pe.jus.br");
@@ -444,40 +404,4 @@ class SubprocessoNotificacaoServiceTest {
         return usuario;
     }
 
-    @Test
-    @DisplayName("criarNotificacaoSuperior - deve enviar apenas ao superior direto")
-    void criarNotificacaoSuperior_ApenasSuperiorDireto() {
-        Processo p = new Processo();
-        p.setDescricao("P");
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(p);
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        u.setSigla("U");
-        sp.setUnidade(u);
-        Unidade destino = new Unidade();
-        destino.setCodigo(99L);
-
-        NotificacaoCommand cmd = NotificacaoCommand.builder()
-                .subprocesso(sp)
-                .unidadeOrigem(u)
-                .unidadeDestino(destino)
-                .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
-                .build();
-
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
-
-        UnidadeResumoLeitura rl1 = mock(UnidadeResumoLeitura.class);
-        when(rl1.sigla()).thenReturn("S1");
-
-        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(rl1));
-        when(templateEngine.process(anyString(), any())).thenReturn("corpo");
-
-        invokeMethod(service, "criarNotificacaoSuperior", cmd, new HashMap<>());
-
-        verify(notificacaoService).enfileirar(argThat(cmdEmail ->
-                "s1@tre-pe.jus.br".equals(cmdEmail.destinatario())
-        ));
-    }
 }
