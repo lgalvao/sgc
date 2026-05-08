@@ -4,6 +4,7 @@ import {createTestingPinia} from '@pinia/testing';
 import HistoricoView from '../HistoricoView.vue';
 import {useRouter} from 'vue-router';
 import * as processoService from '@/services/processo';
+import * as configuracaoService from '@/services/configuracaoService';
 
 vi.mock('vue-router', () => ({
     useRouter: vi.fn(() => ({
@@ -13,6 +14,11 @@ vi.mock('vue-router', () => ({
 
 vi.mock('@/services/processo', () => ({
     buscarProcessosFinalizados: vi.fn(),
+}));
+
+vi.mock('@/services/configuracaoService', () => ({
+    buscarConfiguracoes: vi.fn(),
+    salvarConfiguracoes: vi.fn(),
 }));
 
 const LayoutPadraoStub = {
@@ -42,16 +48,18 @@ describe('HistoricoView.vue', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValue([...mockProcessosFinalizados] as any);
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([]);
         mockRouter = {push: vi.fn()};
         (useRouter as any).mockReturnValue(mockRouter);
     });
 
-    const createWrapper = () => {
+    const createWrapper = (initialState?: Record<string, unknown>) => {
         return mount(HistoricoView, {
             global: {
                 plugins: [
                     createTestingPinia({
                         createSpy: vi.fn,
+                        initialState,
                         stubActions: false,
                     })
                 ],
@@ -73,6 +81,28 @@ describe('HistoricoView.vue', () => {
         await flushPromises();
 
         expect(processoService.buscarProcessosFinalizados).toHaveBeenCalled();
+    });
+
+    it('nao deve carregar configuracoes sem permissao', async () => {
+        wrapper = createWrapper();
+
+        await flushPromises();
+
+        expect(configuracaoService.buscarConfiguracoes).not.toHaveBeenCalled();
+    });
+
+    it('deve carregar configuracoes quando a permissao existir', async () => {
+        wrapper = createWrapper({
+            perfil: {
+                permissoesSessao: {
+                    mostrarMenuConfiguracoes: true
+                }
+            }
+        });
+
+        await flushPromises();
+
+        expect(configuracaoService.buscarConfiguracoes).toHaveBeenCalledTimes(1);
     });
 
     it('deve lidar com erro ao carregar historico', async () => {

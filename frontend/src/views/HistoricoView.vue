@@ -29,15 +29,18 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {useHistoricoStore} from '@/stores/historico';
+import {usePerfilStore} from '@/stores/perfil';
 import {useConfiguracoes} from '@/composables/useConfiguracoes';
 import {TEXTOS} from '@/constants/textos';
 import type {ProcessoResumo} from "@/types/tipos";
 
 const router = useRouter();
 const historicoStore = useHistoricoStore();
+const perfilStore = usePerfilStore();
 const {carregarConfiguracoes, getDiasInativacaoProcesso} = useConfiguracoes();
 
 const loading = computed(() => historicoStore.carregando);
+const podeCarregarConfiguracoes = computed(() => perfilStore.permissoesSessao?.mostrarMenuConfiguracoes === true);
 
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
 const asc = ref(false);
@@ -88,7 +91,9 @@ async function carregarDadosTela(deveRecarregarHistorico: boolean) {
   if (deveRecarregarHistorico) {
     promessas.push(historicoStore.garantirDados());
   }
-  promessas.push(carregarConfiguracoes());
+  if (podeCarregarConfiguracoes.value) {
+    promessas.push(carregarConfiguracoes());
+  }
 
   try {
     await Promise.all(promessas);
