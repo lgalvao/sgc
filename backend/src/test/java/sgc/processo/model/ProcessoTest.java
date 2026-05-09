@@ -1,7 +1,6 @@
 package sgc.processo.model;
 
 import org.junit.jupiter.api.*;
-import org.springframework.test.util.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
 
@@ -107,9 +106,8 @@ class ProcessoTest {
     class Participantes {
 
         @Test
-        @DisplayName("Deve retornar vazio se participantes for null")
+        @DisplayName("Deve retornar vazio se não houver participantes")
         void deveRetornarVazioSeParticipantesNull() {
-            ReflectionTestUtils.setField(processo, "participantes", null);
             assertThat(processo.getCodigosParticipantes()).isEmpty();
             assertThat(processo.getSiglasParticipantes()).isEmpty();
         }

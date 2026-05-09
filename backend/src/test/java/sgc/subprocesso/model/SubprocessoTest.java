@@ -3,7 +3,6 @@ package sgc.subprocesso.model;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
-import org.springframework.test.util.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -73,7 +72,6 @@ class SubprocessoTest {
     @DisplayName("Deve permitir mudar situação se processo for nulo")
     void devePermitirMudarSituacaoSeProcessoNulo() {
         Subprocesso sp = new Subprocesso();
-        ReflectionTestUtils.setField(sp, "processo", null);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
     }
@@ -84,7 +82,7 @@ class SubprocessoTest {
         Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(p);
-        ReflectionTestUtils.setField(sp, "situacao", null);
+        sp.setSituacaoForcada(null);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
     }

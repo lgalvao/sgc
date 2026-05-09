@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.test.util.*;
 import sgc.mapa.dto.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
@@ -215,13 +214,14 @@ class SubprocessoConsultaServiceTest {
                     usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService,
                     acessoService, analiseRepo, analiseHistoricoServiceMock);
 
-            target = service;
-            ReflectionTestUtils.setField(target, "acessoService", acessoService);
-            ReflectionTestUtils.setField(target, "visualizacaoService", visualizacaoService);
-            ReflectionTestUtils.setField(
-                    target,
-                    "contextoConsultaService",
-                    new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService)
+            target = new SubprocessoConsultaService(
+                    subprocessoRepo,
+                    mapaManutencaoService,
+                    movimentacaoRepo,
+                    validacaoService,
+                    new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService),
+                    acessoService,
+                    visualizacaoService
             );
         }
 
@@ -540,15 +540,20 @@ class SubprocessoConsultaServiceTest {
             localizacaoSubprocessoService = new LocalizacaoSubprocessoService(movimentacaoRepo);
             AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioService);
 
-            SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
-            ReflectionTestUtils.setField(service, "contextoConsultaService", contextoConsultaService);
-
             SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
-            ReflectionTestUtils.setField(service, "acessoService", acessoService);
-
             SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
                     usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
-            ReflectionTestUtils.setField(service, "visualizacaoService", visualizacaoService);
+            SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
+
+            service = new SubprocessoConsultaService(
+                    subprocessoRepo,
+                    mapaManutencaoService,
+                    movimentacaoRepo,
+                    validacaoService,
+                    contextoConsultaService,
+                    acessoService,
+                    visualizacaoService
+            );
         }
 
         private Subprocesso criarSubprocessoComMapa(Long codigo) {

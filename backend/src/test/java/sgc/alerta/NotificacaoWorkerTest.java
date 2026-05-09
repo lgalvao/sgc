@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.test.util.*;
 import sgc.alerta.model.*;
 
 import java.util.*;
@@ -20,12 +19,11 @@ class NotificacaoWorkerTest {
     @Mock
     private EmailService emailService;
 
-    @InjectMocks
     private NotificacaoWorker worker;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(worker, "loteWorker", 20);
+        worker = new NotificacaoWorker(notificacaoService, emailService, 20);
     }
 
     @Test
