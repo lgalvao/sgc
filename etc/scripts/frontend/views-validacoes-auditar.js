@@ -92,8 +92,8 @@ function generateReport(results) {
 
             files[filePath].forEach(item => {
                 let content = item.content
-                    .replaceAll("\\", "\\\\")
-                    .replace(/\|/g, "\\|");
+                    .replace(/\|/g, "\\|")
+                    .replaceAll("\\", "\\\\");
                 // Use concatenation to avoid template literal issues
                 md += "| " + item.line + " | `" + item.field + "()` | " + item.guarantee + " | `" + content + "` |\n";
             });
