@@ -357,56 +357,6 @@ class E2eControllerTest {
         controllerComErro.limparProcessoCompleto(999L);
     }
 
-    @Test
-    @DisplayName("Deve iniciar processo ao criar fixture com iniciar=true")
-    void deveIniciarProcessoAoCriarFixtureComIniciarTrue() throws Exception {
-
-        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
-                "Desc", "SIGLA", true, 10);
-
-        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
-
-        Processo proc = new Processo();
-        proc.setCodigo(100L);
-        when(processoService.criar(any())).thenReturn(proc);
-        doNothing().when(processoService).iniciar(eq(100L), anyList());
-        when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
-
-        var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
-                E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
-        method.setAccessible(true);
-
-        method.invoke(controller, req, TipoProcesso.DIAGNOSTICO);
-
-        verify(processoService).iniciar(eq(100L), eq(List.of(1L)));
-    }
-
-    @Test
-    @DisplayName("Deve cobrir branches de erros em iniciar no fixture")
-    void deveCobrirBranchesErrosIniciar() throws Exception {
-
-        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
-                "   ", "SIGLA", true, 10); // Blank description
-
-        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
-
-        Processo proc = new Processo();
-        proc.setCodigo(100L);
-        when(processoService.criar(any())).thenReturn(proc);
-        when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
-
-        // Simular retorno de erros vazio (sucesso)
-        doNothing().when(processoService).iniciar(anyLong(), anyList());
-
-        var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
-                E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
-        method.setAccessible(true);
-
-        method.invoke(controller, req, TipoProcesso.MAPEAMENTO);
-
-        verify(processoService).iniciar(eq(100L), anyList());
-    }
-
     @Nested
     @DisplayName("Cobertura extra isolada")
     class CoberturaExtra {

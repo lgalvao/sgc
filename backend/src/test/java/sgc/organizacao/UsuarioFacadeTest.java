@@ -82,7 +82,6 @@ class UsuarioFacadeTest {
 
             Usuario resultado = facade.usuarioAutenticado();
 
-            assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).buscarPerfisPorUsuarioTitulo(titulo);
             SecurityContextHolder.clearContext();
@@ -156,7 +155,6 @@ class UsuarioFacadeTest {
 
             Usuario resultado = facade.carregarUsuarioParaAutenticacao(titulo);
 
-            assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).buscarPerfisPorUsuarioTitulo(titulo);
         }
@@ -303,7 +301,7 @@ class UsuarioFacadeTest {
 
             AdministradorDto resultado = facade.adicionarAdministrador(titulo);
 
-            assertThat(resultado).isNotNull();
+            assertThat(resultado.tituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).adicionarAdministrador(titulo);
         }
 

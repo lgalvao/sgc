@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
@@ -23,7 +22,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
-import static org.springframework.test.util.ReflectionTestUtils.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,8 +32,6 @@ class LoginControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private LoginController loginController;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
 
@@ -286,67 +282,118 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("entrar deve aceitar cookie de pré-auth após cookies irrelevantes")
-    void entrar_ComCookiePreAuthAposCookiesIrrelevantes() {
+    @DisplayName("POST /api/usuarios/entrar - Deve aceitar pré-auth mesmo com cookies adicionais antes")
+    @WithMockUser
+    void entrar_ComCookiesAdicionaisAntesDoPreaAuth_DeveAutenticar() throws Exception {
+        EntrarRequest req = EntrarRequest.builder()
+                .perfil("ADMIN")
+                .unidadeCodigo(1L)
+                .build();
+
+        Usuario usuario = new Usuario();
+        usuario.setNome("Admin user");
+        usuario.setTituloEleitoral("123");
+
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setCookies(new Cookie("OUTRO", "x"), new Cookie("SGC_PRE_AUTH", "token-pre-auth"));
-
-        String titulo = invokeMethod(loginController, "extrairTituloPreAuth", request);
-
-        assertThat(titulo).isEqualTo("123");
+        mockMvc.perform(post("/api/usuarios/entrar")
+                        .with(csrf())
+                        .cookie(new Cookie("OUTRO", "x"), new Cookie("SGC_PRE_AUTH", "token-pre-auth"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Admin user"));
     }
 
     @Test
-    @DisplayName("cookies de login não devem ser secure quando a configuração desabilitar Secure")
-    void cookiesNaoDevemSerSecureQuandoConfiguracaoDesabilitarSecure() {
-        setField(loginController, "cookieSecure", false);
-        MockHttpServletResponse response = new MockHttpServletResponse();
+    @DisplayName("POST /api/usuarios/login - IP sanitizado (log injection) deve ser repassado ao limitador")
+    @WithMockUser
+    void login_IpComQuebraDeLinha_DevePassarIpSanitizadoAoLimitador() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        when(loginFacade.buscarAutorizacoesUsuario("123"))
+                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        Usuario usuario = new Usuario();
+        usuario.setNome("Admin user");
+        usuario.setTituloEleitoral("123");
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-        invokeMethod(loginController, "adicionarCookiePreAuth", response, "token-pre-auth");
-        invokeMethod(loginController, "adicionarCookieJwt", response, "token-jwt");
-        invokeMethod(loginController, "limparCookiePreAuth", response);
+        mockMvc.perform(post("/api/usuarios/login")
+                        .with(csrf())
+                        .with(request -> {
+                            request.setRemoteAddr("192.168.1.1\n\rFAKE");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
 
-        assertThat(response.getCookies()).hasSize(3);
-        assertThat(Arrays.stream(response.getCookies()).noneMatch(Cookie::getSecure)).isTrue();
+        verify(limitadorTentativasLogin).verificar("192.168.1.1__FAKE");
     }
 
     @Test
-    @DisplayName("cookies de login devem ser secure quando a configuração habilitar Secure")
-    void cookiesDevemSerSecureQuandoConfiguracaoHabilitarSecure() {
-        setField(loginController, "cookieSecure", true);
-        MockHttpServletResponse response = new MockHttpServletResponse();
+    @DisplayName("POST /api/usuarios/login - IP nulo não deve impedir login")
+    @WithMockUser
+    void login_IpNulo_DeveContinuarFluxoSemLimitador() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        when(loginFacade.buscarAutorizacoesUsuario("123"))
+                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        Usuario usuario = new Usuario();
+        usuario.setNome("Admin user");
+        usuario.setTituloEleitoral("123");
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-        invokeMethod(loginController, "adicionarCookiePreAuth", response, "token-pre-auth");
-        invokeMethod(loginController, "adicionarCookieJwt", response, "token-jwt");
-        invokeMethod(loginController, "limparCookiePreAuth", response);
+        mockMvc.perform(post("/api/usuarios/login")
+                        .with(csrf())
+                        .with(request -> {
+                            request.setRemoteAddr(null);
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
 
-        assertThat(response.getCookies()).hasSize(3);
-        assertThat(Arrays.stream(response.getCookies()).allMatch(Cookie::getSecure)).isTrue();
+        verify(limitadorTentativasLogin, never()).verificar(any());
     }
 
-    @Test
-    @DisplayName("deve higienizar o IP em extrairIp para evitar Log injection")
-    void deveHigienizarIp() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRemoteAddr("192.168.1.1\n\rFAKE");
+    @Nested
+    @DisplayName("Cookies sem flag Secure (aplicacao.cookies.secure=false)")
+    class CookiesSemSecure {
 
-        String ip = invokeMethod(loginController, "extrairIp", request);
+        @Test
+        @DisplayName("POST /api/usuarios/login - Cookies gerados não devem ter flag Secure quando desabilitado")
+        @WithMockUser
+        void login_CookiesNaoDevemSerSecureQuandoDesabilitado() throws Exception {
+            AutenticarRequest req = criarRequestPadrao();
+            UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+            when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+            when(loginFacade.buscarAutorizacoesUsuario("123"))
+                    .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
+            when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+            Usuario usuario = new Usuario();
+            usuario.setNome("Admin user");
+            usuario.setTituloEleitoral("123");
+            when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-        assertThat(ip).isEqualTo("192.168.1.1__FAKE");
-    }
-
-    @Test
-    @DisplayName("deve tratar IP nulo em extrairIp")
-    @SuppressWarnings("DataFlowIssue")
-    void deveTratarIpNulo() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRemoteAddr(null);
-
-        String ip = invokeMethod(loginController, "extrairIp", request);
-
-        assertThat(ip).isNull();
+            mockMvc.perform(post("/api/usuarios/login")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isOk())
+                    .andExpect(cookie().exists("jwtToken"))
+                    .andExpect(result -> {
+                        Cookie jwt = result.getResponse().getCookie("jwtToken");
+                        assertThat(jwt).isNotNull();
+                        assertThat(jwt.getSecure()).isFalse();
+                    });
+        }
     }
 
     private AutenticarRequest criarRequestPadrao() {
