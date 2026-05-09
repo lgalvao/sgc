@@ -237,10 +237,12 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro base", "CODE", HttpStatus.BAD_REQUEST) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
-        assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(((ErroApi) response.getBody()).getMessage()).isEqualTo("Erro base");
+        assertThat(response.getBody())
+                .isInstanceOfSatisfying(ErroApi.class, erroApi -> {
+                    assertThat(erroApi.getMessage()).isEqualTo("Erro base");
+                    assertThat(erroApi.getCode()).isEqualTo("CODE");
+                });
     }
 
     @Test
@@ -250,10 +252,12 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro com detalhe", "CODE", HttpStatus.BAD_REQUEST, details) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
-        assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(((ErroApi) response.getBody()).getDetails()).isEqualTo(details);
+        assertThat(response.getBody())
+                .isInstanceOfSatisfying(ErroApi.class, erroApi -> {
+                    assertThat(erroApi.getDetails()).isEqualTo(details);
+                    assertThat(erroApi.getMessage()).isEqualTo("Erro com detalhe");
+                });
     }
 
     @Test
@@ -287,6 +291,11 @@ class RestExceptionHandlerTest {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getBody())
+                .isInstanceOfSatisfying(ErroApi.class, erroApi -> {
+                    assertThat(erroApi.getMessage()).isEqualTo("Erro server");
+                    assertThat(erroApi.getCode()).isEqualTo("CODE");
+                });
     }
 
     private HttpMessageNotWritableException criarExcecaoEscrita() {
@@ -294,80 +303,24 @@ class RestExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("Deve cobrir descreverRequisicao quando não for ServletWebRequest")
-    void deveCobrirDescreverRequisicaoNaoServlet() {
+    @DisplayName("Deve tratar HttpMessageNotWritableException com resposta padronizada")
+    void deveTratarHttpMessageNotWritableException() {
         WebRequest mockRequest = Mockito.mock(WebRequest.class);
 
         ResponseEntity<Object> response = restExceptionHandler.handleHttpMessageNotWritable(
                 criarExcecaoEscrita(), null, HttpStatus.INTERNAL_SERVER_ERROR, mockRequest);
 
-        assertThat(response).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve cobrir descreverRequisicao quando for ServletWebRequest")
-    void deveCobrirDescreverRequisicaoServlet() {
-        ServletWebRequest mockRequest = Mockito.mock(ServletWebRequest.class);
-        jakarta.servlet.http.HttpServletRequest mockHttpRequest = Mockito.mock(jakarta.servlet.http.HttpServletRequest.class);
-
-        Mockito.when(mockRequest.getRequest()).thenReturn(mockHttpRequest);
-        Mockito.when(mockHttpRequest.getMethod()).thenReturn("POST");
-        Mockito.when(mockHttpRequest.getRequestURI()).thenReturn("/api/teste");
-
-        restExceptionHandler.handleHttpMessageNotWritable(criarExcecaoEscrita(), null, HttpStatus.INTERNAL_SERVER_ERROR, mockRequest);
-
-        Mockito.verify(mockRequest).getRequest();
-    }
-
-    @Test
-    @DisplayName("Deve cobrir obterCausaRaiz com múltiplas causas")
-    void deveCobrirObterCausaRaizMultiplasCausas() {
-        Exception causaRaiz = new RuntimeException("Raiz");
-        Exception causaMeio = new RuntimeException("Meio", causaRaiz);
-        Exception ex = new RuntimeException("Topo", causaMeio);
-        WebRequest request = Mockito.mock(WebRequest.class);
-
-        ResponseEntity<Object> response = restExceptionHandler.handleHttpMessageNotWritable(
-                new HttpMessageNotWritableException("Erro", ex),
-                null, HttpStatus.INTERNAL_SERVER_ERROR, request);
-
-        assertThat(response).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve cobrir handleErroNegocio com erro 4xx e detalhes")
-    @SuppressWarnings("unchecked")
-    void deveCobrirHandleErroNegocio4xxComDetalhes() {
-        Map<String, String> details = new HashMap<>();
-        details.put("campo", "erro no campo");
-
-        ErroNegocioBase ex = new ErroNegocioBase("Mensagem Erro", "COD_400", HttpStatus.BAD_REQUEST, details) {
-        };
-
-        ResponseEntity<ErroApi> response = restExceptionHandler.handleErroNegocio(ex);
-        ErroApi corpo = Objects.requireNonNull(response.getBody());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(corpo.getMessage()).isEqualTo("Mensagem Erro");
-
-        Map<String, Object> responseDetails = (Map<String, Object>) corpo.getDetails();
-        assertThat(responseDetails).containsEntry("campo", "erro no campo");
-    }
-
-    @Test
-    @DisplayName("Deve cobrir handleErroNegocio com erro 5xx")
-    void deveCobrirHandleErroNegocio5xx() {
-        ErroNegocioBase ex = new ErroNegocioBase("Erro Crítico", "COD_500", HttpStatus.INTERNAL_SERVER_ERROR) {
-        };
-
-        ResponseEntity<ErroApi> response = restExceptionHandler.handleErroNegocio(ex);
-
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getBody())
+                .isInstanceOfSatisfying(ErroApi.class, erroApi -> {
+                    assertThat(erroApi.getMessage()).isEqualTo("Erro inesperado ao processar a resposta.");
+                    assertThat(erroApi.getCode()).isEqualTo("ERRO_SERIALIZACAO");
+                });
     }
 
     @Test
-    @DisplayName("Deve cobrir handleGenericException com mensagem nula")
-    void deveCobrirHandleGenericExceptionMensagemNula() {
+    @DisplayName("Deve tratar Exception genérica sem mensagem com erro padrão")
+    void deveTratarExceptionGenericaSemMensagem() {
         Exception ex = new NullPointerException();
 
         ResponseEntity<ErroApi> response = restExceptionHandler.handleGenericException(ex);
@@ -375,6 +328,7 @@ class RestExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(corpo.getMessage()).isEqualTo("Erro inesperado. Consulte o suporte com o código de rastreamento.");
+        assertThat(corpo.getCode()).isEqualTo("ERRO_INTERNO");
     }
 
     @Test

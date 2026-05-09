@@ -148,17 +148,21 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("validarSituacaoPermitida: throw se status diferente")
+    @DisplayName("validarSituacaoPermitida: deve informar situação atual e permitida quando status for incompatível")
     void validarSituacaoPermitida_Throw() {
         assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
-                .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining(subprocesso.getSituacao().name())
+                .hasMessageContaining(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO.name());
     }
 
     @Test
-    @DisplayName("validarSituacaoPermitida: throw IllegalArgumentException se status null")
+    @DisplayName("validarSituacaoPermitida: deve lançar IllegalArgumentException quando status for nulo")
     void validarSituacaoPermitida_NullStatus() {
         Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(null);
         assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
-                .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Situação do subprocesso não pode ser nula");
     }
 }
