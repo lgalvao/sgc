@@ -140,7 +140,7 @@ projeto
 projeto
     .command("setup")
     .description("Prepara o ambiente do projeto com etapas opcionais de bootstrap.")
-    .option("--instalar-dependencias", "Executa pnpm install na raiz, no frontend e no toolkit.")
+    .option("--instalar-dependencias", "Executa npm install na raiz, no frontend e no toolkit.")
     .option("--instalar-playwright", "Instala o Chromium do Playwright.")
     .option("--importar-certificados", "Executa a importacao de certificados Java locais.")
     .action(async (opcoes) => {

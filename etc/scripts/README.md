@@ -120,25 +120,25 @@ node etc/scripts/sgc.js projeto arvore-linhas
 Instalação:
 
 ```bash
-pnpm --dir etc/scripts install
+npm --prefix etc/scripts install
 ```
 
 Execução dos testes do toolkit:
 
 ```bash
-pnpm --dir etc/scripts run test
+npm --prefix etc/scripts run test
 ```
 
 Lint do toolkit:
 
 ```bash
-pnpm --dir etc/scripts run lint
+npm --prefix etc/scripts run lint
 ```
 
 Auditoria de dependências:
 
 ```bash
-pnpm --dir etc/scripts run deps:audit
+npm --prefix etc/scripts run deps:audit
 node etc/scripts/sgc.js projeto dependencias auditar
 ```
 
@@ -153,7 +153,7 @@ Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e
 
 ## Relação com o restante do repositório
 
-O toolkit não substitui os comandos nativos de Gradle, pnpm ou Playwright; ele os complementa com:
+O toolkit não substitui os comandos nativos de Gradle, npm ou Playwright; ele os complementa com:
 
 - automação padronizada;
 - relatórios agregados;

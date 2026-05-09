@@ -34,11 +34,10 @@ RUN --mount=type=cache,target=/root/.gradle \
 FROM deps-java AS deps-frontend
 
 COPY frontend/build.gradle.kts frontend/
-COPY frontend/package.json frontend/pnpm-lock.yaml frontend/
+COPY frontend/package.json frontend/package-lock.json frontend/
 
 # Instala dependências do frontend, preservando a orquestração oficial do Gradle
 RUN --mount=type=cache,target=/root/.gradle \
-    --mount=type=cache,target=/root/.pnpm-store \
     gradle :frontend:install --no-daemon --configuration-cache
 
 # Estágio 1: Build unificado (Backend + Frontend)

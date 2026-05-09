@@ -1,4 +1,4 @@
-import com.github.gradle.node.pnpm.task.PnpmTask
+import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
     alias(libs.plugins.spring.boot) apply false
@@ -14,7 +14,6 @@ plugins {
 node {
     download.set(true)
     version.set("26.1.0")
-    pnpmVersion.set("11.0.8")
 }
 
 allprojects {
@@ -53,20 +52,20 @@ subprojects {
 }
 
 // Delegation tasks for convenience
-tasks.register<PnpmTask>("installRoot") {
+tasks.register<NpmTask>("installRoot") {
     group = "setup"
-    description = "Instala as dependências do root (pnpm install)"
-    pnpmCommand.set(listOf("install"))
+    description = "Instala as dependências do root (npm install)"
+    npmCommand.set(listOf("install"))
     inputs.file("package.json")
-    inputs.file("pnpm-lock.yaml")
+    inputs.file("package-lock.json")
     outputs.dir("node_modules")
 }
 
-tasks.register<PnpmTask>("incrementVersion") {
+tasks.register<NpmTask>("incrementVersion") {
     group = "versioning"
     description = "Incrementa a versão global usando release-it"
     dependsOn("installRoot")
-    pnpmCommand.set(listOf("run", "release", "--", "--ci", "--patch"))
+    npmCommand.set(listOf("run", "release", "--", "--ci", "--patch"))
 }
 
 tasks.register("installFrontend") {

@@ -129,8 +129,8 @@ O `main.ts` carrega dinamicamente `FeedbackWidget.vue` quando `VITE_FEEDBACK_WID
 ## Execução local
 
 ```bash
-pnpm --dir frontend install
-pnpm --dir frontend run dev
+npm --prefix frontend install
+npm --prefix frontend run dev
 ```
 
 Aplicação em `http://localhost:5173`.
@@ -138,9 +138,9 @@ Aplicação em `http://localhost:5173`.
 ## Builds
 
 ```bash
-pnpm --dir frontend run build
-pnpm --dir frontend run build:hom
-pnpm --dir frontend run build:prod
+npm --prefix frontend run build
+npm --prefix frontend run build:hom
+npm --prefix frontend run build:prod
 ```
 
 No build integrado via Gradle, `:frontend:buildVue` gera `dist/` e a raiz copia esse conteúdo para o backend.
@@ -167,10 +167,10 @@ Os testes se distribuem entre diretórios centrais e testes co-localizados.
 Comandos principais:
 
 ```bash
-pnpm --dir frontend run test:unit
-pnpm --dir frontend run typecheck
-pnpm --dir frontend run lint
-pnpm --dir frontend run quality:all
+npm --prefix frontend run test:unit
+npm --prefix frontend run typecheck
+npm --prefix frontend run lint
+npm --prefix frontend run quality:all
 ```
 
 Na raiz do repositório também existem atalhos:

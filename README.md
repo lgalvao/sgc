@@ -128,16 +128,15 @@ flowchart LR
 ### Pré-requisitos
 
 - JDK 25
-- Node.js com Corepack habilitado
-- pnpm 10.33.4 para o frontend/tooling
+- Node.js 22+
+- npm 11+
 
 ### Setup inicial
 
 ```bash
-corepack enable
-pnpm install
-pnpm --dir frontend install
-pnpm --dir etc/scripts install
+npm install
+npm --prefix frontend install
+npm --prefix etc/scripts install
 ```
 
 ### Backend
@@ -151,7 +150,7 @@ API em `http://localhost:10000`.
 ### Frontend
 
 ```bash
-pnpm --dir frontend run dev
+npm --prefix frontend run dev
 ```
 
 SPA em `http://localhost:5173`.
@@ -184,8 +183,8 @@ A raiz usa tarefas Gradle para:
 ```bash
 ./gradlew :backend:build
 ./gradlew :frontend:buildVue
-pnpm --dir frontend run build:hom
-pnpm --dir frontend run build:prod
+npm --prefix frontend run build:hom
+npm --prefix frontend run build:prod
 ```
 
 ## Estratégia de testes

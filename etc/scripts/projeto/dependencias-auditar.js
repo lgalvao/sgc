@@ -28,7 +28,7 @@ async function executarAuditoriaDependencias() {
         ESCOPOS_AUDITORIA.map((escopo) => ({
             title: escopo.titulo,
             task: async () => {
-                await execa("pnpm", ["run", "deps:audit"], {
+                await execa("npm", ["run", "deps:audit"], {
                     cwd: escopo.diretorio,
                     stdio: "inherit",
                     shell: process.platform === "win32"

@@ -37,26 +37,21 @@ clear
 invoke_passo 'git pull' git pull
 invoke_passo 'Testes backend' "$GRADLE_CMD" backend:test
 
-# Garantir que pnpm está instalado via corepack
-if ! command -v pnpm &> /dev/null; then
-    invoke_passo 'Habilitar corepack' corepack enable
-fi
+invoke_passo 'Atualizar npm' npm install -g npm@latest
+invoke_passo 'Atualizar globais' npm update -g
+invoke_passo 'Atualizar raiz' npm update
 
-invoke_passo 'Atualizar pnpm' corepack prepare pnpm@latest --activate
-invoke_passo 'Atualizar globais' pnpm update -g
-invoke_passo 'Atualizar raiz' pnpm update
-
-invoke_passo 'typecheck' pnpm run typecheck
-invoke_passo 'lint' pnpm run lint
+invoke_passo 'typecheck' npm run typecheck
+invoke_passo 'lint' npm run lint
 
 # Frontend
 if [ -d "frontend" ]; then
     pushd frontend > /dev/null
-    invoke_passo 'Frontend deps' pnpm update
-    invoke_passo 'Testes frontend' pnpm exec vitest run
+    invoke_passo 'Frontend deps' npm update
+    invoke_passo 'Testes frontend' npx vitest run
     popd > /dev/null
 fi
 
-invoke_passo 'Testes e2e mínimos' pnpm exec playwright test captura jornada
+invoke_passo 'Testes e2e mínimos' npx playwright test captura jornada
 
 echo -e "\n${GREEN}Tudo certo!${NC}"

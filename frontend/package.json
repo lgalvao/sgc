@@ -2,7 +2,6 @@
   "name": "sgc",
   "private": true,
   "version": "1.0.4",
-  "packageManager": "pnpm@11.0.9+sha512.34ce82e6780233cf9cad8685029a8f81d2e06196c5a9bad98879f7424940c6817c4e4524fb7d38b8553ceed48b9758b8ebaf1abd3600c232c4c8cf7366086f38",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,19 +12,19 @@
     "build:prod": "vite build --mode production",
     "preview": "vite preview",
     "lint:ox": "oxlint .",
-    "lint": "pnpm run lint:ox && pnpm exec eslint . --ext .vue,.js,.mjs,.ts --fix",
-    "deps:audit": "pnpm exec knip",
+    "lint": "npm run lint:ox && eslint . --ext .vue,.js,.mjs,.ts --fix",
+    "deps:audit": "knip",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
-    "test": "pnpm run test:unit",
+    "test": "npm run test:unit",
     "test:unit": "vitest --run --reporter=dot --no-color",
     "coverage:unit": "vitest --run --coverage --reporter=dot --no-color",
     "coverage:unit:collect": "vitest --run --coverage --reporter=dot --no-color --coverage.thresholds.lines=0 --coverage.thresholds.functions=0 --coverage.thresholds.statements=0 --coverage.thresholds.branches=0",
     "cruft:audit": "node ../etc/scripts/sgc.js frontend cruft auditar",
     "cruft:check": "node ../etc/scripts/sgc.js frontend cruft validar",
-    "quality:test": "pnpm run test:unit",
+    "quality:test": "npm run test:unit",
     "quality:lint": "oxlint . && eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist",
     "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
-    "quality:all": "pnpm run quality:test && pnpm run quality:lint && pnpm run quality:typecheck && pnpm run cruft:check"
+    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck && npm run cruft:check"
   },
   "dependencies": {
     "axios": "1.16.0",
@@ -71,9 +70,7 @@
     "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "^3.2.8"
   },
-  "pnpm": {
-    "overrides": {
-      "glob": "^13.0.0"
-    }
+  "overrides": {
+    "glob": "^13.0.0"
   }
 }

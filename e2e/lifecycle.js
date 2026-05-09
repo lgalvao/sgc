@@ -356,8 +356,8 @@ function startBackend() {
 }
 
 function startFrontend() {
-    const pnpmExecutable = isWindows ? 'pnpm.cmd' : 'pnpm';
-    const argumentosFrontend = ['exec', 'vite'];
+    const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
+    const argumentosFrontend = ['exec', '--', 'vite'];
 
     if (modoHomologacao()) {
         argumentosFrontend.push('--mode', 'hom');
@@ -380,7 +380,7 @@ function startFrontend() {
     };
 
     const frontendProcess = spawn(
-        pnpmExecutable,
+        npmExecutable,
         argumentosFrontend,
         spawnOptions
     );

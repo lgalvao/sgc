@@ -4,10 +4,10 @@
   "version": "1.0.4",
   "type": "module",
   "scripts": {
-    "test": "pnpm -C frontend test",
-    "test:e2e": "pnpm exec playwright test",
-    "test:unit": "pnpm -C frontend run test:unit",
-    "typecheck": "pnpm run typecheck:e2e && pnpm -C frontend run typecheck",
+    "test": "npm --prefix frontend run test",
+    "test:e2e": "playwright test",
+    "test:unit": "npm --prefix frontend run test:unit",
+    "typecheck": "npm run typecheck:e2e && npm --prefix frontend run typecheck",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "sgc": "node etc/scripts/sgc.js",
     "smells:auditar": "node etc/scripts/sgc.js codigo smells auditar",
@@ -16,9 +16,9 @@
     "qa:dashboard": "node etc/scripts/sgc.js qa snapshot coletar --perfil rapido",
     "qa:dashboard:serve": "node etc/scripts/sgc.js qa dashboard servir --porta 4179",
     "lint:ox": "oxlint .",
-    "lint": "pnpm run lint:ox && pnpm exec eslint . --fix",
-    "deps:audit": "pnpm exec knip",
-    "deps:audit:all": "pnpm run deps:audit && pnpm -C frontend run deps:audit && pnpm -C etc/scripts run deps:audit",
+    "lint": "npm run lint:ox && eslint . --fix",
+    "deps:audit": "knip",
+    "deps:audit:all": "npm run deps:audit && npm --prefix frontend run deps:audit && npm --prefix etc/scripts run deps:audit",
     "release": "release-it",
     "sast": "semgrep scan --config p/java --config p/typescript --config p/javascript --config p/owasp-top-ten --config p/security-audit --config p/secrets --metrics=off"
   },
@@ -38,9 +38,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.2"
   },
-  "pnpm": {
-    "overrides": {
-      "glob": "^13.0.0"
-    }
+  "overrides": {
+    "glob": "^13.0.0"
   }
 }

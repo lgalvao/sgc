@@ -16,7 +16,7 @@ const CATEGORIAS = {
 
 const RECURSOS = [
     {tipo: "comando", nome: "node", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoMin: "22.0.0"},
-    {tipo: "comando", nome: "pnpm", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
+    {tipo: "comando", nome: "npm", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
     {tipo: "comando", nome: "git", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
     {tipo: "comando", nome: "java", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoEsperada: "25"},
     {tipo: "comando", nome: "keytool", obrigatorio: false, categoria: CATEGORIAS.AMBIENTE},

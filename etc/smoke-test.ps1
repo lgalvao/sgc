@@ -128,9 +128,9 @@ Write-Host "=========================================`n" -ForegroundColor $COLOR
 
 # Passos
 Run-Step "junit"      { .\gradlew.bat :backend:test }
-Run-Step "typecheck"  { pnpm run typecheck -s }
-Run-Step "lint"       { pnpm run lint -s }
-Run-Step "vitest"     { pnpm -C frontend run test:unit -- -s --reporter=dot }
+Run-Step "typecheck"  { npm run typecheck -s }
+Run-Step "lint"       { npm run lint -s }
+Run-Step "vitest"     { npm --prefix frontend run test:unit -- -s --reporter=dot }
 Run-Step "e2e"        { npx playwright test captura jornada --reporter=dot } -ErrorDetailMsg "Obs: Verifique e2e/server.log para detalhes de inicialização."
 
 # Resumo Final

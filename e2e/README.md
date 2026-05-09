@@ -65,7 +65,7 @@ O backend ainda expõe `/e2e/fixtures/*` para **state-jumping** quando um cenár
 Ele:
 
 - sobe backend via `gradlew bootRun -PENV=e2e|hom`;
-- sobe frontend via `pnpm exec vite`;
+- sobe frontend via `npm exec -- vite`;
 - cria um SMTP local para testes de e-mail;
 - verifica portas e, em `e2e`, pode reutilizar backend existente quando configurado;
 - permite ligar monitoramento de lentidão por variável de ambiente.
@@ -97,8 +97,8 @@ Por padrão, `playwright.config.ts`:
 ### Execuções úteis
 
 ```bash
-pnpm exec playwright test --ui
-pnpm exec playwright test e2e/cdu-01.spec.ts
+npx playwright test --ui
+npx playwright test e2e/cdu-01.spec.ts
 node e2e/lifecycle.js
 ```
 

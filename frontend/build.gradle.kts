@@ -1,4 +1,4 @@
-import com.github.gradle.node.pnpm.task.PnpmTask
+import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
     base
@@ -8,26 +8,25 @@ plugins {
 node {
     download.set(true)
     version.set("22.22.0")
-    pnpmVersion.set("10.33.4")
 }
 
-tasks.register<PnpmTask>("install") {
+tasks.register<NpmTask>("install") {
     group = "setup"
-    description = "Instala as dependências do frontend (pnpm install)"
-    pnpmCommand.set(listOf("install", "--no-frozen-lockfile", "--config.confirmModulesPurge=false"))
+    description = "Instala as dependências do frontend (npm ci)"
+    npmCommand.set(listOf("ci"))
     inputs.file("package.json")
-    inputs.file("pnpm-lock.yaml")
+    inputs.file("package-lock.json")
     outputs.dir("node_modules")
 }
 
-tasks.register<PnpmTask>("dev") {
+tasks.register<NpmTask>("dev") {
     group = "application"
     description = "Inicia o servidor de desenvolvimento do frontend (Vite)"
     dependsOn("install")
-    pnpmCommand.set(listOf("run", "dev"))
+    npmCommand.set(listOf("run", "dev"))
 }
 
-tasks.register<PnpmTask>("buildVue") {
+tasks.register<NpmTask>("buildVue") {
     group = "build"
     description = "Gera o build de produção do frontend Vue"
     dependsOn("install")
@@ -52,22 +51,22 @@ tasks.register<PnpmTask>("buildVue") {
         else -> "build"
     }
 
-    pnpmCommand.set(listOf("run", scriptBuild))
+    npmCommand.set(listOf("run", scriptBuild))
 }
 
-tasks.register<PnpmTask>("quality") {
+tasks.register<NpmTask>("quality") {
     group = "verification"
     description = "Executa verificações de qualidade do frontend (lint, tests, typecheck)"
     dependsOn("install")
-    pnpmCommand.set(listOf("run", "quality:all"))
+    npmCommand.set(listOf("run", "quality:all"))
     ignoreExitValue.set(true)
 }
 
-tasks.register<PnpmTask>("test") {
+tasks.register<NpmTask>("test") {
     group = "verification"
     description = "Executa apenas os testes do frontend"
     dependsOn("install")
-    pnpmCommand.set(listOf("run", "quality:test"))
+    npmCommand.set(listOf("run", "quality:test"))
     ignoreExitValue.set(true)
 }
 

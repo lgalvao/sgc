@@ -137,10 +137,10 @@ const ADAPTADORES = {
         return execucao;
     },
     async frontendCobertura() {
-        const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "pnpm -C frontend run coverage:unit:collect", "frontend");
+        const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "npm --prefix frontend run coverage:unit:collect", "frontend");
         const saida = await executarComando({
-            comando: "pnpm",
-            args: ["-C", "frontend", "run", "coverage:unit:collect"],
+            comando: "npm",
+            args: ["--prefix", "frontend", "run", "coverage:unit:collect"],
             cwd: DIRETORIO_RAIZ
         });
         const cobertura = await extrairCoberturaFrontend();
@@ -163,10 +163,10 @@ const ADAPTADORES = {
         return execucao;
     },
     async frontendTypecheck() {
-        const execucao = criarExecucao("frontend-typecheck", "Frontend typecheck", "qualidade", "pnpm -C frontend run typecheck", "frontend");
+        const execucao = criarExecucao("frontend-typecheck", "Frontend typecheck", "qualidade", "npm --prefix frontend run typecheck", "frontend");
         const saida = await executarComando({
-            comando: "pnpm",
-            args: ["-C", "frontend", "run", "typecheck"],
+            comando: "npm",
+            args: ["--prefix", "frontend", "run", "typecheck"],
             cwd: DIRETORIO_RAIZ
         });
         execucao.status = saida.code === 0 ? "sucesso" : "falha";
