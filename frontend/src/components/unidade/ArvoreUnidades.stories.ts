@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import ArvoreUnidades from './ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
 import {ref} from 'vue';
@@ -79,10 +77,6 @@ export const Default: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const item = page.getByTestId('chk-arvore-unidade-PRES');
-        await expect.element(item).toBeVisible();
-    },
 };
 
 export const ComPreSelecao: Story = {

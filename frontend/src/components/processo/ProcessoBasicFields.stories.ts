@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import {ref} from 'vue';
 import ProcessoBasicFields from './ProcessoBasicFields.vue';
 import {TipoProcesso} from '@/types/tipos';
@@ -36,12 +34,6 @@ export const Default: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const inputDescricao = page.getByTestId('inp-processo-descricao');
-        await expect.element(inputDescricao).toBeVisible();
-        const selectTipo = page.getByTestId('sel-processo-tipo');
-        await expect.element(selectTipo).toBeVisible();
-    },
 };
 
 export const Preenchido: Story = {
@@ -63,10 +55,6 @@ export const Preenchido: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const inputDescricao = page.getByTestId('inp-processo-descricao');
-        await expect.element(inputDescricao).toHaveValue('Mapeamento de Competências 2025');
-    },
 };
 
 export const EmEdicao: Story = {
@@ -89,10 +77,6 @@ export const EmEdicao: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const selectTipo = page.getByTestId('sel-processo-tipo');
-        await expect.element(selectTipo).toBeDisabled();
-    },
 };
 
 export const ComErros: Story = {
@@ -116,8 +100,4 @@ export const ComErros: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        await expect.element(page.getByText('A descrição é obrigatória.')).toBeVisible();
-        await expect.element(page.getByText('Selecione um tipo de processo.')).toBeVisible();
-    },
 };

@@ -23,8 +23,7 @@
     "types": [
       "node",
       "vitest/globals",
-      "vite/client",
-      "@vitest/browser/matchers"
+      "vite/client"
     ],
     "paths": {
       "@/*": [

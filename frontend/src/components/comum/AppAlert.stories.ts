@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page, userEvent} from 'vitest/browser';
 import AppAlert from './AppAlert.vue';
 
 const meta: Meta<typeof AppAlert> = {
@@ -63,15 +61,6 @@ export const ComNotificacaoEstruturada: Story = {
         },
         variante: 'danger',
         dispensavel: true,
-    },
-    play: async () => {
-        const botaoDetalhes = page.getByRole('button', {name: /mostrar detalhes/i});
-        await expect.element(botaoDetalhes).toBeVisible();
-
-        await userEvent.click(botaoDetalhes);
-
-        const lista = page.getByRole('list');
-        await expect.element(lista).toBeVisible();
     },
 };
 

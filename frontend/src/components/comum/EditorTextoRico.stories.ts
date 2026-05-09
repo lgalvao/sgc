@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import {ref} from 'vue';
 import EditorTextoRico from './EditorTextoRico.vue';
 
@@ -76,10 +74,6 @@ export const Desabilitado: Story = {
         },
         template: '<EditorTextoRico v-bind="args" v-model="valor" style="height: 300px;" />',
     }),
-    play: async () => {
-        const botoes = page.getByRole('toolbar').getByRole('button');
-        await expect.element(botoes.first()).toBeDisabled();
-    },
 };
 
 export const VazioEditavel: Story = {

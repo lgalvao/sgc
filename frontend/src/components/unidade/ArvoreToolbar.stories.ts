@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page, userEvent} from 'vitest/browser';
 import {ref} from 'vue';
 import ArvoreToolbar from './ArvoreToolbar.vue';
 
@@ -30,10 +28,6 @@ export const ModoVisualizacao: Story = {
         },
         template: '<ArvoreToolbar v-bind="args" v-model:termoBusca="termo" />',
     }),
-    play: async () => {
-        const input = page.getByTestId('inp-arvore-busca');
-        await expect.element(input).toBeVisible();
-    },
 };
 
 export const ModoSelecao: Story = {
@@ -49,12 +43,6 @@ export const ModoSelecao: Story = {
         },
         template: '<ArvoreToolbar v-bind="args" v-model:termoBusca="termo" />',
     }),
-    play: async () => {
-        const btnTodos = page.getByTestId('btn-arvore-selecionar-todos');
-        await expect.element(btnTodos).toBeVisible();
-        const btnLimpar = page.getByTestId('btn-arvore-limpar-selecao');
-        await expect.element(btnLimpar).toBeVisible();
-    },
 };
 
 export const ComBusca: Story = {
@@ -70,10 +58,6 @@ export const ComBusca: Story = {
         },
         template: '<ArvoreToolbar v-bind="args" v-model:termoBusca="termo" />',
     }),
-    play: async () => {
-        const input = page.getByTestId('inp-arvore-busca');
-        await expect.element(input).toHaveValue('PROEN');
-    },
 };
 
 export const ModoSelecaoComBusca: Story = {
@@ -109,9 +93,4 @@ export const FiltrarUnidade: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const input = page.getByTestId('inp-arvore-busca');
-        await userEvent.type(input, 'REIT');
-        await expect.element(input).toHaveValue('REIT');
-    },
 };

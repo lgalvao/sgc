@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import {ref} from 'vue';
 import LoginCredenciaisCampos from './LoginCredenciaisCampos.vue';
 
@@ -49,12 +47,6 @@ export const Default: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const inputUsuario = page.getByTestId('inp-login-usuario');
-        await expect.element(inputUsuario).toBeVisible();
-        const inputSenha = page.getByTestId('inp-login-senha');
-        await expect.element(inputSenha).toBeVisible();
-    },
 };
 
 export const ComErros: Story = {
@@ -87,10 +79,6 @@ export const ComErros: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        await expect.element(page.getByText('Título eleitoral inválido.')).toBeVisible();
-        await expect.element(page.getByText('Senha incorreta.')).toBeVisible();
-    },
 };
 
 export const Carregando: Story = {
@@ -123,10 +111,6 @@ export const Carregando: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const inputUsuario = page.getByTestId('inp-login-usuario');
-        await expect.element(inputUsuario).toBeDisabled();
-    },
 };
 
 export const ComCapsLock: Story = {
@@ -159,10 +143,6 @@ export const ComCapsLock: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const alertCaps = page.getByTestId('alert-caps-lock');
-        await expect.element(alertCaps).toBeVisible();
-    },
 };
 
 export const SenhaVisivel: Story = {

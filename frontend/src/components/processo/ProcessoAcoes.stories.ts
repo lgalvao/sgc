@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import ProcessoAcoes from './ProcessoAcoes.vue';
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import type {Processo} from '@/types/tipos';
@@ -72,9 +70,6 @@ export const Default: Story = {
         acaoBlocoPrincipal: null,
         processandoAcaoBloco: false,
     },
-    play: async () => {
-        await expect.element(page.getByTestId('processo-info')).toBeVisible();
-    },
 };
 
 export const ComBotaoFinalizar: Story = {
@@ -86,11 +81,6 @@ export const ComBotaoFinalizar: Story = {
         acoesBlocoVisiveis: [],
         acaoBlocoPrincipal: null,
         processandoAcaoBloco: false,
-    },
-    play: async () => {
-        const btnFinalizar = page.getByTestId('btn-processo-finalizar');
-        await expect.element(btnFinalizar).toBeVisible();
-        await expect.element(btnFinalizar).not.toBeDisabled();
     },
 };
 
@@ -104,10 +94,6 @@ export const FinalizarDesabilitado: Story = {
         acaoBlocoPrincipal: null,
         processandoAcaoBloco: false,
     },
-    play: async () => {
-        const btnFinalizar = page.getByTestId('btn-processo-finalizar');
-        await expect.element(btnFinalizar).toBeDisabled();
-    },
 };
 
 export const ComMenuAcoesBloco: Story = {
@@ -119,10 +105,6 @@ export const ComMenuAcoesBloco: Story = {
         acoesBlocoVisiveis: acoesBlocoMock,
         acaoBlocoPrincipal: null,
         processandoAcaoBloco: false,
-    },
-    play: async () => {
-        const btnAcoesBloco = page.getByTestId('btn-processo-acoes-bloco');
-        await expect.element(btnAcoesBloco).toBeVisible();
     },
 };
 

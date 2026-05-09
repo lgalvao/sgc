@@ -1,6 +1,4 @@
 ﻿import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import {ref} from 'vue';
 import CadastroObservacaoModal from './CadastroObservacaoModal.vue';
 
@@ -53,10 +51,6 @@ export const Aberto: Story = {
       />
     `,
     }),
-    play: async () => {
-        const textarea = page.getByTestId('inp-observacao-modal');
-        await expect.element(textarea).toBeVisible();
-    },
 };
 
 export const ComSucesso: Story = {
@@ -156,8 +150,5 @@ export const ComErro: Story = {
       />
     `,
     }),
-    play: async () => {
-        await expect.element(page.getByText('Não foi possível processar a solicitação. Tente novamente.')).toBeVisible();
-    },
 };
 

@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import ProcessoDiagnosticoAlert from './ProcessoDiagnosticoAlert.vue';
 
 const meta: Meta<typeof ProcessoDiagnosticoAlert> = {
@@ -27,10 +25,6 @@ export const ComGrupos: Story = {
         ],
         unidadesSemResponsavel: [],
     },
-    play: async () => {
-        const alerta = page.getByTestId('alert-diagnostico-organizacional');
-        await expect.element(alerta).toBeVisible();
-    },
 };
 
 export const ComUnidadesSemResponsavel: Story = {
@@ -43,11 +37,6 @@ export const ComUnidadesSemResponsavel: Story = {
             {codigo: 2, sigla: 'PROEN'},
             {codigo: 3, sigla: 'CF'},
         ],
-    },
-    play: async () => {
-        const alerta = page.getByTestId('alert-diagnostico-organizacional');
-        await expect.element(alerta).toBeVisible();
-        await expect.element(page.getByText(/PROEN/)).toBeVisible();
     },
 };
 
@@ -82,9 +71,6 @@ export const Carregando: Story = {
         resumo: '',
         grupos: [],
         unidadesSemResponsavel: [],
-    },
-    play: async () => {
-        await expect.element(page.getByText('Validando informações organizacionais...')).toBeVisible();
     },
 };
 

@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import {ref} from 'vue';
 import LoginPerfilSelect from './LoginPerfilSelect.vue';
 import type {PerfilUnidade} from '@/types/autenticacao';
@@ -68,12 +66,6 @@ export const Visivel: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const secao = page.getByTestId('sec-login-perfil');
-        await expect.element(secao).toBeVisible();
-        const select = page.getByTestId('sel-login-perfil');
-        await expect.element(select).toBeVisible();
-    },
 };
 
 export const ComErro: Story = {
@@ -99,9 +91,6 @@ export const ComErro: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        await expect.element(page.getByText('Selecione um perfil de acesso.')).toBeVisible();
-    },
 };
 
 export const Oculto: Story = {

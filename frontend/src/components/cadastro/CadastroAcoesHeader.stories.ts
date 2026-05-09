@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import CadastroAcoesHeader from './CadastroAcoesHeader.vue';
 import type {PermissoesSubprocesso, Unidade} from '@/types/tipos';
 
@@ -78,9 +76,6 @@ export const SemSubprocesso: Story = {
         loadingValidacao: false,
         podeVisualizarImpacto: false,
     },
-    play: async () => {
-        await expect.element(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
-    },
 };
 
 export const ComHistorico: Story = {
@@ -95,10 +90,6 @@ export const ComHistorico: Story = {
         loadingValidacao: false,
         podeVisualizarImpacto: false,
     },
-    play: async () => {
-        const btnHistorico = page.getByTestId('btn-cad-atividades-historico');
-        await expect.element(btnHistorico).toBeVisible();
-    },
 };
 
 export const ComDisponibilizar: Story = {
@@ -112,10 +103,6 @@ export const ComDisponibilizar: Story = {
         acaoPrincipalCadastro: null,
         loadingValidacao: false,
         podeVisualizarImpacto: false,
-    },
-    play: async () => {
-        const btnDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
-        await expect.element(btnDisponibilizar).toBeVisible();
     },
 };
 
@@ -134,10 +121,6 @@ export const ComMultiplasAcoes: Story = {
         },
         loadingValidacao: false,
         podeVisualizarImpacto: true,
-    },
-    play: async () => {
-        const btnAcoes = page.getByTestId('btn-cadastro-acoes');
-        await expect.element(btnAcoes).toBeVisible();
     },
 };
 

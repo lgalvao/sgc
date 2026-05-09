@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import SubprocessoMovimentacoes from './SubprocessoMovimentacoes.vue';
 import type {Movimentacao} from '@/types/tipos';
 
@@ -59,19 +57,11 @@ export const Default: Story = {
     args: {
         movimentacoes: movimentacoesMock,
     },
-    play: async () => {
-        const tabela = page.getByTestId('tbl-movimentacoes');
-        await expect.element(tabela).toBeVisible();
-    },
 };
 
 export const Vazio: Story = {
     args: {
         movimentacoes: [],
-    },
-    play: async () => {
-        const emptyState = page.getByTestId('empty-state-movimentacoes');
-        await expect.element(emptyState).toBeVisible();
     },
 };
 

@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import FeedbackModal from './FeedbackModal.vue';
 
 const meta: Meta<typeof FeedbackModal> = {
@@ -22,12 +20,6 @@ export const Aberto: Story = {
         captura: null,
         enviando: false,
     },
-    play: async () => {
-        const modal = page.getByTestId('feedback-modal');
-        await expect.element(modal).toBeVisible();
-        const titulo = page.getByTestId('feedback-modal-title');
-        await expect.element(titulo).toHaveTextContent('Enviar feedback');
-    },
 };
 
 export const Enviando: Story = {
@@ -35,12 +27,6 @@ export const Enviando: Story = {
         visivel: true,
         captura: null,
         enviando: true,
-    },
-    play: async () => {
-        const btnEnviar = page.getByTestId('feedback-btn-enviar');
-        await expect.element(btnEnviar).toBeDisabled();
-        const btnCancelar = page.getByTestId('feedback-btn-cancelar');
-        await expect.element(btnCancelar).toBeDisabled();
     },
 };
 

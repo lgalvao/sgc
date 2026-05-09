@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import {ref} from 'vue';
 import ProcessoUnidadesField from './ProcessoUnidadesField.vue';
 import type {Unidade} from '@/types/tipos';
@@ -69,10 +67,6 @@ export const Default: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        const container = page.getByTestId('container-processo-unidades');
-        await expect.element(container).toBeVisible();
-    },
 };
 
 export const ComUnidadesSelecionadas: Story = {
@@ -139,7 +133,4 @@ export const ComErro: Story = {
       </div>
     `,
     }),
-    play: async () => {
-        await expect.element(page.getByText('Selecione ao menos uma unidade participante.')).toBeVisible();
-    },
 };

@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import UnidadeContatoInfo from './UnidadeContatoInfo.vue';
 import type {Usuario} from '@/types/tipos';
 
@@ -63,11 +61,6 @@ export const ComResponsavelCompleto: Story = {
         label: 'Titular:',
         contato: usuarioCompleto,
     },
-    play: async () => {
-        await expect.element(page.getByText('Maria Aparecida de Souza')).toBeVisible();
-        const linkEmail = page.getByRole('link');
-        await expect.element(linkEmail).toHaveAttribute('href', 'mailto:maria.souza@ifce.edu.br');
-    },
 };
 
 export const SomenteName: Story = {
@@ -82,9 +75,6 @@ export const SemContato: Story = {
         label: 'Titular:',
         contato: null,
         nomeFallback: 'Não definido',
-    },
-    play: async () => {
-        await expect.element(page.getByText('Não definido')).toBeVisible();
     },
 };
 

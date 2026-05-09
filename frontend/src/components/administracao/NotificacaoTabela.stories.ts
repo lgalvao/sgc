@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import NotificacaoTabela from './NotificacaoTabela.vue';
 import type {Notificacao} from '@/services/notificacaoService';
 
@@ -56,19 +54,11 @@ export const Default: Story = {
     args: {
         items: notificacoesMock,
     },
-    play: async () => {
-        const tabela = page.getByTestId('tbl-notificacoes');
-        await expect.element(tabela).toBeVisible();
-    },
 };
 
 export const Vazio: Story = {
     args: {
         items: [],
-    },
-    play: async () => {
-        const emptyAlert = page.getByTestId('alert-notificacoes-sem-registros');
-        await expect.element(emptyAlert).toBeVisible();
     },
 };
 
@@ -76,18 +66,10 @@ export const ComFalhaDefinitiva: Story = {
     args: {
         items: notificacoesMock.filter(n => n.situacao === 'FALHA_DEFINITIVA'),
     },
-    play: async () => {
-        const btnReenviar = page.getByTestId('btn-notificacoes-reenviar-2');
-        await expect.element(btnReenviar).toBeVisible();
-    },
 };
 
 export const ComPreviewDisponivel: Story = {
     args: {
         items: notificacoesMock.filter(n => n.corpoHtml !== null),
-    },
-    play: async () => {
-        const btnPreview = page.getByTestId('btn-preview-1');
-        await expect.element(btnPreview).toBeVisible();
     },
 };

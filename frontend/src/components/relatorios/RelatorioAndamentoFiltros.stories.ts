@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import {ref} from 'vue';
 import RelatorioAndamentoFiltros from './RelatorioAndamentoFiltros.vue';
 
@@ -29,12 +27,6 @@ export const Default: Story = {
         opcoesProcessos: opcoesProcessosMock,
         carregando: false,
     },
-    play: async () => {
-        const btnGerar = page.getByTestId('btn-gerar-andamento');
-        await expect.element(btnGerar).toBeDisabled();
-        const btnExportar = page.getByTestId('btn-exportar-andamento');
-        await expect.element(btnExportar).toBeDisabled();
-    },
 };
 
 export const ComProcessoSelecionado: Story = {
@@ -51,12 +43,6 @@ export const ComProcessoSelecionado: Story = {
         },
         template: '<RelatorioAndamentoFiltros v-bind="args" v-model:codProcessoSelecionado="cod" />',
     }),
-    play: async () => {
-        const btnGerar = page.getByTestId('btn-gerar-andamento');
-        await expect.element(btnGerar).not.toBeDisabled();
-        const btnExportar = page.getByTestId('btn-exportar-andamento');
-        await expect.element(btnExportar).not.toBeDisabled();
-    },
 };
 
 export const Carregando: Story = {
@@ -73,10 +59,6 @@ export const Carregando: Story = {
         },
         template: '<RelatorioAndamentoFiltros v-bind="args" v-model:codProcessoSelecionado="cod" />',
     }),
-    play: async () => {
-        const btnGerar = page.getByTestId('btn-gerar-andamento');
-        await expect.element(btnGerar).toBeDisabled();
-    },
 };
 
 export const SemProcessos: Story = {

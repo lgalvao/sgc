@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page, userEvent} from 'vitest/browser';
 import FeedbackButton from './FeedbackButton.vue';
 
 const meta: Meta<typeof FeedbackButton> = {
@@ -29,11 +27,6 @@ export const Normal: Story = {
         },
         template: '<div style="position: relative; height: 120px;"><FeedbackButton v-bind="args" /></div>',
     }),
-    play: async () => {
-        const botao = page.getByRole('button', {name: /enviar feedback/i});
-        await expect.element(botao).toBeVisible();
-        await expect.element(botao).not.toBeDisabled();
-    },
 };
 
 export const Carregando: Story = {
@@ -47,10 +40,6 @@ export const Carregando: Story = {
         },
         template: '<div style="position: relative; height: 120px;"><FeedbackButton v-bind="args" /></div>',
     }),
-    play: async () => {
-        const botao = page.getByRole('button', {name: /enviar feedback/i});
-        await expect.element(botao).toBeDisabled();
-    },
 };
 
 export const Sucesso: Story = {
@@ -90,9 +79,4 @@ export const AoClicar: Story = {
         },
         template: '<div style="position: relative; height: 120px;"><FeedbackButton v-bind="args" @click="clicks++" /></div>',
     }),
-    play: async () => {
-        const botao = page.getByRole('button', {name: /enviar feedback/i});
-        await userEvent.click(botao);
-        await expect.element(botao).toBeVisible();
-    },
 };

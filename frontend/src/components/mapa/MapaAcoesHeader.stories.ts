@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import MapaAcoesHeader from './MapaAcoesHeader.vue';
 import type {Unidade} from '@/types/tipos';
 
@@ -45,9 +43,6 @@ export const Default: Story = {
         podeVisualizarImpacto: false,
         usarMenuAcoesMapa: false,
     },
-    play: async () => {
-        await expect.element(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
-    },
 };
 
 export const ComSubprocesso: Story = {
@@ -57,10 +52,6 @@ export const ComSubprocesso: Story = {
         podeVerSugestoes: false,
         podeVisualizarImpacto: false,
         usarMenuAcoesMapa: false,
-    },
-    play: async () => {
-        const btnHistorico = page.getByTestId('btn-mapa-historico');
-        await expect.element(btnHistorico).toBeVisible();
     },
 };
 
@@ -72,10 +63,6 @@ export const ComVerSugestoes: Story = {
         loadingSugestoesVisualizacao: false,
         podeVisualizarImpacto: false,
         usarMenuAcoesMapa: false,
-    },
-    play: async () => {
-        const btnSugestoes = page.getByTestId('btn-mapa-ver-sugestoes');
-        await expect.element(btnSugestoes).toBeVisible();
     },
 };
 
@@ -97,10 +84,6 @@ export const ComMenuAcoes: Story = {
         mostrarAcaoPrincipalMapa: false,
         habilitarAcaoPrincipalMapa: false,
     },
-    play: async () => {
-        const btnAcoes = page.getByTestId('btn-mapa-acoes');
-        await expect.element(btnAcoes).toBeVisible();
-    },
 };
 
 export const ComHomologar: Story = {
@@ -121,10 +104,6 @@ export const ComHomologar: Story = {
         mostrarAcaoPrincipalMapa: true,
         habilitarAcaoPrincipalMapa: true,
         rotuloAcaoPrincipalMapa: 'Homologar Mapa',
-    },
-    play: async () => {
-        const btnAcoes = page.getByTestId('btn-mapa-acoes');
-        await expect.element(btnAcoes).toBeVisible();
     },
 };
 

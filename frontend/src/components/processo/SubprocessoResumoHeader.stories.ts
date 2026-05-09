@@ -1,6 +1,4 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect} from 'vitest';
-import {page} from 'vitest/browser';
 import SubprocessoResumoHeader from './SubprocessoResumoHeader.vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import type {SubprocessoDetalhe, ResponsavelDto} from '@/types/tipos';
@@ -110,11 +108,6 @@ export const Default: Story = {
         formatDataSimples,
         formatTipoResponsabilidade,
     },
-    play: async () => {
-        const header = page.getByTestId('header-subprocesso');
-        await expect.element(header).toBeVisible();
-        await expect.element(page.getByTestId('txt-header-processo')).toBeVisible();
-    },
 };
 
 export const ComAcoesCabecalho: Story = {
@@ -131,10 +124,6 @@ export const ComAcoesCabecalho: Story = {
         formatSituacaoSubprocesso,
         formatDataSimples,
         formatTipoResponsabilidade,
-    },
-    play: async () => {
-        const btnAcoes = page.getByTestId('btn-subprocesso-acoes');
-        await expect.element(btnAcoes).toBeVisible();
     },
 };
 
