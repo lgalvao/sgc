@@ -51,6 +51,12 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Backend).");
     });
 
+    test("despacha ajuda da jornada de cobertura do backend", async () => {
+        const resultado = await executarSgc(["backend", "cobertura", "jornada", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Executa a jornada consolidada de cobertura do backend.");
+    });
+
     test("audita cheiros de codigo em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-smells-"));
         const frontendDir = path.join(base, "frontend", "src");
