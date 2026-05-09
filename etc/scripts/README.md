@@ -50,6 +50,7 @@ graph TD
 
 ```bash
 node etc/scripts/sgc.js backend cobertura auditoria
+node etc/scripts/sgc.js backend cobertura jornada
 node etc/scripts/sgc.js backend testes analisar
 node etc/scripts/sgc.js backend testes priorizar
 node etc/scripts/sgc.js backend testes gerar-stub

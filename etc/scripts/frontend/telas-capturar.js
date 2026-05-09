@@ -25,7 +25,8 @@ let category = ARGS.find(arg => !arg.startsWith('-')) || 'all';
 
 if (HELP) {
     console.log(`
-Uso: node scripts/frontend/capturar-telas.js [categoria] [opções]
+Uso recomendado: node etc/scripts/sgc.js frontend telas capturar [categoria] [opções]
+Execução direta: node etc/scripts/frontend/telas-capturar.js [categoria] [opções]
 
 Categorias disponíveis:
   ${Object.keys(CATEGORIES).join('\n  ')}

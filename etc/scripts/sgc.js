@@ -34,6 +34,7 @@ program
 const backend = program.command("backend").description("Ferramentas do backend.");
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
 criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "etc/scripts/backend/cobertura-auditoria.js");
+criarComandoScript(backendCobertura, "jornada", "Executa a jornada consolidada de cobertura do backend.", "etc/scripts/backend/cobertura-jornada.js");
 
 const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
 criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "etc/scripts/backend/testes-analisar.js");

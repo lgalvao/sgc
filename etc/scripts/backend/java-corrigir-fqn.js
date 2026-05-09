@@ -175,8 +175,8 @@ function main() {
     const {dryRun, help} = parseArgs(process.argv.slice(2));
     if (help) {
         exibirAjudaComando({
-            comandoSgc: 'java corrigir-fqn',
-            scriptDireto: 'java-corrigir-fqn.cjs',
+            comandoSgc: "backend java corrigir-fqn",
+            scriptDireto: "backend/java-corrigir-fqn.js",
             descricao: 'Substitui nomes totalmente qualificados por imports em arquivos Java.',
             opcoes: [
                 '--dry-run     Apenas mostra os arquivos que seriam alterados',

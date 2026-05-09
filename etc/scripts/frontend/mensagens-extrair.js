@@ -406,7 +406,7 @@ function extrair() {
     // ── Gravar resultado ──
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(resultado, null, 2), 'utf-8');
     console.log(`\n✅ Resultado gravado em: ${path.relative(process.cwd(), OUTPUT_FILE)}`);
-    console.log(`\n💡 Próximo passo: node etc/scripts/analisar-mensagens.cjs`);
+    console.log(`\n💡 Próximo passo: node etc/scripts/sgc.js frontend mensagens analisar`);
 
     return resultado;
 }
