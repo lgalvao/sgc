@@ -77,15 +77,7 @@ tasks.register("installFrontend") {
 tasks.register("buildFrontend") {
     group = "build"
     description = "Gera o build de produção do frontend (Vite)"
-    dependsOn(":frontend:buildVue")
-}
-
-tasks.register<Copy>("copyFrontend") {
-    group = "build"
-    description = "Copia o frontend gerado para os recursos estáticos do backend"
-    dependsOn("buildFrontend")
-    from("frontend/dist")
-    into("backend/src/main/resources/static")
+    dependsOn(":frontend:build")
 }
 
 tasks.register<Delete>("cleanFrontend") {

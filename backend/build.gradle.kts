@@ -85,14 +85,16 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
-tasks.named("processResources") {
-    mustRunAfter(":copyFrontend")
+tasks.named<ProcessResources>("processResources") {
+    dependsOn(":frontend:build")
+    from(rootProject.layout.projectDirectory.dir("frontend/dist")) {
+        into("static")
+    }
 }
 
 tasks.withType<BootJar> {
     enabled = true
     mainClass.set("sgc.Sgc")
-    dependsOn(":copyFrontend")
 }
 
 springBoot {
