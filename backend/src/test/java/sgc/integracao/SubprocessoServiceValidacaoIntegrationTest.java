@@ -131,15 +131,15 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("validarCadastro: deve retornar válido quando todas as atividades possuem conhecimentos")
     void validarCadastro_Valido() {
-        Atividade atividade = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Atividade 1").build();
-        atividadeRepo.save(atividade);
+        Atividade a = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Atividade 1").build();
+        atividadeRepo.save(a);
 
-        Conhecimento conhecimento = Conhecimento.builder()
-                .atividade(atividade)
+        Conhecimento c = Conhecimento.builder()
+                .atividade(a)
                 .descricao("Conhecimento 1")
                 .build();
-        atividade.getConhecimentos().add(conhecimento);
-        atividadeRepo.save(atividade);
+        a.getConhecimentos().add(c);
+        atividadeRepo.save(a);
 
         ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
 

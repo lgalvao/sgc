@@ -38,6 +38,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes do E2eController (Backend support)")
 @SuppressWarnings("NullAway.Init")
 class E2eControllerTest {
+    private static final String SCRIPT_SQL_MINIMO_VALIDO = "SELECT 1;";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -90,7 +92,7 @@ class E2eControllerTest {
         when(mockResource.exists()).thenReturn(exists);
         if (exists) {
             try {
-                when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
+                when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -399,7 +401,7 @@ class E2eControllerTest {
                 Resource resource = mock(Resource.class);
                 when(resourceLoaderMock.getResource(anyString())).thenReturn(resource);
                 when(resource.exists()).thenReturn(true);
-                when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
+                when(resource.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
 
                 controllerIsolado.resetDatabase();
 
@@ -683,7 +685,7 @@ class E2eControllerTest {
             });
             when(resourceLoaderMock.getResource(anyString())).thenReturn(resourceMock);
             when(resourceMock.exists()).thenReturn(true);
-            when(resourceMock.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
+            when(resourceMock.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
 
             E2eController controllerComMocks = new E2eController(
                     jdbcTemplateMock,
