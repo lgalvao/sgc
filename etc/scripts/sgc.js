@@ -4,6 +4,7 @@ import pc from "picocolors";
 import {executarNode} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
 import {executarDoctor} from "./projeto/doctor.js";
+import {executarAuditoriaDependencias} from "./projeto/dependencias-auditar.js";
 import {executarLimpeza} from "./projeto/limpar.js";
 import {executarPerfilQualidade} from "./projeto/qualidade.js";
 import {executarSetup} from "./projeto/setup.js";
@@ -101,6 +102,15 @@ const qaDashboard = qa.command("dashboard").description("Ferramentas operacionai
 criarComandoScript(qaDashboard, "servir", "Serve o dashboard de QA localmente.", "etc/scripts/qa/dashboard-servir.js");
 
 const projeto = program.command("projeto").description("Ferramentas transversais do repositório.");
+projeto
+    .command("dependencias")
+    .description("Ferramentas para auditar uso e declaracao de dependencias.")
+    .command("auditar")
+    .description("Executa o knip na raiz, no frontend e no toolkit.")
+    .action(async () => {
+        await executarAuditoriaDependencias();
+    });
+
 projeto
     .command("doctor")
     .description("Valida comandos e arquivos essenciais do ambiente.")

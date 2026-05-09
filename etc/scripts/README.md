@@ -97,6 +97,7 @@ node etc/scripts/sgc.js qa dashboard servir --porta 4179
 
 ```bash
 node etc/scripts/sgc.js projeto doctor
+node etc/scripts/sgc.js projeto dependencias auditar
 node etc/scripts/sgc.js projeto limpar --confirmar
 node etc/scripts/sgc.js projeto qualidade rapido
 node etc/scripts/sgc.js projeto setup --instalar-dependencias
@@ -132,6 +133,13 @@ Lint do toolkit:
 
 ```bash
 pnpm --dir etc/scripts run lint
+```
+
+Auditoria de dependências:
+
+```bash
+pnpm --dir etc/scripts run deps:audit
+node etc/scripts/sgc.js projeto dependencias auditar
 ```
 
 ## Organização dos testes

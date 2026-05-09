@@ -5,6 +5,7 @@
   "description": "Toolkit unificado de scripts do SGC",
   "scripts": {
     "sgc": "node ./sgc.js",
+    "deps:audit": "pnpm exec knip",
     "test": "vitest run",
     "lint": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures",
     "lint:fix": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures --fix"
@@ -18,9 +19,11 @@
     "listr2": "^10.2.1",
     "picocolors": "^1.1.1",
     "serve-handler": "^6.1.7",
-    "which": "^6.0.1"
+    "which": "^6.0.1",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "knip": "^6.12.1",
     "oxlint": "^1.57.0",
     "vitest": "^4.1.2"
   }

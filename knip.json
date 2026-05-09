@@ -1,0 +1,17 @@
+{
+  "entry": [
+    "e2e/**/*.ts",
+    "e2e/lifecycle.js"
+  ],
+  "project": [
+    "e2e/**/*.ts",
+    "e2e/**/*.js"
+  ],
+  "ignoreBinaries": [
+    "semgrep"
+  ],
+  "ignoreDependencies": [
+    "commander",
+    "picocolors"
+  ]
+}
