@@ -90,7 +90,7 @@ Consolidar a implementação do módulo de Diagnóstico do SGC aproveitando a ar
 
 - Criar fluxo de autoavaliação do servidor por competência técnica.
 - Persistir importância e domínio na escala prevista.
-- Implementar regra específica para servidores C13, incluindo definição de cinco competências e soma obrigatória de pesos igual a 10.
+- Implementar regra específica para servidores C13, entendido aqui como a classificação funcional citada na IN 68, incluindo definição de cinco competências e soma obrigatória de pesos igual a 10.
 - Implementar criação e edição de consenso pela chefia.
 - Implementar aprovação do consenso pelo servidor e reabertura obrigatória quando o consenso for alterado após aprovação.
 - Implementar impossibilidade de avaliação com justificativa obrigatória.
@@ -153,9 +153,9 @@ Consolidar a implementação do módulo de Diagnóstico do SGC aproveitando a ar
 
 ## 6. Ambiguidades e dúvidas em aberto
 
-- A situação final do processo de diagnóstico será `FINALIZADO`, `HOMOLOGADO` ou ambas?
-- O subprocesso de diagnóstico deve continuar com o fluxo simples atual ou também ganhar estados intermediários de validação e homologação?
-- Na iniciação do processo, o subprocesso de diagnóstico começa em `NAO_INICIADO` ou diretamente em `DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO`?
+- A situação final do processo de diagnóstico será `FINALIZADO`, `HOMOLOGADO` ou ambas, considerando o estado hoje exposto em `backend/src/main/java/sgc/subprocesso/model/SituacaoSubprocesso.java` e o ciclo macro atual do processo?
+- O subprocesso de diagnóstico deve continuar com o fluxo simples atual ou também ganhar estados intermediários de validação e homologação, além dos que hoje já existem em `backend/src/main/java/sgc/subprocesso/model/SituacaoSubprocesso.java`?
+- Na iniciação do processo, o subprocesso de diagnóstico começa em `NAO_INICIADO` ou diretamente em `DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO`, considerando o comportamento já embutido em `backend/src/main/java/sgc/processo/model/TipoProcesso.java`, `backend/src/main/java/sgc/processo/service/ProcessoService.java` e `backend/src/main/java/sgc/subprocesso/model/SituacaoSubprocesso.java`?
 - A tabela `diagnostico` já existente será reaproveitada como agregador principal do módulo ou será remodelada?
 - O congelamento da árvore no início do processo deve incluir apenas unidades e servidores, ou também responsáveis, chefias, vínculos temporários e mapa vigente copiado?
 - A regra de C13 vale para toda autoavaliação do servidor C13 ou apenas para um subconjunto específico de unidades/cargos?
