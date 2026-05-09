@@ -158,12 +158,12 @@ import NotificacaoTabela from "@/components/administracao/NotificacaoTabela.vue"
 import {TEXTOS} from "@/constants/textos";
 import {TIPOS_NOTIFICACAO_LABELS} from "@/constants/notificacoes";
 import {
+  buscarUrlLeitorEmailTestes,
   compararNotificacoes,
   listarNotificacoesAdmin,
   type Notificacao,
   obterStatusNotificacao,
   reenviarNotificacao,
-  buscarUrlLeitorEmailTestes,
 } from "@/services/notificacaoService";
 import {formatarDataHoraBR} from "@/utils";
 import {ehModoProducao} from "@/utils/ambiente";

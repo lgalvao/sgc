@@ -6,8 +6,8 @@ import lombok.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.config.*;
 import sgc.alerta.dto.*;
+import sgc.comum.config.*;
 
 import java.util.*;
 

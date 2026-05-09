@@ -3,8 +3,8 @@ import {ref} from "vue";
 import type {ContextoCadastroAtividadesSubprocesso, ContextoEdicaoSubprocesso} from "@/types/tipos";
 import {
     type AtualizacaoStatusLocal,
-    dadosValidos,
     atualizarDetalhesContexto,
+    dadosValidos,
     registrarContexto
 } from "@/stores/subprocessoStoreHelpers";
 import type {ErroNormalizado} from "@/utils/apiError";

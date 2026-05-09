@@ -11,8 +11,8 @@ import org.springframework.security.access.*;
 import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.*;
-import org.springframework.web.servlet.resource.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
+import org.springframework.web.servlet.resource.*;
 import sgc.comum.util.*;
 import sgc.seguranca.sanitizacao.*;
 

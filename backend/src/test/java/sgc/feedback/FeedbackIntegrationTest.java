@@ -1,28 +1,22 @@
 package sgc.feedback;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import sgc.feedback.dto.FeedbackListagemDto;
-import sgc.integracao.BaseIntegrationTest;
+import org.springframework.mock.web.*;
+import org.springframework.security.test.context.support.*;
+import org.springframework.test.context.*;
+import sgc.feedback.dto.*;
+import sgc.integracao.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.UUID;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("FeedbackIntegrationTest")
 class FeedbackIntegrationTest extends BaseIntegrationTest {

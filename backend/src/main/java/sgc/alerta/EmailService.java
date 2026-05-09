@@ -2,7 +2,6 @@ package sgc.alerta;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import lombok.RequiredArgsConstructor;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import sgc.comum.config.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.regex.*;
 
 @Service

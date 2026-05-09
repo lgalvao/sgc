@@ -163,7 +163,13 @@ import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
 import {useCadastroAnaliseFluxo} from "@/views/cadastroAnaliseFluxo";
 import {useCadastroDisponibilizacao} from "@/views/cadastroDisponibilizacao";
-import {type Atividade, type AtividadeOperacaoResponse, type PermissoesSubprocesso, Perfil, TipoProcesso} from "@/types/tipos";
+import {
+  type Atividade,
+  type AtividadeOperacaoResponse,
+  Perfil,
+  type PermissoesSubprocesso,
+  TipoProcesso
+} from "@/types/tipos";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
 import {listarAnalisesCadastro} from "@/services/analiseService";
