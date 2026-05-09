@@ -33,7 +33,7 @@ Consolidar a implementação do módulo de Diagnóstico do SGC aproveitando a ar
 
 ### 2.4 Tensão entre o contexto atual e a nova especificação
 
-- Hoje o processo global do SGC termina em `FINALIZADO`; a nova especificação fala em `Homologado`.
+- Hoje o processo global do SGC termina em `FINALIZADO`; a nova especificação fala em `HOMOLOGADO`.
 - Hoje o subprocesso de diagnóstico existente no código evolui para `Autoavaliação em andamento -> Monitoramento -> Concluído`; a nova especificação adiciona estados de validação e homologação na cadeia hierárquica.
 - Hoje o início do diagnóstico no código já cria subprocesso em `DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO`; a especificação preliminar diz que o subprocesso nasce em `Não iniciado`.
 - O schema existente da tabela `diagnostico` usa situações `EM_ANDAMENTO`, `CONCLUIDO`, `VALIDADO` e `HOMOLOGADO`, mas esse ciclo não está integrado ao workflow atual de `subprocesso`.
@@ -155,7 +155,7 @@ Consolidar a implementação do módulo de Diagnóstico do SGC aproveitando a ar
 
 - A situação final do processo de diagnóstico será `FINALIZADO`, `HOMOLOGADO` ou ambas?
 - O subprocesso de diagnóstico deve continuar com o fluxo simples atual ou também ganhar estados intermediários de validação e homologação?
-- Na iniciação do processo, o subprocesso de diagnóstico começa em `Não iniciado` ou diretamente em `Autoavaliação em andamento`?
+- Na iniciação do processo, o subprocesso de diagnóstico começa em `NAO_INICIADO` ou diretamente em `DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO`?
 - A tabela `diagnostico` já existente será reaproveitada como agregador principal do módulo ou será remodelada?
 - O congelamento da árvore no início do processo deve incluir apenas unidades e servidores, ou também responsáveis, chefias, vínculos temporários e mapa vigente copiado?
 - A regra de C13 vale para toda autoavaliação do servidor C13 ou apenas para um subconjunto específico de unidades/cargos?
@@ -165,7 +165,7 @@ Consolidar a implementação do módulo de Diagnóstico do SGC aproveitando a ar
 - O fluxo alternativo de discordância do servidor exige histórico versionado do consenso anterior?
 - A impossibilidade de avaliação exclui o servidor dos cálculos de gap e de ocupação crítica ou apenas permite concluir a unidade com exceção registrada?
 - O preenchimento de ocupações críticas será por servidor e competência, por servidor e ocupação, ou por ocupação consolidada da unidade?
-- O “monitoramento” citado na especificação é uma etapa operacional com tela e ações próprias ou apenas um estado de consolidação antes do encerramento?
+- O estado `DIAGNOSTICO_MONITORAMENTO` representa uma etapa operacional com tela, ações e atores próprios, ou apenas uma consolidação intermediária antes do encerramento sem interação adicional?
 - A validação em bloco do gestor deve produzir uma única movimentação por unidade, uma movimentação agregada por lote, ou ambas?
 - Os relatórios de gaps devem usar domínio exigido do consenso final, da autoavaliação, do mapa vigente ou de outra referência?
 - Há necessidade de trilha de auditoria detalhada por edição de autoavaliação, consenso e ocupação crítica?
