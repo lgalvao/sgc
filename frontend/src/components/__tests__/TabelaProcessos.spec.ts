@@ -176,12 +176,9 @@ describe("TabelaProcessos.vue", () => {
         });
 
         await context.wrapper.vm.$nextTick();
-        await context.wrapper.vm.$nextTick();
 
-        expect(context.wrapper.vm.fields.some((f: any) => f.label === "Finalizado em")).toBe(true);
-
-        const headers = context.wrapper.findAll("th");
-        expect(headers.some((h) => h.text().trim() === "Finalizado em")).toBe(true);
+        const thead = context.wrapper.find("thead");
+        expect(thead.text()).toContain("Finalizado em");
 
         const rows = context.wrapper.findAll("tbody tr");
         expect(rows[1].text()).toContain("26/08/2024");
