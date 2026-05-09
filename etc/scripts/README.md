@@ -104,6 +104,7 @@ node etc/scripts/sgc.js projeto limpar --confirmar
 node etc/scripts/sgc.js projeto qualidade rapido
 node etc/scripts/sgc.js projeto setup --instalar-dependencias
 node etc/scripts/sgc.js projeto arvore-linhas
+node etc/scripts/sgc.js projeto versao-sincronizar 1.2.3
 ```
 
 ### Aliases legados

@@ -627,6 +627,12 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Serve o dashboard de QA localmente.");
     });
 
+    test("exibe ajuda do comando de sincronizacao de versao do projeto", async () => {
+        const resultado = await executarSgc(["projeto", "versao-sincronizar", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Sincroniza a versao entre gradle.properties e frontend/package.json.");
+    });
+
     test("executa o doctor em JSON", async () => {
         const resultado = await executarSgc(["projeto", "doctor", "--json"]);
         expect(resultado.exitCode).toBe(0);

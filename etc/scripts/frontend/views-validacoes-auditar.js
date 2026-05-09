@@ -49,7 +49,7 @@ function scanFiles() {
                     // Regex matches: getSigla() != null, getSigla() == null
                     // Also matches: getSigla() == null
                     // Using regex to match getter followed by null check
-                    const pattern = new RegExp(`${getter}\(\)\s*(!=|==)\s*null`);
+                    const pattern = new RegExp(`${getter}\\(\\)\\s*(!=|==)\\s*null`);
 
                     if (pattern.test(line)) {
                         results.push({
@@ -91,7 +91,9 @@ function generateReport(results) {
             md += "|------|-------|-------------|------|\n";
 
             files[filePath].forEach(item => {
-                let content = item.content.replace(/\|/g, '\\|');
+                let content = item.content
+                    .replaceAll("\\", "\\\\")
+                    .replace(/\|/g, "\\|");
                 // Use concatenation to avoid template literal issues
                 md += "| " + item.line + " | `" + item.field + "()` | " + item.guarantee + " | `" + content + "` |\n";
             });

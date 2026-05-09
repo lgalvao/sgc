@@ -150,6 +150,8 @@ projeto
     });
 
 criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do repositório.", "etc/scripts/projeto/arvore-linhas.js");
+criarComandoScript(projeto, "versao-sincronizar", "Sincroniza a versao entre gradle.properties e frontend/package.json.", "etc/scripts/projeto/versao-sincronizar.js");
+criarComandoScript(projeto, "sincronizar-versao", "Alias legado para 'versao-sincronizar'.", "etc/scripts/legado/projeto/sincronizar-versao.js");
 
 program.addHelpText(
     "after",

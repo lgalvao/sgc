@@ -70,6 +70,7 @@ Consolidar problemas de manutenção detectados no toolkit e iniciar correções
 
 - `sgc.js` atualizado para usar os nomes canônicos.
 - Comando canônico de views passou a ser `frontend views validacoes-auditar`.
+- Comando canônico de versão no projeto passou a ser `projeto versao-sincronizar`.
 - `README.md` atualizado para refletir o comando canônico.
 - `.release-it.json` atualizado para a nova nomenclatura de sincronização de versão.
 
