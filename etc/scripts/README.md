@@ -1,29 +1,50 @@
 # Toolkit de Scripts do SGC
 
-## Visão geral
+## Papel do módulo
 
-`etc/scripts` concentra a CLI de automação do repositório.
+`etc/scripts/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para qualidade, setup, diagnóstico do projeto, utilidades de backend/frontend e geração de dashboards de QA.
 
-Entrada principal:
+Ponto de entrada principal:
 
 ```bash
 node etc/scripts/sgc.js
 ```
 
-## Instalação
+## Visão arquitetural
 
-```bash
-pnpm --dir etc/scripts install
+O toolkit é um módulo Node.js em ESM, separado do backend/frontend, com dependências próprias e testes próprios.
+
+```mermaid
+graph TD
+    CLI[sgc.js] --> Backend[backend/]
+    CLI --> Frontend[frontend/]
+    CLI --> Codigo[codigo/]
+    CLI --> E2E[e2e/]
+    CLI --> QA[qa/]
+    CLI --> Projeto[projeto/]
+    Backend --> Lib[lib/]
+    Frontend --> Lib
+    Codigo --> Lib
+    E2E --> Lib
+    QA --> Lib
+    Projeto --> Lib
 ```
 
-## Estrutura resumida
+## Estrutura do diretório
 
-- `sgc.js`: roteador principal de comandos.
-- `lib/`: utilitários comuns.
-- `backend/`, `frontend/`, `codigo/`, `e2e/`, `qa/`, `projeto/`: comandos por domínio.
-- `test/`: testes do toolkit.
+| Caminho | Papel |
+|---|---|
+| `sgc.js` | roteador principal da CLI |
+| `lib/` | infraestrutura compartilhada, execução, paths, saída e utilidades |
+| `backend/` | comandos de cobertura, testes e higiene Java |
+| `frontend/` | comandos de cobertura, mensagens, validações, test ids e cruft |
+| `codigo/` | auditorias transversais de smells |
+| `e2e/` | automações relacionadas à suíte E2E |
+| `qa/` | snapshot, resumo e dashboard de qualidade |
+| `projeto/` | setup, doctor, limpeza e qualidade do repositório |
+| `test/` | testes do toolkit |
 
-## Comandos disponíveis
+## Comandos por domínio
 
 ### Backend
 
@@ -52,7 +73,7 @@ node etc/scripts/sgc.js frontend test-ids listar-duplicados
 node etc/scripts/sgc.js frontend telas capturar
 ```
 
-### Código
+### Código transversal
 
 ```bash
 node etc/scripts/sgc.js codigo smells auditar
@@ -69,7 +90,7 @@ node etc/scripts/sgc.js e2e limpar
 ```bash
 node etc/scripts/sgc.js qa snapshot coletar --perfil rapido
 node etc/scripts/sgc.js qa resumo
-node etc/scripts/sgc.js qa dashboard servir
+node etc/scripts/sgc.js qa dashboard servir --porta 4179
 ```
 
 ### Projeto
@@ -82,13 +103,57 @@ node etc/scripts/sgc.js projeto setup --instalar-dependencias
 node etc/scripts/sgc.js projeto arvore-linhas
 ```
 
-## Testes do toolkit
+## Casos de uso típicos
+
+- gerar snapshot consolidado de qualidade para revisão técnica;
+- auditar cruft/duplicidade no frontend;
+- apoiar evolução da suíte de testes backend;
+- validar divergência entre Bean Validation e validação de UI;
+- preparar ambiente local de desenvolvimento;
+- servir dashboards de QA para inspeção manual.
+
+## Dependências e execução
+
+`etc/scripts/package.json` define dependências próprias, separadas do restante do repositório.
+
+Instalação:
+
+```bash
+pnpm --dir etc/scripts install
+```
+
+Execução dos testes do toolkit:
 
 ```bash
 pnpm --dir etc/scripts run test
 ```
 
-## Observações
+Lint do toolkit:
 
-- A CLI aceita argumentos extras para comandos delegados.
-- Use `node etc/scripts/sgc.js --help` para a árvore completa.
+```bash
+pnpm --dir etc/scripts run lint
+```
+
+## Organização dos testes
+
+O diretório `test/` contém:
+
+- `sgc.test.js`: testes da CLI principal
+- `fixtures/`: dados auxiliares para simular cenários de execução
+
+Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e respeitando contratos básicos de operação.
+
+## Relação com o restante do repositório
+
+O toolkit não substitui os comandos nativos de Gradle, pnpm ou Playwright; ele os complementa com:
+
+- automação padronizada;
+- relatórios agregados;
+- auditorias específicas do SGC;
+- comandos de produtividade difíceis de expressar apenas com scripts simples.
+
+## Referências
+
+- [README raiz](../../README.md)
+- [Backend do SGC](../../backend/README.md)
+- [Frontend do SGC](../../frontend/README.md)

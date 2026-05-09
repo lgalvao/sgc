@@ -1,52 +1,88 @@
 # Pacote `comum`
 
-## Objetivo
+## Papel arquitetural
 
-O pacote `sgc.comum` concentra infraestrutura compartilhada entre os domínios do backend.
+`sgc.comum` é a base compartilhada do backend. Ele não representa um domínio funcional do produto; representa a infraestrutura comum usada pelos demais módulos.
 
-Ele não representa um domínio de negócio específico; fornece base de configuração, erros, modelos e utilidades.
+A regra principal é simples: **o pacote deve oferecer suporte técnico e semântico reutilizável, sem absorver regras de negócio específicas**.
 
-## Subpacotes principais
+## O que vive aqui
 
 ### `config`
 
 Configurações transversais da aplicação, como:
 
-- configuração geral da aplicação,
-- cache,
-- OpenAPI,
-- integração de templates.
+- inicialização geral do Spring;
+- cache;
+- OpenAPI;
+- integração com templates;
+- demais ajustes de infraestrutura compartilhada.
 
 ### `erros`
 
-Padronização de exceções e resposta de erro da API:
+Padronização da resposta de erro da API:
 
 - `RestExceptionHandler`
 - `ErroApi`
 - `ErroSubApi`
-- exceções de negócio (`ErroNegocio`, `ErroValidacao`, `ErroAcessoNegado`, etc.).
+- exceções de negócio e de validação (`ErroNegocio`, `ErroValidacao`, `ErroAcessoNegado`, `ErroEntidadeNaoEncontrada`...)
+
+Essa camada garante que a API responda de forma consistente independentemente do domínio que originou a falha.
 
 ### `model`
 
-Tipos base compartilhados, incluindo:
+Tipos base compartilhados, com destaque para:
 
-- `EntidadeBase` (com campo `codigo`),
-- contratos reutilizáveis de model/repositório.
+- `EntidadeBase`, de onde as entidades herdam o campo `codigo`;
+- contratos/modelos reutilizados por mais de um domínio.
 
 ### `util`
 
-Utilitários transversais, incluindo:
+Ferramentas transversais, incluindo:
 
-- monitoramento (`MonitoramentoAspect`, `FiltroMonitoramentoHttp`, `MonitoramentoProperties`),
-- apoio de formatação e helpers técnicos.
+- monitoramento (`MonitoramentoAspect`, `FiltroMonitoramentoHttp`, propriedades de monitoramento);
+- utilitários de formatação e apoio técnico.
 
-## Artefatos adicionais
+## Relação com os demais módulos
 
-- `ComumDtos`
-- `Mensagens`
+```mermaid
+graph TD
+    Comum[sgc.comum]
+    Processo[processo]
+    Subprocesso[subprocesso]
+    Mapa[mapa]
+    Organizacao[organizacao]
+    Seguranca[seguranca]
 
-## Quando usar
+    Processo --> Comum
+    Subprocesso --> Comum
+    Mapa --> Comum
+    Organizacao --> Comum
+    Seguranca --> Comum
+```
 
-Use `sgc.comum` para evitar duplicação entre módulos e manter padrão único de infraestrutura.
+## Restrições arquiteturais
 
-Evite colocar regras de negócio específicas de domínio neste pacote.
+O projeto possui teste arquitetural explícito para impedir que `sgc.comum` vire um novo domínio de negócio.
+
+Em `ArchConsistencyTest` existe a regra de que o pacote:
+
+- não deve conter `Controller`;
+- não deve conter `Service` de negócio.
+
+Isso força o módulo a permanecer pequeno, estável e previsível.
+
+## Quando colocar algo em `comum`
+
+Coloque aqui somente o que atender simultaneamente a estas características:
+
+- é usado por mais de um domínio;
+- não carrega regra de processo/subprocesso/mapa/organização;
+- melhora a consistência técnica do backend inteiro.
+
+Se a funcionalidade depende do vocabulário de negócio, provavelmente ela pertence ao módulo funcional correspondente, não a `comum`.
+
+## Referências
+
+- [Backend do SGC](../../../../../../backend/README.md)
+- [Módulo `subprocesso`](../subprocesso/README.md)

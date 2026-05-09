@@ -1,65 +1,141 @@
 # Testes End-to-End (E2E)
 
-## Visão geral
+## Papel da suíte
 
-A suíte E2E usa **Playwright** para validar fluxos completos do SGC, integrando frontend e backend.
+`e2e/` contém a suíte Playwright do SGC. Ela valida fluxos completos do produto sobre backend e frontend reais, com apoio de fixtures de banco, autenticação e endpoints auxiliares do perfil `e2e`.
 
-Os testes ficam neste diretório e são executados com infraestrutura iniciada por `e2e/lifecycle.js`.
+A suíte é orientada por **casos de uso** e não por telas isoladas: por isso a maioria dos arquivos segue a convenção `cdu-XX.spec.ts`.
 
-## Estrutura
+## Arquitetura da execução
 
-- `cdu-*.spec.ts`: cenários por caso de uso.
-- `helpers/`: abstrações de interação.
-- `fixtures/`: fixtures de autenticação e dados.
-- `hooks/`: limpeza e preparação.
-- `setup/`: artefatos de banco e configuração.
-
-## Execução
-
-Da raiz do repositório:
-
-```bash
-npm run test:e2e
+```mermaid
+graph LR
+    Playwright --> Lifecycle[e2e/lifecycle.js]
+    Lifecycle --> Backend[Spring Boot perfil e2e ou hom]
+    Lifecycle --> Frontend[Vite]
+    Lifecycle --> SMTP[SMTP local]
+    Playwright --> Fixtures[fixtures/]
+    Playwright --> Helpers[helpers/]
+    Backend --> E2EApi[/e2e/*]
 ```
 
-Comandos úteis adicionais:
+## Estrutura do diretório
 
-```bash
-pnpm exec playwright test --ui
-pnpm exec playwright test e2e/cdu-01.spec.ts
-```
+| Caminho | Papel |
+|---|---|
+| `cdu-*.spec.ts` | cenários alinhados aos casos de uso do sistema |
+| `jornada*.spec.ts` | jornadas transversais e cenários mais amplos |
+| `feedback-control.spec.ts` | fluxo do widget/controle de feedback |
+| `captura.spec.ts` | suporte a capturas específicas |
+| `helpers/` | operações semânticas reutilizáveis |
+| `fixtures/` | extensões do Playwright para autenticação, banco e preparação de estado |
+| `hooks/` | limpeza/preparação complementar |
+| `setup/` | `seed.sql` e artefatos de inicialização |
+| `lifecycle.js` | sobe backend, frontend e SMTP locais |
+| `README.md` | visão do módulo |
+
+## Organização dos helpers
+
+Helpers especializados em `helpers/`:
+
+- `helpers-auth.ts`: login, usuários e escolha de perfil
+- `helpers-navegacao.ts`: navegação e limpeza de notificações
+- `helpers-processos.ts`: criação e inspeção de processos/subprocessos
+- `helpers-atividades.ts`: cadastro e manutenção de atividades/conhecimentos
+- `helpers-mapas.ts`: navegação e mutações no mapa
+- `helpers-analise.ts`: aceite, devolução, homologação e histórico
+
+A regra prática é: **o teste descreve o cenário; o helper executa os detalhes da UI**.
+
+## Fixtures e preparação de estado
+
+`fixtures/` oferece suporte para reduzir repetição e custo estrutural:
+
+- `auth-fixtures.ts`: autenticação pronta por perfil/unidade
+- `database-fixtures.ts`: preparo/limpeza de base
+- `fixtures-processos.ts` e `processo-fixtures.ts`: criação de processos/estado inicial
+- `base.ts` e `complete-fixtures.ts`: composição do ambiente de teste
+
+O backend ainda expõe `/e2e/fixtures/*` para **state-jumping** quando um cenário precisa começar em estado profundo sem percorrer toda a UI.
 
 ## Lifecycle local
 
-Para subir frontend + backend fora da execução do Playwright:
+`lifecycle.js` é a peça central da suíte.
 
-```bash
-node e2e/lifecycle.js
-```
+Ele:
 
-Variáveis úteis:
+- sobe backend via `gradlew bootRun -PENV=e2e|hom`;
+- sobe frontend via `pnpm exec vite`;
+- cria um SMTP local para testes de e-mail;
+- verifica portas e, em `e2e`, pode reutilizar backend existente quando configurado;
+- permite ligar monitoramento de lentidão por variável de ambiente.
+
+Variáveis relevantes:
 
 - `SGC_PERFIL=e2e|hom`
 - `SGC_MONITORAMENTO=sim|nao`
 - `SGC_LIFECYCLE_REUTILIZAR_EXISTENTE=on|off`
 - `E2E_BACKEND_BASE_PORT`
 - `E2E_FRONTEND_PORT`
+- `E2E_SMTP_PORT`
+
+## Modos de execução
+
+### Suíte padrão
+
+```bash
+npm run test:e2e
+```
+
+Por padrão, `playwright.config.ts`:
+
+- usa `workers: 1`;
+- sobe a infra via `node e2e/lifecycle.js`;
+- roda em `chromium-headless-shell`;
+- considera `http://localhost:5173` como baseURL.
+
+### Execuções úteis
+
+```bash
+pnpm exec playwright test --ui
+pnpm exec playwright test e2e/cdu-01.spec.ts
+node e2e/lifecycle.js
+```
 
 ## Perfil `hom`
 
-`SGC_PERFIL=hom` sobe a aplicação para homologação sem os endpoints auxiliares `/e2e/*`.
+O lifecycle também aceita `SGC_PERFIL=hom` para subir a aplicação apontando para homologação/local hom, mas sem usar a suíte funcional padrão.
 
-A suíte padrão não deve rodar nesse modo, porque depende de reset/fixtures do perfil `e2e`.
+Nesse modo:
 
-## Boas práticas
+- não se deve depender de `/e2e/*`;
+- não se deve confiar em `seed.sql`;
+- o objetivo é observação/manualidade controlada, não a execução da suíte oficial.
 
-- Preferir `data-testid` para seletores.
-- Evitar `waitForTimeout`.
-- Manter testes idempotentes.
-- Usar fixtures de autenticação para reduzir duplicação.
+## Como os testes se conectam ao backend
+
+O backend fornece suporte dedicado em `backend/src/main/java/sgc/e2e`:
+
+- `E2eController`
+- `E2eSecurityConfig`
+- endpoints de reset/limpeza
+- endpoints de fixtures para estados complexos
+
+Veja também: [Suporte E2E no backend](../backend/src/main/java/sgc/e2e/README.md).
+
+## Princípios de manutenção da suíte
+
+- preferir `data-testid` a seletores frágeis;
+- evitar `waitForTimeout()` em testes funcionais;
+- usar fixtures para preparar estado repetitivo, não para esconder comportamento;
+- respeitar cenários seriais quando o arquivo assim exigir;
+- investigar causa raiz de falhas em vez de introduzir resiliência artificial.
+
+As regras detalhadas estão em [../etc/docs/regras-e2e.md](../etc/docs/regras-e2e.md).
 
 ## Referências
 
 - [README raiz](../README.md)
+- [Backend do SGC](../backend/README.md)
 - [Suporte E2E no backend](../backend/src/main/java/sgc/e2e/README.md)
 - [Regras E2E](../etc/docs/regras-e2e.md)
