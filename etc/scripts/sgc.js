@@ -62,11 +62,12 @@ criarComandoScript(frontendCruft, "auditar", "Audita cruft estrutural do fronten
 criarComandoScript(frontendCruft, "validar", "Valida budgets e waivers do cruft do frontend.", "etc/scripts/frontend/cruft-validar.js");
 
 const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
-criarComandoScript(frontendViews, "auditar-validacoes", "Audita links e validacoes nas views.", "etc/scripts/frontend/views-auditar-validacoes.js");
+criarComandoScript(frontendViews, "validacoes-auditar", "Audita links e validacoes nas views.", "etc/scripts/frontend/views-validacoes-auditar.js");
+criarComandoScript(frontendViews, "auditar-validacoes", "Alias legado para 'validacoes-auditar'.", "etc/scripts/legado/frontend/views-auditar-validacoes.js");
 
 const frontendTestIds = frontend.command("test-ids").description("Ferramentas para atributos data-test.");
 criarComandoScript(frontendTestIds, "listar", "Lista data-test do frontend.", "etc/scripts/frontend/test-ids-listar.js");
-criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplicados.", "etc/scripts/frontend/test-ids-duplicados.js");
+criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplicados.", "etc/scripts/frontend/test-ids-listar-duplicados.js");
 
 const frontendTelas = frontend.command("telas").description("Ferramentas de captura e apoio visual.");
 criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "etc/scripts/frontend/telas-capturar.js");

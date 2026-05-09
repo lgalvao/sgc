@@ -3,7 +3,7 @@ import path from "node:path";
 
 const novaVersao = process.argv[2];
 if (!novaVersao) {
-    console.error("Uso: node sincronizar-versao.js <versao>");
+    console.error("Uso: node etc/scripts/projeto/versao-sincronizar.js <versao>");
     process.exit(1);
 }
 

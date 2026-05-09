@@ -608,6 +608,13 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Extrai mensagens do projeto.");
     });
 
+    test("exibe comando canonico e alias legado para auditoria de views", async () => {
+        const resultado = await executarSgc(["frontend", "views", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("validacoes-auditar");
+        expect(resultado.stdout).toContain("auditar-validacoes");
+    });
+
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {
         const resultado = await executarScriptFrontendCobertura(["--help"]);
         expect(resultado.exitCode).toBe(0);

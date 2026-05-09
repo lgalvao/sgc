@@ -57,3 +57,26 @@ Consolidar problemas de manutenção detectados no toolkit e iniciar correções
 
 5. **Governança de compatibilidade**
    - Definir política para mudanças de interface (flags, output e exit code) e manter checklist de compatibilidade para evitar regressões silenciosas em automações.
+
+## Rodada 2 (nomenclatura e legado)
+
+### Padronização aplicada
+
+- `frontend/test-ids-duplicados.js` ➜ `frontend/test-ids-listar-duplicados.js`
+- `frontend/views-auditar-validacoes.js` ➜ `frontend/views-validacoes-auditar.js`
+- `projeto/sincronizar-versao.js` ➜ `projeto/versao-sincronizar.js`
+
+### Ajustes de integração
+
+- `sgc.js` atualizado para usar os nomes canônicos.
+- Comando canônico de views passou a ser `frontend views validacoes-auditar`.
+- `README.md` atualizado para refletir o comando canônico.
+- `.release-it.json` atualizado para a nova nomenclatura de sincronização de versão.
+
+### Diretório de legado criado
+
+- `etc/scripts/legado/frontend/views-auditar-validacoes.js`
+- `etc/scripts/legado/frontend/test-ids-duplicados.js`
+- `etc/scripts/legado/projeto/sincronizar-versao.js`
+
+Os aliases legados emitem aviso de depreciação e delegam para os scripts canônicos, preservando compatibilidade de execução direta enquanto a migração é concluída.
