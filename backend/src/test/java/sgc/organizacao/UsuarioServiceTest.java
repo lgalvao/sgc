@@ -176,7 +176,7 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve buscar autorizacoes de perfil e perfis")
+        @DisplayName("Deve buscar autorizações de perfil e perfis")
         void deveBuscarAutorizacoesEPerfis() {
             List<UsuarioPerfilAutorizacaoLeitura> auts = usuarioServiceInternal.buscarAutorizacoesPerfil(TITULO_ADMIN);
             assertThat(auts).isNotEmpty();
