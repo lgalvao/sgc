@@ -1,7 +1,6 @@
 import vue from "@vitejs/plugin-vue";
 import type {RollupLog} from "rollup";
 import {defineConfig} from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 const backendBasePort = Number.parseInt(process.env.E2E_BACKEND_BASE_PORT || "10000", 10);
 const workerCount = Number.parseInt(process.env.E2E_WORKER_COUNT || "1", 10);
@@ -57,7 +56,6 @@ export default defineConfig({
     envDir: "../",
     plugins: [
         vue(),
-        tsconfigPaths(),
         {
             name: "e2e-worker-rewrite",
             configureServer(server) {
@@ -74,6 +72,9 @@ export default defineConfig({
             },
         },
     ],
+    resolve: {
+        tsconfigPaths: true,
+    },
     server: {
         watch: {
             usePolling: true,
