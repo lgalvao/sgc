@@ -160,7 +160,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("validarSituacaoPermitida: deve lançar IllegalArgumentException quando status for nulo")
     void validarSituacaoPermitida_NullStatus() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacaoForcada(null);
+        sp.setSituacao(null);
         assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Situação do subprocesso não pode ser nula");

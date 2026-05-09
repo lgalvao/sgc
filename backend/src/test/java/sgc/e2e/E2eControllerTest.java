@@ -660,14 +660,45 @@ class E2eControllerTest {
         }
 
         @Test
-        @DisplayName("limparTabela: deve ignorar erro ao excluir tabela")
-        void deveIgnorarErroAoLimparTabela() throws Exception {
-            Statement stmt = mock(Statement.class);
-            doThrow(new SQLException("Erro simulado")).when(stmt).execute(anyString());
+        @DisplayName("resetDatabase: deve continuar reset quando uma exclusão falhar")
+        void deveContinuarResetQuandoUmaExclusaoFalhar() throws Exception {
+            JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
+            DataSource dataSourceMock = mock(DataSource.class);
+            Connection connectionMock = mock(Connection.class);
+            Statement statementMock = mock(Statement.class);
+            ResourceLoader resourceLoaderMock = mock(ResourceLoader.class);
+            Resource resourceMock = mock(Resource.class);
+            CacheManager cacheManagerMock = mock(CacheManager.class);
 
-            assertThatCode(() -> controller.limparTabela(stmt, "TABELA"))
-                    .doesNotThrowAnyException();
-            verify(stmt).execute("DELETE FROM sgc.TABELA");
+            when(jdbcTemplateMock.getDataSource()).thenReturn(dataSourceMock);
+            when(dataSourceMock.getConnection()).thenReturn(connectionMock);
+            when(connectionMock.createStatement()).thenReturn(statementMock);
+            when(jdbcTemplateMock.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
+            when(statementMock.execute(anyString())).thenAnswer(invocacao -> {
+                String sql = invocacao.getArgument(0);
+                if ("DELETE FROM sgc.TABELA_TESTE".equals(sql)) {
+                    throw new SQLException("Erro simulado");
+                }
+                return true;
+            });
+            when(resourceLoaderMock.getResource(anyString())).thenReturn(resourceMock);
+            when(resourceMock.exists()).thenReturn(true);
+            when(resourceMock.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
+
+            E2eController controllerComMocks = new E2eController(
+                    jdbcTemplateMock,
+                    namedJdbcTemplate,
+                    processoService,
+                    processoRepo,
+                    subprocessoRepo,
+                    mapaRepo,
+                    unidadeService,
+                    resourceLoaderMock,
+                    cacheManagerMock);
+
+            assertThatCode(controllerComMocks::resetDatabase).doesNotThrowAnyException();
+            verify(statementMock).execute("DELETE FROM sgc.TABELA_TESTE");
+            verify(statementMock).execute("SET REFERENTIAL_INTEGRITY TRUE");
         }
     }
 }
