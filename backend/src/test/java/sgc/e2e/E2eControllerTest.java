@@ -38,6 +38,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes do E2eController (Backend support)")
 @SuppressWarnings("NullAway.Init")
 class E2eControllerTest {
+    private static final String SCRIPT_SQL_MINIMO_VALIDO = "SELECT 1;";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -90,7 +92,7 @@ class E2eControllerTest {
         when(mockResource.exists()).thenReturn(exists);
         if (exists) {
             try {
-                when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
+                when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -399,7 +401,7 @@ class E2eControllerTest {
                 Resource resource = mock(Resource.class);
                 when(resourceLoaderMock.getResource(anyString())).thenReturn(resource);
                 when(resource.exists()).thenReturn(true);
-                when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
+                when(resource.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
 
                 controllerIsolado.resetDatabase();
 
@@ -660,15 +662,45 @@ class E2eControllerTest {
         }
 
         @Test
-        @DisplayName("limparTabela: Deve logar erro se falhar")
-        void deveCobrirErroAoLimparTabela() throws Exception {
-            Statement stmt = mock(Statement.class);
-            doThrow(new SQLException("Erro simulado")).when(stmt).execute(anyString());
+        @DisplayName("resetDatabase: deve continuar reset quando uma exclusão falhar")
+        void deveContinuarResetQuandoUmaExclusaoFalhar() throws Exception {
+            JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
+            DataSource dataSourceMock = mock(DataSource.class);
+            Connection connectionMock = mock(Connection.class);
+            Statement statementMock = mock(Statement.class);
+            ResourceLoader resourceLoaderMock = mock(ResourceLoader.class);
+            Resource resourceMock = mock(Resource.class);
+            CacheManager cacheManagerMock = mock(CacheManager.class);
 
-            var method = E2eController.class.getDeclaredMethod("limparTabela", Statement.class, String.class);
-            method.setAccessible(true);
+            when(jdbcTemplateMock.getDataSource()).thenReturn(dataSourceMock);
+            when(dataSourceMock.getConnection()).thenReturn(connectionMock);
+            when(connectionMock.createStatement()).thenReturn(statementMock);
+            when(jdbcTemplateMock.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
+            when(statementMock.execute(anyString())).thenAnswer(invocacao -> {
+                String sql = invocacao.getArgument(0);
+                if ("DELETE FROM sgc.TABELA_TESTE".equals(sql)) {
+                    throw new SQLException("Erro simulado");
+                }
+                return true;
+            });
+            when(resourceLoaderMock.getResource(anyString())).thenReturn(resourceMock);
+            when(resourceMock.exists()).thenReturn(true);
+            when(resourceMock.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
 
-            method.invoke(controller, stmt, "TABELA");
+            E2eController controllerComMocks = new E2eController(
+                    jdbcTemplateMock,
+                    namedJdbcTemplate,
+                    processoService,
+                    processoRepo,
+                    subprocessoRepo,
+                    mapaRepo,
+                    unidadeService,
+                    resourceLoaderMock,
+                    cacheManagerMock);
+
+            assertThatCode(controllerComMocks::resetDatabase).doesNotThrowAnyException();
+            verify(statementMock).execute("DELETE FROM sgc.TABELA_TESTE");
+            verify(statementMock).execute("SET REFERENTIAL_INTEGRITY TRUE");
         }
     }
 }

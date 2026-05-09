@@ -98,9 +98,15 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("validarCadastro: deve retornar erro sem atividades")
     void validarCadastro_SemAtividades() {
         ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
+
         assertThat(dto.valido()).isFalse();
-        assertThat(dto.erros()).hasSize(1);
-        assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
+        assertThat(dto.erros())
+                .singleElement()
+                .satisfies(erro -> {
+                    assertThat(erro.tipo()).isEqualTo("SEM_ATIVIDADES");
+                    assertThat(erro.mensagem()).isEqualTo("O mapa não possui atividades cadastradas.");
+                    assertThat(erro.atividadeCodigo()).isNull();
+                });
     }
 
     @Test
@@ -110,22 +116,53 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         atividadeRepo.save(a);
 
         ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
+
         assertThat(dto.valido()).isFalse();
-        assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+        assertThat(dto.erros())
+                .singleElement()
+                .satisfies(erro -> {
+                    assertThat(erro.tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+                    assertThat(erro.atividadeCodigo()).isEqualTo(a.getCodigo());
+                    assertThat(erro.descricaoAtividade()).isEqualTo("Ativ 1");
+                    assertThat(erro.mensagem()).isEqualTo("Esta atividade não possui conhecimentos associados.");
+                });
     }
 
     @Test
-    @DisplayName("validarSituacaoPermitida: throw se status diferente")
+    @DisplayName("validarCadastro: deve retornar válido quando todas as atividades possuem conhecimentos")
+    void validarCadastro_Valido() {
+        Atividade a = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Atividade 1").build();
+        atividadeRepo.save(a);
+
+        Conhecimento c = Conhecimento.builder()
+                .atividade(a)
+                .descricao("Conhecimento 1")
+                .build();
+        a.getConhecimentos().add(c);
+        atividadeRepo.save(a);
+
+        ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
+
+        assertThat(dto.valido()).isTrue();
+        assertThat(dto.erros()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("validarSituacaoPermitida: deve informar situação atual e permitida quando status for incompatível")
     void validarSituacaoPermitida_Throw() {
         assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
-                .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining(subprocesso.getSituacao().name())
+                .hasMessageContaining(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO.name());
     }
 
     @Test
-    @DisplayName("validarSituacaoPermitida: throw IllegalArgumentException se status null")
+    @DisplayName("validarSituacaoPermitida: deve lançar IllegalArgumentException quando status for nulo")
     void validarSituacaoPermitida_NullStatus() {
         Subprocesso sp = new Subprocesso();
+        sp.setSituacao(null);
         assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
-                .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Situação do subprocesso não pode ser nula");
     }
 }
