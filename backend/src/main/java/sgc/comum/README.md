@@ -1,88 +1,52 @@
-# Pacote comum
+# Pacote `comum`
 
-## Visão geral
+## Objetivo
 
-O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de
-outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir
-consistência.
+O pacote `sgc.comum` concentra infraestrutura compartilhada entre os domínios do backend.
 
-Este pacote abriga exclusivamente código de suporte sem lógica de negócio específica de domínio.
+Ele não representa um domínio de negócio específico; fornece base de configuração, erros, modelos e utilidades.
 
-## Arquitetura e Subpacotes
+## Subpacotes principais
 
-O `comum` fornece infraestrutura básica, como o tratamento de erros, modelos de dados compartilhados, configurações do
-Spring e suporte para serialização JSON.
+### `config`
 
-```mermaid
-graph TD
-    subgraph "Módulos de Negócio"
-        direction LR
-        Controllers
-        Services
-        Models
-    end
+Configurações transversais da aplicação, como:
 
-    subgraph "Pacote comum"
-        direction LR
-        Erros(erros)
-        ModeloBase(model)
-        Config(config)
-        Json(json)
-    end
+- configuração geral da aplicação,
+- cache,
+- OpenAPI,
+- integração de templates.
 
-    Services -- Lançam --> Erros
-    Controllers -- Capturam exceções via --> Erros
-    Models -- Herdam de --> ModeloBase
-    Controllers & Services -- Usam --> Config
-    Models -- Usam --> Json
-```
+### `erros`
 
-### 1. `exceções`
+Padronização de exceções e resposta de erro da API:
 
-- **Responsabilidade:** Define a hierarquia de exceções customizadas e o tratador global de erros.
-- **Componentes notáveis:**
-    - **`RestExceptionHandler`**: Um `@ControllerAdvice` que intercepta exceções lançadas pela aplicação e as converte
-      em respostas JSON padronizadas (`ErroApi`).
-    - **`ErroApi`**: Classe que modela a resposta de erro JSON padrão (status, mensagem, timestamp).
-    - **`ErroSubApi`**: Classe para detalhes de erros (ex: campos inválidos na validação).
-    - **Exceções de Negócio:**
-        - `ErroEntidadeNaoEncontrada`: HTTP 404.
-        - `ErroValidacao`: HTTP 400.
-        - `ErroAcessoNegado`: HTTP 403.
+- `RestExceptionHandler`
+- `ErroApi`
+- `ErroSubApi`
+- exceções de negócio (`ErroNegocio`, `ErroValidacao`, `ErroAcessoNegado`, etc.).
 
-### 2. `model`
+### `model`
 
-- **Responsabilidade:** Contém modelos de dados compartilhados.
-- **Componentes notáveis:**
-    - **`EntidadeBase`**: Superclasse (`@MappedSuperclass`) que fornece o campo `codigo` (ID) para as entidades JPA.
-    - **`Parametro`**: Entidade para configuração dinâmica de parâmetros do sistema.
+Tipos base compartilhados, incluindo:
 
-### 3. `config`
+- `EntidadeBase` (com campo `codigo`),
+- contratos reutilizáveis de model/repositório.
 
-- **Responsabilidade:** Centraliza as classes de configuração do Spring.
-- **Componentes notáveis:**
-    - `ConfigSeguranca`: Configurações do Spring Security.
-    - `ConfigWeb`: Configurações de CORS e MVC.
-    - `ConfigThymeleaf`: Configuração do template engine para e-mails.
+### `util`
 
-### 4. `json`
+Utilitários transversais, incluindo:
 
-- **Responsabilidade:** Utilitários para serialização e sanitização JSON.
-- **Componentes notáveis:**
-    - `SanitizeHtml`: Anotação customizada para sanitização de HTML.
-    - `HtmlSanitizingDeserializer`: Deserializador jackson que remove tags HTML perigosas de strings de entrada.
+- monitoramento (`MonitoramentoAspect`, `FiltroMonitoramentoHttp`, `MonitoramentoProperties`),
+- apoio de formatação e helpers técnicos.
 
-## Propósito e Uso
+## Artefatos adicionais
 
-- **Padronização de Erros**: Ao lançar exceções do pacote `erros`, garantimos que o cliente da API receba sempre uma
-  resposta JSON consistente e traduzida.
-- **Reutilização**: Classes como `EntidadeBase` e anotações como `@SanitizeHtml` reduzem código boilerplate nos módulos
-  de negócio.
+- `ComumDtos`
+- `Mensagens`
 
-## Como testar
+## Quando usar
 
-Para executar apenas os testes deste módulo (a partir do diretório `backend`):
+Use `sgc.comum` para evitar duplicação entre módulos e manter padrão único de infraestrutura.
 
-```bash
-./gradlew test --tests "sgc.comum.*"
-```
+Evite colocar regras de negócio específicas de domínio neste pacote.

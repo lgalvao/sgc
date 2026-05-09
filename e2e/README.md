@@ -1,151 +1,65 @@
-# Testes end-to-End (E2E)
+# Testes End-to-End (E2E)
 
-Este diretório contém a suite de testes automatizados de ponta a ponta, implementada com **Playwright 1.58.2**.
+## Visão geral
 
-## 🎯 Objetivo
+A suíte E2E usa **Playwright** para validar fluxos completos do SGC, integrando frontend e backend.
 
-Garantir que os fluxos críticos de negócio (Casos de Uso) funcionem corretamente integrando Frontend, Backend e Banco de
-Dados.
+Os testes ficam neste diretório e são executados com infraestrutura iniciada por `e2e/lifecycle.js`.
 
-## 🏗️ Estrutura do Projeto
+## Estrutura
 
-Seguimos uma arquitetura organizada para manter os testes legíveis e manuteníveis:
+- `cdu-*.spec.ts`: cenários por caso de uso.
+- `helpers/`: abstrações de interação.
+- `fixtures/`: fixtures de autenticação e dados.
+- `hooks/`: limpeza e preparação.
+- `setup/`: artefatos de banco e configuração.
 
-### 1. Specs (`*.spec.ts`)
+## Execução
 
-Arquivos de teste declarativos. Descrevem **O QUE** está sendo testado, não **COMO**.
-
-* Focam na narrativa do usuário.
-* Não contêm seletores CSS ou lógica de espera direta (delegam para Helpers).
-* Mapeados 1:1 com os Casos de Uso (ex: `cdu-01.spec.ts`).
-
-### 2. Helpers (`/helpers`)
-
-Encapsulam a complexidade de automação e interações com a página.
-
-* **`helpers-auth.ts`**: Login e gestão de sessão.
-* **`helpers-processos.ts`**: Navegação e ações em processos.
-* **`helpers-mapas.ts`**: Manipulação de tabelas e formulários de competências.
-* **Abstração:** Métodos semânticos como `criarCompetencia(...)` em vez de manipulação direta de seletores nos testes.
-
-### 3. Fixtures (`/fixtures`)
-
-Define dados de teste e extensões do objeto `test` do Playwright.
-
-* **`base.ts`**: Extensão base do Playwright com configurações globais e listeners de log/erro.
-* **`auth-fixtures.ts`**: ⭐ Fixtures de autenticação prontas para uso. Elimina duplicação de código de login.
-* **`fixtures-processos.ts`**: Helpers para criação de processos via API (em desenvolvimento).
-
-**💡 Uso de Auth fixtures:**
-
-```typescript
-import {test, expect} from './fixtures/auth-fixtures';
-
-// ❌ ANTES (duplicação)
-test.beforeEach(async ({page}) => {
-  await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-});
-
-test('Deve criar processo', async ({page}) => {
-  // teste...
-});
-
-// ✅ DEPOIS (usando fixture)
-test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
-  // Já está logado como ADMIN!
-  // teste...
-});
-```
-
-**Fixtures disponíveis:**
-
-* `autenticadoComoAdmin` - Admin único perfil (191919)
-* `autenticadoComoGestor` - Gestor COORD_11 (222222)
-* `autenticadoComoChefeSecao111` - Chefe seção 111 (333333)
-* `autenticadoComoChefeSecao211` - Chefe seção 211 (101010)
-* `autenticadoComoChefeSecao212` - Chefe seção 212 (181818)
-* `autenticadoComoChefeSecao221` - Chefe seção 221 (141414)
-* `autenticadoComoChefeAssessoria11` - Chefe assessoria 11 (555555)
-* E outras (veja `auth-fixtures.ts` para lista completa)
-
-### 4. Setup e Hooks (`/setup`, `/hooks`)
-
-* **`/setup`**: Scripts de inicialização global, como `seed.sql` e configuração inicial do ambiente.
-* **`/hooks`**: Lógica executada antes ou depois dos testes, como `hooks-limpeza.ts` para garantir um estado limpo.
-
-## 🚀 Como executar
-
-### Pré-requisitos
-
-* Não é necessário subir frontend/backend manualmente para a suíte Playwright padrão.
-* Os testes iniciam a infraestrutura E2E automaticamente via `playwright.config.ts` e `e2e/lifecycle.js`.
-* Para paralelismo isolado, usamos frontend único e 1 backend por worker.
-* O `lifecycle.js` inicia em `e2e` por padrão. O modo `hom` é apenas para subir a aplicação apontando para homologação,
-  sem
-  endpoints `/e2e`, sem `seed.sql` e sem rotinas de limpeza.
-
-### Comandos
+Da raiz do repositório:
 
 ```bash
-# Instalar dependências
-pnpm install
-
-# Rodar todos os testes (Headless)
-pnpm run test:e2e
-
-# Rodar com 2 workers isolados (configuração atualmente validada)
-pnpm run test:e2e:2w
-
-# Rodar captura de telas
-pnpm run test:e2e:captura
-
-# Rodar com interface gráfica (UI Mode)
-npx playwright test --ui
-
-# Rodar um arquivo específico
-npx playwright test e2e/cdu-01.spec.ts
-
-# Subir frontend + backend em modo homologação (sem reset/seed)
-$env:SGC_PERFIL='hom'; node e2e/lifecycle.js
+npm run test:e2e
 ```
 
-## 🛠️ Suporte no Backend
+Comandos úteis adicionais:
 
-O backend possui um perfil específico (`e2e`) que habilita endpoints auxiliares para facilitar os testes:
+```bash
+pnpm exec playwright test --ui
+pnpm exec playwright test e2e/cdu-01.spec.ts
+```
 
-* **Reset de Banco:** `/e2e/reset-database` (Limpa e popula o banco antes dos testes).
-* **Fixtures:** `/e2e/fixtures/*` (Cria dados complexos via API para pular etapas repetitivas na UI).
+## Lifecycle local
 
-Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
+Para subir frontend + backend fora da execução do Playwright:
 
-## Homologação com segurança
+```bash
+node e2e/lifecycle.js
+```
 
-Se precisar usar o mesmo script para subir a aplicação contra homologação:
+Variáveis úteis:
 
-* Use `SGC_PERFIL=hom`.
-* Nesse modo, o backend sobe com `-PENV=hom`.
-* O script não reutiliza backend existente.
-* O script não depende de `/e2e/reset-database`.
-* Qualquer tentativa de ativar o backend `e2e` fora de H2 deve falhar na inicialização.
+- `SGC_PERFIL=e2e|hom`
+- `SGC_MONITORAMENTO=sim|nao`
+- `SGC_LIFECYCLE_REUTILIZAR_EXISTENTE=on|off`
+- `E2E_BACKEND_BASE_PORT`
+- `E2E_FRONTEND_PORT`
 
-Nao use a suíte Playwright padrão contra homologação. Os testes dependem de endpoints `/e2e/*` e de dados do `seed.sql`.
+## Perfil `hom`
 
-## ♻️ Isolamento por worker
+`SGC_PERFIL=hom` sobe a aplicação para homologação sem os endpoints auxiliares `/e2e/*`.
 
-Para paralelismo com isolamento de estado, a infraestrutura E2E suporta:
+A suíte padrão não deve rodar nesse modo, porque depende de reset/fixtures do perfil `e2e`.
 
-* 1 frontend único compartilhado.
-* 1 backend por worker.
-* Banco H2 em memória dedicado por worker (`sgc-e2e-w{index}`).
-* Portas dedicadas por worker:
-    * Backend: `10000 + workerIndex`
-    * Frontend único: `5173`
-* Configuração validada até aqui: `2 workers`.
+## Boas práticas
 
-## 🤝 Padrões de Contribuição
+- Preferir `data-testid` para seletores.
+- Evitar `waitForTimeout`.
+- Manter testes idempotentes.
+- Usar fixtures de autenticação para reduzir duplicação.
 
-* **Seletores resilientes:** Use sempre `data-testid="..."` em vez de classes CSS ou XPaths frágeis.
-* **Idempotência:** Cada teste deve ser independente. Use os hooks `beforeEach` para limpar/resetar o estado.
-* **Determinismo:** Evite `page.waitForTimeout()`. Use esperas explícitas por elementos ou respostas de rede.
-* **Auth fixtures:** Use sempre as fixtures de autenticação (`autenticadoComoAdmin`, etc.) em vez de chamar `login()`
-  manualmente. Isso reduz duplicação e torna os testes mais legíveis.
+## Referências
+
+- [README raiz](../README.md)
+- [Suporte E2E no backend](../backend/src/main/java/sgc/e2e/README.md)
+- [Regras E2E](../etc/docs/regras-e2e.md)
