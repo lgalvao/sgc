@@ -20,6 +20,7 @@ export function useCacheSync() {
     const painelStore = usePainelStore();
 
     const source = new EventSource("/api/eventos");
+    let encerradoManualmente = false;
 
     source.addEventListener(EVENTO_CACHE_ATUALIZADO, () => {
         unidadeStore.invalidar();
@@ -28,11 +29,20 @@ export function useCacheSync() {
     });
 
     source.addEventListener("error", (event) => {
+        if (encerradoManualmente) {
+            return;
+        }
+
+        if (source.readyState !== EventSource.OPEN) {
+            return;
+        }
+
         logger.warn("Erro na conexão SSE de sincronização de cache:", event);
         // Browser gerencia reconexão automática do EventSource.
     });
 
     return () => {
+        encerradoManualmente = true;
         source.close();
     };
 }

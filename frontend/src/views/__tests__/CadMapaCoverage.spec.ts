@@ -297,7 +297,7 @@ describe('MapaView Coverage', () => {
         expect(vm.fieldErrors.atividades).toBe('Erro em atividade');
     });
 
-    it('disponibilizarMapa returns early if codSubprocesso is null', async () => {
+    it('disponibilizarMapa falha com invariante quando codigoSubprocesso nao foi carregado', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
         const wrapper = mount(MapaView, {
             global: {
@@ -312,7 +312,7 @@ describe('MapaView Coverage', () => {
 
         const vm = wrapper.vm as unknown as MapaViewVm;
         vm.codigoSubprocesso = null;
-        await vm.disponibilizarMapa({});
+        await expect(vm.disponibilizarMapa({})).rejects.toThrow('Invariante violada: codigoSubprocesso não carregado');
 
         const fluxoMapa = useFluxoMapaModule.useFluxoMapa();
         expect(fluxoMapa.disponibilizarMapa).not.toHaveBeenCalled();

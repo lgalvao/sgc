@@ -2,7 +2,7 @@
   "name": "sgc",
   "private": true,
   "version": "1.0.4",
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@11.0.9+sha512.34ce82e6780233cf9cad8685029a8f81d2e06196c5a9bad98879f7424940c6817c4e4524fb7d38b8553ceed48b9758b8ebaf1abd3600c232c4c8cf7366086f38",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -30,7 +30,7 @@
     "axios": "1.16.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
-    "bootstrap-vue-next": "^0.45.1",
+    "bootstrap-vue-next": "^0.45.2",
     "date-fns": "^4.1.0",
     "html2canvas": "^1.4.1",
     "pinia": "^3.0.4",

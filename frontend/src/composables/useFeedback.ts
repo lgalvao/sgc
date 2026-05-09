@@ -25,6 +25,7 @@ export function useFeedback() {
                 html2canvas(document.body, {
                     useCORS: true,
                     allowTaint: false,
+                    logging: false,
                     scale: window.devicePixelRatio,
                 }),
                 new Promise<never>((_, rejeitar) =>

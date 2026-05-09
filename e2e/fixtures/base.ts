@@ -52,6 +52,18 @@ function ehErroHttpMonitoradoEsperado(args: unknown[]): boolean {
     });
 }
 
+function sanitizarTextoConsole(texto: string): string {
+    return texto
+        .replace(/%c/g, '')
+        .replace(/\s+background:\s[^;]+;\s*/g, ' ')
+        .replace(/\s+border-radius:\s[^;]+;\s*/g, ' ')
+        .replace(/\s+color:\s[^;]+;\s*/g, ' ')
+        .replace(/\s+font-weight:\s[^;]+;\s*/g, ' ')
+        .replace(/\s+padding:\s[^;]+;\s*/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 export const test = base.extend<{
     cleanupAutomatico: ReturnType<typeof useProcessoCleanup>;
 }>({
@@ -85,8 +97,14 @@ export const test = base.extend<{
 
         // Listener para logs do console
         page.on('console', async msg => {
-            const text = msg.text();
+            const text = sanitizarTextoConsole(msg.text());
             const locationUrl = msg.location().url || '';
+            const type = String(msg.type());
+
+            if (!['log', 'error', 'warning', 'warn', 'info'].includes(type)) {
+                return;
+            }
+
             // Filtrar logs de conexão do Vite para reduzir ruído
             if (text.includes('[vite] connecting...') || text.includes('[vite] connected.')) {
                 return;
@@ -111,8 +129,6 @@ export const test = base.extend<{
                 && /\/api\/processos\/\d+\/detalhes$/.test(locationUrl)) {
                 return;
             }
-
-            const type = String(msg.type());
 
             // Tenta expandir argumentos se forem objetos (ex: AxiosError)
             let expandedArgs: string;

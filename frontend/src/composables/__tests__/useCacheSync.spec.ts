@@ -7,15 +7,21 @@ import {useProcessoStore} from '@/stores/processo';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {useMapasStore} from '@/stores/mapas';
 import {createPinia, setActivePinia} from 'pinia';
+import {logger} from '@/utils';
 
 // Global to hold the last created instance
 let lastInstance: EventSourceMock | null = null;
 
 // Mock EventSource
 class EventSourceMock {
+    static readonly CONNECTING = 0;
+    static readonly OPEN = 1;
+    static readonly CLOSED = 2;
+
     public onmessage: ((event: any) => void) | null = null;
     public onerror: ((event?: any) => void) | null = null;
     public close = vi.fn();
+    public readyState = EventSourceMock.OPEN;
     private listeners: Record<string, ((event: any) => void)[]> = {};
 
     constructor(public url: string) {
@@ -68,6 +74,7 @@ describe('useCacheSync', () => {
         vi.spyOn(processoStore, 'invalidar');
         vi.spyOn(subprocessoStore, 'invalidar');
         vi.spyOn(mapasStore, 'invalidar');
+        vi.spyOn(logger, 'warn').mockImplementation(() => logger);
     });
 
     it('deve conectar ao EventSource na URL correta', () => {
@@ -121,14 +128,44 @@ describe('useCacheSync', () => {
         expect(mapasStore.dadosMapaValidos(200)).toBe(true);
     });
 
-    it('não deve fechar a conexão em caso de erro transitório', () => {
+    it('não deve fechar a conexão em caso de erro transitório durante reconexão', () => {
         useCacheSync();
+        if (lastInstance) {
+            lastInstance.readyState = EventSourceMock.CONNECTING;
+        }
 
         if (lastInstance?.onerror) {
             lastInstance.onerror();
         }
 
         expect(lastInstance?.close).not.toHaveBeenCalled();
+        expect(logger.warn).not.toHaveBeenCalled();
+    });
+
+    it('não deve logar warning quando a conexão SSE já estiver fechada', () => {
+        useCacheSync();
+        if (lastInstance) {
+            lastInstance.readyState = EventSourceMock.CLOSED;
+        }
+
+        if (lastInstance?.onerror) {
+            lastInstance.onerror();
+        }
+
+        expect(lastInstance?.close).not.toHaveBeenCalled();
+        expect(logger.warn).not.toHaveBeenCalled();
+    });
+
+    it('não deve logar warning ao encerrar a conexão manualmente', () => {
+        const closeSync = useCacheSync();
+
+        closeSync();
+
+        if (lastInstance?.onerror) {
+            lastInstance.onerror();
+        }
+
+        expect(logger.warn).not.toHaveBeenCalled();
     });
 
     it('deve fechar a conexao ao chamar a funcao de retorno', () => {
