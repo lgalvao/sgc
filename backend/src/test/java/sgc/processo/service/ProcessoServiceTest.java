@@ -31,7 +31,6 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.ReflectionTestUtils.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.processo.model.SituacaoProcesso.*;
 import static sgc.processo.model.TipoProcesso.*;
@@ -1316,12 +1315,26 @@ class ProcessoServiceTest {
         }
 
         @Test
-        @DisplayName("processarAcoesBlocoAceiteHomologacao - fall-through branch")
-        void deveNaoFazerNadaQuandoAcaoNaoForAceitarOuHomologar() {
-            ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(), AcaoProcesso.DISPONIBILIZAR);
+        @DisplayName("executarAcaoEmBloco não deve acionar fluxos de aceite/homologação quando ação for disponibilizar")
+        void deveNaoAcionarFluxosDeAceiteOuHomologacaoQuandoAcaoForDisponibilizar() {
+            Long codProcesso = 1L;
+            DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(10L), LocalDate.now().plusDays(1));
 
-            assertThatCode(() -> invokeMethod(processoService, "processarAcoesBlocoAceiteHomologacao", req, List.of()))
-                    .doesNotThrowAnyException();
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            sp.setUnidade(unidade);
+
+            Usuario usuario = new Usuario();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
+
+            assertThatCode(() -> processoService.executarAcaoEmBloco(codProcesso, req)).doesNotThrowAnyException();
+
+            verify(cadastroFluxoService, never()).aceitarCadastroEmBloco(anyList());
+            verify(transicaoService, never()).aceitarValidacaoEmBloco(anyList());
         }
     }
     @Test
@@ -1672,15 +1685,47 @@ class ProcessoServiceTest {
     }
 
     @Test
-    @DisplayName("validarDadosBasicosParticipante - deve lancar excecao quando nome ou sigla em branco")
-    void validarDadosBasicosParticipante_Erro() {
-        ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.builder().codUnidade(10L).nome("").sigla("S").build();
-        assertThatThrownBy(() -> invokeMethod(processoService, "validarDadosBasicosParticipante", 1L, dto))
+    @DisplayName("obterDetalhesCompleto deve lançar erro quando participante tiver nome vazio")
+    void obterDetalhesCompletoDeveLancarErroQuandoParticipanteTiverNomeVazio() {
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setTipo(MAPEAMENTO);
+
+        Unidade unidade = criarUnidadeValida(10L);
+        unidade.setNome(" ");
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Snapshot inconsistente");
+    }
 
-        ProcessoDetalheDto.UnidadeParticipanteDto dto2 = ProcessoDetalheDto.UnidadeParticipanteDto.builder().codUnidade(10L).nome("N").sigla("").build();
-        assertThatThrownBy(() -> invokeMethod(processoService, "validarDadosBasicosParticipante", 1L, dto2))
+    @Test
+    @DisplayName("obterDetalhesCompleto deve lançar erro quando participante tiver sigla vazia")
+    void obterDetalhesCompletoDeveLancarErroQuandoParticipanteTiverSiglaVazia() {
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setTipo(MAPEAMENTO);
+
+        Unidade unidade = criarUnidadeValida(10L);
+        unidade.setSigla("");
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Snapshot inconsistente");
     }
@@ -1831,4 +1876,5 @@ class ProcessoServiceTest {
         }
     }
 
+}
 }
