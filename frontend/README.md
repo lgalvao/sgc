@@ -1,95 +1,61 @@
-# Frontend SGC
+# Frontend do SGC
 
-Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema de Gestão de Competências).
+## Visão geral
 
-## 🚀 Como executar
+Este módulo contém a SPA do SGC.
 
-Para iniciar o servidor de desenvolvimento:
+- **Vue 3.5** com `<script setup lang="ts">`
+- **TypeScript 5.9**
+- **Vite 7**
+- **Pinia (setup stores)**
+- **BootstrapVueNext**
 
-```bash
-cd frontend
-pnpm install
-pnpm run dev
-```
+## Estrutura principal (`src/`)
 
-A aplicação estará disponível em `http://localhost:5173`.
+- `views/`: telas de caso de uso.
+- `components/`: componentes reutilizáveis.
+- `stores/`: estado global com Pinia.
+- `composables/`: lógica reutilizável.
+- `services/`: integração HTTP com backend.
+- `router/`: rotas modulares.
+- `types/`: contratos TypeScript.
+- `utils/`: utilitários transversais.
 
-## Arquitetura e Tecnologias
-
-O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **TypeScript**.
-
-* **Framework:** Vue.js 3.5 (Composition API, `<script setup>`)
-* **Linguagem:** TypeScript 5.9
-* **Estado:** Pinia (Setup stores)
-* **Roteamento:** Vue Router (modularizado)
-* **UI:** BootstrapVueNext + Bootstrap 5
-* **Build:** Vite 7
-* **HTTP:** Axios (com interceptors para JWT)
-* **Testes:** Vitest (unitários) + Playwright (E2E)
-* **Qualidade:** ESLint + OXLint + TypeScript (typecheck)
-
-### Fluxo de Dados
-
-1. **Views (`src/views`)**: Componentes de página. Disparam ações.
-2. **Stores (`src/stores`)**: Gerenciam o estado reativo (Pinia). Chamam os services.
-3. **Services (`src/services`)**: Camada de abstração da API. Fazem requisições HTTP.
-4. **Backend**: API REST Spring Boot.
-
-## Estrutura de Pastas principais
-
-* **`src/components/`**: Componentes reutilizáveis, organizados por funcionalidade.
-* **`src/composables/`**: Lógica de estado reutilizável (Composition API).
-* **`src/services/`**: Encapsulamento de chamadas HTTP.
-* **`src/stores/`**: Gerenciamento de estado global (Pinia).
-* **`src/views/`**: Telas principais da aplicação.
-* **`src/utils/`**: Funções utilitárias e auxiliares.
-* **`src/types/`**: Definições de tipos e DTOs.
-
-## Testes e Qualidade
-
-### Unitários (Vitest)
+## Execução local
 
 ```bash
-pnpm run test:unit
+pnpm --dir frontend install
+pnpm --dir frontend run dev
 ```
 
-### Type check
+Aplicação em `http://localhost:5173`.
+
+## Build
 
 ```bash
-pnpm run typecheck
+pnpm --dir frontend run build
+pnpm --dir frontend run build:hom
+pnpm --dir frontend run build:prod
 ```
 
-### Linting
+## Testes e qualidade
 
 ```bash
-pnpm run lint
+pnpm --dir frontend run test:unit
+pnpm --dir frontend run typecheck
+pnpm --dir frontend run lint
+pnpm --dir frontend run quality:all
 ```
 
-### Qualidade completa
+## Convenções do módulo
 
-Para executar testes, linting e typecheck de uma vez:
+- Componentes em `PascalCase`.
+- Stores no padrão `use{Nome}Store`.
+- Tratamento de erro centralizado (evitar recuperação local de erro irrecuperável de backend).
+- Permissões de UI consumidas a partir da estrutura enviada pelo backend.
 
-```bash
-pnpm run quality:all
-```
+## Referências
 
-### E2E (Playwright)
-
-```bash
-pnpm run test:e2e
-```
-
-## Autenticação
-
-A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo
-`axios-setup.ts`.
-
-## Builds
-
-| Comando               | Destino                                              |
-|-----------------------|------------------------------------------------------|
-| `pnpm run build`      | Build padrão (desenvolvimento)                       |
-| `pnpm run build:hom`  | Build para homologação (habilita widget de feedback) |
-| `pnpm run build:prod` | Build para produção                                  |
-
-Para convenções de código, veja o arquivo **[AGENTS.md](../AGENTS.md)** na raiz do projeto.
+- [README raiz](../README.md)
+- [Regras de acesso](../etc/reqs/regras-acesso.md)
+- [Regras E2E](../etc/docs/regras-e2e.md)

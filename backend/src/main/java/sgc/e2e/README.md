@@ -1,29 +1,37 @@
-# Pacote E2E (End-to-End testing support)
+# Pacote `e2e` do backend
 
 ## Visão geral
 
-O pacote `e2e` (backend) fornece **endpoints auxiliares e configurações específicas para testes end-to-end** (E2E).
+`sgc.e2e` fornece suporte para automação de testes de ponta a ponta quando o backend sobe com perfil `e2e`.
 
-> **⚠️ AVISO IMPORTANTE:** Este código **só é ativado no perfil Spring `e2e`**. Ele contém endpoints que executam
-> operações destrutivas (como limpar o banco de dados) e **NUNCA** deve estar ativo em produção.
+Esse pacote é isolado por perfil e não deve ser usado em produção.
 
-## Funcionalidades
+## Ativação
 
-O objetivo deste pacote é facilitar a automação de testes, permitindo:
+- Perfil Spring: `e2e`
+- Condição adicional no controller: `aplicacao.ambiente-testes=true`
+- Banco obrigatório: **H2 em memória** (validado em runtime)
 
-1. **Reset de Estado:** Endpoint para limpar e reseear o banco de dados para um estado conhecido (
-   `/e2e/reset-database`).
-2. **Criação de Fixtures:** Endpoints para criar cenários complexos (ex: um processo em andamento) rapidamente, sem a
-   necessidade de navegar por toda a UI (`/e2e/fixtures/*`).
-3. **Limpeza específica:** Endpoint para remover dados de um teste específico (`/e2e/processo/{codigo}/limpar`).
+## Componentes principais
 
-## Componentes
+- `E2eController`: endpoints auxiliares para reset e fixtures.
+- `E2eSecurityConfig`: libera `/e2e/**` e mantém autenticação para `/api/**`.
+- `AtribuicaoTemporariaViewsE2eAspect`: sincroniza views auxiliares usadas em cenários de atribuição temporária.
 
-* **`E2eController`**: Expõe a API REST auxiliar.
-* **`E2eSecurityConfig`**: Configuração de segurança relaxada para permitir que os testes acessem os endpoints de
-  controle sem autenticação complexa, ao mesmo tempo que mantém a simulação de segurança para a aplicação principal.
+## Endpoints de suporte (resumo)
 
-## Como usar
+Base: `/e2e`
 
-Este pacote é utilizado exclusivamente pela suite de testes Playwright localizada no diretório `/e2e` na raiz do
-projeto.
+- `POST /reset-database`
+- `POST /processo/{codigo}/limpar`
+- `POST /processo/{codigo}/limpar-completo`
+- `POST /fixtures/*` (cenários auxiliares)
+
+## Uso esperado
+
+Consumido pela suíte Playwright em `/e2e` (raiz do repositório), especialmente durante preparação/limpeza de cenário.
+
+## Segurança operacional
+
+- Nunca habilitar perfil `e2e` fora de ambiente de teste.
+- Não reutilizar endpoints de fixture em fluxos funcionais da aplicação.
