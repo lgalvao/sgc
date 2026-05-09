@@ -3,7 +3,6 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.context.bean.override.mockito.*;
-import org.springframework.test.util.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.mapa.dto.*;
@@ -70,7 +69,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
 
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
 
         subprocessoRepo.save(subprocesso);
 
@@ -161,7 +160,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("salvarMapaSubprocesso: mudar situacao de MAPEAMENTO_CADASTRO_HOMOLOGADO")
     void salvarMapaSubprocesso_MapeamentoHomologado() {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocessoRepo.save(subprocesso);
 
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
@@ -179,7 +178,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("salvarMapaSubprocesso: mudar situacao de REVISAO_CADASTRO_HOMOLOGADA")
     void salvarMapaSubprocesso_RevisaoHomologada() {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         subprocessoRepo.save(subprocesso);
 
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
@@ -197,7 +196,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("adicionarCompetencia: adicionar e mudar situacao")
     void adicionarCompetencia_MapeamentoHomologado() {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocessoRepo.save(subprocesso);
 
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
@@ -213,7 +212,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("adicionarCompetencia: adicionar e mudar situacao revisao")
     void adicionarCompetencia_RevisaoHomologada() {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         subprocessoRepo.save(subprocesso);
 
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
@@ -229,7 +228,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("atualizarCompetencia: deve atualizar a competencia")
     void atualizarCompetencia_Sucesso() {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         subprocessoRepo.save(subprocesso);
 
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
@@ -248,7 +247,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("removerCompetencia: deve remover e mudar situacao MAPEAMENTO_MAPA_CRIADO para CADASTRO_HOMOLOGADO")
     void removerCompetencia_MapeamentoMapaCriado() {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         subprocessoRepo.save(subprocesso);
 
         Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Unica comp").build();
@@ -264,7 +263,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("removerCompetencia: deve remover e mudar situacao REVISAO_MAPA_AJUSTADO para CADASTRO_HOMOLOGADA")
     void removerCompetencia_RevisaoMapaAjustado() {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocessoRepo.save(subprocesso);
 
         Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Unica comp").build();

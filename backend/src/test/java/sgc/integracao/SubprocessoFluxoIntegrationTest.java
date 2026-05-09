@@ -6,7 +6,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.*;
-import org.springframework.test.util.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
@@ -203,7 +202,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("ADMIN deve conseguir remover a ultima atividade de uma competencia durante edicao do mapa")
     void adminDeveConseguirRemoverUltimaAtividadeDeCompetencia() throws Exception {
-        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         subprocessoRepo.save(subprocesso);
 
         admin.setUnidadeAtivaCodigo(unidadeFilha.getCodigo());

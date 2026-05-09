@@ -241,9 +241,9 @@ class SgcPermissionEvaluatorTest {
         Usuario usuario = new Usuario();
         when(authentication.getPrincipal()).thenReturn(usuario);
 
-        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () ->
-                evaluator.hasPermission(authentication, 1L, "Subprocesso", "ACAO_INEXISTENTE")
-        );
+        assertThatThrownBy(() ->
+                evaluator.hasPermission(authentication, 1L, "Subprocesso", "ACAO_INEXISTENTE"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
