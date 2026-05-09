@@ -98,9 +98,15 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("validarCadastro: deve retornar erro sem atividades")
     void validarCadastro_SemAtividades() {
         ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
+
         assertThat(dto.valido()).isFalse();
-        assertThat(dto.erros()).hasSize(1);
-        assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
+        assertThat(dto.erros())
+                .singleElement()
+                .satisfies(erro -> {
+                    assertThat(erro.tipo()).isEqualTo("SEM_ATIVIDADES");
+                    assertThat(erro.mensagem()).isEqualTo("O mapa não possui atividades cadastradas.");
+                    assertThat(erro.atividadeCodigo()).isNull();
+                });
     }
 
     @Test
@@ -110,8 +116,35 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         atividadeRepo.save(a);
 
         ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
+
         assertThat(dto.valido()).isFalse();
-        assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+        assertThat(dto.erros())
+                .singleElement()
+                .satisfies(erro -> {
+                    assertThat(erro.tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+                    assertThat(erro.atividadeCodigo()).isEqualTo(a.getCodigo());
+                    assertThat(erro.descricaoAtividade()).isEqualTo("Ativ 1");
+                    assertThat(erro.mensagem()).isEqualTo("Esta atividade não possui conhecimentos associados.");
+                });
+    }
+
+    @Test
+    @DisplayName("validarCadastro: deve retornar válido quando todas as atividades possuem conhecimentos")
+    void validarCadastro_Valido() {
+        Atividade atividade = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Atividade 1").build();
+        atividadeRepo.save(atividade);
+
+        Conhecimento conhecimento = Conhecimento.builder()
+                .atividade(atividade)
+                .descricao("Conhecimento 1")
+                .build();
+        atividade.getConhecimentos().add(conhecimento);
+        atividadeRepo.save(atividade);
+
+        ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
+
+        assertThat(dto.valido()).isTrue();
+        assertThat(dto.erros()).isEmpty();
     }
 
     @Test

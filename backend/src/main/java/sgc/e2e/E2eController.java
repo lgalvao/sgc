@@ -128,7 +128,7 @@ public class E2eController {
         }
     }
 
-    private void limparTabela(Statement stmt, String table) {
+    void limparTabela(Statement stmt, String table) {
         log.debug("Limpando tabela: sgc.{}", table);
         try {
             stmt.execute("DELETE FROM sgc." + table);

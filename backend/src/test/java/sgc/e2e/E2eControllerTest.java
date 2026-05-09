@@ -660,15 +660,14 @@ class E2eControllerTest {
         }
 
         @Test
-        @DisplayName("limparTabela: Deve logar erro se falhar")
-        void deveCobrirErroAoLimparTabela() throws Exception {
+        @DisplayName("limparTabela: deve ignorar erro ao excluir tabela")
+        void deveIgnorarErroAoLimparTabela() throws Exception {
             Statement stmt = mock(Statement.class);
             doThrow(new SQLException("Erro simulado")).when(stmt).execute(anyString());
 
-            var method = E2eController.class.getDeclaredMethod("limparTabela", Statement.class, String.class);
-            method.setAccessible(true);
-
-            method.invoke(controller, stmt, "TABELA");
+            assertThatCode(() -> controller.limparTabela(stmt, "TABELA"))
+                    .doesNotThrowAnyException();
+            verify(stmt).execute("DELETE FROM sgc.TABELA");
         }
     }
 }
