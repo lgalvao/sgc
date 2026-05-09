@@ -59,8 +59,8 @@ function parseArgs(argv) {
 
 function imprimirAjuda() {
     exibirAjudaComando({
-        comandoSgc: 'testes priorizar',
-        scriptDireto: 'testes-priorizar.cjs',
+        comandoSgc: "backend testes priorizar",
+        scriptDireto: "backend/testes-priorizar.js",
         descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
         opcoes: [
             '--input <arquivo>   Arquivo de entrada em JSON ou Markdown',
@@ -68,7 +68,7 @@ function imprimirAjuda() {
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            'node etc/scripts/sgc.js backend testes priorizar --input analise-testes.json --output priorizacao-testes.md'
+            "node etc/scripts/sgc.js backend testes priorizar --input analise-testes.json --output priorizacao-testes.md"
         ]
     });
 }

@@ -4,6 +4,7 @@
     "codigo/**/*.js",
     "e2e/**/*.js",
     "frontend/**/*.js",
+    "legado/**/*.js",
     "lib/**/*.js",
     "projeto/**/*.js",
     "qa/**/*.js",
@@ -14,18 +15,13 @@
     "codigo/**/*.js",
     "e2e/**/*.js",
     "frontend/**/*.js",
+    "legado/**/*.js",
     "lib/**/*.js",
     "projeto/**/*.js",
     "qa/**/*.js",
     "test/**/*.js"
   ],
   "ignoreBinaries": [
-    "playwright",
-    "knip",
-    "vitest",
-    "oxlint"
-  ],
-  "ignoreDependencies": [
-    "oxlint"
+    "playwright"
   ]
 }

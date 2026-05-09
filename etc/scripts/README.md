@@ -42,6 +42,7 @@ graph TD
 | `e2e/` | automações relacionadas à suíte E2E |
 | `qa/` | snapshot, resumo e dashboard de qualidade |
 | `projeto/` | setup, doctor, limpeza e qualidade do repositório |
+| `legado/` | aliases de compatibilidade para scripts renomeados |
 | `test/` | testes do toolkit |
 
 ## Comandos por domínio
@@ -50,6 +51,7 @@ graph TD
 
 ```bash
 node etc/scripts/sgc.js backend cobertura auditoria
+node etc/scripts/sgc.js backend cobertura jornada
 node etc/scripts/sgc.js backend testes analisar
 node etc/scripts/sgc.js backend testes priorizar
 node etc/scripts/sgc.js backend testes gerar-stub
@@ -67,7 +69,7 @@ node etc/scripts/sgc.js frontend mensagens analisar
 node etc/scripts/sgc.js frontend validacoes auditar
 node etc/scripts/sgc.js frontend cruft auditar
 node etc/scripts/sgc.js frontend cruft validar
-node etc/scripts/sgc.js frontend views auditar-validacoes
+node etc/scripts/sgc.js frontend views validacoes-auditar
 node etc/scripts/sgc.js frontend test-ids listar
 node etc/scripts/sgc.js frontend test-ids listar-duplicados
 node etc/scripts/sgc.js frontend telas capturar
@@ -102,7 +104,16 @@ node etc/scripts/sgc.js projeto limpar --confirmar
 node etc/scripts/sgc.js projeto qualidade rapido
 node etc/scripts/sgc.js projeto setup --instalar-dependencias
 node etc/scripts/sgc.js projeto arvore-linhas
+node etc/scripts/sgc.js projeto versao-sincronizar 1.2.3
 ```
+
+### Aliases legados
+
+Os aliases abaixo foram mantidos em `etc/scripts/legado/` para compatibilidade de execução direta:
+
+- `frontend/views-auditar-validacoes.js` ➜ `frontend/views-validacoes-auditar.js`
+- `frontend/test-ids-duplicados.js` ➜ `frontend/test-ids-listar-duplicados.js`
+- `projeto/sincronizar-versao.js` ➜ `projeto/versao-sincronizar.js`
 
 ## Casos de uso típicos
 

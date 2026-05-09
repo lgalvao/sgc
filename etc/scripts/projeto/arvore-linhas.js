@@ -119,7 +119,8 @@ function parseArgs() {
 
     if (args.includes('--help') || args.includes('-h')) {
         process.stdout.write(`
-Uso: node scripts/gerar_arvore_linhas.js [opções]
+Uso recomendado: node etc/scripts/sgc.js projeto arvore-linhas [opções]
+Execução direta: node etc/scripts/projeto/arvore-linhas.js [opções]
 
 Opções:
   --depth <n>          Limita a profundidade da árvore exibida (ex: --depth 2)

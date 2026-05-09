@@ -34,8 +34,8 @@ function importarCertificado(keytoolBin, alias, certPath) {
 function main() {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
         exibirAjudaComando({
-            comandoSgc: 'java instalar-certificados',
-            scriptDireto: 'java-instalar-certificados.cjs',
+            comandoSgc: "backend java instalar-certificados",
+            scriptDireto: "backend/java-instalar-certificados.js",
             descricao: 'Importa cert-tre.cer e cert-for.cer em cacerts usando keytool.',
             exemplos: [
                 'node etc/scripts/sgc.js backend java instalar-certificados'

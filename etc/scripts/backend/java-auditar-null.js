@@ -143,7 +143,7 @@ async function main() {
 
     if (args.includes('--help') || args.includes('-h')) {
         exibirAjudaComando({
-            comandoSgc: 'java auditar-null',
+            comandoSgc: "backend java auditar-null",
             scriptDireto: 'backend/java-auditar-null.js',
             descricao: 'Audita verificacoes de null no codigo Java e gera relatorios. Pode injetar @Nullable automaticamente com --fix.',
             opcoes: [

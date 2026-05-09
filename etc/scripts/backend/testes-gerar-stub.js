@@ -14,8 +14,8 @@ async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
         exibirAjudaComando({
-            comandoSgc: 'testes gerar-stub',
-            scriptDireto: 'testes-gerar-stub.cjs',
+            comandoSgc: "backend testes gerar-stub",
+            scriptDireto: "backend/testes-gerar-stub.js",
             descricao: 'Gera um arquivo CoverageTest inicial para a classe informada.',
             argumentos: '<NomeDaClasseOuFqn>',
             exemplos: [
@@ -28,8 +28,8 @@ async function main() {
     const target = args[0];
     if (!target) {
         exibirAjudaComando({
-            comandoSgc: 'testes gerar-stub',
-            scriptDireto: 'testes-gerar-stub.cjs',
+            comandoSgc: "backend testes gerar-stub",
+            scriptDireto: "backend/testes-gerar-stub.js",
             descricao: 'Gera um arquivo CoverageTest inicial para a classe informada.',
             argumentos: '<NomeDaClasseOuFqn>'
         });

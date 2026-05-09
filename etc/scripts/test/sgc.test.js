@@ -51,6 +51,12 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Backend).");
     });
 
+    test("despacha ajuda da jornada de cobertura do backend", async () => {
+        const resultado = await executarSgc(["backend", "cobertura", "jornada", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Executa a jornada consolidada de cobertura do backend.");
+    });
+
     test("audita cheiros de codigo em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-smells-"));
         const frontendDir = path.join(base, "frontend", "src");
@@ -602,6 +608,13 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Extrai mensagens do projeto.");
     });
 
+    test("exibe comando canonico e alias legado para auditoria de views", async () => {
+        const resultado = await executarSgc(["frontend", "views", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("validacoes-auditar");
+        expect(resultado.stdout).toContain("auditar-validacoes");
+    });
+
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {
         const resultado = await executarScriptFrontendCobertura(["--help"]);
         expect(resultado.exitCode).toBe(0);
@@ -612,6 +625,12 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarSgc(["qa", "dashboard", "servir", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Serve o dashboard de QA localmente.");
+    });
+
+    test("exibe ajuda do comando de sincronizacao de versao do projeto", async () => {
+        const resultado = await executarSgc(["projeto", "versao-sincronizar", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Sincroniza a versao entre gradle.properties e frontend/package.json.");
     });
 
     test("executa o doctor em JSON", async () => {

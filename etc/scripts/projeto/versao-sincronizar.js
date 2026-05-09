@@ -3,7 +3,8 @@ import path from "node:path";
 
 const novaVersao = process.argv[2];
 if (!novaVersao) {
-    console.error("Uso: node sincronizar-versao.js <versao>");
+    console.error("Uso recomendado: node etc/scripts/sgc.js projeto versao-sincronizar <versao>");
+    console.error("Execução direta: node etc/scripts/projeto/versao-sincronizar.js <versao>");
     process.exit(1);
 }
 

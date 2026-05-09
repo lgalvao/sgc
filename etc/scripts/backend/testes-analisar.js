@@ -47,8 +47,8 @@ function parseArgs(argv) {
 
 function imprimirAjuda() {
     exibirAjudaComando({
-        comandoSgc: 'testes analisar',
-        scriptDireto: 'testes-analisar.js',
+        comandoSgc: "backend testes analisar",
+        scriptDireto: "backend/testes-analisar.js",
         descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
             '--dir <caminho>         Diretorio raiz do backend (padrao: backend)',
@@ -58,7 +58,7 @@ function imprimirAjuda() {
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
-            'node etc/scripts/sgc.js backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json'
+            "node etc/scripts/sgc.js backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json"
         ]
     });
 }
