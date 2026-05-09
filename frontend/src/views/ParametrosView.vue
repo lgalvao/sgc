@@ -112,7 +112,6 @@ import {TEXTOS} from '@/constants/textos';
 const {
   configuracoes,
   loading,
-  saving,
   error,
   carregarConfiguracoes,
   salvarConfiguracoes,

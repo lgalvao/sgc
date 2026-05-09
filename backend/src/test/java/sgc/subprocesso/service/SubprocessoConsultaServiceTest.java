@@ -191,12 +191,7 @@ class SubprocessoConsultaServiceTest {
         verify(unidadeService, never()).buscarPorCodigo(anyLong());
     }
 
-    private Usuario criarUsuario(String titulo, String nome) {
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(titulo);
-        usuario.setNome(nome);
-        return usuario;
-    }
+
 
     @Nested
     @DisplayName("Cobertura extra - visualização e contexto")

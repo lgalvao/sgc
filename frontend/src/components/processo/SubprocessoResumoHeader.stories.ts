@@ -93,11 +93,11 @@ const subprocessoMock: SubprocessoDetalhe = {
 };
 
 const formatSituacaoSubprocesso = (situacao: string) =>
-    situacao.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    situacao.replaceAll(/_/g, ' ').toLowerCase().replaceAll(/\b\w/g, c => c.toUpperCase());
 
 const formatDataSimples = (data: string | null) => data ? new Date(data).toLocaleDateString('pt-BR') : '-';
 
-const formatTipoResponsabilidade = (_responsavel: ResponsavelDto | null) => '';
+const formatTipoResponsabilidade = (_: ResponsavelDto | null) => '';
 
 export const Default: Story = {
     args: {

@@ -109,7 +109,6 @@ import {TEXTOS} from "@/constants/textos";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 import {useToastStore} from "@/stores/toast";
-import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import * as processoService from "@/services/processo";
@@ -152,7 +151,6 @@ const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const toastStore = useToastStore();
-const organizacaoStore = useOrganizacaoStore();
 const unidadeStore = useUnidadeStore();
 const {invalidarCachesProcesso} = useInvalidacaoNavegacao();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
@@ -167,8 +165,7 @@ const {
   resumoDiagnostico,
   unidadesSemResponsavel,
   exibirAlertaDiagnostico,
-  dispensarAlertaDiagnostico,
-  alertaDiagnosticoDispensado
+  dispensarAlertaDiagnostico
 } = useDiagnosticoOrganizacionalAlert(unidades, mostrarDiagnosticoOrganizacional);
 const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value);
 const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoading.value || isLoadingData.value);

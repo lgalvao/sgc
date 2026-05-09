@@ -45,7 +45,6 @@
 <script lang="ts" setup>
 import {BButton, BCard, BFormGroup, BSpinner} from "bootstrap-vue-next";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
-import {TEXTOS} from "@/constants/textos";
 import type {Unidade} from "@/types/tipos";
 
 interface Props {

@@ -47,12 +47,12 @@ watch(() => props.visivel, (aberto) => {
 
 const notaTextoPlano = computed(() =>
   nota.value
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/(p|div|li)>/gi, '\n')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/gi, ' ')
-      .replace(/\s+\n/g, '\n')
-      .replace(/\n{3,}/g, '\n\n')
+      .replaceAll(/<br\s*\/?>/gi, '\n')
+      .replaceAll(/<\/(p|div|li)>/gi, '\n')
+      .replaceAll(/<[^>]+>/g, ' ')
+      .replaceAll(/&nbsp;/gi, ' ')
+      .replaceAll(/\s+\n/g, '\n')
+      .replaceAll(/\n{3,}/g, '\n\n')
       .trim()
 )
 
@@ -86,10 +86,10 @@ function submeter() {
       <div class="feedback-modal__conteudo">
         <section class="feedback-modal__principal">
           <div class="feedback-modal__campo">
-            <label class="form-label feedback-modal__label">
+            <div class="form-label feedback-modal__label">
               Descreva o problema, a dúvida ou a sugestão
               <span aria-hidden="true" class="text-danger">*</span>
-            </label>
+            </div>
             <EditorTextoRico
                 v-model="nota"
                 :desabilitado="enviando"
@@ -176,7 +176,7 @@ function submeter() {
             data-testid="feedback-btn-enviar"
             type="submit"
         >
-          <span v-if="enviando" aria-hidden="true" class="spinner-border spinner-border-sm me-1" role="status"/>
+          <output v-if="enviando" aria-hidden="true" class="spinner-border spinner-border-sm me-1" />
           Enviar feedback
         </button>
       </div>

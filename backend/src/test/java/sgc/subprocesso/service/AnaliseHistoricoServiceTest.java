@@ -121,10 +121,5 @@ class AnaliseHistoricoServiceTest {
                 .hasMessage("Unidade 99 ausente no histórico de análises");
     }
 
-    private Usuario criarUsuario(String titulo, String nome) {
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(titulo);
-        usuario.setNome(nome);
-        return usuario;
-    }
+
 }

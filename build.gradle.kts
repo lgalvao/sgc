@@ -6,8 +6,6 @@ plugins {
     alias(libs.plugins.spotbugs) apply false
     alias(libs.plugins.open.rewrite) apply false
     alias(libs.plugins.node)
-    java
-    jacoco
     idea
 }
 
