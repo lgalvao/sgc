@@ -93,7 +93,7 @@ function main() {
     console.log(`  📄 ${ARQUIVO_ANALISE_MD}`);
     console.log(`  📄 ${ARQUIVO_ANALISE_JSON}`);
     console.log(`  📄 ${ARQUIVO_PRIORIZACAO}`);
-    console.log("\nPróximos passos:");
+    console.log("\nProximos passos:");
     console.log(`  1. Revisar ${ARQUIVO_AUDITORIA}.`);
     console.log(`  2. Atacar itens P1 de ${ARQUIVO_PRIORIZACAO}.`);
     console.log("  3. Gerar stubs com `node etc/scripts/sgc.js backend testes gerar-stub <Classe>` quando fizer sentido.");
