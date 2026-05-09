@@ -74,7 +74,6 @@ class UsuarioServiceTest {
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral(TITULO_ADMIN);
             usuarioServiceInternal.carregarAuthorities(usuario);
-            assertThat(usuario.getAuthorities()).isNotNull();
             assertThat(usuario.getAuthorities()).isNotEmpty();
         }
 
@@ -95,7 +94,6 @@ class UsuarioServiceTest {
 
             var usuario = usuarioService.buscarPorLogin(TITULO_ADMIN);
 
-            assertThat(usuario).isNotNull();
             assertThat(usuario.getTituloEleitoral()).isEqualTo(TITULO_ADMIN);
         }
 
@@ -107,10 +105,9 @@ class UsuarioServiceTest {
 
             Map<String, Usuario> result = usuarioService.buscarUsuariosPorTitulos(titulos);
 
-            assertThat(result).isNotNull();
-            assertThat(result.size()).isEqualTo(2);
-            assertThat(result).containsKey(TITULO_CHEFE_UNIT2);
-            assertThat(result).containsKey(TITULO_ADMIN);
+            assertThat(result).hasSize(2)
+                    .containsKey(TITULO_CHEFE_UNIT2)
+                    .containsKey(TITULO_ADMIN);
         }
 
         @Test
@@ -118,9 +115,9 @@ class UsuarioServiceTest {
         void devePesquisarUsuariosPorNome() {
             List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("Admin");
 
-            assertThat(resultado).isNotNull();
             assertThat(resultado).isNotEmpty();
-            assertThat(resultado.stream().anyMatch(usuario -> usuario.nome().contains("Admin"))).isTrue();
+            assertThat(resultado).extracting(UsuarioPesquisaDto::nome)
+                    .anyMatch(nome -> nome.contains("Admin"));
         }
 
         @Test
@@ -128,9 +125,9 @@ class UsuarioServiceTest {
         void devePesquisarUsuariosPorTituloEleitoral() {
             List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("17");
 
-            assertThat(resultado).isNotNull();
             assertThat(resultado).isNotEmpty();
-            assertThat(resultado.stream().anyMatch(usuario -> "17".equals(usuario.tituloEleitoral()))).isTrue();
+            assertThat(resultado).extracting(UsuarioPesquisaDto::tituloEleitoral)
+                    .contains("17");
         }
 
         @Test
@@ -179,13 +176,13 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve buscar autorizacoes de perfil e perfis")
+        @DisplayName("Deve buscar autorizações de perfil e perfis")
         void deveBuscarAutorizacoesEPerfis() {
             List<UsuarioPerfilAutorizacaoLeitura> auts = usuarioServiceInternal.buscarAutorizacoesPerfil(TITULO_ADMIN);
-            assertThat(auts).isNotNull();
+            assertThat(auts).isNotEmpty();
 
             List<Perfil> perfis = usuarioServiceInternal.buscarPerfisPorUsuarioTitulo(TITULO_ADMIN);
-            assertThat(perfis).isNotNull();
+            assertThat(perfis).isNotEmpty();
         }
 
         @Test
@@ -205,7 +202,6 @@ class UsuarioServiceTest {
 
             Unidade result = unidadeService2.buscarPorCodigo(COD_UNIT_SEC1);
 
-            assertThat(result).isNotNull();
             assertThat(result.getCodigo()).isEqualTo(COD_UNIT_SEC1);
             assertThat(result.getNome()).isEqualTo(NOME_UNIT_SEC1);
         }
@@ -215,7 +211,6 @@ class UsuarioServiceTest {
         void deveBuscarUnidadesAtivas() {
             List<UnidadeDto> result = hierarquiaService.buscarArvoreHierarquica();
 
-            assertThat(result).isNotNull();
             assertThat(result).isNotEmpty();
         }
 
@@ -225,11 +220,8 @@ class UsuarioServiceTest {
 
             List<UnidadeDto> result = hierarquiaService.buscarSubordinadas(COD_UNIT_SEC1);
 
-            assertThat(result).isNotNull();
             assertThat(result).isNotEmpty();
-            for (UnidadeDto unidade : result) {
-                assertThat(unidade.getCodigoPai()).isEqualTo(COD_UNIT_SEC1);
-            }
+            assertThat(result).allMatch(unidade -> COD_UNIT_SEC1.equals(unidade.getCodigoPai()));
         }
 
         @Test
@@ -238,16 +230,10 @@ class UsuarioServiceTest {
 
             List<UnidadeDto> result = hierarquiaService.buscarArvoreHierarquica();
 
-            assertThat(result).isNotNull();
             assertThat(result).isNotEmpty();
-
-            assertThat(result.stream().anyMatch(u -> u.getCodigo().equals(1L))).isTrue();
-
-            for (UnidadeDto unidade : result) {
-                if (unidade.getCodigo().equals(1L)) {
-                    assertThat(unidade.getCodigoPai()).isNull();
-                }
-            }
+            assertThat(result).extracting(UnidadeDto::getCodigo).contains(1L);
+            assertThat(result).filteredOn(u -> u.getCodigo().equals(1L))
+                    .allMatch(u -> u.getCodigoPai() == null);
         }
 
         @Test
@@ -277,7 +263,6 @@ class UsuarioServiceTest {
 
             UnidadeResponsavelDto result = responsavelService.buscarResponsavelUnidade(2L);
 
-            assertThat(result).isNotNull();
             assertThat(result.unidadeCodigo()).isEqualTo(2L);
             assertThat(result.titularTitulo()).isEqualTo(TITULO_CHEFE_UNIT2);
         }
@@ -288,9 +273,7 @@ class UsuarioServiceTest {
 
             List<Long> result = responsavelService.buscarUnidadesOndeEhResponsavel(TITULO_CHEFE_UNIT2);
 
-            assertThat(result).isNotNull();
-            assertThat(result).isNotEmpty();
-            assertThat(result).contains(2L);
+            assertThat(result).isNotEmpty().contains(2L);
         }
 
         @Test
@@ -301,15 +284,9 @@ class UsuarioServiceTest {
 
             Map<Long, UnidadeResponsavelDto> result = responsavelService.buscarResponsaveisUnidades(unidades);
 
-            assertThat(result).isNotNull();
-            assertThat(result).containsKey(2L);
-            assertThat(result).containsKey(9L);
-            UnidadeResponsavelDto responsavel2 = result.get(2L);
-            UnidadeResponsavelDto responsavel9 = result.get(9L);
-            assertThat(responsavel2).isNotNull();
-            assertThat(responsavel9).isNotNull();
-            assertThat(responsavel2.titularTitulo()).isEqualTo(TITULO_CHEFE_UNIT2);
-            assertThat(responsavel9.titularTitulo()).isEqualTo("333333333333");
+            assertThat(result).containsKey(2L).containsKey(9L);
+            assertThat(result.get(2L).titularTitulo()).isEqualTo(TITULO_CHEFE_UNIT2);
+            assertThat(result.get(9L).titularTitulo()).isEqualTo("333333333333");
         }
     }
 
@@ -322,10 +299,8 @@ class UsuarioServiceTest {
 
             List<PerfilDto> result = usuarioService.buscarPerfisUsuario(TITULO_CHEFE_UNIT2);
 
-            assertThat(result).isNotNull();
             assertThat(result).isNotEmpty();
-            assertThat(result.stream()
-                    .anyMatch(p -> p.perfil().equals("CHEFE") && Objects.equals(p.unidadeCodigo(), 2L))).isTrue();
+            assertThat(result).anyMatch(p -> p.perfil().equals("CHEFE") && Objects.equals(p.unidadeCodigo(), 2L));
         }
     }
 
@@ -356,7 +331,7 @@ class UsuarioServiceTest {
 
             // Listar
             List<AdministradorDto> admins = usuarioService.listarAdministradores();
-            assertThat(admins.stream().anyMatch(a -> a.tituloEleitoral().equals(tituloNovoAdmin))).isTrue();
+            assertThat(admins).extracting(AdministradorDto::tituloEleitoral).contains(tituloNovoAdmin);
 
             // Falhar ao adicionar duplicado
             assertThatThrownBy(() -> usuarioService.adicionarAdministrador(tituloNovoAdmin))
