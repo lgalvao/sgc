@@ -1,6 +1,6 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, reloginSemLimparSpa, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/index.js';
 import {
     adicionarAtividade,
@@ -276,6 +276,24 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Terceira devolução');
         await expect(modal.getByTestId('cell-resultado-1')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-1')).toHaveText('Segunda devolução');
+        await fecharHistoricoAnalise(page);
+
+        await reloginSemLimparSpa(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
+        await navegarParaCadastro(page);
+        await (await abrirAcaoCadastroDevolver(page)).click();
+        await page.getByTestId('inp-devolucao-cadastro-obs').fill('Quarta devolução');
+        await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
+        await verificarPaginaPainel(page);
+
+        await reloginSemLimparSpa(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
+        await navegarParaCadastro(page);
+
+        const modalAtualizado = await abrirHistoricoAnalise(page);
+        await expect(modalAtualizado.getByTestId('cell-observacao-0')).toHaveText('Quarta devolução');
+        await expect(modalAtualizado.getByTestId('cell-observacao-1')).toHaveText('Terceira devolução');
+        await expect(modalAtualizado.getByTestId('cell-observacao-2')).toHaveText('Segunda devolução');
         await fecharHistoricoAnalise(page);
     });
 

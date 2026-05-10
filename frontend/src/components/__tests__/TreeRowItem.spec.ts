@@ -35,6 +35,22 @@ describe("TreeRowItem.vue", () => {
         expect(wrapper.find("td").classes()).toContain("tree-table-primeira-coluna");
     });
 
+    it("deve possuir role button ou ser um elemento de botão no toggle icon", () => {
+        const item = {
+            codigo: 1,
+            nome: "Item 1",
+            children: [{codigo: 2, nome: "Child 1"}],
+        };
+        const columns = [{key: "nome", label: "Nome"}];
+        const wrapper = mount(TreeRowItem, {
+            props: {item, columns, level: 0},
+        });
+
+        const toggle = wrapper.find(".toggle-hit-area");
+        // BButton renders a button by default
+        expect(toggle.element.tagName.toLowerCase()).toBe("button");
+    });
+
     it("deve renderizar faixa fixa para alinhamento da primeira coluna", () => {
         const item = {codigo: 1, nome: "Item 1"};
         const columns = [{key: "nome", label: "Nome"}];

@@ -31,12 +31,53 @@ describe("InputData.vue", () => {
             stubs: {
                 BInputGroup: {template: "<div><slot /></div>"},
                 BInputGroupText: {
-                    template: "<button type=\"button\" @click=\"$emit('click')\"><slot /></button>",
-                    emits: ["click"]
+                    template: `
+                        <button
+                            type="button"
+                            :aria-label="ariaLabel"
+                            :role="role"
+                            :tabindex="tabindex"
+                            @click="$emit('click')"
+                            @keydown.enter="$emit('keydown.enter')"
+                            @keydown.space="$emit('keydown.space')"
+                        >
+                            <slot />
+                        </button>
+                    `,
+                    props: ["ariaLabel", "role", "tabindex"],
+                    emits: ["click", "keydown.enter", "keydown.space"]
                 },
                 BFormInput: BFormInputStub,
             },
         },
+    });
+
+    it("deve possuir atributos de acessibilidade no ícone do calendário", () => {
+        const wrapper = criarWrapper();
+        const trigger = wrapper.find("button");
+
+        expect(trigger.attributes("aria-label")).toBe("Abrir calendário");
+        expect(trigger.attributes("role")).toBe("button");
+        expect(trigger.attributes("tabindex")).toBe("0");
+    });
+
+    it("deve abrir o seletor nativo ao pressionar Enter ou Espaço", async () => {
+        const wrapper = criarWrapper({dataTestid: "input-data"});
+        const input = wrapper.get('[data-testid="input-data"]').element as HTMLInputElement;
+        const showPicker = vi.fn();
+
+        Object.defineProperty(input, "showPicker", {
+            value: showPicker,
+            configurable: true,
+        });
+
+        const trigger = wrapper.find("button");
+
+        await trigger.trigger("keydown.enter");
+        expect(showPicker).toHaveBeenCalledTimes(1);
+
+        await trigger.trigger("keydown.space");
+        expect(showPicker).toHaveBeenCalledTimes(2);
     });
 
     it("deve repassar props para o input", () => {

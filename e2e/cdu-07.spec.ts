@@ -11,7 +11,6 @@ import {
     esperarPaginaDetalhesProcesso,
     esperarPaginaSubprocesso,
     fazerLogout,
-    limparNotificacoes,
     navegarParaSubprocesso
 } from './helpers/helpers-navegacao.js';
 import {

@@ -13,8 +13,16 @@
         type="date"
         @update:model-value="(val) => $emit('update:modelValue', String(val))"
     />
-    <BInputGroupText class="cursor-pointer" @click="abrirCalendario">
-      <i class="bi bi-calendar-event"></i>
+    <BInputGroupText
+        aria-label="Abrir calendário"
+        class="cursor-pointer"
+        role="button"
+        tabindex="0"
+        @click="abrirCalendario"
+        @keydown.enter.prevent="abrirCalendario"
+        @keydown.space.prevent="abrirCalendario"
+    >
+      <i aria-hidden="true" class="bi bi-calendar-event"></i>
     </BInputGroupText>
   </BInputGroup>
 </template>

@@ -103,10 +103,16 @@
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA }}</dt>
           <dd class="col-sm-9">
             <div v-if="feedbackSelecionado.screenshotDisponivel">
-              <button class="btn p-0 border-0 d-inline-block" @click="abrirImagemAmpliada(feedbackSelecionado.codigo)">
+              <button
+                  aria-label="Ampliar captura de tela"
+                  class="btn p-0 border-0 d-inline-block"
+                  title="Clique para ampliar"
+                  type="button"
+                  @click="abrirImagemAmpliada(feedbackSelecionado.codigo)"
+              >
                 <img
                     :src="obterUrlScreenshot(feedbackSelecionado.codigo)"
-                    alt="Captura de tela"
+                    alt="Captura de tela do feedback"
                     class="img-fluid border rounded feedback-thumbnail shadow-sm"
                 />
               </button>

@@ -1,8 +1,18 @@
+import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {
+    login,
+    loginComPerfil,
+    reloginComPerfilSemLimparSpa,
+    reloginSemLimparSpa,
+    USUARIOS
+} from './helpers/helpers-auth.js';
 import {
     acessarDetalhesProcesso,
+    criarProcesso,
     criarProcessoSimples,
+    extrairProcessoCodigo,
+    finalizarProcesso,
     iniciarProcesso,
     verificarDetalhesSubprocesso,
     verificarProcessoTabela
@@ -11,17 +21,28 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {
     aceitarCadastroMapeamento,
+    aceitarRevisao,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
 import {
+    abrirModalImpacto,
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
+    fecharModalImpacto,
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
+import {
+    aceitarOuHomologarMapa,
+    criarCompetencia,
+    disponibilizarMapa,
+    editarCompetencia,
+    navegarParaMapa,
+    verificarCompetenciaNoMapa
+} from './helpers/helpers-mapas.js';
 
 test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
     const SIT_PROCESSO = {
@@ -52,10 +73,323 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     const timestamp = Date.now();
     const descProcesso = `Jornada Geral Mapeamento ${timestamp}`;
     const descricaoProcessoRevisao = `Jornada Geral Revisao ${timestamp}`;
+    const DESC_ATIVIDADE = 'Atividade 1';
+    const DESC_CONHECIMENTO = 'Conhecimento 1.1';
+    const DESC_COMPETENCIA_INICIAL = `Competência técnica base ${timestamp}`;
+    const DESC_ATIVIDADE_REVISAO = `Atividade revisão ${timestamp}`;
+    const DESC_CONHECIMENTO_REVISAO = 'Conhecimento revisão 1';
+
+    let codigoProcessoMapeamento = 0;
+    let codigoProcessoRevisao = 0;
 
     test.beforeAll(async ({request}) => {
         await resetDatabase(request);
     });
+
+    const reabrirSubprocessoSemLimparSpa = async (page: Page, options: {
+        codigoProcesso: number;
+        usuario: typeof ADMIN;
+        perfil?: string;
+        reaproveitarSessaoAtual?: boolean;
+    }) => {
+        if (options.reaproveitarSessaoAtual) {
+            if (options.perfil) {
+                await reloginComPerfilSemLimparSpa(page, options.usuario.titulo, options.usuario.senha, options.perfil);
+            } else {
+                await reloginSemLimparSpa(page, options.usuario.titulo, options.usuario.senha);
+            }
+        } else if (options.perfil) {
+            await loginComPerfil(page, options.usuario.titulo, options.usuario.senha, options.perfil);
+        } else {
+            await login(page, options.usuario.titulo, options.usuario.senha);
+        }
+
+        await page.goto(`/processo/${options.codigoProcesso}/${SIGLA_SECAO}`);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${options.codigoProcesso}/${SIGLA_SECAO}(?:\?.*)?$`));
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+    };
+
+    const verificarConteudoVisivelDoMapa = async (page: Page, descricaoCompetencia: string, atividades: string[]) => {
+        await expect(page.getByText(descricaoCompetencia, {exact: true}).first()).toBeVisible();
+
+        for (const atividade of atividades) {
+            await expect(page.getByText(atividade, {exact: true}).first()).toBeVisible();
+        }
+    };
+
+    const adminCriaEDisponibilizaMapaInicial = async (page: Page) => {
+        await login(page, ADMIN.titulo, ADMIN.senha);
+        await acessarSubprocessoAdmin(page, descProcesso, SIGLA_SECAO);
+        codigoProcessoMapeamento = await extrairProcessoCodigo(page);
+
+        await navegarParaMapa(page);
+        await criarCompetencia(page, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE]);
+        await disponibilizarMapa(page);
+    };
+
+    const chefeConsultaEValidaMapaDisponibilizado = async (page: Page) => {
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoMapeamento,
+            usuario: CHEFE_SECAO,
+            reaproveitarSessaoAtual: true
+        });
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Mapa disponibilizado',
+            localizacao: SIGLA_SECAO
+        });
+
+        await navegarParaMapa(page);
+        await verificarConteudoVisivelDoMapa(page, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE]);
+        await page.getByTestId('btn-mapa-acoes').click();
+        await page.getByTestId('btn-mapa-acao-validar').click();
+        await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
+    };
+
+    const coordenadoriaAceitaValidacaoDoMapa = async (page: Page) => {
+        await login(page, GESTOR_COORDENADORIA.titulo, GESTOR_COORDENADORIA.senha);
+        await acessarSubprocessoGestor(page, descProcesso, SIGLA_SECAO);
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Mapa validado',
+            localizacao: SIGLA_COORDENADORIA
+        });
+
+        await aceitarOuHomologarMapa(page, 'Aceite da validação pela coordenadoria');
+    };
+
+    const secretariaAceitaValidacaoDoMapa = async (page: Page) => {
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoMapeamento,
+            usuario: GESTOR_SECRETARIA,
+            perfil: GESTOR_SECRETARIA.perfil!,
+            reaproveitarSessaoAtual: true
+        });
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Mapa validado',
+            localizacao: SIGLA_SECRETARIA
+        });
+
+        await aceitarOuHomologarMapa(page, 'Aceite da validação pela secretaria');
+    };
+
+    const adminHomologaMapaEFinalizaMapeamento = async (page: Page) => {
+        await login(page, ADMIN.titulo, ADMIN.senha);
+        await acessarSubprocessoAdmin(page, descProcesso, SIGLA_SECAO);
+        await aceitarOuHomologarMapa(page, 'Homologação final do mapa inicial');
+
+        await page.goto('/painel');
+        await acessarDetalhesProcesso(page, descProcesso);
+        await finalizarProcesso(page);
+        await verificarProcessoTabela(page, {
+            descricao: descProcesso,
+            tipo: 'Mapeamento',
+            situacao: SIT_PROCESSO.FINALIZADO
+        });
+    };
+
+    const adminCriaEIniciaProcessoDeRevisao = async (page: Page) => {
+        await login(page, ADMIN.titulo, ADMIN.senha);
+
+        await criarProcesso(page, {
+            descricao: descricaoProcessoRevisao,
+            tipo: 'REVISAO',
+            unidade: SIGLA_SECAO,
+            expandir: [SIGLA_SECRETARIA, SIGLA_COORDENADORIA],
+            iniciar: true
+        });
+
+        await verificarProcessoTabela(page, {
+            descricao: descricaoProcessoRevisao,
+            tipo: 'Revisão',
+            situacao: SIT_PROCESSO.EM_ANDAMENTO
+        });
+
+        await acessarSubprocessoAdmin(page, descricaoProcessoRevisao, SIGLA_SECAO);
+        codigoProcessoRevisao = await extrairProcessoCodigo(page);
+    };
+
+    const chefeConfereBaseVigenteEDisponibilizaRevisao = async (page: Page) => {
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoRevisao,
+            usuario: CHEFE_SECAO,
+            reaproveitarSessaoAtual: true
+        });
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Não iniciado',
+            localizacao: SIGLA_SECAO
+        });
+
+        await navegarParaCadastro(page);
+        await expect(page.getByText(DESC_ATIVIDADE, {exact: true})).toBeVisible();
+        await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
+
+        await adicionarAtividade(page, DESC_ATIVIDADE_REVISAO);
+        await adicionarConhecimento(page, DESC_ATIVIDADE_REVISAO, DESC_CONHECIMENTO_REVISAO);
+
+        await abrirModalImpacto(page);
+        await expect(page.getByTestId('modal-impacto-body')).toContainText(DESC_ATIVIDADE_REVISAO);
+        await fecharModalImpacto(page);
+
+        await disponibilizarCadastro(page);
+    };
+
+    const coordenadoriaAceitaRevisaoDoCadastro = async (page: Page) => {
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoRevisao,
+            usuario: GESTOR_COORDENADORIA
+        });
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Revisão do cadastro disponibilizada',
+            localizacao: SIGLA_COORDENADORIA
+        });
+
+        await navegarParaCadastro(page);
+        await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
+        await abrirModalImpacto(page);
+        await expect(page.getByTestId('modal-impacto-body')).toContainText(DESC_ATIVIDADE_REVISAO);
+        await fecharModalImpacto(page);
+        await aceitarRevisao(page, 'Aceite da revisão pela coordenadoria');
+    };
+
+    const secretariaAceitaRevisaoDoCadastro = async (page: Page) => {
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoRevisao,
+            usuario: GESTOR_SECRETARIA,
+            perfil: GESTOR_SECRETARIA.perfil!,
+            reaproveitarSessaoAtual: true
+        });
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Revisão do cadastro disponibilizada',
+            localizacao: SIGLA_SECRETARIA
+        });
+
+        await navegarParaCadastro(page);
+        await aceitarRevisao(page, 'Aceite da revisão pela secretaria');
+    };
+
+    const adminHomologaCadastroRevisado = async (page: Page) => {
+        await login(page, ADMIN.titulo, ADMIN.senha);
+        await acessarSubprocessoAdmin(page, descricaoProcessoRevisao, SIGLA_SECAO);
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Revisão do cadastro disponibilizada',
+            localizacao: SIGLA_ADMIN
+        });
+
+        await navegarParaCadastro(page);
+        await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
+        await abrirModalImpacto(page);
+        await expect(page.getByTestId('modal-impacto-body')).toContainText(DESC_ATIVIDADE_REVISAO);
+        await fecharModalImpacto(page);
+        await homologarCadastroMapeamento(page, 'Cadastro revisado homologado');
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Revisão do cadastro homologada',
+            localizacao: SIGLA_ADMIN
+        });
+    };
+
+    const adminAjustaEDisponibilizaMapaRevisado = async (page: Page) => {
+        await login(page, ADMIN.titulo, ADMIN.senha);
+        await acessarSubprocessoAdmin(page, descricaoProcessoRevisao, SIGLA_SECAO);
+
+        await navegarParaMapa(page);
+        await page.getByTestId('cad-mapa__btn-impactos-mapa').click();
+        await expect(page.getByTestId('modal-impacto-body')).toContainText(DESC_ATIVIDADE_REVISAO);
+        await page.getByTestId('btn-fechar-impacto').click();
+
+        await editarCompetencia(page, DESC_COMPETENCIA_INICIAL, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE_REVISAO]);
+        await verificarCompetenciaNoMapa(page, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE, DESC_ATIVIDADE_REVISAO]);
+
+        await page.getByRole('link', {name: SIGLA_SECAO, exact: true}).click();
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+
+        await navegarParaMapa(page);
+        await verificarCompetenciaNoMapa(page, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE, DESC_ATIVIDADE_REVISAO]);
+        await disponibilizarMapa(page);
+    };
+
+    const chefeValidaMapaRevisado = async (page: Page) => {
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoRevisao,
+            usuario: CHEFE_SECAO,
+            reaproveitarSessaoAtual: true
+        });
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Mapa disponibilizado',
+            localizacao: SIGLA_SECAO
+        });
+
+        await navegarParaMapa(page);
+        await verificarConteudoVisivelDoMapa(page, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE, DESC_ATIVIDADE_REVISAO]);
+        await page.getByTestId('btn-mapa-acoes').click();
+        await page.getByTestId('btn-mapa-acao-validar').click();
+        await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
+    };
+
+    const coordenadoriaESecretariaAceitamMapaRevisado = async (page: Page) => {
+        await login(page, GESTOR_COORDENADORIA.titulo, GESTOR_COORDENADORIA.senha);
+        await acessarSubprocessoGestor(page, descricaoProcessoRevisao, SIGLA_SECAO);
+        await aceitarOuHomologarMapa(page, 'Aceite do mapa revisado pela coordenadoria');
+
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoRevisao,
+            usuario: GESTOR_SECRETARIA,
+            perfil: GESTOR_SECRETARIA.perfil!,
+            reaproveitarSessaoAtual: true
+        });
+        await aceitarOuHomologarMapa(page, 'Aceite do mapa revisado pela secretaria');
+    };
+
+    const adminHomologaMapaRevisado = async (page: Page) => {
+        await login(page, ADMIN.titulo, ADMIN.senha);
+        await acessarSubprocessoAdmin(page, descricaoProcessoRevisao, SIGLA_SECAO);
+        await aceitarOuHomologarMapa(page, 'Homologação final do mapa revisado');
+
+        await acessarSubprocessoAdmin(page, descricaoProcessoRevisao, SIGLA_SECAO);
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Mapa homologado',
+            localizacao: SIGLA_ADMIN
+        });
+    };
+
+    const consultarResultadoFinalComCacheQuente = async (page: Page, options: {
+        usuario: typeof ADMIN;
+        perfil?: string;
+    }) => {
+        await reabrirSubprocessoSemLimparSpa(page, {
+            codigoProcesso: codigoProcessoRevisao,
+            usuario: options.usuario,
+            perfil: options.perfil
+        });
+
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Mapa homologado'
+        });
+
+        await navegarParaMapa(page);
+        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeHidden();
+        await verificarConteudoVisivelDoMapa(page, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE, DESC_ATIVIDADE_REVISAO]);
+    };
 
     test('Fase 1 - ADMIN cria e inicia o processo de mapeamento da seção', async ({page}) => {
         // O ADMIN faz login.
@@ -119,9 +453,6 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await navegarParaCadastro(page);
 
         // O CHEFE registra uma atividade e um conhecimento da unidade.
-        const DESC_ATIVIDADE = 'Atividade 1';
-        const DESC_CONHECIMENTO = 'Conhecimento 1.1';
-
         await adicionarAtividade(page, DESC_ATIVIDADE);
         await adicionarConhecimento(page, DESC_ATIVIDADE, DESC_CONHECIMENTO);
 
@@ -191,68 +522,81 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
     });
 
-    test('Fase 3 - ADMIN cria o mapa do mapeamento e a hierarquia valida até a homologação', async () => {
-        test.fixme(true, 'Implementar criação do mapa, disponibilização, validação do CHEFE, dois aceites de GESTOR e homologação final.');
-        expect(true).toBe(true);
+    test('Fase 3 - ADMIN cria o mapa do mapeamento e a hierarquia valida até a homologação', async ({page}) => {
+        await test.step('ADMIN estrutura e disponibiliza o primeiro mapa da seção', async () => {
+            await adminCriaEDisponibilizaMapaInicial(page);
+        });
 
-        // Estrutura prevista:
-        // 1. ADMIN cria competência(s) para a SECAO_111.
-        // 2. ADMIN disponibiliza o mapa.
-        // 3. CHEFE_SECAO_111 valida o mapa.
-        // 4. GESTOR_COORD registra aceite da validação.
-        // 5. GESTOR_SECRETARIA_1 registra segundo aceite.
-        // 6. ADMIN homologa o mapa.
-        // 7. ADMIN finaliza o processo de mapeamento.
+        await test.step('CHEFE valida o mapa disponibilizado sem perder o contexto carregado da SPA', async () => {
+            await chefeConsultaEValidaMapaDisponibilizado(page);
+        });
+
+        await test.step('COORDENADORIA e SECRETARIA registram os dois aceites hierárquicos', async () => {
+            await coordenadoriaAceitaValidacaoDoMapa(page);
+            await secretariaAceitaValidacaoDoMapa(page);
+        });
+
+        await test.step('ADMIN homologa o mapa e encerra o processo de mapeamento', async () => {
+            await adminHomologaMapaEFinalizaMapeamento(page);
+        });
     });
 
-    test('Fase 4 - ADMIN cria e inicia o processo de revisão da mesma seção', async () => {
-        void descricaoProcessoRevisao;
+    test('Fase 4 - ADMIN cria e inicia o processo de revisão da mesma seção', async ({page}) => {
+        await test.step('ADMIN abre a revisão já apoiada no mapa vigente da seção', async () => {
+            await adminCriaEIniciaProcessoDeRevisao(page);
+        });
 
-        test.fixme(true, 'Implementar criação e início do processo de revisão usando a mesma SECAO_111 já mapeada.');
-        expect(true).toBe(true);
-
-        // Estrutura prevista:
-        // 1. Login como ADMIN.
-        // 2. Criar processo do tipo REVISAO para SECAO_111.
-        // 3. Iniciar processo.
-        // 4. Validar que a revisão parte de mapa vigente.
+        await test.step('CHEFE confirma que a revisão nasce com o cadastro vigente e botão de impactos disponível', async () => {
+            await chefeConfereBaseVigenteEDisponibilizaRevisao(page);
+        });
     });
 
-    test('Fase 5 - CHEFE revisa o cadastro com impacto real e a hierarquia homologa a revisão', async () => {
-        test.fixme(true, 'Implementar alteração com impacto real no mapa, disponibilização da revisão e homologação do cadastro revisado.');
-        expect(true).toBe(true);
+    test('Fase 5 - CHEFE revisa o cadastro com impacto real e a hierarquia homologa a revisão', async ({page}) => {
+        await test.step('COORDENADORIA e SECRETARIA aceitam a revisão do cadastro já com impacto visível', async () => {
+            await coordenadoriaAceitaRevisaoDoCadastro(page);
+            await secretariaAceitaRevisaoDoCadastro(page);
+        });
 
-        // Estrutura prevista:
-        // 1. CHEFE_SECAO_111 altera cadastro para gerar impacto real.
-        // 2. CHEFE_SECAO_111 consulta impactos no mapa.
-        // 3. CHEFE_SECAO_111 disponibiliza a revisão.
-        // 4. GESTOR_COORD registra primeiro aceite.
-        // 5. GESTOR_SECRETARIA_1 registra segundo aceite.
-        // 6. ADMIN homologa a revisão do cadastro.
+        await test.step('ADMIN homologa o cadastro revisado e libera o ajuste do mapa', async () => {
+            await adminHomologaCadastroRevisado(page);
+        });
     });
 
-    test('Fase 6 - ADMIN ajusta o mapa da revisão e a hierarquia valida novamente', async () => {
-        test.fixme(true, 'Implementar ajuste do mapa revisado, disponibilização, validação e homologação final do mapa.');
-        expect(true).toBe(true);
+    test('Fase 6 - ADMIN ajusta o mapa da revisão e a hierarquia valida novamente', async ({page}) => {
+        await test.step('ADMIN ajusta o mapa revisado e confirma a persistência do novo vínculo ao reentrar na tela', async () => {
+            await adminAjustaEDisponibilizaMapaRevisado(page);
+        });
 
-        // Estrutura prevista:
-        // 1. ADMIN abre impactos no mapa.
-        // 2. ADMIN ajusta o mapa para refletir a revisão.
-        // 3. ADMIN disponibiliza o mapa revisado.
-        // 4. CHEFE_SECAO_111 valida o mapa revisado.
-        // 5. GESTOR_COORD registra primeiro aceite.
-        // 6. GESTOR_SECRETARIA_1 registra segundo aceite.
-        // 7. ADMIN homologa o mapa revisado.
+        await test.step('CHEFE valida e a hierarquia gestora aceita o mapa revisado', async () => {
+            await chefeValidaMapaRevisado(page);
+            await coordenadoriaESecretariaAceitamMapaRevisado(page);
+        });
+
+        await test.step('ADMIN homologa o mapa revisado', async () => {
+            await adminHomologaMapaRevisado(page);
+        });
     });
 
-    test('Fase 7 - ADMIN finaliza a revisão e os perfis consultam o resultado final', async () => {
-        test.fixme(true, 'Implementar finalização do processo de revisão e consulta final pelos perfis principais.');
-        expect(true).toBe(true);
+    test('Fase 7 - ADMIN finaliza a revisão e os perfis consultam o resultado final', async ({page}) => {
+        await test.step('ADMIN encerra a revisão e confirma o processo finalizado no painel', async () => {
+            await login(page, ADMIN.titulo, ADMIN.senha);
+            await acessarDetalhesProcesso(page, descricaoProcessoRevisao);
+            await finalizarProcesso(page);
+            await verificarProcessoTabela(page, {
+                descricao: descricaoProcessoRevisao,
+                tipo: 'Revisão',
+                situacao: SIT_PROCESSO.FINALIZADO
+            });
+        });
 
-        // Estrutura prevista:
-        // 1. ADMIN finaliza o processo de revisão.
-        // 2. Validar processo finalizado.
-        // 3. Validar mapa vigente atualizado da SECAO_111.
-        // 4. Validar que CHEFE_SECAO_111, GESTOR_COORD e GESTOR_SECRETARIA_1 conseguem consultar o resultado final.
+        await test.step('Os perfis principais consultam o mapa final no mesmo contexto quente da SPA', async () => {
+            await consultarResultadoFinalComCacheQuente(page, {usuario: ADMIN});
+            await consultarResultadoFinalComCacheQuente(page, {usuario: CHEFE_SECAO});
+            await consultarResultadoFinalComCacheQuente(page, {usuario: GESTOR_COORDENADORIA});
+            await consultarResultadoFinalComCacheQuente(page, {
+                usuario: GESTOR_SECRETARIA,
+                perfil: GESTOR_SECRETARIA.perfil!
+            });
+        });
     });
 });

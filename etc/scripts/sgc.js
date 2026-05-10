@@ -72,6 +72,11 @@ criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplic
 const frontendTelas = frontend.command("telas").description("Ferramentas de captura e apoio visual.");
 criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "etc/scripts/frontend/telas-capturar.js");
 
+const frontendA11y = frontend.command("a11y").description("Auditorias de acessibilidade do frontend.");
+criarComandoScript(frontendA11y, "auditar", "Executa auditoria estatica de acessibilidade no frontend.", "etc/scripts/frontend/a11y-auditar.js");
+criarComandoScript(frontendA11y, "crawler", "Executa o crawler Axe-core em todas as rotas principais.", "e2e/a11y/crawler.spec.ts");
+criarComandoScript(frontendA11y, "processar", "Processa os resultados do crawler em um relatório Markdown.", "etc/scripts/frontend/a11y-processar-resultados.js");
+
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 const codigoSmells = codigo.command("smells").description("Auditorias de cheiros de codigo.");
 criarComandoScript(codigoSmells, "auditar", "Gera snapshot de sinais de complexidade acidental e codigo defensivo.", "etc/scripts/codigo/smells-auditar.js");

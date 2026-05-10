@@ -15,6 +15,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
     // Usuário não-admin existente no seed (David Bowie - CHEFE da Assessoria 11)
     const TITULO_NOVO_ADMIN = '555555';
     const NOME_NOVO_ADMIN = 'David Bowie';
+    const TITULO_ADMIN_CACHE_QUENTE = '888888';
 
     test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({
                                                                                                 _resetAutomatico,
@@ -90,6 +91,48 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
 
         await expect(modal).toBeHidden();
         await expect(tabela.getByText(NOME_NOVO_ADMIN)).toBeHidden();
+    });
+
+    test('Cenário 3.1: lista de administradores reflete ida e volta imediata após mutações', async ({
+                                                                                                        _resetAutomatico,
+                                                                                                        page,
+                                                                                                        _autenticadoComoAdmin
+                                                                                                    }) => {
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
+
+        await page.getByRole('button', {name: TEXTOS.administracao.BOTAO_ADICIONAR}).click();
+        const modalAdicionar = page.getByRole('dialog');
+        await expect(modalAdicionar).toBeVisible();
+        await modalAdicionar.getByPlaceholder(TEXTOS.administracao.PLACEHOLDER_TITULO).fill(TITULO_ADMIN_CACHE_QUENTE);
+
+        const respostaAdicionar = page.waitForResponse(resp => resp.url().includes('/api/') && resp.request().method() === 'POST');
+        await modalAdicionar.getByRole('button', {name: TEXTOS.comum.BOTAO_CRIAR}).click();
+        await respostaAdicionar;
+        await expect(modalAdicionar).toBeHidden();
+
+        const tabela = page.locator('main table');
+        const linhaAdminQuente = tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE});
+        await expect(linhaAdminQuente).toBeVisible();
+
+        await page.goto('/painel');
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
+        await expect(tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE})).toBeVisible();
+
+        await tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE}).getByRole('button').click();
+        const modalRemover = page.getByRole('dialog');
+        await expect(modalRemover).toBeVisible();
+        const respostaRemover = page.waitForResponse(resp => resp.url().includes('/api/') && resp.request().method() === 'POST');
+        await modalRemover.getByRole('button', {name: /Remover/i}).click();
+        await respostaRemover;
+        await expect(modalRemover).toBeHidden();
+        await expect(tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE})).toBeHidden();
+
+        await page.goto('/painel');
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
+        await expect(tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE})).toHaveCount(0);
     });
 
     test('Cenário 4: ADMIN tenta adicionar sem título e sistema valida campo obrigatório', async ({
