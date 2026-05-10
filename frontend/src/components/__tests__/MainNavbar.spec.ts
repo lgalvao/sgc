@@ -4,8 +4,10 @@ import {ref} from "vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import NavBar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
+import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
 
 vi.mock("@/composables/usePerfil");
+vi.mock("@/composables/useTemaPreferencia");
 vi.mock("@/services/usuarioService", () => ({
     logout: vi.fn().mockResolvedValue(undefined),
 }));
@@ -34,6 +36,10 @@ describe("MainNavbar.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useTemaPreferencia).mockReturnValue({
+            getTemaEscuro: vi.fn().mockReturnValue(false),
+            setTemaEscuro: vi.fn(),
+        } as any);
         localStorage.clear();
 
         // Default mock for usePerfil

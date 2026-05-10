@@ -107,15 +107,5 @@ describe('useConfiguracoes', () => {
         expect(composable.getDiasAlertaNovo()).toBe(3);
     });
 
-    it('deve persistir tema escuro no localStorage', () => {
-        const composable = useConfiguracoes();
 
-        expect(composable.getTemaEscuro()).toBe(false);
-
-        composable.setTemaEscuro(true);
-        expect(composable.getTemaEscuro()).toBe(true);
-
-        const novoComposable = useConfiguracoes();
-        expect(novoComposable.getTemaEscuro()).toBe(true);
-    });
 });

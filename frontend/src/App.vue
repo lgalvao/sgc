@@ -10,6 +10,7 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useCacheSync} from "@/composables/useCacheSync";
 import {useConfiguracoes} from "@/composables/useConfiguracoes";
+import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
 
 interface PackageJson {
   version: string;
@@ -20,7 +21,8 @@ interface PackageJson {
 const route = useRoute();
 const perfilStore = usePerfilStore();
 const organizacaoStore = useOrganizacaoStore();
-const {carregarConfiguracoes, getTemaEscuro} = useConfiguracoes();
+const {carregarConfiguracoes} = useConfiguracoes();
+const {getTemaEscuro, setContextoUsuarioTemaEscuro} = useTemaPreferencia();
 const version = (pkg as PackageJson).version;
 
 const aplicarTema = () => {
@@ -29,6 +31,7 @@ const aplicarTema = () => {
 };
 
 onMounted(() => {
+  setContextoUsuarioTemaEscuro(perfilStore.usuarioCodigo);
   aplicarTema();
 });
 
@@ -45,6 +48,15 @@ watch(
 watch(
     () => getTemaEscuro(),
     () => aplicarTema()
+);
+
+watch(
+    () => perfilStore.usuarioCodigo,
+    (codigo) => {
+      setContextoUsuarioTemaEscuro(codigo);
+      aplicarTema();
+    },
+    {immediate: true}
 );
 
 watch(

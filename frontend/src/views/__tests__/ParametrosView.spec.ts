@@ -23,8 +23,6 @@ describe('ParametrosView', () => {
             error: ref(error),
             getDiasInativacaoProcesso: vi.fn().mockReturnValue(30),
             getDiasAlertaNovo: vi.fn().mockReturnValue(5),
-            getTemaEscuro: vi.fn().mockReturnValue(false),
-            setTemaEscuro: vi.fn(),
             carregarConfiguracoes: vi.fn().mockResolvedValue([]),
             salvarConfiguracoes: vi.fn().mockResolvedValue(true)
         };
@@ -79,16 +77,6 @@ describe('ParametrosView', () => {
         await wrapper.find('form').trigger('submit.prevent');
         expect(configuracoesStore.salvarConfiguracoes).not.toHaveBeenCalled();
         expect(wrapper.text()).toContain('Configurações salvas.');
-    });
-
-    it('deve aplicar tema escuro imediatamente ao alternar o checkbox', async () => {
-        setupWrapper();
-        await wrapper.vm.$nextTick();
-
-        const checkbox = wrapper.find('input[type="checkbox"]');
-        await checkbox.setValue(true);
-
-        expect(configuracoesStore.setTemaEscuro).toHaveBeenCalledWith(true);
     });
 
     it('deve mostrar erro ao falhar ao salvar', async () => {

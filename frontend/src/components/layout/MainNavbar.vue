@@ -107,6 +107,19 @@
         </BNavItemDropdown>
 
         <BNavItem
+            class="me-lg-1"
+            data-testid="btn-toggle-tema"
+            :title="tituloTema"
+            @click.prevent="alternarTema"
+        >
+          <template #default>
+            <span class="visually-hidden">{{ tituloTema }}</span>
+            <i aria-hidden="true" :class="`${iconeTema} me-lg-0 me-1`"/>
+            <span aria-hidden="true" class="d-lg-none">Tema</span>
+          </template>
+        </BNavItem>
+
+        <BNavItem
             class="me-lg-0"
             data-testid="btn-logout"
             title="Sair"
@@ -138,11 +151,13 @@ import {
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
+import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
 import {usePerfilStore} from "@/stores/perfil";
 import {TEXTOS} from "@/constants/textos";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
+const {getTemaEscuro, setTemaEscuro} = useTemaPreferencia();
 
 const {
   perfilSelecionado,
@@ -163,6 +178,12 @@ const isMobile = computed(() => windowWidth.value < 992);
 const labelUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? TEXTOS.comum.MENU_UNIDADES : TEXTOS.comum.MENU_MINHA_UNIDADE);
 const iconUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
 const linkUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
+const iconeTema = computed(() => getTemaEscuro() ? 'bi bi-sun' : 'bi bi-moon-stars');
+const tituloTema = computed(() => getTemaEscuro() ? 'Desativar modo escuro' : 'Ativar modo escuro');
+
+function alternarTema() {
+  setTemaEscuro(!getTemaEscuro());
+}
 
 async function handleLogout() {
   await perfilStore.logout();
