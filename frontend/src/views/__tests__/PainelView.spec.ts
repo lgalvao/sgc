@@ -259,4 +259,77 @@ describe('PainelView', () => {
         await flushPromises();
         expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); // Should not increase
     });
+
+    it('deve mostrar estado vazio de alertas sem renderizar a tabela', async () => {
+        vi.mocked(painelService.obterBootstrap).mockResolvedValueOnce({
+            processos: [],
+            alertas: [],
+        } as any);
+
+        const wrapper = mount(PainelView, createMountOptions());
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="empty-state-alertas"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(false);
+    });
+
+    it('deve renderizar a tabela de alertas quando houver itens', async () => {
+        const alertaMock = {
+            codigo: 1,
+            codProcesso: 10,
+            unidadeOrigem: 'SEC',
+            unidadeDestino: 'CGP',
+            descricao: 'Alerta',
+            dataHora: '2026-03-18T10:00:00',
+            dataHoraLeitura: null,
+            mensagem: 'Processo pendente',
+            origem: 'Secretaria',
+            processo: 'Processo 10',
+        };
+        vi.mocked(painelService.obterBootstrap).mockResolvedValueOnce({
+            processos: [],
+            alertas: [alertaMock],
+        } as any);
+
+        const wrapper = mount(PainelView, createMountOptions());
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="empty-state-alertas"]').exists()).toBe(false);
+    });
+
+    it('deve mostrar botão de criar processo quando mostrarCriarProcesso=true', async () => {
+        const wrapper = mount(PainelView, createMountOptions());
+        await flushPromises();
+        expect(wrapper.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(true);
+    });
+
+    it('não deve mostrar botão de criar processo quando mostrarCriarProcesso=false', async () => {
+        const wrapper = mount(PainelView, createMountOptions({permissoesSessao: {mostrarCriarProcesso: false}} as any));
+        await flushPromises();
+        expect(wrapper.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(false);
+    });
+
+    it('deve redirecionar para CadProcesso ao emitir evento cta-vazio', async () => {
+        const opcoesCtaVazio = {
+            ...createMountOptions(),
+            global: {
+                ...createMountOptions().global,
+                stubs: {
+                    ...createMountOptions().global.stubs,
+                    TabelaProcessos: {
+                        name: 'TabelaProcessos',
+                        template: '<div data-testid="tbl-processos"></div>',
+                        emits: ['cta-vazio'],
+                    },
+                },
+            },
+        };
+        const wrapper = mount(PainelView, opcoesCtaVazio);
+        await flushPromises();
+
+        mockRouterPush.mockClear();
+        await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('cta-vazio');
+        expect(mockRouterPush).toHaveBeenCalledWith({name: 'CadProcesso'});
+    });
 });

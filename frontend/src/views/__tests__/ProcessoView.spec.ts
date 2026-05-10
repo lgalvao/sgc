@@ -1042,3 +1042,448 @@ describe("Processo.vue", () => {
         expect(menuAcoes.attributes('disabled')).toBeUndefined();
     });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bloco de testes originados do ProcessoViewCoverage.spec.ts (mesclado)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const coberturaStubs = {
+    PageHeader: {template: '<div><slot/><slot name="actions"/></div>'},
+    ProcessoAcoes: {
+        name: 'ProcessoAcoes',
+        props: [
+            'mostrarFinalizarProcesso',
+            'podeFinalizar',
+            'usarMenuAcoesBloco',
+            'acoesBlocoVisiveis',
+            'acaoBlocoPrincipal',
+            'processandoAcaoBloco'
+        ],
+        emits: ['finalizar', 'abrir-acao-bloco'],
+        methods: {
+            obterId(codigo: string) {
+                switch (codigo) {
+                    case 'aceitar-cadastro': return 'btn-aceitar-bloco';
+                    case 'aceitar-mapa': return 'btn-aceitar-mapas-bloco';
+                    case 'homologar-cadastro': return 'btn-homologar-bloco';
+                    case 'homologar-mapa': return 'btn-homologar-mapas-bloco';
+                    case 'disponibilizar-mapa': return 'btn-disponibilizar-bloco';
+                    default: return `btn-${codigo}`;
+                }
+            },
+            obterTestId(codigo: string) {
+                switch (codigo) {
+                    case 'aceitar-cadastro': return 'btn-processo-aceitar-bloco';
+                    case 'aceitar-mapa': return 'btn-processo-aceitar-mapas-bloco';
+                    case 'homologar-cadastro': return 'btn-processo-homologar-bloco';
+                    case 'homologar-mapa': return 'btn-processo-homologar-mapas-bloco';
+                    case 'disponibilizar-mapa': return 'btn-processo-disponibilizar-bloco';
+                    default: return `btn-processo-${codigo}`;
+                }
+            }
+        },
+        template: `
+          <div>
+            <button
+                v-if="mostrarFinalizarProcesso"
+                data-testid="btn-processo-finalizar"
+                :disabled="!podeFinalizar"
+                @click="$emit('finalizar')"
+            >
+              Finalizar
+            </button>
+            <div v-if="usarMenuAcoesBloco" data-testid="btn-processo-acoes-bloco">
+              <button type="button">Ações em bloco</button>
+              <button
+                  v-for="acao in acoesBlocoVisiveis"
+                  :id="obterId(acao.codigo)"
+                  :key="acao.codigo"
+                  :data-testid="obterTestId(acao.codigo)"
+                  :disabled="!acao.habilitar || processandoAcaoBloco"
+                  @click="$emit('abrir-acao-bloco', acao)"
+              >
+                {{ acao.rotulo }}
+              </button>
+            </div>
+            <button
+                v-else-if="acaoBlocoPrincipal"
+                :id="obterId(acaoBlocoPrincipal.codigo)"
+                :data-testid="obterTestId(acaoBlocoPrincipal.codigo)"
+                :disabled="!acaoBlocoPrincipal.habilitar || processandoAcaoBloco"
+                @click="$emit('abrir-acao-bloco', acaoBlocoPrincipal)"
+            >
+              {{ acaoBlocoPrincipal.rotulo }}
+            </button>
+          </div>
+        `
+    },
+    TreeTable: {template: '<div>TreeTable</div>'},
+    ModalAcaoBloco: {
+        name: 'ModalAcaoBloco',
+        template: '<div>ModalAcaoBloco</div>',
+        setup(_props: unknown, {expose}: { expose: (exposed: Record<string, any>) => void }) {
+            expose({
+                abrir: vi.fn(),
+                fechar: vi.fn(),
+                setErro: vi.fn(),
+                setProcessando: vi.fn()
+            });
+            return {};
+        }
+    },
+    ModalConfirmacao: {
+        template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
+        props: ['modelValue'],
+        emits: ['confirmar', 'update:modelValue']
+    },
+    BAlert: {template: '<div v-if="modelValue"><slot /></div>', props: ['modelValue']},
+    BBadge: {template: '<span><slot /></span>'},
+    BButton: {
+        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+        props: ['disabled']
+    },
+    BDropdown: {
+        template: '<div><button :disabled="disabled">{{ text }}</button><slot /></div>',
+        props: ['text', 'disabled']
+    },
+    BDropdownItemButton: {
+        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+        props: ['disabled']
+    },
+    BContainer: {template: '<div><slot /></div>'},
+    BSpinner: {template: '<span>Loading</span>'}
+};
+
+function criarAcoesBlocoCobertura(subprocessosElegiveis: any[]) {
+    const filtrar = (campo: string) => subprocessosElegiveis.filter((item) => item[campo]);
+    const criarAcao = (
+        codigo: string,
+        acao: "ACEITAR" | "HOMOLOGAR" | "DISPONIBILIZAR",
+        campo: string,
+        redirecionarPainel: boolean,
+        requerDataLimite = false,
+    ) => {
+        const unidades = filtrar(campo);
+        return {
+            codigo,
+            acao,
+            mostrar: unidades.length > 0,
+            habilitar: unidades.length > 0,
+            requerDataLimite,
+            redirecionarPainel,
+            rotulo: codigo,
+            titulo: codigo,
+            texto: codigo,
+            rotuloBotao: codigo,
+            mensagemSucesso: codigo,
+            unidades,
+        };
+    };
+    return [
+        criarAcao("aceitar-cadastro", "ACEITAR", "habilitarAceitarCadastroBloco", true),
+        criarAcao("aceitar-mapa", "ACEITAR", "habilitarAceitarMapaBloco", true),
+        criarAcao("homologar-cadastro", "HOMOLOGAR", "habilitarHomologarCadastroBloco", false),
+        criarAcao("homologar-mapa", "HOMOLOGAR", "habilitarHomologarMapaBloco", true),
+        criarAcao("disponibilizar-mapa", "DISPONIBILIZAR", "habilitarDisponibilizarMapaBloco", true, true),
+    ];
+}
+
+describe("ProcessoDetalheView — cobertura adicional", () => {
+    const criarWrapperCobertura = (initialState: any = {}) => {
+        const pinia = createTestingPinia({
+            createSpy: vi.fn,
+            initialState: {
+                perfil: {
+                    perfilSelecionado: "GESTOR",
+                    unidadeSelecionada: 100,
+                    perfisUnidades: [{perfil: "GESTOR", unidade: {codigo: 100}}],
+                    perfis: ["GESTOR"]
+                }
+            },
+            stubActions: true
+        });
+
+        if (initialState.perfil) {
+            const store = usePerfilStore(pinia);
+            store.$patch(initialState.perfil);
+        }
+
+        const processo = initialState.processos?.processoDetalhe ?? {
+            codigo: 1,
+            descricao: "Processo teste",
+            tipo: TipoProcesso.MAPEAMENTO,
+            situacao: "EM_ANDAMENTO",
+            unidades: []
+        };
+        const subprocessosElegiveis = initialState.processos?.subprocessosElegiveis ?? [];
+
+        if (initialState.processos?.lastError) {
+            vi.mocked(processoService.buscarContextoCompleto).mockRejectedValue(
+                new Error(initialState.processos.lastError.message)
+            );
+        } else {
+            vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
+                ...processo,
+                elegiveis: subprocessosElegiveis,
+                acoesBloco: processo.acoesBloco ?? criarAcoesBlocoCobertura(subprocessosElegiveis),
+            });
+        }
+        vi.mocked(processoService.finalizarProcesso).mockResolvedValue(undefined);
+        vi.mocked(processoService.executarAcaoEmBloco).mockResolvedValue(undefined);
+
+        return mount(ProcessoView, {
+            global: {
+                plugins: [pinia],
+                stubs: coberturaStubs
+            }
+        });
+    };
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("deve lidar com erro ao finalizar processo", async () => {
+        const wrapper = criarWrapperCobertura({
+            perfil: {perfilSelecionado: "ADMIN", unidadeSelecionada: 999, perfis: ["ADMIN"]}
+        });
+
+        vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Erro ao finalizar"));
+        await flushPromises();
+
+        const acoes = wrapper.find('[data-testid="btn-processo-finalizar"]');
+        if (acoes.exists()) await acoes.trigger('click');
+        await flushPromises();
+
+        const modal = wrapper.findComponent({name: "ModalConfirmacao"});
+        if (modal.exists()) await modal.vm.$emit("confirmar");
+        await flushPromises();
+    });
+
+    it("não deve exibir erro quando o carregamento inicial for cancelado", async () => {
+        vi.mocked(processoService.buscarContextoCompleto).mockResolvedValueOnce(null as never);
+
+        const wrapper = criarWrapperCobertura();
+        await flushPromises();
+
+        expect((wrapper.vm as any).lastError).toBeNull();
+    });
+
+    it("deve abrir detalhes da unidade (navegação) para ADMIN", async () => {
+        const wrapper = criarWrapperCobertura({
+            perfil: {perfilSelecionado: "ADMIN", unidadeSelecionada: 999, perfis: ["ADMIN"]}
+        });
+        await flushPromises();
+
+        const item = {clickable: true, sigla: "U1", codigo: 10};
+        await (wrapper.vm as any).abrirDetalhesUnidade(item);
+
+        expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
+            name: "Subprocesso",
+            params: {codProcesso: "1", siglaUnidade: "U1"}
+        }));
+    });
+
+    it("não deve navegar se item não clicável", async () => {
+        const wrapper = criarWrapperCobertura();
+        await flushPromises();
+
+        await (wrapper.vm as any).abrirDetalhesUnidade({clickable: false});
+        expect(mocks.push).not.toHaveBeenCalled();
+    });
+
+    it("deve navegar para unidade de terceiros se CHEFE (controle é no backend)", async () => {
+        const wrapper = criarWrapperCobertura({
+            perfil: {perfilSelecionado: "CHEFE", unidadeSelecionada: 200, perfis: ["CHEFE"]}
+        });
+        await flushPromises();
+
+        await (wrapper.vm as any).abrirDetalhesUnidade({clickable: true, codigo: 10, sigla: "U1", unidadeAtual: "U1"});
+
+        expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
+            params: {codProcesso: "1", siglaUnidade: "U1"}
+        }));
+    });
+
+    it("deve navegar para própria unidade se CHEFE", async () => {
+        const wrapper = criarWrapperCobertura({
+            perfil: {perfilSelecionado: "CHEFE", unidadeSelecionada: 10, perfis: ["CHEFE"]}
+        });
+        await flushPromises();
+
+        await (wrapper.vm as any).abrirDetalhesUnidade({clickable: true, codigo: 10, sigla: "U1"});
+
+        expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
+            params: {codProcesso: "1", siglaUnidade: "U1"}
+        }));
+    });
+
+    it("deve lidar com erro na ação em bloco", async () => {
+        const wrapper = criarWrapperCobertura({
+            processos: {
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        habilitarAceitarCadastroBloco: true,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: true,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
+                    }
+                ]
+            }
+        });
+        await flushPromises();
+
+        const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find(
+            (acao: any) => acao.codigo === 'aceitar-cadastro'
+        );
+        vi.mocked(processoService.executarAcaoEmBloco).mockRejectedValue(new Error("Erro bloco"));
+
+        await modal.vm.$emit("confirmar", {ids: [1]});
+        await flushPromises();
+
+        if (modal.exists()) {
+            expect(modal.vm.setErro).toHaveBeenCalledWith("Erro bloco");
+        }
+    });
+
+    it("deve filtrar unidades elegíveis para Disponibilizar a partir do backend", async () => {
+        const wrapper = criarWrapperCobertura({
+            processos: {
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                        localizacaoCodigo: 100,
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: true
+                    },
+                    {
+                        unidadeCodigo: 2,
+                        unidadeSigla: "B",
+                        unidadeNome: "Unidade B",
+                        situacao: "OUTRO",
+                        localizacaoCodigo: 100,
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
+                    }
+                ]
+            }
+        });
+        await flushPromises();
+
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find(
+            (acao: any) => acao.codigo === 'disponibilizar-mapa'
+        );
+        expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
+        expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
+    });
+
+    it("deve filtrar unidades elegíveis para Homologar a partir do backend", async () => {
+        const wrapper = criarWrapperCobertura({
+            processos: {
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        localizacaoCodigo: 100,
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: true,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
+                    },
+                    {
+                        unidadeCodigo: 2,
+                        unidadeSigla: "B",
+                        unidadeNome: "Unidade B",
+                        situacao: "OUTRO",
+                        localizacaoCodigo: 100,
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
+                    }
+                ]
+            }
+        });
+        await flushPromises();
+
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find(
+            (acao: any) => acao.codigo === 'homologar-cadastro'
+        );
+        expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
+    });
+
+    it("deve filtrar unidades elegíveis para Aceitar a partir do backend", async () => {
+        const wrapper = criarWrapperCobertura({
+            processos: {
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                        localizacaoCodigo: 100,
+                        habilitarAceitarCadastroBloco: true,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
+                    },
+                    {
+                        unidadeCodigo: 2,
+                        unidadeSigla: "B",
+                        unidadeNome: "Unidade B",
+                        situacao: "OUTRO",
+                        localizacaoCodigo: 100,
+                        habilitarAceitarCadastroBloco: false,
+                        habilitarAceitarMapaBloco: false,
+                        habilitarHomologarCadastroBloco: false,
+                        habilitarHomologarMapaBloco: false,
+                        habilitarDisponibilizarMapaBloco: false
+                    }
+                ]
+            }
+        });
+        await flushPromises();
+
+        (wrapper.vm as any).acaoBlocoAtual = (wrapper.vm as any).acoesBlocoVisiveis.find(
+            (acao: any) => acao.codigo === 'aceitar-cadastro'
+        );
+        expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
+        expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
+    });
+
+    it("deve cobrir branches de erro e estados de carregamento", async () => {
+        const wrapper = criarWrapperCobertura({
+            processos: {
+                processoDetalhe: {codigo: 1, situacao: 'EM_ANDAMENTO'},
+                lastError: {message: 'Erro de teste'}
+            }
+        });
+        await flushPromises();
+
+        expect(wrapper.text()).toContain('Erro de teste');
+
+        (wrapper.vm as any).notify('Erro Manual', 'danger');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.text()).toContain('Erro Manual');
+    });
+});

@@ -1,9 +1,17 @@
 import {describe, expect, it, vi} from 'vitest';
-import {getLogLevel} from '../logger';
+import logger, {getLogLevel} from '../logger';
 
 vi.unmock("@/utils/logger");
 
 describe('logger', () => {
+    it('deve exportar uma instância do logger com os métodos esperados', () => {
+        expect(logger).toBeDefined();
+        expect(typeof logger.info).toBe('function');
+        expect(typeof logger.error).toBe('function');
+        expect(typeof logger.warn).toBe('function');
+        expect(typeof logger.success).toBe('function');
+    });
+
     describe('getLogLevel', () => {
         it('deve retornar 1 para o modo test', () => {
             expect(getLogLevel('test')).toBe(1);
@@ -16,6 +24,11 @@ describe('logger', () => {
         it('deve retornar 4 para o modo development ou outros', () => {
             expect(getLogLevel('development')).toBe(4);
             expect(getLogLevel('other')).toBe(4);
+        });
+
+        it('deve retornar 4 para ambientes desconhecidos como staging e string vazia', () => {
+            expect(getLogLevel('staging')).toBe(4);
+            expect(getLogLevel('')).toBe(4);
         });
 
         it('deve detectar o modo ambiente quando não informado', () => {

@@ -883,4 +883,43 @@ describe("ArvoreUnidades.vue", () => {
             expect(wrapper.find('input[type="search"]').exists()).toBe(false);
         });
     });
+
+    describe("watchers", () => {
+        it("deve atualizar unidades expandidas quando a prop unidades muda", async () => {
+            const wrapper = createWrapper({unidades: [], modelValue: []});
+            const vm = wrapper.vm as unknown as {expandedUnits: Set<number>};
+            expect(vm.expandedUnits.size).toBe(0);
+
+            await wrapper.setProps({
+                unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}]
+            });
+
+            expect(vm.expandedUnits.has(1)).toBe(false);
+        });
+
+        it("deve atualizar unidadesSelecionadasLocal quando modelValue muda externamente", async () => {
+            const wrapper = createWrapper({
+                unidades: [{codigo: 1, sigla: "A", nome: "A", isElegivel: true, filhas: []}],
+                modelValue: []
+            });
+            const vm = wrapper.vm as unknown as {unidadesSelecionadasLocal: number[]};
+            expect(vm.unidadesSelecionadasLocal).toEqual([]);
+
+            await wrapper.setProps({modelValue: [1]});
+            expect(vm.unidadesSelecionadasLocal).toEqual([1]);
+        });
+
+        it("não deve atualizar unidadesSelecionadasLocal se modelValue for igual (evitar loop)", async () => {
+            const wrapper = createWrapper({
+                unidades: [{codigo: 1, sigla: "A", nome: "A", isElegivel: true, filhas: []}],
+                modelValue: [1]
+            });
+            const vm = wrapper.vm as unknown as {unidadesSelecionadasLocal: number[]};
+            const localAntes = vm.unidadesSelecionadasLocal;
+
+            await wrapper.setProps({modelValue: [1]});
+            expect(vm.unidadesSelecionadasLocal).toEqual([1]);
+            expect(vm.unidadesSelecionadasLocal).toBe(localAntes);
+        });
+    });
 });

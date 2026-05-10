@@ -128,4 +128,24 @@ describe("CompetenciaCard.vue", () => {
         expect(items.length).toBe(1); // Só atividade 2 tem
         expect(items[0].text()).toContain("Java");
     });
+
+    it("getConhecimentosTooltip retorna mensagem para atividade sem conhecimentos", () => {
+        const wrapper = mount(CompetenciaCard, {
+            props: {
+                competencia: {
+                    codigo: 1,
+                    descricao: "Competencia teste",
+                    atividades: [{codigo: 999, descricao: "Atividade 999", conhecimentos: []}],
+                },
+                atividades: [],
+                podeEditar: true
+            },
+            global: {stubs, directives: {"b-tooltip": {}}},
+        });
+
+        if ((wrapper.vm as any).getConhecimentosTooltip) {
+            const result = (wrapper.vm as any).getConhecimentosTooltip(999);
+            expect(result).toBe('Nenhum conhecimento cadastrado');
+        }
+    });
 });

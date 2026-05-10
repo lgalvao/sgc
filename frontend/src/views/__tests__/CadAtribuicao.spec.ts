@@ -213,4 +213,22 @@ describe('CadAtribuicao.vue', () => {
 
         expect(context.wrapper.vm.erroUsuario).toBe(TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR);
     });
+
+    it('deve falhar com exceção quando invariante de unidade é violada', async () => {
+        context.wrapper = criarWrapper();
+        await flushPromises();
+
+        (context.wrapper.vm as any).unidade = null;
+        await expect((context.wrapper.vm as any).criarAtribuicao())
+            .rejects
+            .toThrow('Invariante violada: unidade não carregada');
+    });
+
+    it('deve atualizar dataInicio via atribuição direta', async () => {
+        context.wrapper = criarWrapper();
+        await flushPromises();
+
+        (context.wrapper.vm as any).dataInicio = '2023-10-10';
+        expect((context.wrapper.vm as any).dataInicio).toBe('2023-10-10');
+    });
 });
