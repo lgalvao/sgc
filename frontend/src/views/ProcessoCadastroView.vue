@@ -165,8 +165,7 @@ const {
   resumoDiagnostico,
   unidadesSemResponsavel,
   exibirAlertaDiagnostico,
-  dispensarAlertaDiagnostico,
-  alertaDiagnosticoDispensado
+  dispensarAlertaDiagnostico
 } = useDiagnosticoOrganizacionalAlert(unidades, mostrarDiagnosticoOrganizacional);
 const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value);
 const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoading.value || isLoadingData.value);

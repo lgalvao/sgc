@@ -132,6 +132,8 @@ const LOG_FILTERS = [
     /NotificacaoEmailServiceMock.*ATIVADO/,
     /E-mails serão mockados/,
 
+    // Ruído de progresso dos runners (por exemplo vitest em modo dot)
+    /^\s*[.·]+\s*$/,
 
     /^\s*$/
 ];

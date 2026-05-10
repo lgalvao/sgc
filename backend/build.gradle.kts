@@ -86,7 +86,8 @@ dependencies {
 }
 
 tasks.named<ProcessResources>("processResources") {
-    dependsOn(":frontend:build")
+    dependsOn(":frontend:buildVue")
+    exclude("static/**")
     from(rootProject.layout.projectDirectory.dir("frontend/dist")) {
         into("static")
     }
