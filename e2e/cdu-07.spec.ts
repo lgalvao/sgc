@@ -6,7 +6,7 @@ import {
     criarProcessoFixture,
     criarProcessoMapaDisponibilizadoFixture
 } from './fixtures/index.js';
-import {autenticar, login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, reloginSemLimparSpa, USUARIOS} from './helpers/helpers-auth.js';
 import {
     esperarPaginaDetalhesProcesso,
     esperarPaginaSubprocesso,
@@ -406,10 +406,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(page.getByTestId('header-subprocesso')).toBeVisible();
 
         // Logout e novo login na mesma aba, sem limpar storage nem reiniciar a aplicação.
-        await fazerLogout(page);
-        await autenticar(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
-        await page.waitForURL(/\/painel(?:\?|$)/);
-        await limparNotificacoes(page);
+        await reloginSemLimparSpa(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
 
         // Acessa o mesmo subprocesso imediatamente após o login do CHEFE.
         await page.goto(`/processo/${codProcesso}/${unidade}`);

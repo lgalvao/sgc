@@ -61,6 +61,11 @@ export async function autenticar(page: Page, usuario: string, senha: string) {
     await page.getByTestId('btn-login-entrar').click();
 }
 
+async function finalizarLoginNoPainel(page: Page) {
+    await page.waitForURL(/\/painel(?:\?|$)/);
+    await limparNotificacoes(page);
+}
+
 async function limparSessaoNavegador(page: Page) {
     // 1. Tenta limpar o storage se já estivermos no domínio do app,
     // antes de limpar cookies e navegar (evita race conditions)
@@ -93,8 +98,7 @@ export async function login(page: Page, usuario: string, senha: string) {
     await limparSessaoNavegador(page);
 
     await autenticar(page, usuario, senha);
-    await page.waitForURL(/\/painel(?:\?|$)/);
-    await limparNotificacoes(page);
+    await finalizarLoginNoPainel(page);
 }
 
 export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
@@ -103,8 +107,21 @@ export async function loginComPerfil(page: Page, usuario: string, senha: string,
     await autenticar(page, usuario, senha);
     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
     await page.getByTestId('btn-login-entrar').click();
-    await page.waitForURL(/\/painel(?:\?|$)/);
-    await limparNotificacoes(page);
+    await finalizarLoginNoPainel(page);
+}
+
+export async function reloginSemLimparSpa(page: Page, usuario: string, senha: string) {
+    await fazerLogout(page);
+    await autenticar(page, usuario, senha);
+    await finalizarLoginNoPainel(page);
+}
+
+export async function reloginComPerfilSemLimparSpa(page: Page, usuario: string, senha: string, perfilUnidade: string) {
+    await fazerLogout(page);
+    await autenticar(page, usuario, senha);
+    await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
+    await page.getByTestId('btn-login-entrar').click();
+    await finalizarLoginNoPainel(page);
 }
 
 /**

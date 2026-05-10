@@ -103,6 +103,14 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await editarCompetencia(page, compDesc, newDesc, [ATIVIDADE_2]);
         await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
 
+        // CT-03a: após editar, sair e voltar ao subprocesso deve refletir a competência atualizada
+        await page.getByRole('link', {name: UNIDADE_ALVO, exact: true}).click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+
+        await navegarParaMapa(page);
+        await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
+
         // CT-05: Validar cancelamento da Exclusão
         await excluirCompetenciaCancelando(page, newDesc);
         await expect(page.getByText(newDesc).first()).toBeVisible();
@@ -111,6 +119,14 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await excluirCompetenciaConfirmando(page, newDesc);
         await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)).toBeVisible();
+
+        // CT-04a: após exclusão, sair e voltar ao mapa não deve ressuscitar a competência removida
+        await page.getByRole('link', {name: UNIDADE_ALVO, exact: true}).click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}(?:\?.*)?$`));
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+
+        await navegarParaMapa(page);
+        await expect(page.getByText(newDesc).first()).toBeHidden();
 
         // CT-06: Navegar para Disponibilização
         const compFinal = `Competência final ${timestamp}`;
