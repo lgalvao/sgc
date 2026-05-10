@@ -4,7 +4,7 @@ import ProcessoView from "../ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";
 import {useToastStore} from "@/stores/toast";
-import {nextTick} from "vue";
+import {nextTick, ref} from "vue";
 import {Perfil, SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import * as processoService from "@/services/processo";
@@ -23,6 +23,15 @@ const mocks = {
     query: {}
 };
 
+const processoStoreMock = {
+    garantirContextoCompleto: vi.fn((codProcesso: number) => processoService.buscarContextoCompleto(codProcesso)),
+    invalidar: vi.fn(),
+    dadosValidos: vi.fn().mockReturnValue(false),
+    contextoCompleto: null as any,
+    codProcessoCarregado: null as number | null,
+    resetar: vi.fn(),
+};
+
 vi.mock("vue-router", () => ({
     useRoute: () => ({params: mocks.params, query: mocks.query}),
     useRouter: () => ({push: mocks.push})
@@ -30,14 +39,8 @@ vi.mock("vue-router", () => ({
 
 // Mock da useProcessoStore (Rodada 2) — delega ao processoService já mockado
 vi.mock("@/stores/processo", async () => {
-    const processoSvc = await import("@/services/processo");
     return {
-        useProcessoStore: () => ({
-            garantirContextoCompleto: (codProcesso: number) => processoSvc.buscarContextoCompleto(codProcesso),
-            invalidar: vi.fn(),
-            dadosValidos: vi.fn().mockReturnValue(false),
-            contextoCompleto: null,
-        }),
+        useProcessoStore: () => processoStoreMock,
     };
 });
 
@@ -346,6 +349,13 @@ describe("Processo.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processoStoreMock.contextoCompleto = null;
+        processoStoreMock.codProcessoCarregado = null;
+        processoStoreMock.dadosValidos.mockReset();
+        processoStoreMock.dadosValidos.mockReturnValue(false);
+        processoStoreMock.garantirContextoCompleto.mockImplementation(
+            (codProcesso: number) => processoService.buscarContextoCompleto(codProcesso)
+        );
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -360,17 +370,157 @@ describe("Processo.vue", () => {
         expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
     });
 
-    it("deve recarregar detalhes ao reativar a view em keepAlive apenas quando o cache estiver inválido", async () => {
+    it("não recarrega o contexto ao reativar quando o cache ainda está válido", async () => {
+        processoStoreMock.dadosValidos.mockReturnValue(true);
+        const manterMontado = ref(true);
+
+        const wrapperKeepAlive = mount({
+            components: {ProcessoView},
+            setup() {
+                return {manterMontado};
+            },
+            template: "<keep-alive><ProcessoView v-if='manterMontado' /></keep-alive>",
+        }, {
+            global: {
+                plugins: [
+                    createTestingPinia({
+                        createSpy: vi.fn,
+                        stubActions: true
+                    })
+                ],
+                stubs: {
+                    ModalAcaoBloco: ModalAcaoBlocoStub,
+                    ModalConfirmacao: ModalConfirmacaoStub,
+                    ProcessoSubprocessosTable: TreeTableStub,
+                    PageHeader: PageHeaderStub,
+                    ProcessoInfo: ProcessoInfoStub,
+                    BAlert: BAlertStub,
+                    BSpinner: BSpinnerStub,
+                    BButton: {
+                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
+                        props: ['disabled']
+                    },
+                    BDropdown: BDropdownStub,
+                    BDropdownItemButton: BDropdownItemButtonStub
+                }
+            }
+        });
+
         await flushPromises();
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
 
-        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
-        for (const hook of hooks) {
-            await hook.call(wrapper.vm);
-        }
+        manterMontado.value = false;
+        await nextTick();
+        manterMontado.value = true;
+        await flushPromises();
+
+        expect(processoService.buscarContextoCompleto).not.toHaveBeenCalled();
+        wrapperKeepAlive.unmount();
+    });
+
+    it("recarrega o contexto ao reativar quando o cache está inválido", async () => {
+        processoStoreMock.dadosValidos.mockReturnValue(false);
+        const manterMontado = ref(true);
+
+        const wrapperKeepAlive = mount({
+            components: {ProcessoView},
+            setup() {
+                return {manterMontado};
+            },
+            template: "<keep-alive><ProcessoView v-if='manterMontado' /></keep-alive>",
+        }, {
+            global: {
+                plugins: [
+                    createTestingPinia({
+                        createSpy: vi.fn,
+                        stubActions: true
+                    })
+                ],
+                stubs: {
+                    ModalAcaoBloco: ModalAcaoBlocoStub,
+                    ModalConfirmacao: ModalConfirmacaoStub,
+                    ProcessoSubprocessosTable: TreeTableStub,
+                    PageHeader: PageHeaderStub,
+                    ProcessoInfo: ProcessoInfoStub,
+                    BAlert: BAlertStub,
+                    BSpinner: BSpinnerStub,
+                    BButton: {
+                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
+                        props: ['disabled']
+                    },
+                    BDropdown: BDropdownStub,
+                    BDropdownItemButton: BDropdownItemButtonStub
+                }
+            }
+        });
+
+        await flushPromises();
+        vi.mocked(processoService.buscarContextoCompleto).mockClear();
+
+        manterMontado.value = false;
+        await nextTick();
+        manterMontado.value = true;
         await flushPromises();
 
         expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
+        wrapperKeepAlive.unmount();
+    });
+
+    it("mantém o snapshot e exibe erro se a recarga em background falhar", async () => {
+        processoStoreMock.dadosValidos.mockReturnValue(false);
+        const manterMontado = ref(true);
+        vi.mocked(processoService.buscarContextoCompleto)
+            .mockResolvedValueOnce({
+                ...mockProcesso,
+                descricao: "Processo Teste",
+                elegiveis: mockElegiveis,
+                acoesBloco: criarAcoesBloco(mockElegiveis),
+            } as any)
+            .mockRejectedValueOnce(new Error("Falha na recarga"));
+
+        const wrapperKeepAlive = mount({
+            components: {ProcessoView},
+            setup() {
+                return {manterMontado};
+            },
+            template: "<keep-alive><ProcessoView v-if='manterMontado' /></keep-alive>",
+        }, {
+            global: {
+                plugins: [
+                    createTestingPinia({
+                        createSpy: vi.fn,
+                        stubActions: true
+                    })
+                ],
+                stubs: {
+                    ModalAcaoBloco: ModalAcaoBlocoStub,
+                    ModalConfirmacao: ModalConfirmacaoStub,
+                    ProcessoSubprocessosTable: TreeTableStub,
+                    PageHeader: PageHeaderStub,
+                    ProcessoInfo: ProcessoInfoStub,
+                    BAlert: BAlertStub,
+                    BSpinner: BSpinnerStub,
+                    BButton: {
+                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
+                        props: ['disabled']
+                    },
+                    BDropdown: BDropdownStub,
+                    BDropdownItemButton: BDropdownItemButtonStub
+                }
+            }
+        });
+        await flushPromises();
+        vi.mocked(processoService.buscarContextoCompleto).mockClear();
+
+        manterMontado.value = false;
+        await nextTick();
+        manterMontado.value = true;
+        await flushPromises();
+
+        expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
+        expect(wrapperKeepAlive.findComponent(TreeTableStub).exists()).toBe(true);
+        expect(wrapperKeepAlive.text()).toContain("Falha na recarga");
+        wrapperKeepAlive.unmount();
     });
 
     it("deve exibir erro se falhar ao carregar processo", async () => {
