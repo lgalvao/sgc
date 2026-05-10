@@ -30,6 +30,7 @@
           {{ cancelTitle }}
         </BButton>
         <BButton
+            :aria-busy="loading"
             :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
             :disabled="loading || okDisabled"
             :variant="((okVariant || variant || 'primary') as unknown as ButtonVariant)"

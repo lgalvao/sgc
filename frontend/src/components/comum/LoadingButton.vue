@@ -1,5 +1,6 @@
 <template>
   <BButton
+      :aria-busy="loading"
       :disabled="loading || disabled"
       v-bind="$attrs"
   >

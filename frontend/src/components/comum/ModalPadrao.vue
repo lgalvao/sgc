@@ -24,6 +24,7 @@
         <slot name="acao">
           <BButton
               v-if="mostrarBotaoAcao"
+              :aria-busy="loading"
               :data-testid="testIdConfirmar || 'btn-modal-padrao-confirmar'"
               :disabled="loading || acaoDesabilitada"
               :variant="variantAcao"

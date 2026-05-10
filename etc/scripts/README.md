@@ -73,6 +73,9 @@ node etc/scripts/sgc.js frontend views validacoes-auditar
 node etc/scripts/sgc.js frontend test-ids listar
 node etc/scripts/sgc.js frontend test-ids listar-duplicados
 node etc/scripts/sgc.js frontend telas capturar
+node etc/scripts/sgc.js frontend a11y auditar
+node etc/scripts/sgc.js frontend a11y crawler
+node etc/scripts/sgc.js frontend a11y processar
 ```
 
 ### Código transversal
