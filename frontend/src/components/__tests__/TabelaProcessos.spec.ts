@@ -104,7 +104,7 @@ describe("TabelaProcessos.vue", () => {
 
         await context.wrapper.findComponent({name: "BTable"}).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
 
-        expect(context.wrapper.emitted("ordenar")).toBeTruthy();
+        expect(context.wrapper.emitted("ordenar")).toBeDefined();
         expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
     });
 
@@ -123,7 +123,7 @@ describe("TabelaProcessos.vue", () => {
         const rows = context.wrapper.findAll("tbody tr");
         await rows[0].trigger("click");
 
-        expect(context.wrapper.emitted("selecionarProcesso")).toBeTruthy();
+        expect(context.wrapper.emitted("selecionarProcesso")).toBeDefined();
         expect(context.wrapper.emitted("selecionarProcesso")![0]).toEqual([
             mockProcessos[0],
         ]);
@@ -159,7 +159,7 @@ describe("TabelaProcessos.vue", () => {
         const rows = context.wrapper.findAll("tbody tr");
         await rows[0].trigger("keydown", {key: "Enter"});
 
-        expect(context.wrapper.emitted("selecionarProcesso")).toBeTruthy();
+        expect(context.wrapper.emitted("selecionarProcesso")).toBeDefined();
         expect(context.wrapper.emitted("selecionarProcesso")![0]).toEqual([
             mockProcessos[0],
         ]);
@@ -264,7 +264,7 @@ describe("TabelaProcessos.vue", () => {
         const botaoCta = context.wrapper.find('[data-testid="btn-empty-state-criar-processo"]');
         expect(botaoCta.exists()).toBe(true);
         await botaoCta.trigger("click");
-        expect(context.wrapper.emitted("ctaVazio")).toBeTruthy();
+        expect(context.wrapper.emitted("ctaVazio")).toBeDefined();
     });
 
     describe("Modo compacto", () => {
@@ -322,7 +322,7 @@ describe("TabelaProcessos.vue", () => {
                 order: "asc"
             }]);
 
-            expect(context.wrapper.emitted("ordenar")).toBeTruthy();
+            expect(context.wrapper.emitted("ordenar")).toBeDefined();
             expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
         });
     });

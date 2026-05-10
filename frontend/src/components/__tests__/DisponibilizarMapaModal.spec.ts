@@ -63,7 +63,7 @@ describe("DisponibilizarMapaModal.vue", () => {
         const wrapper = createWrapper({mostrar: true});
 
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-cancelar"]').trigger("click");
-        expect(wrapper.emitted("fechar")).toBeTruthy();
+        expect(wrapper.emitted("fechar")).toBeDefined();
     });
 
     it("deve emitir o evento disponibilizar com a data selecionada", async () => {
@@ -76,7 +76,7 @@ describe("DisponibilizarMapaModal.vue", () => {
 
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
 
-        expect(wrapper.emitted("disponibilizar")).toBeTruthy();
+        expect(wrapper.emitted("disponibilizar")).toBeDefined();
         expect(wrapper.emitted("disponibilizar")?.[0]).toEqual([{
             dataLimite,
             observacoes: ""

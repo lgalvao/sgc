@@ -116,7 +116,7 @@ describe("ModalAcaoBloco.vue", () => {
         expect(btnConfirmar?.exists()).toBe(true);
         await btnConfirmar?.trigger('click');
 
-        expect(wrapper.emitted('confirmar')).toBeTruthy();
+        expect(wrapper.emitted('confirmar')).toBeDefined();
         expect(wrapper.emitted('confirmar')![0][0]).toEqual({
             ids: [2],
             dataLimite: undefined
@@ -135,7 +135,7 @@ describe("ModalAcaoBloco.vue", () => {
         await vm.confirmar();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted('confirmar')).toBeFalsy();
+        expect(wrapper.emitted('confirmar')).toBeUndefined();
         expect(vm.mensagemErroDataLimite).toBe("A data limite é obrigatória.");
         expect(wrapper.text()).toContain("A data limite é obrigatória.");
 
@@ -145,7 +145,7 @@ describe("ModalAcaoBloco.vue", () => {
 
         await vm.confirmar();
 
-        expect(wrapper.emitted('confirmar')).toBeTruthy();
+        expect(wrapper.emitted('confirmar')).toBeDefined();
         expect(wrapper.emitted('confirmar')![0][0]).toEqual({
             ids: [1],
             dataLimite: amanha

@@ -84,7 +84,7 @@ describe('ModalConfirmacao.vue', () => {
         const cancelBtn = wrapper.find('[data-testid="btn-modal-confirmacao-cancelar"]')
         await cancelBtn.trigger('click')
 
-        expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+        expect(wrapper.emitted('update:modelValue')).toBeDefined()
         expect(wrapper.emitted('update:modelValue')![0]).toEqual([false])
     })
 
@@ -100,8 +100,8 @@ describe('ModalConfirmacao.vue', () => {
         const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
         await confirmBtn.trigger('click')
 
-        expect(wrapper.emitted('confirmar')).toBeTruthy()
-        expect(wrapper.emitted('update:modelValue')).toBeTruthy() // Fecha
+        expect(wrapper.emitted('confirmar')).toBeDefined()
+        expect(wrapper.emitted('update:modelValue')).toBeDefined() // Fecha
     })
 
     it('emite confirmar mas NAO fecha o modal se autoClose=false', async () => {
@@ -116,7 +116,7 @@ describe('ModalConfirmacao.vue', () => {
         const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
         await confirmBtn.trigger('click')
 
-        expect(wrapper.emitted('confirmar')).toBeTruthy()
+        expect(wrapper.emitted('confirmar')).toBeDefined()
         expect(wrapper.emitted('update:modelValue')).toBeFalsy() // Não fecha
     })
 

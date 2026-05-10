@@ -68,7 +68,7 @@ describe('FeedbackModal.vue', () => {
         await wrapper.find('form').trigger('submit')
 
         expect(wrapper.text()).toContain('Descreva o problema com pelo menos 10 caracteres.')
-        expect(wrapper.emitted('enviar')).toBeFalsy()
+        expect(wrapper.emitted('enviar')).toBeUndefined()
     })
 
     it('deve emitir enviar com os dados corretos', async () => {
@@ -88,7 +88,7 @@ describe('FeedbackModal.vue', () => {
 
         await wrapper.find('form').trigger('submit')
 
-        expect(wrapper.emitted('enviar')).toBeTruthy()
+        expect(wrapper.emitted('enviar')).toBeDefined()
         expect(wrapper.emitted('enviar')![0]).toEqual(['sugestao', '<p>Esta é uma descrição longa o suficiente.</p>'])
     })
 
@@ -103,7 +103,7 @@ describe('FeedbackModal.vue', () => {
         })
 
         await wrapper.find('[data-testid="feedback-btn-remover-captura"]').trigger('click')
-        expect(wrapper.emitted('removerCaptura')).toBeTruthy()
+        expect(wrapper.emitted('removerCaptura')).toBeDefined()
     })
 
     it('não deve exibir a opção de elogio', () => {

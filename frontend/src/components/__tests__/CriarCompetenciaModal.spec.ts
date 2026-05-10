@@ -93,7 +93,7 @@ describe("CriarCompetenciaModal.vue", () => {
         await flushPromises();
         await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
 
-        expect(wrapper.emitted("salvar")).toBeTruthy();
+        expect(wrapper.emitted("salvar")).toBeDefined();
     });
 
     it("deve permitir salvar edicao sem atividades associadas", async () => {
@@ -113,7 +113,7 @@ describe("CriarCompetenciaModal.vue", () => {
             wrapper
                 .find('[data-testid="btn-criar-competencia-salvar"]')
                 .attributes("disabled"),
-        ).toBeFalsy();
+        ).toBeUndefined();
     });
 
     it("deve exigir campos obrigatorios e exibir erros inline ao salvar", async () => {
@@ -124,14 +124,14 @@ describe("CriarCompetenciaModal.vue", () => {
 
         expect(wrapper.text()).toContain('A descrição é obrigatória.');
         expect(wrapper.text()).toContain('Selecione ao menos uma atividade.');
-        expect(wrapper.emitted('salvar')).toBeFalsy();
+        expect(wrapper.emitted('salvar')).toBeUndefined();
     });
 
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {
         const wrapper = createWrapper({mostrar: true, atividades});
 
         await wrapper.find('[data-testid="btn-criar-competencia-cancelar"]').trigger("click");
-        expect(wrapper.emitted("fechar")).toBeTruthy();
+        expect(wrapper.emitted("fechar")).toBeDefined();
     });
 
     it("deve emitir o evento salvar com os dados corretos", async () => {
@@ -144,7 +144,7 @@ describe("CriarCompetenciaModal.vue", () => {
         await flushPromises();
         await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
 
-        expect(wrapper.emitted("salvar")).toBeTruthy();
+        expect(wrapper.emitted("salvar")).toBeDefined();
         expect(wrapper.emitted("salvar")?.[0]).toEqual([
             {
                 descricao,
@@ -161,7 +161,7 @@ describe("CriarCompetenciaModal.vue", () => {
         await flushPromises();
         await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
 
-        expect(wrapper.emitted("salvar")).toBeFalsy();
+        expect(wrapper.emitted("salvar")).toBeUndefined();
     });
 
 });

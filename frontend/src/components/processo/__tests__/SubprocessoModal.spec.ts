@@ -40,7 +40,7 @@ describe('SubprocessoModal.vue', () => {
         await btn.trigger('click');
 
         expect(wrapper.text()).toContain('A data limite para validação deve ser uma data futura.');
-        expect(wrapper.emitted('confirmarAlteracao')).toBeFalsy();
+        expect(wrapper.emitted('confirmarAlteracao')).toBeUndefined();
     });
 
     it('deve usar a última data limite do subprocesso como mínimo quando ela for maior que amanhã', () => {

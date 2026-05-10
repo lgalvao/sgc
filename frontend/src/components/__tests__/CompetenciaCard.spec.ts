@@ -77,7 +77,7 @@ describe("CompetenciaCard.vue", () => {
         });
 
         await wrapper.find('[data-testid="btn-editar-competencia"]').trigger("click");
-        expect(wrapper.emitted("editar")).toBeTruthy();
+        expect(wrapper.emitted("editar")).toBeDefined();
         expect(wrapper.emitted("editar")?.[0]).toEqual([mockCompetencia]);
     });
 
@@ -92,7 +92,7 @@ describe("CompetenciaCard.vue", () => {
         });
 
         await wrapper.find('[data-testid="btn-excluir-competencia"]').trigger("click");
-        expect(wrapper.emitted("excluir")).toBeTruthy();
+        expect(wrapper.emitted("excluir")).toBeDefined();
         expect(wrapper.emitted("excluir")?.[0]).toEqual([mockCompetencia.codigo]);
     });
 
@@ -110,7 +110,7 @@ describe("CompetenciaCard.vue", () => {
         const botoes = wrapper.findAll('[data-testid="btn-remover-atividade-associada"]');
         await botoes[0].trigger("click"); // Clica no primeiro (Atividade 101)
 
-        expect(wrapper.emitted("removerAtividade")).toBeTruthy();
+        expect(wrapper.emitted("removerAtividade")).toBeDefined();
         expect(wrapper.emitted("removerAtividade")?.[0]).toEqual([mockCompetencia.codigo, 101]);
     });
 

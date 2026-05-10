@@ -58,7 +58,7 @@ describe('CompetenciaEdicaoModal.vue', () => {
             await wrapper.find('[data-testid="btn-competencia-selecionar-todas-atividades"]').trigger('click');
             await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger('click');
 
-            expect(wrapper.emitted('salvar')).toBeTruthy();
+            expect(wrapper.emitted('salvar')).toBeDefined();
             expect(wrapper.emitted('salvar')![0][0]).toMatchObject({
                 atividadesSelecionadas: [1, 2],
             });
@@ -75,7 +75,7 @@ describe('CompetenciaEdicaoModal.vue', () => {
             });
             const btn = wrapper.find('[data-testid="btn-criar-competencia-cancelar"]');
             await btn.trigger('click');
-            expect(wrapper.emitted('fechar')).toBeTruthy();
+            expect(wrapper.emitted('fechar')).toBeDefined();
         });
 
         it('exibe fieldError.generic quando fornecido', () => {
@@ -136,7 +136,7 @@ describe('CompetenciaEdicaoModal.vue', () => {
             const btn = wrapper.find('[data-testid="btn-criar-competencia-salvar"]');
             await btn.trigger('click');
             const emitido = wrapper.emitted('salvar');
-            expect(emitido).toBeTruthy();
+            expect(emitido).toBeDefined();
             expect(emitido![0][0]).toMatchObject({
                 descricao: comp.descricao,
                 atividadesSelecionadas: [atv.codigo],
@@ -151,7 +151,7 @@ describe('CompetenciaEdicaoModal.vue', () => {
             });
             const btn = wrapper.find('[data-testid="btn-criar-competencia-salvar"]');
             await btn.trigger('click');
-            expect(wrapper.emitted('salvar')).toBeFalsy();
+            expect(wrapper.emitted('salvar')).toBeUndefined();
         });
     });
 

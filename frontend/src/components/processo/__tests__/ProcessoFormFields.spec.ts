@@ -120,7 +120,7 @@ describe("ProcessoFormFields.vue", () => {
 
         await input.setValue("Nova descrição");
 
-        expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+        expect(wrapper.emitted('update:modelValue')).toBeDefined();
         expect(wrapper.emitted('update:modelValue')![0][0]).toMatchObject({
             descricao: "Nova descrição"
         });
@@ -132,7 +132,7 @@ describe("ProcessoFormFields.vue", () => {
 
         await select.setValue("MAPEAMENTO");
 
-        expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+        expect(wrapper.emitted('update:modelValue')).toBeDefined();
         expect(wrapper.emitted('update:modelValue')![0][0]).toMatchObject({
             tipo: "MAPEAMENTO"
         });
@@ -144,7 +144,7 @@ describe("ProcessoFormFields.vue", () => {
 
         await input.setValue("2026-12-31");
 
-        expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+        expect(wrapper.emitted('update:modelValue')).toBeDefined();
         expect(wrapper.emitted('update:modelValue')![0][0]).toMatchObject({
             dataLimite: "2026-12-31"
         });

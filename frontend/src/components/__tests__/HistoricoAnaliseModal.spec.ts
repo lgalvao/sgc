@@ -93,6 +93,6 @@ describe("HistoricoAnaliseModal", () => {
         });
 
         await context.wrapper.find('[data-testid="btn-modal-fechar"]').trigger("click");
-        expect(context.wrapper.emitted("fechar")).toBeTruthy();
+        expect(context.wrapper.emitted("fechar")).toBeDefined();
     });
 });

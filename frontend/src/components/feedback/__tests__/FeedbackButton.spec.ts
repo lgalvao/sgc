@@ -65,6 +65,6 @@ describe('FeedbackButton.vue', () => {
             }
         })
         await wrapper.find('[data-testid="feedback-btn"]').trigger('click')
-        expect(wrapper.emitted('click')).toBeTruthy()
+        expect(wrapper.emitted('click')).toBeDefined()
     })
 })
