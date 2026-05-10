@@ -166,4 +166,32 @@ describe('HistoricoView.vue', () => {
         // should not throw error or call push
         expect(mockRouter.push).toHaveBeenCalledTimes(2);
     });
+
+    it('deve inverter direção ao ordenar pelo mesmo campo', async () => {
+        wrapper = createWrapper();
+        await flushPromises();
+
+        const ascInicial = wrapper.vm.asc;
+
+        wrapper.vm.ordenarPor('dataFinalizacao'); // mesmo campo atual
+        expect(wrapper.vm.asc).toBe(!ascInicial); // deve inverter
+
+        wrapper.vm.ordenarPor('dataFinalizacao'); // mesmo campo novamente
+        expect(wrapper.vm.asc).toBe(ascInicial); // volta ao original
+    });
+
+    it('deve lidar com datas nulas ao comparar processos na ordenação', async () => {
+        vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValueOnce([
+            {codigo: 1, dataFinalizacao: '2023-01-01', descricao: 'A'},
+            {codigo: 2, dataFinalizacao: null, descricao: 'B'},
+            {codigo: 3, dataFinalizacao: '2023-01-02', descricao: 'C'},
+        ] as any);
+
+        wrapper = createWrapper();
+        await flushPromises();
+
+        const processosOrdenados = wrapper.vm.processosOrdenados;
+        expect(processosOrdenados).toHaveLength(3);
+        expect(processosOrdenados[processosOrdenados.length - 1].codigo).toBe(2); // null vai para o fim (desc)
+    });
 });

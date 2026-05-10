@@ -169,15 +169,15 @@ describe("ImportarAtividadesModal.vue", () => {
         await flushPromises();
 
         expect(subprocessoService.importarAtividades).toHaveBeenCalledWith(123, 100, [50]);
-        expect(wrapper.emitted("importar")).toBeTruthy();
+        expect(wrapper.emitted("importar")).toBeDefined();
         expect(wrapper.emitted("importar")?.[0]?.[0]).toMatchObject({aviso: "Importação concluída"});
-        expect(wrapper.emitted("fechar")).toBeTruthy();
+        expect(wrapper.emitted("fechar")).toBeDefined();
     });
 
     it("emite fechar ao cancelar", async () => {
         const wrapper = createWrapper();
         await wrapper.find('[data-testid="importar-atividades-modal__btn-modal-cancelar"]').trigger("click");
-        expect(wrapper.emitted("fechar")).toBeTruthy();
+        expect(wrapper.emitted("fechar")).toBeDefined();
     });
 
     it("limpa seleções de atividades ao trocar de processo", async () => {

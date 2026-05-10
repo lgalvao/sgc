@@ -50,7 +50,7 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-describe('MapaView Coverage', () => {
+describe('MapaView', () => {
     const commonStubs = {
         PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
         BButton: {template: '<button />'},

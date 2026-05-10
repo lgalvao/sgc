@@ -51,7 +51,7 @@ describe("CadastroObservacaoModal.vue", () => {
         });
         const textarea = wrapper.find("textarea");
         await textarea.setValue("Nova observação");
-        expect(wrapper.emitted("update:observacao")).toBeTruthy();
+        expect(wrapper.emitted("update:observacao")).toBeDefined();
         expect(wrapper.emitted("update:observacao")![0]).toEqual(["Nova observação"]);
     });
 

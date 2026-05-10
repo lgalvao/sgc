@@ -43,7 +43,7 @@ const stubs = {
     ModalConfirmacao: {template: '<div></div>'},
 };
 
-describe("ProcessoDetalheView Uncovered Branches", () => {
+describe("ProcessoDetalheView - ramos com ativação", () => {
     let pinia: any;
 
     beforeEach(() => {

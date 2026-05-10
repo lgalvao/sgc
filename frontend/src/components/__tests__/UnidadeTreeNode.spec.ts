@@ -257,4 +257,35 @@ describe("UnidadeTreeNode.vue", () => {
         expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false);
         expect(wrapper.find('.unidade-label-agrupador').text()).toContain("ZONAS ELEITORAIS");
     });
+
+    it("deve aplicar estilo cursor:help no label quando isHabilitado retornar false", () => {
+        const wrapper = mount(UnidadeTreeNode, {
+            props: {
+                ...defaultProps,
+                isHabilitado: vi.fn().mockReturnValue(false)
+            },
+            ...mountOptions
+        });
+
+        const label = wrapper.find('.unidade-label');
+        expect(label.attributes('style')).toContain('cursor: help');
+    });
+
+    it("não deve aplicar estilo cursor:help no label quando isHabilitado retornar true", () => {
+        const wrapper = mount(UnidadeTreeNode, {
+            props: {
+                ...defaultProps,
+                isHabilitado: vi.fn().mockReturnValue(true)
+            },
+            ...mountOptions
+        });
+
+        const label = wrapper.find('.unidade-label');
+        const style = label.attributes('style');
+        if (style) {
+            expect(style).not.toContain('cursor: help');
+        } else {
+            expect(style).toBeUndefined();
+        }
+    });
 });

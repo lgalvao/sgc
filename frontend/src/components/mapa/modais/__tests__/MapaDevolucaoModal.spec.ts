@@ -40,7 +40,7 @@ describe("MapaDevolucaoModal.vue", () => {
         });
         const textarea = wrapper.find("textarea");
         await textarea.setValue("Minha justificativa");
-        expect(wrapper.emitted("update:observacao")).toBeTruthy();
+        expect(wrapper.emitted("update:observacao")).toBeDefined();
         expect(wrapper.emitted("update:observacao")![0]).toEqual(["Minha justificativa"]);
     });
 

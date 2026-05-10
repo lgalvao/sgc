@@ -38,13 +38,13 @@ describe("ModalPadrao.vue", () => {
     it("emite confirmar ao clicar no botão de ação", async () => {
         const wrapper = mount(ModalPadrao, mountOptions);
         await wrapper.find('[data-testid="btn-modal-padrao-confirmar"]').trigger("click");
-        expect(wrapper.emitted("confirmar")).toBeTruthy();
+        expect(wrapper.emitted("confirmar")).toBeDefined();
     });
 
     it("fecha e emite update:modelValue ao cancelar", async () => {
         const wrapper = mount(ModalPadrao, mountOptions);
         await wrapper.find('[data-testid="btn-modal-padrao-cancelar"]').trigger("click");
-        expect(wrapper.emitted("fechar")).toBeTruthy();
+        expect(wrapper.emitted("fechar")).toBeDefined();
         expect(wrapper.emitted("update:modelValue")?.[0]).toEqual([false]);
     });
 });

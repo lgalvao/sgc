@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
+import {run} from 'axe-core';
 import AppAlert from '../AppAlert.vue';
 
 describe('AppAlert.vue', () => {
@@ -64,6 +65,41 @@ describe('AppAlert.vue', () => {
         });
 
         wrapper.vm.$emit('dismissed');
-        expect(wrapper.emitted().dismissed).toBeTruthy();
+        expect(wrapper.emitted().dismissed).toBeDefined();
+    });
+});
+
+describe('AppAlert A11y', () => {
+    function montarAlerta(props: InstanceType<typeof AppAlert>['$props']) {
+        const alvo = document.createElement('div');
+        document.body.appendChild(alvo);
+
+        const wrapper = mount(AppAlert, {
+            props,
+            attachTo: alvo,
+        });
+
+        return {wrapper, alvo};
+    }
+
+    it('não tem violações de acessibilidade no modo simples', async () => {
+        const {wrapper, alvo} = montarAlerta({mensagem: 'Hello world'});
+        const results = await run(alvo);
+        expect(results).toHaveNoViolations();
+        wrapper.unmount();
+        alvo.remove();
+    });
+
+    it('não tem violações de acessibilidade no modo detalhado', async () => {
+        const {wrapper, alvo} = montarAlerta({
+            notificacao: {
+                resumo: 'Erro',
+                detalhes: ['Detalhe 1', 'Detalhe 2']
+            },
+        });
+        const results = await run(alvo);
+        expect(results).toHaveNoViolations();
+        wrapper.unmount();
+        alvo.remove();
     });
 });

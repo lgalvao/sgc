@@ -244,7 +244,7 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.vm.$nextTick();
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeTruthy();
+        expect(emitted).toBeDefined();
         expect(emitted![emitted!.length - 1][0]).toEqual([101, 102]);
     });
 
@@ -269,7 +269,7 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Desmarcar todas as unidades"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeTruthy();
+        expect(emitted).toBeDefined();
         expect(emitted![emitted!.length - 1][0]).toEqual([]);
     });
 
@@ -304,7 +304,7 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeTruthy();
+        expect(emitted).toBeDefined();
         const selection = emitted![0][0] as number[];
         expect(selection).toContain(10);
         expect(selection).toContain(21);
@@ -318,7 +318,7 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Desmarcar todas as unidades"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeTruthy();
+        expect(emitted).toBeDefined();
         expect(emitted![0][0]).toEqual([]);
     });
 
@@ -525,7 +525,7 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeTruthy();
+        expect(emitted).toBeDefined();
         expect(emitted![0][0]).toContain(400);
     });
 
@@ -553,7 +553,7 @@ describe("ArvoreUnidades.vue", () => {
 
         // toggle should do nothing
         await root.props("onToggle")(mockUnidades[0].filhas![0], true);
-        expect(wrapper.emitted("update:modelValue")).toBeFalsy();
+        expect(wrapper.emitted("update:modelValue")).toBeUndefined();
     });
 
     it("deve atualizar unidadesSelecionadasLocal quando modelValue muda", async () => {
@@ -666,7 +666,7 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.vm.$nextTick();
 
         const emissoes = wrapper.emitted("update:modelValue");
-        expect(emissoes).toBeTruthy();
+        expect(emissoes).toBeDefined();
         const ultimaEmissao = emissoes![emissoes!.length - 1][0] as number[];
         expect(ultimaEmissao).toEqual([21]);
     });
@@ -881,6 +881,45 @@ describe("ArvoreUnidades.vue", () => {
         it("não deve renderizar o campo de busca se a árvore estiver vazia", () => {
             const wrapper = createWrapper({unidades: []});
             expect(wrapper.find('input[type="search"]').exists()).toBe(false);
+        });
+    });
+
+    describe("watchers", () => {
+        it("deve atualizar unidades expandidas quando a prop unidades muda", async () => {
+            const wrapper = createWrapper({unidades: [], modelValue: []});
+            const vm = wrapper.vm as unknown as {expandedUnits: Set<number>};
+            expect(vm.expandedUnits.size).toBe(0);
+
+            await wrapper.setProps({
+                unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}]
+            });
+
+            expect(vm.expandedUnits.has(1)).toBe(false);
+        });
+
+        it("deve atualizar unidadesSelecionadasLocal quando modelValue muda externamente", async () => {
+            const wrapper = createWrapper({
+                unidades: [{codigo: 1, sigla: "A", nome: "A", isElegivel: true, filhas: []}],
+                modelValue: []
+            });
+            const vm = wrapper.vm as unknown as {unidadesSelecionadasLocal: number[]};
+            expect(vm.unidadesSelecionadasLocal).toEqual([]);
+
+            await wrapper.setProps({modelValue: [1]});
+            expect(vm.unidadesSelecionadasLocal).toEqual([1]);
+        });
+
+        it("não deve atualizar unidadesSelecionadasLocal se modelValue for igual (evitar loop)", async () => {
+            const wrapper = createWrapper({
+                unidades: [{codigo: 1, sigla: "A", nome: "A", isElegivel: true, filhas: []}],
+                modelValue: [1]
+            });
+            const vm = wrapper.vm as unknown as {unidadesSelecionadasLocal: number[]};
+            const localAntes = vm.unidadesSelecionadasLocal;
+
+            await wrapper.setProps({modelValue: [1]});
+            expect(vm.unidadesSelecionadasLocal).toEqual([1]);
+            expect(vm.unidadesSelecionadasLocal).toBe(localAntes);
         });
     });
 });

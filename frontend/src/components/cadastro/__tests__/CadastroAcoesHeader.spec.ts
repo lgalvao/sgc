@@ -64,7 +64,7 @@ describe('CadastroAcoesHeader.vue', () => {
         })
         const btn = wrapper.find('[data-testid="btn-cad-atividades-historico"]')
         await btn.trigger('click')
-        expect(wrapper.emitted('abrir-historico')).toBeTruthy()
+        expect(wrapper.emitted('abrir-historico')).toBeDefined()
     })
 
     describe('Lógica de Ações Únicas vs Dropdown', () => {
@@ -150,7 +150,7 @@ describe('CadastroAcoesHeader.vue', () => {
             const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-edicao"]')
             expect(btn.exists()).toBe(true)
             await btn.trigger('click')
-            expect(wrapper.emitted('abrir-impacto')).toBeTruthy()
+            expect(wrapper.emitted('abrir-impacto')).toBeDefined()
         })
 
         it('deve mostrar e habilitar botão de importar se permitido', async () => {
@@ -164,7 +164,7 @@ describe('CadastroAcoesHeader.vue', () => {
             const btn = wrapper.find('[data-testid="btn-cad-atividades-importar"]')
             expect(btn.exists()).toBe(true)
             await btn.trigger('click')
-            expect(wrapper.emitted('abrir-importar')).toBeTruthy()
+            expect(wrapper.emitted('abrir-importar')).toBeDefined()
         })
 
         it('deve desabilitar botão de importar se não puder editar cadastro', () => {
@@ -189,7 +189,7 @@ describe('CadastroAcoesHeader.vue', () => {
             })
             const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]')
             await btn.trigger('click')
-            expect(wrapper.emitted('disponibilizar')).toBeTruthy()
+            expect(wrapper.emitted('disponibilizar')).toBeDefined()
         })
 
         it('deve mostrar estado de loading no botão de disponibilizar', () => {

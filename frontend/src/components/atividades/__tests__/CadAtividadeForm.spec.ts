@@ -24,7 +24,7 @@ describe("CadAtividadeForm.vue", () => {
         const wrapper = criarWrapper({}, "   ");
         await wrapper.find("form").trigger("submit.prevent");
         expect(wrapper.text()).toContain("Informe a atividade.");
-        expect(wrapper.emitted("submit")).toBeFalsy();
+        expect(wrapper.emitted("submit")).toBeUndefined();
     });
 
     it("mantém o botão habilitado com campo vazio e valida no submit", async () => {
@@ -36,7 +36,7 @@ describe("CadAtividadeForm.vue", () => {
         await wrapper.find("form").trigger("submit.prevent");
 
         expect(wrapper.text()).toContain("Informe a atividade.");
-        expect(wrapper.emitted("submit")).toBeFalsy();
+        expect(wrapper.emitted("submit")).toBeUndefined();
     });
 
     it("exibe erro recebido via prop", () => {
@@ -47,7 +47,7 @@ describe("CadAtividadeForm.vue", () => {
     it("emite submit quando texto é válido", async () => {
         const wrapper = criarWrapper({}, "Nova atividade");
         await wrapper.find("form").trigger("submit.prevent");
-        expect(wrapper.emitted("submit")).toBeTruthy();
+        expect(wrapper.emitted("submit")).toBeDefined();
     });
 
     it("remove o erro local após correção depois da primeira tentativa", async () => {

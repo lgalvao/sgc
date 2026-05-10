@@ -206,12 +206,12 @@ describe("TreeTable.vue", () => {
 
         const vm = wrapper.vm as any;
         const foundItem = vm.findItemByCodigo(dataWithNestedChildren, 1);
-        expect(foundItem).toBeTruthy();
+        expect(foundItem).toBeDefined();
         expect(foundItem?.nome).toBe("Item 1");
 
         // Testar encontrar item aninhado
         const foundNestedItem = vm.findItemByCodigo(dataWithNestedChildren, 111);
-        expect(foundNestedItem).toBeTruthy();
+        expect(foundNestedItem).toBeDefined();
         expect(foundNestedItem?.nome).toBe("SubSubItem 1.1.1");
     });
 

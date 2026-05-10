@@ -48,7 +48,7 @@ describe("AtividadeItem.vue", () => {
         expect(saveButton.exists()).toBe(true);
         await saveButton.trigger('click');
 
-        expect(context.wrapper!.emitted('atualizar-atividade')).toBeTruthy();
+        expect(context.wrapper!.emitted('atualizar-atividade')).toBeDefined();
         expect(context.wrapper!.emitted('atualizar-atividade')![0]).toEqual(['Atividade editada']);
     });
 
@@ -65,7 +65,7 @@ describe("AtividadeItem.vue", () => {
 
         await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
 
-        expect(context.wrapper!.emitted('adicionar-conhecimento')).toBeTruthy();
+        expect(context.wrapper!.emitted('adicionar-conhecimento')).toBeDefined();
         expect(context.wrapper!.emitted('adicionar-conhecimento')![0]).toEqual(['Novo conhecimento']);
     });
 
@@ -81,7 +81,7 @@ describe("AtividadeItem.vue", () => {
 
         await input.setValue('');
         await context.wrapper.find('[data-testid="btn-salvar-edicao-atividade"]').trigger('click');
-        expect(context.wrapper.emitted('atualizar-atividade')).toBeFalsy();
+        expect(context.wrapper.emitted('atualizar-atividade')).toBeUndefined();
         expect(context.wrapper.text()).toContain('Informe a atividade.');
         expect(context.wrapper.find('[data-testid="inp-editar-atividade"]').exists()).toBe(true);
     });
@@ -98,7 +98,7 @@ describe("AtividadeItem.vue", () => {
 
         await input.setValue('Atividade teste'); // Same as initial
         await context.wrapper.find('[data-testid="btn-salvar-edicao-atividade"]').trigger('click');
-        expect(context.wrapper.emitted('atualizar-atividade')).toBeFalsy();
+        expect(context.wrapper.emitted('atualizar-atividade')).toBeUndefined();
     });
 
     it("não deve adicionar conhecimento vazio", async () => {
@@ -112,7 +112,7 @@ describe("AtividadeItem.vue", () => {
         await input.setValue('');
         await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
 
-        expect(context.wrapper.emitted('adicionar-conhecimento')).toBeFalsy();
+        expect(context.wrapper.emitted('adicionar-conhecimento')).toBeUndefined();
         expect(context.wrapper.text()).toContain('Informe o conhecimento.');
     });
 
@@ -140,7 +140,7 @@ describe("AtividadeItem.vue", () => {
         });
 
         await context.wrapper.find('[data-testid="btn-remover-atividade"]').trigger('click');
-        expect(context.wrapper.emitted('remover-atividade')).toBeTruthy();
+        expect(context.wrapper.emitted('remover-atividade')).toBeDefined();
     });
 
     it("deve emitir 'remover-conhecimento'", async () => {
@@ -151,7 +151,7 @@ describe("AtividadeItem.vue", () => {
         });
 
         await context.wrapper.find('[data-testid="btn-remover-conhecimento"]').trigger('click');
-        expect(context.wrapper!.emitted('remover-conhecimento')).toBeTruthy();
+        expect(context.wrapper!.emitted('remover-conhecimento')).toBeDefined();
         expect(context.wrapper!.emitted('remover-conhecimento')![0]).toEqual([10]);
     });
 
@@ -167,7 +167,7 @@ describe("AtividadeItem.vue", () => {
         await input.setValue('Conhecimento editado');
         await context.wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]').trigger('click');
 
-        expect(context.wrapper!.emitted('atualizar-conhecimento')).toBeTruthy();
+        expect(context.wrapper!.emitted('atualizar-conhecimento')).toBeDefined();
         expect(context.wrapper!.emitted('atualizar-conhecimento')![0]).toEqual([10, 'Conhecimento editado']);
     });
 
@@ -183,7 +183,7 @@ describe("AtividadeItem.vue", () => {
         await input.setValue('');
         await context.wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]').trigger('click');
 
-        expect(context.wrapper.emitted('atualizar-conhecimento')).toBeFalsy();
+        expect(context.wrapper.emitted('atualizar-conhecimento')).toBeUndefined();
         expect(context.wrapper.text()).toContain('Informe o conhecimento.');
         expect(context.wrapper.find('[data-testid="inp-editar-conhecimento"]').exists()).toBe(true);
     });

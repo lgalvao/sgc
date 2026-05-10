@@ -5,6 +5,7 @@ import TabelaProcessos from "../processo/TabelaProcessos.vue";
 import EmptyState from "../comum/EmptyState.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {TEXTOS} from "@/constants/textos";
+import {createMockProcessoResumo} from "@/test-utils/mockFactories";
 
 const BTableSortStub = {
     name: "BTable",
@@ -103,7 +104,7 @@ describe("TabelaProcessos.vue", () => {
 
         await context.wrapper.findComponent({name: "BTable"}).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
 
-        expect(context.wrapper.emitted("ordenar")).toBeTruthy();
+        expect(context.wrapper.emitted("ordenar")).toBeDefined();
         expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
     });
 
@@ -122,7 +123,7 @@ describe("TabelaProcessos.vue", () => {
         const rows = context.wrapper.findAll("tbody tr");
         await rows[0].trigger("click");
 
-        expect(context.wrapper.emitted("selecionarProcesso")).toBeTruthy();
+        expect(context.wrapper.emitted("selecionarProcesso")).toBeDefined();
         expect(context.wrapper.emitted("selecionarProcesso")![0]).toEqual([
             mockProcessos[0],
         ]);
@@ -158,7 +159,7 @@ describe("TabelaProcessos.vue", () => {
         const rows = context.wrapper.findAll("tbody tr");
         await rows[0].trigger("keydown", {key: "Enter"});
 
-        expect(context.wrapper.emitted("selecionarProcesso")).toBeTruthy();
+        expect(context.wrapper.emitted("selecionarProcesso")).toBeDefined();
         expect(context.wrapper.emitted("selecionarProcesso")![0]).toEqual([
             mockProcessos[0],
         ]);
@@ -263,7 +264,7 @@ describe("TabelaProcessos.vue", () => {
         const botaoCta = context.wrapper.find('[data-testid="btn-empty-state-criar-processo"]');
         expect(botaoCta.exists()).toBe(true);
         await botaoCta.trigger("click");
-        expect(context.wrapper.emitted("ctaVazio")).toBeTruthy();
+        expect(context.wrapper.emitted("ctaVazio")).toBeDefined();
     });
 
     describe("Modo compacto", () => {
@@ -321,8 +322,66 @@ describe("TabelaProcessos.vue", () => {
                 order: "asc"
             }]);
 
-            expect(context.wrapper.emitted("ordenar")).toBeTruthy();
+            expect(context.wrapper.emitted("ordenar")).toBeDefined();
             expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
+        });
+    });
+
+    describe("comportamento de teclado e atributos de linha", () => {
+        const BTableLinhasStub = {
+            props: ['items', 'tbodyTrAttrs', 'tbodyTrClass'],
+            template: `
+                <table>
+                    <tbody>
+                        <tr v-for="item in items" :key="item.codigo"
+                            v-bind="tbodyTrAttrs ? tbodyTrAttrs(item, 'row') : {}">
+                            <td>Row</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `
+        };
+
+        const mockProcessoSimples = [createMockProcessoResumo({
+            codigo: 1,
+            descricao: "Processo teste",
+            tipo: TipoProcesso.MAPEAMENTO,
+            situacao: SituacaoProcesso.EM_ANDAMENTO,
+        })];
+
+        it("deve selecionar processo ao pressionar Space na linha", async () => {
+            const wrapper = mount(TabelaProcessos, {
+                global: {stubs: {BTable: BTableLinhasStub, EmptyState: true}},
+                props: {processos: mockProcessoSimples, criterioOrdenacao: "descricao", direcaoOrdenacaoAsc: true},
+            });
+
+            await wrapper.find('tr').trigger('keydown', {key: ' '});
+            expect(wrapper.emitted('selecionarProcesso')).toBeDefined();
+            expect(wrapper.emitted('selecionarProcesso')![0]).toEqual([mockProcessoSimples[0]]);
+        });
+
+        it("deve retornar classe e atributos vazios para entradas inválidas nas funções de linha", () => {
+            const BTableClassStub = {
+                props: ['items', 'tbodyTrClass', 'tbodyTrAttrs'],
+                template: `
+                    <div>
+                        <div data-testid="null-class" :class="tbodyTrClass ? tbodyTrClass(null, 'row') : ''"></div>
+                        <div data-testid="null-attr" v-bind="tbodyTrAttrs ? tbodyTrAttrs(null, 'row') : {}"></div>
+                        <div data-testid="wrong-class" :class="tbodyTrClass ? tbodyTrClass(items[0], 'cell') : ''"></div>
+                        <div data-testid="wrong-attr" v-bind="tbodyTrAttrs ? tbodyTrAttrs(items[0], 'cell') : {}"></div>
+                    </div>
+                `
+            };
+
+            const wrapper = mount(TabelaProcessos, {
+                global: {stubs: {BTable: BTableClassStub, EmptyState: true}},
+                props: {processos: mockProcessoSimples, criterioOrdenacao: "descricao", direcaoOrdenacaoAsc: true},
+            });
+
+            expect(wrapper.find('[data-testid="null-class"]').classes().length).toBe(0);
+            expect(wrapper.find('[data-testid="null-attr"]').attributes('tabindex')).toBeUndefined();
+            expect(wrapper.find('[data-testid="wrong-class"]').classes().length).toBe(0);
+            expect(wrapper.find('[data-testid="wrong-attr"]').attributes('tabindex')).toBeUndefined();
         });
     });
 });

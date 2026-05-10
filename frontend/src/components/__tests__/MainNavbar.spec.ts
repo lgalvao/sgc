@@ -274,4 +274,30 @@ describe("MainNavbar.vue", () => {
 
         expect(mockPush).toHaveBeenCalledWith("/login");
     });
+
+    it("deve atualizar isMobile ao redimensionar a janela", () => {
+        const options = getCommonMountOptions({});
+        const wrapper = mount(NavBar, options);
+
+        expect((wrapper.vm as any).isMobile).toBe(false);
+
+        globalThis.innerWidth = 500;
+        globalThis.dispatchEvent(new Event('resize'));
+        expect((wrapper.vm as any).isMobile).toBe(true);
+
+        globalThis.innerWidth = 1200;
+        globalThis.dispatchEvent(new Event('resize'));
+        expect((wrapper.vm as any).isMobile).toBe(false);
+    });
+
+    it("deve remover event listener ao desmontar", () => {
+        const removeEventListenerSpy = vi.spyOn(globalThis, 'removeEventListener');
+        const options = getCommonMountOptions({});
+        const wrapper = mount(NavBar, options);
+
+        wrapper.unmount();
+
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+        removeEventListenerSpy.mockRestore();
+    });
 });

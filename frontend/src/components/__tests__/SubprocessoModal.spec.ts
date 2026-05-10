@@ -40,7 +40,7 @@ describe("SubprocessoModal", () => {
         expect(confirmButton.attributes("disabled")).toBeUndefined();
         await confirmButton.trigger("click");
 
-        expect(context.wrapper.emitted("confirmarAlteracao")).toBeFalsy();
+        expect(context.wrapper.emitted("confirmarAlteracao")).toBeUndefined();
         expect(context.wrapper.text()).toContain("A data limite para validação deve ser uma data futura.");
     });
 
@@ -63,7 +63,7 @@ describe("SubprocessoModal", () => {
             props: {mostrarModal: true, dataLimiteAtual, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
         });
         await context.wrapper.find('[data-testid="subprocesso-modal__btn-modal-cancelar"]').trigger("click");
-        expect(context.wrapper.emitted("fecharModal")).toBeTruthy();
+        expect(context.wrapper.emitted("fecharModal")).toBeDefined();
     });
 
     it('deve emitir "confirmarAlteracao" com a nova data', async () => {
@@ -78,7 +78,7 @@ describe("SubprocessoModal", () => {
             .setValue(novaData);
         await context.wrapper.find('[data-testid="btn-modal-confirmar"]').trigger("click");
 
-        expect(context.wrapper.emitted("confirmarAlteracao")).toBeTruthy();
+        expect(context.wrapper.emitted("confirmarAlteracao")).toBeDefined();
         expect(context.wrapper.emitted("confirmarAlteracao")?.[0]).toEqual([novaData]);
     });
 });
