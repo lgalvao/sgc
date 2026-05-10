@@ -298,10 +298,48 @@ const BDropdownItemButtonStub = {
     props: ["disabled"]
 };
 
+const BButtonStub = {
+    template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
+    props: ['disabled']
+};
+
+const stubsProcessoDetalhe = {
+    ModalAcaoBloco: ModalAcaoBlocoStub,
+    ModalConfirmacao: ModalConfirmacaoStub,
+    ProcessoSubprocessosTable: TreeTableStub,
+    PageHeader: PageHeaderStub,
+    ProcessoInfo: ProcessoInfoStub,
+    BAlert: BAlertStub,
+    BSpinner: BSpinnerStub,
+    BButton: BButtonStub,
+    BDropdown: BDropdownStub,
+    BDropdownItemButton: BDropdownItemButtonStub
+};
+
 describe("Processo.vue", () => {
     let wrapper: any;
     let perfilStore: any;
     let toastStore: any;
+
+    const montarKeepAliveProcessoView = (manterMontado: { value: boolean }) => {
+        return mount({
+            components: {ProcessoView},
+            setup() {
+                return {manterMontado};
+            },
+            template: "<keep-alive><ProcessoView v-if='manterMontado' /></keep-alive>",
+        }, {
+            global: {
+                plugins: [
+                    createTestingPinia({
+                        createSpy: vi.fn,
+                        stubActions: true
+                    })
+                ],
+                stubs: stubsProcessoDetalhe
+            }
+        });
+    };
 
     const createWrapper = (opcoes: { processo?: any; elegiveis?: any[]; erroCarregamento?: Error | null } = {}) => {
         const processo = opcoes.processo ?? mockProcesso;
@@ -328,21 +366,7 @@ describe("Processo.vue", () => {
                         stubActions: true
                     })
                 ],
-                stubs: {
-                    ModalAcaoBloco: ModalAcaoBlocoStub,
-                    ModalConfirmacao: ModalConfirmacaoStub,
-                    ProcessoSubprocessosTable: TreeTableStub,
-                    PageHeader: PageHeaderStub,
-                    ProcessoInfo: ProcessoInfoStub,
-                    BAlert: BAlertStub,
-                    BSpinner: BSpinnerStub,
-                    BButton: {
-                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
-                        props: ['disabled']
-                    },
-                    BDropdown: BDropdownStub,
-                    BDropdownItemButton: BDropdownItemButtonStub
-                }
+                stubs: stubsProcessoDetalhe
             }
         });
     };
@@ -373,38 +397,7 @@ describe("Processo.vue", () => {
     it("não recarrega o contexto ao reativar quando o cache ainda está válido", async () => {
         processoStoreMock.dadosValidos.mockReturnValue(true);
         const manterMontado = ref(true);
-
-        const wrapperKeepAlive = mount({
-            components: {ProcessoView},
-            setup() {
-                return {manterMontado};
-            },
-            template: "<keep-alive><ProcessoView v-if='manterMontado' /></keep-alive>",
-        }, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        createSpy: vi.fn,
-                        stubActions: true
-                    })
-                ],
-                stubs: {
-                    ModalAcaoBloco: ModalAcaoBlocoStub,
-                    ModalConfirmacao: ModalConfirmacaoStub,
-                    ProcessoSubprocessosTable: TreeTableStub,
-                    PageHeader: PageHeaderStub,
-                    ProcessoInfo: ProcessoInfoStub,
-                    BAlert: BAlertStub,
-                    BSpinner: BSpinnerStub,
-                    BButton: {
-                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
-                        props: ['disabled']
-                    },
-                    BDropdown: BDropdownStub,
-                    BDropdownItemButton: BDropdownItemButtonStub
-                }
-            }
-        });
+        const wrapperKeepAlive = montarKeepAliveProcessoView(manterMontado);
 
         await flushPromises();
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
@@ -421,38 +414,7 @@ describe("Processo.vue", () => {
     it("recarrega o contexto ao reativar quando o cache está inválido", async () => {
         processoStoreMock.dadosValidos.mockReturnValue(false);
         const manterMontado = ref(true);
-
-        const wrapperKeepAlive = mount({
-            components: {ProcessoView},
-            setup() {
-                return {manterMontado};
-            },
-            template: "<keep-alive><ProcessoView v-if='manterMontado' /></keep-alive>",
-        }, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        createSpy: vi.fn,
-                        stubActions: true
-                    })
-                ],
-                stubs: {
-                    ModalAcaoBloco: ModalAcaoBlocoStub,
-                    ModalConfirmacao: ModalConfirmacaoStub,
-                    ProcessoSubprocessosTable: TreeTableStub,
-                    PageHeader: PageHeaderStub,
-                    ProcessoInfo: ProcessoInfoStub,
-                    BAlert: BAlertStub,
-                    BSpinner: BSpinnerStub,
-                    BButton: {
-                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
-                        props: ['disabled']
-                    },
-                    BDropdown: BDropdownStub,
-                    BDropdownItemButton: BDropdownItemButtonStub
-                }
-            }
-        });
+        const wrapperKeepAlive = montarKeepAliveProcessoView(manterMontado);
 
         await flushPromises();
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
@@ -477,38 +439,7 @@ describe("Processo.vue", () => {
                 acoesBloco: criarAcoesBloco(mockElegiveis),
             } as any)
             .mockRejectedValueOnce(new Error("Falha na recarga"));
-
-        const wrapperKeepAlive = mount({
-            components: {ProcessoView},
-            setup() {
-                return {manterMontado};
-            },
-            template: "<keep-alive><ProcessoView v-if='manterMontado' /></keep-alive>",
-        }, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        createSpy: vi.fn,
-                        stubActions: true
-                    })
-                ],
-                stubs: {
-                    ModalAcaoBloco: ModalAcaoBlocoStub,
-                    ModalConfirmacao: ModalConfirmacaoStub,
-                    ProcessoSubprocessosTable: TreeTableStub,
-                    PageHeader: PageHeaderStub,
-                    ProcessoInfo: ProcessoInfoStub,
-                    BAlert: BAlertStub,
-                    BSpinner: BSpinnerStub,
-                    BButton: {
-                        template: '<button :disabled="disabled" @click="$emit(\'click\', $event)"><slot /></button>',
-                        props: ['disabled']
-                    },
-                    BDropdown: BDropdownStub,
-                    BDropdownItemButton: BDropdownItemButtonStub
-                }
-            }
-        });
+        const wrapperKeepAlive = montarKeepAliveProcessoView(manterMontado);
         await flushPromises();
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
 
