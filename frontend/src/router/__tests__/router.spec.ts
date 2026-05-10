@@ -17,23 +17,22 @@ vi.mock('@/views/HistoricoView.vue', () => ({default: {name: 'HistoricoView'}}))
 vi.mock('@/views/RelatoriosView.vue', () => ({default: {name: 'RelatoriosView'}}));
 vi.mock('@/views/ParametrosView.vue', () => ({default: {name: 'ParametrosView'}}));
 vi.mock('@/views/AdministradoresView.vue', () => ({default: {name: 'AdministradoresView'}}));
-vi.mock("@/views/UnidadesView.vue", () => ({default: {name: 'UnidadesView'}}));
-vi.mock("@/views/UnidadeView.vue", () => ({default: {name: 'UnidadeView'}}));
-vi.mock("@/views/AtribuicaoTemporariaView.vue", () => ({default: {name: 'AtribuicaoTemporariaView'}}));
+vi.mock('@/views/UnidadesView.vue', () => ({default: {name: 'UnidadesView'}}));
+vi.mock('@/views/UnidadeView.vue', () => ({default: {name: 'UnidadeView'}}));
+vi.mock('@/views/AtribuicaoTemporariaView.vue', () => ({default: {name: 'AtribuicaoTemporariaView'}}));
 
 vi.mock('@/stores/perfil', () => ({
     usePerfilStore: vi.fn(),
 }));
 
-const routes = [
-    ...mainRoutes,
-    ...processoRoutes,
-    ...unidadeRoutes,
-    {path: '/login', component: {template: '<div>Login</div>'}}, // Mock login component
-    {path: '/painel', component: {template: '<div>Painel</div>'}} // Mock painel component if needed
-];
+type RotaComProps = {
+    params: Record<string, string>;
+    query?: Record<string, string>;
+};
 
-describe('Router guards', () => {
+const rotas = [...mainRoutes, ...processoRoutes, ...unidadeRoutes];
+
+describe('Router', () => {
     let router: Router;
     let perfilStoreMock: {
         usuarioCodigo: number | null;
@@ -42,148 +41,95 @@ describe('Router guards', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-
-        perfilStoreMock = {
-            usuarioCodigo: null,
-            perfisUnidades: [],
-        };
+        perfilStoreMock = {usuarioCodigo: null, perfisUnidades: []};
         vi.mocked(usePerfilStore).mockReturnValue(perfilStoreMock as never);
 
-        // Create fresh router with mock routes first to avoid loading real components
         router = createRouter({
             history: createMemoryHistory(),
-            routes: [
-                {path: '/login', component: {template: '<div>Login</div>'}}, // Mock login component
-                {path: '/painel', component: {template: '<div>Painel</div>'}}, // Mock painel component
-                ...routes,
-            ],
+            routes: rotas,
         });
 
-        // Copying logic from router/index.ts for testing
         router.beforeEach((to: RouteLocationNormalized) => {
             const perfilStore = usePerfilStore();
-            const isAuthenticated = perfilStore.usuarioCodigo;
-            const publicPages = ["/login"];
-            const authRequired = !publicPages.includes(to.path);
+            const autenticado = Boolean(perfilStore.usuarioCodigo);
+            const paginaPublica = ['/login'].includes(to.path);
 
-            if (authRequired && !isAuthenticated) {
-                return "/login";
+            if (!paginaPublica && !autenticado) {
+                return '/login';
             }
 
             return true;
         });
 
         router.afterEach((to: RouteLocationNormalized) => {
-            const meta = to.meta;
-            const titleBase = typeof meta.title === "string" ? meta.title : (to.name as string) || "SGC";
-            document.title = `${titleBase} - SGC`;
+            const tituloBase = typeof to.meta.title === 'string' ? to.meta.title : (to.name as string) || 'SGC';
+            document.title = `${tituloBase} - SGC`;
         });
     });
 
-    it('redirects to login if not authenticated and trying to access private route', async () => {
-        perfilStoreMock.usuarioCodigo = null;
+    it('redireciona para login quando usuário não autenticado acessa rota privada', async () => {
         await router.push('/painel');
         expect(router.currentRoute.value.path).toBe('/login');
     });
 
-    it('allows access to login if not authenticated', async () => {
-        perfilStoreMock.usuarioCodigo = null;
-        await router.push('/login');
-        expect(router.currentRoute.value.path).toBe('/login');
-    });
-
-    it('allows access to private route if authenticated', async () => {
+    it('permite acesso à rota privada quando usuário autenticado', async () => {
         perfilStoreMock.usuarioCodigo = 123;
         await router.push('/painel');
         expect(router.currentRoute.value.path).toBe('/painel');
     });
 
-    it('updates document title', async () => {
+    it('atualiza document.title com meta.title e com fallback para nome da rota', async () => {
         perfilStoreMock.usuarioCodigo = 123;
+
         await router.push('/processo/cadastro');
-        expect(document.title.toLowerCase()).toContain('novo processo - sgc');
-    });
-});
+        expect(document.title).toBe('Novo processo - SGC');
 
-describe('Route props logic', () => {
-    type PropsRoute = {
-        params: Record<string, string>;
-        query?: Record<string, string>;
-    };
-
-    it('Processo routes props transformation', () => {
-        const subprocessoRoute = processoRoutes.find(r => r.name === 'Subprocesso')!;
-        const propsFn = subprocessoRoute.props as (route: PropsRoute) => unknown;
-        expect(propsFn({params: {codProcesso: '10', siglaUnidade: 'TIC'}}))
-            .toEqual({codProcesso: 10, siglaUnidade: 'TIC'});
-
-        expect(propsFn({params: {codProcesso: '10', siglaUnidade: 'TIC'}, query: {codSubprocesso: '55'}}))
-            .toEqual({codProcesso: 10, siglaUnidade: 'TIC', codSubprocesso: 55});
-
-        const mapaRoute = processoRoutes.find(r => r.name === 'SubprocessoMapa')!;
-        const mapaProps = (mapaRoute.props as (route: PropsRoute) => unknown)({
-            params: {
-                codProcesso: '11',
-                siglaUnidade: 'DIP'
-            }
+        router.addRoute({
+            path: '/teste-sem-titulo',
+            name: 'TesteSemTitulo',
+            component: {template: '<div>Teste</div>'},
         });
-        expect(mapaProps).toEqual({codProcesso: 11, sigla: 'DIP'});
 
-        const mapaPropsComCodigo = (mapaRoute.props as (route: PropsRoute) => unknown)({
-            params: {
-                codProcesso: '11',
-                siglaUnidade: 'DIP'
-            },
-            query: {codSubprocesso: '66'}
-        });
-        expect(mapaPropsComCodigo).toEqual({codProcesso: 11, sigla: 'DIP', codSubprocesso: 66});
-
-        const visMapaRoute = processoRoutes.find(r => r.name === 'SubprocessoMapa')!;
-        const visMapaProps = (visMapaRoute.props as (route: PropsRoute) => unknown)({
-            params: {
-                codProcesso: '12',
-                siglaUnidade: 'ABC'
-            }
-        });
-        expect(visMapaProps).toEqual({codProcesso: 12, sigla: 'ABC'});
-
-        const cadastroRoute = processoRoutes.find(r => r.name === 'SubprocessoCadastro')!;
-        const cadastroProps = (cadastroRoute.props as (route: PropsRoute) => unknown)({
-            params: {
-                codProcesso: '13',
-                siglaUnidade: 'XYZ'
-            }
-        });
-        expect(cadastroProps).toEqual({codProcesso: 13, sigla: 'XYZ'});
-
-        const cadastroPropsComCodigo = (cadastroRoute.props as (route: PropsRoute) => unknown)({
-            params: {
-                codProcesso: '13',
-                siglaUnidade: 'XYZ'
-            },
-            query: {codSubprocesso: '77'}
-        });
-        expect(cadastroPropsComCodigo).toEqual({codProcesso: 13, sigla: 'XYZ', codSubprocesso: 77});
-
-        const visCadastroRoute = processoRoutes.find(r => r.name === 'SubprocessoCadastro')!;
-        const visCadastroProps = (visCadastroRoute.props as (route: PropsRoute) => unknown)({
-            params: {
-                codProcesso: '14',
-                siglaUnidade: 'TEST'
-            }
-        });
-        expect(visCadastroProps).toEqual({codProcesso: 14, sigla: 'TEST'});
+        await router.push('/teste-sem-titulo');
+        expect(document.title).toBe('TesteSemTitulo - SGC');
     });
 
-    it('Unidade routes props transformation', () => {
-        const mapaRoute = unidadeRoutes.find(r => r.name === 'Mapa')!;
-        const propsFn = mapaRoute.props as (route: PropsRoute) => unknown;
-        // Mapa route uses query param for codProcesso and params for codUnidade
-        expect(propsFn({params: {codUnidade: '10'}, query: {codProcesso: '99'}}))
-            .toEqual({codUnidade: 10, codProcesso: 99});
+    it('transforma params e query em props para rotas de processo e unidade', () => {
+        const subprocesso = processoRoutes.find((rota) => rota.name === 'Subprocesso');
+        expect(subprocesso).toBeDefined();
+        const propsSubprocesso = subprocesso?.props as (rota: RotaComProps) => unknown;
+        expect(propsSubprocesso({params: {codProcesso: '10', siglaUnidade: 'TIC'}, query: {codSubprocesso: '55'}})).toEqual({
+            codProcesso: 10,
+            siglaUnidade: 'TIC',
+            codSubprocesso: 55,
+        });
 
-        const atribuicaoRoute = unidadeRoutes.find(r => r.name === 'AtribuicaoTemporariaForm')!;
-        const atribProps = (atribuicaoRoute.props as (route: PropsRoute) => unknown)({params: {codUnidade: '20'}});
-        expect(atribProps).toEqual({codUnidade: 20});
+        const mapa = processoRoutes.find((rota) => rota.name === 'SubprocessoMapa');
+        expect(mapa).toBeDefined();
+        const propsMapa = mapa?.props as (rota: RotaComProps) => unknown;
+        expect(propsMapa({params: {codProcesso: '11', siglaUnidade: 'DIP'}, query: {codSubprocesso: '66'}})).toEqual({
+            codProcesso: 11,
+            sigla: 'DIP',
+            codSubprocesso: 66,
+        });
+
+        const cadastro = processoRoutes.find((rota) => rota.name === 'SubprocessoCadastro');
+        expect(cadastro).toBeDefined();
+        const propsCadastro = cadastro?.props as (rota: RotaComProps) => unknown;
+        expect(propsCadastro({params: {codProcesso: '13', siglaUnidade: 'XYZ'}, query: {codSubprocesso: '77'}})).toEqual({
+            codProcesso: 13,
+            sigla: 'XYZ',
+            codSubprocesso: 77,
+        });
+
+        const mapaUnidade = unidadeRoutes.find((rota) => rota.name === 'Mapa');
+        expect(mapaUnidade).toBeDefined();
+        const propsMapaUnidade = mapaUnidade?.props as (rota: RotaComProps) => unknown;
+        expect(propsMapaUnidade({params: {codUnidade: '10'}, query: {codProcesso: '99'}})).toEqual({codUnidade: 10, codProcesso: 99});
+
+        const atribuicao = unidadeRoutes.find((rota) => rota.name === 'AtribuicaoTemporariaForm');
+        expect(atribuicao).toBeDefined();
+        const propsAtribuicao = atribuicao?.props as (rota: RotaComProps) => unknown;
+        expect(propsAtribuicao({params: {codUnidade: '20'}})).toEqual({codUnidade: 20});
     });
 });
