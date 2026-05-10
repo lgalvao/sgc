@@ -20,7 +20,7 @@ interface PackageJson {
 const route = useRoute();
 const perfilStore = usePerfilStore();
 const organizacaoStore = useOrganizacaoStore();
-const {carregarConfiguracoes, getTemaEscuro} = useConfiguracoes();
+const {carregarConfiguracoes, getTemaEscuro, setContextoUsuarioTemaEscuro} = useConfiguracoes();
 const version = (pkg as PackageJson).version;
 
 const aplicarTema = () => {
@@ -29,6 +29,7 @@ const aplicarTema = () => {
 };
 
 onMounted(() => {
+  setContextoUsuarioTemaEscuro(perfilStore.usuarioCodigo);
   aplicarTema();
 });
 
@@ -45,6 +46,15 @@ watch(
 watch(
     () => getTemaEscuro(),
     () => aplicarTema()
+);
+
+watch(
+    () => perfilStore.usuarioCodigo,
+    (codigo) => {
+      setContextoUsuarioTemaEscuro(codigo);
+      aplicarTema();
+    },
+    {immediate: true}
 );
 
 watch(

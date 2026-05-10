@@ -64,22 +64,6 @@
           </BFormInvalidFeedback>
         </BFormGroup>
 
-        <BFormGroup
-            class="mb-4"
-            label-for="temaEscuro"
-        >
-          <BFormCheckbox
-              id="temaEscuro"
-              v-model="form.temaEscuro"
-              switch
-          >
-            {{ TEXTOS.configuracoes.LABEL_TEMA_ESCURO }}
-          </BFormCheckbox>
-          <template #description>
-            {{ TEXTOS.configuracoes.DESC_TEMA_ESCURO }}
-          </template>
-        </BFormGroup>
-
         <hr class="my-4">
 
         <div class="d-flex justify-content-end">
@@ -97,8 +81,8 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive, ref, watch} from 'vue';
-import {BAlert, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormInvalidFeedback} from 'bootstrap-vue-next';
+import {computed, onMounted, reactive, ref} from 'vue';
+import {BAlert, BForm, BFormGroup, BFormInput, BFormInvalidFeedback} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
@@ -116,9 +100,7 @@ const {
   carregarConfiguracoes,
   salvarConfiguracoes,
   getDiasInativacaoProcesso,
-  getDiasAlertaNovo,
-  getTemaEscuro,
-  setTemaEscuro
+  getDiasAlertaNovo
 } = useConfiguracoes();
 const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
@@ -131,10 +113,8 @@ const {
 
 const form = reactive({
   diasInativacao: 30,
-  diasAlertaNovo: 3,
-  temaEscuro: false
+  diasAlertaNovo: 3
 });
-const temaEscuroInicializado = ref(false);
 
 const diasInativacaoInvalido = computed(() => Number(form.diasInativacao) < 1);
 const diasAlertaNovoInvalido = computed(() => Number(form.diasAlertaNovo) < 1);
@@ -149,11 +129,8 @@ const mensagemErroDiasAlertaNovo = computed(() =>
 );
 
 function atualizarFormulario() {
-  temaEscuroInicializado.value = false;
   form.diasInativacao = getDiasInativacaoProcesso();
   form.diasAlertaNovo = getDiasAlertaNovo();
-  form.temaEscuro = getTemaEscuro();
-  temaEscuroInicializado.value = true;
 }
 
 async function carregar() {
@@ -221,11 +198,4 @@ onMounted(async () => {
   }
 });
 
-watch(() => form.temaEscuro, (novoValor) => {
-  if (!temaEscuroInicializado.value) {
-    return;
-  }
-
-  setTemaEscuro(novoValor);
-});
 </script>
