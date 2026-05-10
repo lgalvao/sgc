@@ -10,6 +10,7 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useCacheSync} from "@/composables/useCacheSync";
 import {useConfiguracoes} from "@/composables/useConfiguracoes";
+import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
 
 interface PackageJson {
   version: string;
@@ -20,7 +21,8 @@ interface PackageJson {
 const route = useRoute();
 const perfilStore = usePerfilStore();
 const organizacaoStore = useOrganizacaoStore();
-const {carregarConfiguracoes, getTemaEscuro, setContextoUsuarioTemaEscuro} = useConfiguracoes();
+const {carregarConfiguracoes} = useConfiguracoes();
+const {getTemaEscuro, setContextoUsuarioTemaEscuro} = useTemaPreferencia();
 const version = (pkg as PackageJson).version;
 
 const aplicarTema = () => {

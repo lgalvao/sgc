@@ -2,12 +2,12 @@ import {describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import MainNavbar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
-import {useConfiguracoes} from "@/composables/useConfiguracoes";
+import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
 import {ref} from "vue";
 import {createTestingPinia} from "@pinia/testing";
 
 vi.mock("@/composables/usePerfil");
-vi.mock("@/composables/useConfiguracoes");
+vi.mock("@/composables/useTemaPreferencia");
 
 const mocks = vi.hoisted(() => ({
     push: vi.fn()
@@ -29,7 +29,7 @@ vi.mock("vue-router", () => ({
 }));
 
 describe("MainNavbar.vue Coverage", () => {
-    vi.mocked(useConfiguracoes).mockReturnValue({
+    vi.mocked(useTemaPreferencia).mockReturnValue({
         getTemaEscuro: vi.fn().mockReturnValue(false),
         setTemaEscuro: vi.fn(),
     } as any);

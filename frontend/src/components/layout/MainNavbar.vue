@@ -151,13 +151,13 @@ import {
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
-import {useConfiguracoes} from "@/composables/useConfiguracoes";
+import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
 import {usePerfilStore} from "@/stores/perfil";
 import {TEXTOS} from "@/constants/textos";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const {getTemaEscuro, setTemaEscuro} = useConfiguracoes();
+const {getTemaEscuro, setTemaEscuro} = useTemaPreferencia();
 
 const {
   perfilSelecionado,
