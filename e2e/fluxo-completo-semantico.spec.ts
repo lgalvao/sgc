@@ -191,6 +191,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await acessarSubprocessoAdmin(page, descProcesso, SIGLA_SECAO);
         await aceitarOuHomologarMapa(page, 'Homologação final do mapa inicial');
 
+        await page.getByRole('link', {name: /Histórico/i}).click();
+        await expect(page).toHaveURL(/\/historico/);
         await page.getByRole('link', {name: /Painel/i}).click();
         await expect(page).toHaveURL(/\/painel/);
         await acessarDetalhesProcesso(page, descProcesso);
