@@ -103,6 +103,34 @@ describe("usePerfilStore", () => {
         expect(organizacaoStore.carregado).toBe(false);
     });
 
+    it("deve avancar a versao da sessao em login e logout, mesmo ao reutilizar o mesmo usuario", async () => {
+        const store = usePerfilStore();
+        const mockFluxo = {
+            autenticado: true,
+            requerSelecaoPerfil: false,
+            perfisUnidades: [{perfil: Perfil.GESTOR, unidade: {codigo: 1, sigla: "U1", nome: "Unidade 1"}}],
+            sessao: {
+                perfil: Perfil.GESTOR,
+                unidadeCodigo: 1,
+                tituloEleitoral: "123",
+                nome: "Teste",
+                permissoes: {acoes: []}
+            }
+        };
+        vi.mocked(usuarioService.login).mockResolvedValue(mockFluxo as any);
+
+        expect(store.versaoSessao).toBe(0);
+
+        await store.iniciarLogin("123", "senha");
+        expect(store.versaoSessao).toBe(1);
+
+        await store.logout();
+        expect(store.versaoSessao).toBe(2);
+
+        await store.iniciarLogin("123", "senha");
+        expect(store.versaoSessao).toBe(3);
+    });
+
     it("unidadeAtual deve retornar valor correto", () => {
         const store = usePerfilStore();
         store.perfilSelecionado = Perfil.GESTOR as any;

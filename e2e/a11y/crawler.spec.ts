@@ -1,4 +1,4 @@
-import {test} from '../fixtures/a11y.js';
+import {expect, test} from '../fixtures/a11y.js';
 import {login, USUARIOS} from '../helpers/helpers-auth.js';
 import fs from 'fs';
 import path from 'path';
@@ -17,7 +17,11 @@ const ROUTES = [
 ];
 
 test.describe('Accessibility Crawler (Axe-core)', () => {
-    let scanResults = [];
+    const scanResults: Array<{
+        route: string;
+        name: string;
+        violations: unknown[];
+    }> = [];
 
     test.afterAll(async () => {
         const resultsPath = path.join(process.cwd(), 'a11y-scan-results.json');
@@ -39,6 +43,7 @@ test.describe('Accessibility Crawler (Axe-core)', () => {
             await page.waitForTimeout(1000); 
 
             const accessibilityScanResults = await makeAxeBuilder().analyze();
+            expect(accessibilityScanResults.violations).toBeDefined();
             
             scanResults.push({
                 route: route.path,

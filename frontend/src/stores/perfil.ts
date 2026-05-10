@@ -22,6 +22,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
     const permissoesSessao = useLocalStorage<PermissoesSessao | null>("permissoesSessao", null);
     const usuarioNome = useSessionStorage<string | null>("usuarioNome", null);
+    const versaoSessao = ref(0);
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const unidadeAtualDetalhes = ref<Unidade | null>(null);
     const painelStore = usePainelStore();
@@ -60,8 +61,13 @@ export const usePerfilStore = defineStore("perfil", () => {
         organizacaoStore.resetar();
     }
 
+    function avancarVersaoSessao() {
+        versaoSessao.value += 1;
+    }
+
     function aplicarSessaoPerfil(dados: SessaoPerfil) {
         invalidarDadosDaSessao();
+        avancarVersaoSessao();
         perfilSelecionado.value = dados.perfil;
         unidadeSelecionada.value = dados.unidadeCodigo;
         unidadeSelecionadaSigla.value = dados.unidadeSigla;
@@ -73,6 +79,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     function limparSessaoLocal() {
+        avancarVersaoSessao();
         usuarioCodigo.value = null;
         perfilSelecionado.value = null;
         unidadeSelecionada.value = null;
@@ -143,6 +150,7 @@ export const usePerfilStore = defineStore("perfil", () => {
 
     return {
         usuarioCodigo,
+        versaoSessao,
         perfilSelecionado,
         unidadeSelecionada,
         unidadeSelecionadaSigla,

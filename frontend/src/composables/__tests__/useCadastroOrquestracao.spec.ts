@@ -3,11 +3,13 @@ import {ref} from "vue";
 import {useCadastroOrquestracao} from "../useCadastroOrquestracao";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import * as formatters from "@/utils/formatters";
+import logger from "@/utils/logger";
 
 const storeMock = {
     garantirContextoCadastroAtividades: vi.fn(),
     garantirContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     atualizarStatusLocal: vi.fn(),
+    erroIntegracaoContexto: null as {codigo?: string} | null,
 };
 
 vi.mock("@/stores/subprocesso", () => ({
@@ -21,6 +23,7 @@ describe("useCadastroOrquestracao", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         atividades.value = [];
+        storeMock.erroIntegracaoContexto = null;
     });
 
     it("deve carregar contexto inicial por processo e unidade", async () => {
@@ -91,9 +94,38 @@ describe("useCadastroOrquestracao", () => {
     it("deve retornar false quando contexto não for encontrado", async () => {
         const {carregarContextoInicial} = useCadastroOrquestracao(props, atividades);
         vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(null);
+        const loggerSpy = vi.spyOn(logger, "error").mockImplementation(() => logger as never);
 
         const success = await carregarContextoInicial();
 
         expect(success).toBe(false);
+        expect(loggerSpy).toHaveBeenCalledWith("ERRO: Subprocesso não encontrado!");
+    });
+
+    it("deve repetir a carga quando a primeira tentativa for cancelada na transição de sessão", async () => {
+        const {carregarContextoInicial, codigoSubprocesso} = useCadastroOrquestracao(props, atividades);
+        const loggerSpy = vi.spyOn(logger, "error").mockImplementation(() => logger as never);
+        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade)
+            .mockImplementationOnce(async () => {
+                storeMock.erroIntegracaoContexto = {codigo: "REQUEST_CANCELADA"};
+                return null;
+            })
+            .mockImplementationOnce(async () => {
+                storeMock.erroIntegracaoContexto = null;
+                return {
+                    detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
+                    atividadesDisponiveis: [],
+                    unidade: {sigla: "U", nome: "Unidade U"},
+                    mapa: {codigo: 50},
+                } as any;
+            });
+
+        const success = await carregarContextoInicial();
+
+        expect(success).toBe(true);
+        expect(codigoSubprocesso.value).toBe(123);
+        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U", false);
+        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(2, 1, "U", true);
+        expect(loggerSpy).not.toHaveBeenCalled();
     });
 });

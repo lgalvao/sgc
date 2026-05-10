@@ -241,7 +241,6 @@ export const TEXTOS = {
         BOTAO_ADICIONAR: "Adicionar",
         EMPTY_TITLE: "Sem administradores cadastrados",
         EMPTY_DESCRIPTION: "Use o botão de adicionar para incluir o primeiro administrador.",
-        LABEL_TITULO: "Título",
         PLACEHOLDER_TITULO: "Digite nome ou título",
         MODAL_ADICIONAR_TITULO: "Adicionar administrador",
         MODAL_REMOVER_TITULO: "Confirmar remoção",

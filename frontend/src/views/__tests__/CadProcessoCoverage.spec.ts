@@ -176,7 +176,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect(processoService.iniciarProcesso).not.toHaveBeenCalled();
         expect(wrapper.vm.notificacao).not.toBeNull();
         expect(wrapper.vm.notificacao?.notificacao?.resumo).toContain('Failed to create');
-        expect(wrapper.vm.isLoading).toBe(false);
+        expect(wrapper.vm.isStarting).toBe(false);
     });
 
     it('handles error starting process during initiation flow', async () => {
@@ -205,7 +205,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect(processoService.iniciarProcesso).toHaveBeenCalledWith(777, 'MAPEAMENTO', [1]);
         expect(wrapper.vm.notificacao).not.toBeNull();
         expect(wrapper.vm.notificacao?.notificacao?.resumo).toContain('Failed to start');
-        expect(wrapper.vm.isLoading).toBe(false);
+        expect(wrapper.vm.isStarting).toBe(false);
     });
 
     it('opens and confirms removal modal', async () => {

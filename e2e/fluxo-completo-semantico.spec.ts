@@ -80,9 +80,6 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     const DESC_ATIVIDADE_REVISAO = `Atividade revisão ${timestamp}`;
     const DESC_CONHECIMENTO_REVISAO = 'Conhecimento revisão 1';
 
-    let codigoProcessoMapeamento = 0;
-    let codigoProcessoRevisao = 0;
-
     test.beforeAll(async ({request}) => {
         await resetDatabase(request);
     });
@@ -126,7 +123,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     const adminCriaEDisponibilizaMapaInicial = async (page: Page) => {
         await login(page, ADMIN.titulo, ADMIN.senha);
         await acessarSubprocessoAdmin(page, descProcesso, SIGLA_SECAO);
-        codigoProcessoMapeamento = await extrairProcessoCodigo(page);
+        await extrairProcessoCodigo(page);
 
         await navegarParaMapa(page);
         await criarCompetencia(page, DESC_COMPETENCIA_INICIAL, [DESC_ATIVIDADE]);
@@ -222,7 +219,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         });
 
         await acessarSubprocessoAdmin(page, descricaoProcessoRevisao, SIGLA_SECAO);
-        codigoProcessoRevisao = await extrairProcessoCodigo(page);
+        await extrairProcessoCodigo(page);
     };
 
     const chefeConfereBaseVigenteEDisponibilizaRevisao = async (page: Page) => {
@@ -557,6 +554,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await test.step('ADMIN homologa o mapa e encerra o processo de mapeamento', async () => {
             await adminHomologaMapaEFinalizaMapeamento(page);
         });
+
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
     });
 
     test('Fase 4 - ADMIN cria e inicia o processo de revisão da mesma seção', async ({page}) => {
@@ -567,6 +566,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await test.step('CHEFE confirma que a revisão nasce com o cadastro vigente e botão de impactos disponível', async () => {
             await chefeConfereBaseVigenteEDisponibilizaRevisao(page);
         });
+
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
     });
 
     test('Fase 5 - CHEFE revisa o cadastro com impacto real e a hierarquia homologa a revisão', async ({page}) => {
@@ -578,6 +579,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await test.step('ADMIN homologa o cadastro revisado e libera o ajuste do mapa', async () => {
             await adminHomologaCadastroRevisado(page);
         });
+
+        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
     });
 
     test('Fase 6 - ADMIN ajusta o mapa da revisão e a hierarquia valida novamente', async ({page}) => {
@@ -593,6 +596,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await test.step('ADMIN homologa o mapa revisado', async () => {
             await adminHomologaMapaRevisado(page);
         });
+
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toContainText('Mapa homologado');
     });
 
     test('Fase 7 - ADMIN finaliza a revisão e os perfis consultam o resultado final', async ({page}) => {
@@ -616,5 +621,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
                 perfil: GESTOR_SECRETARIA.perfil!
             });
         });
+
+        await expect(page.getByText(DESC_COMPETENCIA_INICIAL, {exact: true}).first()).toBeVisible();
     });
 });

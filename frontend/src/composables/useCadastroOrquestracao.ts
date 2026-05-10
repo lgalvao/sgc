@@ -42,17 +42,32 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         codMapa.value = data.mapa.codigo;
     }
 
+    function erroIntegracaoFoiCancelado(): boolean {
+        return subprocessoStore.erroIntegracaoContexto?.codigo === "REQUEST_CANCELADA";
+    }
+
+    async function buscarContextoInicial(limparAntes = false) {
+        return typeof props.codSubprocesso === "number"
+            ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, limparAntes)
+            : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
+                Number(props.codProcesso),
+                props.sigla,
+                limparAntes,
+            );
+    }
+
     async function carregarContextoInicial() {
         try {
-            const data = typeof props.codSubprocesso === "number"
-                ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, false)
-                : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
-                    Number(props.codProcesso),
-                    props.sigla,
-                    false,
-                );
+            let data = await buscarContextoInicial(false);
+
+            if (!data && erroIntegracaoFoiCancelado()) {
+                data = await buscarContextoInicial(true);
+            }
 
             if (!data) {
+                if (erroIntegracaoFoiCancelado()) {
+                    return false;
+                }
                 logger.error("ERRO: Subprocesso não encontrado!");
                 return false;
             }

@@ -79,11 +79,7 @@
         </BAlert>
         <BFormGroup
             class="mb-3"
-            label-for="tituloEleitoral"
         >
-          <template #label>
-            {{ TEXTOS.administracao.LABEL_TITULO }} <span aria-hidden="true" class="text-danger">*</span>
-          </template>
           <BuscadorUsuarios
               id="tituloEleitoral"
               ref="inputTituloRef"

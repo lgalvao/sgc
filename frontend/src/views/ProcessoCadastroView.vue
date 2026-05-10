@@ -34,7 +34,7 @@
 
         <div class="d-flex flex-wrap justify-content-end gap-2 mt-4 pt-3 border-top">
           <BButton
-              :disabled="isLoading"
+              :disabled="anyLoading"
               data-testid="btn-processo-cancelar-rodape"
               to="/painel"
               variant="outline-secondary"
@@ -44,7 +44,7 @@
 
           <LoadingButton
               v-if="processoEditando"
-              :disabled="isLoading"
+              :disabled="anyLoading"
               :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
               data-testid="btn-processo-remover-rodape"
               icon="trash"
@@ -54,7 +54,7 @@
 
           <LoadingButton
               :disabled="salvarDesabilitado"
-              :loading="isLoading"
+              :loading="isSaving"
               :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
               data-testid="btn-processo-salvar-rodape"
               icon="save"
@@ -66,6 +66,7 @@
 
           <LoadingButton
               :disabled="iniciarDesabilitado"
+              :loading="isStarting"
               :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
               data-testid="btn-processo-iniciar-rodape"
               icon="play-fill"
@@ -80,7 +81,8 @@
         v-model:mostrar-confirmacao="mostrarModalConfirmacao"
         v-model:mostrar-remocao="mostrarModalRemocao"
         :descricao="descricao"
-        :is-loading="isLoading"
+        :is-loading-confirmacao="isStarting"
+        :is-loading-remocao="isRemoving"
         :tipo-label="tipo || '-'"
         :total-unidades="unidadesSelecionadas.length"
         @confirmar-iniciar="confirmarIniciarProcesso"
@@ -147,7 +149,9 @@ const formData = computed({
 
 const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
 
-const isLoading = ref(false);
+const isSaving = ref(false);
+const isStarting = ref(false);
+const isRemoving = ref(false);
 const router = useRouter();
 const route = useRoute();
 const toastStore = useToastStore();
@@ -167,8 +171,9 @@ const {
   exibirAlertaDiagnostico,
   dispensarAlertaDiagnostico
 } = useDiagnosticoOrganizacionalAlert(unidades, mostrarDiagnosticoOrganizacional);
-const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value);
-const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoading.value || isLoadingData.value);
+const anyLoading = computed(() => isSaving.value || isStarting.value || isRemoving.value);
+const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value || anyLoading.value);
+const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value || anyLoading.value);
 
 function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
   const codigosElegiveis = new Set<number>();
@@ -308,7 +313,7 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
 
 async function salvarProcesso() {
   clearErrors();
-  isLoading.value = true;
+  isSaving.value = true;
 
   try {
     if (processoEditando.value) {
@@ -326,7 +331,7 @@ async function salvarProcesso() {
   } catch (error) {
     handleApiErrors(error, "Erro ao salvar processo", "Não foi possível salvar o processo.");
   } finally {
-    isLoading.value = false;
+    isSaving.value = false;
   }
 }
 
@@ -336,7 +341,7 @@ function abrirModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   clearErrors();
-  isLoading.value = true;
+  isStarting.value = true;
   let codigoProcesso = processoEditando.value?.codigo;
 
   if (!codigoProcesso) {
@@ -347,7 +352,7 @@ async function confirmarIniciarProcesso() {
     } catch (error) {
       mostrarModalConfirmacao.value = false;
       handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
-      isLoading.value = false;
+      isStarting.value = false;
       return;
     }
   }
@@ -363,7 +368,7 @@ async function confirmarIniciarProcesso() {
     mostrarModalConfirmacao.value = false;
     handleApiErrors(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
   } finally {
-    isLoading.value = false;
+    isStarting.value = false;
   }
 }
 
@@ -380,7 +385,7 @@ async function confirmarRemocao() {
     fecharModalRemocao();
     return;
   }
-  isLoading.value = true;
+  isRemoving.value = true;
   const descRemovida = processoEditando.value.descricao;
   try {
     await processoService.excluirProcesso(processoEditando.value.codigo);
@@ -393,7 +398,7 @@ async function confirmarRemocao() {
     fecharModalRemocao();
     handleApiErrors(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
   } finally {
-    isLoading.value = false;
+    isRemoving.value = false;
   }
 }
 </script>

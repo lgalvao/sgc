@@ -361,7 +361,9 @@ export async function acessarDetalhesProcesso(page: Page, descricao: string) {
  * Finaliza o processo atual a partir da tela de detalhes do processo.
  */
 export async function finalizarProcesso(page: Page) {
-    await page.getByTestId('btn-processo-finalizar').click();
+    const botaoFinalizar = page.getByTestId('btn-processo-finalizar');
+    await expect(botaoFinalizar).toBeEnabled();
+    await botaoFinalizar.click();
     await page.getByTestId('btn-finalizar-processo-confirmar').click();
     await page.waitForURL(/\/painel(?:\?.*)?$/);
 }

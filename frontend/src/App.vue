@@ -96,7 +96,7 @@ const shouldShowNavBarExtras = computed(() => {
 
 const maximoRotasEmCache = 10;
 const chaveSessao = computed(() =>
-    `${perfilStore.usuarioCodigo ?? "anon"}-${perfilStore.perfilSelecionado ?? "sem-perfil"}-${perfilStore.unidadeSelecionada ?? "sem-unidade"}`
+    `${perfilStore.versaoSessao}-${perfilStore.usuarioCodigo ?? "anon"}-${perfilStore.perfilSelecionado ?? "sem-perfil"}-${perfilStore.unidadeSelecionada ?? "sem-unidade"}`
 );
 </script>
 

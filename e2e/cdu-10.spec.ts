@@ -8,7 +8,6 @@ import {
     disponibilizarCadastro,
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
-import {extrairProcessoCodigo} from './helpers/helpers-processos.js';
 import {
     abrirAcaoCadastroDevolver,
     abrirHistoricoAnalise,
@@ -271,7 +270,6 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Chefe verifica o histórico já consolidado antes de reentrar na mesma SPA.
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        const codigoProcessoRevisao = await extrairProcessoCodigo(page);
         await navegarParaCadastro(page);
         const modal = await abrirHistoricoAnalise(page);
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
