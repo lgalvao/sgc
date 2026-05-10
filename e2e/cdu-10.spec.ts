@@ -8,6 +8,7 @@ import {
     disponibilizarCadastro,
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
+import {extrairProcessoCodigo} from './helpers/helpers-processos.js';
 import {
     abrirAcaoCadastroDevolver,
     abrirHistoricoAnalise,
@@ -235,7 +236,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
-    test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({_resetAutomatico, page}) => {
+    test('5. Cenário 4: Histórico considera apenas as análises desde a última disponibilização, inclusive em reentrada quente', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaCadastro(page);
@@ -268,32 +269,25 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await limparNotificacoes(page);
         await expect(page.getByTestId('tbl-alertas').locator('tr', {hasText: TEXTOS.alerta.REVISAO_DEVOLVIDA(UNIDADE_ALVO)}).first()).toBeVisible();
 
-        // Chefe verifica que histórico tem TODAS as devoluções (a última primeiro)
+        // Chefe verifica que o histórico considera apenas a análise desde a última disponibilização.
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
+        const codigoProcessoRevisao = await extrairProcessoCodigo(page);
         await navegarParaCadastro(page);
         const modal = await abrirHistoricoAnalise(page);
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Terceira devolução');
-        await expect(modal.getByTestId('cell-resultado-1')).toHaveText(/Devolu[cç][aã]o/i);
-        await expect(modal.getByTestId('cell-observacao-1')).toHaveText('Segunda devolução');
+        await expect(modal.getByText('Segunda devolução')).toHaveCount(0);
         await fecharHistoricoAnalise(page);
 
-        await reloginSemLimparSpa(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaCadastro(page);
-        await (await abrirAcaoCadastroDevolver(page)).click();
-        await page.getByTestId('inp-devolucao-cadastro-obs').fill('Quarta devolução');
-        await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-        await verificarPaginaPainel(page);
-
+        // Reentra na mesma revisão sem limpar a SPA e confirma que o histórico não ressuscita análises antigas.
         await reloginSemLimparSpa(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaCadastro(page);
+        await page.goto(`/processo/${codigoProcessoRevisao}/${UNIDADE_ALVO}/cadastro`);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoRevisao}/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
+        await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
 
         const modalAtualizado = await abrirHistoricoAnalise(page);
-        await expect(modalAtualizado.getByTestId('cell-observacao-0')).toHaveText('Quarta devolução');
-        await expect(modalAtualizado.getByTestId('cell-observacao-1')).toHaveText('Terceira devolução');
-        await expect(modalAtualizado.getByTestId('cell-observacao-2')).toHaveText('Segunda devolução');
+        await expect(modalAtualizado.getByTestId('cell-observacao-0')).toHaveText('Terceira devolução');
+        await expect(modalAtualizado.getByText('Segunda devolução')).toHaveCount(0);
         await fecharHistoricoAnalise(page);
     });
 

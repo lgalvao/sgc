@@ -108,7 +108,11 @@ const chaveSessao = computed(() =>
   >
     {{ TEXTOS.comum.PULAR_CONTEUDO }}
   </a>
-  <BOrchestrator class="orchestrator-container"/>
+  <BOrchestrator
+      aria-atomic="true"
+      aria-live="polite"
+      class="orchestrator-container"
+  />
 
   <div class="d-flex flex-column min-vh-100">
     <div
