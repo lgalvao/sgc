@@ -58,6 +58,20 @@ describe("SubprocessoModal", () => {
         expect(confirmButton.attributes("disabled")).toBeUndefined();
     });
 
+    it("deve usar a última data limite do subprocesso como data mínima quando for maior que amanhã", () => {
+        context.wrapper = mount(SubprocessoModal, {
+            props: {
+                mostrarModal: true,
+                dataLimiteAtual,
+                ultimaDataLimiteSubprocesso: new Date("2099-12-31T12:00:00"),
+                etapaAtual: 1
+            },
+        });
+
+        const input = context.wrapper.find('[data-testid="input-nova-data-limite"]');
+        expect(input.attributes("min")).toBe("2099-12-31");
+    });
+
     it('deve emitir "fecharModal" ao clicar no botão de cancelar', async () => {
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
