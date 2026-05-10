@@ -295,6 +295,25 @@ describe("SubprocessoCards.vue", () => {
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({name: "AutoavaliacaoDiagnostico"}));
     });
 
+    it("navega para diagnóstico com Enter e espaço", async () => {
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "U1"
+        });
+
+        const cardDiagnostico = wrapper.find('[data-testid="card-subprocesso-diagnostico"]');
+
+        await cardDiagnostico.trigger("keydown", {key: "Enter"});
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({name: "AutoavaliacaoDiagnostico"}));
+
+        pushMock.mockClear();
+        await cardDiagnostico.trigger("keydown", {key: " "});
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({name: "AutoavaliacaoDiagnostico"}));
+    });
+
     it("trata tecla Enter/Space nos cards", async () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.MAPEAMENTO,

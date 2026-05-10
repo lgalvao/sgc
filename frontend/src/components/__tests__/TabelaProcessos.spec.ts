@@ -165,6 +165,30 @@ describe("TabelaProcessos.vue", () => {
         ]);
     });
 
+    it("deve ocultar a coluna de situação quando showSituacao for falso", async () => {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions({}, {
+                BTable: {
+                    ...BTableSortStub,
+                    props: ["fields"],
+                    template: '<table><thead><tr><th v-for="field in fields" :key="field.key">{{ field.label }}</th></tr></thead><slot /></table>',
+                }
+            }),
+            props: {
+                processos: mockProcessos,
+                criterioOrdenacao: "dataFinalizacao",
+                direcaoOrdenacaoAsc: false,
+                showDataFinalizacao: true,
+                showSituacao: false,
+            },
+        });
+
+        await context.wrapper.vm.$nextTick();
+        const headers = context.wrapper.findAll("th").map((th) => th.text());
+        expect(headers).toContain("Finalizado em");
+        expect(headers).not.toContain("Situação");
+    });
+
     it("deve exibir a coluna Finalizado em quando showDataFinalizacao é true", async () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions(),

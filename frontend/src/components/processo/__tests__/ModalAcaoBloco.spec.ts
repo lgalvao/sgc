@@ -41,6 +41,21 @@ describe('ModalAcaoBloco.vue', () => {
         expect(wrapper.text()).toContain('A data limite para validação deve ser uma data futura.');
     });
 
+    it("deve emitir confirmar com unidades selecionadas e data válida", async () => {
+        const wrapper = mount(ModalAcaoBloco, {
+            props: propsPadrao
+        });
+        (wrapper.vm as { abrir: () => void }).abrir();
+        await wrapper.vm.$nextTick();
+
+        const input = wrapper.find('[data-testid="inp-data-limite-bloco"]');
+        await input.setValue("2099-01-01");
+        await (wrapper.vm as { confirmar: () => Promise<void> }).confirmar();
+
+        expect(wrapper.emitted("confirmar")).toBeDefined();
+        expect(wrapper.emitted("confirmar")?.[0]).toEqual([{ids: [1], dataLimite: "2099-01-01"}]);
+    });
+
     it('deve usar a maior última data limite selecionada como mínimo', () => {
         const wrapper = mount(ModalAcaoBloco, {
             props: {
