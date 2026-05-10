@@ -60,7 +60,6 @@
             :data="dadosArvore"
             :hide-controls="true"
             :hide-headers="true"
-            :striped="false"
             @row-click="abrirDetalheUnidade"
         />
       </div>

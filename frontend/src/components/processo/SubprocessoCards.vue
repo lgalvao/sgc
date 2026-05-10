@@ -14,8 +14,9 @@
             @keydown="habilitarAcessoCadastro && handleKeyDown($event, 'SubprocessoCadastro')"
         >
           <div class="card-click-area">
-            <BCardTitle :class="habilitarAcessoCadastro ? undefined : 'text-muted'">
-              {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}
+            <BCardTitle :class="['d-flex align-items-start gap-3 mb-3', habilitarAcessoCadastro ? undefined : 'text-muted']">
+              <i aria-hidden="true" class="bi bi-card-checklist text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
               {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TEXTO }}
@@ -37,8 +38,9 @@
             @keydown="mapaHabilitado && handleKeyDown($event, 'SubprocessoMapa')"
         >
           <div class="card-click-area">
-            <BCardTitle :class="mapaHabilitado ? undefined : 'text-muted'">
-              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
+            <BCardTitle :class="['d-flex align-items-start gap-3 mb-3', mapaHabilitado ? undefined : 'text-muted']">
+              <i aria-hidden="true" class="bi bi-diagram-3 text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.MAPA_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
               {{ TEXTOS.subprocesso.cards.MAPA_TEXTO }}
@@ -62,8 +64,9 @@
             @keydown="handleKeyDown($event, 'AutoavaliacaoDiagnostico', true)"
         >
           <div class="card-click-area">
-            <BCardTitle>
-              {{ TEXTOS.subprocesso.cards.AUTOAVALIACAO_TITULO }}
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-clipboard-check text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.AUTOAVALIACAO_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
               {{ TEXTOS.subprocesso.cards.AUTOAVALIACAO_TEXTO }}
@@ -85,8 +88,9 @@
             @keydown="handleKeyDown($event, 'OcupacoesCriticasDiagnostico', true)"
         >
           <div class="card-click-area">
-            <BCardTitle>
-              {{ TEXTOS.subprocesso.cards.OCUPACOES_TITULO }}
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-people text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.OCUPACOES_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
               {{ TEXTOS.subprocesso.cards.OCUPACOES_TEXTO }}
@@ -107,8 +111,9 @@
             @keydown="handleKeyDown($event, 'MonitoramentoDiagnostico', true)"
         >
           <div class="card-click-area">
-            <BCardTitle>
-              {{ TEXTOS.subprocesso.cards.MONITORAMENTO_TITULO }}
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-activity text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.MONITORAMENTO_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
               {{ TEXTOS.subprocesso.cards.MONITORAMENTO_TEXTO }}

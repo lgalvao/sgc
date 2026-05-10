@@ -39,7 +39,6 @@
           :busy="carregandoAdmins"
           hover
           responsive
-          striped
       >
         <template #table-busy>
           <div class="text-center text-primary my-2">

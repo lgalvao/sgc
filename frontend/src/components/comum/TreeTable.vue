@@ -241,7 +241,6 @@ const classesTabela = computed(() => ({
   "table": true,
   "table-hover": true,
   "m-0": true,
-  "table-striped": props.striped,
 }));
 
 const deveExibirCabecalhoControles = computed(() =>

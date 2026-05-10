@@ -14,7 +14,10 @@
             @keydown.space.prevent="router.push('/relatorios/andamento')"
         >
           <div class="card-click-area">
-            <BCardTitle>{{ TEXTOS.relatorios.ANDAMENTO_PROCESSO }}</BCardTitle>
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-bar-chart-steps text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.relatorios.ANDAMENTO_PROCESSO }}</span>
+            </BCardTitle>
             <BCardText class="text-muted">
               Situação das unidades participantes em um processo ativo
             </BCardText>
@@ -33,7 +36,10 @@
             @keydown.space.prevent="router.push('/relatorios/mapas-vigentes')"
         >
           <div class="card-click-area">
-            <BCardTitle>Mapas vigentes</BCardTitle>
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-diagram-3 text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">Mapas vigentes</span>
+            </BCardTitle>
             <BCardText class="text-muted">
               Detalhes de mapas de competências vigentes por unidade
             </BCardText>

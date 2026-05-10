@@ -28,7 +28,6 @@
               :items="historico"
               hover
               responsive
-              striped
           >
             <template #head(dataHora)>
               <span data-testid="header-historico-dataHora">Data/Hora</span>

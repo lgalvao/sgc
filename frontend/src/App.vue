@@ -160,6 +160,66 @@ const chaveSessao = computed(() =>
 </template>
 
 <style>
+[data-bs-theme="dark"] {
+  --bs-body-bg: #0f172a;
+  --bs-body-color: #f8fafc;
+  --bs-tertiary-bg: #020617;
+  --bs-secondary-bg: #1e293b;
+  --bs-secondary-color: #94a3b8;
+  --bs-tertiary-color: #64748b;
+  --bs-emphasis-color: #ffffff;
+  --bs-border-color: #334155;
+  --bs-primary: #818cf8;
+  --bs-primary-rgb: 129, 140, 248;
+  --bs-link-color: #a5b4fc;
+  --bs-link-hover-color: #c7d2fe;
+  --bs-card-bg: #1e293b;
+  --bs-card-border-color: #475569;
+}
+
+[data-bs-theme="dark"] .card {
+  background-color: var(--bs-card-bg);
+  border: 1px solid var(--bs-card-border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="dark"] .card:hover {
+  border-color: #818cf8;
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.15);
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+  --bs-btn-color: #818cf8;
+  --bs-btn-border-color: #818cf8;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #6366f1;
+  --bs-btn-hover-border-color: #6366f1;
+  --bs-btn-focus-shadow-rgb: 129, 140, 248;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #6366f1;
+  --bs-btn-active-border-color: #6366f1;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+  --bs-btn-color: #94a3b8;
+  --bs-btn-border-color: #475569;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #334155;
+  --bs-btn-hover-border-color: #334155;
+  --bs-btn-focus-shadow-rgb: 148, 163, 184;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #334155;
+  --bs-btn-active-border-color: #334155;
+}
+
+[data-bs-theme="dark"] .bg-body-tertiary {
+  background-color: var(--bs-tertiary-bg) !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+  color: #94a3b8 !important;
+}
+
 .cabecalho-fixo {
   z-index: 1020;
 }

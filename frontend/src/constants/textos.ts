@@ -286,7 +286,7 @@ export const TEXTOS = {
         },
         FEEDBACKS_TITULO: "Feedbacks",
         FEEDBACKS_ATUALIZAR: "Atualizar",
-        FEEDBACKS_SEM_REGISTROS: "Nenhum feedback encontrado",
+        FEEDBACKS_SEM_REGISTROS: "Nenhum feedback registrado",
         FEEDBACKS_ERRO_CARREGAR: "Não foi possível carregar os feedbacks",
         FEEDBACKS_MODAL_TITULO: "Detalhes do feedback",
         FEEDBACKS_CAMPOS: {

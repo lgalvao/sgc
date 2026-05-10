@@ -35,7 +35,6 @@
           hover
           responsive
           small
-          striped
       >
         <template #cell(tipo)="{ item }">
           <BBadge :variant="obterVarianteTipo(item.tipo)">
@@ -127,7 +126,7 @@
           <dt v-if="feedbackSelecionado.metadataJson" class="col-sm-12 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.METADADOS }}</dt>
           <dd v-if="feedbackSelecionado.metadataJson" class="col-sm-12">
             <div class="table-responsive border rounded mt-2">
-              <table class="table table-sm table-striped mb-0">
+              <table class="table table-sm mb-0">
                 <thead class="table-light">
                   <tr>
                     <th class="ps-2">Chave</th>

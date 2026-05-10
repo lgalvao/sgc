@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {computed, type Ref, unref} from "vue";
-import {BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
+import {BCard, BCardBody, BCol, BDropdown, BDropdownItemButton, BRow} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import type {ResponsavelDto, SubprocessoDetalhe} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -103,61 +103,70 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
       </template>
     </PageHeader>
 
-    <BCard class="mb-4" data-testid="header-subprocesso-details" no-body>
-      <BCardBody>
-        <p data-testid="txt-header-processo">
-          <strong>{{ TEXTOS.subprocesso.LABEL_PROCESSO }}:</strong> {{ subprocesso.processoDescricao }}
-        </p>
-        <p>
-          <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_SITUACAO }}:</span>
-          <span data-testid="subprocesso-header__txt-situacao">{{
-              formatSituacaoSubprocesso(subprocesso.situacao)
-            }}</span>
-        </p>
-        <p>
-          <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_LOCALIZACAO }}:</span>
-          <span data-testid="subprocesso-header__txt-localizacao">{{ subprocesso.localizacaoAtual }}</span>
-        </p>
-        <p v-if="subprocesso.prazoEtapaAtual">
-          <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_PRAZO_ETAPA }}:</span>
-          <span data-testid="subprocesso-header__txt-prazo">{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
-        </p>
-        <p class="mt-2"><strong>{{ TEXTOS.subprocesso.LABEL_TITULAR }}:</strong> {{ subprocesso.titular?.nome || '' }}
-        </p>
-        <p class="ms-3 mb-2">
-          <span v-if="subprocesso.titular?.ramal" class="me-3">
-            <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-            {{ subprocesso.titular.ramal }}
-          </span>
-          <span v-if="subprocesso.titular?.email">
-            <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-            <a :href="`mailto:${subprocesso.titular.email}`" class="link-discreto">{{ subprocesso.titular.email }}</a>
-          </span>
-        </p>
-        <template
-            v-if="subprocesso.responsavel?.usuario?.nome && subprocesso.responsavel.usuario.nome !== subprocesso.titular?.nome">
-          <p class="mt-2">
-            <strong>{{ TEXTOS.subprocesso.LABEL_RESPONSAVEL }}:</strong> {{
-              subprocesso.responsavel.usuario.nome || ''
-            }}
-            <span v-if="subprocesso.responsavel.tipo" class="ms-1">
-              - {{ formatTipoResponsabilidade(subprocesso.responsavel) }}
-            </span>
+    <BRow class="mb-4">
+      <BCol class="mb-3 mb-md-0" md="6">
+        <BCard class="h-100" data-testid="header-subprocesso-details-info">
+          <p class="mb-2" data-testid="txt-header-processo">
+            <strong>{{ TEXTOS.subprocesso.LABEL_PROCESSO }}:</strong> {{ subprocesso.processoDescricao }}
           </p>
-          <p class="ms-3 mb-0">
-            <span v-if="subprocesso.responsavel.usuario.ramal" class="me-3">
+          <p class="mb-2">
+            <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_SITUACAO }}:</span>
+            <span data-testid="subprocesso-header__txt-situacao">{{
+                formatSituacaoSubprocesso(subprocesso.situacao)
+              }}</span>
+          </p>
+          <p class="mb-2">
+            <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_LOCALIZACAO }}:</span>
+            <span data-testid="subprocesso-header__txt-localizacao">{{ subprocesso.localizacaoAtual }}</span>
+          </p>
+          <p v-if="subprocesso.prazoEtapaAtual" class="mb-0">
+            <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_PRAZO_ETAPA }}:</span>
+            <span data-testid="subprocesso-header__txt-prazo">{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
+          </p>
+        </BCard>
+      </BCol>
+
+      <BCol md="6">
+        <BCard class="h-100" data-testid="header-subprocesso-details-resp">
+          <p class="mb-2"><strong>{{ TEXTOS.subprocesso.LABEL_TITULAR }}:</strong> {{
+              subprocesso.titular?.nome || ''
+            }}</p>
+          <p class="ms-3 mb-3">
+            <span v-if="subprocesso.titular?.ramal" class="me-3">
               <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-              {{ subprocesso.responsavel.usuario.ramal }}
+              {{ subprocesso.titular.ramal }}
             </span>
-            <span v-if="subprocesso.responsavel.usuario.email">
+            <span v-if="subprocesso.titular?.email">
               <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-              <a :href="`mailto:${subprocesso.responsavel.usuario.email}`" class="link-discreto">{{
-                  subprocesso.responsavel.usuario.email
-                }}</a>
+              <a :href="`mailto:${subprocesso.titular.email}`" class="link-discreto">{{ subprocesso.titular.email }}</a>
             </span>
           </p>
-        </template>
-      </BCardBody>
-    </BCard>
+
+          <template
+              v-if="subprocesso.responsavel?.usuario?.nome && subprocesso.responsavel.usuario.nome !== subprocesso.titular?.nome">
+            <p class="mb-2">
+              <strong>{{ TEXTOS.subprocesso.LABEL_RESPONSAVEL }}:</strong> {{
+                subprocesso.responsavel.usuario.nome || ''
+              }}
+              <span v-if="subprocesso.responsavel.tipo" class="ms-1 small text-muted italic">
+                - {{ formatTipoResponsabilidade(subprocesso.responsavel) }}
+              </span>
+            </p>
+            <p class="ms-3 mb-0">
+              <span v-if="subprocesso.responsavel.usuario.ramal" class="me-3">
+                <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
+                {{ subprocesso.responsavel.usuario.ramal }}
+              </span>
+              <span v-if="subprocesso.responsavel.usuario.email">
+                <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
+                <a :href="`mailto:${subprocesso.responsavel.usuario.email}`" class="link-discreto">{{
+                    subprocesso.responsavel.usuario.email
+                  }}</a>
+              </span>
+            </p>
+          </template>
+        </BCard>
+      </BCol>
+    </BRow>
   </div>
 </template>

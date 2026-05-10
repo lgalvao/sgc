@@ -3,7 +3,6 @@
       :columns="colunas"
       :data="mapeamentoHierarquia"
       :hide-controls="true"
-      :striped="false"
       @row-click="emitirCliqueLinha"
   />
 </template>

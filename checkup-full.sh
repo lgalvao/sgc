@@ -71,9 +71,8 @@ atualizar_dependencias_npm 'etc/scripts' 'Atualizar dependências de etc/scripts
 
 invoke_passo 'Lint raiz' npm run lint:ox
 invoke_passo 'Lint etc/scripts' npm --prefix etc/scripts run lint
-
 invoke_passo 'Testes etc/scripts' npm --prefix etc/scripts run test
 invoke_passo 'Qualidade frontend + backend' "$GRADLE_CMD" backend:qualityCheckFast
-invoke_passo 'Testes e2e mínimos' npx playwright test e2e/captura.spec.ts e2e/jornada.spec.ts
+invoke_passo 'Testes e2e' npx playwright test
 
 echo -e "\n${GREEN}Tudo certo!${NC}"
