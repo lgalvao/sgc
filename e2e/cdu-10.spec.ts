@@ -282,9 +282,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Reentra na mesma revisão sem limpar a SPA e confirma que o histórico continua coerente.
         await reloginSemLimparSpa(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await page.goto(`/processo/${codigoProcessoRevisao}/${UNIDADE_ALVO}/cadastro`);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoRevisao}/${UNIDADE_ALVO}/cadastro(?:\?.*)?$`));
-        await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
+        await navegarParaCadastro(page);
 
         const modalAtualizado = await abrirHistoricoAnalise(page);
         await expect(modalAtualizado.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);

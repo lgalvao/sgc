@@ -115,7 +115,8 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         const linhaAdminQuente = tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE});
         await expect(linhaAdminQuente).toBeVisible();
 
-        await page.goto('/painel');
+        await page.getByRole('link', {name: /Painel/i}).click();
+        await expect(page).toHaveURL(/\/painel/);
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
         await expect(tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE})).toBeVisible();
@@ -129,7 +130,8 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await expect(modalRemover).toBeHidden();
         await expect(tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE})).toBeHidden();
 
-        await page.goto('/painel');
+        await page.getByRole('link', {name: /Painel/i}).click();
+        await expect(page).toHaveURL(/\/painel/);
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
         await expect(tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE})).toHaveCount(0);

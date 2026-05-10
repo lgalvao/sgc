@@ -5,6 +5,7 @@ import {
     loginComPerfil,
     reloginComPerfilSemLimparSpa,
     reloginSemLimparSpa,
+    type Usuario,
     USUARIOS
 } from './helpers/helpers-auth.js';
 import {
@@ -87,10 +88,11 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     });
 
     const reabrirSubprocessoSemLimparSpa = async (page: Page, options: {
-        codigoProcesso: number;
-        usuario: typeof ADMIN;
+        usuario: Usuario;
         perfil?: string;
         reaproveitarSessaoAtual?: boolean;
+        papel: 'admin' | 'chefe' | 'gestor';
+        descricaoProcesso: string;
     }) => {
         if (options.reaproveitarSessaoAtual) {
             if (options.perfil) {
@@ -104,9 +106,13 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await login(page, options.usuario.titulo, options.usuario.senha);
         }
 
-        await page.goto(`/processo/${options.codigoProcesso}/${SIGLA_SECAO}`);
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${options.codigoProcesso}/${SIGLA_SECAO}(?:\?.*)?$`));
-        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+        if (options.papel === 'admin') {
+            await acessarSubprocessoAdmin(page, options.descricaoProcesso, SIGLA_SECAO);
+        } else if (options.papel === 'gestor') {
+            await acessarSubprocessoGestor(page, options.descricaoProcesso, SIGLA_SECAO);
+        } else {
+            await acessarSubprocessoChefeDireto(page, options.descricaoProcesso, SIGLA_SECAO);
+        }
     };
 
     const verificarConteudoVisivelDoMapa = async (page: Page, descricaoCompetencia: string, atividades: string[]) => {
@@ -129,9 +135,10 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
 
     const chefeConsultaEValidaMapaDisponibilizado = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoMapeamento,
             usuario: CHEFE_SECAO,
-            reaproveitarSessaoAtual: true
+            reaproveitarSessaoAtual: true,
+            papel: 'chefe',
+            descricaoProcesso: descProcesso
         });
 
         await verificarDetalhesSubprocesso(page, {
@@ -163,10 +170,11 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
 
     const secretariaAceitaValidacaoDoMapa = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoMapeamento,
             usuario: GESTOR_SECRETARIA,
             perfil: GESTOR_SECRETARIA.perfil!,
-            reaproveitarSessaoAtual: true
+            reaproveitarSessaoAtual: true,
+            papel: 'gestor',
+            descricaoProcesso: descProcesso
         });
 
         await verificarDetalhesSubprocesso(page, {
@@ -183,7 +191,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await acessarSubprocessoAdmin(page, descProcesso, SIGLA_SECAO);
         await aceitarOuHomologarMapa(page, 'Homologação final do mapa inicial');
 
-        await page.goto('/painel');
+        await page.getByRole('link', {name: /Painel/i}).click();
+        await expect(page).toHaveURL(/\/painel/);
         await acessarDetalhesProcesso(page, descProcesso);
         await finalizarProcesso(page);
         await verificarProcessoTabela(page, {
@@ -216,9 +225,10 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
 
     const chefeConfereBaseVigenteEDisponibilizaRevisao = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoRevisao,
             usuario: CHEFE_SECAO,
-            reaproveitarSessaoAtual: true
+            reaproveitarSessaoAtual: true,
+            papel: 'chefe',
+            descricaoProcesso: descricaoProcessoRevisao
         });
 
         await verificarDetalhesSubprocesso(page, {
@@ -243,8 +253,9 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
 
     const coordenadoriaAceitaRevisaoDoCadastro = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoRevisao,
-            usuario: GESTOR_COORDENADORIA
+            usuario: GESTOR_COORDENADORIA,
+            papel: 'gestor',
+            descricaoProcesso: descricaoProcessoRevisao
         });
 
         await verificarDetalhesSubprocesso(page, {
@@ -263,10 +274,11 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
 
     const secretariaAceitaRevisaoDoCadastro = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoRevisao,
             usuario: GESTOR_SECRETARIA,
             perfil: GESTOR_SECRETARIA.perfil!,
-            reaproveitarSessaoAtual: true
+            reaproveitarSessaoAtual: true,
+            papel: 'gestor',
+            descricaoProcesso: descricaoProcessoRevisao
         });
 
         await verificarDetalhesSubprocesso(page, {
@@ -325,9 +337,10 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
 
     const chefeValidaMapaRevisado = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoRevisao,
             usuario: CHEFE_SECAO,
-            reaproveitarSessaoAtual: true
+            reaproveitarSessaoAtual: true,
+            papel: 'chefe',
+            descricaoProcesso: descricaoProcessoRevisao
         });
 
         await verificarDetalhesSubprocesso(page, {
@@ -350,10 +363,11 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await aceitarOuHomologarMapa(page, 'Aceite do mapa revisado pela coordenadoria');
 
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoRevisao,
             usuario: GESTOR_SECRETARIA,
             perfil: GESTOR_SECRETARIA.perfil!,
-            reaproveitarSessaoAtual: true
+            reaproveitarSessaoAtual: true,
+            papel: 'gestor',
+            descricaoProcesso: descricaoProcessoRevisao
         });
         await aceitarOuHomologarMapa(page, 'Aceite do mapa revisado pela secretaria');
     };
@@ -372,13 +386,15 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     };
 
     const consultarResultadoFinalComCacheQuente = async (page: Page, options: {
-        usuario: typeof ADMIN;
+        usuario: Usuario;
         perfil?: string;
     }) => {
         await reabrirSubprocessoSemLimparSpa(page, {
-            codigoProcesso: codigoProcessoRevisao,
             usuario: options.usuario,
             perfil: options.perfil
+            ,
+            papel: options.perfil ? 'gestor' : options.usuario === ADMIN ? 'admin' : options.usuario === CHEFE_SECAO ? 'chefe' : 'gestor',
+            descricaoProcesso: descricaoProcessoRevisao
         });
 
         await verificarDetalhesSubprocesso(page, {
