@@ -296,7 +296,12 @@ const mensagemErroSugestoes = computed(() => {
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   fecharModal();
   toastStore.setPending(mensagem);
-  invalidarCachesSubprocesso({incluirPainel: true, incluirProcesso: true});
+  invalidarCachesSubprocesso({
+    incluirPainel: true,
+    incluirProcesso: true,
+    incluirMapas: true,
+    codigoSubprocessoMapa: codigoSubprocesso.value ?? undefined,
+  });
   await router.push({name: "Painel"});
 }
 

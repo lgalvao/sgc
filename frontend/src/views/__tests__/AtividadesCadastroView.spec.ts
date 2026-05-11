@@ -63,7 +63,11 @@ type CadastroViewVm = {
     disponibilizarCadastro: () => Promise<void>;
     adicionarAtividade: () => Promise<void>;
     confirmarRemocao: () => Promise<void>;
-    processarRespostaLocal: (payload: { atividadesAtualizadas?: unknown[] }) => void;
+    processarRespostaLocal: (payload: {
+        atividadesAtualizadas?: unknown[];
+        subprocesso?: { codigo: number; situacao: SituacaoSubprocesso };
+        permissoes?: PermissoesSubprocesso;
+    }) => void;
     notify: (mensagem: string, variante: string) => void;
     carregarContextoInicial: () => Promise<void>;
     $nextTick: () => Promise<void>;
@@ -97,6 +101,7 @@ type SubprocessoStoreMock = {
     buscarSubprocessoDetalhe: ReturnType<typeof vi.fn>;
     atualizarStatusLocal: ReturnType<typeof vi.fn>;
     invalidar: ReturnType<typeof vi.fn>;
+    invalidarContextoEdicao: ReturnType<typeof vi.fn>;
     lastError: { message: string } | null;
     clearError: ReturnType<typeof vi.fn>;
     limparErroIntegracao: ReturnType<typeof vi.fn>;
@@ -178,6 +183,7 @@ const subprocessosMock = reactive({
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
     invalidar: vi.fn(),
+    invalidarContextoEdicao: vi.fn(),
     erroIntegracaoContexto: null as { message: string } | null,
     lastError: null as SubprocessoStoreMock["lastError"],
     clearError: vi.fn(),
@@ -391,6 +397,7 @@ describe("CadastroView.vue", () => {
         subprocessosMock.lastError = null;
         subprocessosMock.erroIntegracaoContexto = null;
         subprocessosMock.atualizarStatusLocal = vi.fn();
+        subprocessosMock.invalidarContextoEdicao = vi.fn();
         subprocessosMock.garantirContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(criarContextoEdicao());
         subprocessosMock.garantirContextoCadastroAtividades.mockResolvedValue(criarContextoEdicao());
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
@@ -949,7 +956,11 @@ describe("CadastroView.vue", () => {
 
         // 375-377 (adicionarAtividade success branch)
         vm.codigoSubprocesso = 123;
-        const mockAtiv = {atividadesAtualizadas: []};
+        const mockAtiv = {
+            atividadesAtualizadas: [],
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: criarContextoEdicao().detalhes.permissoes,
+        };
         mockAtividadeForm.adicionarAtividade.mockResolvedValue(mockAtiv);
         await vm.adicionarAtividade();
 
@@ -968,7 +979,11 @@ describe("CadastroView.vue", () => {
         await vm.confirmarRemocao();
 
         // 291 (processarRespostaLocal branch)
-        vm.processarRespostaLocal({atividadesAtualizadas: [{codigo: 1}]});
+        vm.processarRespostaLocal({
+            atividadesAtualizadas: [{codigo: 1}],
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: criarContextoEdicao().detalhes.permissoes,
+        });
     });
 
     it("deve limpar erro da nova atividade quando o texto for alterado", async () => {

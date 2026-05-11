@@ -88,6 +88,11 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
+        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
+            incluirPainel: true,
+            incluirMapas: true,
+            codigoSubprocessoMapa: 123,
+        });
         expect(subprocessoStoreMock.limparContextoAtual).toHaveBeenCalled();
     });
 
@@ -122,6 +127,11 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.devolverCadastro).toHaveBeenCalledWith(123, req);
+        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
+            incluirPainel: true,
+            incluirMapas: true,
+            codigoSubprocessoMapa: 123,
+        });
     });
 
     it("deve aceitar cadastro", async () => {
@@ -133,6 +143,11 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.aceitarCadastro).toHaveBeenCalledWith(123, req);
+        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
+            incluirPainel: true,
+            incluirMapas: true,
+            codigoSubprocessoMapa: 123,
+        });
     });
 
     it("deve homologar cadastro", async () => {
@@ -144,6 +159,11 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.homologarCadastro).toHaveBeenCalledWith(123, req);
+        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
+            incluirPainel: true,
+            incluirMapas: true,
+            codigoSubprocessoMapa: 123,
+        });
     });
 
     it("não deve invalidar caches ao homologar cadastro sem redirecionar para o painel", async () => {

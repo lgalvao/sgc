@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
+import {defineComponent, h, ref} from "vue";
+import {flushPromises, mount} from "@vue/test-utils";
 import {useCadastroOrquestracao} from "../useCadastroOrquestracao";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import * as formatters from "@/utils/formatters";
@@ -9,21 +10,40 @@ const storeMock = {
     garantirContextoCadastroAtividades: vi.fn(),
     garantirContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     atualizarStatusLocal: vi.fn(),
+    invalidarContextoEdicao: vi.fn(),
+    dadosCadastroValidos: vi.fn(),
     erroIntegracaoContexto: null as {codigo?: string} | null,
+};
+
+const mapasStoreMock = {
+    invalidar: vi.fn(),
 };
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => storeMock
 }));
 
+vi.mock("@/stores/mapas", () => ({
+    useMapasStore: () => mapasStoreMock
+}));
+
 describe("useCadastroOrquestracao", () => {
     const atividades = ref<any[]>([]);
     const props = {codProcesso: 1, sigla: "U"};
+    const criarComponenteTeste = (entradaProps = props) => defineComponent({
+        setup() {
+            return useCadastroOrquestracao(entradaProps, atividades);
+        },
+        render() {
+            return h("div");
+        },
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();
         atividades.value = [];
         storeMock.erroIntegracaoContexto = null;
+        storeMock.dadosCadastroValidos.mockReturnValue(false);
     });
 
     it("deve carregar contexto inicial por processo e unidade", async () => {
@@ -50,6 +70,20 @@ describe("useCadastroOrquestracao", () => {
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
         });
         expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
+    });
+
+    it("deve invalidar caches de mapa relacionados ao processar resposta local", () => {
+        const {processarRespostaLocal} = useCadastroOrquestracao(props, atividades);
+
+        processarRespostaLocal({
+            subprocesso: {codigo: 123, situacao: "S"} as any,
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
+            atividadesAtualizadas: [{codigo: 9, descricao: "Atualizada"}] as any,
+        });
+
+        expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
+        expect(mapasStoreMock.invalidar).toHaveBeenCalledWith(123);
+        expect(storeMock.invalidarContextoEdicao).toHaveBeenCalledWith(123);
     });
 
     it("deve reaproveitar a assinatura de referência quando ela vier do backend", async () => {
@@ -127,5 +161,47 @@ describe("useCadastroOrquestracao", () => {
         expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U", false);
         expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(2, 1, "U", true);
         expect(loggerSpy).not.toHaveBeenCalled();
+    });
+
+    it("deve recarregar ao reativar quando o contexto de cadastro estiver inválido", async () => {
+        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+            detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
+            atividadesDisponiveis: [],
+            unidade: {sigla: "U", nome: "Unidade U"},
+            mapa: {codigo: 50},
+        } as any);
+
+        const wrapper = mount(criarComponenteTeste());
+        await wrapper.vm.carregarContextoInicial();
+        await flushPromises();
+
+        storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade.mockClear();
+        storeMock.dadosCadastroValidos.mockReturnValue(false);
+
+        // @ts-expect-error acesso interno para simular ativação keepAlive
+        await wrapper.vm.$.a?.[0]();
+
+        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
+    });
+
+    it("não deve recarregar ao reativar quando o contexto de cadastro ainda estiver válido", async () => {
+        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+            detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
+            atividadesDisponiveis: [],
+            unidade: {sigla: "U", nome: "Unidade U"},
+            mapa: {codigo: 50},
+        } as any);
+
+        const wrapper = mount(criarComponenteTeste());
+        await wrapper.vm.carregarContextoInicial();
+        await flushPromises();
+
+        storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade.mockClear();
+        storeMock.dadosCadastroValidos.mockReturnValue(true);
+
+        // @ts-expect-error acesso interno para simular ativação keepAlive
+        await wrapper.vm.$.a?.[0]();
+
+        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 });
