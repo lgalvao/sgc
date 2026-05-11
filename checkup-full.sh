@@ -32,24 +32,6 @@ function invoke_passo() {
     fi
 }
 
-function atualizar_dependencias_npm() {
-    local prefixo="$1"
-    local label="$2"
-
-    imprimir_passo "$label"
-    set +e
-    if [ -n "$prefixo" ]; then
-        npm --prefix "$prefixo" update
-    else
-        npm update
-    fi
-    local exit_code=$?
-    set -e
-    if [ "$exit_code" -ne 0 ]; then
-        falhar_passo "$label" "$exit_code"
-    fi
-}
-
 GRADLE_CMD="./gradlew"
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || -n "${WINDIR:-}" ]]; then
     if [[ -f "./gradlew.bat" ]]; then
@@ -62,9 +44,6 @@ if [ -t 1 ]; then
 fi
 
 invoke_passo 'Atualizar branch local' git pull
-atualizar_dependencias_npm '' 'Atualizar dependências da raiz'
-atualizar_dependencias_npm 'etc/scripts' 'Atualizar dependências de etc/scripts'
-
 invoke_passo 'Lint raiz' npm run lint:ox
 invoke_passo 'Lint etc/scripts' npm --prefix etc/scripts run lint
 invoke_passo 'Testes etc/scripts' npm --prefix etc/scripts run test
