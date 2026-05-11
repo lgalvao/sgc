@@ -4,6 +4,7 @@ import RelatorioMapasView from "@/views/RelatorioMapasView.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from "@/services/unidadeService";
 import {useRelatoriosStore} from "@/stores/relatorios";
+import {Perfil} from "@/types/tipos";
 
 vi.mock("@/services/unidadeService", async (importOriginal) => {
     const actual = await importOriginal<typeof import("@/services/unidadeService")>();
@@ -188,5 +189,38 @@ describe("RelatorioMapasView.vue", () => {
         expect(ctx.wrapper.text()).toContain("Competência 1");
         expect(ctx.wrapper.text()).toContain("Atividade 1");
         expect(ctx.wrapper.text()).toContain("Conhecimento 1");
+    });
+
+    it("deve restringir a árvore à unidade ativa e subordinadas quando perfil for GESTOR", async () => {
+        ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: Perfil.GESTOR,
+                unidadeSelecionada: 1
+            }
+        }, stubs));
+        await ctx.wrapper.vm.$nextTick();
+        await ctx.wrapper.vm.$nextTick();
+
+        const vm = ctx.wrapper.vm as unknown as {
+            unidadesDisponiveis: Array<{ sigla: string; filhas?: Array<{ sigla: string }> }>;
+        };
+
+        expect(vm.unidadesDisponiveis).toHaveLength(1);
+        expect(vm.unidadesDisponiveis[0].sigla).toBe("SA");
+    });
+
+    it("deve encerrar o carregamento mesmo quando gerar relatório falhar", async () => {
+        ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
+        await ctx.wrapper.vm.$nextTick();
+
+        const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm).$pinia);
+        vi.spyOn(relatoriosStore, "buscarRelatorioMapas").mockRejectedValue(new Error("403"));
+
+        await ctx.wrapper.find("[data-testid='arvore-unidades-stub']").trigger("click");
+        await ctx.wrapper.vm.$nextTick();
+
+        await (ctx.wrapper.vm as any).gerarRelatorio();
+
+        expect((ctx.wrapper.vm as any).carregando).toBe(false);
     });
 });

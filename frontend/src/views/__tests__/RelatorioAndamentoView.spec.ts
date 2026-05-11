@@ -148,4 +148,30 @@ describe('RelatorioAndamentoView', () => {
         await vm.exportarPdf();
         expect(notify).toHaveBeenCalledWith(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
     });
+
+    it('encerra o carregamento quando gerar relatório falha', async () => {
+        const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        vm.codProcessoSelecionado = 1;
+        buscarRelatorioAndamento.mockRejectedValueOnce(new Error("403"));
+
+        await vm.gerarRelatorio();
+
+        expect(vm.carregando).toBe(false);
+    });
+
+    it('encerra o carregamento quando exportar pdf falha', async () => {
+        const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        vm.codProcessoSelecionado = 1;
+        exportarAndamentoPdf.mockRejectedValueOnce(new Error("403"));
+
+        await vm.exportarPdf();
+
+        expect(vm.carregando).toBe(false);
+    });
 });

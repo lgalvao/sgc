@@ -41,12 +41,14 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import RelatorioMapasFiltros from "@/components/relatorios/RelatorioMapasFiltros.vue";
 import RelatorioMapaVigenteCard from "@/components/relatorios/RelatorioMapaVigenteCard.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
+import {usePerfilStore} from "@/stores/perfil";
 import {TEXTOS} from "@/constants/textos";
-import type {Unidade} from "@/types/tipos";
+import {Perfil, type Unidade} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
 import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
 
 const relatoriosStore = useRelatoriosStore();
+const perfilStore = usePerfilStore();
 const {notify} = useNotification();
 
 const unidadesDisponiveis = ref<Unidade[]>([]);
@@ -81,6 +83,29 @@ function filtrarArvorePorMapaVigente(unidades: Unidade[]): Unidade[] {
       .filter((unidade): unidade is Unidade => unidade !== null);
 }
 
+function buscarSubarvore(unidades: Unidade[], codigoRaiz: number): Unidade[] {
+  for (const unidade of unidades) {
+    if (unidade.codigo === codigoRaiz) {
+      return [unidade];
+    }
+
+    const encontrada = buscarSubarvore(unidade.filhas ?? [], codigoRaiz);
+    if (encontrada.length > 0) {
+      return encontrada;
+    }
+  }
+
+  return [];
+}
+
+function aplicarEscopoPerfil(unidades: Unidade[]): Unidade[] {
+  if (perfilStore.perfilSelecionado !== Perfil.GESTOR || !perfilStore.unidadeSelecionada) {
+    return unidades;
+  }
+
+  return buscarSubarvore(unidades, perfilStore.unidadeSelecionada);
+}
+
 async function carregarUnidades() {
   try {
     const [arvore, codigosComMapa] = await Promise.all([
@@ -91,7 +116,9 @@ async function carregarUnidades() {
         arvore,
         new Set(codigosComMapa)
     );
-    unidadesDisponiveis.value = filtrarArvorePorMapaVigente(unidadesComElegibilidade);
+    unidadesDisponiveis.value = aplicarEscopoPerfil(
+        filtrarArvorePorMapaVigente(unidadesComElegibilidade)
+    );
   } catch {
     notify("Erro ao carregar unidades", "danger");
   }
@@ -102,9 +129,15 @@ async function exportarPdf() {
     return;
   }
 
-  carregando.value = true;
-  await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value);
-  carregando.value = false;
+  try {
+    carregando.value = true;
+    await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value);
+  } catch {
+    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
+  } finally {
+    carregando.value = false;
+  }
+
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_GERAR, "danger");
   }
@@ -115,9 +148,15 @@ async function gerarRelatorio() {
     return;
   }
 
-  carregando.value = true;
-  await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value);
-  carregando.value = false;
+  try {
+    carregando.value = true;
+    await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value);
+  } catch {
+    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
+  } finally {
+    carregando.value = false;
+  }
+
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
   }

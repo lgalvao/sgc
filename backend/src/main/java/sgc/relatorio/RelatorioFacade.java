@@ -11,8 +11,10 @@ import org.openpdf.text.pdf.draw.*;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
+import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -52,6 +54,8 @@ public class RelatorioFacade {
     private final ResponsavelUnidadeService responsavelService;
     private final MapaManutencaoService mapaManutencaoService;
     private final UnidadeService unidadeService;
+    private final UnidadeHierarquiaService unidadeHierarquiaService;
+    private final UsuarioFacade usuarioFacade;
     private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
@@ -143,13 +147,37 @@ public class RelatorioFacade {
             return List.of();
         }
 
-        Set<Long> codigosNormalizados = new LinkedHashSet<>(codigosUnidades);
+        Set<Long> codigosNormalizados = validarEscopoRelatorioMapas(codigosUnidades);
 
         return unidadeService.buscarMapasPorUnidades(new ArrayList<>(codigosNormalizados)).stream()
                 .map(UnidadeMapa::getMapaVigente)
                 .filter(Objects::nonNull)
                 .map(Mapa::getSubprocesso)
                 .toList();
+    }
+
+    private Set<Long> validarEscopoRelatorioMapas(List<Long> codigosUnidades) {
+        Set<Long> codigosNormalizados = new LinkedHashSet<>(codigosUnidades);
+        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+
+        if (contextoUsuario.perfil() == Perfil.ADMIN) {
+            return codigosNormalizados;
+        }
+
+        if (contextoUsuario.perfil() != Perfil.GESTOR) {
+            throw new ErroAcessoNegado("Usuário não possui permissão para gerar relatório de mapas vigentes.");
+        }
+
+        Set<Long> codigosPermitidos = new HashSet<>(unidadeHierarquiaService.buscarIdsDescendentes(contextoUsuario.unidadeAtivaCodigo()));
+        codigosPermitidos.add(contextoUsuario.unidadeAtivaCodigo());
+
+        boolean possuiCodigoForaDaHierarquia = codigosNormalizados.stream()
+                .anyMatch(codigo -> !codigosPermitidos.contains(codigo));
+        if (possuiCodigoForaDaHierarquia) {
+            throw new ErroAcessoNegado("Usuário não possui permissão para gerar relatório para uma ou mais unidades selecionadas.");
+        }
+
+        return codigosNormalizados;
     }
 
     private RelatorioMapaDto criarRelatorioMapaDto(Subprocesso subprocesso) {

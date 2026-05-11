@@ -29,6 +29,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     private ResponsavelUnidadeService responsavelService;
 
     private Processo processo;
+    private Processo processoGestor;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +51,19 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
 
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.saveAndFlush(sp);
+
+        Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
+        processoGestor = ProcessoFixture.novoProcesso()
+                .setTipo(TipoProcesso.MAPEAMENTO)
+                .setSituacao(SituacaoProcesso.EM_ANDAMENTO)
+                .setDescricao("Processo CDU-35 Gestor");
+
+        processoGestor = processoRepo.save(processoGestor);
+
+        Subprocesso subprocessoGestor = SubprocessoFixture.novoSubprocesso(processoGestor, unidadeGestor)
+                .setDataLimiteEtapa1(LocalDateTime.now().plusDays(5));
+        subprocessoGestor.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocessoRepo.saveAndFlush(subprocessoGestor);
     }
 
     @Test
@@ -63,9 +77,19 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Não deve permitir gerar relatório de andamento sem ser ADMIN")
+    @DisplayName("Deve permitir gerar relatório de andamento quando GESTOR acessa processo da própria subárvore")
     @WithMockGestor
-    void gerarRelatorioAndamento_semPermissao_proibido() throws Exception {
+    void gerarRelatorioAndamento_comoGestorNaSubarvore_sucesso() throws Exception {
+        mockMvc.perform(get(API_REL_ANDAMENTO, processoGestor.getCodigo()).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/pdf"))
+                .andExpect(header().exists("Content-Disposition"));
+    }
+
+    @Test
+    @DisplayName("Deve negar relatório de andamento para processo fora da subárvore do GESTOR apenas como defesa de servidor")
+    @WithMockGestor
+    void gerarRelatorioAndamento_foraDaSubarvoreDoGestor_proibido() throws Exception {
         mockMvc.perform(get(API_REL_ANDAMENTO, processo.getCodigo()).with(csrf()))
                 .andExpect(status().isForbidden());
     }

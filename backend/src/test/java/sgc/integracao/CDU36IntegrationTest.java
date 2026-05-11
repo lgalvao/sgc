@@ -3,7 +3,6 @@ package sgc.integracao;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.security.test.context.support.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
@@ -89,9 +88,21 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Não deve permitir gerar relatório de mapas sem ser ADMIN")
-    @WithMockUser(roles = "GESTOR")
-    void gerarRelatorioMapas_semPermissao_proibido() throws Exception {
+    @DisplayName("Deve permitir gerar relatório de mapas para a própria hierarquia quando GESTOR")
+    @WithMockGestor
+    void gerarRelatorioMapas_comoGestorNaHierarquia_sucesso() throws Exception {
+        mockMvc.perform(get(API_REL_MAPAS)
+                        .param("codUnidade", "101")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/pdf"))
+                .andExpect(header().exists("Content-Disposition"));
+    }
+
+    @Test
+    @DisplayName("Deve negar relatório de mapas fora da subárvore do GESTOR apenas como defesa de servidor")
+    @WithMockGestor
+    void gerarRelatorioMapas_foraDaHierarquiaDoGestor_proibido() throws Exception {
         mockMvc.perform(get(API_REL_MAPAS)
                         .param("codUnidade", unidade.getCodigo().toString())
                         .with(csrf()))

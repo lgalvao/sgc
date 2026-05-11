@@ -9,8 +9,10 @@ ENV FRONTEND_BUILD_MODE=$FRONTEND_BUILD_MODE
 COPY deploy/*.cer deploy/cert-combinados.pem /tmp/certs/
 RUN cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/ && \
     update-ca-trust extract && \
-    keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-tre -file /tmp/certs/cert-tre.cer && \
-    keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-for -file /tmp/certs/cert-for.cer
+    keytool -cacerts -storepass changeit -noprompt -trustcacerts \
+        -importcert -alias cert-tre -file /tmp/certs/cert-tre.cer && \
+    keytool -cacerts -storepass changeit -noprompt -trustcacerts \
+        -importcert -alias cert-for -file /tmp/certs/cert-for.cer
 
 # Configura certificados para o Node.js baixado pelo plugin Gradle
 ENV NODE_EXTRA_CA_CERTS=/tmp/certs/cert-combinados.pem
@@ -71,6 +73,7 @@ LABEL description="Sistema de Gestao de Competencias - SGC" \
       version="1.0"
 
 COPY deploy/*.cer /tmp/certs/
+ENV TZ=America/Recife
 RUN set -eux; \
     cp /tmp/certs/*.cer /etc/pki/ca-trust/source/anchors/; \
     update-ca-trust extract; \
@@ -80,17 +83,15 @@ RUN set -eux; \
     useradd --uid 333 --gid 333 --no-create-home --shell /sbin/nologin sgc; \
     dnf remove -y shadow-utils; \
     dnf clean all; \
-    rm -rf /var/cache/dnf
-
-ENV TZ=America/Recife
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
-
-RUN keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-tre -file /tmp/certs/cert-tre.cer && \
-    keytool -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias cert-for -file /tmp/certs/cert-for.cer && \
-    rm -rf /tmp/certs
-
-RUN mkdir -p /var/log/sgc /aplicacao && \
+    rm -rf /var/cache/dnf; \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime; \
+    echo $TZ > /etc/timezone; \
+    keytool -cacerts -storepass changeit -noprompt -trustcacerts \
+        -importcert -alias cert-tre -file /tmp/certs/cert-tre.cer; \
+    keytool -cacerts -storepass changeit -noprompt -trustcacerts \
+        -importcert -alias cert-for -file /tmp/certs/cert-for.cer; \
+    rm -rf /tmp/certs; \
+    mkdir -p /var/log/sgc /aplicacao; \
     chown -R sgc:sgc /var/log/sgc /aplicacao
 
 WORKDIR /aplicacao

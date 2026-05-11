@@ -10,6 +10,7 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
+import sgc.processo.service.*;
 import sgc.seguranca.*;
 
 import java.util.*;
@@ -32,6 +33,9 @@ class RelatorioControllerTest {
 
     @MockitoBean
     private RelatorioFacade relatorioFacade;
+
+    @MockitoBean
+    private ProcessoService processoService;
 
     @Test
     @DisplayName("GET /api/relatorios/andamento/{codProcesso} - Deve retornar relatório de andamento")
@@ -61,10 +65,44 @@ class RelatorioControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/relatorios/andamento/{codProcesso} - Deve retornar relatório de andamento quando GESTOR com acesso")
+    @WithMockUser(roles = "GESTOR")
+    void deveObterRelatorioAndamentoComoGestorComAcesso() throws Exception {
+        RelatorioAndamentoDto dto = RelatorioAndamentoDto.builder()
+                .siglaUnidade("U1")
+                .nomeUnidade("Unidade 1")
+                .situacaoAtual("EM_ANDAMENTO")
+                .responsavel("Responsável")
+                .titular("Responsável")
+                .build();
+        when(processoService.checarAcesso(any(), eq(1L))).thenReturn(true);
+        when(relatorioFacade.obterRelatorioAndamento(1L)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/relatorios/andamento/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].siglaUnidade").value("U1"));
+    }
+
+    @Test
     @DisplayName("GET /api/relatorios/andamento/{codProcesso}/exportar - Deve gerar PDF")
     @WithMockUser(roles = "ADMIN")
     void deveGerarRelatorioAndamentoPdf() throws Exception {
         String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+        mockMvc.perform(get("/api/relatorios/andamento/1/exportar"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-andamento-%s.pdf".formatted(dataAtual)));
+
+        verify(relatorioFacade).gerarRelatorioAndamento(eq(1L), any());
+    }
+
+    @Test
+    @DisplayName("GET /api/relatorios/andamento/{codProcesso}/exportar - Deve gerar PDF quando GESTOR com acesso")
+    @WithMockUser(roles = "GESTOR")
+    void deveGerarRelatorioAndamentoPdfComoGestorComAcesso() throws Exception {
+        String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+        when(processoService.checarAcesso(any(), eq(1L))).thenReturn(true);
+
         mockMvc.perform(get("/api/relatorios/andamento/1/exportar"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
@@ -84,6 +122,19 @@ class RelatorioControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-mapas-%s.pdf".formatted(dataAtual)));
 
         verify(relatorioFacade).gerarRelatorioMapas(eq(List.of(2L, 3L)), any());
+    }
+
+    @Test
+    @DisplayName("GET /api/relatorios/mapas/exportar - Deve gerar PDF quando GESTOR")
+    @WithMockUser(roles = "GESTOR")
+    void deveGerarRelatorioMapasPdfComoGestor() throws Exception {
+        String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+        mockMvc.perform(get("/api/relatorios/mapas/exportar").param("codUnidade", "2"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-mapas-%s.pdf".formatted(dataAtual)));
+
+        verify(relatorioFacade).gerarRelatorioMapas(eq(List.of(2L)), any());
     }
 
     @Test
@@ -116,6 +167,25 @@ class RelatorioControllerTest {
                 .andExpect(jsonPath("$[0].competencias[0].descricao").value("Competência 1"))
                 .andExpect(jsonPath("$[0].competencias[0].atividades[0].descricao").value("Atividade 1"))
                 .andExpect(jsonPath("$[0].competencias[0].atividades[0].conhecimentos[0].descricao").value("Conhecimento 1"));
+    }
+
+    @Test
+    @DisplayName("GET /api/relatorios/mapas - Deve retornar relatório de mapas quando GESTOR")
+    @WithMockUser(roles = "GESTOR")
+    void deveObterRelatorioMapasComoGestor() throws Exception {
+        RelatorioMapaDto dto = new RelatorioMapaDto(
+                2L,
+                "SEC",
+                "Secretaria",
+                1,
+                List.of()
+        );
+        when(relatorioFacade.obterRelatorioMapas(List.of(2L))).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/relatorios/mapas").param("codUnidade", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigoUnidade").value(2))
+                .andExpect(jsonPath("$[0].siglaUnidade").value("SEC"));
     }
 
 }

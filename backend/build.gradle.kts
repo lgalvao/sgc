@@ -86,14 +86,20 @@ dependencies {
 }
 
 tasks.named<ProcessResources>("processResources") {
-    dependsOn(":frontend:buildVue")
     exclude("static/**")
-    from(rootProject.layout.projectDirectory.dir("frontend/dist")) {
-        into("static")
-    }
+}
+
+val atualizarFrontend = tasks.register<Copy>("atualizarFrontend") {
+    group = "build"
+    description = "Gera o build do frontend e copia para os recursos do backend"
+    dependsOn(":frontend:buildVue")
+    mustRunAfter(tasks.named("processResources"))
+    from(rootProject.layout.projectDirectory.dir("frontend/dist"))
+    into(layout.buildDirectory.dir("resources/main/static"))
 }
 
 tasks.withType<BootJar> {
+    dependsOn(atualizarFrontend)
     enabled = true
     mainClass.set("sgc.Sgc")
 }
@@ -103,6 +109,7 @@ springBoot {
 }
 
 tasks.named<BootRun>("bootRun") {
+    dependsOn(atualizarFrontend)
     mainClass.set("sgc.Sgc")
     val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "e2e"
     val envFile = rootProject.file(".env.$env")

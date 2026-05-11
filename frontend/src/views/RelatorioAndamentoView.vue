@@ -92,9 +92,15 @@ async function gerarRelatorio() {
     return;
   }
 
-  carregando.value = true;
-  await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value!);
-  carregando.value = false;
+  try {
+    carregando.value = true;
+    await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value);
+  } catch {
+    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
+  } finally {
+    carregando.value = false;
+  }
+
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
   }
@@ -102,7 +108,16 @@ async function gerarRelatorio() {
 
 async function exportarPdf() {
   if (!codProcessoSelecionado.value) return;
-  await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value);
+
+  try {
+    carregando.value = true;
+    await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value);
+  } catch {
+    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
+  } finally {
+    carregando.value = false;
+  }
+
   if (relatoriosStore.lastError) {
     notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
   }
