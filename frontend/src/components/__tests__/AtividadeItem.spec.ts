@@ -231,9 +231,9 @@ describe("AtividadeItem.vue", () => {
         const inputConhecimento = context.wrapper.find('[data-testid="inp-novo-conhecimento"]');
         const btnAdicionarConhecimento = context.wrapper.find('[data-testid="btn-adicionar-conhecimento"]');
 
-        expect(btnEditarAtividade.attributes('disabled')).toBeDefined();
-        expect(btnRemoverAtividade.attributes('disabled')).toBeDefined();
-        expect(inputConhecimento.attributes('disabled')).toBeDefined();
-        expect(btnAdicionarConhecimento.attributes('disabled')).toBeDefined();
+        expect(btnEditarAtividade.attributes('disabled')).toBe('');
+        expect(btnRemoverAtividade.attributes('disabled')).toBe('');
+        expect(inputConhecimento.attributes('disabled')).toBe('');
+        expect(btnAdicionarConhecimento.attributes('disabled')).toBe('');
     });
 });

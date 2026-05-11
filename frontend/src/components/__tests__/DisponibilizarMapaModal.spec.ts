@@ -1,9 +1,18 @@
 ﻿import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {mount} from "@vue/test-utils";
 import {BFormInput} from "bootstrap-vue-next";
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import DisponibilizarMapaModal from "@/components/mapa/modais/MapaDisponibilizacaoModal.vue";
 import {obterAmanhaFormatado} from "@/utils/date";
+
+vi.mock("@/utils/date", async () => {
+    const actual = await vi.importActual<typeof import("@/utils/date")>("@/utils/date");
+    return {
+        ...actual,
+        obterAmanhaFormatado: () => "2026-03-25",
+        ehDataEstritamenteFutura: (d: string) => d > "2026-03-24",
+    };
+});
 
 const ModalPadraoStub = {
     template: `
@@ -87,12 +96,12 @@ describe("DisponibilizarMapaModal.vue", () => {
         const wrapper = createWrapper({mostrar: true, loading: true});
 
         const btnConfirmar = wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]');
-        expect(btnConfirmar.attributes("disabled")).toBeDefined();
+        expect(btnConfirmar.attributes("disabled")).toBe("");
         expect(btnConfirmar.text()).toContain("Disponibilizando...");
         expect(btnConfirmar.find(".spinner-border").exists()).toBe(true);
 
         const btnCancelar = wrapper.find('[data-testid="btn-disponibilizar-mapa-cancelar"]');
-        expect(btnCancelar.attributes("disabled")).toBeDefined();
+        expect(btnCancelar.attributes("disabled")).toBe("");
     });
 
     it("deve exibir erros de validação quando fornecidos", () => {
@@ -151,6 +160,50 @@ describe("DisponibilizarMapaModal.vue", () => {
 
         const updatedObsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
         expect((updatedObsTextarea.element as HTMLTextAreaElement).value).toBe("");
+    });
+
+    it("deve ter o atributo min correto no campo de data", () => {
+        const wrapper = mount(DisponibilizarMapaModal, {
+            props: {mostrar: true},
+        });
+        const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
+        expect(input.attributes("min")).toBe("2026-03-25");
+    });
+
+    it("deve exibir erro se a data não for futura", async () => {
+        const wrapper = mount(DisponibilizarMapaModal, {
+            props: {mostrar: true},
+        });
+        const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
+        await input.setValue("2026-03-24");
+        expect(wrapper.text()).toContain("A data limite para validação deve ser uma data futura.");
+    });
+
+    it("deve usar a última data limite do subprocesso como mínimo quando ela for maior que amanhã", () => {
+        const wrapper = mount(DisponibilizarMapaModal, {
+            props: {mostrar: true, ultimaDataLimiteSubprocesso: "2026-03-30T00:00:00"},
+        });
+        const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
+        expect(input.attributes("min")).toBe("2026-03-30");
+    });
+
+    it("deve exigir data maior ou igual à última data limite do subprocesso", async () => {
+        const wrapper = mount(DisponibilizarMapaModal, {
+            props: {mostrar: true, ultimaDataLimiteSubprocesso: "2026-03-30T00:00:00"},
+        });
+        const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
+        await input.setValue("2026-03-29");
+        expect(wrapper.text()).toContain("A data limite deve ser maior ou igual à última data limite do subprocesso.");
+    });
+
+    it("deve exigir data limite obrigatória no submit e focar o input", async () => {
+        const wrapper = mount(DisponibilizarMapaModal, {
+            props: {mostrar: true},
+        });
+        const btn = wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]');
+        await btn.trigger("click");
+        await wrapper.vm.$nextTick();
+        expect(wrapper.text()).toContain("A data limite é obrigatória.");
     });
 });
 

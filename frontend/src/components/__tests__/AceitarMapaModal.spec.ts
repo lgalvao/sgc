@@ -69,7 +69,7 @@ describe("AceitarMapaModal.vue", () => {
         await wrapper
             .find('[data-testid="btn-aceite-mapa-cancelar"]')
             .trigger("click");
-        expect(wrapper.emitted("fecharModal")).toBeDefined();
+        expect(wrapper.emitted("fecharModal")).toHaveLength(1);
     });
 
     it("deve renderizar o campo opcional de observação", () => {
@@ -89,8 +89,8 @@ describe("AceitarMapaModal.vue", () => {
             .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
-        expect(wrapper.emitted("confirmarAceitacao")).toBeDefined();
-        expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual(["Observação teste"]);
+        expect(wrapper.emitted("confirmarAceitacao")).toHaveLength(1);
+        expect(wrapper.emitted("confirmarAceitacao")![0]).toEqual(["Observação teste"]);
     });
 
     it("deve emitir o evento confirmarAceitacao com uma observação vazia", async () => {
@@ -100,7 +100,7 @@ describe("AceitarMapaModal.vue", () => {
             .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
-        expect(wrapper.emitted("confirmarAceitacao")).toBeDefined();
+        expect(wrapper.emitted("confirmarAceitacao")).toHaveLength(1);
         expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual([""]);
     });
 
@@ -110,8 +110,8 @@ describe("AceitarMapaModal.vue", () => {
         const btnCancelar = wrapper.find('[data-testid="btn-aceite-mapa-cancelar"]');
         const btnConfirmar = wrapper.find('[data-testid="btn-aceite-mapa-confirmar"]');
 
-        expect(btnCancelar.attributes("disabled")).toBeDefined();
-        expect(btnConfirmar.attributes("disabled")).toBeDefined();
+        expect(btnCancelar.attributes("disabled")).toBe("");
+        expect(btnConfirmar.attributes("disabled")).toBe("");
     });
 });
 

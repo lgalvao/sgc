@@ -5,7 +5,6 @@ vi.unmock("@/utils/logger");
 
 describe('logger', () => {
     it('deve exportar uma instância do logger com os métodos esperados', () => {
-        expect(logger).toBeDefined();
         expect(typeof logger.info).toBe('function');
         expect(typeof logger.error).toBe('function');
         expect(typeof logger.warn).toBe('function');
