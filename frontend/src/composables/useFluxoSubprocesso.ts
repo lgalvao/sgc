@@ -83,7 +83,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
         );
     }
@@ -94,7 +94,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
         );
     }
@@ -123,7 +123,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.DEVOLUCAO_REALIZADA,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
         );
     }
@@ -134,7 +134,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: TEXTOS.sucesso.DEVOLUCAO_REALIZADA,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
         );
     }
@@ -147,7 +147,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
         );
     }
@@ -160,7 +160,7 @@ export function useFluxoSubprocesso() {
             {
                 mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
-                invalidarCaches: {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
         );
     }
@@ -178,7 +178,7 @@ export function useFluxoSubprocesso() {
                 redirecionarParaPainel,
                 redirecionarPara: options?.redirecionarPara,
                 invalidarCaches: redirecionarParaPainel
-                    ? {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                    ? {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
                     : undefined
             }
         );
@@ -197,7 +197,7 @@ export function useFluxoSubprocesso() {
                 redirecionarParaPainel,
                 redirecionarPara: options?.redirecionarPara,
                 invalidarCaches: redirecionarParaPainel
-                    ? {incluirPainel: true, incluirMapas: false, codigoSubprocessoMapa: codigoSubprocesso}
+                    ? {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
                     : undefined
             }
         );

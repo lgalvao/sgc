@@ -9,11 +9,20 @@ const storeMock = {
     garantirContextoCadastroAtividades: vi.fn(),
     garantirContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     atualizarStatusLocal: vi.fn(),
+    invalidarContextoEdicao: vi.fn(),
     erroIntegracaoContexto: null as {codigo?: string} | null,
+};
+
+const mapasStoreMock = {
+    invalidar: vi.fn(),
 };
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => storeMock
+}));
+
+vi.mock("@/stores/mapas", () => ({
+    useMapasStore: () => mapasStoreMock
 }));
 
 describe("useCadastroOrquestracao", () => {
@@ -50,6 +59,20 @@ describe("useCadastroOrquestracao", () => {
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
         });
         expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
+    });
+
+    it("deve invalidar caches de mapa relacionados ao processar resposta local", () => {
+        const {processarRespostaLocal} = useCadastroOrquestracao(props, atividades);
+
+        processarRespostaLocal({
+            subprocesso: {codigo: 123, situacao: "S"} as any,
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
+            atividadesAtualizadas: [{codigo: 9, descricao: "Atualizada"}] as any,
+        });
+
+        expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
+        expect(mapasStoreMock.invalidar).toHaveBeenCalledWith(123);
+        expect(storeMock.invalidarContextoEdicao).toHaveBeenCalledWith(123);
     });
 
     it("deve reaproveitar a assinatura de referência quando ela vier do backend", async () => {

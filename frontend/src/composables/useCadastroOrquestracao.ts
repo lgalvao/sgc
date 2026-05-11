@@ -1,5 +1,6 @@
 import {ref, type Ref} from "vue";
 import type {Atividade, ContextoCadastroAtividadesSubprocesso, RespostaLocalCadastro, Unidade} from "@/types/tipos";
+import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import logger from "@/utils/logger";
@@ -12,6 +13,7 @@ interface CadastroOrquestracaoProps {
 
 export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
+    const mapasStore = useMapasStore();
 
     const carregandoInicial = ref(true);
     const codigoSubprocesso = ref<number | null>(null);
@@ -25,6 +27,8 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
             ...response.subprocesso,
             permissoes: response.permissoes
         });
+        mapasStore.invalidar(response.subprocesso.codigo);
+        subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
     }
 
     function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso) {
