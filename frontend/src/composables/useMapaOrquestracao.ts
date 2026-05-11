@@ -1,4 +1,4 @@
-import {ref} from "vue";
+import {getCurrentInstance, onActivated, onMounted, ref} from "vue";
 import type {ContextoEdicaoSubprocesso, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
@@ -19,6 +19,7 @@ export function useMapaOrquestracao(
     const carregandoInicial = ref(true);
     const codigoSubprocesso = ref<number | null>(null);
     const unidade = ref<Unidade | null>(null);
+    const carregamentoInicialConcluido = ref(false);
 
     function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
         unidade.value = data.unidade;
@@ -57,6 +58,27 @@ export function useMapaOrquestracao(
         } finally {
             carregandoInicial.value = false;
         }
+    }
+
+    if (getCurrentInstance()) {
+        onMounted(() => {
+            carregamentoInicialConcluido.value = true;
+        });
+
+        onActivated(async () => {
+            if (!carregamentoInicialConcluido.value) {
+                return;
+            }
+
+            const codigo = codigoSubprocesso.value;
+            if (typeof codigo === "number"
+                && subprocessoStore.dadosEdicaoValidos(codigo)
+                && mapasStore.dadosMapaValidos(codigo)) {
+                return;
+            }
+
+            await carregarContextoInicial();
+        });
     }
 
     return {

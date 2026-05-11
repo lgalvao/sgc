@@ -1,4 +1,4 @@
-import {ref, type Ref} from "vue";
+import {getCurrentInstance, onActivated, onMounted, ref, type Ref} from "vue";
 import type {Atividade, ContextoCadastroAtividadesSubprocesso, RespostaLocalCadastro, Unidade} from "@/types/tipos";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -20,6 +20,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
     const atividadesSnapshotInicial = ref<string | null>(null);
     const unidade = ref<Unidade | null>(null);
     const codMapa = ref<number | null>(null);
+    const carregamentoInicialConcluido = ref(false);
 
     function processarRespostaLocal(response: RespostaLocalCadastro) {
         atividades.value = response.atividadesAtualizadas;
@@ -82,6 +83,25 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         } finally {
             carregandoInicial.value = false;
         }
+    }
+
+    if (getCurrentInstance()) {
+        onMounted(() => {
+            carregamentoInicialConcluido.value = true;
+        });
+
+        onActivated(async () => {
+            if (!carregamentoInicialConcluido.value) {
+                return;
+            }
+
+            const codigo = codigoSubprocesso.value;
+            if (typeof codigo === "number" && subprocessoStore.dadosCadastroValidos(codigo)) {
+                return;
+            }
+
+            await carregarContextoInicial();
+        });
     }
 
     return {
