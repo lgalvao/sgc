@@ -21,7 +21,7 @@ public class NotificacaoAdminController {
     private final ConfigAplicacao configAplicacao;
 
     @GetMapping("/listar")
-    @Operation(summary = "Lista as notificações individuais de processos ativos")
+    @Operation(summary = "Lista as notificações individuais registradas")
     public ResponseEntity<List<NotificacaoDto>> listar(@RequestParam(defaultValue = "50") int limite) {
         List<NotificacaoDto> dtos = notificacaoService.listarTodasAdmin(limite)
                 .stream()

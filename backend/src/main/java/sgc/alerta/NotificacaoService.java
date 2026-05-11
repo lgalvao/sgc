@@ -73,8 +73,7 @@ public class NotificacaoService {
     @Transactional(readOnly = true)
     public List<NotificacaoEmail> listarTodasAdmin(int limite) {
         int tamanho = Math.clamp(limite, 1, LIMITE_CONSULTA_MAXIMO);
-        // Busca as notificações mais recentes de processos em andamento
-        return notificacaoEmailRepo.buscarRecentesDeProcessosEmAndamento(PageRequest.of(0, tamanho));
+        return notificacaoEmailRepo.findAllByOrderByDataHoraCriacaoDesc(PageRequest.of(0, tamanho));
     }
 
     @Transactional(readOnly = true)

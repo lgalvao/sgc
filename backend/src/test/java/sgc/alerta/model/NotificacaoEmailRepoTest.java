@@ -7,6 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -77,6 +78,32 @@ class NotificacaoEmailRepoTest {
         assertThat(notificacoes)
                 .extracting(NotificacaoEmail::getChaveIdempotencia)
                 .contains("chave-repo-subprocesso");
+    }
+
+    @Test
+    @DisplayName("deve listar todas as notificacoes para administracao inclusive sem subprocesso e de processo finalizado")
+    void deveListarTodasAsNotificacoesParaAdministracaoInclusiveSemSubprocessoEDeProcessoFinalizado() {
+        NotificacaoEmail semSubprocesso = criarNotificacao("chave-repo-sem-subprocesso");
+        semSubprocesso.setSubprocesso(null);
+        semSubprocesso.setDataHoraCriacao(LocalDateTime.of(2026, 4, 21, 10, 0));
+        notificacaoEmailRepo.save(semSubprocesso);
+
+        Subprocesso subprocessoFinalizado = subprocessoRepo.findById(60000L).orElseThrow();
+        Processo processoFinalizado = subprocessoFinalizado.getProcesso();
+        processoFinalizado.setSituacao(SituacaoProcesso.FINALIZADO);
+
+        NotificacaoEmail deProcessoFinalizado = criarNotificacao("chave-repo-processo-finalizado");
+        deProcessoFinalizado.setDataHoraCriacao(LocalDateTime.of(2026, 4, 21, 9, 0));
+        notificacaoEmailRepo.save(deProcessoFinalizado);
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAllByOrderByDataHoraCriacaoDesc(
+                PageRequest.of(0, 10)
+        );
+
+        assertThat(notificacoes)
+                .extracting(NotificacaoEmail::getChaveIdempotencia)
+                .contains("chave-repo-sem-subprocesso", "chave-repo-processo-finalizado");
+        assertThat(notificacoes.getFirst().getChaveIdempotencia()).isEqualTo("chave-repo-sem-subprocesso");
     }
 
     @Test

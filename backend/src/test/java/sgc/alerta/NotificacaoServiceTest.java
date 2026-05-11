@@ -178,13 +178,13 @@ class NotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("listarTodasAdmin deve buscar notificações de processos em andamento")
-    void listarTodasAdminDeveBuscarNotificacoesDeProcessosEmAndamento() {
-        when(notificacaoEmailRepo.buscarRecentesDeProcessosEmAndamento(any())).thenReturn(List.of());
+    @DisplayName("listarTodasAdmin deve buscar todas as notificações registradas")
+    void listarTodasAdminDeveBuscarTodasAsNotificacoesRegistradas() {
+        when(notificacaoEmailRepo.findAllByOrderByDataHoraCriacaoDesc(any())).thenReturn(List.of());
 
         service.listarTodasAdmin(50);
 
-        verify(notificacaoEmailRepo).buscarRecentesDeProcessosEmAndamento(argThat(pageable ->
+        verify(notificacaoEmailRepo).findAllByOrderByDataHoraCriacaoDesc(argThat(pageable ->
                 pageable.getPageNumber() == 0 && pageable.getPageSize() == 50
         ));
     }
