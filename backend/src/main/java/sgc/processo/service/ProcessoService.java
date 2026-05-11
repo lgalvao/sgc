@@ -44,6 +44,8 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 @Transactional
 public class ProcessoService {
+    private static final String SIGLA_UNIDADE_ADMIN = "ADMIN";
+    private static final String SIGLA_UNIDADE_SEDOC = "SEDOC";
 
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
@@ -378,14 +380,14 @@ public class ProcessoService {
         String assunto = "SGC: Lembrete - " + processo.getDescricao();
         String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
                 .formatted(codProcesso, unidadeCodigo, LocalDate.now());
-        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                .tipoNotificacao(TipoNotificacao.LEMBRETE_PRAZO)
-                .unidadeDestinoSigla(unidade.getSigla())
-                .destinatario(emailUnidade(unidade))
-                .assunto(assunto)
-                .corpoHtml(corpoHtml)
-                .chaveIdempotencia(chave)
-                .build());
+        enfileirarNotificacaoUnidade(
+                unidade,
+                TipoNotificacao.LEMBRETE_PRAZO,
+                assunto,
+                corpoHtml,
+                chave,
+                null
+        );
     }
 
 
@@ -1006,14 +1008,14 @@ public class ProcessoService {
                 participante
         );
 
-        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                .subprocesso(subprocessoDestino)
-                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
-                .destinatario(emailUnidade(unidadeDestino))
-                .assunto(assunto)
-                .corpoHtml(corpoHtml)
-                .chaveIdempotencia(chaveInicioProcesso(processo, unidadeDestino, participante))
-                .build());
+        enfileirarNotificacaoUnidade(
+                unidadeDestino,
+                TipoNotificacao.PROCESSO_INICIADO,
+                assunto,
+                corpoHtml,
+                chaveInicioProcesso(processo, unidadeDestino, participante),
+                subprocessoDestino
+        );
     }
 
     private Map<Long, List<String>> mapearSiglasSubordinadasPorSuperior(List<Unidade> participantes) {
@@ -1031,6 +1033,65 @@ public class ProcessoService {
 
     private String emailUnidade(Unidade unidade) {
         return "%s@tre-pe.jus.br".formatted(unidade.getSigla().toLowerCase(Locale.ROOT));
+    }
+
+    private void enfileirarNotificacaoUnidade(
+            Unidade unidadeDestino,
+            TipoNotificacao tipoNotificacao,
+            String assunto,
+            String corpoHtml,
+            String chaveIdempotencia,
+            @Nullable Subprocesso subprocesso
+    ) {
+        String destinatarioPrincipal = emailDestinoPrincipal(unidadeDestino);
+
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoNotificacao(tipoNotificacao)
+                .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .destinatario(destinatarioPrincipal)
+                .assunto(assunto)
+                .corpoHtml(corpoHtml)
+                .chaveIdempotencia(chaveIdempotencia)
+                .build());
+
+        Optional<String> destinatarioCopia = emailCopiaAdmin(unidadeDestino);
+        if (destinatarioCopia.isPresent()) {
+            notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                    .subprocesso(subprocesso)
+                    .tipoNotificacao(tipoNotificacao)
+                    .unidadeDestinoSigla(unidadeDestino.getSigla())
+                    .destinatario(destinatarioCopia.get())
+                    .assunto(assunto)
+                    .corpoHtml(corpoHtml)
+                    .chaveIdempotencia(chaveIdempotencia + ":copia-admin")
+                    .build());
+        }
+    }
+
+    private String emailDestinoPrincipal(Unidade unidadeDestino) {
+        if (isUnidadeAdmin(unidadeDestino)) {
+            return "%s@tre-pe.jus.br".formatted(SIGLA_UNIDADE_SEDOC.toLowerCase(Locale.ROOT));
+        }
+        return emailUnidade(unidadeDestino);
+    }
+
+    private Optional<String> emailCopiaAdmin(Unidade unidadeDestino) {
+        if (!isUnidadeAdmin(unidadeDestino)) {
+            return Optional.empty();
+        }
+
+        Usuario usuario = usuarioService.usuarioAutenticado();
+        Unidade unidadeLotacao = usuario.getUnidadeLotacao();
+        if (unidadeLotacao != null && SIGLA_UNIDADE_SEDOC.equalsIgnoreCase(unidadeLotacao.getSigla())) {
+            return Optional.empty();
+        }
+
+        return Optional.of(usuario.getEmail());
+    }
+
+    private boolean isUnidadeAdmin(Unidade unidadeDestino) {
+        return SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
     }
 
     private String chaveInicioProcesso(Processo processo, Unidade unidadeDestino, boolean participante) {
@@ -1114,14 +1175,14 @@ public class ProcessoService {
                 unidade.getSigla(),
                 processo.getDescricao()
         );
-        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
-                .unidadeDestinoSigla(unidade.getSigla())
-                .destinatario(emailUnidade(unidade))
-                .assunto("SGC: Finalização do processo " + processo.getDescricao())
-                .corpoHtml(corpo)
-                .chaveIdempotencia(chaveFinalizacaoProcesso(processo, unidade, true))
-                .build());
+        enfileirarNotificacaoUnidade(
+                unidade,
+                TipoNotificacao.PROCESSO_FINALIZADO,
+                "SGC: Finalização do processo " + processo.getDescricao(),
+                corpo,
+                chaveFinalizacaoProcesso(processo, unidade, true),
+                null
+        );
     }
 
     private void criarNotificacaoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
@@ -1130,14 +1191,14 @@ public class ProcessoService {
                 processo.getDescricao(),
                 subordinadas
         );
-        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
-                .unidadeDestinoSigla(unidade.getSigla())
-                .destinatario(emailUnidade(unidade))
-                .assunto("SGC: Finalização do processo " + processo.getDescricao() + " em unidades subordinadas")
-                .corpoHtml(corpo)
-                .chaveIdempotencia(chaveFinalizacaoProcesso(processo, unidade, false))
-                .build());
+        enfileirarNotificacaoUnidade(
+                unidade,
+                TipoNotificacao.PROCESSO_FINALIZADO,
+                "SGC: Finalização do processo " + processo.getDescricao() + " em unidades subordinadas",
+                corpo,
+                chaveFinalizacaoProcesso(processo, unidade, false),
+                null
+        );
     }
 
     private String chaveFinalizacaoProcesso(Processo processo, Unidade unidade, boolean direto) {

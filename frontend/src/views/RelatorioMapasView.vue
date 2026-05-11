@@ -11,7 +11,12 @@
         </template>
       </PageHeader>
 
+      <BAlert v-if="semMapasDisponiveis" show variant="info">
+        {{ mensagemSemMapasDisponiveis }}
+      </BAlert>
+
       <RelatorioMapasFiltros
+          v-else
           :carregando="carregando"
           :tem-unidades-selecionadas="temUnidadesSelecionadas"
           :unidades-disponiveis="unidadesDisponiveis"
@@ -34,7 +39,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton} from "bootstrap-vue-next";
+import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
@@ -56,6 +61,12 @@ const unidadesSelecionadas = ref<number[]>([]);
 const carregando = ref(false);
 const relatorioMapas = computed(() => relatoriosStore.relatorioMapas);
 const temUnidadesSelecionadas = computed(() => unidadesSelecionadas.value.length > 0);
+const semMapasDisponiveis = computed(() => !carregando.value && unidadesDisponiveis.value.length === 0);
+const mensagemSemMapasDisponiveis = computed(() =>
+    perfilStore.perfilSelecionado === Perfil.GESTOR
+        ? "Não há mapas vigentes para sua unidade ou unidades subordinadas."
+        : "Não há mapas vigentes."
+);
 
 function aplicarElegibilidadeMapaVigente(unidades: Unidade[], codigosElegiveis: Set<number>): Unidade[] {
   return unidades.map(unidade => ({

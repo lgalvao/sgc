@@ -1,6 +1,6 @@
 {
   "name": "sgc",
-  "description": "Sistema de Gestão de Conhecimentos",
+  "description": "Sistema de Gestão de Competências",
   "version": "1.0.4",
   "type": "module",
   "scripts": {

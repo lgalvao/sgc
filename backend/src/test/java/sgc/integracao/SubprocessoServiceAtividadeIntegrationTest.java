@@ -2,10 +2,12 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.data.domain.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.comum.erros.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
@@ -36,6 +38,10 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     private AtividadeRepo atividadeRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Subprocesso subprocessoDestino;
     private Subprocesso subprocessoOrigem;
@@ -107,6 +113,12 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("importarAtividades: Deve importar atividades de outro mapa com sucesso")
     void importarAtividades_Sucesso() {
+        long totalMovimentacoesAntes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoDestino.getCodigo()).size();
+        long totalAlertasAntes = alertaRepo.count();
+        long totalNotificacoesAntes = notificacaoEmailRepo
+                .findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(subprocessoDestino.getCodigo(), Pageable.ofSize(100))
+                .size();
+
         subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), List.of());
 
         Subprocesso destAtualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
@@ -114,6 +126,12 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
 
         long countAtividadesDestino = atividadeRepo.findByMapa_Codigo(destAtualizado.getMapa().getCodigo()).size();
         assertThat(countAtividadesDestino).isEqualTo(1);
+        assertThat(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoDestino.getCodigo()))
+                .hasSize((int) totalMovimentacoesAntes);
+        assertThat(alertaRepo.count()).isEqualTo(totalAlertasAntes);
+        assertThat(notificacaoEmailRepo
+                .findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(subprocessoDestino.getCodigo(), Pageable.ofSize(100)))
+                .hasSize((int) totalNotificacoesAntes);
     }
 
     @Test

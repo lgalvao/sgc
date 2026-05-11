@@ -9,6 +9,7 @@
     "build-storybook": "storybook build",
     "build": "vite build",
     "build:hom": "vite build --mode hom",
+    "build:e2e": "vite build --mode e2e",
     "build:prod": "vite build --mode production",
     "preview": "vite preview",
     "lint:ox": "oxlint .",

@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.openpdf.text.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
+import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -38,12 +39,24 @@ class RelatorioFacadeTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock
+    private UsuarioFacade usuarioFacade;
+    @Mock
     private PdfFactory pdfFactory;
     @Mock
     private Document document;
 
     @InjectMocks
     private RelatorioFacade relatorioService;
+
+    private void mockContextoAdmin() {
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+            "111111111111",
+            999L,
+            Perfil.ADMIN
+        ));
+    }
 
     @Test
     @DisplayName("Deve obter relatório de andamento com dados corretos")
@@ -263,6 +276,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve gerar relatório de mapas completo")
     void deveGerarRelatorioMapasCompleto() throws DocumentException {
+        mockContextoAdmin();
         when(pdfFactory.createDocument()).thenReturn(document);
         Unidade u = new Unidade();
         u.setSigla("U1");
@@ -304,6 +318,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve obter relatório de mapas somente para unidades com mapa vigente")
     void deveObterRelatorioMapasSomenteParaUnidadesComMapaVigente() {
+        mockContextoAdmin();
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setSigla("U1");
@@ -349,6 +364,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve normalizar códigos duplicados antes de buscar mapas")
     void deveNormalizarCodigosDuplicadosAntesDeBuscarMapas() {
+        mockContextoAdmin();
         when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of());
 
         relatorioService.obterRelatorioMapas(List.of(1L, 1L, 2L));
@@ -359,6 +375,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve ignorar unidades sem mapa vigente ao montar relatório de mapas")
     void deveIgnorarUnidadesSemMapaVigenteAoMontarRelatorioDeMapas() {
+        mockContextoAdmin();
         Unidade unidade = new Unidade();
         unidade.setCodigo(2L);
         unidade.setSigla("U2");
@@ -408,6 +425,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve processar competência sem atividades")
     void deveProcessarCompetenciaSemAtividades() throws DocumentException {
+        mockContextoAdmin();
         when(pdfFactory.createDocument()).thenReturn(document);
         Unidade u = new Unidade();
         u.setSigla("U1");
@@ -439,6 +457,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve processar atividade sem conhecimentos")
     void deveProcessarAtividadeSemConhecimentos() throws DocumentException {
+        mockContextoAdmin();
         when(pdfFactory.createDocument()).thenReturn(document);
         Unidade u = new Unidade();
         u.setSigla("U1");
@@ -487,6 +506,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
     void deveCobrirErroGerarPdfMapas() throws DocumentException {
+        mockContextoAdmin();
         when(pdfFactory.createDocument()).thenReturn(document);
         when(unidadeService.buscarMapasPorUnidades(List.of(1L))).thenReturn(List.of());
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());

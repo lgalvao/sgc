@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {mount} from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import RelatorioMapasView from "@/views/RelatorioMapasView.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from "@/services/unidadeService";
@@ -26,6 +26,7 @@ describe("RelatorioMapasView.vue", () => {
     const stubs = {
         LayoutPadrao: {template: "<div><slot /></div>"},
         PageHeader: {template: "<div><slot name='actions' /></div>"},
+        BAlert: {template: "<div data-testid='alert-sem-mapas'><slot /></div>"},
         BCard: {template: "<div v-bind='$attrs'><slot /></div>"},
         BCardBody: {template: "<div><slot /></div>"},
         BCardTitle: {template: "<div><slot /></div>"},
@@ -73,7 +74,7 @@ describe("RelatorioMapasView.vue", () => {
 
     it("deve carregar unidades e codigos com mapa vigente ao montar", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
         expect(unidadeService.buscarCodigosUnidadesComMapaVigente).toHaveBeenCalled();
@@ -81,8 +82,7 @@ describe("RelatorioMapasView.vue", () => {
 
     it("deve mostrar apenas ramos que levam a unidades com mapa vigente", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
-        await ctx.wrapper.vm.$nextTick();
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         const vm = ctx.wrapper.vm as unknown as {
             unidadesDisponiveis: Array<{
@@ -107,13 +107,13 @@ describe("RelatorioMapasView.vue", () => {
 
     it("deve enviar as unidades selecionadas ao gerar html", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm).$pinia);
         const buscarSpy = vi.spyOn(relatoriosStore, "buscarRelatorioMapas").mockResolvedValue(undefined as any);
 
         await ctx.wrapper.find("[data-testid='arvore-unidades-stub']").trigger("click");
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
         await ctx.wrapper.find("[data-testid='btn-gerar-html-mapas']").trigger("click");
 
         expect(buscarSpy).toHaveBeenCalledWith([10]);
@@ -121,13 +121,13 @@ describe("RelatorioMapasView.vue", () => {
 
     it("deve enviar as unidades selecionadas ao exportar pdf", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm).$pinia);
         const exportarSpy = vi.spyOn(relatoriosStore, "exportarMapasPdf").mockResolvedValue(undefined as any);
 
         await ctx.wrapper.find("[data-testid='arvore-unidades-stub']").trigger("click");
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
         await ctx.wrapper.find("[data-testid='btn-gerar-mapas']").trigger("click");
 
         expect(exportarSpy).toHaveBeenCalledWith([10]);
@@ -135,7 +135,7 @@ describe("RelatorioMapasView.vue", () => {
 
     it("deve desabilitar os botões enquanto não houver unidades selecionadas", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         const btnGerarHtml = ctx.wrapper.find("[data-testid='btn-gerar-html-mapas']");
         const btnPdf = ctx.wrapper.find("[data-testid='btn-gerar-mapas']");
@@ -144,7 +144,7 @@ describe("RelatorioMapasView.vue", () => {
         expect(btnPdf.attributes("disabled")).toBeDefined();
 
         await ctx.wrapper.find("[data-testid='arvore-unidades-stub']").trigger("click");
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         expect(btnGerarHtml.attributes("disabled")).toBeUndefined();
         expect(btnPdf.attributes("disabled")).toBeUndefined();
@@ -181,7 +181,7 @@ describe("RelatorioMapasView.vue", () => {
                 ]
             }
         }, stubs));
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         expect(ctx.wrapper.find("[data-testid='card-mapa-vigente']").exists()).toBe(true);
         expect(ctx.wrapper.text()).toContain("COORD");
@@ -198,8 +198,7 @@ describe("RelatorioMapasView.vue", () => {
                 unidadeSelecionada: 1
             }
         }, stubs));
-        await ctx.wrapper.vm.$nextTick();
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         const vm = ctx.wrapper.vm as unknown as {
             unidadesDisponiveis: Array<{ sigla: string; filhas?: Array<{ sigla: string }> }>;
@@ -211,16 +210,47 @@ describe("RelatorioMapasView.vue", () => {
 
     it("deve encerrar o carregamento mesmo quando gerar relatório falhar", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         const relatoriosStore = useRelatoriosStore((ctx.wrapper.vm).$pinia);
         vi.spyOn(relatoriosStore, "buscarRelatorioMapas").mockRejectedValue(new Error("403"));
 
         await ctx.wrapper.find("[data-testid='arvore-unidades-stub']").trigger("click");
-        await ctx.wrapper.vm.$nextTick();
+        await flushPromises();
 
         await (ctx.wrapper.vm as any).gerarRelatorio();
 
         expect((ctx.wrapper.vm as any).carregando).toBe(false);
+    });
+
+    it("deve mostrar alerta para ADMIN quando não houver mapas vigentes", async () => {
+        vi.mocked(unidadeService.buscarCodigosUnidadesComMapaVigente).mockResolvedValue([]);
+
+        ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: Perfil.ADMIN
+            }
+        }, stubs));
+        await flushPromises();
+
+        expect(ctx.wrapper.find("[data-testid='alert-sem-mapas']").exists()).toBe(true);
+        expect(ctx.wrapper.text()).toContain("Não há mapas vigentes.");
+        expect(ctx.wrapper.find("[data-testid='container-arvore-unidades-mapas']").exists()).toBe(false);
+    });
+
+    it("deve mostrar alerta específico para GESTOR quando não houver mapas vigentes na subárvore", async () => {
+        vi.mocked(unidadeService.buscarCodigosUnidadesComMapaVigente).mockResolvedValue([]);
+
+        ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: Perfil.GESTOR,
+                unidadeSelecionada: 1
+            }
+        }, stubs));
+        await flushPromises();
+
+        expect(ctx.wrapper.find("[data-testid='alert-sem-mapas']").exists()).toBe(true);
+        expect(ctx.wrapper.text()).toContain("Não há mapas vigentes para sua unidade ou unidades subordinadas.");
+        expect(ctx.wrapper.find("[data-testid='container-arvore-unidades-mapas']").exists()).toBe(false);
     });
 });

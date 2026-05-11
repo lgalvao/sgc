@@ -343,7 +343,7 @@ function startBackend() {
         }
     };
 
-    const backendProcess = spawn(gradlewPath, ['bootRun', `-PENV=${PERFIL_LIFECYCLE}`, argsGradle], spawnOptions);
+    const backendProcess = spawn(gradlewPath, ['bootRun', `-PENV=${PERFIL_LIFECYCLE}`, '-PskipFrontend=true', argsGradle], spawnOptions);
     backendProcessos.push(backendProcess);
 
     backendProcess.stdout.on('data', data => log(`BACKEND`, data));

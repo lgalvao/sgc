@@ -42,11 +42,13 @@ tasks.register<NpmTask>("buildVue") {
     val modoBuildFrontend = (
         System.getenv("FRONTEND_BUILD_MODE")
             ?: project.findProperty("frontendBuildMode")?.toString()
+            ?: project.findProperty("ENV")?.toString()
             ?: "production"
         ).lowercase()
 
     val scriptBuild = when (modoBuildFrontend) {
         "hom" -> "build:hom"
+        "e2e" -> "build:e2e"
         "prod", "production" -> "build:prod"
         else -> "build"
     }

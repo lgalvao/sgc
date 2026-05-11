@@ -109,7 +109,9 @@ springBoot {
 }
 
 tasks.named<BootRun>("bootRun") {
-    dependsOn(atualizarFrontend)
+    if (project.findProperty("skipFrontend")?.toString() != "true") {
+        dependsOn(atualizarFrontend)
+    }
     mainClass.set("sgc.Sgc")
     val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "e2e"
     val envFile = rootProject.file(".env.$env")

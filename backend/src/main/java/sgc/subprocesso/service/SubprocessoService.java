@@ -419,7 +419,6 @@ public class SubprocessoService {
                 contexto.codMapaOrigem(), contexto.codMapaDestino(), codigosAtividades);
 
         atualizarSituacaoDestinoAposImportacao(contexto.subprocessoDestino());
-        registrarMovimentacaoImportacao(contexto);
 
         return new ImportacaoAtividadesResultado(
                 contexto.subprocessoDestino().getCodigo(),
@@ -494,21 +493,6 @@ public class SubprocessoService {
         }
 
         subprocessoRepo.save(subprocessoDestino);
-    }
-
-    private void registrarMovimentacaoImportacao(ImportacaoAtividadesContexto contexto) {
-        Unidade unidadeOrigem = contexto.subprocessoOrigem().getUnidade();
-        String descricao = Mensagens.HIST_IMPORTACAO_ATIVIDADES.formatted(
-                contexto.subprocessoOrigem().getCodigo(),
-                unidadeOrigem.getSigla());
-
-        movimentacaoRepo.save(Movimentacao.builder()
-                .subprocesso(contexto.subprocessoDestino())
-                .unidadeOrigem(unidadeOrigem)
-                .unidadeDestino(contexto.subprocessoDestino().getUnidade())
-                .descricao(descricao)
-                .usuario(contexto.usuario())
-                .build());
     }
 
     private boolean houveDuplicidadeNaImportacao(int totalSolicitado, int totalImportado) {

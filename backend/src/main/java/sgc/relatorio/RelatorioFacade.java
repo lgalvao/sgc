@@ -33,7 +33,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RelatorioFacade {
-    private static final String NOME_SISTEMA = "Sistema de Gestão de Conhecimentos";
+    private static final String NOME_SISTEMA = "Sistema de Gestão de Competências";
     private static final DateTimeFormatter FORMATADOR_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FORMATADOR_DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 

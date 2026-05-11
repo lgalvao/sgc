@@ -1635,6 +1635,98 @@ class ProcessoServiceTest {
                         && cmd.tipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO
                         && "U1".equals(cmd.unidadeDestinoSigla())
                         && cmd.chaveIdempotencia().startsWith("processo:1:lembrete:unidade:10:dia:")
+            ));
+        }
+
+    @Test
+    @DisplayName("enviarLembrete para unidade ADMIN deve enviar para SEDOC quando ADMIN estiver lotado na SEDOC")
+    void enviarLembreteAdminLotadoNaSedoc() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setDescricao("Processo Teste");
+        processo.setDataLimite(LocalDateTime.of(2026, 6, 30, 0, 0));
+
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
+        admin.setNome("Administrador");
+        UnidadeProcesso participanteAdmin = new UnidadeProcesso();
+        participanteAdmin.setUnidadeCodigo(1L);
+        participanteAdmin.setSigla("ADMIN");
+        processo.setParticipantes(new ArrayList<>(List.of(participanteAdmin)));
+
+        Unidade sedoc = new Unidade();
+        sedoc.setCodigo(2L);
+        sedoc.setSigla("SEDOC");
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setEmail("admin.sedoc@tre-pe.jus.br");
+        usuario.setUnidadeLotacao(sedoc);
+
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(10L);
+
+        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(processo));
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
+        when(servicoAlertas.criarAlertaAdmin(eq(processo), eq(admin), anyString())).thenReturn(alerta);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+        processoService.enviarLembrete(1L, 1L);
+
+        verify(notificacaoService, times(1)).enfileirar(argThat(cmd ->
+                "sedoc@tre-pe.jus.br".equals(cmd.destinatario())
+                        && "ADMIN".equals(cmd.unidadeDestinoSigla())
+                        && cmd.chaveIdempotencia().equals("processo:1:lembrete:unidade:1:dia:" + LocalDate.now())
+        ));
+    }
+
+    @Test
+    @DisplayName("enviarLembrete para unidade ADMIN deve enviar cópia ao e-mail pessoal quando ADMIN estiver lotado em outra unidade")
+    void enviarLembreteAdminLotadoForaDaSedoc() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setDescricao("Processo Teste");
+        processo.setDataLimite(LocalDateTime.of(2026, 6, 30, 0, 0));
+
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
+        admin.setNome("Administrador");
+        UnidadeProcesso participanteAdmin = new UnidadeProcesso();
+        participanteAdmin.setUnidadeCodigo(1L);
+        participanteAdmin.setSigla("ADMIN");
+        processo.setParticipantes(new ArrayList<>(List.of(participanteAdmin)));
+
+        Unidade outra = new Unidade();
+        outra.setCodigo(3L);
+        outra.setSigla("COAUD");
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setEmail("admin.teste@tre-pe.jus.br");
+        usuario.setUnidadeLotacao(outra);
+
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(10L);
+
+        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(processo));
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
+        when(servicoAlertas.criarAlertaAdmin(eq(processo), eq(admin), anyString())).thenReturn(alerta);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+        processoService.enviarLembrete(1L, 1L);
+
+        verify(notificacaoService, times(2)).enfileirar(any());
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "sedoc@tre-pe.jus.br".equals(cmd.destinatario())
+                        && cmd.chaveIdempotencia().equals("processo:1:lembrete:unidade:1:dia:" + LocalDate.now())
+        ));
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "admin.teste@tre-pe.jus.br".equals(cmd.destinatario())
+                        && cmd.chaveIdempotencia().equals("processo:1:lembrete:unidade:1:dia:" + LocalDate.now() + ":copia-admin")
         ));
     }
 
