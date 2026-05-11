@@ -157,6 +157,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve importar atividades e conhecimentos")
         void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
+            int totalMovimentacoesAntes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
+                    subprocessoDestino.getCodigo()).size();
+
             ImportarAtividadesRequest request =
                     new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), codigosAtividadesOrigem);
 
@@ -202,8 +205,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             List<Movimentacao> movimentacoes =
                     movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                             subprocessoDestino.getCodigo());
-            assertThat(movimentacoes).hasSize(2);
-            assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
+            assertThat(movimentacoes).hasSize(totalMovimentacoesAntes);
         }
 
         @Test
