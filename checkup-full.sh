@@ -61,18 +61,14 @@ if [ -t 1 ]; then
     clear
 fi
 
-invoke_passo 'Atualizar branch local' git pull --ff-only
-
-invoke_passo 'Atualizar npm global' npm install -g npm@latest
-invoke_passo 'Atualizar pacotes globais' npm update -g
-
+invoke_passo 'Atualizar branch local' git pull
 atualizar_dependencias_npm '' 'Atualizar dependências da raiz'
 atualizar_dependencias_npm 'etc/scripts' 'Atualizar dependências de etc/scripts'
 
 invoke_passo 'Lint raiz' npm run lint:ox
 invoke_passo 'Lint etc/scripts' npm --prefix etc/scripts run lint
 invoke_passo 'Testes etc/scripts' npm --prefix etc/scripts run test
-invoke_passo 'Qualidade frontend + backend' "$GRADLE_CMD" backend:qualityCheckFast
+invoke_passo 'Qualidade frontend + backend' "$GRADLE_CMD" backend:qualityCheck
 invoke_passo 'Testes e2e' npx playwright test
 
 echo -e "\n${GREEN}Tudo certo!${NC}"
