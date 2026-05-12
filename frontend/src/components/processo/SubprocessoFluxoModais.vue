@@ -21,7 +21,7 @@ defineProps<{
     siglaUnidade: string;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
     (e: "fechar-modal-data"): void;
     (e: "confirmar-alteracao-data", novaData: string): void;
     (e: "update:mostrarModalReabrir", valor: boolean): void;
