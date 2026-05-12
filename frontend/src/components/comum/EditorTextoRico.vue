@@ -47,9 +47,9 @@ const editor = new Editor({
     editorProps: {
         attributes: {
             class: "editor-texto-rico__conteudo form-control",
-            id: props.id,
+            ...(props.id ? {id: props.id} : {}),
             "data-testid": dataTestid,
-            "aria-required": ariaRequired,
+            ...(ariaRequired ? {"aria-required": ariaRequired} : {}),
             role: "textbox",
         },
     },

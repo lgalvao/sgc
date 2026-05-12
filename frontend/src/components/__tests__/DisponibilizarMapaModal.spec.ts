@@ -32,11 +32,23 @@ const ModalPadraoStub = {
     emits: ["update:modelValue", "fechar", "confirmar"],
 };
 
+const EditorTextoRicoStub = {
+    props: ["modelValue"],
+    emits: ["update:modelValue"],
+    template: `
+        <textarea
+            :data-testid="$attrs['data-testid']"
+            :value="modelValue"
+            @input="$emit('update:modelValue', $event.target.value)"
+        />
+    `,
+};
+
 describe("DisponibilizarMapaModal.vue", () => {
     const context = setupComponentTest();
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, {ModalPadrao: ModalPadraoStub});
+        const options = getCommonMountOptions({}, {ModalPadrao: ModalPadraoStub, EditorTextoRico: EditorTextoRicoStub});
 
         context.wrapper = mount(DisponibilizarMapaModal, {
             ...options,
@@ -57,8 +69,7 @@ describe("DisponibilizarMapaModal.vue", () => {
 
     async function definirObservacoes(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
         const editor = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
-        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
-        await editor.trigger("input");
+        await editor.setValue(conteudoHtml);
     }
 
     it("não deve renderizar o modal quando mostrar for falso", () => {
@@ -162,8 +173,14 @@ describe("DisponibilizarMapaModal.vue", () => {
 
         expect(wrapper.findComponent(BFormInput).props().modelValue).toBe("");
 
-        const updatedObsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
-        expect(updatedObsTextarea.text()).toBe("");
+        const inputAposReset = wrapper.findComponent(BFormInput).find("input");
+        await inputAposReset.setValue(obterAmanhaFormatado());
+        await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
+
+        expect(wrapper.emitted("disponibilizar")?.[0]).toEqual([{
+            dataLimite: obterAmanhaFormatado(),
+            observacoes: "",
+        }]);
     });
 
     it("deve ter o atributo min correto no campo de data", () => {
@@ -210,4 +227,3 @@ describe("DisponibilizarMapaModal.vue", () => {
         expect(wrapper.text()).toContain("A data limite é obrigatória.");
     });
 });
-
