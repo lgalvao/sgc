@@ -136,12 +136,12 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         await expect(modal).toBeVisible();
 
         // Conteúdo do modal exibe as sugestões
-        const txtSugestoes = page.getByTestId('txt-ver-sugestoes-mapa-texto');
+        const txtSugestoes = page.getByTestId('txt-ver-sugestoes-mapa-html');
         await expect(txtSugestoes).toBeVisible();
         await expect(txtSugestoes).toContainText('Sugestão de ajuste na competência via fixture E2E');
 
         // Fecha o modal
-        await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();
+        await modal.getByTestId('btn-visualizacao-texto-formatado-fechar').click();
         await expect(modal).toBeHidden();
     });
 });
@@ -185,8 +185,8 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         await page.getByTestId('btn-mapa-ver-sugestoes').click();
-        await expect(page.getByTestId('txt-ver-sugestoes-mapa-texto')).toContainText(TEXTO_SUGESTAO);
-        await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();
+        await expect(page.getByTestId('txt-ver-sugestoes-mapa-html')).toContainText(TEXTO_SUGESTAO);
+        await page.getByRole('dialog').getByTestId('btn-visualizacao-texto-formatado-fechar').click();
 
         await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();

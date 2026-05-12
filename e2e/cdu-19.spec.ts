@@ -108,7 +108,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await abrirSugestoesMapa(page);
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-        await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue('');
+        await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveText('');
 
         // Preenche e confirma
         await page.getByTestId('inp-sugestoes-mapa-texto').fill(TEXTO_SUGESTAO);
@@ -150,7 +150,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await esperarMapaSomenteLeitura(page);
         await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
         await abrirSugestoesMapa(page);
-        await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue(TEXTO_SUGESTAO);
+        await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toContainText(TEXTO_SUGESTAO);
         await page.getByTestId('btn-sugestoes-mapa-cancelar').click();
     });
 
@@ -168,7 +168,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
 
         await abrirSugestoesMapa(page);
-        await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue(TEXTO_SUGESTAO);
+        await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toContainText(TEXTO_SUGESTAO);
 
         // Cancela sem alterar o estado
         await page.getByTestId('btn-sugestoes-mapa-cancelar').click();
