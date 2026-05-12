@@ -31,18 +31,17 @@ describe("AceitarMapaModal.vue", () => {
                 ...options.global,
                 components: {
                     ModalConfirmacao: ModalConfirmacaoStub,
+                    EditorTextoRico: {
+                        props: ["modelValue"],
+                        emits: ["update:modelValue"],
+                        template: '<textarea :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
+                    },
                     ...options.global.components
                 }
             },
         });
         return context.wrapper;
     };
-
-    async function definirObservacao(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
-        const editor = wrapper.find('[data-testid="inp-aceite-mapa-observacao"]');
-        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
-        await editor.trigger("input");
-    }
 
     it("não deve renderizar o modal quando mostrarModal for falso", () => {
         const wrapper = createWrapper({mostrarModal: false});
@@ -87,14 +86,14 @@ describe("AceitarMapaModal.vue", () => {
     it("deve emitir o evento confirmarAceitacao com a observação", async () => {
         const wrapper = createWrapper();
 
-        await definirObservacao(wrapper, "<p>Observação teste</p>");
+        await wrapper.find('[data-testid="inp-aceite-mapa-observacao"]').setValue("Observação teste");
 
         await wrapper
             .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
         expect(wrapper.emitted("confirmarAceitacao")).toHaveLength(1);
-        expect(wrapper.emitted("confirmarAceitacao")![0]).toEqual(["<p>Observação teste</p>"]);
+        expect(wrapper.emitted("confirmarAceitacao")![0]).toEqual(["Observação teste"]);
     });
 
     it("deve emitir o evento confirmarAceitacao com uma observação vazia", async () => {

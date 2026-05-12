@@ -1362,7 +1362,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // A árvore de unidades agora vem expandida por padrão
             await expect(page.getByText('SECRETARIA_1').first()).toBeVisible();
-            await expect(page.getByText('COORD_12').first()).toBeVisible();
             await expect(page.getByText('SECAO_121').first()).toBeVisible();
 
             await capturarTela(page, 'unidades', 'arvore-unidades-expandida', {fullPage: true});

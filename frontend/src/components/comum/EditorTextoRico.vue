@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, onBeforeUnmount, watch} from "vue";
+import {computed, onBeforeUnmount, useAttrs, watch} from "vue";
 import {Editor, EditorContent} from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import {htmlTemConteudo, normalizarHtmlEditor} from "@/utils/textoFormatado";
@@ -8,18 +8,21 @@ const props = withDefaults(defineProps<{
     modelValue: string;
     desabilitado?: boolean;
     rotulo?: string;
-    dataTestid?: string;
     minimoAltura?: string;
 }>(), {
     desabilitado: false,
     rotulo: "Editor de texto",
-    dataTestid: "editor-texto-rico-conteudo",
     minimoAltura: "12rem",
 });
 
 const emit = defineEmits<{
     "update:modelValue": [valor: string];
 }>();
+
+const attrs = useAttrs();
+const dataTestid = typeof attrs["data-testid"] === "string"
+    ? attrs["data-testid"]
+    : "editor-texto-rico-conteudo";
 
 const editor = new Editor({
     extensions: [
@@ -34,6 +37,7 @@ const editor = new Editor({
     editorProps: {
         attributes: {
             class: "editor-texto-rico__conteudo form-control",
+            "data-testid": dataTestid,
             role: "textbox",
         },
     },
@@ -138,7 +142,6 @@ function sincronizarPorDom(event: Event) {
             :editor="editor"
             :aria-label="rotulo"
             :class="classesEditor"
-            :data-testid="dataTestid"
             :style="{ '--editor-minimo-altura': minimoAltura }"
             @input.capture="sincronizarPorDom"
         />
