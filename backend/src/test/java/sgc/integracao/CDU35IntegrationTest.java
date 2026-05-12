@@ -51,6 +51,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
 
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.saveAndFlush(sp);
+        registrarMovimentacaoInicial(sp);
 
         Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
         processoGestor = ProcessoFixture.novoProcesso()
@@ -64,6 +65,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
                 .setDataLimiteEtapa1(LocalDateTime.now().plusDays(5));
         subprocessoGestor.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.saveAndFlush(subprocessoGestor);
+        registrarMovimentacaoInicial(subprocessoGestor);
     }
 
     @Test
