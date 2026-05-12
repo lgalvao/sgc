@@ -51,3 +51,4 @@ invoke_passo 'Qualidade frontend + backend' "$GRADLE_CMD" backend:qualityCheck
 invoke_passo 'Testes e2e' npx playwright test
 
 echo -e "\n${GREEN}Tudo certo!${NC}"
+
