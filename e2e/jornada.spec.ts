@@ -151,6 +151,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.executarComo(page, GESTOR, async () => {
             await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
             await AtividadeHelpers.navegarParaCadastro(page);
             await AnaliseHelpers.verificarAcoesAnaliseCadastro(page, {
                 rotuloPrincipal: /Registrar aceite/i,

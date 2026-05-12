@@ -549,7 +549,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             localizacao: SIGLA_SECRETARIA
         });
 
-        // O GESTOR da secretaria abre a tela de atividades e registra aceite.
+        // O GESTOR da secretaria registra aceite direto (sem devolução), cobrindo o caminho positivo.
         await navegarParaCadastro(page);
         await aceitarCadastroMapeamento(page, 'Obs. cadastro aceito');
 
