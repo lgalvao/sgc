@@ -1081,7 +1081,10 @@ public class ProcessoService {
             return Optional.empty();
         }
 
-        Usuario usuario = usuarioService.usuarioAutenticado();
+        // Busca o usuário com unidadeLotacao inicializada via JOIN FETCH para evitar
+        // LazyInitializationException ao acessar getSigla() fora de sessão Hibernate.
+        Usuario usuarioPrincipal = usuarioService.usuarioAutenticado();
+        Usuario usuario = usuarioService.buscarUsuarioComUnidadeLotacao(usuarioPrincipal.getTituloEleitoral());
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
         if (unidadeLotacao != null && SIGLA_UNIDADE_SEDOC.equalsIgnoreCase(unidadeLotacao.getSigla())) {
             return Optional.empty();

@@ -47,6 +47,12 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
+    public Usuario buscarUsuarioComUnidadeLotacao(String titulo) {
+        return usuarioService.buscarOptComUnidadeLotacao(titulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
+    }
+
+    @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioSemAtribuicoesParaAutenticacao(String titulo) {
         return usuarioService.buscarOpt(titulo).orElse(null);
     }
@@ -104,7 +110,7 @@ public class UsuarioFacade {
         Usuario usuario;
         try {
             usuario = usuarioService.buscar(titulo);
-        } catch (ErroEntidadeNaoEncontrada ex) {
+        } catch (ErroEntidadeNaoEncontrada _) {
             throw new ErroInconsistenciaInterna(
                     "Usuario %s ausente ao buscar perfis; isso indica inconsistencia interna do sistema".formatted(titulo)
             );

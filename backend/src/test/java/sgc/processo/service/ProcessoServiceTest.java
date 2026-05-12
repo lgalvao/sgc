@@ -1660,6 +1660,7 @@ class ProcessoServiceTest {
         sedoc.setSigla("SEDOC");
 
         Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("TITULO_SEDOC");
         usuario.setPerfilAtivo(Perfil.ADMIN);
         usuario.setEmail("admin.sedoc@tre-pe.jus.br");
         usuario.setUnidadeLotacao(sedoc);
@@ -1672,6 +1673,7 @@ class ProcessoServiceTest {
         when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
         when(servicoAlertas.criarAlertaAdmin(eq(processo), eq(admin), anyString())).thenReturn(alerta);
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioService.buscarUsuarioComUnidadeLotacao("TITULO_SEDOC")).thenReturn(usuario);
 
         processoService.enviarLembrete(1L, 1L);
 
@@ -1704,6 +1706,7 @@ class ProcessoServiceTest {
         outra.setSigla("COAUD");
 
         Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("TITULO_COAUD");
         usuario.setPerfilAtivo(Perfil.ADMIN);
         usuario.setEmail("admin.teste@tre-pe.jus.br");
         usuario.setUnidadeLotacao(outra);
@@ -1716,6 +1719,7 @@ class ProcessoServiceTest {
         when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
         when(servicoAlertas.criarAlertaAdmin(eq(processo), eq(admin), anyString())).thenReturn(alerta);
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioService.buscarUsuarioComUnidadeLotacao("TITULO_COAUD")).thenReturn(usuario);
 
         processoService.enviarLembrete(1L, 1L);
 

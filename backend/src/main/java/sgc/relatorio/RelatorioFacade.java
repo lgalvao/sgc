@@ -232,7 +232,7 @@ public class RelatorioFacade {
             responsavel = respDto.substitutoNome() + " (Substituição)";
         }
 
-        String localizacao = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getSigla() : "-";
+        String localizacao = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getSigla() : "";
 
         LocalDateTime ultimaMov = sp.getDataFimEtapa2() != null ? sp.getDataFimEtapa2() : (sp.getDataFimEtapa1() != null ? sp.getDataFimEtapa1() : sp.getDataLimiteEtapa1());
 
@@ -432,7 +432,7 @@ public class RelatorioFacade {
         ClassPathResource recurso = new ClassPathResource("relatorio/brasao.png");
         Image imagem = Image.getInstance(recurso.getInputStream().readAllBytes());
         imagem.scaleToFit(54f, 54f);
-        imagem.setAlignment(Image.ALIGN_LEFT);
+        imagem.setAlignment(Element.ALIGN_LEFT);
         return imagem;
     }
 
