@@ -26,6 +26,32 @@ type DependenciasSubprocessoAcoesAdministrativas = {
     garantirContextoEdicao: (codigoSubprocesso: number, limpar: boolean) => Promise<unknown>;
 };
 
+
+async function executarComCarregamento(loading: Ref<boolean>, acao: () => Promise<void>) {
+    loading.value = true;
+    try {
+        await acao();
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function executarComNotificacaoDeErro(
+    loading: Ref<boolean>,
+    mensagemErro: string,
+    notify: (mensagem: string, variante: VarianteAlerta) => void,
+    acao: () => Promise<void>
+) {
+    await executarComCarregamento(loading, async () => {
+        try {
+            await acao();
+        } catch (error) {
+            logger.error(mensagemErro, error);
+            notify(mensagemErro, "danger");
+        }
+    });
+}
+
 export function useSubprocessoAcoesAdministrativas({
                                                        subprocesso,
                                                        codigoSubprocesso,
@@ -61,29 +87,6 @@ export function useSubprocessoAcoesAdministrativas({
         deveExibirErro(!justificativaReabertura.value.trim()) ? "Informe a justificativa para reabrir." : "",
     );
 
-    async function executarComCarregamento(loading: Ref<boolean>, acao: () => Promise<void>) {
-        loading.value = true;
-        try {
-            await acao();
-        } finally {
-            loading.value = false;
-        }
-    }
-
-    async function executarComNotificacaoDeErro(
-        loading: Ref<boolean>,
-        mensagemErro: string,
-        acao: () => Promise<void>
-    ) {
-        await executarComCarregamento(loading, async () => {
-            try {
-                await acao();
-            } catch (error) {
-                logger.error(mensagemErro, error);
-                notify(mensagemErro, "danger");
-            }
-        });
-    }
 
     function abrirModalAlterarDataLimite() {
         if (habilitarAlterarDataLimite.value) {
@@ -101,7 +104,7 @@ export function useSubprocessoAcoesAdministrativas({
         const detalhe = subprocesso.value;
         if (!novaData || !detalhe) return;
 
-        await executarComNotificacaoDeErro(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, async () => {
+        await executarComNotificacaoDeErro(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, notify, async () => {
             await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             fecharModalAlterarDataLimite();
             notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, "success");
@@ -159,7 +162,7 @@ export function useSubprocessoAcoesAdministrativas({
         const codigo = codigoSubprocesso.value;
         if (!detalhe || !codigo || loadingLembrete.value) return;
 
-        await executarComNotificacaoDeErro(loadingLembrete, TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, async () => {
+        await executarComNotificacaoDeErro(loadingLembrete, TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, notify, async () => {
             await enviarLembrete(codProcesso, detalhe.unidade.codigo);
             await garantirContextoEdicao(codigo, true);
             modalLembreteAberto.value = false;
