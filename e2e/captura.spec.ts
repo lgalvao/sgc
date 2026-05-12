@@ -1512,6 +1512,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaCadastro(page);
             const modalHistoricoChefe = await abrirHistoricoAnalise(page);
             await expect(modalHistoricoChefe).toBeVisible();
+            await expect(modalHistoricoChefe.getByTestId('cell-resultado-0')).toHaveText(/Devolu/i);
+            await expect(modalHistoricoChefe).toContainText('Dados incompletos para a Secretaria');
             await capturarTela(page, 'historico-analise', 'historico-com-devolucao', {
                 tags: ['modal', 'historico', 'devolucao'],
                 extra: {perfil: 'CHEFE', mostra: 'registro-devolucao'}
@@ -1800,7 +1802,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await adicionarAtividade(page, atividadeDesc);
             await adicionarAtividade(page, atividadeComConhecimento);
             await adicionarConhecimento(page, atividadeComConhecimento, conhecimentoDesc);
-            await adicionarConhecimento(page, atividadeComConhecimento, 'Conhecimento extra');
 
             // Modal de remoção de conhecimento - abrir
             const cardComConhecimento = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeComConhecimento)});

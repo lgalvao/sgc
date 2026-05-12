@@ -135,6 +135,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             // Importar atividade do Seed e adicionar um conhecimento extra antes de disponibilizar
             await AtividadeHelpers.importarAtividades(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
             await AtividadeHelpers.adicionarConhecimento(page, 'Atividade 1', 'Conhecimento Adicional');
+            await expect(page.getByText('Conhecimento Adicional')).toBeVisible();
             await AtividadeHelpers.disponibilizarCadastro(page);
 
             await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
@@ -252,6 +253,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await MapaHelpers.editarCompetencia(page, 'Competência Técnica Rascunho', 'Competência Técnica Básica');
             await expect(page.getByText('Competência Técnica Básica', {exact: true})).toBeVisible();
             await expect(page.getByText('Competência Técnica Rascunho', {exact: true})).toBeHidden();
+            // Verificar que a atividade ainda está associada após a edição
+            await MapaHelpers.verificarCompetenciaNoMapa(page, 'Competência Técnica Básica', ['Atividade 1']);
 
             await MapaHelpers.disponibilizarMapa(page);
 
