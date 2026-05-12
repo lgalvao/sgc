@@ -1,5 +1,6 @@
 import {computed, type ComputedRef, reactive, ref, type Ref, toRefs} from "vue";
 import type {VarianteAlerta} from "@/composables/useNotification";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {TEXTOS} from "@/constants/textos";
 import type {SubprocessoDetalhe} from "@/types/tipos";
 import logger from "@/utils/logger";
@@ -43,6 +44,7 @@ export function useSubprocessoAcoesAdministrativas({
                                                        enviarLembrete,
                                                        garantirContextoEdicao,
                                                    }: DependenciasSubprocessoAcoesAdministrativas) {
+    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
     const estadoModais = reactive({
         modalLembreteAberto: false,
         mostrarModalAlterarDataLimite: false,
@@ -103,6 +105,8 @@ export function useSubprocessoAcoesAdministrativas({
             await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             fecharModalAlterarDataLimite();
             notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, "success");
+            // ProcessoResumo.dataLimite é exibido no painel — invalida para refletir a mudança
+            invalidarCachesSubprocesso({incluirPainel: true});
             await atualizarSubprocessoAtual();
         });
     }

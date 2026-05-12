@@ -6,14 +6,14 @@
 
 ## Stack técnica
 
-- **Vue 3.5** com `<script setup lang="ts">`
-- **TypeScript 5.9**
-- **Vite 7**
+- **Vue 3** com `<script setup lang="ts">`
+- **TypeScript 6**
+- **Vite 8**
 - **Pinia 3** em setup stores
 - **Vue Router 5**
 - **BootstrapVueNext + Bootstrap 5**
 - **Axios** para integração HTTP
-- **Vitest** para testes unitários
+- **Vitest 4** para testes unitários
 
 ## Estrutura principal
 

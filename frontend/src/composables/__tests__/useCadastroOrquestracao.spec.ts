@@ -19,9 +19,7 @@ const mapasStoreMock = {
     invalidar: vi.fn(),
 };
 
-const painelStoreMock = {
-    invalidar: vi.fn(),
-};
+const invalidarCachesSubprocessoMock = vi.fn();
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => storeMock
@@ -31,8 +29,10 @@ vi.mock("@/stores/mapas", () => ({
     useMapasStore: () => mapasStoreMock
 }));
 
-vi.mock("@/stores/painel", () => ({
-    usePainelStore: () => painelStoreMock
+vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
+    useInvalidacaoNavegacao: () => ({
+        invalidarCachesSubprocesso: invalidarCachesSubprocessoMock,
+    }),
 }));
 
 describe("useCadastroOrquestracao", () => {
@@ -80,7 +80,21 @@ describe("useCadastroOrquestracao", () => {
         expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
     });
 
-    it("deve invalidar caches de mapa e painel relacionados ao processar resposta local", () => {
+    it("carga inicial não deve invalidar o painel (operação de leitura)", async () => {
+        const {carregarContextoInicial} = useCadastroOrquestracao(props, atividades);
+        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+            detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
+            atividadesDisponiveis: [],
+            unidade: {sigla: "U", nome: "Unidade U"},
+            mapa: {codigo: 50},
+        } as any);
+
+        await carregarContextoInicial();
+
+        expect(invalidarCachesSubprocessoMock).not.toHaveBeenCalled();
+    });
+
+    it("deve invalidar caches de mapa e painel ao processar resposta de mutação", () => {
         const {processarRespostaLocal} = useCadastroOrquestracao(props, atividades);
 
         processarRespostaLocal({
@@ -92,7 +106,7 @@ describe("useCadastroOrquestracao", () => {
         expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
         expect(mapasStoreMock.invalidar).toHaveBeenCalledWith(123);
         expect(storeMock.invalidarContextoEdicao).toHaveBeenCalledWith(123);
-        expect(painelStoreMock.invalidar).toHaveBeenCalledOnce();
+        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({incluirPainel: true});
     });
 
     it("deve reaproveitar a assinatura de referência quando ela vier do backend", async () => {

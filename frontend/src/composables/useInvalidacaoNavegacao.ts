@@ -4,11 +4,45 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
 
 /**
- * Centraliza a invalidação dos caches de navegação da SPA.
+ * Ponto central de invalidação dos caches de navegação da SPA.
+ *
+ * ## Por que isso existe
  *
  * O frontend usa stores Pinia como cache de sessão e várias rotas em keepAlive.
- * Quando uma ação de workflow esquece de invalidar um store relacionado, a
- * navegação interna reaproveita snapshots antigos até um refresh completo.
+ * Quando o usuário navega entre telas sem recarregar a página, os componentes
+ * em keepAlive reaproveitam os snapshots das stores via `onActivated`. Se uma
+ * ação de escrita (workflow, mutação de dados) não invalidar as stores afetadas,
+ * o usuário verá dados desatualizados até um refresh completo da página.
+ *
+ * ## Regra fundamental
+ *
+ * **Leitura não invalida. Mutação invalida.**
+ * Funções de carga inicial (ex: `sincronizarEstadoInicialContexto`) não devem
+ * chamar `store.invalidar()` para caches de outras telas. Apenas ações que
+ * alteram dados no backend devem disparar invalidação.
+ *
+ * ## Quando usar cada função
+ *
+ * - `invalidarCachesProcesso()`: ações que afetam o processo inteiro
+ *   (criar, iniciar, finalizar, remover processo). Invalida tudo.
+ *
+ * - `invalidarCachesSubprocesso(opcoes)`: ações que afetam um subprocesso
+ *   (workflow de cadastro, alteração de data, mapa). Invalida seletivamente:
+ *   - `incluirPainel: true` → obrigatório quando a mutação altera campos de
+ *     `ProcessoResumo` exibidos no painel (situação, data limite, dados gerais).
+ *     Não é necessário para mutações de atividades/competências que não alteram
+ *     a situação do processo.
+ *   - `incluirProcesso: true` → quando o `ProcessoDetalheView` exibe dados
+ *     que foram alterados (ex: ações de bloco).
+ *   - `incluirMapas: true` → quando o mapa do subprocesso foi alterado.
+ *
+ * ## Quem pode chamar este composable
+ *
+ * Apenas composables de **ação** (fluxo, workflow, formulários de mutação)
+ * e views que orquestram essas ações. Composables de orquestração de leitura
+ * (ex: `useCadastroOrquestracao`, `useMapaOrquestracao`) só devem chamar
+ * `store.invalidar()` para stores do próprio domínio (mapas, contexto de edição),
+ * nunca para stores de outras telas (painel, processo).
  */
 export function useInvalidacaoNavegacao() {
     const painelStore = usePainelStore();

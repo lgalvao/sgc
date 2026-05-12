@@ -2,7 +2,7 @@ import {getCurrentInstance, onActivated, onMounted, ref, type Ref} from "vue";
 import type {Atividade, ContextoCadastroAtividadesSubprocesso, RespostaLocalCadastro, Unidade} from "@/types/tipos";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {usePainelStore} from "@/stores/painel";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import logger from "@/utils/logger";
 
@@ -15,7 +15,7 @@ interface CadastroOrquestracaoProps {
 export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
-    const painelStore = usePainelStore();
+    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
 
     const carregandoInicial = ref(true);
     const codigoSubprocesso = ref<number | null>(null);
@@ -24,7 +24,15 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
     const codMapa = ref<number | null>(null);
     const carregamentoInicialConcluido = ref(false);
 
-    function processarRespostaLocal(response: RespostaLocalCadastro) {
+    /**
+     * Aplica o payload de um contexto de cadastro ao estado local e invalida
+     * os caches de subprocesso e mapas dependentes.
+     *
+     * Esta função é usada tanto na carga inicial quanto após mutações.
+     * NÃO invalida o painelStore — use processarRespostaLocal para mutações
+     * que devem reflectir no painel ao retornar.
+     */
+    function aplicarEstadoContexto(response: RespostaLocalCadastro) {
         atividades.value = response.atividadesAtualizadas;
         subprocessoStore.atualizarStatusLocal({
             ...response.subprocesso,
@@ -32,12 +40,24 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         });
         mapasStore.invalidar(response.subprocesso.codigo);
         subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
-        // Invalida o painel para que ao retornar o usuário veja o estado atualizado
-        painelStore.invalidar();
     }
 
+    /**
+     * Processa a resposta de uma mutação de cadastro (adicionar, remover,
+     * importar atividades). Aplica o novo estado local e invalida o painel
+     * para que ao retornar o usuário veja os dados atualizados.
+     */
+    function processarRespostaLocal(response: RespostaLocalCadastro) {
+        aplicarEstadoContexto(response);
+        invalidarCachesSubprocesso({incluirPainel: true});
+    }
+
+    /**
+     * Sincroniza o estado inicial do contexto de cadastro após a carga do
+     * backend. Não invalida o painel — é uma operação de leitura, não mutação.
+     */
     function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso) {
-        processarRespostaLocal({
+        aplicarEstadoContexto({
             subprocesso: {
                 codigo: data.detalhes.codigo,
                 situacao: data.detalhes.situacao,
