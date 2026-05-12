@@ -6,6 +6,7 @@ import org.jspecify.annotations.*;
 import org.springframework.security.access.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
+import sgc.comum.util.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -204,7 +205,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
 
         log.info("Acesso negado por hierarquia para {} (Perfil: {}, Unidade ativa: {}). Unidade alvo: {}.",
-                mascarar(usuario.getTituloEleitoral()), perfil, usuario.getUnidadeAtivaCodigo(), unidadeAlvo.getCodigo());
+                MascaraUtil.mascarar(usuario.getTituloEleitoral()), perfil, usuario.getUnidadeAtivaCodigo(), unidadeAlvo.getCodigo());
         return false;
     }
 
@@ -216,7 +217,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         if (!permitido && logarNegacao) {
             log.info("Acesso negado por localização. Usuário: {} (Unidade ativa: {}). Subprocesso {} localizado em {}.",
-                    mascarar(usuario.getTituloEleitoral()),
+                    MascaraUtil.mascarar(usuario.getTituloEleitoral()),
                     usuario.getUnidadeAtivaCodigo(),
                     sp.getCodigo(),
                     localizacao.getCodigo());
@@ -225,11 +226,6 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     }
 
     // ── Utilitário ──────────────────────────────────────────────────
-
-    private String mascarar(String valor) {
-        if (valor.length() <= 4) return "***";
-        return "***" + valor.substring(valor.length() - 4);
-    }
 
     private AcaoPermissao resolverAcao(String permissao) {
         try {

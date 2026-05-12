@@ -6,6 +6,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
 import sgc.comum.erros.*;
+import sgc.comum.util.*;
 
 import java.nio.charset.*;
 
@@ -37,11 +38,11 @@ public class ClienteAcessoAd {
                             })
                     .body(String.class);
 
-            log.info("Usuário {} autenticado no AD.", titulo);
+            log.info("Usuário {} autenticado no AD.", MascaraUtil.mascarar(titulo));
         } catch (ErroAutenticacao e) {
             throw e;
         } catch (Exception e) {
-            log.error("Erro ao autenticar usuário {} no AD: {}", titulo, e.getMessage(), e);
+            log.error("Erro ao autenticar usuário {} no AD: {}", MascaraUtil.mascarar(titulo), e.getMessage(), e);
             throw new ErroAutenticacao("Ocorreu um erro inesperado durante a autenticação.");
         }
     }

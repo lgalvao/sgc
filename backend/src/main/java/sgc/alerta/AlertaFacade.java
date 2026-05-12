@@ -7,6 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.comum.util.MascaraUtil;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -247,7 +248,7 @@ public class AlertaFacade {
             try {
                 alertaService.salvarAlertasUsuarios(alertasUsuariosParaSalvar);
             } catch (DataIntegrityViolationException e) {
-                log.warn("Concorrência ao marcar alertas como lidos para usuário {}: {}", usuarioTitulo, e.getMessage());
+                log.warn("Concorrência ao marcar alertas como lidos para usuário {}: {}", MascaraUtil.mascarar(usuarioTitulo), e.getMessage());
                 // Silencioso: se já foi marcado por outra thread, o objetivo foi atingido.
             }
         }

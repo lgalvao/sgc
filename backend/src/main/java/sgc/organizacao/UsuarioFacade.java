@@ -10,6 +10,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
+import sgc.comum.util.MascaraUtil;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -161,7 +162,7 @@ public class UsuarioFacade {
 
         usuarioService.adicionarAdministrador(usuarioTitulo);
 
-        log.info("Administrador {} adicionado", usuarioTitulo);
+        log.info("Administrador {} adicionado", MascaraUtil.mascarar(usuarioTitulo));
         return toAdministradorDto(usuario);
     }
 
@@ -173,7 +174,7 @@ public class UsuarioFacade {
         }
 
         usuarioService.removerAdministrador(usuarioTitulo);
-        log.info("Administrador {} removido.", usuarioTitulo);
+        log.info("Administrador {} removido.", MascaraUtil.mascarar(usuarioTitulo));
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {

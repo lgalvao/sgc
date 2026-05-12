@@ -303,7 +303,7 @@ describe("Unidades.vue", () => {
                 unidade: "DTI - Diretoria",
                 tipo: undefined,
                 children: [],
-                expanded: true,
+                expanded: false,
                 clickable: true,
             }
         ]);
@@ -337,7 +337,7 @@ describe("Unidades.vue", () => {
                 unidade: "DTI - Diretoria",
                 tipo: undefined,
                 children: [],
-                expanded: true,
+                expanded: false,
                 clickable: true,
             }
         ]);

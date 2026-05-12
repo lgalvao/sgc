@@ -6,6 +6,8 @@ import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
 
+import sgc.comum.util.*;
+
 /**
  * Cliente de simulação de AD para habilitar a execução dos fluxos
  * autenticados durante o bypass de teste E2E, injetado dinamicamente
@@ -21,11 +23,6 @@ public class ClienteAcessoAdE2e extends ClienteAcessoAd {
 
     @Override
     public void autenticar(String titulo, String senha) {
-        log.debug("Usuário autenticado sem AD (perfil e2e): {}", mascarar(titulo));
-    }
-
-    private String mascarar(String valor) {
-        if (valor.length() <= 4) return "***";
-        return "***" + valor.substring(valor.length() - 4);
+        log.debug("Usuário autenticado sem AD (perfil e2e): {}", MascaraUtil.mascarar(titulo));
     }
 }

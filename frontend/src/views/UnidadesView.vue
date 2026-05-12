@@ -206,7 +206,7 @@ function mapearUnidadeParaLinha(unidade: Unidade): LinhaUnidadeArvore {
     unidade: `${unidade.sigla} - ${unidade.nome}`,
     tipo: unidade.tipo,
     children: mapearUnidadesParaLinhas(unidade.filhas ?? []),
-    expanded: true,
+    expanded: false,
     clickable: true,
   };
 }

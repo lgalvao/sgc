@@ -7,6 +7,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
+import sgc.comum.util.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -55,7 +56,7 @@ public class LoginFacade {
             clienteAcessoAd.autenticar(tituloEleitoral, senha);
             return true;
         } catch (ErroAutenticacao e) {
-            log.warn("Falha na autenticação do usuário {}: {}", mascarar(tituloEleitoral), e.getMessage());
+            log.warn("Falha na autenticação do usuário {}: {}", MascaraUtil.mascarar(tituloEleitoral), e.getMessage());
             return false;
         }
     }
@@ -107,7 +108,7 @@ public class LoginFacade {
         }
 
         String siglaUnidade = unidade.getSigla();
-        log.info("Usuário {} autorizado: {}-{}", mascarar(tituloEleitoral), perfilSolicitado, siglaUnidade);
+        log.info("Usuário {} autorizado: {}-{}", MascaraUtil.mascarar(tituloEleitoral), perfilSolicitado, siglaUnidade);
 
         return gerenciadorJwt.gerarToken(
                 tituloEleitoral,
@@ -128,11 +129,6 @@ public class LoginFacade {
                         atribuicao.perfil(),
                         toUnidadeResumoObrigatoria(atribuicao)))
                 .toList();
-    }
-
-    private String mascarar(String valor) {
-        if (valor.length() <= 4) return "***";
-        return "***" + valor.substring(valor.length() - 4);
     }
 
     private UnidadeResumoDto toUnidadeResumoObrigatoria(@Nullable UsuarioPerfilAutorizacaoLeitura atribuicao) {

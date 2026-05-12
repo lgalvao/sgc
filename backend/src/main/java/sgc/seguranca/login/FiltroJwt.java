@@ -8,6 +8,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.context.*;
 import org.springframework.web.filter.*;
 import sgc.organizacao.*;
+import sgc.comum.util.*;
 import sgc.organizacao.model.*;
 
 import java.io.*;
@@ -81,16 +82,11 @@ public class FiltroJwt extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {
-                    log.warn("Usuário {} do JWT não encontrado no SGRH", mascarar(claims.tituloEleitoral()));
+                    log.warn("Usuário {} do JWT não encontrado no SGRH", MascaraUtil.mascarar(claims.tituloEleitoral()));
                 }
             });
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String mascarar(String valor) {
-        if (valor.length() <= 4) return "***";
-        return "***" + valor.substring(valor.length() - 4);
     }
 }
