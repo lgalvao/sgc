@@ -4,8 +4,13 @@ import {Editor, EditorContent} from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import {htmlTemConteudo, normalizarHtmlEditor} from "@/utils/textoFormatado";
 
+defineOptions({
+    inheritAttrs: false,
+});
+
 const props = withDefaults(defineProps<{
     modelValue: string;
+    id?: string;
     desabilitado?: boolean;
     rotulo?: string;
     minimoAltura?: string;
@@ -23,6 +28,11 @@ const attrs = useAttrs();
 const dataTestid = typeof attrs["data-testid"] === "string"
     ? attrs["data-testid"]
     : "editor-texto-rico-conteudo";
+const ariaRequired = typeof attrs["aria-required"] === "string"
+    ? attrs["aria-required"]
+    : undefined;
+const classeRaiz = computed(() => attrs.class);
+const estiloRaiz = computed(() => attrs.style);
 
 const editor = new Editor({
     extensions: [
@@ -37,7 +47,9 @@ const editor = new Editor({
     editorProps: {
         attributes: {
             class: "editor-texto-rico__conteudo form-control",
+            id: props.id,
             "data-testid": dataTestid,
+            "aria-required": ariaRequired,
             role: "textbox",
         },
     },
@@ -122,7 +134,7 @@ function sincronizarPorDom(event: Event) {
 </script>
 
 <template>
-    <div class="editor-texto-rico">
+    <div :class="['editor-texto-rico', classeRaiz]" :style="estiloRaiz">
         <div class="editor-texto-rico__barra" role="toolbar">
             <button
                 v-for="acao in acoes"
