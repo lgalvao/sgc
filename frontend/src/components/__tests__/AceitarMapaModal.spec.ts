@@ -29,15 +29,18 @@ describe("AceitarMapaModal.vue", () => {
             },
             global: {
                 ...options.global,
-                components: {
+                stubs: {
                     ModalConfirmacao: ModalConfirmacaoStub,
                     EditorTextoRico: {
                         props: ["modelValue"],
                         emits: ["update:modelValue"],
                         template: '<textarea :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
                     },
+                    ...options.global.stubs
+                },
+                components: {
                     ...options.global.components
-                }
+                },
             },
         });
         return context.wrapper;

@@ -8,55 +8,46 @@ describe("MapaDevolucaoModal.vue", () => {
         modelValue: true,
         loading: false,
         observacao: "",
-        erro: ""
+        erro: "",
     };
 
     const stubs = {
         ModalConfirmacao: {
-            template: '<div><slot /></div>',
-            props: ['modelValue']
-        }
+            template: "<div><slot /></div>",
+            props: ["modelValue"],
+        },
+        EditorTextoRico: {
+            props: ["modelValue"],
+            emits: ["update:modelValue"],
+            template: '<textarea :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
+        },
     };
 
-    async function definirObservacao(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
-        const editor = wrapper.find('[data-testid="inp-devolucao-mapa-obs"]');
-        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
-        await editor.trigger("input");
+    function montar(props = defaultProps) {
+        return mount(MapaDevolucaoModal, {
+            props,
+            global: {
+                plugins: [createTestingPinia()],
+                stubs,
+            },
+        });
     }
 
     it("deve renderizar corretamente", () => {
-        const wrapper = mount(MapaDevolucaoModal, {
-            props: defaultProps,
-            global: {
-                plugins: [createTestingPinia()],
-                stubs
-            }
-        });
+        const wrapper = montar();
         expect(wrapper.text()).toContain("Confirma a devolução");
         expect(wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').exists()).toBe(true);
     });
 
     it("deve emitir update:observacao ao digitar", async () => {
-        const wrapper = mount(MapaDevolucaoModal, {
-            props: defaultProps,
-            global: {
-                plugins: [createTestingPinia()],
-                stubs
-            }
-        });
-        await definirObservacao(wrapper, "<p>Minha justificativa</p>");
+        const wrapper = montar();
+        await wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').setValue("Minha justificativa");
         expect(wrapper.emitted("update:observacao")).toBeDefined();
-        expect(wrapper.emitted("update:observacao")![0]).toEqual(["<p>Minha justificativa</p>"]);
+        expect(wrapper.emitted("update:observacao")![0]).toEqual(["Minha justificativa"]);
     });
 
     it("deve exibir erro se fornecido", () => {
-        const wrapper = mount(MapaDevolucaoModal, {
-            props: {...defaultProps, erro: "Campo obrigatório"},
-            global: {
-                plugins: [createTestingPinia()],
-                stubs
-            }
-        });
+        const wrapper = montar({...defaultProps, erro: "Campo obrigatório"});
         expect(wrapper.text()).toContain("Campo obrigatório");
     });
 });
