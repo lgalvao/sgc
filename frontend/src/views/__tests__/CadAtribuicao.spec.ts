@@ -116,6 +116,12 @@ describe('CadAtribuicao.vue', () => {
         });
     }
 
+    async function definirJustificativa(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
+        const editor = wrapper.find('[data-testid="textarea-justificativa"]');
+        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
+        await editor.trigger('input');
+    }
+
     beforeEach(() => {
         vi.clearAllMocks();
         vi.spyOn(console, 'error').mockImplementation(() => {
@@ -151,8 +157,7 @@ describe('CadAtribuicao.vue', () => {
         const dateInicioInput = context.wrapper.find('[data-testid="input-data-inicio"]');
         await dateInicioInput.setValue('2023-01-01');
 
-        const textarea = context.wrapper.find('[data-testid="textarea-justificativa"]');
-        await textarea.setValue('Justificativa de teste');
+        await definirJustificativa(context.wrapper, '<p>Justificativa de teste</p>');
 
         await context.wrapper.find('form').trigger('submit');
         await flushPromises();
@@ -161,7 +166,7 @@ describe('CadAtribuicao.vue', () => {
             tituloEleitoralUsuario: '111',
             dataInicio: '2023-01-01',
             dataTermino: '2023-12-31',
-            justificativa: 'Justificativa de teste'
+            justificativa: '<p>Justificativa de teste</p>'
         });
     });
 

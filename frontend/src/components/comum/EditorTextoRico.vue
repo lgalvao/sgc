@@ -10,13 +10,11 @@ const props = withDefaults(defineProps<{
     rotulo?: string;
     dataTestid?: string;
     minimoAltura?: string;
-    alvoDataTestid?: "editor" | "espelho";
 }>(), {
     desabilitado: false,
     rotulo: "Editor de texto",
     dataTestid: "editor-texto-rico-conteudo",
     minimoAltura: "12rem",
-    alvoDataTestid: "espelho",
 });
 
 const emit = defineEmits<{
@@ -98,17 +96,10 @@ const classesEditor = computed(() => ({
     "is-invalid": props.desabilitado === false && !htmlTemConteudo(props.modelValue) && false,
 }));
 
-const dataTestidEspelho = computed(() => props.alvoDataTestid === "espelho" ? props.dataTestid : undefined);
-const dataTestidEditor = computed(() => props.alvoDataTestid === "editor" ? props.dataTestid : `${props.dataTestid}-editor`);
-
 function executarAcao(executar: () => boolean) {
     if (!props.desabilitado) {
         executar();
     }
-}
-
-function atualizarPorEspelho(event: Event) {
-    emit("update:modelValue", (event.target as HTMLTextAreaElement).value);
 }
 
 function sincronizarPorDom(event: Event) {
@@ -128,14 +119,6 @@ function sincronizarPorDom(event: Event) {
 
 <template>
     <div class="editor-texto-rico">
-        <textarea
-            :value="modelValue"
-            :data-testid="dataTestidEspelho"
-            aria-hidden="true"
-            class="editor-texto-rico__espelho"
-            tabindex="-1"
-            @input="atualizarPorEspelho"
-        />
         <div class="editor-texto-rico__barra" role="toolbar">
             <button
                 v-for="acao in acoes"
@@ -155,7 +138,7 @@ function sincronizarPorDom(event: Event) {
             :editor="editor"
             :aria-label="rotulo"
             :class="classesEditor"
-            :data-testid="dataTestidEditor"
+            :data-testid="dataTestid"
             :style="{ '--editor-minimo-altura': minimoAltura }"
             @input.capture="sincronizarPorDom"
         />
@@ -171,18 +154,6 @@ function sincronizarPorDom(event: Event) {
     border-radius: 0.75rem;
     background: var(--bs-body-bg);
     overflow: hidden;
-}
-
-.editor-texto-rico__espelho {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
 }
 
 .editor-texto-rico__barra {

@@ -17,6 +17,12 @@ describe("CadastroObservacaoModal.vue", () => {
         label: "Observação"
     };
 
+    async function definirObservacao(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
+        const editor = wrapper.find('[data-testid="inp-obs"]');
+        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
+        await editor.trigger("input");
+    }
+
     it("deve renderizar corretamente com props básicas", () => {
         const wrapper = mount(CadastroObservacaoModal, {
             props: defaultProps,
@@ -49,10 +55,9 @@ describe("CadastroObservacaoModal.vue", () => {
                 plugins: [createTestingPinia({createSpy: vi.fn})],
             }
         });
-        const textarea = wrapper.find("textarea");
-        await textarea.setValue("Nova observação");
+        await definirObservacao(wrapper, "<p>Nova observação</p>");
         expect(wrapper.emitted("update:observacao")).toBeDefined();
-        expect(wrapper.emitted("update:observacao")![0]).toEqual(["Nova observação"]);
+        expect(wrapper.emitted("update:observacao")![0]).toEqual(["<p>Nova observação</p>"]);
     });
 
     it("deve exibir feedback de validação se houver", () => {

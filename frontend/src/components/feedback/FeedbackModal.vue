@@ -92,7 +92,6 @@ function submeter() {
             </div>
             <EditorTextoRico
                 v-model="nota"
-                alvo-data-testid="editor"
                 data-testid="feedback-nota"
                 :desabilitado="enviando"
                 class="feedback-modal__textarea"

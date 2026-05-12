@@ -48,9 +48,9 @@ describe("CriarCompetenciaModal.vue", () => {
                 ...options.global,
                 components: {
                     ModalPadrao: ModalPadraoStub,
-                    BFormTextarea,
                     BCard,
                     BFormCheckbox,
+                    BFormTextarea,
                     ...options.global.components
                 }
             },

@@ -97,6 +97,12 @@ const mountOptions = {
 };
 
 describe('AtribuicaoTemporariaView', () => {
+    async function definirJustificativa(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
+        const editor = wrapper.find('[data-testid="textarea-justificativa"]');
+        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
+        await editor.trigger('input');
+    }
+
     beforeEach(() => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
@@ -203,7 +209,7 @@ describe('AtribuicaoTemporariaView', () => {
         await wrapper.findComponent({name: 'BuscadorUsuarios'}).vm.$emit('update:selecionado', '999');
         await wrapper.find('[data-testid="input-data-inicio"]').setValue('2025-01-01');
         await wrapper.find('[data-testid="input-data-termino"]').setValue('2025-12-31');
-        await wrapper.find('[data-testid="textarea-justificativa"]').setValue('Teste de justificativa');
+        await definirJustificativa(wrapper, '<p>Teste de justificativa</p>');
 
         await wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]').trigger('click');
         await flushPromises();
@@ -212,7 +218,7 @@ describe('AtribuicaoTemporariaView', () => {
             tituloEleitoralUsuario: '999',
             dataInicio: '2025-01-01',
             dataTermino: '2025-12-31',
-            justificativa: 'Teste de justificativa'
+            justificativa: '<p>Teste de justificativa</p>'
         });
         expect(buscarDiagnosticoOrganizacional).toHaveBeenCalled();
         expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'success');
@@ -237,7 +243,7 @@ describe('AtribuicaoTemporariaView', () => {
         await wrapper.findComponent({name: 'BuscadorUsuarios'}).vm.$emit('update:selecionado', '999');
         await wrapper.find('[data-testid="input-data-inicio"]').setValue('2025-01-01');
         await wrapper.find('[data-testid="input-data-termino"]').setValue('2025-12-31');
-        await wrapper.find('[data-testid="textarea-justificativa"]').setValue('Teste de justificativa');
+        await definirJustificativa(wrapper, '<p>Teste de justificativa</p>');
 
         await wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]').trigger('click');
         await flushPromises();

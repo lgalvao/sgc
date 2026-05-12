@@ -326,20 +326,21 @@ describe("MapaView somente leitura", () => {
         await flushPromises();
 
         expect(subprocessoService.obterSugestoesMapa).toHaveBeenCalledWith(123);
-        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-texto"]').exists()).toBe(false);
-        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa"]').exists()).toBe(true);
-        expect((wrapper.find('[data-testid="txt-ver-sugestoes-mapa"]').element as HTMLTextAreaElement).value)
+        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-html"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="txt-ver-sugestoes-mapa-html"]').html())
             .toContain("Sugestão persistida");
 
         await wrapper.find('[data-testid="btn-mapa-acao-sugestoes"]').trigger("click");
         await flushPromises();
 
         expect(subprocessoService.obterSugestoesMapa).toHaveBeenCalledWith(123);
-        await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Nova sugestão");
+        const editor = wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]');
+        (editor.element as HTMLDivElement).innerHTML = "<p>Nova sugestão</p>";
+        await editor.trigger("input");
         await wrapper.find('[data-testid="btn-confirmar-modal"]').trigger("click");
         await flushPromises();
 
-        expect(subprocessoService.apresentarSugestoes).toHaveBeenCalledWith(123, {sugestoes: "Nova sugestão"});
+        expect(subprocessoService.apresentarSugestoes).toHaveBeenCalledWith(123, {sugestoes: "<p>Nova sugestão</p>"});
 
         await wrapper.find('[data-testid="btn-mapa-historico"]').trigger("click");
         await flushPromises();

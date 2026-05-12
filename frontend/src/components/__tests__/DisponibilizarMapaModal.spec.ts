@@ -55,6 +55,12 @@ describe("DisponibilizarMapaModal.vue", () => {
         return context.wrapper;
     };
 
+    async function definirObservacoes(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
+        const editor = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
+        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
+        await editor.trigger("input");
+    }
+
     it("não deve renderizar o modal quando mostrar for falso", () => {
         const wrapper = createWrapper({mostrar: false});
         expect(wrapper.find('[data-testid="modal-stub"]').exists()).toBe(false);
@@ -128,14 +134,13 @@ describe("DisponibilizarMapaModal.vue", () => {
         const nativeInput = inputWrapper.find("input");
         await nativeInput.setValue(dataLimite);
 
-        const obsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
-        await obsTextarea.setValue(observacoes);
+        await definirObservacoes(wrapper, `<p>${observacoes}</p>`);
 
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
 
         expect(wrapper.emitted("disponibilizar")?.[0]).toEqual([{
             dataLimite,
-            observacoes
+            observacoes: `<p>${observacoes}</p>`
         }]);
     });
 
@@ -147,8 +152,7 @@ describe("DisponibilizarMapaModal.vue", () => {
         const nativeInput = inputWrapper.find("input");
         await nativeInput.setValue(obterAmanhaFormatado());
 
-        const obsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
-        await obsTextarea.setValue("Obs");
+        await definirObservacoes(wrapper, "<p>Obs</p>");
 
         // Hide
         await wrapper.setProps({mostrar: false});
@@ -159,7 +163,7 @@ describe("DisponibilizarMapaModal.vue", () => {
         expect(wrapper.findComponent(BFormInput).props().modelValue).toBe("");
 
         const updatedObsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
-        expect((updatedObsTextarea.element as HTMLTextAreaElement).value).toBe("");
+        expect(updatedObsTextarea.text()).toBe("");
     });
 
     it("deve ter o atributo min correto no campo de data", () => {

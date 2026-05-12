@@ -256,6 +256,12 @@ describe('SubprocessoView.vue', () => {
         return {wrapper, store: subprocessoStoreMock};
     };
 
+    async function definirJustificativaReabertura(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
+        const editor = wrapper.find('[data-testid="inp-justificativa-reabrir"]');
+        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
+        await editor.trigger('input');
+    }
+
     it('fetches data on mount', async () => {
         mountComponent();
         await flushPromises();
@@ -439,14 +445,13 @@ describe('SubprocessoView.vue', () => {
         expect(vm.tipoReabertura).toBe('cadastro');
         expect(vm.mostrarModalReabrir).toBe(true);
 
-        const textarea = wrapper.find('textarea');
-        await textarea.setValue('Erro no preenchimento');
+        await definirJustificativaReabertura(wrapper, '<p>Erro no preenchimento</p>');
 
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
         await btn.trigger('click');
         await flushPromises();
 
-        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, '<p>Erro no preenchimento</p>');
     });
 
     it('reabre revisão com sucesso', async () => {
@@ -457,14 +462,13 @@ describe('SubprocessoView.vue', () => {
         const vm = wrapper.vm as unknown as SubprocessoViewVm;
         expect(vm.tipoReabertura).toBe('revisao');
 
-        const textarea = wrapper.find('textarea');
-        await textarea.setValue('Revisão incompleta');
+        await definirJustificativaReabertura(wrapper, '<p>Revisão incompleta</p>');
 
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
         await btn.trigger('click');
         await flushPromises();
 
-        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
+        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, '<p>Revisão incompleta</p>');
     });
 
     it('impede reabertura se justificativa vazia e exibe pendência contextual', async () => {
@@ -487,8 +491,7 @@ describe('SubprocessoView.vue', () => {
 
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
 
-        const textarea = wrapper.find('textarea');
-        await textarea.setValue('Justificativa');
+        await definirJustificativaReabertura(wrapper, '<p>Justificativa</p>');
 
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
         await btn.trigger('click');

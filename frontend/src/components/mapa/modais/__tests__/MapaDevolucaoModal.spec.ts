@@ -18,6 +18,12 @@ describe("MapaDevolucaoModal.vue", () => {
         }
     };
 
+    async function definirObservacao(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
+        const editor = wrapper.find('[data-testid="inp-devolucao-mapa-obs"]');
+        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
+        await editor.trigger("input");
+    }
+
     it("deve renderizar corretamente", () => {
         const wrapper = mount(MapaDevolucaoModal, {
             props: defaultProps,
@@ -27,7 +33,7 @@ describe("MapaDevolucaoModal.vue", () => {
             }
         });
         expect(wrapper.text()).toContain("Confirma a devolução");
-        expect(wrapper.find("textarea").exists()).toBe(true);
+        expect(wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').exists()).toBe(true);
     });
 
     it("deve emitir update:observacao ao digitar", async () => {
@@ -38,10 +44,9 @@ describe("MapaDevolucaoModal.vue", () => {
                 stubs
             }
         });
-        const textarea = wrapper.find("textarea");
-        await textarea.setValue("Minha justificativa");
+        await definirObservacao(wrapper, "<p>Minha justificativa</p>");
         expect(wrapper.emitted("update:observacao")).toBeDefined();
-        expect(wrapper.emitted("update:observacao")![0]).toEqual(["Minha justificativa"]);
+        expect(wrapper.emitted("update:observacao")![0]).toEqual(["<p>Minha justificativa</p>"]);
     });
 
     it("deve exibir erro se fornecido", () => {
