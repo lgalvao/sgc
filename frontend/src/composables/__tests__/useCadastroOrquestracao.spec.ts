@@ -19,12 +19,20 @@ const mapasStoreMock = {
     invalidar: vi.fn(),
 };
 
+const painelStoreMock = {
+    invalidar: vi.fn(),
+};
+
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => storeMock
 }));
 
 vi.mock("@/stores/mapas", () => ({
     useMapasStore: () => mapasStoreMock
+}));
+
+vi.mock("@/stores/painel", () => ({
+    usePainelStore: () => painelStoreMock
 }));
 
 describe("useCadastroOrquestracao", () => {
@@ -72,7 +80,7 @@ describe("useCadastroOrquestracao", () => {
         expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
     });
 
-    it("deve invalidar caches de mapa relacionados ao processar resposta local", () => {
+    it("deve invalidar caches de mapa e painel relacionados ao processar resposta local", () => {
         const {processarRespostaLocal} = useCadastroOrquestracao(props, atividades);
 
         processarRespostaLocal({
@@ -84,6 +92,7 @@ describe("useCadastroOrquestracao", () => {
         expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
         expect(mapasStoreMock.invalidar).toHaveBeenCalledWith(123);
         expect(storeMock.invalidarContextoEdicao).toHaveBeenCalledWith(123);
+        expect(painelStoreMock.invalidar).toHaveBeenCalledOnce();
     });
 
     it("deve reaproveitar a assinatura de referência quando ela vier do backend", async () => {

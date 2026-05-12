@@ -2,6 +2,7 @@ import {getCurrentInstance, onActivated, onMounted, ref, type Ref} from "vue";
 import type {Atividade, ContextoCadastroAtividadesSubprocesso, RespostaLocalCadastro, Unidade} from "@/types/tipos";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessoStore} from "@/stores/subprocesso";
+import {usePainelStore} from "@/stores/painel";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import logger from "@/utils/logger";
 
@@ -14,6 +15,7 @@ interface CadastroOrquestracaoProps {
 export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
+    const painelStore = usePainelStore();
 
     const carregandoInicial = ref(true);
     const codigoSubprocesso = ref<number | null>(null);
@@ -30,6 +32,8 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         });
         mapasStore.invalidar(response.subprocesso.codigo);
         subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
+        // Invalida o painel para que ao retornar o usuário veja o estado atualizado
+        painelStore.invalidar();
     }
 
     function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso) {
