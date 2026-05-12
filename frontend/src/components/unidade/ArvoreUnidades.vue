@@ -6,6 +6,8 @@
         :modo-selecao="modoSelecao"
         @selecionar-todos="selecionarTodas(unidadesExibidas)"
         @limpar-selecao="deselecionarTodas"
+        @expandir-todos="expandirRecursivo(unidadesExibidas)"
+        @recolher-todos="limparExpansao"
     />
 
     <UnidadeTreeNode
@@ -111,19 +113,20 @@ function organizarUnidadesParaExibicao(unidades: Unidade[], codigoPai: number): 
 }
 
 // Lógica de Busca e Filtragem
-function filtrarUnidadesRecursivo(unidades: Unidade[], termo: string): Unidade[] {
-  if (!termo) return unidades;
+function filtrarUnidadesRecursivo(unidades: Unidade[], termo: string, forceInclude = false): Unidade[] {
+  const termoNormalizado = termo.trim().toLowerCase();
+  if (!termoNormalizado && !forceInclude) return unidades;
 
-  const termoNormalizado = termo.toLowerCase();
   const resultado: Unidade[] = [];
 
   for (const unidade of unidades) {
-    const filhasFiltradas = unidade.filhas
-        ? filtrarUnidadesRecursivo(unidade.filhas, termo)
-        : [];
-
-    const matches = unidade.sigla.toLowerCase().includes(termoNormalizado) ||
+    const matches = forceInclude ||
+        unidade.sigla.toLowerCase().includes(termoNormalizado) ||
         unidade.nome.toLowerCase().includes(termoNormalizado);
+
+    const filhasFiltradas = unidade.filhas
+        ? filtrarUnidadesRecursivo(unidade.filhas, termo, matches)
+        : [];
 
     if (matches || filhasFiltradas.length > 0) {
       resultado.push({

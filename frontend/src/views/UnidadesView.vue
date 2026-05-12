@@ -170,18 +170,17 @@ function recolherTodasLinhas() {
   treeTableRef.value?.collapseAll();
 }
 
-function filtrarUnidadesPorSigla(unidadesOrigem: Unidade[], termo: string): Unidade[] {
+function filtrarUnidadesPorSigla(unidadesOrigem: Unidade[], termo: string, forceInclude = false): Unidade[] {
   const termoNormalizado = termo.trim().toLowerCase();
-  if (!termoNormalizado) {
+  if (!termoNormalizado && !forceInclude) {
     return unidadesOrigem;
   }
 
   const resultado: Unidade[] = [];
 
   for (const unidade of unidadesOrigem) {
-    const filhasFiltradas = filtrarUnidadesPorSigla(unidade.filhas ?? [], termo);
-    const siglaNormalizada = unidade.sigla.toLowerCase();
-    const corresponde = siglaNormalizada.includes(termoNormalizado);
+    const corresponde = forceInclude || unidade.sigla.toLowerCase().includes(termoNormalizado);
+    const filhasFiltradas = filtrarUnidadesPorSigla(unidade.filhas ?? [], termo, corresponde);
 
     if (corresponde || filhasFiltradas.length > 0) {
       resultado.push({

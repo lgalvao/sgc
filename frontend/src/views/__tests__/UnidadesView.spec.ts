@@ -343,6 +343,69 @@ describe("Unidades.vue", () => {
         ]);
     });
 
+    it("deve desconsiderar espaços antes e depois no termo de busca", async () => {
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce([
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 2, sigla: "DTI", nome: "Diretoria", filhas: []},
+                    {codigo: 3, sigla: "SGP", nome: "Gestao de Pessoas", filhas: []}
+                ]
+            }
+        ] as any);
+
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        const busca = wrapper.find('[data-testid="inp-arvore-busca"]');
+        await busca.setValue("  dti  ");
+        await flushPromises();
+
+        const arvore = wrapper.findComponent({name: 'TreeTable'});
+        expect(arvore.props("data")).toHaveLength(1);
+        expect(arvore.props("data")[0].sigla).toBe("DTI");
+    });
+
+    it("deve mostrar toda a subárvore quando uma unidade pai coincide com a busca por sigla", async () => {
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce([
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {
+                        codigo: 10,
+                        sigla: "PAI",
+                        nome: "Unidade Pai",
+                        filhas: [
+                            {codigo: 11, sigla: "FILHO1", nome: "Filho 1", filhas: []},
+                            {codigo: 12, sigla: "FILHO2", nome: "Filho 2", filhas: []}
+                        ]
+                    }
+                ]
+            }
+        ] as any);
+
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        const busca = wrapper.find('[data-testid="inp-arvore-busca"]');
+        await busca.setValue("pai");
+        await flushPromises();
+
+        const arvore = wrapper.findComponent({name: 'TreeTable'});
+        const data = arvore.props("data") as any[];
+        
+        expect(data).toHaveLength(1);
+        expect(data[0].sigla).toBe("PAI");
+        // Se o bug existir, children estará vazio porque FILHO1 e FILHO2 não contêm "pai"
+        expect(data[0].children).toHaveLength(2);
+        expect(data[0].children[0].sigla).toBe("FILHO1");
+        expect(data[0].children[1].sigla).toBe("FILHO2");
+    });
+
     it("deve exibir mensagem quando não houver unidades", async () => {
         const wrapper = createWrapper({unidades: []});
         await flushPromises();

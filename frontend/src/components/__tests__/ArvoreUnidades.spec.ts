@@ -849,6 +849,41 @@ describe("ArvoreUnidades.vue", () => {
             expect(exibidas[0].filhas[0].sigla).toBe("COSIS");
         });
 
+        it("deve desconsiderar espaços antes e depois no termo de busca", async () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
+            const input = wrapper.find('input[type="search"]');
+
+            await input.setValue("  COSIS  ");
+
+            const exibidas = (wrapper.vm as any).unidadesExibidas;
+            expect(exibidas).toHaveLength(1);
+            expect(exibidas[0].sigla).toBe("STI");
+            expect(exibidas[0].filhas[0].sigla).toBe("COSIS");
+        });
+
+        it("deve expandir todas as unidades ao clicar no botão expandir tudo", async () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
+            
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(false);
+            
+            await wrapper.find('[data-testid="btn-arvore-expandir-tudo"]').trigger("click");
+            
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(true);
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0].filhas![0])).toBe(true);
+        });
+
+        it("deve recolher todas as unidades ao clicar no botão recolher tudo", async () => {
+            const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
+            
+            // Expandir primeiro
+            await wrapper.find('[data-testid="btn-arvore-expandir-tudo"]').trigger("click");
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(true);
+            
+            // Recolher
+            await wrapper.find('[data-testid="btn-arvore-recolher-tudo"]').trigger("click");
+            expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(false);
+        });
+
         it("deve expandir automaticamente as unidades ao pesquisar", async () => {
             const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
             const input = wrapper.find('input[type="search"]');
