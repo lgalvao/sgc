@@ -3,6 +3,7 @@ package sgc.subprocesso.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import sgc.comum.*;
+import sgc.seguranca.sanitizacao.*;
 
 import java.time.*;
 
@@ -13,5 +14,6 @@ import java.time.*;
 public record DisponibilizarMapaRequest(
         @NotNull(message = Mensagens.DATA_LIMITE_VALIDACAO_OBRIGATORIA)
         @Future(message = Mensagens.DATA_LIMITE_VALIDACAO_FUTURA) LocalDate dataLimite,
+        @SanitizarHtml
         String observacoes) {
 }

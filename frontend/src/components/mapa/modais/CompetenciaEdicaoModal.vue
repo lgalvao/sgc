@@ -1,7 +1,8 @@
 ﻿<script lang="ts" setup>
-import {BAlert, BButton, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BButton, BFormInvalidFeedback} from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
+import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
 import CompetenciaAtividadeItem from "./CompetenciaAtividadeItem.vue";
 import type {Atividade, Competencia} from "@/types/tipos";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
@@ -17,8 +18,6 @@ const emit = defineEmits<{ fechar: []; salvar: [c: { descricao: string; atividad
 const novaComp = ref({descricao: ""});
 const selecionadas = ref<number[]>([]);
 const editando = ref<Competencia | null>(null);
-const inputRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
-
 const {validarSubmissao, resetarValidacao, deveExibirErro, focarPrimeiroErroInvalido} = useValidacaoFormulario();
 
 const mostrarComp = computed({
@@ -67,7 +66,7 @@ function limparSelecaoAtividades() {
       :titulo="editando ? 'Edição de competência' : 'Criação de competência'"
       data-testid="mdl-criar-competencia" tamanho="lg"
       test-id-cancelar="btn-criar-competencia-cancelar" test-id-confirmar="btn-criar-competencia-salvar"
-      @confirmar="salvar" @fechar="emit('fechar')" @shown="nextTick(() => inputRef?.$el?.focus())"
+      @confirmar="salvar" @fechar="emit('fechar')" @shown="nextTick(() => undefined)"
   >
     <BAlert v-if="fieldErrors?.generic" :model-value="true" class="mb-4" variant="danger">{{
         fieldErrors.generic
@@ -75,9 +74,13 @@ function limparSelecaoAtividades() {
     </BAlert>
     <div class="mb-4">
       <h5>Descrição <span aria-hidden="true" class="text-danger">*</span></h5>
-      <BFormTextarea
-id="descricao" ref="inputRef" v-model="novaComp.descricao" :state="erroDesc ? false : null"
-                     data-testid="inp-criar-competencia-descricao" placeholder="Descreva a competência" rows="3"/>
+      <EditorTextoRico
+          id="descricao"
+          v-model="novaComp.descricao"
+          data-testid="inp-criar-competencia-descricao"
+          minimo-altura="10rem"
+          rotulo="Descrição da competência"
+      />
       <BFormInvalidFeedback :state="erroDesc ? false : null">{{ erroDesc }}</BFormInvalidFeedback>
     </div>
     <div class="mb-4">

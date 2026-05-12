@@ -108,11 +108,12 @@
           <template #label>
             {{ TEXTOS.atribuicaoTemporaria.LABEL_JUSTIFICATIVA }} <span aria-hidden="true" class="text-danger">*</span>
           </template>
-          <BFormTextarea
+          <EditorTextoRico
               id="justificativa"
               v-model="justificativa"
-              :state="mensagemErroJustificativa ? false : null"
               data-testid="textarea-justificativa"
+              minimo-altura="10rem"
+              rotulo="Justificativa"
           />
           <BFormInvalidFeedback :state="mensagemErroJustificativa ? false : null">
             {{ mensagemErroJustificativa }}
@@ -146,7 +147,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BFormTextarea, BRow} from "bootstrap-vue-next";
+import {BAlert, BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BRow} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
@@ -158,6 +159,7 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import InputData from "@/components/comum/InputData.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
+import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {usePerfil} from "@/composables/usePerfil";

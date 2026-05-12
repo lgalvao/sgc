@@ -47,12 +47,12 @@
         label="Observações"
         label-for="observacoes"
     >
-      <BFormTextarea
+      <EditorTextoRico
           id="observacoes"
           v-model="observacoesDisponibilizacao"
-          :state="fieldErrors?.observacoes ? false : null"
           data-testid="inp-disponibilizar-mapa-obs"
-          rows="3"
+          minimo-altura="10rem"
+          rotulo="Observações"
       />
     </BFormGroup>
     <BAlert
@@ -79,10 +79,11 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BFormGroup, BFormInvalidFeedback} from "bootstrap-vue-next";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";
+import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
 import {computed, ref, watch} from "vue";
 import {ehDataEstritamenteFutura, obterAmanhaFormatado} from "@/utils/date";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";

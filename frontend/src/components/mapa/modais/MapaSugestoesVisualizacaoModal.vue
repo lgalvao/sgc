@@ -1,45 +1,30 @@
-﻿<script lang="ts" setup>
+<script lang="ts" setup>
 import {computed} from "vue";
-import {BFormGroup, BFormTextarea} from "bootstrap-vue-next";
-import ModalPadrao from "@/components/comum/ModalPadrao.vue";
+import ModalVisualizacaoTextoFormatado from "@/components/comum/ModalVisualizacaoTextoFormatado.vue";
 
 const props = defineProps<{
-  modelValue: boolean;
-  sugestoes: string;
-  podeEditar?: boolean;
+    modelValue: boolean;
+    sugestoes: string;
+    podeEditar?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "update:modelValue", valor: boolean): void;
-  (e: "fechar"): void;
+    (e: "update:modelValue", valor: boolean): void;
+    (e: "fechar"): void;
 }>();
 
 const mostrar = computed({
-  get: () => props.modelValue,
-  set: (valor: boolean) => emit("update:modelValue", valor),
+    get: () => props.modelValue,
+    set: (valor: boolean) => emit("update:modelValue", valor),
 });
 </script>
 
 <template>
-  <ModalPadrao
-      v-model="mostrar"
-      :mostrar-botao-acao="false"
-      test-id-cancelar="btn-ver-sugestoes-mapa-fechar"
-      texto-cancelar="Fechar"
-      titulo="Sugestões sobre o mapa"
-      @fechar="$emit('fechar')"
-  >
-    <BFormGroup class="mb-3">
-      <template #label>Sugestões registradas para o mapa de competências:</template>
-      <div
-v-if="!podeEditar" class="border rounded p-3 bg-body-tertiary white-space-pre-line"
-           data-testid="txt-ver-sugestoes-mapa-texto">
-        {{ sugestoes }}
-      </div>
-      <BFormTextarea
-v-else id="sugestoesVisualizacao" :model-value="sugestoes" data-testid="txt-ver-sugestoes-mapa"
-                     readonly rows="5"/>
-    </BFormGroup>
-  </ModalPadrao>
+    <ModalVisualizacaoTextoFormatado
+        v-model="mostrar"
+        :conteudo="sugestoes"
+        test-id-conteudo="txt-ver-sugestoes-mapa-html"
+        titulo="Sugestões sobre o mapa"
+        @fechar="$emit('fechar')"
+    />
 </template>
-

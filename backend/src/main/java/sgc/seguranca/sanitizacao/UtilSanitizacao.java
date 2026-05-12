@@ -8,14 +8,16 @@ import org.owasp.html.*;
  * Garante que a política de segurança seja aplicada consistentemente
  */
 public final class UtilSanitizacao {
-    private static final PolicyFactory POLITICA_PADRAO = new HtmlPolicyBuilder().toFactory();
+    private static final PolicyFactory POLITICA_PADRAO = new HtmlPolicyBuilder()
+            .allowElements("p", "br", "strong", "b", "em", "i", "u", "ul", "ol", "li")
+            .toFactory();
 
     private UtilSanitizacao() {
         // Construtor privado para impedir instanciação
     }
 
     /**
-     * Sanitiza o texto fornecido, removendo todas as tags HTML.
+     * Sanitiza o texto fornecido, preservando apenas a formatação mínima permitida pelo sistema.
      */
     public static String sanitizar(@Nullable String entrada) {
         return POLITICA_PADRAO.sanitize(entrada);
