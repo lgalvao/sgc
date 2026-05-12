@@ -55,6 +55,7 @@ public class RelatorioFacade {
     private final MapaManutencaoService mapaManutencaoService;
     private final UnidadeService unidadeService;
     private final UnidadeHierarquiaService unidadeHierarquiaService;
+    private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final UsuarioFacade usuarioFacade;
     private final PdfFactory pdfFactory;
 
@@ -62,9 +63,10 @@ public class RelatorioFacade {
     public List<RelatorioAndamentoDto> obterRelatorioAndamento(Long codProcesso) {
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
         Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade = buscarResponsaveisPorUnidade(subprocessos);
+        Map<Long, Unidade> localizacoes = localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessos);
 
         return subprocessos.stream()
-                .map(sp -> criarRelatorioAndamentoDto(sp, responsaveisPorUnidade))
+                .map(sp -> criarRelatorioAndamentoDto(sp, responsaveisPorUnidade, localizacoes.get(sp.getCodigo())))
                 .toList();
     }
 
@@ -73,13 +75,14 @@ public class RelatorioFacade {
         Processo processo = processoService.buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
         Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade = buscarResponsaveisPorUnidade(subprocessos);
+        Map<Long, Unidade> localizacoes = localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessos);
         LocalDateTime dataGeracao = LocalDateTime.now();
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
             document.open();
             List<RelatorioAndamentoDto> relatorios = subprocessos.stream()
-                    .map(sp -> criarRelatorioAndamentoDto(sp, responsaveisPorUnidade))
+                    .map(sp -> criarRelatorioAndamentoDto(sp, responsaveisPorUnidade, localizacoes.get(sp.getCodigo())))
                     .toList();
 
             adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
@@ -93,7 +96,7 @@ public class RelatorioFacade {
 
             adicionarCartoesAndamento(document, relatorios);
         } catch (DocumentException | IOException e) {
-            throw new RuntimeException("Erro ao gerar PDF", e);
+            throw new IllegalStateException("Erro ao gerar PDF", e);
         }
     }
 
@@ -119,7 +122,7 @@ public class RelatorioFacade {
                 adicionarSecaoMapa(document, sp.getUnidade(), competencias);
             }
         } catch (DocumentException | IOException e) {
-            throw new RuntimeException("Erro ao gerar PDF", e);
+            throw new IllegalStateException("Erro ao gerar PDF", e);
         }
     }
 
@@ -221,7 +224,8 @@ public class RelatorioFacade {
 
     private RelatorioAndamentoDto criarRelatorioAndamentoDto(
             Subprocesso sp,
-            Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade
+            Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade,
+            @Nullable Unidade localizacaoUnidade
     ) {
         Unidade unidade = sp.getUnidade();
         UnidadeResponsavelDto respDto = responsaveisPorUnidade.get(unidade.getCodigo());
@@ -232,9 +236,15 @@ public class RelatorioFacade {
             responsavel = respDto.substitutoNome() + " (Substituição)";
         }
 
-        String localizacao = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getSigla() : "";
+        String localizacao = localizacaoUnidade != null ? localizacaoUnidade.getSigla() : "-";
 
-        LocalDateTime ultimaMov = sp.getDataFimEtapa2() != null ? sp.getDataFimEtapa2() : (sp.getDataFimEtapa1() != null ? sp.getDataFimEtapa1() : sp.getDataLimiteEtapa1());
+        LocalDateTime ultimaMov = sp.getDataLimiteEtapa1();
+        if (sp.getDataFimEtapa1() != null) {
+            ultimaMov = sp.getDataFimEtapa1();
+        }
+        if (sp.getDataFimEtapa2() != null) {
+            ultimaMov = sp.getDataFimEtapa2();
+        }
 
         return RelatorioAndamentoDto.builder()
                 .siglaUnidade(unidade.getSigla())
@@ -352,7 +362,7 @@ public class RelatorioFacade {
             PdfPTable dtEtapa2 = new PdfPTable(new float[]{1f, 1f});
             dtEtapa2.setWidthPercentage(100f);
             String dtLim2 = formatarData(relatorio.dataLimiteEtapa2());
-            if (relatorio.dataLimiteEtapa2() != null && !relatorio.dataLimiteEtapa2().equals(relatorio.dataLimiteEtapa1())) {
+            if (relatorio.dataLimiteEtapa2() != null && !Objects.equals(relatorio.dataLimiteEtapa2(), relatorio.dataLimiteEtapa1())) {
                 dtLim2 += " (Prazo ajustado)";
             }
             dtEtapa2.addCell(criarCelulaRotuloValor("Data limite:", dtLim2));

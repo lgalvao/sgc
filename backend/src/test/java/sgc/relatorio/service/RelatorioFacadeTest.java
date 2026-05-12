@@ -41,6 +41,8 @@ class RelatorioFacadeTest {
     @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
     @Mock
+    private LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    @Mock
     private UsuarioFacade usuarioFacade;
     @Mock
     private PdfFactory pdfFactory;
@@ -70,6 +72,7 @@ class RelatorioFacadeTest {
         u.setCodigo(1L);
 
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
@@ -80,6 +83,7 @@ class RelatorioFacadeTest {
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(responsavelService.buscarResponsaveisUnidades(List.of(1L)))
                 .thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularNome("Resp").build()));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, u));
 
         List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
 
@@ -105,6 +109,7 @@ class RelatorioFacadeTest {
         unidade.setCodigo(1L);
 
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
         sp.setUnidade(unidade);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
@@ -112,6 +117,7 @@ class RelatorioFacadeTest {
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(responsavelService.buscarResponsaveisUnidades(List.of(1L)))
                 .thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularNome("Resp").build()));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, unidade));
 
         List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
 
@@ -135,6 +141,7 @@ class RelatorioFacadeTest {
         u.setCodigo(1L);
 
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
@@ -146,6 +153,7 @@ class RelatorioFacadeTest {
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(responsavelService.buscarResponsaveisUnidades(List.of(1L)))
                 .thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularNome("Resp").build()));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, u));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
@@ -167,11 +175,13 @@ class RelatorioFacadeTest {
         u2.setCodigo(2L);
 
         Subprocesso sp1 = new Subprocesso();
+        sp1.setCodigo(1L);
         sp1.setUnidade(u1);
         sp1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp1.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
 
         Subprocesso sp2 = new Subprocesso();
+        sp2.setCodigo(2L);
         sp2.setUnidade(u2);
         sp2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp2.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 11, 8, 0));
@@ -180,6 +190,10 @@ class RelatorioFacadeTest {
         when(responsavelService.buscarResponsaveisUnidades(List.of(1L, 2L))).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().titularNome("Resp 1").build(),
                 2L, UnidadeResponsavelDto.builder().titularNome("Resp 2").build()
+        ));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(
+                1L, u1,
+                2L, u2
         ));
 
         relatorioService.obterRelatorioAndamento(1L);
@@ -217,12 +231,14 @@ class RelatorioFacadeTest {
         // titular ok, substituto ok
 
         Subprocesso sp1 = new Subprocesso();
+        sp1.setCodigo(1L);
         sp1.setUnidade(u1);
         sp1.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         sp1.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
         sp1.setDataLimiteEtapa2(java.time.LocalDateTime.of(2023, 10, 10, 8, 0));
 
         Subprocesso sp2 = new Subprocesso();
+        sp2.setCodigo(2L);
         sp2.setUnidade(u2);
         sp2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp2.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
@@ -230,6 +246,7 @@ class RelatorioFacadeTest {
         sp2.setDataLimiteEtapa2(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
 
         Subprocesso sp3 = new Subprocesso();
+        sp3.setCodigo(3L);
         sp3.setUnidade(u3);
         sp3.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp3.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
@@ -249,6 +266,11 @@ class RelatorioFacadeTest {
                 // sem resp para u2 -> map nao tem entry 2L
                 3L, resp3
         ));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(
+                1L, u1,
+                2L, u2,
+                3L, u3
+        ));
 
         List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
 
@@ -257,19 +279,19 @@ class RelatorioFacadeTest {
         // Valida sp1
         assertThat(resultado.getFirst().titular()).isEqualTo("Não designado");
         assertThat(resultado.getFirst().responsavel()).isEqualTo("Não designado");
-        assertThat(resultado.get(0).localizacao()).isEqualTo("-");
+        assertThat(resultado.get(0).localizacao()).isEqualTo("U1");
         assertThat(resultado.get(0).dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 10, 8, 0));
 
         // Valida sp2
         assertThat(resultado.get(1).titular()).isEqualTo("Não designado");
         assertThat(resultado.get(1).responsavel()).isEqualTo("Não designado");
-        assertThat(resultado.get(1).localizacao()).isEqualTo("U0");
+        assertThat(resultado.get(1).localizacao()).isEqualTo("U2");
         assertThat(resultado.get(1).dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 9, 11, 8, 0));
 
         // Valida sp3
         assertThat(resultado.get(2).titular()).isEqualTo("Titular 3");
         assertThat(resultado.get(2).responsavel()).isEqualTo("Substituto 3 (Substituição)");
-        assertThat(resultado.get(2).localizacao()).isEqualTo("U0");
+        assertThat(resultado.get(2).localizacao()).isEqualTo("U3");
         assertThat(resultado.get(2).dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 12, 8, 0));
     }
 
@@ -404,11 +426,8 @@ class RelatorioFacadeTest {
         assertThat(resultado).hasSize(1);
         assertThat(resultado)
                 .singleElement()
-                .satisfies(relatorio -> {
-                    assertThat(relatorio.codigoUnidade()).isEqualTo(2L);
-                    assertThat(relatorio.siglaUnidade()).isEqualTo("U2");
-                    assertThat(relatorio.totalCompetencias()).isZero();
-                });
+                .extracting(RelatorioMapaDto::codigoUnidade, RelatorioMapaDto::siglaUnidade, RelatorioMapaDto::totalCompetencias)
+                .containsExactly(2L, "U2", 0);
     }
 
     @Test
@@ -494,6 +513,7 @@ class RelatorioFacadeTest {
     void deveCobrirErroGerarPdf() throws DocumentException {
         when(processoService.buscarPorCodigo(1L)).thenReturn(new Processo());
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
