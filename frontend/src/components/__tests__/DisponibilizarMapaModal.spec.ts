@@ -145,13 +145,13 @@ describe("DisponibilizarMapaModal.vue", () => {
         const nativeInput = inputWrapper.find("input");
         await nativeInput.setValue(dataLimite);
 
-        await definirObservacoes(wrapper, observacoes);
+        await definirObservacoes(wrapper, `<p>${observacoes}</p>`);
 
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
 
         expect(wrapper.emitted("disponibilizar")?.[0]).toEqual([{
             dataLimite,
-            observacoes
+            observacoes: `<p>${observacoes}</p>`
         }]);
     });
 
