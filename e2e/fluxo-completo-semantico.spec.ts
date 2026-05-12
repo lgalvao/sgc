@@ -26,6 +26,9 @@ import {
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
+    abrirHistoricoAnalise,
+    devolverCadastroMapeamento,
+    fecharHistoricoAnalise,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
 import {
@@ -488,9 +491,49 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             localizacao: SIGLA_COORDENADORIA
         });
 
-        // O GESTOR da coordenadoria abre a tela de atividades e registra aceite.
+        // O GESTOR da coordenadoria abre a tela de atividades, consulta o histórico e devolve o cadastro.
         await navegarParaCadastro(page);
-        await aceitarCadastroMapeamento(page, 'Aceite da COORD_11');
+        const modalHistoricoCoord = await abrirHistoricoAnalise(page);
+        await expect(modalHistoricoCoord).toBeVisible();
+        await fecharHistoricoAnalise(page);
+        await devolverCadastroMapeamento(page, 'Cadastro devolvido: favor verificar as atividades antes de disponibilizar novamente.');
+
+        // Após a devolução, o CHEFE recebe o cadastro de volta na sua unidade.
+        await login(page, CHEFE_SECAO.titulo, CHEFE_SECAO.senha);
+        await acessarSubprocessoChefeDireto(page, descProcesso, SIGLA_SECAO);
+
+        // O cadastro deve retornar ao estado "Cadastro em andamento" na seção.
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: 'Cadastro em andamento',
+            localizacao: SIGLA_SECAO
+        });
+
+        // O CHEFE abre o cadastro e verifica o histórico de devolução.
+        await navegarParaCadastro(page);
+        const modalHistoricoChefe = await abrirHistoricoAnalise(page);
+        await expect(modalHistoricoChefe.getByTestId('cell-resultado-0')).toHaveText(/Devolu/i);
+        await fecharHistoricoAnalise(page);
+
+        // O CHEFE re-disponibiliza o cadastro (sem precisar alterar dados).
+        await disponibilizarCadastro(page);
+
+        // O GESTOR da coordenadoria faz login novamente e aceita o cadastro após correção.
+        await login(page, GESTOR_COORDENADORIA.titulo, GESTOR_COORDENADORIA.senha);
+
+        // O GESTOR da coordenadoria abre o subprocesso da seção.
+        await acessarSubprocessoGestor(page, descProcesso, SIGLA_SECAO);
+
+        // O cadastro deve chegar à coordenadoria disponibilizado para análise novamente.
+        await verificarDetalhesSubprocesso(page, {
+            sigla: SIGLA_SECAO,
+            situacao: SIT_CADASTRO_DISPONIBILIZADO,
+            localizacao: SIGLA_COORDENADORIA
+        });
+
+        // O GESTOR da coordenadoria aceita o cadastro após a correção do CHEFE.
+        await navegarParaCadastro(page);
+        await aceitarCadastroMapeamento(page, 'Aceite da COORD_11 após correção.');
 
         // O GESTOR da secretaria faz login.
         await loginComPerfil(page, GESTOR_SECRETARIA.titulo, GESTOR_SECRETARIA.senha, GESTOR_SECRETARIA.perfil!);
@@ -620,6 +663,28 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
                 usuario: GESTOR_SECRETARIA,
                 perfil: GESTOR_SECRETARIA.perfil!
             });
+        });
+
+        await test.step('O CHEFE confere que o mapa homologado está em modo somente leitura sem ações de edição', async () => {
+            await login(page, CHEFE_SECAO.titulo, CHEFE_SECAO.senha);
+            await acessarSubprocessoChefeDireto(page, descricaoProcessoRevisao, SIGLA_SECAO);
+            await navegarParaMapa(page);
+            await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeHidden();
+            await expect(page.getByText(DESC_COMPETENCIA_INICIAL, {exact: true}).first()).toBeVisible();
+            await expect(page.getByText(DESC_ATIVIDADE, {exact: true}).first()).toBeVisible();
+            await expect(page.getByText(DESC_ATIVIDADE_REVISAO, {exact: true}).first()).toBeVisible();
+        });
+
+        await test.step('O GESTOR pode acessar o histórico do mapa homologado', async () => {
+            await loginComPerfil(page, GESTOR_SECRETARIA.titulo, GESTOR_SECRETARIA.senha, GESTOR_SECRETARIA.perfil!);
+            await acessarSubprocessoGestor(page, descricaoProcessoRevisao, SIGLA_SECAO);
+            await navegarParaMapa(page);
+            await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
+            await page.getByTestId('btn-mapa-historico').click();
+            const modalHistorico = page.getByRole('dialog');
+            await expect(modalHistorico).toBeVisible();
+            await page.keyboard.press('Escape');
+            await expect(modalHistorico).toBeHidden();
         });
 
         await expect(page.getByText(DESC_COMPETENCIA_INICIAL, {exact: true}).first()).toBeVisible();

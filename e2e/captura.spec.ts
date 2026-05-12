@@ -22,13 +22,21 @@ import {
 } from './helpers/helpers-atividades.js';
 import {
     abrirAcaoCadastroPrincipal,
+    abrirHistoricoAnalise,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
-    acessarSubprocessoGestor
+    acessarSubprocessoGestor,
+    fecharHistoricoAnalise
 } from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
-import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {
+    abrirDevolucaoMapa,
+    abrirModalCriarCompetencia,
+    disponibilizarMapa,
+    excluirCompetenciaConfirmando,
+    navegarParaMapa
+} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -1431,6 +1439,449 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await expect(page.getByTestId('btn-gerar-mapas')).toBeVisible();
             await capturarTela(page, 'relatorios', 'botao-gerar-pdf', {tags: ['ui-element', 'pdf']});
+        });
+    });
+
+    // SEÇÃO 11 - HISTÓRICO DE ANÁLISE E DEVOLUÇÃO DE CADASTRO
+    test.describe('11 - Histórico de Análise e Devolução', () => {
+        test('Captura modal de histórico e fluxo de devolução de cadastro', async ({page, request}) => {
+            const unidadeAlvo = 'SECAO_221';
+            const descricao = `Proc devolucao ${Date.now()}`;
+
+            const processo = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            // Gestor acessa cadastro disponibilizado para ver o histórico
+            await login(
+                page,
+                USUARIOS.GESTOR_COORD_22.titulo,
+                USUARIOS.GESTOR_COORD_22.senha
+            );
+            await page.goto(`/processo/${processo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaCadastro(page);
+            await capturarTela(page, 'historico-analise', 'cadastro-disponibilizado-gestor', {
+                fullPage: true,
+                tags: ['analise', 'historico']
+            });
+
+            // Abrir modal de histórico de análise
+            const modalHistorico = await abrirHistoricoAnalise(page);
+            await expect(modalHistorico).toBeVisible();
+            await capturarTela(page, 'historico-analise', 'modal-historico-analise', {
+                tags: ['modal', 'historico'],
+                extra: {perfil: 'GESTOR'}
+            });
+            await fecharHistoricoAnalise(page);
+
+            // Iniciar devolução de cadastro - abrir modal
+            const dropdown = page.getByTestId('btn-cadastro-acoes');
+            if (await dropdown.count() > 0) {
+                await dropdown.click();
+                await page.getByTestId('btn-cadastro-acao-devolver').click();
+            } else {
+                await page.getByTestId('btn-acao-devolver').click();
+            }
+            const modalDevolucao = page.locator('.modal.show');
+            await expect(modalDevolucao).toBeVisible();
+            await capturarTela(page, 'historico-analise', 'modal-devolucao-cadastro', {
+                tags: ['modal', 'devolucao'],
+                extra: {perfil: 'GESTOR', acao: 'devolver-cadastro'}
+            });
+
+            // Preencher observação e confirmar devolução
+            await modalDevolucao.getByTestId('inp-devolucao-cadastro-obs').fill('Dados incompletos para a Secretaria');
+            await capturarTela(page, 'historico-analise', 'modal-devolucao-preenchido', {
+                tags: ['modal', 'devolucao', 'preenchido']
+            });
+            await modalDevolucao.getByTestId('btn-devolucao-cadastro-confirmar').click();
+            await expect(page).toHaveURL(/\/painel/);
+
+            // Chefe vê o cadastro devolvido com situação "em andamento"
+            await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+            await page.goto(`/processo/${processo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo}/${unidadeAlvo}(?:\?.*)?$`));
+            await capturarTela(page, 'historico-analise', 'subprocesso-apos-devolucao', {
+                fullPage: true,
+                tags: ['devolucao', 'chefe'],
+                extra: {estado: 'CADASTRO_EM_ANDAMENTO'}
+            });
+
+            // Chefe acessa cadastro e vê histórico com registro de devolução
+            await navegarParaCadastro(page);
+            const modalHistoricoChefe = await abrirHistoricoAnalise(page);
+            await expect(modalHistoricoChefe).toBeVisible();
+            await capturarTela(page, 'historico-analise', 'historico-com-devolucao', {
+                tags: ['modal', 'historico', 'devolucao'],
+                extra: {perfil: 'CHEFE', mostra: 'registro-devolucao'}
+            });
+            await fecharHistoricoAnalise(page);
+        });
+    });
+
+    // SEÇÃO 12 - MODAIS DE GESTÃO DO MAPA
+    test.describe('12 - Modais de Gestão do Mapa', () => {
+        test('Captura modais de exclusão, edição e sugestões do mapa', async ({page, request}) => {
+            const unidadeAlvo = 'SECAO_112';
+            const descricao = `Proc mapa modais ${Date.now()}`;
+            const competencia1 = 'Competência para excluir';
+            const competencia2 = 'Competência para editar';
+
+            const processoCodigo = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaCadastro(page);
+            await (await abrirAcaoCadastroPrincipal(page)).click();
+            await expect(page.getByRole('dialog')).toBeVisible();
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para teste de mapa');
+            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+
+            await navegarParaMapa(page);
+
+            // Criar duas competências para testar edição e exclusão
+            await MapaHelpers.criarCompetencia(page, competencia1, []);
+            await MapaHelpers.criarCompetencia(page, competencia2, []);
+            await capturarTela(page, 'mapa-modais', 'mapa-com-duas-competencias', {
+                fullPage: true,
+                tags: ['mapa', 'competencias']
+            });
+
+            // Modal de exclusão - abrir e cancelar
+            const cardExcluir = page.getByTestId('cad-mapa__card-competencia').filter({has: page.getByText(competencia1, {exact: true})});
+            await cardExcluir.hover();
+            await cardExcluir.getByTestId('btn-excluir-competencia').click();
+            const modalExclusao = page.getByTestId('mdl-excluir-competencia');
+            await expect(modalExclusao).toBeVisible();
+            await capturarTela(page, 'mapa-modais', 'modal-excluir-competencia', {
+                tags: ['modal', 'exclusao'],
+                extra: {competencia: competencia1}
+            });
+            await modalExclusao.getByTestId('btn-modal-confirmacao-cancelar').click();
+            await expect(modalExclusao).toBeHidden();
+            await expect(page.getByText(competencia1, {exact: true})).toBeVisible();
+            await capturarTela(page, 'mapa-modais', 'competencia-mantida-apos-cancelar-exclusao', {
+                tags: ['cancelamento']
+            });
+
+            // Modal de exclusão - confirmar
+            await excluirCompetenciaConfirmando(page, competencia1);
+            await capturarTela(page, 'mapa-modais', 'competencia-excluida', {
+                tags: ['exclusao', 'confirmado']
+            });
+
+            // Modal de edição de competência
+            const cardEditar = page.getByTestId('cad-mapa__card-competencia').filter({has: page.getByText(competencia2, {exact: true})});
+            await cardEditar.hover();
+            await cardEditar.getByTestId('btn-editar-competencia').click();
+            const modalEdicao = page.getByTestId('mdl-criar-competencia');
+            await expect(modalEdicao).toBeVisible();
+            await capturarTela(page, 'mapa-modais', 'modal-editar-competencia', {
+                tags: ['modal', 'edicao'],
+                extra: {competencia: competencia2}
+            });
+            await page.getByTestId('inp-criar-competencia-descricao').fill(`${competencia2} Editada`);
+            await capturarTela(page, 'mapa-modais', 'modal-editar-competencia-preenchido', {
+                tags: ['modal', 'edicao', 'preenchido']
+            });
+            await page.getByTestId('btn-criar-competencia-salvar').click();
+            await expect(modalEdicao).toBeHidden();
+            await expect(page.getByText(`${competencia2} Editada`, {exact: true})).toBeVisible();
+        });
+
+        test('Captura devolução do mapa e mapa somente leitura', async ({page, request}) => {
+            const unidadeAlvo = 'ASSESSORIA_11';
+            const descricao = `Proc devolucao mapa ${Date.now()}`;
+
+            const processoCodigo = await criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            // CHEFE valida o mapa
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaMapa(page);
+
+            // Abrir ações do mapa para o chefe
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+            await page.getByTestId('btn-mapa-acoes').click();
+            await capturarTela(page, 'mapa-modais', 'menu-acoes-mapa-chefe', {
+                tags: ['menu', 'acoes-mapa', 'chefe']
+            });
+            await page.keyboard.press('Escape');
+
+            // GESTOR abre mapa e usa devolução
+            await loginComPerfil(
+                page,
+                USUARIOS.GESTOR_SECRETARIA_1.titulo,
+                USUARIOS.GESTOR_SECRETARIA_1.senha,
+                USUARIOS.GESTOR_SECRETARIA_1.perfil
+            );
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaMapa(page);
+            await capturarTela(page, 'mapa-modais', 'mapa-disponibilizado-gestor', {
+                fullPage: true,
+                tags: ['mapa', 'analise'],
+                extra: {perfil: 'GESTOR', estado: 'DISPONIBILIZADO'}
+            });
+
+            // Abrir modal de devolução do mapa
+            await abrirDevolucaoMapa(page);
+            const modalDevolucaoMapa = page.getByRole('dialog');
+            await expect(modalDevolucaoMapa).toBeVisible();
+            await capturarTela(page, 'mapa-modais', 'modal-devolver-mapa', {
+                tags: ['modal', 'devolucao-mapa'],
+                extra: {perfil: 'GESTOR'}
+            });
+            await page.keyboard.press('Escape');
+        });
+
+        test('Captura modal de sugestões do mapa', async ({page, request}) => {
+            const unidadeAlvo = 'ASSESSORIA_11';
+            const descricao = `Proc sugestoes ${Date.now()}`;
+
+            const processoCodigo = await criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            // CHEFE pode ver sugestões no mapa disponibilizado
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaMapa(page);
+            await capturarTela(page, 'mapa-modais', 'mapa-chefe-disponibilizado', {
+                fullPage: true,
+                tags: ['mapa', 'chefe', 'disponibilizado']
+            });
+
+            // Abrir dropdown de ações do mapa e sugestões
+            await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
+            await page.getByTestId('btn-mapa-acoes').click();
+            const btnSugestoes = page.getByTestId('btn-mapa-acao-sugestoes');
+            if (await btnSugestoes.isVisible()) {
+                await capturarTela(page, 'mapa-modais', 'menu-acoes-com-sugestoes', {
+                    tags: ['menu', 'sugestoes']
+                });
+                await btnSugestoes.click();
+                await expect(page.getByRole('dialog')).toBeVisible();
+                await capturarTela(page, 'mapa-modais', 'modal-sugestoes-mapa', {
+                    tags: ['modal', 'sugestoes'],
+                    extra: {perfil: 'CHEFE'}
+                });
+                await page.keyboard.press('Escape');
+            } else {
+                await page.keyboard.press('Escape');
+                await capturarTela(page, 'mapa-modais', 'acoes-mapa-sem-sugestoes', {
+                    tags: ['menu', 'sem-sugestoes']
+                });
+            }
+        });
+
+        test('Captura mapa somente leitura após homologação', async ({page, request}) => {
+            const unidadeAlvo = 'ASSESSORIA_11';
+            const descricao = `Proc mapa homologado ${Date.now()}`;
+
+            const processoCodigo = await criarProcessoMapeamentoComMapaHomologadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            // CHEFE vê mapa homologado (somente leitura, sem botão de editar)
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await capturarTela(page, 'mapa-modais', 'subprocesso-mapa-homologado-chefe', {
+                fullPage: true,
+                tags: ['subprocesso', 'homologado', 'chefe']
+            });
+            await navegarParaMapa(page);
+            await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeHidden();
+            await capturarTela(page, 'mapa-modais', 'mapa-homologado-somente-leitura-chefe', {
+                fullPage: true,
+                tags: ['mapa', 'homologado', 'somente-leitura', 'chefe'],
+                extra: {estado: 'MAPA_HOMOLOGADO'}
+            });
+
+            // GESTOR vê mapa homologado
+            await loginComPerfil(
+                page,
+                USUARIOS.GESTOR_SECRETARIA_1.titulo,
+                USUARIOS.GESTOR_SECRETARIA_1.senha,
+                USUARIOS.GESTOR_SECRETARIA_1.perfil!
+            );
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaMapa(page);
+            await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeHidden();
+            await capturarTela(page, 'mapa-modais', 'mapa-homologado-somente-leitura-gestor', {
+                fullPage: true,
+                tags: ['mapa', 'homologado', 'somente-leitura', 'gestor'],
+                extra: {estado: 'MAPA_HOMOLOGADO', perfil: 'GESTOR'}
+            });
+
+            // Histórico do mapa (abre modal, não navega para outra página)
+            await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
+            await page.getByTestId('btn-mapa-historico').click();
+            const modalHistoricoMapa = page.getByRole('dialog');
+            await expect(modalHistoricoMapa).toBeVisible();
+            await capturarTela(page, 'mapa-modais', 'historico-mapa', {
+                fullPage: false,
+                tags: ['historico', 'mapa'],
+                extra: {perfil: 'GESTOR'}
+            });
+            await page.keyboard.press('Escape');
+        });
+    });
+
+    // SEÇÃO 13 - PERFIL SERVIDOR
+    test.describe('13 - Perfil Servidor (Somente Leitura)', () => {
+        test('Captura painel e acesso restrito do perfil Servidor', async ({page, request}) => {
+            const unidadeAlvo = 'SECAO_221';
+            const descricao = `Proc servidor ${Date.now()}`;
+
+            const processoCodigo = await criarProcessoMapeamentoIniciadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            // SERVIDOR faz login e vê o painel
+            await login(page, USUARIOS.SERVIDOR_SECAO_221.titulo, USUARIOS.SERVIDOR_SECAO_221.senha);
+            await expect(page).toHaveURL(/\/painel/);
+            await capturarTela(page, 'perfil-servidor', 'painel-servidor', {
+                fullPage: true,
+                tags: ['servidor', 'painel'],
+                extra: {perfil: 'SERVIDOR'}
+            });
+
+            // SERVIDOR não deve ver o botão de criar processo
+            await expect(page.getByTestId('btn-painel-criar-processo')).toBeHidden();
+            await capturarTela(page, 'perfil-servidor', 'painel-servidor-sem-criar', {
+                tags: ['servidor', 'acesso-restrito']
+            });
+
+            // SERVIDOR não deve ter acesso ao menu de Unidades, Relatórios, etc.
+            await expect(page.getByRole('link', {name: /Unidades/i})).toBeHidden();
+
+            // SERVIDOR acessa subprocesso da sua unidade (somente leitura)
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await capturarTela(page, 'perfil-servidor', 'subprocesso-servidor', {
+                fullPage: true,
+                tags: ['servidor', 'subprocesso', 'somente-leitura'],
+                extra: {perfil: 'SERVIDOR'}
+            });
+        });
+    });
+
+    // SEÇÃO 14 - MODAIS DE REMOÇÃO DE ATIVIDADE E CONHECIMENTO
+    test.describe('14 - Modais de Remoção de Atividade e Conhecimento', () => {
+        test('Captura modais de remoção de atividade e conhecimento', async ({page, request}) => {
+            const unidadeAlvo = 'SECAO_111';
+            const descricao = `Proc remocao ${Date.now()}`;
+            const atividadeDesc = `Atividade para remover ${Date.now()}`;
+            const conhecimentoDesc = 'Conhecimento para remover';
+            const atividadeComConhecimento = `Atividade com conhecimento ${Date.now()}`;
+
+            const processoCodigo = await criarProcessoMapeamentoIniciadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaCadastro(page);
+
+            // Adicionar atividade e conhecimento para remoção
+            await adicionarAtividade(page, atividadeDesc);
+            await adicionarAtividade(page, atividadeComConhecimento);
+            await adicionarConhecimento(page, atividadeComConhecimento, conhecimentoDesc);
+            await adicionarConhecimento(page, atividadeComConhecimento, 'Conhecimento extra');
+
+            // Modal de remoção de conhecimento - abrir
+            const cardComConhecimento = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeComConhecimento)});
+            const linhaConhecimento = cardComConhecimento.getByTestId('cad-atividades__item-conhecimento').filter({hasText: conhecimentoDesc});
+            await linhaConhecimento.hover();
+            await linhaConhecimento.getByTestId('btn-remover-conhecimento').click();
+            const modalRemoverConhecimento = page.getByRole('dialog');
+            await expect(modalRemoverConhecimento).toBeVisible();
+            await capturarTela(page, 'remocao', 'modal-remover-conhecimento', {
+                tags: ['modal', 'remocao', 'conhecimento'],
+                extra: {conhecimento: conhecimentoDesc}
+            });
+            // Cancelar remoção
+            await page.getByTestId('btn-modal-confirmacao-cancelar').click();
+            await expect(page.getByRole('dialog')).toBeHidden();
+            await expect(cardComConhecimento.getByText(conhecimentoDesc)).toBeVisible();
+            await capturarTela(page, 'remocao', 'conhecimento-mantido-apos-cancelar', {
+                tags: ['cancelamento', 'conhecimento']
+            });
+
+            // Modal de remoção de atividade - hover e abrir
+            const cardAtividadeRemover = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeDesc, {exact: true})});
+            const hoverRow = cardAtividadeRemover.getByTestId('cad-atividades__hover-row');
+            await hoverRow.hover();
+            await aguardarPinturaEstavel(page);
+            await capturarTela(page, 'remocao', 'atividade-hover-com-remover', {
+                tags: ['hover', 'atividade']
+            });
+            await cardAtividadeRemover.getByTestId('btn-remover-atividade').click();
+            const modalRemoverAtividade = page.getByRole('dialog');
+            await expect(modalRemoverAtividade).toBeVisible();
+            await capturarTela(page, 'remocao', 'modal-remover-atividade', {
+                tags: ['modal', 'remocao', 'atividade'],
+                extra: {atividade: atividadeDesc}
+            });
+            // Confirmar remoção
+            await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+            await expect(page.getByText(atividadeDesc, {exact: true})).toBeHidden();
+            await capturarTela(page, 'remocao', 'atividade-removida', {
+                tags: ['remocao', 'confirmado']
+            });
+        });
+
+        test('Captura modal de impacto no mapa (revisão)', async ({page, request}) => {
+            const unidadeAlvo = 'ASSESSORIA_11';
+            const descricao = `Proc impacto ${Date.now()}`;
+
+            const processoCodigo = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo
+            );
+
+            // Homologar o processo via admin para ter um mapa base
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await navegarParaCadastro(page);
+            await (await abrirAcaoCadastroPrincipal(page)).click();
+            await expect(page.getByRole('dialog')).toBeVisible();
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para teste de impacto');
+            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+
+            // Criar mapa e disponibilizar
+            await navegarParaMapa(page);
+            const competencia = `Competência impacto ${Date.now()}`;
+            await MapaHelpers.criarCompetencia(page, competencia, []);
+            await capturarTela(page, 'impacto-mapa', 'mapa-antes-disponibilizar', {
+                fullPage: true,
+                tags: ['mapa', 'impacto']
+            });
+
+            // Botão de impacto no mapa
+            const btnImpactoMapa = page.getByTestId('cad-mapa__btn-impactos-mapa');
+            if (await btnImpactoMapa.isVisible()) {
+                await btnImpactoMapa.click();
+                await expect(page.getByRole('dialog')).toBeVisible();
+                await capturarTela(page, 'impacto-mapa', 'modal-impacto-mapa', {
+                    tags: ['modal', 'impacto', 'mapa']
+                });
+                await page.keyboard.press('Escape');
+            }
         });
     });
 });
