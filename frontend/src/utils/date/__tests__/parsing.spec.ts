@@ -89,6 +89,10 @@ describe("analisarData", () => {
             expect(analisarData("nao-e-data")).toBeNull();
         });
 
+        it("retorna null para data DD/MM/YYYY invalida (31/02)", () => {
+            expect(analisarData("31/02/2025")).toBeNull();
+        });
+
         it("retorna null para string com apenas espacos", () => {
             expect(analisarData("   ")).toBeNull();
         });

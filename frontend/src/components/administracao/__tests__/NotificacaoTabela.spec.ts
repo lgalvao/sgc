@@ -56,7 +56,7 @@ describe("NotificacaoTabela.vue", () => {
             }
         });
         await wrapper.find('[data-testid="btn-detalhes-1"]').trigger("click");
-        expect(wrapper.emitted("detalhes")).toBeDefined();
+        expect(wrapper.emitted("detalhes")).toHaveLength(1);
         expect(wrapper.emitted("detalhes")![0]).toEqual([items[0]]);
     });
 
@@ -68,7 +68,7 @@ describe("NotificacaoTabela.vue", () => {
             }
         });
         await wrapper.find('[data-testid="btn-preview-1"]').trigger("click");
-        expect(wrapper.emitted("preview")).toBeDefined();
+        expect(wrapper.emitted("preview")).toHaveLength(1);
         expect(wrapper.emitted("preview")![0]).toEqual([items[0]]);
     });
 
@@ -85,6 +85,6 @@ describe("NotificacaoTabela.vue", () => {
         expect(wrapper.find('[data-testid="btn-notificacoes-reenviar-2"]').exists()).toBe(true);
 
         await wrapper.find('[data-testid="btn-notificacoes-reenviar-2"]').trigger("click");
-        expect(wrapper.emitted("reenviar")).toBeDefined();
+        expect(wrapper.emitted("reenviar")).toHaveLength(1);
     });
 });

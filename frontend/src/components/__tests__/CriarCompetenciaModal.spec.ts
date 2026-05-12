@@ -93,7 +93,7 @@ describe("CriarCompetenciaModal.vue", () => {
         await flushPromises();
         await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
 
-        expect(wrapper.emitted("salvar")).toBeDefined();
+        expect(wrapper.emitted("salvar")).toHaveLength(1);
     });
 
     it("deve permitir salvar edicao sem atividades associadas", async () => {
@@ -131,7 +131,7 @@ describe("CriarCompetenciaModal.vue", () => {
         const wrapper = createWrapper({mostrar: true, atividades});
 
         await wrapper.find('[data-testid="btn-criar-competencia-cancelar"]').trigger("click");
-        expect(wrapper.emitted("fechar")).toBeDefined();
+        expect(wrapper.emitted("fechar")).toHaveLength(1);
     });
 
     it("deve emitir o evento salvar com os dados corretos", async () => {
@@ -144,7 +144,7 @@ describe("CriarCompetenciaModal.vue", () => {
         await flushPromises();
         await wrapper.find('[data-testid="btn-criar-competencia-salvar"]').trigger("click");
 
-        expect(wrapper.emitted("salvar")).toBeDefined();
+        expect(wrapper.emitted("salvar")).toHaveLength(1);
         expect(wrapper.emitted("salvar")?.[0]).toEqual([
             {
                 descricao,

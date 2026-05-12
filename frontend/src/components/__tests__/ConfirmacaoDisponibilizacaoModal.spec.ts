@@ -78,7 +78,7 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
             global: globalOptions
         })
 
-        expect(wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]').attributes('disabled')).toBeDefined()
+        expect(wrapper.find('[data-testid="btn-confirmar-disponibilizacao"]').attributes('disabled')).toBe('')
     })
 
 })

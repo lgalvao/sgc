@@ -477,4 +477,18 @@ describe('useAcesso', () => {
             habilitar: false,
         });
     });
+
+    it('deve reagir a mudanças no subprocesso', () => {
+        const subprocesso = ref<SubprocessoDetalhe | null>(criarSubprocesso({
+            permissoes: criarPermissoes({habilitarEditarCadastro: false}),
+        }));
+        const {habilitarEditarCadastro} = useAcesso(subprocesso);
+
+        expect(habilitarEditarCadastro.value).toBe(false);
+
+        subprocesso.value = criarSubprocesso({
+            permissoes: criarPermissoes({habilitarEditarCadastro: true}),
+        });
+        expect(habilitarEditarCadastro.value).toBe(true);
+    });
 });

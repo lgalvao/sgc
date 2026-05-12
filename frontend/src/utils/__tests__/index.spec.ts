@@ -1,34 +1,7 @@
 import {describe, expect, it} from "vitest";
-import {analisarData, formatarDataBR, formatarDataHoraBR, formatarDataParaInput,} from "@/utils";
+import {formatarDataBR, formatarDataHoraBR, formatarDataParaInput,} from "@/utils";
 
 describe("utilitários", () => {
-    describe("analisarData", () => {
-        it("deve retornar null para entrada nula ou indefinida", () => {
-            expect(analisarData(null)).toBeNull();
-            expect(analisarData(undefined)).toBeNull();
-            expect(analisarData("")).toBeNull();
-        });
-
-        it("deve analisar strings de data ISO", () => {
-            const date = analisarData("2024-03-15");
-            expect(date).toBeInstanceOf(Date);
-            expect(date?.getFullYear()).toBe(2024);
-            expect(date?.getMonth()).toBe(2);
-            expect([14, 15]).toContain(date?.getDate());
-        });
-
-        it("deve analisar o formato de data brasileiro DD/MM/YYYY", () => {
-            const date = analisarData("15/03/2024");
-            expect(date).toEqual(new Date(2024, 2, 15));
-        });
-
-        it("deve retornar null para strings de data inválidas", () => {
-            expect(analisarData("invalid")).toBeNull();
-            expect(analisarData("99/99/9999")).toBeNull();
-            expect(analisarData("00/01/2024")).toBeNull();
-        });
-    });
-
     describe("formatarDataBR", () => {
         it('deve retornar "Não informado" para nulo ou indefinido', () => {
             expect(formatarDataBR(null)).toBe("Não informado");

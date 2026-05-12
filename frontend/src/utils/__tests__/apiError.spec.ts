@@ -76,7 +76,7 @@ describe('apiError utils', () => {
             const normalized = normalizarErro(err);
             expect(normalized.tipo).toBe('inesperado');
             expect(normalized.mensagem).toBe('Erro custom');
-            expect(normalized.stackTrace).toBeDefined();
+            expect(normalized.stackTrace).toContain('Error: Erro custom');
         });
 
         it('deve normalizar erro desconhecido (string)', () => {
@@ -92,6 +92,42 @@ describe('apiError utils', () => {
             expect(normalizarErro({isAxiosError: true, response: {status: 403}}).tipo).toBe('proibido');
             expect(normalizarErro({isAxiosError: true, response: {status: 409}}).tipo).toBe('conflito');
             expect(normalizarErro({isAxiosError: true, response: {status: 503}}).tipo).toBe('inesperado');
+        });
+
+        it('deve extrair traceId e erros do payload se presentes', () => {
+            const err = {
+                isAxiosError: true,
+                response: {
+                    status: 422,
+                    data: {
+                        message: 'Entidade não processável',
+                        traceId: 'trace-123',
+                        erros: [{campo: 'nome', mensagem: 'obrigatório'}],
+                    },
+                },
+            };
+            const normalized = normalizarErro(err);
+            expect(normalized.traceId).toBe('trace-123');
+            expect(normalized.erros).toHaveLength(1);
+            expect(normalized.erros![0]).toEqual({campo: 'nome', mensagem: 'obrigatório'});
+        });
+
+        it('deve mapear o campo details do payload para detalhes no erro normalizado', () => {
+            const err = {
+                isAxiosError: true,
+                response: {
+                    status: 400,
+                    data: {
+                        message: 'Erro de validação customizado',
+                        code: 'VAL_001',
+                        details: 'algum detalhe',
+                    },
+                },
+            };
+            const normalized = normalizarErro(err);
+            expect(normalized.tipo).toBe('validacao');
+            expect(normalized.codigo).toBe('VAL_001');
+            expect(normalized.detalhes).toBe('algum detalhe');
         });
     });
 

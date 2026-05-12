@@ -117,7 +117,7 @@ describe('ModalConfirmacao.vue', () => {
         await confirmBtn.trigger('click')
 
         expect(wrapper.emitted('confirmar')).toBeDefined()
-        expect(wrapper.emitted('update:modelValue')).toBeFalsy() // Não fecha
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined() // Não fecha
     })
 
     it('renderiza conteúdo customizado via slot', () => {
@@ -164,7 +164,7 @@ describe('ModalConfirmacao.vue', () => {
         })
 
         const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
-        expect(confirmBtn.attributes('disabled')).toBeDefined()
+        expect(confirmBtn.attributes('disabled')).toBe('')
     })
 
     it('exibe estado de carregamento corretamente', () => {
@@ -179,8 +179,8 @@ describe('ModalConfirmacao.vue', () => {
         const confirmBtn = wrapper.find('[data-testid="btn-modal-confirmacao-confirmar"]')
         const cancelBtn = wrapper.find('[data-testid="btn-modal-confirmacao-cancelar"]')
 
-        expect(confirmBtn.attributes('disabled')).toBeDefined()
-        expect(cancelBtn.attributes('disabled')).toBeDefined()
+        expect(confirmBtn.attributes('disabled')).toBe('')
+        expect(cancelBtn.attributes('disabled')).toBe('')
         expect(confirmBtn.find('.spinner-border').exists()).toBe(true)
         expect(confirmBtn.text()).toContain('Processando...')
     })

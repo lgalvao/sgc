@@ -42,7 +42,7 @@ describe('LoadingButton.vue', () => {
         })
 
         const button = wrapper.find('.b-button-stub')
-        expect(button.attributes('disabled')).toBeDefined()
+        expect(button.attributes('disabled')).toBe('')
         expect(wrapper.find('.b-spinner-stub').exists()).toBe(true)
     })
 
@@ -107,6 +107,6 @@ describe('LoadingButton.vue', () => {
             global: globalOptions
         })
 
-        expect(wrapper.find('.b-button-stub').attributes('disabled')).toBeDefined()
+        expect(wrapper.find('.b-button-stub').attributes('disabled')).toBe('')
     })
 })

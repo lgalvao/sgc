@@ -26,7 +26,7 @@ describe('FeedbackButton.vue', () => {
             }
         })
         const btn = wrapper.find('[data-testid="feedback-btn"]')
-        expect(btn.attributes('disabled')).toBeDefined()
+        expect(btn.attributes('disabled')).toBe('')
         expect(wrapper.find('i').classes()).toContain('bi-arrow-repeat')
     })
 

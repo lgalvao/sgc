@@ -244,7 +244,6 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.vm.$nextTick();
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeDefined();
         expect(emitted![emitted!.length - 1][0]).toEqual([101, 102]);
     });
 
@@ -269,7 +268,6 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Desmarcar todas as unidades"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeDefined();
         expect(emitted![emitted!.length - 1][0]).toEqual([]);
     });
 
@@ -304,7 +302,6 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeDefined();
         const selection = emitted![0][0] as number[];
         expect(selection).toContain(10);
         expect(selection).toContain(21);
@@ -318,7 +315,6 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Desmarcar todas as unidades"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeDefined();
         expect(emitted![0][0]).toEqual([]);
     });
 
@@ -525,7 +521,6 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
 
         const emitted = wrapper.emitted("update:modelValue");
-        expect(emitted).toBeDefined();
         expect(emitted![0][0]).toContain(400);
     });
 
@@ -666,7 +661,6 @@ describe("ArvoreUnidades.vue", () => {
         await wrapper.vm.$nextTick();
 
         const emissoes = wrapper.emitted("update:modelValue");
-        expect(emissoes).toBeDefined();
         const ultimaEmissao = emissoes![emissoes!.length - 1][0] as number[];
         expect(ultimaEmissao).toEqual([21]);
     });

@@ -100,7 +100,7 @@ describe("ImpactoMapaModal.vue", () => {
         const btn = wrapper.find('[data-testid="btn-fechar-impacto"]');
         await btn.trigger("click");
 
-        expect(wrapper.emitted().fechar).toBeDefined();
+        expect(wrapper.emitted().fechar).toHaveLength(1);
     });
 
     it("deve exibir estado de carregamento via prop", async () => {
