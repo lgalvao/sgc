@@ -4,7 +4,24 @@ import CadastroObservacaoModal from "../CadastroObservacaoModal.vue";
 import {createTestingPinia} from "@pinia/testing";
 
 describe("CadastroObservacaoModal.vue", () => {
-    const defaultProps = {
+    type PropsCadastroObservacaoModal = {
+        modelValue: boolean;
+        loading: boolean;
+        titulo: string;
+        okTitle: string;
+        texto: string;
+        observacao: string;
+        testIdConfirmar: string;
+        inputId: string;
+        inputDataTestid: string;
+        label: string;
+        erro?: string | null;
+        labelObrigatoria?: boolean;
+        estadoObservacao?: boolean | null;
+        feedbackObservacao?: string | null;
+    };
+
+    const defaultProps: PropsCadastroObservacaoModal = {
         modelValue: true,
         loading: false,
         titulo: "Meu Título",
@@ -23,7 +40,7 @@ describe("CadastroObservacaoModal.vue", () => {
         template: '<textarea :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
     };
 
-    function montar(props = defaultProps) {
+    function montar(props: PropsCadastroObservacaoModal = defaultProps) {
         return mount(CadastroObservacaoModal, {
             props,
             global: {

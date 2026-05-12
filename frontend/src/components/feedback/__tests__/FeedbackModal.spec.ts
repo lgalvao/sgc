@@ -18,17 +18,24 @@ describe('FeedbackModal.vue', () => {
         vi.clearAllMocks()
     })
 
+    const modalStub = {
+        props: ['modelValue'],
+        template: '<div v-if="modelValue"><slot name="title" /><slot /></div>'
+    }
+
     const stubs = {
-        'b-modal': {
+        BModal: modalStub,
+        'b-modal': modalStub,
+        EditorTextoRico: {
             props: ['modelValue'],
-            template: '<div v-if="modelValue"><slot name="title" /><slot /></div>'
-        }
+            emits: ['update:modelValue'],
+            template: '<textarea :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
+        },
     }
 
     function definirConteudoEditor(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
         const editor = wrapper.find('[data-testid="feedback-nota"]')
-        ;(editor.element as HTMLDivElement).innerHTML = conteudoHtml
-        return editor.trigger('input')
+        return editor.setValue(conteudoHtml)
     }
 
     it('deve renderizar o título correto', () => {
