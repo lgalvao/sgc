@@ -173,10 +173,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex,
-                                                                    HttpHeaders headers,
-                                                                    HttpStatusCode status,
-                                                                    WebRequest request) {
+    @Nullable
+    protected ResponseEntity<@NonNull Object> handleNoResourceFoundException(
+            @NonNull NoResourceFoundException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request) {
         if (request instanceof ServletWebRequest servletWebRequest
                 && deveEncaminharParaFrontend(ex.getResourcePath())
                 && encaminharIndexHtml(servletWebRequest)) {

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
@@ -160,7 +161,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
-        assertThat(movs1.getFirst().getDescricao()).contains("Disponibilização do mapa");
+        assertThat(movs1.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_MAPA_DISPONIBILIZADO);
 
         // Verificações para Subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
@@ -202,11 +203,11 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve rejeitar disponibilização em bloco com data menor que a última data limite de algum subprocesso")
+    @DisplayName("Deve rejeitar disponibilização em bloco com data menor ou igual ao fim da etapa anterior")
     @WithMockAdmin
-    void disponibilizarMapaEmBloco_deveFalharQuandoDataMenorQueUltimaDataLimite() throws Exception {
+    void disponibilizarMapaEmBloco_deveFalharQuandoDataMenorOuIgualFimEtapaAnterior() throws Exception {
         subprocesso1.setDataLimiteEtapa1(LocalDate.now().plusDays(7).atStartOfDay());
-        subprocesso1.setDataLimiteEtapa2(LocalDate.now().plusDays(15).atStartOfDay());
+        subprocesso1.setDataFimEtapa1(LocalDate.now().plusDays(10).atStartOfDay());
         subprocessoRepo.saveAndFlush(subprocesso1);
 
         Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
@@ -230,6 +231,6 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent())
-                .andExpect(content().string(containsString("A data limite deve ser maior ou igual à última data limite do subprocesso.")));
+                .andExpect(content().string(containsString(Mensagens.DATA_LIMITE_MAIOR_QUE_FIM_ETAPA_ANTERIOR)));
     }
 }

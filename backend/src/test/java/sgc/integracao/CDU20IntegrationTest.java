@@ -136,7 +136,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         subprocesso.getCodigo());
         assertThat(movimentacoesDevolucao).hasSize(2); // Setup + Devolução
         assertThat(movimentacoesDevolucao.getFirst().getDescricao())
-                .isEqualTo("Devolução da validação do mapa de competências para ajustes");
+                .isEqualTo(Mensagens.HIST_MAPA_VALIDACAO_DEVOLVIDA);
         assertThat(movimentacoesDevolucao.getFirst().getUnidadeOrigem().getSigla())
                 .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacoesDevolucao.getFirst().getUnidadeDestino().getSigla())
