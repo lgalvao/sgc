@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
@@ -251,7 +252,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigo(subprocessoCriado.getCodigo());
         assertThat(movs).hasSize(1);
-        assertThat(movs.getFirst().getDescricao()).isEqualTo("Processo iniciado");
+        assertThat(movs.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_PROCESSO_INICIADO);
 
         aguardarEmail(2);
         assertThat(algumEmailPara("u_rev@tre-pe.jus.br")).isTrue();

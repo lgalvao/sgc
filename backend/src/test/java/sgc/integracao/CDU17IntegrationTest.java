@@ -162,7 +162,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             Movimentacao mov = movimentacoes.getFirst();
             assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo(ADMIN_LITERAL);
             assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
-            assertThat(mov.getDescricao()).isEqualTo("Disponibilização do mapa de competências para validação");
+            assertThat(mov.getDescricao()).isEqualTo(Mensagens.HIST_MAPA_DISPONIBILIZADO);
 
             List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);

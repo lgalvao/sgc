@@ -8,6 +8,7 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.comum.ComumDtos.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
@@ -101,7 +102,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(codSp);
         assertThat(movimentacoes).isNotEmpty();
         boolean movimentacaoExiste = movimentacoes.stream()
-                .anyMatch(m -> m.getDescricao().contains("Reabertura de revisão de cadastro"));
+                .anyMatch(m -> m.getDescricao().contains(Mensagens.HIST_REVISAO_REABERTA));
 
         assertThat(movimentacaoExiste).isTrue();
 

@@ -136,7 +136,7 @@ public class SubprocessoService {
         associarMapasASubprocessos(subprocessosSalvos, mapasSalvos);
 
         List<Movimentacao> movimentacoes = subprocessosSalvos.stream()
-                .map(subprocesso -> criarMovimentacaoInicial(subprocesso, unidadeOrigem, usuario, "Processo iniciado"))
+                .map(subprocesso -> criarMovimentacaoInicial(subprocesso, unidadeOrigem, usuario, Mensagens.HIST_PROCESSO_INICIADO))
                 .toList();
         movimentacaoRepo.saveAll(movimentacoes);
     }
@@ -150,7 +150,7 @@ public class SubprocessoService {
                 .unidadeOrigem(command.unidadeOrigem())
                 .usuario(usuario)
                 .situacaoInicial(NAO_INICIADO)
-                .descMovimentacao("Processo iniciado")
+                .descMovimentacao(Mensagens.HIST_PROCESSO_INICIADO)
                 .build());
         log.info("Criado subprocesso para unidade {}", command.unidade().getSigla());
     }

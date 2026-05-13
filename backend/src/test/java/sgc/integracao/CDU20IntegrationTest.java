@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.comum.ComumDtos.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
@@ -89,7 +90,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidade)
                 .unidadeDestino(unidadeSuperior)
-                .descricao("Mapa validado e submetido para análise")
+                .descricao(Mensagens.HIST_MAPA_VALIDADO)
                 .usuario(usuarioChefe)
                 .build();
         movimentacaoRepo.save(m);
@@ -179,7 +180,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         // Adicionar verificação de Movimentacao e Alerta após aceite
         List<Movimentacao> movimentacoesAceite = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());
         assertThat(movimentacoesAceite).hasSize(4); // Setup + devolução + validação + aceite
-        assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
+        assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_MAPA_VALIDACAO_ACEITA);
         assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
 
@@ -217,7 +218,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movimentacoes =
                 movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());
-        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
+        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_MAPA_VALIDACAO_ACEITA);
         assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
 
@@ -264,7 +265,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Deve ter o setup + homologação
         assertThat(movimentacoes).hasSizeGreaterThanOrEqualTo(2);
-        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências homologado");
+        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_MAPA_HOMOLOGADO);
         assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
         assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
 

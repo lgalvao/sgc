@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
@@ -81,7 +82,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocesso1)
                 .unidadeOrigem(unidade1)
                 .unidadeDestino(unidadeSuperior)
-                .descricao("Cadastro disponibilizado")
+                .descricao(Mensagens.HIST_CADASTRO_DISPONIBILIZADO)
                 .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(m1);
@@ -90,7 +91,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocesso2)
                 .unidadeOrigem(unidade2)
                 .unidadeDestino(unidadeSuperior)
-                .descricao("Cadastro disponibilizado")
+                .descricao(Mensagens.HIST_CADASTRO_DISPONIBILIZADO)
                 .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(m2);

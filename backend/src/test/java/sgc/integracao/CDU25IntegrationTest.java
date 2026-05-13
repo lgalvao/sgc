@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
@@ -80,7 +81,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocesso1)
                 .unidadeOrigem(unidade1)
                 .unidadeDestino(unidadeSuperior)
-                .descricao("Mapa validado")
+                .descricao(Mensagens.HIST_MAPA_VALIDADO)
                 .dataHora(LocalDateTime.now())
                 .usuario(usuarioGestor)
                 .build();
@@ -90,7 +91,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocesso2)
                 .unidadeOrigem(unidade2)
                 .unidadeDestino(unidadeSuperior)
-                .descricao("Mapa validado")
+                .descricao(Mensagens.HIST_MAPA_VALIDADO)
                 .dataHora(LocalDateTime.now())
                 .usuario(usuarioGestor)
                 .build();
@@ -134,7 +135,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
-        assertThat(movs1.getFirst().getDescricao()).contains("Mapa de competências validado");
+        assertThat(movs1.getFirst().getDescricao()).contains(Mensagens.HIST_MAPA_VALIDACAO_ACEITA);
 
         // Check subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
@@ -169,7 +170,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocessoPainel)
                 .unidadeOrigem(secaoDesenvolvimento)
                 .unidadeDestino(coordenadoriaSistemas)
-                .descricao("Mapa validado")
+                .descricao(Mensagens.HIST_MAPA_VALIDADO)
                 .dataHora(LocalDateTime.now())
                 .usuario(usuarioCoordenadoria)
                 .build();

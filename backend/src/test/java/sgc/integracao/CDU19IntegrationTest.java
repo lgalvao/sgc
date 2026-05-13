@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
@@ -95,7 +96,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                             subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2);
             assertThat(movimentacoes.getFirst().getDescricao())
-                    .isEqualTo("Sugestões apresentadas para o mapa de competências");
+                    .isEqualTo(Mensagens.HIST_MAPA_SUGESTOES_APRESENTADAS);
 
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla())
                     .isEqualTo(unidade.getSigla());
@@ -132,7 +133,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                             subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2);
             assertThat(movimentacoes.getFirst().getDescricao())
-                    .isEqualTo("Validação do mapa de competências");
+                    .isEqualTo(Mensagens.HIST_MAPA_VALIDADO);
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla())
                     .isEqualTo(unidade.getSigla());
             assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla())

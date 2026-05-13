@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.request.*;
 import org.springframework.test.web.servlet.result.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.ComumDtos.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
@@ -221,7 +222,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacaoAceite.getUnidadeDestino().getSigla())
                 .isEqualTo("ADMIN");
         assertThat(movimentacaoAceite.getDescricao())
-                .isEqualTo("Cadastro aceito");
+                .isEqualTo(Mensagens.HIST_CADASTRO_ACEITO);
     }
 
     @Test

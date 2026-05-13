@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -110,7 +111,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(spCodigo);
         assertThat(movs).isNotEmpty();
-        assertThat(movs.getFirst().getDescricao()).isEqualTo("Disponibilização do cadastro");
+        assertThat(movs.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_CADASTRO_DISPONIBILIZADO);
         assertThat(movs.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDESENV");
         assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("COSIS");
 

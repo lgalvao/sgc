@@ -8,6 +8,7 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.comum.ComumDtos.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
@@ -99,7 +100,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
 
         assertThat(movimentacoes).isNotEmpty();
 
-        boolean movimentacaoExiste = movimentacoes.stream().anyMatch(m -> m.getDescricao().contains("Reabertura de cadastro"));
+        boolean movimentacaoExiste = movimentacoes.stream().anyMatch(m -> m.getDescricao().contains(Mensagens.HIST_CADASTRO_REABERTO));
         assertThat(movimentacaoExiste).isTrue();
 
         // Verificar se foi criado um alerta
