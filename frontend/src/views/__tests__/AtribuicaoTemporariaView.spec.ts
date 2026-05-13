@@ -138,7 +138,7 @@ describe("AtribuicaoTemporariaView", () => {
                         emits: ["update:termo", "update:selecionado"],
                     },
                     EditorTextoRico: {
-                        template: "<div contenteditable data-testid='textarea-justificativa' @input=\"$emit('update:modelValue', $event.target.innerHTML)\"></div>",
+                        template: "<div contenteditable data-testid='textarea-justificativa' @input=\"$emit('update:modelValue', $event.target.innerHTML)\" v-html='modelValue'></div>",
                         props: ["modelValue"],
                         emits: ["update:modelValue"],
                     },
@@ -232,9 +232,10 @@ describe("AtribuicaoTemporariaView", () => {
         const wrapper = mountView();
         await flushPromises();
 
-        expect(wrapper.text()).toContain(TEXTOS.atribuicaoTemporaria.TITULO_EDICAO);
+        expect(wrapper.text()).toContain(TEXTOS.atribuicaoTemporaria.TITULO);
         expect(wrapper.find("[data-testid='btn-remover-atribuicao']").exists()).toBe(true);
         expect(wrapper.find("[data-testid='textarea-justificativa']").element.innerHTML).toContain("Vigente");
+        expect(wrapper.text()).toContain(TEXTOS.atribuicaoTemporaria.BOTAO_REMOVER);
     });
 
     it("atualiza atribuição vigente", async () => {

@@ -156,9 +156,9 @@
       <ModalConfirmacao
           v-model="mostrarModalRemocao"
           :loading="isLoading"
+          :auto-close="false"
           :ok-title="TEXTOS.comum.BOTAO_REMOVER"
           :titulo="TEXTOS.atribuicaoTemporaria.MODAL_REMOVER_TITULO"
-          auto-close="false"
           test-id-confirmar="btn-confirmar-remover-atribuicao"
           variant="danger"
           @confirmar="removerAtribuicao"
@@ -240,11 +240,7 @@ const atribuicaoVigente = computed(() => {
 });
 
 const modoEdicao = computed(() => Boolean(atribuicaoVigente.value));
-const tituloPagina = computed(() =>
-    modoEdicao.value
-        ? TEXTOS.atribuicaoTemporaria.TITULO_EDICAO
-        : TEXTOS.atribuicaoTemporaria.TITULO
-);
+const tituloPagina = computed(() => TEXTOS.atribuicaoTemporaria.TITULO);
 const textoBotaoSalvar = computed(() =>
     modoEdicao.value ? TEXTOS.comum.BOTAO_SALVAR : TEXTOS.comum.BOTAO_CRIAR
 );

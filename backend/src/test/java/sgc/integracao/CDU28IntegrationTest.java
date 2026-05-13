@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.dto.*;
@@ -126,5 +127,120 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(422));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar uma atribuição temporária com sucesso")
+    @WithMockAdmin
+    void atualizarAtribuicaoTemporaria_sucesso() throws Exception {
+        CriarAtribuicaoRequest criacao = new CriarAtribuicaoRequest(
+                usuario.getTituloEleitoral(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(10),
+                "Primeira"
+        );
+
+        mockMvc.perform(post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(criacao)))
+                .andExpect(status().isCreated());
+
+        Long codigoAtribuicao = entityManager.createQuery(
+                        "select a.codigo from AtribuicaoTemporaria a where a.unidade.codigo = :codUnidade",
+                        Long.class
+                )
+                .setParameter("codUnidade", unidade.getCodigo())
+                .getSingleResult();
+
+        CriarAtribuicaoRequest atualizacao = new CriarAtribuicaoRequest(
+                usuario.getTituloEleitoral(),
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(20),
+                "Atualizada"
+        );
+
+        mockMvc.perform(post("/api/unidades/{codUnidade}/atribuicoes-temporarias/{codigo}/atualizar", unidade.getCodigo(), codigoAtribuicao)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(atualizacao)))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+        AtribuicaoTemporaria atribuicaoAtualizada = entityManager.find(AtribuicaoTemporaria.class, codigoAtribuicao);
+        assertThat(atribuicaoAtualizada.getJustificativa()).isEqualTo("Atualizada");
+        assertThat(atribuicaoAtualizada.getDataInicio()).isEqualTo(atualizacao.dataInicio().atStartOfDay());
+    }
+
+    @Test
+    @DisplayName("Deve remover uma atribuição temporária com sucesso")
+    @WithMockAdmin
+    void removerAtribuicaoTemporaria_sucesso() throws Exception {
+        CriarAtribuicaoRequest criacao = new CriarAtribuicaoRequest(
+                usuario.getTituloEleitoral(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(10),
+                "Primeira"
+        );
+
+        mockMvc.perform(post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(criacao)))
+                .andExpect(status().isCreated());
+
+        Long codigoAtribuicao = entityManager.createQuery(
+                        "select a.codigo from AtribuicaoTemporaria a where a.unidade.codigo = :codUnidade",
+                        Long.class
+                )
+                .setParameter("codUnidade", unidade.getCodigo())
+                .getSingleResult();
+
+        mockMvc.perform(post("/api/unidades/{codUnidade}/atribuicoes-temporarias/{codigo}/excluir", unidade.getCodigo(), codigoAtribuicao)
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+
+        entityManager.flush();
+        entityManager.clear();
+        Long quantidade = entityManager.createQuery(
+                        "select count(a) from AtribuicaoTemporaria a where a.codigo = :codigo",
+                        Long.class
+                )
+                .setParameter("codigo", codigoAtribuicao)
+                .getSingleResult();
+        assertThat(quantidade).isZero();
+    }
+
+    @Test
+    @DisplayName("Não deve permitir atribuição com período sobreposto")
+    @WithMockAdmin
+    void criarAtribuicaoTemporaria_periodoSobreposto_erro() throws Exception {
+        CriarAtribuicaoRequest primeira = new CriarAtribuicaoRequest(
+                usuario.getTituloEleitoral(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(10),
+                "Primeira"
+        );
+
+        mockMvc.perform(post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(primeira)))
+                .andExpect(status().isCreated());
+
+        CriarAtribuicaoRequest segunda = new CriarAtribuicaoRequest(
+                usuario.getTituloEleitoral(),
+                LocalDate.now().plusDays(5),
+                LocalDate.now().plusDays(15),
+                "Sobreposta"
+        );
+
+        mockMvc.perform(post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(segunda)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(Mensagens.ATRIBUICAO_TEMPORARIA_SOBREPOSTA)));
     }
 }

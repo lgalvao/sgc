@@ -8,7 +8,7 @@ import org.owasp.html.*;
  * Garante que a política de segurança seja aplicada consistentemente
  */
 public final class UtilSanitizacao {
-    private static final PolicyFactory POLITICA_PADRAO = new HtmlPolicyBuilder()
+    private static final PolicyFactory POLITICA_FORMATADA = new HtmlPolicyBuilder()
             .allowElements("p", "br", "strong", "b", "em", "i", "u", "ul", "ol", "li")
             .toFactory();
 
@@ -22,7 +22,14 @@ public final class UtilSanitizacao {
      * Sanitiza o texto fornecido, preservando apenas a formatação mínima permitida pelo sistema.
      */
     public static String sanitizar(@Nullable String entrada) {
-        return POLITICA_PADRAO.sanitize(entrada);
+        return limparTags(entrada);
+    }
+
+    /**
+     * Sanitiza o texto fornecido, preservando apenas a formatação mínima permitida pelo sistema.
+     */
+    public static String sanitizarFormatado(@Nullable String entrada) {
+        return POLITICA_FORMATADA.sanitize(entrada);
     }
 
     /**

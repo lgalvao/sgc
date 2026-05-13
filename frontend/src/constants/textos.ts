@@ -130,7 +130,7 @@ export const TEXTOS = {
         },
     },
     atribuicaoTemporaria: {
-        TITULO: "Criar atribuição temporária",
+        TITULO: "Atribuição temporária",
         TITULO_EDICAO: "Editar atribuição temporária",
         LABEL_USUARIO: "Usuário",
         SELECIONE_USUARIO: "Selecione um usuário",
@@ -152,7 +152,7 @@ export const TEXTOS = {
         ERRO_ATUALIZAR: "Falha ao atualizar atribuição. Tente novamente.",
         ERRO_REMOVER: "Falha ao remover atribuição. Tente novamente.",
         ERRO_CARREGAR_ATRIBUICOES: "Falha ao carregar atribuições temporárias da unidade.",
-        BOTAO_REMOVER: "Remover atribuição",
+        BOTAO_REMOVER: "Remover",
         MODAL_REMOVER_TITULO: "Remover atribuição temporária",
         MODAL_REMOVER_TEXTO: "Confirma a remoção da atribuição temporária vigente desta unidade?",
     },

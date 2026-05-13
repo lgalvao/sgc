@@ -1,16 +1,24 @@
 <template>
-  <div>
-    <p :data-testid="dataTestid" class="mt-2">
-      <strong>{{ label }}</strong> {{ nomeExibido }}
+  <div class="contato-unidade">
+    <p
+        :data-testid="dataTestid"
+        class="contato-unidade__titulo mt-2 mb-1"
+    >
+      <strong>{{ label }}</strong>
+      <span>{{ nomeExibido }}</span>
     </p>
     <p
         v-if="descricao"
-        class="ms-3 mb-1 text-muted"
+        class="contato-unidade__descricao ms-3 mb-1 text-muted"
         data-testid="unidade-contato-descricao"
     >
       {{ descricao }}
     </p>
-    <p v-if="contato" :class="detalhesClass">
+    <p
+        v-if="contato"
+        :class="detalhesClass"
+        class="contato-unidade__detalhes"
+    >
       <span v-if="contato.ramal" class="me-3">
         <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
         {{ contato.ramal }}
@@ -48,3 +56,18 @@ const props = withDefaults(defineProps<{
 
 const nomeExibido = computed(() => props.contato?.nome ?? props.nomeFallback);
 </script>
+
+<style scoped>
+.contato-unidade__titulo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+}
+
+.contato-unidade__detalhes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+</style>

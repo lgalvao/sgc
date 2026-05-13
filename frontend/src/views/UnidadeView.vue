@@ -236,12 +236,16 @@ const descricaoResponsabilidade = computed(() => {
   const tipoResponsabilidade = unidade.value?.tipoResponsabilidade ?? "TITULAR";
   const dataFim = unidade.value?.dataFimResponsabilidade;
 
-  if (tipoResponsabilidade === "SUBSTITUTO" && dataFim) {
-    return `Substituição (até ${formatarDataBR(dataFim)})`;
+  if (tipoResponsabilidade === "SUBSTITUTO") {
+    return dataFim
+        ? `Substituição (até ${formatarDataBR(dataFim)})`
+        : "Substituição";
   }
 
-  if (tipoResponsabilidade === "ATRIBUICAO_TEMPORARIA" && dataFim) {
-    return `Atrib. temporária (até ${formatarDataBR(dataFim)})`;
+  if (tipoResponsabilidade === "ATRIBUICAO_TEMPORARIA") {
+    return dataFim
+        ? `Atrib. temporária (até ${formatarDataBR(dataFim)})`
+        : "Atrib. temporária";
   }
 
   return "Titular";

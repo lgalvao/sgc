@@ -1,5 +1,6 @@
 package sgc.organizacao.model;
 
+import org.jspecify.annotations.*;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.*;
 import org.springframework.stereotype.*;
@@ -34,6 +35,6 @@ public interface AtribuicaoTemporariaRepo extends JpaRepository<AtribuicaoTempor
             @Param("codUnidade") Long codUnidade,
             @Param("dataInicio") LocalDateTime dataInicio,
             @Param("dataTermino") LocalDateTime dataTermino,
-            @Param("codigoIgnorado") Long codigoIgnorado
+            @Param("codigoIgnorado") @Nullable Long codigoIgnorado
     );
 }

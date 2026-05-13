@@ -268,6 +268,8 @@ public class UnidadeHierarquiaService {
         copia.setResponsavel(dtoCompleto.getResponsavel());
         copia.setTitular(dtoCompleto.getTitular());
         copia.setTipoResponsabilidade(dtoCompleto.getTipoResponsabilidade());
+        copia.setDataInicioResponsabilidade(dtoCompleto.getDataInicioResponsabilidade());
+        copia.setDataFimResponsabilidade(dtoCompleto.getDataFimResponsabilidade());
         
         return copia;
     }
@@ -291,6 +293,8 @@ public class UnidadeHierarquiaService {
                 .responsavel(dto.getResponsavel())
                 .titular(dto.getTitular())
                 .tipoResponsabilidade(dto.getTipoResponsabilidade())
+                .dataInicioResponsabilidade(dto.getDataInicioResponsabilidade())
+                .dataFimResponsabilidade(dto.getDataFimResponsabilidade())
                 .build();
     }
 

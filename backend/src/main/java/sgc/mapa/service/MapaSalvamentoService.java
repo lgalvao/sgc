@@ -47,7 +47,7 @@ public class MapaSalvamentoService {
     }
 
     private void atualizarObservacoes(Mapa mapa, @Nullable String observacoes) {
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(observacoes);
+        var sanitizedObservacoes = UtilSanitizacao.sanitizarFormatado(observacoes);
 
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
         mapaRepo.save(mapa);

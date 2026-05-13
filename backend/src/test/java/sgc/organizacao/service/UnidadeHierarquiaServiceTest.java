@@ -9,6 +9,7 @@ import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.testutils.*;
 
+import java.time.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -117,6 +118,9 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve enriquecer unidade da árvore com responsável atual")
     void deveEnriquecerUnidadeDaArvoreComResponsavelAtual() {
+        unidadeOperacional.getResponsabilidade().setTipo("ATRIBUICAO_TEMPORARIA");
+        unidadeOperacional.getResponsabilidade().setDataInicio(LocalDateTime.of(2026, 5, 10, 0, 0));
+        unidadeOperacional.getResponsabilidade().setDataFim(LocalDateTime.of(2026, 5, 30, 23, 59, 59));
         when(selfProvider.getObject()).thenReturn(service);
         when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
         when(unidadeService.buscarPorCodigo(3L)).thenReturn(unidadeOperacional);
@@ -125,6 +129,8 @@ class UnidadeHierarquiaServiceTest {
 
         assertThat(resultado.getResponsavel()).isNotNull();
         assertThat(resultado.getResponsavel().nome()).isEqualTo("Responsável 3");
+        assertThat(resultado.getTipoResponsabilidade()).isEqualTo("ATRIBUICAO_TEMPORARIA");
+        assertThat(resultado.getDataFimResponsabilidade()).isEqualTo(LocalDateTime.of(2026, 5, 30, 23, 59, 59));
     }
 
     @Test
