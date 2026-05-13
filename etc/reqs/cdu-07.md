@@ -11,8 +11,7 @@ Fluxo principal:
 
 1. O sistema mostra a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade do perfil.
 
-2. A tela será composta por três seções, que serão denominadas aqui de `Dados da unidade`, `Movimentações do processo` e
-   `Elementos do processo`.
+2. A tela será composta por três seções, que serão denominadas aqui de `Dados da unidade`, `Movimentações do processo` e `Elementos do processo`.
 
    2.1. Na seção `Dados da unidade` (sem título) serão apresentadas as informações:
 

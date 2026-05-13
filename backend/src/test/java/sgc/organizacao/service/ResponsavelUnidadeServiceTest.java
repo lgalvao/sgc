@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.comum.config.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
@@ -150,6 +151,32 @@ class ResponsavelUnidadeServiceTest {
 
             verify(usuarioRepo).listarPorTitulosComUnidadeLotacao(List.of("111", "222"));
             verify(usuarioRepo).listarPorTitulosComUnidadeLotacao(List.of("111", "222"));
+        }
+
+        @Test
+        @DisplayName("Deve buscar atribuições por unidade")
+        void deveBuscarAtribuicoesPorUnidade() {
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            unidade.setSigla("UNIT");
+
+            AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
+            atribuicao.setCodigo(1L);
+            atribuicao.setUnidade(unidade);
+            atribuicao.setUsuarioTitulo("123");
+            atribuicao.setDataInicio(LocalDateTime.now());
+            atribuicao.setDataTermino(LocalDateTime.now().plusDays(1));
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+
+            when(atribuicaoTemporariaRepo.listarPorUnidadeComUnidade(10L)).thenReturn(List.of(atribuicao));
+            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(List.of("123"))).thenReturn(List.of(usuario));
+
+            List<AtribuicaoDto> resultado = service.buscarAtribuicoesPorUnidade(10L);
+
+            assertThat(resultado).hasSize(1);
+            assertThat(resultado.getFirst().codigo()).isEqualTo(1L);
         }
     }
 
@@ -315,6 +342,91 @@ class ResponsavelUnidadeServiceTest {
             verifyNoInteractions(cacheOrganizacaoService);
             verifyNoInteractions(alertaFacade);
             verifyNoInteractions(notificacaoService);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar atribuição com período sobreposto")
+        void deveRejeitarAtribuicaoComPeriodoSobreposto() {
+            Long codUnidade = 1L;
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
+                    "123",
+                    LocalDate.of(2026, 5, 13),
+                    LocalDate.of(2026, 5, 30),
+                    "Justificativa"
+            );
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(codUnidade);
+            Usuario usuario = new Usuario().setTituloEleitoral("123");
+
+            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(atribuicaoTemporariaRepo.existeSobreposicaoPeriodo(
+                    eq(codUnidade),
+                    any(LocalDateTime.class),
+                    any(LocalDateTime.class),
+                    isNull()
+            )).thenReturn(true);
+
+            assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessage(Mensagens.ATRIBUICAO_TEMPORARIA_SOBREPOSTA);
+        }
+    }
+
+    @Nested
+    @DisplayName("Atualizar e remover atribuição temporária")
+    class AtualizarERemoverAtribuicaoTemporariaTests {
+
+        @Test
+        @DisplayName("Deve atualizar atribuição existente")
+        void deveAtualizarAtribuicaoExistente() {
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(1L);
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+            usuario.setMatricula("MAT1");
+
+            AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
+            atribuicao.setCodigo(9L);
+            atribuicao.setUnidade(unidade);
+
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
+                    "123",
+                    LocalDate.of(2026, 5, 13),
+                    LocalDate.of(2026, 5, 30),
+                    "Atualizada"
+            );
+
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(atribuicaoTemporariaRepo.findById(9L)).thenReturn(Optional.of(atribuicao));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(atribuicaoTemporariaRepo.save(atribuicao)).thenReturn(atribuicao);
+
+            service.atualizarAtribuicaoTemporaria(1L, 9L, request);
+
+            assertThat(atribuicao.getUsuarioTitulo()).isEqualTo("123");
+            assertThat(atribuicao.getJustificativa()).isEqualTo("Atualizada");
+            verify(cacheOrganizacaoService).invalidarAposCommit();
+        }
+
+        @Test
+        @DisplayName("Deve remover atribuição existente")
+        void deveRemoverAtribuicaoExistente() {
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(1L);
+
+            AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
+            atribuicao.setCodigo(9L);
+            atribuicao.setUnidade(unidade);
+
+            when(atribuicaoTemporariaRepo.findById(9L)).thenReturn(Optional.of(atribuicao));
+
+            service.removerAtribuicaoTemporaria(1L, 9L);
+
+            verify(atribuicaoTemporariaRepo).delete(atribuicao);
+            verify(cacheOrganizacaoService).invalidarAposCommit();
         }
     }
 

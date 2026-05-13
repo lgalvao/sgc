@@ -74,6 +74,50 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar atribuições da unidade")
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornarAtribuicoesDaUnidade() throws Exception {
+        when(responsavelService.buscarAtribuicoesPorUnidade(1L)).thenReturn(List.of(AtribuicaoDto.builder().codigo(10L).build()));
+
+        mockMvc.perform(get("/api/unidades/1/atribuicoes-temporarias"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigo").value(10));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar atribuição temporária")
+    @WithMockUser(roles = "ADMIN")
+    void deveAtualizarAtribuicaoTemporaria() throws Exception {
+        String conteudo = """
+                {
+                    "tituloEleitoralUsuario":"123",
+                    "dataInicio":"2025-01-01",
+                    "dataTermino":"2025-12-31",
+                    "justificativa":"teste"
+                }""";
+
+        mockMvc.perform(post("/api/unidades/1/atribuicoes-temporarias/9/atualizar")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(conteudo))
+                .andExpect(status().isOk());
+
+        verify(responsavelService)
+                .atualizarAtribuicaoTemporaria(eq(1L), eq(9L), any(CriarAtribuicaoRequest.class));
+    }
+
+    @Test
+    @DisplayName("Deve remover atribuição temporária")
+    @WithMockUser(roles = "ADMIN")
+    void deveRemoverAtribuicaoTemporaria() throws Exception {
+        mockMvc.perform(post("/api/unidades/1/atribuicoes-temporarias/9/excluir")
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+
+        verify(responsavelService).removerAtribuicaoTemporaria(1L, 9L);
+    }
+
+    @Test
     @DisplayName("Deve retornar lista ao buscar todas as unidades")
     @WithMockUser
     void deveRetornarListaAoBuscarTodasUnidades() throws Exception {

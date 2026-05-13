@@ -3,7 +3,7 @@
     <CarregamentoPagina v-if="carregandoInicial && !unidade"/>
 
     <div v-else class="col-lg-8 col-md-9 col-12">
-      <PageHeader :title="TEXTOS.atribuicaoTemporaria.TITULO">
+      <PageHeader :title="tituloPagina">
         <template v-if="unidade" #default>
           {{ unidade.sigla }}
         </template>
@@ -33,7 +33,7 @@
         {{ erroFormulario }}
       </BAlert>
 
-      <BForm v-else class="mt-4" @submit.prevent="criarAtribuicao">
+      <BForm class="mt-4" @submit.prevent="salvarAtribuicao">
         <BFormGroup
             class="mb-3"
             label-for="usuario"
@@ -122,6 +122,16 @@
 
         <div class="d-flex justify-content-end gap-2 mt-4">
           <BButton
+              v-if="modoEdicao"
+              :disabled="isLoading"
+              class="btn-acao-footer me-auto"
+              data-testid="btn-remover-atribuicao"
+              variant="outline-danger"
+              @click="mostrarModalRemocao = true"
+          >
+            {{ TEXTOS.atribuicaoTemporaria.BOTAO_REMOVER }}
+          </BButton>
+          <BButton
               :disabled="isLoading"
               class="btn-acao-footer"
               data-testid="btn-cancelar-atribuicao"
@@ -133,15 +143,28 @@
           <LoadingButton
               :disabled="isLoading"
               :loading="isLoading"
-              :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
-              :text="TEXTOS.comum.BOTAO_CRIAR"
+              :loading-text="textoBotaoSalvando"
+              :text="textoBotaoSalvar"
               class="btn-acao-footer"
-              data-testid="cad-atribuicao__btn-criar-atribuicao"
+              data-testid="cad-atribuicao__btn-salvar-atribuicao"
               variant="success"
-              @click="criarAtribuicao"
+              @click="salvarAtribuicao"
           />
         </div>
       </BForm>
+
+      <ModalConfirmacao
+          v-model="mostrarModalRemocao"
+          :loading="isLoading"
+          :ok-title="TEXTOS.comum.BOTAO_REMOVER"
+          :titulo="TEXTOS.atribuicaoTemporaria.MODAL_REMOVER_TITULO"
+          auto-close="false"
+          test-id-confirmar="btn-confirmar-remover-atribuicao"
+          variant="danger"
+          @confirmar="removerAtribuicao"
+      >
+        <p class="mb-0">{{ TEXTOS.atribuicaoTemporaria.MODAL_REMOVER_TEXTO }}</p>
+      </ModalConfirmacao>
     </div>
   </LayoutPadrao>
 </template>
@@ -160,13 +183,20 @@ import InputData from "@/components/comum/InputData.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
 import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
+import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeStore} from "@/stores/unidade";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/date";
-import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
+import {
+  atualizarAtribuicaoTemporaria,
+  buscarAtribuicoesTemporariasPorUnidade,
+  criarAtribuicaoTemporaria,
+  removerAtribuicaoTemporaria,
+  type AtribuicaoTemporaria
+} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 
@@ -179,6 +209,7 @@ const unidadeStore = useUnidadeStore();
 const organizacaoStore = useOrganizacaoStore();
 
 const unidade = ref<Unidade | null>(null);
+const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
 const usuarioSelecionado = ref<string | null>(null);
 const termoUsuario = ref("");
 const dataInicio = ref("");
@@ -188,6 +219,7 @@ const isLoading = ref(false);
 const carregandoInicial = ref(true);
 const inputUsuarioRef = ref<InstanceType<typeof BuscadorUsuarios> | null>(null);
 const carregamentoInicialConcluido = ref(false);
+const mostrarModalRemocao = ref(false);
 
 const erroUsuario = ref("");
 const erroFormulario = ref("");
@@ -197,6 +229,28 @@ const {
   validarSubmissao,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
+
+const atribuicaoVigente = computed(() => {
+  const agora = new Date();
+  return atribuicoes.value.find((atribuicao) => {
+    const dataInicioAtribuicao = new Date(atribuicao.dataInicio);
+    const dataTerminoAtribuicao = new Date(atribuicao.dataTermino);
+    return dataInicioAtribuicao <= agora && dataTerminoAtribuicao >= agora;
+  }) ?? null;
+});
+
+const modoEdicao = computed(() => Boolean(atribuicaoVigente.value));
+const tituloPagina = computed(() =>
+    modoEdicao.value
+        ? TEXTOS.atribuicaoTemporaria.TITULO_EDICAO
+        : TEXTOS.atribuicaoTemporaria.TITULO
+);
+const textoBotaoSalvar = computed(() =>
+    modoEdicao.value ? TEXTOS.comum.BOTAO_SALVAR : TEXTOS.comum.BOTAO_CRIAR
+);
+const textoBotaoSalvando = computed(() =>
+    modoEdicao.value ? TEXTOS.atribuicaoTemporaria.SALVANDO : TEXTOS.atribuicaoTemporaria.CRIANDO
+);
 
 const formularioValido = computed(() => {
   return Boolean(
@@ -227,18 +281,41 @@ const mensagemErroJustificativa = computed(() =>
     deveExibirErro(!justificativa.value.trim()) ? "Informe a justificativa." : "",
 );
 
-async function carregarDados() {
-  // Se já temos a unidade correta carregada, evitamos o spinner pesado
-  if (unidade.value?.codigo === props.codUnidade && unidadeStore.cacheUnidades.has(props.codUnidade)) {
-    carregandoInicial.value = false;
+function resetarFormularioAtribuicao() {
+  usuarioSelecionado.value = null;
+  termoUsuario.value = "";
+  dataInicio.value = "";
+  dataTermino.value = "";
+  justificativa.value = "";
+  resetarValidacao();
+}
+
+function preencherFormularioComAtribuicaoVigente() {
+  if (!atribuicaoVigente.value) {
+    resetarFormularioAtribuicao();
     return;
   }
 
+  usuarioSelecionado.value = atribuicaoVigente.value.usuario.tituloEleitoral;
+  termoUsuario.value = atribuicaoVigente.value.usuario.nome;
+  dataInicio.value = atribuicaoVigente.value.dataInicio.slice(0, 10);
+  dataTermino.value = atribuicaoVigente.value.dataTermino.slice(0, 10);
+  justificativa.value = atribuicaoVigente.value.justificativa;
+  resetarValidacao();
+}
+
+async function carregarDados(forcar = false) {
   carregandoInicial.value = true;
+  erroUsuario.value = "";
+
   try {
-    unidade.value = await unidadeStore.obterUnidade(props.codUnidade);
+    unidade.value = await unidadeStore.obterUnidade(props.codUnidade, forcar);
+    atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(props.codUnidade);
+    preencherFormularioComAtribuicaoVigente();
   } catch (error) {
-    erroUsuario.value = TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
+    const mensagemErro = normalizarErro(error).mensagem;
+    erroUsuario.value = mensagemErro || TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
+    erroFormulario.value = mensagemErro || TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR_ATRIBUICOES;
     logger.error(error);
   } finally {
     carregandoInicial.value = false;
@@ -254,12 +331,19 @@ onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  await carregarDados();
+  await carregarDados(true);
 });
 
-async function criarAtribuicao() {
+async function atualizarCachesPosMutacao() {
+  unidade.value = await unidadeStore.obterUnidade(props.codUnidade, true);
+  atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(props.codUnidade);
+  preencherFormularioComAtribuicaoVigente();
+}
+
+async function salvarAtribuicao() {
   const unidadeAtual = unidade.value;
-  if (!unidadeAtual) throw new Error('Invariante violada: unidade não carregada');
+  if (!unidadeAtual) throw new Error("Invariante violada: unidade não carregada");
+
   erroUsuario.value = "";
   erroFormulario.value = "";
 
@@ -269,40 +353,67 @@ async function criarAtribuicao() {
   }
 
   const tituloEleitoralUsuario = usuarioSelecionado.value!;
+  const request = {
+    tituloEleitoralUsuario,
+    dataInicio: dataInicio.value,
+    dataTermino: dataTermino.value,
+    justificativa: justificativa.value
+  };
+  const estavaEmEdicao = modoEdicao.value;
 
   isLoading.value = true;
 
   try {
-    await criarAtribuicaoTemporaria(unidadeAtual.codigo, {
-      tituloEleitoralUsuario,
-      dataInicio: dataInicio.value,
-      dataTermino: dataTermino.value,
-      justificativa: justificativa.value
-    });
-    await organizacaoStore.recarregarDiagnostico(mostrarDiagnosticoOrganizacional.value);
+    if (atribuicaoVigente.value) {
+      await atualizarAtribuicaoTemporaria(unidadeAtual.codigo, atribuicaoVigente.value.codigo, request);
+    } else {
+      await criarAtribuicaoTemporaria(unidadeAtual.codigo, request);
+    }
 
-    notify(TEXTOS.atribuicaoTemporaria.SUCESSO, 'success');
-    resetarFormularioAtribuicao();
+    await organizacaoStore.recarregarDiagnostico(mostrarDiagnosticoOrganizacional.value);
+    await atualizarCachesPosMutacao();
+    notify(
+        estavaEmEdicao
+            ? TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO
+            : TEXTOS.atribuicaoTemporaria.SUCESSO,
+        "success"
+    );
   } catch (error) {
     logger.error(error);
-    erroFormulario.value = normalizarErro(error).mensagem || TEXTOS.atribuicaoTemporaria.ERRO_CRIAR;
+    erroFormulario.value = normalizarErro(error).mensagem || (
+        estavaEmEdicao
+            ? TEXTOS.atribuicaoTemporaria.ERRO_ATUALIZAR
+            : TEXTOS.atribuicaoTemporaria.ERRO_CRIAR
+    );
   } finally {
     isLoading.value = false;
   }
 }
 
-function resetarFormularioAtribuicao() {
-  usuarioSelecionado.value = null;
-  termoUsuario.value = "";
+async function removerAtribuicao() {
+  const unidadeAtual = unidade.value;
+  const atribuicaoAtual = atribuicaoVigente.value;
+  if (!unidadeAtual || !atribuicaoAtual) {
+    return;
+  }
 
-  dataInicio.value = "";
-  dataTermino.value = "";
-  justificativa.value = "";
-  resetarValidacao();
   erroFormulario.value = "";
+  isLoading.value = true;
+
+  try {
+    await removerAtribuicaoTemporaria(unidadeAtual.codigo, atribuicaoAtual.codigo);
+    await organizacaoStore.recarregarDiagnostico(mostrarDiagnosticoOrganizacional.value);
+    await atualizarCachesPosMutacao();
+    mostrarModalRemocao.value = false;
+    resetarFormularioAtribuicao();
+    notify(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
+  } catch (error) {
+    logger.error(error);
+    erroFormulario.value = normalizarErro(error).mensagem || TEXTOS.atribuicaoTemporaria.ERRO_REMOVER;
+  } finally {
+    isLoading.value = false;
+  }
 }
-
-
 </script>
 
 <style scoped>
@@ -315,5 +426,4 @@ function resetarFormularioAtribuicao() {
 .usuario-resultados {
   max-height: 16rem;
 }
-
 </style>

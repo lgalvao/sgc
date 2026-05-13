@@ -3,6 +3,13 @@
     <p :data-testid="dataTestid" class="mt-2">
       <strong>{{ label }}</strong> {{ nomeExibido }}
     </p>
+    <p
+        v-if="descricao"
+        class="ms-3 mb-1 text-muted"
+        data-testid="unidade-contato-descricao"
+    >
+      {{ descricao }}
+    </p>
     <p v-if="contato" :class="detalhesClass">
       <span v-if="contato.ramal" class="me-3">
         <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
@@ -29,11 +36,13 @@ const props = withDefaults(defineProps<{
   contato?: Usuario | Responsavel | null;
   dataTestid?: string;
   nomeFallback?: string;
+  descricao?: string;
   detalhesClass?: string;
 }>(), {
   contato: null,
   dataTestid: undefined,
   nomeFallback: "",
+  descricao: "",
   detalhesClass: "ms-3 mb-0",
 });
 

@@ -7,6 +7,7 @@ import org.jspecify.annotations.*;
 import sgc.comum.*;
 import sgc.organizacao.model.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -23,14 +24,19 @@ import java.util.*;
 public class UnidadeDto {
     @JsonView(OrganizacaoViews.Publica.class)
     private Long codigo;
+
     @JsonView(OrganizacaoViews.Publica.class)
     private String nome;
+
     @JsonView(OrganizacaoViews.Publica.class)
     @NotBlank(message = Mensagens.SIGLA_OBRIGATORIA)
+
     @Size(max = 20, message = Mensagens.SIGLA_MAX)
     private String sigla;
+
     @JsonView(OrganizacaoViews.Publica.class)
     private @Nullable Long codigoPai;
+
     @JsonView(OrganizacaoViews.Publica.class)
     private @Nullable String tipo;
 
@@ -49,6 +55,14 @@ public class UnidadeDto {
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("tipoResponsabilidade")
     private @Nullable String tipoResponsabilidade;
+
+    @JsonView(OrganizacaoViews.Publica.class)
+    @JsonProperty("dataInicioResponsabilidade")
+    private @Nullable LocalDateTime dataInicioResponsabilidade;
+
+    @JsonView(OrganizacaoViews.Publica.class)
+    @JsonProperty("dataFimResponsabilidade")
+    private @Nullable LocalDateTime dataFimResponsabilidade;
 
     @JsonView(OrganizacaoViews.Publica.class)
     private @Nullable UsuarioResumoDto titular;
@@ -79,6 +93,8 @@ public class UnidadeDto {
         if (responsabilidade != null) {
             dto.setResponsavel(UsuarioResumoDto.fromEntity(responsabilidade.getUsuario()));
             dto.setTipoResponsabilidade(responsabilidade.getTipo());
+            dto.setDataInicioResponsabilidade(responsabilidade.getDataInicio());
+            dto.setDataFimResponsabilidade(responsabilidade.getDataFim());
         }
 
         return dto;

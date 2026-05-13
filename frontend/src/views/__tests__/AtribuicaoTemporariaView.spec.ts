@@ -1,35 +1,64 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {flushPromises, mount} from '@vue/test-utils';
-import AtribuicaoTemporariaView from '../AtribuicaoTemporariaView.vue';
-import {buscarDiagnosticoOrganizacional} from '@/services/unidadeService';
-import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
-import {createMemoryHistory, createRouter} from 'vue-router';
-import {createPinia, setActivePinia} from 'pinia';
-import {useUnidadeStore} from '@/stores/unidade';
-import type {Unidade} from '@/types/tipos';
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {flushPromises, mount} from "@vue/test-utils";
+import AtribuicaoTemporariaView from "@/views/AtribuicaoTemporariaView.vue";
+import {TEXTOS} from "@/constants/textos";
 
-const unidadeMinima: Unidade = {codigo: 1, sigla: 'TESTE', nome: 'Unidade de Teste'};
+const {
+    mockPush,
+    mockNotify,
+    mockClear,
+    mockObterUnidade,
+    mockBuscarAtribuicoes,
+    mockCriarAtribuicao,
+    mockAtualizarAtribuicao,
+    mockRemoverAtribuicao,
+    mockRecarregarDiagnostico,
+    mockUnidadeStore,
+} = vi.hoisted(() => {
+    const unidade = {
+        codigo: 1,
+        sigla: "TESTE",
+        nome: "Unidade de Teste",
+        tipoResponsabilidade: "TITULAR",
+        titular: null,
+        responsavel: null,
+        filhas: [],
+    };
 
-vi.mock('@/services/unidadeService', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@/services/unidadeService')>();
     return {
-        ...actual,
-        buscarUnidadePorCodigo: vi.fn(),
-        buscarDiagnosticoOrganizacional: vi.fn(),
+        mockPush: vi.fn(),
+        mockNotify: vi.fn(),
+        mockClear: vi.fn(),
+        mockObterUnidade: vi.fn().mockResolvedValue(unidade),
+        mockBuscarAtribuicoes: vi.fn().mockResolvedValue([]),
+        mockCriarAtribuicao: vi.fn().mockResolvedValue(undefined),
+        mockAtualizarAtribuicao: vi.fn().mockResolvedValue(undefined),
+        mockRemoverAtribuicao: vi.fn().mockResolvedValue(undefined),
+        mockRecarregarDiagnostico: vi.fn().mockResolvedValue(undefined),
+        mockUnidadeStore: {
+            cacheUnidades: new Map<number, unknown>(),
+            obterUnidade: vi.fn().mockResolvedValue(unidade),
+        },
     };
 });
 
-vi.mock('@/services/usuarioService', () => ({
-    pesquisarUsuarios: vi.fn(),
+vi.mock("vue-router", () => ({
+    useRouter: () => ({
+        push: mockPush,
+    }),
 }));
 
-vi.mock('@/services/atribuicaoTemporariaService', () => ({
-    criarAtribuicaoTemporaria: vi.fn(),
+vi.mock("@/stores/unidade", () => ({
+    useUnidadeStore: () => mockUnidadeStore,
 }));
 
-const mockNotify = vi.fn();
-const mockClear = vi.fn();
-vi.mock('@/composables/useNotification', () => ({
+vi.mock("@/stores/organizacao", () => ({
+    useOrganizacaoStore: () => ({
+        recarregarDiagnostico: mockRecarregarDiagnostico,
+    }),
+}));
+
+vi.mock("@/composables/useNotification", () => ({
     useNotification: () => ({
         notificacao: {value: null},
         notify: mockNotify,
@@ -37,219 +66,270 @@ vi.mock('@/composables/useNotification', () => ({
     }),
 }));
 
-vi.mock('@/composables/usePerfil', () => ({
+vi.mock("@/composables/usePerfil", () => ({
     usePerfil: () => ({
-        mostrarDiagnosticoOrganizacional: {value: true}
-    })
+        mostrarDiagnosticoOrganizacional: {value: true},
+    }),
 }));
 
-const router = createRouter({
-    history: createMemoryHistory(),
-    routes: [
-        {path: '/', component: {template: '<div></div>'}},
-        {path: '/unidade/:codigo', component: {template: '<div></div>'}}
-    ],
-});
+vi.mock("@/services/atribuicaoTemporariaService", () => ({
+    criarAtribuicaoTemporaria: mockCriarAtribuicao,
+    buscarAtribuicoesTemporariasPorUnidade: mockBuscarAtribuicoes,
+    atualizarAtribuicaoTemporaria: mockAtualizarAtribuicao,
+    removerAtribuicaoTemporaria: mockRemoverAtribuicao,
+}));
 
-const mountOptions = {
-    props: {codUnidade: 1},
-    global: {
-        plugins: [router, createPinia()],
-        stubs: {
-            LayoutPadrao: {
-                template: '<div><slot></slot></div>',
-            },
-            PageHeader: {
-                template: '<div><slot></slot><slot name="actions"></slot></div>',
-            },
-            InputData: {
-                name: 'InputData',
-                template: '<input type="date" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-                props: ['modelValue']
-            },
-            LoadingButton: {
-                props: ['disabled', 'loading', 'text'],
-                template: '<button :disabled="disabled" @click="$emit(\'click\')">LoadingButton</button>'
-            },
-            BuscadorUsuarios: {
-                name: 'BuscadorUsuarios',
-                props: ['termo', 'selecionado'],
-                template: '<div></div>',
-                methods: {
-                    limparResultadosPesquisaUsuarios() {
-                    }
-                }
-            },
-            BFormTextarea: {
-                name: 'BFormTextarea',
-                props: ['modelValue', 'state'],
-                template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
-            },
-            AppAlert: {
-                name: 'AppAlert',
-                template: '<div><button @click="$emit(\'dismissed\')">x</button></div>'
-            },
-            CarregamentoPagina: {
-                template: '<div data-testid="loading">Carregando...</div>'
-            }
-        },
-    },
-};
+describe("AtribuicaoTemporariaView", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date("2026-05-13T12:00:00"));
+        vi.clearAllMocks();
+        mockUnidadeStore.cacheUnidades.clear();
+        mockUnidadeStore.obterUnidade = mockObterUnidade;
+        mockObterUnidade.mockResolvedValue({
+            codigo: 1,
+            sigla: "TESTE",
+            nome: "Unidade de Teste",
+            tipoResponsabilidade: "TITULAR",
+            titular: null,
+            responsavel: null,
+            filhas: [],
+        });
+        mockBuscarAtribuicoes.mockResolvedValue([]);
+    });
 
-describe('AtribuicaoTemporariaView', () => {
-    async function definirJustificativa(wrapper: ReturnType<typeof mount>, conteudoHtml: string) {
-        const editor = wrapper.find('[data-testid="textarea-justificativa"]');
-        (editor.element as HTMLDivElement).innerHTML = conteudoHtml;
-        await editor.trigger('input');
+    function mountView() {
+        return mount(AtribuicaoTemporariaView, {
+            props: {codUnidade: 1},
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: "<div><slot /></div>"},
+                    PageHeader: {
+                        template: "<div><h1>{{ title }}</h1><slot /><slot name='actions' /></div>",
+                        props: ["title"],
+                    },
+                    BButton: {
+                        template: "<button :disabled='disabled' @click=\"$emit('click')\"><slot /></button>",
+                        props: ["disabled", "to", "variant"],
+                    },
+                    BAlert: {
+                        template: "<div><slot /></div>",
+                        props: ["modelValue"],
+                        emits: ["dismissed"],
+                    },
+                    BForm: {
+                        template: "<form @submit.prevent=\"$emit('submit', $event)\"><slot /></form>",
+                        emits: ["submit"],
+                    },
+                    BFormGroup: {template: "<div><slot name='label' /><slot name='description' /><slot /></div>"},
+                    BFormInvalidFeedback: {template: "<div><slot /></div>", props: ["state"]},
+                    BRow: {template: "<div><slot /></div>"},
+                    BCol: {template: "<div><slot /></div>"},
+                    InputData: {
+                        name: "InputData",
+                        template: "<input :value='modelValue' @input=\"$emit('update:modelValue', $event.target.value)\" />",
+                        props: ["modelValue", "min", "state", "max"],
+                        emits: ["update:modelValue"],
+                    },
+                    BuscadorUsuarios: {
+                        name: "BuscadorUsuarios",
+                        template: "<input :value='termo' @input=\"$emit('update:termo', $event.target.value)\" />",
+                        props: ["termo", "selecionado", "placeholder", "state"],
+                        emits: ["update:termo", "update:selecionado"],
+                    },
+                    EditorTextoRico: {
+                        template: "<div contenteditable data-testid='textarea-justificativa' @input=\"$emit('update:modelValue', $event.target.innerHTML)\"></div>",
+                        props: ["modelValue"],
+                        emits: ["update:modelValue"],
+                    },
+                    LoadingButton: {
+                        template: "<button :disabled='disabled' @click=\"$emit('click')\">{{ text }}</button>",
+                        props: ["disabled", "loading", "loadingText", "text", "variant"],
+                        emits: ["click"],
+                    },
+                    AppAlert: {template: "<div />"},
+                    CarregamentoPagina: {template: "<div data-testid='loading'>Carregando...</div>"},
+                    ModalConfirmacao: {
+                        template: `
+                          <div v-if="modelValue">
+                            <slot />
+                            <button :data-testid="testIdConfirmar" @click="$emit('confirmar')">{{ okTitle }}</button>
+                          </div>
+                        `,
+                        props: ["modelValue", "testIdConfirmar", "okTitle", "loading", "titulo", "variant", "autoClose"],
+                        emits: ["update:modelValue", "confirmar"],
+                    },
+                },
+            },
+        });
     }
 
-    beforeEach(() => {
-        setActivePinia(createPinia());
-        vi.clearAllMocks();
-        vi.mocked(buscarDiagnosticoOrganizacional).mockResolvedValue({
-            possuiViolacoes: false,
-            resumo: 'OK',
-            quantidadeTiposViolacao: 0,
-            quantidadeOcorrencias: 0,
-            grupos: []
-        });
+    async function preencherFormulario(wrapper: ReturnType<typeof mount>) {
+        await wrapper.findComponent({name: "BuscadorUsuarios"}).vm.$emit("update:selecionado", "999");
+        await wrapper.findAll("input")[1].setValue("2026-05-13");
+        await wrapper.findAll("input")[2].setValue("2026-05-30");
+        const editor = wrapper.find("[data-testid='textarea-justificativa']");
+        (editor.element as HTMLDivElement).innerHTML = "<p>Justificativa de teste</p>";
+        await editor.trigger("input");
+    }
+
+    it("carrega unidade e atribuições ao montar", async () => {
+        const wrapper = mountView();
+        await flushPromises();
+
+        expect(mockObterUnidade).toHaveBeenCalledWith(1, false);
+        expect(mockBuscarAtribuicoes).toHaveBeenCalledWith(1);
+        expect(wrapper.text()).toContain(TEXTOS.atribuicaoTemporaria.TITULO);
+        expect(wrapper.text()).toContain("TESTE");
     });
 
-    it('deve carregar a unidade corretamente no onMounted via store', async () => {
-        const pinia = createPinia();
-        setActivePinia(pinia);
-        const unidadeStore = useUnidadeStore();
-        vi.spyOn(unidadeStore, 'obterUnidade').mockResolvedValue({
+    it("cria atribuição quando não há AT vigente", async () => {
+        const wrapper = mountView();
+        await flushPromises();
+        await preencherFormulario(wrapper);
+
+        await wrapper.find("[data-testid='cad-atribuicao__btn-salvar-atribuicao']").trigger("click");
+        await flushPromises();
+
+        expect(mockCriarAtribuicao).toHaveBeenCalledWith(1, {
+            tituloEleitoralUsuario: "999",
+            dataInicio: "2026-05-13",
+            dataTermino: "2026-05-30",
+            justificativa: "<p>Justificativa de teste</p>",
+        });
+        expect(mockAtualizarAtribuicao).not.toHaveBeenCalled();
+        expect(mockNotify).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO, "success");
+    });
+
+    it("entra em modo edição quando há AT vigente", async () => {
+        mockObterUnidade.mockResolvedValueOnce({
             codigo: 1,
-            sigla: 'TESTE-UNIDADE',
-            nome: 'Unidade de Teste'
-        } as any);
-
-        const wrapper = mount(AtribuicaoTemporariaView, {
-            ...mountOptions,
-            global: { ...mountOptions.global, plugins: [router, pinia] }
+            sigla: "TESTE",
+            nome: "Unidade de Teste",
+            tipoResponsabilidade: "ATRIBUICAO_TEMPORARIA",
+            titular: null,
+            responsavel: null,
+            filhas: [],
         });
+        mockBuscarAtribuicoes.mockResolvedValueOnce([
+            {
+                codigo: 10,
+                unidadeCodigo: 1,
+                unidadeSigla: "TESTE",
+                usuario: {
+                    tituloEleitoral: "999",
+                    matricula: "M1",
+                    nome: "Servidor Teste",
+                    email: "servidor@tre-pe.jus.br",
+                    ramal: "1234",
+                },
+                dataInicio: "2026-05-10T00:00:00",
+                dataTermino: "2026-05-30T23:59:59",
+                justificativa: "<p>Vigente</p>",
+            },
+        ]);
+
+        const wrapper = mountView();
         await flushPromises();
 
-        expect(unidadeStore.obterUnidade).toHaveBeenCalledWith(1);
-        expect(wrapper.text()).toContain('TESTE-UNIDADE');
+        expect(wrapper.text()).toContain(TEXTOS.atribuicaoTemporaria.TITULO_EDICAO);
+        expect(wrapper.find("[data-testid='btn-remover-atribuicao']").exists()).toBe(true);
+        expect(wrapper.find("[data-testid='textarea-justificativa']").element.innerHTML).toContain("Vigente");
     });
 
-    it('deve usar cache e evitar spinner pesado no onActivated se a unidade já estiver carregada', async () => {
-        const pinia = createPinia();
-        setActivePinia(pinia);
-        const unidadeStore = useUnidadeStore();
-        
-        vi.spyOn(unidadeStore, 'obterUnidade').mockResolvedValue(unidadeMinima as any);
-        unidadeStore.cacheUnidades.set(1, unidadeMinima as any);
-        
-        const wrapper = mount(AtribuicaoTemporariaView, {
-            ...mountOptions,
-            global: { ...mountOptions.global, plugins: [router, pinia] }
+    it("atualiza atribuição vigente", async () => {
+        mockObterUnidade.mockResolvedValue({
+            codigo: 1,
+            sigla: "TESTE",
+            nome: "Unidade de Teste",
+            tipoResponsabilidade: "ATRIBUICAO_TEMPORARIA",
+            titular: null,
+            responsavel: null,
+            filhas: [],
         });
+        mockBuscarAtribuicoes.mockResolvedValue([
+            {
+                codigo: 10,
+                unidadeCodigo: 1,
+                unidadeSigla: "TESTE",
+                usuario: {
+                    tituloEleitoral: "999",
+                    matricula: "M1",
+                    nome: "Servidor Teste",
+                    email: "servidor@tre-pe.jus.br",
+                    ramal: "1234",
+                },
+                dataInicio: "2026-05-10T00:00:00",
+                dataTermino: "2026-05-30T23:59:59",
+                justificativa: "<p>Vigente</p>",
+            },
+        ]);
+
+        const wrapper = mountView();
         await flushPromises();
 
-        // Força chamada do carregarDados (onActivated simulação)
-        await (wrapper.vm as any).carregarDados();
+        await wrapper.findAll("input")[2].setValue("2026-06-05");
+        const editor = wrapper.find("[data-testid='textarea-justificativa']");
+        (editor.element as HTMLDivElement).innerHTML = "<p>Atualizada</p>";
+        await editor.trigger("input");
+
+        await wrapper.find("[data-testid='cad-atribuicao__btn-salvar-atribuicao']").trigger("click");
         await flushPromises();
 
-        expect(wrapper.find('[data-testid="loading"]').exists()).toBe(false);
-        expect(wrapper.text()).toContain('TESTE');
+        expect(mockAtualizarAtribuicao).toHaveBeenCalledWith(1, 10, {
+            tituloEleitoralUsuario: "999",
+            dataInicio: "2026-05-10",
+            dataTermino: "2026-06-05",
+            justificativa: "<p>Atualizada</p>",
+        });
+        expect(mockNotify).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO, "success");
     });
 
-    it('deve validar formulário vazio', async () => {
-        const pinia = createPinia();
-        setActivePinia(pinia);
-        const unidadeStore = useUnidadeStore();
-        vi.spyOn(unidadeStore, 'obterUnidade').mockResolvedValue(unidadeMinima as any);
-        
-        const wrapper = mount(AtribuicaoTemporariaView, {
-            ...mountOptions,
-            global: { ...mountOptions.global, plugins: [router, pinia] }
+    it("remove atribuição vigente", async () => {
+        mockObterUnidade.mockResolvedValue({
+            codigo: 1,
+            sigla: "TESTE",
+            nome: "Unidade de Teste",
+            tipoResponsabilidade: "ATRIBUICAO_TEMPORARIA",
+            titular: null,
+            responsavel: null,
+            filhas: [],
         });
+        mockBuscarAtribuicoes.mockResolvedValue([
+            {
+                codigo: 10,
+                unidadeCodigo: 1,
+                unidadeSigla: "TESTE",
+                usuario: {
+                    tituloEleitoral: "999",
+                    matricula: "M1",
+                    nome: "Servidor Teste",
+                    email: "servidor@tre-pe.jus.br",
+                    ramal: "1234",
+                },
+                dataInicio: "2026-05-10T00:00:00",
+                dataTermino: "2026-05-30T23:59:59",
+                justificativa: "<p>Vigente</p>",
+            },
+        ]);
+
+        const wrapper = mountView();
         await flushPromises();
 
-        await wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]').trigger('click');
+        await wrapper.find("[data-testid='btn-remover-atribuicao']").trigger("click");
+        await wrapper.find("[data-testid='btn-confirmar-remover-atribuicao']").trigger("click");
         await flushPromises();
 
-        expect(mockNotify).not.toHaveBeenCalledWith(expect.any(String), 'success');
-        expect(criarAtribuicaoTemporaria).not.toHaveBeenCalled();
+        expect(mockRemoverAtribuicao).toHaveBeenCalledWith(1, 10);
+        expect(mockNotify).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
     });
 
-    it('deve manter o botão de criar habilitado para permitir validação contextual', async () => {
-        const pinia = createPinia();
-        setActivePinia(pinia);
-        const unidadeStore = useUnidadeStore();
-        vi.spyOn(unidadeStore, 'obterUnidade').mockResolvedValue(unidadeMinima as any);
-
-        const wrapper = mount(AtribuicaoTemporariaView, {
-            ...mountOptions,
-            global: { ...mountOptions.global, plugins: [router, pinia] }
-        });
+    it("navega de volta ao cancelar", async () => {
+        const wrapper = mountView();
         await flushPromises();
 
-        const botaoCriar = wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]');
-        expect((botaoCriar.element as HTMLButtonElement).disabled).toBe(false);
+        await wrapper.find("[data-testid='btn-cancelar-atribuicao']").trigger("click");
+
+        expect(mockPush).toHaveBeenCalledWith("/unidade/1");
     });
-
-    it('deve criar atribuicao com sucesso', async () => {
-        const pinia = createPinia();
-        setActivePinia(pinia);
-        const unidadeStore = useUnidadeStore();
-        vi.spyOn(unidadeStore, 'obterUnidade').mockResolvedValue(unidadeMinima as any);
-        vi.mocked(criarAtribuicaoTemporaria).mockResolvedValue();
-
-        const wrapper = mount(AtribuicaoTemporariaView, {
-            ...mountOptions,
-            global: { ...mountOptions.global, plugins: [router, pinia] }
-        });
-        await flushPromises();
-
-        // Preenchendo o formulário via DOM/Componentes
-        await wrapper.findComponent({name: 'BuscadorUsuarios'}).vm.$emit('update:selecionado', '999');
-        await wrapper.find('[data-testid="input-data-inicio"]').setValue('2025-01-01');
-        await wrapper.find('[data-testid="input-data-termino"]').setValue('2025-12-31');
-        await definirJustificativa(wrapper, '<p>Teste de justificativa</p>');
-
-        await wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]').trigger('click');
-        await flushPromises();
-
-        expect(criarAtribuicaoTemporaria).toHaveBeenCalledWith(1, {
-            tituloEleitoralUsuario: '999',
-            dataInicio: '2025-01-01',
-            dataTermino: '2025-12-31',
-            justificativa: '<p>Teste de justificativa</p>'
-        });
-        expect(buscarDiagnosticoOrganizacional).toHaveBeenCalled();
-        expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'success');
-
-        // Verifica se limpou
-        expect(wrapper.findComponent({name: 'BuscadorUsuarios'}).props('selecionado')).toBeNull();
-    });
-
-    it('deve lidar com erro ao criar atribuicao', async () => {
-        const pinia = createPinia();
-        setActivePinia(pinia);
-        const unidadeStore = useUnidadeStore();
-        vi.spyOn(unidadeStore, 'obterUnidade').mockResolvedValue(unidadeMinima as any);
-        vi.mocked(criarAtribuicaoTemporaria).mockRejectedValue(new Error('Erro no servidor'));
-
-        const wrapper = mount(AtribuicaoTemporariaView, {
-            ...mountOptions,
-            global: { ...mountOptions.global, plugins: [router, pinia] }
-        });
-        await flushPromises();
-
-        await wrapper.findComponent({name: 'BuscadorUsuarios'}).vm.$emit('update:selecionado', '999');
-        await wrapper.find('[data-testid="input-data-inicio"]').setValue('2025-01-01');
-        await wrapper.find('[data-testid="input-data-termino"]').setValue('2025-12-31');
-        await definirJustificativa(wrapper, '<p>Teste de justificativa</p>');
-
-        await wrapper.find('[data-testid="cad-atribuicao__btn-criar-atribuicao"]').trigger('click');
-        await flushPromises();
-
-        expect(criarAtribuicaoTemporaria).toHaveBeenCalled();
-        expect(wrapper.text()).toContain('Erro no servidor');
-    });
-
 });

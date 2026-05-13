@@ -9,6 +9,8 @@ export interface Unidade {
     tituloTitular?: string;
     isElegivel?: boolean;
     tipoResponsabilidade?: string;
+    dataInicioResponsabilidade?: string | null;
+    dataFimResponsabilidade?: string | null;
     titular?: Usuario | null;
     responsavel?: Responsavel | Usuario | null;
 }

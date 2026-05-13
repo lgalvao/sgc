@@ -129,6 +129,7 @@ public final class Mensagens {
     public static final String SUBPROCESSOS_NAO_HOMOLOGADOS = "Subprocessos não homologados.";
     public static final String PROCESSO_DEVE_ESTAR_FINALIZADO = "Processo deve estar finalizado.";
     public static final String DATA_FIM_DEVE_SER_POSTERIOR = "A data de término deve ser posterior à data de início.";
+    public static final String ATRIBUICAO_TEMPORARIA_SOBREPOSTA = "Já existe uma atribuição temporária sobreposta para a unidade no período informado.";
     public static final String UNIDADES_SEM_MAPA = "Unidades sem mapa.";
     public static final String UNIDADES_EM_PROCESSO_ATIVO = "Unidades já em processo ativo.";
     public static final String TRANSICAO_INVALIDA = "Transição de situação inválida: %s -> %s";

@@ -46,6 +46,31 @@ public class UnidadeController {
         return ResponseEntity.ok(responsavelService.buscarTodasAtribuicoes());
     }
 
+    @GetMapping("/{codUnidade}/atribuicoes-temporarias")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AtribuicaoDto>> buscarAtribuicoesPorUnidade(@PathVariable Long codUnidade) {
+        return ResponseEntity.ok(responsavelService.buscarAtribuicoesPorUnidade(codUnidade));
+    }
+
+    @PostMapping("/{codUnidade}/atribuicoes-temporarias/{codigoAtribuicao}/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> atualizarAtribuicaoTemporaria(
+            @PathVariable Long codUnidade,
+            @PathVariable Long codigoAtribuicao,
+            @Valid @RequestBody CriarAtribuicaoRequest request) {
+        responsavelService.atualizarAtribuicaoTemporaria(codUnidade, codigoAtribuicao, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{codUnidade}/atribuicoes-temporarias/{codigoAtribuicao}/excluir")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> removerAtribuicaoTemporaria(
+            @PathVariable Long codUnidade,
+            @PathVariable Long codigoAtribuicao) {
+        responsavelService.removerAtribuicaoTemporaria(codUnidade, codigoAtribuicao);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
         List<UnidadeDto> hierarquia = hierarquiaService.buscarArvoreHierarquica();

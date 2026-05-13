@@ -40,6 +40,7 @@ const {
             titular: u,
             responsavel: ur,
             tipoResponsabilidade: 'SUBSTITUTO',
+            dataFimResponsabilidade: '2026-05-30T23:59:59',
             filhas: [
                 {codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: []},
                 {codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: []}
@@ -131,6 +132,7 @@ describe('UnidadeView.vue', () => {
         expect(wrapper.text()).toContain('TEST');
         expect(wrapper.text()).toContain('UnidadeView Teste');
         expect(wrapper.text()).toContain('Titular teste');
+        expect(wrapper.text()).toContain('Substituição');
     });
 
     it('não exibe responsável quando for o titular', async () => {
@@ -148,7 +150,9 @@ describe('UnidadeView.vue', () => {
         await flushPromises();
 
         expect(wrapper.text()).toContain('Titular teste');
-        expect(wrapper.find('[data-testid="unidade-responsavel-info"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="unidade-titular-info"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="unidade-responsavel-info"]').exists()).toBe(true);
+        expect(wrapper.text()).toContain('Titular');
     });
 
     it('renders subordinate units tree table', async () => {
@@ -237,5 +241,24 @@ describe('UnidadeView.vue', () => {
         await trocaProps;
         await ativacao;
         await flushPromises();
+    });
+
+    it('exibe botão de editar atribuição quando responsável atual veio de AT', async () => {
+        mockObterUnidade.mockResolvedValueOnce({
+            ...mockUnidadeData,
+            tipoResponsabilidade: 'ATRIBUICAO_TEMPORARIA',
+            dataFimResponsabilidade: '2026-05-30T23:59:59'
+        });
+
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'ADMIN',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: true},
+            },
+        });
+        await flushPromises();
+
+        expect(wrapper.text()).toContain('Editar atribuição');
+        expect(wrapper.text()).toContain('Atrib. temporária');
     });
 });

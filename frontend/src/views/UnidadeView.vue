@@ -31,7 +31,7 @@
                 variant="outline-secondary"
                 @click="irParaCriarAtribuicao"
             >
-              {{ TEXTOS.unidade.BOTAO_CRIAR_ATRIBUICAO }}
+              {{ textoBotaoAtribuicao }}
             </BButton>
           </template>
         </PageHeader>
@@ -39,6 +39,7 @@
         <BCard class="mb-4" no-body>
           <BCardBody>
             <UnidadeContatoInfo
+                v-if="titularExibivel"
                 :contato="unidade.titular"
                 :label="TEXTOS.unidade.LABEL_TITULAR"
                 :nome-fallback="TEXTOS.unidade.NAO_INFORMADO"
@@ -48,6 +49,7 @@
             <UnidadeContatoInfo
                 v-if="responsavelExibivel"
                 :contato="responsavelExibivel"
+                :descricao="descricaoResponsabilidade"
                 :label="TEXTOS.unidade.LABEL_RESPONSAVEL"
                 data-testid="unidade-responsavel-info"
             />
@@ -94,6 +96,7 @@ import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {logger} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
+import {formatarDataBR} from "@/utils";
 
 const props = defineProps<{ codUnidade: number }>();
 
@@ -211,21 +214,37 @@ const temSubordinadas = computed(() => subordinadas.value.length > 0);
 const dadosFormatadosSubordinadas = computed(() => formatarDadosParaArvore(subordinadas.value));
 
 const responsavelExibivel = computed<Usuario | Responsavel | null>(() => {
-  const responsavel = unidade.value?.responsavel;
+  return unidade.value?.responsavel ?? unidade.value?.titular ?? null;
+});
+
+const titularExibivel = computed(() => {
   const titular = unidade.value?.titular;
-  
-  // Se não houver responsável, não exibe nada
-  if (!responsavel) {
-    return null;
+  const responsavel = responsavelExibivel.value;
+  if (!titular || !responsavel) {
+    return Boolean(titular);
+  }
+  return titular.tituloEleitoral !== responsavel.tituloEleitoral;
+});
+
+const textoBotaoAtribuicao = computed(() =>
+    unidade.value?.tipoResponsabilidade === "ATRIBUICAO_TEMPORARIA"
+        ? TEXTOS.unidade.BOTAO_EDITAR_ATRIBUICAO
+        : TEXTOS.unidade.BOTAO_CRIAR_ATRIBUICAO
+);
+
+const descricaoResponsabilidade = computed(() => {
+  const tipoResponsabilidade = unidade.value?.tipoResponsabilidade ?? "TITULAR";
+  const dataFim = unidade.value?.dataFimResponsabilidade;
+
+  if (tipoResponsabilidade === "SUBSTITUTO" && dataFim) {
+    return `Substituição (até ${formatarDataBR(dataFim)})`;
   }
 
-  // Se o responsável for a mesma pessoa que o titular, não exibe o campo "Responsável" (mostra apenas "Titular")
-  // Compara pelo título eleitoral para garantir que é a mesma pessoa
-  if (titular && responsavel.tituloEleitoral === titular.tituloEleitoral) {
-    return null;
+  if (tipoResponsabilidade === "ATRIBUICAO_TEMPORARIA" && dataFim) {
+    return `Atrib. temporária (até ${formatarDataBR(dataFim)})`;
   }
 
-  return responsavel;
+  return "Titular";
 });
 
 interface UnidadeFormatada {

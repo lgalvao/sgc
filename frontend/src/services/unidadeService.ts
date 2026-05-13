@@ -17,6 +17,8 @@ type UnidadeApiDto = {
     isElegivel?: boolean;
     tituloTitular?: string;
     tipoResponsabilidade?: string;
+    dataInicioResponsabilidade?: string | null;
+    dataFimResponsabilidade?: string | null;
     titular?: UsuarioResumoDto | null;
     responsavel?: UsuarioResumoDto | null;
     subunidades?: UnidadeApiDto[];
@@ -54,6 +56,8 @@ function mapearUnidade(dto: UnidadeApiDto): Unidade {
         isElegivel: dto.isElegivel,
         tituloTitular: dto.tituloTitular,
         tipoResponsabilidade: dto.tipoResponsabilidade,
+        dataInicioResponsabilidade: dto.dataInicioResponsabilidade ?? null,
+        dataFimResponsabilidade: dto.dataFimResponsabilidade ?? null,
         titular: mapearUsuarioResumo(dto.titular),
         responsavel: mapearUsuarioResumo(dto.responsavel),
         filhas: (dto.subunidades ?? []).map(mapearUnidade),

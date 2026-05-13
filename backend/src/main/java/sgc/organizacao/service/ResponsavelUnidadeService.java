@@ -56,6 +56,15 @@ public class ResponsavelUnidadeService {
                 .toList();
     }
 
+    public List<AtribuicaoDto> buscarAtribuicoesPorUnidade(Long codUnidade) {
+        List<AtribuicaoTemporaria> atribuicoes = atribuicaoTemporariaRepo.listarPorUnidadeComUnidade(codUnidade);
+        Map<String, Usuario> usuariosPorTitulo = carregarUsuariosPorTitulo(atribuicoes);
+
+        return atribuicoes.stream()
+                .map(atribuicao -> toAtribuicaoTemporariaDto(atribuicao, usuariosPorTitulo))
+                .toList();
+    }
+
     private Map<String, Usuario> carregarUsuariosPorTitulo(List<AtribuicaoTemporaria> atribuicoes) {
         List<String> titulos = atribuicoes.stream()
                 .map(AtribuicaoTemporaria::getUsuarioTitulo)
@@ -95,28 +104,84 @@ public class ResponsavelUnidadeService {
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         Unidade unidade = unidadeRepo.findById(codUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
-
-        String titulo = request.tituloEleitoralUsuario();
-        Usuario usuario = usuarioRepo.findById(titulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
-
-        LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
-
-        if (request.dataTermino().isBefore(inicio)) {
-            throw new ErroValidacao(Mensagens.DATA_FIM_DEVE_SER_POSTERIOR);
-        }
-
-        AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria()
-                .setUnidade(unidade)
-                .setUsuarioTitulo(usuario.getTituloEleitoral())
-                .setUsuarioMatricula(usuario.getMatricula())
-                .setDataInicio(request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now())
-                .setDataTermino(request.dataTermino().atTime(23, 59, 59))
-                .setJustificativa(request.justificativa());
+        Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
+        AtribuicaoTemporaria atribuicao = montarAtribuicaoTemporaria(new AtribuicaoTemporaria(), unidade, usuario, request);
 
         AtribuicaoTemporaria atribuicaoSalva = atribuicaoTemporariaRepo.save(atribuicao);
         criarNotificacoesAtribuicaoTemporaria(atribuicaoSalva, usuario);
         cacheOrganizacaoService.invalidarAposCommit();
+    }
+
+    @Transactional
+    public void atualizarAtribuicaoTemporaria(Long codUnidade, Long codigoAtribuicao, CriarAtribuicaoRequest request) {
+        Unidade unidade = unidadeRepo.findById(codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
+        AtribuicaoTemporaria atribuicao = buscarAtribuicaoObrigatoria(codigoAtribuicao);
+        validarPertencimentoUnidade(atribuicao, codUnidade);
+        Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
+
+        montarAtribuicaoTemporaria(atribuicao, unidade, usuario, request);
+        atribuicaoTemporariaRepo.save(atribuicao);
+        cacheOrganizacaoService.invalidarAposCommit();
+    }
+
+    @Transactional
+    public void removerAtribuicaoTemporaria(Long codUnidade, Long codigoAtribuicao) {
+        AtribuicaoTemporaria atribuicao = buscarAtribuicaoObrigatoria(codigoAtribuicao);
+        validarPertencimentoUnidade(atribuicao, codUnidade);
+        atribuicaoTemporariaRepo.delete(atribuicao);
+        cacheOrganizacaoService.invalidarAposCommit();
+    }
+
+    private Usuario buscarUsuarioObrigatorio(String titulo) {
+        return usuarioRepo.findById(titulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
+    }
+
+    private AtribuicaoTemporaria buscarAtribuicaoObrigatoria(Long codigoAtribuicao) {
+        return atribuicaoTemporariaRepo.findById(codigoAtribuicao)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(AtribuicaoTemporaria.class.getSimpleName(), codigoAtribuicao));
+    }
+
+    private void validarPertencimentoUnidade(AtribuicaoTemporaria atribuicao, Long codUnidade) {
+        if (!Objects.equals(atribuicao.getUnidade().getCodigo(), codUnidade)) {
+            throw new ErroValidacao("A atribuição temporária não pertence à unidade informada.");
+        }
+    }
+
+    private AtribuicaoTemporaria montarAtribuicaoTemporaria(
+            AtribuicaoTemporaria atribuicao,
+            Unidade unidade,
+            Usuario usuario,
+            CriarAtribuicaoRequest request
+    ) {
+        LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
+        if (request.dataTermino().isBefore(inicio)) {
+            throw new ErroValidacao(Mensagens.DATA_FIM_DEVE_SER_POSTERIOR);
+        }
+
+        LocalDateTime dataInicio = request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now();
+        LocalDateTime dataTermino = request.dataTermino().atTime(23, 59, 59);
+        validarSobreposicaoPeriodo(unidade.getCodigo(), dataInicio, dataTermino, atribuicao.getCodigo());
+
+        return atribuicao
+                .setUnidade(unidade)
+                .setUsuarioTitulo(usuario.getTituloEleitoral())
+                .setUsuarioMatricula(usuario.getMatricula())
+                .setDataInicio(dataInicio)
+                .setDataTermino(dataTermino)
+                .setJustificativa(request.justificativa());
+    }
+
+    private void validarSobreposicaoPeriodo(
+            Long codUnidade,
+            LocalDateTime dataInicio,
+            LocalDateTime dataTermino,
+            Long codigoIgnorado
+    ) {
+        if (atribuicaoTemporariaRepo.existeSobreposicaoPeriodo(codUnidade, dataInicio, dataTermino, codigoIgnorado)) {
+            throw new ErroValidacao(Mensagens.ATRIBUICAO_TEMPORARIA_SOBREPOSTA);
+        }
     }
 
     private void criarNotificacoesAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao, Usuario usuario) {
