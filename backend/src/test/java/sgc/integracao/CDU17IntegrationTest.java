@@ -244,11 +244,11 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Não deve disponibilizar mapa com data limite menor que a última data limite do subprocesso")
+        @DisplayName("Não deve disponibilizar mapa com data limite menor ou igual à data de fim da etapa anterior")
         @WithMockAdmin
-        void disponibilizarMapa_comDataLimiteMenorQueUltimaDataLimite_retornaUnprocessable() throws Exception {
+        void disponibilizarMapa_comDataLimiteMenorOuIgualDataFimEtapaAnterior_retornaUnprocessable() throws Exception {
             subprocesso.setDataLimiteEtapa1(LocalDate.now().plusDays(8).atStartOfDay());
-            subprocesso.setDataLimiteEtapa2(LocalDate.now().plusDays(12).atStartOfDay());
+            subprocesso.setDataFimEtapa1(LocalDate.now().plusDays(10).atStartOfDay());
             subprocessoRepo.save(subprocesso);
 
             DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
@@ -259,7 +259,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isUnprocessableContent())
-                    .andExpect(jsonPath("$.message").value(Mensagens.DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO));
+                    .andExpect(jsonPath("$.message").value(Mensagens.DATA_LIMITE_MAIOR_QUE_FIM_ETAPA_ANTERIOR));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
@@ -66,6 +66,7 @@ const SubprocessoModalStub = {
 };
 
 const toast = {
+    create: vi.fn(),
     success: vi.fn(),
 };
 vi.mock('bootstrap-vue-next', async (importOriginal) => {
@@ -75,6 +76,7 @@ vi.mock('bootstrap-vue-next', async (importOriginal) => {
         useToast: () => ({
             show: vi.fn(),
             success: toast.success,
+            create: toast.create,
         }),
     };
 });
@@ -243,7 +245,7 @@ describe('SubprocessoView.vue', () => {
                     mapaCompleto: null,
                 },
             },
-            stubActions: true,
+            stubActions: false,
         });
 
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
@@ -436,7 +438,11 @@ describe('SubprocessoView.vue', () => {
 
         expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
         expect(vm.mostrarModalAlterarDataLimite).toBe(false);
-        expect(toast.success).toHaveBeenCalledWith(expect.stringContaining(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA));
+        expect(toast.create).toHaveBeenCalledWith(expect.objectContaining({
+            props: expect.objectContaining({
+                body: expect.stringContaining(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA)
+            })
+        }));
     });
 
     it('trata erro ao alterar data limite', async () => {
@@ -532,7 +538,11 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.enviarLembrete).toHaveBeenCalledWith(1, 1);
-        expect(toast.success).toHaveBeenCalledWith(expect.stringContaining(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO));
+        expect(toast.create).toHaveBeenCalledWith(expect.objectContaining({
+            props: expect.objectContaining({
+                body: expect.stringContaining(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO)
+            })
+        }));
     });
 
     it('trata erro ao enviar lembrete', async () => {

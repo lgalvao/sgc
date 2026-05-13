@@ -123,6 +123,7 @@
           :pode-apresentar-sugestoes="podeApresentarSugestoes"
           :sugestoes="sugestoes"
           :sugestoes-visualizacao="sugestoesVisualizacao"
+          :data-fim-etapa1="subprocesso?.dataFimEtapa1"
           :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
           @disponibilizar="disponibilizarMapa"
           @confirmar-aceitacao="confirmarAceitacao"

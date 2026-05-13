@@ -24,6 +24,7 @@ defineProps<{
   mostrarModalDisponibilizar: boolean;
   loadingDisponibilizacao: boolean;
   notificacaoDisponibilizacao: string;
+  dataFimEtapa1?: string | null;
   ultimaDataLimiteSubprocesso?: string | null;
   mostrarModalExcluirCompetencia: boolean;
   loadingExclusao: boolean;
@@ -82,11 +83,12 @@ defineEmits<{
                             :mostrar="mostrarModalCriarNovaCompetencia" @fechar="$emit('fechar-criar-competencia')"
                             @salvar="$emit('salvar-competencia', $event)"/>
     <MapaDisponibilizacaoModal
-:field-errors="fieldErrors" :loading="loadingDisponibilizacao"
-                               :mostrar="mostrarModalDisponibilizar" :notificacao="notificacaoDisponibilizacao"
-                               :ultima-data-limite-subprocesso="ultimaDataLimiteSubprocesso ?? undefined"
-                               @disponibilizar="$emit('disponibilizar', $event)"
-                               @fechar="$emit('fechar-disponibilizar')"/>
+ :field-errors="fieldErrors" :loading="loadingDisponibilizacao"
+                                :mostrar="mostrarModalDisponibilizar" :notificacao="notificacaoDisponibilizacao"
+                                :data-fim-etapa-anterior="dataFimEtapa1 ?? undefined"
+                                :ultima-data-limite-subprocesso="ultimaDataLimiteSubprocesso ?? undefined"
+                                @disponibilizar="$emit('disponibilizar', $event)"
+                                @fechar="$emit('fechar-disponibilizar')"/>
     <CompetenciaExclusaoModal
 :descricao="competenciaParaExcluir?.descricao || ''" :loading="loadingExclusao"
                               :model-value="mostrarModalExcluirCompetencia"

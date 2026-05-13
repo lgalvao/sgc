@@ -56,6 +56,7 @@ import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 interface Props {
   mostrarModal: boolean;
   dataLimiteAtual: Date | null;
+  dataFimEtapaAnterior: Date | null;
   ultimaDataLimiteSubprocesso: Date | null;
   etapaAtual: number | null;
   loading?: boolean;
@@ -81,12 +82,21 @@ const {
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 
+const deveValidarFimEtapaAnterior = computed(() => props.etapaAtual === 2);
+const dataFimEtapaAnteriorFormatada = computed(() => {
+  if (!props.dataFimEtapaAnterior) return "";
+  return formatarDataParaInput(props.dataFimEtapaAnterior);
+});
+
 const mensagemErroDataLimite = computed(() => {
   const deveExibirMensagem = campoDataInteragido.value || validacaoSubmetida.value;
   if (!deveExibirMensagem) return "";
   if (deveExibirErro(!novaDataLimite.value)) return "A data limite é obrigatória.";
   if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) {
     return "A data limite para validação deve ser uma data futura.";
+  }
+  if (deveValidarFimEtapaAnterior.value && dataFimEtapaAnteriorFormatada.value && novaDataLimite.value <= dataFimEtapaAnteriorFormatada.value) {
+    return "A data limite deve ser maior que a data de fim da etapa anterior.";
   }
   return "";
 });
@@ -102,7 +112,12 @@ watch(novaDataLimite, (novaData) => {
 });
 
 const dataLimiteMinima = computed(() => {
-  return obterAmanhaFormatado();
+  const amanha = obterAmanhaFormatado();
+  if (!deveValidarFimEtapaAnterior.value || !dataFimEtapaAnteriorFormatada.value) {
+    return amanha;
+  }
+  const primeiroDiaValido = somarDias(dataFimEtapaAnteriorFormatada.value, 1);
+  return primeiroDiaValido > amanha ? primeiroDiaValido : amanha;
 });
 
 const dataLimiteAtualFormatada = computed(() => {
@@ -112,6 +127,9 @@ const dataLimiteAtualFormatada = computed(() => {
 const isDataValida = computed(() => {
   if (!novaDataLimite.value) return false;
   if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) return false;
+  if (deveValidarFimEtapaAnterior.value && dataFimEtapaAnteriorFormatada.value && novaDataLimite.value <= dataFimEtapaAnteriorFormatada.value) {
+    return false;
+  }
   return true;
 });
 
@@ -139,5 +157,11 @@ function confirmar() {
     return;
   }
   emit('confirmarAlteracao', novaDataLimite.value);
+}
+
+function somarDias(dataIso: string, dias: number) {
+  const data = new Date(`${dataIso}T00:00:00`);
+  data.setDate(data.getDate() + dias);
+  return data.toISOString().split("T")[0];
 }
 </script>

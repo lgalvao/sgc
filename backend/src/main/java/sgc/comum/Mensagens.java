@@ -63,6 +63,8 @@ public final class Mensagens {
     public static final String DATA_LIMITE_VALIDACAO_FUTURA = "A data limite para validação deve ser uma data futura.";
     public static final String DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO =
             "A data limite deve ser maior ou igual à última data limite do subprocesso.";
+    public static final String DATA_LIMITE_MAIOR_QUE_FIM_ETAPA_ANTERIOR =
+            "A data limite deve ser maior que a data de fim da etapa anterior.";
     // ── Ações em bloco ───────────────────────────────────────────────────────
     public static final String ACAO_OBRIGATORIA = "A ação é obrigatória";
     public static final String ACAO_DEVE_SER_INFORMADA = "A ação deve ser informada";

@@ -176,9 +176,9 @@ public class SubprocessoTransicaoService {
 
         validacaoService.validarMapaParaDisponibilizacao(sp);
 
-        LocalDate ultimaDataLimite = obterUltimaDataLimite(sp);
-        if (ultimaDataLimite != null && request.dataLimite().isBefore(ultimaDataLimite)) {
-            throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO);
+        LocalDate dataFimEtapaAnterior = obterDataFimEtapaAnterior(sp);
+        if (dataFimEtapaAnterior != null && !request.dataLimite().isAfter(dataFimEtapaAnterior)) {
+            throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_MAIOR_QUE_FIM_ETAPA_ANTERIOR);
         }
 
         Mapa mapa = sp.getMapa();
@@ -215,6 +215,11 @@ public class SubprocessoTransicaoService {
             throw new IllegalStateException("Subprocesso %s com data limite da etapa 1 posterior à etapa 2".formatted(sp.getCodigo()));
         }
         return dataLimiteEtapa2.toLocalDate();
+    }
+
+    private @Nullable LocalDate obterDataFimEtapaAnterior(Subprocesso sp) {
+        LocalDateTime dataFimEtapa1 = sp.getDataFimEtapa1();
+        return dataFimEtapa1 == null ? null : dataFimEtapa1.toLocalDate();
     }
 
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request) {
@@ -482,6 +487,12 @@ public class SubprocessoTransicaoService {
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoSp = sp.getSituacao();
+        if (situacaoSp.ehEtapaMapa()) {
+            LocalDate dataFimEtapaAnterior = obterDataFimEtapaAnterior(sp);
+            if (dataFimEtapaAnterior != null && !novaDataLimite.isAfter(dataFimEtapaAnterior)) {
+                throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_MAIOR_QUE_FIM_ETAPA_ANTERIOR);
+            }
+        }
 
         atualizarDataLimitePorSituacao(sp, situacaoSp, novaDataLimite.atStartOfDay());
 

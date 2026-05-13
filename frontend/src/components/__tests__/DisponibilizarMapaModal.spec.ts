@@ -200,21 +200,21 @@ describe("DisponibilizarMapaModal.vue", () => {
         expect(wrapper.text()).toContain("A data limite para validação deve ser uma data futura.");
     });
 
-    it("deve usar a última data limite do subprocesso como mínimo quando ela for maior que amanhã", () => {
+    it("deve usar o dia seguinte ao fim da etapa anterior como mínimo quando ele for maior que amanhã", () => {
         const wrapper = mount(DisponibilizarMapaModal, {
-            props: {mostrar: true, ultimaDataLimiteSubprocesso: "2026-03-30T00:00:00"},
+            props: {mostrar: true, dataFimEtapaAnterior: "2026-03-30T00:00:00"},
         });
         const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
-        expect(input.attributes("min")).toBe("2026-03-30");
+        expect(input.attributes("min")).toBe("2026-03-31");
     });
 
-    it("deve exigir data maior ou igual à última data limite do subprocesso", async () => {
+    it("deve exigir data maior que a data de fim da etapa anterior", async () => {
         const wrapper = mount(DisponibilizarMapaModal, {
-            props: {mostrar: true, ultimaDataLimiteSubprocesso: "2026-03-30T00:00:00"},
+            props: {mostrar: true, dataFimEtapaAnterior: "2026-03-30T00:00:00"},
         });
         const input = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
-        await input.setValue("2026-03-29");
-        expect(wrapper.text()).toContain("A data limite deve ser maior ou igual à última data limite do subprocesso.");
+        await input.setValue("2026-03-30");
+        expect(wrapper.text()).toContain("A data limite deve ser maior que a data de fim da etapa anterior.");
     });
 
     it("deve exigir data limite obrigatória no submit e focar o input", async () => {

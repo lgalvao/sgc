@@ -41,6 +41,7 @@ export function mapearDetalheSubprocesso(dto: SubprocessoDetalheResponse): Subpr
         localizacaoAtual: dto.localizacaoAtual,
         processoDescricao: subprocesso.processoDescricao,
         dataCriacaoProcesso: subprocesso.dataCriacaoProcesso,
+        dataFimEtapa1: subprocesso.dataFimEtapa1,
         ultimaDataLimiteSubprocesso: subprocesso.ultimaDataLimite,
         tipoProcesso: subprocesso.tipoProcesso,
         prazoEtapaAtual: subprocesso.dataLimiteEtapa2 ?? subprocesso.dataLimiteEtapa1,

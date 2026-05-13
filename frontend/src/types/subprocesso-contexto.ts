@@ -52,6 +52,7 @@ export interface SubprocessoDetalhe {
     localizacaoAtual: string;
     processoDescricao: string;
     dataCriacaoProcesso: string;
+    dataFimEtapa1: string | null;
     ultimaDataLimiteSubprocesso: string;
     tipoProcesso: TipoProcesso;
     prazoEtapaAtual: string;

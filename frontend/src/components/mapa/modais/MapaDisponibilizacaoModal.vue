@@ -90,6 +90,7 @@ const props = defineProps<{
   mostrar: boolean;
   notificacao?: string;
   loading?: boolean;
+  dataFimEtapaAnterior?: string;
   ultimaDataLimiteSubprocesso?: string;
   fieldErrors?: {
     dataLimite?: string;
@@ -113,7 +114,7 @@ const {
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
 
-const ultimaDataLimiteFormatada = computed(() => extrairData(props.ultimaDataLimiteSubprocesso));
+const dataFimEtapaAnteriorFormatada = computed(() => extrairData(props.dataFimEtapaAnterior));
 const mensagemErroDataLimite = computed(() => {
   if (props.fieldErrors?.dataLimite) return props.fieldErrors.dataLimite;
   if (erroLocalDataLimite.value) return erroLocalDataLimite.value;
@@ -121,12 +122,13 @@ const mensagemErroDataLimite = computed(() => {
 });
 const dataMinimaPermitida = computed(() => {
   const amanha = obterAmanhaFormatado();
-  const ultimaDataLimite = ultimaDataLimiteFormatada.value;
-  if (!ultimaDataLimite) return amanha;
-  return ultimaDataLimite > amanha ? ultimaDataLimite : amanha;
+  const dataFimEtapaAnterior = dataFimEtapaAnteriorFormatada.value;
+  if (!dataFimEtapaAnterior) return amanha;
+  const primeiroDiaValido = somarDias(dataFimEtapaAnterior, 1);
+  return primeiroDiaValido > amanha ? primeiroDiaValido : amanha;
 });
 
-watch([dataLimiteValidacao, ultimaDataLimiteFormatada], ([novaData, ultimaDataLimite]) => {
+watch([dataLimiteValidacao, dataFimEtapaAnteriorFormatada], ([novaData, dataFimEtapaAnterior]) => {
   erroLocalDataLimite.value = "";
   if (!novaData || novaData.length !== 10) return;
 
@@ -135,8 +137,8 @@ watch([dataLimiteValidacao, ultimaDataLimiteFormatada], ([novaData, ultimaDataLi
     return;
   }
 
-  if (ultimaDataLimite && novaData < ultimaDataLimite) {
-    erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite do subprocesso.";
+  if (dataFimEtapaAnterior && novaData <= dataFimEtapaAnterior) {
+    erroLocalDataLimite.value = "A data limite deve ser maior que a data de fim da etapa anterior.";
   }
 });
 
@@ -171,6 +173,12 @@ function disponibilizar() {
 
 function extrairData(data?: string) {
   return data?.split("T")[0] ?? "";
+}
+
+function somarDias(dataIso: string, dias: number) {
+  const data = new Date(`${dataIso}T00:00:00`);
+  data.setDate(data.getDate() + dias);
+  return data.toISOString().split("T")[0];
 }
 </script>
 

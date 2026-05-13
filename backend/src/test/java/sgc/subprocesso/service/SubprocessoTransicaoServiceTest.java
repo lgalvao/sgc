@@ -232,12 +232,12 @@ class SubprocessoTransicaoServiceTest {
     class CoberturaAdicional {
 
         @Test
-        @DisplayName("Deve lançar erro quando data limite é anterior à última data (disponibilizarMapa)")
+        @DisplayName("Deve lançar erro quando data limite não é posterior ao fim da etapa anterior")
         void deveLancarErroQuandoDataLimiteAnterior() {
             Unidade u = criarUnidade(10L, "U10", "Unidade 10");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, u);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
-            sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(30)); // Requisito: sempre definida
+            sp.setDataFimEtapa1(LocalDate.now().plusDays(5).atStartOfDay());
             sp.setMapa(new sgc.mapa.model.Mapa());
 
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");

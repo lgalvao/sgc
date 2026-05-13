@@ -118,6 +118,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // Mudar situação para MAPA
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        subprocesso.setDataFimEtapa1(LocalDate.now().plusDays(15).atStartOfDay());
         subprocessoRepo.save(subprocesso);
         entityManager.flush();
 
@@ -142,6 +143,27 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         List<Alerta> alertas = alertaRepo.findAll();
         Alerta alerta = alertas.getLast();
         assertThat(alerta.getDescricao()).contains("Data limite da etapa 2 alterada");
+    }
+
+    @Test
+    @DisplayName("Não deve permitir alterar data limite da etapa 2 para data menor ou igual ao fim da etapa anterior")
+    @WithMockAdmin
+    void alterarDataLimite_etapa2_dataMenorOuIgualFimEtapaAnterior_erro() throws Exception {
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        subprocesso.setDataFimEtapa1(LocalDate.now().plusDays(15).atStartOfDay());
+        subprocessoRepo.save(subprocesso);
+        entityManager.flush();
+
+        LocalDate novaData = LocalDate.now().plusDays(15);
+        DataRequest request = new DataRequest(novaData);
+
+        mockMvc.perform(
+                        post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(content().string(containsString("A data limite deve ser maior que a data de fim da etapa anterior.")));
     }
 
     @Test

@@ -7,6 +7,7 @@ import {TEXTOS} from "@/constants/textos";
 
 defineProps<{
     dataLimiteAtual: Date | null;
+    dataFimEtapa1: Date | null;
     etapaAtual: number | null;
     loadingDataLimite: boolean;
     mostrarModalAlterarDataLimite: boolean;
@@ -35,6 +36,7 @@ defineEmits<{
 <template>
     <SubprocessoModal
         :data-limite-atual="dataLimiteAtual"
+        :data-fim-etapa-anterior="dataFimEtapa1"
         :etapa-atual="etapaAtual"
         :loading="loadingDataLimite"
         :mostrar-modal="mostrarModalAlterarDataLimite"

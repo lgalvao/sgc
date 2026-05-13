@@ -66,6 +66,7 @@
 
   <SubprocessoFluxoModais
       :data-limite-atual="dataLimite"
+      :data-fim-etapa1="subprocesso?.dataFimEtapa1 ? analisarData(subprocesso.dataFimEtapa1) : null"
       :etapa-atual="subprocesso?.etapaAtual ?? null"
       :justificativa-reabertura="justificativaReabertura"
       :loading-data-limite="loadingDataLimite"
