@@ -177,9 +177,9 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Não deve permitir alterar data limite para data menor que a última data limite do subprocesso")
+    @DisplayName("Deve permitir reduzir a data limite desde que a nova data continue no futuro")
     @WithMockAdmin
-    void alterarDataLimite_dataMenorQueUltimaDataLimite_erro() throws Exception {
+    void alterarDataLimite_dataMenorQueAtual_masFutura_sucesso() throws Exception {
         LocalDate novaData = subprocesso.getDataLimiteEtapa1().toLocalDate().minusDays(1);
         DataRequest request = new DataRequest(novaData);
 
@@ -188,7 +188,12 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnprocessableContent())
-                .andExpect(content().string(containsString("A data limite deve ser maior ou igual à última data limite do subprocesso.")));
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(atualizado.getDataLimiteEtapa1().toLocalDate()).isEqualTo(novaData);
     }
 }

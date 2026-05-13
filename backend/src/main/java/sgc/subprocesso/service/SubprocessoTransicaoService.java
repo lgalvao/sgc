@@ -482,11 +482,6 @@ public class SubprocessoTransicaoService {
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoSp = sp.getSituacao();
-        LocalDate ultimaDataLimite = obterUltimaDataLimite(sp);
-
-        if (ultimaDataLimite != null && novaDataLimite.isBefore(ultimaDataLimite)) {
-            throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO);
-        }
 
         atualizarDataLimitePorSituacao(sp, situacaoSp, novaDataLimite.atStartOfDay());
 

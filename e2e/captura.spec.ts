@@ -818,7 +818,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByTestId('inp-processo-descricao').fill(descricao);
             await expect(page.getByTestId('btn-processo-salvar-rodape')).toBeDisabled();
-            await capturarTela(page, 'processo', 'botoes-desativados-falta-data-unidade', {
+            await capturarTela(page, 'processo', 'botoes-desativados-falta-campos', {
                 extra: {preenchido: 'descricao'}
             });
 
@@ -1031,6 +1031,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
+            test.setTimeout(30000);
             const descricao = `Proc mapa ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
 

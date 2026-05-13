@@ -88,9 +88,6 @@ const mensagemErroDataLimite = computed(() => {
   if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) {
     return "A data limite para validação deve ser uma data futura.";
   }
-  if (dataLimiteMinimaPorUltimaData.value && novaDataLimite.value < dataLimiteMinimaPorUltimaData.value) {
-    return "A data limite deve ser maior ou igual à última data limite do subprocesso.";
-  }
   return "";
 });
 
@@ -104,16 +101,8 @@ watch(novaDataLimite, (novaData) => {
   }
 });
 
-const dataLimiteMinimaPorUltimaData = computed(() => {
-  if (!props.ultimaDataLimiteSubprocesso) return "";
-  return formatarDataParaInput(props.ultimaDataLimiteSubprocesso);
-});
-
 const dataLimiteMinima = computed(() => {
-  const amanha = obterAmanhaFormatado();
-  const ultimaDataLimite = dataLimiteMinimaPorUltimaData.value;
-  if (!ultimaDataLimite) return amanha;
-  return ultimaDataLimite > amanha ? ultimaDataLimite : amanha;
+  return obterAmanhaFormatado();
 });
 
 const dataLimiteAtualFormatada = computed(() => {
@@ -123,7 +112,7 @@ const dataLimiteAtualFormatada = computed(() => {
 const isDataValida = computed(() => {
   if (!novaDataLimite.value) return false;
   if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) return false;
-  return !dataLimiteMinimaPorUltimaData.value || novaDataLimite.value >= dataLimiteMinimaPorUltimaData.value;
+  return true;
 });
 
 watch(

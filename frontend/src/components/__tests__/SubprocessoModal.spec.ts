@@ -58,7 +58,7 @@ describe("SubprocessoModal", () => {
         expect(confirmButton.attributes("disabled")).toBeUndefined();
     });
 
-    it("deve usar a última data limite do subprocesso como data mínima quando for maior que amanhã", () => {
+    it("deve usar amanhã como data mínima", () => {
         context.wrapper = mount(SubprocessoModal, {
             props: {
                 mostrarModal: true,
@@ -69,7 +69,27 @@ describe("SubprocessoModal", () => {
         });
 
         const input = context.wrapper.find('[data-testid="input-nova-data-limite"]');
-        expect(input.attributes("min")).toBe("2099-12-31");
+        expect(input.attributes("min")).toBe(utils.obterAmanhaFormatado());
+    });
+
+    it("deve permitir confirmar uma data futura menor que a data limite atual", async () => {
+        vi.spyOn(utils, "ehDataEstritamenteFutura").mockReturnValue(true);
+        context.wrapper = mount(SubprocessoModal, {
+            props: {
+                mostrarModal: true,
+                dataLimiteAtual: new Date("2026-05-31T00:00:00"),
+                ultimaDataLimiteSubprocesso: new Date("2026-05-31T00:00:00"),
+                etapaAtual: 1
+            },
+        });
+
+        await context.wrapper
+            .find('[data-testid="input-nova-data-limite"]')
+            .setValue("2026-05-30");
+        await context.wrapper.find('[data-testid="btn-modal-confirmar"]').trigger("click");
+
+        expect(context.wrapper.text()).not.toContain("A data limite deve ser maior ou igual à última data limite do subprocesso.");
+        expect(context.wrapper.emitted("confirmarAlteracao")?.[0]).toEqual(["2026-05-30"]);
     });
 
     it('deve emitir "fecharModal" ao clicar no botão de cancelar', async () => {

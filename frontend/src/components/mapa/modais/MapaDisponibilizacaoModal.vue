@@ -55,17 +55,14 @@
           rotulo="Observações"
       />
     </BFormGroup>
-    <BAlert
+    <div
         v-if="notificacao"
-        :fade="false"
-        :model-value="true"
-        class="mt-3"
+        class="mt-3 p-3 bg-body-tertiary border rounded text-secondary small d-flex align-items-start gap-2"
         data-testid="alert-disponibilizar-mapa"
-        dismissible
-        variant="secondary"
     >
-      {{ notificacao }}
-    </BAlert>
+      <i class="bi bi-info-circle-fill fs-6 mt-0"></i>
+      <div>{{ notificacao }}</div>
+    </div>
     <template #acao>
       <LoadingButton
           :loading="loading"

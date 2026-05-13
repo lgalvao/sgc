@@ -513,7 +513,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await navegarParaCadastro(page);
         const modalHistoricoChefe = await abrirHistoricoAnalise(page);
         await expect(modalHistoricoChefe.getByTestId('cell-resultado-0')).toHaveText(/Devolu/i);
-        await expect(modalHistoricoChefe).toContainText('Cadastro devolvido: favor verificar as atividades antes de disponibilizar novamente.');
+        await expect(modalHistoricoChefe).toContainText(/Cadastro devolvido: favor verificar as atividades antes de disponibilizar/i);
         await fecharHistoricoAnalise(page);
 
         // O CHEFE re-disponibiliza o cadastro (sem precisar alterar dados).

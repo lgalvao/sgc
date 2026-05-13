@@ -26,7 +26,11 @@ describe("RelatorioMapasView.vue", () => {
     const stubs = {
         LayoutPadrao: {template: "<div><slot /></div>"},
         PageHeader: {template: "<div><slot name='actions' /></div>"},
-        BAlert: {template: "<div data-testid='alert-sem-mapas'><slot /></div>"},
+        BAlert: {template: "<div class='alert-stub'><slot /></div>"},
+        EmptyState: {
+            props: ["title", "description", "icon"],
+            template: "<div data-testid='empty-state-stub'><h1>{{ title }}</h1><p>{{ description }}</p></div>"
+        },
         BCard: {template: "<div v-bind='$attrs'><slot /></div>"},
         BCardBody: {template: "<div><slot /></div>"},
         BCardTitle: {template: "<div><slot /></div>"},
@@ -233,7 +237,7 @@ describe("RelatorioMapasView.vue", () => {
         }, stubs));
         await flushPromises();
 
-        expect(ctx.wrapper.find("[data-testid='alert-sem-mapas']").exists()).toBe(true);
+        expect(ctx.wrapper.find("[data-testid='empty-state-stub']").exists()).toBe(true);
         expect(ctx.wrapper.text()).toContain("Não há mapas vigentes.");
         expect(ctx.wrapper.find("[data-testid='container-arvore-unidades-mapas']").exists()).toBe(false);
     });
@@ -249,7 +253,7 @@ describe("RelatorioMapasView.vue", () => {
         }, stubs));
         await flushPromises();
 
-        expect(ctx.wrapper.find("[data-testid='alert-sem-mapas']").exists()).toBe(true);
+        expect(ctx.wrapper.find("[data-testid='empty-state-stub']").exists()).toBe(true);
         expect(ctx.wrapper.text()).toContain("Não há mapas vigentes para sua unidade ou unidades subordinadas.");
         expect(ctx.wrapper.find("[data-testid='container-arvore-unidades-mapas']").exists()).toBe(false);
     });

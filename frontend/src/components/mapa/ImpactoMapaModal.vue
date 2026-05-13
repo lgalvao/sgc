@@ -13,10 +13,10 @@
     </div>
 
     <div v-else-if="impacto" class="impacto-container" data-testid="modal-impacto-body">
-      <BAlert v-if="!impacto.temImpactos" :model-value="true" variant="success">
-        <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        {{ TEXTOS.mapa.impacto.SEM_IMPACTOS }}
-      </BAlert>
+      <div v-if="!impacto.temImpactos" class="text-center py-4" data-testid="alert-sem-impactos">
+        <i aria-hidden="true" class="bi bi-check-circle-fill fs-3 text-success d-block mb-2"/>
+        <span class="text-success fw-medium">{{ TEXTOS.mapa.impacto.SEM_IMPACTOS }}</span>
+      </div>
 
       <div v-else>
         <!-- 7.1 Atividades Inseridas -->

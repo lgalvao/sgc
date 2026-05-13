@@ -75,6 +75,7 @@ export function useSubprocessoCarregamento({
         if (!codigo) return;
 
         await garantirContextoEdicao(codigo, true);
+        exibirToastPendente();
     }
 
     onMounted(async () => {

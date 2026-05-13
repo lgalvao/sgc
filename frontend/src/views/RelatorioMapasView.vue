@@ -11,12 +11,14 @@
         </template>
       </PageHeader>
 
-      <BAlert v-if="semMapasDisponiveis" dismissible show variant="info">
-        {{ mensagemSemMapasDisponiveis }}
-      </BAlert>
+      <EmptyState
+          v-if="semMapasDisponiveis"
+          :title="mensagemSemMapasDisponiveis"
+          icon="bi-file-earmark-spreadsheet"
+      />
 
       <RelatorioMapasFiltros
-          v-else
+          v-else-if="unidadesDisponiveis.length > 0"
           :carregando="carregando"
           :tem-unidades-selecionadas="temUnidadesSelecionadas"
           :unidades-disponiveis="unidadesDisponiveis"
@@ -43,6 +45,7 @@ import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import RelatorioMapasFiltros from "@/components/relatorios/RelatorioMapasFiltros.vue";
 import RelatorioMapaVigenteCard from "@/components/relatorios/RelatorioMapaVigenteCard.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";

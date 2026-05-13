@@ -65,6 +65,20 @@ const SubprocessoModalStub = {
     emits: ['confirmar-alteracao', 'fechar-modal']
 };
 
+const toast = {
+    success: vi.fn(),
+};
+vi.mock('bootstrap-vue-next', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('bootstrap-vue-next')>();
+    return {
+        ...actual,
+        useToast: () => ({
+            show: vi.fn(),
+            success: toast.success,
+        }),
+    };
+});
+
 vi.mock('@/services/processo', () => ({
     reabrirCadastro: vi.fn(),
     enviarLembrete: vi.fn(),
@@ -422,6 +436,7 @@ describe('SubprocessoView.vue', () => {
 
         expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
         expect(vm.mostrarModalAlterarDataLimite).toBe(false);
+        expect(toast.success).toHaveBeenCalledWith(expect.stringContaining(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA));
     });
 
     it('trata erro ao alterar data limite', async () => {
@@ -517,6 +532,7 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.enviarLembrete).toHaveBeenCalledWith(1, 1);
+        expect(toast.success).toHaveBeenCalledWith(expect.stringContaining(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO));
     });
 
     it('trata erro ao enviar lembrete', async () => {

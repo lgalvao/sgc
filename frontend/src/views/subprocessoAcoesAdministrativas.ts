@@ -5,6 +5,7 @@ import {TEXTOS} from "@/constants/textos";
 import type {SubprocessoDetalhe} from "@/types/tipos";
 import {formatarDataBR} from "@/utils";
 import logger from "@/utils/logger";
+import {useToastStore} from "@/stores/toast";
 
 type TipoReabertura = "cadastro" | "revisao";
 
@@ -72,6 +73,7 @@ export function useSubprocessoAcoesAdministrativas({
                                                        garantirContextoEdicao,
                                                    }: DependenciasSubprocessoAcoesAdministrativas) {
     const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+    const toastStore = useToastStore();
     const estadoModais = reactive({
         modalLembreteAberto: false,
         mostrarModalAlterarDataLimite: false,
@@ -108,7 +110,7 @@ export function useSubprocessoAcoesAdministrativas({
         await executarComNotificacaoDeErro(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, notify, async () => {
             await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             fecharModalAlterarDataLimite();
-            notify(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`, "success");
+            toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
             // ProcessoResumo.dataLimite é exibido no painel — invalida para refletir a mudança
             invalidarCachesSubprocesso({incluirPainel: true});
             await atualizarSubprocessoAtual();
@@ -167,7 +169,8 @@ export function useSubprocessoAcoesAdministrativas({
             await enviarLembrete(codProcesso, detalhe.unidade.codigo);
             await garantirContextoEdicao(codigo, true);
             modalLembreteAberto.value = false;
-            notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, "success");
+            toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
+            exibirToastPendente();
         });
     }
 

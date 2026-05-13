@@ -13,15 +13,14 @@
                 <BSpinner label="Carregando dados" variant="primary"/>
             </div>
             <template v-else>
-                <BAlert
+                <div
                     v-if="historico.length === 0"
-                    :fade="false"
-                    :model-value="true"
+                    class="text-center py-3 text-muted"
                     data-testid="alert-historico-vazio"
-                    variant="secondary"
                 >
+                    <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
                     Nenhuma análise registrada para este mapa.
-                </BAlert>
+                </div>
                 <div v-else>
                     <BTable
                         :fields="fields"
