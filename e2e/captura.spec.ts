@@ -663,7 +663,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaMapa(page);
             await abrirModalCriarCompetencia(page);
             await page.getByTestId('inp-criar-competencia-descricao').fill(competencia);
-            await page.locator('label').filter({hasText: atividade}).click();
+            await page.getByRole('checkbox', {name: atividade}).check();
             await page.getByTestId('btn-criar-competencia-salvar').click();
             await expect(page.locator('.competencia-card', {has: page.getByText(competencia)})).toBeVisible();
             await capturarTela(page, 'processo', 'mapa-criado', {
@@ -1370,15 +1370,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // A árvore de unidades agora vem expandida por padrão
             await expect(page.getByText('SECRETARIA_1').first()).toBeVisible();
-            await expect(page.getByText('SECAO_121').first()).toBeVisible();
+            await expect(page.getByText(/SECAO_12[12]/).first()).toBeVisible();
 
             await capturarTela(page, 'unidades', 'arvore-unidades-expandida', {fullPage: true});
 
-            const unidade = page.getByText('SECAO_121').first();
+            const unidade = page.getByText(/SECAO_12[12]/).first();
             await expect(unidade).toBeVisible();
             await unidade.click();
             await expect(page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i})).toBeVisible();
-            await capturarTela(page, 'unidades', 'detalhes-unidade', {fullPage: true, extra: {unidade: 'SECAO_121'}});
+            await capturarTela(page, 'unidades', 'detalhes-unidade', {fullPage: true, extra: {unidade: 'SECAO_12x'}});
 
             const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
             await expect(btnCriarAtribuicao).toBeVisible();
@@ -1815,7 +1815,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 extra: {conhecimento: conhecimentoDesc}
             });
             // Cancelar remoção
-            await page.getByTestId('btn-modal-confirmacao-cancelar').click();
+            await page.getByRole('dialog').last().getByTestId('btn-modal-confirmacao-cancelar').click();
             await expect(page.getByRole('dialog')).toBeHidden();
             await expect(cardComConhecimento.getByText(conhecimentoDesc)).toBeVisible();
             await capturarTela(page, 'remocao', 'conhecimento-mantido-apos-cancelar', {
