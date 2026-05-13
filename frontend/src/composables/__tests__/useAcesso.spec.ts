@@ -60,6 +60,7 @@ function criarSubprocesso(parciais: Partial<SubprocessoDetalhe> = {}): Subproces
         ultimaDataLimiteSubprocesso: '2025-01-01T00:00:00',
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         prazoEtapaAtual: '2025-01-01T00:00:00',
+        dataFimEtapa1: null,
         isEmAndamento: true,
         etapaAtual: 1,
         movimentacoes: [],
