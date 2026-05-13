@@ -12,6 +12,8 @@ public final class UtilSanitizacao {
             .allowElements("p", "br", "strong", "b", "em", "i", "u", "ul", "ol", "li")
             .toFactory();
 
+    private static final PolicyFactory POLITICA_TEXTO_PURO = new HtmlPolicyBuilder().toFactory();
+
     private UtilSanitizacao() {
         // Construtor privado para impedir instanciação
     }
@@ -21,5 +23,12 @@ public final class UtilSanitizacao {
      */
     public static String sanitizar(@Nullable String entrada) {
         return POLITICA_PADRAO.sanitize(entrada);
+    }
+
+    /**
+     * Remove todas as tags HTML do texto fornecido.
+     */
+    public static String limparTags(@Nullable String entrada) {
+        return POLITICA_TEXTO_PURO.sanitize(entrada);
     }
 }

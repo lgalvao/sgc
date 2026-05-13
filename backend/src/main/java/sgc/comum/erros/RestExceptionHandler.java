@@ -41,7 +41,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     );
 
     private String sanitizar(@Nullable String texto) {
-        return UtilSanitizacao.sanitizar(texto);
+        return UtilSanitizacao.limparTags(texto);
     }
 
     private ResponseEntity<@NonNull ErroApi> buildResponseEntity(ErroApi erroApi) {
