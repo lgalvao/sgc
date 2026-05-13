@@ -120,34 +120,37 @@ const mensagemErroSelecao = computed(() => {
 });
 
 const ultimaDataLimiteSelecionada = computed(() => {
-  return props.unidades
+  const datasSelecionadas = props.unidades
       .filter(unidade => selecionadosLocal.value.includes(unidade.codigo))
       .map(unidade => extrairData(unidade.ultimaDataLimite))
-      .filter(Boolean)
-      .reduce<string>((maior, atual) => !maior || atual > maior ? atual : maior, '');
+      .filter(data => data.length > 0);
+  if (datasSelecionadas.length === 0) {
+    return "";
+  }
+  return datasSelecionadas.reduce((maior, atual) => atual > maior ? atual : maior);
 });
 
 const dataMinimaPermitida = computed(() => {
   const amanha = obterAmanhaFormatado();
   const ultimaDataLimite = ultimaDataLimiteSelecionada.value;
-  if (!ultimaDataLimite) return amanha;
+  if (ultimaDataLimite.length === 0) return amanha;
   return ultimaDataLimite > amanha ? ultimaDataLimite : amanha;
 });
 
 const dataMinimaPermitidaFormatada = computed(() => {
-  return dataMinimaPermitida.value ? formatarDataBR(dataMinimaPermitida.value) : "";
+  return formatarDataBR(dataMinimaPermitida.value);
 });
 
 watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) => {
   erroLocalDataLimite.value = "";
-  if (!novaData || novaData.length !== 10 || !props.mostrarDataLimite) {
+  if (novaData.length !== 10 || !props.mostrarDataLimite) {
     return;
   }
   if (!ehDataEstritamenteFutura(novaData)) {
     erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
     return;
   }
-  if (ultimaDataLimite && novaData < ultimaDataLimite) {
+  if (ultimaDataLimite.length > 0 && novaData < ultimaDataLimite) {
     erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite das unidades selecionadas.";
   }
 });
@@ -215,7 +218,10 @@ function setErro(msg: string | null) {
 }
 
 function extrairData(data?: string) {
-  return data?.split("T")[0] || "";
+  if (typeof data !== "string" || data.length === 0) {
+    return "";
+  }
+  return data.split("T")[0];
 }
 
 defineExpose({

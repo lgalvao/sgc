@@ -214,25 +214,26 @@ function normalizarTipoChave(tipo: string): string {
 }
 
 function formatarTipo(tipo: string): string {
-  const chave = normalizarTipoChave(tipo || "");
+  const chave = normalizarTipoChave(tipo);
   const configuracao = CONFIG_TIPO_FEEDBACK[chave];
   return configuracao?.rotulo ?? (chave.charAt(0) + chave.slice(1).toLowerCase());
 }
 
 function obterVarianteTipo(tipo: string): VarianteTipoFeedback {
-  const chave = normalizarTipoChave(tipo || "");
+  const chave = normalizarTipoChave(tipo);
   return CONFIG_TIPO_FEEDBACK[chave]?.variante ?? "secondary";
 }
 
 function obterIconeTipo(tipo: string): string {
-  const chave = normalizarTipoChave(tipo || "");
+  const chave = normalizarTipoChave(tipo);
   return CONFIG_TIPO_FEEDBACK[chave]?.icone ?? ICONE_TIPO_PADRAO;
 }
 
 function resumirNota(nota: string): string {
   if (!nota) return "";
   const doc = new DOMParser().parseFromString(nota, "text/html");
-  const textoLimpo = (doc.body.textContent || "").replaceAll(/\s+/g, " ").trim();
+  const textoBruto = doc.body.textContent ?? "";
+  const textoLimpo = textoBruto.replaceAll(/\s+/g, " ").trim();
 
   if (textoLimpo.length <= 120) {
     return textoLimpo;
@@ -322,7 +323,13 @@ function compactarAcesso(raw: Record<string, unknown>, filtrado: Record<string, 
     return;
   }
 
-  filtrado["Acesso"] = `${perfilAtivo || "-"} - ${unidadeAtiva || "-"}`;
+  if (perfilAtivo && unidadeAtiva) {
+    filtrado["Acesso"] = `${perfilAtivo} - ${unidadeAtiva}`;
+  } else if (perfilAtivo) {
+    filtrado["Acesso"] = perfilAtivo;
+  } else {
+    filtrado["Acesso"] = unidadeAtiva;
+  }
   chavesIgnorar.add("perfilAtivo");
   chavesIgnorar.add("unidadeAtiva");
 }
@@ -361,7 +368,7 @@ async function carregar() {
   try {
     feedbacks.value = await listarFeedbacksAdmin();
   } catch (error) {
-    erro.value = normalizarErro(error).mensagem || TEXTOS.administracao.FEEDBACKS_ERRO_CARREGAR;
+    erro.value = normalizarErro(error).mensagem;
   } finally {
     carregando.value = false;
   }
