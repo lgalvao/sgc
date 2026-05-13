@@ -11,7 +11,7 @@
         </template>
       </PageHeader>
 
-      <BAlert v-if="semMapasDisponiveis" show variant="info">
+      <BAlert v-if="semMapasDisponiveis" dismissible show variant="info">
         {{ mensagemSemMapasDisponiveis }}
       </BAlert>
 

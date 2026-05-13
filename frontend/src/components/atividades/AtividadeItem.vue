@@ -53,6 +53,7 @@
           :model-value="true"
           class="mt-2 py-2 mb-0"
           data-testid="atividade-erro-validacao"
+          dismissible
           variant="danger"
       >
         <i aria-hidden="true" class="bi bi-exclamation-circle-fill me-2"/>

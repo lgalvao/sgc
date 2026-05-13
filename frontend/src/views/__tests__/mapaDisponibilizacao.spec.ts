@@ -49,9 +49,10 @@ describe('mapaDisponibilizacao.ts', () => {
         it('deve mostrar erro se não puder confirmar', () => {
             const deps = criarDependencias()
             deps.competencias.value = []
-            const {abrirModalDisponibilizar, erroValidacaoMapa} = useMapaDisponibilizacao(deps as any)
+            const {abrirModalDisponibilizar, erroValidacaoMapa, erroValidacaoMapaTick} = useMapaDisponibilizacao(deps as any)
             abrirModalDisponibilizar()
             expect(erroValidacaoMapa.value).toBe(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)
+            expect(erroValidacaoMapaTick.value).toBe(1)
             expect(deps.mostrarModalDisponibilizar.value).toBe(false)
         })
 
@@ -103,13 +104,14 @@ describe('mapaDisponibilizacao.ts', () => {
 
     it('deve limpar erros do mapa', () => {
         const deps = criarDependencias()
-        const {limparErroMapa, erroValidacaoMapa} = useMapaDisponibilizacao(deps as any)
+        const {limparErroMapa, erroValidacaoMapa, erroValidacaoMapaTick} = useMapaDisponibilizacao(deps as any)
         const erroMapa = ref<string | null>('erro')
         erroValidacaoMapa.value = 'erro local'
 
         limparErroMapa(erroMapa)
 
         expect(erroValidacaoMapa.value).toBe('')
+        expect(erroValidacaoMapaTick.value).toBe(1)
         expect(erroMapa.value).toBe(null)
     })
 })

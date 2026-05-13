@@ -1,10 +1,10 @@
 <template>
   <BAlert
       v-if="mensagem || notificacao"
-      :dispensavel="dispensavel"
+      :dismissible="dispensavel"
       :fade="false"
       :model-value="true"
-      :variante="variante"
+      :variant="variante"
       class="mb-3"
       data-testid="app-alert"
       @dismissed="emit('dismissed')"

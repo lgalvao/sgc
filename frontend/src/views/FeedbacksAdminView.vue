@@ -17,7 +17,7 @@
         </template>
       </PageHeader>
 
-      <BAlert v-if="erro" :model-value="true" variant="danger">
+      <BAlert v-if="erro" :model-value="true" dismissible variant="danger">
         {{ erro }}
       </BAlert>
 

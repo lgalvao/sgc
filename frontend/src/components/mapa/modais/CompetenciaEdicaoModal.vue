@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {BAlert, BButton, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
@@ -87,8 +87,9 @@ function limparSelecaoAtividades() {
         @fechar="emit('fechar')"
         @shown="nextTick(() => inputRef?.$el?.focus())"
     >
-        <BAlert v-if="fieldErrors?.generic" :model-value="true" class="mb-4" variant="danger">
-            {{ fieldErrors.generic }}
+        <BAlert v-if="fieldErrors?.generic " :model-value="true" class="mb-4" dismissible variant="danger">
+
+          {{ fieldErrors.generic }}
         </BAlert>
         <div class="mb-4">
             <h5>Descrição <span aria-hidden="true" class="text-danger">*</span></h5>

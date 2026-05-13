@@ -20,7 +20,7 @@
         </template>
       </PageHeader>
 
-      <BAlert v-if="erroAdmins" :model-value="true" variant="danger">
+      <BAlert v-if="erroAdmins" :model-value="true" dismissible variant="danger">
         {{ erroAdmins }}
       </BAlert>
 
@@ -73,7 +73,7 @@
           @confirmar="adicionarAdmin"
           @shown="() => inputTituloRef?.focus()"
       >
-        <BAlert v-if="erroAdicionarAdmin" :model-value="true" class="mb-3" variant="danger">
+        <BAlert v-if="erroAdicionarAdmin" :model-value="true" class="mb-3" dismissible variant="danger">
           {{ erroAdicionarAdmin }}
         </BAlert>
         <BFormGroup
@@ -104,7 +104,7 @@
           variant="danger"
           @confirmar="removerAdmin"
       >
-        <BAlert v-if="erroRemoverAdmin" :model-value="true" class="mb-3" variant="danger">
+        <BAlert v-if="erroRemoverAdmin" :model-value="true" class="mb-3" dismissible variant="danger">
           {{ erroRemoverAdmin }}
         </BAlert>
         <p v-if="adminParaRemover">
