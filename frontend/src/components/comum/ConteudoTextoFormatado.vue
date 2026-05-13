@@ -10,6 +10,7 @@ withDefaults(defineProps<{
 </script>
 
 <template>
+    <!-- eslint-disable vue/no-v-html -->
     <div
         v-if="conteudo"
         :data-testid="testId"

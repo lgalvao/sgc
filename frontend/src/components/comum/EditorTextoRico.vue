@@ -15,6 +15,7 @@ const props = withDefaults(defineProps<{
     rotulo?: string;
     minimoAltura?: string;
 }>(), {
+    id: undefined,
     desabilitado: false,
     rotulo: "Editor de texto",
     minimoAltura: "12rem",
