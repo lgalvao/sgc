@@ -1,0 +1,147 @@
+{
+  "geradoEm": "2026-05-13T21:43:20.600Z",
+  "base": "/home/runner/work/sgc/sgc",
+  "pontuacao": {
+    "total": 1715,
+    "faixa": "critico",
+    "porEscopo": {
+      "backend": 1128,
+      "frontend": 80,
+      "frontend_testes": 507
+    }
+  },
+  "contagens": {
+    "backend_nullable_dto": 126,
+    "backend_null_checks": 240,
+    "backend_objects_null": 9,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": 507,
+    "frontend_catch_any": 0,
+    "frontend_null_checks": 28,
+    "frontend_fallback_or": 24
+  },
+  "deltas": {
+    "backend_nullable_dto": 126,
+    "backend_null_checks": 240,
+    "backend_objects_null": 9,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": 507,
+    "frontend_catch_any": 0,
+    "frontend_null_checks": 28,
+    "frontend_fallback_or": 24
+  },
+  "hotspots": [
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/dto/UnidadeDto.java",
+      "pontuacao": 58,
+      "categorias": {
+        "backend_nullable_dto": 10,
+        "backend_null_checks": 4
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/alerta/dto/NotificacaoDto.java",
+      "pontuacao": 51,
+      "categorias": {
+        "backend_nullable_dto": 9,
+        "backend_null_checks": 3
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
+      "pontuacao": 44,
+      "categorias": {
+        "frontend_any_testes": 44
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoResumoDto.java",
+      "pontuacao": 36,
+      "categorias": {
+        "backend_nullable_dto": 6,
+        "backend_null_checks": 3
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/ProcessoView.spec.ts",
+      "pontuacao": 35,
+      "categorias": {
+        "frontend_any_testes": 35
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pontuacao": 34,
+      "categorias": {
+        "backend_null_checks": 16,
+        "backend_objects_null": 1
+      }
+    },
+    {
+      "arquivo": "frontend/src/components/__tests__/ArvoreUnidades.spec.ts",
+      "pontuacao": 33,
+      "categorias": {
+        "frontend_any_testes": 33
+      }
+    },
+    {
+      "arquivo": "frontend/src/stores/__tests__/subprocesso.spec.ts",
+      "pontuacao": 31,
+      "categorias": {
+        "frontend_any_testes": 31
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java",
+      "pontuacao": 30,
+      "categorias": {
+        "backend_null_checks": 14,
+        "backend_objects_null": 1
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/AtualizarSubprocessoRequest.java",
+      "pontuacao": 30,
+      "categorias": {
+        "backend_nullable_dto": 6
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java",
+      "pontuacao": 29,
+      "categorias": {
+        "backend_nullable_dto": 5,
+        "backend_null_checks": 2
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "pontuacao": 26,
+      "categorias": {
+        "backend_null_checks": 13
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/alerta/dto/AlertaDto.java",
+      "pontuacao": 25,
+      "categorias": {
+        "backend_nullable_dto": 5
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoListagemDto.java",
+      "pontuacao": 25,
+      "categorias": {
+        "backend_nullable_dto": 5
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/relatorio/RelatorioFacade.java",
+      "pontuacao": 24,
+      "categorias": {
+        "backend_null_checks": 11,
+        "backend_objects_null": 1
+      }
+    }
+  ]
+}
