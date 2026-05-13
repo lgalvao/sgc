@@ -122,9 +122,14 @@ function clearError() {
 }
 
 function possuiDadosLocaisValidos(): boolean {
+  const unidadeEmCache = unidadeStore.cacheUnidades.get(props.codUnidade);
+  const mapaVigenteEmCache = unidadeStore.cacheMapasVigentes.get(props.codUnidade);
+
   return unidade.value?.codigo === props.codUnidade
       && unidadeStore.cacheUnidades.has(props.codUnidade)
       && unidadeStore.cacheMapasVigentes.has(props.codUnidade)
+      && unidade.value === unidadeEmCache
+      && mapaVigente.value === mapaVigenteEmCache
       && !lastError.value;
 }
 

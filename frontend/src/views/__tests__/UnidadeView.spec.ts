@@ -300,7 +300,9 @@ describe('UnidadeView.vue', () => {
             dataFimResponsabilidade: null
         };
 
-        mockObterUnidade.mockResolvedValue(unidadeComAtribuicao);
+        mockObterUnidade
+            .mockResolvedValueOnce(unidadeComAtribuicao)
+            .mockResolvedValue(unidadeSemAtribuicao);
 
         const manterMontado = ref(true);
         const wrapper = createKeepAliveWrapper(manterMontado, {
@@ -321,6 +323,7 @@ describe('UnidadeView.vue', () => {
         manterMontado.value = true;
         await flushPromises();
 
+        expect(mockObterUnidade).toHaveBeenCalledTimes(1);
         expect(wrapper.find('[data-testid="unidade-view__btn-atribuicao-texto"]').text()).toBe('Criar atribuição');
         expect(wrapper.text()).toContain('Titular');
         wrapper.unmount();
