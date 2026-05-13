@@ -4,6 +4,7 @@ import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {nextTick, ref} from "vue";
 
 const {
     mockPush,
@@ -119,6 +120,33 @@ describe('UnidadeView.vue', () => {
         });
         return {wrapper: context.wrapper};
     };
+
+    const createKeepAliveWrapper = (manterMontado: { value: boolean }, initialStateOverride = {}) => mount({
+        components: {UnidadeView},
+        setup() {
+            return {manterMontado};
+        },
+        template: "<keep-alive><UnidadeView v-if='manterMontado' :cod-unidade='1' /></keep-alive>",
+    }, {
+        ...getCommonMountOptions(
+            {
+                perfil: {
+                    perfilSelecionado: 'USER',
+                    permissoesSessao: {mostrarCriarAtribuicaoTemporaria: false},
+                },
+                ...initialStateOverride
+            },
+            {
+                BContainer: {template: '<div><slot /></div>'},
+                BCard: {template: '<div><slot /></div>'},
+                BCardBody: {template: '<div><slot /></div>'},
+                BButton: {template: `<button @click="$emit('click')"><slot /></button>`},
+                BAlert: {template: '<div><slot /></div>', emits: ['dismissed']},
+                TreeTable: TreeTableStub,
+            },
+            {stubActions: false}
+        )
+    });
 
     it('fetches data on mount', async () => {
         createWrapper();
@@ -257,5 +285,44 @@ describe('UnidadeView.vue', () => {
 
         expect(wrapper.text()).toContain('Editar atribuição');
         expect(wrapper.text()).toContain('Atrib. temporária');
+    });
+
+    it('reaplica o snapshot atualizado da store ao reativar a view', async () => {
+        const unidadeComAtribuicao = {
+            ...mockUnidadeData,
+            tipoResponsabilidade: 'ATRIBUICAO_TEMPORARIA',
+            dataFimResponsabilidade: '2026-05-30T23:59:59'
+        };
+        const unidadeSemAtribuicao = {
+            ...mockUnidadeData,
+            responsavel: mockUnidadeData.titular,
+            tipoResponsabilidade: 'TITULAR',
+            dataFimResponsabilidade: null
+        };
+
+        mockObterUnidade.mockResolvedValue(unidadeComAtribuicao);
+
+        const manterMontado = ref(true);
+        const wrapper = createKeepAliveWrapper(manterMontado, {
+            perfil: {
+                perfilSelecionado: 'ADMIN',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: true},
+            },
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="unidade-view__btn-atribuicao-texto"]').text()).toBe('Editar atribuição');
+
+        mockUnidadeStore.cacheUnidades.set(1, unidadeSemAtribuicao);
+        mockUnidadeStore.cacheMapasVigentes.set(1, null);
+
+        manterMontado.value = false;
+        await nextTick();
+        manterMontado.value = true;
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="unidade-view__btn-atribuicao-texto"]').text()).toBe('Criar atribuição');
+        expect(wrapper.text()).toContain('Titular');
+        wrapper.unmount();
     });
 });

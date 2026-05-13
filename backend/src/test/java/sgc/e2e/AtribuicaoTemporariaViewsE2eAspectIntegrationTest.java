@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.service.*;
 
+import java.sql.Timestamp;
 import java.time.*;
 
 import static org.assertj.core.api.Assertions.*;

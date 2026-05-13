@@ -98,10 +98,10 @@ import UnidadeContatoInfo from "@/components/unidade/UnidadeContatoInfo.vue";
 import {useUnidadeStore} from "@/stores/unidade";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
-import {logger} from "@/utils";
+import {logger,formatarDataBR} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
-import {formatarDataBR} from "@/utils";
+
 
 const props = defineProps<{ codUnidade: number }>();
 
@@ -126,6 +126,18 @@ function possuiDadosLocaisValidos(): boolean {
       && unidadeStore.cacheUnidades.has(props.codUnidade)
       && unidadeStore.cacheMapasVigentes.has(props.codUnidade)
       && !lastError.value;
+}
+
+function reaplicarDadosDoCache(): boolean {
+  if (!unidadeStore.cacheUnidades.has(props.codUnidade) || !unidadeStore.cacheMapasVigentes.has(props.codUnidade)) {
+    return false;
+  }
+
+  unidade.value = unidadeStore.cacheUnidades.get(props.codUnidade) ?? null;
+  definirUnidadeAtual(unidade.value);
+  mapaVigente.value = unidadeStore.cacheMapasVigentes.get(props.codUnidade) ?? null;
+  carregandoPagina.value = false;
+  return true;
 }
 
 function deveExibirCarregamento(forcar: boolean): boolean {
@@ -199,6 +211,9 @@ onActivated(async () => {
     return;
   }
   if (possuiDadosLocaisValidos()) {
+    return;
+  }
+  if (reaplicarDadosDoCache()) {
     return;
   }
   await carregarDados();

@@ -2,120 +2,121 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {loginComPerfil} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
-test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
-    const SIGLA_UNIDADE = 'ASSESSORIA_11';
-    const TITULO_USUARIO_ALVO = '232323';
-    const NOME_USUARIO_ALVO = 'Bon Jovi';
-    const PERFIL_TEMPORARIO = 'CHEFE - ASSESSORIA_11';
-    const SIGLAS_SUBARVORE_SECRETARIA_1 = [
-        'ASSESSORIA_11',
-        'ASSESSORIA_12',
-        'COORD_11',
-        'COORD_12'
-    ];
-    const SIGLAS_SUBARVORE_SECRETARIA_2 = [
-        'ASSESSORIA_21',
-        'ASSESSORIA_22',
-        'COORD_21',
-        'COORD_22'
-    ];
-    const SIGLAS_SUBARVORE_SECRETARIA_3 = [
-        'ASSESSORIA_31',
-        'ASSESSORIA_32',
-        'COORD_31',
-        'COORD_32'
-    ];
+const SIGLA_UNIDADE = 'ASSESSORIA_11';
+const TITULO_USUARIO_ALVO = '232323';
+const NOME_USUARIO_ALVO = 'Bon Jovi';
+const PERFIL_TEMPORARIO = 'CHEFE - ASSESSORIA_11';
+const SIGLAS_SUBARVORE_SECRETARIA_1 = [
+    'ASSESSORIA_11',
+    'ASSESSORIA_12',
+    'COORD_11',
+    'COORD_12'
+];
+const SIGLAS_SUBARVORE_SECRETARIA_2 = [
+    'ASSESSORIA_21',
+    'ASSESSORIA_22',
+    'COORD_21',
+    'COORD_22'
+];
+const SIGLAS_SUBARVORE_SECRETARIA_3 = [
+    'ASSESSORIA_31',
+    'ASSESSORIA_32',
+    'COORD_31',
+    'COORD_32'
+];
 
-    function formatarDataInput(data: Date) {
-        return data.toISOString().slice(0, 10);
+function formatarDataInput(data: Date) {
+    return data.toISOString().slice(0, 10);
+}
+
+function obterPeriodoVigente() {
+    const inicio = new Date();
+    const termino = new Date();
+    termino.setDate(termino.getDate() + 30);
+    return {
+        dataInicio: formatarDataInput(inicio),
+        dataTermino: formatarDataInput(termino),
+    };
+}
+
+async function validarRamoUnidade(
+    page: import('@playwright/test').Page,
+    siglaRamo: string,
+    siglasFilhas: string[]
+) {
+    const tabela = page.getByTestId('tbl-tree');
+    await expect(tabela.getByText(new RegExp(String.raw`^${siglaRamo}\s+-\s+`)).first()).toBeVisible();
+    for (const siglaFilha of siglasFilhas) {
+        await expect(tabela.getByText(new RegExp(String.raw`^${siglaFilha}\s+-\s+`)).first()).toBeVisible();
     }
+}
 
-    function obterPeriodoVigente() {
-        const inicio = new Date();
-        const termino = new Date();
-        termino.setDate(termino.getDate() + 30);
-        return {
-            dataInicio: formatarDataInput(inicio),
-            dataTermino: formatarDataInput(termino),
-        };
-    }
+async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
+    const tabela = page.getByTestId('tbl-tree');
+    await expect(tabela.getByText(/^SECRETARIA_1\s+-\s+/).first()).toBeVisible();
+    await expect(tabela.getByText(/^SECRETARIA_2\s+-\s+/).first()).toBeVisible();
+    const textoUnidade = tabela.getByText(new RegExp(String.raw`^${SIGLA_UNIDADE}\s+-\s+`)).first();
+    await expect(textoUnidade).toBeVisible();
+    await textoUnidade.click();
+}
 
-    async function validarRamoUnidade(
-        page: import('@playwright/test').Page,
-        siglaRamo: string,
-        siglasFilhas: string[]
-    ) {
-        const tabela = page.getByTestId('tbl-tree');
-        await expect(tabela.getByText(new RegExp(String.raw`^${siglaRamo}\s+-\s+`)).first()).toBeVisible();
-        for (const siglaFilha of siglasFilhas) {
-            await expect(tabela.getByText(new RegExp(String.raw`^${siglaFilha}\s+-\s+`)).first()).toBeVisible();
-        }
-    }
+async function garantirSemAtribuicaoVigente(page: import('@playwright/test').Page) {
+    await acessarUnidadeAlvo(page);
+    await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
+    await expect(page.getByTestId('unidade-view__titulo')).toHaveText(SIGLA_UNIDADE);
 
-    async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
-        const tabela = page.getByTestId('tbl-tree');
-        await expect(tabela.getByText(/^SECRETARIA_1\s+-\s+/).first()).toBeVisible();
-        await expect(tabela.getByText(/^SECRETARIA_2\s+-\s+/).first()).toBeVisible();
-        const textoUnidade = tabela.getByText(new RegExp(String.raw`^${SIGLA_UNIDADE}\s+-\s+`)).first();
-        await expect(textoUnidade).toBeVisible();
-        await textoUnidade.click();
-    }
-
-    async function garantirSemAtribuicaoVigente(page: import('@playwright/test').Page) {
-        await acessarUnidadeAlvo(page);
-        await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
-        await expect(page.getByTestId('unidade-view__titulo')).toHaveText(SIGLA_UNIDADE);
-
-        const textoBotaoAtribuicao = page.getByTestId('unidade-view__btn-atribuicao-texto');
-        if (await textoBotaoAtribuicao.isVisible().catch(() => false) && await textoBotaoAtribuicao.textContent() === 'Editar atribuição') {
-            await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
-            await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
-            await expect(page.getByTestId('btn-remover-atribuicao')).toBeVisible();
-
-            await page.getByTestId('btn-remover-atribuicao').click();
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-            await modal.getByRole('button', {name: 'Remover'}).click();
-            await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO).first()).toBeVisible();
-
-            await page.getByTestId('btn-cancelar-atribuicao').click();
-            await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
-        }
-
-        await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Criar atribuição');
-    }
-
-    async function abrirTelaCriacaoAtribuicao(page: import('@playwright/test').Page) {
-        await garantirSemAtribuicaoVigente(page);
+    const textoBotaoAtribuicao = page.getByTestId('unidade-view__btn-atribuicao-texto');
+    if (await textoBotaoAtribuicao.isVisible().catch(() => false) && await textoBotaoAtribuicao.textContent() === 'Editar atribuição') {
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
+        await expect(page.getByTestId('btn-remover-atribuicao')).toBeVisible();
+
+        await page.getByTestId('btn-remover-atribuicao').click();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await modal.getByRole('button', {name: 'Remover'}).click();
+        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO).first()).toBeVisible();
+
+        await page.getByTestId('btn-cancelar-atribuicao').click();
+        await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
     }
 
-    async function criarAtribuicaoVigente(page: import('@playwright/test').Page, justificativa = 'Cobertura de férias') {
-        const {dataInicio, dataTermino} = obterPeriodoVigente();
+    await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Criar atribuição');
+}
 
-        await abrirTelaCriacaoAtribuicao(page);
-        await selecionarUsuarioAlvo(page);
-        await page.getByTestId('input-data-inicio').fill(dataInicio);
-        await page.getByTestId('input-data-termino').fill(dataTermino);
-        await page.getByTestId('textarea-justificativa').fill(justificativa);
-        await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
-        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO).first()).toBeVisible();
-    }
+async function abrirTelaCriacaoAtribuicao(page: import('@playwright/test').Page) {
+    await garantirSemAtribuicaoVigente(page);
+    await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
+    await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
+}
 
-    async function selecionarUsuarioAlvo(page: import('@playwright/test').Page) {
-        const inputBusca = page.getByTestId('input-busca-usuario');
-        await inputBusca.click();
-        await inputBusca.pressSequentially(TITULO_USUARIO_ALVO, {delay: 100});
+async function criarAtribuicaoVigente(page: import('@playwright/test').Page, justificativa = 'Cobertura de férias') {
+    const {dataInicio, dataTermino} = obterPeriodoVigente();
 
-        const listaResultados = page.getByTestId('lista-usuarios-pesquisa');
-        await expect(listaResultados).toBeVisible();
+    await abrirTelaCriacaoAtribuicao(page);
+    await selecionarUsuarioAlvo(page);
+    await page.getByTestId('input-data-inicio').fill(dataInicio);
+    await page.getByTestId('input-data-termino').fill(dataTermino);
+    await page.getByTestId('textarea-justificativa').fill(justificativa);
+    await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
+    await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO).first()).toBeVisible();
+}
 
-        const opcaoUsuario = page.getByTestId(new RegExp(`opcao-usuario-${TITULO_USUARIO_ALVO}`)).filter({hasText: NOME_USUARIO_ALVO}).first();
-        await expect(opcaoUsuario).toBeVisible();
-        await opcaoUsuario.click();
-        await expect(listaResultados).toBeHidden();
-    }
+async function selecionarUsuarioAlvo(page: import('@playwright/test').Page) {
+    const inputBusca = page.getByTestId('input-busca-usuario');
+    await inputBusca.click();
+    await inputBusca.pressSequentially(TITULO_USUARIO_ALVO, {delay: 100});
+
+    const listaResultados = page.getByTestId('lista-usuarios-pesquisa');
+    await expect(listaResultados).toBeVisible();
+
+    const opcaoUsuario = page.getByTestId(new RegExp(`opcao-usuario-${TITULO_USUARIO_ALVO}`)).filter({hasText: NOME_USUARIO_ALVO}).first();
+    await expect(opcaoUsuario).toBeVisible();
+    await opcaoUsuario.click();
+    await expect(listaResultados).toBeHidden();
+}
+
+test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
     test.beforeEach(async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await page.getByRole('link', {name: /Unidades/i}).click();
