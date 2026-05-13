@@ -646,8 +646,13 @@ public class ProcessoService {
             Usuario usuario,
             @Nullable Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        return isSituacaoCadastroDisponibilizado(subprocesso.getSituacao())
-                && verificarPermissaoEscritaEmBloco(usuario, subprocesso, ACEITAR_CADASTRO, localizacoesPrecarregadas);
+        return podeExecutarAcaoEmBloco(
+                subprocesso,
+                usuario,
+                localizacoesPrecarregadas,
+                ACEITAR_CADASTRO,
+                this::isSituacaoCadastroDisponibilizado
+        );
     }
 
     private boolean podeAceitarMapaEmBloco(
@@ -655,8 +660,13 @@ public class ProcessoService {
             Usuario usuario,
             @Nullable Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        return isSituacaoMapaAceitavel(subprocesso.getSituacao())
-                && verificarPermissaoEscritaEmBloco(usuario, subprocesso, ACEITAR_MAPA, localizacoesPrecarregadas);
+        return podeExecutarAcaoEmBloco(
+                subprocesso,
+                usuario,
+                localizacoesPrecarregadas,
+                ACEITAR_MAPA,
+                this::isSituacaoMapaAceitavel
+        );
     }
 
     private boolean podeHomologarCadastroEmBloco(
@@ -664,8 +674,13 @@ public class ProcessoService {
             Usuario usuario,
             @Nullable Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        return isSituacaoCadastroDisponibilizado(subprocesso.getSituacao())
-                && verificarPermissaoEscritaEmBloco(usuario, subprocesso, HOMOLOGAR_CADASTRO, localizacoesPrecarregadas);
+        return podeExecutarAcaoEmBloco(
+                subprocesso,
+                usuario,
+                localizacoesPrecarregadas,
+                HOMOLOGAR_CADASTRO,
+                this::isSituacaoCadastroDisponibilizado
+        );
     }
 
     private boolean podeHomologarMapaEmBloco(
@@ -673,8 +688,13 @@ public class ProcessoService {
             Usuario usuario,
             @Nullable Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        return isSituacaoMapaHomologavel(subprocesso.getSituacao())
-                && verificarPermissaoEscritaEmBloco(usuario, subprocesso, HOMOLOGAR_MAPA, localizacoesPrecarregadas);
+        return podeExecutarAcaoEmBloco(
+                subprocesso,
+                usuario,
+                localizacoesPrecarregadas,
+                HOMOLOGAR_MAPA,
+                this::isSituacaoMapaHomologavel
+        );
     }
 
     private boolean podeDisponibilizarEmBloco(
@@ -690,6 +710,17 @@ public class ProcessoService {
                 || situacao == REVISAO_CADASTRO_HOMOLOGADA;
         return elegivelDisponibilizacao
                 && verificarPermissaoEscritaEmBloco(usuario, subprocesso, DISPONIBILIZAR_MAPA, localizacoesPrecarregadas);
+    }
+
+    private boolean podeExecutarAcaoEmBloco(
+            Subprocesso subprocesso,
+            Usuario usuario,
+            @Nullable Map<Long, Unidade> localizacoesPrecarregadas,
+            AcaoPermissao acao,
+            java.util.function.Predicate<SituacaoSubprocesso> criterioSituacao
+    ) {
+        return criterioSituacao.test(subprocesso.getSituacao())
+                && verificarPermissaoEscritaEmBloco(usuario, subprocesso, acao, localizacoesPrecarregadas);
     }
 
     private boolean verificarPermissaoEscritaEmBloco(

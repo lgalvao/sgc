@@ -38,7 +38,7 @@
       >
         <template #cell(tipo)="{ item }">
           <BBadge :variant="obterVarianteTipo(item.tipo)">
-            <i :class="['bi', iconesTipo[item.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
+            <i :class="['bi', obterIconeTipo(item.tipo), 'me-1']"></i>
             {{ formatarTipo(item.tipo) }}
           </BBadge>
         </template>
@@ -85,7 +85,7 @@
           <dt class="col-sm-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO }}</dt>
           <dd class="col-sm-9">
             <BBadge :variant="obterVarianteTipo(feedbackSelecionado.tipo)">
-              <i :class="['bi', iconesTipo[feedbackSelecionado.tipo.toUpperCase()] || 'bi-chat-left-text', 'me-1']"></i>
+              <i :class="['bi', obterIconeTipo(feedbackSelecionado.tipo), 'me-1']"></i>
               {{ formatarTipo(feedbackSelecionado.tipo) }}
             </BBadge>
           </dd>
@@ -193,39 +193,46 @@ const campos = [
   {key: "acoes", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ACOES},
 ];
 
-function formatarTipo(tipo: string): string {
-  const t = (tipo || "").toUpperCase();
-  const tipos: Record<string, string> = {
-    BUG: "Bug",
-    SUGESTAO: "Sugestão",
-    QUESTAO: "Questão",
-    ELOGIO: "Elogio",
-  };
-  return tipos[t] ?? (t.charAt(0) + t.slice(1).toLowerCase());
-}
+type VarianteTipoFeedback = "danger" | "primary" | "info" | "success" | "secondary";
 
-function obterVarianteTipo(tipo: string): "danger" | "primary" | "info" | "success" | "secondary" {
-  const t = (tipo || "").toUpperCase();
-  const variantes: Record<string, "danger" | "primary" | "info" | "success" | "secondary"> = {
-    BUG: "danger",
-    SUGESTAO: "primary",
-    QUESTAO: "info",
-    ELOGIO: "success",
-  };
-  return variantes[t] ?? "secondary";
-}
-
-const iconesTipo: Record<string, string> = {
-  BUG: "bi-bug",
-  SUGESTAO: "bi-lightbulb",
-  QUESTAO: "bi-question-circle",
-  ELOGIO: "bi-emoji-smile",
+const CONFIG_TIPO_FEEDBACK: Record<string, { rotulo: string; variante: VarianteTipoFeedback; icone: string }> = {
+  BUG: {rotulo: "Bug", variante: "danger", icone: "bi-bug"},
+  SUGESTAO: {rotulo: "Sugestão", variante: "primary", icone: "bi-lightbulb"},
+  QUESTAO: {rotulo: "Questão", variante: "info", icone: "bi-question-circle"},
+  ELOGIO: {rotulo: "Elogio", variante: "success", icone: "bi-emoji-smile"},
 };
+const ICONE_TIPO_PADRAO = "bi-chat-left-text";
+const CHAVES_IGNORAR_BASE = ["rotaNome", "fusoHorario", "usuarioNome", "usuarioCodigo", "dataHora"] as const;
+const MAPA_TRADUCOES_METADADOS: Record<string, string> = {
+  tituloPagina: "Título da página",
+  idioma: "Idioma",
+  userAgent: "Navegador",
+};
+
+function normalizarTipoChave(tipo: string): string {
+  return tipo.toUpperCase();
+}
+
+function formatarTipo(tipo: string): string {
+  const chave = normalizarTipoChave(tipo);
+  const configuracao = CONFIG_TIPO_FEEDBACK[chave];
+  return configuracao?.rotulo ?? (chave.charAt(0) + chave.slice(1).toLowerCase());
+}
+
+function obterVarianteTipo(tipo: string): VarianteTipoFeedback {
+  const chave = normalizarTipoChave(tipo);
+  return CONFIG_TIPO_FEEDBACK[chave]?.variante ?? "secondary";
+}
+
+function obterIconeTipo(tipo: string): string {
+  const chave = normalizarTipoChave(tipo);
+  return CONFIG_TIPO_FEEDBACK[chave]?.icone ?? ICONE_TIPO_PADRAO;
+}
 
 function resumirNota(nota: string): string {
   if (!nota) return "";
   const doc = new DOMParser().parseFromString(nota, "text/html");
-  const textoLimpo = (doc.body.textContent || "").replaceAll(/\s+/g, " ").trim();
+  const textoLimpo = (doc.body.textContent ?? "").replaceAll(/\s+/g, " ").trim();
 
   if (textoLimpo.length <= 120) {
     return textoLimpo;
@@ -267,65 +274,16 @@ function formatarMetadados(json?: string | null): Record<string, unknown> {
   try {
     const raw = JSON.parse(json);
     const filtrado: Record<string, unknown> = {};
-    const chavesIgnorar = ["rotaNome", "fusoHorario", "usuarioNome", "usuarioCodigo", "dataHora"];
+    const chavesIgnorar = new Set<string>(CHAVES_IGNORAR_BASE);
 
-    const mapaTraducoes: Record<string, string> = {
-      tituloPagina: "Título da página",
-      idioma: "Idioma",
-      userAgent: "Navegador",
-    };
-
-    // Compactação de rota e query
-    if (raw.rotaCaminho) {
-      let rotaCompleta = raw.rotaCaminho;
-      if (raw.rotaQuery && raw.rotaQuery !== "{}" && raw.rotaQuery !== "null") {
-        try {
-          const query = JSON.parse(raw.rotaQuery);
-          const params = new URLSearchParams(query).toString();
-          if (params) rotaCompleta += `?${params}`;
-        } catch {
-          // Se falhar o parse da query, ignora e usa só o caminho
-        }
-      }
-      filtrado["Rota"] = rotaCompleta;
-      chavesIgnorar.push("rotaCaminho", "rotaQuery");
-    }
-
-    // Compactação de perfil e unidade
-    if (raw.perfilAtivo || raw.unidadeAtiva) {
-      const perfil = raw.perfilAtivo || "-";
-      const unidade = raw.unidadeAtiva || "-";
-      filtrado["Acesso"] = `${perfil} - ${unidade}`;
-      chavesIgnorar.push("perfilAtivo", "unidadeAtiva");
-    }
-
-    // Compactação de resolução
-    if (raw.larguraTela && raw.alturaTela) {
-      filtrado["Resolução"] = `${raw.larguraTela}x${raw.alturaTela}`;
-      chavesIgnorar.push("larguraTela", "alturaTela");
-    }
+    compactarRota(raw, filtrado, chavesIgnorar);
+    compactarAcesso(raw, filtrado, chavesIgnorar);
+    compactarResolucao(raw, filtrado, chavesIgnorar);
 
     Object.entries(raw).forEach(([chave, valor]) => {
-      if (chavesIgnorar.includes(chave)) return;
-
-      const label = mapaTraducoes[chave] || (chave.charAt(0).toUpperCase() + chave.slice(1));
-
-      if (chave === "userAgent") {
-        filtrado[label] = extrairNavegadorAmigavel(valor as string);
-        return;
-      }
-
-      // Formatação de data/hora se o valor parecer um ISO string
-      if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(valor)) {
-        try {
-          filtrado[label] = formatarDataHoraBR(valor);
-          return;
-        } catch {
-          // Mantém original se falhar
-        }
-      }
-
-      filtrado[label] = valor;
+      if (chavesIgnorar.has(chave)) return;
+      const label = MAPA_TRADUCOES_METADADOS[chave] || (chave.charAt(0).toUpperCase() + chave.slice(1));
+      filtrado[label] = formatarValorMetadado(chave, valor);
     });
 
     return filtrado;
@@ -334,13 +292,82 @@ function formatarMetadados(json?: string | null): Record<string, unknown> {
   }
 }
 
+function compactarRota(raw: Record<string, unknown>, filtrado: Record<string, unknown>, chavesIgnorar: Set<string>) {
+  const rotaCaminho = typeof raw.rotaCaminho === "string" ? raw.rotaCaminho : "";
+  if (!rotaCaminho) {
+    return;
+  }
+
+  let rotaCompleta = rotaCaminho;
+  const rotaQuery = typeof raw.rotaQuery === "string" ? raw.rotaQuery : "";
+  if (rotaQuery && rotaQuery !== "{}" && rotaQuery !== "null") {
+    try {
+      const query = JSON.parse(rotaQuery);
+      const params = new URLSearchParams(query).toString();
+      if (params) rotaCompleta += `?${params}`;
+    } catch {
+      // Se falhar o parse da query, ignora e usa só o caminho.
+    }
+  }
+
+  filtrado["Rota"] = rotaCompleta;
+  chavesIgnorar.add("rotaCaminho");
+  chavesIgnorar.add("rotaQuery");
+}
+
+function compactarAcesso(raw: Record<string, unknown>, filtrado: Record<string, unknown>, chavesIgnorar: Set<string>) {
+  const perfilAtivo = typeof raw.perfilAtivo === "string" ? raw.perfilAtivo : "";
+  const unidadeAtiva = typeof raw.unidadeAtiva === "string" ? raw.unidadeAtiva : "";
+  if (!perfilAtivo && !unidadeAtiva) {
+    return;
+  }
+
+  if (perfilAtivo && unidadeAtiva) {
+    filtrado["Acesso"] = `${perfilAtivo} - ${unidadeAtiva}`;
+  } else if (perfilAtivo) {
+    filtrado["Acesso"] = perfilAtivo;
+  } else {
+    filtrado["Acesso"] = unidadeAtiva;
+  }
+  chavesIgnorar.add("perfilAtivo");
+  chavesIgnorar.add("unidadeAtiva");
+}
+
+function compactarResolucao(raw: Record<string, unknown>, filtrado: Record<string, unknown>, chavesIgnorar: Set<string>) {
+  const larguraTela = raw.larguraTela;
+  const alturaTela = raw.alturaTela;
+  if (!larguraTela || !alturaTela) {
+    return;
+  }
+
+  filtrado["Resolução"] = `${larguraTela}x${alturaTela}`;
+  chavesIgnorar.add("larguraTela");
+  chavesIgnorar.add("alturaTela");
+}
+
+function formatarValorMetadado(chave: string, valor: unknown): unknown {
+  if (chave === "userAgent") {
+    return extrairNavegadorAmigavel(typeof valor === "string" ? valor : "");
+  }
+
+  if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(valor)) {
+    try {
+      return formatarDataHoraBR(valor);
+    } catch {
+      return valor;
+    }
+  }
+
+  return valor;
+}
+
 async function carregar() {
   carregando.value = true;
   erro.value = null;
   try {
     feedbacks.value = await listarFeedbacksAdmin();
   } catch (error) {
-    erro.value = normalizarErro(error).mensagem || TEXTOS.administracao.FEEDBACKS_ERRO_CARREGAR;
+    erro.value = normalizarErro(error).mensagem;
   } finally {
     carregando.value = false;
   }

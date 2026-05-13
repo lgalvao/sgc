@@ -93,7 +93,7 @@
               <InputData
                   id="dataTermino"
                   v-model="dataTermino"
-                  :min="dataInicio || obterHojeFormatado()"
+                  :min="dataMinimaTermino"
                   :state="mensagemErroDataTermino ? false : null"
                   data-testid="input-data-termino"
                   max="2099-12-31"
@@ -251,6 +251,7 @@ const textoBotaoSalvar = computed(() =>
 const textoBotaoSalvando = computed(() =>
     modoEdicao.value ? TEXTOS.atribuicaoTemporaria.SALVANDO : TEXTOS.atribuicaoTemporaria.CRIANDO
 );
+const dataMinimaTermino = computed(() => dataInicio.value.length > 0 ? dataInicio.value : obterHojeFormatado());
 
 const formularioValido = computed(() => {
   return Boolean(
@@ -291,16 +292,17 @@ function resetarFormularioAtribuicao() {
 }
 
 function preencherFormularioComAtribuicaoVigente() {
-  if (!atribuicaoVigente.value) {
+  const atribuicaoAtual = atribuicaoVigente.value;
+  if (!atribuicaoAtual) {
     resetarFormularioAtribuicao();
     return;
   }
 
-  usuarioSelecionado.value = atribuicaoVigente.value.usuario.tituloEleitoral;
-  termoUsuario.value = atribuicaoVigente.value.usuario.nome;
-  dataInicio.value = atribuicaoVigente.value.dataInicio.slice(0, 10);
-  dataTermino.value = atribuicaoVigente.value.dataTermino.slice(0, 10);
-  justificativa.value = atribuicaoVigente.value.justificativa;
+  usuarioSelecionado.value = atribuicaoAtual.usuario.tituloEleitoral;
+  termoUsuario.value = atribuicaoAtual.usuario.nome;
+  dataInicio.value = atribuicaoAtual.dataInicio.slice(0, 10);
+  dataTermino.value = atribuicaoAtual.dataTermino.slice(0, 10);
+  justificativa.value = atribuicaoAtual.justificativa;
   resetarValidacao();
 }
 
@@ -314,8 +316,8 @@ async function carregarDados(forcar = false) {
     preencherFormularioComAtribuicaoVigente();
   } catch (error) {
     const mensagemErro = normalizarErro(error).mensagem;
-    erroUsuario.value = mensagemErro || TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
-    erroFormulario.value = mensagemErro || TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR_ATRIBUICOES;
+    erroUsuario.value = mensagemErro;
+    erroFormulario.value = mensagemErro;
     logger.error(error);
   } finally {
     carregandoInicial.value = false;
@@ -380,11 +382,7 @@ async function salvarAtribuicao() {
     );
   } catch (error) {
     logger.error(error);
-    erroFormulario.value = normalizarErro(error).mensagem || (
-        estavaEmEdicao
-            ? TEXTOS.atribuicaoTemporaria.ERRO_ATUALIZAR
-            : TEXTOS.atribuicaoTemporaria.ERRO_CRIAR
-    );
+    erroFormulario.value = normalizarErro(error).mensagem;
   } finally {
     isLoading.value = false;
   }
@@ -409,7 +407,7 @@ async function removerAtribuicao() {
     notify(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
   } catch (error) {
     logger.error(error);
-    erroFormulario.value = normalizarErro(error).mensagem || TEXTOS.atribuicaoTemporaria.ERRO_REMOVER;
+    erroFormulario.value = normalizarErro(error).mensagem;
   } finally {
     isLoading.value = false;
   }

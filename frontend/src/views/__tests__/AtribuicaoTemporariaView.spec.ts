@@ -190,6 +190,7 @@ describe("AtribuicaoTemporariaView", () => {
 
         await wrapper.find("[data-testid='cad-atribuicao__btn-salvar-atribuicao']").trigger("click");
         await flushPromises();
+        await flushPromises();
 
         expect(mockCriarAtribuicao).toHaveBeenCalledWith(1, {
             tituloEleitoralUsuario: "999",
@@ -276,6 +277,7 @@ describe("AtribuicaoTemporariaView", () => {
 
         await wrapper.find("[data-testid='cad-atribuicao__btn-salvar-atribuicao']").trigger("click");
         await flushPromises();
+        await flushPromises();
 
         expect(mockAtualizarAtribuicao).toHaveBeenCalledWith(1, 10, {
             tituloEleitoralUsuario: "999",
@@ -332,5 +334,55 @@ describe("AtribuicaoTemporariaView", () => {
         await wrapper.find("[data-testid='btn-cancelar-atribuicao']").trigger("click");
 
         expect(mockPush).toHaveBeenCalledWith("/unidade/1");
+    });
+
+    it("exibe erro normalizado ao falhar no carregamento inicial", async () => {
+        mockObterUnidade.mockRejectedValueOnce(new Error("Falha ao carregar unidade"));
+
+        const wrapper = mountView();
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("Falha ao carregar unidade");
+    });
+
+    it("exibe erro normalizado ao falhar criação de atribuição", async () => {
+        mockCriarAtribuicao.mockRejectedValueOnce(new Error("Falha ao salvar atribuição"));
+
+        const wrapper = mountView();
+        await flushPromises();
+        await preencherFormulario(wrapper);
+        await wrapper.find("[data-testid='cad-atribuicao__btn-salvar-atribuicao']").trigger("click");
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("Falha ao salvar atribuição");
+    });
+
+    it("exibe erro normalizado ao falhar remoção de atribuição", async () => {
+        mockBuscarAtribuicoes.mockResolvedValueOnce([
+            {
+                codigo: 10,
+                unidadeCodigo: 1,
+                unidadeSigla: "TESTE",
+                usuario: {
+                    tituloEleitoral: "999",
+                    matricula: "M1",
+                    nome: "Servidor Teste",
+                    email: "servidor@tre-pe.jus.br",
+                    ramal: "1234",
+                },
+                dataInicio: "2026-05-10T00:00:00",
+                dataTermino: "2026-05-30T23:59:59",
+                justificativa: "<p>Vigente</p>",
+            },
+        ]);
+        mockRemoverAtribuicao.mockRejectedValueOnce(new Error("Falha ao remover atribuição"));
+
+        const wrapper = mountView();
+        await flushPromises();
+        await wrapper.find("[data-testid='btn-remover-atribuicao']").trigger("click");
+        await wrapper.find("[data-testid='btn-confirmar-remover-atribuicao']").trigger("click");
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("Falha ao remover atribuição");
     });
 });

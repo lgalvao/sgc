@@ -169,4 +169,34 @@ describe("FeedbacksAdminView", () => {
 
         expect(wrapper.text()).toContain("Erro ao listar");
     });
+
+    it("formata acesso com único campo disponível nos metadados", async () => {
+        vi.mocked(listarFeedbacksAdmin).mockResolvedValue([
+            {
+                codigo: "abc",
+                tipo: "SUGESTAO",
+                nota: "Teste",
+                metadataJson: JSON.stringify({
+                    perfilAtivo: "ADMIN",
+                }),
+                caminhoScreenshot: null,
+                screenshotDisponivel: false,
+                usuarioCodigo: "123",
+                usuarioNome: "João",
+                enviadoEm: "2026-05-04T10:00:00Z",
+                rota: "/painel",
+                status: "NOVO"
+            }
+        ] as any);
+
+        const wrapper = montarComponente();
+        await flushPromises();
+        await wrapper.find("[data-testid='btn-feedback-detalhes-abc']").trigger("click");
+
+        const modal = wrapper.find("[data-testid='modal-detalhes-feedback']");
+        expect(modal.exists()).toBe(true);
+        expect(modal.text()).toContain("Acesso");
+        expect(modal.text()).toContain("ADMIN");
+        expect(modal.text()).not.toContain("ADMIN -");
+    });
 });
