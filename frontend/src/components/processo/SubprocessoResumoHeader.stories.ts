@@ -85,6 +85,7 @@ const subprocessoMock: SubprocessoDetalhe = {
     ultimaDataLimiteSubprocesso: '2025-09-30',
     tipoProcesso: TipoProcesso.MAPEAMENTO,
     prazoEtapaAtual: '2025-03-31',
+    dataFimEtapa1: null,
     isEmAndamento: true,
     etapaAtual: 1,
     movimentacoes: [],

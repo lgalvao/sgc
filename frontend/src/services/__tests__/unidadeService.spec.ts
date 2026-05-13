@@ -92,6 +92,8 @@ describe('unidadeService', () => {
                     tipoResponsabilidade: undefined,
                     titular: null,
                     responsavel: null,
+                    dataInicioResponsabilidade: null,
+                    dataFimResponsabilidade: null,
                     filhas: [
                         {
                             codigo: 2,
@@ -103,6 +105,8 @@ describe('unidadeService', () => {
                             tipoResponsabilidade: undefined,
                             titular: null,
                             responsavel: null,
+                            dataInicioResponsabilidade: null,
+                            dataFimResponsabilidade: null,
                             filhas: []
                         }
                     ]

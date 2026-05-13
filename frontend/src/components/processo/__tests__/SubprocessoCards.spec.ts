@@ -75,6 +75,7 @@ describe("SubprocessoCards.vue", () => {
             dataCriacaoProcesso: "2025-01-01T00:00:00",
             tipoProcesso: TipoProcesso.REVISAO,
             prazoEtapaAtual: "2025-01-01T00:00:00",
+            dataFimEtapa1: null,
             ultimaDataLimiteSubprocesso: "2025-01-01T00:00:00",
             isEmAndamento: true,
             etapaAtual: 1,
