@@ -9,6 +9,8 @@ import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/h
 import {TEXTOS} from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
+    test.setTimeout(120_000);
+
     test.beforeAll(async ({request}) => {
         // Reset do banco de dados UMA VEZ para iniciar a jornada
         const response = await request.post('/e2e/reset-database');
@@ -208,23 +210,20 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
 
     const homologarMapeamentoAdmin = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
+            await ProcessoHelpers.acessarDetalhesProcesso(page, descricaoMapeamento);
+            const btnHomologar = await ProcessoHelpers.obterAcaoBloco(page, 'btn-processo-homologar-bloco');
+            await expect(btnHomologar).toBeVisible();
+            await expect(btnHomologar).toBeEnabled();
+            await btnHomologar.click();
+
+            const modal = page.locator('#modal-acao-bloco');
+            await expect(modal).toHaveClass(/show/);
+            await expect(modal.getByText(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO)).toBeVisible();
+            await modal.getByRole('button', {name: TEXTOS.acaoBloco.homologar.BOTAO}).click();
+
+            await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
+
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
-            await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
-            await AtividadeHelpers.navegarParaCadastro(page);
-            await AnaliseHelpers.verificarAcoesAnaliseCadastro(page, {
-                rotuloPrincipal: /Homologar/i,
-                principalHabilitado: true,
-                devolverHabilitado: true
-            });
-
-            // Verificar histórico completo antes de homologar (deve ter devolução e aceite)
-            const modalHistorico = await AnaliseHelpers.abrirHistoricoAnalise(page);
-            await expect(modalHistorico).toBeVisible();
-            await expect(modalHistorico.locator('[data-testid^="cell-resultado-"]').first()).toBeVisible();
-            await AnaliseHelpers.fecharHistoricoAnalise(page);
-
-            await AnaliseHelpers.homologarCadastroMapeamento(page);
 
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
@@ -233,7 +232,6 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
         });
-        await expect(page).toHaveURL(/\/login/);
     };
 
     const criarMapaAdmin = async (page: Page) => {

@@ -34,10 +34,14 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
  * Acessa subprocesso como ADMIN (via lista de unidades)
  */
 export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: string, siglaUnidade: string) {
-    await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
-
-    await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
-    await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
+    if (/\/painel(?:\?.*)?$/.test(page.url())) {
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso});
+        await expect(linhaProcesso).toBeVisible();
+        await linhaProcesso.click();
+    } else {
+        await expect(page).toHaveURL(/\/processo\/(?:cadastro\?codProcesso=)?\d+(?:\?.*)?$/);
+        await expect(page.getByTestId('processo-info')).toBeVisible();
+    }
 
     await navegarParaSubprocesso(page, siglaUnidade);
     await expect(page.getByTestId('header-subprocesso')).toBeVisible();
@@ -223,12 +227,13 @@ export async function homologarCadastroMapeamento(page: Page, observacao: string
     await btnHomologar.click();
 
     // Modal: "Homologação do cadastro"
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO)).toBeVisible();
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible();
+    await expect(modal.getByText(TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO)).toBeVisible();
 
-    await page.getByTestId('inp-aceite-cadastro-obs').fill(observacao);
+    await modal.getByTestId('inp-aceite-cadastro-obs').fill(observacao);
 
-    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+    await modal.getByTestId('btn-aceite-cadastro-confirmar').click();
 
     // Aguarda o redirecionamento para a tela do subprocesso
     await expect(page).toHaveURL(/\/processo\/\d+\/(\w+)(?:\?.*)?$/);

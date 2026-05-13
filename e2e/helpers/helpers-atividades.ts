@@ -13,7 +13,7 @@ async function obterBotaoDisponibilizarCadastro(page: Page) {
 }
 
 export async function esperarTelaAtividades(page: Page) {
-    await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
+    await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
 }
 
 export async function esperarAtividadesEditaveis(page: Page) {
@@ -49,10 +49,15 @@ export async function esperarAtividadesSomenteLeitura(page: Page) {
 }
 
 export async function navegarParaCadastro(page: Page) {
+    if (/\/cadastro(?:\?.*)?$/.test(page.url())) {
+        await esperarTelaAtividades(page);
+        return;
+    }
+
     const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();
     await card.click();
-    await page.waitForURL(/\/cadastro(?:\?.*)?$/);
+    await expect(page).toHaveURL(/\/cadastro(?:\?.*)?$/);
 
     await esperarTelaAtividades(page);
 }

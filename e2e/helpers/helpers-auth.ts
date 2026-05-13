@@ -98,7 +98,7 @@ async function clicarEntrarAposEstabilizar(page: Page) {
 }
 
 async function finalizarLoginNoPainel(page: Page) {
-    await page.waitForURL(/\/painel(?:\?|$)/);
+    await expect(page).toHaveURL(/\/painel(?:\?|$)/);
     await limparNotificacoes(page);
 }
 

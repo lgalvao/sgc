@@ -1,4 +1,4 @@
-import {expect, type Page} from '@playwright/test';
+import {expect, type Locator, type Page} from '@playwright/test';
 
 /**
  * Helpers para navegação e verificação de páginas nos testes E2E.
@@ -87,9 +87,36 @@ export async function verificarAlertaPainel(page: Page, mensagem: string | RegEx
  */
 export async function fazerLogout(page: Page): Promise<void> {
     try {
+        if (/\/login(?:\?.*)?$/.test(page.url())) {
+            return;
+        }
+
         // Limpar notificações que possam estar sobrepondo o menu ou botões
         await limparNotificacoes(page);
-        const botaoLogout = page.getByTestId('btn-logout');
+
+        const candidatosLogout = [
+            page.getByTestId('btn-logout'),
+            page.getByTitle('Sair'),
+            page.getByRole('link', {name: /^sair$/i}),
+            page.getByRole('button', {name: /^sair$/i})
+        ];
+
+        let botaoLogout: Locator | null = null;
+        for (const candidato of candidatosLogout) {
+            if (await candidato.count() > 0 && await candidato.first().isVisible()) {
+                botaoLogout = candidato.first();
+                break;
+            }
+        }
+
+        if (!botaoLogout) {
+            await page.waitForURL(/\/login(?:\?.*)?$/, {timeout: 2_000}).catch(() => null);
+            if (/\/login(?:\?.*)?$/.test(page.url())) {
+                return;
+            }
+            throw new Error('Botão de logout não encontrado na navegação atual.');
+        }
+
         await botaoLogout.scrollIntoViewIfNeeded();
 
         try {
@@ -162,7 +189,8 @@ export async function esperarPaginaSubprocesso(page: Page, siglaUnidade?: string
 }
 
 /**
- * Navega para um subprocesso clicando na célula da unidade na tabela TreeTable.
+ * Navega para um subprocesso a partir da tela de detalhes do processo.
+ * Suporta tanto a árvore de subprocessos quanto a tabela simples exibida em alguns perfis/fluxos.
  * Se já estiver na página do subprocesso (redirecionamento direto), apenas valida.
  */
 export async function navegarParaSubprocesso(
@@ -175,16 +203,31 @@ export async function navegarParaSubprocesso(
     const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}(?:\?.*)?$`);
     if (urlSubprocesso.test(page.url())) return;
 
-    await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
     const info = page.getByTestId('processo-info');
     await expect(info).toBeVisible();
 
-    const tabela = page.getByTestId('tbl-tree');
-    await expect(tabela).toBeVisible();
+    const padraoUnidade = new RegExp(String.raw`^${siglaUnidade}\b`, 'i');
+    const tabelaArvore = page.getByTestId('tbl-tree');
+    if (await tabelaArvore.count() > 0 && await tabelaArvore.isVisible()) {
+        const celula = tabelaArvore.getByRole('cell', {name: padraoUnidade}).first();
+        await expect(celula).toBeVisible();
+        await celula.click();
+        await expect(page).toHaveURL(urlSubprocesso);
+        return;
+    }
 
-    const celula = tabela.getByRole('cell', {name: new RegExp(String.raw`^${siglaUnidade}\b`)}).first();
-    await expect(celula).toBeVisible();
-    await celula.click();
+    const tabelaProcessos = page.getByTestId('tbl-processos');
+    if (await tabelaProcessos.count() > 0 && await tabelaProcessos.isVisible()) {
+        const linhaProcesso = tabelaProcessos.locator('tr').filter({hasText: padraoUnidade}).first();
+        await expect(linhaProcesso).toBeVisible();
+        await linhaProcesso.click();
+        await expect(page).toHaveURL(urlSubprocesso);
+        return;
+    }
+
+    const linhaGenerica = page.locator('main table tr').filter({hasText: padraoUnidade}).first();
+    await expect(linhaGenerica).toBeVisible();
+    await linhaGenerica.click();
 
     await expect(page).toHaveURL(urlSubprocesso);
 }
