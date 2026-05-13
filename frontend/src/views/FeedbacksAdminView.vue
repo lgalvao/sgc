@@ -232,8 +232,7 @@ function obterIconeTipo(tipo: string): string {
 function resumirNota(nota: string): string {
   if (!nota) return "";
   const doc = new DOMParser().parseFromString(nota, "text/html");
-  const textoBruto = doc.body.textContent ?? "";
-  const textoLimpo = textoBruto.replaceAll(/\s+/g, " ").trim();
+  const textoLimpo = (doc.body.textContent ?? "").replaceAll(/\s+/g, " ").trim();
 
   if (textoLimpo.length <= 120) {
     return textoLimpo;

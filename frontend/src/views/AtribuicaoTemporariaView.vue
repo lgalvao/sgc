@@ -315,7 +315,7 @@ async function carregarDados(forcar = false) {
     atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(props.codUnidade);
     preencherFormularioComAtribuicaoVigente();
   } catch (error) {
-    const mensagemErro = extrairMensagemErro(error);
+    const mensagemErro = normalizarErro(error).mensagem;
     erroUsuario.value = mensagemErro;
     erroFormulario.value = mensagemErro;
     logger.error(error);
@@ -382,7 +382,7 @@ async function salvarAtribuicao() {
     );
   } catch (error) {
     logger.error(error);
-    erroFormulario.value = extrairMensagemErro(error);
+    erroFormulario.value = normalizarErro(error).mensagem;
   } finally {
     isLoading.value = false;
   }
@@ -407,15 +407,10 @@ async function removerAtribuicao() {
     notify(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
   } catch (error) {
     logger.error(error);
-    erroFormulario.value = extrairMensagemErro(error);
+    erroFormulario.value = normalizarErro(error).mensagem;
   } finally {
     isLoading.value = false;
   }
-}
-
-function extrairMensagemErro(error: unknown): string {
-  const mensagem = normalizarErro(error).mensagem;
-  return mensagem;
 }
 </script>
 
