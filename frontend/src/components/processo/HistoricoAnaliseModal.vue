@@ -122,7 +122,7 @@
 
 <script lang="ts" setup>
 import {ref} from "vue";
-import {BAlert, BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
+import {BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
 import ModalVisualizacaoTextoFormatado from "@/components/comum/ModalVisualizacaoTextoFormatado.vue";
 import type {Analise} from "@/types/tipos";
 import {formatarDataHoraBR} from "@/utils/date";
