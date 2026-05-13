@@ -13,7 +13,12 @@
     <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO"/>
     <template v-else>
       <div v-if="unidade">
-        <PageHeader :subtitle="unidade.nome" :title="unidade.sigla">
+        <PageHeader
+            :subtitle="unidade.nome"
+            :title="unidade.sigla"
+            actions-test-id="unidade-view__acoes"
+            title-test-id="unidade-view__titulo"
+        >
           <template #actions>
             <BButton
                 v-if="mapaVigente"
@@ -31,7 +36,7 @@
                 variant="outline-secondary"
                 @click="irParaCriarAtribuicao"
             >
-              {{ textoBotaoAtribuicao }}
+              <span data-testid="unidade-view__btn-atribuicao-texto">{{ textoBotaoAtribuicao }}</span>
             </BButton>
           </template>
         </PageHeader>

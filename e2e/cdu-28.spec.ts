@@ -26,6 +26,20 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         'COORD_32'
     ];
 
+    function formatarDataInput(data: Date) {
+        return data.toISOString().slice(0, 10);
+    }
+
+    function obterPeriodoVigente() {
+        const inicio = new Date();
+        const termino = new Date();
+        termino.setDate(termino.getDate() + 30);
+        return {
+            dataInicio: formatarDataInput(inicio),
+            dataTermino: formatarDataInput(termino),
+        };
+    }
+
     async function validarRamoUnidade(
         page: import('@playwright/test').Page,
         siglaRamo: string,
@@ -47,13 +61,46 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await textoUnidade.click();
     }
 
-    async function abrirTelaCriacaoAtribuicao(page: import('@playwright/test').Page) {
+    async function garantirSemAtribuicaoVigente(page: import('@playwright/test').Page) {
         await acessarUnidadeAlvo(page);
         await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
-        await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
-        await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();
+        await expect(page.getByTestId('unidade-view__titulo')).toHaveText(SIGLA_UNIDADE);
+
+        const textoBotaoAtribuicao = page.getByTestId('unidade-view__btn-atribuicao-texto');
+        if (await textoBotaoAtribuicao.isVisible().catch(() => false) && await textoBotaoAtribuicao.textContent() === 'Editar atribuição') {
+            await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
+            await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
+            await expect(page.getByTestId('btn-remover-atribuicao')).toBeVisible();
+
+            await page.getByTestId('btn-remover-atribuicao').click();
+            const modal = page.getByRole('dialog');
+            await expect(modal).toBeVisible();
+            await modal.getByRole('button', {name: 'Remover'}).click();
+            await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO).first()).toBeVisible();
+
+            await page.getByTestId('btn-cancelar-atribuicao').click();
+            await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
+        }
+
+        await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Criar atribuição');
+    }
+
+    async function abrirTelaCriacaoAtribuicao(page: import('@playwright/test').Page) {
+        await garantirSemAtribuicaoVigente(page);
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
+    }
+
+    async function criarAtribuicaoVigente(page: import('@playwright/test').Page, justificativa = 'Cobertura de férias') {
+        const {dataInicio, dataTermino} = obterPeriodoVigente();
+
+        await abrirTelaCriacaoAtribuicao(page);
+        await selecionarUsuarioAlvo(page);
+        await page.getByTestId('input-data-inicio').fill(dataInicio);
+        await page.getByTestId('input-data-termino').fill(dataTermino);
+        await page.getByTestId('textarea-justificativa').fill(justificativa);
+        await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
+        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO).first()).toBeVisible();
     }
 
     async function selecionarUsuarioAlvo(page: import('@playwright/test').Page) {
@@ -93,11 +140,9 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(tabela.getByText(/^SECAO_112\s+-\s+/).first()).toBeVisible();
         await expect(tabela.getByText(/^SECAO_113\s+-\s+/).first()).toBeVisible();
 
-        await acessarUnidadeAlvo(page);
+        await garantirSemAtribuicaoVigente(page);
 
-        await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
-        await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
-        await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();
+        await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Criar atribuição');
     });
 
     test('Cenario 2: tela de atribuição expõe os campos e ações exigidos pelo requisito', async ({
@@ -107,8 +152,8 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
                                                                                                  }) => {
         await abrirTelaCriacaoAtribuicao(page);
 
-        await expect(page.getByRole('heading', {name: TEXTOS.atribuicaoTemporaria.TITULO})).toBeVisible();
-        await expect(page.locator('p.text-muted', {hasText: SIGLA_UNIDADE}).first()).toBeVisible();
+        await expect(page.getByTestId('atribuicao-view__titulo')).toHaveText('Atribuição temporária');
+        await expect(page.getByTestId('atribuicao-view__sigla')).toHaveText(SIGLA_UNIDADE);
         await expect(page.getByText(TEXTOS.atribuicaoTemporaria.AJUDA_PESQUISA_USUARIO)).toBeVisible();
 
         await expect(page.getByLabel(TEXTOS.atribuicaoTemporaria.LABEL_USUARIO)).toBeVisible();
@@ -118,7 +163,9 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByLabel(TEXTOS.atribuicaoTemporaria.LABEL_JUSTIFICATIVA)).toBeVisible();
 
         await expect(page.getByTestId('btn-cancelar-atribuicao')).toBeVisible();
-        await expect(page.getByTestId('cad-atribuicao__btn-criar-atribuicao')).toBeVisible();
+        await expect(page.getByTestId('cad-atribuicao__btn-salvar-atribuicao')).toBeVisible();
+        await expect(page.getByTestId('cad-atribuicao__btn-salvar-atribuicao')).toHaveText('Criar');
+        await expect(page.getByTestId('btn-remover-atribuicao')).toBeHidden();
     });
 
     test('Cenario 3: o formulário exibe erros de validação ao tentar criar incompleto', async ({
@@ -128,7 +175,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
                                                                                                }) => {
         await abrirTelaCriacaoAtribuicao(page);
 
-        const btnCriar = page.getByTestId('cad-atribuicao__btn-criar-atribuicao');
+        const btnCriar = page.getByTestId('cad-atribuicao__btn-salvar-atribuicao');
         await btnCriar.click();
 
         await expect(page.getByText(TEXTOS.atribuicaoTemporaria.ERRO_SELECIONE_USUARIO)).toBeVisible();
@@ -146,7 +193,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
         await page.getByTestId('btn-cancelar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
-        await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
+        await expect(page.getByTestId('unidade-view__titulo')).toHaveText(SIGLA_UNIDADE);
     });
 
     test('Cenario 5: ADMIN cria atribuição e usuário destino recebe perfil temporário', async ({
@@ -154,17 +201,53 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
                                                                                                    _autenticadoComoAdmin,
                                                                                                    page
                                                                                                }) => {
-        await abrirTelaCriacaoAtribuicao(page);
-
-        await selecionarUsuarioAlvo(page);
-        await page.getByTestId('input-data-inicio').fill('2030-01-01');
-        await page.getByTestId('input-data-termino').fill('2030-12-31');
-        await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');
-        await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
-
-        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO).first()).toBeVisible();
+        await criarAtribuicaoVigente(page);
+        await page.getByTestId('btn-cancelar-atribuicao').click();
+        await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Editar atribuição');
+        await expect(page.getByText(/Atrib\. temporária/)).toBeVisible();
 
         await loginComPerfil(page, TITULO_USUARIO_ALVO, 'senha', PERFIL_TEMPORARIO);
         await expect(page.locator('.user-info-text')).toContainText(PERFIL_TEMPORARIO);
+    });
+
+    test('Cenario 6: ADMIN acessa atribuição vigente para editar', async ({
+                                                                              _resetAutomatico,
+                                                                              _autenticadoComoAdmin,
+                                                                              page
+                                                                          }) => {
+        await criarAtribuicaoVigente(page);
+        await page.getByTestId('btn-cancelar-atribuicao').click();
+
+        await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Editar atribuição');
+        await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
+
+        await expect(page.getByTestId('atribuicao-view__titulo')).toHaveText('Atribuição temporária');
+        await expect(page.getByTestId('cad-atribuicao__btn-salvar-atribuicao')).toHaveText('Salvar');
+        await expect(page.getByTestId('btn-remover-atribuicao')).toBeVisible();
+
+        await page.getByTestId('textarea-justificativa').fill('Cobertura de férias atualizada');
+        await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
+
+        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO).first()).toBeVisible();
+    });
+
+    test('Cenario 7: ADMIN remove atribuição vigente', async ({
+                                                                  _resetAutomatico,
+                                                                  _autenticadoComoAdmin,
+                                                                  page
+                                                              }) => {
+        await criarAtribuicaoVigente(page);
+        await page.getByTestId('btn-cancelar-atribuicao').click();
+        await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
+
+        await page.getByTestId('btn-remover-atribuicao').click();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await page.getByTestId('btn-confirmar-remover-atribuicao').click();
+
+        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO).first()).toBeVisible();
+
+        await page.getByTestId('btn-cancelar-atribuicao').click();
+        await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Criar atribuição');
     });
 });

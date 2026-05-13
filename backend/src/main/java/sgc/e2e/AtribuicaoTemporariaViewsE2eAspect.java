@@ -1,6 +1,7 @@
 package sgc.e2e;
 
 import lombok.*;
+import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.jspecify.annotations.*;
 import org.springframework.context.annotation.*;
@@ -27,6 +28,36 @@ public class AtribuicaoTemporariaViewsE2eAspect {
     )
     @Transactional
     public void sincronizarViews(Long codUnidade, CriarAtribuicaoRequest request) {
+        sincronizarAtribuicaoTemporaria(codUnidade, request);
+    }
+
+    @AfterReturning(
+            value = "execution(* sgc.organizacao.service.ResponsavelUnidadeService.atualizarAtribuicaoTemporaria(..)) && args(codUnidade, codigoAtribuicao, request)",
+            argNames = "codUnidade,codigoAtribuicao,request"
+    )
+    @Transactional
+    public void sincronizarViewsAposAtualizacao(Long codUnidade, Long codigoAtribuicao, CriarAtribuicaoRequest request) {
+        sincronizarAtribuicaoTemporaria(codUnidade, request);
+    }
+
+    @Around(
+            value = "execution(* sgc.organizacao.service.ResponsavelUnidadeService.removerAtribuicaoTemporaria(..)) && args(codUnidade, codigoAtribuicao)",
+            argNames = "joinPoint,codUnidade,codigoAtribuicao"
+    )
+    @Transactional
+    public Object sincronizarViewsAposRemocao(ProceedingJoinPoint joinPoint, Long codUnidade, Long codigoAtribuicao) throws Throwable {
+        String tituloAnterior = jdbcTemplate.queryForList(
+                "SELECT usuario_titulo FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
+                String.class,
+                codUnidade
+        ).stream().findFirst().orElse(null);
+
+        Object resultado = joinPoint.proceed();
+        restaurarResponsabilidadeTitular(codUnidade, tituloAnterior);
+        return resultado;
+    }
+
+    private void sincronizarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         String tituloAnterior = jdbcTemplate.queryForList(
                 "SELECT usuario_titulo FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
                 String.class,
@@ -58,6 +89,46 @@ public class AtribuicaoTemporariaViewsE2eAspect {
 
         removerPerfisDeResponsabilidadeAnteriores(tituloAnterior, request.tituloEleitoralUsuario(), codUnidade);
         sincronizarPerfisDaUnidade(request.tituloEleitoralUsuario(), codUnidade, tipoUnidade);
+    }
+
+    private void restaurarResponsabilidadeTitular(Long codUnidade, @Nullable String tituloResponsavelAnterior) {
+        String tituloTitular = buscarValorObrigatorio(
+                "SELECT titulo_titular FROM sgc.vw_unidade WHERE codigo = ?",
+                codUnidade
+        );
+        String matriculaTitular = buscarValorObrigatorio(
+                "SELECT matricula_titular FROM sgc.vw_unidade WHERE codigo = ?",
+                codUnidade
+        );
+        String tipoUnidade = buscarValorObrigatorio(
+                "SELECT tipo FROM sgc.vw_unidade WHERE codigo = ?",
+                codUnidade
+        );
+
+        jdbcTemplate.update("""
+                        MERGE INTO sgc.VW_RESPONSABILIDADE
+                        (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio, data_fim)
+                        KEY(unidade_codigo)
+                        VALUES (?, ?, ?, 'TITULAR', CURRENT_TIMESTAMP, NULL)
+                        """,
+                codUnidade,
+                tituloTitular,
+                matriculaTitular
+        );
+
+        if (tituloResponsavelAnterior != null && !tituloResponsavelAnterior.equals(tituloTitular)) {
+            jdbcTemplate.update("""
+                            DELETE FROM sgc.vw_usuario_perfil_unidade
+                            WHERE usuario_titulo = ?
+                              AND unidade_codigo = ?
+                              AND perfil IN ('CHEFE', 'GESTOR')
+                            """,
+                    tituloResponsavelAnterior,
+                    codUnidade
+            );
+        }
+
+        sincronizarPerfisDaUnidade(tituloTitular, codUnidade, tipoUnidade);
     }
 
     private void removerPerfisDeResponsabilidadeAnteriores(@Nullable String tituloAnterior, String novoTitulo, Long codUnidade) {

@@ -81,6 +81,111 @@ class AtribuicaoTemporariaViewsE2eAspectIntegrationTest {
         assertThat(perfisChefeTitularAnterior).isZero();
     }
 
+    @Test
+    @DisplayName("Deve ressincronizar views ao atualizar atribuição temporária")
+    void deveRessincronizarViewsAoAtualizarAtribuicaoTemporaria() {
+        prepararMassaMinima();
+
+        responsavelUnidadeService.criarAtribuicaoTemporaria(
+                3L,
+                new CriarAtribuicaoRequest(
+                        "232323",
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(10),
+                        "Cobertura de férias"
+                )
+        );
+
+        Long codigoAtribuicao = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.atribuicao_temporaria WHERE unidade_codigo = ?",
+                Long.class,
+                3L
+        );
+
+        responsavelUnidadeService.atualizarAtribuicaoTemporaria(
+                3L,
+                codigoAtribuicao,
+                new CriarAtribuicaoRequest(
+                        "232323",
+                        LocalDate.now().plusDays(1),
+                        LocalDate.now().plusDays(20),
+                        "Atualizada"
+                )
+        );
+
+        Timestamp dataFim = jdbcTemplate.queryForObject(
+                "SELECT data_fim FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
+                Timestamp.class,
+                3L
+        );
+
+        assertThat(dataFim.toLocalDateTime()).isEqualTo(LocalDate.now().plusDays(20).atTime(23, 59, 59));
+    }
+
+    @Test
+    @DisplayName("Deve restaurar titular e perfis ao remover atribuição temporária")
+    void deveRestaurarTitularEPerfisAoRemoverAtribuicaoTemporaria() {
+        prepararMassaMinima();
+
+        responsavelUnidadeService.criarAtribuicaoTemporaria(
+                3L,
+                new CriarAtribuicaoRequest(
+                        "232323",
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(10),
+                        "Cobertura de férias"
+                )
+        );
+
+        Long codigoAtribuicao = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.atribuicao_temporaria WHERE unidade_codigo = ?",
+                Long.class,
+                3L
+        );
+
+        responsavelUnidadeService.removerAtribuicaoTemporaria(3L, codigoAtribuicao);
+
+        String responsavelAtual = jdbcTemplate.queryForObject(
+                "SELECT usuario_titulo FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
+                String.class,
+                3L
+        );
+        String tipoResponsabilidade = jdbcTemplate.queryForObject(
+                "SELECT tipo FROM sgc.VW_RESPONSABILIDADE WHERE unidade_codigo = ?",
+                String.class,
+                3L
+        );
+        Integer perfisChefeTitular = jdbcTemplate.queryForObject(
+                """
+                        SELECT COUNT(*)
+                        FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil = 'CHEFE'
+                        """,
+                Integer.class,
+                "555555",
+                3L
+        );
+        Integer perfisChefeTemporario = jdbcTemplate.queryForObject(
+                """
+                        SELECT COUNT(*)
+                        FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil = 'CHEFE'
+                        """,
+                Integer.class,
+                "232323",
+                3L
+        );
+
+        assertThat(responsavelAtual).isEqualTo("555555");
+        assertThat(tipoResponsabilidade).isEqualTo("TITULAR");
+        assertThat(perfisChefeTitular).isEqualTo(1);
+        assertThat(perfisChefeTemporario).isZero();
+    }
+
     private void prepararMassaMinima() {
         jdbcTemplate.update("""
                 MERGE INTO sgc.vw_unidade

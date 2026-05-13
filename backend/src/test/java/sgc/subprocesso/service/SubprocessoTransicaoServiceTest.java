@@ -353,11 +353,12 @@ class SubprocessoTransicaoServiceTest {
         void alterarDataLimiteDeveLancarErroQuandoAnteriorEtapa2() {
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, new Unidade());
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(5));
+            sp.setDataFimEtapa1(LocalDateTime.now().plusDays(7));
             sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 
-            assertThatThrownBy(() -> service.alterarDataLimite(1L, LocalDate.now().plusDays(7)))
+            assertThatThrownBy(() -> service.alterarDataLimite(1L, LocalDate.now().plusDays(6)))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
         }
 

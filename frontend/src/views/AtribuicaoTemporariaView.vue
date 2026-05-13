@@ -3,9 +3,13 @@
     <CarregamentoPagina v-if="carregandoInicial && !unidade"/>
 
     <div v-else class="col-lg-8 col-md-9 col-12">
-      <PageHeader :title="tituloPagina">
+      <PageHeader
+          :title="tituloPagina"
+          actions-test-id="atribuicao-view__acoes"
+          title-test-id="atribuicao-view__titulo"
+      >
         <template v-if="unidade" #default>
-          {{ unidade.sigla }}
+          <span data-testid="atribuicao-view__sigla">{{ unidade.sigla }}</span>
         </template>
         <template #actions>
           <BButton :to="`/unidade/${props.codUnidade}`" variant="outline-secondary">

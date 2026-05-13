@@ -14,16 +14,15 @@
 
 3. O usuário clica em uma das unidades.
 
-4. O sistema mostra a tela `Detalhes da unidade` para a unidade selecionada, exibindo o titular e o responsável atual da unidade.
+4. O sistema mostra a tela `Detalhes da unidade`, mostrando o titular e o responsável atual da unidade.
 
 5. Se **não houver atribuição temporária vigente** para a unidade, o sistema exibe o botão `Criar atribuição`.
 
 6. Se **houver atribuição temporária vigente** para a unidade, o sistema:
-
-   - exibe o responsável com o tipo `Atrib. temporária (até [DATA_TERMINO_ATRIB])`, na própria tela de detalhes da unidade;
+   - mostra o responsável com o tipo `Atrib. temporária (até [DATA_TERMINO_ATRIB])`, na própria tela;
    - mostra o botão `Criar atribuição` no lugar do botão `Editar atribuição`.
 
-7. Ao clicar em `Criar atribuição` ou `Editar atribuição`, o sistema apresenta a tela `Atribuição temporária`, no contexto da unidade selecionada, com estes campos:
+7. Ao clicar em `Criar atribuição` ou `Editar atribuição`, o sistema apresenta a tela `Atribuição temporária`, com estes campos:
 
    - Dropdown pesquisável `Usuário` com os nomes dos servidores da unidade
    - `Data de início`
