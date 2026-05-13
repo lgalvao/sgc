@@ -61,6 +61,34 @@ export async function autenticar(page: Page, usuario: string, senha: string) {
     await page.getByTestId('btn-login-entrar').click();
 }
 
+async function clicarEntrarAposEstabilizar(page: Page) {
+    const seletorPerfil = page.getByTestId('sel-login-perfil');
+    const botaoEntrar = page.getByTestId('btn-login-entrar');
+    await expect(seletorPerfil).toBeVisible();
+    await expect(botaoEntrar).toBeVisible();
+    await expect(botaoEntrar).toBeEnabled();
+
+    // A troca de perfil expande/recolhe o bloco de autorização com animação.
+    // Esperamos o botão parar de se mover antes do clique real.
+    let caixaAnterior = await botaoEntrar.boundingBox();
+    for (let tentativa = 0; tentativa < 10; tentativa++) {
+        await page.waitForTimeout(100);
+        const caixaAtual = await botaoEntrar.boundingBox();
+        if (caixaAnterior && caixaAtual) {
+            const mesmoX = Math.abs(caixaAtual.x - caixaAnterior.x) < 0.5;
+            const mesmoY = Math.abs(caixaAtual.y - caixaAnterior.y) < 0.5;
+            const mesmaLargura = Math.abs(caixaAtual.width - caixaAnterior.width) < 0.5;
+            const mesmaAltura = Math.abs(caixaAtual.height - caixaAnterior.height) < 0.5;
+            if (mesmoX && mesmoY && mesmaLargura && mesmaAltura) {
+                break;
+            }
+        }
+        caixaAnterior = caixaAtual;
+    }
+
+    await botaoEntrar.click();
+}
+
 async function finalizarLoginNoPainel(page: Page) {
     await page.waitForURL(/\/painel(?:\?|$)/);
     await limparNotificacoes(page);
@@ -106,7 +134,7 @@ export async function loginComPerfil(page: Page, usuario: string, senha: string,
 
     await autenticar(page, usuario, senha);
     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
-    await page.getByTestId('btn-login-entrar').click();
+    await clicarEntrarAposEstabilizar(page);
     await finalizarLoginNoPainel(page);
 }
 
@@ -120,7 +148,7 @@ export async function reloginComPerfilSemLimparSpa(page: Page, usuario: string, 
     await fazerLogout(page);
     await autenticar(page, usuario, senha);
     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
-    await page.getByTestId('btn-login-entrar').click();
+    await clicarEntrarAposEstabilizar(page);
     await finalizarLoginNoPainel(page);
 }
 

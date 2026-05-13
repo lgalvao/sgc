@@ -371,6 +371,52 @@ async function criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
     return processo.codigo;
 }
 
+async function criarProcessoMapeamentoComCadastroHomologadoPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-cadastro-homologado', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de cadastro homologado: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
+async function criarProcessoRevisaoComCadastroHomologadoPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-revisao-com-cadastro-homologado', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de revisão com cadastro homologado: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
 async function criarProcessoMapeamentoComMapaHomologadoPorFixture(
     request: APIRequestContext,
     cleanup: ReturnType<typeof useProcessoCleanup>,
@@ -388,6 +434,29 @@ async function criarProcessoMapeamentoComMapaHomologadoPorFixture(
 
     if (!response.ok()) {
         throw new Error(`Falha ao criar fixture de mapa homologado: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
+async function criarProcessoMapeamentoComMapaComSugestoesPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-com-sugestoes', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de mapa com sugestões: ${response.status()} ${await response.text()}`);
     }
     const processo = await response.json() as { codigo: number };
     cleanup.registrar(processo.codigo);
@@ -1368,13 +1437,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/unidades/);
             await capturarTela(page, 'unidades', 'arvore-unidades', {fullPage: true});
 
-            // A árvore de unidades agora vem expandida por padrão
             await expect(page.getByText('SECRETARIA_1').first()).toBeVisible();
-            await expect(page.getByText(/SECAO_12[12]/).first()).toBeVisible();
+            await expect(page.getByTestId('btn-unidades-expandir-todas')).toBeVisible();
+            await page.getByTestId('btn-unidades-expandir-todas').click();
+            const unidade = page.getByRole('row', {name: /SECAO_121/i}).first();
+            await expect(unidade).toBeVisible();
 
             await capturarTela(page, 'unidades', 'arvore-unidades-expandida', {fullPage: true});
 
-            const unidade = page.getByText(/SECAO_12[12]/).first();
             await expect(unidade).toBeVisible();
             await unidade.click();
             await expect(page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i})).toBeVisible();
@@ -1525,25 +1595,18 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 12 - MODAIS DE GESTÃO DO MAPA
     test.describe('12 - Modais de Gestão do Mapa', () => {
         test('Captura modais de exclusão, edição e sugestões do mapa', async ({page, request}) => {
-            const unidadeAlvo = 'SECAO_112';
+            const unidadeAlvo = 'SECAO_322';
             const descricao = `Proc mapa modais ${Date.now()}`;
             const competencia1 = 'Competência para excluir';
             const competencia2 = 'Competência para editar';
 
-            const processoCodigo = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+            const processoCodigo = await criarProcessoMapeamentoComCadastroHomologadoPorFixture(
                 request, cleanup, descricao, unidadeAlvo
             );
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
-            await navegarParaCadastro(page);
-            await (await abrirAcaoCadastroPrincipal(page)).click();
-            await expect(page.getByRole('dialog')).toBeVisible();
-            await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para teste de mapa');
-            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
-
             await navegarParaMapa(page);
 
             // Criar duas competências para testar edição e exclusão
@@ -1597,15 +1660,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura devolução do mapa e mapa somente leitura', async ({page, request}) => {
-            const unidadeAlvo = 'ASSESSORIA_11';
+            const unidadeAlvo = 'SECAO_221';
             const descricao = `Proc devolucao mapa ${Date.now()}`;
 
-            const processoCodigo = await criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
+            const processoCodigo = await criarProcessoMapeamentoComMapaComSugestoesPorFixture(
                 request, cleanup, descricao, unidadeAlvo
             );
 
-            // CHEFE valida o mapa
-            await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+            // CHEFE vê o mapa em modo somente leitura
+            await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaMapa(page);
@@ -1618,20 +1681,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
             await page.keyboard.press('Escape');
 
-            // GESTOR abre mapa e usa devolução
-            await loginComPerfil(
-                page,
-                USUARIOS.GESTOR_SECRETARIA_1.titulo,
-                USUARIOS.GESTOR_SECRETARIA_1.senha,
-                USUARIOS.GESTOR_SECRETARIA_1.perfil
-            );
+            // GESTOR da unidade atual do fluxo abre o modal de devolução
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaMapa(page);
             await capturarTela(page, 'mapa-modais', 'mapa-disponibilizado-gestor', {
                 fullPage: true,
                 tags: ['mapa', 'analise'],
-                extra: {perfil: 'GESTOR', estado: 'DISPONIBILIZADO'}
+                extra: {perfil: 'GESTOR', estado: 'COM_SUGESTOES'}
             });
 
             // Abrir modal de devolução do mapa
@@ -1783,7 +1841,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 14 - MODAIS DE REMOÇÃO DE ATIVIDADE E CONHECIMENTO
     test.describe('14 - Modais de Remoção de Atividade e Conhecimento', () => {
         test('Captura modais de remoção de atividade e conhecimento', async ({page, request}) => {
-            const unidadeAlvo = 'SECAO_111';
+            const unidadeAlvo = 'SECAO_323';
             const descricao = `Proc remocao ${Date.now()}`;
             const atividadeDesc = `Atividade para remover ${Date.now()}`;
             const conhecimentoDesc = 'Conhecimento para remover';
@@ -1793,7 +1851,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 request, cleanup, descricao, unidadeAlvo
             );
 
-            await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
+            await login(page, '380001', 'senha');
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
             await navegarParaCadastro(page);
@@ -1849,25 +1907,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const unidadeAlvo = 'ASSESSORIA_11';
             const descricao = `Proc impacto ${Date.now()}`;
 
-            const processoCodigo = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+            const processoCodigo = await criarProcessoRevisaoComCadastroHomologadoPorFixture(
                 request, cleanup, descricao, unidadeAlvo
             );
 
-            // Homologar o processo via admin para ter um mapa base
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
-            await navegarParaCadastro(page);
-            await (await abrirAcaoCadastroPrincipal(page)).click();
-            await expect(page.getByRole('dialog')).toBeVisible();
-            await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para teste de impacto');
-            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
-
-            // Criar mapa e disponibilizar
             await navegarParaMapa(page);
-            const competencia = `Competência impacto ${Date.now()}`;
-            await MapaHelpers.criarCompetencia(page, competencia, []);
             await capturarTela(page, 'impacto-mapa', 'mapa-antes-disponibilizar', {
                 fullPage: true,
                 tags: ['mapa', 'impacto']

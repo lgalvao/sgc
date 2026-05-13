@@ -53,10 +53,14 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
 
     await page.getByTestId('inp-criar-competencia-descricao').fill(descricao);
 
-    for (const atividade of atividades) {
-        const checkbox = modal.getByLabel(atividade, {exact: true});
-        await expect(checkbox).toBeVisible();
-        await checkbox.click();
+    if (atividades.length === 0) {
+        await modal.getByTestId('btn-competencia-selecionar-todas-atividades').click();
+    } else {
+        for (const atividade of atividades) {
+            const checkbox = modal.getByLabel(atividade, {exact: true});
+            await expect(checkbox).toBeVisible();
+            await checkbox.click();
+        }
     }
 
     await page.getByTestId('btn-criar-competencia-salvar').click();
