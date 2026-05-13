@@ -55,7 +55,15 @@ export async function verificarTelaLogin(page: Page) {
     await expect(page.getByTestId('btn-login-entrar')).toContainText(TEXTOS.comum.BOTAO_ENTRAR);
 }
 
+async function aguardarFormularioLoginPronto(page: Page) {
+    await verificarTelaLogin(page);
+    await expect(page.getByTestId('inp-login-usuario')).toBeEditable();
+    await expect(page.getByTestId('inp-login-senha')).toBeEditable();
+    await expect(page.getByTestId('btn-login-entrar')).toBeEnabled();
+}
+
 export async function autenticar(page: Page, usuario: string, senha: string) {
+    await aguardarFormularioLoginPronto(page);
     await page.getByTestId('inp-login-usuario').fill(usuario);
     await page.getByTestId('inp-login-senha').fill(senha);
     await page.getByTestId('btn-login-entrar').click();
@@ -114,12 +122,14 @@ async function limparSessaoNavegador(page: Page) {
 
     // 4. Navega para a página de login
     await page.goto('/login');
+    await page.waitForLoadState('domcontentloaded');
 
     // 5. Garante a limpeza após o carregamento para total isolamento
     await page.evaluate(() => {
         window.localStorage.clear();
         window.sessionStorage.clear();
     });
+    await aguardarFormularioLoginPronto(page);
 }
 
 export async function login(page: Page, usuario: string, senha: string) {
