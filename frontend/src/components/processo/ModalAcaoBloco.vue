@@ -15,7 +15,7 @@
   >
     <p class="mb-3">{{ texto }}</p>
 
-    <BAlert v-if="erro" :model-value="true" class="mb-3" variant="danger">
+    <BAlert v-if="erro" :model-value="true" class="mb-3" dismissible variant="danger">
       {{ erro }}
     </BAlert>
 
@@ -231,4 +231,3 @@ watch(() => props.unidadesPreSelecionadas, (newVal) => {
   selecionadosLocal.value = [...newVal];
 }, {immediate: true});
 </script>
-

@@ -10,7 +10,7 @@
         @dismissed="clear()"
     />
 
-    <BAlert :model-value="true" variant="warning">
+    <BAlert :model-value="true" dismissible variant="warning">
       {{ TEXTOS.administracao.LIMPEZA_ALERTA }}
     </BAlert>
 

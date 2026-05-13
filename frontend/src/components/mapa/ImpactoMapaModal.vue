@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <BAlert v-else-if="mostrar" :model-value="true" variant="danger">
+    <BAlert v-else-if="mostrar" :model-value="true" dismissible variant="danger">
       {{ TEXTOS.mapa.impacto.ERRO_CARREGAR }}
     </BAlert>
 

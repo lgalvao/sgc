@@ -3,6 +3,7 @@ import type {VarianteAlerta} from "@/composables/useNotification";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {TEXTOS} from "@/constants/textos";
 import type {SubprocessoDetalhe} from "@/types/tipos";
+import {formatarDataBR} from "@/utils";
 import logger from "@/utils/logger";
 
 type TipoReabertura = "cadastro" | "revisao";
@@ -107,7 +108,7 @@ export function useSubprocessoAcoesAdministrativas({
         await executarComNotificacaoDeErro(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, notify, async () => {
             await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             fecharModalAlterarDataLimite();
-            notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, "success");
+            notify(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`, "success");
             // ProcessoResumo.dataLimite é exibido no painel — invalida para refletir a mudança
             invalidarCachesSubprocesso({incluirPainel: true});
             await atualizarSubprocessoAtual();

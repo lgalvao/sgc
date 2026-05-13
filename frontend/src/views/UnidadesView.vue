@@ -51,6 +51,7 @@
       <div v-if="dadosArvore.length > 0">
         <ArvoreToolbar
             v-model:termo-busca="termoBusca"
+            :exibir-acoes-expansao="false"
             :modo-selecao="false"
         />
 

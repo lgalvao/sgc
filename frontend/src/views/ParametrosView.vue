@@ -4,7 +4,7 @@
 
     <CarregamentoPagina v-if="loading"/>
 
-    <BAlert v-else-if="error" :model-value="true" variant="danger">
+    <BAlert v-else-if="error" :model-value="true" dismissible variant="danger">
       {{ error }}
     </BAlert>
 

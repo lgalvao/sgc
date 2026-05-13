@@ -23,25 +23,27 @@
         </BButton>
       </template>
 
-      <BButton
-          aria-label="Expandir todas as unidades"
-          class="arvore-unidades__botao-icone"
-          data-testid="btn-arvore-expandir-tudo"
-          size="sm"
-          variant="outline-secondary"
-          @click="$emit('expandir-todos')">
-        <i aria-hidden="true" class="bi bi-arrows-expand"/>
-      </BButton>
+      <template v-if="exibirAcoesExpansao">
+        <BButton
+            aria-label="Expandir todas as unidades"
+            class="arvore-unidades__botao-icone"
+            data-testid="btn-arvore-expandir-tudo"
+            size="sm"
+            variant="outline-secondary"
+            @click="$emit('expandir-todos')">
+          <i aria-hidden="true" class="bi bi-arrows-expand"/>
+        </BButton>
 
-      <BButton
-          aria-label="Recolher todas as unidades"
-          class="arvore-unidades__botao-icone"
-          data-testid="btn-arvore-recolher-tudo"
-          size="sm"
-          variant="outline-secondary"
-          @click="$emit('recolher-todos')">
-        <i aria-hidden="true" class="bi bi-arrows-collapse"/>
-      </BButton>
+        <BButton
+            aria-label="Recolher todas as unidades"
+            class="arvore-unidades__botao-icone"
+            data-testid="btn-arvore-recolher-tudo"
+            size="sm"
+            variant="outline-secondary"
+            @click="$emit('recolher-todos')">
+          <i aria-hidden="true" class="bi bi-arrows-collapse"/>
+        </BButton>
+      </template>
     </div>
 
     <div class="arvore-unidades__busca">
@@ -67,10 +69,13 @@
 <script lang="ts" setup>
 import {BButton, BFormInput} from "bootstrap-vue-next";
 
-defineProps<{
+withDefaults(defineProps<{
   termoBusca: string;
   modoSelecao: boolean;
-}>();
+  exibirAcoesExpansao?: boolean;
+}>(), {
+  exibirAcoesExpansao: true,
+});
 
 defineEmits<{
   'update:termoBusca': [value: string];

@@ -34,13 +34,13 @@
 
       <BAlert
           v-if="erroMapaExibido"
-          :key="erroMapaExibido"
+          :key="`${erroMapaExibido}-${erroValidacaoMapaTick}`"
           :model-value="true"
           dismissible
           no-fade
           show
           variant="danger"
-          @dismissed="limparErroMapa"
+          @dismissed="dispensarErroMapa"
       >
         {{ erroMapaExibido }}
       </BAlert>
@@ -431,6 +431,7 @@ const {
 
 const {
   erroValidacaoMapa,
+  erroValidacaoMapaTick,
   loadingDisponibilizacao,
   notificacaoDisponibilizacao,
   abrirModalDisponibilizar,
@@ -450,5 +451,9 @@ const {
   aplicarErroNormalizado,
 });
 const erroMapaExibido = computed(() => erroValidacaoMapa.value || erroMapa.value);
+
+function dispensarErroMapa() {
+  limparErroMapa(erroMapa);
+}
 
 </script>

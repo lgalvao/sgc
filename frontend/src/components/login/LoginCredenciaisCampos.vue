@@ -143,6 +143,7 @@ function atualizarSenha(valor: string | number | null) {
         :model-value="true"
         class="small mt-1 py-1 px-2 mb-0"
         data-testid="alert-caps-lock"
+        dismissible
         variant="warning"
     >
       <i

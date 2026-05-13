@@ -29,15 +29,19 @@ export function useMapaDisponibilizacao({
                                         }: DependenciasMapaDisponibilizacao) {
     const notificacaoDisponibilizacao = ref("");
     const erroValidacaoMapa = ref("");
+    const erroValidacaoMapaTick = ref(0);
     const loadingDisponibilizacao = ref(false);
 
     const podeConfirmarDisponibilizacao = computed(() =>
         competencias.value.length > 0 && !existeCompetenciaSemAtividade.value && atividadesSemCompetencia.value.length === 0,
     );
 
-    function limparErroMapa(erroMapa: Ref<string | null>) {
+    function limparErroMapa(erroMapa?: Ref<string | null>) {
         erroValidacaoMapa.value = "";
-        erroMapa.value = null;
+        erroValidacaoMapaTick.value += 1;
+        if (erroMapa) {
+            erroMapa.value = null;
+        }
     }
 
     function obterMensagemErroChecklistDisponibilizacao() {
@@ -51,6 +55,7 @@ export function useMapaDisponibilizacao({
         erroValidacaoMapa.value = "";
         if (!podeConfirmarDisponibilizacao.value) {
             erroValidacaoMapa.value = obterMensagemErroChecklistDisponibilizacao();
+            erroValidacaoMapaTick.value += 1;
             return;
         }
         mostrarModalDisponibilizar.value = true;
@@ -95,6 +100,7 @@ export function useMapaDisponibilizacao({
     return {
         podeConfirmarDisponibilizacao,
         erroValidacaoMapa,
+        erroValidacaoMapaTick,
         loadingDisponibilizacao,
         notificacaoDisponibilizacao,
         abrirModalDisponibilizar,

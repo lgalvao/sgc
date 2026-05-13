@@ -11,7 +11,7 @@
       @confirmar="disponibilizar"
       @fechar="fechar"
   >
-    <BAlert v-if="fieldErrors?.generic" :model-value="true" class="mb-3" variant="danger">
+    <BAlert v-if="fieldErrors?.generic" :model-value="true" class="mb-3" dismissible variant="danger">
       {{ fieldErrors.generic }}
     </BAlert>
     <BFormGroup
@@ -61,6 +61,7 @@
         :model-value="true"
         class="mt-3"
         data-testid="alert-disponibilizar-mapa"
+        dismissible
         variant="secondary"
     >
       {{ notificacao }}
@@ -175,6 +176,5 @@ function extrairData(data?: string) {
   return data?.split("T")[0] ?? "";
 }
 </script>
-
 
 

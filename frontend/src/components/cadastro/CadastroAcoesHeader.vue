@@ -67,6 +67,14 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         >
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
         </BButton>
+        <BButton
+            v-if="codSubprocesso && podeVisualizarImpacto"
+            data-testid="cad-atividades__btn-impactos-mapa-edicao"
+            variant="outline-secondary"
+            @click="$emit('abrir-impacto')"
+        >
+          <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
+        </BButton>
         <BDropdown
             v-if="codSubprocesso && usarDropdownAcoes"
             :text="TEXTOS.mapa.BOTAO_ACOES"
@@ -119,28 +127,6 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         >
           {{ acaoPrincipalCadastro.rotuloBotao }}
         </BButton>
-        <LoadingButton
-            v-else-if="codSubprocesso && mostrarDisponibilizarCadastro"
-            :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
-            :loading="loadingValidacao"
-            :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
-            :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
-            data-testid="btn-cad-atividades-disponibilizar"
-            icon="check-lg"
-            variant="success"
-            @click="$emit('disponibilizar')"
-        />
-      </div>
-
-      <div v-if="podeVisualizarImpacto || mostrarImportarAtividades" class="d-flex gap-2">
-        <BButton
-            v-if="codSubprocesso && podeVisualizarImpacto"
-            data-testid="cad-atividades__btn-impactos-mapa-edicao"
-            variant="outline-secondary"
-            @click="$emit('abrir-impacto')"
-        >
-          <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
-        </BButton>
         <BButton
             v-if="codSubprocesso && mostrarImportarAtividades"
             :disabled="!permissoes.habilitarEditarCadastro"
@@ -150,6 +136,17 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         >
           <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
         </BButton>
+        <LoadingButton
+            v-if="codSubprocesso && mostrarDisponibilizarCadastro && !usarDropdownAcoes"
+            :disabled="loadingValidacao || !permissoes.habilitarDisponibilizarCadastro"
+            :loading="loadingValidacao"
+            :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
+            :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
+            data-testid="btn-cad-atividades-disponibilizar"
+            icon="check-lg"
+            variant="success"
+            @click="$emit('disponibilizar')"
+        />
       </div>
     </template>
   </PageHeader>
