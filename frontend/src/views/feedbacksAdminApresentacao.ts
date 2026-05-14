@@ -25,7 +25,7 @@ function obterConfiguracaoTipo(tipo: string) {
 }
 
 function capitalizarTipo(chave: string): string {
-  return chave.charAt(0) + chave.slice(1).toLowerCase();
+  return chave.charAt(0).toUpperCase() + chave.slice(1).toLowerCase();
 }
 
 export function formatarTipo(tipo: string): string {

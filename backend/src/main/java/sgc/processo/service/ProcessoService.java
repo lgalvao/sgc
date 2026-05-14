@@ -148,7 +148,22 @@ public class ProcessoService {
             subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadesAcesso);
         }
 
+        return listarSubprocessosElegiveisSemLocalizacoesPrecarregadas(subprocessos, usuario);
+    }
+
+    private List<SubprocessoElegivelDto> listarSubprocessosElegiveisSemLocalizacoesPrecarregadas(
+            List<Subprocesso> subprocessos,
+            Usuario usuario
+    ) {
         return listarSubprocessosElegiveis(subprocessos, usuario, false, Map.of());
+    }
+
+    private List<SubprocessoElegivelDto> listarSubprocessosElegiveisComLocalizacoesPrecarregadas(
+            List<Subprocesso> subprocessos,
+            Usuario usuario,
+            Map<Long, Unidade> localizacoesPrecarregadas
+    ) {
+        return listarSubprocessosElegiveis(subprocessos, usuario, true, localizacoesPrecarregadas);
     }
 
     private List<SubprocessoElegivelDto> listarSubprocessosElegiveis(
@@ -357,10 +372,9 @@ public class ProcessoService {
                 .filter(subprocesso -> unidadesAcesso.contains(subprocesso.getUnidade().getCodigo()))
                 .toList();
         if (incluirElegiveis) {
-            List<SubprocessoElegivelDto> subprocessosElegiveis = listarSubprocessosElegiveis(
+            List<SubprocessoElegivelDto> subprocessosElegiveis = listarSubprocessosElegiveisComLocalizacoesPrecarregadas(
                     subprocessosVisiveis,
                     usuario,
-                    true,
                     localizacoesPorSubprocesso
             );
             dto.getElegiveis().addAll(subprocessosElegiveis);

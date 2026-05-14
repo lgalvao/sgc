@@ -4,7 +4,7 @@
 
 Este diagnóstico foi reconfirmado com validações executadas no repositório:
 
-- Baseline backend: `./gradlew --no-daemon --no-configuration-cache :backend:test` (**1796 testes passando**).
+- Baseline backend: `./gradlew --no-daemon --no-configuration-cache :backend:test` (**1794 testes passando**).
 - Baseline frontend: `npm run lint`, `npm run typecheck`, `npm run test:unit` (**134 arquivos de teste e 1295 testes passando**).
 - Cheiros gerais: `npm run smells:auditar`.
 - Cruft frontend: `npm run frontend:cruft`.

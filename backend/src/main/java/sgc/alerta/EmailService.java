@@ -4,7 +4,6 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.*;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ public class EmailService {
     private final ConfigAplicacao config;
     private final String modoEnvio;
 
-    @Autowired
     public EmailService(
             JavaMailSender enviadorEmail,
             ConfigAplicacao config,
