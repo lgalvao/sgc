@@ -4,6 +4,7 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.*;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import java.io.*;
 import java.util.regex.*;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class EmailService {
     private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
@@ -21,8 +21,18 @@ public class EmailService {
 
     private final JavaMailSender enviadorEmail;
     private final ConfigAplicacao config;
-    @Value("${sgc.notificacao-email.modo-envio:smtp}")
-    private String modoEnvio;
+    private final String modoEnvio;
+
+    @Autowired
+    public EmailService(
+            JavaMailSender enviadorEmail,
+            ConfigAplicacao config,
+            @Value("${sgc.notificacao-email.modo-envio:smtp}") String modoEnvio
+    ) {
+        this.enviadorEmail = enviadorEmail;
+        this.config = config;
+        this.modoEnvio = modoEnvio;
+    }
 
     public void enviarEmail(String para, String assunto, String corpo) {
         processarEnvioEmail(para, assunto, corpo, false);

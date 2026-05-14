@@ -1,4 +1,4 @@
-package sgc.alerta.notificacao;
+package sgc.alerta;
 
 import jakarta.mail.internet.*;
 import org.junit.jupiter.api.*;
@@ -7,7 +7,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.mail.*;
 import org.springframework.mail.javamail.*;
-import sgc.alerta.*;
 import sgc.comum.config.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -176,15 +175,17 @@ class EmailServiceTest {
     @Nested
     @DisplayName("Modo mock ativo")
     class ModoMockAtivo {
+        private EmailService notificacaoServicoMock;
+
         @BeforeEach
         void configurarModoMock() {
-            org.springframework.test.util.ReflectionTestUtils.setField(notificacaoServico, "modoEnvio", "mock");
+            notificacaoServicoMock = new EmailService(enviadorEmail, config, "mock");
         }
 
         @Test
         @DisplayName("Não deve enviar e-mail quando modo mock estiver ativo")
         void naoDeveEnviarEmailQuandoModoMockEstiverAtivo() {
-            notificacaoServico.enviarEmailHtml(DESTINATARIO, "Assunto", "<h1>Corpo</h1>");
+            notificacaoServicoMock.enviarEmailHtml(DESTINATARIO, "Assunto", "<h1>Corpo</h1>");
 
             verify(enviadorEmail, never()).send(any(MimeMessage.class));
         }
@@ -192,7 +193,7 @@ class EmailServiceTest {
         @Test
         @DisplayName("Não deve enviar e-mail de texto simples quando modo mock estiver ativo")
         void naoDeveEnviarEmailTextoSimplesQuandoModoMockEstiverAtivo() {
-            notificacaoServico.enviarEmail(DESTINATARIO, "Assunto", "Corpo texto");
+            notificacaoServicoMock.enviarEmail(DESTINATARIO, "Assunto", "Corpo texto");
 
             verify(enviadorEmail, never()).send(any(MimeMessage.class));
         }

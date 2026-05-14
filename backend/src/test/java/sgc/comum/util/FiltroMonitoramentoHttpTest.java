@@ -7,7 +7,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.mock.web.*;
 
 import java.io.*;
-import java.lang.reflect.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -404,31 +403,4 @@ class FiltroMonitoramentoHttpTest {
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
-    @Test
-    @DisplayName("logarJavaLento deve ignorar atributo não-lista")
-    void logarJavaLentoIgnoraAtributoNaoLista() throws Exception {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        Method metodo = FiltroMonitoramentoHttp.class.getDeclaredMethod("logarJavaLento", HttpServletRequest.class);
-        metodo.setAccessible(true);
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, "nao-lista");
-
-        assertThatCode(() -> metodo.invoke(filtro, request)).doesNotThrowAnyException();
-    }
-
-    @Test
-    @DisplayName("logarJavaLento deve processar lista não vazia sem lançar exceção")
-    void logarJavaLentoProcessaListaNaoVazia() throws Exception {
-        MonitoramentoProperties properties = new MonitoramentoProperties();
-        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
-        Method metodo = FiltroMonitoramentoHttp.class.getDeclaredMethod("logarJavaLento", HttpServletRequest.class);
-        metodo.setAccessible(true);
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, new ArrayList<>(List.of("java Classe.metodo 10.00ms")));
-
-        assertThatCode(() -> metodo.invoke(filtro, request)).doesNotThrowAnyException();
-    }
 }

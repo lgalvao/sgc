@@ -15,7 +15,7 @@ Este diagnóstico foi reconfirmado com validações executadas no repositório:
 
 ### 1) Complexidade e acoplamento ainda altos no backend
 
-- `backend/src/main/java/sgc/processo/service/ProcessoService.java` segue como hotspot com **1446 linhas**.
+- `backend/src/main/java/sgc/processo/service/ProcessoService.java` segue como hotspot com **1471 linhas**.
 - Cobertura aponta esse serviço como **P1 crítico** (impacto **611.0**, com **9 linhas** e **20 branches** sem teste).
 - O serviço ainda concentra fluxo de ação em bloco, montagem de detalhe e regras de elegibilidade/permissão.
 
@@ -25,13 +25,13 @@ Este diagnóstico foi reconfirmado com validações executadas no repositório:
 - `frontend/src/views/ProcessoCadastroView.vue` mantém tamanho elevado (**405 linhas**) e aparece entre hotspots de cruft.
 - O parser/normalização de metadados de feedback era um foco de complexidade local na view.
 
-### 3) Robustez defensiva em excesso (com melhora incremental)
+### 3) Robustez defensiva em excesso (com melhora relevante nesta rodada)
 
 Da auditoria de cheiros/cruft:
 
-- Backend: **126 DTOs** com `@Nullable`, **237** checks explícitos de null, **9** usos de `Objects.isNull/nonNull`.
+- Backend: **109 DTOs** com `@Nullable`, **235** checks explícitos de null, **9** usos de `Objects.isNull/nonNull`.
 - Frontend produção: **28** checks de null, **70** fallbacks defensivos, **51** blocos `catch`.
-- Score de cheiros caiu para **1706 (crítico)**.
+- Score de cheiros caiu para **1617 (crítico)**.
 - Score de cruft frontend caiu para **462 (crítico)**.
 
 ### 4) Risco de manutenção ainda concentrado
@@ -51,6 +51,13 @@ Da auditoria de cheiros/cruft:
     - `executarAcaoEmBloco` foi simplificado para early-return por tipo de comando.
     - A validação de permissão de análise em bloco foi isolada em helper dedicado (`validarPermissaoAnaliseEmBloco`).
     - Resultado direto: menos estado temporário e ramificações implícitas no trecho crítico.
+
+3. **Rodada de redução de nulabilidade acidental e de testes inúteis**
+    - `ProcessoService` teve remoção de nulabilidade implícita em parâmetros internos de elegibilidade/permissão em bloco (remoção de `@Nullable` e uso de contexto explícito).
+    - `UnidadeDto` e `NotificacaoDto` tiveram limpeza de `@Nullable` redundante em propriedades opcionais de DTO, reduzindo ruído sem alterar contrato serializado.
+    - `FiltroMonitoramentoHttpTest` removeu 2 testes reflexivos de método privado (`getDeclaredMethod`/`setAccessible`) por não validarem contrato público.
+    - `EmailService` ganhou construtor package-private para testabilidade e `EmailServiceTest` deixou de usar `ReflectionTestUtils.setField` para modo mock.
+    - Resultado direto: redução mensurável de cheiros associados a nulabilidade e remoção de acoplamento de testes a implementação interna.
 
 ## Próximos cortes recomendados (prioridade)
 

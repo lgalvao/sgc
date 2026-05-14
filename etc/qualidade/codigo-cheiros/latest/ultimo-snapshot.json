@@ -1,18 +1,18 @@
 {
-  "geradoEm": "2026-05-14T22:16:03.150Z",
+  "geradoEm": "2026-05-14T22:51:46.076Z",
   "base": "/home/runner/work/sgc/sgc",
   "pontuacao": {
-    "total": 1706,
+    "total": 1617,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 1122,
+      "backend": 1033,
       "frontend": 76,
       "frontend_testes": 508
     }
   },
   "contagens": {
-    "backend_nullable_dto": 126,
-    "backend_null_checks": 237,
+    "backend_nullable_dto": 109,
+    "backend_null_checks": 235,
     "backend_objects_null": 9,
     "frontend_any_producao": 0,
     "frontend_any_testes": 508,
@@ -31,22 +31,6 @@
     "frontend_fallback_or": 0
   },
   "hotspots": [
-    {
-      "arquivo": "backend/src/main/java/sgc/organizacao/dto/UnidadeDto.java",
-      "pontuacao": 58,
-      "categorias": {
-        "backend_nullable_dto": 10,
-        "backend_null_checks": 4
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/alerta/dto/NotificacaoDto.java",
-      "pontuacao": 51,
-      "categorias": {
-        "backend_nullable_dto": 9,
-        "backend_null_checks": 3
-      }
-    },
     {
       "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
       "pontuacao": 44,
@@ -70,14 +54,6 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
-      "pontuacao": 34,
-      "categorias": {
-        "backend_null_checks": 16,
-        "backend_objects_null": 1
-      }
-    },
-    {
       "arquivo": "frontend/src/components/__tests__/ArvoreUnidades.spec.ts",
       "pontuacao": 33,
       "categorias": {
@@ -93,6 +69,14 @@
     },
     {
       "arquivo": "backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java",
+      "pontuacao": 30,
+      "categorias": {
+        "backend_null_checks": 14,
+        "backend_objects_null": 1
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
       "pontuacao": 30,
       "categorias": {
         "backend_null_checks": 14,
@@ -141,6 +125,20 @@
       "categorias": {
         "backend_null_checks": 11,
         "backend_objects_null": 1
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/alerta/EnfileirarNotificacaoCommand.java",
+      "pontuacao": 20,
+      "categorias": {
+        "backend_nullable_dto": 4
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/mapa/dto/AtualizarEstadoMapaCommand.java",
+      "pontuacao": 20,
+      "categorias": {
+        "backend_nullable_dto": 4
       }
     }
   ]
