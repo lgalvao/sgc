@@ -59,7 +59,7 @@ public class ValidadorDadosOrganizacionais {
         }
 
         violacoesPorTipo.forEach((tipo, detalhes) ->
-                log.warn("DIAGN. ORGANIZACIONAL [{}]: {} ocorrencia(s). {}",
+                log.warn("DIAGN. ORGANIZACIONAL [{}]: {} ocorrência(s). {}",
                         tipo,
                         detalhes.size(),
                         String.join("; ", detalhes))
