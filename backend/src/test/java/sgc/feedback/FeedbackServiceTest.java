@@ -381,7 +381,7 @@ class FeedbackServiceTest {
         UUID id = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
                 .id(id)
-                .caminhoScreenshot("C:\\\\feedback\\\\arquivo.webp")
+                .caminhoScreenshot("pasta\\arquivo.webp")
                 .build();
         when(repo.findById(id)).thenReturn(Optional.of(registro));
 

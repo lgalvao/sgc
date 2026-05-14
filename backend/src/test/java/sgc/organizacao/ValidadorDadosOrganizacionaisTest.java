@@ -162,7 +162,7 @@ class ValidadorDadosOrganizacionaisTest {
                 semUnidade.put("perfil", "GESTOR");
                 return List.of(
                         Map.of("USUARIO_TITULO", "222", "PERFIL", "GESTOR", "UNIDADE_CODIGO", 1L),
-                        Map.of("usuario_titulo", "222", "perfil", "GESTOR", "unidade_codigo", 1L),
+                        Map.of("USUARIO_TITULO", "222", "PERFIL", "GESTOR", "UNIDADE_CODIGO", 1L),
                         semUsuario,
                         semPerfil,
                         semUnidade,
