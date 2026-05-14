@@ -1,6 +1,6 @@
 # Auditoria de cheiros de codigo
 
-Gerado em: 2026-05-14T22:51:46.076Z
+Gerado em: 2026-05-14T23:14:40.505Z
 Pontuacao: 1617 (critico)
 
 ## Contagens
