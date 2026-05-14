@@ -66,7 +66,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         // CDU-19 Passo 5.4/5.5: verificar movimentação registrada no subprocesso com data/hora
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: /Validação do mapa/i})
+            .locator('tr', {hasText: /Mapa validado/i})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);

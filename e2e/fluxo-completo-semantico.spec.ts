@@ -684,7 +684,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await page.getByTestId('btn-mapa-historico').click();
             const modalHistorico = page.getByRole('dialog');
             await expect(modalHistorico).toBeVisible();
-            await page.keyboard.press('Escape');
+            await modalHistorico.getByTestId('btn-fechar-historico').click();
             await expect(modalHistorico).toBeHidden();
         });
 

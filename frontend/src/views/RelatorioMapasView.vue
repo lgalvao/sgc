@@ -121,21 +121,17 @@ function aplicarEscopoPerfil(unidades: Unidade[]): Unidade[] {
 }
 
 async function carregarUnidades() {
-  try {
-    const [arvore, codigosComMapa] = await Promise.all([
-      buscarTodasUnidades(),
-      buscarCodigosUnidadesComMapaVigente()
-    ]);
-    const unidadesComElegibilidade = aplicarElegibilidadeMapaVigente(
-        arvore,
-        new Set(codigosComMapa)
-    );
-    unidadesDisponiveis.value = aplicarEscopoPerfil(
-        filtrarArvorePorMapaVigente(unidadesComElegibilidade)
-    );
-  } catch {
-    notify("Erro ao carregar unidades", "danger");
-  }
+  const [arvore, codigosComMapa] = await Promise.all([
+    buscarTodasUnidades(),
+    buscarCodigosUnidadesComMapaVigente()
+  ]);
+  const unidadesComElegibilidade = aplicarElegibilidadeMapaVigente(
+      arvore,
+      new Set(codigosComMapa)
+  );
+  unidadesDisponiveis.value = aplicarEscopoPerfil(
+      filtrarArvorePorMapaVigente(unidadesComElegibilidade)
+  );
 }
 
 async function exportarPdf() {

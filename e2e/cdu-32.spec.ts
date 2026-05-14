@@ -52,10 +52,10 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
 
         await verificarToast(page, /Cadastro reaberto/i);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
-        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Cadastro reaberto/i);
 
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: /Reabertura de cadastro/i})
+            .locator('tr', {hasText: /Cadastro reaberto/i})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);

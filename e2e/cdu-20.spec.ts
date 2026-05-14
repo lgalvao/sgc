@@ -240,7 +240,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await expect(page.getByRole('columnheader', {name: 'Descrição'})).toBeVisible();
 
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: 'Devolução da validação do mapa de competências para ajustes'})
+            .locator('tr', {hasText: 'Validação do mapa devolvida para ajustes'})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
 

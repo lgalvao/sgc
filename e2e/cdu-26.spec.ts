@@ -148,7 +148,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await navegarParaSubprocesso(page, unidadeIsolada);
 
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: /Mapa de competências homologado/i})
+            .locator('tr', {hasText: /Mapa homologado/i})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);

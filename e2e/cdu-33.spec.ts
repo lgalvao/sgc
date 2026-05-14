@@ -93,7 +93,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
 
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: /Reabertura de revisão de cadastro/i})
+            .locator('tr', {hasText: /Revisão do cadastro reaberta/i})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);

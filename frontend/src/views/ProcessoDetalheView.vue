@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <LayoutPadrao>
     <AppAlert
         v-if="lastError"
@@ -34,7 +34,6 @@
 
     <CarregamentoPagina v-else-if="!lastError" :mensagem="TEXTOS.processo.CARREGANDO_DETALHES"/>
 
-    <!-- Modal de Ação em Bloco -->
     <ModalAcaoBloco
         :id="'modal-acao-bloco'"
         ref="modalBlocoRef"
@@ -118,12 +117,10 @@ async function carregarContextoCompleto() {
     }
     return data;
   } catch (error) {
-    // No bootstrap inicial, não há snapshot útil para preservar.
-    // Em recargas em background, mantemos o último snapshot até que haja sucesso
-    // ou a pessoa usuária decida sair do contexto.
+    // Em recargas em background, mantemos o último snapshot até que haja sucesso ou usuário decida sair
     processo.value = snapshotAnterior;
     lastError.value = normalizarErro(error);
-    throw error;
+    return null;
   }
 }
 
@@ -173,12 +170,8 @@ async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
 
 onMounted(async () => {
   if (codProcesso) {
-    try {
-      await carregarContextoCompleto();
-      carregamentoInicialConcluido.value = true;
-    } catch {
-      // O erro já foi convertido em estado local para exibição inline.
-    }
+    await carregarContextoCompleto();
+    carregamentoInicialConcluido.value = true;
   }
 });
 
@@ -189,11 +182,7 @@ onActivated(async () => {
   if (processoStore.dadosValidos(codProcesso)) {
     return;
   }
-  try {
-    await carregarContextoCompleto();
-  } catch {
-    // O erro já foi convertido em estado local para exibição inline.
-  }
+  await carregarContextoCompleto();
 });
 
 defineExpose({
@@ -204,4 +193,3 @@ defineExpose({
   acoesBlocoVisiveis,
 });
 </script>
-

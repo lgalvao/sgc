@@ -141,7 +141,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: /Disponibilização do mapa de competências/i})
+            .locator('tr', {hasText: /Mapa disponibilizado para validação/i})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ModalPadrao
       :loading="loading"
       :model-value="mostrarModal"
@@ -97,6 +97,9 @@ const mensagemErroDataLimite = computed(() => {
   }
   if (deveValidarFimEtapaAnterior.value && dataFimEtapaAnteriorFormatada.value && novaDataLimite.value <= dataFimEtapaAnteriorFormatada.value) {
     return "A data limite deve ser maior que a data de fim da etapa anterior.";
+  }
+  if (props.ultimaDataLimiteSubprocesso && novaDataLimite.value < formatarDataParaInput(props.ultimaDataLimiteSubprocesso)) {
+    return "A data limite deve ser maior ou igual à última data limite do subprocesso.";
   }
   return "";
 });

@@ -101,7 +101,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         // CDU-17 Passo 14: verificar movimentação registrada com data/hora
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: /Disponibilização do mapa/i})
+            .locator('tr', {hasText: /Mapa disponibilizado para validação/i})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
