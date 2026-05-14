@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BAlert, BButton} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
