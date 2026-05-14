@@ -44,11 +44,13 @@ if [ -t 1 ]; then
 fi
 
 invoke_passo 'Atualizar branch local' git pull
-invoke_passo 'Lint raiz' npm run lint:ox
-invoke_passo 'Lint etc/scripts' npm --prefix etc/scripts run lint
-invoke_passo 'Testes etc/scripts' npm --prefix etc/scripts run test
-invoke_passo 'Qualidade frontend + backend' "$GRADLE_CMD" backend:qualityCheck
+invoke_passo 'npm install' npm install --prefix etc/scripts --silent && npm install --silent && npm install --prefix frontend --silent 
+invoke_passo 'npm update' npm update --prefix etc/scripts --silent && npm update --silent && npm update --prefix frontend --silent 
+invoke_passo 'Lint raiz' npm run lint 
+invoke_passo 'Typecheck raiz' npm run typecheck
+invoke_passo 'Testes scripts' npm --prefix etc/scripts run test
+invoke_passo 'Testes frontend' npm --prefix frontend run test
+invoke_passo 'Testes backend' "$GRADLE_CMD" backend:test
 invoke_passo 'Testes e2e' npx playwright test
 
 echo -e "\n${GREEN}Tudo certo!${NC}"
-

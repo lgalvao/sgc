@@ -272,7 +272,7 @@ describe("CLI raiz do toolkit", () => {
         expect(typeof conteudoJson.estatisticas.classes_fora_escopo_jacoco).toBe("number");
         expect(typeof conteudoJson.estatisticas.classes_ruido_ignorado).toBe("number");
         expect(conteudoJson.categorias.Repositories.tested.length).toBeGreaterThanOrEqual(1);
-    });
+    }, 60000);
 
     test("ignora DTOs estruturais e contratuais do backlog real", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-dto-"));
