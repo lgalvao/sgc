@@ -3,7 +3,6 @@ import {computed, onBeforeUnmount, ref, useAttrs, watch} from "vue";
 import {Editor, EditorContent} from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import {
-    htmlTemConteudo,
     LIMITE_PADRAO_TEXTO_FORMATADO,
     normalizarHtmlEditor,
     obterComprimentoHtmlFormatado
