@@ -33,4 +33,4 @@ Prioridade baseada em volume de código não testado e complexidade condicional.
 | 20 | `frontend/src/views/cadastroDisponibilizacao.ts` | 20.5 | 10 | 86.49% | P3 |
 
 
-_Gerado automaticamente pelo toolkit SGC em 14/05/2026, 22:10:40._
+_Gerado automaticamente pelo toolkit SGC em 14/05/2026, 22:16:04._

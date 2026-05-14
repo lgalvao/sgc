@@ -33,4 +33,4 @@ Prioridade baseada em complexidade ciclomática cruzada com lacunas de teste.
 | 20 | `sgc.subprocesso.service.SubprocessoNotificacaoService` | 79.0 | 36 | 1 | 4 | P1 |
 
 
-_Gerado automaticamente pelo toolkit SGC em 14/05/2026, 22:10:40._
+_Gerado automaticamente pelo toolkit SGC em 14/05/2026, 22:16:04._

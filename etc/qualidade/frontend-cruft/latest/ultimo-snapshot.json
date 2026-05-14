@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-14T22:07:23.226Z",
+  "geradoEm": "2026-05-14T22:16:03.694Z",
   "base": "/home/runner/work/sgc/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -10,8 +10,8 @@
     }
   },
   "resumo": {
-    "arquivosFrontend": 421,
-    "arquivosProducao": 224,
+    "arquivosFrontend": 422,
+    "arquivosProducao": 225,
     "arquivosTeste": 197,
     "scoreTotal": 462,
     "faixa": "critico"
@@ -264,22 +264,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/FeedbacksAdminView.vue",
-      "camada": "view",
-      "linhas": 398,
-      "score": 11,
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 1,
-        "catchBlocks": 4,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/utils/textoFormatado.ts",
       "camada": "utils",
       "linhas": 37,
@@ -337,6 +321,22 @@
         "checksNull": 0,
         "fallbacksDefensivos": 3,
         "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/views/feedbacksAdminApresentacao.ts",
+      "camada": "view",
+      "linhas": 161,
+      "score": 9,
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 1,
+        "catchBlocks": 3,
         "castsDuplos": 0,
         "storageDireto": 0,
         "exportsSuspeitos": 0
@@ -663,30 +663,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/FeedbacksAdminView.vue",
-      "camada": "view",
-      "categoriaArquivo": "producao",
-      "linhas": 398,
-      "imports": 10,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 1,
-        "catchBlocks": 4,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 11,
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/composables/useFeedback.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
@@ -780,6 +756,36 @@
         "checksNull": 0,
         "fallbacksDefensivos": 3,
         "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 9,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/views/feedbacksAdminApresentacao.ts",
+      "camada": "view",
+      "categoriaArquivo": "producao",
+      "linhas": 161,
+      "imports": 1,
+      "exports": 5,
+      "exportsRuntime": [
+        "formatarTipo",
+        "obterVarianteTipo",
+        "obterIconeTipo",
+        "resumirNota",
+        "formatarMetadados"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 1,
+        "catchBlocks": 3,
         "castsDuplos": 0,
         "storageDireto": 0,
         "exportsSuspeitos": 0
@@ -1953,6 +1959,30 @@
       "exportsRuntime": [
         "useFluxoSubprocesso"
       ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 1,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 2,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/views/FeedbacksAdminView.vue",
+      "camada": "view",
+      "categoriaArquivo": "producao",
+      "linhas": 241,
+      "imports": 11,
+      "exports": 0,
+      "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,

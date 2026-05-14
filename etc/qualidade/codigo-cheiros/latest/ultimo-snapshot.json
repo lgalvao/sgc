@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-05-14T22:07:22.671Z",
+  "geradoEm": "2026-05-14T22:16:03.150Z",
   "base": "/home/runner/work/sgc/sgc",
   "pontuacao": {
     "total": 1706,
@@ -22,13 +22,13 @@
   },
   "deltas": {
     "backend_nullable_dto": 0,
-    "backend_null_checks": -3,
+    "backend_null_checks": 0,
     "backend_objects_null": 0,
     "frontend_any_producao": 0,
-    "frontend_any_testes": 1,
+    "frontend_any_testes": 0,
     "frontend_catch_any": 0,
     "frontend_null_checks": 0,
-    "frontend_fallback_or": -4
+    "frontend_fallback_or": 0
   },
   "hotspots": [
     {

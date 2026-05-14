@@ -296,23 +296,30 @@ public class ProcessoService {
             return;
         }
 
-        AcaoPermissao acaoRequerida = null;
-        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
-            acaoRequerida = switch (analise.acao()) {
-                case ACEITAR -> ACEITAR_MAPA;
-                case HOMOLOGAR -> HOMOLOGAR_MAPA;
-                default -> null;
-            };
+        if (!(command instanceof ProcessarAnaliseEmBlocoCommand analise)) {
+            return;
         }
 
-        if (acaoRequerida != null && !permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
+        validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
+        processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
+    }
+
+    private void validarPermissaoAnaliseEmBloco(
+            Usuario usuario,
+            List<Subprocesso> subprocessos,
+            ProcessarAnaliseEmBlocoCommand analise
+    ) {
+        AcaoPermissao acaoRequerida = switch (analise.acao()) {
+            case ACEITAR -> ACEITAR_MAPA;
+            case HOMOLOGAR -> HOMOLOGAR_MAPA;
+            default -> null;
+        };
+        if (acaoRequerida == null) {
+            return;
+        }
+        if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
             throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
         }
-
-        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
-            processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
-        }
-
     }
 
 
