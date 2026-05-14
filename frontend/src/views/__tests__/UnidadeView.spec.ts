@@ -178,6 +178,7 @@ describe('UnidadeView.vue', () => {
         expect(wrapper.find('[data-testid="unidade-titular-info"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="unidade-responsavel-info"]').exists()).toBe(true);
         expect(wrapper.text()).toContain('Titular');
+        expect(wrapper.text()).not.toContain('Responsável');
     });
 
     it('renders subordinate units tree table', async () => {
@@ -326,6 +327,7 @@ describe('UnidadeView.vue', () => {
         expect(mockObterUnidade).toHaveBeenCalledTimes(1);
         expect(wrapper.find('[data-testid="unidade-view__btn-atribuicao-texto"]').text()).toBe('Criar atribuição');
         expect(wrapper.text()).toContain('Titular');
+        expect(wrapper.text()).not.toContain('Responsável');
         wrapper.unmount();
     });
 });

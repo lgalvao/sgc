@@ -54,8 +54,8 @@
             <UnidadeContatoInfo
                 v-if="responsavelExibivel"
                 :contato="responsavelExibivel"
-                :descricao="descricaoResponsabilidade"
-                :label="TEXTOS.unidade.LABEL_RESPONSAVEL"
+                :descricao="descricaoContatoPrincipal"
+                :label="labelContatoPrincipal"
                 data-testid="unidade-responsavel-info"
             />
           </BCardBody>
@@ -242,13 +242,21 @@ const responsavelExibivel = computed<Usuario | Responsavel | null>(() => {
   return unidade.value?.responsavel ?? unidade.value?.titular ?? null;
 });
 
-const titularExibivel = computed(() => {
+const responsavelEhTitular = computed(() => {
   const titular = unidade.value?.titular;
   const responsavel = responsavelExibivel.value;
   if (!titular || !responsavel) {
+    return false;
+  }
+  return titular.tituloEleitoral === responsavel.tituloEleitoral;
+});
+
+const titularExibivel = computed(() => {
+  const titular = unidade.value?.titular;
+  if (!titular || !responsavelExibivel.value) {
     return Boolean(titular);
   }
-  return titular.tituloEleitoral !== responsavel.tituloEleitoral;
+  return !responsavelEhTitular.value;
 });
 
 const textoBotaoAtribuicao = computed(() =>
@@ -275,6 +283,18 @@ const descricaoResponsabilidade = computed(() => {
 
   return "Titular";
 });
+
+const labelContatoPrincipal = computed(() =>
+    responsavelEhTitular.value
+        ? TEXTOS.unidade.LABEL_TITULAR
+        : TEXTOS.unidade.LABEL_RESPONSAVEL
+);
+
+const descricaoContatoPrincipal = computed(() =>
+    responsavelEhTitular.value
+        ? ""
+        : descricaoResponsabilidade.value
+);
 
 interface UnidadeFormatada {
   codigo: number;
