@@ -99,7 +99,7 @@
           :acao-principal-cadastro="acaoPrincipalCadastro"
           :codigo-subprocesso="codigoSubprocesso"
           :dados-remocao="dadosRemocao"
-          :erro-fluxo="fluxoSubprocesso.lastError?.value?.mensagem"
+          :erro-fluxo="erroFluxoCadastro"
           :historico-analises="historicoAnalises"
           :impactos="impactos ?? null"
           :is-revisao="isRevisao"
@@ -174,6 +174,7 @@ import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
+import {extrairTextoPlanoHtml} from "@/utils/textoFormatado";
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -382,8 +383,21 @@ const {
 const erroGlobalFormatado = computed(() =>
     erroGlobal.value ? {mensagem: erroGlobal.value} : null
 );
+const erroCampoObservacaoDevolucao = computed(() =>
+    fluxoSubprocesso.lastError.value?.erros?.find((erro) =>
+        ["justificativa", "texto", "observacoes"].includes(erro.campo ?? "")
+    )?.mensagem ?? ""
+);
+const erroFluxoCadastro = computed(() =>
+    fluxoSubprocesso.lastError.value?.tipo === "validacao"
+        ? undefined
+        : fluxoSubprocesso.lastError.value?.mensagem
+);
 const mensagemErroObservacaoDevolucao = computed(() =>
-    deveExibirErro(!observacaoDevolucao.value.trim()) ? TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA : ""
+    erroCampoObservacaoDevolucao.value
+        || (deveExibirErro(!extrairTextoPlanoHtml(observacaoDevolucao.value))
+            ? TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA
+            : "")
 );
 
 const {

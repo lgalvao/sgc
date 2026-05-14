@@ -3,6 +3,7 @@ package sgc.comum.dto;
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
 import sgc.comum.ComumDtos.*;
+import sgc.comum.Mensagens;
 
 import java.time.*;
 import java.util.*;
@@ -65,6 +66,15 @@ class ComumDtosValidationTest {
             JustificativaRequest req = new JustificativaRequest("");
             Set<ConstraintViolation<JustificativaRequest>> violations = validator.validate(req);
             assertThat(violations).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar justificativa acima de 500 caracteres")
+        void deveRejeitarJustificativaAcimaDe500Caracteres() {
+            JustificativaRequest req = new JustificativaRequest("a".repeat(501));
+            Set<ConstraintViolation<JustificativaRequest>> violations = validator.validate(req);
+            assertThat(violations).hasSize(1);
+            assertThat(violations.iterator().next().getMessage()).isEqualTo(Mensagens.JUSTIFICATIVA_MAX);
         }
     }
 

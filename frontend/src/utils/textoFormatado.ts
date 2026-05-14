@@ -1,3 +1,5 @@
+export const LIMITE_PADRAO_TEXTO_FORMATADO = 500;
+
 export function extrairTextoPlanoHtml(html: string | null | undefined): string {
     if (!html) {
         return "";
@@ -20,4 +22,15 @@ export function normalizarHtmlEditor(html: string | null | undefined): string {
     }
 
     return html?.trim() || "";
+}
+
+export function obterComprimentoHtmlFormatado(html: string | null | undefined): number {
+    return normalizarHtmlEditor(html).length;
+}
+
+export function excedeLimiteHtmlFormatado(
+    html: string | null | undefined,
+    limite = LIMITE_PADRAO_TEXTO_FORMATADO
+): boolean {
+    return obterComprimentoHtmlFormatado(html) > limite;
 }

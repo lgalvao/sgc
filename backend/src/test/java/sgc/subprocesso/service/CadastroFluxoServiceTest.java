@@ -303,7 +303,9 @@ class CadastroFluxoServiceTest {
         service.devolver(1L, "Obs");
 
         verify(transicaoService).registrarAnalise(argThat(cmd ->
-                cmd.unidadeDestinoTransicao().equals(uOrigem)));
+                cmd.unidadeDestinoTransicao().equals(uOrigem)
+                        && cmd.motivoAnalise() == null
+                        && "Obs".equals(cmd.observacoes())));
     }
 
     @Test

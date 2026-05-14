@@ -14,7 +14,7 @@ import java.util.*;
  */
 @Builder
 public record SalvarMapaRequest(
-        @Nullable @Size(max = 1000, message = Mensagens.OBSERVACOES_MAX_1000) @SanitizarHtml String observacoes,
+        @Nullable @Size(max = 500, message = Mensagens.OBSERVACOES_MAX_500) @SanitizarHtml String observacoes,
         @Valid List<CompetenciaRequest> competencias) {
 
     @Builder

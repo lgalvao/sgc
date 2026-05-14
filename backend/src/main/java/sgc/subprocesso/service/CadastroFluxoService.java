@@ -179,7 +179,7 @@ public class CadastroFluxoService {
                 .unidadeOrigemTransicao(unidadeAnalise)
                 .unidadeDestinoTransicao(unidadeDevolucao)
                 .usuario(usuario)
-                .motivoAnalise(obs)
+                .motivoAnalise(null)
                 .observacoes(obs)
                 .build());
 
@@ -205,7 +205,7 @@ public class CadastroFluxoService {
                     .unidadeOrigemTransicao(unidadeAtual)
                     .unidadeDestinoTransicao(unidadeDestino)
                     .usuario(usuario)
-                    .motivoAnalise(obs)
+                    .motivoAnalise(null)
                     .observacoes(obs)
                     .build());
         }

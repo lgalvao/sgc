@@ -168,6 +168,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         Analise analiseRegistrada = analises.getFirst();
         assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
         assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getMotivo()).isNull();
         assertThat(analiseRegistrada.getUnidadeCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
@@ -208,6 +209,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         Analise analiseRegistrada = analises.getFirst();
         assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getMotivo()).isNull();
         assertThat(analiseRegistrada.getUsuarioTitulo())
                 .isEqualTo("132313231323");
 
@@ -342,5 +344,33 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
         assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
         assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+    }
+
+    @Test
+    @DisplayName("Deve devolver cadastro com justificativa acima de 200 caracteres usando observações")
+    void devolverCadastro_justificativaLongaDevePersistirEmObservacoes() throws Exception {
+        Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
+        gestor.setPerfilAtivo(Perfil.GESTOR);
+        gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
+        gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
+
+        String observacoes = "A".repeat(241);
+        JustificativaRequest requestBody = new JustificativaRequest(observacoes);
+
+        mockMvc.perform(post("/api/subprocessos/{codigo}/devolver-cadastro", subprocesso.getCodigo())
+                        .with(csrf())
+                        .with(user(gestor))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Analise analiseRegistrada = analiseRepo
+                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo())
+                .getFirst();
+        assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getMotivo()).isNull();
     }
 }

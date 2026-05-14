@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed} from "vue";
+import {computed, ref, watch} from "vue";
 import {BFormGroup, BFormInvalidFeedback} from "bootstrap-vue-next";
 import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -49,6 +49,22 @@ const observacaoModel = computed({
     get: () => props.observacao,
     set: (valor) => emit("update:observacao", valor),
 });
+
+const observacaoInvalida = ref(false);
+
+watch(() => props.modelValue, (aberto) => {
+    if (!aberto) {
+        observacaoInvalida.value = false;
+    }
+});
+
+function confirmar() {
+    if (observacaoInvalida.value) {
+        return;
+    }
+
+    emit("confirmar");
+}
 </script>
 
 <template>
@@ -57,10 +73,11 @@ const observacaoModel = computed({
         :auto-close="false"
         :loading="loading"
         :ok-title="okTitle"
+        :ok-disabled="observacaoInvalida"
         :test-id-confirmar="testIdConfirmar"
         :titulo="titulo"
         :variant="variant"
-        @confirmar="$emit('confirmar')"
+        @confirmar="confirmar"
     >
         <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
         <p>{{ texto }}</p>
@@ -75,6 +92,7 @@ const observacaoModel = computed({
                 :data-testid="inputDataTestid"
                 minimo-altura="10rem"
                 :rotulo="label"
+                @update:invalido="observacaoInvalida = $event"
             />
             <BFormInvalidFeedback v-if="feedbackObservacao" :state="estadoObservacao">
                 {{ feedbackObservacao }}

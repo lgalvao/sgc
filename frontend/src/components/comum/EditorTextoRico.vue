@@ -1,8 +1,13 @@
 <script lang="ts" setup>
-import {computed, onBeforeUnmount, useAttrs, watch} from "vue";
+import {computed, onBeforeUnmount, ref, useAttrs, watch} from "vue";
 import {Editor, EditorContent} from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import {htmlTemConteudo, normalizarHtmlEditor} from "@/utils/textoFormatado";
+import {
+    htmlTemConteudo,
+    LIMITE_PADRAO_TEXTO_FORMATADO,
+    normalizarHtmlEditor,
+    obterComprimentoHtmlFormatado
+} from "@/utils/textoFormatado";
 
 defineOptions({
     inheritAttrs: false,
@@ -14,15 +19,18 @@ const props = withDefaults(defineProps<{
     desabilitado?: boolean;
     rotulo?: string;
     minimoAltura?: string;
+    maximoCaracteres?: number;
 }>(), {
     id: undefined,
     desabilitado: false,
     rotulo: "Editor de texto",
     minimoAltura: "12rem",
+    maximoCaracteres: LIMITE_PADRAO_TEXTO_FORMATADO,
 });
 
 const emit = defineEmits<{
     "update:modelValue": [valor: string];
+    "update:invalido": [valor: boolean];
 }>();
 
 const attrs = useAttrs();
@@ -34,6 +42,9 @@ const ariaRequired = typeof attrs["aria-required"] === "string"
     : undefined;
 const classeRaiz = computed(() => attrs.class);
 const estiloRaiz = computed(() => attrs.style);
+const erroComprimento = ref("");
+const ultimoConteudoValido = ref(normalizarHtmlEditor(props.modelValue));
+const comprimentoExibido = ref(obterComprimentoHtmlFormatado(props.modelValue));
 
 const editor = new Editor({
     extensions: [
@@ -57,16 +68,43 @@ const editor = new Editor({
     content: normalizarHtmlEditor(props.modelValue),
     editable: !props.desabilitado,
     onUpdate: ({editor: editorAtual}) => {
-        emit("update:modelValue", editorAtual.isEmpty ? "" : normalizarHtmlEditor(editorAtual.getHTML()));
+        const htmlNormalizado = editorAtual.isEmpty ? "" : normalizarHtmlEditor(editorAtual.getHTML());
+        const comprimentoAnterior = obterComprimentoHtmlFormatado(props.modelValue);
+        const comprimentoAtual = htmlNormalizado.length;
+        const excedeuLimite = comprimentoAtual > props.maximoCaracteres;
+        const estaReduzindoConteudoExistente = comprimentoAnterior > props.maximoCaracteres
+            && comprimentoAtual < comprimentoAnterior;
+
+        comprimentoExibido.value = comprimentoAtual;
+
+        if (excedeuLimite && !estaReduzindoConteudoExistente) {
+            erroComprimento.value = `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`;
+            emit("update:invalido", true);
+            editorAtual.commands.setContent(ultimoConteudoValido.value, {emitUpdate: false});
+            return;
+        }
+
+        ultimoConteudoValido.value = htmlNormalizado;
+        erroComprimento.value = excedeuLimite
+            ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
+            : "";
+        emit("update:invalido", excedeuLimite);
+        emit("update:modelValue", htmlNormalizado);
     },
 });
 
 watch(() => props.modelValue, (valorAtual) => {
-    const conteudoAtual = normalizarHtmlEditor(editor.getHTML());
     const proximoConteudo = normalizarHtmlEditor(valorAtual);
+    const conteudoAtual = normalizarHtmlEditor(editor.getHTML());
     if (conteudoAtual === proximoConteudo) {
         return;
     }
+    ultimoConteudoValido.value = proximoConteudo;
+    comprimentoExibido.value = proximoConteudo.length;
+    erroComprimento.value = proximoConteudo.length > props.maximoCaracteres
+        ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
+        : "";
+    emit("update:invalido", proximoConteudo.length > props.maximoCaracteres);
     editor.commands.setContent(proximoConteudo, {emitUpdate: false});
 }, {immediate: true});
 
@@ -110,8 +148,10 @@ const acoes = computed(() => ([
 ]));
 
 const classesEditor = computed(() => ({
-    "is-invalid": props.desabilitado === false && !htmlTemConteudo(props.modelValue) && false,
+    "is-invalid": Boolean(erroComprimento.value),
 }));
+
+const contadorCaracteres = computed(() => comprimentoExibido.value);
 
 function executarAcao(executar: () => boolean) {
     if (!props.desabilitado) {
@@ -154,10 +194,26 @@ function sincronizarPorDom(event: Event) {
         <EditorContent
             :editor="editor"
             :aria-label="rotulo"
+            :aria-invalid="erroComprimento ? 'true' : 'false'"
             :class="classesEditor"
             :style="{ '--editor-minimo-altura': minimoAltura }"
             @input.capture="sincronizarPorDom"
         />
+        <div
+            class="editor-texto-rico__rodape"
+            :class="{'editor-texto-rico__rodape--erro': erroComprimento}"
+        >
+            <span
+                v-if="erroComprimento"
+                class="invalid-feedback d-block m-0"
+                data-testid="editor-texto-rico-erro"
+            >
+                {{ erroComprimento }}
+            </span>
+            <span class="editor-texto-rico__contador" data-testid="editor-texto-rico-contador">
+                {{ contadorCaracteres }}/{{ maximoCaracteres }}
+            </span>
+        </div>
     </div>
 </template>
 
@@ -216,6 +272,27 @@ function sincronizarPorDom(event: Event) {
 .editor-texto-rico :deep(.editor-texto-rico__conteudo p:last-child),
 .editor-texto-rico :deep(.editor-texto-rico__conteudo ul:last-child),
 .editor-texto-rico :deep(.editor-texto-rico__conteudo ol:last-child) {
-    margin-bottom: 0;
+  margin-bottom: 0;
+}
+
+.editor-texto-rico__rodape {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.55rem 0.85rem 0.7rem;
+  border-top: 1px solid var(--bs-border-color-translucent);
+  background: var(--bs-body-bg);
+  font-size: 0.875rem;
+}
+
+.editor-texto-rico__rodape--erro .editor-texto-rico__contador {
+  color: var(--bs-danger-text-emphasis);
+}
+
+.editor-texto-rico__contador {
+  margin-left: auto;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
 }
 </style>
