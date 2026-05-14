@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.mock.web.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -311,5 +312,123 @@ class FiltroMonitoramentoHttpTest {
         assertThat(generatedId)
                 .isNotBlank()
                 .isNotEqualTo("   ");
+    }
+
+    @Test
+    @DisplayName("obterDescricaoHttpAtual deve retornar sem-http quando atributos não estiverem disponíveis")
+    void obterDescricaoHttpAtualSemAtributos() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sem-atributos");
+        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                new org.springframework.web.context.request.ServletRequestAttributes(request)
+        );
+
+        assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("sem-http");
+        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+    }
+
+    @Test
+    @DisplayName("registrarJavaLento não deve falhar sem contexto ou com atributo inválido")
+    void registrarJavaLentoSemContextoOuAtributoInvalido() {
+        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+        assertThatCode(() -> FiltroMonitoramentoHttp.registrarJavaLento("Classe", "metodo", 10)).doesNotThrowAnyException();
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, "invalido");
+        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                new org.springframework.web.context.request.ServletRequestAttributes(request)
+        );
+        assertThatCode(() -> FiltroMonitoramentoHttp.registrarJavaLento("Classe", "metodo", 11)).doesNotThrowAnyException();
+        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+    }
+
+    @Test
+    @DisplayName("registrarJavaLento deve preservar nome simples para classe sem pacote ou com sufixo inválido")
+    void registrarJavaLentoComNomeClasseSemPacoteOuInvalido() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        List<String> entradas = new ArrayList<>();
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, entradas);
+        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                new org.springframework.web.context.request.ServletRequestAttributes(request)
+        );
+
+        FiltroMonitoramentoHttp.registrarJavaLento("ClasseSimples", "metodoA", 1.5);
+        FiltroMonitoramentoHttp.registrarJavaLento("pacote.", "metodoB", 2.5);
+
+        assertThat(entradas).containsExactly(
+                "java ClasseSimples.metodoA 1.50ms",
+                "java pacote..metodoB 2.50ms"
+        );
+        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+    }
+
+    @Test
+    @DisplayName("deve preencher tempo mesmo com status HTTP diferente de 200")
+    void deveProcessarStatusHttpDiferenteDe200() throws ServletException, IOException {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
+        properties.setTempoHttpLentoMs(0);
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/erro");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filtro.doFilter(request, response, (req, res) -> ((HttpServletResponse) res).setStatus(404));
+
+        assertThat(response.getStatus()).isEqualTo(404);
+        assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_TEMPO_SERVIDOR_MS)).isNotBlank();
+        assertThat(response.getHeader("Server-Timing")).startsWith("app;dur=");
+    }
+
+    @Test
+    @DisplayName("obterDescricaoHttpAtual deve retornar sem-http quando método/caminho forem inválidos")
+    void obterDescricaoHttpAtualComMetodoOuCaminhoInvalidos() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/filtro");
+        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                new org.springframework.web.context.request.ServletRequestAttributes(request)
+        );
+
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_METODO, " ");
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_CAMINHO, "/api/filtro");
+        assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("sem-http");
+
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_METODO, "GET");
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_CAMINHO, " ");
+        assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("sem-http");
+
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_METODO, "GET");
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_CAMINHO, "/api/filtro");
+        assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("GET /api/filtro");
+
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_METODO, 123);
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_CAMINHO, "/api/filtro");
+        assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("sem-http");
+        org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+    }
+
+    @Test
+    @DisplayName("logarJavaLento deve ignorar atributo não-lista")
+    void logarJavaLentoIgnoraAtributoNaoLista() throws Exception {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        Method metodo = FiltroMonitoramentoHttp.class.getDeclaredMethod("logarJavaLento", HttpServletRequest.class);
+        metodo.setAccessible(true);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, "nao-lista");
+
+        assertThatCode(() -> metodo.invoke(filtro, request)).doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("logarJavaLento deve processar lista não vazia sem lançar exceção")
+    void logarJavaLentoProcessaListaNaoVazia() throws Exception {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        Method metodo = FiltroMonitoramentoHttp.class.getDeclaredMethod("logarJavaLento", HttpServletRequest.class);
+        metodo.setAccessible(true);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, new ArrayList<>(List.of("java Classe.metodo 10.00ms")));
+
+        assertThatCode(() -> metodo.invoke(filtro, request)).doesNotThrowAnyException();
     }
 }

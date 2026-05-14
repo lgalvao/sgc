@@ -1,5 +1,7 @@
 package sgc.comum.erros;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
@@ -319,6 +321,41 @@ class RestExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("Deve tratar HttpMessageNotWritableException com causa raiz e contexto ServletWebRequest")
+    void deveTratarHttpMessageNotWritableComCausaRaizEContextoServlet() {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/teste");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        IllegalArgumentException causaRaiz = new IllegalArgumentException("raiz");
+        RuntimeException causaIntermediaria = new RuntimeException("intermediaria", causaRaiz);
+        HttpMessageNotWritableException ex = new HttpMessageNotWritableException("erro escrita", causaIntermediaria);
+
+        ResponseEntity<Object> retorno = restExceptionHandler.handleHttpMessageNotWritable(
+                ex, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
+
+        assertThat(retorno.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(retorno.getBody()).isInstanceOf(ErroApi.class);
+    }
+
+    @Test
+    @DisplayName("Deve tratar HttpMessageNotWritableException com causa cíclica sem loop infinito")
+    void deveTratarHttpMessageNotWritableComCausaCiclica() {
+        class CausaCiclica extends RuntimeException {
+            @Override
+            public synchronized Throwable getCause() {
+                return this;
+            }
+        }
+        HttpMessageNotWritableException ex = new HttpMessageNotWritableException("erro", new CausaCiclica());
+
+        ResponseEntity<Object> retorno = restExceptionHandler.handleHttpMessageNotWritable(
+                ex, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, Mockito.mock(WebRequest.class));
+
+        assertThat(retorno.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(retorno.getBody()).isInstanceOf(ErroApi.class);
+    }
+
+    @Test
     @DisplayName("Deve tratar Exception genérica sem mensagem com erro padrão")
     void deveTratarExceptionGenericaSemMensagem() {
         Exception ex = new NullPointerException();
@@ -375,5 +412,78 @@ class RestExceptionHandlerTest {
 
         assertThat(resultado).isNotNull();
         assertThat(response.getForwardedUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("Nao deve encaminhar rota SPA quando método não for GET")
+    void naoDeveEncaminharQuandoMetodoNaoEhGet() {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/painel");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.POST, "/painel", "painel");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+
+        assertThat(resultado).isNotNull();
+        assertThat(response.getForwardedUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("Nao deve encaminhar rota SPA quando caminho estiver em branco")
+    void naoDeveEncaminharQuandoCaminhoEmBranco() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, "", "");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+
+        assertThat(resultado).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Nao deve encaminhar rota SPA quando resposta estiver ausente")
+    void naoDeveEncaminharQuandoRespostaAusente() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/painel");
+        ServletWebRequest webRequest = new ServletWebRequest(request);
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, "/painel", "painel");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+
+        assertThat(resultado).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Nao deve encaminhar rota SPA quando forward para index falhar")
+    void naoDeveEncaminharQuandoForwardFalhar() throws Exception {
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        RequestDispatcher dispatcher = Mockito.mock(RequestDispatcher.class);
+        Mockito.when(request.getMethod()).thenReturn("GET");
+        Mockito.when(request.getRequestURI()).thenReturn("/painel");
+        Mockito.when(request.getRequestDispatcher("/index.html")).thenReturn(dispatcher);
+        Mockito.doThrow(new ServletException("falha")).when(dispatcher).forward(request, response);
+
+        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, "/painel", "painel");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, webRequest);
+
+        assertThat(resultado).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Nao deve tentar encaminhar quando WebRequest não é ServletWebRequest")
+    void naoDeveEncaminharQuandoWebRequestNaoEhServlet() {
+        NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, "/painel", "painel");
+
+        ResponseEntity<Object> resultado = restExceptionHandler.handleNoResourceFoundException(
+                ex, new HttpHeaders(), HttpStatus.NOT_FOUND, Mockito.mock(WebRequest.class));
+
+        assertThat(resultado).isNotNull();
     }
 }

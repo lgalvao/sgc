@@ -198,25 +198,6 @@ public class SubprocessoTransicaoService {
         registrarTransicaoDoAdminParaUnidade(sp, TipoTransicao.MAPA_DISPONIBILIZADO, usuario, normalizarTexto(observacoes));
     }
 
-    private @Nullable LocalDate obterUltimaDataLimite(Subprocesso sp) {
-        LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
-        LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
-
-        if (dataLimiteEtapa1 == null) {
-            if (dataLimiteEtapa2 == null) {
-                return null;
-            }
-            throw new IllegalStateException("Subprocesso %s com data limite da etapa 2 sem data limite da etapa 1".formatted(sp.getCodigo()));
-        }
-        if (dataLimiteEtapa2 == null) {
-            return dataLimiteEtapa1.toLocalDate();
-        }
-        if (dataLimiteEtapa1.isAfter(dataLimiteEtapa2)) {
-            throw new IllegalStateException("Subprocesso %s com data limite da etapa 1 posterior à etapa 2".formatted(sp.getCodigo()));
-        }
-        return dataLimiteEtapa2.toLocalDate();
-    }
-
     private @Nullable LocalDate obterDataFimEtapaAnterior(Subprocesso sp) {
         LocalDateTime dataFimEtapa1 = sp.getDataFimEtapa1();
         return dataFimEtapa1 == null ? null : dataFimEtapa1.toLocalDate();

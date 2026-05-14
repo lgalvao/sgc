@@ -458,6 +458,35 @@ class SubprocessoTransicaoServiceTest {
         }
 
         @Test
+        @DisplayName("disponibilizarMapa deve manter sugestões nulas quando observação estiver em branco")
+        void disponibilizarMapaComObservacaoEmBranco() {
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setUnidade(u);
+            sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Processo p = new Processo();
+            p.setTipo(MAPEAMENTO);
+            sp.setProcesso(p);
+            sp.setMapa(new sgc.mapa.model.Mapa());
+            sp.getMapa().setCodigo(100L);
+            sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(1L);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+            service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(LocalDate.of(2026, 1, 15), "   "));
+
+            assertThat(sp.getMapa().getSugestoes()).isNull();
+        }
+
+        @Test
         @DisplayName("disponibilizarMapaEmBloco - deve aceitar lista de subprocessos")
         void disponibilizarMapaEmBloco_ComListaDeSubprocessos() {
             Unidade u = new Unidade();
@@ -522,6 +551,76 @@ class SubprocessoTransicaoServiceTest {
 
             verify(analiseRepo).save(argThat(a -> a.getUnidadeCodigo().equals(1L)));
             assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_VALIDADO);
+        }
+
+        @Test
+        @DisplayName("disponibilizarMapa deve negar escrita quando subprocesso está em outra localização")
+        void disponibilizarMapaDeveNegarQuandoLocalizacaoDiferente() {
+            Unidade unidadeSubprocesso = criarUnidade(10L, "U10", "Unidade 10");
+            Unidade unidadeAtual = criarUnidade(20L, "U20", "Unidade 20");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, unidadeSubprocesso);
+            sp.setMapa(new sgc.mapa.model.Mapa());
+
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAtual);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+            assertThatThrownBy(() -> service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(LocalDate.now().plusDays(1), null)))
+                    .isInstanceOf(sgc.comum.erros.ErroAcessoNegado.class)
+                    .hasMessageContaining("não está localizado");
+        }
+
+        @Test
+        @DisplayName("disponibilizarMapa deve falhar para tipo de processo sem situação configurada")
+        void disponibilizarMapaTipoSemSituacaoConfigurada() {
+            Unidade unidade = criarUnidade(10L, "U10", "Unidade 10");
+            Subprocesso sp = criarSubprocesso(DIAGNOSTICO, MAPEAMENTO_CADASTRO_HOMOLOGADO, unidade);
+            sgc.mapa.model.Mapa mapa = new sgc.mapa.model.Mapa();
+            mapa.setCodigo(100L);
+            sp.setMapa(mapa);
+
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+            assertThatThrownBy(() -> service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(LocalDate.now().plusDays(3), "obs")))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("sem situação configurada");
+        }
+
+        @Test
+        @DisplayName("devolverValidacao deve manter situação quando devolução não retorna para unidade do subprocesso")
+        void devolverValidacaoMantemSituacaoQuandoDestinoNaoEhUnidadeDoSubprocesso() {
+            Unidade unidadeSubprocesso = criarUnidade(1L, "U1", "Unidade 1");
+            Unidade unidadeAnalise = criarUnidade(10L, "U10", "Unidade 10");
+            Unidade unidadeDevolucao = criarUnidade(20L, "U20", "Unidade 20");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidadeSubprocesso);
+            sp.setDataFimEtapa2(LocalDateTime.now());
+
+            Movimentacao movimentacao = new Movimentacao();
+            movimentacao.setUnidadeDestino(unidadeAnalise);
+            movimentacao.setUnidadeOrigem(unidadeDevolucao);
+
+            Usuario usuario = criarUsuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
+            when(hierarquiaService.isSubordinada(unidadeDevolucao, unidadeAnalise)).thenReturn(true);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(analiseRepo.save(any())).thenAnswer(i -> i.getArgument(0));
+
+            service.devolverValidacao(1L, "just");
+
+            assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_VALIDADO);
+            assertThat(sp.getDataFimEtapa2()).isNotNull();
         }
     }
 }
