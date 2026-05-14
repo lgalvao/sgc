@@ -165,7 +165,8 @@ class SituacaoSubprocessoTest {
             "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO, true",
             "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, true",
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
-            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false"
+            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false",
+            "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, DIAGNOSTICO, false"
     })
     @DisplayName("podeTransicionarPara: Deve validar início do processo conforme o tipo")
     void inicioProcesso(SituacaoSubprocesso de, SituacaoSubprocesso para, TipoProcesso tipo, boolean esperado) {

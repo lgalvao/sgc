@@ -195,4 +195,14 @@ class HierarquiaServiceTest {
 
         assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isFalse();
     }
+
+    @Test
+    @DisplayName("Deve retornar false quando pai imediato existe mas nao corresponde ao superior informado")
+    void deveRetornarFalseQuandoPaiImediatoNaoCorrespondeAoSuperiorInformado() {
+        Unidade superior = criarUnidade(1L, null);
+        Unidade alvo = criarUnidade(3L, null);
+        when(unidadeHierarquiaService.buscarCodigoPai(3L)).thenReturn(99L);
+
+        assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isFalse();
+    }
 }

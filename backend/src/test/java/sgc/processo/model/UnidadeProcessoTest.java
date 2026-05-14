@@ -53,4 +53,48 @@ class UnidadeProcessoTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Snapshot de unidade sem codigo persistido");
     }
+
+    @Test
+    @DisplayName("deve criar snapshot sem superior quando unidade nao possui unidade superior")
+    void deveCriarSnapshotSemSuperiorQuandoUnidadeNaoPossuiUnidadeSuperior() {
+        Unidade unidade = criarUnidade();
+        unidade.setUnidadeSuperior(null);
+        Processo processo = new Processo();
+        processo.setCodigo(10L);
+
+        UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(processo, unidade);
+
+        assertThat(snapshot.getUnidadeSuperiorCodigo()).isNull();
+    }
+
+    @Test
+    @DisplayName("deve falhar ao criar snapshot com tipo nao suportado")
+    void deveFalharAoCriarSnapshotComTipoNaoSuportado() {
+        Unidade unidade = criarUnidade();
+        unidade.setTipo(TipoUnidade.RAIZ);
+        Processo processo = new Processo();
+        processo.setCodigo(10L);
+
+        assertThatThrownBy(() -> UnidadeProcesso.criarSnapshot(processo, unidade))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Tipo de unidade nao suportado");
+    }
+
+    @Test
+    @DisplayName("deve retornar null para getUnidadeCodigo quando codigo nao foi definido")
+    void deveRetornarNullParaGetUnidadeCodigoQuandoCodigoNaoFoiDefinido() {
+        UnidadeProcesso up = new UnidadeProcesso();
+
+        assertThat(up.getUnidadeCodigo()).isNull();
+    }
+
+    @Test
+    @DisplayName("deve atualizar unidadeCodigo quando ja possui codigo definido")
+    void deveAtualizarUnidadeCodigoQuandoJaPossuiCodigoDefinido() {
+        UnidadeProcesso up = new UnidadeProcesso();
+        up.setUnidadeCodigo(10L);
+        up.setUnidadeCodigo(20L);
+
+        assertThat(up.getUnidadeCodigo()).isEqualTo(20L);
+    }
 }

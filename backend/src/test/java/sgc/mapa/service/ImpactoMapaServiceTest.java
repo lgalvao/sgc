@@ -986,4 +986,127 @@ class ImpactoMapaServiceTest {
             assertThat(impactoMapaService.podeVisualizarImpactos(sp)).isEqualTo(expected);
         }
     }
+
+    @Test
+    @DisplayName("verificarImpactos deve classificar corretamente conhecimentos parcialmente sobrepostos")
+    void verificarImpactosComConhecimentosParcialmenteSobrepostos() {
+        mockAcessoLivre();
+        Subprocesso sp = criarSubprocessoParaImpacto(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 200L);
+        sp.setCodigo(2L);
+
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(30L);
+        Mapa mapaAtual = new Mapa();
+        mapaAtual.setCodigo(31L);
+
+        when(mapaRepo.buscarMapaVigentePorUnidade(200L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(2L)).thenReturn(Optional.of(mapaAtual));
+
+        Conhecimento cJava = new Conhecimento();
+        cJava.setDescricao("Java");
+        Conhecimento cPython = new Conhecimento();
+        cPython.setDescricao("Python");
+        Conhecimento cKotlin = new Conhecimento();
+        cKotlin.setDescricao("Kotlin");
+
+        Atividade aVigente = new Atividade();
+        aVigente.setCodigo(10L);
+        aVigente.setDescricao("Programação");
+        aVigente.setConhecimentos(Set.of(cJava, cPython));
+
+        Atividade aAtual = new Atividade();
+        aAtual.setCodigo(11L);
+        aAtual.setDescricao("Programação");
+        aAtual.setConhecimentos(Set.of(cJava, cKotlin));
+
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(30L)).thenReturn(List.of(aVigente));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(31L)).thenReturn(List.of(aAtual));
+        when(competenciaRepo.findByMapa_Codigo(30L)).thenReturn(List.of());
+
+        mockUsuarioAutenticado(usuarioAdmin());
+        ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
+
+        assertThat(response.alteradas()).hasSize(1);
+        assertThat(response.alteradas().getFirst().conhecimentosAdicionados()).containsExactlyInAnyOrder("Kotlin");
+        assertThat(response.alteradas().getFirst().conhecimentosRemovidos()).containsExactlyInAnyOrder("Python");
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve ignorar atividade sem competencias na heuristica de renomeacao")
+    void verificarImpactosDeveIgnorarAtividadeSemCompetenciasNaHeuristica() {
+        mockAcessoLivre();
+        Subprocesso sp = criarSubprocessoParaImpacto(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 201L);
+        sp.setCodigo(3L);
+
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(40L);
+        Mapa mapaAtual = new Mapa();
+        mapaAtual.setCodigo(41L);
+
+        when(mapaRepo.buscarMapaVigentePorUnidade(201L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(3L)).thenReturn(Optional.of(mapaAtual));
+
+        Atividade aVigente = new Atividade();
+        aVigente.setCodigo(20L);
+        aVigente.setDescricao("Ativity Old");
+        aVigente.setConhecimentos(Set.of());
+        aVigente.setCompetencias(Set.of());
+
+        Atividade aAtual = new Atividade();
+        aAtual.setCodigo(21L);
+        aAtual.setDescricao("Ativity New");
+        aAtual.setConhecimentos(Set.of());
+        aAtual.setCompetencias(Set.of());
+
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(40L)).thenReturn(List.of(aVigente));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(41L)).thenReturn(List.of(aAtual));
+        when(competenciaRepo.findByMapa_Codigo(40L)).thenReturn(List.of());
+
+        mockUsuarioAutenticado(usuarioAdmin());
+        ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
+
+        assertThat(response.alteradas()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve ignorar atividade vigente sem competencias na heuristica")
+    void verificarImpactosDeveIgnorarVigentesSemCompetenciasNaHeuristica() {
+        mockAcessoLivre();
+        Subprocesso sp = criarSubprocessoParaImpacto(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 202L);
+        sp.setCodigo(4L);
+
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(50L);
+        Mapa mapaAtual = new Mapa();
+        mapaAtual.setCodigo(51L);
+
+        when(mapaRepo.buscarMapaVigentePorUnidade(202L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(4L)).thenReturn(Optional.of(mapaAtual));
+
+        Competencia compAtual = new Competencia();
+        compAtual.setCodigo(70L);
+        compAtual.setDescricao("Comp Atual");
+        compAtual.setAtividades(Set.of());
+
+        Atividade aVigente = new Atividade();
+        aVigente.setCodigo(30L);
+        aVigente.setDescricao("Desc Antiga");
+        aVigente.setConhecimentos(Set.of());
+        aVigente.setCompetencias(Set.of());
+
+        Atividade aAtual = new Atividade();
+        aAtual.setCodigo(31L);
+        aAtual.setDescricao("Desc Nova");
+        aAtual.setConhecimentos(Set.of());
+        aAtual.setCompetencias(Set.of(compAtual));
+
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(50L)).thenReturn(List.of(aVigente));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(51L)).thenReturn(List.of(aAtual));
+        when(competenciaRepo.findByMapa_Codigo(50L)).thenReturn(List.of());
+
+        mockUsuarioAutenticado(usuarioAdmin());
+        ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
+
+        assertThat(response.alteradas()).isEmpty();
+    }
 }

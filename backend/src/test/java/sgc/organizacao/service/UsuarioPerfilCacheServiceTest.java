@@ -77,4 +77,17 @@ class UsuarioPerfilCacheServiceTest {
                 .containsExactly(Perfil.ADMIN);
         verify(usuarioPerfilRepo).findByUsuarioTitulo("999");
     }
+
+    @Test
+    @DisplayName("Deve ignorar perfis cuja unidade nao esteja no cache")
+    void deveIgnorarPerfisCujaUnidadeNaoEstejaNoCache() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of());
+        when(usuarioPerfilRepo.findByUsuarioTitulo("111")).thenReturn(List.of(
+                new UsuarioPerfil("111", 99L, Perfil.SERVIDOR)
+        ));
+
+        List<UsuarioPerfilAutorizacaoLeitura> perfis = usuarioPerfilCacheService.buscarAutorizacoesPerfil("111");
+
+        assertThat(perfis).isEmpty();
+    }
 }

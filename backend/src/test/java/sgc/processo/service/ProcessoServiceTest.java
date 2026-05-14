@@ -2023,5 +2023,86 @@ class ProcessoServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("enviarLembrete deve lançar ErroValidacao quando unidade nao participa do processo")
+    void enviarLembreteDeveLancarErroQuandoUnidadeNaoParticipaDoProcesso() {
+        Long codProcesso = 1L;
+        Long codUnidade = 99L;
+
+        Processo p = new Processo();
+        p.setCodigo(codProcesso);
+        Unidade outraUnidade = criarUnidadeValida(10L);
+        p.adicionarParticipantes(Set.of(outraUnidade));
+
+        when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
+        when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(criarUnidadeValida(codUnidade));
+
+        assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, codUnidade))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("Unidade não participa");
+    }
+
+    @Test
+    @DisplayName("finalizar deve criar notificacao consolidada para unidade INTEROPERACIONAL")
+    void finalizarDeveCriarNotificacaoConsolidadaParaUnidadeInteroperacional() {
+        Long codProcesso = 200L;
+        Processo p = new Processo();
+        p.setCodigo(codProcesso);
+        p.setDescricao("Processo INTEROPERACIONAL");
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Unidade unidadeInterop = criarUnidadeValida(20L);
+        unidadeInterop.setTipo(TipoUnidade.INTEROPERACIONAL);
+        unidadeInterop.setSigla("INTEROP");
+        p.adicionarParticipantes(Set.of(unidadeInterop));
+
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidadeInterop));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of());
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString()))
+                .thenReturn("<html>finalizado interop</html>");
+        when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso))
+                .thenReturn(ResultadoValidacao.ofValido());
+
+        processoService.finalizar(codProcesso);
+
+        verify(notificacaoService, atLeastOnce()).enfileirar(any());
+    }
+
+    @Test
+    @DisplayName("finalizar deve criar notificacao para unidade INTERMEDIARIA com subordinadas")
+    void finalizarDeveCriarNotificacaoParaUnidadeIntermediariaComSubordinadas() {
+        Long codProcesso = 201L;
+        Processo p = new Processo();
+        p.setCodigo(codProcesso);
+        p.setDescricao("Processo INTERMEDIARIA");
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Unidade unidadeInter = criarUnidadeValida(30L);
+        unidadeInter.setTipo(TipoUnidade.INTERMEDIARIA);
+        unidadeInter.setSigla("INTER");
+        Unidade unidadeOper = criarUnidadeValida(31L);
+        unidadeOper.setTipo(TipoUnidade.OPERACIONAL);
+        unidadeOper.setSigla("OPER");
+        p.adicionarParticipantes(Set.of(unidadeInter, unidadeOper));
+
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidadeInter, unidadeOper));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(30L)).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(31L)).thenReturn(List.of(30L));
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString()))
+                .thenReturn("<html>finalizado inter</html>");
+        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(anyString(), anyString(), anyList()))
+                .thenReturn("<html>consolidado</html>");
+        when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso))
+                .thenReturn(ResultadoValidacao.ofValido());
+
+        processoService.finalizar(codProcesso);
+
+        verify(notificacaoService, atLeastOnce()).enfileirar(any());
+    }
+
 }
 }

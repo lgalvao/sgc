@@ -246,4 +246,44 @@ class NotificacaoServiceTest {
                         && cmd.proximaTentativaEm() == null
         ));
     }
+
+    @Test
+    @DisplayName("marcarFalha deve usar nome da classe quando mensagem de erro for nula")
+    void marcarFalhaDeveUsarNomeDaClasseQuandoMensagemDeErroForNula() {
+        NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(20L)
+                .tentativas(0)
+                .build();
+
+        service.marcarFalha(notificacao, new RuntimeException((String) null));
+
+        assertThat(notificacao.getUltimoErro()).isEqualTo(RuntimeException.class.getName());
+    }
+
+    @Test
+    @DisplayName("marcarFalha deve usar nome da classe quando mensagem de erro for vazia")
+    void marcarFalhaDeveUsarNomeDaClasseQuandoMensagemDeErroForVazia() {
+        NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(20L)
+                .tentativas(0)
+                .build();
+
+        service.marcarFalha(notificacao, new RuntimeException(""));
+
+        assertThat(notificacao.getUltimoErro()).isEqualTo(RuntimeException.class.getName());
+    }
+
+    @Test
+    @DisplayName("marcarFalha deve truncar mensagem de erro acima do limite")
+    void marcarFalhaDeveTruncarMensagemDeErroAcimaDoLimite() {
+        NotificacaoEmail notificacao = NotificacaoEmail.builder()
+                .codigo(20L)
+                .tentativas(0)
+                .build();
+        String mensagemLonga = "x".repeat(3000);
+
+        service.marcarFalha(notificacao, new RuntimeException(mensagemLonga));
+
+        assertThat(notificacao.getUltimoErro()).hasSize(2000);
+    }
 }
