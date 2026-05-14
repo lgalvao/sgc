@@ -392,12 +392,12 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         perfil?: string;
     }) => {
         let papel: 'gestor' | 'admin' | 'chefe' = 'gestor';
-        if (options.perfil) {
-            papel = 'gestor';
-        } else if (options.usuario === ADMIN) {
-            papel = 'admin';
-        } else if (options.usuario === CHEFE_SECAO) {
-            papel = 'chefe';
+        if (!options.perfil) {
+            if (options.usuario === ADMIN) {
+                papel = 'admin';
+            } else if (options.usuario === CHEFE_SECAO) {
+                papel = 'chefe';
+            }
         }
 
         await reabrirSubprocessoSemLimparSpa(page, {
