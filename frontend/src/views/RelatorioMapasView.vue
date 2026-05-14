@@ -139,41 +139,19 @@ async function carregarUnidades() {
 }
 
 async function exportarPdf() {
-  if (!temUnidadesSelecionadas.value) {
-    return;
-  }
-
-  try {
-    carregando.value = true;
-    await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value);
-  } catch {
-    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
-  } finally {
-    carregando.value = false;
-  }
-
-  if (relatoriosStore.lastError) {
-    notify(TEXTOS.relatorios.ERRO_GERAR, "danger");
-  }
+  if (!temUnidadesSelecionadas.value) return;
+  carregando.value = true;
+  await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value)
+      .catch(() => notify(TEXTOS.relatorios.ERRO_GERAR, "danger"))
+      .finally(() => { carregando.value = false; });
 }
 
 async function gerarRelatorio() {
-  if (!temUnidadesSelecionadas.value) {
-    return;
-  }
-
-  try {
-    carregando.value = true;
-    await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value);
-  } catch {
-    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
-  } finally {
-    carregando.value = false;
-  }
-
-  if (relatoriosStore.lastError) {
-    notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
-  }
+  if (!temUnidadesSelecionadas.value) return;
+  carregando.value = true;
+  await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value)
+      .catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
+      .finally(() => { carregando.value = false; });
 }
 
 onMounted(() => {

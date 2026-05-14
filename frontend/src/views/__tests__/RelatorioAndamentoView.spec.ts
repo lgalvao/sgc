@@ -5,27 +5,21 @@ import RelatorioAndamentoView from '@/views/RelatorioAndamentoView.vue';
 import * as painelService from '@/services/painelService';
 import {TEXTOS} from '@/constants/textos';
 
-const buscarRelatorioAndamento = vi.fn();
-const exportarAndamentoPdf = vi.fn();
+const buscarRelatorioAndamento = vi.fn().mockResolvedValue(undefined);
+const exportarAndamentoPdf = vi.fn().mockResolvedValue(undefined);
 const limparRelatorio = vi.fn();
-const clearError = vi.fn();
 const notify = vi.fn();
 
 const relatorioAndamento = ref<any[]>([]);
-const lastError = ref<Error | null>(null);
 
 vi.mock('@/stores/relatorios', () => ({
     useRelatoriosStore: () => ({
         get relatorioAndamento() {
             return relatorioAndamento.value;
         },
-        get lastError() {
-            return lastError.value;
-        },
         buscarRelatorioAndamento,
         exportarAndamentoPdf,
         limparRelatorio,
-        clearError,
     })
 }));
 
@@ -62,7 +56,8 @@ const stubs = {
 describe('RelatorioAndamentoView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        lastError.value = null;
+        buscarRelatorioAndamento.mockResolvedValue(undefined);
+        exportarAndamentoPdf.mockResolvedValue(undefined);
         relatorioAndamento.value = [{
             siglaUnidade: 'U1',
             nomeUnidade: 'Unidade 1',
@@ -114,7 +109,7 @@ describe('RelatorioAndamentoView', () => {
         await flushPromises();
         const vm = wrapper.vm as any;
 
-        // return early
+        // return early quando não há processo selecionado
         await vm.gerarRelatorio();
         expect(buscarRelatorioAndamento).not.toHaveBeenCalled();
 
@@ -123,8 +118,8 @@ describe('RelatorioAndamentoView', () => {
         expect(buscarRelatorioAndamento).toHaveBeenCalledWith(1);
         expect(notify).not.toHaveBeenCalled();
 
-        // cover error
-        lastError.value = new Error("Erro");
+        // cover error: mock rejeita, view deve notificar
+        buscarRelatorioAndamento.mockRejectedValueOnce(new Error("Erro"));
         await vm.gerarRelatorio();
         expect(notify).toHaveBeenCalledWith(TEXTOS.relatorios.ERRO_BUSCA, "danger");
     });
@@ -134,7 +129,7 @@ describe('RelatorioAndamentoView', () => {
         await flushPromises();
         const vm = wrapper.vm as any;
 
-        // return early
+        // return early quando não há processo selecionado
         await vm.exportarPdf();
         expect(exportarAndamentoPdf).not.toHaveBeenCalled();
 
@@ -143,8 +138,8 @@ describe('RelatorioAndamentoView', () => {
         expect(exportarAndamentoPdf).toHaveBeenCalledWith(1);
         expect(notify).not.toHaveBeenCalled();
 
-        // cover error
-        lastError.value = new Error("Erro");
+        // cover error: mock rejeita, view deve notificar
+        exportarAndamentoPdf.mockRejectedValueOnce(new Error("Erro"));
         await vm.exportarPdf();
         expect(notify).toHaveBeenCalledWith(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
     });

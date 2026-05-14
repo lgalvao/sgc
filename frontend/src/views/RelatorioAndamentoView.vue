@@ -88,39 +88,19 @@ async function carregarProcessos() {
 }
 
 async function gerarRelatorio() {
-  if (!codProcessoSelecionado.value) {
-    return;
-  }
-
-  try {
-    carregando.value = true;
-    await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value);
-  } catch {
-    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
-  } finally {
-    carregando.value = false;
-  }
-
-  if (relatoriosStore.lastError) {
-    notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
-  }
+  if (!codProcessoSelecionado.value) return;
+  carregando.value = true;
+  await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value)
+      .catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
+      .finally(() => { carregando.value = false; });
 }
 
 async function exportarPdf() {
   if (!codProcessoSelecionado.value) return;
-
-  try {
-    carregando.value = true;
-    await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value);
-  } catch {
-    // O erro já é normalizado na store; a view só precisa encerrar o estado de carregamento.
-  } finally {
-    carregando.value = false;
-  }
-
-  if (relatoriosStore.lastError) {
-    notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
-  }
+  carregando.value = true;
+  await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value)
+      .catch(() => notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger"))
+      .finally(() => { carregando.value = false; });
 }
 
 onMounted(() => {
