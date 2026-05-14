@@ -24,9 +24,13 @@ function obterConfiguracaoTipo(tipo: string) {
   return CONFIG_TIPO_FEEDBACK[normalizarTipoChave(tipo)];
 }
 
+function capitalizarTipo(chave: string): string {
+  return chave.charAt(0) + chave.slice(1).toLowerCase();
+}
+
 export function formatarTipo(tipo: string): string {
   const chave = normalizarTipoChave(tipo);
-  return obterConfiguracaoTipo(chave)?.rotulo ?? (chave.charAt(0) + chave.slice(1).toLowerCase());
+  return obterConfiguracaoTipo(chave)?.rotulo ?? capitalizarTipo(chave);
 }
 
 export function obterVarianteTipo(tipo: string): VarianteTipoFeedback {

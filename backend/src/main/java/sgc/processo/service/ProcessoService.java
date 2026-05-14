@@ -296,12 +296,10 @@ public class ProcessoService {
             return;
         }
 
-        if (!(command instanceof ProcessarAnaliseEmBlocoCommand analise)) {
-            return;
+        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
+            validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
+            processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
         }
-
-        validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
-        processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
     }
 
     private void validarPermissaoAnaliseEmBloco(
