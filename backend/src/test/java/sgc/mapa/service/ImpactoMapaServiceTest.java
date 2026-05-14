@@ -840,6 +840,107 @@ class ImpactoMapaServiceTest {
         assertThatThrownBy(() -> impactoMapaService.verificarImpactos(sp)).isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
+    @Test
+    @DisplayName("calcularImpactos deve retornar sem impacto para processo de mapeamento")
+    void calcularImpactosMapeamentoSemImpacto() {
+        Subprocesso subprocesso = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        subprocesso.setProcesso(processo);
+
+        ImpactoMapaResponse resposta = impactoMapaService.calcularImpactos(subprocesso);
+
+        assertThat(resposta.temImpactos()).isFalse();
+        assertThat(resposta.inseridas()).isEmpty();
+        assertThat(resposta.removidas()).isEmpty();
+        assertThat(resposta.alteradas()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("podeVisualizarImpactos deve retornar falso para processo de mapeamento")
+    void podeVisualizarImpactosMapeamentoRetornaFalso() {
+        Subprocesso subprocesso = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        subprocesso.setProcesso(processo);
+
+        assertThat(impactoMapaService.podeVisualizarImpactos(subprocesso)).isFalse();
+        verifyNoInteractions(usuarioFacade, permissionEvaluator);
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve lançar erro de validação para processo de mapeamento")
+    void verificarImpactosMapeamentoLancaErroValidacao() {
+        Subprocesso subprocesso = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        subprocesso.setProcesso(processo);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAdmin());
+
+        assertThatThrownBy(() -> impactoMapaService.verificarImpactos(subprocesso))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("apenas para processos de revisão");
+    }
+
+    @Test
+    @DisplayName("podeVisualizarImpactos deve retornar falso quando não há permissão")
+    void podeVisualizarImpactosSemPermissao() {
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        Subprocesso subprocesso = criarSubprocessoParaImpacto(SituacaoSubprocesso.NAO_INICIADO, 1L);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)).thenReturn(false);
+
+        assertThat(impactoMapaService.podeVisualizarImpactos(subprocesso)).isFalse();
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve calcular adicionados e removidos na heurística de renomeação")
+    void verificarImpactosHeuristicaComConhecimentosDiferentes() {
+        mockAcessoLivre();
+        Subprocesso subprocesso = criarSubprocessoParaImpacto(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 11L);
+        subprocesso.setCodigo(77L);
+        mockUsuarioAutenticado(usuarioAdmin());
+
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(501L);
+        Mapa mapaAtual = new Mapa();
+        mapaAtual.setCodigo(601L);
+        when(mapaRepo.buscarMapaVigentePorUnidade(11L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(77L)).thenReturn(Optional.of(mapaAtual));
+
+        Competencia competencia = new Competencia();
+        competencia.setCodigo(900L);
+        competencia.setDescricao("Comp");
+
+        Conhecimento legado = new Conhecimento();
+        legado.setDescricao("Legado");
+        Atividade atividadeVigente = new Atividade();
+        atividadeVigente.setCodigo(1000L);
+        atividadeVigente.setDescricao("Nome antigo");
+        atividadeVigente.setConhecimentos(Set.of(legado));
+        atividadeVigente.setCompetencias(Set.of(competencia));
+        competencia.setAtividades(Set.of(atividadeVigente));
+
+        Conhecimento novo = new Conhecimento();
+        novo.setDescricao("Novo");
+        Atividade atividadeAtual = new Atividade();
+        atividadeAtual.setCodigo(1001L);
+        atividadeAtual.setDescricao("Nome novo");
+        atividadeAtual.setConhecimentos(Set.of(novo));
+        atividadeAtual.setCompetencias(Set.of(competencia));
+
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(501L)).thenReturn(List.of(atividadeVigente));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(601L)).thenReturn(List.of(atividadeAtual));
+        when(competenciaRepo.findByMapa_Codigo(501L)).thenReturn(List.of(competencia));
+
+        ImpactoMapaResponse resposta = impactoMapaService.verificarImpactos(subprocesso);
+
+        assertThat(resposta.alteradas()).hasSize(1);
+        assertThat(resposta.alteradas().getFirst().conhecimentosAdicionados()).contains("Novo");
+        assertThat(resposta.alteradas().getFirst().conhecimentosRemovidos()).contains("Legado");
+    }
+
     @Nested
     @DisplayName("Testes de Situação")
     class CheckSituacaoTest {

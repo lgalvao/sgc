@@ -499,6 +499,60 @@ class E2eControllerTest {
         }
 
         @Test
+        @DisplayName("validarAmbienteE2e deve falhar quando DataSource está indisponível")
+        void validarAmbienteE2eComDataSourceNulo() {
+            when(jdbcTemplate.getDataSource()).thenReturn(null);
+
+            assertThatThrownBy(() -> controller.validarAmbienteE2e())
+                    .isInstanceOf(ErroConfiguracao.class)
+                    .hasMessageContaining("DataSource indisponível");
+        }
+
+        @Test
+        @DisplayName("validarAmbienteE2e deve falhar quando banco não é H2 em memória")
+        void validarAmbienteE2eComBancoNaoH2() throws Exception {
+            DataSource dataSource = mock(DataSource.class);
+            Connection conexao = mock(Connection.class);
+            DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+            when(jdbcTemplate.getDataSource()).thenReturn(dataSource);
+            when(dataSource.getConnection()).thenReturn(conexao);
+            when(conexao.getMetaData()).thenReturn(metaData);
+            when(metaData.getDatabaseProductName()).thenReturn("Oracle");
+            when(metaData.getURL()).thenReturn("jdbc:oracle:thin:@localhost:1521/xe");
+
+            assertThatThrownBy(() -> controller.validarAmbienteE2e())
+                    .isInstanceOf(ErroConfiguracao.class)
+                    .hasMessageContaining("requer H2 em memória");
+        }
+
+        @Test
+        @DisplayName("validarAmbienteE2e deve aceitar conexão H2 válida")
+        void validarAmbienteE2eComH2Valido() throws Exception {
+            DataSource dataSource = mock(DataSource.class);
+            Connection conexao = mock(Connection.class);
+            DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+            when(jdbcTemplate.getDataSource()).thenReturn(dataSource);
+            when(dataSource.getConnection()).thenReturn(conexao);
+            when(conexao.getMetaData()).thenReturn(metaData);
+            when(metaData.getDatabaseProductName()).thenReturn("H2");
+            when(metaData.getURL()).thenReturn("jdbc:h2:mem:testdb");
+
+            assertThatCode(() -> controller.validarAmbienteE2e()).doesNotThrowAnyException();
+        }
+
+        @Test
+        @DisplayName("validarAmbienteE2e deve encapsular falha de conexão SQL")
+        void validarAmbienteE2eComFalhaSql() throws Exception {
+            DataSource dataSource = mock(DataSource.class);
+            when(jdbcTemplate.getDataSource()).thenReturn(dataSource);
+            when(dataSource.getConnection()).thenThrow(new SQLException("falha sql"));
+
+            assertThatThrownBy(() -> controller.validarAmbienteE2e())
+                    .isInstanceOf(ErroConfiguracao.class)
+                    .hasMessageContaining("Falha ao validar DataSource");
+        }
+
+        @Test
         @DisplayName("criarProcessoMapeamento deve falhar se unidadeSigla for vazia")
         void deveFalharSeUnidadeSiglaVazia() {
             E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
@@ -506,6 +560,85 @@ class E2eControllerTest {
             assertThatThrownBy(() -> controller.criarProcessoMapeamento(request))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessage("Unidade é obrigatória");
+        }
+
+        @Test
+        @DisplayName("criarProcessoMapeamentoComMapaDisponibilizado deve falhar sem unidade superior")
+        void deveFalharSemUnidadeSuperiorObrigatoria() {
+            E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest("desc", "SIGLA", true, 30);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            unidade.setSigla("SIGLA");
+            when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+            when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            Processo processo = Processo.builder().codigo(100L).build();
+            when(processoService.criar(any())).thenReturn(processo);
+            when(processoService.buscarPorCodigo(anyLong())).thenReturn(processo);
+
+            assertThatThrownBy(() -> controller.criarProcessoMapeamentoComMapaDisponibilizado(request))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("sem unidade superior");
+        }
+
+        @Test
+        @DisplayName("criarProcessoMapeamentoComMapaDisponibilizado deve falhar quando SQL não retorna código gerado")
+        void deveFalharQuandoCodigoGeradoNaoEhEncontrado() {
+            E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest("desc", "SIGLA", true, 30);
+            when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            unidade.setSigla("SIGLA");
+            Unidade superior = new Unidade();
+            superior.setCodigo(5L);
+            unidade.setUnidadeSuperior(superior);
+            when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+
+            Processo processo = Processo.builder().codigo(100L).build();
+            when(processoService.criar(any())).thenReturn(processo);
+            when(processoService.buscarPorCodigo(anyLong())).thenReturn(processo);
+
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(200L);
+            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(anyLong(), anyLong())).thenReturn(Optional.of(subprocesso));
+            when(subprocessoRepo.findById(anyLong())).thenReturn(Optional.of(subprocesso));
+
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(300L);
+            when(mapaRepo.buscarPorSubprocesso(anyLong())).thenReturn(Optional.of(mapa));
+
+            when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
+                    .thenReturn(null);
+
+            assertThatThrownBy(() -> controller.criarProcessoMapeamentoComMapaDisponibilizado(request))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("não encontrou codigo gerado");
+        }
+
+        @Test
+        @DisplayName("resetDatabase deve continuar quando cache não existir")
+        void resetDatabaseComCacheNulo() throws Exception {
+            DataSource dataSource = mock(DataSource.class);
+            Connection connection = mock(Connection.class);
+            Statement statement = mock(Statement.class);
+            Resource seed = mock(Resource.class);
+            CacheManager cacheManagerMock = mock(CacheManager.class);
+
+            when(jdbcTemplate.getDataSource()).thenReturn(dataSource);
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.createStatement()).thenReturn(statement);
+            when(statement.getUpdateCount()).thenReturn(-1);
+            when(statement.getMoreResults()).thenReturn(false);
+            when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of());
+            when(resourceLoader.getResource(anyString())).thenReturn(seed);
+            when(seed.exists()).thenReturn(true);
+            when(seed.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
+            when(cacheManagerMock.getCacheNames()).thenReturn(List.of("cache-inexistente"));
+            when(cacheManagerMock.getCache("cache-inexistente")).thenReturn(null);
+
+            E2eController controllerComCacheNulo = new E2eController(
+                    jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManagerMock);
+
+            assertThatCode(controllerComCacheNulo::resetDatabase).doesNotThrowAnyException();
         }
 
         @Test

@@ -1768,6 +1768,57 @@ class ProcessoServiceTest {
     }
 
     @Test
+    @DisplayName("executarAcaoEmBloco - não deve acionar transições para ação DISPONIBILIZAR em comando de análise")
+    void executarAcaoEmBloco_ProcessarAnaliseDisponibilizarSemTransicao() {
+        Long codProc = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.DISPONIBILIZAR);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        sp.setUnidade(u);
+        Usuario usuario = new Usuario();
+
+        when(consultaService.listarEntidadesPorProcessoEUnidades(codProc, List.of(10L))).thenReturn(List.of(sp));
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+        assertThatCode(() -> processoService.executarAcaoEmBloco(codProc, req)).doesNotThrowAnyException();
+        verifyNoInteractions(cadastroFluxoService, transicaoService, permissionEvaluator);
+    }
+
+    @Test
+    @DisplayName("iniciar mapeamento deve falhar quando processo não possui participantes")
+    void iniciarMapeamentoSemParticipantes() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(CRIADO);
+
+        when(repo.buscar(Processo.class, 1L)).thenReturn(processo);
+
+        assertThatThrownBy(() -> processoService.iniciar(1L, List.of()))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining(Mensagens.SEM_UNIDADES_PARTICIPANTES);
+    }
+
+    @Test
+    @DisplayName("finalizar deve falhar quando subprocessos não estiverem aptos")
+    void finalizarComSubprocessosNaoHomologados() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
+        when(repo.buscar(Processo.class, 1L)).thenReturn(processo);
+        when(validacaoService.validarSubprocessosParaFinalizacao(1L)).thenReturn(
+                SubprocessoValidacaoService.ResultadoValidacao.ofInvalido("pendente"));
+
+        assertThatThrownBy(() -> processoService.finalizar(1L))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
+    }
+
+    @Test
     @DisplayName("listarIniciadosPorParticipantes - deve retornar pagina normal")
     void listarIniciadosPorParticipantes_Sucesso() {
         when(processoRepo.listarCodigosPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), any()))

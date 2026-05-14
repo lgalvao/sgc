@@ -150,6 +150,27 @@ class FeedbackServiceTest {
     }
 
     @Test
+    @DisplayName("deve lançar ErroValidacao quando nota exceder o limite")
+    void deveLancarErroPorNotaMuitoLonga() {
+        String notaLonga = "a".repeat(2001);
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, notaLonga, null);
+
+        assertThatThrownBy(() -> service.registrar(payload, null))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("2000");
+    }
+
+    @Test
+    @DisplayName("deve lançar ErroValidacao quando nota for nula")
+    void deveLancarErroPorNotaNula() {
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, null, null);
+
+        assertThatThrownBy(() -> service.registrar(payload, null))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("nota");
+    }
+
+    @Test
     @DisplayName("deve lançar ErroValidacao quando screenshot exceder tamanho máximo")
     void deveLancarErroPorScreenshotGrande() {
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Problema encontrado nesta funcionalidade", null);
@@ -214,6 +235,24 @@ class FeedbackServiceTest {
         service.registrar(payload, screenshot);
 
         verify(repo).save(argThat(r -> r.getCaminhoScreenshot() == null));
+    }
+
+    @Test
+    @DisplayName("deve ignorar screenshot vazio")
+    void deveIgnorarScreenshotVazio() {
+        configurarUsuarioMock();
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug sem imagem válida", null);
+        MockMultipartFile screenshotVazio = new MockMultipartFile("screenshot", "s.webp", "image/webp", new byte[0]);
+        when(repo.save(any())).thenAnswer(invocation -> {
+            FeedbackRegistro registro = invocation.getArgument(0);
+            registro.setId(UUID.randomUUID());
+            registro.setEnviadoEm(OffsetDateTime.now());
+            return registro;
+        });
+
+        service.registrar(payload, screenshotVazio);
+
+        verify(repo).save(argThat(registro -> registro.getCaminhoScreenshot() == null));
     }
 
     @Test
@@ -324,6 +363,54 @@ class FeedbackServiceTest {
     @Test
     @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando arquivo de screenshot não existe")
     void deveLancarErroQuandoArquivoDeScreenshotNaoExiste() {
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot("arquivo-inexistente.webp")
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
+    }
+
+    @Test
+    @DisplayName("deve tratar caminho legado com separador invertido na resolução de screenshot")
+    void deveTratarCaminhoLegadoComSeparadorInvertido() {
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot("pasta\\arquivo.webp")
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
+    }
+
+    @Test
+    @DisplayName("deve lançar ErroInconsistenciaInterna quando falhar leitura do arquivo")
+    void deveLancarErroInconsistenciaAoLerDiretorioComoArquivo() throws IOException {
+        UUID id = UUID.randomUUID();
+        Path diretorio = Files.createTempDirectory("feedback-screenshot-dir");
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot(diretorio.toString())
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroInconsistenciaInterna.class)
+                .hasMessageContaining("Erro ao ler arquivo de screenshot");
+    }
+
+    @Test
+    @DisplayName("deve usar diretório padrão quando screenshot-dir estiver em branco")
+    void deveUsarDiretorioPadraoQuandoConfiguracaoEmBranco() {
+        propriedades = new FeedbackPropriedades("   ", 5_242_880L);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
         UUID id = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
                 .id(id)

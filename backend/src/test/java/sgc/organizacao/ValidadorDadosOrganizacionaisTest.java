@@ -133,6 +133,120 @@ class ValidadorDadosOrganizacionaisTest {
         assertThat(diagnostico.quantidadeOcorrencias()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("diagnosticar cobre cenários inválidos da view de perfis e duplicidade de título")
+    void diagnosticarCobreInvalidacoesDaViewDePerfis() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INT", "INT", "111", TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(1L, "111"),
+                new ResponsabilidadeLeitura(2L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("titulos")) {
+                return List.of(Map.of("TITULO", "111"));
+            }
+            if (parametros.containsKey("codigos")) {
+                Map<String, Object> semUsuario = new HashMap<>();
+                semUsuario.put("perfil", "GESTOR");
+                semUsuario.put("unidade_codigo", 2L);
+                Map<String, Object> semPerfil = new HashMap<>();
+                semPerfil.put("usuario_titulo", "111");
+                semPerfil.put("unidade_codigo", 2L);
+                Map<String, Object> semUnidade = new HashMap<>();
+                semUnidade.put("usuario_titulo", "111");
+                semUnidade.put("perfil", "GESTOR");
+                return List.of(
+                        Map.of("USUARIO_TITULO", "222", "PERFIL", "GESTOR", "UNIDADE_CODIGO", 1L),
+                        Map.of("USUARIO_TITULO", "222", "PERFIL", "GESTOR", "UNIDADE_CODIGO", 1L),
+                        semUsuario,
+                        semPerfil,
+                        semUnidade,
+                        Map.of("usuario_titulo", "111", "perfil", "NAO_EXISTE", "unidade_codigo", 2L)
+                );
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains(
+                        "VW_USUARIO com titulo duplicado",
+                        "VW_USUARIO_PERFIL_UNIDADE com usuario_titulo nulo",
+                        "VW_USUARIO_PERFIL_UNIDADE com perfil nulo",
+                        "VW_USUARIO_PERFIL_UNIDADE com unidade_codigo nulo",
+                        "VW_USUARIO_PERFIL_UNIDADE com perfil invalido",
+                        "VW_USUARIO_PERFIL_UNIDADE com chave duplicada",
+                        "Responsavel de unidade intermediaria sem perfil GESTOR correspondente"
+                );
+    }
+
+    @Test
+    @DisplayName("diagnosticar não acusa intermediária quando responsável possui perfil gestor correspondente")
+    void diagnosticarNaoAcusaIntermediariaQuandoResponsavelPossuiGestorCorrespondente() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INT", "INT", "111", TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(1L, "111"),
+                new ResponsabilidadeLeitura(2L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("codigos")) {
+                return List.of(Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L));
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+        assertThat(diagnostico.grupos()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("diagnosticar ignora unidades fora do escopo participante")
+    void diagnosticarIgnoraUnidadesForaDoEscopoParticipante() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INAT", "INAT", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.INATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "RAIZ", "RAIZ", "111", TipoUnidade.RAIZ, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(3L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null)
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(new ResponsabilidadeLeitura(3L, "111")));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+        verify(usuarioRepo).findAllById(List.of("111"));
+    }
+
+    @Test
+    @DisplayName("diagnosticar usa resumo genérico quando não consegue extrair sigla")
+    void diagnosticarUsaResumoGenericoQuandoNaoExtraiSigla() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(1L, " ", TipoUnidade.OPERACIONAL, null)
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of());
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.resumo()).startsWith("Foram encontradas");
+        assertThat(diagnostico.resumo()).doesNotContain("Há unidades atualmente sem responsável efetivo");
+    }
+
     private static UnidadeHierarquiaLeitura unidade(Long codigo, String sigla, TipoUnidade tipo, String tituloTitular) {
         return new UnidadeHierarquiaLeitura(codigo, sigla, sigla, tituloTitular, tipo, SituacaoUnidade.ATIVA, null);
     }
