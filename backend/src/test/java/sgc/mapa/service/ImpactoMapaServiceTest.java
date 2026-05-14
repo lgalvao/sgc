@@ -840,6 +840,48 @@ class ImpactoMapaServiceTest {
         assertThatThrownBy(() -> impactoMapaService.verificarImpactos(sp)).isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
+    @Test
+    @DisplayName("calcularImpactos deve retornar sem impacto para processo de mapeamento")
+    void calcularImpactosMapeamentoSemImpacto() {
+        Subprocesso subprocesso = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        subprocesso.setProcesso(processo);
+
+        ImpactoMapaResponse resposta = impactoMapaService.calcularImpactos(subprocesso);
+
+        assertThat(resposta.temImpactos()).isFalse();
+        assertThat(resposta.inseridas()).isEmpty();
+        assertThat(resposta.removidas()).isEmpty();
+        assertThat(resposta.alteradas()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("podeVisualizarImpactos deve retornar falso para processo de mapeamento")
+    void podeVisualizarImpactosMapeamentoRetornaFalso() {
+        Subprocesso subprocesso = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        subprocesso.setProcesso(processo);
+
+        assertThat(impactoMapaService.podeVisualizarImpactos(subprocesso)).isFalse();
+        verifyNoInteractions(usuarioFacade, permissionEvaluator);
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve lançar erro de validação para processo de mapeamento")
+    void verificarImpactosMapeamentoLancaErroValidacao() {
+        Subprocesso subprocesso = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        subprocesso.setProcesso(processo);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAdmin());
+
+        assertThatThrownBy(() -> impactoMapaService.verificarImpactos(subprocesso))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("apenas para processos de revisão");
+    }
+
     @Nested
     @DisplayName("Testes de Situação")
     class CheckSituacaoTest {

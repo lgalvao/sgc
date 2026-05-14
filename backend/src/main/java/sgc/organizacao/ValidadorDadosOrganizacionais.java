@@ -34,7 +34,6 @@ public class ValidadorDadosOrganizacionais {
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final UsuarioRepo usuarioRepo;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    boolean logado = false;
 
     @Cacheable(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, sync = true)
     @Transactional(readOnly = true)
@@ -59,15 +58,11 @@ public class ValidadorDadosOrganizacionais {
             return DiagnosticoOrganizacionalDto.semViolacoes();
         }
 
-        violacoesPorTipo.forEach((tipo, detalhes) -> {
-                    if (!logado) {
-                        log.warn("DIAGN. ORGANIZACIONAL [{}]: {} ocorrencia(s). {}",
-                                tipo,
-                                detalhes.size(),
-                                String.join("; ", detalhes));
-                        logado = true;
-                    }
-                }
+        violacoesPorTipo.forEach((tipo, detalhes) ->
+                log.warn("DIAGN. ORGANIZACIONAL [{}]: {} ocorrencia(s). {}",
+                        tipo,
+                        detalhes.size(),
+                        String.join("; ", detalhes))
         );
 
         int quantidadeOcorrencias = violacoesPorTipo.values().stream()

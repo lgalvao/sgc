@@ -150,6 +150,17 @@ class FeedbackServiceTest {
     }
 
     @Test
+    @DisplayName("deve lançar ErroValidacao quando nota exceder o limite")
+    void deveLancarErroPorNotaMuitoLonga() {
+        String notaLonga = "a".repeat(2001);
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, notaLonga, null);
+
+        assertThatThrownBy(() -> service.registrar(payload, null))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("2000");
+    }
+
+    @Test
     @DisplayName("deve lançar ErroValidacao quando screenshot exceder tamanho máximo")
     void deveLancarErroPorScreenshotGrande() {
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Problema encontrado nesta funcionalidade", null);
@@ -214,6 +225,24 @@ class FeedbackServiceTest {
         service.registrar(payload, screenshot);
 
         verify(repo).save(argThat(r -> r.getCaminhoScreenshot() == null));
+    }
+
+    @Test
+    @DisplayName("deve ignorar screenshot vazio")
+    void deveIgnorarScreenshotVazio() {
+        configurarUsuarioMock();
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug sem imagem válida", null);
+        MockMultipartFile screenshotVazio = new MockMultipartFile("screenshot", "s.webp", "image/webp", new byte[0]);
+        when(repo.save(any())).thenAnswer(invocation -> {
+            FeedbackRegistro registro = invocation.getArgument(0);
+            registro.setId(UUID.randomUUID());
+            registro.setEnviadoEm(OffsetDateTime.now());
+            return registro;
+        });
+
+        service.registrar(payload, screenshotVazio);
+
+        verify(repo).save(argThat(registro -> registro.getCaminhoScreenshot() == null));
     }
 
     @Test
@@ -328,6 +357,21 @@ class FeedbackServiceTest {
         var registro = FeedbackRegistro.builder()
                 .id(id)
                 .caminhoScreenshot("arquivo-inexistente.webp")
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
+    }
+
+    @Test
+    @DisplayName("deve tratar caminho legado com separador invertido na resolução de screenshot")
+    void deveTratarCaminhoLegadoComSeparadorInvertido() {
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot("C:\\\\feedback\\\\arquivo.webp")
                 .build();
         when(repo.findById(id)).thenReturn(Optional.of(registro));
 
