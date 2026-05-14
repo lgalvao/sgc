@@ -234,17 +234,10 @@ export async function navegarParaSubprocesso(
 
 export async function obterAcaoCabecalhoSubprocesso(page: Page, testIdAcao: string) {
     const dropdown = page.getByTestId('btn-subprocesso-acoes');
-    if (await dropdown.count() > 0) {
-        const acaoMenu = page.getByTestId(testIdAcao);
-        if (await acaoMenu.count() === 0 || !(await acaoMenu.isVisible())) {
-            await expect(dropdown).toBeVisible();
-            await dropdown.click();
-        }
-        await expect(acaoMenu).toBeVisible();
-        return acaoMenu;
-    }
+    await expect(dropdown).toBeVisible();
+    await dropdown.click();
 
-    const acaoDireta = page.getByTestId(testIdAcao);
-    await expect(acaoDireta).toBeVisible();
-    return acaoDireta;
+    const acao = page.locator(`[data-testid="${testIdAcao}"]:visible`).first();
+    await expect(acao).toBeVisible();
+    return acao;
 }

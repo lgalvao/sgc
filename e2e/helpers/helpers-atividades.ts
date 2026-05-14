@@ -58,7 +58,6 @@ export async function navegarParaCadastro(page: Page) {
     await expect(card).toBeVisible();
     await card.click();
     await expect(page).toHaveURL(/\/cadastro(?:\?.*)?$/);
-
     await esperarTelaAtividades(page);
 }
 
