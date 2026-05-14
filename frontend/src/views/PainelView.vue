@@ -197,7 +197,17 @@ const camposAlertas = [
     formatter: ({value}: { value: unknown }) => formatarDataHoraBR(value as string | Date)
   },
   {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
-  {key: "processo", label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO, sortable: false},
+  {
+    key: "processo",
+    label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO,
+    sortable: false,
+    formatter: ({value}: { value: unknown }) => {
+      if (typeof value === "string" && value.trim().length > 0) {
+        return value;
+      }
+      return "-";
+    }
+  },
   {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},
 ];
 
