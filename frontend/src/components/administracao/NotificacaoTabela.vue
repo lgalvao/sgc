@@ -30,9 +30,6 @@
       <template #cell(assunto)="{ item }">
         <div :title="item.assunto" class="linha-assunto">
           <div class="fw-semibold">{{ formatarAssunto(item.assunto) }}</div>
-          <div class="text-muted small">
-            {{ resumirContexto(item) }}
-          </div>
         </div>
       </template>
 
