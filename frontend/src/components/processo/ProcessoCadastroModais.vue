@@ -10,7 +10,7 @@
         :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
         test-id-cancelar="btn-iniciar-processo-cancelar"
         test-id-confirmar="btn-iniciar-processo-confirmar"
-        variant="success"
+        variant="danger"
         @confirmar="$emit('confirmar-iniciar')"
         @update:model-value="$emit('update:mostrarConfirmacao', $event)"
     >
@@ -68,4 +68,3 @@ defineEmits<{
   margin-bottom: 0.5rem;
 }
 </style>
-

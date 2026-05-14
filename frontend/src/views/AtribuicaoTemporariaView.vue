@@ -128,7 +128,7 @@
           <BButton
               v-if="modoEdicao"
               :disabled="isLoading"
-              class="btn-acao-footer me-auto"
+              class="btn-acao-footer"
               data-testid="btn-remover-atribuicao"
               variant="outline-danger"
               @click="mostrarModalRemocao = true"

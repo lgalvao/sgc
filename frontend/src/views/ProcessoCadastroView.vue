@@ -70,7 +70,7 @@
               :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
               data-testid="btn-processo-iniciar-rodape"
               icon="play-fill"
-              variant="success"
+              variant="danger"
               @click="abrirModalConfirmacao"
           />
         </div>
