@@ -6,7 +6,6 @@ import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
 import java.lang.annotation.*;
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -76,9 +75,6 @@ class TituloEleitoralValidationTest {
         );
         assertThat(retention).isNotNull();
         assertThat(retention.value()).isEqualTo(java.lang.annotation.RetentionPolicy.RUNTIME);
-        assertThat(TituloEleitoral.class.getDeclaredMethods())
-                .extracting(Method::getName)
-                .contains("message", "groups", "payload");
     }
 
     private record RequisicaoTeste(@TituloEleitoral String tituloEleitoral) {

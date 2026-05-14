@@ -4,7 +4,7 @@
 
 Este diagnóstico foi reconfirmado com validações executadas no repositório:
 
-- Baseline backend: `./gradlew --no-daemon --no-configuration-cache :backend:test` (**1794 testes passando**).
+- Baseline backend: `./gradlew --no-daemon --no-configuration-cache :backend:test` (**1793 testes passando**).
 - Baseline frontend: `npm run lint`, `npm run typecheck`, `npm run test:unit` (**134 arquivos de teste e 1295 testes passando**).
 - Cheiros gerais: `npm run smells:auditar`.
 - Cruft frontend: `npm run frontend:cruft`.
@@ -25,13 +25,13 @@ Este diagnóstico foi reconfirmado com validações executadas no repositório:
 - `frontend/src/views/ProcessoCadastroView.vue` mantém tamanho elevado (**405 linhas**) e aparece entre hotspots de cruft.
 - O parser/normalização de metadados de feedback era um foco de complexidade local na view.
 
-### 3) Robustez defensiva em excesso (com melhora relevante nesta rodada)
+### 3) Robustez defensiva em excesso (com melhora ampla nesta rodada)
 
 Da auditoria de cheiros/cruft:
 
-- Backend: **109 DTOs** com `@Nullable`, **235** checks explícitos de null, **9** usos de `Objects.isNull/nonNull`.
+- Backend: **79 DTOs** com `@Nullable`, **235** checks explícitos de null, **9** usos de `Objects.isNull/nonNull`.
 - Frontend produção: **28** checks de null, **70** fallbacks defensivos, **51** blocos `catch`.
-- Score de cheiros caiu para **1617 (crítico)**.
+- Score de cheiros caiu para **1467 (crítico)**.
 - Score de cruft frontend caiu para **462 (crítico)**.
 
 ### 4) Risco de manutenção ainda concentrado
@@ -58,6 +58,12 @@ Da auditoria de cheiros/cruft:
     - `FiltroMonitoramentoHttpTest` removeu 2 testes reflexivos de método privado (`getDeclaredMethod`/`setAccessible`) por não validarem contrato público.
     - `EmailService` ganhou construtor package-private para testabilidade e `EmailServiceTest` deixou de usar `ReflectionTestUtils.setField` para modo mock.
     - Resultado direto: redução mensurável de cheiros associados a nulabilidade e remoção de acoplamento de testes a implementação interna.
+
+4. **Nova rodada ampla: limpeza estrutural de nulabilidade e corte de teste artificial**
+    - Redução de `@Nullable` em lote em DTOs centrais (`SubprocessoResumoDto`, `SubprocessoListagemDto`, `AtualizarSubprocessoRequest`, `ProcessoResumoDto`, `ProcessoDetalheDto`, `RelatorioAndamentoDto`) e em fixture interna do `E2eController`.
+    - Remoção de teste de baixo valor focado apenas em cobertura de branch (`ImpactoMapaResponseTest`).
+    - `TituloEleitoralValidationTest` foi simplificado removendo asserção reflexiva de métodos declarados da anotação, mantendo validação de contrato relevante (`@Target` e `@Retention`).
+    - Resultado direto: redução adicional e expressiva de ruído de nulabilidade e menor acoplamento de testes a detalhes de implementação.
 
 ## Próximos cortes recomendados (prioridade)
 

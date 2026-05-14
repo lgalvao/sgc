@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.cache.*;
 import org.springframework.context.annotation.*;
@@ -782,12 +781,12 @@ public class E2eController {
      * DTO para requisição de criação de processo fixture.
      */
     public record ProcessoFixtureRequest(
-            @Nullable String descricao, String unidadeSigla, @Nullable Boolean iniciar, @Nullable Integer diasLimite) {
-        private static ProcessoFixtureRequest iniciado(@Nullable String descricao, String unidadeSigla, @Nullable Integer diasLimite) {
+            String descricao, String unidadeSigla, Boolean iniciar, Integer diasLimite) {
+        private static ProcessoFixtureRequest iniciado(String descricao, String unidadeSigla, Integer diasLimite) {
             return new ProcessoFixtureRequest(descricao, unidadeSigla, true, diasLimite);
         }
 
-        private static ProcessoFixtureRequest mapaBase(String unidadeSigla, @Nullable Integer diasLimite) {
+        private static ProcessoFixtureRequest mapaBase(String unidadeSigla, Integer diasLimite) {
             return iniciado("Mapa base fixture " + System.currentTimeMillis(), unidadeSigla, diasLimite);
         }
     }

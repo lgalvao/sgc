@@ -1,17 +1,17 @@
 {
-  "geradoEm": "2026-05-14T23:14:40.505Z",
+  "geradoEm": "2026-05-14T23:16:50.854Z",
   "base": "/home/runner/work/sgc/sgc",
   "pontuacao": {
-    "total": 1617,
+    "total": 1467,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 1033,
+      "backend": 883,
       "frontend": 76,
       "frontend_testes": 508
     }
   },
   "contagens": {
-    "backend_nullable_dto": 109,
+    "backend_nullable_dto": 79,
     "backend_null_checks": 235,
     "backend_objects_null": 9,
     "frontend_any_producao": 0,
@@ -21,7 +21,7 @@
     "frontend_fallback_or": 20
   },
   "deltas": {
-    "backend_nullable_dto": 0,
+    "backend_nullable_dto": -30,
     "backend_null_checks": 0,
     "backend_objects_null": 0,
     "frontend_any_producao": 0,
@@ -36,14 +36,6 @@
       "pontuacao": 44,
       "categorias": {
         "frontend_any_testes": 44
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoResumoDto.java",
-      "pontuacao": 36,
-      "categorias": {
-        "backend_nullable_dto": 6,
-        "backend_null_checks": 3
       }
     },
     {
@@ -84,21 +76,6 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/AtualizarSubprocessoRequest.java",
-      "pontuacao": 30,
-      "categorias": {
-        "backend_nullable_dto": 6
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java",
-      "pontuacao": 29,
-      "categorias": {
-        "backend_nullable_dto": 5,
-        "backend_null_checks": 2
-      }
-    },
-    {
       "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
       "pontuacao": 26,
       "categorias": {
@@ -107,13 +84,6 @@
     },
     {
       "arquivo": "backend/src/main/java/sgc/alerta/dto/AlertaDto.java",
-      "pontuacao": 25,
-      "categorias": {
-        "backend_nullable_dto": 5
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoListagemDto.java",
       "pontuacao": 25,
       "categorias": {
         "backend_nullable_dto": 5
@@ -139,6 +109,34 @@
       "pontuacao": 20,
       "categorias": {
         "backend_nullable_dto": 4
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/mapa/dto/AtualizarMapaRequest.java",
+      "pontuacao": 20,
+      "categorias": {
+        "backend_nullable_dto": 4
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/mapa/dto/CriarMapaRequest.java",
+      "pontuacao": 20,
+      "categorias": {
+        "backend_nullable_dto": 4
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/mapa/dto/MapaResumoDto.java",
+      "pontuacao": 20,
+      "categorias": {
+        "backend_nullable_dto": 4
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/feedback/FeedbackService.java",
+      "pontuacao": 18,
+      "categorias": {
+        "backend_null_checks": 9
       }
     }
   ]

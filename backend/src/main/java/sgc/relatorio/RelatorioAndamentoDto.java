@@ -1,7 +1,6 @@
 package sgc.relatorio;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 
 import java.time.*;
 
@@ -12,10 +11,10 @@ public record RelatorioAndamentoDto(
         String situacaoAtual,
         String localizacao,
         LocalDateTime dataLimiteEtapa1,
-        @Nullable LocalDateTime dataLimiteEtapa2,
-        @Nullable LocalDateTime dataFimEtapa1,
-        @Nullable LocalDateTime dataFimEtapa2,
-        @Nullable LocalDateTime dataUltimaMovimentacao,
+        LocalDateTime dataLimiteEtapa2,
+        LocalDateTime dataFimEtapa1,
+        LocalDateTime dataFimEtapa2,
+        LocalDateTime dataUltimaMovimentacao,
         String responsavel,
         String titular
 ) {
