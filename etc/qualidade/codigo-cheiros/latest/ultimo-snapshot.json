@@ -1,34 +1,34 @@
 {
-  "geradoEm": "2026-05-13T21:43:20.600Z",
+  "geradoEm": "2026-05-14T22:07:22.671Z",
   "base": "/home/runner/work/sgc/sgc",
   "pontuacao": {
-    "total": 1715,
+    "total": 1706,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 1128,
-      "frontend": 80,
-      "frontend_testes": 507
+      "backend": 1122,
+      "frontend": 76,
+      "frontend_testes": 508
     }
   },
   "contagens": {
     "backend_nullable_dto": 126,
-    "backend_null_checks": 240,
+    "backend_null_checks": 237,
     "backend_objects_null": 9,
     "frontend_any_producao": 0,
-    "frontend_any_testes": 507,
+    "frontend_any_testes": 508,
     "frontend_catch_any": 0,
     "frontend_null_checks": 28,
-    "frontend_fallback_or": 24
+    "frontend_fallback_or": 20
   },
   "deltas": {
-    "backend_nullable_dto": 126,
-    "backend_null_checks": 240,
-    "backend_objects_null": 9,
+    "backend_nullable_dto": 0,
+    "backend_null_checks": -3,
+    "backend_objects_null": 0,
     "frontend_any_producao": 0,
-    "frontend_any_testes": 507,
+    "frontend_any_testes": 1,
     "frontend_catch_any": 0,
-    "frontend_null_checks": 28,
-    "frontend_fallback_or": 24
+    "frontend_null_checks": 0,
+    "frontend_fallback_or": -4
   },
   "hotspots": [
     {
