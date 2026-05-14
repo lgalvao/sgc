@@ -141,4 +141,60 @@ class EmailServiceTest {
         verify(enviadorEmail).send(captor.capture());
         assertThat(captor.getValue().getSubject()).isEqualTo("[SGC] Aviso");
     }
+
+    @Test
+    @DisplayName("Deve retornar apenas o prefixo quando o assunto estiver vazio apos normalizacao")
+    void deveRetornarApenasPrefixoQuandoAssuntoEstiverVazioAposNormalizacao() throws Exception {
+        setupMockEmail();
+
+        notificacaoServico.enviarEmail(DESTINATARIO, "[SGC]", "Corpo");
+
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(enviadorEmail).send(captor.capture());
+        assertThat(captor.getValue().getSubject()).isEqualTo("[SGC]");
+    }
+
+    @Test
+    @DisplayName("Deve usar prefixo padrao quando o prefixo configurado estiver em branco")
+    void deveUsarPrefixoPadraoQuandoPrefixoConfiguradoEstiverEmBranco() throws Exception {
+        ConfigAplicacao.Email emailConfig = new ConfigAplicacao.Email();
+        emailConfig.setRemetente("noreply@test.com");
+        emailConfig.setRemetenteNome("Remetente teste");
+        emailConfig.setAssuntoPrefixo("  ");
+        when(config.getEmail()).thenReturn(emailConfig);
+
+        MimeMessage mimeMessage = new MimeMessage((jakarta.mail.Session) null);
+        when(enviadorEmail.createMimeMessage()).thenReturn(mimeMessage);
+
+        notificacaoServico.enviarEmail(DESTINATARIO, "Aviso", "Corpo");
+
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(enviadorEmail).send(captor.capture());
+        assertThat(captor.getValue().getSubject()).isEqualTo("[SGC] Aviso");
+    }
+
+    @Nested
+    @DisplayName("Modo mock ativo")
+    class ModoMockAtivo {
+        @BeforeEach
+        void configurarModoMock() {
+            org.springframework.test.util.ReflectionTestUtils.setField(notificacaoServico, "modoEnvio", "mock");
+        }
+
+        @Test
+        @DisplayName("Não deve enviar e-mail quando modo mock estiver ativo")
+        void naoDeveEnviarEmailQuandoModoMockEstiverAtivo() {
+            notificacaoServico.enviarEmailHtml(DESTINATARIO, "Assunto", "<h1>Corpo</h1>");
+
+            verify(enviadorEmail, never()).send(any(MimeMessage.class));
+        }
+
+        @Test
+        @DisplayName("Não deve enviar e-mail de texto simples quando modo mock estiver ativo")
+        void naoDeveEnviarEmailTextoSimplesQuandoModoMockEstiverAtivo() {
+            notificacaoServico.enviarEmail(DESTINATARIO, "Assunto", "Corpo texto");
+
+            verify(enviadorEmail, never()).send(any(MimeMessage.class));
+        }
+    }
 }

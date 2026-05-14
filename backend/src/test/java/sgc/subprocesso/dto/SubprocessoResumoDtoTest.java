@@ -62,4 +62,92 @@ class SubprocessoResumoDtoTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Subprocesso deve possuir processo e unidade associados");
     }
+
+    @Test
+    @DisplayName("deve falhar quando processo estiver presente mas unidade estiver ausente")
+    void deveFalharQuandoProcessoEstiverPresenteMasUnidadeEstiverAusente() {
+        Processo processo = Processo.builder()
+                .descricao("Processo")
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .dataCriacao(LocalDateTime.of(2025, 1, 1, 10, 0))
+                .dataLimite(LocalDateTime.of(2025, 1, 30, 10, 0))
+                .build();
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setProcesso(processo);
+
+        assertThatThrownBy(() -> SubprocessoResumoDto.fromEntity(subprocesso))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Subprocesso deve possuir processo e unidade associados");
+    }
+
+    @Test
+    @DisplayName("deve retornar dataLimiteEtapa1 como ultimaDataLimite quando etapa1 for posterior a etapa2")
+    void deveRetornarDataLimiteEtapa1QuandoEtapa1ForPosteriorAEtapa2() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setNome("Unidade");
+        unidade.setSigla("UND");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setTituloTitular("999");
+
+        Processo processo = Processo.builder()
+                .descricao("Processo")
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .tipo(TipoProcesso.REVISAO)
+                .dataCriacao(LocalDateTime.of(2025, 1, 1, 10, 0))
+                .dataLimite(LocalDateTime.of(2025, 2, 28, 10, 0))
+                .build();
+        processo.setCodigo(50L);
+
+        LocalDateTime etapa1 = LocalDateTime.of(2025, 2, 20, 10, 0);
+        LocalDateTime etapa2 = LocalDateTime.of(2025, 2, 10, 10, 0);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(20L);
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        subprocesso.setDataLimiteEtapa1(etapa1);
+        subprocesso.setDataLimiteEtapa2(etapa2);
+
+        SubprocessoResumoDto dto = SubprocessoResumoDto.fromEntity(subprocesso);
+
+        assertThat(dto.ultimaDataLimite()).isEqualTo(etapa1);
+    }
+
+    @Test
+    @DisplayName("deve retornar dataLimiteEtapa2 como ultimaDataLimite quando etapa2 for posterior a etapa1")
+    void deveRetornarDataLimiteEtapa2QuandoEtapa2ForPosteriorAEtapa1() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setNome("Unidade");
+        unidade.setSigla("UND");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setTituloTitular("999");
+
+        Processo processo = Processo.builder()
+                .descricao("Processo")
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .tipo(TipoProcesso.REVISAO)
+                .dataCriacao(LocalDateTime.of(2025, 1, 1, 10, 0))
+                .dataLimite(LocalDateTime.of(2025, 3, 31, 10, 0))
+                .build();
+        processo.setCodigo(50L);
+
+        LocalDateTime etapa1 = LocalDateTime.of(2025, 2, 10, 10, 0);
+        LocalDateTime etapa2 = LocalDateTime.of(2025, 3, 20, 10, 0);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(20L);
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        subprocesso.setDataLimiteEtapa1(etapa1);
+        subprocesso.setDataLimiteEtapa2(etapa2);
+
+        SubprocessoResumoDto dto = SubprocessoResumoDto.fromEntity(subprocesso);
+
+        assertThat(dto.ultimaDataLimite()).isEqualTo(etapa2);
+    }
 }

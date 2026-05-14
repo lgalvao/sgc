@@ -449,4 +449,88 @@ class FeedbackServiceTest {
 
         verify(repo).save(argThat(r -> "/desconhecido".equals(r.getRota())));
     }
+
+    @Test
+    @DisplayName("deve usar rota /desconhecido quando rotaCaminho for nulo nos metadados JSON")
+    void deveUsarRotaDesconhecidaQuandoRotaCaminhoForNuloNoJson() {
+        configurarUsuarioMock();
+        // Metadados com rotaCaminho explicitamente nulo (JSON null node)
+        tools.jackson.databind.node.ObjectNode metadados = objectMapper.createObjectNode();
+        metadados.putNull("rotaCaminho");
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", metadados);
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().id(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+
+        service.registrar(payload, null);
+
+        verify(repo).save(argThat(r -> "/desconhecido".equals(r.getRota())));
+    }
+
+    @Test
+    @DisplayName("deve marcar screenshot indisponível quando caminhoScreenshot estiver em branco")
+    void deveMarcarScreenshotIndisponivelQuandoCaminhoEstiverEmBranco() {
+        var registro = FeedbackRegistro.builder()
+                .id(UUID.randomUUID())
+                .tipo(FeedbackTipo.BUG)
+                .nota("Nota")
+                .usuarioId("1")
+                .usuarioNome("Usuário")
+                .rota("/rota")
+                .status(FeedbackStatus.NOVO)
+                .caminhoScreenshot("  ")
+                .enviadoEm(java.time.OffsetDateTime.now())
+                .build();
+        when(repo.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(registro)));
+
+        var resposta = service.listarRecentes(1);
+
+        assertThat(resposta).hasSize(1);
+        assertThat(resposta.getFirst().screenshotDisponivel()).isFalse();
+    }
+
+    @Test
+    @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando caminhoScreenshot estiver em branco")
+    void deveLancarErroQuandoCaminhoScreenshotEstiverEmBranco() {
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot("  ")
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Screenshot não disponível");
+    }
+
+    @Test
+    @DisplayName("deve descartar screenshot quando screenshotDir for nulo")
+    void deveDescartarScreenshotQuandoScreenshotDirForNulo() {
+        propriedades = new FeedbackPropriedades(null, 5_242_880L);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        configurarUsuarioMock();
+        var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", null);
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().id(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+
+        service.registrar(payload, screenshot);
+
+        verify(repo).save(argThat(r -> r.getCaminhoScreenshot() == null));
+    }
+
+    @Test
+    @DisplayName("deve usar caminho padrão quando screenshotDir for nulo na resolução de caminho")
+    void deveUsarCaminhosPadraoQuandoScreenshotDirForNuloNaResolucao() {
+        propriedades = new FeedbackPropriedades(null, 5_242_880L);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot("arquivo-inexistente.webp")
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
+    }
 }

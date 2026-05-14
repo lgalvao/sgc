@@ -256,4 +256,102 @@ class ValidadorDadosOrganizacionaisTest {
         usuario.setTituloEleitoral(tituloEleitoral);
         return usuario;
     }
+
+    @Test
+    @DisplayName("diagnosticar lida com unidade_codigo como String na view de perfis")
+    void diagnosticarLidaComUnidadeCodigoComoStringNaViewDePerfis() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(10L, "OPER", TipoUnidade.OPERACIONAL, "111")
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(new ResponsabilidadeLeitura(10L, "111")));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("titulos")) {
+                return List.of();
+            }
+            if (parametros.containsKey("codigos")) {
+                // unidade_codigo como String para testar ramo toString em lerLong
+                return List.of(Map.of("usuario_titulo", "111", "perfil", "INVALIDO", "UNIDADE_CODIGO", "10"));
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("VW_USUARIO_PERFIL_UNIDADE com perfil invalido");
+    }
+
+    @Test
+    @DisplayName("diagnosticar ignora linha de titulo duplicado com titulo nulo ou vazio")
+    void diagnosticarIgnoraLinhaDeTituloDuplicadoComTituloNuloOuVazio() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(5L, "OPER", TipoUnidade.OPERACIONAL, "555")
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(new ResponsabilidadeLeitura(5L, "555")));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("555")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("titulos")) {
+                // linha com titulo nulo: deve ser ignorada na contagem de duplicatas
+                Map<String, Object> linhaNula = new HashMap<>();
+                linhaNula.put("titulo", null);
+                return List.of(linhaNula);
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .doesNotContain("VW_USUARIO com titulo duplicado");
+    }
+
+    @Test
+    @DisplayName("diagnosticar nao reporta intermediaria quando responsabilidade nao existe mas possui gestor")
+    void diagnosticarNaoReportaIntermediariaQuandoResponsabilidadeNaoExisteMasPossuiGestor() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INT", "INT", "111", TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
+        ));
+        // Sem responsabilidade para a unidade intermediaria
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(2L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("codigos")) {
+                return List.of(Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L));
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .doesNotContain("Unidade intermediaria sem perfil GESTOR")
+                .doesNotContain("Responsavel de unidade intermediaria sem perfil GESTOR correspondente");
+    }
+
+    @Test
+    @DisplayName("diagnosticar acusa titular referenciado ausente na view de usuarios")
+    void diagnosticarAcusaTitularReferenciadoAusenteNaViewDeUsuarios() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(7L, "OPER7", TipoUnidade.OPERACIONAL, "777")
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of());
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of()); // usuario nao existe
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("Titular referenciado ausente na VW_USUARIO");
+    }
 }
