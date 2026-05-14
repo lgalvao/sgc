@@ -541,6 +541,18 @@ class E2eControllerTest {
         }
 
         @Test
+        @DisplayName("validarAmbienteE2e deve encapsular falha de conexão SQL")
+        void validarAmbienteE2eComFalhaSql() throws Exception {
+            DataSource dataSource = mock(DataSource.class);
+            when(jdbcTemplate.getDataSource()).thenReturn(dataSource);
+            when(dataSource.getConnection()).thenThrow(new SQLException("falha sql"));
+
+            assertThatThrownBy(() -> controller.validarAmbienteE2e())
+                    .isInstanceOf(ErroConfiguracao.class)
+                    .hasMessageContaining("Falha ao validar DataSource");
+        }
+
+        @Test
         @DisplayName("criarProcessoMapeamento deve falhar se unidadeSigla for vazia")
         void deveFalharSeUnidadeSiglaVazia() {
             E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
@@ -600,6 +612,33 @@ class E2eControllerTest {
             assertThatThrownBy(() -> controller.criarProcessoMapeamentoComMapaDisponibilizado(request))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("não encontrou codigo gerado");
+        }
+
+        @Test
+        @DisplayName("resetDatabase deve continuar quando cache não existir")
+        void resetDatabaseComCacheNulo() throws Exception {
+            DataSource dataSource = mock(DataSource.class);
+            Connection connection = mock(Connection.class);
+            Statement statement = mock(Statement.class);
+            Resource seed = mock(Resource.class);
+            CacheManager cacheManagerMock = mock(CacheManager.class);
+
+            when(jdbcTemplate.getDataSource()).thenReturn(dataSource);
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.createStatement()).thenReturn(statement);
+            when(statement.getUpdateCount()).thenReturn(-1);
+            when(statement.getMoreResults()).thenReturn(false);
+            when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of());
+            when(resourceLoader.getResource(anyString())).thenReturn(seed);
+            when(seed.exists()).thenReturn(true);
+            when(seed.getInputStream()).thenReturn(new ByteArrayInputStream(SCRIPT_SQL_MINIMO_VALIDO.getBytes(StandardCharsets.UTF_8)));
+            when(cacheManagerMock.getCacheNames()).thenReturn(List.of("cache-inexistente"));
+            when(cacheManagerMock.getCache("cache-inexistente")).thenReturn(null);
+
+            E2eController controllerComCacheNulo = new E2eController(
+                    jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManagerMock);
+
+            assertThatCode(controllerComCacheNulo::resetDatabase).doesNotThrowAnyException();
         }
 
         @Test

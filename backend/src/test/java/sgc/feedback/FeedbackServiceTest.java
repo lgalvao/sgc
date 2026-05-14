@@ -161,6 +161,16 @@ class FeedbackServiceTest {
     }
 
     @Test
+    @DisplayName("deve lançar ErroValidacao quando nota for nula")
+    void deveLancarErroPorNotaNula() {
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, null, null);
+
+        assertThatThrownBy(() -> service.registrar(payload, null))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("nota");
+    }
+
+    @Test
     @DisplayName("deve lançar ErroValidacao quando screenshot exceder tamanho máximo")
     void deveLancarErroPorScreenshotGrande() {
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Problema encontrado nesta funcionalidade", null);
@@ -372,6 +382,39 @@ class FeedbackServiceTest {
         var registro = FeedbackRegistro.builder()
                 .id(id)
                 .caminhoScreenshot("C:\\\\feedback\\\\arquivo.webp")
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
+    }
+
+    @Test
+    @DisplayName("deve lançar ErroInconsistenciaInterna quando falhar leitura do arquivo")
+    void deveLancarErroInconsistenciaAoLerDiretorioComoArquivo() throws IOException {
+        UUID id = UUID.randomUUID();
+        Path diretorio = Files.createTempDirectory("feedback-screenshot-dir");
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot(diretorio.toString())
+                .build();
+        when(repo.findById(id)).thenReturn(Optional.of(registro));
+
+        assertThatThrownBy(() -> service.obterScreenshot(id))
+                .isInstanceOf(ErroInconsistenciaInterna.class)
+                .hasMessageContaining("Erro ao ler arquivo de screenshot");
+    }
+
+    @Test
+    @DisplayName("deve usar diretório padrão quando screenshot-dir estiver em branco")
+    void deveUsarDiretorioPadraoQuandoConfiguracaoEmBranco() {
+        propriedades = new FeedbackPropriedades("   ", 5_242_880L);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        UUID id = UUID.randomUUID();
+        var registro = FeedbackRegistro.builder()
+                .id(id)
+                .caminhoScreenshot("arquivo-inexistente.webp")
                 .build();
         when(repo.findById(id)).thenReturn(Optional.of(registro));
 

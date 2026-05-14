@@ -213,6 +213,40 @@ class ValidadorDadosOrganizacionaisTest {
         assertThat(diagnostico.grupos()).isEmpty();
     }
 
+    @Test
+    @DisplayName("diagnosticar ignora unidades fora do escopo participante")
+    void diagnosticarIgnoraUnidadesForaDoEscopoParticipante() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INAT", "INAT", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.INATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "RAIZ", "RAIZ", "111", TipoUnidade.RAIZ, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(3L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null)
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(new ResponsabilidadeLeitura(3L, "111")));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+        verify(usuarioRepo).findAllById(List.of("111"));
+    }
+
+    @Test
+    @DisplayName("diagnosticar usa resumo genérico quando não consegue extrair sigla")
+    void diagnosticarUsaResumoGenericoQuandoNaoExtraiSigla() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(1L, " ", TipoUnidade.OPERACIONAL, null)
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of());
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.resumo()).startsWith("Foram encontradas");
+        assertThat(diagnostico.resumo()).doesNotContain("Há unidades atualmente sem responsável efetivo");
+    }
+
     private static UnidadeHierarquiaLeitura unidade(Long codigo, String sigla, TipoUnidade tipo, String tituloTitular) {
         return new UnidadeHierarquiaLeitura(codigo, sigla, sigla, tituloTitular, tipo, SituacaoUnidade.ATIVA, null);
     }
