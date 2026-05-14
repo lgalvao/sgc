@@ -171,7 +171,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     const secretariaAceitaValidacaoDoMapa = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
             usuario: GESTOR_SECRETARIA,
-            perfil: GESTOR_SECRETARIA.perfil!,
+            perfil: GESTOR_SECRETARIA.perfil,
             reaproveitarSessaoAtual: true,
             papel: 'gestor',
             descricaoProcesso: descProcesso
@@ -277,7 +277,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     const secretariaAceitaRevisaoDoCadastro = async (page: Page) => {
         await reabrirSubprocessoSemLimparSpa(page, {
             usuario: GESTOR_SECRETARIA,
-            perfil: GESTOR_SECRETARIA.perfil!,
+            perfil: GESTOR_SECRETARIA.perfil,
             reaproveitarSessaoAtual: true,
             papel: 'gestor',
             descricaoProcesso: descricaoProcessoRevisao
@@ -366,7 +366,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
 
         await reabrirSubprocessoSemLimparSpa(page, {
             usuario: GESTOR_SECRETARIA,
-            perfil: GESTOR_SECRETARIA.perfil!,
+            perfil: GESTOR_SECRETARIA.perfil,
             reaproveitarSessaoAtual: true,
             papel: 'gestor',
             descricaoProcesso: descricaoProcessoRevisao
@@ -391,11 +391,19 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         usuario: Usuario;
         perfil?: string;
     }) => {
+        let papel: 'gestor' | 'admin' | 'chefe' = 'gestor';
+        if (options.perfil) {
+            papel = 'gestor';
+        } else if (options.usuario === ADMIN) {
+            papel = 'admin';
+        } else if (options.usuario === CHEFE_SECAO) {
+            papel = 'chefe';
+        }
+
         await reabrirSubprocessoSemLimparSpa(page, {
             usuario: options.usuario,
-            perfil: options.perfil
-            ,
-            papel: options.perfil ? 'gestor' : options.usuario === ADMIN ? 'admin' : options.usuario === CHEFE_SECAO ? 'chefe' : 'gestor',
+            perfil: options.perfil,
+            papel,
             descricaoProcesso: descricaoProcessoRevisao
         });
 
@@ -537,7 +545,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await aceitarCadastroMapeamento(page, 'Aceite da COORD_11 após correção.');
 
         // O GESTOR da secretaria faz login.
-        await loginComPerfil(page, GESTOR_SECRETARIA.titulo, GESTOR_SECRETARIA.senha, GESTOR_SECRETARIA.perfil!);
+        await loginComPerfil(page, GESTOR_SECRETARIA.titulo, GESTOR_SECRETARIA.senha, GESTOR_SECRETARIA.perfil);
 
         // O GESTOR da secretaria abre o subprocesso da mesma seção.
         await acessarSubprocessoGestor(page, descProcesso, SIGLA_SECAO);
@@ -662,7 +670,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await consultarResultadoFinalComCacheQuente(page, {usuario: GESTOR_COORDENADORIA});
             await consultarResultadoFinalComCacheQuente(page, {
                 usuario: GESTOR_SECRETARIA,
-                perfil: GESTOR_SECRETARIA.perfil!
+                perfil: GESTOR_SECRETARIA.perfil
             });
         });
 
@@ -677,14 +685,14 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         });
 
         await test.step('O GESTOR pode acessar o histórico do mapa homologado', async () => {
-            await loginComPerfil(page, GESTOR_SECRETARIA.titulo, GESTOR_SECRETARIA.senha, GESTOR_SECRETARIA.perfil!);
+            await loginComPerfil(page, GESTOR_SECRETARIA.titulo, GESTOR_SECRETARIA.senha, GESTOR_SECRETARIA.perfil);
             await acessarSubprocessoGestor(page, descricaoProcessoRevisao, SIGLA_SECAO);
             await navegarParaMapa(page);
             await expect(page.getByTestId('btn-mapa-historico')).toBeVisible();
             await page.getByTestId('btn-mapa-historico').click();
             const modalHistorico = page.getByRole('dialog');
             await expect(modalHistorico).toBeVisible();
-            await modalHistorico.getByTestId('btn-fechar-historico').click();
+            await modalHistorico.getByTestId('btn-modal-fechar').click();
             await expect(modalHistorico).toBeHidden();
         });
 

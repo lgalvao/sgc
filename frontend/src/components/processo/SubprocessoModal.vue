@@ -92,14 +92,14 @@ const mensagemErroDataLimite = computed(() => {
   const deveExibirMensagem = campoDataInteragido.value || validacaoSubmetida.value;
   if (!deveExibirMensagem) return "";
   if (deveExibirErro(!novaDataLimite.value)) return "A data limite é obrigatória.";
+  if (props.ultimaDataLimiteSubprocesso && novaDataLimite.value < formatarDataParaInput(props.ultimaDataLimiteSubprocesso)) {
+    return "A data limite deve ser maior ou igual à última data limite do subprocesso.";
+  }
   if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) {
     return "A data limite para validação deve ser uma data futura.";
   }
   if (deveValidarFimEtapaAnterior.value && dataFimEtapaAnteriorFormatada.value && novaDataLimite.value <= dataFimEtapaAnteriorFormatada.value) {
     return "A data limite deve ser maior que a data de fim da etapa anterior.";
-  }
-  if (props.ultimaDataLimiteSubprocesso && novaDataLimite.value < formatarDataParaInput(props.ultimaDataLimiteSubprocesso)) {
-    return "A data limite deve ser maior ou igual à última data limite do subprocesso.";
   }
   return "";
 });
@@ -116,11 +116,16 @@ watch(novaDataLimite, (novaData) => {
 
 const dataLimiteMinima = computed(() => {
   const amanha = obterAmanhaFormatado();
-  if (!deveValidarFimEtapaAnterior.value || !dataFimEtapaAnteriorFormatada.value) {
-    return amanha;
+  let minima = amanha;
+  if (deveValidarFimEtapaAnterior.value && dataFimEtapaAnteriorFormatada.value) {
+    const primeiroDiaValido = somarDias(dataFimEtapaAnteriorFormatada.value, 1);
+    if (primeiroDiaValido > minima) minima = primeiroDiaValido;
   }
-  const primeiroDiaValido = somarDias(dataFimEtapaAnteriorFormatada.value, 1);
-  return primeiroDiaValido > amanha ? primeiroDiaValido : amanha;
+  if (props.ultimaDataLimiteSubprocesso) {
+    const ultima = formatarDataParaInput(props.ultimaDataLimiteSubprocesso);
+    if (ultima > minima) minima = ultima;
+  }
+  return minima;
 });
 
 const dataLimiteAtualFormatada = computed(() => {
@@ -131,6 +136,9 @@ const isDataValida = computed(() => {
   if (!novaDataLimite.value) return false;
   if (!ehDataEstritamenteFutura(analisarData(novaDataLimite.value))) return false;
   if (deveValidarFimEtapaAnterior.value && dataFimEtapaAnteriorFormatada.value && novaDataLimite.value <= dataFimEtapaAnteriorFormatada.value) {
+    return false;
+  }
+  if (props.ultimaDataLimiteSubprocesso && novaDataLimite.value < formatarDataParaInput(props.ultimaDataLimiteSubprocesso)) {
     return false;
   }
   return true;
