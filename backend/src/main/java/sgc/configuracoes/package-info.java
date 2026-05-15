@@ -1,4 +1,4 @@
 @NullMarked
-package sgc.parametros;
+package sgc.configuracoes;
 
 import org.jspecify.annotations.*;

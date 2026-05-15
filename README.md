@@ -57,7 +57,7 @@ O backend está em `backend/src/main/java/sgc` e é organizado por domínio:
 | `seguranca` | login, JWT, sanitização de entrada e `SgcPermissionEvaluator` |
 | `alerta` | alertas da UI, notificações e fila/worker de e-mail |
 | `relatorio` | relatórios de andamento e mapas vigentes |
-| `parametros` | parâmetros/configurações dinâmicas |
+| `configuracaos` | parâmetros/configurações dinâmicas |
 | `feedback` | recebimento e gestão de feedbacks com screenshot |
 | `comum` | infraestrutura compartilhada, exceções, config, monitoramento e modelo base |
 | `e2e` | endpoints e adaptações exclusivas do perfil de testes E2E |

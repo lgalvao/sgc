@@ -27,7 +27,7 @@ Código principal em `src/main/java/sgc`:
 | `seguranca` | login, JWT, permission evaluator, sanitização e config de segurança |
 | `alerta` | alertas exibidos no frontend, notificações e worker de e-mail |
 | `relatorio` | relatórios PDF/exportações de andamento e mapas |
-| `parametros` | parâmetros/configurações editáveis |
+| `configuracaos` | parâmetros/configurações editáveis |
 | `feedback` | recebimento e gestão de feedbacks administrativos |
 | `comum` | config, erros, monitoramento, tipos base e utilidades compartilhadas |
 | `e2e` | suporte exclusivo para automação de testes ponta a ponta |

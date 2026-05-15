@@ -1,4 +1,4 @@
-package sgc.parametros;
+package sgc.configuracoes;
 
 import com.fasterxml.jackson.databind.*;
 import org.junit.jupiter.api.*;
@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
-import sgc.parametros.model.*;
+import sgc.configuracoes.model.*;
 import sgc.seguranca.*;
 
 import java.util.*;
@@ -34,7 +34,7 @@ class ConfiguracaoControllerTest {
     @DisplayName("GET /api/configuracoes - Deve listar configurações com sucesso")
     @WithMockUser(roles = "ADMIN")
     void deveListarConfiguracoes() throws Exception {
-        Parametro param = Parametro.builder()
+        Configuracao param = Configuracao.builder()
                 .chave("KEY")
                 .descricao("Description")
                 .valor("VALUE")
@@ -67,14 +67,14 @@ class ConfiguracaoControllerTest {
     @DisplayName("POST /api/configuracoes - Deve atualizar configurações com sucesso")
     @WithMockUser(roles = "ADMIN")
     void deveAtualizarConfiguracoes() throws Exception {
-        ParametroRequest request = new ParametroRequest(1L, "KEY", "Description", "NEW_VALUE");
-        Parametro response = Parametro.builder()
+        ConfiguracaoRequest request = new ConfiguracaoRequest(1L, "KEY", "Description", "NEW_VALUE");
+        Configuracao response = Configuracao.builder()
                 .chave("KEY")
                 .descricao("Description")
                 .valor("NEW_VALUE")
                 .build();
 
-        when(configuracaoService.buscarPorCodigo(1L)).thenReturn(new Parametro());
+        when(configuracaoService.buscarPorCodigo(1L)).thenReturn(new Configuracao());
         when(configuracaoService.salvar(any())).thenReturn(List.of(response));
 
         mockMvc.perform(post("/api/configuracoes")

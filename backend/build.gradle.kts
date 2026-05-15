@@ -201,7 +201,6 @@ tasks.withType<Test> {
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
         "-XX:+EnableDynamicAgentLoading",
-
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
         "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"

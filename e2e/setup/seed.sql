@@ -350,11 +350,11 @@ VALUES (9902, 99001);
 
 
 -- Parâmetros do sistema
-INSERT INTO sgc.parametro (codigo, chave, descricao, valor)
+INSERT INTO sgc.configuracao (codigo, chave, descricao, valor)
 VALUES (1, 'DIAS_INATIVACAO_PROCESSO', 'Dias para inativação de processos', '30');
-INSERT INTO sgc.parametro (codigo, chave, descricao, valor)
+INSERT INTO sgc.configuracao (codigo, chave, descricao, valor)
 VALUES (2, 'DIAS_ALERTA_NOVO', 'Dias para indicação de alerta como novo', '3');
-INSERT INTO sgc.parametro (codigo, chave, descricao, valor)
+INSERT INTO sgc.configuracao (codigo, chave, descricao, valor)
 VALUES (3, 'TEMA_ESCURO', 'Habilitar tema escuro global', 'false');
 
 -- Dados para teste de Importação (CDU-08)

@@ -14,11 +14,11 @@ public final class Mensagens {
     public static final String DATA_OBRIGATORIA = "A data é obrigatória";
     public static final String DATA_INICIO_OBRIGATORIA = "A data de início é obrigatória";
     public static final String DATA_TERMINO_OBRIGATORIA = "A data de término é obrigatória";
-    // ── Chave de parâmetro ───────────────────────────────────────────────────
+    // ── Chave de Configuração ───────────────────────────────────────────────────
     public static final String CHAVE_OBRIGATORIA = "A chave não pode estar vazia";
     public static final String CHAVE_MAX = "A chave deve ter no máximo 50 caracteres";
     public static final String VALOR_OBRIGATORIO = "O valor não pode estar vazio";
-    public static final String CODIGO_PARAMETRO_OBRIGATORIO = "O código do parâmetro é obrigatório";
+    public static final String CODIGO_PARAMETRO_OBRIGATORIO = "O código do Configuração é obrigatório";
     // ── Descrição ────────────────────────────────────────────────────────────
     public static final String DESCRICAO_OBRIGATORIA = "Preencha a descrição";
     public static final String DESCRICAO_MAX = "A descrição deve ter no máximo 255 caracteres";

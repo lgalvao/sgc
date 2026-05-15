@@ -1,4 +1,4 @@
-package sgc.parametros.model;
+package sgc.configuracoes.model;
 
 import sgc.comum.model.*;
 

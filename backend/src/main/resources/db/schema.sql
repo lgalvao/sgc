@@ -465,7 +465,7 @@ create table if not exists sgc.notificacao_email
             )
 );
 
-create table if not exists sgc.parametro
+create table if not exists sgc.configuracao
 (
     codigo
               bigint

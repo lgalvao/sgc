@@ -110,7 +110,7 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve retornar erro quando não houver parâmetro de unidade")
+    @DisplayName("Deve retornar erro quando não houver Configuração de unidade")
     @WithMockAdmin
     void gerarRelatorioMapas_semUnidade_erro() throws Exception {
         mockMvc.perform(get(API_REL_MAPAS).with(csrf()))

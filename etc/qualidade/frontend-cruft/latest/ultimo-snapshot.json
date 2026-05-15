@@ -3578,7 +3578,7 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/ParametrosView.vue",
+      "arquivo": "frontend/src/views/ConfiguracaoView.vue",
       "camada": "view",
       "categoriaArquivo": "producao",
       "linhas": 202,
@@ -4738,7 +4738,7 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/__tests__/ParametrosView.spec.ts",
+      "arquivo": "frontend/src/views/__tests__/ConfiguracaoView.spec.ts",
       "camada": "view",
       "categoriaArquivo": "teste",
       "linhas": 135,

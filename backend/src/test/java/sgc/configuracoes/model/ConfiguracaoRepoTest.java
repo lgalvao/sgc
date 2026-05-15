@@ -1,4 +1,4 @@
-package sgc.parametros.model;
+package sgc.configuracoes.model;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
@@ -10,22 +10,22 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @Tag("integration")
-@DisplayName("ParametroRepo - Testes de Repositório")
-class ParametroRepoTest {
+@DisplayName("ConfiguracaoRepo - Testes de Repositório")
+class ConfiguracaoRepoTest {
 
     @Autowired
-    private ParametroRepo parametroRepo;
+    private ConfiguracaoRepo configuracaoRepo;
 
     @Test
     @DisplayName("deve buscar parametro por chave")
     void deveBuscarParametroPorChave() {
-        parametroRepo.save(Parametro.builder()
+        configuracaoRepo.save(Configuracao.builder()
                 .chave("DIAS_ALERTA_NOVO")
                 .descricao("Dias para indicacao de alerta como novo")
                 .valor("3")
                 .build());
 
-        assertThat(parametroRepo.findByChave("DIAS_ALERTA_NOVO")).get().satisfies(parametro -> {
+        assertThat(configuracaoRepo.findByChave("DIAS_ALERTA_NOVO")).get().satisfies(parametro -> {
             assertThat(parametro.getDescricao()).contains("alerta");
             assertThat(parametro.getValor()).isEqualTo("3");
         });

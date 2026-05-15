@@ -1,13 +1,13 @@
-package sgc.parametros;
+package sgc.configuracoes;
 
 import jakarta.validation.constraints.*;
 import sgc.comum.*;
 
 /**
- * DTO de requisição para atualização de parâmetro de configuração.
- * Utilizado na atualização em bloco de parâmetros.
+ * DTO de requisição para atualização de Configuração de configuração.
+ * Utilizado na atualização em bloco de Configuraçãos.
  */
-public record ParametroRequest(
+public record ConfiguracaoRequest(
         @NotNull(message = Mensagens.CODIGO_PARAMETRO_OBRIGATORIO)
         Long codigo,
 

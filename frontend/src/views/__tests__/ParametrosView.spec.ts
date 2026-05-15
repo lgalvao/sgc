@@ -1,14 +1,14 @@
 import {mount} from '@vue/test-utils';
 import {ref} from 'vue';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import ParametrosView from '@/views/ParametrosView.vue';
+import ConfiguracaoView from '../ConfiguracaoView.vue';
 import {useConfiguracoes} from '@/composables/useConfiguracoes';
 
 vi.mock('@/composables/useConfiguracoes', () => ({
     useConfiguracoes: vi.fn()
 }));
 
-describe('ParametrosView', () => {
+describe('ConfiguracaoView', () => {
     let wrapper: any;
     let configuracoesStore: any;
 
@@ -28,7 +28,7 @@ describe('ParametrosView', () => {
         };
         vi.mocked(useConfiguracoes).mockReturnValue(configuracoesStore);
 
-        wrapper = mount(ParametrosView, {
+        wrapper = mount(ConfiguracaoView, {
             global: {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},

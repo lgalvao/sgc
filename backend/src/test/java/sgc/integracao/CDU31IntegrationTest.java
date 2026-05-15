@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
 import sgc.integracao.mocks.*;
-import sgc.parametros.model.*;
+import sgc.configuracoes.model.*;
 import tools.jackson.databind.*;
 
 import java.util.*;
@@ -25,24 +25,24 @@ class CDU31IntegrationTest extends BaseIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ParametroRepo parametroRepo;
+    private ConfiguracaoRepo configuracaoRepo;
 
     @Autowired
     private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
-        Parametro p1 = new Parametro();
+        Configuracao p1 = new Configuracao();
         p1.setChave("DIAS_INATIVACAO_PROCESSO");
         p1.setValor("30");
         p1.setDescricao("Dias para inativação");
-        parametroRepo.save(p1);
+        configuracaoRepo.save(p1);
 
-        Parametro p2 = new Parametro();
+        Configuracao p2 = new Configuracao();
         p2.setChave("DIAS_ALERTA_NOVO");
         p2.setValor("5");
         p2.setDescricao("Dias alerta novo");
-        parametroRepo.save(p2);
+        configuracaoRepo.save(p2);
 
         entityManager.flush();
         entityManager.clear();
@@ -63,7 +63,7 @@ class CDU31IntegrationTest extends BaseIntegrationTest {
                 });
 
         // Atualizar
-        List<Parametro> existing = parametroRepo.findAll();
+        List<Configuracao> existing = configuracaoRepo.findAll();
         existing.forEach(p -> {
             if (p.getChave().equals("DIAS_INATIVACAO_PROCESSO")) p.setValor("60");
             if (p.getChave().equals("DIAS_ALERTA_NOVO")) p.setValor("10");
@@ -78,7 +78,7 @@ class CDU31IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        Parametro atualizado = parametroRepo.findByChave("DIAS_INATIVACAO_PROCESSO").orElseThrow();
+        Configuracao atualizado = configuracaoRepo.findByChave("DIAS_INATIVACAO_PROCESSO").orElseThrow();
         assertThat(atualizado.getValor()).isEqualTo("60");
     }
 }

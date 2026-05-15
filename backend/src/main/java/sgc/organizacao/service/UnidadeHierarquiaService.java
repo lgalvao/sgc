@@ -45,7 +45,7 @@ public class UnidadeHierarquiaService {
     }
 
     /**
-     * Busca a árvore hierárquica com filtro de elegibilidade baseado em parâmetros de negócio.
+     * Busca a árvore hierárquica com filtro de elegibilidade baseado em Configuraçãos de negócio.
      */
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             boolean requerMapaVigente, Set<Long> unidadesBloqueadas) {

@@ -1,4 +1,4 @@
-package sgc.parametros.model;
+package sgc.configuracoes.model;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.*;
 import sgc.comum.*;
 import sgc.comum.model.*;
+import sgc.configuracoes.*;
 
 @Entity
 @Table(name = "PARAMETRO", schema = "sgc")
@@ -15,7 +16,7 @@ import sgc.comum.model.*;
 @NoArgsConstructor
 @SuperBuilder
 @SuppressWarnings("NullAway.Init")
-public class Parametro extends EntidadeBase {
+public class Configuracao extends EntidadeBase {
     @JsonView(ConfiguracaoViews.Publica.class)
     @Column(name = "chave", length = 50, nullable = false)
     @NotBlank(message = Mensagens.CHAVE_OBRIGATORIA)
@@ -31,7 +32,7 @@ public class Parametro extends EntidadeBase {
     @NotBlank(message = Mensagens.VALOR_OBRIGATORIO)
     private String valor;
 
-    public void atualizarDe(sgc.parametros.ParametroRequest request) {
+    public void atualizarDe(ConfiguracaoRequest request) {
         this.descricao = request.descricao();
         this.valor = request.valor();
     }

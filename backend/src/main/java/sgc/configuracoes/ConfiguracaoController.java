@@ -1,4 +1,4 @@
-package sgc.parametros;
+package sgc.configuracoes;
 
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.*;
@@ -7,7 +7,7 @@ import lombok.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.validation.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.parametros.model.*;
+import sgc.configuracoes.model.*;
 
 import java.util.*;
 
@@ -22,27 +22,27 @@ public class ConfiguracaoController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas as configurações")
-    public List<ParametroDto> listar() {
+    public List<ConfiguracaoDto> listar() {
         return configuracaoService.buscarTodos().stream()
-                .map(ParametroDto::fromEntity)
+                .map(ConfiguracaoDto::fromEntity)
                 .toList();
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar configurações em bloco")
-    public List<ParametroDto> atualizar(@RequestBody @Valid List<ParametroRequest> parametros) {
-        // Buscar parâmetros existentes e atualizar com dados das requests
-        List<Parametro> parametrosAtualizados = parametros.stream()
+    public List<ConfiguracaoDto> atualizar(@RequestBody @Valid List<ConfiguracaoRequest> parametros) {
+        // Buscar Configuraçãos existentes e atualizar com dados das requests
+        List<Configuracao> parametrosAtualizados = parametros.stream()
                 .map(request -> {
-                    Parametro parametro = configuracaoService.buscarPorCodigo(request.codigo());
-                    parametro.atualizarDe(request);
-                    return parametro;
+                    Configuracao configuracao = configuracaoService.buscarPorCodigo(request.codigo());
+                    configuracao.atualizarDe(request);
+                    return configuracao;
                 })
                 .toList();
 
         return configuracaoService.salvar(parametrosAtualizados).stream()
-                .map(ParametroDto::fromEntity)
+                .map(ConfiguracaoDto::fromEntity)
                 .toList();
     }
 }

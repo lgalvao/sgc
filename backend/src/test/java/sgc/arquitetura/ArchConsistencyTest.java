@@ -183,7 +183,7 @@ public class ArchConsistencyTest {
                         }
                     } catch (Exception e) {
                         String mensagem = String.format(
-                                "Não foi possível inspecionar os parâmetros de %s.%s: %s",
+                                "Não foi possível inspecionar os Configuraçãos de %s.%s: %s",
                                 method.getOwner().getSimpleName(), method.getName(), e.getMessage());
                         events.add(SimpleConditionEvent.violated(method, mensagem));
                     }
@@ -210,7 +210,7 @@ public class ArchConsistencyTest {
             .and()
             .areDeclaredInClassesThat()
             .areAnnotatedWith(RestController.class)
-            .should(new ArchCondition<>("não receber parâmetros com @AuthenticationPrincipal") {
+            .should(new ArchCondition<>("não receber Configuraçãos com @AuthenticationPrincipal") {
                 @Override
                 public void check(JavaMethod method, ConditionEvents events) {
                     try {
@@ -225,7 +225,7 @@ public class ArchConsistencyTest {
                         }
                     } catch (Exception e) {
                         String mensagem = String.format(
-                                "Não foi possível inspecionar os parâmetros de %s.%s: %s",
+                                "Não foi possível inspecionar os Configuraçãos de %s.%s: %s",
                                 method.getOwner().getSimpleName(), method.getName(), e.getMessage());
                         events.add(SimpleConditionEvent.violated(method, mensagem));
                     }
@@ -250,7 +250,7 @@ public class ArchConsistencyTest {
             .and()
             .areDeclaredInClassesThat()
             .haveSimpleNameEndingWith("Facade")
-            .should(new ArchCondition<>("não receber Usuario como parâmetro de aplicação") {
+            .should(new ArchCondition<>("não receber Usuario como Configuração de aplicação") {
                 @Override
                 public void check(JavaMethod method, ConditionEvents events) {
                     String nomeClasse = method.getOwner().getName();
@@ -264,7 +264,7 @@ public class ArchConsistencyTest {
                         for (java.lang.reflect.Parameter parametro : method.reflect().getParameters()) {
                             if (parametro.getType().equals(Usuario.class)) {
                                 String mensagem = String.format(
-                                        "Método público %s.%s recebe Usuario como parâmetro; o usuário atual deve vir do contexto autenticado centralizado",
+                                        "Método público %s.%s recebe Usuario como Configuração; o usuário atual deve vir do contexto autenticado centralizado",
                                         method.getOwner().getSimpleName(),
                                         method.getName());
                                 events.add(SimpleConditionEvent.violated(method, mensagem));
@@ -272,7 +272,7 @@ public class ArchConsistencyTest {
                         }
                     } catch (Exception e) {
                         String mensagem = String.format(
-                                "Não foi possível inspecionar os parâmetros de %s.%s: %s",
+                                "Não foi possível inspecionar os Configuraçãos de %s.%s: %s",
                                 method.getOwner().getSimpleName(), method.getName(), e.getMessage());
                         events.add(SimpleConditionEvent.violated(method, mensagem));
                     }
@@ -404,7 +404,7 @@ public class ArchConsistencyTest {
                                 }
                                 c.getParameters().stream()
                                         .filter(p -> p.isAnnotatedWith(lazyAnnotation))
-                                        .forEach(p -> events.add(SimpleConditionEvent.violated(p, "Parâmetro em " + c.getFullName() + " está anotado com @Lazy")));
+                                        .forEach(p -> events.add(SimpleConditionEvent.violated(p, "Configuração em " + c.getFullName() + " está anotado com @Lazy")));
                             });
                 }
             })

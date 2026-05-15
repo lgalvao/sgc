@@ -118,7 +118,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("SEGURANÇA: Endpoint mantém isolamento mesmo com parâmetros conflitantes")
+    @DisplayName("SEGURANÇA: Endpoint mantém isolamento mesmo com Configuraçãos conflitantes")
     void listarAlertas_ParamConflitanteMantemIsolamento() throws Exception {
         autenticar(servidor);
 

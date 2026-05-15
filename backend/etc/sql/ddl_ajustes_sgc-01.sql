@@ -246,9 +246,9 @@ DECLARE
     PROCEDURE garantir_parametro(p_chave VARCHAR2, p_desc VARCHAR2, p_valor VARCHAR2) IS
         v_count NUMBER;
     BEGIN
-        SELECT COUNT(*) INTO v_count FROM parametro WHERE chave = p_chave;
+        SELECT COUNT(*) INTO v_count FROM configuracao WHERE chave = p_chave;
         IF v_count = 0 THEN
-            INSERT INTO parametro (chave, descricao, valor) VALUES (p_chave, p_desc, p_valor);
+            INSERT INTO configuracao (chave, descricao, valor) VALUES (p_chave, p_desc, p_valor);
         END IF;
     END;
 BEGIN

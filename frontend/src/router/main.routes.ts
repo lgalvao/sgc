@@ -1,4 +1,5 @@
 import type {RouteRecordRaw} from "vue-router";
+import vue from "@vitejs/plugin-vue";
 
 const mainRoutes: RouteRecordRaw[] = [
     {
@@ -50,7 +51,7 @@ const mainRoutes: RouteRecordRaw[] = [
     {
         path: "/configuracoes",
         name: "Parametros",
-        component: () => import("@/views/ParametrosView.vue"),
+        component: () => import("@/views/ConfiguracaoView.vue"),
         meta: {title: "Configurações"},
     },
     {

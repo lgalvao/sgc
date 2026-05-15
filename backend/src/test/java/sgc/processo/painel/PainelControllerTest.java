@@ -127,7 +127,7 @@ class PainelControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/painel/alertas - Deve ignorar parâmetros de usuário/unidade da URL e usar o Token")
+    @DisplayName("GET /api/painel/alertas - Deve ignorar Configuraçãos de usuário/unidade da URL e usar o Token")
     void listarAlertas_IgnoraParametrosUrl() throws Exception {
         Usuario usuarioMock = Usuario.builder()
                 .tituloEleitoral("123")
