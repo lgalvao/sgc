@@ -155,6 +155,23 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar codigos das unidades sem histórico de mapa")
+    @WithMockUser
+    void deveRetornarCodigosUnidadesSemHistoricoMapa() throws Exception {
+        UnidadeDto unidadeFilha = UnidadeDto.builder().codigo(40L).subunidades(List.of()).build();
+        UnidadeDto unidadeRaiz = UnidadeDto.builder().codigo(30L).subunidades(List.of(unidadeFilha)).build();
+        UnidadeDto unidadeComHistorico = UnidadeDto.builder().codigo(50L).subunidades(List.of()).build();
+
+        when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(unidadeRaiz, unidadeComHistorico));
+        when(unidadeService.buscarTodosCodigosUnidadesComHistoricoMapa()).thenReturn(List.of(50L));
+
+        mockMvc.perform(get("/api/unidades/sem-historico-mapa"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(30))
+                .andExpect(jsonPath("$[1]").value(40));
+    }
+
+    @Test
     @DisplayName("Deve retornar árvore de elegibilidade")
     @WithMockUser
     void deveRetornarArvoreDeElegibilidade() throws Exception {

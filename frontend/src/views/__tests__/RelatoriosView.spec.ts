@@ -2,6 +2,7 @@ import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import RelatoriosView from '@/views/RelatoriosView.vue';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
+import {Perfil} from "@/types/tipos";
 
 const mockPush = vi.fn();
 vi.mock("vue-router", () => ({
@@ -24,11 +25,16 @@ describe('RelatoriosView.vue', () => {
     };
 
     it('deve renderizar os cards de relatórios', () => {
-        const mountOptions = getCommonMountOptions({}, stubs);
+        const mountOptions = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: Perfil.ADMIN
+            }
+        }, stubs);
         ctx.wrapper = mount(RelatoriosView, mountOptions);
 
         expect(ctx.wrapper.find('[data-testid="card-relatorio-andamento"]').exists()).toBe(true);
         expect(ctx.wrapper.find('[data-testid="card-relatorio-mapas"]').exists()).toBe(true);
+        expect(ctx.wrapper.find('[data-testid="card-relatorio-unidades-sem-mapas-vigentes"]').exists()).toBe(true);
     });
 
     it('deve navegar para relatório de andamento ao clicar no card', async () => {
@@ -56,5 +62,28 @@ describe('RelatoriosView.vue', () => {
 
         await ctx.wrapper.find('[data-testid="card-relatorio-andamento"]').trigger('keydown.space');
         expect(mockPush).toHaveBeenCalledWith('/relatorios/andamento');
+    });
+
+    it('deve ocultar card de mapas não vigentes para perfil não admin', () => {
+        const mountOptions = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: Perfil.GESTOR
+            }
+        }, stubs);
+        ctx.wrapper = mount(RelatoriosView, mountOptions);
+
+        expect(ctx.wrapper.find('[data-testid="card-relatorio-unidades-sem-mapas-vigentes"]').exists()).toBe(false);
+    });
+
+    it('deve navegar para relatório de unidades sem mapas vigentes ao clicar no card', async () => {
+        const mountOptions = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: Perfil.ADMIN
+            }
+        }, stubs);
+        ctx.wrapper = mount(RelatoriosView, mountOptions);
+
+        await ctx.wrapper.find('[data-testid="card-relatorio-unidades-sem-mapas-vigentes"]').trigger('click');
+        expect(mockPush).toHaveBeenCalledWith('/relatorios/unidades-sem-mapas-vigentes');
     });
 });

@@ -88,6 +88,27 @@ public class UnidadeController {
         return ResponseEntity.ok(unidadeService.buscarTodosCodigosUnidadesComMapa());
     }
 
+    @GetMapping("/sem-historico-mapa")
+    public ResponseEntity<List<Long>> buscarCodigosUnidadesSemHistoricoMapa() {
+        Set<Long> codigosComHistoricoMapa = new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComHistoricoMapa());
+        List<Long> codigosArvoreElegivel = coletarCodigosRecursivo(hierarquiaService.buscarArvoreComElegibilidade(
+                info -> info.tipo() != TipoUnidade.INTERMEDIARIA && info.possuiResponsavelEfetivo()
+        ));
+
+        return ResponseEntity.ok(codigosArvoreElegivel.stream()
+                .filter(codigo -> !codigosComHistoricoMapa.contains(codigo))
+                .toList());
+    }
+
+    private List<Long> coletarCodigosRecursivo(List<UnidadeDto> unidades) {
+        List<Long> codigos = new ArrayList<>();
+        for (UnidadeDto unidade : unidades) {
+            codigos.add(unidade.getCodigo());
+            codigos.addAll(coletarCodigosRecursivo(unidade.getSubunidades()));
+        }
+        return codigos;
+    }
+
     @GetMapping("/arvore-com-elegibilidade")
     public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
             @RequestParam("tipoProcesso") String tipoProcesso,

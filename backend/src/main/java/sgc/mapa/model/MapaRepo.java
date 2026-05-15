@@ -9,6 +9,13 @@ import java.util.*;
 @Repository
 public interface MapaRepo extends JpaRepository<Mapa, Long> {
     @Query("""
+            SELECT DISTINCT m.subprocesso.unidade.codigo
+            FROM Mapa m
+            WHERE m.subprocesso.unidade.codigo IS NOT NULL
+            """)
+    List<Long> listarCodigosUnidadesComHistoricoMapa();
+
+    @Query("""
             SELECT um.mapaVigente FROM UnidadeMapa um
             LEFT JOIN FETCH um.mapaVigente.subprocesso
             WHERE um.unidadeCodigo = :unidadeCodigo

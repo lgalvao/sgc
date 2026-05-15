@@ -84,5 +84,12 @@ export const relatoriosService = {
             responseType: 'blob'
         });
         baixarPdf(new Blob([response.data]), nomearArquivoRelatorio("sgc-rel-mapas"));
+    },
+
+    async downloadRelatorioUnidadesSemMapasVigentesPdf(): Promise<void> {
+        const response = await apiClient.get("/relatorios/unidades-sem-mapas-vigentes/exportar", {
+            responseType: "blob"
+        });
+        baixarPdf(new Blob([response.data]), nomearArquivoRelatorio("sgc-rel-unidades-sem-mapas-vigentes"));
     }
 };

@@ -20,6 +20,8 @@ public class UnidadeService {
 
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
+    private final MapaRepo mapaRepo;
+    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
 
     public Unidade buscarPorCodigo(Long codigo) {
@@ -88,6 +90,24 @@ public class UnidadeService {
     @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADES_COM_MAPA, sync = true)
     public List<Long> buscarTodosCodigosUnidadesComMapa() {
         return unidadeMapaRepo.listarTodosCodigosUnidade();
+    }
+
+    public List<Long> buscarTodosCodigosUnidadesSemHistoricoMapa() {
+        Set<Long> codigosComHistoricoMapa = new HashSet<>(buscarTodosCodigosUnidadesComHistoricoMapa());
+        return listarTodosCodigosDaArvore().stream()
+                .filter(codigo -> !codigosComHistoricoMapa.contains(codigo))
+                .toList();
+    }
+
+    @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADES_COM_MAPA, key = "'historico'", sync = true)
+    public List<Long> buscarTodosCodigosUnidadesComHistoricoMapa() {
+        return mapaRepo.listarCodigosUnidadesComHistoricoMapa();
+    }
+
+    private List<Long> listarTodosCodigosDaArvore() {
+        return cacheViewsOrganizacaoService.listarTodasUnidades().stream()
+                .map(UnidadeHierarquiaLeitura::codigo)
+                .toList();
     }
 
     public List<UnidadeMapa> buscarMapasPorUnidades(List<Long> codigosUnidades) {

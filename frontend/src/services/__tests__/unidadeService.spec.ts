@@ -3,6 +3,7 @@ import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade,
     buscarCodigosUnidadesComMapaVigente,
+    buscarCodigosUnidadesSemHistoricoMapa,
     buscarDiagnosticoOrganizacional,
     buscarReferenciaMapaVigente,
     buscarTodasUnidades,
@@ -65,6 +66,12 @@ describe('unidadeService', () => {
             vi.mocked(apiUtils.apiGet).mockResolvedValueOnce([1, 2]);
             await buscarCodigosUnidadesComMapaVigente();
             expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/com-mapa-vigente');
+        });
+
+        it('deve chamar buscarCodigosUnidadesSemHistoricoMapa corretamente', async () => {
+            vi.mocked(apiUtils.apiGet).mockResolvedValueOnce([3, 4]);
+            await buscarCodigosUnidadesSemHistoricoMapa();
+            expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/sem-historico-mapa');
         });
     });
 

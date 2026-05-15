@@ -46,6 +46,28 @@
           </div>
         </BCard>
       </BCol>
+
+      <BCol v-if="perfilStore.perfilSelecionado === Perfil.ADMIN" class="mb-4" md="4">
+        <BCard
+            class="h-100 card-actionable"
+            data-testid="card-relatorio-unidades-sem-mapas-vigentes"
+            role="button"
+            tabindex="0"
+            @click="router.push('/relatorios/unidades-sem-mapas-vigentes')"
+            @keydown.enter="router.push('/relatorios/unidades-sem-mapas-vigentes')"
+            @keydown.space.prevent="router.push('/relatorios/unidades-sem-mapas-vigentes')"
+        >
+          <div class="card-click-area">
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-diagram-3 text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">Unidades sem mapas vigentes</span>
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Lista de unidades sem mapa vigente
+            </BCardText>
+          </div>
+        </BCard>
+      </BCol>
     </BRow>
   </LayoutPadrao>
 </template>
@@ -56,8 +78,11 @@ import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {TEXTOS} from "@/constants/textos";
+import {usePerfilStore} from "@/stores/perfil";
+import {Perfil} from "@/types/tipos";
 
 const router = useRouter();
+const perfilStore = usePerfilStore();
 </script>
 
 <style scoped>
