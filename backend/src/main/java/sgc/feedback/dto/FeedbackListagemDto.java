@@ -1,6 +1,5 @@
 package sgc.feedback.dto;
 
-import org.jspecify.annotations.*;
 import sgc.feedback.*;
 
 import java.time.*;
@@ -10,8 +9,8 @@ public record FeedbackListagemDto(
         UUID codigo,
         FeedbackTipo tipo,
         String nota,
-        @Nullable String metadataJson,
-        @Nullable String caminhoScreenshot,
+        String metadataJson,
+        String caminhoScreenshot,
         boolean screenshotDisponivel,
         String usuarioCodigo,
         String usuarioNome,

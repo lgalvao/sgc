@@ -1,17 +1,16 @@
 package sgc.organizacao.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
 
 @Builder
 public record PerfilDto(
         @TituloEleitoral
-        @Nullable String usuarioTitulo,
+        String usuarioTitulo,
 
-        @Nullable Long unidadeCodigo,
-        @Nullable String unidadeNome,
+        Long unidadeCodigo,
+        String unidadeNome,
         String perfil,
         String descricao) {
 

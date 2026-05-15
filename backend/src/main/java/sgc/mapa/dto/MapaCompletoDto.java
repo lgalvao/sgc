@@ -1,6 +1,5 @@
 package sgc.mapa.dto;
 
-import org.jspecify.annotations.*;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.*;
 
@@ -9,10 +8,10 @@ import java.util.*;
 public record MapaCompletoDto(
         Long codigo,
         Long subprocessoCodigo,
-        @Nullable String observacoes,
+        String observacoes,
         List<CompetenciaMapaDto> competencias,
         List<AtividadeMapaDto> atividades,
-        @Nullable String situacao) {
+        String situacao) {
 
     public static MapaCompletoDto fromEntity(Mapa mapa) {
         Subprocesso subprocesso = mapa.getSubprocesso();

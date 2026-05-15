@@ -312,11 +312,11 @@ public class ProcessoService {
             executarDisponibilizacaoMapaEmBloco(disponibilizacao, usuario, subprocessos);
             return;
         }
-
-        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
-            validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
-            processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
+        if (!(command instanceof ProcessarAnaliseEmBlocoCommand analise)) {
+            return;
         }
+        validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
+        processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
     }
 
     private void validarPermissaoAnaliseEmBloco(
@@ -329,12 +329,10 @@ public class ProcessoService {
             case HOMOLOGAR -> HOMOLOGAR_MAPA;
             default -> null;
         };
-        if (acaoRequerida == null) {
+        if (acaoRequerida == null || permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
             return;
         }
-        if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
-            throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
-        }
+        throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
     }
 
 

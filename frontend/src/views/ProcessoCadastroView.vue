@@ -116,6 +116,7 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import * as processoService from "@/services/processo";
 import {Processo, TipoProcesso, type Unidade} from "@/types/tipos";
 import {usePerfil} from "@/composables/usePerfil";
+import {filtrarSelecionadasPorElegibilidade, removerUnidadesSemEquipe} from "@/views/processoCadastroUnidades";
 
 const {
   descricao,
@@ -175,42 +176,15 @@ const anyLoading = computed(() => isSaving.value || isStarting.value || isRemovi
 const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value || anyLoading.value);
 const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value || anyLoading.value);
 
-function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
-  const codigosElegiveis = new Set<number>();
-  const visitar = (unidade: Unidade) => {
-    if (unidade.isElegivel === true) {
-      codigosElegiveis.add(unidade.codigo);
-    }
-    (unidade.filhas ?? []).forEach(visitar);
-  };
-  unidadesArvore.forEach(visitar);
-  return codigosElegiveis;
-}
-
 function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
-  const codigosElegiveis = coletarCodigosElegiveis(unidadesArvore);
-  const selecionadasFiltradas = unidadesSelecionadas.value.filter(codigo =>
-      codigosElegiveis.has(codigo),
+  const selecionadasFiltradas = filtrarSelecionadasPorElegibilidade(
+      unidadesSelecionadas.value,
+      unidadesArvore,
   );
 
   if (selecionadasFiltradas.length !== unidadesSelecionadas.value.length) {
     unidadesSelecionadas.value = selecionadasFiltradas;
   }
-}
-
-function removerUnidadesSemEquipe(unidadesArvore: Unidade[]): Unidade[] {
-  return unidadesArvore.flatMap((unidade) => {
-    const filhasFiltradas = removerUnidadesSemEquipe(unidade.filhas ?? []);
-
-    if (unidade.tipo === "SEM_EQUIPE") {
-      return filhasFiltradas;
-    }
-
-    return [{
-      ...unidade,
-      filhas: filhasFiltradas
-    }];
-  });
 }
 
 async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcesso?: number) {

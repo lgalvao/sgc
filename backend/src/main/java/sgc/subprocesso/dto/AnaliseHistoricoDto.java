@@ -2,7 +2,6 @@ package sgc.subprocesso.dto;
 
 import lombok.*;
 import org.hibernate.validator.constraints.br.*;
-import org.jspecify.annotations.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -21,7 +20,7 @@ public record AnaliseHistoricoDto(
         String unidadeNome,
         LocalDateTime dataHora,
 
-        @Nullable String motivo,
-        @Nullable String observacoes
+        String motivo,
+        String observacoes
 ) {
 }

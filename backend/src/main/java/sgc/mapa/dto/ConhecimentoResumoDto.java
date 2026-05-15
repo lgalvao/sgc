@@ -1,10 +1,9 @@
 package sgc.mapa.dto;
 
-import org.jspecify.annotations.*;
 import sgc.mapa.model.*;
 
 public record ConhecimentoResumoDto(
-        @Nullable Long codigo,
+        Long codigo,
         String descricao) {
 
     public static ConhecimentoResumoDto fromEntity(Conhecimento conhecimento) {
@@ -13,4 +12,3 @@ public record ConhecimentoResumoDto(
                 conhecimento.getDescricao());
     }
 }
-
