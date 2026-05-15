@@ -1,7 +1,6 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.processo.model.*;
 
 import java.time.*;
@@ -17,11 +16,11 @@ public record ProcessoResumoDto(
         String tipo,
         LocalDateTime dataLimite,
         LocalDateTime dataCriacao,
-        @Nullable LocalDateTime dataFinalizacao,
-        @Nullable Long unidadeCodigo,
-        @Nullable String unidadeNome,
+        LocalDateTime dataFinalizacao,
+        Long unidadeCodigo,
+        String unidadeNome,
         String unidadesParticipantes,
-        @Nullable String linkDestino
+        String linkDestino
 ) {
     public static ProcessoResumoDto fromEntity(Processo processo) {
         return ProcessoResumoDto.builder()

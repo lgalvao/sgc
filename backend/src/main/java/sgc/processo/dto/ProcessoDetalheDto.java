@@ -1,7 +1,6 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
@@ -72,12 +71,12 @@ public class ProcessoDetalheDto {
         private String nome;
         private String sigla;
         private Long codUnidade;
-        private @Nullable Long codUnidadeSuperior;
+        private Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
         private LocalDateTime dataLimite;
-        private @Nullable Long mapaCodigo;
-        private @Nullable Long codSubprocesso;
-        private @Nullable Long localizacaoAtualCodigo;
+        private Long mapaCodigo;
+        private Long codSubprocesso;
+        private Long localizacaoAtualCodigo;
 
         public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
             Unidade superior = unidade.getUnidadeSuperior();
@@ -102,7 +101,7 @@ public class ProcessoDetalheDto {
                 String nome,
                 String sigla,
                 Long codUnidade,
-                @Nullable Long codUnidadeSuperior
+                Long codUnidadeSuperior
         ) {
             return UnidadeParticipanteDto.builder()
                     .nome(nome)

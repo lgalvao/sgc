@@ -1,7 +1,6 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.organizacao.dto.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
@@ -14,17 +13,17 @@ public record SubprocessoListagemDto(
         UnidadeResumoDto unidade,
         SituacaoSubprocesso situacao,
         LocalDateTime dataLimiteEtapa1,
-        @Nullable LocalDateTime dataFimEtapa1,
-        @Nullable LocalDateTime dataLimiteEtapa2,
-        @Nullable LocalDateTime dataFimEtapa2,
+        LocalDateTime dataFimEtapa1,
+        LocalDateTime dataLimiteEtapa2,
+        LocalDateTime dataFimEtapa2,
         Long codProcesso,
         Long codUnidade,
-        @Nullable Long codMapa,
+        Long codMapa,
         String processoDescricao,
         LocalDateTime dataCriacaoProcesso,
         TipoProcesso tipoProcesso,
         boolean isEmAndamento,
-        @Nullable Integer etapaAtual) {
+        Integer etapaAtual) {
 
     public static SubprocessoListagemDto fromEntity(Subprocesso subprocesso) {
         return fromResumo(SubprocessoResumoDto.fromEntity(subprocesso));

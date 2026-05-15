@@ -1,89 +1,86 @@
 # Relatório de Qualidade de Código (Frontend + Backend)
 
-## Escopo e evidências objetivas
+## Escopo e evidências objetivas (confirmadas)
 
-Este diagnóstico foi baseado em validações e auditorias executadas no repositório:
+Este diagnóstico foi reconfirmado com validações executadas no repositório:
 
-- Baseline backend: `./gradlew --no-daemon --no-configuration-cache :backend:test` (1716 testes passando).
-- Baseline frontend: `npm run lint`, `npm run typecheck`, `npm run test:unit` (133 arquivos de teste e 1283 testes passando).
+- Baseline backend: `./gradlew --no-daemon --no-configuration-cache :backend:test` (**1793 testes passando**).
+- Baseline frontend: `npm run lint`, `npm run typecheck`, `npm run test:unit` (**134 arquivos de teste e 1295 testes passando**).
 - Cheiros gerais: `npm run smells:auditar`.
 - Cruft frontend: `npm run frontend:cruft`.
 - Cobertura/riscos backend: `node etc/scripts/sgc.js backend cobertura auditoria`.
 - Cobertura/riscos frontend: `node etc/scripts/sgc.js frontend cobertura auditoria`.
 
-## Achados principais
+## Achados principais (estado atual)
 
-### 1) Complexidade e acoplamento excessivo no backend
+### 1) Complexidade e acoplamento ainda altos no backend
 
-- `backend/src/main/java/sgc/processo/service/ProcessoService.java` com **1408 linhas** (arquivo mais extenso do backend).
-- Auditoria de cobertura aponta esse serviço como **P1 crítico** (impacto 656.5; 25 linhas + 33 branches sem teste).
-- O serviço concentra múltiplas responsabilidades (consulta, workflow, validação, notificações, ações em bloco), elevando custo de manutenção e risco de regressão.
+- `backend/src/main/java/sgc/processo/service/ProcessoService.java` segue como hotspot com **1471 linhas**.
+- Cobertura aponta esse serviço como **P1 crítico** (impacto **611.0**, com **9 linhas** e **20 branches** sem teste).
+- O serviço ainda concentra fluxo de ação em bloco, montagem de detalhe e regras de elegibilidade/permissão.
 
-### 2) Concentração de lógica e parsing em views do frontend
+### 2) Hotspots de cobertura e clareza no frontend
 
-- `frontend/src/views/FeedbacksAdminView.vue` aparece como hotspot de cobertura (**P2 alto**, 24 statements sem teste).
-- `frontend/src/views/ProcessoCadastroView.vue` (404 linhas) e `frontend/src/views/FeedbacksAdminView.vue` (370 linhas) acumulam lógica de transformação e tratamento local.
-- Em `FeedbacksAdminView.vue` havia repetição de mapeamentos de tipo de feedback (rótulo/variante/ícone) e parsing concentrado de metadados.
+- `frontend/src/views/FeedbacksAdminView.vue` permanece em prioridade alta de cobertura (**P2**, impacto **83.0**, **26 statements** sem teste).
+- `frontend/src/views/ProcessoCadastroView.vue` mantém tamanho elevado (**405 linhas**) e aparece entre hotspots de cruft.
+- O parser/normalização de metadados de feedback era um foco de complexidade local na view.
 
-### 3) Sinais de robustez defensiva em excesso
+### 3) Robustez defensiva em excesso (com melhora ampla nesta rodada)
 
 Da auditoria de cheiros/cruft:
 
-- Backend: 126 DTOs com `@Nullable`, 240 checks explícitos de null, 9 usos de `Objects.isNull/nonNull`.
-- Frontend produção: 28 checks de null, 71 fallbacks defensivos, 58 blocos `catch`.
-- Score global de cheiros: **1715 (crítico)**; score de cruft frontend: **475 (crítico)**.
+- Backend: **79 DTOs** com `@Nullable`, **235** checks explícitos de null, **9** usos de `Objects.isNull/nonNull`.
+- Frontend produção: **28** checks de null, **70** fallbacks defensivos, **51** blocos `catch`.
+- Score de cheiros caiu para **1467 (crítico)**.
+- Score de cruft frontend caiu para **462 (crítico)**.
 
-### 4) Fragmentação de risco de testes/cobertura
+### 4) Risco de manutenção ainda concentrado
 
-- Cobertura global é boa, mas com hotspots relevantes:
-  - Backend P1: `ProcessoService`, `ValidadorDadosOrganizacionais`, `ImpactoMapaService`.
-  - Frontend P2/P3: `FeedbacksAdminView.vue`, `AtribuicaoTemporariaView.vue`, `ModalAcaoBloco.vue`.
-- Risco localizado: mudanças em fluxos principais tendem a ser caras por baixa isolação por responsabilidade.
+- Backend P1: `ProcessoService`, `ValidadorDadosOrganizacionais`, `SubprocessoAcessoService`, `SubprocessoService`, `ImpactoMapaService`.
+- Frontend P2/P3: `FeedbacksAdminView.vue`, `CadastroView.vue`, `MapaView.vue`, `ModalDevolucaoCadastro.vue`.
+- Risco segue localizado em arquivos com múltiplas responsabilidades.
 
-## Ações recomendadas (priorizadas)
+## Ações aplicadas nesta rodada (simplificação e clareza)
 
-### Prioridade alta (iniciadas nesta rodada)
+1. **FeedbacksAdminView simplificado por extração de responsabilidade**
+    - Parsing/normalização e helpers de apresentação foram movidos para `frontend/src/views/feedbacksAdminApresentacao.ts`.
+    - A SFC `FeedbacksAdminView.vue` ficou menor e mais focada em renderização/orquestração.
+    - Resultado direto: redução da superfície local e melhoria de legibilidade no hotspot P2.
 
-1. **Reduzir repetição e ramificações no `ProcessoService`**  
-   Consolidar verificações semelhantes de elegibilidade/permissão de ações em bloco em helpers únicos, mantendo contratos e regras de acesso intactos.
+2. **ProcessoService com fluxo de ação em bloco mais explícito**
+    - `executarAcaoEmBloco` foi simplificado para early-return por tipo de comando.
+    - A validação de permissão de análise em bloco foi isolada em helper dedicado (`validarPermissaoAnaliseEmBloco`).
+    - Resultado direto: menos estado temporário e ramificações implícitas no trecho crítico.
 
-2. **Simplificar `FeedbacksAdminView`**  
-   Centralizar configuração de tipos de feedback e modularizar transformação de metadados para reduzir complexidade ciclomática local e facilitar testes unitários focados.
+3. **Rodada de redução de nulabilidade acidental e de testes inúteis**
+    - `ProcessoService` teve remoção de nulabilidade implícita em parâmetros internos de elegibilidade/permissão em bloco (remoção de `@Nullable` e uso de contexto explícito).
+    - `UnidadeDto` e `NotificacaoDto` tiveram limpeza de `@Nullable` redundante em propriedades opcionais de DTO, reduzindo ruído sem alterar contrato serializado.
+    - `FiltroMonitoramentoHttpTest` removeu 2 testes reflexivos de método privado (`getDeclaredMethod`/`setAccessible`) por não validarem contrato público.
+    - `EmailService` ganhou construtor package-private para testabilidade e `EmailServiceTest` deixou de usar `ReflectionTestUtils.setField` para modo mock.
+    - Resultado direto: redução mensurável de cheiros associados a nulabilidade e remoção de acoplamento de testes a implementação interna.
 
-### Prioridade alta (próximos passos)
+4. **Nova rodada ampla: limpeza estrutural de nulabilidade e corte de teste artificial**
+    - Redução de `@Nullable` em lote em DTOs centrais (`SubprocessoResumoDto`, `SubprocessoListagemDto`, `AtualizarSubprocessoRequest`, `ProcessoResumoDto`, `ProcessoDetalheDto`, `RelatorioAndamentoDto`) e em fixture interna do `E2eController`.
+    - Remoção de teste de baixo valor focado apenas em cobertura de branch (`ImpactoMapaResponseTest`).
+    - `TituloEleitoralValidationTest` foi simplificado removendo asserção reflexiva de métodos declarados da anotação, mantendo validação de contrato relevante (`@Target` e `@Retention`).
+    - Resultado direto: redução adicional e expressiva de ruído de nulabilidade e menor acoplamento de testes a detalhes de implementação.
 
-3. **Fatiar `ProcessoService` por responsabilidade funcional**  
-   Separar gradualmente workflow de notificações, montagem de DTO de detalhe e regras de ação em bloco em serviços coesos, preservando API pública.
+## Próximos cortes recomendados (prioridade)
 
-4. **Extrair lógica de transformação das views para módulos de apoio**  
-   Mover parsing/normalização para arquivos `src/views/*.ts` (ou helpers locais de módulo), reduzindo carga nas SFCs e melhorando testabilidade.
+1. **Fatiar `ProcessoService` por responsabilidade funcional**
+    - Separar progressivamente elegibilidade/permissões de ação em bloco e montagem de detalhes para reduzir acoplamento.
 
-5. **Endurecer cobertura nos hotspots P1/P2**  
-   Adicionar testes comportamentais para cenários de erro/edge-cases de `ProcessoService` e `FeedbacksAdminView`/`AtribuicaoTemporariaView`.
+2. **Continuar extrações locais em views grandes**
+    - Repetir o padrão adotado em `FeedbacksAdminView` para `ProcessoCadastroView` e outros hotspots.
 
-### Prioridade média
+3. **Endurecer cobertura nos hotspots P1/P2**
+    - Priorizar cenários comportamentais de borda em `ProcessoService` e `FeedbacksAdminView`.
 
-6. **Ratcheting contínuo dos budgets de qualidade**  
-   Definir metas progressivas para reduzir checks nulos/fallbacks defensivos e impedir regressão de cruft.
+4. **Ratcheting contínuo de cruft**
+    - Reduzir gradualmente checks nulos e fallbacks defensivos em produção, evitando regressão via auditorias.
 
-7. **Remoção sistemática de código redundante/depreciado**  
-   Revisão orientada por hotspots para eliminar caminhos mortos e APIs de suporte a fluxos antigos.
+## Critérios de sucesso da continuidade
 
-## Trabalho já iniciado nesta tarefa
-
-Foram aplicadas simplificações concretas de maior impacto local sem alteração de contrato externo:
-
-- **Frontend (`FeedbacksAdminView.vue`)**
-  - Unificação da configuração de tipo de feedback (rótulo/variante/ícone) em fonte única.
-  - Redução de duplicação na renderização de ícones.
-  - Extração de passos de compactação/formatação de metadados para funções coesas.
-
-- **Backend (`ProcessoService.java`)**
-  - Consolidação de lógica repetida de elegibilidade/permissão de ações em bloco com helper dedicado.
-  - Redução de duplicação entre métodos `podeAceitar*` e `podeHomologar*`.
-
-## Critérios de sucesso para continuidade
-
-- Manter todos os testes/lint/typecheck passando.
-- Reduzir tamanho e responsabilidades por arquivo sem quebrar contratos HTTP/DTO.
-- Priorizar cortes pequenos com validação imediata.
+- Manter lint/typecheck/testes passando.
+- Reduzir superfície e responsabilidade por arquivo sem alterar contratos HTTP/DTO e regras de acesso.
+- Executar cortes pequenos com validação imediata e documentação atualizada dos achados.

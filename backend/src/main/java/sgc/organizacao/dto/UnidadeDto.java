@@ -35,10 +35,10 @@ public class UnidadeDto {
     private String sigla;
 
     @JsonView(OrganizacaoViews.Publica.class)
-    private @Nullable Long codigoPai;
+    private Long codigoPai;
 
     @JsonView(OrganizacaoViews.Publica.class)
-    private @Nullable String tipo;
+    private String tipo;
 
     @Builder.Default
     @JsonView(OrganizacaoViews.Publica.class)
@@ -46,7 +46,7 @@ public class UnidadeDto {
 
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("tituloTitular")
-    private @Nullable String tituloTitular;
+    private String tituloTitular;
 
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("isElegivel")
@@ -54,21 +54,21 @@ public class UnidadeDto {
 
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("tipoResponsabilidade")
-    private @Nullable String tipoResponsabilidade;
+    private String tipoResponsabilidade;
 
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("dataInicioResponsabilidade")
-    private @Nullable LocalDateTime dataInicioResponsabilidade;
+    private LocalDateTime dataInicioResponsabilidade;
 
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("dataFimResponsabilidade")
-    private @Nullable LocalDateTime dataFimResponsabilidade;
+    private LocalDateTime dataFimResponsabilidade;
 
     @JsonView(OrganizacaoViews.Publica.class)
-    private @Nullable UsuarioResumoDto titular;
+    private UsuarioResumoDto titular;
 
     @JsonView(OrganizacaoViews.Publica.class)
-    private @Nullable UsuarioResumoDto responsavel;
+    private UsuarioResumoDto responsavel;
 
     public static @Nullable UnidadeDto fromEntity(@Nullable Unidade entity) {
         if (entity == null) return null;

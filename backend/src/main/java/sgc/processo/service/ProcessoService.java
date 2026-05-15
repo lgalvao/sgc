@@ -148,13 +148,29 @@ public class ProcessoService {
             subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadesAcesso);
         }
 
-        return listarSubprocessosElegiveis(subprocessos, usuario, null);
+        return listarSubprocessosElegiveisSemLocalizacoesPrecarregadas(subprocessos, usuario);
+    }
+
+    private List<SubprocessoElegivelDto> listarSubprocessosElegiveisSemLocalizacoesPrecarregadas(
+            List<Subprocesso> subprocessos,
+            Usuario usuario
+    ) {
+        return listarSubprocessosElegiveis(subprocessos, usuario, false, Map.of());
+    }
+
+    private List<SubprocessoElegivelDto> listarSubprocessosElegiveisComLocalizacoesPrecarregadas(
+            List<Subprocesso> subprocessos,
+            Usuario usuario,
+            Map<Long, Unidade> localizacoesPrecarregadas
+    ) {
+        return listarSubprocessosElegiveis(subprocessos, usuario, true, localizacoesPrecarregadas);
     }
 
     private List<SubprocessoElegivelDto> listarSubprocessosElegiveis(
             List<Subprocesso> subprocessos,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         List<Subprocesso> subprocessosElegiveis = new ArrayList<>();
         Map<Long, ElegibilidadeAcaoBloco> elegibilidadesPorSubprocesso = new HashMap<>();
@@ -163,6 +179,7 @@ public class ProcessoService {
             ElegibilidadeAcaoBloco elegibilidade = avaliarElegibilidadeAcaoBloco(
                     subprocesso,
                     usuario,
+                    usarLocalizacoesPrecarregadas,
                     localizacoesPrecarregadas
             );
             if (!elegibilidade.possuiAlgumaAcao()) {
@@ -172,7 +189,7 @@ public class ProcessoService {
             elegibilidadesPorSubprocesso.put(subprocesso.getCodigo(), elegibilidade);
         }
 
-        Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas != null
+        Map<Long, Unidade> localizacoesPorSubprocesso = usarLocalizacoesPrecarregadas
                 ? localizacoesPrecarregadas
                 : localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessosElegiveis);
 
@@ -296,23 +313,28 @@ public class ProcessoService {
             return;
         }
 
-        AcaoPermissao acaoRequerida = null;
         if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
-            acaoRequerida = switch (analise.acao()) {
-                case ACEITAR -> ACEITAR_MAPA;
-                case HOMOLOGAR -> HOMOLOGAR_MAPA;
-                default -> null;
-            };
-        }
-
-        if (acaoRequerida != null && !permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
-            throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
-        }
-
-        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
+            validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
             processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
         }
+    }
 
+    private void validarPermissaoAnaliseEmBloco(
+            Usuario usuario,
+            List<Subprocesso> subprocessos,
+            ProcessarAnaliseEmBlocoCommand analise
+    ) {
+        AcaoPermissao acaoRequerida = switch (analise.acao()) {
+            case ACEITAR -> ACEITAR_MAPA;
+            case HOMOLOGAR -> HOMOLOGAR_MAPA;
+            default -> null;
+        };
+        if (acaoRequerida == null) {
+            return;
+        }
+        if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
+            throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
+        }
     }
 
 
@@ -350,7 +372,7 @@ public class ProcessoService {
                 .filter(subprocesso -> unidadesAcesso.contains(subprocesso.getUnidade().getCodigo()))
                 .toList();
         if (incluirElegiveis) {
-            List<SubprocessoElegivelDto> subprocessosElegiveis = listarSubprocessosElegiveis(
+            List<SubprocessoElegivelDto> subprocessosElegiveis = listarSubprocessosElegiveisComLocalizacoesPrecarregadas(
                     subprocessosVisiveis,
                     usuario,
                     localizacoesPorSubprocesso
@@ -644,11 +666,13 @@ public class ProcessoService {
     private boolean podeAceitarCadastroEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         return podeExecutarAcaoEmBloco(
                 subprocesso,
                 usuario,
+                usarLocalizacoesPrecarregadas,
                 localizacoesPrecarregadas,
                 ACEITAR_CADASTRO,
                 this::isSituacaoCadastroDisponibilizado
@@ -658,11 +682,13 @@ public class ProcessoService {
     private boolean podeAceitarMapaEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         return podeExecutarAcaoEmBloco(
                 subprocesso,
                 usuario,
+                usarLocalizacoesPrecarregadas,
                 localizacoesPrecarregadas,
                 ACEITAR_MAPA,
                 this::isSituacaoMapaAceitavel
@@ -672,11 +698,13 @@ public class ProcessoService {
     private boolean podeHomologarCadastroEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         return podeExecutarAcaoEmBloco(
                 subprocesso,
                 usuario,
+                usarLocalizacoesPrecarregadas,
                 localizacoesPrecarregadas,
                 HOMOLOGAR_CADASTRO,
                 this::isSituacaoCadastroDisponibilizado
@@ -686,11 +714,13 @@ public class ProcessoService {
     private boolean podeHomologarMapaEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         return podeExecutarAcaoEmBloco(
                 subprocesso,
                 usuario,
+                usarLocalizacoesPrecarregadas,
                 localizacoesPrecarregadas,
                 HOMOLOGAR_MAPA,
                 this::isSituacaoMapaHomologavel
@@ -700,7 +730,8 @@ public class ProcessoService {
     private boolean podeDisponibilizarEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         boolean elegivelDisponibilizacao = situacao == MAPEAMENTO_MAPA_CRIADO
@@ -709,27 +740,41 @@ public class ProcessoService {
                 || situacao == REVISAO_MAPA_AJUSTADO
                 || situacao == REVISAO_CADASTRO_HOMOLOGADA;
         return elegivelDisponibilizacao
-                && verificarPermissaoEscritaEmBloco(usuario, subprocesso, DISPONIBILIZAR_MAPA, localizacoesPrecarregadas);
+                && verificarPermissaoEscritaEmBloco(
+                usuario,
+                subprocesso,
+                DISPONIBILIZAR_MAPA,
+                usarLocalizacoesPrecarregadas,
+                localizacoesPrecarregadas
+        );
     }
 
     private boolean podeExecutarAcaoEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas,
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas,
             AcaoPermissao acao,
             java.util.function.Predicate<SituacaoSubprocesso> criterioSituacao
     ) {
         return criterioSituacao.test(subprocesso.getSituacao())
-                && verificarPermissaoEscritaEmBloco(usuario, subprocesso, acao, localizacoesPrecarregadas);
+                && verificarPermissaoEscritaEmBloco(
+                usuario,
+                subprocesso,
+                acao,
+                usarLocalizacoesPrecarregadas,
+                localizacoesPrecarregadas
+        );
     }
 
     private boolean verificarPermissaoEscritaEmBloco(
             Usuario usuario,
             Subprocesso subprocesso,
             AcaoPermissao acao,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
-        if (localizacoesPrecarregadas == null) {
+        if (!usarLocalizacoesPrecarregadas) {
             return permissionEvaluator.verificarPermissaoSilenciosa(usuario, subprocesso, acao);
         }
 
@@ -748,20 +793,21 @@ public class ProcessoService {
     }
 
     private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(Subprocesso subprocesso, Usuario usuario) {
-        return avaliarElegibilidadeAcaoBloco(subprocesso, usuario, null);
+        return avaliarElegibilidadeAcaoBloco(subprocesso, usuario, false, Map.of());
     }
 
     private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(
             Subprocesso subprocesso,
             Usuario usuario,
-            @Nullable Map<Long, Unidade> localizacoesPrecarregadas
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
     ) {
         return new ElegibilidadeAcaoBloco(
-                podeAceitarCadastroEmBloco(subprocesso, usuario, localizacoesPrecarregadas),
-                podeAceitarMapaEmBloco(subprocesso, usuario, localizacoesPrecarregadas),
-                podeHomologarCadastroEmBloco(subprocesso, usuario, localizacoesPrecarregadas),
-                podeHomologarMapaEmBloco(subprocesso, usuario, localizacoesPrecarregadas),
-                podeDisponibilizarEmBloco(subprocesso, usuario, localizacoesPrecarregadas)
+                podeAceitarCadastroEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
+                podeAceitarMapaEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
+                podeHomologarCadastroEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
+                podeHomologarMapaEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
+                podeDisponibilizarEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas)
         );
     }
 
