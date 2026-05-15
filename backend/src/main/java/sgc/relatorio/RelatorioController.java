@@ -56,7 +56,7 @@ public class RelatorioController {
 
     @GetMapping("/unidades-sem-mapas-vigentes/exportar")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Gera relatório de unidades sem histórico de mapas")
+    @Operation(summary = "Gera relatório de unidades sem mapa vigente")
     public void gerarRelatorioUnidadesSemMapasVigentesPdf(HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioUnidadesSemMapasVigentes()));

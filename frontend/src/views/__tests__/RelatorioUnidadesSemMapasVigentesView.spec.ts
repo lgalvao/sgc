@@ -15,7 +15,7 @@ vi.mock("@/services/unidadeService", async (importOriginal) => {
     return {
         ...actual,
         buscarTodasUnidades: vi.fn(),
-        buscarCodigosUnidadesSemHistoricoMapa: vi.fn(),
+        buscarCodigosUnidadesSemMapaVigente: vi.fn(),
     };
 });
 
@@ -80,25 +80,25 @@ describe("RelatorioUnidadesSemMapasVigentesView.vue", () => {
                 ],
             },
         ] as any);
-        vi.mocked(unidadeService.buscarCodigosUnidadesSemHistoricoMapa).mockResolvedValue([2, 4, 999]);
+        vi.mocked(unidadeService.buscarCodigosUnidadesSemMapaVigente).mockResolvedValue([2, 4, 999]);
         mocks.downloadRelatorioUnidadesSemMapasVigentesPdf.mockResolvedValue(undefined);
     });
 
-    it("deve exibir apenas unidades ativas sem histórico de mapa", async () => {
+    it("deve exibir apenas unidades ativas sem mapa vigente", async () => {
         ctx.wrapper = mount(RelatorioUnidadesSemMapasVigentesView, getCommonMountOptions({}, stubs));
 
         await ctx.wrapper.find("[data-testid='btn-visualizar-unidades-sem-mapa']").trigger("click");
         await flushPromises();
 
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
-        expect(unidadeService.buscarCodigosUnidadesSemHistoricoMapa).toHaveBeenCalledTimes(1);
+        expect(unidadeService.buscarCodigosUnidadesSemMapaVigente).toHaveBeenCalledTimes(1);
         expect(ctx.wrapper.text()).toContain("SA");
         expect(ctx.wrapper.find("[data-testid='arvore']").text()).toContain("COA");
         expect(ctx.wrapper.find("[data-testid='arvore']").text()).not.toContain("SB");
     });
 
-    it("deve exibir empty state quando não houver unidades sem histórico", async () => {
-        vi.mocked(unidadeService.buscarCodigosUnidadesSemHistoricoMapa).mockResolvedValue([]);
+    it("deve exibir empty state quando não houver unidades sem mapa vigente", async () => {
+        vi.mocked(unidadeService.buscarCodigosUnidadesSemMapaVigente).mockResolvedValue([]);
         ctx.wrapper = mount(RelatorioUnidadesSemMapasVigentesView, getCommonMountOptions({}, stubs));
 
         await ctx.wrapper.find("[data-testid='btn-visualizar-unidades-sem-mapa']").trigger("click");

@@ -88,15 +88,15 @@ public class UnidadeController {
         return ResponseEntity.ok(unidadeService.buscarTodosCodigosUnidadesComMapa());
     }
 
-    @GetMapping("/sem-historico-mapa")
-    public ResponseEntity<List<Long>> buscarCodigosUnidadesSemHistoricoMapa() {
-        Set<Long> codigosComHistoricoMapa = new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComHistoricoMapa());
+    @GetMapping("/sem-mapa-vigente")
+    public ResponseEntity<List<Long>> buscarCodigosUnidadesSemMapaVigente() {
+        Set<Long> codigosComMapaVigente = new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa());
         List<Long> codigosArvoreElegivel = coletarCodigosRecursivo(hierarquiaService.buscarArvoreComElegibilidade(
                 info -> info.tipo() != TipoUnidade.INTERMEDIARIA && info.possuiResponsavelEfetivo()
         ));
 
         return ResponseEntity.ok(codigosArvoreElegivel.stream()
-                .filter(codigo -> !codigosComHistoricoMapa.contains(codigo))
+                .filter(codigo -> !codigosComMapaVigente.contains(codigo))
                 .toList());
     }
 

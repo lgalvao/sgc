@@ -89,8 +89,8 @@ export async function buscarCodigosUnidadesComMapaVigente(): Promise<number[]> {
     return apiGet("/unidades/com-mapa-vigente");
 }
 
-export async function buscarCodigosUnidadesSemHistoricoMapa(): Promise<number[]> {
-    return apiGet("/unidades/sem-historico-mapa");
+export async function buscarCodigosUnidadesSemMapaVigente(): Promise<number[]> {
+    return apiGet("/unidades/sem-mapa-vigente");
 }
 
 export async function buscarUnidadePorCodigo(codigo: number): Promise<Unidade> {

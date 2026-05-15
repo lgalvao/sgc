@@ -37,7 +37,7 @@
 
     <template v-else-if="relatorioVisualizado">
       <EmptyState
-          v-if="unidadesSemHistoricoMapaArvore.length === 0"
+          v-if="unidadesSemMapaVigenteArvore.length === 0"
           title="Não há unidades sem mapa vigente."
           icon="bi-building"
       />
@@ -69,7 +69,7 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {buscarCodigosUnidadesSemHistoricoMapa, buscarTodasUnidades} from "@/services/unidadeService";
+import {buscarCodigosUnidadesSemMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
 import {relatoriosService} from "@/services/relatoriosService";
 import {TEXTOS} from "@/constants/textos";
 import {useNotification} from "@/composables/useNotification";
@@ -79,7 +79,7 @@ import {organizarArvoreUnidades, TITULO_GRUPO_ZONAS_ELEITORAIS} from "@/utils/tr
 
 const {notify} = useNotification();
 const carregando = ref(false);
-const unidadesSemHistoricoMapaArvore = ref<Unidade[]>([]);
+const unidadesSemMapaVigenteArvore = ref<Unidade[]>([]);
 const relatorioVisualizado = ref(false);
 
 type CardUnidade = {
@@ -111,13 +111,13 @@ function ordenarComoArvoreUnidades(unidades: Unidade[]): Unidade[] {
   });
 }
 
-function filtrarArvoreSemHistoricoMapa(unidades: Unidade[], codigosSemHistoricoMapa: Set<number>): Unidade[] {
+function filtrarArvoreSemMapaVigente(unidades: Unidade[], codigosSemMapaVigente: Set<number>): Unidade[] {
   return unidades
       .map((unidade): Unidade | null => {
-        const filhasFiltradas = filtrarArvoreSemHistoricoMapa(unidade.filhas ?? [], codigosSemHistoricoMapa);
-        const unidadeSemHistoricoMapa = codigosSemHistoricoMapa.has(unidade.codigo);
+        const filhasFiltradas = filtrarArvoreSemMapaVigente(unidade.filhas ?? [], codigosSemMapaVigente);
+        const unidadeSemMapaVigente = codigosSemMapaVigente.has(unidade.codigo);
 
-        if (!unidadeSemHistoricoMapa && filhasFiltradas.length === 0) {
+        if (!unidadeSemMapaVigente && filhasFiltradas.length === 0) {
           return null;
         }
 
@@ -145,7 +145,7 @@ function removerNoAdmin(unidades: Unidade[]): Unidade[] {
 }
 
 const cardsRelatorio = computed<CardUnidade[]>(() => {
-  const maesOrdenadas = ordenarComoArvoreUnidades(unidadesSemHistoricoMapaArvore.value);
+  const maesOrdenadas = ordenarComoArvoreUnidades(unidadesSemMapaVigenteArvore.value);
 
   return maesOrdenadas.map(unidadeMae => {
     // Se for um agrupador visual (Zonas), as filhas já estão prontas/ordenadas
@@ -162,19 +162,19 @@ const cardsRelatorio = computed<CardUnidade[]>(() => {
   });
 });
 
-async function carregarUnidadesSemHistoricoMapa() {
+async function carregarUnidadesSemMapaVigente() {
   carregando.value = true;
   await Promise.all([
     buscarTodasUnidades(),
-    buscarCodigosUnidadesSemHistoricoMapa()
-  ]).then(([arvore, codigosSemHistoricoMapa]) => {
-    const codigosSemHistoricoMapaSet = new Set(codigosSemHistoricoMapa);
+    buscarCodigosUnidadesSemMapaVigente()
+  ]).then(([arvore, codigosSemMapaVigente]) => {
+    const codigosSemMapaVigenteSet = new Set(codigosSemMapaVigente);
     
     // Padrão da página de Unidades: pular o primeiro nível (Órgão)
     const unidadesBase = arvore.flatMap(u => u.filhas ?? []);
     
-    unidadesSemHistoricoMapaArvore.value = removerNoAdmin(
-        filtrarArvoreSemHistoricoMapa(unidadesBase, codigosSemHistoricoMapaSet)
+    unidadesSemMapaVigenteArvore.value = removerNoAdmin(
+        filtrarArvoreSemMapaVigente(unidadesBase, codigosSemMapaVigenteSet)
     );
   }).catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
       .finally(() => { carregando.value = false; });
@@ -182,7 +182,7 @@ async function carregarUnidadesSemHistoricoMapa() {
 
 async function visualizarRelatorio() {
   relatorioVisualizado.value = true;
-  await carregarUnidadesSemHistoricoMapa();
+  await carregarUnidadesSemMapaVigente();
 }
 
 async function exportarPdf() {

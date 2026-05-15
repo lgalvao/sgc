@@ -137,8 +137,8 @@ public class RelatorioFacade {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioUnidadesSemMapasVigentes(OutputStream outputStream) {
-        List<UnidadeResumoLeitura> unidadesSemHistoricoMapa = unidadeService
-                .buscarResumosPorCodigos(unidadeService.buscarTodosCodigosUnidadesSemHistoricoMapa());
+        List<UnidadeResumoLeitura> unidadesSemMapaVigente = unidadeService
+                .buscarResumosPorCodigos(unidadeService.buscarTodosCodigosUnidadesSemMapaVigente());
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
@@ -149,15 +149,15 @@ public class RelatorioFacade {
                     "Todas as unidades",
                     LocalDateTime.now(),
                     null,
-                    unidadesSemHistoricoMapa.size()
+                    unidadesSemMapaVigente.size()
             ));
 
-            if (unidadesSemHistoricoMapa.isEmpty()) {
-                document.add(criarParagrafo("Não há unidades sem histórico de mapa.", FONTE_TEXTO, 0f));
+            if (unidadesSemMapaVigente.isEmpty()) {
+                document.add(criarParagrafo("Não há unidades sem mapa vigente.", FONTE_TEXTO, 0f));
                 return;
             }
 
-            for (UnidadeResumoLeitura unidade : unidadesSemHistoricoMapa) {
+            for (UnidadeResumoLeitura unidade : unidadesSemMapaVigente) {
                 document.add(criarParagrafo(
                         "%s - %s (código %d)".formatted(unidade.sigla(), unidade.nome(), unidade.codigo()),
                         FONTE_TEXTO_CORPO,
