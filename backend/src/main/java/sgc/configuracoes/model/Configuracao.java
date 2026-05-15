@@ -10,7 +10,7 @@ import sgc.comum.model.*;
 import sgc.configuracoes.*;
 
 @Entity
-@Table(name = "PARAMETRO", schema = "sgc")
+@Table(name = "CONFIGURACAO", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor

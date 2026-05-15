@@ -1,13 +1,13 @@
 # Auditoria de cheiros de codigo
 
-Gerado em: 2026-05-15T23:10:42.987Z
+Gerado em: 2026-05-15T23:46:02.008Z
 Pontuacao: 1317 (critico)
 
 ## Contagens
 
 | Sinal | Total | Delta | Peso |
 |---|---:|---:|---:|
-| Backend DTOs com @Nullable | 49 | -30 | 5 |
+| Backend DTOs com @Nullable | 49 | 0 | 5 |
 | Backend checks explicitos de null | 235 | 0 | 2 |
 | Backend Objects.isNull/nonNull | 9 | 0 | 2 |
 | Frontend producao com any explicito | 0 | 0 | 4 |

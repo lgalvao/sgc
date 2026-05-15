@@ -46,7 +46,7 @@ DELETE
 FROM SGC.VW_UNIDADE;
 
 DELETE
-FROM SGC.PARAMETRO;
+FROM SGC.CONFIGURACAO;
 
 -- -------------------------------------------------------------------------------------------------
 -- VW_UNIDADE - simulada como tabela no H2

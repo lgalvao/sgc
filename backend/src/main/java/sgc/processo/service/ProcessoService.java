@@ -788,11 +788,6 @@ public class ProcessoService {
         return Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
     }
 
-    @SuppressWarnings("unused")
-    private boolean isElegivelParaAcaoEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return avaliarElegibilidadeAcaoBloco(subprocesso, usuario).possuiAlgumaAcao();
-    }
-
     private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(Subprocesso subprocesso, Usuario usuario) {
         return avaliarElegibilidadeAcaoBloco(subprocesso, usuario, false, Map.of());
     }
