@@ -329,7 +329,10 @@ public class ProcessoService {
             case HOMOLOGAR -> HOMOLOGAR_MAPA;
             default -> null;
         };
-        if (acaoRequerida == null || permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
+        if (acaoRequerida == null) {
+            return;
+        }
+        if (permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
             return;
         }
         throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
