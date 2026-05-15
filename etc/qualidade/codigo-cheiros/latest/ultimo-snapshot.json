@@ -1,17 +1,17 @@
 {
-  "geradoEm": "2026-05-14T23:16:50.854Z",
+  "geradoEm": "2026-05-15T23:10:42.987Z",
   "base": "/home/runner/work/sgc/sgc",
   "pontuacao": {
-    "total": 1467,
+    "total": 1317,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 883,
+      "backend": 733,
       "frontend": 76,
       "frontend_testes": 508
     }
   },
   "contagens": {
-    "backend_nullable_dto": 79,
+    "backend_nullable_dto": 49,
     "backend_null_checks": 235,
     "backend_objects_null": 9,
     "frontend_any_producao": 0,
@@ -83,13 +83,6 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/alerta/dto/AlertaDto.java",
-      "pontuacao": 25,
-      "categorias": {
-        "backend_nullable_dto": 5
-      }
-    },
-    {
       "arquivo": "backend/src/main/java/sgc/relatorio/RelatorioFacade.java",
       "pontuacao": 24,
       "categorias": {
@@ -126,14 +119,22 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/mapa/dto/MapaResumoDto.java",
-      "pontuacao": 20,
+      "arquivo": "backend/src/main/java/sgc/feedback/FeedbackService.java",
+      "pontuacao": 18,
       "categorias": {
-        "backend_nullable_dto": 4
+        "backend_null_checks": 9
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/feedback/FeedbackService.java",
+      "arquivo": "backend/src/main/java/sgc/organizacao/dto/UnidadeDto.java",
+      "pontuacao": 18,
+      "categorias": {
+        "backend_nullable_dto": 2,
+        "backend_null_checks": 4
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java",
       "pontuacao": 18,
       "categorias": {
         "backend_null_checks": 9
