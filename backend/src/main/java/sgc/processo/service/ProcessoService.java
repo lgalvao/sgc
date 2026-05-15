@@ -312,11 +312,11 @@ public class ProcessoService {
             executarDisponibilizacaoMapaEmBloco(disponibilizacao, usuario, subprocessos);
             return;
         }
-
-        if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
-            validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
-            processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
+        if (!(command instanceof ProcessarAnaliseEmBlocoCommand analise)) {
+            return;
         }
+        validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
+        processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
     }
 
     private void validarPermissaoAnaliseEmBloco(
@@ -332,9 +332,10 @@ public class ProcessoService {
         if (acaoRequerida == null) {
             return;
         }
-        if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
-            throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
+        if (permissionEvaluator.verificarPermissao(usuario, subprocessos, acaoRequerida)) {
+            return;
         }
+        throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
     }
 
 
@@ -785,11 +786,6 @@ public class ProcessoService {
 
         Unidade localizacao = obterLocalizacaoAtual(subprocesso, localizacoesPrecarregadas);
         return Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
-    }
-
-    @SuppressWarnings("unused")
-    private boolean isElegivelParaAcaoEmBloco(Subprocesso subprocesso, Usuario usuario) {
-        return avaliarElegibilidadeAcaoBloco(subprocesso, usuario).possuiAlgumaAcao();
     }
 
     private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(Subprocesso subprocesso, Usuario usuario) {

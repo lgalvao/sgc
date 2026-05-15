@@ -1,7 +1,6 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 
@@ -9,12 +8,12 @@ import java.time.*;
 
 @Builder
 public record MovimentacaoDto(
-        @Nullable Long codigo,
+        Long codigo,
         LocalDateTime dataHora,
-        @Nullable Long unidadeOrigemCodigo,
+        Long unidadeOrigemCodigo,
         String unidadeOrigemSigla,
         String unidadeOrigemNome,
-        @Nullable Long unidadeDestinoCodigo,
+        Long unidadeDestinoCodigo,
         String unidadeDestinoSigla,
         String unidadeDestinoNome,
         String usuarioTitulo,

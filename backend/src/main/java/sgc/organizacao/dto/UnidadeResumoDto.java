@@ -1,7 +1,6 @@
 package sgc.organizacao.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -11,8 +10,8 @@ public record UnidadeResumoDto(
         Long codigo,
         String nome,
         String sigla,
-        @Nullable String tipo,
-        @Nullable String tituloTitular) {
+        String tipo,
+        String tituloTitular) {
 
     public static UnidadeResumoDto fromEntityObrigatoria(Unidade unidade) {
         Objects.requireNonNull(unidade, "Unidade obrigatoria para resumo");

@@ -1,12 +1,11 @@
 package sgc.mapa.dto;
 
-import org.jspecify.annotations.*;
 import sgc.mapa.model.*;
 
 import java.util.*;
 
 public record CompetenciaMapaDto(
-        @Nullable Long codigo,
+        Long codigo,
         String descricao,
         List<AtividadeMapaDto> atividades) {
 
@@ -21,4 +20,3 @@ public record CompetenciaMapaDto(
                 atividades);
     }
 }
-
