@@ -93,8 +93,7 @@ import {
   formatarAssunto,
   formatarDestinatario,
   formatarQuando,
-  formatarTipoNotificacao,
-  resumirContexto
+  formatarTipoNotificacao
 } from "@/utils/notificacaoFormatters";
 
 defineProps<{
