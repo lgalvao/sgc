@@ -54,11 +54,24 @@ public class RelatorioController {
         return ResponseEntity.ok(relatorioService.obterRelatorioMapas(codigosUnidades));
     }
 
+    @GetMapping("/unidades-sem-mapas-vigentes/exportar")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Gera relatório de unidades sem mapa vigente")
+    public void gerarRelatorioUnidadesSemMapasVigentesPdf(HttpServletResponse response) throws IOException {
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioUnidadesSemMapasVigentes()));
+        relatorioService.gerarRelatorioUnidadesSemMapasVigentes(response.getOutputStream());
+    }
+
     private String nomeArquivoRelatorioAndamento() {
         return "sgc-rel-andamento-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
     }
 
     private String nomeArquivoRelatorioMapas() {
         return "sgc-rel-mapas-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
+    }
+
+    private String nomeArquivoRelatorioUnidadesSemMapasVigentes() {
+        return "sgc-rel-unidades-sem-mapas-vigentes-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
     }
 }

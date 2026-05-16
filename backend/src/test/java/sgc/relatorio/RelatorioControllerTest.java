@@ -188,4 +188,20 @@ class RelatorioControllerTest {
                 .andExpect(jsonPath("$[0].siglaUnidade").value("SEC"));
     }
 
+    @Test
+    @DisplayName("GET /api/relatorios/unidades-sem-mapas-vigentes/exportar - Deve gerar PDF")
+    @WithMockUser(roles = "ADMIN")
+    void deveGerarRelatorioUnidadesSemMapasVigentesPdf() throws Exception {
+        String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+        mockMvc.perform(get("/api/relatorios/unidades-sem-mapas-vigentes/exportar"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
+                .andExpect(header().string(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=sgc-rel-unidades-sem-mapas-vigentes-%s.pdf".formatted(dataAtual)
+                ));
+
+        verify(relatorioFacade).gerarRelatorioUnidadesSemMapasVigentes(any());
+    }
+
 }

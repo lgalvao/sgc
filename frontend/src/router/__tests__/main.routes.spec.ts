@@ -12,11 +12,12 @@ vi.mock('@/views/NotificacoesAdminView.vue', () => ({default: {name: 'Notificaco
 vi.mock('@/views/FeedbacksAdminView.vue', () => ({default: {name: 'FeedbacksAdminView'}}));
 vi.mock('@/views/RelatorioAndamentoView.vue', () => ({default: {name: 'RelatorioAndamentoView'}}));
 vi.mock('@/views/RelatorioMapasView.vue', () => ({default: {name: 'RelatorioMapasView'}}));
+vi.mock('@/views/RelatorioUnidadesSemMapasVigentesView.vue', () => ({default: {name: 'RelatorioUnidadesSemMapasVigentesView'}}));
 vi.mock('@/views/ErroGeralView.vue', () => ({default: {name: 'ErroGeralView'}}));
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(13);
+        expect(mainRoutes).toHaveLength(14);
     });
 
     it("deve conter a rota RelatorioAndamento", async () => {
@@ -27,6 +28,11 @@ describe("main.routes", () => {
     it("deve conter a rota RelatorioMapas", async () => {
         const route = mainRoutes.find((r) => r.name === "RelatorioMapas");
         expect(route?.path).toBe("/relatorios/mapas-vigentes");
+    });
+
+    it("deve conter a rota RelatorioUnidadesSemMapasVigentes", async () => {
+        const route = mainRoutes.find((r) => r.name === "RelatorioUnidadesSemMapasVigentes");
+        expect(route?.path).toBe("/relatorios/unidades-sem-mapas-vigentes");
     });
 
     it("deve redirecionar da raiz para /login", () => {

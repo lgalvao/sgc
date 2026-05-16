@@ -135,6 +135,40 @@ public class RelatorioFacade {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public void gerarRelatorioUnidadesSemMapasVigentes(OutputStream outputStream) {
+        List<UnidadeResumoLeitura> unidadesSemMapaVigente = unidadeService
+                .buscarResumosPorCodigos(unidadeService.buscarTodosCodigosUnidadesSemMapaVigente());
+
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
+            document.open();
+            adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
+                    "Relatório de Unidades sem Mapas Vigentes",
+                    "Escopo",
+                    "Todas as unidades",
+                    LocalDateTime.now(),
+                    null,
+                    unidadesSemMapaVigente.size()
+            ));
+
+            if (unidadesSemMapaVigente.isEmpty()) {
+                document.add(criarParagrafo("Não há unidades sem mapa vigente.", FONTE_TEXTO, 0f));
+                return;
+            }
+
+            for (UnidadeResumoLeitura unidade : unidadesSemMapaVigente) {
+                document.add(criarParagrafo(
+                        "%s - %s (código %d)".formatted(unidade.sigla(), unidade.nome(), unidade.codigo()),
+                        FONTE_TEXTO_CORPO,
+                        0f
+                ));
+            }
+        } catch (DocumentException | IOException e) {
+            throw new IllegalStateException("Erro ao gerar PDF", e);
+        }
+    }
+
     private Map<Long, UnidadeResponsavelDto> buscarResponsaveisPorUnidade(List<Subprocesso> subprocessos) {
         List<Long> codigosUnidade = subprocessos.stream()
                 .map(Subprocesso::getUnidade)

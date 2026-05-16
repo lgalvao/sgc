@@ -48,6 +48,12 @@ const mainRoutes: RouteRecordRaw[] = [
         meta: {title: "Relatório de Mapas Vigentes"},
     },
     {
+        path: "/relatorios/unidades-sem-mapas-vigentes",
+        name: "RelatorioUnidadesSemMapasVigentes",
+        component: () => import("@/views/RelatorioUnidadesSemMapasVigentesView.vue"),
+        meta: {title: "Relatório de Unidades sem Mapas Vigentes"},
+    },
+    {
         path: "/configuracoes",
         name: "Parametros",
         component: () => import("@/views/ConfiguracaoView.vue"),
