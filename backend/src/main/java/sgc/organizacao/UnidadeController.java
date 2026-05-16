@@ -89,24 +89,9 @@ public class UnidadeController {
     }
 
     @GetMapping("/sem-mapa-vigente")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Long>> buscarCodigosUnidadesSemMapaVigente() {
-        Set<Long> codigosComMapaVigente = new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa());
-        List<Long> codigosArvoreElegivel = coletarCodigosRecursivo(hierarquiaService.buscarArvoreComElegibilidade(
-                info -> info.tipo() != TipoUnidade.INTERMEDIARIA && info.possuiResponsavelEfetivo()
-        ));
-
-        return ResponseEntity.ok(codigosArvoreElegivel.stream()
-                .filter(codigo -> !codigosComMapaVigente.contains(codigo))
-                .toList());
-    }
-
-    private List<Long> coletarCodigosRecursivo(List<UnidadeDto> unidades) {
-        List<Long> codigos = new ArrayList<>();
-        for (UnidadeDto unidade : unidades) {
-            codigos.add(unidade.getCodigo());
-            codigos.addAll(coletarCodigosRecursivo(unidade.getSubunidades()));
-        }
-        return codigos;
+        return ResponseEntity.ok(unidadeService.buscarTodosCodigosUnidadesSemMapaVigente());
     }
 
     @GetMapping("/arvore-com-elegibilidade")

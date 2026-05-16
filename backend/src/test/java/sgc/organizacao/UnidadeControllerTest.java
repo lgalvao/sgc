@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UnidadeController.class)
+@EnableMethodSecurity
 @Import(RestExceptionHandler.class)
 @Tag("integration")
 @DisplayName("Testes do Controller de Unidade")
@@ -156,19 +158,22 @@ class UnidadeControllerTest {
 
     @Test
     @DisplayName("Deve retornar codigos das unidades sem mapa vigente")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void deveRetornarCodigosUnidadesSemMapaVigente() throws Exception {
-        UnidadeDto unidadeFilha = UnidadeDto.builder().codigo(40L).subunidades(List.of()).build();
-        UnidadeDto unidadeRaiz = UnidadeDto.builder().codigo(30L).subunidades(List.of(unidadeFilha)).build();
-        UnidadeDto unidadeComMapaVigente = UnidadeDto.builder().codigo(50L).subunidades(List.of()).build();
-
-        when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(unidadeRaiz, unidadeComMapaVigente));
-        when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(50L));
+        when(unidadeService.buscarTodosCodigosUnidadesSemMapaVigente()).thenReturn(List.of(30L, 40L));
 
         mockMvc.perform(get("/api/unidades/sem-mapa-vigente"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0]").value(30))
                 .andExpect(jsonPath("$[1]").value(40));
+    }
+
+    @Test
+    @DisplayName("Deve proibir perfil não admin ao buscar codigos das unidades sem mapa vigente")
+    @WithMockUser
+    void deveProibirBuscaCodigosUnidadesSemMapaVigenteParaNaoAdmin() throws Exception {
+        mockMvc.perform(get("/api/unidades/sem-mapa-vigente"))
+                .andExpect(status().isForbidden());
     }
 
     @Test

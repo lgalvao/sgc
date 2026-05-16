@@ -83,4 +83,18 @@ describe("Router", () => {
         await router.push("/relatorios");
         expect(router.currentRoute.value.path).toBe("/relatorios");
     });
+
+    it("redireciona gestor ao painel ao acessar relatório de unidades sem mapas vigentes", async () => {
+        perfilStore.usuarioCodigo = "123";
+        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        await router.push("/relatorios/unidades-sem-mapas-vigentes");
+        expect(router.currentRoute.value.path).toBe("/painel");
+    });
+
+    it("permite acesso ao relatório de unidades sem mapas vigentes para admin", async () => {
+        perfilStore.usuarioCodigo = "123";
+        perfilStore.perfilSelecionado = Perfil.ADMIN;
+        await router.push("/relatorios/unidades-sem-mapas-vigentes");
+        expect(router.currentRoute.value.path).toBe("/relatorios/unidades-sem-mapas-vigentes");
+    });
 });

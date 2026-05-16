@@ -129,21 +129,6 @@ function filtrarArvoreSemMapaVigente(unidades: Unidade[], codigosSemMapaVigente:
       .filter((unidade): unidade is Unidade => unidade !== null);
 }
 
-function removerNoAdmin(unidades: Unidade[]): Unidade[] {
-  return unidades.flatMap(unidade => {
-    const filhasFiltradas = removerNoAdmin(unidade.filhas ?? []);
-
-    if (unidade.sigla === "ADMIN") {
-      return filhasFiltradas;
-    }
-
-    return [{
-      ...unidade,
-      filhas: filhasFiltradas
-    }];
-  });
-}
-
 const cardsRelatorio = computed<CardUnidade[]>(() => {
   const maesOrdenadas = ordenarComoArvoreUnidades(unidadesSemMapaVigenteArvore.value);
 
@@ -169,13 +154,8 @@ async function carregarUnidadesSemMapaVigente() {
     buscarCodigosUnidadesSemMapaVigente()
   ]).then(([arvore, codigosSemMapaVigente]) => {
     const codigosSemMapaVigenteSet = new Set(codigosSemMapaVigente);
-    
-    // Padrão da página de Unidades: pular o primeiro nível (Órgão)
-    const unidadesBase = arvore.flatMap(u => u.filhas ?? []);
-    
-    unidadesSemMapaVigenteArvore.value = removerNoAdmin(
-        filtrarArvoreSemMapaVigente(unidadesBase, codigosSemMapaVigenteSet)
-    );
+
+    unidadesSemMapaVigenteArvore.value = filtrarArvoreSemMapaVigente(arvore, codigosSemMapaVigenteSet);
   }).catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
       .finally(() => { carregando.value = false; });
 }
