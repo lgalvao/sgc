@@ -2,30 +2,25 @@
 
 ## 1. Visão geral
 
-O sistema de acesso do SGC baseia-se em dois eixos:
+As regras de acesso do SGC baseiam-se em dois eixos:
 
 | Eixo            | O que controla         | Critério                           |
 |-----------------|------------------------|------------------------------------|
 | **Hierarquia**  | Visualização (Leitura) | Unidade responsável do subprocesso |
 | **Localização** | Execução (Escrita)     | Localização atual do subprocesso   |
 
-**Regra de ouro:** O usuário só pode executar ações de escrita em um subprocesso se este estiver **localizado na sua
-unidade ativa** — incluindo o perfil ADMIN. Mas há algumas exceções, conforme descrito abaixo.
-
----
+**Regra de ouro:** O usuário só pode executar ações de escrita em um subprocesso se este estiver **localizado na sua unidade ativa** — incluindo o perfil ADMIN. Mas há algumas exceções, conforme descrito abaixo.
 
 ## 2. Perfis de Acesso
 
 | Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                     |
 |--------------|----------------------------------------|------------------------------------------------------------------------------------------------------------------|
 | **ADMIN**    | Todo o sistema                         | Criar/editar processos, iniciar, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
-| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes                                                                 |
+| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes, gerar relatórios de sua subarvores de unidades.                |
 | **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades/conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões                  |
 | **SERVIDOR** | Apenas sua unidade                     | Participar de diagnósticos (autoavaliação)                                                                       |
 
----
-
-## 3. Regras de Visualização (Leitura)
+## 3. Regras de Visualização 
 
 Validadas no método `checkHierarquia` do `SgcPermissionEvaluator`:
 
@@ -48,10 +43,6 @@ As regras de visualização de alertas **não seguem a hierarquia recursiva**. A
     * Veem os alertas exclusivos (**pessoais**) direcionados a eles.
     * Veem **também** alertas coletivos da sua **unidade ativa** (alertas que não possuem um usuário de destino
       específico).
-
-**Ordenação:** Os alertas são exibidos obrigatoriamente em ordem decrescente por **Data/Hora**, não sendo permitida a reordenação pelo usuário.
-
----
 
 ## 4. Regras de Execução (Escrita)
 
@@ -128,8 +119,6 @@ Estes endpoints permitem a geração e exportação de relatórios, com acesso f
 | `GET /api/relatorios/mapas`                       | Visualizar consolidado de mapas em JSON        | `hasAnyRole('ADMIN', 'GESTOR')` | 36 |
 | `GET /api/relatorios/mapas/exportar`              | Exportar relatório consolidado de mapas em PDF | `hasAnyRole('ADMIN', 'GESTOR')` | 36 |
 
----
-
 ## 5. Ações em Bloco
 
 ### 5.1 Via endpoints dedicados no SubprocessoController
@@ -168,8 +157,7 @@ O `checkProcesso` do Evaluator valida ações a nível de processo (não subproc
 
 ## 6. Atividades e Conhecimentos (AtividadeFacade)
 
-O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conhecimentos. A verificação fina é feita na
-`AtividadeFacade.verificarPermissaoEdicao()`:
+O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conhecimentos. A verificação fina é feita na `AtividadeFacade.verificarPermissaoEdicao()`:
 
 1. **Permissão de localização:** Checa `EDITAR_CADASTRO` via `permissionEvaluator` (CHEFE + localização).
 2. **Validação de situação:** Permite edição apenas nas seguintes situações do subprocesso:
@@ -181,14 +169,9 @@ O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conheci
     - `REVISAO_MAPA_AJUSTADO`
     - `REVISAO_MAPA_COM_SUGESTOES`
 
----
-
-
 ### 6.1 Exceção de UX para controles de edição
 
-Mesmo quando o backend indicar que o perfil possui a ação estrutural de edição, o frontend deve **ocultar** os controles
-de edição (em vez de apenas desabilitar) nos casos abaixo, quando a situação do subprocesso não permitir edição no
-workflow atual:
+Mesmo quando o backend indicar que o perfil possui a ação estrutural de edição, o frontend deve **ocultar** os controles de edição (em vez de apenas desabilitar) nos casos abaixo, quando a situação do subprocesso não permitir edição no workflow atual:
 
 - **Cadastro de atividades:** perfil **CHEFE**.
 - **Cadastro de mapa:** perfil **ADMIN**.
@@ -197,14 +180,10 @@ Essa exceção é intencional e restrita às telas de cadastro/edição citadas 
 
 ## 7. Importação de Atividades
 
-- `POST /subprocessos/{codigo}/importar-atividades` — protegido com
-  `hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')`.
+- `POST /subprocessos/{codigo}/importar-atividades` — protegido com `hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')`.
 - `IMPORTAR_ATIVIDADES` exige perfil **CHEFE** + localização.
 - `GET /subprocessos/{codigo}/atividades-importacao` — protegido com `isAuthenticated()`.
-- A ação `CONSULTAR_PARA_IMPORTACAO` no Evaluator permite que CHEFE consulte subprocessos finalizados ou da sua
-  hierarquia.
-
----
+- A ação `CONSULTAR_PARA_IMPORTACAO` no Evaluator permite que CHEFE consulte subprocessos finalizados ou da sua hierarquia.
 
 ## 8. Situações do Subprocesso
 
@@ -243,8 +222,6 @@ As ações devem seguir essas diretrizes na UI:
 - **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar processo" para CHEFE).
 - **Desabilitar:** Se o perfil permite, mas a **situação** ou a **localização** atual impede (ex: botão "Disponibilizar"
   visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo). Algumas exceções se aplicam quando a UX seria comprometida com a aplicação das regras (ex. componentes de edição de mapas e atividades são escondidos quando edição não é permitida, ao invés de apenas desabilitados)
-
----
 
 ## 10. Implementação técnica
 
