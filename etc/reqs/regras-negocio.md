@@ -30,9 +30,8 @@ a(s) fonte(s) de onde foi extraída.
 
 ## 1. Estrutura organizacional e Tipos de Unidade
 
-**RN-01.01** — A árvore de unidades organizacionais está subordinada a uma unidade virtual raiz de sigla **ADMIN** (
-código fixo 1), que não existe no SGRH e é criada artificialmente pelo sistema.
-> Fonte: `_intro.md`, `_intro-glossario.md` (Unidade raiz), `views/view-03-unidade.md` (RN-VIEW03-01)
+**RN-01.01** — A árvore de unidades organizacionais está subordinada a uma unidade virtual raiz de sigla **ADMIN** (código fixo 1), que não existe no SGRH e é criada artificialmente pelo sistema.
+> Fonte: `_intro-situacoes.md`, `_intro-glossario.md` (Unidade raiz), `views/view-03-unidade.md` (RN-VIEW03-01)
 
 **RN-01.02** — As unidades são classificadas em quatro tipos funcionais:
 
@@ -43,7 +42,7 @@ código fixo 1), que não existe no SGRH e é criada artificialmente pelo sistem
 - **SEM_EQUIPE**: Unidade sem unidades subordinadas e com menos de 2 servidores lotados. Não participa de nenhum
   processo.
 
-> Fonte: `_intro.md` (linhas 5–8), `_intro-glossario.md`, `views/view-03-unidade.md` (RN-VIEW03-03)
+> Fonte: `_intro-situacoes.md` (linhas 5–8), `_intro-glossario.md`, `views/view-03-unidade.md` (RN-VIEW03-03)
 
 **RN-01.03** — A classificação do tipo de unidade é calculada automaticamente a partir dos dados do SGRH: quantidade de
 servidores lotados e existência de unidades subordinadas. A regra inclui servidores de unidades filhas únicas (sem
@@ -56,7 +55,7 @@ possuem responsável atribuído pelo sistema.
 
 **RN-01.05** — Unidades do tipo **INTERMEDIÁRIA** não cadastram atividades e conhecimentos; seu papel no sistema é
 exclusivamente o de validar os cadastros e mapas das unidades subordinadas.
-> Fonte: `_intro.md`, `_intro-glossario.md`, `cdu-04.md` (passo 9)
+> Fonte: `_intro-situacoes.md`, `_intro-glossario.md`, `cdu-04.md` (passo 9)
 
 **RN-01.06** — As **Centrais de Atendimento ao Eleitor (CAEs)** têm como unidade superior, na hierarquia do SGC, a Zona
 eleitoral sob sua responsabilidade vigente, conforme dados do SIGMA (esquema CORAU). Se não houver zona atribuída, a
@@ -78,28 +77,28 @@ organizacionais no SGRH.
 
 **RN-02.01** — O sistema opera com quatro perfis de usuário: **ADMIN**, **GESTOR**, **CHEFE** e **SERVIDOR**. Um mesmo
 usuário pode acumular múltiplos perfis em diferentes unidades.
-> Fonte: `_intro.md` (linhas 21–28), `cdu-01.md` (passos 7–8)
+> Fonte: `_intro-situacoes.md` (linhas 21–28), `cdu-01.md` (passos 7–8)
 
 **RN-02.02** — O perfil **ADMIN** é atribuído manualmente a servidores (geralmente da SEDOC) cadastrados na tabela
 ADMINISTRADOR. Usuários ADMIN atuam no contexto da unidade raiz virtual ADMIN. O ADMIN não é "todo-poderoso": a maioria
 das ações de escrita só pode ser realizada quando o subprocesso está localizado na unidade ADMIN.
-> Fonte: `_intro.md`, `_intro-glossario.md` (Perfil ADMIN), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-02)
+> Fonte: `_intro-situacoes.md`, `_intro-glossario.md` (Perfil ADMIN), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-02)
 
 **RN-02.03** — O perfil **GESTOR** é atribuído automaticamente ao responsável (titular, substituto ou atribuído
 temporariamente) de uma unidade do tipo **INTERMEDIÁRIA** ou **INTEROPERACIONAL**.
-> Fonte: `_intro.md`, `cdu-01.md` (passo 7), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-03)
+> Fonte: `_intro-situacoes.md`, `cdu-01.md` (passo 7), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-03)
 
 **RN-02.04** — O perfil **CHEFE** é atribuído automaticamente ao responsável de uma unidade do tipo **OPERACIONAL** ou *
 *INTEROPERACIONAL**.
-> Fonte: `_intro.md`, `cdu-01.md` (passo 7), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-04)
+> Fonte: `_intro-situacoes.md`, `cdu-01.md` (passo 7), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-04)
 
 **RN-02.05** — O perfil **SERVIDOR** é atribuído automaticamente a todo servidor lotado em uma unidade operacional ou
 interoperacional que não seja o responsável pela unidade. Servidores participam apenas de processos de diagnóstico.
-> Fonte: `_intro.md`, `cdu-01.md` (passo 7), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-05)
+> Fonte: `_intro-situacoes.md`, `cdu-01.md` (passo 7), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-05)
 
 **RN-02.06** — O responsável de uma unidade **INTEROPERACIONAL** acumula os perfis **GESTOR** e **CHEFE**, podendo
 escolher entre eles no momento de login.
-> Fonte: `_intro.md`, `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-04, RN-VIEW06-06)
+> Fonte: `_intro-situacoes.md`, `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-04, RN-VIEW06-06)
 
 **RN-02.07** — Os perfis são dinâmicos: ao mudar de responsável (por fim de substituição, atribuição temporária ou
 mudança de titular no SGRH), os perfis são automaticamente reatribuídos sem intervenção manual (isso porque os dados de
@@ -109,11 +108,11 @@ Oracle). A perda de lotação ativa implica perda imediata de todos os perfis.
 
 **RN-02.08** — O perfil **GESTOR** não cadastra nenhuma informação no sistema; ele apenas valida, devolve ou encaminha
 subprocessos.
-> Fonte: `_intro.md` (descrição do perfil GESTOR)
+> Fonte: `_intro-situacoes.md` (descrição do perfil GESTOR)
 
 **RN-02.09** — O cadastro de atividades e conhecimentos é responsabilidade exclusiva do perfil **CHEFE** e restrito a
 sua unidade organizacional. Nem mesmo o ADMIN pode realizar essa operação.
-> Fonte: `_intro.md`, `_intro-glossario.md` (Atividade), `cdu-08.md`
+> Fonte: `_intro-situacoes.md`, `_intro-glossario.md` (Atividade), `cdu-08.md`
 
 **RN-02.10** — A identificação única dos usuários no sistema é o **título de eleitor**, que é permanente e utilizado
 como chave primária e no processo de login.
@@ -153,13 +152,13 @@ ou senha inválidos."**
 
 **RN-04.01** — O sistema suporta três tipos de processos: **Mapeamento**, **Revisão** e **Diagnóstico**. O tipo não pode
 ser alterado após a criação do processo.
-> Fonte: `_intro.md` (linhas 16–19), `cdu-03.md` (passo 3 — edição)
+> Fonte: `_intro-situacoes.md` (linhas 16–19), `cdu-03.md` (passo 3 — edição)
 
 **RN-04.02** — Um processo pode ser criado apenas pelo perfil **ADMIN**.
 > Fonte: `cdu-03.md`
 
 **RN-04.03** — Um processo passa pelas seguintes situações: **'Criado'** → **'Em andamento'** → **'Finalizado'**.
-> Fonte: `_intro.md` (Situações de Processos)
+> Fonte: `_intro-situacoes.md` (Situações de Processos)
 
 **RN-04.04** — Processos na situação **'Criado'** podem ser editados ou removidos. Após iniciados (situação 'Em
 andamento' ou 'Finalizado'), não podem ser mais editados nem removidos.
@@ -238,7 +237,7 @@ ser selecionada. Mensagens de validação:
 
 **RN-05.01** — Cada processo possui um subprocesso por unidade operacional ou interoperacional participante. O
 subprocesso, entre outras coisas, registra o progresso da unidade dentro do processo.
-> Fonte: `_intro.md`, `_intro-glossario.md` (Subprocesso)
+> Fonte: `_intro-situacoes.md`, `_intro-glossario.md` (Subprocesso)
 
 **RN-05.02** — A **localização atual** do subprocesso é determinada pela unidade de destino da última movimentação
 registrada. Ela é fundamental para determinar quem pode atuar no subprocesso em cada momento.
@@ -247,16 +246,16 @@ registrada. Ela é fundamental para determinar quem pode atuar no subprocesso em
 **RN-05.03** — As situações de subprocessos de **Mapeamento** são, em ordem de progressão:
 `'Não iniciado'` → `'Cadastro em andamento'` → `'Cadastro disponibilizado'` → `'Cadastro homologado'` →
 `'Mapa criado'` → `'Mapa disponibilizado'` → (`'Mapa com sugestões'` ou) `'Mapa validado'` → `'Mapa homologado'`.
-> Fonte: `_intro.md` (Situações de subprocessos de Mapeamento)
+> Fonte: `_intro-situacoes.md` (Situações de subprocessos de Mapeamento)
 
 **RN-05.04** — As situações de subprocessos de **Revisão** são, em ordem de progressão: `'Não iniciado'` →
 `'Revisão do cadastro em andamento'` → `'Revisão do cadastro disponibilizada'` → `'Revisão do cadastro homologada'` →
 `'Mapa ajustado'` → `'Mapa disponibilizado'` → (`'Mapa com sugestões'` ou) `'Mapa validado'` → `'Mapa homologado'`.
-> Fonte: `_intro.md` (Situações de subprocessos de Revisão)
+> Fonte: `_intro-situacoes.md` (Situações de subprocessos de Revisão)
 
 **RN-05.05** — As situações de subprocessos de **Diagnóstico** são: `'Não iniciado'` → `'Autoavaliação em andamento'` →
 `'Monitoramento'` → `'Concluído'`.
-> Fonte: `_intro.md` (Situações de subprocessos de Diagnóstico)
+> Fonte: `_intro-situacoes.md` (Situações de subprocessos de Diagnóstico)
 
 **RN-05.06** — Toda transição de estado do subprocesso gera um registro de **movimentação** com: data/hora, unidade
 origem, unidade destino e descrição da ação realizada. As movimentações são apresentadas em ordem decrescente de
@@ -363,7 +362,7 @@ ao subprocesso da unidade, a tela deve ser exibida previamente preenchida com es
 
 **RN-07.01** — O mapa de competências é criado e mantido exclusivamente pelo perfil **ADMIN**, a partir das atividades e
 conhecimentos cadastrados pelas unidades.
-> Fonte: `_intro.md`, `_intro-glossario.md` (Competência, Mapa de competências), `cdu-15.md`
+> Fonte: `_intro-situacoes.md`, `_intro-glossario.md` (Competência, Mapa de competências), `cdu-15.md`
 
 **RN-07.02** — Uma **competência** deve estar associada a pelo menos uma atividade do cadastro da unidade. Não é
 possível disponibilizar o mapa se alguma competência não tiver associação com atividade.
@@ -392,7 +391,7 @@ de texto formatado obrigatório) antes de submeter para análise das unidades su
 **RN-07.08** — Ao apresentar sugestões, a situação do subprocesso muda para **'Mapa com sugestões'**. Se a unidade
 superior ou o ADMIN devolver, a situação pode retornar para 'Mapa disponibilizado' (para a unidade do subprocesso) ou
 para 'Mapa com sugestões' (para unidade intermediária).
-> Fonte: `cdu-19.md` (passo 4.3), `_intro.md` (diagrama de estados)
+> Fonte: `cdu-19.md` (passo 4.3), `_intro-situacoes.md` (diagrama de estados)
 
 **RN-07.09** — O perfil **GESTOR** pode aceitar (encaminhar para o nível superior) ou devolver a validação do mapa para
 ajustes. O GESTOR não pode homologar.
@@ -709,7 +708,7 @@ reconstruir rotas manualmente.
 
 | Arquivo                                   | Conteúdo                                                                                      |
 |-------------------------------------------|-----------------------------------------------------------------------------------------------|
-| `_intro.md`                               | Introdução geral, tipos de processo, situações de processos e subprocessos, perfis de usuário |
+| `_intro-situacoes.md`                               | Introdução geral, tipos de processo, situações de processos e subprocessos, perfis de usuário |
 | `_intro-glossario.md`                     | Glossário de termos do sistema                                                                |
 | `cdu-01.md`                               | Login e estrutura de telas                                                                    |
 | `cdu-02.md`                               | Visualizar painel                                                                             |

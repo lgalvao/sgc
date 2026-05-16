@@ -15,10 +15,11 @@ específicos que funcionam melhor com tratamento próprio.
 
 - Se a ação nunca puder ser realizada pelo perfil atual, o botão ou controle não deve ser renderizado.
 - Se o perfil pode realizar a ação, mas a localização, situação de workflow, permissão contextual ou estado de carregamento impede a execução agora, o controle deve aparecer desabilitado.
-- **Exceção (cadastro de atividades / mapa):** quando o perfil CHEFE (cadastro) ou ADMIN (mapa) possui capacidade estrutural de edição, mas a situação do subprocesso impede a edição naquele momento, os controles de edição **devem ser ocultados** (não apenas desabilitados).
 - Ação desabilitada por workflow/localização deve ter motivo acessível e persistente quando o contexto não for óbvio.
 - Tooltip pode complementar o motivo, mas não deve ser o único canal quando a informação for essencial.
 - Erro corrigível de formulário não deve deixar a ação principal muda; a tentativa deve exibir validação inline ou contextual.
+- **Exceção (cadastro de atividades / mapa):** quando o perfil CHEFE (cadastro) ou ADMIN (mapa) possui capacidade estrutural de edição, mas a situação do subprocesso impede a edição naquele momento, os controles de edição **devem ser ocultados** (não apenas desabilitados).
+
 
 ## Canais de feedback
 
@@ -47,10 +48,8 @@ específicos que funcionam melhor com tratamento próprio.
 
 ## Acessibilidade e visibilidade
 
-- **Ações permanentes**: É vedado o uso de estados de 'hover' (passar o mouse) para ocultar botões de ação essenciais (
-  ex. editar e excluir). As ações devem estar permanentemente visíveis para garantir operabilidade plena via teclado e dispositivos móveis.
-- **Informação de domínio inline**: Dados fundamentais (como a lista de conhecimentos associada a uma atividade) devem
-  ser apresentados de forma inline ou estruturada no corpo da página, nunca escondidos atrás de tooltips ou popovers.
+- **Ações permanentes**: É vedado o uso de estados de 'hover' (passar o mouse) para ocultar botões de ação essenciais (ex. editar e excluir). As ações devem estar permanentemente visíveis para garantir operabilidade plena via teclado e dispositivos móveis.
+- **Informação de domínio inline**: Dados fundamentais (como a lista de conhecimentos associada a uma atividade) devem ser apresentados de forma inline ou estruturada no corpo da página, nunca escondidos atrás de tooltips ou popovers.
 - **Proximidade**: Os controles de ação (botões) devem ser posicionados o mais próximo possível do item que eles afetam para reduzir a carga cognitiva e facilitar a identificação da funcionalidade.
 - **Operabilidade via teclado**: Todo elemento interativo deve ser um elemento nativo de formulário ou botão (como os do `BootstrapVueNext`), garantindo que integrem a ordem natural de tabulação.
 
@@ -68,7 +67,7 @@ específicos que funcionam melhor com tratamento próprio.
 - Erros de entrada devem retornar campos estáveis em português quando houver campo corrigível.
 - O contrato alvo para erros estruturados é `erros` com itens contendo `campo` e `mensagem`.
 
-## Exceções saudáveis
+## Exceções
 
 - Login pode usar mensagens globais para credenciais inválidas, por segurança.
 - Fluxos complexos podem combinar erro por item e erro global quando isso deixar a ação mais clara.

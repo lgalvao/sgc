@@ -16,12 +16,11 @@ unidade ativa** — incluindo o perfil ADMIN.
 
 ## 2. Perfis de Acesso
 
-| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                     |
-|--------------|----------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| **ADMIN**    | Todo o sistema                         | Criar/editar processos, iniciar, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
-| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes                                                                 |
-| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades/conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões                  |
-| **SERVIDOR** | Apenas sua unidade                     | Participar de diagnósticos (autoavaliação)                                                                       |
+| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                   |
+|--------------|----------------------------------------|| **ADMIN**    | Todo o sistema                         | Criar/editar processos, iniciar, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
+| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes                                                 |
+| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades/conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões |
+| **SERVIDOR** | Apenas sua unidade                     | Participar de diagnósticos (autoavaliação)                                                       |
 
 ---
 
