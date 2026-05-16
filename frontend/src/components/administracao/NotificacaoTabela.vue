@@ -192,8 +192,3 @@ const camposTabela = [
   color: var(--bs-body-color);
 }
 </style>
-und: var(--bs-secondary-bg);
-  border-color: var(--bs-secondary-color);
-  color: var(--bs-body-color);
-}
-</style>
