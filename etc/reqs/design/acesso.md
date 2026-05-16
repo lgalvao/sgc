@@ -118,6 +118,13 @@ Estes endpoints permitem a geração e exportação de relatórios, com acesso f
 | `GET /api/relatorios/andamento/{codigo}/exportar` | Exportar relatório de andamento em PDF         | ADMIN ou Hierarquia (`@processoService.checarAcesso`) | 35 |
 | `GET /api/relatorios/mapas`                       | Visualizar consolidado de mapas em JSON        | `hasAnyRole('ADMIN', 'GESTOR')` | 36 |
 | `GET /api/relatorios/mapas/exportar`              | Exportar relatório consolidado de mapas em PDF | `hasAnyRole('ADMIN', 'GESTOR')` | 36 |
+| `GET /api/relatorios/unidades-sem-mapas-vigentes/exportar` | Exportar relatório de unidades sem mapa vigente em PDF | `hasRole('ADMIN')` | 37 |
+
+### 4.4 Consultas auxiliares de Unidades
+
+| Endpoint                             | Ação                                                       | Perfil / Controle      | CDU |
+|--------------------------------------|------------------------------------------------------------|------------------------|-----|
+| `GET /api/unidades/sem-mapa-vigente` | Listar códigos de unidades sem mapa vigente para pré-visualização | `hasRole('ADMIN')` | 37 |
 
 ## 5. Ações em Bloco
 

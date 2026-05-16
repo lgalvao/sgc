@@ -746,6 +746,7 @@ reconstruir rotas manualmente.
 | `cdu-34.md`                               | Enviar lembrete de prazo                                                                      |
 | `cdu-35.md`                               | Gerar relatório de andamento                                                                  |
 | `cdu-36.md`                               | Gerar relatório de mapas                                                                      |
+| `cdu-37.md`                               | Gerar relatório de unidades sem mapas vigentes                                                |
 | `views/views-indice.md`                   | Índice das views do sistema                                                                   |
 | `views/view-01-vinculacao-unidade.md`     | VW_VINCULACAO_UNIDADE                                                                         |
 | `views/view-02-zona-resp-central.md`      | VW_ZONA_RESP_CENTRAL                                                                          |
