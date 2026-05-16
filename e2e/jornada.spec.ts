@@ -84,10 +84,10 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             const tabelaNotificacoes = page.getByTestId('tbl-notificacoes');
             await expect(tabelaNotificacoes).toBeVisible();
             await expect(tabelaNotificacoes).toContainText('SECAO_321');
-            await expect(tabelaNotificacoes).toContainText('Mapeamento Secão 321');
+            await expect(tabelaNotificacoes).toContainText('Mapa de competências disponibilizado - SECAO_321');
             await expect(tabelaNotificacoes).toContainText('Falha Definitiva');
             await expect(tabelaNotificacoes).toContainText('SECAO_311');
-            await expect(tabelaNotificacoes).toContainText('Mapeamento Secão 311');
+            await expect(tabelaNotificacoes).toContainText('Cadastro de atividades homologado');
             await expect(tabelaNotificacoes).toContainText('Enviado');
             const btnDetalhesFalha = tabelaNotificacoes.locator('[data-testid^="btn-detalhes-"]').first();
             await expect(btnDetalhesFalha).toBeVisible();
