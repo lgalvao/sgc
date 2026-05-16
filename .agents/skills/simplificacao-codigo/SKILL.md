@@ -13,7 +13,7 @@ do mesmo fluxo de negócio.
 Antes de simplificar, confirme as restrições nestas fontes:
 
 - `etc/reqs`
-- `etc/docs/regras-acesso.md`
+- `etc/docs/acesso.md`
 - `AGENTS.md`
 - `plano-simplificacao.md`, se existir
 
@@ -71,7 +71,7 @@ Reduzir complexidade acidental preservando:
 - Não colapsar camadas só porque parecem verbosas.
 - Não mover controller para acesso direto a repositório quando houver regra de negócio, segurança, transação ou montagem
   de resposta.
-- Não simplificar permissão sem confronto explícito com `etc/docs/regras-acesso.md`.
+- Não simplificar permissão sem confronto explícito com `etc/docs/acesso.md`.
 - Em `subprocesso`, simplifique antes duplicações de busca, validação e contexto; evite fusões amplas de serviço.
 - Prefira helpers privados, `command`/DTO interno e centralização de leitura antes de criar abstrações novas.
 - Se o frontend estiver reconstruindo regra de acesso, workflow ou disponibilidade por falta de sinal no DTO, prefira
@@ -229,7 +229,7 @@ npm run lint
 - A leitura do fluxo ficou mais curta?
 - Há algum collaborator implícito que pode virar dado explícito?
 - Existe código morto liberado por esta simplificação?
-- A mudança continua alinhada com `etc/reqs` e `etc/docs/regras-acesso.md`?
+- A mudança continua alinhada com `etc/reqs` e `etc/docs/acesso.md`?
 
 ## Saída esperada
 

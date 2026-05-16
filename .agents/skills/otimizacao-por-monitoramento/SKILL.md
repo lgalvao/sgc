@@ -13,7 +13,7 @@ evidência de execução, não de inspeção estática isolada.
 Antes de otimizar, confirme as restrições nestas fontes:
 
 - `etc/reqs`
-- `etc/docs/regras-acesso.md`
+- `etc/docs/acesso.md`
 - `AGENTS.md`
 - o cenário E2E relacionado
 

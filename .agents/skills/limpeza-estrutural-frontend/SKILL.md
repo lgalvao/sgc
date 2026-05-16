@@ -17,7 +17,7 @@ Antes de simplificar, confirme as restrições nestas fontes:
 
 - `AGENTS.md`
 - `etc/reqs`
-- `etc/docs/regras-acesso.md`
+- `etc/docs/acesso.md`
 - `etc/qualidade/frontend-cruft-budget.json`
 - `etc/qualidade/frontend-cruft-waivers.json`
 - `etc/qualidade/frontend-cruft/latest`

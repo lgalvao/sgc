@@ -120,4 +120,4 @@ Comando principal:
 ## Referências
 
 - [Backend do SGC](../../../../../../backend/README.md)
-- [Regras de acesso](../../../../../../etc/reqs/regras-acesso.md)
+- [Regras de acesso](../../../../../../etc/reqs/acesso.md)

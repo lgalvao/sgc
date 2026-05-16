@@ -93,7 +93,8 @@ import {
   formatarAssunto,
   formatarDestinatario,
   formatarQuando,
-  formatarTipoNotificacao
+  formatarTipoNotificacao,
+  resumirContexto
 } from "@/utils/notificacaoFormatters";
 
 defineProps<{
@@ -187,6 +188,11 @@ const camposTabela = [
 .btn-acao:hover,
 .btn-acao:focus {
   background: var(--bs-secondary-bg);
+  border-color: var(--bs-secondary-color);
+  color: var(--bs-body-color);
+}
+</style>
+und: var(--bs-secondary-bg);
   border-color: var(--bs-secondary-color);
   color: var(--bs-body-color);
 }

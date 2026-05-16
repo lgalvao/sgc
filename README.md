@@ -258,6 +258,6 @@ npm run test:e2e
 - [frontend/README.md](frontend/README.md)
 - [e2e/README.md](e2e/README.md)
 - [etc/scripts/README.md](etc/scripts/README.md)
-- [etc/reqs/regras-acesso.md](etc/reqs/regras-acesso.md)
+- [etc/reqs/acesso.md](etc/reqs/acesso.md)
 - [etc/docs/regras-e2e.md](etc/docs/regras-e2e.md)
 - [AGENTS.md](AGENTS.md)

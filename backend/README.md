@@ -133,7 +133,7 @@ Resumo funcional:
 - **CHEFE** atua sobre cadastro/validação quando o subprocesso está em sua unidade ativa;
 - **SERVIDOR** atua no que o domínio de diagnóstico exigir, sem receber privilégios de gestão.
 
-Veja também: [regras de acesso](../etc/reqs/regras-acesso.md).
+Veja também: [regras de acesso](../etc/reqs/acesso.md).
 
 ## Perfis de execução
 

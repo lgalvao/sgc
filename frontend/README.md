@@ -194,5 +194,5 @@ npm run lint
 
 - [README raiz](../README.md)
 - [Backend do SGC](../backend/README.md)
-- [Regras de acesso](../etc/reqs/regras-acesso.md)
+- [Regras de acesso](../etc/reqs/acesso.md)
 - [Regras E2E](../etc/docs/regras-e2e.md)
