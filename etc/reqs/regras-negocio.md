@@ -563,6 +563,9 @@ finalização para considerar processo inativo; padrão: 10) e `DIAS_ALERTA_NOVO
 de marcá-lo como novo). O efeito das alterações é imediato.
 > Fonte: `cdu-31.md`
 
+**RN-13.04** — O perfil **ADMIN** pode acompanhar notificações administrativas de e-mail, visualizar detalhes, abrir preview do conteúdo quando disponível e reenfileirar notificações com falha definitiva.
+> Fonte: `cdu-38.md`
+
 ---
 
 ## 14. Atribuição temporária de Responsabilidade
@@ -747,6 +750,7 @@ reconstruir rotas manualmente.
 | `cdu-35.md`                               | Gerar relatório de andamento                                                                  |
 | `cdu-36.md`                               | Gerar relatório de mapas                                                                      |
 | `cdu-37.md`                               | Gerar relatório de unidades sem mapas vigentes                                                |
+| `cdu-38.md`                               | Acompanhar notificações administrativas                                                       |
 | `views/views-indice.md`                   | Índice das views do sistema                                                                   |
 | `views/view-01-vinculacao-unidade.md`     | VW_VINCULACAO_UNIDADE                                                                         |
 | `views/view-02-zona-resp-central.md`      | VW_ZONA_RESP_CENTRAL                                                                          |
