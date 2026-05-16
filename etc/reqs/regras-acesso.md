@@ -10,17 +10,18 @@ O sistema de acesso do SGC baseia-se em dois eixos:
 | **Localização** | Execução (Escrita)     | Localização atual do subprocesso   |
 
 **Regra de ouro:** O usuário só pode executar ações de escrita em um subprocesso se este estiver **localizado na sua
-unidade ativa** — incluindo o perfil ADMIN.
+unidade ativa** — incluindo o perfil ADMIN. Mas há algumas exceções, conforme descrito abaixo.
 
 ---
 
 ## 2. Perfis de Acesso
 
-| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                   |
-|--------------|----------------------------------------|| **ADMIN**    | Todo o sistema                         | Criar/editar processos, iniciar, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
-| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes                                                 |
-| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades/conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões |
-| **SERVIDOR** | Apenas sua unidade                     | Participar de diagnósticos (autoavaliação)                                                       |
+| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                     |
+|--------------|----------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| **ADMIN**    | Todo o sistema                         | Criar/editar processos, iniciar, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
+| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes                                                                 |
+| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades/conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões                  |
+| **SERVIDOR** | Apenas sua unidade                     | Participar de diagnósticos (autoavaliação)                                                                       |
 
 ---
 
@@ -29,20 +30,16 @@ unidade ativa** — incluindo o perfil ADMIN.
 Validadas no método `checkHierarquia` do `SgcPermissionEvaluator`:
 
 - **ADMIN:** `return true` — acesso global.
-- **GESTOR:** `hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario)` — vê sua unidade e todas as
-  subordinadas.
+- **GESTOR:** `hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario)` — vê sua unidade e todas as subordinadas.
 - **CHEFE / SERVIDOR:** `usuario.getUnidadeAtivaCodigo() == unidadeAlvo.getCodigo()` — vê apenas sua própria unidade.
 
 ### Exceção: VERIFICAR_IMPACTOS
 
-A ação `VERIFICAR_IMPACTOS` **não depende de localização** no Evaluator (apenas retorna `true` se o perfil for CHEFE,
-GESTOR ou ADMIN). O controle fino de em quais situações cada perfil pode ver os impactos é feito no **serviço** (
-`ImpactoMapaService`), não no Evaluator.
+A ação `VERIFICAR_IMPACTOS` **não depende de localização** no Evaluator (apenas retorna `true` se o perfil for CHEFE, GESTOR ou ADMIN). O controle fino de em quais situações cada perfil pode ver os impactos é feito no **serviço** (`ImpactoMapaService`), não no Evaluator.
 
-### Exceção: Alertas (Painel e Barra de Navegação)
+### Exceção: Alertas (Painel)
 
-As regras de visualização de alertas **não seguem a hierarquia recursiva**. A visibilidade é determinada pelo perfil e
-pelo destino do alerta (CDU-02):
+As regras de visualização de alertas **não seguem a hierarquia recursiva**. A visibilidade é determinada pelo perfil e pelo destino do alerta (CDU-02):
 
 - **Perfil SERVIDOR:**
     * Vê **apenas** os alertas exclusivos (**pessoais**) direcionados ao seu título de eleitor.
@@ -52,8 +49,7 @@ pelo destino do alerta (CDU-02):
     * Veem **também** alertas coletivos da sua **unidade ativa** (alertas que não possuem um usuário de destino
       específico).
 
-**Ordenação:** Os alertas são exibidos obrigatoriamente em ordem decrescente por **Data/Hora**, não sendo permitida a
-reordenação pelo usuário.
+**Ordenação:** Os alertas são exibidos obrigatoriamente em ordem decrescente por **Data/Hora**, não sendo permitida a reordenação pelo usuário.
 
 ---
 
@@ -117,12 +113,20 @@ Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 | `POST /api/usuarios/administradores/{titulo}/remover`      | Remover administrador           | 30    |
 | `POST /api/unidades/{codigo}/atribuicoes-temporarias`      | Criar atribuição temporária     | 28    |
 | `GET /api/unidades/atribuicoes`                            | Listar atribuições              | 28    |
-| `GET /api/relatorios/andamento/{codigo}`                   | Ver relatório de andamento      | 35    |
-| `GET /api/relatorios/andamento/{codigo}/exportar`          | Exportar relatório de andamento | 35    |
-| `GET /api/relatorios/mapas/{codigo}/exportar`              | Exportar relatório de mapas     | 36    |
 | `POST /api/mapas`                                          | Criar mapa                      | 15    |
 | `POST /api/mapas/{codigo}/atualizar`                       | Atualizar mapa                  | 15    |
 | `POST /api/mapas/{codigo}/excluir`                         | Excluir mapa                    | 15    |
+
+### 4.3 Ações de Relatórios (Acesso por ADMIN ou Hierarquia)
+
+Estes endpoints permitem a geração e exportação de relatórios, com acesso flexibilizado para administradores, gestores ou usuários da hierarquia do processo/unidade alvo:
+
+| Endpoint                                          | Ação                                           | Perfil / Controle | CDU |
+|---------------------------------------------------|------------------------------------------------|-------------------|-----|
+| `GET /api/relatorios/andamento/{codigo}`          | Visualizar andamento do processo em JSON       | ADMIN ou Hierarquia (`@processoService.checarAcesso`) | 35 |
+| `GET /api/relatorios/andamento/{codigo}/exportar` | Exportar relatório de andamento em PDF         | ADMIN ou Hierarquia (`@processoService.checarAcesso`) | 35 |
+| `GET /api/relatorios/mapas`                       | Visualizar consolidado de mapas em JSON        | `hasAnyRole('ADMIN', 'GESTOR')` | 36 |
+| `GET /api/relatorios/mapas/exportar`              | Exportar relatório consolidado de mapas em PDF | `hasAnyRole('ADMIN', 'GESTOR')` | 36 |
 
 ---
 
@@ -142,8 +146,8 @@ Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 
 `POST /api/processos/{codigo}/acao-em-bloco` — protegido com `hasAnyRole('ADMIN', 'GESTOR')`.
 
-A `ProcessoFacade.executarAcaoEmBloco()` faz a verificação fina de permissão internamente via
-`permissionEvaluator.checkPermission()`, categorizando cada subprocesso na ação correta (aceitar cadastro, aceitar mapa,
+A `ProcessoService.executarAcaoEmBloco()` faz a verificação fina de permissão internamente via
+`permissionEvaluator.verificarPermissao()`, categorizando cada subprocesso na ação correta (aceitar cadastro, aceitar mapa,
 homologar cadastro, homologar mapa, ou disponibilizar mapa).
 
 ### 5.3 Permissões no nível de Processo (checkProcesso)
@@ -156,6 +160,7 @@ O `checkProcesso` do Evaluator valida ações a nível de processo (não subproc
 | `FINALIZAR_PROCESSO`           | ADMIN    | Processo não pode estar `FINALIZADO` |
 | `ACEITAR_CADASTRO_EM_BLOCO`    | GESTOR   | —                                    |
 | `HOMOLOGAR_CADASTRO_EM_BLOCO`  | ADMIN    | —                                    |
+| `ACEITAR_MAPA_EM_BLOCO`        | GESTOR   | —                                    |
 | `HOMOLOGAR_MAPA_EM_BLOCO`      | ADMIN    | —                                    |
 | `DISPONIBILIZAR_MAPA_EM_BLOCO` | ADMIN    | —                                    |
 
@@ -237,7 +242,7 @@ As ações devem seguir essas diretrizes na UI:
 
 - **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar processo" para CHEFE).
 - **Desabilitar:** Se o perfil permite, mas a **situação** ou a **localização** atual impede (ex: botão "Disponibilizar"
-  visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo).
+  visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo). Algumas exceções se aplicam quando a UX seria comprometida com a aplicação das regras (ex. componentes de edição de mapas e atividades são escondidos quando edição não é permitida, ao invés de apenas desabilitados)
 
 ---
 
@@ -256,13 +261,5 @@ As ações devem seguir essas diretrizes na UI:
 @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_MAPA')")
 
 // Acesso a detalhes de processo — admin ou hierarquia:
-@PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
+@PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
 ```
-
-### Localização do Subprocesso
-
-A localização é obtida via `obterUnidadeLocalizacao()`:
-
-1. Se `sp.getLocalizacaoAtual()` não é null, usa este valor (cache).
-2. Senão, busca a última movimentação (`movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc`).
-3. Se não houver movimentação, assume a unidade do subprocesso (posição inicial).

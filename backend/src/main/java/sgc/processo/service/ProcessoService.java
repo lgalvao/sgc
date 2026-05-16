@@ -788,10 +788,6 @@ public class ProcessoService {
         return Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
     }
 
-    private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(Subprocesso subprocesso, Usuario usuario) {
-        return avaliarElegibilidadeAcaoBloco(subprocesso, usuario, false, Map.of());
-    }
-
     private ElegibilidadeAcaoBloco avaliarElegibilidadeAcaoBloco(
             Subprocesso subprocesso,
             Usuario usuario,
@@ -1150,12 +1146,8 @@ public class ProcessoService {
     }
 
     private Optional<String> emailCopiaAdmin(Unidade unidadeDestino) {
-        if (!isUnidadeAdmin(unidadeDestino)) {
-            return Optional.empty();
-        }
+        if (!isUnidadeAdmin(unidadeDestino)) return Optional.empty();
 
-        // Busca o usuário com unidadeLotacao inicializada via JOIN FETCH para evitar
-        // LazyInitializationException ao acessar getSigla() fora de sessão Hibernate.
         Usuario usuarioPrincipal = usuarioService.usuarioAutenticado();
         Usuario usuario = usuarioService.buscarUsuarioComUnidadeLotacao(usuarioPrincipal.getTituloEleitoral());
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
@@ -1367,8 +1359,8 @@ public class ProcessoService {
         List<Long> codigosUnidades = tipo == REVISAO
                 ? validarCodigosRevisao(codsUnidadesParam)
                 : validarCodigosParticipantes(processo.getCodigosParticipantes());
-        Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
 
+        Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
         if (tipo == REVISAO) {
             processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
         }

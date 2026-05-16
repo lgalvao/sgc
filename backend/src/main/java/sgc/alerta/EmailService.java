@@ -2,7 +2,6 @@ package sgc.alerta;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.*;
