@@ -27,7 +27,7 @@ O sistema suporta três tipos principais de processos:
 - **revisão**: consiste na atualização periódica dos mapas de competências vigentes em cada unidade considerando as
   mudanças organizacionais e de atribuições;
 - **diagnóstico**: avalia a importância e domínio das competências pelos servidores das unidades, identificando
-  lacunas (gaps) e necessidades de capacitação; **o módulo de diagnóstico ainda está em especificação**.
+  lacunas (gaps) e necessidades de capacitação, a partir do mapa de competências vigente de cada unidade.
 
 ## Atores e perfis
 

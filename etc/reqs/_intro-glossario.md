@@ -37,9 +37,28 @@ conhecimento.
 Elemento sintetizante das atribuições de uma unidade. É criado pelos perfis ADMIN a partir das atividades e
 conhecimentos cadastrados pelas unidades.
 
+## Autoavaliação de diagnóstico
+
+Avaliação individual preenchida pelo próprio servidor, para cada competência vigente da unidade, informando os valores
+de importância e domínio.
+
+## Avaliação de consenso
+
+Avaliação registrada pelo perfil CHEFE para um servidor, a partir da autoavaliação realizada e das tratativas entre
+chefia e servidor. É a avaliação visível para a hierarquia superior.
+
 ## Devolução
 
 Ato de devolver para ajustes, após análise, as informações fornecidas (cadastro, mapa etc.) por uma unidade subordinada.
+
+## Gap de competência
+
+Diferença entre o valor de importância e o valor de domínio atribuídos a uma competência, para um servidor, usada para
+identificar lacunas de capacitação. Quando a importância ou o domínio forem marcados como `NA`, o gap não entra nos
+cálculos consolidados.
+
+PENDÊNCIA DE REFINAMENTO: a fórmula acima foi adotada como regra inicial de especificação e ainda precisa de validação
+funcional final com a área de negócio.
 
 ## Localização atual de subprocesso
 
@@ -88,6 +107,14 @@ competências técnicas.
 Avaliação realizada pelos servidores e pelos responsáveis pelas unidades para identificar a importância e o domínio das
 competências das unidades por parte dos seus servidores, assim como as competências com poucos servidores capacitados.
 Também referido como de competências técnicas e identificação das ocupações críticas.
+
+## Ocupações críticas
+
+No contexto do diagnóstico, denominação da informação de situação de capacitação registrada pelo perfil CHEFE, para cada
+servidor e para cada competência vigente da unidade, usando os valores `NA`, `AC`, `EC`, `C` e `I`.
+
+PENDÊNCIA DE REFINAMENTO: confirmar se "ocupações críticas" se esgota nessa grade de situação de capacitação ou se
+existirá, no futuro, algum conceito adicional de ocupação/cargo crítico da unidade.
 
 ## Responsável
 

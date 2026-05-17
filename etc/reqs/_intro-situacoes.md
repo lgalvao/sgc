@@ -6,8 +6,8 @@ especificações de casos de uso.
 
 Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para os atores de transição:
 
-- **`udp`** (unidade do processo): A unidade (operacional ou interoperacional) para a qual o mapa será criado, e que é
-  responsável por realizar o cadastro de atividades e conhecimentos.
+- **`udp`** (unidade do processo): A unidade operacional ou interoperacional participante, responsável pelo trabalho
+  principal do subprocesso.
 - **`int`** (unidade intermediária): A unidade de gestão imediatamente superior na árvore hierárquica, que avalia as
   informações submetidas pelas unidades a ela subordinadas.
 - **ADMIN**: Unidade raiz administradora (geralmente um servidor da SEDOC).
@@ -16,15 +16,17 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 
 - **Criado**: Processo cadastrado, mas não iniciado.
 - **Em andamento**: Processo foi iniciado e todas as unidades participantes foram notificadas.
-- **Finalizado**: Mapa de competências homologado para todas as unidades (no caso de mapeamento/revisão).
+- **Finalizado**: Fluxo do processo concluído para todas as unidades participantes. Em mapeamento e revisão, indica que
+  os mapas homologados se tornaram vigentes. Em diagnóstico, indica que todas as unidades tiveram seus diagnósticos
+  homologados e que os relatórios consolidados foram liberados.
 
 ### Situações de subprocessos de Mapeamento
 
 - **Não iniciado**: Unidade notificada do início do processo, mas sem nenhum cadastro de atividades salvo.
-- **Cadastro em andamento**: Cadastro salvo pela unidade mas não marcado como finalizado.
+- **Cadastro em andamento**: Cadastro salvo pela unidade, mas não marcado como finalizado.
 - **Cadastro disponibilizado**: Cadastro finalizado, aguardando validação.
 - **Cadastro homologado**: Cadastro validado na unidade ADMIN.
-- **Mapa criado**: Perfil ADMIN criou o mapa para a unidade mas ainda não disponibilizou.
+- **Mapa criado**: Perfil ADMIN criou o mapa para a unidade, mas ainda não disponibilizou.
 - **Mapa disponibilizado**: Perfil ADMIN disponibilizou o mapa para validação.
 - **Mapa com sugestões**: Perfil CHEFE indicou sugestões para o mapa.
 - **Mapa validado**: Toda a hierarquia aprovou o mapa disponibilizado.
@@ -38,7 +40,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 - **Revisão do cadastro disponibilizada**: Foi concluída a revisão do cadastro de atividades da unidade, aguardando
   validação.
 - **Revisão do cadastro homologada**: Foi concluída a validação da revisão do cadastro de atividades da unidade.
-- **Mapa ajustado**: Perfil ADMIN criou o mapa ajustado para a unidade mas ainda não o disponibilizou.
+- **Mapa ajustado**: Perfil ADMIN criou o mapa ajustado para a unidade, mas ainda não o disponibilizou.
 - **Mapa disponibilizado**: Perfil ADMIN disponibilizou o mapa ajustado para validação.
 - **Mapa com sugestões**: Perfil CHEFE indicou sugestões para o mapa.
 - **Mapa validado**: Toda a hierarquia aprovou o mapa disponibilizado.
@@ -46,11 +48,21 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 
 ### Situações de subprocessos de Diagnóstico
 
-- **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhum questionário ou avaliação foi
-  iniciado.
-- **Autoavaliação em andamento**: Avaliações das competências em preenchimento pelos servidores/responsáveis da unidade.
-- **Monitoramento**: Período de acompanhamento dos gaps identificados.
-- **Concluído**: Avaliações e consolidações do diagnóstico estão totalmente finalizadas.
+- **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhuma avaliação individual foi
+  concluída e nenhuma informação de capacitação foi registrada.
+- **Em andamento**: Há autoavaliações, consensos, ocupações críticas ou ajustes do diagnóstico em elaboração na
+  unidade.
+- **Concluído**: A unidade concluiu o diagnóstico e o encaminhou para análise da unidade superior.
+- **Homologado**: O diagnóstico da unidade foi aceito em toda a cadeia hierárquica e homologado pela unidade ADMIN.
+
+### Situações de avaliações individuais de diagnóstico
+
+- **Autoavaliação não iniciada**: O servidor ainda não concluiu a sua autoavaliação.
+- **Autoavaliação concluída**: O servidor concluiu a autoavaliação e a chefia já pode elaborar o consenso.
+- **Consenso criado**: A chefia registrou uma avaliação de consenso para o servidor, que ainda aguarda aprovação final.
+- **Consenso aprovado**: O servidor aprovou a avaliação de consenso vigente.
+- **Avaliação impossibilitada**: A chefia registrou impossibilidade de realização da avaliação daquele servidor no ciclo
+  atual.
 
 ```mermaid
 ---
@@ -224,4 +236,47 @@ stateDiagram-v2
     }
 
     MapaHomologado --> [*]
+```
+
+```mermaid
+---
+title: "Processo de Diagnóstico"
+---
+
+stateDiagram-v2
+    NaoIniciado: Não iniciado
+    EmAndamento: Em andamento
+    Concluido: Concluído
+    Homologado: Homologado
+
+    [*] --> NaoIniciado
+    NaoIniciado --> EmAndamento: udp iniciou avaliações
+    EmAndamento --> Concluido: udp concluiu diagnóstico
+    Concluido --> EmAndamento: int ou ADMIN devolveu
+    Concluido --> Concluido: int registrou aceite
+    Concluido --> Homologado: ADMIN homologou
+    Homologado --> [*]
+```
+
+```mermaid
+---
+title: "Avaliação Individual de Diagnóstico"
+---
+
+stateDiagram-v2
+    AutoNaoIniciada: Autoavaliação não iniciada
+    AutoConcluida: Autoavaliação concluída
+    ConsensoCriado: Consenso criado
+    ConsensoAprovado: Consenso aprovado
+    Impossibilitada: Avaliação impossibilitada
+
+    [*] --> AutoNaoIniciada
+    AutoNaoIniciada --> AutoConcluida: servidor concluiu autoavaliação
+    AutoConcluida --> ConsensoCriado: chefe criou consenso
+    ConsensoCriado --> ConsensoAprovado: servidor aprovou
+    ConsensoAprovado --> ConsensoCriado: chefe reabriu consenso
+    AutoNaoIniciada --> Impossibilitada: chefe indicou impossibilidade
+    AutoConcluida --> Impossibilitada: chefe indicou impossibilidade
+    ConsensoCriado --> Impossibilitada: chefe indicou impossibilidade
+    [*] --> Impossibilitada
 ```

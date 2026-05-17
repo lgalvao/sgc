@@ -62,4 +62,4 @@ Fluxo principal:
    2.3.2. Se o processo for do tipo **Diagnóstico**, a seção apresentará estes cards:
 
     - `Diagnóstico da equipe` (descrição "Diagnóstico das competências pelos servidores da unidade")
-    - `Ocupações críticas` (descrição "Identificação das ocupações críticas da unidade").
+    - `Ocupações críticas` (descrição "Situação de capacitação dos servidores da unidade por competência").
