@@ -2,6 +2,10 @@
 
 Ator: SERVIDOR
 
+Maturidade: Média
+
+Base principal: Fluxo narrado e validado na reunião, com modelagem de consulta derivada do fluxo de consenso.
+
 ## Pré-condições
 
 - Login realizado com perfil SERVIDOR

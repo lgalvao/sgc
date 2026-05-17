@@ -2,6 +2,10 @@
 
 Ator: GESTOR, ADMIN
 
+Maturidade: Média
+
+Base principal: Respostas do usuário sobre monitoramento na tela de detalhes do processo, complementadas por modelagem de acompanhamento.
+
 ## Pré-condições
 
 - Login realizado com perfil GESTOR ou ADMIN

@@ -2,6 +2,10 @@
 
 Ator: CHEFE
 
+Maturidade: Média
+
+Base principal: Fluxo narrado e validado na reunião, complementado por respostas do usuário sobre reabertura e consenso.
+
 ## Pré-condições
 
 - Login realizado com perfil CHEFE

@@ -2,6 +2,10 @@
 
 Ator: GESTOR
 
+Maturidade: Média
+
+Base principal: Fluxo narrado e validado na reunião, complementado por paralelismo com as ações em bloco dos processos já existentes.
+
 ## Pré-condições
 
 - Login realizado com perfil GESTOR

@@ -2,6 +2,10 @@
 
 Ator: SERVIDOR
 
+Maturidade: Alta
+
+Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas do usuário.
+
 ## Pré-condições
 
 - Login realizado com perfil SERVIDOR

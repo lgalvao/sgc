@@ -2,6 +2,10 @@
 
 Ator: CHEFE
 
+Maturidade: Média
+
+Base principal: Fluxo narrado e validado na reunião, com interpretação operacional do conceito de ocupações críticas.
+
 ## Pré-condições
 
 - Login realizado com perfil CHEFE

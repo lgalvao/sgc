@@ -2,6 +2,10 @@
 
 Ator: ADMIN
 
+Maturidade: Média
+
+Base principal: Fluxo narrado e validado na reunião, complementado por paralelismo com os processos de mapeamento e revisão.
+
 ## Pré-condições
 
 - Login realizado com perfil ADMIN

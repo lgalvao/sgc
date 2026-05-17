@@ -2,6 +2,10 @@
 
 Ator: ADMIN, GESTOR
 
+Maturidade: Média
+
+Base principal: Respostas do usuário sobre pacote mínimo de relatórios, complementadas por regra inicial de cálculo.
+
 ## Pré-condições
 
 - Login realizado com perfil ADMIN ou GESTOR

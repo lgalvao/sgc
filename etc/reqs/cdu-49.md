@@ -2,6 +2,10 @@
 
 Ator: GESTOR, ADMIN
 
+Maturidade: Média
+
+Base principal: Fluxo narrado e validado na reunião, complementado por paralelismo com os fluxos hierárquicos já existentes.
+
 ## Pré-condições
 
 - Login realizado com perfil GESTOR ou ADMIN

@@ -2,6 +2,10 @@
 
 Ator: ADMIN
 
+Maturidade: Média
+
+Base principal: Respostas do usuário sobre encerramento do processo, complementadas por paralelismo com a finalização de mapeamento e revisão.
+
 ## Pré-condições
 
 - Login realizado com perfil ADMIN
