@@ -129,6 +129,18 @@ function filtrarArvoreSemMapaVigente(unidades: Unidade[], codigosSemMapaVigente:
       .filter((unidade): unidade is Unidade => unidade !== null);
 }
 
+function filtrarUnidadesExibidas(arvore: Unidade[]): Unidade[] {
+  const unidadesExibidas: Unidade[] = [];
+
+  for (const unidade of arvore) {
+    if (unidade.filhas && unidade.filhas.length > 0) {
+      unidadesExibidas.push(...unidade.filhas);
+    }
+  }
+
+  return unidadesExibidas;
+}
+
 const cardsRelatorio = computed<CardUnidade[]>(() => {
   const maesOrdenadas = ordenarComoArvoreUnidades(unidadesSemMapaVigenteArvore.value);
 
@@ -154,8 +166,9 @@ async function carregarUnidadesSemMapaVigente() {
     buscarCodigosUnidadesSemMapaVigente()
   ]).then(([arvore, codigosSemMapaVigente]) => {
     const codigosSemMapaVigenteSet = new Set(codigosSemMapaVigente);
+    const unidadesExibidas = filtrarUnidadesExibidas(arvore);
 
-    unidadesSemMapaVigenteArvore.value = filtrarArvoreSemMapaVigente(arvore, codigosSemMapaVigenteSet);
+    unidadesSemMapaVigenteArvore.value = filtrarArvoreSemMapaVigente(unidadesExibidas, codigosSemMapaVigenteSet);
   }).catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
       .finally(() => { carregando.value = false; });
 }
