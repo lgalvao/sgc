@@ -1510,6 +1510,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await expect(page.getByTestId('btn-gerar-mapas')).toBeVisible();
             await capturarTela(page, 'relatorios', 'botao-gerar-pdf', {tags: ['ui-element', 'pdf']});
+
+            await page.goto('/relatorios');
+            await page.getByTestId('card-relatorio-unidades-sem-mapas-vigentes').click();
+            await expect(page.getByTestId('btn-visualizar-unidades-sem-mapa')).toBeVisible();
+            await capturarTela(page, 'relatorios', 'relatorio-unidades-sem-mapas-vigentes', {extra: {relatorio: 'unidades-sem-mapas-vigentes'}});
+
+            await page.getByTestId('btn-visualizar-unidades-sem-mapa').click();
+            await expect(page.locator('.arvore-unidades-sem-mapa').first()).toBeVisible();
+            await capturarTela(page, 'relatorios', 'relatorio-unidades-sem-mapas-vigentes-arvore', {fullPage: true, tags: ['arvore', 'unidades-sem-mapas']});
         });
     });
 
