@@ -79,8 +79,14 @@ describe("RelatorioUnidadesSemMapasVigentesView.vue", () => {
                     },
                 ],
             },
+            {
+                codigo: 901,
+                sigla: "ORFA",
+                nome: "Unidade sem superior ativo",
+                filhas: [],
+            },
         ] as any);
-        vi.mocked(unidadeService.buscarCodigosUnidadesSemMapaVigente).mockResolvedValue([2, 4, 999]);
+        vi.mocked(unidadeService.buscarCodigosUnidadesSemMapaVigente).mockResolvedValue([2, 4, 901, 999]);
         mocks.downloadRelatorioUnidadesSemMapasVigentesPdf.mockResolvedValue(undefined);
     });
 
@@ -92,9 +98,10 @@ describe("RelatorioUnidadesSemMapasVigentesView.vue", () => {
 
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
         expect(unidadeService.buscarCodigosUnidadesSemMapaVigente).toHaveBeenCalledTimes(1);
-        expect(ctx.wrapper.text()).toContain("ADMIN");
+        expect(ctx.wrapper.text()).not.toContain("ADMIN");
+        expect(ctx.wrapper.text()).not.toContain("ORFA");
         expect(ctx.wrapper.text()).toContain("SA");
-        expect(ctx.wrapper.find("[data-testid='arvore']").text()).toContain("SB");
+        expect(ctx.wrapper.find("[data-testid='arvore']").text()).toContain("COA");
     });
 
     it("deve exibir empty state quando não houver unidades sem mapa vigente", async () => {
