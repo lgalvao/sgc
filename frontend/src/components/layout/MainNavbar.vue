@@ -85,9 +85,9 @@
             right
         >
           <template #button-content>
-            <span class="visually-hidden">Ações Especiais</span>
-            <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1" title="Ações Especiais"/>
-            <span aria-hidden="true" class="d-lg-none">Ações Especiais</span>
+            <span class="visually-hidden">Ações especiais</span>
+            <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1" title="Ações especiais"/>
+            <span aria-hidden="true" class="d-lg-none">Ações especiais</span>
           </template>
           <BDropdownItem
               data-testid="btn-nav-feedbacks"

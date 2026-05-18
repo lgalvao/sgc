@@ -258,7 +258,7 @@ A implementação exibe cinco elementos adicionais para ADMIN:
 1. Ícone Notificações (`/administracao/notificacoes`)
 2. Ícone Configurações (`/configuracoes`) ✓
 3. Ícone Administradores (`/administradores`) ✓
-4. Dropdown "Ações Especiais" com:
+4. Dropdown "Ações especiais" com:
    - Feedbacks (`/administracao/feedbacks`)
    - Limpeza de processos (`/administracao/limpeza-processos`)
 
