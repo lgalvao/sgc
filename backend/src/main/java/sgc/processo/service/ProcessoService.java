@@ -12,6 +12,7 @@ import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
+import sgc.configuracoes.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
@@ -63,6 +64,7 @@ public class ProcessoService {
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoTransicaoService transicaoService;
     private final CadastroFluxoService cadastroFluxoService;
+    private final ConfiguracaoService configuracaoService;
 
 
     @Transactional(readOnly = true)
@@ -83,12 +85,13 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public List<Processo> listarFinalizados() {
+        LocalDateTime corteInatividade = calcularCorteInatividade();
         Usuario usuario = usuarioService.usuarioAutenticado();
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
-            return processoRepo.listarPorSituacaoComParticipantes(FINALIZADO);
+            return processoRepo.listarFinalizadosInativosComParticipantes(FINALIZADO, corteInatividade);
         }
         List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
-        return processoRepo.listarPorSituacaoEUnidadeCodigos(FINALIZADO, unidadesAcesso);
+        return processoRepo.listarFinalizadosInativosEUnidadeCodigos(FINALIZADO, corteInatividade, unidadesAcesso);
     }
 
     @Transactional(readOnly = true)
@@ -108,7 +111,7 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Page<Processo> listarTodos(Pageable pageable) {
-        Page<Long> paginaCodigos = processoRepo.listarCodigos(pageable);
+        Page<Long> paginaCodigos = processoRepo.listarCodigosAtivos(FINALIZADO, calcularCorteInatividade(), pageable);
         return carregarPaginaComParticipantes(paginaCodigos, pageable);
     }
 
@@ -121,9 +124,13 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Page<Processo> listarIniciadosPorSubprocessos(List<Long> unidadeCodigos, Pageable pageable) {
-        Page<Long> paginaCodigos = processoRepo.listarCodigosPorSubprocessosESituacaoDiferente(
-                unidadeCodigos, CRIADO, pageable);
+        Page<Long> paginaCodigos = processoRepo.listarCodigosAtivosPorSubprocessos(
+                unidadeCodigos, CRIADO, FINALIZADO, calcularCorteInatividade(), pageable);
         return carregarPaginaComParticipantes(paginaCodigos, pageable);
+    }
+
+    private LocalDateTime calcularCorteInatividade() {
+        return LocalDateTime.now().minusDays(configuracaoService.buscarDiasInativacaoProcesso());
     }
 
     @Transactional(readOnly = true)

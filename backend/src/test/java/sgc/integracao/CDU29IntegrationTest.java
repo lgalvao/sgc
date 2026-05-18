@@ -34,9 +34,9 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
                 .descricao("Processo finalizado 1")
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .tipo(TipoProcesso.MAPEAMENTO)
-                .dataCriacao(agora.minusDays(10))
+                .dataCriacao(agora.minusDays(20))
                 .dataLimite(agora.plusMonths(1))
-                .dataFinalizacao(agora.minusDays(2))
+                .dataFinalizacao(agora.minusDays(15))
                 .build();
         processoFinalizado1.adicionarParticipantes(Set.of(u101));
         processoFinalizado1 = processoRepo.save(processoFinalizado1);
@@ -47,9 +47,9 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
                 .descricao("Processo finalizado 2")
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .tipo(TipoProcesso.REVISAO)
-                .dataCriacao(agora.minusDays(10))
+                .dataCriacao(agora.minusDays(21))
                 .dataLimite(agora.plusMonths(1))
-                .dataFinalizacao(agora.minusDays(1))
+                .dataFinalizacao(agora.minusDays(16))
                 .build();
         processoFinalizado2.adicionarParticipantes(Set.of(u102));
         processoRepo.save(processoFinalizado2);
@@ -60,9 +60,9 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
                 .descricao("Processo finalizado 3")
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .tipo(TipoProcesso.MAPEAMENTO)
-                .dataCriacao(agora.minusDays(10))
+                .dataCriacao(agora.minusDays(22))
                 .dataLimite(agora.plusMonths(1))
-                .dataFinalizacao(agora.minusDays(3))
+                .dataFinalizacao(agora.minusDays(17))
                 .build();
         processoFinalizado3.adicionarParticipantes(Set.of(u10));
         processoRepo.save(processoFinalizado3);

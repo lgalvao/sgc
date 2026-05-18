@@ -35,6 +35,33 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
             @Param("situacao") SituacaoProcesso situacao,
             @Param("codigos") List<Long> codigos);
 
+    @Query("""
+            SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes
+            WHERE p.situacao = :situacaoFinalizado
+            AND p.dataFinalizacao IS NOT NULL
+            AND p.dataFinalizacao < :corteInatividade
+            ORDER BY p.dataFinalizacao DESC
+            """)
+    List<Processo> listarFinalizadosInativosComParticipantes(
+            @Param("situacaoFinalizado") SituacaoProcesso situacaoFinalizado,
+            @Param("corteInatividade") java.time.LocalDateTime corteInatividade);
+
+    @Query("""
+            SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes
+            WHERE p.situacao = :situacaoFinalizado
+            AND p.dataFinalizacao IS NOT NULL
+            AND p.dataFinalizacao < :corteInatividade
+            AND p.codigo IN (
+                SELECT p2.codigo FROM Processo p2 JOIN p2.participantes up2
+                WHERE up2.codigo.unidadeCodigo IN :codigos
+            )
+            ORDER BY p.dataFinalizacao DESC
+            """)
+    List<Processo> listarFinalizadosInativosEUnidadeCodigos(
+            @Param("situacaoFinalizado") SituacaoProcesso situacaoFinalizado,
+            @Param("corteInatividade") java.time.LocalDateTime corteInatividade,
+            @Param("codigos") List<Long> codigos);
+
     /**
      * Busca processos onde as unidades participantes incluem as unidades especificadas
      * e o processo não está na situação especificada.
@@ -55,6 +82,18 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
             ORDER BY p.dataCriacao DESC, p.codigo DESC
             """)
     Page<Long> listarCodigos(Pageable pageable);
+
+    @Query("""
+            SELECT p.codigo FROM Processo p
+            WHERE p.situacao <> :situacaoFinalizado
+               OR p.dataFinalizacao IS NULL
+               OR p.dataFinalizacao >= :corteInatividade
+            ORDER BY p.dataCriacao DESC, p.codigo DESC
+            """)
+    Page<Long> listarCodigosAtivos(
+            @Param("situacaoFinalizado") SituacaoProcesso situacaoFinalizado,
+            @Param("corteInatividade") java.time.LocalDateTime corteInatividade,
+            Pageable pageable);
 
     @Query("""
             SELECT p.codigo FROM Processo p
@@ -80,6 +119,27 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     Page<Long> listarCodigosPorSubprocessosESituacaoDiferente(
             @Param("codigos") List<Long> codigos,
             @Param("situacao") SituacaoProcesso situacao,
+            Pageable pageable);
+
+    @Query("""
+            SELECT p.codigo FROM Processo p
+            WHERE p.situacao <> :situacaoCriado
+            AND (
+                p.situacao <> :situacaoFinalizado
+                OR p.dataFinalizacao IS NULL
+                OR p.dataFinalizacao >= :corteInatividade
+            )
+            AND EXISTS (
+                SELECT 1 FROM Subprocesso s
+                WHERE s.processo = p
+                AND s.unidade.codigo IN :codigos
+            )
+            """)
+    Page<Long> listarCodigosAtivosPorSubprocessos(
+            @Param("codigos") List<Long> codigos,
+            @Param("situacaoCriado") SituacaoProcesso situacaoCriado,
+            @Param("situacaoFinalizado") SituacaoProcesso situacaoFinalizado,
+            @Param("corteInatividade") java.time.LocalDateTime corteInatividade,
             Pageable pageable);
 
     @Query("""

@@ -8,6 +8,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.comum.util.MascaraUtil;
+import sgc.configuracoes.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -25,6 +26,7 @@ public class AlertaFacade {
     private final UsuarioService usuarioService;
     private final UnidadeService unidadeService;
     private final UnidadeHierarquiaService unidadeHierarquiaService;
+    private final ConfiguracaoService configuracaoService;
 
     private Unidade unidadeRaiz() {
         return unidadeService.buscarPorCodigo(1L);
@@ -50,7 +52,18 @@ public class AlertaFacade {
             if (dataHoraLeitura != null) mapaLeitura.put(alertaUsuario.getCodigo().getAlertaCodigo(), dataHoraLeitura);
         }
 
-        alertas.forEach(alerta -> alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo())));
+        int diasAlertaNovo = configuracaoService.buscarDiasAlertaNovo();
+        LocalDateTime corteLeituraAutomatica = LocalDateTime.now().minusDays(diasAlertaNovo);
+        alertas.forEach(alerta -> {
+            LocalDateTime leitura = mapaLeitura.get(alerta.getCodigo());
+            if (leitura != null) {
+                alerta.setDataHoraLeitura(leitura);
+                return;
+            }
+            if (alerta.getDataHora().isBefore(corteLeituraAutomatica)) {
+                alerta.setDataHoraLeitura(alerta.getDataHora().plusDays(diasAlertaNovo));
+            }
+        });
 
         return alertas;
     }

@@ -11,6 +11,11 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ConfiguracaoService {
+    public static final String CHAVE_DIAS_INATIVACAO_PROCESSO = "DIAS_INATIVACAO_PROCESSO";
+    public static final String CHAVE_DIAS_ALERTA_NOVO = "DIAS_ALERTA_NOVO";
+    public static final int PADRAO_DIAS_INATIVACAO_PROCESSO = 10;
+    public static final int PADRAO_DIAS_ALERTA_NOVO = 3;
+
     private final ConfiguracaoRepo configuracaoRepo;
 
     public List<Configuracao> buscarTodos() {
@@ -39,5 +44,34 @@ public class ConfiguracaoService {
         Configuracao configuracao = buscarPorChave(chave);
         configuracao.setValor(novoValor);
         return configuracaoRepo.save(configuracao);
+    }
+
+    @Transactional(readOnly = true)
+    public int buscarDiasInativacaoProcesso() {
+        return buscarValorInteiro(CHAVE_DIAS_INATIVACAO_PROCESSO, PADRAO_DIAS_INATIVACAO_PROCESSO);
+    }
+
+    @Transactional(readOnly = true)
+    public int buscarDiasAlertaNovo() {
+        return buscarValorInteiro(CHAVE_DIAS_ALERTA_NOVO, PADRAO_DIAS_ALERTA_NOVO);
+    }
+
+    @Transactional(readOnly = true)
+    public int buscarValorInteiro(String chave, int valorPadrao) {
+        Optional<Configuracao> configuracaoOpt = configuracaoRepo.findByChave(chave);
+        if (configuracaoOpt.isEmpty()) {
+            return valorPadrao;
+        }
+
+        String valor = configuracaoOpt.get().getValor();
+        try {
+            int valorConvertido = Integer.parseInt(valor);
+            if (valorConvertido < 1) {
+                throw new ErroConfiguracao("Configuração '%s' deve ser maior ou igual a 1.".formatted(chave));
+            }
+            return valorConvertido;
+        } catch (NumberFormatException e) {
+            throw new ErroConfiguracao("Configuração '%s' possui valor inválido: '%s'.".formatted(chave, valor));
+        }
     }
 }

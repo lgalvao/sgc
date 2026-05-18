@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
+import sgc.configuracoes.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -34,6 +35,8 @@ class AlertaFacadeTest {
     private UnidadeService unidadeService;
     @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock
+    private ConfiguracaoService configuracaoService;
 
     @InjectMocks
     private AlertaFacade alertaFacade;
@@ -47,6 +50,7 @@ class AlertaFacadeTest {
         String titulo = "123";
         Alerta alerta = new Alerta();
         alerta.setCodigo(1L);
+        alerta.setDataHora(LocalDateTime.now());
 
         AlertaUsuario leitura = new AlertaUsuario();
         leitura.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
@@ -54,11 +58,30 @@ class AlertaFacadeTest {
 
         when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(alerta));
         when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of(leitura));
+        when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
 
         List<Alerta> resultado = alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().getDataHoraLeitura()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve considerar alerta lido automaticamente quando prazo configurado expira")
+    void deveConsiderarAlertaLidoAutomaticamenteQuandoPrazoExpira() {
+        String titulo = "123";
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(1L);
+        alerta.setDataHora(LocalDateTime.now().minusDays(5));
+
+        when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(alerta));
+        when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of());
+        when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
+
+        List<Alerta> resultado = alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().getDataHoraLeitura()).isNotNull();
     }
 
     @Test
@@ -242,10 +265,13 @@ class AlertaFacadeTest {
             String titulo = "123";
             Alerta a1 = new Alerta();
             a1.setCodigo(1L);
+            a1.setDataHora(LocalDateTime.now());
             Alerta a2 = new Alerta();
             a2.setCodigo(2L);
+            a2.setDataHora(LocalDateTime.now());
 
             when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(a1, a2));
+            when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
 
             AlertaUsuario au1 = new AlertaUsuario();
             au1.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());

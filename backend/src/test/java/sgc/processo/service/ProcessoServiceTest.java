@@ -13,6 +13,7 @@ import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
+import sgc.configuracoes.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
@@ -75,6 +76,8 @@ class ProcessoServiceTest {
     private SubprocessoTransicaoService transicaoService;
     @Mock
     private CadastroFluxoService cadastroFluxoService;
+    @Mock
+    private ConfiguracaoService configuracaoService;
 
     private void mockarResponsaveisEfetivos() {
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
@@ -837,14 +840,15 @@ class ProcessoServiceTest {
             Pageable pageable = Pageable.unpaged();
             Processo p = new Processo();
             p.setCodigo(10L);
-            when(processoRepo.listarCodigosPorSubprocessosESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable))
+            when(configuracaoService.buscarDiasInativacaoProcesso()).thenReturn(10);
+            when(processoRepo.listarCodigosAtivosPorSubprocessos(eq(List.of(1L)), eq(SituacaoProcesso.CRIADO), eq(SituacaoProcesso.FINALIZADO), any(), eq(pageable)))
                     .thenReturn(new PageImpl<>(List.of(10L), pageable, 1));
             when(processoRepo.listarPorCodigosComParticipantes(List.of(10L))).thenReturn(List.of(p));
 
             Page<Processo> res = processoService.listarIniciadosPorSubprocessos(List.of(1L), pageable);
 
             assertThat(res.getContent()).containsExactly(p);
-            verify(processoRepo).listarCodigosPorSubprocessosESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable);
+            verify(processoRepo).listarCodigosAtivosPorSubprocessos(eq(List.of(1L)), eq(SituacaoProcesso.CRIADO), eq(SituacaoProcesso.FINALIZADO), any(), eq(pageable));
         }
 
         @Test
@@ -884,7 +888,8 @@ class ProcessoServiceTest {
         @DisplayName("Deve listar todos com paginação")
         void deveListarTodosPaginado() {
             Pageable pageable = Pageable.unpaged();
-            when(processoRepo.listarCodigos(pageable)).thenReturn(Page.empty());
+            when(configuracaoService.buscarDiasInativacaoProcesso()).thenReturn(10);
+            when(processoRepo.listarCodigosAtivos(eq(SituacaoProcesso.FINALIZADO), any(), eq(pageable))).thenReturn(Page.empty());
 
             var res = processoService.listarTodos(pageable);
             assertThat(res).isEmpty();
