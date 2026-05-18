@@ -8,7 +8,7 @@
       </template>
     </PageHeader>
 
-    <BCard class="mb-4">
+    <BCard class="relatorio-sem-mapa__filtros-card mb-4">
       <div class="d-flex flex-wrap gap-2">
         <BButton
             :disabled="carregando"
@@ -46,14 +46,19 @@
         <BCard
             v-for="card in cardsRelatorio"
             :key="card.chave"
-            class="p-3"
+            class="relatorio-sem-mapa__card p-3"
         >
-          <div class="d-flex align-items-baseline gap-2 mb-3">
-            <h3 class="mb-0 text-primary fw-bold">{{ card.titulo }}</h3>
-            <span v-if="card.subtitulo && card.titulo !== card.subtitulo" class="text-uppercase small fw-bold text-secondary">{{ card.subtitulo }}</span>
+          <div class="relatorio-sem-mapa__cabecalho d-flex align-items-baseline gap-2 mb-3">
+            <h3 class="relatorio-sem-mapa__titulo mb-0">{{ card.titulo }}</h3>
+            <span
+                v-if="card.subtitulo && card.titulo !== card.subtitulo"
+                class="relatorio-sem-mapa__subtitulo"
+            >
+              {{ card.subtitulo }}
+            </span>
           </div>
 
-          <div v-if="card.unidades.length > 0" class="border rounded p-3">
+          <div v-if="card.unidades.length > 0" class="relatorio-sem-mapa__conteudo border rounded p-3">
             <UnidadesSemMapaArvore :unidades="card.unidades"/>
           </div>
         </BCard>
@@ -185,3 +190,45 @@ async function exportarPdf() {
       .finally(() => { carregando.value = false; });
 }
 </script>
+
+<style scoped>
+.relatorio-sem-mapa__filtros-card,
+.relatorio-sem-mapa__card {
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-body-bg);
+  border-radius: 0.75rem;
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
+.relatorio-sem-mapa__cabecalho {
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.relatorio-sem-mapa__titulo {
+  color: var(--bs-primary-text-emphasis);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.relatorio-sem-mapa__subtitulo {
+  color: var(--bs-secondary-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.relatorio-sem-mapa__conteudo {
+  background-color: transparent;
+  border-color: var(--bs-border-color) !important;
+  border-radius: 0.6rem !important;
+}
+
+@media (max-width: 768px) {
+  .relatorio-sem-mapa__titulo {
+    font-size: 1.2rem;
+  }
+}
+</style>
