@@ -86,6 +86,24 @@ test.describe('CDU-02 - Visualizar painel', () => {
             });
         });
 
+        test('Processo finalizado recente deve continuar visível no painel', async ({
+                                                                                        _resetAutomatico,
+                                                                                        page,
+                                                                                        _autenticadoComoAdmin
+                                                                                    }) => {
+            await page.goto('/painel');
+            await expect(page).toHaveURL(/\/painel/);
+
+            await verificarProcessoTabela(page, {
+                descricao: 'Processo Seed 200',
+                tipo: 'Mapeamento',
+                situacao: 'Finalizado',
+                unidadesParticipantes: ['SECRETARIA_1']
+            });
+
+            await expect(page.getByTestId('tbl-processos').getByText('Processo Histórico Seed 201')).toBeHidden();
+        });
+
         test('Processos "Criado" devem aparecer apenas para ADMIN', async ({
                                                                                _resetAutomatico,
                                                                                page,
@@ -303,6 +321,18 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 .first();
             await expect(linhaAlertaLida).toBeVisible();
             await expect(linhaAlertaLida).not.toHaveClass(/fw-bold/);
+        });
+
+        test('Alerta expirado pelo prazo configurado não deve aparecer destacado', async ({
+                                                                                              _resetAutomatico,
+                                                                                              page,
+                                                                                              _autenticadoComoAdmin
+                                                                                          }) => {
+            const linhaAlertaAntigo = page.getByTestId('row-alerta-5');
+
+            await expect(linhaAlertaAntigo).toBeVisible();
+            await expect(linhaAlertaAntigo).toContainText('Alerta antigo seed 201');
+            await expect(linhaAlertaAntigo).not.toHaveClass(/fw-bold/);
         });
     });
 

@@ -64,4 +64,18 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(headers.filter({hasText: /Processo|Descrição/i})).toBeVisible();
         await expect(headers.filter({hasText: /Tipo/i})).toBeVisible();
     });
+
+    test('Cenario 5: Histórico exibe apenas processos finalizados inativos', async ({
+                                                                                         _resetAutomatico,
+                                                                                         page,
+                                                                                         _autenticadoComoAdmin
+                                                                                     }) => {
+        await page.getByRole('link', {name: /Histórico/i}).click();
+        await expect(page).toHaveURL(/\/historico/);
+
+        const tabela = page.getByTestId('tbl-processos');
+        await expect(tabela.getByText('Processo Histórico Seed 201')).toBeVisible();
+        await expect(tabela.getByText('Processo Seed 200')).toBeHidden();
+        await expect(tabela.getByText('Processo 99')).toBeHidden();
+    });
 });

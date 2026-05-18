@@ -382,6 +382,31 @@ VALUES (200, 200, CURRENT_TIMESTAMP - INTERVAL '5' DAY, CURRENT_TIMESTAMP - INTE
 INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
 VALUES (2, 200);
 
+-- Processo 201: finalizado há mais tempo para aparecer apenas no Histórico
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (201, CURRENT_TIMESTAMP - INTERVAL '45' DAY, CURRENT_TIMESTAMP - INTERVAL '35' DAY,
+        CURRENT_TIMESTAMP - INTERVAL '35' DAY, 'Processo Histórico Seed 201', 'FINALIZADO', 'MAPEAMENTO');
+
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular,
+                                  titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
+VALUES (201, 4, 'CONCLUIDA', 'Assessoria 12', 'ASSESSORIA_12', 'OPERACIONAL', '00151515', '151515',
+        CURRENT_TIMESTAMP - INTERVAL '45' DAY, 2);
+
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (201, 201, 4, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP - INTERVAL '35' DAY);
+
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (10, 201, 4, 4, '151515', CURRENT_TIMESTAMP - INTERVAL '44' DAY - INTERVAL '8' HOUR, 'Processo iniciado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (11, 201, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '40' DAY - INTERVAL '14' HOUR,
+        'Disponibilização do cadastro');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (12, 201, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '35' DAY - INTERVAL '10' HOUR,
+        'Mapa homologado antigo');
+
 -- Atividade para SECRETARIA_1
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
 VALUES (2001, 'Atividade 1', 200);
@@ -627,6 +652,8 @@ INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codig
 VALUES (2, CURRENT_TIMESTAMP - INTERVAL '2' DAY - INTERVAL '10' HOUR, 200, 2, 1, 'Mapa de competências homologado');
 INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
 VALUES (3, CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '16' HOUR, 301, 1, 1, 'Cadastro homologado');
+INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
+VALUES (5, CURRENT_TIMESTAMP - INTERVAL '5' DAY - INTERVAL '4' HOUR, 201, 2, 1, 'Alerta antigo seed 201');
 
 -- Alerta para Unidade 36 (SECAO_321) - Mapa Disponibilizado para Validação
 INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
@@ -642,6 +669,8 @@ INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura
 VALUES (2, '111111', NULL);
 INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura)
 VALUES (3, '111111', NULL);
+INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura)
+VALUES (5, '111111', NULL);
 
 -- Para o alerta da Unidade 36 (Usuário 360001)
 INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura)
