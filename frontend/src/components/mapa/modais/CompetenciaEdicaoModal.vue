@@ -109,7 +109,7 @@ function limparSelecaoAtividades() {
             <div class="d-flex gap-2 mb-2">
                 <BButton
                     aria-label="Selecionar todas as atividades"
-                    class="botao-selecao-suave"
+                    class="btn-acao-sutil"
                     data-testid="btn-competencia-selecionar-todas-atividades"
                     size="sm"
                     title="Selecionar todas"
@@ -120,7 +120,7 @@ function limparSelecaoAtividades() {
                 </BButton>
                 <BButton
                     aria-label="Desmarcar todas as atividades"
-                    class="botao-selecao-suave"
+                    class="btn-acao-sutil"
                     data-testid="btn-competencia-limpar-selecao-atividades"
                     size="sm"
                     title="Limpar seleção"
@@ -159,24 +159,7 @@ function limparSelecaoAtividades() {
     gap: 0.35rem;
 }
 
-.botao-selecao-suave {
-    width: 2rem;
-    height: 2rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border-color: var(--bs-border-color) !important;
-    color: var(--bs-secondary) !important;
-}
-
-.botao-selecao-suave:hover {
-    background-color: var(--bs-tertiary-bg) !important;
-    border-color: var(--bs-border-color-translucent) !important;
-    color: var(--bs-emphasis-color) !important;
-}
-
-.botao-selecao-suave i {
+.btn-acao-sutil i {
     font-size: 1.1rem;
 }
 </style>

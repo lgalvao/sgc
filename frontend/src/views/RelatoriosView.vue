@@ -59,11 +59,11 @@
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
-              <i aria-hidden="true" class="bi bi-diagram-3 text-primary flex-shrink-0 mt-1"></i>
+              <i aria-hidden="true" class="bi bi-journal-x text-primary flex-shrink-0 mt-1"></i>
               <span class="lh-sm">Unidades sem mapas vigentes</span>
             </BCardTitle>
             <BCardText class="text-muted">
-              Lista de unidades sem mapa vigente
+              Unidades que ainda não passaram por um processo de mapeamento.
             </BCardText>
           </div>
         </BCard>

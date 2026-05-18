@@ -44,7 +44,7 @@
                             <span data-testid="header-historico-observacao">Observação</span>
                         </template>
                         <template #head(observacoesAcoes)>
-                            <span class="text-end d-block">Visualizar</span>
+                            <span class="text-end d-block"></span>
                         </template>
                         <template #cell(dataHora)="{ item, index }">
                             <span :data-testid="`cell-dataHora-${index}`">
@@ -84,6 +84,7 @@
                                 <BButton
                                     v-if="extrairTextoPlanoHtml((item as Analise).observacoes)"
                                     :data-testid="`btn-ver-observacao-${index}`"
+                                    class="btn-acao-sutil"
                                     size="sm"
                                     variant="outline-secondary"
                                     @click="abrirObservacao((item as Analise).observacoes)"

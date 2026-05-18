@@ -271,4 +271,23 @@ button:disabled,
   color: var(--bs-emphasis-color);
   text-decoration: none;
 }
+
+.btn-acao-sutil {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-secondary-color) !important;
+  transition: all 0.2s;
+}
+
+.btn-acao-sutil:hover,
+.btn-acao-sutil:focus {
+  background-color: var(--bs-tertiary-bg) !important;
+  border-color: var(--bs-border-color-translucent) !important;
+  color: var(--bs-emphasis-color) !important;
+}
 </style>

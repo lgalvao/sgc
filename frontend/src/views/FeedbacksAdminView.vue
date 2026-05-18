@@ -60,6 +60,7 @@
           <BButton
               :aria-label="`Ver detalhes do feedback ${item.codigo}`"
               :data-testid="`btn-feedback-detalhes-${item.codigo}`"
+              class="btn-acao-sutil"
               size="sm"
               variant="outline-secondary"
               @click="abrirDetalhes(item)"
@@ -191,7 +192,7 @@ const campos = [
   {key: "nota", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA},
   {key: "rota", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ROTA},
   {key: "enviadoEm", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ENVIADO_EM},
-  {key: "acoes", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ACOES},
+  {key: "acoes", label: ""},
 ];
 
 function abrirDetalhes(item: FeedbackAdmin) {

@@ -48,7 +48,7 @@
           <BButton
               :data-testid="`btn-detalhes-${item.codigo}`"
               :title="TEXTOS.administracao.NOTIFICACOES_DETALHES"
-              class="btn-acao"
+              class="btn-acao-sutil"
               size="sm"
               variant="outline-secondary"
               @click="$emit('detalhes', item)"
@@ -58,7 +58,7 @@
           <BButton
               v-if="item.corpoHtml"
               :data-testid="`btn-preview-${item.codigo}`"
-              class="btn-acao"
+              class="btn-acao-sutil"
               size="sm"
               title="Ver conteúdo do e-mail"
               variant="outline-secondary"
@@ -69,7 +69,7 @@
           <BButton
               v-if="item.situacao === 'FALHA_DEFINITIVA'"
               :data-testid="`btn-notificacoes-reenviar-${item.codigo}`"
-              class="btn-acao"
+              class="btn-acao-sutil"
               size="sm"
               title="Tentar reenviar e-mail"
               variant="outline-dark"
@@ -173,21 +173,5 @@ const camposTabela = [
 
 .linha-assunto {
   min-width: 0;
-}
-
-.btn-acao {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.25rem 0.55rem;
-  border-color: var(--bs-border-color);
-  color: var(--bs-secondary-color);
-}
-
-.btn-acao:hover,
-.btn-acao:focus {
-  background: var(--bs-secondary-bg);
-  border-color: var(--bs-secondary-color);
-  color: var(--bs-body-color);
 }
 </style>
