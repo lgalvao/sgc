@@ -2,7 +2,7 @@
 
 Este documento consolida todas as regras de negócio do Sistema de Gestão de Competências (SGC), extraídas
 sistematicamente dos requisitos funcionais. As regras estão organizadas em categorias temáticas; cada regra referencia
-a(s) fonte(s) de onde foi extraída.
+suas fontes.
 
 ---
 
@@ -641,32 +641,26 @@ preservado no momento do início.
 **RN-16.01 (VW_VINCULACAO_UNIDADE)** — Esta view rastreia o histórico de sucessões de unidades organizacionais (
 extinções e reestruturações), permitindo identificar qual unidade atual sucedeu unidades históricas. É usada para
 auditoria de processos históricos e migração de dados.
-> Fonte: `views/view-01-vinculacao-unidade.md`
 
 **RN-16.02 (VW_ZONA_RESP_CENTRAL)** — Esta view mapeia as Centrais de Atendimento ao Eleitor (CAEs) para as Zonas
 eleitorais sob sua responsabilidade vigente, integrando dados do SGRH e do CORAU. É essencial para determinar a posição
 hierárquica das CAEs na árvore de unidades.
-> Fonte: `views/view-02-zona-resp-central.md`
 
 **RN-16.03 (VW_UNIDADE)** — View principal de unidades do sistema. Consolida dados do SGRH, enriquece com classificação
 de tipo (RAIZ, SEM_EQUIPE, OPERACIONAL, INTEROPERACIONAL, INTERMEDIÁRIA), titularidade, situação e hierarquia ajustada (
 incluindo a unidade virtual ADMIN e o ajuste de CAEs).
-> Fonte: `views/view-03-unidade.md`
 
 **RN-16.04 (VW_USUARIO)** — View com dados de todos os servidores com lotação ativa no TRE-PE, incluindo nome, e-mail,
 ramal, unidade de lotação e unidade de competência (calculada). É a base para autenticação, determinação de perfis e
 envio de notificações.
-> Fonte: `views/view-04-usuario.md`
 
 **RN-16.05 (VW_RESPONSABILIDADE)** — View que consolida as responsabilidades vigentes de cada unidade (titularidade,
 substituição ou atribuição temporária), respeitando a hierarquia de precedência. Unidades sem responsável definido
 aparecem com campos nulos, indicando situação irregular.
-> Fonte: `views/view-05-responsabilidade.md`
 
 **RN-16.06 (VW_USUARIO_PERFIL_UNIDADE)** — View que é o coração do sistema de autorização. Estabelece o mapeamento
 completo entre usuários, perfis (ADMIN, GESTOR, CHEFE, SERVIDOR) e unidades. É consultada em cada login e em todas as
 validações de permissão.
-> Fonte: `views/view-06-usuario-perfil-unidade.md`
 
 **RN-16.07 (Acessibilidade de Interface)** — Toda funcionalidade e informação de domínio deve ser operável por teclado e
 compatível com leitores de tela (WCAG 2.2 AA). É vedado o uso de estados de 'hover' ou 'tooltips' para ocultar ações
@@ -751,13 +745,6 @@ reconstruir rotas manualmente.
 | `cdu-36.md`                               | Gerar relatório de mapas                                                                      |
 | `cdu-37.md`                               | Gerar relatório de unidades sem mapas vigentes                                                |
 | `cdu-38.md`                               | Acompanhar notificações administrativas                                                       |
-| `views/views-indice.md`                   | Índice das views do sistema                                                                   |
-| `views/view-01-vinculacao-unidade.md`     | VW_VINCULACAO_UNIDADE                                                                         |
-| `views/view-02-zona-resp-central.md`      | VW_ZONA_RESP_CENTRAL                                                                          |
-| `views/view-03-unidade.md`                | VW_UNIDADE                                                                                    |
-| `views/view-04-usuario.md`                | VW_USUARIO                                                                                    |
-| `views/view-05-responsabilidade.md`       | VW_RESPONSABILIDADE                                                                           |
-| `views/view-06-usuario-perfil-unidade.md` | VW_USUARIO_PERFIL_UNIDADE                                                                     |
 | `design/arvore-unidades.md`               | Especificação da árvore de seleção de unidades                                                |
 | `design/breadcrumbs.md`                   | Especificação da barra de navegação/breadcrumbs                                               |
 |
