@@ -23,6 +23,13 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
     Optional<Mapa> buscarPorSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
     @Query("""
+     SELECT DISTINCT s.unidade.codigo
+     FROM Mapa m
+     JOIN m.subprocesso s
+ """)
+    List<Long> buscarCodigosUnidadesQueJaTiveramMapa();
+
+    @Query("""
             SELECT DISTINCT m FROM Mapa m
             LEFT JOIN FETCH m.atividades a
             LEFT JOIN FETCH a.conhecimentos k
