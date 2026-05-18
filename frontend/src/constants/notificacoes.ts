@@ -4,6 +4,7 @@ export const TIPOS_NOTIFICACAO_LABELS: Record<string, string> = {
     DATA_LIMITE_ALTERADA: "Alteração da data limite",
     LEMBRETE_PRAZO: "Lembrete de prazo",
     ATRIBUICAO_TEMPORARIA: "Atribuição temporária",
+
     CADASTRO_DISPONIBILIZADO: "Cadastro disponibilizado",
     CADASTRO_DEVOLVIDO: "Cadastro devolvido para ajustes",
     CADASTRO_ACEITO: "Cadastro aceito",
