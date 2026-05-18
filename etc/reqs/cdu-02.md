@@ -42,7 +42,7 @@ Ator: Usuário (todos os perfis)
 
    3.1. Campos da tabela:
     - `Descrição`: Descrição do alerta
-    - `Data/Hora`: Informação da data e da hora de geração do alerta
+    - `Data/hora`: Informação da data e da hora de geração do alerta
     - `Processo`: Descrição do processo a que se refere o alerta
     - `Unidade`: Unidade de origem do alerta
 
@@ -56,8 +56,8 @@ Ator: Usuário (todos os perfis)
           específico).
 
    3.3. Regras de exibição e funcionamento da tabela de alertas:
-    - Alertas ainda não visualizados pelo usuário logado serão exibidos em negrito.
-    - Na primeira visualização de um ou mais alertas pelo usuário logado, estes alertas deverão ser marcado como
-      visualizado **pelo usuário**, de maneira a serem exibidos sem negrito a partir da próxima visualização pelo mesmo
-      usuário.
+    - Alertas considerados não lidos pelo sistema serão exibidos em negrito.
+    - Um alerta deixa de ser considerado não lido quando o usuário o visualiza pela primeira vez.
+    - Um alerta também deixa de ser considerado não lido quando expira o prazo definido na configuração
+      `DIAS_ALERTA_NOVO`.
     - Os alertas devem estar ordenados de forma decrescente por data/hora, nao sendo permitida a reordenação.

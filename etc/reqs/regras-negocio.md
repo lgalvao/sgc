@@ -463,8 +463,9 @@ mapa, validação e homologação de mapa, finalização do processo, reabertura
 unidade de destino (ou ao usuário destinatário no caso de atribuições temporárias).
 > Fonte: `cdu-04.md` (passo 13), `cdu-09.md` (passo 13), `cdu-13.md` (passo 9.10), e outros CDUs
 
-**RN-09.03** — Alertas não visualizados pelo usuário são exibidos em **negrito** no Painel. Na primeira visualização, o
-alerta é marcado como lido para aquele usuário específico.
+**RN-09.03** — Alertas considerados não lidos pelo sistema são exibidos em **negrito** no Painel. Na primeira
+visualização, o alerta é marcado como lido para aquele usuário específico. Alertas também passam a ser considerados
+lidos automaticamente após o prazo definido em `DIAS_ALERTA_NOVO`.
 > Fonte: `cdu-02.md` (passo 3.2)
 
 **RN-09.04** — Os alertas são exibidos no Painel em ordem **decrescente de data/hora**, sem permitir reordenação pelo
@@ -559,8 +560,8 @@ administrador (informando o título eleitoral) e remover um administrador existe
 > Fonte: `cdu-30.md` (passo 12)
 
 **RN-13.03** — O perfil **ADMIN** pode configurar dois parâmetros do sistema: `DIAS_INATIVACAO_PROCESSO` (dias após
-finalização para considerar processo inativo; padrão: 10) e `DIAS_ALERTA_NOVO` (dias após criação de alerta para deixar
-de marcá-lo como novo). O efeito das alterações é imediato.
+finalização para considerar processo inativo; padrão: 10) e `DIAS_ALERTA_NOVO` (dias após envio de alerta para que ele
+seja considerado lido automaticamente). O efeito das alterações é imediato.
 > Fonte: `cdu-31.md`
 
 **RN-13.04** — O perfil **ADMIN** pode acompanhar notificações administrativas de e-mail, visualizar detalhes, abrir preview do conteúdo quando disponível e reenfileirar notificações com falha definitiva.
