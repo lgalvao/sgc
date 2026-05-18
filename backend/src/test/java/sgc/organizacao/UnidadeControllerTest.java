@@ -160,7 +160,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar codigos das unidades sem mapa vigente")
     @WithMockUser(roles = "ADMIN")
     void deveRetornarCodigosUnidadesSemMapaVigente() throws Exception {
-        when(unidadeService.buscarTodosCodigosUnidadesSemMapaVigente()).thenReturn(List.of(30L, 40L));
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(30L, 40L));
 
         mockMvc.perform(get("/api/unidades/sem-mapa-vigente"))
                 .andExpect(status().isOk())

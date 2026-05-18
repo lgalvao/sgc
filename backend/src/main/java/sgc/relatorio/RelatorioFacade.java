@@ -138,7 +138,7 @@ public class RelatorioFacade {
     @Transactional(readOnly = true)
     public void gerarRelatorioUnidadesSemMapasVigentes(OutputStream outputStream) {
         List<UnidadeResumoLeitura> unidadesSemMapaVigente = unidadeService
-                .buscarResumosPorCodigos(unidadeService.buscarTodosCodigosUnidadesSemMapaVigente());
+                .buscarResumosPorCodigos(unidadeService.buscarCodigosUnidadesSemMapaVigente());
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);

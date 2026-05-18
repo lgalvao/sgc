@@ -91,7 +91,7 @@ public class UnidadeController {
     @GetMapping("/sem-mapa-vigente")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Long>> buscarCodigosUnidadesSemMapaVigente() {
-        return ResponseEntity.ok(unidadeService.buscarTodosCodigosUnidadesSemMapaVigente());
+        return ResponseEntity.ok(unidadeService.buscarCodigosUnidadesSemMapaVigente());
     }
 
     @GetMapping("/arvore-com-elegibilidade")

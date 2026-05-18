@@ -20,6 +20,7 @@ public class UnidadeService {
 
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
+    private final MapaRepo mapaRepo;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
 
@@ -91,11 +92,8 @@ public class UnidadeService {
         return unidadeMapaRepo.listarTodosCodigosUnidade();
     }
 
-    public List<Long> buscarTodosCodigosUnidadesSemMapaVigente() {
-        Set<Long> codigosComMapaVigente = new HashSet<>(buscarTodosCodigosUnidadesComMapa());
-        return listarTodosCodigosDaArvore().stream()
-                .filter(codigo -> !codigosComMapaVigente.contains(codigo))
-                .toList();
+    public List<Long> buscarCodigosUnidadesSemMapaVigente() {
+        return unidadeRepo.buscarCodigosUnidadesSemMapaVigente();
     }
 
     private List<Long> listarTodosCodigosDaArvore() {

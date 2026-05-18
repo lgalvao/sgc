@@ -61,6 +61,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
                 u.situacao,
                 u.unidadeSuperior.codigo
             )
+
             FROM Unidade u
             WHERE u.situacao = SituacaoUnidade.ATIVA
             """)
@@ -105,6 +106,19 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
     Optional<Unidade> buscarPorSiglaComSuperior(@Param("sigla") String sigla);
+
+    @Query("""
+            SELECT u.codigo 
+            FROM Unidade u 
+            WHERE u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
+              AND u.codigo NOT IN (SELECT um.unidadeCodigo FROM UnidadeMapa um)
+              AND u.codigo NOT IN (
+                  SELECT up.codigo.unidadeCodigo 
+                  FROM UnidadeProcesso up 
+                  WHERE up.processo.situacao IN (sgc.processo.model.SituacaoProcesso.CRIADO, sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO)
+              )
+            """)
+    List<Long> buscarCodigosUnidadesSemMapaVigente();
 
     List<Unidade> findByUnidadeSuperiorCodigoAndSituacao(Long unidadeSuperiorCodigo, SituacaoUnidade situacao);
 

@@ -29,7 +29,7 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
             JOIN subprocesso.processo processo
             WHERE processo.dataFinalizacao IS NOT NULL
             """)
-    List<Long> buscarCodigosUnidadesQueJaTiveramMapa();
+    List<Long> buscarCodigosUnidadesComMapaVigente();
 
     @Query("""
             SELECT DISTINCT m FROM Mapa m

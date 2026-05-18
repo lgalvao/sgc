@@ -4,6 +4,11 @@ import org.junit.jupiter.api.*;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.*;
 import sgc.integracao.mocks.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+
+import java.time.*;
+import java.util.*;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -49,5 +54,31 @@ class CDU37IntegrationTest extends BaseIntegrationTest {
     void buscarCodigosUnidadesSemMapaVigente_comoGestor_proibido() throws Exception {
         mockMvc.perform(get(API_UNIDADES_SEM_MAPA_VIGENTE).with(csrf()))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Deve filtrar unidades com processos ativos na busca de códigos")
+    @WithMockAdmin
+    void buscarCodigosUnidadesSemMapaVigente_filtrandoProcessosAtivos() throws Exception {
+        // Unidade 905: sem mapa e sem processo no data.sql
+        Long codSemMapaEProcesso = 905L;
+        // Unidade 4: sem mapa no data.sql, mas vamos criar um processo para ela
+        Long codComProcessoAtivo = 4L;
+
+        Processo p = new Processo()
+                .setDescricao("Processo Ativo de Teste")
+                .setTipo(TipoProcesso.MAPEAMENTO)
+                .setSituacao(SituacaoProcesso.EM_ANDAMENTO)
+                .setDataCriacao(LocalDateTime.now())
+                .setDataLimite(LocalDateTime.now().plusDays(30));
+
+        Unidade u = unidadeRepo.findById(codComProcessoAtivo).orElseThrow();
+        p.adicionarParticipantes(Set.of(u));
+        processoRepo.saveAndFlush(p);
+
+        mockMvc.perform(get(API_UNIDADES_SEM_MAPA_VIGENTE).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@ == %d)]".formatted(codSemMapaEProcesso)).exists())
+                .andExpect(jsonPath("$[?(@ == %d)]".formatted(codComProcessoAtivo)).doesNotExist());
     }
 }
