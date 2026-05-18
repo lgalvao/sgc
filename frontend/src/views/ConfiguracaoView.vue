@@ -23,7 +23,7 @@
             label-for="diasInativacao"
         >
           <template #label>
-            {{ TEXTOS.configuracoes.LABEL_DIAS_INATIVACAO }} <span aria-hidden="true" class="text-danger">*</span>
+            {{ TEXTOS.configuracoes.LABEL_DIAS_INATIVACAO }}
           </template>
           <template #description>
             {{ TEXTOS.configuracoes.DESC_DIAS_INATIVACAO }}
@@ -46,7 +46,7 @@
             label-for="diasAlertaNovo"
         >
           <template #label>
-            {{ TEXTOS.configuracoes.LABEL_DIAS_ALERTA_NOVO }} <span aria-hidden="true" class="text-danger">*</span>
+            {{ TEXTOS.configuracoes.LABEL_DIAS_ALERTA_NOVO }}
           </template>
           <template #description>
             {{ TEXTOS.configuracoes.DESC_DIAS_ALERTA_NOVO }}

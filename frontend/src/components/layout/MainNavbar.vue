@@ -58,7 +58,7 @@
         >
           <template #default>
             <span class="visually-hidden">Configurações</span>
-            <i aria-hidden="true" class="bi bi-sliders me-lg-0 me-1"/>
+            <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1"/>
             <span aria-hidden="true" class="d-lg-none">Configurações</span>
           </template>
         </BNavItem>
@@ -77,6 +77,19 @@
           </template>
         </BNavItem>
 
+        <BNavItem
+            class="me-lg-1"
+            data-testid="btn-toggle-tema"
+            :title="tituloTema"
+            @click.prevent="alternarTema"
+        >
+          <template #default>
+            <span class="visually-hidden">{{ tituloTema }}</span>
+            <i aria-hidden="true" :class="`${iconeTema} me-lg-0 me-1`"/>
+            <span aria-hidden="true" class="d-lg-none">Tema</span>
+          </template>
+        </BNavItem>
+
         <BNavItemDropdown
             v-if="isAdmin"
             class="me-lg-1"
@@ -86,7 +99,7 @@
         >
           <template #button-content>
             <span class="visually-hidden">Ações especiais</span>
-            <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1" title="Ações especiais"/>
+            <i aria-hidden="true" class="bi bi-flask me-lg-0 me-1" title="Ações especiais"/>
             <span aria-hidden="true" class="d-lg-none">Ações especiais</span>
           </template>
           <BDropdownItem
@@ -105,19 +118,6 @@
             </span>
           </BDropdownItem>
         </BNavItemDropdown>
-
-        <BNavItem
-            class="me-lg-1"
-            data-testid="btn-toggle-tema"
-            :title="tituloTema"
-            @click.prevent="alternarTema"
-        >
-          <template #default>
-            <span class="visually-hidden">{{ tituloTema }}</span>
-            <i aria-hidden="true" :class="`${iconeTema} me-lg-0 me-1`"/>
-            <span aria-hidden="true" class="d-lg-none">Tema</span>
-          </template>
-        </BNavItem>
 
         <BNavItem
             class="me-lg-0"
