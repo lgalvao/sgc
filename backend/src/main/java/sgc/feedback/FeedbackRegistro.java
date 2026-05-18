@@ -11,7 +11,7 @@ import java.util.*;
  * Entidade que persiste um registro de feedback enviado durante homologação.
  */
 @Entity
-@Table(name = "SGC_FEEDBACK", schema = "sgc")
+@Table(name = "FEEDBACK", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor

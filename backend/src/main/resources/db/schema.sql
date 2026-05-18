@@ -753,7 +753,7 @@ create index if not exists idx_notif_email_subproc_sit on sgc.notificacao_email 
 create index if not exists idx_notif_email_usuario on sgc.notificacao_email (usuario_destino_titulo);
 
 -- Feedback UAT (perfil hom)
-create table if not exists sgc.sgc_feedback
+create table if not exists sgc.FEEDBACK
 (
     id                 uuid                       not null,
     tipo               varchar(20)                not null,
@@ -765,11 +765,11 @@ create table if not exists sgc.sgc_feedback
     enviado_em         timestamp with time zone   not null,
     rota               varchar(500)               not null,
     status             varchar(20) default 'NOVO' not null,
-    constraint pk_sgc_feedback primary key (id),
+    constraint pk_FEEDBACK primary key (id),
     constraint ck_feedback_tipo check (tipo in ('BUG', 'SUGESTAO', 'QUESTAO', 'ELOGIO')),
     constraint ck_feedback_status check (status in ('NOVO', 'REVISADO', 'RESOLVIDO', 'DESCARTADO'))
 );
 
-create index if not exists idx_feedback_status on sgc.sgc_feedback (status);
-create index if not exists idx_feedback_usuario on sgc.sgc_feedback (usuario_id);
-create index if not exists idx_feedback_data on sgc.sgc_feedback (enviado_em);
+create index if not exists idx_feedback_status on sgc.FEEDBACK (status);
+create index if not exists idx_feedback_usuario on sgc.FEEDBACK (usuario_id);
+create index if not exists idx_feedback_data on sgc.FEEDBACK (enviado_em);

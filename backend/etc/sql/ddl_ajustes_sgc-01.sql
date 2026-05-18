@@ -188,35 +188,35 @@ BEGIN
     SELECT COUNT(*)
     INTO v_count
     FROM user_tables
-    WHERE table_name = 'SGC_FEEDBACK';
+    WHERE table_name = 'FEEDBACK';
 
     IF v_count = 0 THEN
         EXECUTE IMMEDIATE q'[
-        CREATE TABLE SGC_FEEDBACK
-            (id RAW(16) NOT NULL, tipo VARCHAR2(20) NOT NULL, nota VARCHAR2(2000) NOT NULL, metadata_json CLOB, caminho_screenshot VARCHAR2(500), usuario_id VARCHAR2(100) NOT NULL, usuario_nome VARCHAR2(200) NOT NULL, enviado_em TIMESTAMP WITH TIME ZONE NOT NULL, rota VARCHAR2(500) NOT NULL, status VARCHAR2(20) DEFAULT 'NOVO' NOT NULL, CONSTRAINT pk_sgc_feedback PRIMARY KEY (id), CONSTRAINT ck_feedback_tipo CHECK (tipo in ('BUG', 'SUGESTAO', 'QUESTAO', 'ELOGIO')), CONSTRAINT ck_feedback_status CHECK (status in ('NOVO', 'REVISADO', 'RESOLVIDO', 'DESCARTADO')))
+        CREATE TABLE FEEDBACK
+            (id RAW(16) NOT NULL, tipo VARCHAR2(20) NOT NULL, nota VARCHAR2(2000) NOT NULL, metadata_json CLOB, caminho_screenshot VARCHAR2(500), usuario_id VARCHAR2(100) NOT NULL, usuario_nome VARCHAR2(200) NOT NULL, enviado_em TIMESTAMP WITH TIME ZONE NOT NULL, rota VARCHAR2(500) NOT NULL, status VARCHAR2(20) DEFAULT 'NOVO' NOT NULL, CONSTRAINT pk_FEEDBACK PRIMARY KEY (id), CONSTRAINT ck_feedback_tipo CHECK (tipo in ('BUG', 'SUGESTAO', 'QUESTAO', 'ELOGIO')), CONSTRAINT ck_feedback_status CHECK (status in ('NOVO', 'REVISADO', 'RESOLVIDO', 'DESCARTADO')))
         ]';
     END IF;
 END;
 /
 
-COMMENT ON TABLE SGC_FEEDBACK IS 'Registros de feedback coletados via widget de UAT.';
-COMMENT ON COLUMN SGC_FEEDBACK.id IS 'Identificador unico (UUID).';
-COMMENT ON COLUMN SGC_FEEDBACK.tipo IS 'Tipo de feedback: BUG, SUGESTAO, QUESTAO, ELOGIO.';
-COMMENT ON COLUMN SGC_FEEDBACK.nota IS 'Descricao textual do feedback.';
-COMMENT ON COLUMN SGC_FEEDBACK.metadata_json IS 'Metadados contextuais do sistema e navegador em formato JSON.';
-COMMENT ON COLUMN SGC_FEEDBACK.caminho_screenshot IS 'Caminho no sistema de arquivos para a captura de tela.';
-COMMENT ON COLUMN SGC_FEEDBACK.usuario_id IS 'Identificador do usuario que enviou o feedback.';
-COMMENT ON COLUMN SGC_FEEDBACK.usuario_nome IS 'Nome do usuario que enviou o feedback.';
-COMMENT ON COLUMN SGC_FEEDBACK.enviado_em IS 'Data e hora do envio do feedback.';
-COMMENT ON COLUMN SGC_FEEDBACK.rota IS 'Caminho da rota/pagina onde o feedback foi gerado.';
-COMMENT ON COLUMN SGC_FEEDBACK.status IS 'Situacao do feedback: NOVO, REVISADO, RESOLVIDO, DESCARTADO.';
+COMMENT ON TABLE FEEDBACK IS 'Registros de feedback coletados via widget de UAT.';
+COMMENT ON COLUMN FEEDBACK.id IS 'Identificador unico (UUID).';
+COMMENT ON COLUMN FEEDBACK.tipo IS 'Tipo de feedback: BUG, SUGESTAO, QUESTAO, ELOGIO.';
+COMMENT ON COLUMN FEEDBACK.nota IS 'Descricao textual do feedback.';
+COMMENT ON COLUMN FEEDBACK.metadata_json IS 'Metadados contextuais do sistema e navegador em formato JSON.';
+COMMENT ON COLUMN FEEDBACK.caminho_screenshot IS 'Caminho no sistema de arquivos para a captura de tela.';
+COMMENT ON COLUMN FEEDBACK.usuario_id IS 'Identificador do usuario que enviou o feedback.';
+COMMENT ON COLUMN FEEDBACK.usuario_nome IS 'Nome do usuario que enviou o feedback.';
+COMMENT ON COLUMN FEEDBACK.enviado_em IS 'Data e hora do envio do feedback.';
+COMMENT ON COLUMN FEEDBACK.rota IS 'Caminho da rota/pagina onde o feedback foi gerado.';
+COMMENT ON COLUMN FEEDBACK.status IS 'Situacao do feedback: NOVO, REVISADO, RESOLVIDO, DESCARTADO.';
 
 DECLARE
     v_count NUMBER;
 BEGIN
     SELECT COUNT(*) INTO v_count FROM user_indexes WHERE index_name = 'IDX_FEEDBACK_STATUS';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_status ON SGC_FEEDBACK (status)';
+        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_status ON FEEDBACK (status)';
     END IF;
 END;
 /
@@ -226,7 +226,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO v_count FROM user_indexes WHERE index_name = 'IDX_FEEDBACK_USER';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_usuario ON SGC_FEEDBACK (usuario_id)';
+        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_usuario ON FEEDBACK (usuario_id)';
     END IF;
 END;
 /
@@ -236,7 +236,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO v_count FROM user_indexes WHERE index_name = 'IDX_FEEDBACK_DATE';
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_data ON SGC_FEEDBACK (enviado_em)';
+        EXECUTE IMMEDIATE 'CREATE INDEX idx_feedback_data ON FEEDBACK (enviado_em)';
     END IF;
 END;
 /

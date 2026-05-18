@@ -282,7 +282,7 @@ src/main/java/.../feedback/
 
 ```java
 @Entity
-@Table(name = "SGC_FEEDBACK")   // Prefix consistent with SGC naming conventions
+@Table(name = "FEEDBACK")   // Prefix consistent with SGC naming conventions
 public class FeedbackRecord {
 
     @Id
@@ -364,9 +364,9 @@ metadata.** The metadata copy is kept for diagnostic purposes only.
 Create a Flyway migration (or Liquibase changeset, whichever SGC uses):
 
 ```sql
--- V{next}__create_sgc_feedback.sql
+-- V{next}__create_FEEDBACK.sql
 
-CREATE TABLE SGC_FEEDBACK (
+CREATE TABLE FEEDBACK (
     ID              RAW(16)         NOT NULL,
     TYPE            VARCHAR2(20)    NOT NULL,
     NOTE            VARCHAR2(2000)  NOT NULL,
@@ -377,14 +377,14 @@ CREATE TABLE SGC_FEEDBACK (
     SUBMITTED_AT    TIMESTAMP WITH TIME ZONE NOT NULL,
     ROUTE_PATH      VARCHAR2(500)   NOT NULL,
     STATUS          VARCHAR2(20)    DEFAULT 'NEW' NOT NULL,
-    CONSTRAINT PK_SGC_FEEDBACK PRIMARY KEY (ID),
+    CONSTRAINT PK_FEEDBACK PRIMARY KEY (ID),
     CONSTRAINT CK_FEEDBACK_TYPE CHECK (TYPE IN ('BUG','SUGGESTION','QUESTION','PRAISE')),
     CONSTRAINT CK_FEEDBACK_STATUS CHECK (STATUS IN ('NEW','REVIEWED','RESOLVED','WONTFIX'))
 );
 
-CREATE INDEX IDX_FEEDBACK_STATUS ON SGC_FEEDBACK(STATUS);
-CREATE INDEX IDX_FEEDBACK_USER ON SGC_FEEDBACK(SUBMITTED_BY_USER_ID);
-CREATE INDEX IDX_FEEDBACK_DATE ON SGC_FEEDBACK(SUBMITTED_AT);
+CREATE INDEX IDX_FEEDBACK_STATUS ON FEEDBACK(STATUS);
+CREATE INDEX IDX_FEEDBACK_USER ON FEEDBACK(SUBMITTED_BY_USER_ID);
+CREATE INDEX IDX_FEEDBACK_DATE ON FEEDBACK(SUBMITTED_AT);
 ```
 
 -----

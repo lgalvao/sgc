@@ -5,11 +5,11 @@
       data-testid="cad-atividades__card-atividade"
       no-body
   >
-    <BCardBody class="py-2 position-relative">
+    <BCardHeader class="py-2">
       <BCardTitle
           :class="{'atividade-hover-row': !emEdicao}"
           :data-testid="!emEdicao ? 'cad-atividades__hover-row' : undefined"
-          class="d-flex align-items-center atividade-titulo-card"
+          class="d-flex align-items-center fs-5 mb-0"
       >
         <InlineEditor
             :can-edit="podeEditar"
@@ -46,7 +46,9 @@
           </template>
         </InlineEditor>
       </BCardTitle>
+    </BCardHeader>
 
+    <BCardBody class="py-2 position-relative">
       <!-- Mensagem de erro inline -->
       <BAlert
           v-if="erroValidacao"
@@ -60,10 +62,13 @@
         {{ erroValidacao }}
       </BAlert>
 
-      <div class="mt-3 ms-3">
+      <div
+          :class="{'pode-editar': podeEditar}"
+          class="mt-2 ms-3"
+      >
         <BForm
             v-if="podeEditar"
-            class="mb-3"
+            class="mb-2"
             data-testid="form-novo-conhecimento"
             @submit.prevent="adicionarConhecimento"
         >
@@ -151,6 +156,7 @@ import {
   BButton,
   BCard,
   BCardBody,
+  BCardHeader,
   BCardTitle,
   BCol,
   BForm,
@@ -236,28 +242,6 @@ watch(novoConhecimento, (valorAtual, valorAnterior) => {
   box-shadow: 0 2px 8px 0 rgba(var(--bs-danger-rgb), 0.1) !important;
 }
 
-.botao-acao {
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 1.1rem;
-  border-width: 2px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-  margin-left: 0;
-  margin-right: 0;
-  position: relative;
-  z-index: 2;
-}
-
-.botao-acao:focus,
-.botao-acao:hover {
-  background: var(--bs-primary-bg-subtle);
-  box-shadow: 0 0 0 2px var(--bs-primary);
-}
-
 .atividade-descricao {
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -265,23 +249,12 @@ watch(novoConhecimento, (valorAtual, valorAnterior) => {
   display: inline-block;
 }
 
-.conhecimento-hover-row:hover span {
+.pode-editar .conhecimento-hover-row:hover span {
   font-weight: bold;
 }
 
-.atividade-hover-row:hover .atividade-descricao {
+.pode-editar .atividade-hover-row:hover .atividade-descricao {
   font-weight: bold;
-}
-
-.atividade-titulo-card {
-  background: var(--bs-tertiary-bg);
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 0.5rem 0.75rem;
-  margin-left: -0.75rem;
-  margin-right: -0.75rem;
-  margin-top: -0.5rem;
-  border-top-left-radius: 0.375rem;
-  border-top-right-radius: 0.375rem;
 }
 
 .group-conhecimento span {

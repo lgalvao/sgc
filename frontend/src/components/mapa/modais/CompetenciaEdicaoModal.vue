@@ -109,28 +109,30 @@ function limparSelecaoAtividades() {
             <div class="d-flex gap-2 mb-2">
                 <BButton
                     aria-label="Selecionar todas as atividades"
+                    class="botao-selecao-suave"
                     data-testid="btn-competencia-selecionar-todas-atividades"
                     size="sm"
+                    title="Selecionar todas"
                     variant="outline-secondary"
                     @click="selecionarTodasAtividades"
                 >
-                    <i aria-hidden="true" class="bi bi-check-all me-1"/>
-                    {{ TEXTOS.atividades.importacao.BOTAO_SELECIONAR_TODAS }}
+                    <i aria-hidden="true" class="bi bi-check-all"/>
                 </BButton>
                 <BButton
                     aria-label="Desmarcar todas as atividades"
+                    class="botao-selecao-suave"
                     data-testid="btn-competencia-limpar-selecao-atividades"
                     size="sm"
+                    title="Limpar seleção"
                     variant="outline-secondary"
                     @click="limparSelecaoAtividades"
                 >
-                    <i aria-hidden="true" class="bi bi-x-lg me-1"/>
-                    {{ TEXTOS.atividades.importacao.BOTAO_LIMPAR_SELECAO }}
+                    <i aria-hidden="true" class="bi bi-x-lg"/>
                 </BButton>
             </div>
             <div
                 id="atividades"
-                :class="['lista-atividades p-2 border rounded', { 'border-danger is-invalid': erroAtv }]"
+                :class="['lista-atividades py-1 px-0', { 'border border-danger is-invalid rounded p-2': erroAtv }]"
                 tabindex="-1"
             >
                 <CompetenciaAtividadeItem
@@ -155,5 +157,26 @@ function limparSelecaoAtividades() {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+}
+
+.botao-selecao-suave {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-color: var(--bs-border-color) !important;
+    color: var(--bs-secondary) !important;
+}
+
+.botao-selecao-suave:hover {
+    background-color: var(--bs-tertiary-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    color: var(--bs-emphasis-color) !important;
+}
+
+.botao-selecao-suave i {
+    font-size: 1.1rem;
 }
 </style>

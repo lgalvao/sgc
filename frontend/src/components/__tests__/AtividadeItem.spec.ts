@@ -20,6 +20,7 @@ describe("AtividadeItem.vue", () => {
             template: '<button class="btn" v-bind="$attrs"><slot /></button>'
         },
         BCard: {template: '<div class="card"><slot /></div>'},
+        BCardHeader: {template: '<div class="card-header"><slot /></div>'},
         BCardBody: {template: '<div class="card-body"><slot /></div>'},
         BFormInput: {
             template: '<input class="form-control" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',

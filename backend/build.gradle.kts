@@ -49,7 +49,8 @@ dependencies {
     implementation(libs.h2)
     implementation(libs.springdoc.openapi)
 
-    if (project.findProperty("ENV")?.toString() != "hom") {
+    val envAmbiente = project.findProperty("ENV")?.toString()
+    if (envAmbiente != "hom" && envAmbiente != "e2e") {
         developmentOnly(libs.spring.boot.devtools)
     }
 
@@ -145,6 +146,14 @@ tasks.named<BootRun>("bootRun") {
 
     if (envLocalFile.exists()) {
         carregarConfiguracoesEnv(envLocalFile, true)
+    }
+
+    doFirst {
+        val tmpDir = layout.buildDirectory.dir("tmp").get().asFile
+        if (!tmpDir.exists()) {
+            tmpDir.mkdirs()
+        }
+        systemProperty("java.io.tmpdir", tmpDir.absolutePath)
     }
 }
 

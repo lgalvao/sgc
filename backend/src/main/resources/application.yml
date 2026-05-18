@@ -248,7 +248,7 @@ sgc:
   notificacao-email:
     modo-envio: ${SGC_NOTIFICACAO_EMAIL_MODO_ENVIO:mock}
   feedback:
-    screenshot-dir: ${SGC_FEEDBACK_SCREENSHOT_DIR:./feedbacks/screenshots}
+    screenshot-dir: ${FEEDBACK_SCREENSHOT_DIR:./feedbacks/screenshots}
     max-screenshot-size-bytes: 5242880
 
 ---
