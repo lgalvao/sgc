@@ -4,11 +4,12 @@ import org.junit.jupiter.api.*;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.*;
 import sgc.integracao.mocks.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
 import java.time.*;
-import java.util.*;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -57,28 +58,40 @@ class CDU37IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve filtrar unidades com processos ativos na busca de códigos")
+    @DisplayName("Deve filtrar unidades com mapa existente na busca de códigos")
     @WithMockAdmin
-    void buscarCodigosUnidadesSemMapaVigente_filtrandoProcessosAtivos() throws Exception {
-        // Unidade 905: sem mapa e sem processo no data.sql
-        Long codSemMapaEProcesso = 905L;
-        // Unidade 4: sem mapa no data.sql, mas vamos criar um processo para ela
-        Long codComProcessoAtivo = 4L;
+    void buscarCodigosUnidadesSemMapaVigente_filtrandoUnidadesComMapaExistente() throws Exception {
+        // Unidade 905: sem mapa no data.sql
+        Long codSemMapa = 905L;
+        // Unidade 4: sem mapa no data.sql, vamos criar um mapa para ela
+        Long codComMapa = 4L;
 
-        Processo p = new Processo()
-                .setDescricao("Processo Ativo de Teste")
+        Processo processo = new Processo()
+                .setDescricao("Processo com mapa de teste")
                 .setTipo(TipoProcesso.MAPEAMENTO)
                 .setSituacao(SituacaoProcesso.EM_ANDAMENTO)
                 .setDataCriacao(LocalDateTime.now())
                 .setDataLimite(LocalDateTime.now().plusDays(30));
 
-        Unidade u = unidadeRepo.findById(codComProcessoAtivo).orElseThrow();
-        p.adicionarParticipantes(Set.of(u));
-        processoRepo.saveAndFlush(p);
+        processoRepo.saveAndFlush(processo);
+
+        Unidade unidade = unidadeRepo.findById(codComMapa).orElseThrow();
+        Subprocesso subprocesso = Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .build();
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        Mapa mapa = Mapa.builder()
+                .subprocesso(subprocesso)
+                .build();
+        mapaRepo.saveAndFlush(mapa);
 
         mockMvc.perform(get(API_UNIDADES_SEM_MAPA_VIGENTE).with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@ == %d)]".formatted(codSemMapaEProcesso)).exists())
-                .andExpect(jsonPath("$[?(@ == %d)]".formatted(codComProcessoAtivo)).doesNotExist());
+                .andExpect(jsonPath("$[?(@ == %d)]".formatted(codSemMapa)).exists())
+                .andExpect(jsonPath("$[?(@ == %d)]".formatted(codComMapa)).doesNotExist());
     }
 }
