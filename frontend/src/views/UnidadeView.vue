@@ -20,19 +20,9 @@
             title-test-id="unidade-view__titulo"
         >
           <template #actions>
-            <BButton
-                v-if="mapaVigente"
-                data-testid="btn-mapa-vigente"
-                variant="outline-secondary"
-                @click="visualizarMapa"
-            >
-              <i
-                  class="bi bi-file-earmark-spreadsheet me-2"
-              />{{ TEXTOS.unidade.BOTAO_MAPA_VIGENTE }}
-            </BButton>
             <BDropdown
                 v-if="podeExportarMapaVigente"
-                :text="TEXTOS.unidade.BOTAO_EXPORTAR"
+                text="Mapa vigente"
                 data-testid="btn-exportar-mapa-vigente"
                 toggle-class="text-nowrap"
                 variant="outline-secondary"
@@ -227,18 +217,6 @@ function irParaCriarAtribuicao() {
 
 function navegarParaUnidadeSubordinada(row: TreeItem) {
   router.push({path: `/unidade/${row.codigo}`});
-}
-
-function visualizarMapa() {
-  if (mapaVigente.value) {
-    router.push({
-      name: "SubprocessoMapa",
-      params: {
-        codProcesso: mapaVigente.value.codProcesso,
-        siglaUnidade: unidade.value?.sigla
-      }
-    });
-  }
 }
 
 async function exportarMapaVigentePdf() {

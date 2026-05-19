@@ -220,19 +220,12 @@ describe('UnidadeView.vue', () => {
         expect(mockPush).toHaveBeenCalledWith({path: '/unidade/2'});
     });
 
-    it('renders and clicks "Mapa vigente" button when map exists', async () => {
+    it('não exibe botão de visualização do mapa vigente na tela da unidade', async () => {
         mockObterReferenciaMapaVigente.mockResolvedValueOnce(mockMapaVigente);
         const {wrapper} = createWrapper();
         await flushPromises();
 
-        const btn = wrapper.find('[data-testid="btn-mapa-vigente"]');
-        expect(btn.exists()).toBe(true);
-
-        await btn.trigger('click');
-        expect(mockPush).toHaveBeenCalledWith({
-            name: 'SubprocessoMapa',
-            params: {codProcesso: 99, siglaUnidade: 'TEST'}
-        });
+        expect(wrapper.find('[data-testid="btn-mapa-vigente"]').exists()).toBe(false);
     });
 
     it('exporta PDF do mapa vigente para CHEFE', async () => {

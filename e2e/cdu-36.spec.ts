@@ -111,7 +111,7 @@ test.describe('CDU-36 - Gerar relatório de mapas', () => {
         await page.getByRole('link', {name: /Minha unidade/i}).click();
         await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
 
-        await expect(page.getByTestId('btn-mapa-vigente')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-vigente')).toHaveCount(0);
         await expect(page.getByTestId('btn-exportar-mapa-vigente')).toBeVisible();
 
         await page.getByTestId('btn-exportar-mapa-vigente').click();
