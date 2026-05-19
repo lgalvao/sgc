@@ -197,12 +197,24 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("salvarMapa: deve salvar e manter vínculo com subprocesso")
     void salvarMapa_Sucesso() {
+        Subprocesso subprocessoEmEdicao = Subprocesso.builder()
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO)
+                .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .build();
+        subprocessoRepo.save(subprocessoEmEdicao);
+
+        Mapa mapaEdicao = new Mapa();
+        mapaEdicao.setSubprocesso(subprocessoEmEdicao);
+        mapaRepo.saveAndFlush(mapaEdicao);
+        subprocessoEmEdicao.setMapa(mapaEdicao);
         SalvarMapaRequest request = new SalvarMapaRequest("Justificativa teste", List.of());
 
-        Mapa resultado = subprocessoService.salvarMapa(subprocesso.getCodigo(), request);
+        Mapa resultado = subprocessoService.salvarMapa(subprocessoEmEdicao.getCodigo(), request);
 
-        assertThat(resultado.getCodigo()).isEqualTo(subprocesso.getMapa().getCodigo());
-        assertThat(resultado.getSubprocesso().getCodigo()).isEqualTo(subprocesso.getCodigo());
+        assertThat(resultado.getCodigo()).isEqualTo(subprocessoEmEdicao.getMapa().getCodigo());
+        assertThat(resultado.getSubprocesso().getCodigo()).isEqualTo(subprocessoEmEdicao.getCodigo());
     }
 
     @Test
