@@ -21,6 +21,9 @@ interface Props {
   mostrarDisponibilizarMapa?: boolean;
   habilitarDisponibilizarMapa?: boolean;
   loadingDisponibilizacao?: boolean;
+  mostrarExportacaoMapa?: boolean;
+  loadingExportacaoPdf?: boolean;
+  loadingExportacaoCsv?: boolean;
   mostrarDevolverMapa?: boolean;
   habilitarDevolverMapa?: boolean;
   mostrarAcaoPrincipalMapa?: boolean;
@@ -43,6 +46,9 @@ const props = withDefaults(defineProps<Props>(), {
   mostrarDisponibilizarMapa: false,
   habilitarDisponibilizarMapa: false,
   loadingDisponibilizacao: false,
+  mostrarExportacaoMapa: false,
+  loadingExportacaoPdf: false,
+  loadingExportacaoCsv: false,
   mostrarDevolverMapa: false,
   habilitarDevolverMapa: false,
   mostrarAcaoPrincipalMapa: false,
@@ -59,6 +65,8 @@ defineEmits<{
   (e: "abrir-disponibilizar"): void;
   (e: "abrir-devolver"): void;
   (e: "abrir-acao-principal"): void;
+  (e: "exportar-pdf"): void;
+  (e: "exportar-csv"): void;
 }>();
 
 const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
@@ -104,6 +112,29 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
             variant="outline-secondary"
             @click="$emit('abrir-impacto')"
         />
+
+        <BDropdown
+            v-if="mostrarExportacaoMapa"
+            :text="TEXTOS.mapa.BOTAO_EXPORTAR"
+            data-testid="btn-mapa-exportar"
+            toggle-class="text-nowrap"
+            variant="outline-secondary"
+        >
+          <BDropdownItemButton
+              :disabled="loadingExportacaoPdf"
+              data-testid="btn-mapa-exportar-pdf"
+              @click="$emit('exportar-pdf')"
+          >
+            PDF
+          </BDropdownItemButton>
+          <BDropdownItemButton
+              :disabled="loadingExportacaoCsv"
+              data-testid="btn-mapa-exportar-csv"
+              @click="$emit('exportar-csv')"
+          >
+            {{ TEXTOS.relatorios.BOTAO_CSV }}
+          </BDropdownItemButton>
+        </BDropdown>
 
         <BDropdown
             v-if="usarMenuAcoesMapa"

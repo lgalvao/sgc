@@ -111,7 +111,12 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             SELECT u.codigo 
             FROM Unidade u 
             WHERE u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
-              AND u.codigo NOT IN (SELECT um.unidadeCodigo FROM UnidadeMapa um)
+              AND u.codigo NOT IN (
+                  SELECT um.unidadeCodigo
+                  FROM UnidadeMapa um
+                  JOIN um.mapaVigente mapa
+                  JOIN mapa.subprocesso subprocesso
+              )
               AND u.codigo NOT IN (
                   SELECT up.codigo.unidadeCodigo 
                   FROM UnidadeProcesso up 

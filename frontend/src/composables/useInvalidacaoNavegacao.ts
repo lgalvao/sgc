@@ -2,6 +2,7 @@ import {usePainelStore} from "@/stores/painel";
 import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
+import {useUnidadeStore} from "@/stores/unidade";
 
 /**
  * Ponto central de invalidação dos caches de navegação da SPA.
@@ -49,6 +50,7 @@ export function useInvalidacaoNavegacao() {
     const processoStore = useProcessoStore();
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
+    const unidadeStore = useUnidadeStore();
 
     function limparEstadoSubprocessoAtual(): void {
         subprocessoStore.limparContextoAtual();
@@ -59,6 +61,7 @@ export function useInvalidacaoNavegacao() {
         processoStore.invalidar();
         subprocessoStore.invalidar();
         mapasStore.invalidar();
+        unidadeStore.invalidar();
     }
 
     function invalidarCachesSubprocesso(opcoes?: {

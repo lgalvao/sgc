@@ -10,12 +10,15 @@
           :habilitar-disponibilizar-mapa="habilitarDisponibilizarMapa"
           :habilitar-validar-mapa="habilitarValidarMapa"
           :loading-disponibilizacao="loadingDisponibilizacao"
+          :loading-exportacao-csv="loadingExportacaoCsv"
+          :loading-exportacao-pdf="loadingExportacaoPdf"
           :loading-impacto="loadingImpacto"
           :loading-sugestoes-visualizacao="loadingSugestoesVisualizacao"
           :mostrar-acao-principal-mapa="mostrarAcaoPrincipalMapa"
           :mostrar-apresentar-sugestoes="mostrarApresentarSugestoes"
           :mostrar-devolver-mapa="mostrarDevolverMapa"
           :mostrar-disponibilizar-mapa="mostrarDisponibilizarMapa"
+          :mostrar-exportacao-mapa="mostrarExportacaoMapa"
           :mostrar-validar-mapa="mostrarValidarMapa"
           :pode-ver-sugestoes="podeVerSugestoes"
           :pode-visualizar-impacto="podeVisualizarImpacto"
@@ -29,6 +32,8 @@
           @abrir-impacto="abrirModalImpacto"
           @abrir-sugestoes="abrirModalSugestoes"
           @abrir-validar="abrirModalValidar"
+          @exportar-csv="exportarMapaAtualCsv"
+          @exportar-pdf="exportarMapaAtualPdf"
           @ver-sugestoes="verSugestoes"
       />
 
@@ -183,6 +188,7 @@ import {normalizarErro} from "@/utils/apiError";
 import type {Analise, MapaCompleto,} from "@/types/tipos";
 import {Perfil} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
+import {relatoriosService} from "@/services/relatoriosService";
 
 const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();
 const router = useRouter();
@@ -235,6 +241,9 @@ const {
   unidade,
   carregarContextoInicial,
 } = useMapaOrquestracao(props);
+const mostrarExportacaoMapa = computed(() => perfilStore.perfilSelecionado === Perfil.CHEFE && Boolean(codigoSubprocesso.value));
+const loadingExportacaoPdf = ref(false);
+const loadingExportacaoCsv = ref(false);
 
 const mapasStore = useMapas(codigoSubprocesso);
 const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
@@ -350,6 +359,32 @@ async function executarComSubprocesso(
   const codSubp = codigoSubprocesso.value;
   if (!codSubp) throw new Error("Invariante violada: codigoSubprocesso não carregado");
   await callback(codSubp);
+}
+
+async function exportarMapaAtualPdf() {
+  loadingExportacaoPdf.value = true;
+  try {
+    await executarComSubprocesso((codSubprocessoAtual) =>
+        relatoriosService.downloadRelatorioMapaAtualPdf(codSubprocessoAtual)
+    );
+  } catch {
+    notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
+  } finally {
+    loadingExportacaoPdf.value = false;
+  }
+}
+
+async function exportarMapaAtualCsv() {
+  loadingExportacaoCsv.value = true;
+  try {
+    await executarComSubprocesso((codSubprocessoAtual) =>
+        relatoriosService.downloadRelatorioMapaAtualCsv(codSubprocessoAtual)
+    );
+  } catch {
+    notify(TEXTOS.relatorios.ERRO_EXPORTAR_CSV, "danger");
+  } finally {
+    loadingExportacaoCsv.value = false;
+  }
 }
 
 const contextoEdicaoAtual = computed(() => subprocessoStore.contextoEdicao);

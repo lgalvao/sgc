@@ -30,6 +30,28 @@
                   class="bi bi-file-earmark-spreadsheet me-2"
               />{{ TEXTOS.unidade.BOTAO_MAPA_VIGENTE }}
             </BButton>
+            <BDropdown
+                v-if="podeExportarMapaVigente"
+                :text="TEXTOS.unidade.BOTAO_EXPORTAR"
+                data-testid="btn-exportar-mapa-vigente"
+                toggle-class="text-nowrap"
+                variant="outline-secondary"
+            >
+              <BDropdownItemButton
+                  :disabled="loadingExportacaoPdf"
+                  data-testid="btn-exportar-mapa-vigente-pdf"
+                  @click="exportarMapaVigentePdf"
+              >
+                PDF
+              </BDropdownItemButton>
+              <BDropdownItemButton
+                  :disabled="loadingExportacaoCsv"
+                  data-testid="btn-exportar-mapa-vigente-csv"
+                  @click="exportarMapaVigenteCsv"
+              >
+                {{ TEXTOS.relatorios.BOTAO_CSV }}
+              </BDropdownItemButton>
+            </BDropdown>
             <BButton
                 v-if="mostrarCriarAtribuicaoTemporaria"
                 data-testid="unidade-view__btn-criar-atribuicao"
@@ -85,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, onActivated, ref, watch} from "vue";
 import {useRouter} from "vue-router";
@@ -101,20 +123,28 @@ import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {logger,formatarDataBR} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
+import {useNotification} from "@/composables/useNotification";
+import {usePerfilStore} from "@/stores/perfil";
+import {Perfil} from "@/types/comum";
+import {relatoriosService} from "@/services/relatoriosService";
 
 
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const {mostrarCriarAtribuicaoTemporaria} = usePerfil();
+const {notify} = useNotification();
 const {definirUnidadeAtual} = useUnidadeAtual();
 const unidadeStore = useUnidadeStore();
+const perfilStore = usePerfilStore();
 
 const unidade = ref<Unidade | null>(null);
 const mapaVigente = ref<MapaVigenteReferencia | null>(null);
 const lastError = ref<string | null>(null);
 const carregandoPagina = ref(true);
 const carregamentoInicialConcluido = ref(false);
+const loadingExportacaoPdf = ref(false);
+const loadingExportacaoCsv = ref(false);
 let carregamentoEmAndamento: Promise<void> | null = null;
 
 function clearError() {
@@ -211,6 +241,36 @@ function visualizarMapa() {
   }
 }
 
+async function exportarMapaVigentePdf() {
+  if (!mapaVigente.value) {
+    return;
+  }
+
+  loadingExportacaoPdf.value = true;
+  try {
+    await relatoriosService.downloadRelatorioMapaVigenteUnidadePdf(props.codUnidade);
+  } catch {
+    notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
+  } finally {
+    loadingExportacaoPdf.value = false;
+  }
+}
+
+async function exportarMapaVigenteCsv() {
+  if (!mapaVigente.value) {
+    return;
+  }
+
+  loadingExportacaoCsv.value = true;
+  try {
+    await relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv(props.codUnidade);
+  } catch {
+    notify(TEXTOS.relatorios.ERRO_EXPORTAR_CSV, "danger");
+  } finally {
+    loadingExportacaoCsv.value = false;
+  }
+}
+
 onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
@@ -235,6 +295,7 @@ watch(
 const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
 const subordinadas = computed(() => unidade.value?.filhas ?? []);
 const temSubordinadas = computed(() => subordinadas.value.length > 0);
+const podeExportarMapaVigente = computed(() => perfilStore.perfilSelecionado === Perfil.CHEFE && Boolean(mapaVigente.value));
 
 const dadosFormatadosSubordinadas = computed(() => formatarDadosParaArvore(subordinadas.value));
 

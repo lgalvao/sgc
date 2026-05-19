@@ -102,28 +102,18 @@ public class RelatorioFacade {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioMapas(List<Long> codigosUnidades, OutputStream outputStream) {
-        List<Subprocesso> subprocessos = buscarSubprocessosMapasVigentes(codigosUnidades);
-        LocalDateTime dataGeracao = LocalDateTime.now();
-
-        try (Document document = pdfFactory.createDocument()) {
-            pdfFactory.createWriter(document, outputStream);
-            document.open();
-            adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
-                    "Relatório de Mapas Vigentes",
-                    "Escopo",
-                    "Unidades selecionadas",
-                    dataGeracao,
-                    null,
-                    0
-            ));
-
-            for (Subprocesso sp : subprocessos) {
-                List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(sp.getMapa().getCodigo());
-                adicionarSecaoMapa(document, sp.getUnidade(), competencias);
-            }
-        } catch (DocumentException | IOException e) {
-            throw new IllegalStateException("Erro ao gerar PDF", e);
-        }
+        gerarRelatorioMapasPdf(
+                obterRelatorioMapas(codigosUnidades),
+                new CabecalhoRelatorio(
+                        "Relatório de Mapas Vigentes",
+                        "Escopo",
+                        "Unidades selecionadas",
+                        LocalDateTime.now(),
+                        null,
+                        0
+                ),
+                outputStream
+        );
     }
 
     @Transactional(readOnly = true)
@@ -133,6 +123,58 @@ public class RelatorioFacade {
         return subprocessos.stream()
                 .map(this::criarRelatorioMapaDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public RelatorioMapaDto obterRelatorioMapaAtual(Long codSubprocesso) {
+        Subprocesso subprocesso = consultaService.buscarSubprocessoComMapa(codSubprocesso);
+        if (subprocesso.getMapa() == null) {
+            throw new ErroEntidadeNaoEncontrada("Mapa", "S:" + codSubprocesso);
+        }
+        return criarRelatorioMapaDto(subprocesso);
+    }
+
+    @Transactional(readOnly = true)
+    public void gerarRelatorioMapaAtual(Long codSubprocesso, OutputStream outputStream) {
+        RelatorioMapaDto relatorio = obterRelatorioMapaAtual(codSubprocesso);
+        gerarRelatorioMapasPdf(
+                List.of(relatorio),
+                new CabecalhoRelatorio(
+                        "Relatório de Mapa Atual",
+                        "Unidade",
+                        "%s - %s".formatted(relatorio.siglaUnidade(), relatorio.nomeUnidade()),
+                        LocalDateTime.now(),
+                        null,
+                        1
+                ),
+                outputStream
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public RelatorioMapaDto obterRelatorioMapaVigenteUnidade(Long codUnidade) {
+        validarEscopoRelatorioMapaVigenteUnidade(codUnidade);
+        Unidade unidade = unidadeService.buscarPorCodigo(codUnidade);
+        Mapa mapaVigente = unidadeService.buscarMapaVigente(codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("MapaVigente", codUnidade));
+        return criarRelatorioMapaDto(unidade, mapaVigente);
+    }
+
+    @Transactional(readOnly = true)
+    public void gerarRelatorioMapaVigenteUnidade(Long codUnidade, OutputStream outputStream) {
+        RelatorioMapaDto relatorio = obterRelatorioMapaVigenteUnidade(codUnidade);
+        gerarRelatorioMapasPdf(
+                List.of(relatorio),
+                new CabecalhoRelatorio(
+                        "Relatório de Mapa Vigente",
+                        "Unidade",
+                        "%s - %s".formatted(relatorio.siglaUnidade(), relatorio.nomeUnidade()),
+                        LocalDateTime.now(),
+                        null,
+                        1
+                ),
+                outputStream
+        );
     }
 
     @Transactional(readOnly = true)
@@ -217,9 +259,35 @@ public class RelatorioFacade {
         return codigosNormalizados;
     }
 
+    private void validarEscopoRelatorioMapaVigenteUnidade(Long codUnidade) {
+        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+
+        if (contextoUsuario.perfil() == Perfil.ADMIN) {
+            return;
+        }
+
+        if (contextoUsuario.perfil() == Perfil.GESTOR) {
+            Set<Long> codigosPermitidos = new HashSet<>(unidadeHierarquiaService.buscarIdsDescendentes(contextoUsuario.unidadeAtivaCodigo()));
+            codigosPermitidos.add(contextoUsuario.unidadeAtivaCodigo());
+            if (codigosPermitidos.contains(codUnidade)) {
+                return;
+            }
+            throw new ErroAcessoNegado("Usuário não possui permissão para gerar relatório de mapa vigente desta unidade.");
+        }
+
+        if (contextoUsuario.perfil() == Perfil.CHEFE && Objects.equals(contextoUsuario.unidadeAtivaCodigo(), codUnidade)) {
+            return;
+        }
+
+        throw new ErroAcessoNegado("Usuário não possui permissão para gerar relatório de mapa vigente desta unidade.");
+    }
+
     private RelatorioMapaDto criarRelatorioMapaDto(Subprocesso subprocesso) {
-        Unidade unidade = subprocesso.getUnidade();
-        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(subprocesso.getMapa().getCodigo());
+        return criarRelatorioMapaDto(subprocesso.getUnidade(), subprocesso.getMapa());
+    }
+
+    private RelatorioMapaDto criarRelatorioMapaDto(Unidade unidade, Mapa mapa) {
+        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(mapa.getCodigo());
         List<RelatorioMapaCompetenciaDto> competenciasDto = competencias.stream()
                 .map(this::criarRelatorioMapaCompetenciaDto)
                 .toList();
@@ -293,6 +361,24 @@ public class RelatorioFacade {
                 .responsavel(responsavel)
                 .titular(titular)
                 .build();
+    }
+
+    private void gerarRelatorioMapasPdf(
+            List<RelatorioMapaDto> relatorios,
+            CabecalhoRelatorio cabecalho,
+            OutputStream outputStream
+    ) {
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
+            document.open();
+            adicionarCabecalhoRelatorio(document, cabecalho);
+
+            for (RelatorioMapaDto relatorio : relatorios) {
+                adicionarSecaoMapa(document, relatorio);
+            }
+        } catch (DocumentException | IOException e) {
+            throw new IllegalStateException("Erro ao gerar PDF", e);
+        }
     }
 
     private String formatarData(@Nullable LocalDateTime dataHora) {
@@ -435,26 +521,26 @@ public class RelatorioFacade {
         return p;
     }
 
-    private void adicionarSecaoMapa(Document document, Unidade unidade, List<Competencia> competencias) throws DocumentException {
-        Paragraph sigla = new Paragraph(unidade.getSigla(), new Font(Font.HELVETICA, 15, Font.BOLD, COR_PRIMARIA));
+    private void adicionarSecaoMapa(Document document, RelatorioMapaDto relatorio) throws DocumentException {
+        Paragraph sigla = new Paragraph(relatorio.siglaUnidade(), new Font(Font.HELVETICA, 15, Font.BOLD, COR_PRIMARIA));
         sigla.setSpacingAfter(2f);
         document.add(sigla);
-        Paragraph nome = criarParagrafo(unidade.getNome(), new Font(Font.HELVETICA, 10, Font.BOLD, COR_SECUNDARIA), 0f);
+        Paragraph nome = criarParagrafo(relatorio.nomeUnidade(), new Font(Font.HELVETICA, 10, Font.BOLD, COR_SECUNDARIA), 0f);
         nome.setSpacingAfter(4f);
         document.add(nome);
         document.add(new Chunk(new LineSeparator(0.8f, 100f, COR_BORDA, Element.ALIGN_CENTER, 0f)));
         document.add(new Paragraph(" ", new Font(Font.HELVETICA, 2)));
 
-        for (Competencia competencia : competencias) {
-            Paragraph tituloCompetencia = criarParagrafo(competencia.getDescricao(), FONTE_TEXTO_NEGRITO, 0f);
+        for (RelatorioMapaCompetenciaDto competencia : relatorio.competencias()) {
+            Paragraph tituloCompetencia = criarParagrafo(competencia.descricao(), FONTE_TEXTO_NEGRITO, 0f);
             tituloCompetencia.setSpacingAfter(4f);
             document.add(tituloCompetencia);
-            for (Atividade atividade : competencia.getAtividades()) {
-                Paragraph tituloAtividade = criarParagrafo(atividade.getDescricao(), FONTE_TEXTO_CORPO, 10f);
+            for (RelatorioMapaAtividadeDto atividade : competencia.atividades()) {
+                Paragraph tituloAtividade = criarParagrafo(atividade.descricao(), FONTE_TEXTO_CORPO, 10f);
                 tituloAtividade.setSpacingAfter(2f);
                 document.add(tituloAtividade);
-                for (Conhecimento conhecimento : atividade.getConhecimentos()) {
-                    Paragraph itemConhecimento = criarParagrafo("• %s".formatted(conhecimento.getDescricao()), FONTE_TEXTO_CORPO_SUAVE, 20f);
+                for (RelatorioMapaConhecimentoDto conhecimento : atividade.conhecimentos()) {
+                    Paragraph itemConhecimento = criarParagrafo("• %s".formatted(conhecimento.descricao()), FONTE_TEXTO_CORPO_SUAVE, 20f);
                     itemConhecimento.setSpacingAfter(2f);
                     document.add(itemConhecimento);
                 }

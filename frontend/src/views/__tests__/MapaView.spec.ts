@@ -6,6 +6,7 @@ import MapaView from '@/views/MapaView.vue';
 import * as useFluxoMapaModule from '@/composables/useFluxoMapa';
 import * as subprocessoService from '@/services/subprocessoService';
 import type {ContextoEdicaoSubprocesso} from '@/types/tipos';
+import {relatoriosService} from '@/services/relatoriosService';
 
 type MapaViewVm = {
     codigoSubprocesso: number | null;
@@ -19,6 +20,8 @@ type MapaViewVm = {
     removerAtividadeAssociada: (codigoCompetencia: number, codigoAtividade: number) => Promise<void> | void;
     disponibilizarMapa: (payload: Record<string, unknown>) => Promise<void>;
     fecharModalDisponibilizar: () => void;
+    exportarMapaAtualPdf: () => Promise<void>;
+    exportarMapaAtualCsv: () => Promise<void>;
 };
 
 vi.mock('@/composables/useFluxoMapa', () => ({useFluxoMapa: vi.fn()}));
@@ -26,6 +29,16 @@ vi.mock('@/services/subprocessoService', () => ({
     verificarImpactosMapa: vi.fn(),
     obterMapaCompleto: vi.fn(),
     garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+}));
+vi.mock('@/services/relatoriosService', () => ({
+    relatoriosService: {
+        downloadRelatorioMapaAtualPdf: vi.fn(),
+        downloadRelatorioMapaAtualCsv: vi.fn(),
+    },
+}));
+const notifyMock = vi.fn();
+vi.mock('@/composables/useNotification', () => ({
+    useNotification: () => ({notify: notifyMock}),
 }));
 const subprocessoStoreMock = {
     contextoEdicao: null as ContextoEdicaoSubprocesso | null,
@@ -336,5 +349,63 @@ describe('MapaView', () => {
         vm.fecharModalDisponibilizar();
 
         expect(vm.mostrarModalDisponibilizar).toBe(false);
+    });
+
+    it('exporta o PDF do mapa atual quando o código do subprocesso está carregado', async () => {
+        const pinia = createTestingPinia({
+            createSpy: vi.fn,
+            stubActions: false,
+            initialState: {
+                perfil: {perfilSelecionado: 'CHEFE'},
+            }
+        });
+
+        const wrapper = mount(MapaView, {
+            global: {
+                plugins: [pinia],
+                stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
+            }
+        });
+
+        const vm = wrapper.vm as unknown as MapaViewVm;
+        vm.codigoSubprocesso = 456;
+        notifyMock.mockClear();
+
+        await vm.exportarMapaAtualPdf();
+
+        expect(relatoriosService.downloadRelatorioMapaAtualPdf).toHaveBeenCalledWith(456);
+    });
+
+    it('exporta o CSV do mapa atual quando o código do subprocesso está carregado', async () => {
+        const pinia = createTestingPinia({
+            createSpy: vi.fn,
+            stubActions: false,
+            initialState: {
+                perfil: {perfilSelecionado: 'CHEFE'},
+            }
+        });
+
+        const wrapper = mount(MapaView, {
+            global: {
+                plugins: [pinia],
+                stubs: commonStubs
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
+            }
+        });
+
+        const vm = wrapper.vm as unknown as MapaViewVm;
+        vm.codigoSubprocesso = 456;
+        notifyMock.mockClear();
+
+        await vm.exportarMapaAtualCsv();
+
+        expect(relatoriosService.downloadRelatorioMapaAtualCsv).toHaveBeenCalledWith(456);
     });
 });

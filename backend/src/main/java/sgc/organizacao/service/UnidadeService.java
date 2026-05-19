@@ -72,11 +72,11 @@ public class UnidadeService {
     }
 
     public boolean temMapaVigente(Long codigoUnidade) {
-        return unidadeMapaRepo.existsById(codigoUnidade);
+        return buscarRegistroMapaVigenteComProcesso(codigoUnidade).isPresent();
     }
 
     public Optional<MapaVigenteReferenciaDto> buscarReferenciaMapaVigente(Long codigoUnidade) {
-        return buscarRegistroMapaVigente(codigoUnidade)
+        return buscarRegistroMapaVigenteComProcesso(codigoUnidade)
                 .map(UnidadeMapa::getMapaVigente)
                 .map(Mapa::getSubprocesso)
                 .map(subprocesso -> new MapaVigenteReferenciaDto(
@@ -87,7 +87,7 @@ public class UnidadeService {
 
     @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADES_COM_MAPA, sync = true)
     public List<Long> buscarTodosCodigosUnidadesComMapa() {
-        return unidadeMapaRepo.listarTodosCodigosUnidade();
+        return unidadeMapaRepo.listarTodosCodigosUnidadeComMapaVigente();
     }
 
     public List<Long> buscarCodigosUnidadesSemMapaVigente() {
@@ -95,7 +95,15 @@ public class UnidadeService {
     }
 
     public List<UnidadeMapa> buscarMapasPorUnidades(List<Long> codigosUnidades) {
-        return unidadeMapaRepo.findAllById(codigosUnidades);
+        if (codigosUnidades.isEmpty()) {
+            return List.of();
+        }
+        return unidadeMapaRepo.listarMapasVigentesPorUnidades(codigosUnidades);
+    }
+
+    public Optional<Mapa> buscarMapaVigente(Long codigoUnidade) {
+        return buscarRegistroMapaVigenteComProcesso(codigoUnidade)
+                .map(UnidadeMapa::getMapaVigente);
     }
 
     @Transactional
@@ -132,5 +140,9 @@ public class UnidadeService {
 
     private Optional<UnidadeMapa> buscarRegistroMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.findById(codigoUnidade);
+    }
+
+    private Optional<UnidadeMapa> buscarRegistroMapaVigenteComProcesso(Long codigoUnidade) {
+        return unidadeMapaRepo.buscarMapaVigenteComProcesso(codigoUnidade);
     }
 }

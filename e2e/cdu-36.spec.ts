@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaHomologadoFixture} from './fixtures/index.js';
+import {criarProcessoFinalizadoFixture, criarProcessoMapaHomologadoFixture} from './fixtures/index.js';
 
 /**
  * CDU-36 - Gerar relatório de mapas
@@ -9,7 +9,7 @@ import {criarProcessoMapaHomologadoFixture} from './fixtures/index.js';
  * Pré-condições:
  * - Usuário logado como ADMIN
  */
-test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
+test.describe('CDU-36 - Gerar relatório de mapas', () => {
 
     test('Cenários CDU-36: ADMIN define filtros e gera PDF de mapas', async ({
                                                                                  _resetAutomatico,
@@ -89,5 +89,39 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         // en-CA retorna YYYY-MM-DD respeitando o fuso local
         const hoje = new Date().toLocaleDateString('en-CA');
         expect(download.suggestedFilename()).toBe(`sgc-rel-mapas-${hoje}.pdf`);
+    });
+
+    test('Cenário CDU-36: CHEFE acessa Minha unidade e exporta o mapa vigente em PDF', async ({
+                                                                                                  _resetAutomatico,
+                                                                                                  page,
+                                                                                                  request,
+                                                                                                  _autenticadoComoChefeAssessoria11
+                                                                                              }) => {
+        test.slow();
+        const descricaoProcesso = `Minha unidade CDU-36 ${Date.now()}`;
+        await criarProcessoFinalizadoFixture(request, {
+            descricao: descricaoProcesso,
+            unidade: 'ASSESSORIA_11',
+            diasLimite: 30
+        });
+
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+
+        await page.getByRole('link', {name: /Minha unidade/i}).click();
+        await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
+
+        await expect(page.getByTestId('btn-mapa-vigente')).toBeVisible();
+        await expect(page.getByTestId('btn-exportar-mapa-vigente')).toBeVisible();
+
+        await page.getByTestId('btn-exportar-mapa-vigente').click();
+        await expect(page.getByTestId('btn-exportar-mapa-vigente-pdf')).toBeVisible();
+
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByTestId('btn-exportar-mapa-vigente-pdf').click();
+        const download = await downloadPromise;
+
+        const hoje = new Date().toLocaleDateString('en-CA');
+        expect(download.suggestedFilename()).toBe(`sgc-rel-mapa-vigente-${hoje}.pdf`);
     });
 });

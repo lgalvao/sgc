@@ -54,6 +54,38 @@ public class RelatorioController {
         return ResponseEntity.ok(relatorioService.obterRelatorioMapas(codigosUnidades));
     }
 
+    @GetMapping("/mapas/subprocessos/{codSubprocesso}")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @Operation(summary = "Gera a visualização em JSON do mapa atual de um subprocesso")
+    public ResponseEntity<RelatorioMapaDto> obterRelatorioMapaAtual(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(relatorioService.obterRelatorioMapaAtual(codSubprocesso));
+    }
+
+    @GetMapping("/mapas/subprocessos/{codSubprocesso}/exportar")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @Operation(summary = "Gera relatório em PDF do mapa atual de um subprocesso")
+    public void gerarRelatorioMapaAtualPdf(@PathVariable Long codSubprocesso, HttpServletResponse response) throws IOException {
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioMapaAtual()));
+        relatorioService.gerarRelatorioMapaAtual(codSubprocesso, response.getOutputStream());
+    }
+
+    @GetMapping("/mapas-vigentes/unidades/{codUnidade}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @Operation(summary = "Gera a visualização em JSON do mapa vigente de uma unidade")
+    public ResponseEntity<RelatorioMapaDto> obterRelatorioMapaVigenteUnidade(@PathVariable Long codUnidade) {
+        return ResponseEntity.ok(relatorioService.obterRelatorioMapaVigenteUnidade(codUnidade));
+    }
+
+    @GetMapping("/mapas-vigentes/unidades/{codUnidade}/exportar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @Operation(summary = "Gera relatório em PDF do mapa vigente de uma unidade")
+    public void gerarRelatorioMapaVigenteUnidadePdf(@PathVariable Long codUnidade, HttpServletResponse response) throws IOException {
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioMapaVigenteUnidade()));
+        relatorioService.gerarRelatorioMapaVigenteUnidade(codUnidade, response.getOutputStream());
+    }
+
     @GetMapping("/unidades-sem-mapas-vigentes/exportar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Gera relatório de unidades sem mapa vigente")
@@ -69,6 +101,14 @@ public class RelatorioController {
 
     private String nomeArquivoRelatorioMapas() {
         return "sgc-rel-mapas-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
+    }
+
+    private String nomeArquivoRelatorioMapaAtual() {
+        return "sgc-rel-mapa-atual-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
+    }
+
+    private String nomeArquivoRelatorioMapaVigenteUnidade() {
+        return "sgc-rel-mapa-vigente-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
     }
 
     private String nomeArquivoRelatorioUnidadesSemMapasVigentes() {

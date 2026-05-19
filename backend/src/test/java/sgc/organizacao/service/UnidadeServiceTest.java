@@ -123,33 +123,21 @@ class UnidadeServiceTest {
     @Test
     @DisplayName("verificarMapaVigente - Sucesso")
     void temMapaVigente() {
-        when(unidadeMapaRepo.existsById(1L)).thenReturn(true);
+        when(unidadeMapaRepo.buscarMapaVigenteComProcesso(1L)).thenReturn(Optional.of(new UnidadeMapa()));
         assertThat(service.temMapaVigente(1L)).isTrue();
     }
 
     @Test
     @DisplayName("buscarTodosCodigosUnidadesComMapa - Sucesso")
     void buscarTodosCodigosUnidadesComMapa() {
-        when(unidadeMapaRepo.listarTodosCodigosUnidade()).thenReturn(List.of(1L, 2L));
+        when(unidadeMapaRepo.listarTodosCodigosUnidadeComMapaVigente()).thenReturn(List.of(1L, 2L));
         assertThat(service.buscarTodosCodigosUnidadesComMapa()).hasSize(2);
     }
 
     @Test
     @DisplayName("buscarReferenciaMapaVigente - Retorna vazio quando unidade não tem mapa vigente")
     void buscarReferenciaMapaVigente_semMapaVigente() {
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
-
-        Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
-
-        assertThat(resultado).isEmpty();
-    }
-
-    @Test
-    @DisplayName("buscarReferenciaMapaVigente - Retorna vazio quando mapa não tem subprocesso")
-    void buscarReferenciaMapaVigente_mapaSemSubprocesso() {
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setMapaVigente(new Mapa());
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(unidadeMapa));
+        when(unidadeMapaRepo.buscarMapaVigenteComProcesso(1L)).thenReturn(Optional.empty());
 
         Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
 
@@ -172,7 +160,7 @@ class UnidadeServiceTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(mapa);
 
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(unidadeMapa));
+        when(unidadeMapaRepo.buscarMapaVigenteComProcesso(1L)).thenReturn(Optional.of(unidadeMapa));
 
         Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
 
@@ -181,6 +169,30 @@ class UnidadeServiceTest {
                 .get()
                 .extracting(MapaVigenteReferenciaDto::codProcesso, MapaVigenteReferenciaDto::codSubprocesso)
                 .containsExactly(10L, 20L);
+    }
+
+    @Test
+    @DisplayName("buscarMapaVigente - Retorna mapa vigente da unidade")
+    void buscarMapaVigente() {
+        Mapa mapa = new Mapa();
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setMapaVigente(mapa);
+        when(unidadeMapaRepo.buscarMapaVigenteComProcesso(1L)).thenReturn(Optional.of(unidadeMapa));
+
+        Optional<Mapa> resultado = service.buscarMapaVigente(1L);
+
+        assertThat(resultado).containsSame(mapa);
+    }
+
+    @Test
+    @DisplayName("buscarMapasPorUnidades - Usa consulta de mapas vigentes")
+    void buscarMapasPorUnidades() {
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        when(unidadeMapaRepo.listarMapasVigentesPorUnidades(List.of(1L, 2L))).thenReturn(List.of(unidadeMapa));
+
+        List<UnidadeMapa> resultado = service.buscarMapasPorUnidades(List.of(1L, 2L));
+
+        assertThat(resultado).containsExactly(unidadeMapa);
     }
 
     @Test

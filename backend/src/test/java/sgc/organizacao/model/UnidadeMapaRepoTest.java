@@ -22,9 +22,19 @@ class UnidadeMapaRepoTest {
     @Test
     @DisplayName("deve listar codigos de unidade com mapa vigente")
     void deveListarCodigosDeUnidadeComMapaVigente() {
-        List<Long> codigos = unidadeMapaRepo.listarTodosCodigosUnidade();
+        List<Long> codigos = unidadeMapaRepo.listarTodosCodigosUnidadeComMapaVigente();
 
         assertThat(codigos).contains(8L, 9L, 10L, 102L);
+    }
+
+    @Test
+    @DisplayName("deve buscar mapa vigente com processo")
+    void deveBuscarMapaVigenteComProcesso() {
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.buscarMapaVigenteComProcesso(8L).orElseThrow();
+
+        assertThat(unidadeMapa.getMapaVigente()).isNotNull();
+        assertThat(unidadeMapa.getMapaVigente().getSubprocesso()).isNotNull();
+        assertThat(unidadeMapa.getMapaVigente().getSubprocesso().getProcesso()).isNotNull();
     }
 
     @Test
@@ -44,7 +54,7 @@ class UnidadeMapaRepoTest {
     @Test
     @DisplayName("deve buscar varios registros por lista de unidades")
     void deveBuscarVariosRegistrosPorListaDeUnidades() {
-        List<UnidadeMapa> registros = unidadeMapaRepo.findAllById(List.of(8L, 10L, 904L));
+        List<UnidadeMapa> registros = unidadeMapaRepo.listarMapasVigentesPorUnidades(List.of(8L, 10L, 904L));
 
         assertThat(registros)
                 .extracting(UnidadeMapa::getUnidadeCodigoPersistido)

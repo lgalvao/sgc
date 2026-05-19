@@ -12,7 +12,10 @@ const {
     mockMapaVigente,
     mockObterUnidade,
     mockObterReferenciaMapaVigente,
-    mockUnidadeStore
+    mockUnidadeStore,
+    notify,
+    downloadRelatorioMapaVigenteUnidadePdf,
+    downloadRelatorioMapaVigenteUnidadeCsv
 } = vi.hoisted(() => {
     const u = {
         codigo: 10,
@@ -55,7 +58,10 @@ const {
             cacheMapasVigentes: new Map<number, unknown>(),
             obterUnidade: vi.fn(),
             obterReferenciaMapaVigente: vi.fn(),
-        }
+        },
+        notify: vi.fn(),
+        downloadRelatorioMapaVigenteUnidadePdf: vi.fn(),
+        downloadRelatorioMapaVigenteUnidadeCsv: vi.fn(),
     };
 });
 
@@ -74,6 +80,15 @@ vi.mock('@/stores/unidade', () => {
         useUnidadeStore: () => mockUnidadeStore,
     };
 });
+vi.mock('@/composables/useNotification', () => ({
+    useNotification: () => ({notify}),
+}));
+vi.mock('@/services/relatoriosService', () => ({
+    relatoriosService: {
+        downloadRelatorioMapaVigenteUnidadePdf,
+        downloadRelatorioMapaVigenteUnidadeCsv,
+    },
+}));
 
 const TreeTableStub = {
     template: '<div data-testid="tree-table"></div>',
@@ -92,6 +107,8 @@ describe('UnidadeView.vue', () => {
         mockUnidadeStore.obterReferenciaMapaVigente = mockObterReferenciaMapaVigente;
         mockObterUnidade.mockResolvedValue(mockUnidadeData);
         mockObterReferenciaMapaVigente.mockResolvedValue(null);
+        downloadRelatorioMapaVigenteUnidadePdf.mockResolvedValue(undefined);
+        downloadRelatorioMapaVigenteUnidadeCsv.mockResolvedValue(undefined);
     });
 
     const createWrapper = (initialStateOverride = {}) => {
@@ -109,6 +126,8 @@ describe('UnidadeView.vue', () => {
                     BCard: {template: '<div><slot /></div>'},
                     BCardBody: {template: '<div><slot /></div>'},
                     BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+                    BDropdown: {template: '<div><slot /></div>'},
+                    BDropdownItemButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
                     BAlert: {template: '<div><slot /></div>', emits: ['dismissed']},
                     TreeTable: TreeTableStub,
                 },
@@ -141,6 +160,8 @@ describe('UnidadeView.vue', () => {
                 BCard: {template: '<div><slot /></div>'},
                 BCardBody: {template: '<div><slot /></div>'},
                 BButton: {template: `<button @click="$emit('click')"><slot /></button>`},
+                BDropdown: {template: '<div><slot /></div>'},
+                BDropdownItemButton: {template: `<button @click="$emit('click')"><slot /></button>`},
                 BAlert: {template: '<div><slot /></div>', emits: ['dismissed']},
                 TreeTable: TreeTableStub,
             },
@@ -212,6 +233,38 @@ describe('UnidadeView.vue', () => {
             name: 'SubprocessoMapa',
             params: {codProcesso: 99, siglaUnidade: 'TEST'}
         });
+    });
+
+    it('exporta PDF do mapa vigente para CHEFE', async () => {
+        mockObterReferenciaMapaVigente.mockResolvedValueOnce(mockMapaVigente);
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'CHEFE',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: false},
+            },
+        });
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-exportar-mapa-vigente-pdf"]').trigger('click');
+
+        expect(downloadRelatorioMapaVigenteUnidadePdf).toHaveBeenCalledWith(1);
+        expect(notify).not.toHaveBeenCalled();
+    });
+
+    it('exporta CSV do mapa vigente para CHEFE', async () => {
+        mockObterReferenciaMapaVigente.mockResolvedValueOnce(mockMapaVigente);
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'CHEFE',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: false},
+            },
+        });
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-exportar-mapa-vigente-csv"]').trigger('click');
+
+        expect(downloadRelatorioMapaVigenteUnidadeCsv).toHaveBeenCalledWith(1);
+        expect(notify).not.toHaveBeenCalled();
     });
 
     it('displays error alert when fetching unit fails', async () => {

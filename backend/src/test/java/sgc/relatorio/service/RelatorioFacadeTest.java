@@ -537,4 +537,34 @@ class RelatorioFacadeTest {
                 .hasMessageContaining("Erro ao gerar PDF");
     }
 
+    @Test
+    @DisplayName("Deve obter relatório do mapa vigente da unidade a partir do vínculo vigente")
+    void deveObterRelatorioMapaVigenteDaUnidade() {
+        mockContextoAdmin();
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSigla("U1");
+        unidade.setNome("Unidade 1");
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+
+        Competencia competencia = new Competencia();
+        competencia.setCodigo(100L);
+        competencia.setDescricao("Comp 1");
+        competencia.setAtividades(Set.of());
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
+        when(unidadeService.buscarMapaVigente(1L)).thenReturn(Optional.of(mapa));
+        when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(competencia));
+
+        RelatorioMapaDto resultado = relatorioService.obterRelatorioMapaVigenteUnidade(1L);
+
+        assertThat(resultado.codigoUnidade()).isEqualTo(1L);
+        assertThat(resultado.siglaUnidade()).isEqualTo("U1");
+        assertThat(resultado.totalCompetencias()).isEqualTo(1);
+        verify(unidadeService).buscarMapaVigente(1L);
+        verify(mapaManutencaoService, never()).mapaVigenteUnidade(anyLong());
+    }
+
 }
