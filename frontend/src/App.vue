@@ -7,7 +7,6 @@ import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
 import {TEXTOS} from "@/constants/textos";
 import {usePerfilStore} from "@/stores/perfil";
-import {useOrganizacaoStore} from "@/stores/organizacao";
 import {useCacheSync} from "@/composables/useCacheSync";
 import {useConfiguracoes} from "@/composables/useConfiguracoes";
 import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
@@ -20,7 +19,6 @@ interface PackageJson {
 
 const route = useRoute();
 const perfilStore = usePerfilStore();
-const organizacaoStore = useOrganizacaoStore();
 const {carregarConfiguracoes} = useConfiguracoes();
 const {getTemaEscuro, setContextoUsuarioTemaEscuro} = useTemaPreferencia();
 const version = (pkg as PackageJson).version;
@@ -68,22 +66,6 @@ watch(
 
       const encerrarSincronizacao = useCacheSync();
       aoLimpar(encerrarSincronizacao);
-    },
-    {immediate: true}
-);
-
-const devePrecarregarDiagnostico = computed(
-    () => perfilStore.permissoesSessao?.mostrarDiagnosticoOrganizacional === true
-);
-
-watch(
-    () => [perfilStore.usuarioCodigo, devePrecarregarDiagnostico.value, organizacaoStore.carregado, route.path],
-    async ([codigo, deveExibir, carregado, path]) => {
-      if (!codigo || !deveExibir || carregado || path === "/login" || path === "/erro") {
-        return;
-      }
-
-      await organizacaoStore.garantirDiagnostico(true);
     },
     {immediate: true}
 );

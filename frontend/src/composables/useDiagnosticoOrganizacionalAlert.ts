@@ -56,6 +56,14 @@ export function useDiagnosticoOrganizacionalAlert(
     }
 
     watch(
+        () => mostrarDiagnosticoOrganizacional.value,
+        async (deveExibir) => {
+            await organizacaoStore.garantirDiagnostico(deveExibir);
+        },
+        {immediate: true},
+    );
+
+    watch(
         [() => mostrarDiagnosticoOrganizacional.value, gruposDiagnostico, unidades],
         async () => {
             if (!mostrarDiagnosticoOrganizacional.value || unidadesReferenciaCarregadas.value || carregandoUnidadesReferencia.value) {
