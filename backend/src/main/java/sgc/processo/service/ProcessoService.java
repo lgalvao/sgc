@@ -14,6 +14,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.configuracoes.*;
 import sgc.mapa.model.*;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -65,7 +66,7 @@ public class ProcessoService {
     private final SubprocessoTransicaoService transicaoService;
     private final CadastroFluxoService cadastroFluxoService;
     private final ConfiguracaoService configuracaoService;
-    private final MapaRepo mapaRepo;
+    private final MapaManutencaoService mapaManutencaoService;
 
 
     @Transactional(readOnly = true)
@@ -531,7 +532,7 @@ public class ProcessoService {
         List<Long> codigosSubprocessos = subprocessos.stream()
                 .map(Subprocesso::getCodigo)
                 .toList();
-        Map<Long, Mapa> mapasPorSubprocesso = mapaRepo.listarPorSubprocessos(codigosSubprocessos).stream()
+        Map<Long, Mapa> mapasPorSubprocesso = mapaManutencaoService.buscarMapasPorSubprocessos(codigosSubprocessos).stream()
                 .collect(Collectors.toMap(mapa -> mapa.getSubprocesso().getCodigo(), mapa -> mapa));
 
         Map<Long, Mapa> mapasPorUnidade = subprocessos.stream()

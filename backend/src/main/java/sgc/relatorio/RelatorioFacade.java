@@ -102,17 +102,19 @@ public class RelatorioFacade {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioMapas(List<Long> codigosUnidades, OutputStream outputStream) {
+        List<RelatorioMapaDto> relatorios = obterRelatorioMapas(codigosUnidades);
         gerarRelatorioMapasPdf(
-                obterRelatorioMapas(codigosUnidades),
+                relatorios,
                 new CabecalhoRelatorio(
                         "Relatório de Mapas Vigentes",
                         "Escopo",
                         "Unidades selecionadas",
                         LocalDateTime.now(),
                         null,
-                        0
+                        relatorios.size()
                 ),
-                outputStream
+                outputStream,
+                this::adicionarSecaoMapaCompleta
         );
     }
 
@@ -147,7 +149,8 @@ public class RelatorioFacade {
                         null,
                         1
                 ),
-                outputStream
+                outputStream,
+                this::adicionarConteudoMapa
         );
     }
 
@@ -173,7 +176,8 @@ public class RelatorioFacade {
                         null,
                         1
                 ),
-                outputStream
+                outputStream,
+                this::adicionarConteudoMapa
         );
     }
 
@@ -366,7 +370,8 @@ public class RelatorioFacade {
     private void gerarRelatorioMapasPdf(
             List<RelatorioMapaDto> relatorios,
             CabecalhoRelatorio cabecalho,
-            OutputStream outputStream
+            OutputStream outputStream,
+            SecaoPdfConsumer secaoConsumer
     ) {
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
@@ -374,11 +379,32 @@ public class RelatorioFacade {
             adicionarCabecalhoRelatorio(document, cabecalho);
 
             for (RelatorioMapaDto relatorio : relatorios) {
-                adicionarSecaoMapa(document, relatorio);
+                secaoConsumer.accept(document, relatorio);
             }
         } catch (DocumentException | IOException e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
         }
+    }
+
+    @FunctionalInterface
+    private interface SecaoPdfConsumer {
+        void accept(Document document, RelatorioMapaDto relatorio) throws DocumentException;
+    }
+
+    private void adicionarSecaoMapaCompleta(Document document, RelatorioMapaDto relatorio) throws DocumentException {
+        adicionarIdentificacaoUnidade(document, relatorio);
+        adicionarConteudoMapa(document, relatorio);
+    }
+
+    private void adicionarIdentificacaoUnidade(Document document, RelatorioMapaDto relatorio) throws DocumentException {
+        Paragraph sigla = new Paragraph(relatorio.siglaUnidade(), new Font(Font.HELVETICA, 15, Font.BOLD, COR_PRIMARIA));
+        sigla.setSpacingAfter(2f);
+        document.add(sigla);
+        Paragraph nome = criarParagrafo(relatorio.nomeUnidade(), new Font(Font.HELVETICA, 10, Font.BOLD, COR_SECUNDARIA), 0f);
+        nome.setSpacingAfter(4f);
+        document.add(nome);
+        document.add(new Chunk(new LineSeparator(0.8f, 100f, COR_BORDA, Element.ALIGN_CENTER, 0f)));
+        document.add(new Paragraph(" ", new Font(Font.HELVETICA, 2)));
     }
 
     private String formatarData(@Nullable LocalDateTime dataHora) {
@@ -521,16 +547,7 @@ public class RelatorioFacade {
         return p;
     }
 
-    private void adicionarSecaoMapa(Document document, RelatorioMapaDto relatorio) throws DocumentException {
-        Paragraph sigla = new Paragraph(relatorio.siglaUnidade(), new Font(Font.HELVETICA, 15, Font.BOLD, COR_PRIMARIA));
-        sigla.setSpacingAfter(2f);
-        document.add(sigla);
-        Paragraph nome = criarParagrafo(relatorio.nomeUnidade(), new Font(Font.HELVETICA, 10, Font.BOLD, COR_SECUNDARIA), 0f);
-        nome.setSpacingAfter(4f);
-        document.add(nome);
-        document.add(new Chunk(new LineSeparator(0.8f, 100f, COR_BORDA, Element.ALIGN_CENTER, 0f)));
-        document.add(new Paragraph(" ", new Font(Font.HELVETICA, 2)));
-
+    private void adicionarConteudoMapa(Document document, RelatorioMapaDto relatorio) throws DocumentException {
         for (RelatorioMapaCompetenciaDto competencia : relatorio.competencias()) {
             Paragraph tituloCompetencia = criarParagrafo(competencia.descricao(), FONTE_TEXTO_NEGRITO, 0f);
             tituloCompetencia.setSpacingAfter(4f);

@@ -92,6 +92,13 @@ public class MapaManutencaoService {
         return mapaRepo.findAll();
     }
 
+    public List<Mapa> buscarMapasPorSubprocessos(Collection<Long> codigosSubprocessos) {
+        if (codigosSubprocessos.isEmpty()) {
+            return List.of();
+        }
+        return mapaRepo.listarPorSubprocessos(codigosSubprocessos);
+    }
+
     public Optional<Mapa> mapaVigenteUnidade(Long unidadeCodigo) {
         return mapaRepo.buscarMapaVigentePorUnidade(unidadeCodigo);
     }

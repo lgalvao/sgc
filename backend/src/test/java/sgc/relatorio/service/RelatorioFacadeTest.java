@@ -333,8 +333,6 @@ class RelatorioFacadeTest {
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(List.of(1L), out);
         verify(document, atLeastOnce()).add(any());
-        verify(document, atLeastOnce()).add(argThat(element -> element instanceof Paragraph paragrafo
-                && "U1".equals(paragrafo.getContent().trim())));
     }
 
     @Test

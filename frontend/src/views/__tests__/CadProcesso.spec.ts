@@ -40,6 +40,7 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
 const unidadeStoreMock = {
     garantirArvoreElegibilidade: vi.fn().mockResolvedValue([]),
     invalidarCache: vi.fn(),
+    invalidar: vi.fn(),
 };
 
 vi.mock('@/stores/unidade', () => ({
