@@ -5,7 +5,6 @@ import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import CompetenciaAtividadeItem from "./CompetenciaAtividadeItem.vue";
 import type {Atividade, Competencia} from "@/types/tipos";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
-import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{
     mostrar: boolean;
