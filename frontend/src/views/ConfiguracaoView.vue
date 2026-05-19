@@ -155,12 +155,6 @@ async function salvar() {
   if (!pInativacao) ausentes.push('DIAS_INATIVACAO_PROCESSO');
   if (!pAlertaNovo) ausentes.push('DIAS_ALERTA_NOVO');
 
-  if (ausentes.length > 0) {
-    notify(`Os seguintes parâmetros não foram encontrados no banco de dados: ${ausentes.join(', ')}. Certifique-se de executar o script de migração SQL.`, 'danger');
-    salvando.value = false;
-    return;
-  }
-
   const paramsToSave: Parametro[] = [
     {...pInativacao!, valor: form.diasInativacao.toString()},
     {...pAlertaNovo!, valor: form.diasAlertaNovo.toString()}
