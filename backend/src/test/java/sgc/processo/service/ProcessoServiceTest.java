@@ -16,6 +16,7 @@ import sgc.comum.model.*;
 import sgc.configuracoes.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -79,7 +80,7 @@ class ProcessoServiceTest {
     @Mock
     private ConfiguracaoService configuracaoService;
     @Mock
-    private MapaRepo mapaRepo;
+    private MapaManutencaoService mapaManutencaoService;
 
     private void mockarResponsaveisEfetivos() {
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
