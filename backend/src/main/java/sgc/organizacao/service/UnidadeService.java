@@ -6,7 +6,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -20,8 +20,6 @@ public class UnidadeService {
 
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
-    private final MapaRepo mapaRepo;
-    private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
 
     public Unidade buscarPorCodigo(Long codigo) {
@@ -94,12 +92,6 @@ public class UnidadeService {
 
     public List<Long> buscarCodigosUnidadesSemMapaVigente() {
         return unidadeRepo.buscarCodigosUnidadesSemMapaVigente();
-    }
-
-    private List<Long> listarTodosCodigosDaArvore() {
-        return cacheViewsOrganizacaoService.listarTodasUnidades().stream()
-                .map(UnidadeHierarquiaLeitura::codigo)
-                .toList();
     }
 
     public List<UnidadeMapa> buscarMapasPorUnidades(List<Long> codigosUnidades) {
