@@ -117,6 +117,15 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         assertThat(unidadeMapa.getMapaVigente()).isNotNull();
         assertThat(unidadeMapa.getMapaVigente().getCodigo()).isEqualTo(subprocesso.getMapa().getCodigo());
 
+        mockMvc.perform(get("/api/unidades/{codUnidade}/mapa-vigente", unidade.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.temMapaVigente").value(true));
+
+        mockMvc.perform(get("/api/unidades/{codUnidade}/mapa-vigente/referencia", unidade.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codProcesso").value(processo.getCodigo()))
+                .andExpect(jsonPath("$.codSubprocesso").value(subprocesso.getCodigo()));
+
         aguardarEmail(1);
         assertThat(algumEmailPara("cdu21-und@tre-pe.jus.br")).isTrue();
         assertThat(algumEmailComAssunto("[SGC-TEST] Finalização do processo Processo CDU-21")).isTrue();

@@ -65,6 +65,7 @@ public class ProcessoService {
     private final SubprocessoTransicaoService transicaoService;
     private final CadastroFluxoService cadastroFluxoService;
     private final ConfiguracaoService configuracaoService;
+    private final MapaRepo mapaRepo;
 
 
     @Transactional(readOnly = true)
@@ -527,11 +528,23 @@ public class ProcessoService {
 
     private void tornarMapasVigentes(Long codProcesso) {
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
+        List<Long> codigosSubprocessos = subprocessos.stream()
+                .map(Subprocesso::getCodigo)
+                .toList();
+        Map<Long, Mapa> mapasPorSubprocesso = mapaRepo.listarPorSubprocessos(codigosSubprocessos).stream()
+                .collect(Collectors.toMap(mapa -> mapa.getSubprocesso().getCodigo(), mapa -> mapa));
+
         Map<Long, Mapa> mapasPorUnidade = subprocessos.stream()
-                .filter(sp -> sp.getMapa() != null)
+                .map(subprocesso -> {
+                    Mapa mapa = mapasPorSubprocesso.get(subprocesso.getCodigo());
+                    if (mapa == null) {
+                        throw new ErroValidacao("Subprocesso homologado sem mapa para finalizar o processo.");
+                    }
+                    return Map.entry(subprocesso.getUnidade().getCodigo(), mapa);
+                })
                 .collect(java.util.stream.Collectors.toMap(
-                        sp -> sp.getUnidade().getCodigo(),
-                        Subprocesso::getMapa,
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
                         (a, b) -> a
                 ));
         unidadeService.definirMapasVigentesEmBloco(mapasPorUnidade);

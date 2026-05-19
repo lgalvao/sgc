@@ -78,6 +78,8 @@ class ProcessoServiceTest {
     private CadastroFluxoService cadastroFluxoService;
     @Mock
     private ConfiguracaoService configuracaoService;
+    @Mock
+    private MapaRepo mapaRepo;
 
     private void mockarResponsaveisEfetivos() {
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
@@ -2069,10 +2071,18 @@ class ProcessoServiceTest {
                 .thenReturn("<html>finalizado interop</html>");
         when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso))
                 .thenReturn(ResultadoValidacao.ofValido());
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(2000L);
+        subprocesso.setUnidade(unidadeInterop);
+        Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocesso);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
+        when(mapaRepo.listarPorSubprocessos(List.of(2000L))).thenReturn(List.of(mapa));
 
         processoService.finalizar(codProcesso);
 
         verify(notificacaoService, atLeastOnce()).enfileirar(any());
+        verify(unidadeService).definirMapasVigentesEmBloco(Map.of(20L, mapa));
     }
 
     @Test
@@ -2103,10 +2113,54 @@ class ProcessoServiceTest {
                 .thenReturn("<html>consolidado</html>");
         when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso))
                 .thenReturn(ResultadoValidacao.ofValido());
+        Subprocesso subprocessoInter = new Subprocesso();
+        subprocessoInter.setCodigo(3000L);
+        subprocessoInter.setUnidade(unidadeInter);
+        Subprocesso subprocessoOper = new Subprocesso();
+        subprocessoOper.setCodigo(3001L);
+        subprocessoOper.setUnidade(unidadeOper);
+        Mapa mapaInter = new Mapa();
+        mapaInter.setSubprocesso(subprocessoInter);
+        Mapa mapaOper = new Mapa();
+        mapaOper.setSubprocesso(subprocessoOper);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocessoInter, subprocessoOper));
+        when(mapaRepo.listarPorSubprocessos(List.of(3000L, 3001L))).thenReturn(List.of(mapaInter, mapaOper));
 
         processoService.finalizar(codProcesso);
 
         verify(notificacaoService, atLeastOnce()).enfileirar(any());
+        verify(unidadeService).definirMapasVigentesEmBloco(Map.of(30L, mapaInter, 31L, mapaOper));
+    }
+
+    @Test
+    @DisplayName("finalizar deve falhar quando subprocesso homologado não tiver mapa persistido")
+    void finalizarDeveFalharQuandoSubprocessoHomologadoNaoTiverMapa() {
+        Long codProcesso = 202L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setDescricao("Processo sem mapa");
+        processo.setSituacao(EM_ANDAMENTO);
+        processo.setTipo(MAPEAMENTO);
+
+        Unidade unidade = criarUnidadeValida(40L);
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(4000L);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
+
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ResultadoValidacao.ofValido());
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
+        when(mapaRepo.listarPorSubprocessos(List.of(4000L))).thenReturn(List.of());
+
+        assertThatThrownBy(() -> processoService.finalizar(codProcesso))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("Subprocesso homologado sem mapa");
+
+        verify(unidadeService, never()).definirMapasVigentesEmBloco(anyMap());
+        verify(processoRepo, never()).save(any());
     }
 
 }
