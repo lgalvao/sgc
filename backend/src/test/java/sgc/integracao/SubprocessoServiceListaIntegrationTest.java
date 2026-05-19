@@ -156,7 +156,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
         SubprocessoSituacaoDto resultado = consultaService.obterStatus(subprocesso.getCodigo());
 
         assertThat(resultado.codigo()).isEqualTo(subprocesso.getCodigo());
-        assertThat(resultado.situacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(resultado.situacao()).isEqualTo(subprocesso.getSituacao());
     }
 
     @Test
@@ -215,6 +215,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
 
         assertThat(resultado.getCodigo()).isEqualTo(subprocessoEmEdicao.getMapa().getCodigo());
         assertThat(resultado.getSubprocesso().getCodigo()).isEqualTo(subprocessoEmEdicao.getCodigo());
+        assertThat(resultado.getObservacoesDisponibilizacao()).isEqualTo("Justificativa teste");
     }
 
     @Test
