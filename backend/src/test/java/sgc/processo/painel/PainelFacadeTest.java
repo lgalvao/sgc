@@ -136,6 +136,30 @@ class PainelFacadeTest {
         assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
         assertThat(result.getContent().getFirst().getDescricao()).contains("Lembrete");
         assertThat(result.getContent().getFirst().getProcesso().getDescricao()).isEqualTo("Processo teste");
+        verify(alertaFacade).aplicarPrazoConfiguradoLeituraAutomatica(result.getContent());
+    }
+
+    @Test
+    @DisplayName("Deve aplicar prazo configurado aos alertas do painel")
+    void deveAplicarPrazoConfiguradoAosAlertasDoPainel() {
+        Alerta alertaAntigo = new Alerta();
+        alertaAntigo.setCodigo(5L);
+        alertaAntigo.setDataHora(LocalDateTime.now().minusDays(5));
+
+        Page<Alerta> page = new PageImpl<>(List.of(alertaAntigo));
+        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
+        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(5L))).thenReturn(Map.of());
+        doAnswer(invocation -> {
+            Collection<Alerta> alertas = invocation.getArgument(0);
+            alertas.forEach(alerta -> alerta.setDataHoraLeitura(alerta.getDataHora().plusDays(3)));
+            return null;
+        }).when(alertaFacade).aplicarPrazoConfiguradoLeituraAutomatica(anyCollection());
+
+        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
+
+        assertThat(result.getContent()).singleElement().satisfies(alerta ->
+                assertThat(alerta.getDataHoraLeitura()).isEqualTo(alerta.getDataHora().plusDays(3))
+        );
     }
 
     @Test

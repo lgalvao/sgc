@@ -86,6 +86,7 @@ public class PainelFacade {
                 contextoUsuario.usuarioTitulo(),
                 alertasPage.stream().map(Alerta::getCodigo).toList());
         alertasPage.forEach(alerta -> alerta.setDataHoraLeitura(leiturasPorAlerta.get(alerta.getCodigo())));
+        alertaFacade.aplicarPrazoConfiguradoLeituraAutomatica(alertasPage.getContent());
         return alertasPage;
     }
 

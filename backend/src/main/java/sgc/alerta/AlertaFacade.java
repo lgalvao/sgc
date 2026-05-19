@@ -52,20 +52,23 @@ public class AlertaFacade {
             if (dataHoraLeitura != null) mapaLeitura.put(alertaUsuario.getCodigo().getAlertaCodigo(), dataHoraLeitura);
         }
 
+        alertas.forEach(alerta -> alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo())));
+        aplicarPrazoConfiguradoLeituraAutomatica(alertas);
+
+        return alertas;
+    }
+
+    public void aplicarPrazoConfiguradoLeituraAutomatica(Collection<Alerta> alertas) {
         int diasAlertaNovo = configuracaoService.buscarDiasAlertaNovo();
         LocalDateTime corteLeituraAutomatica = LocalDateTime.now().minusDays(diasAlertaNovo);
         alertas.forEach(alerta -> {
-            LocalDateTime leitura = mapaLeitura.get(alerta.getCodigo());
-            if (leitura != null) {
-                alerta.setDataHoraLeitura(leitura);
+            if (alerta.getDataHoraLeitura() != null) {
                 return;
             }
             if (alerta.getDataHora().isBefore(corteLeituraAutomatica)) {
                 alerta.setDataHoraLeitura(alerta.getDataHora().plusDays(diasAlertaNovo));
             }
         });
-
-        return alertas;
     }
 
     public List<Alerta> listarNaoLidos(ContextoUsuarioAutenticado contextoUsuario) {

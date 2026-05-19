@@ -8,12 +8,15 @@ import org.springframework.security.core.*;
 import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
+import sgc.configuracoes.*;
+import sgc.configuracoes.model.*;
 import sgc.alerta.model.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
+import java.time.*;
 import java.util.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
     private static final String API_PAINEL_ALERTAS = "/api/painel/alertas";
+    private static final String API_PAINEL_BOOTSTRAP = "/api/painel/bootstrap";
     private static final String GESTOR = "GESTOR";
     private static final String CHEFE = "CHEFE";
     private static final String PROCESSO_RAIZ_JSON_PATH = "$.content[?(@.descricao == 'Processo raiz')]";
@@ -37,6 +41,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
     @Autowired
     private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private ConfiguracaoRepo configuracaoRepo;
 
     private Unidade unidadeRaiz;
     private Unidade unidadeFilha2;
@@ -216,6 +222,33 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta pessoal SERVIDOR')]").exists())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta unidade SERVIDOR')]").doesNotExist());
+        }
+
+        @Test
+        @DisplayName("CDU-02: Bootstrap do painel deve considerar alerta antigo como lido pelo prazo configurado")
+        void testBootstrapAplicaPrazoConfiguradoAoAlertaAntigo() throws Exception {
+            setupSecurityContext("99008", unidadeRaiz, Perfil.ADMIN);
+
+            Configuracao configuracaoDiasAlertaNovo = configuracaoRepo
+                    .findByChave(ConfiguracaoService.CHAVE_DIAS_ALERTA_NOVO)
+                    .orElseGet(() -> configuracaoRepo.save(Configuracao.builder()
+                            .chave(ConfiguracaoService.CHAVE_DIAS_ALERTA_NOVO)
+                            .descricao("Dias para indicação de alerta como não lido")
+                            .valor("3")
+                            .build()));
+            configuracaoDiasAlertaNovo.setValor("3");
+            configuracaoRepo.saveAndFlush(configuracaoDiasAlertaNovo);
+
+            Alerta alertaAntigo = AlertaFixture.alertaParaUnidade(processoRaiz, unidadeRaiz);
+            alertaAntigo.setCodigo(null);
+            alertaAntigo.setDescricao("Alerta antigo bootstrap");
+            alertaAntigo.setDataHora(LocalDateTime.now().minusDays(5));
+            alertaRepo.saveAndFlush(alertaAntigo);
+
+            mockMvc.perform(get(API_PAINEL_BOOTSTRAP))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.alertas[?(@.descricao == 'Alerta antigo bootstrap')]").exists())
+                    .andExpect(jsonPath("$.alertas[?(@.descricao == 'Alerta antigo bootstrap' && @.dataHoraLeitura != null)]").exists());
         }
     }
 }
