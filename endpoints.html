@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGC — Catálogo de Endpoints</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #243047; --border: #334155;
+    --text: #e2e8f0; --text-muted: #94a3b8; --text-dim: #64748b;
+    --green: #22c55e; --blue: #3b82f6; --orange: #f97316; --red: #ef4444;
+    --purple: #a855f7; --yellow: #eab308; --teal: #14b8a6; --pink: #ec4899;
+    --get: #22c55e; --post: #f97316; --sse: #a855f7;
+    --admin: #ef4444; --gestor: #f97316; --chefe: #eab308; --servidor: #22c55e; --all: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.6; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Layout */
+  #layout { display: flex; min-height: 100vh; }
+  #sidebar { width: 260px; min-width: 260px; background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+  #main { flex: 1; overflow: auto; padding: 32px 40px; max-width: 1100px; }
+
+  /* Sidebar */
+  .sidebar-title { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .08em; padding: 8px 16px 4px; }
+  .sidebar-group { margin-bottom: 4px; }
+  .sidebar-group-header { display: flex; align-items: center; gap: 8px; padding: 6px 16px; cursor: pointer; color: var(--text-muted); font-weight: 600; font-size: 13px; border-radius: 4px; margin: 0 6px; }
+  .sidebar-group-header:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-links { padding-left: 16px; }
+  .sidebar-link { display: block; padding: 4px 16px; color: var(--text-dim); font-size: 12px; border-radius: 4px; margin: 0 6px; }
+  .sidebar-link:hover { background: var(--surface2); color: var(--text); text-decoration: none; }
+  .badge-method { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; display: inline-block; }
+  .badge-GET { background: #14532d; color: var(--get); }
+  .badge-POST { background: #7c2d12; color: var(--post); }
+  .badge-SSE { background: #4a1d96; color: var(--sse); }
+
+  /* Main */
+  h1 { font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .subtitle { color: var(--text-muted); margin-bottom: 32px; font-size: 15px; }
+  h2 { font-size: 20px; font-weight: 700; color: var(--text); margin: 48px 0 16px; padding-top: 48px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 24px 0 8px; }
+
+  /* Endpoint card */
+  .endpoint-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .endpoint-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .endpoint-header:hover { background: var(--surface2); }
+  .method { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; min-width: 48px; text-align: center; }
+  .method-GET { background: #14532d; color: var(--get); }
+  .method-POST { background: #7c2d12; color: var(--post); }
+  .method-SSE { background: #4a1d96; color: var(--sse); }
+  .endpoint-path { font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 13px; color: var(--text); }
+  .endpoint-path .param { color: var(--yellow); }
+  .endpoint-title { color: var(--text-muted); font-size: 13px; margin-left: auto; }
+  .endpoint-body { padding: 0 16px 16px; border-top: 1px solid var(--border); }
+  .endpoint-body .section { margin-top: 14px; }
+  .endpoint-body .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin-bottom: 6px; }
+
+  /* Auth badge */
+  .auth-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+  .auth-ADMIN { background: #450a0a; color: var(--red); }
+  .auth-GESTOR { background: #431407; color: var(--orange); }
+  .auth-CHEFE { background: #422006; color: var(--yellow); }
+  .auth-SERVIDOR { background: #052e16; color: var(--green); }
+  .auth-ALL { background: #172554; color: var(--blue); }
+  .auth-PUBLIC { background: #1c1917; color: var(--text-dim); }
+  .auth-PERM { background: #1e1b4b; color: var(--purple); }
+
+  /* Profile badge */
+  .profile-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #1e1b4b; color: var(--purple); font-weight: 600; }
+
+  /* Code block */
+  code { font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 12px; background: #0f172a; padding: 1px 5px; border-radius: 3px; color: var(--teal); }
+  pre { background: #0f172a; border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow-x: auto; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 12px; color: var(--teal); margin: 6px 0; }
+
+  /* Tags grid */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+  .tag-warn { background: #451a03; color: var(--orange); border-color: #7c2d12; }
+  .tag-danger { background: #450a0a; color: var(--red); border-color: #7f1d1d; }
+  .tag-ok { background: #052e16; color: var(--green); border-color: #14532d; }
+  .tag-info { background: #172554; color: var(--blue); border-color: #1e3a8a; }
+
+  /* Notices */
+  .notice { border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 13px; }
+  .notice-warn { background: #451a03; border-left: 3px solid var(--orange); }
+  .notice-info { background: #172554; border-left: 3px solid var(--blue); }
+  .notice-ok { background: #052e16; border-left: 3px solid var(--green); }
+  .notice-danger { background: #450a0a; border-left: 3px solid var(--red); }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 13px; }
+  th { background: var(--surface2); color: var(--text-muted); text-align: left; padding: 6px 10px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  /* Diagram */
+  .diagram { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 16px 0; overflow-x: auto; }
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .flow-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .flow-arrow { color: var(--text-dim); font-size: 18px; }
+  .flow-box-blue { background: #172554; border-color: #1e3a8a; color: var(--blue); }
+  .flow-box-green { background: #052e16; border-color: #14532d; color: var(--green); }
+  .flow-box-orange { background: #431407; border-color: #7c2d12; color: var(--orange); }
+  .flow-box-purple { background: #1e1b4b; border-color: #4c1d95; color: var(--purple); }
+  .flow-box-red { background: #450a0a; border-color: #7f1d1d; color: var(--red); }
+
+  /* Summary stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 24px 0; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+  .stat-number { font-size: 28px; font-weight: 700; color: var(--blue); }
+  .stat-label { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  /* Collapsible - all open by default */
+  details summary { list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+</style>
+</head>
+<body>
+<div id="layout">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div style="padding:16px;border-bottom:1px solid var(--border);margin-bottom:8px;">
+    <div style="font-weight:700;font-size:15px;color:var(--text);">SGC · Endpoints</div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Catálogo completo da API</div>
+  </div>
+  <div class="sidebar-title">Grupos</div>
+
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-auth" style="color:inherit;">🔐 Autenticação</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-painel" style="color:inherit;">�� Painel</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-processos" style="color:inherit;">📋 Processos</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-subprocessos" style="color:inherit;">🔀 Subprocessos</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-atividades" style="color:inherit;">📝 Atividades</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-mapas" style="color:inherit;">🗺 Mapas</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-unidades" style="color:inherit;">🏢 Unidades</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-usuarios" style="color:inherit;">👤 Usuários</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-relatorios" style="color:inherit;">📊 Relatórios</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-alertas" style="color:inherit;">🔔 Alertas</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-notificacoes" style="color:inherit;">📧 Notificações</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-config" style="color:inherit;">⚙️ Configurações</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-cache" style="color:inherit;">🗄 Cache / SSE</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-feedback" style="color:inherit;">💬 Feedback</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-e2e" style="color:inherit;">🧪 E2E / Fixtures</a></div></div>
+  <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-analise" style="color:inherit;">🔍 Análise Geral</a></div></div>
+
+  <div style="padding:16px;margin-top:16px;border-top:1px solid var(--border);">
+    <div style="font-size:11px;color:var(--text-dim);">Gerado em 2026-05-20</div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+<h1>SGC — Catálogo Completo de Endpoints</h1>
+<p class="subtitle">Documentação abrangente de todos os endpoints da API REST do Sistema de Gestão de Competências (SGC). Base: Spring Boot 4 / Java 25.</p>
+
+<!-- STATS -->
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-number">~120</div><div class="stat-label">Endpoints total</div></div>
+  <div class="stat-card"><div class="stat-number">18</div><div class="stat-label">Controllers</div></div>
+  <div class="stat-card"><div class="stat-number">4</div><div class="stat-label">Perfis de acesso</div></div>
+  <div class="stat-card"><div class="stat-number">3</div><div class="stat-label">Perfis Spring ativos</div></div>
+  <div class="stat-card"><div class="stat-number">JWT</div><div class="stat-label">Autenticação</div></div>
+</div>
+
+<!-- FLUXO GERAL -->
+<h2>Arquitetura Geral</h2>
+<div class="diagram">
+  <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:14px;">Fluxo de autenticação e uso típico</div>
+  <div class="flow">
+    <div class="flow-box">Frontend Vue 3</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-box-orange">POST /api/usuarios/login</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-box-purple">Cookie jwtToken (24h) ou SGC_PRE_AUTH (5min)</div>
+  </div>
+  <div class="flow" style="margin-top:10px;">
+    <div class="flow-box flow-box-purple">Cookie jwtToken</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">JwtAuthFilter</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">SecurityContextHolder (perfil + unidade)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-box-blue">Qualquer endpoint autenticado</div>
+  </div>
+  <div style="margin-top:16px;font-size:12px;color:var(--text-dim);">
+    <strong style="color:var(--text-muted);">Perfis:</strong> ADMIN · GESTOR · CHEFE · SERVIDOR<br>
+    <strong style="color:var(--text-muted);">Permissões granulares:</strong> via <code>SgcPermissionEvaluator</code> + anotações <code>@PreAuthorize</code> / <code>@PostAuthorize</code><br>
+    <strong style="color:var(--text-muted);">Spring profiles:</strong> <code>default/prod</code> · <code>hom</code> (homologação, ativa extras) · <code>e2e</code> (testes E2E)
+  </div>
+</div>
+
+<!-- FLUXO DE PROCESSO -->
+<div class="diagram">
+  <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:14px;">Ciclo de vida de um Processo / Subprocesso</div>
+  <div class="flow">
+    <div class="flow-box flow-box-blue">CRIADO</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-box-orange">iniciar</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-box-orange">EM_ANDAMENTO</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-box-green">finalizar</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-box-green">FINALIZADO</div>
+  </div>
+  <div style="font-size:12px;color:var(--text-dim);margin-top:12px;">
+    Cada Subprocesso dentro do processo passa por estados:<br>
+    <strong style="color:var(--text-muted);">Cadastro:</strong> NAO_INICIADO → CADASTRO_EM_ANDAMENTO → CADASTRO_DISPONIBILIZADO → CADASTRO_DEVOLVIDO → CADASTRO_ACEITO → CADASTRO_HOMOLOGADO<br>
+    <strong style="color:var(--text-muted);">Mapa:</strong> MAPEAMENTO_NAO_INICIADO → MAPA_DISPONIBILIZADO → MAPA_EM_VALIDACAO → MAPA_DEVOLVIDO_PARA_AJUSTE → MAPA_VALIDADO → MAPA_ACEITO → MAPEAMENTO_MAPA_HOMOLOGADO
+  </div>
+</div>
+
+<!-- =========================================
+     AUTENTICAÇÃO
+========================================= -->
+<h2 id="sec-auth">🔐 Autenticação — <code>/api/usuarios</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>LoginController</code>. Não requer autenticação prévia. Gerencia o fluxo de dois passos: credenciais → seleção de perfil.</p>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/usuarios/login</span>
+    <span class="endpoint-title">Iniciar sessão</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div>
+      <p>Autentica o usuário (credenciais verificadas contra o LDAP/base). Se o usuário possui apenas um perfil/unidade, já conclui o login e retorna o JWT. Se possui múltiplos perfis, retorna lista de opções e um cookie temporário <code>SGC_PRE_AUTH</code> (5 min) para o passo 2.</p>
+    </div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PUBLIC">Público (sem auth)</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div>
+      <pre>{ "tituloEleitoral": "12345678901", "senha": "••••••" }</pre>
+    </div>
+    <div class="section"><div class="section-label">Resposta</div>
+      <pre>{ "autenticado": true, "requerSelecaoPerfil": false, "perfisUnidades": [...], "sessao": { "tituloEleitoral": "...", "nome": "...", "perfil": "ADMIN", "unidadeCodigo": 1, "permissoes": {...} } }</pre>
+    </div>
+    <div class="section"><div class="section-label">Uso no frontend</div>
+      <code>usuarioService.login()</code> → store de autenticação Pinia → redireciona para painel ou tela de seleção de perfil.
+    </div>
+    <div class="section"><div class="section-label">Notas de implementação</div>
+      <ul style="color:var(--text-muted);padding-left:20px;font-size:13px;">
+        <li>Rate limiting via <code>LimitadorTentativasLogin</code> por IP</li>
+        <li>Cookies são <code>HttpOnly</code>; <code>Secure</code> configurável via <code>aplicacao.cookies.secure</code></li>
+        <li>Cookie JWT tem <code>maxAge=86400</code> (24h); PRE_AUTH tem <code>maxAge=300</code> (5min)</li>
+        <li>Sanitização de IP contra log injection (CWE-117)</li>
+      </ul>
+    </div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-ok">✅ Endpoint bem projetado. O fluxo de dois passos para múltiplos perfis é elegante. Considera-se adequado.</div>
+      <div class="notice notice-info">💡 Melhoria potencial: o campo <code>requerSelecaoPerfil</code> na resposta é redundante com <code>sessao == null</code>. Poderia ser simplificado.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/usuarios/entrar</span>
+    <span class="endpoint-title">Selecionar perfil (passo 2)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div>
+      <p>Passo 2 do login. Chamado apenas quando o usuário tem múltiplos perfis/unidades. Requer cookie <code>SGC_PRE_AUTH</code> válido. Emite o JWT final e apaga o cookie temporário.</p>
+    </div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PUBLIC">Requer cookie SGC_PRE_AUTH</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div>
+      <pre>{ "perfil": "CHEFE", "unidadeCodigo": 42 }</pre>
+    </div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>usuarioService.entrar()</code> → mesmo store de auth.</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-ok">✅ Necessário e correto. Sem problemas identificados.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/usuarios/logout</span>
+    <span class="endpoint-title">Encerrar sessão</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Remove os cookies <code>jwtToken</code> e <code>SGC_PRE_AUTH</code> (maxAge=0). Sem blacklist de tokens — o JWT continua tecnicamente válido até expirar.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PUBLIC">Público (sem auth)</span></div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-warn">⚠️ Não há invalidação server-side do JWT. Em cenários de segurança elevada (comprometimento de sessão), o token continua válido até expirar (24h). Melhoria: implementar blacklist de tokens (Redis) ou usar tokens de curta duração + refresh token.</div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAINEL
+========================================= -->
+<h2 id="sec-painel">🏠 Painel — <code>/api/painel</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>PainelController</code>. Dashboard principal do sistema. Todos os endpoints usam o contexto do JWT para filtrar dados.</p>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/painel/bootstrap</span>
+    <span class="endpoint-title">Dados iniciais do painel (BFF)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Endpoint BFF (Backend-for-Frontend) que retorna em uma única chamada tudo que o painel precisa na carga inicial: processos relevantes + alertas não lidos + contadores. Reduz drasticamente o número de roundtrips na abertura da tela.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos os perfis autenticados</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>painelService.obterBootstrap()</code> → store Pinia <code>usePainelStore</code> na montagem da view do painel.</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-ok">✅ Excelente padrão BFF. Substitui múltiplas chamadas paralelas. Mantê-lo é prioritário para performance.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/painel/processos</span>
+    <span class="endpoint-title">Lista paginada de processos do painel</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Lista paginada dos processos visíveis ao usuário autenticado (baseado no perfil e unidade do JWT). ADMIN vê todos; perfis menores veem apenas processos de sua unidade ou hierarquia.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos os perfis autenticados</span></div>
+    <div class="section"><div class="section-label">Query Params</div>
+      <table><tr><th>Param</th><th>Tipo</th><th>Descrição</th></tr>
+        <tr><td><code>page</code></td><td>int</td><td>Número da página (0-based)</td></tr>
+        <tr><td><code>size</code></td><td>int</td><td>Tamanho (padrão: 20)</td></tr>
+        <tr><td><code>sort</code></td><td>string</td><td>Campo de ordenação</td></tr>
+      </table>
+    </div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>painelService.listarProcessos()</code> → paginação no componente do painel.</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-info">💡 O endpoint <code>/bootstrap</code> já retorna os processos iniciais. Este endpoint é usado para paginação subsequente — faz sentido existir. Avaliar se o tamanho padrão de 20 é suficiente para evitar paginação na maioria dos casos.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/painel/alertas</span>
+    <span class="endpoint-title">Lista paginada de alertas do painel</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Alertas do usuário conforme CDU-02: alertas pessoais do usuário ou de sua unidade ativa (sem recursividade na hierarquia).</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos os perfis autenticados</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>painelService.listarAlertas()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/painel/alertas/marcar-lidos</span>
+    <span class="endpoint-title">Marcar alertas como lidos</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Marca uma lista de alertas como lidos para o usuário autenticado. Chamado assincronamente pelo frontend após exibir a lista.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos os perfis autenticados</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div><pre>[1, 2, 3, 42]</pre></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>painelService.marcarAlertasLidos()</code> — fire-and-forget.</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-warn">⚠️ Duplicação: <code>AlertaController</code> também tem <code>POST /api/alertas/marcar-como-lidos</code> com o mesmo propósito. Dois endpoints distintos para a mesma operação. Deve-se consolidar em um único.</div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     PROCESSOS
+========================================= -->
+<h2 id="sec-processos">📋 Processos — <code>/api/processos</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controllers: <code>ProcessoController</code> (todos os ambientes) + <code>ProcessoExclusaoController</code> (profile=hom). Gerencia o ciclo de vida dos processos de mapeamento, revisão e diagnóstico.</p>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos</span>
+    <span class="endpoint-title">Criar processo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Cria um novo processo (MAPEAMENTO, REVISÃO ou DIAGNÓSTICO) no estado CRIADO. O processo fica visível mas não ativo até ser iniciado.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div>
+      <pre>{ "descricao": "Mapeamento 2025", "tipo": "MAPEAMENTO", "dataLimite": "2025-12-31" }</pre>
+    </div>
+    <div class="section"><div class="section-label">Resposta</div>201 Created com <code>ProcessoResumoDto</code> e header <code>Location</code>.</div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.criarProcesso()</code> → tela de criação de processo (só visível para ADMIN).</div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span></span>
+    <span class="endpoint-title">Obter processo por código</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span> ou usuário com acesso ao processo via hierarquia.</div>
+    <div class="section"><div class="section-label">Uso no frontend</div>Usado pontualmente em telas de detalhe.</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-info">💡 Este endpoint retorna apenas o resumo (<code>ProcessoResumoDto</code>). Para o detalhe completo, o frontend usa <code>/detalhes</code> ou <code>/contexto-completo</code>. Considerar se este endpoint ainda tem uso específico ou pode ser unificado.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/detalhes</span>
+    <span class="endpoint-title">Detalhes do processo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Retorna o <code>ProcessoDetalheDto</code> com todas as unidades participantes e seus subprocessos. Usado em telas de acompanhamento.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span> ou acesso via hierarquia.</div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.obterDetalhesProcesso()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/contexto-completo</span>
+    <span class="endpoint-title">Contexto completo do processo (BFF)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Endpoint BFF — retorna tudo que a view de detalhe de processo precisa de uma vez, incluindo permissões calculadas para cada subprocesso. Chamado na abertura da página de processo.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span> ou acesso via hierarquia.</div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.buscarContextoCompleto()</code></div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-ok">✅ Padrão BFF correto. Diferente de <code>/detalhes</code> (sem permissões calculadas): este inclui as permissões de UI para cada subprocesso, evitando N+1 requests no frontend.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/iniciar</span>
+    <span class="endpoint-title">Iniciar processo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Transiciona o processo de CRIADO para EM_ANDAMENTO. Recebe a lista de unidades participantes e cria os subprocessos correspondentes. Dispara notificações para os responsáveis.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div>
+      <pre>{ "tipo": "MAPEAMENTO", "unidades": [{ "codigo": 1 }, { "codigo": 2 }] }</pre>
+    </div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.iniciarProcesso()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/finalizar</span>
+    <span class="endpoint-title">Finalizar processo (CDU-21)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Transiciona o processo para FINALIZADO. Exige que todos os subprocessos estejam homologados. Tornar os mapas das unidades participantes como mapas vigentes.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.finalizarProcesso()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/atualizar</span>
+    <span class="endpoint-title">Atualizar processo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Atualiza campos editáveis do processo (descrição, data limite, etc.) antes ou durante o andamento.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.atualizarProcesso()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/excluir</span>
+    <span class="endpoint-title">Excluir processo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Exclui o processo se ainda estiver no estado CRIADO (sem subprocessos iniciados). Para processos em andamento, usar a rota de exclusão completa disponível apenas no perfil <code>hom</code>.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.excluirProcesso()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/excluir-completo</span>
+    <span class="endpoint-title">Excluir processo com todos dependentes</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Remove o processo e todos os seus dependentes em cascata (subprocessos, mapas, atividades, análises, movimentações, notificações, alertas). Disponível apenas no ambiente de homologação para facilitar resets de teste.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span> <span class="profile-badge">profile: hom</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.excluirProcessoCompleto()</code></div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-warn">⚠️ Perigoso por natureza, mas adequadamente restrito ao perfil <code>hom</code>. A restrição de perfil Spring garante que nunca chegue a produção.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/ativos</span>
+    <span class="endpoint-title">Listar processos ativos</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Retorna todos os processos com situação <code>EM_ANDAMENTO</code>. Usado para popular selects e listagens admin.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados</span></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/finalizados</span>
+    <span class="endpoint-title">Listar processos finalizados</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Retorna todos os processos com situação <code>FINALIZADO</code>. Usado principalmente para a funcionalidade de importação de atividades.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.buscarProcessosFinalizados()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/para-importacao</span>
+    <span class="endpoint-title">Listar processos para importação de atividades</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Subconjunto dos processos finalizados que são elegíveis como fonte de importação de atividades (filtra por tipo MAPEAMENTO). Usado no fluxo de revisão onde o chefe pode importar atividades de um mapeamento anterior.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.buscarProcessosParaImportacao()</code></div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-info">💡 Poderia ser unificado com <code>/finalizados</code> usando um parâmetro de filtro (<code>?elegívelImportacao=true</code>). Separar pode ser justificado por clareza de intenção.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/unidades-importacao</span>
+    <span class="endpoint-title">Listar unidades participantes para importação</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Lista todas as unidades que participaram de um processo finalizado, com o código do seu subprocesso. Permite ao chefe navegar para o subprocesso correto para importar atividades.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-CHEFE">CHEFE</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.buscarUnidadesParaImportacao()</code></div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-warn">⚠️ A restrição de acesso a somente <code>CHEFE</code> é questionável — ADMIN e GESTOR também deveriam poder visualizar? Verificar se há um caso de uso legítimo que justifique a restrição.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/unidades-bloqueadas</span>
+    <span class="endpoint-title">Listar unidades bloqueadas por tipo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Retorna IDs de unidades que já participam de um processo ativo do tipo informado. Usado para desabilitar unidades no seletor ao criar/iniciar um novo processo.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados</span></div>
+    <div class="section"><div class="section-label">Query Params</div><table><tr><th>Param</th><th>Obrigatório</th><th>Descrição</th></tr><tr><td><code>tipo</code></td><td>Sim</td><td>MAPEAMENTO, REVISAO ou DIAGNOSTICO</td></tr></table></div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-warn">⚠️ Existe também <code>GET /status-unidades?tipo=</code> com lógica similar. Possível duplicação. O endpoint <code>/status-unidades</code> retorna <code>{"unidadesDesabilitadas": [...]}</code> — mesmo dado, formato diferente. Consolidar em um só.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/status-unidades</span>
+    <span class="endpoint-title">Status de unidades por tipo (duplicado)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Mesmo propósito que <code>/unidades-bloqueadas</code>. Retorna <code>{"unidadesDesabilitadas": [...ids]}</code>.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados</span></div>
+    <div class="section"><div class="section-label">Query Params</div><code>tipo</code> (obrigatório) + <code>codProcesso</code> (opcional, não utilizado na implementação atual)</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-danger">🔴 DUPLICAÇÃO IDENTIFICADA: Este endpoint faz o mesmo que <code>/unidades-bloqueadas</code>. O parâmetro <code>codProcesso</code> é aceito mas ignorado no service. Deve ser removido ou unificado.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/subprocessos-elegiveis</span>
+    <span class="endpoint-title">Subprocessos elegíveis para ação em bloco</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Lista subprocessos do processo que estão em estados que permitem ações em bloco (aceitar/homologar/disponibilizar em massa). Usado pelo painel de ações em bloco.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span> ou <span class="auth-badge auth-GESTOR">GESTOR</span></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/subprocessos</span>
+    <span class="endpoint-title">Listar subprocessos de um processo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Listagem de todos os subprocessos do processo com seus resumos de status. Usado em várias telas de acompanhamento.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span> ou acesso via hierarquia.</div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/enviar-lembrete</span>
+    <span class="endpoint-title">Enviar lembrete de prazo</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Envia e-mail de lembrete de prazo para o responsável de uma unidade específica em um processo.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div><pre>{ "unidadeCodigo": 42 }</pre></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.enviarLembrete()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/processos/<span class="param">{codigo}</span>/acao-em-bloco</span>
+    <span class="endpoint-title">Executar ação em bloco</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Permite ao ADMIN ou GESTOR executar uma ação (ACEITAR, HOMOLOGAR ou DISPONIBILIZAR) em múltiplos subprocessos de uma vez, acelerando o fluxo de aprovação.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span> ou <span class="auth-badge auth-GESTOR">GESTOR</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div>
+      <pre>{ "unidadeCodigos": [1, 2, 3], "acao": "ACEITAR", "dataLimite": "2025-12-31" }</pre>
+    </div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.executarAcaoEmBloco()</code></div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-info">💡 Este endpoint delega para os endpoints de bloco em <code>/subprocessos</code> (aceitar-cadastro-bloco, homologar-cadastro-bloco, etc.). É um wrapper de nível processo, o que é correto arquiteturalmente.</div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     SUBPROCESSOS
+========================================= -->
+<h2 id="sec-subprocessos">🔀 Subprocessos — <code>/api/subprocessos</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>SubprocessoController</code>. Este é o controller mais complexo do sistema, concentrando ~50 endpoints que cobrem todo o fluxo de cadastro de atividades e validação de mapas de competências.</p>
+
+<div class="notice notice-info" style="margin-bottom:16px;">
+  <strong>📌 Padrão de permissões:</strong> A maioria dos endpoints usa <code>@PreAuthorize("hasPermission(..., 'Subprocesso', 'ACAO')")</code>, delegando ao <code>SgcPermissionEvaluator</code> a lógica de controle baseada na hierarquia organizacional e localização atual do subprocesso.
+</div>
+
+<h3>Consultas e contexto</h3>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/subprocessos/<span class="param">{codSubprocesso}</span>/contexto-edicao</span>
+    <span class="endpoint-title">Contexto de edição (BFF)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Endpoint BFF que retorna tudo que a tela de edição de cadastro de atividades precisa: detalhes do subprocesso, atividades atuais, permissões de UI calculadas. Evita múltiplas chamadas da view.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PERM">VISUALIZAR_SUBPROCESSO</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>subprocessoService.buscarContextoEdicao()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/subprocessos/contexto-edicao/buscar</span>
+    <span class="endpoint-title">Contexto de edição por processo+unidade</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Mesmos dados que o endpoint acima, mas buscado pelo par <code>codProcesso</code> + <code>siglaUnidade</code> em vez do código do subprocesso. Útil quando o frontend só conhece o processo e a unidade (rota de URL).</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Autenticado + verificação interna</span></div>
+    <div class="section"><div class="section-label">Query Params</div><code>codProcesso</code> (Long) + <code>siglaUnidade</code> (String)</div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>subprocessoService.buscarContextoEdicaoPorProcessoEUnidade()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/subprocessos/<span class="param">{codSubprocesso}</span>/contexto-cadastro-atividades</span>
+    <span class="endpoint-title">Contexto de cadastro de atividades (BFF)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Dados específicos para a tela de cadastro de atividades: atividades atuais, estado do cadastro, permissões.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PERM">VISUALIZAR_SUBPROCESSO</span></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/subprocessos/<span class="param">{codSubprocesso}</span>/status</span>
+    <span class="endpoint-title">Status atual do subprocesso</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Retorna apenas o <code>SubprocessoSituacaoDto</code> (situação + etapa atual + data limite). Endpoint leve para polling de status sem carregar o contexto completo.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PERM">VISUALIZAR_SUBPROCESSO</span></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-GET">GET</span>
+    <span class="endpoint-path">/api/subprocessos/buscar</span>
+    <span class="endpoint-title">Buscar subprocesso por processo+unidade</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Resolve o código do subprocesso a partir do par processo+unidade. Retorna apenas o código.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Autenticado + @PostAuthorize</span></div>
+    <div class="section"><div class="section-label">Query Params</div><code>codProcesso</code> + <code>siglaUnidade</code></div>
+  </div>
+</div>
+
+<h3>Operações de cadastro de atividades (fluxo de workflow)</h3>
+
+<div class="notice notice-info" style="margin-bottom:12px;">
+  <strong>Fluxo do cadastro:</strong> disponibilizar → (gestor devolver / aceitar) → (chefe/gestor homologar) | Para revisão: iniciar-revisao → disponibilizar-revisao → aceitar/homologar-revisao
+</div>
+
+<table style="margin-bottom:16px;">
+  <tr><th>Endpoint</th><th>Método</th><th>Permissão</th><th>Transição de estado</th></tr>
+  <tr><td><code>POST /{id}/cadastro/disponibilizar</code></td><td>POST</td><td>DISPONIBILIZAR_CADASTRO</td><td>→ CADASTRO_DISPONIBILIZADO</td></tr>
+  <tr><td><code>POST /{id}/devolver-cadastro</code></td><td>POST</td><td>DEVOLVER_CADASTRO</td><td>→ CADASTRO_DEVOLVIDO</td></tr>
+  <tr><td><code>POST /{id}/aceitar-cadastro</code></td><td>POST</td><td>ACEITAR_CADASTRO</td><td>→ CADASTRO_ACEITO</td></tr>
+  <tr><td><code>POST /{id}/homologar-cadastro</code></td><td>POST</td><td>HOMOLOGAR_CADASTRO</td><td>→ CADASTRO_HOMOLOGADO</td></tr>
+  <tr><td><code>POST /{id}/iniciar-revisao-cadastro</code></td><td>POST</td><td>EDITAR_CADASTRO</td><td>→ REVISAO_CADASTRO_EM_ANDAMENTO</td></tr>
+  <tr><td><code>POST /{id}/cancelar-inicio-revisao-cadastro</code></td><td>POST</td><td>EDITAR_CADASTRO</td><td>→ NAO_INICIADO</td></tr>
+  <tr><td><code>POST /{id}/disponibilizar-revisao</code></td><td>POST</td><td>DISPONIBILIZAR_REVISAO_CADASTRO</td><td>→ REVISAO_DISPONIBILIZADA</td></tr>
+  <tr><td><code>POST /{id}/devolver-revisao-cadastro</code></td><td>POST</td><td>DEVOLVER_REVISAO_CADASTRO</td><td>Devolve revisão</td></tr>
+  <tr><td><code>POST /{id}/aceitar-revisao-cadastro</code></td><td>POST</td><td>ACEITAR_REVISAO_CADASTRO</td><td>Aceita revisão</td></tr>
+  <tr><td><code>POST /{id}/homologar-revisao-cadastro</code></td><td>POST</td><td>HOMOLOGAR_REVISAO_CADASTRO</td><td>Homologa revisão</td></tr>
+  <tr><td><code>POST /{id}/reabrir-cadastro</code></td><td>POST</td><td>ADMIN</td><td>Reabre cadastro já aceito/homologado</td></tr>
+  <tr><td><code>POST /{id}/reabrir-revisao-cadastro</code></td><td>POST</td><td>ADMIN</td><td>Reabre revisão</td></tr>
+  <tr><td><code>POST /aceitar-cadastro-bloco</code></td><td>POST</td><td>ACEITAR_CADASTRO</td><td>Aceita N cadastros</td></tr>
+  <tr><td><code>POST /homologar-cadastro-bloco</code></td><td>POST</td><td>HOMOLOGAR_CADASTRO</td><td>Homologa N cadastros</td></tr>
+</table>
+
+<h3>Operações de mapa de competências (fluxo de workflow)</h3>
+
+<table style="margin-bottom:16px;">
+  <tr><th>Endpoint</th><th>Método</th><th>Permissão</th><th>Descrição</th></tr>
+  <tr><td><code>GET /{id}/mapa-completo</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Obtém mapa completo para edição</td></tr>
+  <tr><td><code>POST /{id}/mapa-completo</code></td><td>POST</td><td>EDITAR_MAPA</td><td>Salva mapa completo (batch)</td></tr>
+  <tr><td><code>GET /{id}/mapa-visualizacao</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Mapa formatado para visualização</td></tr>
+  <tr><td><code>GET /{id}/mapa-ajuste</code></td><td>GET</td><td>AJUSTAR_MAPA</td><td>Mapa preparado para ajuste</td></tr>
+  <tr><td><code>POST /{id}/mapa-ajuste/atualizar</code></td><td>POST</td><td>EDITAR_MAPA</td><td>Salva ajustes no mapa</td></tr>
+  <tr><td><code>POST /{id}/disponibilizar-mapa</code></td><td>POST</td><td>DISPONIBILIZAR_MAPA</td><td>Disponibiliza mapa para validação</td></tr>
+  <tr><td><code>POST /{id}/validar-mapa</code></td><td>POST</td><td>VALIDAR_MAPA</td><td>Valida o mapa (CHEFE)</td></tr>
+  <tr><td><code>POST /{id}/devolver-validacao</code></td><td>POST</td><td>DEVOLVER_MAPA</td><td>Devolve mapa para ajuste</td></tr>
+  <tr><td><code>POST /{id}/aceitar-validacao</code></td><td>POST</td><td>ACEITAR_MAPA</td><td>Aceita validação (GESTOR)</td></tr>
+  <tr><td><code>POST /{id}/homologar-validacao</code></td><td>POST</td><td>HOMOLOGAR_MAPA</td><td>Homologa o mapa</td></tr>
+  <tr><td><code>POST /{id}/submeter-mapa-ajustado</code></td><td>POST</td><td>AJUSTAR_MAPA</td><td>Submete mapa após ajustes</td></tr>
+  <tr><td><code>POST /{id}/apresentar-sugestoes</code></td><td>POST</td><td>APRESENTAR_SUGESTOES</td><td>Registra sugestões de melhoria</td></tr>
+  <tr><td><code>POST /disponibilizar-mapa-bloco</code></td><td>POST</td><td>DISPONIBILIZAR_MAPA</td><td>Disponibiliza N mapas</td></tr>
+  <tr><td><code>POST /aceitar-validacao-bloco</code></td><td>POST</td><td>ACEITAR_MAPA</td><td>Aceita N validações</td></tr>
+  <tr><td><code>POST /homologar-validacao-bloco</code></td><td>POST</td><td>HOMOLOGAR_MAPA</td><td>Homologa N validações</td></tr>
+  <tr><td><code>GET /{id}/impactos-mapa</code></td><td>GET</td><td>VERIFICAR_IMPACTOS</td><td>Verifica impactos de mudanças de atividades</td></tr>
+</table>
+
+<h3>Importação e histórico</h3>
+<table style="margin-bottom:16px;">
+  <tr><th>Endpoint</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /{id}/atividades-importacao</code></td><td>CONSULTAR_PARA_IMPORTACAO</td><td>Lista atividades de um SP finalizado para importar</td></tr>
+  <tr><td><code>POST /{id}/importar-atividades</code></td><td>IMPORTAR_ATIVIDADES</td><td>Importa atividades selecionadas de outro SP</td></tr>
+  <tr><td><code>GET /{id}/historico-cadastro</code></td><td>VISUALIZAR_SUBPROCESSO</td><td>Histórico de análises de cadastro</td></tr>
+  <tr><td><code>GET /{id}/historico-validacao</code></td><td>VISUALIZAR_SUBPROCESSO</td><td>Histórico de análises de validação</td></tr>
+  <tr><td><code>GET /{id}/sugestoes</code></td><td>VISUALIZAR_SUBPROCESSO</td><td>Sugestões de melhoria do mapa</td></tr>
+  <tr><td><code>GET /{id}/validar-cadastro</code></td><td>VISUALIZAR_SUBPROCESSO</td><td>Valida se cadastro está pronto para disponibilizar</td></tr>
+  <tr><td><code>POST /{id}/analises-cadastro</code></td><td>DEVOLVER_CADASTRO</td><td>Cria análise de cadastro</td></tr>
+  <tr><td><code>POST /{id}/analises-validacao</code></td><td>DEVOLVER_MAPA</td><td>Cria análise de validação</td></tr>
+</table>
+
+<div class="notice notice-warn">
+  <strong>⚠️ Atenção — duplicação de endpoints de mapa:</strong> Existem tanto <code>GET/POST /{id}/mapa</code> quanto <code>GET/POST /{id}/mapa-completo</code> com implementações idênticas no backend (ambos chamam <code>mapaCompletoDtoPorSubprocesso</code>). Deve-se consolidar em um único endpoint.
+</div>
+
+<div class="endpoint-card" style="margin-top:16px;">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/subprocessos/<span class="param">{codSubprocesso}</span>/competencia</span>
+    <span class="endpoint-title">Adicionar competência ao mapa</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Adiciona uma nova competência (agrupamento de atividades) ao mapa de um subprocesso. Retorna o mapa completo atualizado.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PERM">EDITAR_MAPA</span></div>
+    <div class="section"><div class="section-label">Body (JSON)</div><pre>{ "descricao": "Competência X", "atividadesCodigos": [1, 2, 3] }</pre></div>
+    <div class="section"><div class="section-label">Uso no frontend</div><code>subprocessoServiceMapa.adicionarCompetencia()</code></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/subprocessos/<span class="param">{codSubprocesso}</span>/competencia/<span class="param">{codCompetencia}</span></span>
+    <span class="endpoint-title">Atualizar competência</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PERM">EDITAR_MAPA</span></div>
+    <div class="section"><div class="section-label">Body</div><pre>{ "descricao": "Nova descrição", "atividadesCodigos": [1, 4] }</pre></div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/subprocessos/<span class="param">{codSubprocesso}</span>/competencia/<span class="param">{codCompetencia}</span>/remover</span>
+    <span class="endpoint-title">Remover competência</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-PERM">EDITAR_MAPA</span></div>
+  </div>
+</div>
+
+<!-- =========================================
+     ATIVIDADES
+========================================= -->
+<h2 id="sec-atividades">📝 Atividades — <code>/api/atividades</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>AtividadeController</code>. Gerencia atividades e conhecimentos associados. Restrição forte: somente perfil CHEFE pode criar/editar.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /{codAtividade}</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Obtém atividade por código</td></tr>
+  <tr><td><code>GET /{codAtividade}/conhecimentos</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Lista conhecimentos da atividade</td></tr>
+  <tr><td><code>POST /</code></td><td>POST</td><td>CHEFE</td><td>Cria nova atividade (body inclui mapaCodigo)</td></tr>
+  <tr><td><code>POST /{codigo}/atualizar</code></td><td>POST</td><td>CHEFE</td><td>Atualiza atividade</td></tr>
+  <tr><td><code>POST /{codAtividade}/excluir</code></td><td>POST</td><td>CHEFE</td><td>Exclui atividade</td></tr>
+  <tr><td><code>POST /{codAtividade}/conhecimentos</code></td><td>POST</td><td>CHEFE</td><td>Cria conhecimento para atividade</td></tr>
+  <tr><td><code>POST /{id}/conhecimentos/{idC}/atualizar</code></td><td>POST</td><td>CHEFE</td><td>Atualiza conhecimento</td></tr>
+  <tr><td><code>POST /{id}/conhecimentos/{idC}/excluir</code></td><td>POST</td><td>CHEFE</td><td>Exclui conhecimento</td></tr>
+</table>
+
+<div class="notice notice-info" style="margin-top:16px;">
+  💡 Todos os endpoints de mutação de atividades retornam <code>AtividadeOperacaoResponse</code> — um objeto que contém a atividade afetada, o status atual do subprocesso e a lista atualizada de atividades. Isso evita que o frontend precise fazer uma chamada adicional para recarregar o estado.
+</div>
+
+<!-- =========================================
+     MAPAS
+========================================= -->
+<h2 id="sec-mapas">🗺 Mapas — <code>/api/mapas</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>MapaController</code>. Gerenciamento direto de entidades Mapa (estrutura de competências). Uso tipicamente administrativo.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /</code></td><td>GET</td><td>ADMIN, GESTOR, CHEFE</td><td>Lista todos os mapas</td></tr>
+  <tr><td><code>GET /{codigo}</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO (via Mapa)</td><td>Obtém mapa por código</td></tr>
+  <tr><td><code>POST /</code></td><td>POST</td><td>ADMIN</td><td>Cria novo mapa</td></tr>
+  <tr><td><code>POST /{codMapa}/atualizar</code></td><td>POST</td><td>ADMIN</td><td>Atualiza estado do mapa</td></tr>
+  <tr><td><code>POST /{codMapa}/excluir</code></td><td>POST</td><td>ADMIN</td><td>Exclui mapa</td></tr>
+</table>
+
+<div class="notice notice-warn" style="margin-top:16px;">
+  ⚠️ O endpoint <code>GET /mapas</code> pode retornar um volume muito grande de dados sem paginação. Considerar adicionar paginação ou filtros.
+</div>
+
+<!-- =========================================
+     UNIDADES
+========================================= -->
+<h2 id="sec-unidades">🏢 Unidades — <code>/api/unidades</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>UnidadeController</code>. Estrutura organizacional hierárquica. Os dados de unidades são amplamente cacheados.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /</code></td><td>GET</td><td>Todos autenticados</td><td>Árvore hierárquica completa</td></tr>
+  <tr><td><code>GET /{codigo}</code></td><td>GET</td><td>Todos autenticados</td><td>Unidade por código</td></tr>
+  <tr><td><code>GET /sigla/{sigla}</code></td><td>GET</td><td>Todos autenticados</td><td>Unidade por sigla (com responsável)</td></tr>
+  <tr><td><code>GET /{codigo}/arvore</code></td><td>GET</td><td>Todos autenticados</td><td>Árvore a partir de uma unidade</td></tr>
+  <tr><td><code>GET /sigla/{sigla}/subordinadas</code></td><td>GET</td><td>Todos autenticados</td><td>Siglas das unidades subordinadas</td></tr>
+  <tr><td><code>GET /sigla/{sigla}/superior</code></td><td>GET</td><td>Todos autenticados</td><td>Sigla da unidade superior</td></tr>
+  <tr><td><code>GET /arvore-com-elegibilidade</code></td><td>GET</td><td>Todos autenticados</td><td>Árvore com flag de elegibilidade por tipo de processo</td></tr>
+  <tr><td><code>GET /com-mapa-vigente</code></td><td>GET</td><td>Todos autenticados</td><td>IDs de unidades com mapa vigente</td></tr>
+  <tr><td><code>GET /sem-mapa-vigente</code></td><td>GET</td><td>ADMIN</td><td>IDs de unidades sem mapa vigente</td></tr>
+  <tr><td><code>GET /diagnostico-organizacional</code></td><td>GET</td><td>ADMIN</td><td>Diagnóstico de consistência dos dados org.</td></tr>
+  <tr><td><code>GET /{codUnidade}/mapa-vigente</code></td><td>GET</td><td>Todos autenticados</td><td>Booleano: unidade tem mapa vigente?</td></tr>
+  <tr><td><code>GET /{codUnidade}/mapa-vigente/referencia</code></td><td>GET</td><td>Todos autenticados</td><td>Referência (código + data) do mapa vigente</td></tr>
+  <tr><td><code>GET /{codUnidade}/usuarios</code></td><td>GET</td><td>ADMIN, GESTOR, CHEFE</td><td>Usuários lotados na unidade</td></tr>
+  <tr><td><code>GET /atribuicoes</code></td><td>GET</td><td>ADMIN</td><td>Todas as atribuições temporárias</td></tr>
+  <tr><td><code>GET /{codUnidade}/atribuicoes-temporarias</code></td><td>GET</td><td>ADMIN</td><td>Atribuições temporárias de uma unidade</td></tr>
+  <tr><td><code>POST /{codUnidade}/atribuicoes-temporarias</code></td><td>POST</td><td>ADMIN</td><td>Cria atribuição temporária de responsável</td></tr>
+  <tr><td><code>POST /{codUnidade}/atribuicoes-temporarias/{id}/atualizar</code></td><td>POST</td><td>ADMIN</td><td>Atualiza atribuição temporária</td></tr>
+  <tr><td><code>POST /{codUnidade}/atribuicoes-temporarias/{id}/excluir</code></td><td>POST</td><td>ADMIN</td><td>Remove atribuição temporária</td></tr>
+</table>
+
+<div class="notice notice-info" style="margin-top:16px;">
+  💡 <strong>Atribuições temporárias</strong> permitem delegar responsabilidade de uma unidade a outro usuário por período determinado. Mecanismo essencial para férias/afastamentos. Bem desenhado, com validação de datas.
+</div>
+<div class="notice notice-warn" style="margin-top:8px;">
+  ⚠️ <code>GET /{codUnidade}/mapa-vigente</code> retorna apenas <code>{"temMapaVigente": true/false}</code>. Em muitas telas, o frontend já chama <code>/mapa-vigente/referencia</code> que retorna mais dados. Avaliar se o endpoint booleano ainda é necessário.
+</div>
+
+<!-- =========================================
+     USUÁRIOS
+========================================= -->
+<h2 id="sec-usuarios">👤 Usuários — <code>/api/usuarios</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controllers: <code>LoginController</code> (auth) + <code>UsuarioController</code> (gerenciamento). Note que ambos compartilham o mesmo prefixo de URL.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /{titulo}</code></td><td>GET</td><td>Todos autenticados</td><td>Busca usuário por título eleitoral</td></tr>
+  <tr><td><code>GET /pesquisar?termo=</code></td><td>GET</td><td>Todos autenticados</td><td>Pesquisa usuários por nome (typeahead)</td></tr>
+  <tr><td><code>GET /administradores</code></td><td>GET</td><td>ADMIN</td><td>Lista administradores do sistema</td></tr>
+  <tr><td><code>POST /administradores</code></td><td>POST</td><td>ADMIN</td><td>Promove usuário a administrador</td></tr>
+  <tr><td><code>POST /administradores/{titulo}/remover</code></td><td>POST</td><td>ADMIN</td><td>Remove papel de administrador</td></tr>
+</table>
+
+<div class="notice notice-warn" style="margin-top:16px;">
+  ⚠️ O endpoint <code>GET /usuarios/{titulo}</code> expõe dados do usuário (nome, matrícula, unidade) para qualquer usuário autenticado. Avaliar se isso é adequado para todos os perfis ou se deve ser restrito.
+</div>
+
+<!-- =========================================
+     RELATÓRIOS
+========================================= -->
+<h2 id="sec-relatorios">📊 Relatórios — <code>/api/relatorios</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>RelatorioController</code>. Cada relatório tem dois endpoints: JSON (para visualização in-app) e PDF (para exportação/download).</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /andamento/{codProcesso}</code></td><td>GET</td><td>ADMIN / hierarquia</td><td>Relatório de andamento do processo (JSON) — CDU-35</td></tr>
+  <tr><td><code>GET /andamento/{codProcesso}/exportar</code></td><td>GET</td><td>ADMIN / hierarquia</td><td>Relatório de andamento (PDF)</td></tr>
+  <tr><td><code>GET /mapas?codUnidade=</code></td><td>GET</td><td>ADMIN, GESTOR</td><td>Relatório consolidado de mapas (JSON) — CDU-36</td></tr>
+  <tr><td><code>GET /mapas/exportar?codUnidade=</code></td><td>GET</td><td>ADMIN, GESTOR</td><td>Relatório consolidado de mapas (PDF)</td></tr>
+  <tr><td><code>GET /mapas/subprocessos/{id}</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Mapa atual de um subprocesso (JSON)</td></tr>
+  <tr><td><code>GET /mapas/subprocessos/{id}/exportar</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Mapa atual de um subprocesso (PDF)</td></tr>
+  <tr><td><code>GET /mapas-vigentes/unidades/{id}</code></td><td>GET</td><td>ADMIN, GESTOR, CHEFE</td><td>Mapa vigente de uma unidade (JSON)</td></tr>
+  <tr><td><code>GET /mapas-vigentes/unidades/{id}/exportar</code></td><td>GET</td><td>ADMIN, GESTOR, CHEFE</td><td>Mapa vigente de uma unidade (PDF)</td></tr>
+  <tr><td><code>GET /unidades-sem-mapas-vigentes/exportar</code></td><td>GET</td><td>ADMIN</td><td>Relatório de unidades sem mapa vigente (PDF)</td></tr>
+</table>
+
+<div class="notice notice-info" style="margin-top:16px;">
+  💡 O padrão JSON + PDF para cada relatório é bem desenhado — permite visualização in-app antes de exportar. O frontend usa a versão JSON para renderizar o relatório na tela e a versão <code>/exportar</code> para download.
+</div>
+<div class="notice notice-warn" style="margin-top:8px;">
+  ⚠️ Não há endpoint JSON para <code>/unidades-sem-mapas-vigentes</code> — apenas o PDF. Considerar adicionar a versão JSON para permitir visualização na interface.
+</div>
+
+<!-- =========================================
+     ALERTAS
+========================================= -->
+<h2 id="sec-alertas">🔔 Alertas — <code>/api/alertas</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>AlertaController</code>. Alertas são notificações in-app criadas automaticamente pelo sistema em eventos do workflow.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /</code></td><td>GET</td><td>Todos autenticados</td><td>Lista todos os alertas do usuário (contexto do JWT)</td></tr>
+  <tr><td><code>GET /nao-lidos</code></td><td>GET</td><td>Todos autenticados</td><td>Lista apenas alertas não lidos</td></tr>
+  <tr><td><code>POST /marcar-como-lidos</code></td><td>POST</td><td>Todos autenticados</td><td>Marca lista de alertas como lidos</td></tr>
+</table>
+
+<div class="notice notice-danger" style="margin-top:16px;">
+  🔴 <strong>Duplicação:</strong> <code>POST /alertas/marcar-como-lidos</code> e <code>POST /painel/alertas/marcar-lidos</code> têm o mesmo propósito. O frontend usa ativamente apenas o de <code>/painel</code>. O endpoint de <code>/alertas</code> parece legado. Remover ou consolidar.
+</div>
+
+<!-- =========================================
+     NOTIFICAÇÕES
+========================================= -->
+<h2 id="sec-notificacoes">📧 Notificações — <code>/api/admin/notificacoes</code> + <code>/api/subprocessos/{id}/notificacoes-email</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controllers: <code>NotificacaoAdminController</code> (admin global) + <code>NotificacaoController</code> (por subprocesso). Acompanhamento do envio de e-mails.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /admin/notificacoes/listar?limite=</code></td><td>GET</td><td>ADMIN</td><td>Lista as últimas N notificações (padrão: 50)</td></tr>
+  <tr><td><code>POST /admin/notificacoes/{codigo}/reenviar</code></td><td>POST</td><td>ADMIN</td><td>Recoloca notificação com falha na fila de envio</td></tr>
+  <tr><td><code>GET /admin/notificacoes/leitor-email-testes</code></td><td>GET</td><td>ADMIN</td><td>URL do leitor de e-mails de testes (MailHog/etc)</td></tr>
+  <tr><td><code>GET /subprocessos/{id}/notificacoes-email?limite=</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Notificações de e-mail geradas para o subprocesso</td></tr>
+</table>
+
+<!-- =========================================
+     CONFIGURAÇÕES
+========================================= -->
+<h2 id="sec-config">⚙️ Configurações — <code>/api/configuracoes</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>ConfiguracaoController</code>. Parâmetros do sistema editáveis pelo admin.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>GET /</code></td><td>GET</td><td>ADMIN</td><td>Lista todas as configurações (chave/valor)</td></tr>
+  <tr><td><code>POST /</code></td><td>POST</td><td>ADMIN</td><td>Atualiza configurações em bloco</td></tr>
+</table>
+
+<div class="notice notice-info" style="margin-top:16px;">
+  💡 Configurações são pares chave/valor persistidos no banco. Incluem parâmetros como URL do leitor de e-mails de teste, prazos padrão, etc. A atualização em bloco via <code>POST /</code> (sobrescrita completa) é simples mas efetiva para telas de configuração.
+</div>
+
+<!-- =========================================
+     CACHE / SSE
+========================================= -->
+<h2 id="sec-cache">🗄 Cache e SSE — <code>/api/cache</code> + <code>/api/eventos</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controllers: <code>CacheAdminController</code> + <code>EventosController</code>. Mecanismo de invalidação de cache + notificação em tempo real via Server-Sent Events.</p>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-POST">POST</span>
+    <span class="endpoint-path">/api/cache/evict</span>
+    <span class="endpoint-title">Invalidar e recarregar todos os caches</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Invalida todos os caches de dados organizacionais (unidades, hierarquia, etc.) e os recarrega imediatamente. Após recarregar, transmite evento SSE <code>org-cache-refreshed</code> para que os clientes Vue atualizem seus stores Pinia sem recarregar a página.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ADMIN">ADMIN</span></div>
+    <div class="section"><div class="section-label">Quando usar</div>Após alterações estruturais na base de dados organizacional (importação de dados, mudanças no LDAP, etc.) que não passaram pelo sistema.</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-ok">✅ Mecanismo elegante. O SSE permite que todos os clientes conectados recebam o evento de refresh sem polling. Bem implementado.</div>
+    </div>
+  </div>
+</div>
+
+<div class="endpoint-card">
+  <div class="endpoint-header">
+    <span class="method method-SSE">SSE</span>
+    <span class="endpoint-path">/api/eventos</span>
+    <span class="endpoint-title">Assinar eventos do servidor (SSE)</span>
+  </div>
+  <div class="endpoint-body">
+    <div class="section"><div class="section-label">Finalidade</div><p>Endpoint Server-Sent Events. Clientes Vue se conectam e ficam aguardando eventos. Atualmente apenas o evento <code>org-cache-refreshed</code> é transmitido, mas a arquitetura suporta novos eventos.</p></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados (sem @PreAuthorize explícito — verificar)</span></div>
+    <div class="section"><div class="section-label">Uso no frontend</div>Store Pinia usa <code>EventSource</code> para ouvir e disparar <code>recarregarDadosOrganizacionais()</code> quando recebe o evento.</div>
+    <div class="section"><div class="section-label">Análise</div>
+      <div class="notice notice-warn">⚠️ O endpoint não tem <code>@PreAuthorize</code> explícito. Verificar se o filtro JWT está cobrindo este endpoint ou se é necessário adicionar a anotação.</div>
+      <div class="notice notice-info">💡 Potencial de expansão: alertas em tempo real, notificações de mudança de status de subprocesso, etc.</div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     FEEDBACK
+========================================= -->
+<h2 id="sec-feedback">💬 Feedback — <code>/api/feedback</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>FeedbackController</code>. Disponível apenas nos perfis <code>hom</code>, <code>e2e</code> e <code>test</code>. Widget de feedback da UAT.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
+  <tr><td><code>POST /</code></td><td>POST (multipart)</td><td>Todos autenticados</td><td>Registra feedback com screenshot opcional (PNG/WebP)</td></tr>
+  <tr><td><code>GET /listar?limite=</code></td><td>GET</td><td>ADMIN</td><td>Lista os últimos N feedbacks</td></tr>
+  <tr><td><code>GET /{id}/screenshot</code></td><td>GET</td><td>ADMIN</td><td>Retorna imagem do screenshot do feedback</td></tr>
+</table>
+
+<div class="notice notice-ok" style="margin-top:16px;">
+  ✅ Bem restrito ao perfil <code>hom</code>. A desativação em produção via Spring profile é garantida.
+</div>
+
+<!-- =========================================
+     E2E / FIXTURES
+========================================= -->
+<h2 id="sec-e2e">🧪 E2E e Fixtures — <code>/api/e2e</code></h2>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:13px;">Controller: <code>E2eController</code>. Disponível apenas no perfil <code>e2e</code>. Permite setup e teardown de testes end-to-end através da API.</p>
+
+<table>
+  <tr><th>Endpoint</th><th>Método</th><th>Descrição</th></tr>
+  <tr><td><code>POST /reset</code></td><td>POST</td><td>Reseta o banco para o estado do seed.sql (limpa todas as tabelas e re-executa o seed)</td></tr>
+  <tr><td><code>POST /processo/{codigo}/limpar</code></td><td>POST</td><td>Remove processo e todos seus dependentes (versão simples)</td></tr>
+  <tr><td><code>POST /processo/{codigo}/limpar-completo</code></td><td>POST</td><td>Remove processo com desativação de integridade referencial</td></tr>
+  <tr><td><code>POST /fixtures/processo-mapeamento</code></td><td>POST</td><td>Cria fixture de processo de mapeamento para teste</td></tr>
+  <tr><td><code>POST /fixtures/processo-revisao</code></td><td>POST</td><td>Cria fixture de processo de revisão para teste</td></tr>
+  <tr><td><code>POST /fixtures/processo-finalizado-com-atividades</code></td><td>POST</td><td>Cria processo finalizado com atividades e mapa vigente</td></tr>
+</table>
+
+<div class="notice notice-ok" style="margin-top:16px;">
+  ✅ Corretamente isolado pelo perfil Spring <code>e2e</code>. Nunca disponível em produção. Abordagem idiomática para setup de testes E2E.
+</div>
+<div class="notice notice-warn" style="margin-top:8px;">
+  ⚠️ O controller E2E faz operações diretas via JDBC sem verificações de autorização (executa como admin via <code>executeAsAdmin()</code>). Correto para testes, mas garantir que o perfil <code>e2e</code> nunca seja ativado em produção.
+</div>
+
+<!-- =========================================
+     ANÁLISE GERAL
+========================================= -->
+<h2 id="sec-analise">🔍 Análise e Recomendações</h2>
+
+<h3>Pontos positivos</h3>
+<ul style="color:var(--text-muted);padding-left:20px;line-height:2;">
+  <li>✅ Uso consistente do padrão BFF (<code>/bootstrap</code>, <code>/contexto-completo</code>, <code>/contexto-edicao</code>) reduz N+1 requests</li>
+  <li>✅ Perfis Spring (hom, e2e) isolam endpoints perigosos de forma robusta</li>
+  <li>✅ <code>AtividadeOperacaoResponse</code> retorna estado atualizado eliminando re-fetch</li>
+  <li>✅ Convenção POST com sufixo semântico (<code>/excluir</code>, <code>/iniciar</code>, etc.) bem documentada e consistente</li>
+  <li>✅ Permissões granulares via <code>SgcPermissionEvaluator</code> — separação clara de concerns</li>
+  <li>✅ SSE para invalidação de cache em tempo real é elegante e sem polling</li>
+  <li>✅ Sanitização de inputs (HTML escape, log injection) em pontos corretos</li>
+</ul>
+
+<h3>Problemas e melhorias identificadas</h3>
+<table>
+  <tr><th>#</th><th>Severidade</th><th>Endpoint(s)</th><th>Problema</th><th>Recomendação</th></tr>
+  <tr>
+    <td>1</td>
+    <td><span class="tag tag-danger">Alta</span></td>
+    <td><code>/processos/unidades-bloqueadas</code><br><code>/processos/status-unidades</code></td>
+    <td>Duplicação exata: dois endpoints retornam os mesmos dados (IDs de unidades bloqueadas por tipo)</td>
+    <td>Remover <code>/status-unidades</code> (ou o inverso). O parâmetro <code>codProcesso</code> de status-unidades é aceito mas ignorado.</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><span class="tag tag-danger">Alta</span></td>
+    <td><code>/alertas/marcar-como-lidos</code><br><code>/painel/alertas/marcar-lidos</code></td>
+    <td>Duplicação de funcionalidade de marcação de alertas como lidos</td>
+    <td>Manter apenas <code>/painel/alertas/marcar-lidos</code> (é o que o frontend usa). Remover o de <code>/alertas</code> ou deprecated.</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><span class="tag tag-warn">Média</span></td>
+    <td><code>/subprocessos/{id}/mapa</code><br><code>/subprocessos/{id}/mapa-completo</code></td>
+    <td>GET e POST para ambos têm implementação idêntica no backend</td>
+    <td>Consolidar em <code>/mapa-completo</code> apenas e remover <code>/mapa</code>.</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td><span class="tag tag-warn">Média</span></td>
+    <td><code>/api/eventos</code></td>
+    <td>Sem <code>@PreAuthorize</code> explícito no controller SSE</td>
+    <td>Adicionar <code>@PreAuthorize("isAuthenticated()")</code> para garantir proteção explícita.</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td><span class="tag tag-warn">Média</span></td>
+    <td><code>/usuarios/logout</code></td>
+    <td>JWT não é invalidado server-side — token válido por 24h após logout</td>
+    <td>Implementar blacklist de JWTs revogados (Redis) ou reduzir vida do token + refresh token.</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td><span class="tag tag-warn">Média</span></td>
+    <td><code>/processos/{id}/unidades-importacao</code></td>
+    <td>Restrito somente a CHEFE; ADMIN e GESTOR são bloqueados</td>
+    <td>Revisar regra de acesso — parece um esquecimento. ADMIN pelo menos deveria ter acesso.</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td><span class="tag tag-warn">Média</span></td>
+    <td><code>/relatorios/unidades-sem-mapas-vigentes/exportar</code></td>
+    <td>Apenas versão PDF, sem versão JSON para visualização in-app</td>
+    <td>Adicionar <code>GET /relatorios/unidades-sem-mapas-vigentes</code> retornando JSON, consistente com os outros relatórios.</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td><span class="tag tag-info">Baixa</span></td>
+    <td><code>/mapas</code></td>
+    <td>Sem paginação, pode retornar volume grande</td>
+    <td>Adicionar paginação ou pelo menos filtros básicos.</td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td><span class="tag tag-info">Baixa</span></td>
+    <td><code>/processos/finalizados</code><br><code>/processos/para-importacao</code></td>
+    <td>Dois endpoints similares, diferem apenas por filtro de elegibilidade de importação</td>
+    <td>Considerar unificar com parâmetro <code>?elegívelImportacao=true</code> — mas a separação atual tem clareza de intenção.</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td><span class="tag tag-info">Baixa</span></td>
+    <td><code>/unidades/{id}/mapa-vigente</code></td>
+    <td>Retorna apenas booleano quando <code>/mapa-vigente/referencia</code> já contém essa informação</td>
+    <td>Avaliar se há consumidores que usam somente o booleano; se não, remover.</td>
+  </tr>
+</table>
+
+<h3>Oportunidades de evolução arquitetural</h3>
+<div style="color:var(--text-muted);font-size:13px;padding-left:20px;">
+  <ol style="line-height:2.2;">
+    <li><strong>WebSockets / SSE expandido:</strong> O mecanismo SSE existente pode ser expandido para notificações em tempo real de mudanças de estado de subprocesso, reduzindo a necessidade de polling manual.</li>
+    <li><strong>Endpoint de contexto global:</strong> Um endpoint único de "bootstrap da aplicação" que retorne dados organizacionais (unidades, configurações) junto com os dados do usuário, reduzindo as 3-4 chamadas iniciais.</li>
+    <li><strong>Paginação consistente:</strong> Padronizar paginação em todos os endpoints de listagem que podem crescer (mapas, notificações, feedbacks).</li>
+    <li><strong>Versionamento de API:</strong> Sem versionamento atual (<code>/v1/</code>). Considerar para mudanças breaking futuras.</li>
+    <li><strong>Consolidação de endpoints de bloco:</strong> Os endpoints <code>/bloco</code> duplicam lógica de permissões dos endpoints individuais. Avaliar se um padrão genérico de operação em lote seria mais manutenível.</li>
+  </ol>
+</div>
+
+<div style="margin-top:48px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+  <div style="font-size:13px;color:var(--text-muted);">
+    <strong style="color:var(--text);">SGC — Sistema de Gestão de Competências</strong><br>
+    Documento gerado em 2026-05-20 a partir da análise dos controllers Spring Boot e dos serviços frontend Vue 3.<br>
+    Controllers analisados: <code>AlertaController</code>, <code>AtividadeController</code>, <code>CacheAdminController</code>, <code>ConfiguracaoController</code>, <code>E2eController</code>, <code>EventosController</code>, <code>FeedbackController</code>, <code>LoginController</code>, <code>MapaController</code>, <code>NotificacaoAdminController</code>, <code>NotificacaoController</code>, <code>PainelController</code>, <code>ProcessoController</code>, <code>ProcessoExclusaoController</code>, <code>RelatorioController</code>, <code>SubprocessoController</code>, <code>UnidadeController</code>, <code>UsuarioController</code>.
+  </div>
+</div>
+
+</main>
+</div>
+</body>
+</html>
