@@ -1,6 +1,6 @@
 # Auditoria de consistencia de nomenclatura
 
-Gerado em: 2026-05-20T18:53:13.088Z
+Gerado em: 2026-05-20T19:14:26.784Z
 Base: /home/runner/work/sgc/sgc
 
 ## Indicadores
