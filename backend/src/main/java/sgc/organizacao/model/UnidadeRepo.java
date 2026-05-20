@@ -20,14 +20,14 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("""
             SELECT u.codigo FROM Unidade u
             WHERE UPPER(u.sigla) = UPPER(:sigla)
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     Optional<Long> buscarCodigoAtivoPorSigla(@Param("sigla") String sigla);
 
     @Query("""
             SELECT u.sigla FROM Unidade u
             WHERE u.codigo IN :codigos
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     List<String> buscarSiglasPorCodigos(@Param("codigos") List<Long> codigos);
 
@@ -40,14 +40,14 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             )
             FROM Unidade u
             WHERE u.codigo IN :codigos
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     List<UnidadeResumoLeitura> listarResumosPorCodigos(@Param("codigos") List<Long> codigos);
 
     @Query("""
             SELECT u.sigla FROM Unidade u
             WHERE u.codigo = :codigo
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     Optional<String> buscarSiglaPorCodigo(@Param("codigo") Long codigo);
 
@@ -63,7 +63,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             )
 
             FROM Unidade u
-            WHERE u.situacao = SituacaoUnidade.ATIVA
+            WHERE u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     List<UnidadeHierarquiaLeitura> listarEstruturasAtivas();
 
@@ -74,7 +74,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             LEFT JOIN FETCH u.responsabilidade
             LEFT JOIN FETCH u.responsabilidade.usuario
             WHERE u.codigo = :codigo
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     Optional<Unidade> buscarPorCodigoComResponsavel(@Param("codigo") Long codigo);
 
@@ -83,7 +83,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             LEFT JOIN FETCH u.unidadeSuperior
             LEFT JOIN FETCH u.titular
             WHERE u.codigo = :codigo
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     Optional<Unidade> buscarPorCodigoComSuperior(@Param("codigo") Long codigo);
 
@@ -94,7 +94,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             LEFT JOIN FETCH u.responsabilidade
             LEFT JOIN FETCH u.responsabilidade.usuario
             WHERE UPPER(u.sigla) = UPPER(:sigla)
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     Optional<Unidade> buscarPorSiglaComResponsavel(@Param("sigla") String sigla);
 
@@ -103,7 +103,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             LEFT JOIN FETCH u.unidadeSuperior
             LEFT JOIN FETCH u.titular
             WHERE UPPER(u.sigla) = UPPER(:sigla)
-            AND u.situacao = SituacaoUnidade.ATIVA
+            AND u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)
     Optional<Unidade> buscarPorSiglaComSuperior(@Param("sigla") String sigla);
 

@@ -48,6 +48,9 @@ public class RelatorioFacade {
     private static final Font FONTE_TEXTO_SUAVE = new Font(Font.HELVETICA, 9, Font.NORMAL, COR_SECUNDARIA);
     private static final Font FONTE_TEXTO_CORPO = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
     private static final Font FONTE_TEXTO_CORPO_SUAVE = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.BLACK);
+    private static final String TITULO_GRUPO_ZONAS_ELEITORAIS = "ZONAS ELEITORAIS";
+    private static final String TIPO_ZONA_ELEITORAL = "ZONA ELEITORAL";
+    private static final String TERMO_SECRETARIA = "SECRETARIA";
 
     private final ProcessoService processoService;
     private final SubprocessoConsultaService consultaService;
@@ -183,8 +186,14 @@ public class RelatorioFacade {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioUnidadesSemMapasVigentes(OutputStream outputStream) {
-        List<UnidadeResumoLeitura> unidadesSemMapaVigente = unidadeService
-                .buscarResumosPorCodigos(unidadeService.buscarCodigosUnidadesSemMapaVigente());
+        Set<Long> codigosSemMapaVigente = new HashSet<>(unidadeService.buscarCodigosUnidadesSemMapaVigente());
+        List<UnidadeDto> arvoreCompleta = unidadeHierarquiaService.buscarArvoreHierarquica();
+        List<UnidadeRelatorioSemMapa> unidadesExibidas = filtrarUnidadesExibidas(arvoreCompleta);
+        List<UnidadeRelatorioSemMapa> arvoreFiltrada = filtrarArvoreSemMapaVigente(
+                unidadesExibidas,
+                codigosSemMapaVigente
+        );
+        List<UnidadeRelatorioSemMapa> cardsRelatorio = organizarArvoreUnidades(arvoreFiltrada, "raiz");
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
@@ -195,20 +204,16 @@ public class RelatorioFacade {
                     "Todas as unidades",
                     LocalDateTime.now(),
                     null,
-                    unidadesSemMapaVigente.size()
+                    codigosSemMapaVigente.size()
             ));
 
-            if (unidadesSemMapaVigente.isEmpty()) {
+            if (codigosSemMapaVigente.isEmpty()) {
                 document.add(criarParagrafo("Não há unidades sem mapa vigente.", FONTE_TEXTO, 0f));
                 return;
             }
 
-            for (UnidadeResumoLeitura unidade : unidadesSemMapaVigente) {
-                document.add(criarParagrafo(
-                        "%s - %s (código %d)".formatted(unidade.sigla(), unidade.nome(), unidade.codigo()),
-                        FONTE_TEXTO_CORPO,
-                        0f
-                ));
+            for (UnidadeRelatorioSemMapa card : cardsRelatorio) {
+                adicionarSecaoUnidadesSemMapa(document, card);
             }
         } catch (DocumentException | IOException e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
@@ -575,6 +580,268 @@ public class RelatorioFacade {
         return paragrafo;
     }
 
+    private void adicionarSecaoUnidadesSemMapa(Document document, UnidadeRelatorioSemMapa card) throws DocumentException {
+        adicionarIdentificacaoUnidadeSemMapa(document, card);
+        adicionarListaUnidadesSemMapa(document, card.filhas(), 0);
+    }
+
+    private void adicionarIdentificacaoUnidadeSemMapa(Document document, UnidadeRelatorioSemMapa card) throws DocumentException {
+        String sigla = card.sigla();
+        String nome = card.nome();
+        String tituloTexto = !textoEmBranco(sigla) ? sigla : (textoEmBranco(nome) ? "-" : nome);
+        String subtituloTexto = !textoEmBranco(nome) && !Objects.equals(sigla, nome) ? nome : null;
+
+        Paragraph titulo = new Paragraph(tituloTexto, new Font(Font.HELVETICA, 14, Font.BOLD, COR_PRIMARIA));
+        if (subtituloTexto != null) {
+            titulo.add(new Chunk(" - ", FONTE_TEXTO_SUAVE));
+            titulo.add(new Chunk(subtituloTexto, new Font(Font.HELVETICA, 9, Font.BOLD, COR_SECUNDARIA)));
+        }
+        document.add(titulo);
+
+        document.add(new Paragraph(" ", new Font(Font.HELVETICA, 1)));
+
+    }
+
+    private void adicionarListaUnidadesSemMapa(Document document, List<UnidadeRelatorioSemMapa> unidades, int nivel)
+            throws DocumentException {
+        for (UnidadeRelatorioSemMapa unidade : unidades) {
+            Paragraph item = new Paragraph();
+            item.setIndentationLeft(10f + (nivel * 12f));
+            item.setSpacingAfter(2f);
+
+            String sigla = unidade.sigla();
+            String nome = unidade.nome();
+            boolean temSigla = !textoEmBranco(sigla);
+            boolean temNome = !textoEmBranco(nome);
+
+            if (temSigla) {
+                item.add(new Chunk(sigla, FONTE_TEXTO_NEGRITO));
+            }
+            if (temSigla && temNome) {
+                item.add(new Chunk(" - ", FONTE_TEXTO_SUAVE));
+            }
+            if (temNome) {
+                item.add(new Chunk(nome, FONTE_TEXTO_CORPO));
+            }
+            if (!temSigla && !temNome) {
+                item.add(new Chunk("-", FONTE_TEXTO_CORPO));
+            }
+
+            document.add(item);
+
+            if (!unidade.filhas().isEmpty()) {
+                adicionarListaUnidadesSemMapa(document, unidade.filhas(), nivel + 1);
+            }
+        }
+    }
+
+    private boolean textoEmBranco(@Nullable String texto) {
+        return texto == null || texto.trim().isEmpty();
+    }
+
+    private List<UnidadeRelatorioSemMapa> filtrarUnidadesExibidas(List<UnidadeDto> arvore) {
+        List<UnidadeRelatorioSemMapa> unidadesExibidas = new ArrayList<>();
+
+        for (UnidadeDto unidade : arvore) {
+            List<UnidadeDto> filhas = unidade.getSubunidades();
+            if (filhas != null && !filhas.isEmpty()) {
+                unidadesExibidas.addAll(mapearUnidades(filhas));
+            }
+        }
+
+        return unidadesExibidas;
+    }
+
+    private List<UnidadeRelatorioSemMapa> mapearUnidades(List<UnidadeDto> unidades) {
+        return unidades.stream()
+                .map(unidade -> new UnidadeRelatorioSemMapa(
+                        unidade.getCodigo(),
+                        unidade.getSigla(),
+                        unidade.getNome(),
+                        unidade.getTipo(),
+                        mapearUnidades(Optional.ofNullable(unidade.getSubunidades()).orElseGet(List::of))
+                ))
+                .toList();
+    }
+
+    private List<UnidadeRelatorioSemMapa> filtrarArvoreSemMapaVigente(
+            List<UnidadeRelatorioSemMapa> unidades,
+            Set<Long> codigosSemMapaVigente
+    ) {
+        List<UnidadeRelatorioSemMapa> resultado = new ArrayList<>();
+
+        for (UnidadeRelatorioSemMapa unidade : unidades) {
+            List<UnidadeRelatorioSemMapa> filhasFiltradas = filtrarArvoreSemMapaVigente(
+                    unidade.filhas(),
+                    codigosSemMapaVigente
+            );
+            boolean unidadeSemMapa = codigosSemMapaVigente.contains(unidade.codigo());
+
+            if (!unidadeSemMapa && filhasFiltradas.isEmpty()) {
+                continue;
+            }
+
+            resultado.add(unidade.comFilhas(filhasFiltradas));
+        }
+
+        return resultado;
+    }
+
+    private List<UnidadeRelatorioSemMapa> organizarArvoreUnidades(List<UnidadeRelatorioSemMapa> unidades, String identificadorGrupo) {
+        List<UnidadeRelatorioSemMapa> secretarias = new ArrayList<>();
+        List<UnidadeRelatorioSemMapa> zonasEleitorais = new ArrayList<>();
+        List<UnidadeRelatorioSemMapa> demais = new ArrayList<>();
+
+        for (UnidadeRelatorioSemMapa unidade : unidades) {
+            List<UnidadeRelatorioSemMapa> filhas = organizarArvoreUnidades(
+                    unidade.filhas(),
+                    String.valueOf(unidade.codigo())
+            );
+            UnidadeRelatorioSemMapa unidadeNormalizada = unidade.comFilhas(filhas);
+            String nome = Optional.ofNullable(unidadeNormalizada.nome()).orElse("");
+
+            if (ehZonaEleitoralPorMetadados(unidadeNormalizada, nome)) {
+                zonasEleitorais.add(unidadeNormalizada);
+                continue;
+            }
+
+            if (ehSecretariaPorMetadados(nome)) {
+                secretarias.add(unidadeNormalizada);
+                continue;
+            }
+
+            demais.add(unidadeNormalizada);
+        }
+
+        ordenarAlfabeticamente(secretarias);
+        ordenarAlfabeticamente(zonasEleitorais);
+        ordenarAlfabeticamente(demais);
+
+        List<UnidadeRelatorioSemMapa> resultado = new ArrayList<>(secretarias);
+        if (!zonasEleitorais.isEmpty()) {
+            resultado.add(criarGrupoZonasEleitorais(identificadorGrupo, zonasEleitorais));
+        }
+        resultado.addAll(demais);
+        return resultado;
+    }
+
+    private void ordenarAlfabeticamente(List<UnidadeRelatorioSemMapa> unidades) {
+        unidades.sort((a, b) -> compararTextoPtBr(obterTextoOrdenacao(a), obterTextoOrdenacao(b)));
+    }
+
+    private String obterTextoOrdenacao(UnidadeRelatorioSemMapa unidade) {
+        if (unidade.sigla() != null && !unidade.sigla().isBlank()) {
+            return unidade.sigla();
+        }
+        return Optional.ofNullable(unidade.nome()).orElse("");
+    }
+
+    private boolean ehZonaEleitoralPorMetadados(UnidadeRelatorioSemMapa unidade, String nome) {
+        return ehTextoZonaEleitoral(unidade.tipo())
+                || ehSiglaZonaEleitoral(unidade.sigla())
+                || ehTextoZonaEleitoral(nome);
+    }
+
+    private boolean ehSecretariaPorMetadados(String nome) {
+        return ehTextoSecretaria(nome);
+    }
+
+    private boolean ehTextoZonaEleitoral(@Nullable String valor) {
+        return valor != null && valor.trim().toUpperCase(Locale.ROOT).contains(TIPO_ZONA_ELEITORAL);
+    }
+
+    private boolean ehSiglaZonaEleitoral(@Nullable String valor) {
+        return valor != null && valor.trim().matches("(?i)Z\\.?\\s*E\\.?");
+    }
+
+    private boolean ehTextoSecretaria(@Nullable String valor) {
+        return valor != null && valor.trim().toUpperCase(Locale.ROOT).contains(TERMO_SECRETARIA);
+    }
+
+    private UnidadeRelatorioSemMapa criarGrupoZonasEleitorais(
+            String identificadorGrupo,
+            List<UnidadeRelatorioSemMapa> zonasEleitorais
+    ) {
+        return new UnidadeRelatorioSemMapa(
+                Math.abs(identificadorGrupo.hashCode()) + 1L,
+                TITULO_GRUPO_ZONAS_ELEITORAIS,
+                TITULO_GRUPO_ZONAS_ELEITORAIS,
+                "AGRUPADOR_VISUAL",
+                zonasEleitorais
+        );
+    }
+
+    private int compararTextoPtBr(String a, String b) {
+        return compararSegmentosTexto(a, b);
+    }
+
+    private int compararSegmentosTexto(String a, String b) {
+        List<String> partesA = separarSegmentos(a);
+        List<String> partesB = separarSegmentos(b);
+        int limite = Math.min(partesA.size(), partesB.size());
+
+        for (int i = 0; i < limite; i++) {
+            String segmentoA = partesA.get(i);
+            String segmentoB = partesB.get(i);
+            boolean aNumero = segmentoA.chars().allMatch(Character::isDigit);
+            boolean bNumero = segmentoB.chars().allMatch(Character::isDigit);
+
+            if (aNumero && bNumero) {
+                int comparacao = compararNumeros(segmentoA, segmentoB);
+                if (comparacao != 0) {
+                    return comparacao;
+                }
+                continue;
+            }
+
+            int comparacaoTexto = compararTextoSegmento(segmentoA, segmentoB);
+            if (comparacaoTexto != 0) {
+                return comparacaoTexto;
+            }
+        }
+
+        return Integer.compare(partesA.size(), partesB.size());
+    }
+
+    private List<String> separarSegmentos(String texto) {
+        if (texto == null || texto.isBlank()) {
+            return List.of("");
+        }
+
+        List<String> segmentos = new ArrayList<>();
+        StringBuilder atual = new StringBuilder();
+        boolean numeroAtual = Character.isDigit(texto.charAt(0));
+
+        for (char caractere : texto.toCharArray()) {
+            boolean numero = Character.isDigit(caractere);
+            if (numero == numeroAtual) {
+                atual.append(caractere);
+                continue;
+            }
+            segmentos.add(atual.toString());
+            atual = new StringBuilder().append(caractere);
+            numeroAtual = numero;
+        }
+        segmentos.add(atual.toString());
+        return segmentos;
+    }
+
+    private int compararNumeros(String a, String b) {
+        try {
+            int numeroA = Integer.parseInt(a);
+            int numeroB = Integer.parseInt(b);
+            return Integer.compare(numeroA, numeroB);
+        } catch (NumberFormatException ex) {
+            return a.compareTo(b);
+        }
+    }
+
+    private int compararTextoSegmento(String a, String b) {
+        java.text.Collator collator = java.text.Collator.getInstance(Locale.forLanguageTag("pt-BR"));
+        collator.setStrength(java.text.Collator.PRIMARY);
+        return collator.compare(a, b);
+    }
+
     private Image carregarBrasao() throws IOException, BadElementException {
         ClassPathResource recurso = new ClassPathResource("relatorio/brasao.png");
         Image imagem = Image.getInstance(recurso.getInputStream().readAllBytes());
@@ -603,5 +870,17 @@ public class RelatorioFacade {
             @Nullable String tipoProcesso,
             int quantidadeUnidades
     ) {
+    }
+
+    private record UnidadeRelatorioSemMapa(
+            Long codigo,
+            String sigla,
+            String nome,
+            String tipo,
+            List<UnidadeRelatorioSemMapa> filhas
+    ) {
+        UnidadeRelatorioSemMapa comFilhas(List<UnidadeRelatorioSemMapa> filhas) {
+            return new UnidadeRelatorioSemMapa(codigo, sigla, nome, tipo, filhas);
+        }
     }
 }
