@@ -8,7 +8,6 @@ import {executarColeta} from "./nomes-simbolos-coletar.js";
 const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "nomenclatura", "latest");
 const ARQUIVO_SIMBOLOS_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos.json");
 const ARQUIVO_JSON_AUDITORIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "consistencia.json");
-const ARQUIVO_MD_AUDITORIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "consistencia-resumo.md");
 
 function classificarFormatoNome(nome) {
     if (/^[a-z][a-zA-Z0-9]*$/.test(nome)) {

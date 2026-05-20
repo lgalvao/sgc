@@ -6,7 +6,6 @@ import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "nomenclatura", "latest");
 const ARQUIVO_JSON_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos.json");
-const ARQUIVO_MD_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos-resumo.md");
 
 const EXTENSOES_SUPORTADAS = new Set([".java", ".ts", ".tsx", ".js", ".jsx", ".vue"]);
 const DIRETORIOS_IGNORADOS = new Set([
@@ -130,8 +129,15 @@ function extrairNomeParametro(parametroBruto) {
     }
 
     const tokens = semRest.split(/\s+/).filter(Boolean);
-    const nome = tokens.at(-1)?.replace(/[\[\]?]+$/g, "");
-    return nome ?? null;
+    const ultimoToken = tokens.at(-1);
+    if (!ultimoToken) {
+        return null;
+    }
+
+    return ultimoToken
+        .replace(/\?+$/g, "")
+        .replace(/\]+$/g, "")
+        .replace(/\[+$/g, "");
 }
 
 function extrairParametros(textoParametros) {
@@ -257,7 +263,7 @@ function extrairDadosJava(texto) {
 
     const membros = [];
     const assinaturasRegistradas = new Set();
-    const regexMetodos = /^\s*(?:@\w+(?:\([^)]*\))?\s*)*(?:(?:public|protected|private)\s+)?(?:(?:static|final|abstract|synchronized|native|strictfp|default)\s+)*(?:<[^>{}]+>\s*)?([A-Za-z_$][\w$<>\[\].?]*(?:\s+[A-Za-z_$][\w$<>\[\].?]*)*)\s+([a-z_]\w*)\s*\(([^)]*)\)\s*(?:throws [^{;]+)?\s*(?:\{|;)\s*$/gm;
+    const regexMetodos = /^\s*(?:@\w+(?:\([^)]*\))?\s*)*(?:(?:public|protected|private)\s+)?(?:(?:static|final|abstract|synchronized|native|strictfp|default)\s+)*(?:<[^>{}]+>\s*)?([A-Za-z_$][\w$<>[\].?]*(?:\s+[A-Za-z_$][\w$<>[\].?]*)*)\s+([a-z_]\w*)\s*\(([^)]*)\)\s*(?:throws [^{;]+)?\s*(?:\{|;)\s*$/gm;
     correspondencia = regexMetodos.exec(texto);
     while (correspondencia) {
         const linha = correspondencia[0];
