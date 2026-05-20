@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "npm --prefix frontend run test",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --project=chromium",
     "test:unit": "npm --prefix frontend run test:unit",
     "typecheck": "npm run typecheck:e2e && npm --prefix frontend run typecheck",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
