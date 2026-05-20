@@ -45,6 +45,60 @@ function normalizarSeparadores(caminhoArquivo) {
     return caminhoArquivo.split(path.sep).join("/");
 }
 
+function dividirParametros(textoParametros) {
+    const parametros = [];
+    let atual = "";
+    let nivelGenerico = 0;
+    let nivelParenteses = 0;
+    let nivelColchetes = 0;
+    let aspasSimples = false;
+    let aspasDuplas = false;
+
+    for (let indice = 0; indice < textoParametros.length; indice += 1) {
+        const caractere = textoParametros[indice];
+        const anterior = indice > 0 ? textoParametros[indice - 1] : "";
+
+        if (caractere === "'" && anterior !== "\\" && !aspasDuplas) {
+            aspasSimples = !aspasSimples;
+        } else if (caractere === "\"" && anterior !== "\\" && !aspasSimples) {
+            aspasDuplas = !aspasDuplas;
+        }
+
+        if (!aspasSimples && !aspasDuplas) {
+            if (caractere === "<") {
+                nivelGenerico += 1;
+            } else if (caractere === ">") {
+                nivelGenerico = Math.max(0, nivelGenerico - 1);
+            } else if (caractere === "(") {
+                nivelParenteses += 1;
+            } else if (caractere === ")") {
+                nivelParenteses = Math.max(0, nivelParenteses - 1);
+            } else if (caractere === "[") {
+                nivelColchetes += 1;
+            } else if (caractere === "]") {
+                nivelColchetes = Math.max(0, nivelColchetes - 1);
+            } else if (caractere === ","
+                && nivelGenerico === 0
+                && nivelParenteses === 0
+                && nivelColchetes === 0) {
+                if (atual.trim().length > 0) {
+                    parametros.push(atual.trim());
+                }
+                atual = "";
+                continue;
+            }
+        }
+
+        atual += caractere;
+    }
+
+    if (atual.trim().length > 0) {
+        parametros.push(atual.trim());
+    }
+
+    return parametros;
+}
+
 function extrairNomeParametro(parametroBruto) {
     const parametro = parametroBruto.trim();
     if (parametro.length === 0) {
@@ -56,9 +110,21 @@ function extrairNomeParametro(parametroBruto) {
     }
 
     const semAtribuicao = parametro.split("=")[0].trim();
-    const semRest = semAtribuicao.replace(/^\.\.\./, "");
-    const tokens = semRest.split(/[\s:]+/).filter(Boolean);
-    const nome = tokens.at(-1);
+    const semAnotacoes = semAtribuicao
+        .replace(/@\w+(?:\([^)]*\))?\s*/g, "")
+        .replace(/\b(final|readonly|public|private|protected)\b/g, "")
+        .trim();
+    const semRest = semAnotacoes.replace(/^\.\.\./, "");
+
+    if (semRest.includes(":")) {
+        const nomeEsquerda = semRest.split(":")[0].trim();
+        if (nomeEsquerda.length > 0) {
+            return nomeEsquerda.replace(/\?$/, "");
+        }
+    }
+
+    const tokens = semRest.split(/\s+/).filter(Boolean);
+    const nome = tokens.at(-1)?.replace(/[\[\]?]+$/g, "");
     return nome ?? null;
 }
 
@@ -67,8 +133,7 @@ function extrairParametros(textoParametros) {
         return [];
     }
 
-    return textoParametros
-        .split(",")
+    return dividirParametros(textoParametros)
         .map(extrairNomeParametro)
         .filter((valor) => valor !== null);
 }
@@ -176,9 +241,15 @@ function extrairDadosJava(texto) {
 
     const membros = [];
     const assinaturasRegistradas = new Set();
-    const regexMetodos = /^\s*(?:@\w+(?:\([^)]*\))?\s*)*(?:public|protected|private)?\s*(?:static\s+)?(?:final\s+)?(?:abstract\s+)?(?:synchronized\s+)?(?:native\s+)?(?:strictfp\s+)?(?:<[^>{}]+>\s*)?([A-Za-z_$][\w$<>\[\],.? ]+?)\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*(?:throws [^{;]+)?\s*(?:\{|;)\s*$/gm;
+    const regexMetodos = /^\s*(?:@\w+(?:\([^)]*\))?\s*)*(?:(?:public|protected|private)\s+)?(?:(?:static|final|abstract|synchronized|native|strictfp|default)\s+)*(?:<[^>{}]+>\s*)?([A-Za-z_$][\w$<>\[\].?]*(?:\s+[A-Za-z_$][\w$<>\[\].?]*)*)\s+([a-z_]\w*)\s*\(([^)]*)\)\s*(?:throws [^{;]+)?\s*(?:\{|;)\s*$/gm;
     correspondencia = regexMetodos.exec(texto);
     while (correspondencia) {
+        const linha = correspondencia[0];
+        if (/\b(?:throw|return|new)\b/.test(linha) || linha.includes("->")) {
+            correspondencia = regexMetodos.exec(texto);
+            continue;
+        }
+
         const nome = correspondencia[2];
         if (PALAVRAS_CHAVE_METODO.has(nome)) {
             correspondencia = regexMetodos.exec(texto);
