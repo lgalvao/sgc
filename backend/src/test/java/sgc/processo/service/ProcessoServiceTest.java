@@ -2078,7 +2078,7 @@ class ProcessoServiceTest {
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);
         when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
-        when(mapaRepo.listarPorSubprocessos(List.of(2000L))).thenReturn(List.of(mapa));
+        when(mapaManutencaoService.buscarMapasPorSubprocessos(List.of(2000L))).thenReturn(List.of(mapa));
 
         processoService.finalizar(codProcesso);
 
@@ -2125,7 +2125,7 @@ class ProcessoServiceTest {
         Mapa mapaOper = new Mapa();
         mapaOper.setSubprocesso(subprocessoOper);
         when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocessoInter, subprocessoOper));
-        when(mapaRepo.listarPorSubprocessos(List.of(3000L, 3001L))).thenReturn(List.of(mapaInter, mapaOper));
+        when(mapaManutencaoService.buscarMapasPorSubprocessos(List.of(3000L, 3001L))).thenReturn(List.of(mapaInter, mapaOper));
 
         processoService.finalizar(codProcesso);
 
@@ -2154,7 +2154,7 @@ class ProcessoServiceTest {
         when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
         when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ResultadoValidacao.ofValido());
         when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
-        when(mapaRepo.listarPorSubprocessos(List.of(4000L))).thenReturn(List.of());
+        when(mapaManutencaoService.buscarMapasPorSubprocessos(List.of(4000L))).thenReturn(List.of());
 
         assertThatThrownBy(() -> processoService.finalizar(codProcesso))
                 .isInstanceOf(ErroValidacao.class)
