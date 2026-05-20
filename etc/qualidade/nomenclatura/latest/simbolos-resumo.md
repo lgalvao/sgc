@@ -1,6 +1,6 @@
 # Inventario de simbolos
 
-Gerado em: 2026-05-20T18:46:37.372Z
+Gerado em: 2026-05-20T18:48:20.001Z
 Base: /home/runner/work/sgc/sgc
 
 ## Totais
@@ -8,15 +8,15 @@ Base: /home/runner/work/sgc/sgc
 - Arquivos analisados: 1128
 - Pacotes Java: 51
 - Tipos (class/interface/enum/record/type): 1090
-- Metodos/funcoes/construtores: 4779
+- Metodos/funcoes/construtores: 4437
 
 ## Por linguagem
 
 | Linguagem | Arquivos | Tipos | Membros |
 |---|---:|---:|---:|
-| java | 581 | 772 | 3446 |
-| typescript | 399 | 253 | 851 |
-| javascript | 53 | 0 | 276 |
+| java | 581 | 772 | 3107 |
+| typescript | 399 | 253 | 847 |
+| javascript | 53 | 0 | 277 |
 | vue | 95 | 65 | 206 |
 
 ## Pacotes Java
@@ -77,23 +77,23 @@ Base: /home/runner/work/sgc/sgc
 
 | Arquivo | Linguagem | Tipos | Membros | Pacote |
 |---|---|---:|---:|---|
-| backend/src/main/java/sgc/processo/service/ProcessoService.java | java | 5 | 122 | sgc.processo.service |
+| backend/src/main/java/sgc/processo/service/ProcessoService.java | java | 5 | 92 | sgc.processo.service |
 | backend/src/test/java/sgc/processo/service/ProcessoServiceTest.java | java | 15 | 80 | sgc.processo.service |
 | backend/src/test/java/sgc/subprocesso/SubprocessoControllerTest.java | java | 6 | 72 | sgc.subprocesso |
-| backend/src/main/java/sgc/relatorio/RelatorioFacade.java | java | 4 | 66 | sgc.relatorio |
-| backend/src/main/java/sgc/subprocesso/SubprocessoController.java | java | 1 | 63 | sgc.subprocesso |
-| backend/src/test/java/sgc/subprocesso/service/SubprocessoConsultaServiceTest.java | java | 9 | 51 | sgc.subprocesso.service |
-| backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java | java | 2 | 51 | sgc.subprocesso.service |
-| backend/src/main/java/sgc/e2e/E2eController.java | java | 2 | 50 | sgc.e2e |
-| backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java | java | 7 | 49 | sgc.subprocesso.service |
-| backend/src/main/java/sgc/mapa/service/MapaManutencaoService.java | java | 1 | 45 | sgc.mapa.service |
+| backend/src/main/java/sgc/subprocesso/SubprocessoController.java | java | 1 | 60 | sgc.subprocesso |
+| backend/src/main/java/sgc/relatorio/RelatorioFacade.java | java | 4 | 53 | sgc.relatorio |
+| backend/src/test/java/sgc/subprocesso/service/SubprocessoConsultaServiceTest.java | java | 9 | 50 | sgc.subprocesso.service |
+| backend/src/main/java/sgc/mapa/service/MapaManutencaoService.java | java | 1 | 44 | sgc.mapa.service |
+| backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java | java | 2 | 43 | sgc.subprocesso.service |
 | backend/src/test/java/sgc/mapa/service/ImpactoMapaServiceTest.java | java | 3 | 41 | sgc.mapa.service |
 | backend/src/test/java/sgc/processo/ProcessoControllerTest.java | java | 8 | 39 | sgc.processo |
-| backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java | java | 2 | 39 | sgc.subprocesso.service |
-| backend/src/test/java/sgc/e2e/E2eControllerTest.java | java | 3 | 38 | sgc.e2e |
+| backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java | java | 7 | 39 | sgc.subprocesso.service |
+| backend/src/main/java/sgc/e2e/E2eController.java | java | 2 | 39 | sgc.e2e |
+| backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java | java | 2 | 37 | sgc.subprocesso.service |
+| backend/src/test/java/sgc/e2e/E2eControllerTest.java | java | 3 | 36 | sgc.e2e |
 | backend/src/test/java/sgc/subprocesso/service/SubprocessoValidacaoServiceTest.java | java | 15 | 35 | sgc.subprocesso.service |
-| backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java | java | 9 | 35 | sgc.organizacao |
-| backend/src/main/java/sgc/subprocesso/service/CadastroFluxoService.java | java | 4 | 33 | sgc.subprocesso.service |
-| backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java | java | 2 | 32 | sgc.comum.erros |
 | backend/src/test/java/sgc/organizacao/UsuarioServiceTest.java | java | 7 | 31 | sgc.organizacao |
-| backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java | java | 1 | 31 | sgc.organizacao.service |
+| backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java | java | 2 | 31 | sgc.comum.erros |
+| e2e/helpers/helpers-atividades.ts | typescript | 0 | 30 | - |
+| e2e/lifecycle.js | javascript | 0 | 29 | - |
+| backend/src/test/java/sgc/subprocesso/service/SubprocessoServiceTest.java | java | 6 | 28 | sgc.subprocesso.service |

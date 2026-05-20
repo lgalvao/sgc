@@ -84,6 +84,9 @@ function filtrarSimbolosForaPadrao(inventario) {
         }
 
         for (const membro of arquivo.membros) {
+            if (membro.categoria === "construtor") {
+                continue;
+            }
             const formato = classificarFormatoNome(membro.nome);
             if (formato !== "camelCase" && formato !== "minusculo") {
                 membrosForaPadrao.push({

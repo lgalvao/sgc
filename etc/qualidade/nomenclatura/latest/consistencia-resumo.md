@@ -1,15 +1,15 @@
 # Auditoria de consistencia de nomenclatura
 
-Gerado em: 2026-05-20T18:46:37.412Z
+Gerado em: 2026-05-20T18:48:20.037Z
 Base: /home/runner/work/sgc/sgc
 
 ## Indicadores
 
 - Arquivos analisados: 1128
 - Tipos fora do padrao PascalCase: 0
-- Membros fora do padrao camelCase: 594
-- Parametros fora do padrao camelCase: 767
-- Parametros com uso de 'id': 4
+- Membros fora do padrao camelCase: 321
+- Parametros fora do padrao camelCase: 7
+- Parametros com uso de 'id': 5
 - Pacotes Java fora de lowercase.dotted: 0
 
 ## Formatos de arquivos por extensao
@@ -27,103 +27,33 @@ Base: /home/runner/work/sgc/sgc
 - Nenhum encontrado
 
 ### Membros fora de camelCase
-- AlertaDto(Long codigo,
-        Long codProcesso,
-        String processo,
-        String origem,
-        String unidadeDestino,
-        String descricao,
-        String mensagem,
-        LocalDateTime dataHora,
-        LocalDateTime dataHoraLeitura) (PascalCase) em backend/src/main/java/sgc/alerta/dto/AlertaDto.java
-- NotificacaoDto(Long codigo,
-        Long subprocessoCodigo,
-        String unidadeSigla,
-        String processoDescricao,
-        TipoNotificacao tipoNotificacao,
-        String usuarioDestinoTitulo,
-        String destinatario,
-        String assunto,
-        String corpoHtml,
-        sgc.alerta.model.SituacaoNotificacao situacao,
-        int tentativas,
-        LocalDateTime dataHoraCriacao,
-        LocalDateTime dataHoraEnvio,
-        LocalDateTime proximaTentativaEm,
-        String ultimoErro) (PascalCase) em backend/src/main/java/sgc/alerta/dto/NotificacaoDto.java
-- NotificacaoReenvioDto(Long codigo,
-        int reenfileiradas) (PascalCase) em backend/src/main/java/sgc/alerta/dto/NotificacaoReenvioDto.java
-- NotificacaoSubprocessoResumoDto(Long subprocessoCodigo,
-        Long processoCodigo,
-        String processoDescricao,
-        String unidadeSigla,
-        SituacaoSubprocesso situacaoSubprocesso,
-        long totalNotificacoes,
-        long pendentes,
-        long enviando,
-        long enviadas,
-        long falhasTemporarias,
-        long falhasDefinitivas,
-        SituacaoNotificacao statusGeral,
-        LocalDateTime ultimaNotificacaoEm,
-        LocalDateTime proximaTentativaEm,
-        int maiorTentativas,
-        String ultimoErro,
-        boolean podeReenviar) (PascalCase) em backend/src/main/java/sgc/alerta/dto/NotificacaoSubprocessoResumoDto.java
-- NotificacaoSubprocessoResumoQuery(Long subprocessoCodigo,
-        Long processoCodigo,
-        String processoDescricao,
-        String unidadeSigla,
-        SituacaoSubprocesso situacaoSubprocesso,
-        long totalNotificacoes,
-        long pendentes,
-        long enviando,
-        long enviadas,
-        long falhasTemporarias,
-        long falhasDefinitivas,
-        LocalDateTime ultimaNotificacaoEm,
-        LocalDateTime proximaTentativaEm,
-        int maiorTentativas,
-        String ultimoErro) (PascalCase) em backend/src/main/java/sgc/alerta/dto/NotificacaoSubprocessoResumoQuery.java
-- UrlLeitorEmailTestesDto(String url) (PascalCase) em backend/src/main/java/sgc/alerta/dto/UrlLeitorEmailTestesDto.java
-- EmailAtribuicaoTemporariaCommand(String assunto,
-            String nomeServidor,
-            String siglaUnidade,
-            LocalDateTime dataInicio,
-            LocalDateTime dataTermino,
-            String justificativa,
-            String urlSistema) (PascalCase) em backend/src/main/java/sgc/alerta/EmailModelosService.java
-- RuntimeException(e) (PascalCase) em backend/src/main/java/sgc/alerta/EmailService.java
-- EnfileirarNotificacaoCommand(@Nullable Subprocesso subprocesso,
-        @Nullable TipoNotificacao tipoNotificacao,
-        @Nullable String usuarioDestinoTitulo,
-        @Nullable String unidadeDestinoSigla,
-        String destinatario,
-        String assunto,
-        String corpoHtml,
-        String chaveIdempotencia) (PascalCase) em backend/src/main/java/sgc/alerta/EnfileirarNotificacaoCommand.java
 - findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(Long subprocessoCodigo, Pageable pageable) (outro) em backend/src/main/java/sgc/alerta/model/NotificacaoEmailRepo.java
-- MarcarEnviadoCommand(Long codigo, LocalDateTime agora) (PascalCase) em backend/src/main/java/sgc/alerta/model/NotificacaoEmailRepo.java
-- MarcarFalhaCommand(Long codigo,
-            SituacaoNotificacao situacao,
-            int tentativas,
-            String ultimoErro,
-            LocalDateTime proximaTentativaEm) (PascalCase) em backend/src/main/java/sgc/alerta/model/NotificacaoEmailRepo.java
-- ComumDtos() (PascalCase) em backend/src/main/java/sgc/comum/ComumDtos.java
-- ErroAcessoNegado(String message) (PascalCase) em backend/src/main/java/sgc/comum/erros/ErroAcessoNegado.java
-- ErroApi(HttpStatusCode status, String message) (PascalCase) em backend/src/main/java/sgc/comum/erros/ErroApi.java
-- ErroApi(HttpStatusCode status, String message, String code) (PascalCase) em backend/src/main/java/sgc/comum/erros/ErroApi.java
-- ErroAutenticacao(String mensagem) (PascalCase) em backend/src/main/java/sgc/comum/erros/ErroAutenticacao.java
-- ErroConfiguracao(String message) (PascalCase) em backend/src/main/java/sgc/comum/erros/ErroConfiguracao.java
-- ErroEntidadeNaoEncontrada(String message) (PascalCase) em backend/src/main/java/sgc/comum/erros/ErroEntidadeNaoEncontrada.java
-- ErroEntidadeNaoEncontrada(String entidade, Object codigo) (PascalCase) em backend/src/main/java/sgc/comum/erros/ErroEntidadeNaoEncontrada.java
+- deleteByMapa_Codigo(Long mapaCodigo) (outro) em backend/src/main/java/sgc/mapa/model/CompetenciaRepo.java
+- findByAtividade_Codigo(Long atividadeCodigo) (outro) em backend/src/main/java/sgc/mapa/model/ConhecimentoRepo.java
+- findByMapa_Codigo(Long mapaCodigo) (outro) em backend/src/main/java/sgc/subprocesso/model/SubprocessoRepo.java
+- marcarComoLidos_quandoSucesso_deveRetornarOk() (outro) em backend/src/test/java/sgc/alerta/AlertaControllerTest.java
+- marcarComoLidos_quandoListaVazia_deveRetornarOk() (outro) em backend/src/test/java/sgc/alerta/AlertaControllerTest.java
+- listarAlertas_quandoSucesso_deveRetornarListaDeAlertas() (outro) em backend/src/test/java/sgc/alerta/AlertaControllerTest.java
+- listarNaoLidos_quandoSucesso_deveRetornarListaDeAlertas() (outro) em backend/src/test/java/sgc/alerta/AlertaControllerTest.java
+- marcarComoLidos_Duplicatas() (outro) em backend/src/test/java/sgc/alerta/AlertaFacadeTest.java
+- deveLimparProcessoCompleto_SemDados() (outro) em backend/src/test/java/sgc/e2e/E2eControllerTest.java
+- deveLimparProcessoCompleto_ErroConexao() (outro) em backend/src/test/java/sgc/e2e/E2eControllerTest.java
+- deveLimparProcessoCompleto_DataSourceNull() (outro) em backend/src/test/java/sgc/e2e/E2eControllerTest.java
+- limparTabela_UsaDelete() (outro) em backend/src/test/java/sgc/e2e/E2eControllerTest.java
+- criarProcessoFixture_UnidadeNaoEncontrada() (outro) em backend/src/test/java/sgc/e2e/E2eControllerTest.java
+- criarProcessoFixture_FalhaIniciar() (outro) em backend/src/test/java/sgc/e2e/E2eControllerTest.java
+- criarProcessoFixture_FalhaRecarregar() (outro) em backend/src/test/java/sgc/e2e/E2eControllerTest.java
+- testLoginCompleto_sucessoUsuarioUnicoPerfil() (outro) em backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java
+- testLoginCompleto_sucessoUsuarioMultiplosPerfis() (outro) em backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java
+- testEntrar_falhaUsuarioNaoAutenticado() (outro) em backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java
+- testEntrar_falhaUnidadeInexistente() (outro) em backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java
 
 ### Parametros com `id`
-- id em FeedbackRespostaDto(UUID id,
-        OffsetDateTime enviadoEm) (backend/src/main/java/sgc/feedback/dto/FeedbackRespostaDto.java)
 - id em exibirScreenshot(@PathVariable UUID id) (backend/src/main/java/sgc/feedback/FeedbackController.java)
 - id em obterScreenshot(UUID id) (backend/src/main/java/sgc/feedback/FeedbackService.java)
 - id em unidadeComId(Long id) (backend/src/test/java/sgc/fixture/UnidadeFixture.java)
+- testId em obterAcaoBloco(page: Page, testId: string) (e2e/helpers/helpers-processos.ts)
+- competenciaId em removerAtividadeAssociada(competenciaId: number, codigoAtividade: number) (frontend/src/composables/useMapaCompetenciasMutacoes.ts)
 
 ### Pacotes Java fora do padrao
 - Nenhum encontrado

@@ -51,6 +51,7 @@ function dividirParametros(textoParametros) {
     let nivelGenerico = 0;
     let nivelParenteses = 0;
     let nivelColchetes = 0;
+    let nivelChaves = 0;
     let aspasSimples = false;
     let aspasDuplas = false;
 
@@ -77,10 +78,15 @@ function dividirParametros(textoParametros) {
                 nivelColchetes += 1;
             } else if (caractere === "]") {
                 nivelColchetes = Math.max(0, nivelColchetes - 1);
+            } else if (caractere === "{") {
+                nivelChaves += 1;
+            } else if (caractere === "}") {
+                nivelChaves = Math.max(0, nivelChaves - 1);
             } else if (caractere === ","
                 && nivelGenerico === 0
                 && nivelParenteses === 0
-                && nivelColchetes === 0) {
+                && nivelColchetes === 0
+                && nivelChaves === 0) {
                 if (atual.trim().length > 0) {
                     parametros.push(atual.trim());
                 }
@@ -173,6 +179,10 @@ function extrairFuncoesTsJs(texto) {
     const regexFunction = /^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s+([A-Za-z_]\w*)\s*(?:<[^>]+>\s*)?\(([^)]*)\)\s*(?::\s*[^({=]+)?\s*\{/gm;
     let correspondencia = regexFunction.exec(texto);
     while (correspondencia) {
+        if (correspondencia[2].trim().startsWith("(")) {
+            correspondencia = regexFunction.exec(texto);
+            continue;
+        }
         const assinatura = `${correspondencia[1]}(${correspondencia[2].trim()})`;
         if (!assinaturasRegistradas.has(assinatura)) {
             assinaturasRegistradas.add(assinatura);
@@ -189,6 +199,10 @@ function extrairFuncoesTsJs(texto) {
     const regexArrow = /^\s*(?:export\s+)?const\s+([A-Za-z_]\w*)\s*=\s*(?:async\s*)?(?:<[^>]+>\s*)?\(([^)]*)\)\s*=>/gm;
     correspondencia = regexArrow.exec(texto);
     while (correspondencia) {
+        if (correspondencia[2].trim().startsWith("(")) {
+            correspondencia = regexArrow.exec(texto);
+            continue;
+        }
         const assinatura = `${correspondencia[1]}(${correspondencia[2].trim()})`;
         if (!assinaturasRegistradas.has(assinatura)) {
             assinaturasRegistradas.add(assinatura);
@@ -202,11 +216,13 @@ function extrairFuncoesTsJs(texto) {
         correspondencia = regexArrow.exec(texto);
     }
 
-    const regexMetodo = /^\s*(?:public|private|protected|static|readonly|async|get|set|\s)+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*(?::\s*[^=;{]+)?\s*\{/gm;
+    const regexMetodo = /^\s*(?:(?:public|private|protected|static|readonly|async|get|set)\s+)*([A-Za-z_]\w*)\s*\(([^)]*)\)\s*(?::\s*[^=;{]+)?\s*\{/gm;
     correspondencia = regexMetodo.exec(texto);
     while (correspondencia) {
         const nome = correspondencia[1];
-        if (PALAVRAS_CHAVE_METODO.has(nome)) {
+        if (PALAVRAS_CHAVE_METODO.has(nome)
+            || correspondencia[2].trim().startsWith("(")
+            || correspondencia[0].includes("=>")) {
             correspondencia = regexMetodo.exec(texto);
             continue;
         }
