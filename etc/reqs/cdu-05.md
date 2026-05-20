@@ -24,30 +24,35 @@ Fluxo principal:
 
 6. O usuário confirma.
 
-7. O sistema armazena internamente uma cópia da árvore de unidades participantes ('snapshot') e a vincula com o
+7. Se a seleção incluir alguma unidade com equipe própria e unidades subordinadas, o sistema mostra um diálogo com a
+   mensagem `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo de mapeamento.`, apresentando essas unidades já selecionadas.
+
+8. O usuário confirma a seleção complementar das unidades mostradas no diálogo.
+
+9. O sistema armazena internamente uma cópia da árvore de unidades participantes ('snapshot') e a vincula com o
    processo, a fim de preservar a hierarquia de unidades vigente, no momento da iniciação do processo.
 
-8. O sistema muda a situação do processo de revisão para 'Em andamento';
+10. O sistema muda a situação do processo de revisão para 'Em andamento';
 
-9. O sistema cria internamente um subprocesso para cada unidade operacional ou interoperacional participante, com os
+11. O sistema cria internamente um subprocesso para cada unidade operacional ou unidade com equipe própria e unidades subordinadas confirmada no diálogo complementar, com os
    seguintes campos e valores iniciais:
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.
     - `Situação`: 'Não iniciado'
     - `Sugestões`: Campo de texto formatado reservado para registro de sugestões futuras pelas unidades.
     - `Observações`: Campo de texto formatado reservado para registro de informações futuras pelo perfil ADMIN.
 
-10. O sistema cria internamente uma cópia do mapa de competências vigente, juntamente com as suas respectivas atividades
-    e conhecimentos, para cada unidade operacional ou interoperacional participante, vinculando cada cópia ao
+12. O sistema cria internamente uma cópia do mapa de competências vigente, juntamente com as suas respectivas atividades
+    e conhecimentos, para cada unidade operacional ou unidade com equipe própria e unidades subordinadas confirmada no diálogo complementar, vinculando cada cópia ao
     subprocesso
     da unidade correspondente.
 
-11. O sistema registra uma movimentação para cada subprocesso criado com os campos:
+13. O sistema registra uma movimentação para cada subprocesso criado com os campos:
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: 'ADMIN'
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Processo iniciado'
 
-12. O sistema envia notificações por e-mail para todas as unidades participantes.
+14. O sistema envia notificações por e-mail para todas as unidades participantes.
 
     12.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo este modelo:
 
@@ -77,7 +82,7 @@ Fluxo principal:
         Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
     ```
 
-13. O sistema cria internamente alertas para todas as unidades participantes.
+15. O sistema cria internamente alertas para todas as unidades participantes.
     13.1. Para cada unidade **operacional** será criado um alerta com estes campos/valores:
     - `Descrição`: "Início do processo"
     - `Processo`: [DESCRICAO_PROCESSO]

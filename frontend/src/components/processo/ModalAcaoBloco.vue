@@ -90,6 +90,7 @@ const props = defineProps<{
   unidades: UnidadeSelecao[];
   unidadesPreSelecionadas: number[];
   mostrarDataLimite?: boolean;
+  mostrarSituacao?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -155,11 +156,21 @@ watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) 
   }
 });
 
-const campos = [
-  {key: 'selecao', label: '', thStyle: {width: '40px'}},
-  {key: 'sigla', label: 'Unidade'},
-  {key: 'situacao', label: 'Situação'}
-];
+const campos = computed(() => {
+  const camposBase = [
+    {key: 'selecao', label: '', thStyle: {width: '40px'}},
+    {key: 'sigla', label: 'Unidade'}
+  ];
+
+  if (props.mostrarSituacao === false) {
+    return camposBase;
+  }
+
+  return [
+    ...camposBase,
+    {key: 'situacao', label: 'Situação'}
+  ];
+});
 
 const todosSelecionados = computed({
   get() {

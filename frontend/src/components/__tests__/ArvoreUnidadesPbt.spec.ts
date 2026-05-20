@@ -115,9 +115,7 @@ describe('ArvoreUnidades Property-Based tests', () => {
                         if (allChildrenChecked && node.isElegivel) {
                             expect(vm.isChecked(node.codigo)).toBe(true);
                         } else {
-                            if (node.tipo !== 'INTEROPERACIONAL') {
-                                expect(vm.isChecked(node.codigo)).toBe(false);
-                            }
+                            expect(vm.isChecked(node.codigo)).toBe(false);
                         }
                     }
                 });

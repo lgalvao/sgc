@@ -1,5 +1,6 @@
 import {coletarCodigosElegiveis} from "@/components/unidade/arvoreSelecaoHelpers";
 import type {Unidade} from "@/types/tipos";
+import type {UnidadeSelecao} from "@/types/tipos";
 
 export function filtrarSelecionadasPorElegibilidade(
     selecionadas: number[],
@@ -22,4 +23,41 @@ export function removerUnidadesSemEquipe(unidadesArvore: Unidade[]): Unidade[] {
             filhas: filhasFiltradas
         }];
     });
+}
+
+export function listarUnidadesComEquipePropriaSelecionadas(
+    unidadesArvore: Unidade[],
+    codigosSelecionados: number[]
+): UnidadeSelecao[] {
+    const codigosSelecionadosSet = new Set(codigosSelecionados);
+    const selecionadas: UnidadeSelecao[] = [];
+
+    const visitar = (unidade: Unidade) => {
+        if (unidade.tipo === "INTEROPERACIONAL" && codigosSelecionadosSet.has(unidade.codigo)) {
+            selecionadas.push({
+                codigo: unidade.codigo,
+                sigla: unidade.sigla,
+                nome: unidade.nome,
+                situacao: "",
+            });
+        }
+
+        (unidade.filhas ?? []).forEach(visitar);
+    };
+
+    unidadesArvore.forEach(visitar);
+    return selecionadas;
+}
+
+export function aplicarSelecaoDiretaUnidadesComEquipePropria(
+    codigosSelecionados: number[],
+    codigosComEquipePropria: number[],
+    codigosConfirmados: number[]
+): number[] {
+    const codigosComEquipePropriaSet = new Set(codigosComEquipePropria);
+    const codigosConfirmadosSet = new Set(codigosConfirmados);
+
+    return codigosSelecionados.filter((codigo) =>
+        !codigosComEquipePropriaSet.has(codigo) || codigosConfirmadosSet.has(codigo)
+    );
 }

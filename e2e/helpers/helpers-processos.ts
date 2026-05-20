@@ -179,6 +179,7 @@ export async function iniciarProcessoPeloCadastro(page: Page, options: {
     descricao: string;
     tipo: TipoProcesso;
     unidadesParticipantes?: string[];
+    unidadesComEquipePropriaParticipantes?: string[];
 }): Promise<void> {
     await page.getByTestId('btn-processo-iniciar-rodape').click();
     await confirmarInicioProcessoPeloDialogo(page, options);
@@ -188,12 +189,15 @@ export async function iniciarProcessoPeloCadastro(page: Page, options: {
  * Inicia o processo já aberto na tela de cadastro/detalhes.
  * Versão semântica: não exige informar o tipo novamente.
  */
-export async function iniciarProcesso(page: Page, descricao: string): Promise<void> {
+export async function iniciarProcesso(page: Page, descricao: string, options?: {
+    unidadesComEquipePropriaParticipantes?: string[];
+}): Promise<void> {
     await page.getByTestId('btn-processo-iniciar-rodape').click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
     await dialog.getByTestId('btn-iniciar-processo-confirmar').click();
+    await confirmarSelecaoComplementarUnidadesComEquipePropria(page, options?.unidadesComEquipePropriaParticipantes);
 
     await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
     await verificarProcessoTabela(page, {
@@ -207,16 +211,52 @@ export async function confirmarInicioProcessoPeloDialogo(page: Page, options: {
     descricao: string;
     tipo: TipoProcesso;
     unidadesParticipantes?: string[];
+    unidadesComEquipePropriaParticipantes?: string[];
 }): Promise<void> {
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
     await dialog.getByTestId('btn-iniciar-processo-confirmar').click();
+    await confirmarSelecaoComplementarUnidadesComEquipePropria(page, options.unidadesComEquipePropriaParticipantes);
     await aguardarProcessoNoPainel(page, {
         descricao: options.descricao,
         situacao: 'Em andamento',
         tipo: options.tipo,
         unidadesParticipantes: options.unidadesParticipantes
     });
+}
+
+async function confirmarSelecaoComplementarUnidadesComEquipePropria(
+    page: Page,
+    siglasConfirmadas?: string[]
+): Promise<void> {
+    const modal = page.locator('#modal-unidades-com-equipe-propria');
+    const abriuModal = await modal.waitFor({state: 'visible', timeout: 1500})
+        .then(() => true)
+        .catch(() => false);
+    if (!abriuModal) {
+        return;
+    }
+
+    if (siglasConfirmadas) {
+        const siglasDesejadas = new Set(siglasConfirmadas);
+        const linhas = modal.locator('tbody tr');
+        const totalLinhas = await linhas.count();
+
+        for (let i = 0; i < totalLinhas; i++) {
+            const linha = linhas.nth(i);
+            const sigla = (await linha.locator('td').nth(1).innerText()).trim();
+            const checkbox = linha.locator('input[type="checkbox"]');
+            const deveFicarMarcado = siglasDesejadas.has(sigla);
+
+            if (deveFicarMarcado) {
+                await checkbox.check();
+            } else {
+                await checkbox.uncheck();
+            }
+        }
+    }
+
+    await modal.getByTestId('btn-acao-bloco-confirmar').click();
 }
 
 export interface UnidadeParticipante {

@@ -61,17 +61,16 @@ test.describe('CDU-03 - Manter processo', () => {
         await expect(btnIniciar).toBeDisabled();
     });
 
-    test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({
-                                                                                                         _resetAutomatico,
-                                                                                                         page,
-                                                                                                         _autenticadoComoAdmin
-                                                                                                     }) => {
+    test('Deve deixar unidade com equipe própria indeterminada quando a subárvore ficar parcial', async ({
+                                                                                                             _resetAutomatico,
+                                                                                                             page,
+                                                                                                             _autenticadoComoAdmin
+                                                                                                         }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
         await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
 
-        // SECRETARIA_1 é interoperacional
         const chkRaiz = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');
         const inputRaiz = chkRaiz.locator('input').or(chkRaiz);
 
@@ -84,10 +83,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
         await expect(inputFilha).not.toBeChecked();
-        await expect(inputRaiz).toBeChecked();
-
-        // O estado não deve ser indeterminado, mas sim checked (true) conforme regra de interoperabilidade
-        await expect(inputRaiz).not.toHaveJSProperty('indeterminate', true);
+        await expect(inputRaiz).toHaveJSProperty('indeterminate', true);
     });
 
     test('Deve editar um processo existente', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

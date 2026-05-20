@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     acessarDetalhesProcesso,
+    confirmarInicioProcessoPeloDialogo,
     criarProcesso,
     extrairProcessoCodigo,
     verificarDetalhesProcesso,
@@ -9,12 +10,10 @@ import {
 import {
     esperarPaginaCadastroProcesso,
     esperarPaginaDetalhesProcesso,
-    esperarPaginaPainel,
     esperarPaginaSubprocesso,
-    navegarParaSubprocesso,
     verificarToast
 } from './helpers/helpers-navegacao.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe('CDU-04 - Iniciar processo', () => {
@@ -62,10 +61,12 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await page.getByTestId('btn-processo-iniciar-rodape').click();
         const modal = page.getByRole('dialog');
         await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao,
+            tipo: 'MAPEAMENTO',
+            unidadesComEquipePropriaParticipantes: ['SECRETARIA_1']
+        });
 
-        // Aguarda toast e redirect
-        await esperarPaginaPainel(page);
         await verificarToast(page, TEXTOS.sucesso.PROCESSO_INICIADO);
         await verificarProcessoTabela(page, {
             descricao,
@@ -86,28 +87,16 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await expect(linhaSecretaria1).toContainText('Não iniciado');
         await expect(linhaSecretaria1).toContainText(dataLimiteStr.split('-').reverse().join('/'));
 
-        const linhaAss11 = page.locator('tr', {hasText: 'ASSESSORIA_11'}).first();
-        await expect(linhaAss11).toContainText('Não iniciado');
-        await expect(linhaAss11).toContainText(dataLimiteStr.split('-').reverse().join('/'));
+        const linhaSecao111 = page.locator('tr', {hasText: 'SECAO_111'}).first();
+        await expect(linhaSecao111).toContainText('Não iniciado');
+        await expect(linhaSecao111).toContainText(dataLimiteStr.split('-').reverse().join('/'));
 
-        await navegarParaSubprocesso(page, 'ASSESSORIA_11');
-        await esperarPaginaSubprocesso(page, 'ASSESSORIA_11');
+        await linhaSecretaria1.click();
+        await esperarPaginaSubprocesso(page, 'SECRETARIA_1');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
-
 
         const timeline = page.getByTestId('tbl-movimentacoes');
         await expect(timeline.getByText(TEXTOS.movimentacao.PROCESSO_INICIADO)).toBeVisible();
-
-        const contextoChefeAss11 = await browser.newContext();
-        const paginaChefeAss11 = await contextoChefeAss11.newPage();
-        await login(paginaChefeAss11, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
-
-        const tabelaAlertasAss11 = paginaChefeAss11.getByTestId('tbl-alertas');
-        await expect(tabelaAlertasAss11.locator('tr', {hasText: descricao})
-            .filter({hasText: 'Início do processo'})
-            .filter({hasNotText: 'subordinada'})
-        ).toBeVisible();
-        await contextoChefeAss11.close();
 
         // John lennon (SECRETARIA_1) deve receber alertas tanto como Chefe quanto como Gestor
 
@@ -123,7 +112,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         ).toBeVisible();
 
         await paginaChefeSec1.getByTestId('tbl-processos').locator('tr', {hasText: descricao}).click();
-        await navegarParaSubprocesso(paginaChefeSec1, 'SECRETARIA_1');
+        await paginaChefeSec1.locator('tr', {hasText: 'SECRETARIA_1'}).first().click();
         await esperarPaginaSubprocesso(paginaChefeSec1, 'SECRETARIA_1');
         await expect(paginaChefeSec1.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
         await contextoChefeSec1.close();

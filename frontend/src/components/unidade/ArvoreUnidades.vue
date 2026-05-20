@@ -44,14 +44,14 @@ interface Props {
   filtrarPor?: (unidade: Unidade) => boolean;
   ocultarRaiz?: boolean;
   modoSelecao?: boolean;
-  superioresNaoElegiveisSempreIndeterminadas?: boolean;
+  mostrarSuperioresNaoElegiveisComoIndeterminados?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   filtrarPor: () => true,
   ocultarRaiz: true,
   modoSelecao: true,
-  superioresNaoElegiveisSempreIndeterminadas: false
+  mostrarSuperioresNaoElegiveisComoIndeterminados: false
 });
 
 const emit = defineEmits<(e: "update:modelValue", value: number[]) => void>();

@@ -9,7 +9,7 @@
           <ArvoreUnidades
               id="arvore-unidades-mapas"
               :model-value="unidadesSelecionadas"
-              :superiores-nao-elegiveis-sempre-indeterminadas="true"
+              :mostrar-superiores-nao-elegiveis-como-indeterminados="true"
               :unidades="unidadesDisponiveis"
               @update:model-value="$emit('update:unidadesSelecionadas', $event)"
           />

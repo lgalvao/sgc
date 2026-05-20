@@ -1379,12 +1379,10 @@ public class ProcessoService {
         TipoProcesso tipo = processo.getTipo();
         List<Long> codigosUnidades = tipo == REVISAO
                 ? validarCodigosRevisao(codsUnidadesParam)
-                : validarCodigosParticipantes(processo.getCodigosParticipantes());
+                : validarCodigosParticipantes(codsUnidadesParam);
 
         Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
-        if (tipo == REVISAO) {
-            processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
-        }
+        processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
 
         return new ContextoInicioProcesso(tipo, codigosUnidades, unidadesParaProcessar);
     }

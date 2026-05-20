@@ -59,10 +59,15 @@ Após qualquer mudança nas filhas, o estado do pai é recalculado:
 
 **Importante**: Esta regra se aplica a **todos** os tipos de unidade, incluindo INTERMEDIARIA.
 
-#### 3. Exceção: INTEROPERACIONAL
+#### 3. Unidade com equipe própria e subordinadas
 
-Unidades INTEROPERACIONAL podem estar marcadas mesmo que nem todas as filhas estejam marcadas, pois elas próprias podem
-participar do processo.
+Unidades desse tipo seguem a mesma regra visual da árvore:
+
+- ficam **marcadas** apenas quando toda a subárvore elegível estiver marcada;
+- ficam **indeterminadas** quando houver seleção parcial na subárvore.
+
+A eventual participação direta da própria unidade não é decidida na árvore. Quando necessário, essa decisão é coletada
+em um diálogo separado no momento de iniciar o processo.
 
 ## Elegibilidade
 
@@ -219,3 +224,10 @@ A árvore disponibiliza um campo de busca para localização rápida de unidades
 3. Usuário clica em COORD_11
 4. Apenas a filha elegível é marcada
 5. COORD_11 fica **indeterminada** (nem todas filhas marcadas)
+
+### Cenário 5: Unidade com equipe própria e subordinadas
+
+1. Usuário marca uma unidade com equipe própria e subordinadas
+2. Todas as unidades elegíveis abaixo dela são marcadas recursivamente
+3. O nó fica **marcado** apenas se toda a subárvore elegível estiver marcada
+4. Ao iniciar o processo, o sistema pode pedir confirmação separada sobre a participação direta da própria unidade

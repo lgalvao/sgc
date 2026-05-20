@@ -6,7 +6,7 @@ export function useArvoreSelecao(props: {
     unidades: Unidade[];
     modelValue: number[];
     modoSelecao: boolean;
-    superioresNaoElegiveisSempreIndeterminadas: boolean;
+    mostrarSuperioresNaoElegiveisComoIndeterminados: boolean;
 }, emit: (e: "update:modelValue", value: number[]) => void) {
     const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
@@ -32,20 +32,21 @@ export function useArvoreSelecao(props: {
         return unidade.filhas.some(filha => isHabilitado(filha));
     }
 
-    function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
-        if (!props.modoSelecao) return false;
-
-        const selfSelected = isChecked(unidade.codigo);
+    function calcularEstadoSelecao(
+        unidade: Unidade,
+        selectionSet: ReadonlySet<number>
+    ): boolean | "indeterminate" {
+        const selfSelected = selectionSet.has(unidade.codigo);
 
         if (!unidade.filhas || unidade.filhas.length === 0) {
             return selfSelected;
         }
 
-        const estadosFilhas = unidade.filhas.map(filha => getEstadoSelecao(filha));
+        const estadosFilhas = unidade.filhas.map(filha => calcularEstadoSelecao(filha, selectionSet));
         const todasFilhasMarcadas = estadosFilhas.every(estado => estado === true);
         const algumaFilhaSelecionada = estadosFilhas.some(estado => estado !== false);
 
-        if (props.superioresNaoElegiveisSempreIndeterminadas &&
+        if (props.mostrarSuperioresNaoElegiveisComoIndeterminados &&
             !unidade.isElegivel &&
             algumaFilhaSelecionada) {
             return "indeterminate";
@@ -59,11 +60,12 @@ export function useArvoreSelecao(props: {
             return selfSelected;
         }
 
-        if (unidade.tipo === "INTEROPERACIONAL" && selfSelected) {
-            return true;
-        }
-
         return "indeterminate";
+    }
+
+    function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
+        if (!props.modoSelecao) return false;
+        return calcularEstadoSelecao(unidade, new Set(unidadesSelecionadasLocal.value));
     }
 
     function updateAncestors(node: Unidade, selectionSet: Set<number>) {
@@ -73,13 +75,13 @@ export function useArvoreSelecao(props: {
             if (!parent) break;
 
             const children = parent.filhas || [];
-            const allChildrenSelected = children.every(child => selectionSet.has(child.codigo));
+            const allChildrenSelected = children.every(child => calcularEstadoSelecao(child, selectionSet) === true);
 
             if (allChildrenSelected) {
                 if (parent.isElegivel) {
                     selectionSet.add(parent.codigo);
                 }
-            } else if (parent.tipo !== 'INTEROPERACIONAL') {
+            } else {
                 selectionSet.delete(parent.codigo);
             }
             current = parent;

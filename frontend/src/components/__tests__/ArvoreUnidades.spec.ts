@@ -399,7 +399,7 @@ describe("ArvoreUnidades.vue", () => {
         expect(lastEmission).toContain(100);
     });
 
-    it("não deve deselecionar pai INTEROPERACIONAL se filhos desmarcados", async () => {
+    it("deve deselecionar pai INTEROPERACIONAL se a subárvore deixar de estar totalmente marcada", async () => {
 
         const unidadesTeste: Unidade[] = [
             {
@@ -424,7 +424,7 @@ describe("ArvoreUnidades.vue", () => {
         const lastEmission = emitted![emitted!.length - 1][0] as number[];
 
         expect(lastEmission).not.toContain(201);
-        expect(lastEmission).toContain(200);
+        expect(lastEmission).not.toContain(200);
     });
 
     it("deve emitir a unidade INTEROPERACIONAL ao selecionar a secretaria com subordinadas", async () => {
@@ -475,6 +475,110 @@ describe("ArvoreUnidades.vue", () => {
         expect(lastEmission).toContain(700);
         expect(lastEmission).toContain(702);
         expect(lastEmission).toContain(704);
+    });
+
+    it("deve selecionar ancestral elegível quando uma intermediária ficar totalmente marcada pelos filhos", async () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 710,
+                sigla: "SECRETARIA",
+                nome: "Secretaria",
+                isElegivel: true,
+                tipo: "ADMINISTRATIVA",
+                filhas: [
+                    {
+                        codigo: 711,
+                        sigla: "COORD",
+                        nome: "Coordenadoria",
+                        isElegivel: false,
+                        tipo: "INTERMEDIARIA",
+                        filhas: [
+                            {
+                                codigo: 712,
+                                sigla: "SEC1",
+                                nome: "Seção 1",
+                                isElegivel: true,
+                                filhas: [],
+                                tipo: "OPERACIONAL"
+                            },
+                            {
+                                codigo: 713,
+                                sigla: "SEC2",
+                                nome: "Seção 2",
+                                isElegivel: true,
+                                filhas: [],
+                                tipo: "OPERACIONAL"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [712]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+
+        await root.props("onToggle")(unidadesTeste[0].filhas![0].filhas![1], true);
+
+        const emitted = wrapper.emitted("update:modelValue");
+        const lastEmission = emitted![emitted!.length - 1][0] as number[];
+
+        expect(lastEmission).toContain(710);
+        expect(lastEmission).toContain(712);
+        expect(lastEmission).toContain(713);
+        expect(lastEmission).not.toContain(711);
+    });
+
+    it("deve deselecionar ancestral elegível quando uma intermediária voltar a ficar parcial", async () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 720,
+                sigla: "SECRETARIA",
+                nome: "Secretaria",
+                isElegivel: true,
+                tipo: "ADMINISTRATIVA",
+                filhas: [
+                    {
+                        codigo: 721,
+                        sigla: "COORD",
+                        nome: "Coordenadoria",
+                        isElegivel: false,
+                        tipo: "INTERMEDIARIA",
+                        filhas: [
+                            {
+                                codigo: 722,
+                                sigla: "SEC1",
+                                nome: "Seção 1",
+                                isElegivel: true,
+                                filhas: [],
+                                tipo: "OPERACIONAL"
+                            },
+                            {
+                                codigo: 723,
+                                sigla: "SEC2",
+                                nome: "Seção 2",
+                                isElegivel: true,
+                                filhas: [],
+                                tipo: "OPERACIONAL"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [720, 722, 723]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+
+        await root.props("onToggle")(unidadesTeste[0].filhas![0].filhas![1], false);
+
+        const emitted = wrapper.emitted("update:modelValue");
+        const lastEmission = emitted![emitted!.length - 1][0] as number[];
+
+        expect(lastEmission).not.toContain(720);
+        expect(lastEmission).toContain(722);
+        expect(lastEmission).not.toContain(723);
+        expect(lastEmission).not.toContain(721);
     });
 
     it("deve atualizar ancestrais: não selecionar pai se não for elegível, mesmo se todos filhos selecionados", async () => {
@@ -564,7 +668,7 @@ describe("ArvoreUnidades.vue", () => {
         expect((wrapper.vm as any).isExpanded(novasUnidades[0])).toBe(false);
     });
 
-    it("deve calcular estado de seleção para INTEROPERACIONAL", () => {
+    it("deve calcular estado de seleção para INTEROPERACIONAL sem ambiguidade visual", () => {
         const unidadesTeste: Unidade[] = [
             {
                 codigo: 500,
@@ -579,12 +683,12 @@ describe("ArvoreUnidades.vue", () => {
             }
         ];
 
-        // INTEROPERACIONAL self selected but no children selected -> should return true
+        // nó marcado isoladamente continua marcado enquanto as filhas estiverem desmarcadas
         const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [500]});
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
         expect(root.props("getEstadoSelecao")(unidadesTeste[0])).toBe(true);
 
-        // INTEROPERACIONAL not selected but some children selected -> indeterminate
+        // com subárvore parcial, o estado deve ser indeterminado
         const wrapper2 = createWrapper({unidades: unidadesTeste, modelValue: [501]});
         const root2 = wrapper2.findComponent({name: "UnidadeTreeNode"});
         expect(root2.props("getEstadoSelecao")(unidadesTeste[0])).toBe("indeterminate");
@@ -718,7 +822,7 @@ describe("ArvoreUnidades.vue", () => {
         expect(root.props("isHabilitado")(units[0])).toBe(true);
     });
 
-    it("getEstadoSelecao para INTEROPERACIONAL com filhos parcial selecionados", () => {
+    it("getEstadoSelecao para INTEROPERACIONAL com filhos parcial selecionados deve ser indeterminado", () => {
         const units: Unidade[] = [{
             codigo: 1000, sigla: "INTER", nome: "Inter", isElegivel: true, tipo: "INTEROPERACIONAL",
             filhas: [
@@ -728,8 +832,7 @@ describe("ArvoreUnidades.vue", () => {
         }];
         const wrapper = createWrapper({unidades: units, modelValue: [1000, 1001]});
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
-        // Self selected AND some children selected -> true
-        expect(root.props("getEstadoSelecao")(units[0])).toBe(true);
+        expect(root.props("getEstadoSelecao")(units[0])).toBe("indeterminate");
     });
 
     it("não deve marcar superiores como checked considerando apenas descendentes elegíveis", () => {

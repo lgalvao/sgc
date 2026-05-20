@@ -28,8 +28,8 @@
               intermediário, indicando que há nós selecionados da subárvore, mas não todos;
             - Se todas as unidades de uma subárvore tiverem a seleção removida, o nó raiz desta subárvore deve ter
               automaticamente a seleção removida.
-            - Se a raiz de uma subárvore for uma unidade interoperacional, ela poderá ser selecionada ainda que as
-              unidades subordinadas não o sejam.
+            - Se a raiz de uma subárvore for uma unidade com equipe própria e unidades subordinadas, seu checkbox deve
+              refletir apenas o estado da subárvore, sem tratamento visual especial.
     - Campo `Data limite etapa 1`, para informação do prazo que as unidades terão para concluir a etapa inicial do
       processo.
     - Botões `Cancelar`, `Salvar` e `Iniciar processo`

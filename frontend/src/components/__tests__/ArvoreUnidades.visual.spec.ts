@@ -128,7 +128,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
             expect(vm.getEstadoSelecao(secretaria)).toBe('indeterminate');
         });
 
-        it('SECRETARIA_1 deve estar MARCADA quando todas filhas estão marcadas', () => {
+        it('SECRETARIA_1 deve ficar INDETERMINADA quando restar uma coordenadoria vazia desmarcada', () => {
             const wrapper = mount(ArvoreUnidades, {
                 ...mountOptions,
                 props: {
@@ -140,7 +140,7 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
             const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
             const secretaria = criarUnidades()[0];
 
-            expect(vm.getEstadoSelecao(secretaria)).toBe(true);
+            expect(vm.getEstadoSelecao(secretaria)).toBe('indeterminate');
         });
     });
 
@@ -181,6 +181,22 @@ describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [131, 132] // 2 de 3 filhas
+                }
+            });
+
+            const vm = wrapper.vm as unknown as ArvoreUnidadesVm;
+            const coord11 = criarUnidades()[0].filhas![2];
+
+            expect(vm.getEstadoSelecao(coord11)).toBe('indeterminate');
+        });
+
+        it('COORD_11 deve permanecer INDETERMINADA no modo visual do relatório mesmo com todas filhas selecionadas', () => {
+            const wrapper = mount(ArvoreUnidades, {
+                ...mountOptions,
+                props: {
+                    unidades: criarUnidades(),
+                    modelValue: [131, 132, 133],
+                    mostrarSuperioresNaoElegiveisComoIndeterminados: true
                 }
             });
 

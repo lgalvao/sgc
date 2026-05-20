@@ -183,7 +183,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 
-            processoService.iniciar(id, List.of());
+            processoService.iniciar(id, List.of(10L));
 
             verify(processoRepo).save(any(Processo.class));
         }
@@ -313,6 +313,48 @@ class ProcessoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve iniciar revisao sem subprocesso direto para unidade com equipe própria não confirmada")
+        void deveIniciarRevisaoSemSubprocessoDiretoParaUnidadeComEquipePropriaNaoConfirmada() {
+            Long id = 1021L;
+            Processo processo = new Processo();
+            processo.setCodigo(id);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.REVISAO);
+            processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+            Unidade unidadePai = criarUnidadeValida(10L);
+            unidadePai.setTipo(TipoUnidade.INTEROPERACIONAL);
+            unidadePai.setSigla("STIC");
+
+            Unidade unidadeFilha = criarUnidadeValida(20L);
+            unidadeFilha.setSigla("SEDIA");
+            processo.adicionarParticipantes(Set.of(unidadePai, unidadeFilha));
+
+            UnidadeMapa mapaFilha = UnidadeMapa.builder().unidadeCodigo(20L).build();
+
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(unidadeHierarquiaService.buscarMapaFilhoPai()).thenReturn(Map.of(20L, 10L));
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(10L));
+            when(unidadeService.buscarPorCodigos(List.of(20L))).thenReturn(List.of(unidadeFilha));
+            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidadePai));
+            when(unidadeService.buscarMapasPorUnidades(List.of(20L))).thenReturn(List.of(mapaFilha));
+            Unidade admin = criarUnidadeValida(999L);
+            when(unidadeService.buscarAdmin()).thenReturn(admin);
+            mockarResponsaveisEfetivos();
+
+            processoService.iniciar(id, List.of(20L));
+
+            verify(subprocessoService, times(1)).criarParaRevisao(any());
+            verify(subprocessoService).criarParaRevisao(argThat(command ->
+                    command.processo() == processo
+                            && command.unidade().getCodigo().equals(20L)
+                            && command.unidadeMapa() == mapaFilha
+            ));
+            assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigoPersistido).toList())
+                    .containsExactlyInAnyOrder(10L, 20L);
+        }
+
+        @Test
         @DisplayName("Deve vincular subprocesso nas notificacoes de inicio para exibir no painel de notificacoes")
         void deveVincularSubprocessoNasNotificacoesDeInicio() {
             Long id = 103L;
@@ -370,7 +412,7 @@ class ProcessoServiceTest {
                     .thenReturn(List.of(1L));
             mockarResponsaveisEfetivos();
 
-            List<Long> unidades = List.of();
+            List<Long> unidades = List.of(1L);
             assertThatThrownBy(() -> processoService.iniciar(id, unidades))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.UNIDADES_EM_PROCESSO_ATIVO);
@@ -452,7 +494,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(false);
 
-            List<Long> unidades = List.of();
+            List<Long> unidades = List.of(1L);
             assertThatThrownBy(() -> processoService.iniciar(id, unidades))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
@@ -1091,7 +1133,7 @@ class ProcessoServiceTest {
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 
-            processoService.iniciar(id, List.of());
+            processoService.iniciar(id, List.of(1L));
 
             verify(processoRepo).save(any(Processo.class));
             verify(subprocessoService).criarParaDiagnostico(argThat(command ->

@@ -88,6 +88,18 @@
         @confirmar-iniciar="confirmarIniciarProcesso"
         @confirmar-remocao="confirmarRemocao"
     />
+
+    <ModalAcaoBloco
+        id="modal-unidades-com-equipe-propria"
+        ref="modalUnidadesComEquipePropriaRef"
+        :mostrar-situacao="false"
+        :rotulo-botao="TEXTOS.comum.BOTAO_INICIAR"
+        :texto="textoModalUnidadesComEquipePropria"
+        :titulo="tituloModalUnidadesComEquipePropria"
+        :unidades="unidadesComEquipePropriaSelecionadas"
+        :unidades-pre-selecionadas="idsUnidadesComEquipePropriaSelecionadas"
+        @confirmar="confirmarSelecaoUnidadesComEquipePropria"
+    />
   </LayoutPadrao>
 </template>
 
@@ -101,6 +113,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
 import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoAlert.vue";
 import ProcessoCadastroModais from "@/components/processo/ProcessoCadastroModais.vue";
+import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
 import {deveNotificarGlobalmente, ehErroAxios, extrairErrosGenericos, normalizarErro} from "@/utils/apiError";
@@ -116,7 +129,19 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import * as processoService from "@/services/processo";
 import {Processo, TipoProcesso, type Unidade} from "@/types/tipos";
 import {usePerfil} from "@/composables/usePerfil";
-import {filtrarSelecionadasPorElegibilidade, removerUnidadesSemEquipe} from "@/views/processoCadastroUnidades";
+import {
+  aplicarSelecaoDiretaUnidadesComEquipePropria,
+  filtrarSelecionadasPorElegibilidade,
+  listarUnidadesComEquipePropriaSelecionadas,
+  removerUnidadesSemEquipe
+} from "@/views/processoCadastroUnidades";
+
+type ModalAcaoBlocoRef = {
+  abrir: () => void;
+  fechar: () => void;
+  setProcessando: (valor: boolean) => void;
+  setErro: (mensagem: string | null) => void;
+};
 
 const {
   descricao,
@@ -149,6 +174,7 @@ const formData = computed({
 });
 
 const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
+const modalUnidadesComEquipePropriaRef = ref<ModalAcaoBlocoRef | null>(null);
 
 const isSaving = ref(false);
 const isStarting = ref(false);
@@ -175,6 +201,17 @@ const {
 const anyLoading = computed(() => isSaving.value || isStarting.value || isRemoving.value);
 const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value || anyLoading.value);
 const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value || anyLoading.value);
+const tituloModalUnidadesComEquipePropria = "Selecionar unidades participantes";
+const textoModalUnidadesComEquipePropria =
+    "A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo de mapeamento.";
+
+const unidadesComEquipePropriaSelecionadas = computed(() =>
+    listarUnidadesComEquipePropriaSelecionadas(unidades.value, unidadesSelecionadas.value)
+);
+
+const idsUnidadesComEquipePropriaSelecionadas = computed(() =>
+    unidadesComEquipePropriaSelecionadas.value.map((unidade) => unidade.codigo)
+);
 
 function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
   const selecionadasFiltradas = filtrarSelecionadasPorElegibilidade(
@@ -314,8 +351,29 @@ function abrirModalConfirmacao() {
 }
 
 async function confirmarIniciarProcesso() {
+  if (unidadesComEquipePropriaSelecionadas.value.length > 0) {
+    mostrarModalConfirmacao.value = false;
+    modalUnidadesComEquipePropriaRef.value?.abrir();
+    return;
+  }
+
+  await iniciarProcessoComSelecaoDireta(unidadesSelecionadas.value);
+}
+
+async function confirmarSelecaoUnidadesComEquipePropria(dados: { ids: number[] }) {
+  const codigosDiretos = aplicarSelecaoDiretaUnidadesComEquipePropria(
+      unidadesSelecionadas.value,
+      idsUnidadesComEquipePropriaSelecionadas.value,
+      dados.ids,
+  );
+  await iniciarProcessoComSelecaoDireta(codigosDiretos);
+}
+
+async function iniciarProcessoComSelecaoDireta(codigosDiretos: number[]) {
   clearErrors();
   isStarting.value = true;
+  modalUnidadesComEquipePropriaRef.value?.setErro(null);
+  modalUnidadesComEquipePropriaRef.value?.setProcessando(true);
   let codigoProcesso = processoEditando.value?.codigo;
 
   if (!codigoProcesso) {
@@ -325,6 +383,7 @@ async function confirmarIniciarProcesso() {
       codigoProcesso = novoProcesso.codigo;
     } catch (error) {
       mostrarModalConfirmacao.value = false;
+      modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
       handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
       isStarting.value = false;
       return;
@@ -333,15 +392,18 @@ async function confirmarIniciarProcesso() {
 
   try {
     if (!tipo.value) throw new Error("Tipo não definido");
-    await processoService.iniciarProcesso(codigoProcesso, tipo.value, unidadesSelecionadas.value);
+    await processoService.iniciarProcesso(codigoProcesso, tipo.value, codigosDiretos);
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_INICIADO);
     invalidarCachesProcesso();
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
+    modalUnidadesComEquipePropriaRef.value?.fechar();
   } catch (error) {
     mostrarModalConfirmacao.value = false;
+    modalUnidadesComEquipePropriaRef.value?.fechar();
     handleApiErrors(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
   } finally {
+    modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
     isStarting.value = false;
   }
 }

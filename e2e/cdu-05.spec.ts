@@ -1,7 +1,12 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarDetalhesProcesso, criarProcesso, verificarProcessoTabela} from './helpers/helpers-processos.js';
+import {
+    acessarDetalhesProcesso,
+    confirmarInicioProcessoPeloDialogo,
+    criarProcesso,
+    verificarProcessoTabela
+} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     aceitarCadastroMapeamento,
@@ -244,10 +249,11 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         await page.getByTestId('btn-processo-iniciar-rodape').click();
         await expect(modal).toBeVisible();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao: descProcRevisao,
+            tipo: 'REVISAO'
+        });
 
-        // Validação: Redirecionamento e situação do processo iniciado
-        await verificarPaginaPainel(page);
         await verificarProcessoTabela(page, {
             descricao: descProcRevisao,
             situacao: 'Em andamento',
@@ -342,8 +348,11 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         await acessarDetalhesProcesso(page, descricaoRevisaoSecretaria);
         await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarPaginaPainel(page);
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao: descricaoRevisaoSecretaria,
+            tipo: 'REVISAO',
+            unidadesComEquipePropriaParticipantes: ['SECRETARIA_1']
+        });
 
         await loginComPerfil(
             page,
@@ -371,8 +380,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         await acessarDetalhesProcesso(page, descProcRevisaoHierarquiaInteroperacional);
         await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarPaginaPainel(page);
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao: descProcRevisaoHierarquiaInteroperacional,
+            tipo: 'REVISAO'
+        });
         await verificarProcessoTabela(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
             situacao: 'Em andamento',

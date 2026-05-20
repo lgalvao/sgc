@@ -104,6 +104,34 @@ const ProcessoFormFieldsStub = {
     }
 };
 
+const ModalAcaoBlocoStub = {
+    name: 'ModalAcaoBloco',
+    template: '<div class="modal-acao-bloco-stub"></div>',
+    props: ['unidades', 'unidadesPreSelecionadas', 'titulo', 'texto', 'rotuloBotao', 'mostrarSituacao', 'id'],
+    emits: ['confirmar'],
+    data() {
+        return {
+            aberto: false,
+            processando: false,
+            erro: null as string | null,
+        };
+    },
+    methods: {
+        abrir(this: any) {
+            this.aberto = true;
+        },
+        fechar(this: any) {
+            this.aberto = false;
+        },
+        setProcessando(this: any, valor: boolean) {
+            this.processando = valor;
+        },
+        setErro(this: any, mensagem: string | null) {
+            this.erro = mensagem;
+        },
+    }
+};
+
 function criarErroApi(mensagem: string, erros: Array<{ campo?: string | null; mensagem?: string }> = []) {
     return {
         isAxiosError: true,
@@ -164,6 +192,7 @@ describe('ProcessoCadastroView.vue', () => {
                         props: ['message', 'notification', 'variant', 'dismissible', 'stackTrace'],
                     },
                     ProcessoFormFields: ProcessoFormFieldsStub,
+                    ModalAcaoBloco: ModalAcaoBlocoStub,
                     InputData: {template: '<input type="date" />', props: ['modelValue', 'state']},
                 }
             }
@@ -436,7 +465,7 @@ describe('ProcessoCadastroView.vue', () => {
         expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
-    it('handles startProcess correctly', async () => {
+    it('handles startProcess correctly when there are no unidades com equipe própria selecionadas', async () => {
         mockRoute.query = {codProcesso: '123'};
         const mockProcesso = {
             codigo: 123,
@@ -456,6 +485,76 @@ describe('ProcessoCadastroView.vue', () => {
 
         expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', []);
         expect(mockPush).toHaveBeenCalledWith('/painel');
+    });
+
+    it('abre modal complementar quando houver unidade com equipe própria selecionada', async () => {
+        mockRoute.query = {codProcesso: '123'};
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            situacao: 'CRIADO',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2024-12-31',
+            unidades: []
+        };
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
+            {
+                codigo: 10,
+                sigla: 'STIC',
+                nome: 'Secretaria',
+                tipo: 'INTEROPERACIONAL',
+                isElegivel: true,
+                filhas: [
+                    {codigo: 11, sigla: 'SEDIA', nome: 'Seção', tipo: 'OPERACIONAL', isElegivel: true, filhas: []}
+                ]
+            }
+        ] as any);
+
+        const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
+        await flushPromises();
+        wrapper.vm.unidadesSelecionadas = [10, 11];
+        await nextTick();
+
+        await wrapper.vm.confirmarIniciarProcesso();
+
+        const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
+        expect((modal.vm as any).aberto).toBe(true);
+        expect(processoService.iniciarProcesso).not.toHaveBeenCalled();
+    });
+
+    it('inicia com subconjunto confirmado de unidades com equipe própria', async () => {
+        mockRoute.query = {codProcesso: '123'};
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            situacao: 'CRIADO',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2024-12-31',
+            unidades: []
+        };
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
+            {
+                codigo: 10,
+                sigla: 'STIC',
+                nome: 'Secretaria',
+                tipo: 'INTEROPERACIONAL',
+                isElegivel: true,
+                filhas: [
+                    {codigo: 11, sigla: 'SEDIA', nome: 'Seção', tipo: 'OPERACIONAL', isElegivel: true, filhas: []}
+                ]
+            }
+        ] as any);
+
+        const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
+        await flushPromises();
+        vi.mocked(processoService.iniciarProcesso).mockResolvedValue({} as any);
+        wrapper.vm.unidadesSelecionadas = [10, 11];
+        await nextTick();
+
+        await wrapper.vm.confirmarSelecaoUnidadesComEquipePropria({ids: []});
+        await flushPromises();
+
+        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', [11]);
     });
 
     it('resets units when type changes to REVISAO and no units were previously selected', async () => {
@@ -529,6 +628,7 @@ describe('ProcessoCadastroView.vue', () => {
                         BFormInvalidFeedback: {template: '<div><slot /></div>'},
                         LoadingButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
                         ProcessoFormFields: ProcessoFormFieldsStub,
+                        ModalAcaoBloco: ModalAcaoBlocoStub,
                         PageHeader: true,
                         AppAlert: {
                             template: '<div v-if="message || notification" data-testid="app-alert"></div>',
@@ -742,14 +842,15 @@ describe('ProcessoCadastroView.vue', () => {
                 emits: ['dismissed'],
             },
             ModalConfirmacao: {template: '<div><slot /></div>'},
-            ProcessoFormFields: {
-                template: '<div></div>',
-                methods: {
-                    focarDescricao: vi.fn(),
-                    focarPrimeiroErro: vi.fn(),
-                }
-            },
-            BForm: {template: '<form @submit.prevent><slot /></form>'},
+                        ProcessoFormFields: {
+                            template: '<div></div>',
+                            methods: {
+                                focarDescricao: vi.fn(),
+                                focarPrimeiroErro: vi.fn(),
+                            }
+                        },
+                        ModalAcaoBloco: ModalAcaoBlocoStub,
+                        BForm: {template: '<form @submit.prevent><slot /></form>'},
         };
 
         let pinaRamoNaoCoberto: any;
