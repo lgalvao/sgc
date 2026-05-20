@@ -18,7 +18,7 @@ function salvarTemaEscuroPorUsuario(codigoUsuario: string, novoValor: boolean) {
 }
 
 export function useTemaPreferencia() {
-    function setContextoUsuarioTemaEscuro(codigoUsuario: string | null | undefined) {
+    function definirContextoUsuarioTemaEscuro(codigoUsuario: string | null | undefined) {
         codigoUsuarioTema.value = codigoUsuario ? String(codigoUsuario) : null;
         if (!codigoUsuarioTema.value) {
             temaEscuro.value = false;
@@ -28,11 +28,11 @@ export function useTemaPreferencia() {
         temaEscuro.value = lerTemaEscuroPorUsuario(codigoUsuarioTema.value);
     }
 
-    function getTemaEscuro(): boolean {
+    function obterTemaEscuro(): boolean {
         return temaEscuro.value;
     }
 
-    function setTemaEscuro(novoValor: boolean) {
+    function definirTemaEscuro(novoValor: boolean) {
         temaEscuro.value = novoValor;
         if (codigoUsuarioTema.value) {
             salvarTemaEscuroPorUsuario(codigoUsuarioTema.value, novoValor);
@@ -40,8 +40,8 @@ export function useTemaPreferencia() {
     }
 
     return {
-        setContextoUsuarioTemaEscuro,
-        getTemaEscuro,
-        setTemaEscuro,
+        definirContextoUsuarioTemaEscuro,
+        obterTemaEscuro,
+        definirTemaEscuro,
     };
 }

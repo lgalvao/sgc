@@ -23,7 +23,7 @@ public class FeedbackRegistro {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+    private UUID codigo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 20)
@@ -40,7 +40,7 @@ public class FeedbackRegistro {
     private @Nullable String caminhoScreenshot;
 
     @Column(name = "usuario_id", nullable = false, length = 100)
-    private String usuarioId;
+    private String usuarioCodigo;
 
     @Column(name = "usuario_nome", nullable = false, length = 200)
     private String usuarioNome;

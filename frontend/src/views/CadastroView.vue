@@ -262,7 +262,7 @@ const {
   fluxoSubprocesso
 });
 
-const {withErrorHandling, lastError} = useErrorHandler();
+const {executarComTratamentoDeErros, ultimoErro} = useErrorHandler();
 
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
 
@@ -318,8 +318,8 @@ const {
   atividades,
   codigoSubprocesso,
   codMapa,
-  withErrorHandling,
-  lastError,
+  executarComTratamentoDeErros,
+  ultimoErro,
   notify,
   processarRespostaLocal,
   adicionarAtividadeAction
@@ -384,14 +384,14 @@ const erroGlobalFormatado = computed(() =>
     erroGlobal.value ? {mensagem: erroGlobal.value} : null
 );
 const erroCampoObservacaoDevolucao = computed(() =>
-    fluxoSubprocesso.lastError.value?.erros?.find((erro) =>
+    fluxoSubprocesso.ultimoErro.value?.erros?.find((erro) =>
         ["justificativa", "texto", "observacoes"].includes(erro.campo ?? "")
     )?.mensagem ?? ""
 );
 const erroFluxoCadastro = computed(() =>
-    fluxoSubprocesso.lastError.value?.tipo === "validacao"
+    fluxoSubprocesso.ultimoErro.value?.tipo === "validacao"
         ? undefined
-        : fluxoSubprocesso.lastError.value?.mensagem
+        : fluxoSubprocesso.ultimoErro.value?.mensagem
 );
 const mensagemErroObservacaoDevolucao = computed(() =>
     erroCampoObservacaoDevolucao.value

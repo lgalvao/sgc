@@ -20,16 +20,16 @@ interface PackageJson {
 const route = useRoute();
 const perfilStore = usePerfilStore();
 const {carregarConfiguracoes} = useConfiguracoes();
-const {getTemaEscuro, setContextoUsuarioTemaEscuro} = useTemaPreferencia();
+const {obterTemaEscuro, definirContextoUsuarioTemaEscuro} = useTemaPreferencia();
 const version = (pkg as PackageJson).version;
 
 const aplicarTema = () => {
-  const isDark = getTemaEscuro();
+  const isDark = obterTemaEscuro();
   document.documentElement.setAttribute("data-bs-theme", isDark ? "dark" : "light");
 };
 
 onMounted(() => {
-  setContextoUsuarioTemaEscuro(perfilStore.usuarioCodigo);
+  definirContextoUsuarioTemaEscuro(perfilStore.usuarioCodigo);
   aplicarTema();
 });
 
@@ -44,14 +44,14 @@ watch(
 );
 
 watch(
-    () => getTemaEscuro(),
+    () => obterTemaEscuro(),
     () => aplicarTema()
 );
 
 watch(
     () => perfilStore.usuarioCodigo,
     (codigo) => {
-      setContextoUsuarioTemaEscuro(codigo);
+      definirContextoUsuarioTemaEscuro(codigo);
       aplicarTema();
     },
     {immediate: true}

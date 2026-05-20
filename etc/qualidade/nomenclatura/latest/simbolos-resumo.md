@@ -1,14 +1,14 @@
 # Inventario de simbolos
 
-Gerado em: 2026-05-20T18:53:13.050Z
+Gerado em: 2026-05-20T19:56:53.906Z
 Base: /home/runner/work/sgc/sgc
 
 ## Totais
 
-- Arquivos analisados: 1128
+- Arquivos analisados: 1129
 - Pacotes Java: 51
 - Tipos (class/interface/enum/record/type): 1090
-- Metodos/funcoes/construtores: 4437
+- Metodos/funcoes/construtores: 4445
 
 ## Por linguagem
 
@@ -16,7 +16,7 @@ Base: /home/runner/work/sgc/sgc
 |---|---:|---:|---:|
 | java | 581 | 772 | 3107 |
 | typescript | 399 | 253 | 847 |
-| javascript | 53 | 0 | 277 |
+| javascript | 54 | 0 | 285 |
 | vue | 95 | 65 | 206 |
 
 ## Pacotes Java

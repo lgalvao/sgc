@@ -25,9 +25,9 @@ vi.mock("@/services/subprocessoService", () => ({
 
 vi.mock("@/composables/useErrorHandler", () => ({
     useErrorHandler: () => ({
-        lastError: {value: null},
-        clearError: vi.fn(),
-        withErrorHandling: vi.fn((cb) => cb())
+        ultimoErro: {value: null},
+        limparErro: vi.fn(),
+        executarComTratamentoDeErros: vi.fn((cb) => cb())
     })
 }));
 

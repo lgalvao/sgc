@@ -24,7 +24,7 @@ interface WorkflowOptions {
 }
 
 export function useFluxoSubprocesso() {
-    const {lastError, clearError, withErrorHandling} = useErrorHandler();
+    const {ultimoErro, limparErro, executarComTratamentoDeErros} = useErrorHandler();
     const subprocessoStore = useSubprocessoStore();
     const toastStore = useToastStore();
     const router = useRouter();
@@ -35,7 +35,7 @@ export function useFluxoSubprocesso() {
         options: WorkflowOptions = {}
     ): Promise<boolean> {
         try {
-            await withErrorHandling(async () => {
+            await executarComTratamentoDeErros(async () => {
                 await acao();
 
                 if (options.mensagemSucesso) {
@@ -74,7 +74,7 @@ export function useFluxoSubprocesso() {
     }
 
     async function validarCadastro(codigoSubprocesso: number) {
-        return withErrorHandling(async () => subprocessoService.validarCadastro(codigoSubprocesso));
+        return executarComTratamentoDeErros(async () => subprocessoService.validarCadastro(codigoSubprocesso));
     }
 
     async function disponibilizarCadastro(codigoSubprocesso: number) {
@@ -204,7 +204,7 @@ export function useFluxoSubprocesso() {
     }
 
     async function alterarDataLimiteSubprocesso(codigoSubprocesso: number, dados: { novaData: string }) {
-        return withErrorHandling(async () => {
+        return executarComTratamentoDeErros(async () => {
             await subprocessoService.alterarDataLimiteSubprocesso(codigoSubprocesso, dados);
         });
     }
@@ -230,8 +230,8 @@ export function useFluxoSubprocesso() {
     }
 
     return {
-        lastError,
-        clearError,
+        ultimoErro,
+        limparErro,
         validarCadastro,
         disponibilizarCadastro,
         disponibilizarRevisaoCadastro,

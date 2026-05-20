@@ -20,13 +20,13 @@ public record FeedbackListagemDto(
 ) {
     public static FeedbackListagemDto from(FeedbackRegistro registro, boolean screenshotDisponivel) {
         return new FeedbackListagemDto(
-                registro.getId(),
+                registro.getCodigo(),
                 registro.getTipo(),
                 registro.getNota(),
                 registro.getMetadataJson(),
                 registro.getCaminhoScreenshot(),
                 screenshotDisponivel,
-                registro.getUsuarioId(),
+                registro.getUsuarioCodigo(),
                 registro.getUsuarioNome(),
                 registro.getEnviadoEm(),
                 registro.getRota(),

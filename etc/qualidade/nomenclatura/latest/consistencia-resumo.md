@@ -1,15 +1,15 @@
 # Auditoria de consistencia de nomenclatura
 
-Gerado em: 2026-05-20T18:53:13.088Z
+Gerado em: 2026-05-20T19:56:53.936Z
 Base: /home/runner/work/sgc/sgc
 
 ## Indicadores
 
-- Arquivos analisados: 1128
+- Arquivos analisados: 1129
 - Tipos fora do padrao PascalCase: 0
 - Membros fora do padrao camelCase: 321
-- Parametros fora do padrao camelCase: 7
-- Parametros com uso de 'id': 5
+- Parametros fora do padrao camelCase: 8
+- Parametros com uso de 'id': 1
 - Pacotes Java fora de lowercase.dotted: 0
 
 ## Formatos de arquivos por extensao
@@ -18,7 +18,7 @@ Base: /home/runner/work/sgc/sgc
 |---|---|
 | .java | PascalCase: 556, kebab-case: 25 |
 | .ts | outro: 247, minusculo: 58, kebab-case: 21, camelCase: 73 |
-| .js | minusculo: 13, outro: 3, kebab-case: 37 |
+| .js | minusculo: 13, outro: 3, kebab-case: 38 |
 | .vue | PascalCase: 95 |
 
 ## Exemplos de divergencias
@@ -49,11 +49,7 @@ Base: /home/runner/work/sgc/sgc
 - testEntrar_falhaUnidadeInexistente() (outro) em backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java
 
 ### Parametros com `id`
-- id em exibirScreenshot(@PathVariable UUID id) (backend/src/main/java/sgc/feedback/FeedbackController.java)
-- id em obterScreenshot(UUID id) (backend/src/main/java/sgc/feedback/FeedbackService.java)
-- id em unidadeComId(Long id) (backend/src/test/java/sgc/fixture/UnidadeFixture.java)
 - testId em obterAcaoBloco(page: Page, testId: string) (e2e/helpers/helpers-processos.ts)
-- competenciaId em removerAtividadeAssociada(competenciaId: number, codigoAtividade: number) (frontend/src/composables/useMapaCompetenciasMutacoes.ts)
 
 ### Pacotes Java fora do padrao
 - Nenhum encontrado

@@ -2,37 +2,37 @@ import {ref} from 'vue';
 import type {ErroNormalizado} from '@/utils/apiError';
 
 export function useFormErrors(initialFields: string[] = []) {
-    const errors = ref<Record<string, string>>(
+    const erros = ref<Record<string, string>>(
         Object.fromEntries(initialFields.map(f => [f, '']))
     );
 
-    function clearErrors() {
-        Object.keys(errors.value).forEach(key => {
-            errors.value[key] = '';
+    function limparErros() {
+        Object.keys(erros.value).forEach(key => {
+            erros.value[key] = '';
         });
     }
 
-    function setFromErroNormalizado(normalizedError: ErroNormalizado | null) {
-        clearErrors();
+    function aplicarErroNormalizado(erroNormalizado: ErroNormalizado | null) {
+        limparErros();
 
-        if (!normalizedError?.erros) return;
+        if (!erroNormalizado?.erros) return;
 
-        normalizedError.erros.forEach(erro => {
+        erroNormalizado.erros.forEach(erro => {
             const campo = erro.campo;
-            if (campo && campo in errors.value) {
-                errors.value[campo] = erro.mensagem || 'Campo inválido';
+            if (campo && campo in erros.value) {
+                erros.value[campo] = erro.mensagem || 'Campo inválido';
             }
         });
     }
 
-    function hasErrors(): boolean {
-        return Object.values(errors.value).some(e => e !== '');
+    function temErros(): boolean {
+        return Object.values(erros.value).some(e => e !== '');
     }
 
     return {
-        errors,
-        clearErrors,
-        setFromErroNormalizado,
-        hasErrors
+        erros,
+        limparErros,
+        aplicarErroNormalizado,
+        temErros
     };
 }

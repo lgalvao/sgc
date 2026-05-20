@@ -37,8 +37,8 @@ describe("MainNavbar.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(useTemaPreferencia).mockReturnValue({
-            getTemaEscuro: vi.fn().mockReturnValue(false),
-            setTemaEscuro: vi.fn(),
+            obterTemaEscuro: vi.fn().mockReturnValue(false),
+            definirTemaEscuro: vi.fn(),
         } as any);
         localStorage.clear();
 

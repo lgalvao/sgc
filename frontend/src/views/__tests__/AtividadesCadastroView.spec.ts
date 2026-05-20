@@ -102,8 +102,8 @@ type SubprocessoStoreMock = {
     atualizarStatusLocal: ReturnType<typeof vi.fn>;
     invalidar: ReturnType<typeof vi.fn>;
     invalidarContextoEdicao: ReturnType<typeof vi.fn>;
-    lastError: { message: string } | null;
-    clearError: ReturnType<typeof vi.fn>;
+    ultimoErro: { message: string } | null;
+    limparErro: ReturnType<typeof vi.fn>;
     limparErroIntegracao: ReturnType<typeof vi.fn>;
 };
 
@@ -186,8 +186,8 @@ const subprocessosMock = reactive({
     invalidar: vi.fn(),
     invalidarContextoEdicao: vi.fn(),
     erroIntegracaoContexto: null as { message: string } | null,
-    lastError: null as SubprocessoStoreMock["lastError"],
-    clearError: vi.fn(),
+    ultimoErro: null as SubprocessoStoreMock["ultimoErro"],
+    limparErro: vi.fn(),
     limparErroIntegracao: vi.fn(),
 });
 
@@ -395,15 +395,15 @@ describe("CadastroView.vue", () => {
             unidade: {sigla: "TESTE"},
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         };
-        subprocessosMock.lastError = null;
+        subprocessosMock.ultimoErro = null;
         subprocessosMock.erroIntegracaoContexto = null;
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.invalidarContextoEdicao = vi.fn();
         subprocessosMock.garantirContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(criarContextoEdicao());
         subprocessosMock.garantirContextoCadastroAtividades.mockResolvedValue(criarContextoEdicao());
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
-            lastError: ref(null),
-            clearError: vi.fn(),
+            ultimoErro: ref(null),
+            limparErro: vi.fn(),
             validarCadastro: vi.fn().mockResolvedValue({valido: true}),
             disponibilizarCadastro: vi.fn().mockImplementation(() => {
                 pushMock("/painel");

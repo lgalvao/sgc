@@ -21,7 +21,7 @@ interface Dependencias {
     codProcesso: number;
     processo: Ref<Processo | null>;
     carregarContextoCompleto: () => Promise<Processo | null | undefined>;
-    clearError: () => void;
+    limparErro: () => void;
     registrarErro: (error: unknown) => string;
     notify: (mensagem: string, variant?: VarianteAlerta) => void;
 }
@@ -30,7 +30,7 @@ export function useProcessoAcoes({
                                      codProcesso,
                                      processo,
                                      carregarContextoCompleto,
-                                     clearError,
+                                     limparErro,
                                      registrarErro,
                                      notify,
                                  }: Dependencias) {
@@ -73,7 +73,7 @@ export function useProcessoAcoes({
 
         loadingFinalizacao.value = true;
         try {
-            clearError();
+            limparErro();
             await processoService.finalizarProcesso(codProcesso);
             toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
             invalidarCachesProcesso();
@@ -89,7 +89,7 @@ export function useProcessoAcoes({
 
     async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) {
         try {
-            clearError();
+            limparErro();
             processandoAcaoBloco.value = true;
             modalBlocoRef.value?.setProcessando(true);
 

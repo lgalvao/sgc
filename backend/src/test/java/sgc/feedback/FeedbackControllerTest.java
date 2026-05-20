@@ -40,9 +40,9 @@ class FeedbackControllerTest {
     @DisplayName("POST /api/feedback - deve registrar feedback e retornar 201")
     @WithMockUser
     void deveRegistrarFeedbackComSucesso() throws Exception {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         OffsetDateTime agora = OffsetDateTime.now();
-        when(feedbackService.registrar(any(), any())).thenReturn(new FeedbackRespostaDto(id, agora));
+        when(feedbackService.registrar(any(), any())).thenReturn(new FeedbackRespostaDto(codigo, agora));
 
         String payloadJson = """
                 {"tipo":"bug","nota":"Encontrei um problema ao realizar o cadastro de atividades","metadados":{"rotaCaminho":"/processos/1"}}
@@ -53,7 +53,7 @@ class FeedbackControllerTest {
                         .file(dataPart)
                         .with(csrf()))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(id.toString()));
+                .andExpect(jsonPath("$.codigo").value(codigo.toString()));
     }
 
     @Test
@@ -90,8 +90,8 @@ class FeedbackControllerTest {
     @DisplayName("POST /api/feedback - deve aceitar screenshot junto ao payload")
     @WithMockUser
     void deveRegistrarFeedbackComScreenshot() throws Exception {
-        UUID id = UUID.randomUUID();
-        when(feedbackService.registrar(any(), any())).thenReturn(new FeedbackRespostaDto(id, OffsetDateTime.now()));
+        UUID codigo = UUID.randomUUID();
+        when(feedbackService.registrar(any(), any())).thenReturn(new FeedbackRespostaDto(codigo, OffsetDateTime.now()));
 
         String payloadJson = """
                 {"tipo":"sugestao","nota":"Sugestão de melhoria para a interface do usuário","metadados":null}
@@ -153,14 +153,14 @@ class FeedbackControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/feedback/{id}/screenshot - deve retornar bytes da imagem para admin")
+    @DisplayName("GET /api/feedback/{codigo}/screenshot - deve retornar bytes da imagem para admin")
     @WithMockUser(roles = "ADMIN")
     void deveRetornarScreenshotParaAdmin() throws Exception {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         byte[] imagem = "fake-image-bytes".getBytes();
-        when(feedbackService.obterScreenshot(id)).thenReturn(imagem);
+        when(feedbackService.obterScreenshot(codigo)).thenReturn(imagem);
 
-        mockMvc.perform(get(URL + "/" + id + "/screenshot"))
+        mockMvc.perform(get(URL + "/" + codigo + "/screenshot"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("image/webp"))
                 .andExpect(content().bytes(imagem));

@@ -56,7 +56,7 @@ public class FeedbackService {
                 .nota(payload.nota())
                 .metadataJson(metadataJson)
                 .caminhoScreenshot(caminhoScreenshot)
-                .usuarioId(usuario.getTituloEleitoral())
+                .usuarioCodigo(usuario.getTituloEleitoral())
                 .usuarioNome(usuario.getNome())
                 .enviadoEm(OffsetDateTime.now())
                 .rota(rota)
@@ -64,8 +64,8 @@ public class FeedbackService {
                 .build();
 
         FeedbackRegistro salvo = repo.save(registro);
-        log.info("Feedback registrado: id={} tipo={} usuario={}", salvo.getId(), salvo.getTipo(), salvo.getUsuarioId());
-        return new FeedbackRespostaDto(salvo.getId(), salvo.getEnviadoEm());
+        log.info("Feedback registrado: codigo={} tipo={} usuario={}", salvo.getCodigo(), salvo.getTipo(), salvo.getUsuarioCodigo());
+        return new FeedbackRespostaDto(salvo.getCodigo(), salvo.getEnviadoEm());
     }
 
     @Transactional(readOnly = true)
@@ -87,14 +87,14 @@ public class FeedbackService {
     /**
      * Recupera os bytes da screenshot de um feedback.
      *
-     * @param id identificador do feedback
+     * @param codigo identificador do feedback
      * @return bytes da imagem
      * @throws ErroEntidadeNaoEncontrada se o feedback ou a imagem não existirem
      */
     @Transactional(readOnly = true)
-    public byte[] obterScreenshot(UUID id) {
-        FeedbackRegistro registro = repo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Feedback", id));
+    public byte[] obterScreenshot(UUID codigo) {
+        FeedbackRegistro registro = repo.findById(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Feedback", codigo));
 
         String nomeOuCaminho = registro.getCaminhoScreenshot();
         if (nomeOuCaminho == null || nomeOuCaminho.isBlank()) {

@@ -43,7 +43,7 @@
           :model-value="true"
           dismissible
           variant="danger"
-          @dismissed="clearError()"
+          @dismissed="limparErro()"
       >
         {{ erroUnidades.message }}
       </BAlert>
@@ -159,7 +159,7 @@ function dadosLocaisValidos(): boolean {
   return unidades.value.length > 0 && !erro.value;
 }
 
-function clearError() {
+function limparErro() {
   erro.value = null;
 }
 

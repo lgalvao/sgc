@@ -5,13 +5,13 @@ import {type ErroNormalizado, normalizarErro} from '@/utils/apiError';
  * Composable para tratamento centralizado de erros em stores.
  */
 export function useErrorHandler() {
-    const lastError = ref<ErroNormalizado | null>(null);
+    const ultimoErro = ref<ErroNormalizado | null>(null);
 
     /**
      * Limpa o último erro armazenado.
      */
-    function clearError() {
-        lastError.value = null;
+    function limparErro() {
+        ultimoErro.value = null;
     }
 
     /**
@@ -19,19 +19,19 @@ export function useErrorHandler() {
      *
      * @throws Re-lança o erro após tratamento
      */
-    async function withErrorHandling<T>(
+    async function executarComTratamentoDeErros<T>(
         fn: () => Promise<T>,
-        onError?: (error: ErroNormalizado) => void
+        aoOcorrerErro?: (error: ErroNormalizado) => void
     ): Promise<T> {
-        lastError.value = null;
+        ultimoErro.value = null;
         try {
             return await fn();
         } catch (error) {
-            const normalized = normalizarErro(error);
-            lastError.value = normalized;
+            const normalizado = normalizarErro(error);
+            ultimoErro.value = normalizado;
 
-            if (onError) {
-                onError(normalized);
+            if (aoOcorrerErro) {
+                aoOcorrerErro(normalizado);
             }
 
             throw error;
@@ -39,8 +39,8 @@ export function useErrorHandler() {
     }
 
     return {
-        lastError,
-        clearError,
-        withErrorHandling
+        ultimoErro,
+        limparErro,
+        executarComTratamentoDeErros
     };
 }

@@ -18,11 +18,11 @@ describe('ConfiguracaoView', () => {
                 {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
                 {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
             ]),
-            loading: ref(loading),
-            saving: ref(false),
-            error: ref(error),
-            getDiasInativacaoProcesso: vi.fn().mockReturnValue(30),
-            getDiasAlertaNovo: vi.fn().mockReturnValue(5),
+            carregandoConfiguracoes: ref(loading),
+            salvando: ref(false),
+            erro: ref(error),
+            obterDiasInativacaoProcesso: vi.fn().mockReturnValue(30),
+            obterDiasAlertaNovo: vi.fn().mockReturnValue(5),
             carregarConfiguracoes: vi.fn().mockResolvedValue([]),
             salvarConfiguracoes: vi.fn().mockResolvedValue(true)
         };

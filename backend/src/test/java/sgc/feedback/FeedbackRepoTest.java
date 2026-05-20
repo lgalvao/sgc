@@ -26,7 +26,7 @@ class FeedbackRepoTest {
         FeedbackRegistro registro = FeedbackRegistro.builder()
                 .tipo(FeedbackTipo.BUG)
                 .nota("Teste de repositório")
-                .usuarioId("123")
+                .usuarioCodigo("123")
                 .usuarioNome("Testador")
                 .enviadoEm(OffsetDateTime.now())
                 .rota("/teste")
@@ -34,9 +34,9 @@ class FeedbackRepoTest {
                 .build();
 
         FeedbackRegistro salvo = repo.save(registro);
-        assertThat(salvo.getId()).isNotNull();
+        assertThat(salvo.getCodigo()).isNotNull();
 
-        Optional<FeedbackRegistro> recuperado = repo.findById(salvo.getId());
+        Optional<FeedbackRegistro> recuperado = repo.findById(salvo.getCodigo());
         assertThat(recuperado).isPresent();
         assertThat(recuperado.get().getNota()).isEqualTo("Teste de repositório");
     }

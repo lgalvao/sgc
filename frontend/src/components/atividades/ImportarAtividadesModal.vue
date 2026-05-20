@@ -188,7 +188,7 @@ const {
   deveExibirErro,
   focarPrimeiroErroInvalido
 } = useValidacaoFormulario();
-const {withErrorHandling} = useErrorHandler();
+const {executarComTratamentoDeErros} = useErrorHandler();
 
 const resultadoImportacao = ref<AtividadeOperacaoResponse | null>(null);
 const erroImportacao = ref<string | null>(null);
@@ -291,7 +291,7 @@ async function executarComTratamentoErro<T>(
     aplicarResultado: (resultado: T) => void,
 ) {
   try {
-    aplicarResultado(await withErrorHandling(acao, (erro) => {
+    aplicarResultado(await executarComTratamentoDeErros(acao, (erro) => {
       registrarErroImportacao(erro.mensagem);
     }));
   } catch (error) {
@@ -368,7 +368,7 @@ async function importar() {
 
   importando.value = true;
   try {
-    resultadoImportacao.value = await withErrorHandling(
+    resultadoImportacao.value = await executarComTratamentoDeErros(
         () => subprocessoService.importarAtividades(
             props.codSubprocessoDestino!,
             unidadeSelecionada.value!.codSubprocesso,

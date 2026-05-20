@@ -24,8 +24,8 @@ describe('useConfiguracoes', () => {
 
         expect(configuracaoService.buscarConfiguracoes).toHaveBeenCalled();
         expect(composable.configuracoes.value).toEqual(mockData);
-        expect(composable.error.value).toBeNull();
-        expect(composable.loading.value).toBe(false);
+        expect(composable.erro.value).toBeNull();
+        expect(composable.carregandoConfiguracoes.value).toBe(false);
     });
 
     it('carregarConfiguracoes deve definir erro em caso de falha', async () => {
@@ -35,8 +35,8 @@ describe('useConfiguracoes', () => {
         await composable.carregarConfiguracoes();
 
         expect(composable.configuracoes.value).toEqual([]);
-        expect(composable.error.value).toBe('Erro API');
-        expect(composable.loading.value).toBe(false);
+        expect(composable.erro.value).toBe('Erro API');
+        expect(composable.carregandoConfiguracoes.value).toBe(false);
     });
 
     it('salvarConfiguracoes deve atualizar configuracoes em caso de sucesso', async () => {
@@ -51,7 +51,7 @@ describe('useConfiguracoes', () => {
         expect(configuracaoService.salvarConfiguracoes).toHaveBeenCalledWith(novosParametros);
         expect(composable.configuracoes.value).toEqual(novosParametros);
         expect(result).toBe(true);
-        expect(composable.error.value).toBeNull();
+        expect(composable.erro.value).toBeNull();
     });
 
     it('salvarConfiguracoes deve definir erro em caso de falha', async () => {
@@ -64,47 +64,47 @@ describe('useConfiguracoes', () => {
         const result = await composable.salvarConfiguracoes(novosParametros);
 
         expect(result).toBe(false);
-        expect(composable.error.value).toBe('Erro API');
+        expect(composable.erro.value).toBe('Erro API');
     });
 
-    it('getValor deve retornar valor correto ou padrao', () => {
+    it('obterValor deve retornar valor correto ou padrao', () => {
         const composable = useConfiguracoes();
         composable.configuracoes.value = [
             {codigo: 1, chave: 'TESTE_KEY', descricao: 'Desc', valor: 'valor_teste'}
         ];
 
-        expect(composable.getValor('TESTE_KEY')).toBe('valor_teste');
-        expect(composable.getValor('KEY_INEXISTENTE', 'padrao')).toBe('padrao');
+        expect(composable.obterValor('TESTE_KEY')).toBe('valor_teste');
+        expect(composable.obterValor('KEY_INEXISTENTE', 'padrao')).toBe('padrao');
     });
 
-    it('getDiasInativacaoProcesso deve retornar valor configurado ou padrao', () => {
+    it('obterDiasInativacaoProcesso deve retornar valor configurado ou padrao', () => {
         const composable = useConfiguracoes();
-        expect(composable.getDiasInativacaoProcesso()).toBe(30);
+        expect(composable.obterDiasInativacaoProcesso()).toBe(30);
 
         composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '45'}
         ];
-        expect(composable.getDiasInativacaoProcesso()).toBe(45);
+        expect(composable.obterDiasInativacaoProcesso()).toBe(45);
 
         composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: 'abc'}
         ];
-        expect(composable.getDiasInativacaoProcesso()).toBe(30);
+        expect(composable.obterDiasInativacaoProcesso()).toBe(30);
     });
 
-    it('getDiasAlertaNovo deve retornar valor configurado ou padrao', () => {
+    it('obterDiasAlertaNovo deve retornar valor configurado ou padrao', () => {
         const composable = useConfiguracoes();
-        expect(composable.getDiasAlertaNovo()).toBe(3);
+        expect(composable.obterDiasAlertaNovo()).toBe(3);
 
         composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: '7'}
         ];
-        expect(composable.getDiasAlertaNovo()).toBe(7);
+        expect(composable.obterDiasAlertaNovo()).toBe(7);
 
         composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: 'xyz'}
         ];
-        expect(composable.getDiasAlertaNovo()).toBe(3);
+        expect(composable.obterDiasAlertaNovo()).toBe(3);
     });
 
 

@@ -83,6 +83,7 @@ criarComandoScript(codigoSmells, "auditar", "Gera snapshot de sinais de complexi
 const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
 criarComandoScript(codigoNomes, "coletar-simbolos", "Gera inventario de pacotes, arquivos, tipos e membros.", "etc/scripts/codigo/nomes-simbolos-coletar.js");
 criarComandoScript(codigoNomes, "auditar-consistencia", "Audita padroes e divergencias de nomenclatura.", "etc/scripts/codigo/nomes-consistencia-auditar.js");
+criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e campos com 'id' que deveriam usar 'codigo'.", "etc/scripts/codigo/idioma-consistencia-auditar.js");
 
 const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
 criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");
