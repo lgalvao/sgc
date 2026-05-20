@@ -37,7 +37,7 @@ import type {ProcessoResumo} from "@/types/tipos";
 const router = useRouter();
 const historicoStore = useHistoricoStore();
 const perfilStore = usePerfilStore();
-const {carregarConfiguracoes, getDiasInativacaoProcesso} = useConfiguracoes();
+const {carregarConfiguracoes, obterDiasInativacaoProcesso} = useConfiguracoes();
 
 const loading = computed(() => historicoStore.carregando);
 const podeCarregarConfiguracoes = computed(() => perfilStore.permissoesSessao?.mostrarMenuConfiguracoes === true);
@@ -45,7 +45,7 @@ const podeCarregarConfiguracoes = computed(() => perfilStore.permissoesSessao?.m
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
 const asc = ref(false);
 
-const diasInativacao = computed(() => getDiasInativacaoProcesso());
+const diasInativacao = computed(() => obterDiasInativacaoProcesso());
 
 const processosOrdenados = computed(() => {
   const lista = [...historicoStore.processos];

@@ -9,7 +9,7 @@ describe('mapaDisponibilizacao.ts', () => {
         existeCompetenciaSemAtividade: ref(false),
         atividadesSemCompetencia: ref<Array<{ codigo: number }>>([]),
         mostrarModalDisponibilizar: ref(false),
-        clearErrors: vi.fn(),
+        limparErros: vi.fn(),
         executarComSubprocesso: vi.fn(async (cb) => await cb(123)),
         disponibilizarMapaFluxo: vi.fn().mockResolvedValue(undefined),
         concluirAcaoPainel: vi.fn().mockResolvedValue(undefined),
@@ -61,7 +61,7 @@ describe('mapaDisponibilizacao.ts', () => {
             const {abrirModalDisponibilizar} = useMapaDisponibilizacao(deps as any)
             abrirModalDisponibilizar()
             expect(deps.mostrarModalDisponibilizar.value).toBe(true)
-            expect(deps.clearErrors).toHaveBeenCalled()
+            expect(deps.limparErros).toHaveBeenCalled()
         })
     })
 

@@ -15,8 +15,8 @@ describe("useCadastroAtividadesMutacoes", () => {
     const atividades = ref<any[]>([]);
     const codigoSubprocesso = ref<number | null>(null);
     const codMapa = ref<number | null>(null);
-    const withErrorHandling = vi.fn((cb) => cb());
-    const lastError = ref<any>(null);
+    const executarComTratamentoDeErros = vi.fn((cb) => cb());
+    const ultimoErro = ref<any>(null);
     const notify = vi.fn();
     const processarRespostaLocal = vi.fn();
     const adicionarAtividadeAction = vi.fn();
@@ -25,8 +25,8 @@ describe("useCadastroAtividadesMutacoes", () => {
         atividades,
         codigoSubprocesso,
         codMapa,
-        withErrorHandling,
-        lastError,
+        executarComTratamentoDeErros,
+        ultimoErro,
         notify,
         processarRespostaLocal,
         adicionarAtividadeAction,
@@ -74,7 +74,7 @@ describe("useCadastroAtividadesMutacoes", () => {
     it("deve lidar com erro ao adicionar atividade", async () => {
         const {adicionarAtividade, erroNovaAtividade} = setup();
         adicionarAtividadeAction.mockRejectedValue(new Error("Erro"));
-        lastError.value = {mensagem: "Erro customizado"};
+        ultimoErro.value = {mensagem: "Erro customizado"};
 
         const result = await adicionarAtividade();
 
@@ -226,7 +226,7 @@ describe("useCadastroAtividadesMutacoes", () => {
         const {removerAtividade, confirmarRemocao, mostrarModalConfirmacaoRemocao} = setup();
         removerAtividade(1);
         vi.mocked(atividadeService.excluirAtividade).mockRejectedValue(new Error("Erro de remoção"));
-        lastError.value = {mensagem: "Erro customizado"};
+        ultimoErro.value = {mensagem: "Erro customizado"};
 
         await confirmarRemocao();
 

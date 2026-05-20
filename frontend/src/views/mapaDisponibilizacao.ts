@@ -9,7 +9,7 @@ type DependenciasMapaDisponibilizacao = {
     existeCompetenciaSemAtividade: ComputedRef<boolean>;
     atividadesSemCompetencia: ComputedRef<{ codigo: number }[]>;
     mostrarModalDisponibilizar: Ref<boolean>;
-    clearErrors: () => void;
+    limparErros: () => void;
     executarComSubprocesso: (callback: (codigoSubprocesso: number) => Promise<void>) => Promise<void>;
     disponibilizarMapaFluxo: (codigoSubprocesso: number, request: DisponibilizarMapaRequest) => Promise<void>;
     concluirAcaoPainel: (mensagem: string, fecharModal: () => void) => Promise<void>;
@@ -21,7 +21,7 @@ export function useMapaDisponibilizacao({
                                             existeCompetenciaSemAtividade,
                                             atividadesSemCompetencia,
                                             mostrarModalDisponibilizar,
-                                            clearErrors,
+                                            limparErros,
                                             executarComSubprocesso,
                                             disponibilizarMapaFluxo,
                                             concluirAcaoPainel,
@@ -59,13 +59,13 @@ export function useMapaDisponibilizacao({
             return;
         }
         mostrarModalDisponibilizar.value = true;
-        clearErrors();
+        limparErros();
     }
 
     function fecharModalDisponibilizar() {
         mostrarModalDisponibilizar.value = false;
         notificacaoDisponibilizacao.value = "";
-        clearErrors();
+        limparErros();
     }
 
     async function disponibilizarMapa(request: DisponibilizarMapaRequest) {

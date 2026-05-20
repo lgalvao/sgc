@@ -2,10 +2,10 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.configuracoes.TITULO"/>
 
-    <CarregamentoPagina v-if="loading"/>
+    <CarregamentoPagina v-if="carregandoConfiguracoes"/>
 
-    <BAlert v-else-if="error" :model-value="true" dismissible variant="danger">
-      {{ error }}
+    <BAlert v-else-if="erro" :model-value="true" dismissible variant="danger">
+      {{ erro }}
     </BAlert>
 
     <template v-else>
@@ -95,12 +95,12 @@ import {TEXTOS} from '@/constants/textos';
 
 const {
   configuracoes,
-  loading,
-  error,
+  carregandoConfiguracoes,
+  erro,
   carregarConfiguracoes,
   salvarConfiguracoes,
-  getDiasInativacaoProcesso,
-  getDiasAlertaNovo
+  obterDiasInativacaoProcesso,
+  obterDiasAlertaNovo
 } = useConfiguracoes();
 const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
@@ -129,8 +129,8 @@ const mensagemErroDiasAlertaNovo = computed(() =>
 );
 
 function atualizarFormulario() {
-  form.diasInativacao = getDiasInativacaoProcesso();
-  form.diasAlertaNovo = getDiasAlertaNovo();
+  form.diasInativacao = obterDiasInativacaoProcesso();
+  form.diasAlertaNovo = obterDiasAlertaNovo();
 }
 
 async function carregar() {

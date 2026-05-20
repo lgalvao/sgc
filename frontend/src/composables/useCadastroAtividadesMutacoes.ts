@@ -15,8 +15,8 @@ interface UseCadastroAtividadesMutacoesParams {
     atividades: Ref<Atividade[]>;
     codigoSubprocesso: Ref<number | null>;
     codMapa: Ref<number | null>;
-    withErrorHandling: <T>(operacao: () => Promise<T>) => Promise<T>;
-    lastError: Ref<{ mensagem?: string } | null>;
+    executarComTratamentoDeErros: <T>(operacao: () => Promise<T>) => Promise<T>;
+    ultimoErro: Ref<{ mensagem?: string } | null>;
     notify: (mensagem: string, variante: VarianteAlerta) => void;
     processarRespostaLocal: (response: AtividadeOperacaoResponse) => void;
     adicionarAtividadeAction: (codigoSubprocesso: number, codMapa: number) => Promise<AtividadeOperacaoResponse | null>;
@@ -26,8 +26,8 @@ export function useCadastroAtividadesMutacoes({
                                                   atividades,
                                                   codigoSubprocesso,
                                                   codMapa,
-                                                  withErrorHandling,
-                                                  lastError,
+                                                  executarComTratamentoDeErros,
+                                                  ultimoErro,
                                                   notify,
                                                   processarRespostaLocal,
                                                   adicionarAtividadeAction,
@@ -48,7 +48,7 @@ export function useCadastroAtividadesMutacoes({
         try {
             return {
                 sucesso: true,
-                resultado: await withErrorHandling(operacao),
+                resultado: await executarComTratamentoDeErros(operacao),
             };
         } catch (erro) {
             aoFalhar(erro);
@@ -82,7 +82,7 @@ export function useCadastroAtividadesMutacoes({
         const resultado = await executarOperacaoAtividade(
             () => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!),
             () => {
-                erroNovaAtividade.value = lastError.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
+                erroNovaAtividade.value = ultimoErro.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
             },
         );
         if (!resultado.sucesso || !resultado.resultado) return false;
@@ -100,7 +100,7 @@ export function useCadastroAtividadesMutacoes({
                 return tipo === "atividade"
                     ? await atividadeService.excluirAtividade(atividadeCodigo)
                     : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
-            }, (erro) => notify(lastError.value?.mensagem || (erro as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger"));
+            }, (erro) => notify(ultimoErro.value?.mensagem || (erro as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger"));
             if (resultado.sucesso && resultado.resultado) {
                 processarRespostaLocal(resultado.resultado);
                 dadosRemocao.value = null;

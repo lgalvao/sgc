@@ -9,17 +9,17 @@ describe("useTemaPreferencia", () => {
     it("deve persistir tema escuro por usuário", () => {
         const tema = useTemaPreferencia();
 
-        tema.setContextoUsuarioTemaEscuro("101");
-        expect(tema.getTemaEscuro()).toBe(false);
+        tema.definirContextoUsuarioTemaEscuro("101");
+        expect(tema.obterTemaEscuro()).toBe(false);
 
-        tema.setTemaEscuro(true);
-        expect(tema.getTemaEscuro()).toBe(true);
+        tema.definirTemaEscuro(true);
+        expect(tema.obterTemaEscuro()).toBe(true);
 
-        tema.setContextoUsuarioTemaEscuro("202");
-        expect(tema.getTemaEscuro()).toBe(false);
+        tema.definirContextoUsuarioTemaEscuro("202");
+        expect(tema.obterTemaEscuro()).toBe(false);
 
-        tema.setTemaEscuro(true);
-        tema.setContextoUsuarioTemaEscuro("101");
-        expect(tema.getTemaEscuro()).toBe(true);
+        tema.definirTemaEscuro(true);
+        tema.definirContextoUsuarioTemaEscuro("101");
+        expect(tema.obterTemaEscuro()).toBe(true);
     });
 });

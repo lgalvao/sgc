@@ -12,7 +12,7 @@ describe("useMapaCompetenciasMutacoes", () => {
         removerAtividadeDaCompetencia: vi.fn(),
     };
     const notify = vi.fn();
-    const clearErrors = vi.fn();
+    const limparErros = vi.fn();
     const aplicarErroNormalizado = vi.fn();
     const sincronizarMapa = vi.fn();
 
@@ -21,7 +21,7 @@ describe("useMapaCompetenciasMutacoes", () => {
         competencias: competencias as any,
         fluxoMapa,
         notify,
-        clearErrors,
+        limparErros,
         aplicarErroNormalizado,
         sincronizarMapa,
     });
@@ -38,7 +38,7 @@ describe("useMapaCompetenciasMutacoes", () => {
 
         expect(mostrarModalCriarNovaCompetencia.value).toBe(true);
         expect(competenciaSendoEditada.value).toBeNull();
-        expect(clearErrors).toHaveBeenCalled();
+        expect(limparErros).toHaveBeenCalled();
     });
 
     it("deve ignorar abertura quando nao ha subprocesso", async () => {
@@ -117,7 +117,7 @@ describe("useMapaCompetenciasMutacoes", () => {
         fecharModalCriarNovaCompetencia();
 
         expect(mostrarModalCriarNovaCompetencia.value).toBe(false);
-        expect(clearErrors).toHaveBeenCalled();
+        expect(limparErros).toHaveBeenCalled();
     });
 
     it("deve iniciar exclusão de competência", () => {
@@ -131,7 +131,7 @@ describe("useMapaCompetenciasMutacoes", () => {
             competencias: localCompetencias as any,
             fluxoMapa,
             notify,
-            clearErrors,
+            limparErros,
             aplicarErroNormalizado,
             sincronizarMapa,
         });
@@ -153,7 +153,7 @@ describe("useMapaCompetenciasMutacoes", () => {
             competencias: localCompetencias as any,
             fluxoMapa,
             notify,
-            clearErrors,
+            limparErros,
             aplicarErroNormalizado,
             sincronizarMapa,
         });
@@ -182,7 +182,7 @@ describe("useMapaCompetenciasMutacoes", () => {
             competencias: localCompetencias as any,
             fluxoMapa,
             notify,
-            clearErrors,
+            limparErros,
             aplicarErroNormalizado,
             sincronizarMapa,
         });

@@ -90,8 +90,8 @@ const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
     reabrirRevisaoCadastro: vi.fn(),
-    lastError: ref(null),
-    clearError: vi.fn(),
+    ultimoErro: ref(null),
+    limparErro: vi.fn(),
 };
 const subprocessoStoreMock = reactive({
     contextoEdicao: null as { detalhes: SubprocessoDetalheMock } | null,

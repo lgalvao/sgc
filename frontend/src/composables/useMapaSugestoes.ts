@@ -100,7 +100,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         resetarValidacao();
     }
 
-    async function handleConfirmarSugestoes() {
+    async function confirmarSugestoes() {
         if (!validarSubmissao(!!sugestoes.value.trim())) {
             await focarPrimeiroErroInvalido();
             return;
@@ -133,7 +133,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         fecharModalVerSugestoes,
         abrirModalSugestoes,
         fecharModalSugestoes,
-        handleConfirmarSugestoes,
+        confirmarSugestoes,
         sincronizarSugestoesMapa,
         carregarSugestoesParaEdicao
     };

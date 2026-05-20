@@ -15,10 +15,10 @@ export function useProcessoForm(initialData?: Processo) {
     );
 
     const {
-        errors: fieldErrors,
-        setFromErroNormalizado: baseSetFromErroNormalizado,
-        clearErrors,
-        hasErrors
+        erros: fieldErrors,
+        aplicarErroNormalizado: baseAplicarErroNormalizado,
+        limparErros,
+        temErros
     } = useFormErrors([
         'descricao',
         'tipo',
@@ -27,8 +27,8 @@ export function useProcessoForm(initialData?: Processo) {
         'dataLimiteEtapa1'
     ]);
 
-    function setFromErroNormalizado(normalizedError: import('@/utils/apiError').ErroNormalizado | null) {
-        baseSetFromErroNormalizado(normalizedError);
+    function aplicarErroNormalizado(erroNormalizado: import('@/utils/apiError').ErroNormalizado | null) {
+        baseAplicarErroNormalizado(erroNormalizado);
         // Mapeamento de erro legado/backend para o campo da UI
         if (fieldErrors.value.dataLimiteEtapa1 && !fieldErrors.value.dataLimite) {
             fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
@@ -87,7 +87,7 @@ export function useProcessoForm(initialData?: Processo) {
         tipo.value = null;
         dataLimite.value = '';
         unidadesSelecionadas.value = [];
-        clearErrors();
+        limparErros();
     }
 
     return {
@@ -97,9 +97,9 @@ export function useProcessoForm(initialData?: Processo) {
         unidadesSelecionadas,
         fieldErrors,
         isFormInvalid,
-        setFromErroNormalizado,
-        clearErrors,
-        hasErrors,
+        aplicarErroNormalizado,
+        limparErros,
+        temErros,
         construirCriarRequest,
         construirAtualizarRequest,
         limpar,

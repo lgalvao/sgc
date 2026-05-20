@@ -1,13 +1,13 @@
 <template>
   <LayoutPadrao>
     <BAlert
-        v-if="!carregandoPagina && lastError"
+        v-if="!carregandoPagina && ultimoErro"
         :model-value="true"
         dismissible
         variant="danger"
-        @dismissed="clearError()"
+        @dismissed="limparErro()"
     >
-      {{ lastError }}
+      {{ ultimoErro }}
     </BAlert>
 
     <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO"/>
@@ -130,15 +130,15 @@ const perfilStore = usePerfilStore();
 
 const unidade = ref<Unidade | null>(null);
 const mapaVigente = ref<MapaVigenteReferencia | null>(null);
-const lastError = ref<string | null>(null);
+const ultimoErro = ref<string | null>(null);
 const carregandoPagina = ref(true);
 const carregamentoInicialConcluido = ref(false);
 const loadingExportacaoPdf = ref(false);
 const loadingExportacaoCsv = ref(false);
 let carregamentoEmAndamento: Promise<void> | null = null;
 
-function clearError() {
-  lastError.value = null;
+function limparErro() {
+  ultimoErro.value = null;
 }
 
 function possuiDadosLocaisValidos(): boolean {
@@ -150,7 +150,7 @@ function possuiDadosLocaisValidos(): boolean {
       && unidadeStore.cacheMapasVigentes.has(props.codUnidade)
       && unidade.value === unidadeEmCache
       && mapaVigente.value === mapaVigenteEmCache
-      && !lastError.value;
+      && !ultimoErro.value;
 }
 
 function reaplicarDadosDoCache(): boolean {
@@ -175,7 +175,7 @@ async function carregarDados(forcar = false) {
     return;
   }
 
-  clearError();
+  limparErro();
 
   const tarefaCarregamento = (async () => {
     if (deveExibirCarregamento(forcar)) {
@@ -194,7 +194,7 @@ async function carregarDados(forcar = false) {
       definirUnidadeAtual(unidade.value);
       mapaVigente.value = mapaResp;
     } catch (error: unknown) {
-      lastError.value = normalizarErro(error).mensagem || TEXTOS.unidade.ERRO_CARREGAR;
+      ultimoErro.value = normalizarErro(error).mensagem || TEXTOS.unidade.ERRO_CARREGAR;
       logger.error("Erro ao carregar dados da unidade:", error);
     } finally {
       carregandoPagina.value = false;

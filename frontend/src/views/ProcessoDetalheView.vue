@@ -1,10 +1,10 @@
 <template>
   <LayoutPadrao>
     <AppAlert
-        v-if="lastError"
-        :mensagem="lastError.mensagem"
+        v-if="ultimoErro"
+        :mensagem="ultimoErro.mensagem"
         variant="danger"
-        @dismissed="clearError()"/>
+        @dismissed="limparErro()"/>
 
     <AppAlert
         v-if="notificacao"
@@ -32,7 +32,7 @@
           @row-click="abrirDetalhesUnidade"/>
     </div>
 
-    <CarregamentoPagina v-else-if="!lastError" :mensagem="TEXTOS.processo.CARREGANDO_DETALHES"/>
+    <CarregamentoPagina v-else-if="!ultimoErro" :mensagem="TEXTOS.processo.CARREGANDO_DETALHES"/>
 
     <ModalAcaoBloco
         :id="'modal-acao-bloco'"
@@ -94,20 +94,20 @@ const {isAdmin} = usePerfil();
 const processoStore = useProcessoStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
-const lastError = ref<ErroNormalizado | null>(null);
+const ultimoErro = ref<ErroNormalizado | null>(null);
 const carregamentoInicialConcluido = ref(false);
 
-function clearError() {
-  lastError.value = null;
+function limparErro() {
+  ultimoErro.value = null;
 }
 
 function registrarErro(error: unknown) {
-  lastError.value = normalizarErro(error);
-  return lastError.value?.mensagem || TEXTOS.processo.ERRO_PADRAO;
+  ultimoErro.value = normalizarErro(error);
+  return ultimoErro.value?.mensagem || TEXTOS.processo.ERRO_PADRAO;
 }
 
 async function carregarContextoCompleto() {
-  clearError();
+  limparErro();
   const snapshotAnterior = processo.value;
 
   try {
@@ -119,7 +119,7 @@ async function carregarContextoCompleto() {
   } catch (error) {
     // Em recargas em background, mantemos o último snapshot até que haja sucesso ou usuário decida sair
     processo.value = snapshotAnterior;
-    lastError.value = normalizarErro(error);
+    ultimoErro.value = normalizarErro(error);
     return null;
   }
 }
@@ -146,7 +146,7 @@ const {
   codProcesso,
   processo,
   carregarContextoCompleto,
-  clearError,
+  limparErro,
   notify,
   registrarErro,
 });

@@ -19,7 +19,7 @@ interface UseMapaCompetenciasMutacoesParams {
     competencias: ComputedRef<Competencia[]>;
     fluxoMapa: FluxoMapaCompetencias;
     notify: (mensagem: string, variante: "danger" | "warning" | "success" | "info") => void;
-    clearErrors: () => void;
+    limparErros: () => void;
     aplicarErroNormalizado: (error: ErroNormalizado | null) => void;
     sincronizarMapa: (mapaAtualizado: MapaCompleto | null | undefined) => void;
 }
@@ -29,7 +29,7 @@ export function useMapaCompetenciasMutacoes({
                                                 competencias,
                                                 fluxoMapa,
                                                 notify,
-                                                clearErrors,
+                                                limparErros,
                                                 aplicarErroNormalizado,
                                                 sincronizarMapa,
                                             }: UseMapaCompetenciasMutacoesParams) {
@@ -58,13 +58,13 @@ export function useMapaCompetenciasMutacoes({
         }
     }
 
-    function handleErrors(error: unknown) {
+    function tratarErros(error: unknown) {
         aplicarErroNormalizado(normalizarErro(error) as ErroNormalizado);
     }
 
     function abrirModalCriarNovaCompetencia(competenciaParaEditar: Competencia | null = null) {
         mostrarModalCriarNovaCompetencia.value = true;
-        clearErrors();
+        limparErros();
         competenciaSendoEditada.value = competenciaParaEditar;
     }
 
@@ -74,7 +74,7 @@ export function useMapaCompetenciasMutacoes({
 
     function fecharModalCriarNovaCompetencia() {
         mostrarModalCriarNovaCompetencia.value = false;
-        clearErrors();
+        limparErros();
     }
 
     function iniciarEdicaoCompetencia(competencia: Competencia) {
@@ -99,7 +99,7 @@ export function useMapaCompetenciasMutacoes({
                         sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigo, request));
                     }
                     fecharModalCriarNovaCompetencia();
-                }, handleErrors);
+                }, tratarErros);
             } finally {
                 loadingCompetencia.value = false;
             }
@@ -130,10 +130,10 @@ export function useMapaCompetenciasMutacoes({
         });
     }
 
-    async function removerAtividadeAssociada(competenciaId: number, codigoAtividade: number) {
+    async function removerAtividadeAssociada(codigoCompetencia: number, codigoAtividade: number) {
         await executarComSubprocesso(async (codigo) => {
             await executarOperacaoCompetencia(async () => {
-                sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigo, competenciaId, codigoAtividade));
+                sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigo, codigoCompetencia, codigoAtividade));
             }, (error) => notify(normalizarErro(error).mensagem, "danger"));
         });
     }

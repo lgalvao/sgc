@@ -58,10 +58,10 @@ class FeedbackServiceTest {
         configurarUsuarioMock();
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Encontrei um problema ao salvar o formulário", null);
         var registroSalvo = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.BUG)
                 .nota(payload.nota())
-                .usuarioId(usuarioMock.getTituloEleitoral())
+                .usuarioCodigo(usuarioMock.getTituloEleitoral())
                 .usuarioNome(usuarioMock.getNome())
                 .rota("/desconhecido")
                 .status(FeedbackStatus.NOVO)
@@ -71,11 +71,11 @@ class FeedbackServiceTest {
 
         FeedbackRespostaDto resposta = service.registrar(payload, null);
 
-        assertThat(resposta.id()).isEqualTo(registroSalvo.getId());
+        assertThat(resposta.codigo()).isEqualTo(registroSalvo.getCodigo());
         verify(repo).save(argThat(r ->
                 r.getTipo() == FeedbackTipo.BUG &&
                         r.getNota().equals(payload.nota()) &&
-                        r.getUsuarioId().equals("12345") &&
+                        r.getUsuarioCodigo().equals("12345") &&
                         r.getStatus() == FeedbackStatus.NOVO
         ));
     }
@@ -89,10 +89,10 @@ class FeedbackServiceTest {
         MockMultipartFile screenshot = new MockMultipartFile("screenshot", "screenshot.webp", "image/webp", imagemFake);
 
         var registroSalvo = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.SUGESTAO)
                 .nota(payload.nota())
-                .usuarioId(usuarioMock.getTituloEleitoral())
+                .usuarioCodigo(usuarioMock.getTituloEleitoral())
                 .usuarioNome(usuarioMock.getNome())
                 .rota("/desconhecido")
                 .status(FeedbackStatus.NOVO)
@@ -123,10 +123,10 @@ class FeedbackServiceTest {
         JsonNode metadados = objectMapper.readTree("{\"rotaCaminho\": \"/processos/42\"}");
         var payload = new FeedbackPayloadDto(FeedbackTipo.QUESTAO, "Dúvida sobre esta tela específica", metadados);
         var registroSalvo = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.QUESTAO)
                 .nota(payload.nota())
-                .usuarioId(usuarioMock.getTituloEleitoral())
+                .usuarioCodigo(usuarioMock.getTituloEleitoral())
                 .usuarioNome(usuarioMock.getNome())
                 .rota("/processos/42")
                 .status(FeedbackStatus.NOVO)
@@ -195,7 +195,7 @@ class FeedbackServiceTest {
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug no painel", metadados);
         when(repo.save(any())).thenAnswer(invocation -> {
             FeedbackRegistro registro = invocation.getArgument(0);
-            registro.setId(UUID.randomUUID());
+            registro.setCodigo(UUID.randomUUID());
             registro.setEnviadoEm(OffsetDateTime.now());
             return registro;
         });
@@ -205,7 +205,7 @@ class FeedbackServiceTest {
         verify(repo).save(argThat(registro ->
                 registro.getMetadataJson() == null
                         && "/painel".equals(registro.getRota())
-                        && "12345".equals(registro.getUsuarioId())
+                        && "12345".equals(registro.getUsuarioCodigo())
         ));
     }
 
@@ -221,10 +221,10 @@ class FeedbackServiceTest {
         MockMultipartFile screenshot = new MockMultipartFile("screenshot", "s.webp", "image/webp", imagemFake);
 
         var registroSalvo = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.ELOGIO)
                 .nota(payload.nota())
-                .usuarioId(usuarioMock.getTituloEleitoral())
+                .usuarioCodigo(usuarioMock.getTituloEleitoral())
                 .usuarioNome(usuarioMock.getNome())
                 .rota("/desconhecido")
                 .status(FeedbackStatus.NOVO)
@@ -245,7 +245,7 @@ class FeedbackServiceTest {
         MockMultipartFile screenshotVazio = new MockMultipartFile("screenshot", "s.webp", "image/webp", new byte[0]);
         when(repo.save(any())).thenAnswer(invocation -> {
             FeedbackRegistro registro = invocation.getArgument(0);
-            registro.setId(UUID.randomUUID());
+            registro.setCodigo(UUID.randomUUID());
             registro.setEnviadoEm(OffsetDateTime.now());
             return registro;
         });
@@ -256,17 +256,17 @@ class FeedbackServiceTest {
     }
 
     @Test
-    @DisplayName("deve armazenar usuarioId do contexto de segurança, não dos metadados")
+    @DisplayName("deve armazenar usuarioCodigo do contexto de segurança, não dos metadados")
     void deveUsarUsuarioDoContextoDeSeguranca() throws Exception {
         configurarUsuarioMock();
         JsonNode metadados = objectMapper.readTree("{\"usuarioCodigo\": \"99999\", \"rotaCaminho\": \"/painel\"}");
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug encontrado no painel principal", metadados);
 
         var registroSalvo = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.BUG)
                 .nota(payload.nota())
-                .usuarioId("12345")
+                .usuarioCodigo("12345")
                 .usuarioNome("João Testador")
                 .rota("/painel")
                 .status(FeedbackStatus.NOVO)
@@ -276,28 +276,28 @@ class FeedbackServiceTest {
 
         service.registrar(payload, null);
 
-        // usuarioId deve ser o do security context (12345), não o dos metadados (99999)
-        verify(repo).save(argThat(r -> "12345".equals(r.getUsuarioId())));
+        // usuarioCodigo deve ser o do security context (12345), não o dos metadados (99999)
+        verify(repo).save(argThat(r -> "12345".equals(r.getUsuarioCodigo())));
     }
 
     @Test
     @DisplayName("deve listar feedbacks mais recentes em ordem decrescente")
     void deveListarFeedbacksMaisRecentes() {
         var maisRecente = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.BUG)
                 .nota("Mais recente")
-                .usuarioId("1")
+                .usuarioCodigo("1")
                 .usuarioNome("A")
                 .rota("/painel")
                 .status(FeedbackStatus.NOVO)
                 .enviadoEm(java.time.OffsetDateTime.now())
                 .build();
         var maisAntigo = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.SUGESTAO)
                 .nota("Mais antigo")
-                .usuarioId("2")
+                .usuarioCodigo("2")
                 .usuarioNome("B")
                 .rota("/historico")
                 .status(FeedbackStatus.REVISADO)
@@ -319,17 +319,17 @@ class FeedbackServiceTest {
     @Test
     @DisplayName("deve retornar bytes da screenshot quando existe")
     void deveRetornarBytesDaScreenshot() throws IOException {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         Path tempFile = Files.createTempFile("screenshot-", ".webp");
         Files.write(tempFile, "fake-image-bytes".getBytes());
 
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot(tempFile.toString())
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        byte[] resultado = service.obterScreenshot(id);
+        byte[] resultado = service.obterScreenshot(codigo);
 
         assertThat(resultado).isEqualTo("fake-image-bytes".getBytes());
         Files.deleteIfExists(tempFile);
@@ -338,24 +338,24 @@ class FeedbackServiceTest {
     @Test
     @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando feedback não existe")
     void deveLancarErroQuandoFeedbackNaoExiste() {
-        UUID id = UUID.randomUUID();
-        when(repo.findById(id)).thenReturn(Optional.empty());
+        UUID codigo = UUID.randomUUID();
+        when(repo.findById(codigo)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test
     @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando screenshot não está disponível")
     void deveLancarErroQuandoScreenshotNaoDisponivel() {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot(null)
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Screenshot não disponível");
     }
@@ -363,14 +363,14 @@ class FeedbackServiceTest {
     @Test
     @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando arquivo de screenshot não existe")
     void deveLancarErroQuandoArquivoDeScreenshotNaoExiste() {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot("arquivo-inexistente.webp")
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
     }
@@ -378,14 +378,14 @@ class FeedbackServiceTest {
     @Test
     @DisplayName("deve tratar caminho legado com separador invertido na resolução de screenshot")
     void deveTratarCaminhoLegadoComSeparadorInvertido() {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot("pasta\\arquivo.webp")
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
     }
@@ -393,15 +393,15 @@ class FeedbackServiceTest {
     @Test
     @DisplayName("deve lançar ErroInconsistenciaInterna quando falhar leitura do arquivo")
     void deveLancarErroInconsistenciaAoLerDiretorioComoArquivo() throws IOException {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         Path diretorio = Files.createTempDirectory("feedback-screenshot-dir");
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot(diretorio.toString())
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Erro ao ler arquivo de screenshot");
     }
@@ -411,14 +411,14 @@ class FeedbackServiceTest {
     void deveUsarDiretorioPadraoQuandoConfiguracaoEmBranco() {
         propriedades = new FeedbackPropriedades("   ", 5_242_880L);
         service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot("arquivo-inexistente.webp")
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
     }
@@ -443,7 +443,7 @@ class FeedbackServiceTest {
         configurarUsuarioMock();
         // Metadados sem rotaCaminho
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", objectMapper.createObjectNode());
-        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().id(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().codigo(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
 
         service.registrar(payload, null);
 
@@ -458,7 +458,7 @@ class FeedbackServiceTest {
         tools.jackson.databind.node.ObjectNode metadados = objectMapper.createObjectNode();
         metadados.putNull("rotaCaminho");
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", metadados);
-        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().id(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().codigo(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
 
         service.registrar(payload, null);
 
@@ -469,10 +469,10 @@ class FeedbackServiceTest {
     @DisplayName("deve marcar screenshot indisponível quando caminhoScreenshot estiver em branco")
     void deveMarcarScreenshotIndisponivelQuandoCaminhoEstiverEmBranco() {
         var registro = FeedbackRegistro.builder()
-                .id(UUID.randomUUID())
+                .codigo(UUID.randomUUID())
                 .tipo(FeedbackTipo.BUG)
                 .nota("Nota")
-                .usuarioId("1")
+                .usuarioCodigo("1")
                 .usuarioNome("Usuário")
                 .rota("/rota")
                 .status(FeedbackStatus.NOVO)
@@ -490,14 +490,14 @@ class FeedbackServiceTest {
     @Test
     @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando caminhoScreenshot estiver em branco")
     void deveLancarErroQuandoCaminhoScreenshotEstiverEmBranco() {
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot("  ")
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Screenshot não disponível");
     }
@@ -510,7 +510,7 @@ class FeedbackServiceTest {
         configurarUsuarioMock();
         var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", null);
-        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().id(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().codigo(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
 
         service.registrar(payload, screenshot);
 
@@ -522,14 +522,14 @@ class FeedbackServiceTest {
     void deveUsarCaminhosPadraoQuandoScreenshotDirForNuloNaResolucao() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
         service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
-        UUID id = UUID.randomUUID();
+        UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(codigo)
                 .caminhoScreenshot("arquivo-inexistente.webp")
                 .build();
-        when(repo.findById(id)).thenReturn(Optional.of(registro));
+        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
 
-        assertThatThrownBy(() -> service.obterScreenshot(id))
+        assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessageContaining("Arquivo de screenshot não encontrado no servidor");
     }

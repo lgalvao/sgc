@@ -62,10 +62,10 @@ public class FeedbackController {
         return ResponseEntity.ok(feedbackService.listarRecentes(limite));
     }
 
-    @GetMapping("/{id}/screenshot")
+    @GetMapping("/{codigo}/screenshot")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<byte[]> exibirScreenshot(@PathVariable UUID id) {
-        byte[] imagem = feedbackService.obterScreenshot(id);
+    public ResponseEntity<byte[]> exibirScreenshot(@PathVariable UUID codigo) {
+        byte[] imagem = feedbackService.obterScreenshot(codigo);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("image/webp"))
                 .body(imagem);

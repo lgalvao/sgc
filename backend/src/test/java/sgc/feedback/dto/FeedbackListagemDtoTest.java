@@ -17,12 +17,12 @@ class FeedbackListagemDtoTest {
         UUID id = UUID.randomUUID();
         OffsetDateTime agora = OffsetDateTime.now();
         FeedbackRegistro registro = FeedbackRegistro.builder()
-                .id(id)
+                .codigo(id)
                 .tipo(FeedbackTipo.BUG)
                 .nota("Uma nota de teste")
                 .metadataJson("{\"foo\":\"bar\"}")
                 .caminhoScreenshot("arquivo.webp")
-                .usuarioId("12345")
+                .usuarioCodigo("12345")
                 .usuarioNome("João Silva")
                 .enviadoEm(agora)
                 .rota("/minha-rota")

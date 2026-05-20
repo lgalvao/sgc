@@ -85,7 +85,7 @@
                 :pode-editar="podeEditarMapa"
                 @editar="iniciarEdicaoCompetencia"
                 @excluir="(codigo) => excluirCompetencia(codigo)"
-                @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
+                @remover-atividade="(codigoCompetencia, codAtividade) => removerAtividadeAssociada(codigoCompetencia, codAtividade)"
             />
           </div>
         </template>
@@ -134,7 +134,7 @@
           @confirmar-aceitacao="confirmarAceitacao"
           @confirmar-devolucao="handleConfirmarDevolucao"
           @confirmar-exclusao-competencia="confirmarExclusaoCompetencia"
-          @confirmar-sugestoes="handleConfirmarSugestoes"
+          @confirmar-sugestoes="confirmarSugestoes"
           @confirmar-validacao="confirmarValidacao"
           @fechar-aceite="fecharModalAceitar"
           @fechar-criar-competencia="fecharModalCriarNovaCompetencia"
@@ -286,7 +286,7 @@ const {
   verSugestoes,
   fecharModalVerSugestoes,
   abrirModalSugestoes,
-  handleConfirmarSugestoes,
+  confirmarSugestoes,
 } = useMapaSugestoes({
   codigoSubprocesso,
   notify,
@@ -421,7 +421,7 @@ const existeCompetenciaSemAtividade = computed(() => {
   return competencias.value.some((competencia) => competencia.atividades.length === 0);
 });
 
-const {errors: fieldErrors, setFromErroNormalizado, clearErrors} = useFormErrors([
+const {erros: fieldErrors, aplicarErroNormalizado: aplicarErroNormalizadoBase, limparErros} = useFormErrors([
   'descricao',
   'atividades',
   'atividadesCodigos',
@@ -437,7 +437,7 @@ function sincronizarErrosAtividades() {
 }
 
 function aplicarErroNormalizado(error: ReturnType<typeof normalizarErro> | null) {
-  setFromErroNormalizado(error);
+  aplicarErroNormalizadoBase(error);
   sincronizarErrosAtividades();
 }
 
@@ -460,7 +460,7 @@ const {
   competencias,
   fluxoMapa,
   notify,
-  clearErrors,
+  limparErros,
   aplicarErroNormalizado,
   sincronizarMapa: sincronizarMapaStore,
 });
@@ -480,7 +480,7 @@ const {
   existeCompetenciaSemAtividade,
   atividadesSemCompetencia,
   mostrarModalDisponibilizar,
-  clearErrors,
+  limparErros,
   executarComSubprocesso,
   disponibilizarMapaFluxo: fluxoMapa.disponibilizarMapa,
   concluirAcaoPainel,

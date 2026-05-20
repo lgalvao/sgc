@@ -151,9 +151,9 @@ const {
   unidadesSelecionadas,
   fieldErrors,
   isFormInvalid,
-  setFromErroNormalizado,
-  clearErrors,
-  hasErrors,
+  aplicarErroNormalizado,
+  limparErros,
+  temErros,
   construirCriarRequest,
   construirAtualizarRequest,
   limpar: limparCampos
@@ -298,17 +298,17 @@ watch(tipo, async (novoTipo) => {
 });
 
 function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
-  clearErrors();
+  limparErros();
   clear();
 
   const erroNormalizado = normalizarErro(error);
   const usarErroEstruturado = ehErroAxios(error) || (erroNormalizado.erros?.length ?? 0) > 0;
 
   if (usarErroEstruturado) {
-    setFromErroNormalizado(erroNormalizado);
+    aplicarErroNormalizado(erroNormalizado);
     const genericErrors = extrairErrosGenericos(erroNormalizado);
 
-    if (!hasErrors() || genericErrors.length > 0) {
+    if (!temErros() || genericErrors.length > 0) {
       notifyStructured(erroNormalizado.mensagem || defaultMsg, genericErrors, {
         variante: 'danger',
         stackTrace: erroNormalizado.stackTrace || undefined,
@@ -327,7 +327,7 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
 }
 
 async function salvarProcesso() {
-  clearErrors();
+  limparErros();
   isSaving.value = true;
 
   try {
@@ -374,7 +374,7 @@ async function confirmarSelecaoUnidadesComEquipePropria(dados: { ids: number[] }
 }
 
 async function iniciarProcessoComSelecaoDireta(codigosDiretos: number[]) {
-  clearErrors();
+  limparErros();
   isStarting.value = true;
   modalUnidadesComEquipePropriaRef.value?.setErro(null);
   modalUnidadesComEquipePropriaRef.value?.setProcessando(true);

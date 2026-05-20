@@ -38,30 +38,30 @@ export function useConfiguracoes() {
         return resultado === true;
     }
 
-    function getValor(chave: string, valorPadrao = ""): string {
+    function obterValor(chave: string, valorPadrao = ""): string {
         const parametro = configuracoesMap.value.get(chave);
         return parametro ? parametro.valor : valorPadrao;
     }
 
-    function getDiasInativacaoProcesso(): number {
-        const valor = getValor("DIAS_INATIVACAO_PROCESSO", "30");
+    function obterDiasInativacaoProcesso(): number {
+        const valor = obterValor("DIAS_INATIVACAO_PROCESSO", "30");
         return parseInt(valor, 10) || 30;
     }
 
-    function getDiasAlertaNovo(): number {
-        const valor = getValor("DIAS_ALERTA_NOVO", "3");
+    function obterDiasAlertaNovo(): number {
+        const valor = obterValor("DIAS_ALERTA_NOVO", "3");
         return parseInt(valor, 10) || 3;
     }
 
     return {
         configuracoes,
-        loading: carregandoConfiguracoes,
-        saving: carregando,
-        error: erro,
+        carregandoConfiguracoes,
+        salvando: carregando,
+        erro,
         carregarConfiguracoes,
         salvarConfiguracoes,
-        getValor,
-        getDiasInativacaoProcesso,
-        getDiasAlertaNovo,
+        obterValor,
+        obterDiasInativacaoProcesso,
+        obterDiasAlertaNovo,
     };
 }

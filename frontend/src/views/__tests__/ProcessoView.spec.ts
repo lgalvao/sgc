@@ -466,7 +466,7 @@ describe("Processo.vue", () => {
 
         const alertCmp = wrapper.findComponent(BAlertStub);
         await alertCmp.vm.$emit("dismissed");
-        expect(wrapper.vm.lastError).toBeNull();
+        expect(wrapper.vm.ultimoErro).toBeNull();
     });
 
     it("deve exibir botões de ação em bloco se houver unidades elegíveis", async () => {
@@ -1298,9 +1298,9 @@ describe("ProcessoDetalheView — cobertura adicional", () => {
         };
         const subprocessosElegiveis = initialState.processos?.subprocessosElegiveis ?? [];
 
-        if (initialState.processos?.lastError) {
+        if (initialState.processos?.ultimoErro) {
             vi.mocked(processoService.buscarContextoCompleto).mockRejectedValue(
-                new Error(initialState.processos.lastError.message)
+                new Error(initialState.processos.ultimoErro.message)
             );
         } else {
             vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
@@ -1347,7 +1347,7 @@ describe("ProcessoDetalheView — cobertura adicional", () => {
         const wrapper = criarWrapperCobertura();
         await flushPromises();
 
-        expect((wrapper.vm as any).lastError).toBeNull();
+        expect((wrapper.vm as any).ultimoErro).toBeNull();
     });
 
     it("deve abrir detalhes da unidade (navegação) para ADMIN", async () => {
@@ -1556,7 +1556,7 @@ describe("ProcessoDetalheView — cobertura adicional", () => {
         const wrapper = criarWrapperCobertura({
             processos: {
                 processoDetalhe: {codigo: 1, situacao: 'EM_ANDAMENTO'},
-                lastError: {message: 'Erro de teste'}
+                ultimoErro: {message: 'Erro de teste'}
             }
         });
         await flushPromises();
