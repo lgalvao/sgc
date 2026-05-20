@@ -64,7 +64,7 @@ public class FeedbackService {
                 .build();
 
         FeedbackRegistro salvo = repo.save(registro);
-        log.info("Feedback registrado: id={} tipo={} usuario={}", salvo.getCodigo(), salvo.getTipo(), salvo.getUsuarioCodigo());
+        log.info("Feedback registrado: codigo={} tipo={} usuario={}", salvo.getCodigo(), salvo.getTipo(), salvo.getUsuarioCodigo());
         return new FeedbackRespostaDto(salvo.getCodigo(), salvo.getEnviadoEm());
     }
 
