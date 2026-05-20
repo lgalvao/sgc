@@ -1,0 +1,2164 @@
+{
+  "geradoEm": "2026-05-20T19:55:14.720Z",
+  "base": "/home/runner/work/sgc/sgc",
+  "inventarioFonte": "/home/runner/work/sgc/sgc/etc/qualidade/nomenclatura/latest/simbolos.json",
+  "indicadores": {
+    "arquivos": 1129,
+    "membrosIngles": 240,
+    "camposComId": 0,
+    "parametrosComId": 2,
+    "scoreTotal": 242
+  },
+  "porPrefixo": {
+    "is": 39,
+    "get": 46,
+    "reset": 4,
+    "set": 84,
+    "create": 30,
+    "delete": 1,
+    "has": 2,
+    "parse": 10,
+    "build": 1,
+    "toggle": 3,
+    "handle": 16,
+    "update": 3,
+    "add": 1
+  },
+  "topArquivos": [
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "quantidade": 6,
+      "nomes": [
+        "isMesmaUnidadeAlvo",
+        "isUnidadeAlvoNaHierarquiaUsuario",
+        "isChefe",
+        "isGestor",
+        "isAdmin",
+        "isGestorOuAdmin"
+      ]
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "quantidade": 6,
+      "nomes": [
+        "setRouter",
+        "isMonitoramentoSolicitadoPorSessao",
+        "isMonitoramentoSolicitadoPorUrl",
+        "isMonitoramentoAtivo",
+        "isErroCanceladoHttp",
+        "isRequisicaoPermitidaDuranteTransicao"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "quantidade": 5,
+      "nomes": [
+        "isSituacaoCadastroDisponibilizado",
+        "isSituacaoMapaAceitavel",
+        "isSituacaoMapaHomologavel",
+        "isUnidadeAdmin",
+        "isSituacaoCadastro"
+      ]
+    },
+    {
+      "arquivo": "etc/scripts/projeto/arvore-linhas.js",
+      "quantidade": 5,
+      "nomes": [
+        "getFiles",
+        "buildTree",
+        "getTreeConnectors",
+        "parseArgs",
+        "isTestFile"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "quantidade": 4,
+      "nomes": [
+        "resetDatabase",
+        "getSeedResource",
+        "setSituacaoProcesso",
+        "setSituacaoSubprocesso"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/model/Usuario.java",
+      "quantidade": 4,
+      "nomes": [
+        "getUnidadeCodigo",
+        "getAuthorities",
+        "getPassword",
+        "getUsername"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/model/Subprocesso.java",
+      "quantidade": 4,
+      "nomes": [
+        "getAtividades",
+        "setSituacao",
+        "setSituacaoForcada",
+        "isEmAndamento"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoAcessoService.java",
+      "quantidade": 4,
+      "nomes": [
+        "isSituacaoMapeamentoAPartirDe",
+        "isSituacaoRevisaoAPartirDe",
+        "isFluxoMapeamento",
+        "isFluxoRevisao"
+      ]
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/util/FiltroMonitoramentoHttpTest.java",
+      "quantidade": 4,
+      "nomes": [
+        "getAttribute",
+        "getAttributeNames",
+        "getSessionId",
+        "getSessionMutex"
+      ]
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/useArvoreSelecao.ts",
+      "quantidade": 4,
+      "nomes": [
+        "isChecked",
+        "isHabilitado",
+        "getEstadoSelecao",
+        "updateAncestors"
+      ]
+    },
+    {
+      "arquivo": "frontend/src/composables/useCacheSync.ts",
+      "quantidade": 4,
+      "nomes": [
+        "handleAtualizacaoCache",
+        "handleErro",
+        "handlePageHide",
+        "handlePageShow"
+      ]
+    },
+    {
+      "arquivo": "frontend/src/utils/statusHelpers.ts",
+      "quantidade": 4,
+      "nomes": [
+        "getProcessoBadgeVariant",
+        "getSubprocessoBadgeVariant",
+        "getNotificacaoStatusInfo",
+        "getNotificacaoBadgeVariant"
+      ]
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
+      "quantidade": 4,
+      "nomes": [
+        "createWrapper",
+        "createWrapperCobertura",
+        "setProcessando",
+        "setErro"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/erros/ErroNegocio.java",
+      "quantidade": 3,
+      "nomes": [
+        "getCode",
+        "getStatus",
+        "getMessage"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/service/HierarquiaService.java",
+      "quantidade": 3,
+      "nomes": [
+        "isResponsavel",
+        "isSubordinada",
+        "isSuperiorImediata"
+      ]
+    },
+    {
+      "arquivo": "etc/scripts/backend/java-corrigir-fqn.js",
+      "quantidade": 3,
+      "nomes": [
+        "parseImports",
+        "getInsertPosition",
+        "parseArgs"
+      ]
+    },
+    {
+      "arquivo": "frontend/src/views/CadastroView.vue",
+      "quantidade": 3,
+      "nomes": [
+        "handleImportAtividades",
+        "setAtividadeRef",
+        "handleAdicionarAtividade"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/alerta/model/Alerta.java",
+      "quantidade": 2,
+      "nomes": [
+        "getOrigemSiglaSintetica",
+        "getMensagemSintetica"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/util/MonitoramentoProperties.java",
+      "quantidade": 2,
+      "nomes": [
+        "isMonitoramentoHttpAtivo",
+        "isMonitoramentoJavaLentoAtivo"
+      ]
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/model/Processo.java",
+      "quantidade": 2,
+      "nomes": [
+        "getCodigosParticipantes",
+        "getSiglasParticipantes"
+      ]
+    }
+  ],
+  "membrosIngles": [
+    {
+      "arquivo": "backend/src/main/java/sgc/alerta/EmailService.java",
+      "categoria": "metodo",
+      "nome": "isEmailValido",
+      "assinatura": "isEmailValido(String email)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/alerta/model/Alerta.java",
+      "categoria": "metodo",
+      "nome": "getOrigemSiglaSintetica",
+      "assinatura": "getOrigemSiglaSintetica()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/alerta/model/Alerta.java",
+      "categoria": "metodo",
+      "nome": "getMensagemSintetica",
+      "assinatura": "getMensagemSintetica()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/erros/ErroNegocio.java",
+      "categoria": "metodo",
+      "nome": "getCode",
+      "assinatura": "getCode()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/erros/ErroNegocio.java",
+      "categoria": "metodo",
+      "nome": "getStatus",
+      "assinatura": "getStatus()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/erros/ErroNegocio.java",
+      "categoria": "metodo",
+      "nome": "getMessage",
+      "assinatura": "getMessage()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/model/ComumRepo.java",
+      "categoria": "metodo",
+      "nome": "getPath",
+      "assinatura": "getPath(Root<?> root, String attributeName)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/util/MonitoramentoProperties.java",
+      "categoria": "metodo",
+      "nome": "isMonitoramentoHttpAtivo",
+      "assinatura": "isMonitoramentoHttpAtivo()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/comum/util/MonitoramentoProperties.java",
+      "categoria": "metodo",
+      "nome": "isMonitoramentoJavaLentoAtivo",
+      "assinatura": "isMonitoramentoJavaLentoAtivo()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "categoria": "metodo",
+      "nome": "resetDatabase",
+      "assinatura": "resetDatabase()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "reset"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "categoria": "metodo",
+      "nome": "getSeedResource",
+      "assinatura": "getSeedResource()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "categoria": "metodo",
+      "nome": "setSituacaoProcesso",
+      "assinatura": "setSituacaoProcesso(Long codProcesso)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "categoria": "metodo",
+      "nome": "setSituacaoSubprocesso",
+      "assinatura": "setSituacaoSubprocesso(Long codSubprocesso, SituacaoSubprocesso situacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eSecurityConfig.java",
+      "categoria": "metodo",
+      "nome": "createExpressionHandler",
+      "assinatura": "createExpressionHandler(SgcPermissionEvaluator permissionEvaluator)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/mapa/model/Atividade.java",
+      "categoria": "metodo",
+      "nome": "getMapaCodigo",
+      "assinatura": "getMapaCodigo()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/mapa/model/CompetenciaRepo.java",
+      "categoria": "metodo",
+      "nome": "deleteByMapa_Codigo",
+      "assinatura": "deleteByMapa_Codigo(Long mapaCodigo)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "delete"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/mapa/model/Conhecimento.java",
+      "categoria": "metodo",
+      "nome": "getCodigoAtividade",
+      "assinatura": "getCodigoAtividade()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/model/UnidadeMapa.java",
+      "categoria": "metodo",
+      "nome": "getUnidadeCodigoPersistido",
+      "assinatura": "getUnidadeCodigoPersistido()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/model/Usuario.java",
+      "categoria": "metodo",
+      "nome": "getUnidadeCodigo",
+      "assinatura": "getUnidadeCodigo()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/model/Usuario.java",
+      "categoria": "metodo",
+      "nome": "getAuthorities",
+      "assinatura": "getAuthorities()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/model/Usuario.java",
+      "categoria": "metodo",
+      "nome": "getPassword",
+      "assinatura": "getPassword()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/model/Usuario.java",
+      "categoria": "metodo",
+      "nome": "getUsername",
+      "assinatura": "getUsername()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/service/HierarquiaService.java",
+      "categoria": "metodo",
+      "nome": "isResponsavel",
+      "assinatura": "isResponsavel(Unidade unidade, Usuario usuario)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/service/HierarquiaService.java",
+      "categoria": "metodo",
+      "nome": "isSubordinada",
+      "assinatura": "isSubordinada(Unidade alvo, Unidade superior)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/service/HierarquiaService.java",
+      "categoria": "metodo",
+      "nome": "isSuperiorImediata",
+      "assinatura": "isSuperiorImediata(Unidade alvo, Unidade superior)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/service/UsuarioService.java",
+      "categoria": "metodo",
+      "nome": "isAdministrador",
+      "assinatura": "isAdministrador(String usuarioTitulo)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/model/Processo.java",
+      "categoria": "metodo",
+      "nome": "getCodigosParticipantes",
+      "assinatura": "getCodigosParticipantes()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/model/Processo.java",
+      "categoria": "metodo",
+      "nome": "getSiglasParticipantes",
+      "assinatura": "getSiglasParticipantes()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/model/UnidadeProcesso.java",
+      "categoria": "metodo",
+      "nome": "setUnidadeCodigo",
+      "assinatura": "setUnidadeCodigo(Long unidadeCodigo)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/model/UnidadeProcesso.java",
+      "categoria": "metodo",
+      "nome": "getUnidadeCodigoPersistido",
+      "assinatura": "getUnidadeCodigoPersistido()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/painel/PainelFacade.java",
+      "categoria": "metodo",
+      "nome": "isCovered",
+      "assinatura": "isCovered(Long codUnidade,\n                              Set<Long> participantesIds,\n                              Map<Long, List<Long>> mapaPaiFilhos,\n                              Map<Long, Boolean> cache)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "categoria": "metodo",
+      "nome": "isSituacaoCadastroDisponibilizado",
+      "assinatura": "isSituacaoCadastroDisponibilizado(SituacaoSubprocesso situacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "categoria": "metodo",
+      "nome": "isSituacaoMapaAceitavel",
+      "assinatura": "isSituacaoMapaAceitavel(SituacaoSubprocesso situacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "categoria": "metodo",
+      "nome": "isSituacaoMapaHomologavel",
+      "assinatura": "isSituacaoMapaHomologavel(SituacaoSubprocesso situacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "categoria": "metodo",
+      "nome": "isUnidadeAdmin",
+      "assinatura": "isUnidadeAdmin(Unidade unidadeDestino)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "categoria": "metodo",
+      "nome": "isSituacaoCadastro",
+      "assinatura": "isSituacaoCadastro(SituacaoSubprocesso s)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/relatorio/PdfFactory.java",
+      "categoria": "metodo",
+      "nome": "createDocument",
+      "assinatura": "createDocument()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/relatorio/PdfFactory.java",
+      "categoria": "metodo",
+      "nome": "createWriter",
+      "assinatura": "createWriter(Document document, OutputStream outputStream)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/seguranca/config/ConfigSeguranca.java",
+      "categoria": "metodo",
+      "nome": "createExpressionHandler",
+      "assinatura": "createExpressionHandler(SgcPermissionEvaluator permissionEvaluator)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java",
+      "categoria": "metodo",
+      "nome": "getSigningKey",
+      "assinatura": "getSigningKey()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java",
+      "categoria": "metodo",
+      "nome": "isLimiterDesabilitado",
+      "assinatura": "isLimiterDesabilitado()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java",
+      "categoria": "metodo",
+      "nome": "getCacheSize",
+      "assinatura": "getCacheSize()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/seguranca/SgcPermissionEvaluator.java",
+      "categoria": "metodo",
+      "nome": "hasPermission",
+      "assinatura": "hasPermission(Authentication authentication, Object alvo, Object permissao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "has"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/seguranca/SgcPermissionEvaluator.java",
+      "categoria": "metodo",
+      "nome": "hasPermission",
+      "assinatura": "hasPermission(Authentication authentication, Serializable codigoAlvo, String tipoAlvo, Object permissao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "has"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/model/SituacaoSubprocesso.java",
+      "categoria": "metodo",
+      "nome": "isSituacaoCompativel",
+      "assinatura": "isSituacaoCompativel(SituacaoSubprocesso nova)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/model/Subprocesso.java",
+      "categoria": "metodo",
+      "nome": "getAtividades",
+      "assinatura": "getAtividades()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/model/Subprocesso.java",
+      "categoria": "metodo",
+      "nome": "setSituacao",
+      "assinatura": "setSituacao(SituacaoSubprocesso novaSituacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/model/Subprocesso.java",
+      "categoria": "metodo",
+      "nome": "setSituacaoForcada",
+      "assinatura": "setSituacaoForcada(SituacaoSubprocesso novaSituacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/model/Subprocesso.java",
+      "categoria": "metodo",
+      "nome": "isEmAndamento",
+      "assinatura": "isEmAndamento()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoAcessoService.java",
+      "categoria": "metodo",
+      "nome": "isSituacaoMapeamentoAPartirDe",
+      "assinatura": "isSituacaoMapeamentoAPartirDe(SituacaoSubprocesso situacaoAtual, SituacaoSubprocesso marcoInicial)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoAcessoService.java",
+      "categoria": "metodo",
+      "nome": "isSituacaoRevisaoAPartirDe",
+      "assinatura": "isSituacaoRevisaoAPartirDe(SituacaoSubprocesso situacaoAtual, SituacaoSubprocesso marcoInicial)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoAcessoService.java",
+      "categoria": "metodo",
+      "nome": "isFluxoMapeamento",
+      "assinatura": "isFluxoMapeamento(SituacaoSubprocesso situacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoAcessoService.java",
+      "categoria": "metodo",
+      "nome": "isFluxoRevisao",
+      "assinatura": "isFluxoRevisao(SituacaoSubprocesso situacao)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "categoria": "metodo",
+      "nome": "isMesmaUnidadeAlvo",
+      "assinatura": "isMesmaUnidadeAlvo()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "categoria": "metodo",
+      "nome": "isUnidadeAlvoNaHierarquiaUsuario",
+      "assinatura": "isUnidadeAlvoNaHierarquiaUsuario()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "categoria": "metodo",
+      "nome": "isChefe",
+      "assinatura": "isChefe()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "categoria": "metodo",
+      "nome": "isGestor",
+      "assinatura": "isGestor()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "categoria": "metodo",
+      "nome": "isAdmin",
+      "assinatura": "isAdmin()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "categoria": "metodo",
+      "nome": "isGestorOuAdmin",
+      "assinatura": "isGestorOuAdmin()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoNotificacaoService.java",
+      "categoria": "metodo",
+      "nome": "getEmailUnidade",
+      "assinatura": "getEmailUnidade(Unidade unidade)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java",
+      "categoria": "metodo",
+      "nome": "getSubprocessoParaEdicao",
+      "assinatura": "getSubprocessoParaEdicao(Long codSubprocesso)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/alerta/dto/NotificacaoSubprocessoResumoDtoTest.java",
+      "categoria": "metodo",
+      "nome": "createQuery",
+      "assinatura": "createQuery(long total, long pendentes, long enviando, long enviadas, long falhasTemporarias, long falhasDefinitivas)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/alerta/notificacao/EmailModelosServiceTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/alerta/NotificacaoServiceTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/alerta/NotificacaoWorkerTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/dto/ComumDtosValidationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/erros/RestExceptionHandlerTest.java",
+      "categoria": "metodo",
+      "nome": "getCause",
+      "assinatura": "getCause()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/json/DeserializadorHtmlSanitizadoTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/model/TituloEleitoralValidationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/util/FiltroMonitoramentoHttpTest.java",
+      "categoria": "metodo",
+      "nome": "getAttribute",
+      "assinatura": "getAttribute(@NonNull String name, int scope)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/util/FiltroMonitoramentoHttpTest.java",
+      "categoria": "metodo",
+      "nome": "getAttributeNames",
+      "assinatura": "getAttributeNames(int scope)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/util/FiltroMonitoramentoHttpTest.java",
+      "categoria": "metodo",
+      "nome": "getSessionId",
+      "assinatura": "getSessionId()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/comum/util/FiltroMonitoramentoHttpTest.java",
+      "categoria": "metodo",
+      "nome": "getSessionMutex",
+      "assinatura": "getSessionMutex()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/configuracoes/model/ConfiguracaoValidationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/e2e/E2eControllerTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/e2e/E2eControllerTest.java",
+      "categoria": "metodo",
+      "nome": "resetDatabaseComCacheNulo",
+      "assinatura": "resetDatabaseComCacheNulo()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "reset"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU05IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU06IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU08IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU10IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU11IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "getHistorico_deveRetornarAcoesOrdenadas",
+      "assinatura": "getHistorico_deveRetornarAcoesOrdenadas()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU14IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU14IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUpHomologacao",
+      "assinatura": "setUpHomologacao()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU15IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU16IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU17IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU18IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU19IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU20IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU21IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU22IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU23IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU24IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU24IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "createSubprocessoComMapaCompleto",
+      "assinatura": "createSubprocessoComMapaCompleto(Unidade unidade)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU25IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU26IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU27IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU28IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU29IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU30IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU31IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU32IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU33IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU34IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU35IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/CDU36IntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/mocks/TestConfig.java",
+      "categoria": "metodo",
+      "nome": "getAsyncExecutor",
+      "assinatura": "getAsyncExecutor()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/mocks/TestSecurityConfig.java",
+      "categoria": "metodo",
+      "nome": "createExpressionHandler",
+      "assinatura": "createExpressionHandler(SgcPermissionEvaluator permissionEvaluator)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/mocks/WithMockAdminSecurityContextFactory.java",
+      "categoria": "metodo",
+      "nome": "createSecurityContext",
+      "assinatura": "createSecurityContext(WithMockAdmin customUser)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/mocks/WithMockChefeSecurityContextFactory.java",
+      "categoria": "metodo",
+      "nome": "createSecurityContext",
+      "assinatura": "createSecurityContext(WithMockChefe annotation)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/mocks/WithMockCustomUserSecurityContextFactory.java",
+      "categoria": "metodo",
+      "nome": "createSecurityContext",
+      "assinatura": "createSecurityContext(WithMockCustomUser customUser)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/mocks/WithMockGestorSecurityContextFactory.java",
+      "categoria": "metodo",
+      "nome": "createSecurityContext",
+      "assinatura": "createSecurityContext(WithMockGestor customUser)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/ProcessoSubprocessoViewsQueryBudgetIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SerializacaoEndpointsIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoBuscaIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoFluxoIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceAjusteIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceAtividadeIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceContextoIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceDatasIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceDeletarIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceEmailIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceListaIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceProcessarAlteracoesIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceSalvarIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/integracao/SubprocessoServiceValidacaoIntegrationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/mapa/MapaControllerTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/organizacao/service/RegistroSseEmitterTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/organizacao/service/UnidadeHierarquiaServiceTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/processo/dto/CriarProcessoRequestValidationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/processo/model/ProcessoTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/processo/painel/PainelSecurityReproductionTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/processo/ProcessoControllerTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/processo/service/ProcessoServiceTest.java",
+      "categoria": "metodo",
+      "nome": "isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelMapaSemPermissoes",
+      "assinatura": "isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelMapaSemPermissoes()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/processo/service/ProcessoServiceTest.java",
+      "categoria": "metodo",
+      "nome": "isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelDisponibilizacaoSemPermissao",
+      "assinatura": "isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelDisponibilizacaoSemPermissao()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/seguranca/login/dto/AutenticarReqValidationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/seguranca/login/dto/EntrarReqValidationTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/seguranca/login/LimitadorTentativasLoginTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/seguranca/login/LoginControllerLogInjectionTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/seguranca/login/LoginControllerTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/seguranca/login/LoginFacadeTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/subprocesso/service/SubprocessoAcessoServiceTest.java",
+      "categoria": "metodo",
+      "nome": "createContexto",
+      "assinatura": "createContexto(Subprocesso subprocesso, Perfil perfil, boolean mesmaUnidade, boolean isHierarquia,\n            boolean processoFinalizado, boolean temMapaVigente)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/subprocesso/service/SubprocessoConsultaServiceTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/subprocesso/service/SubprocessoContextoConsultaServiceTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/subprocesso/service/SubprocessoNotificacaoServiceTest.java",
+      "categoria": "metodo",
+      "nome": "getEmailUnidadeDeveGerarEnderecoComSiglaMinuscula",
+      "assinatura": "getEmailUnidadeDeveGerarEnderecoComSiglaMinuscula()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "backend/src/test/java/sgc/subprocesso/service/SubprocessoVisualizacaoServiceTest.java",
+      "categoria": "metodo",
+      "nome": "setUp",
+      "assinatura": "setUp()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "e2e/hooks/hooks-limpeza.ts",
+      "categoria": "funcao",
+      "nome": "resetDatabase",
+      "assinatura": "resetDatabase(request: APIRequestContext)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "reset"
+    },
+    {
+      "arquivo": "etc/scripts/backend/java-corrigir-fqn.js",
+      "categoria": "funcao",
+      "nome": "parseImports",
+      "assinatura": "parseImports(lines)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/backend/java-corrigir-fqn.js",
+      "categoria": "funcao",
+      "nome": "getInsertPosition",
+      "assinatura": "getInsertPosition(lines, importLineIndices)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "etc/scripts/backend/java-corrigir-fqn.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs(argv)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/backend/testes-analisar.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs(argv)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/backend/testes-priorizar.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs(argv)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/codigo/idioma-consistencia-auditar.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs(argv)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/codigo/nomes-consistencia-auditar.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs(argv)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/codigo/nomes-simbolos-coletar.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs(argv)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/codigo/smells-auditar.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs(argv)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/frontend/a11y-auditar.js",
+      "categoria": "funcao",
+      "nome": "getAllFiles",
+      "assinatura": "getAllFiles(dirPath, ext, arrayOfFiles)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "etc/scripts/frontend/a11y-auditar.js",
+      "categoria": "funcao-arrow",
+      "nome": "isInteractive",
+      "assinatura": "isInteractive(tagName)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "etc/scripts/frontend/validacoes-auditar.js",
+      "categoria": "funcao",
+      "nome": "getAllFiles",
+      "assinatura": "getAllFiles(dirPath, ext, arrayOfFiles)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "etc/scripts/frontend/views-validacoes-auditar.js",
+      "categoria": "funcao",
+      "nome": "getAllFiles",
+      "assinatura": "getAllFiles(dirPath, arrayOfFiles)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "etc/scripts/projeto/arvore-linhas.js",
+      "categoria": "funcao",
+      "nome": "getFiles",
+      "assinatura": "getFiles()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "etc/scripts/projeto/arvore-linhas.js",
+      "categoria": "funcao",
+      "nome": "buildTree",
+      "assinatura": "buildTree(fileList)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "build"
+    },
+    {
+      "arquivo": "etc/scripts/projeto/arvore-linhas.js",
+      "categoria": "funcao",
+      "nome": "getTreeConnectors",
+      "assinatura": "getTreeConnectors(isRoot, isLast)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "etc/scripts/projeto/arvore-linhas.js",
+      "categoria": "funcao",
+      "nome": "parseArgs",
+      "assinatura": "parseArgs()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "etc/scripts/projeto/arvore-linhas.js",
+      "categoria": "funcao",
+      "nome": "isTestFile",
+      "assinatura": "isTestFile(filePath)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "etc/scripts/qa/snapshot-coletar-execucao.js",
+      "categoria": "funcao",
+      "nome": "parseJsonSeguro",
+      "assinatura": "parseJsonSeguro(conteudo, fallback = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "parse"
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "categoria": "funcao",
+      "nome": "setRouter",
+      "assinatura": "setRouter(router: Router)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "categoria": "funcao",
+      "nome": "isMonitoramentoSolicitadoPorSessao",
+      "assinatura": "isMonitoramentoSolicitadoPorSessao()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "categoria": "funcao",
+      "nome": "isMonitoramentoSolicitadoPorUrl",
+      "assinatura": "isMonitoramentoSolicitadoPorUrl()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "categoria": "funcao",
+      "nome": "isMonitoramentoAtivo",
+      "assinatura": "isMonitoramentoAtivo()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "categoria": "funcao",
+      "nome": "isErroCanceladoHttp",
+      "assinatura": "isErroCanceladoHttp(error: unknown)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/axios-setup.ts",
+      "categoria": "funcao",
+      "nome": "isRequisicaoPermitidaDuranteTransicao",
+      "assinatura": "isRequisicaoPermitidaDuranteTransicao(url?: string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/components/__tests__/AceitarMapaModal.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(propsOverride = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/components/__tests__/ArvoreUnidades.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(props = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/components/__tests__/CriarCompetenciaModal.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(propsOverride = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/components/__tests__/DisponibilizarMapaModal.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(propsOverride = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/components/__tests__/ImpactoMapaModal.spec.ts",
+      "categoria": "funcao",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(propsOverrides = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/components/atividades/__tests__/ImportarAtividadesModal.spec.ts",
+      "categoria": "funcao",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(props = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/components/atividades/ImportarAtividadesModal.vue",
+      "categoria": "funcao",
+      "nome": "resetModal",
+      "assinatura": "resetModal()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "reset"
+    },
+    {
+      "arquivo": "frontend/src/components/comum/TreeRowItem.vue",
+      "categoria": "funcao-arrow",
+      "nome": "toggleExpand",
+      "assinatura": "toggleExpand(codigo: number | string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "toggle"
+    },
+    {
+      "arquivo": "frontend/src/components/comum/TreeRowItem.vue",
+      "categoria": "funcao-arrow",
+      "nome": "handleRowClick",
+      "assinatura": "handleRowClick()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/components/comum/TreeTable.vue",
+      "categoria": "funcao-arrow",
+      "nome": "toggleExpand",
+      "assinatura": "toggleExpand(codigo: number | string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "toggle"
+    },
+    {
+      "arquivo": "frontend/src/components/comum/TreeTable.vue",
+      "categoria": "funcao-arrow",
+      "nome": "handleTreeRowClick",
+      "assinatura": "handleTreeRowClick(clickedItem: TreeItem)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/components/layout/MainNavbar.vue",
+      "categoria": "funcao",
+      "nome": "handleLogout",
+      "assinatura": "handleLogout()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/components/layout/MainNavbar.vue",
+      "categoria": "funcao-arrow",
+      "nome": "updateWidth",
+      "assinatura": "updateWidth()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "update"
+    },
+    {
+      "arquivo": "frontend/src/components/mapa/CompetenciaCard.vue",
+      "categoria": "funcao",
+      "nome": "getAtividadeCompleta",
+      "assinatura": "getAtividadeCompleta(codigo: number)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/components/processo/__tests__/SubprocessoCards.spec.ts",
+      "categoria": "funcao",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(props: InstanceType<typeof SubprocessoCards>[\"$props\"], access: Partial<PermissoesSubprocesso> = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/components/processo/ModalAcaoBloco.vue",
+      "categoria": "funcao",
+      "nome": "setProcessando",
+      "assinatura": "setProcessando(val: boolean)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "frontend/src/components/processo/ModalAcaoBloco.vue",
+      "categoria": "funcao",
+      "nome": "setErro",
+      "assinatura": "setErro(msg: string | null)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "frontend/src/components/processo/ProcessoFormFields.vue",
+      "categoria": "funcao",
+      "nome": "updateField",
+      "assinatura": "updateField(field: K, value: ProcessoFormData[K])",
+      "tipo": "prefixo-ingles",
+      "prefixo": "update"
+    },
+    {
+      "arquivo": "frontend/src/components/processo/SubprocessoCards.vue",
+      "categoria": "funcao",
+      "nome": "handleKeyDown",
+      "assinatura": "handleKeyDown(event: KeyboardEvent, routeName: string, diag = false)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/components/processo/TabelaProcessos.vue",
+      "categoria": "funcao",
+      "nome": "handleSortChange",
+      "assinatura": "handleSortChange(val: readonly BTableSortBy[] | undefined)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/components/processo/TabelaProcessos.vue",
+      "categoria": "funcao",
+      "nome": "handleSelecionarProcesso",
+      "assinatura": "handleSelecionarProcesso(processo: EventoLinhaProcesso)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/arvoreSelecaoHelpers.ts",
+      "categoria": "funcao",
+      "nome": "getTodasSubunidades",
+      "assinatura": "getTodasSubunidades(unidade: Unidade)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/useArvoreExpansao.ts",
+      "categoria": "funcao",
+      "nome": "isExpanded",
+      "assinatura": "isExpanded(unidade: Unidade)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/useArvoreExpansao.ts",
+      "categoria": "funcao",
+      "nome": "toggleExpand",
+      "assinatura": "toggleExpand(unidade: Unidade)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "toggle"
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/useArvoreSelecao.ts",
+      "categoria": "funcao",
+      "nome": "isChecked",
+      "assinatura": "isChecked(codigo: number)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/useArvoreSelecao.ts",
+      "categoria": "funcao",
+      "nome": "isHabilitado",
+      "assinatura": "isHabilitado(unidade: Unidade)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/useArvoreSelecao.ts",
+      "categoria": "funcao",
+      "nome": "getEstadoSelecao",
+      "assinatura": "getEstadoSelecao(unidade: Unidade)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/components/unidade/useArvoreSelecao.ts",
+      "categoria": "funcao",
+      "nome": "updateAncestors",
+      "assinatura": "updateAncestors(node: Unidade, selectionSet: Set<number>)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "update"
+    },
+    {
+      "arquivo": "frontend/src/composables/useBreadcrumbs.ts",
+      "categoria": "funcao-arrow",
+      "nome": "addFallbackBreadcrumbs",
+      "assinatura": "addFallbackBreadcrumbs(breadcrumbs: Breadcrumb[])",
+      "tipo": "prefixo-ingles",
+      "prefixo": "add"
+    },
+    {
+      "arquivo": "frontend/src/composables/useCacheSync.ts",
+      "categoria": "funcao-arrow",
+      "nome": "handleAtualizacaoCache",
+      "assinatura": "handleAtualizacaoCache()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/composables/useCacheSync.ts",
+      "categoria": "funcao-arrow",
+      "nome": "handleErro",
+      "assinatura": "handleErro(event: Event)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/composables/useCacheSync.ts",
+      "categoria": "funcao-arrow",
+      "nome": "handlePageHide",
+      "assinatura": "handlePageHide()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/composables/useCacheSync.ts",
+      "categoria": "funcao-arrow",
+      "nome": "handlePageShow",
+      "assinatura": "handlePageShow()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/stores/painel.ts",
+      "categoria": "funcao",
+      "nome": "isMarcadoComoLido",
+      "assinatura": "isMarcadoComoLido(codigo: number)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "is"
+    },
+    {
+      "arquivo": "frontend/src/stores/toast.ts",
+      "categoria": "funcao",
+      "nome": "setPending",
+      "assinatura": "setPending(body: string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "frontend/src/test-utils/componentTestHelpers.ts",
+      "categoria": "funcao",
+      "nome": "getCommonMountOptions",
+      "assinatura": "getCommonMountOptions(initialState = {}, additionalStubs = {}, piniaOptions = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/test-utils/helpers.ts",
+      "categoria": "funcao",
+      "nome": "getMockAtividadesData",
+      "assinatura": "getMockAtividadesData()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/test-utils/mockFactories.ts",
+      "categoria": "funcao",
+      "nome": "createMockProcessoResumo",
+      "assinatura": "createMockProcessoResumo(overrides: Partial<ProcessoResumo> = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/utils/logger.ts",
+      "categoria": "funcao-arrow",
+      "nome": "getLogLevel",
+      "assinatura": "getLogLevel(envMode?: string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/utils/statusHelpers.ts",
+      "categoria": "funcao",
+      "nome": "getProcessoBadgeVariant",
+      "assinatura": "getProcessoBadgeVariant(situacao: SituacaoProcesso | string | undefined | null)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/utils/statusHelpers.ts",
+      "categoria": "funcao",
+      "nome": "getSubprocessoBadgeVariant",
+      "assinatura": "getSubprocessoBadgeVariant(situacao: SituacaoSubprocesso | string | undefined | null)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/utils/statusHelpers.ts",
+      "categoria": "funcao",
+      "nome": "getNotificacaoStatusInfo",
+      "assinatura": "getNotificacaoStatusInfo(situacao: string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/utils/statusHelpers.ts",
+      "categoria": "funcao",
+      "nome": "getNotificacaoBadgeVariant",
+      "assinatura": "getNotificacaoBadgeVariant(situacao: string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "get"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/AdministradoresView.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/AtividadesCadastroView.spec.ts",
+      "categoria": "funcao",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(customState = {}, accessOverrides = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(initialState = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapperCobertura",
+      "assinatura": "createWrapperCobertura(initialState = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
+      "categoria": "metodo",
+      "nome": "setProcessando",
+      "assinatura": "setProcessando(this: any, valor: boolean)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
+      "categoria": "metodo",
+      "nome": "setErro",
+      "assinatura": "setErro(this: any, mensagem: string | null)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/HistoricoView.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(initialState?: Record<string, unknown>)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/PainelView.spec.ts",
+      "categoria": "funcao",
+      "nome": "createMountOptions",
+      "assinatura": "createMountOptions(initialStateOverrides = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/ProcessoView.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(opcoes: { processo?: any; elegiveis?: any[]; erroCarregamento?: Error | null } = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/UnidadesView.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(serviceOverride: Partial<{\n        unidades: any[],\n        isLoading: boolean,\n        error: string | null\n    }> = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/UnidadeView.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createWrapper",
+      "assinatura": "createWrapper(initialStateOverride = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/UnidadeView.spec.ts",
+      "categoria": "funcao-arrow",
+      "nome": "createKeepAliveWrapper",
+      "assinatura": "createKeepAliveWrapper(manterMontado: { value: boolean }, initialStateOverride = {})",
+      "tipo": "prefixo-ingles",
+      "prefixo": "create"
+    },
+    {
+      "arquivo": "frontend/src/views/CadastroView.vue",
+      "categoria": "funcao",
+      "nome": "handleImportAtividades",
+      "assinatura": "handleImportAtividades(resultado: AtividadeOperacaoResponse)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/views/CadastroView.vue",
+      "categoria": "funcao",
+      "nome": "setAtividadeRef",
+      "assinatura": "setAtividadeRef(atividadeCodigo: number, el: unknown)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "set"
+    },
+    {
+      "arquivo": "frontend/src/views/CadastroView.vue",
+      "categoria": "funcao",
+      "nome": "handleAdicionarAtividade",
+      "assinatura": "handleAdicionarAtividade()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/views/LoginView.vue",
+      "categoria": "funcao-arrow",
+      "nome": "handleLogin",
+      "assinatura": "handleLogin()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/views/LoginView.vue",
+      "categoria": "funcao-arrow",
+      "nome": "handlePostAuth",
+      "assinatura": "handlePostAuth()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/views/mapaAnaliseFluxo.ts",
+      "categoria": "funcao",
+      "nome": "handleConfirmarDevolucao",
+      "assinatura": "handleConfirmarDevolucao()",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    },
+    {
+      "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
+      "categoria": "funcao",
+      "nome": "handleApiErrors",
+      "assinatura": "handleApiErrors(error: unknown, title: string, defaultMsg: string)",
+      "tipo": "prefixo-ingles",
+      "prefixo": "handle"
+    }
+  ],
+  "camposComId": [],
+  "parametrosComId": [
+    {
+      "arquivo": "backend/src/test/java/sgc/fixture/UnidadeFixture.java",
+      "membro": "unidadeComId(Long id)",
+      "parametro": "id",
+      "tipo": "campo-id-exato",
+      "nome": "id"
+    },
+    {
+      "arquivo": "e2e/helpers/helpers-processos.ts",
+      "membro": "obterAcaoBloco(page: Page, testId: string)",
+      "parametro": "testId",
+      "tipo": "sufixo-Id",
+      "nome": "testId"
+    }
+  ]
+}

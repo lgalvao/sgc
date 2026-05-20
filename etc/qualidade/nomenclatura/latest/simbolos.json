@@ -1,11 +1,11 @@
 {
-  "geradoEm": "2026-05-20T19:14:26.752Z",
+  "geradoEm": "2026-05-20T19:56:53.906Z",
   "base": "/home/runner/work/sgc/sgc",
   "totais": {
-    "arquivos": 1128,
+    "arquivos": 1129,
     "pacotesJava": 51,
     "tipos": 1090,
-    "membros": 4437
+    "membros": 4445
   },
   "porLinguagem": {
     "java": {
@@ -19,9 +19,9 @@
       "membros": 847
     },
     "javascript": {
-      "arquivos": 53,
+      "arquivos": 54,
       "tipos": 0,
-      "membros": 277
+      "membros": 285
     },
     "vue": {
       "arquivos": 95,
@@ -3783,10 +3783,10 @@
         {
           "categoria": "metodo",
           "nome": "exibirScreenshot",
-          "assinatura": "exibirScreenshot(@PathVariable UUID id)",
+          "assinatura": "exibirScreenshot(@PathVariable UUID codigo)",
           "retorno": "ResponseEntity<byte[]>",
           "parametros": [
-            "id"
+            "codigo"
           ]
         },
         {
@@ -3878,10 +3878,10 @@
         {
           "categoria": "metodo",
           "nome": "obterScreenshot",
-          "assinatura": "obterScreenshot(UUID id)",
+          "assinatura": "obterScreenshot(UUID codigo)",
           "retorno": "byte[]",
           "parametros": [
-            "id"
+            "codigo"
           ]
         },
         {
@@ -18943,11 +18943,11 @@
         },
         {
           "categoria": "metodo",
-          "nome": "unidadeComId",
-          "assinatura": "unidadeComId(Long id)",
+          "nome": "unidadeComCodigo",
+          "assinatura": "unidadeComCodigo(Long codigo)",
           "retorno": "Unidade",
           "parametros": [
-            "id"
+            "codigo"
           ]
         }
       ]
@@ -36796,6 +36796,79 @@
       ]
     },
     {
+      "caminho": "etc/scripts/codigo/idioma-consistencia-auditar.js",
+      "linguagem": "javascript",
+      "pacote": null,
+      "tipos": [],
+      "membros": [
+        {
+          "categoria": "funcao",
+          "nome": "detectarIdiomaMembro",
+          "assinatura": "detectarIdiomaMembro(nome)",
+          "parametros": [
+            "nome"
+          ]
+        },
+        {
+          "categoria": "funcao",
+          "nome": "detectarUsoId",
+          "assinatura": "detectarUsoId(nome)",
+          "parametros": [
+            "nome"
+          ]
+        },
+        {
+          "categoria": "funcao",
+          "nome": "analisarInventario",
+          "assinatura": "analisarInventario(inventario)",
+          "parametros": [
+            "inventario"
+          ]
+        },
+        {
+          "categoria": "funcao",
+          "nome": "montarResumo",
+          "assinatura": "montarResumo(auditoria)",
+          "parametros": [
+            "auditoria"
+          ]
+        },
+        {
+          "categoria": "funcao",
+          "nome": "carregarInventario",
+          "assinatura": "carregarInventario(caminhoInventario, base)",
+          "parametros": [
+            "caminhoInventario",
+            "base"
+          ]
+        },
+        {
+          "categoria": "funcao",
+          "nome": "executarAuditoriaIdioma",
+          "assinatura": "executarAuditoriaIdioma({\n    base = DIRETORIO_RAIZ,\n    json = false,\n    semGravar = false,\n    inventario = ARQUIVO_SIMBOLOS_PADRAO,\n    saidaJson = ARQUIVO_JSON_AUDITORIA_PADRAO\n} = {})",
+          "parametros": [
+            "{\n    base = DIRETORIO_RAIZ,\n    json = false,\n    semGravar = false,\n    inventario = ARQUIVO_SIMBOLOS_PADRAO,\n    saidaJson = ARQUIVO_JSON_AUDITORIA_PADRAO\n} = {}"
+          ]
+        },
+        {
+          "categoria": "funcao",
+          "nome": "parseArgs",
+          "assinatura": "parseArgs(argv)",
+          "parametros": [
+            "argv"
+          ]
+        },
+        {
+          "categoria": "metodo",
+          "nome": "escreverLinha",
+          "assinatura": "escreverLinha(`Score total (menor = melhor)",
+          "parametros": [
+            "(menor"
+          ]
+        }
+      ]
+    },
+    {
       "caminho": "etc/scripts/codigo/nomes-consistencia-auditar.js",
       "linguagem": "javascript",
       "pacote": null,
@@ -42663,9 +42736,9 @@
         {
           "categoria": "funcao",
           "nome": "useCadastroAtividadesMutacoes",
-          "assinatura": "useCadastroAtividadesMutacoes({\n                                                  atividades,\n                                                  codigoSubprocesso,\n                                                  codMapa,\n                                                  withErrorHandling,\n                                                  lastError,\n                                                  notify,\n                                                  processarRespostaLocal,\n                                                  adicionarAtividadeAction,\n                                               }: UseCadastroAtividadesMutacoesParams)",
+          "assinatura": "useCadastroAtividadesMutacoes({\n                                                  atividades,\n                                                  codigoSubprocesso,\n                                                  codMapa,\n                                                  executarComTratamentoDeErros,\n                                                  ultimoErro,\n                                                  notify,\n                                                  processarRespostaLocal,\n                                                  adicionarAtividadeAction,\n                                               }: UseCadastroAtividadesMutacoesParams)",
           "parametros": [
-            "{\n                                                  atividades,\n                                                  codigoSubprocesso,\n                                                  codMapa,\n                                                  withErrorHandling,\n                                                  lastError,\n                                                  notify,\n                                                  processarRespostaLocal,\n                                                  adicionarAtividadeAction,\n                                               }: UseCadastroAtividadesMutacoesParams"
+            "{\n                                                  atividades,\n                                                  codigoSubprocesso,\n                                                  codMapa,\n                                                  executarComTratamentoDeErros,\n                                                  ultimoErro,\n                                                  notify,\n                                                  processarRespostaLocal,\n                                                  adicionarAtividadeAction,\n                                               }: UseCadastroAtividadesMutacoesParams"
           ]
         },
         {
@@ -42854,8 +42927,8 @@
         },
         {
           "categoria": "funcao",
-          "nome": "getValor",
-          "assinatura": "getValor(chave: string, valorPadrao = \"\")",
+          "nome": "obterValor",
+          "assinatura": "obterValor(chave: string, valorPadrao = \"\")",
           "parametros": [
             "chave",
             "valorPadrao"
@@ -42863,14 +42936,14 @@
         },
         {
           "categoria": "funcao",
-          "nome": "getDiasInativacaoProcesso",
-          "assinatura": "getDiasInativacaoProcesso()",
+          "nome": "obterDiasInativacaoProcesso",
+          "assinatura": "obterDiasInativacaoProcesso()",
           "parametros": []
         },
         {
           "categoria": "funcao",
-          "nome": "getDiasAlertaNovo",
-          "assinatura": "getDiasAlertaNovo()",
+          "nome": "obterDiasAlertaNovo",
+          "assinatura": "obterDiasAlertaNovo()",
           "parametros": []
         }
       ]
@@ -42970,8 +43043,8 @@
         },
         {
           "categoria": "funcao",
-          "nome": "clearError",
-          "assinatura": "clearError()",
+          "nome": "limparErro",
+          "assinatura": "limparErro()",
           "parametros": []
         }
       ]
@@ -43271,22 +43344,22 @@
         },
         {
           "categoria": "funcao",
-          "nome": "clearErrors",
-          "assinatura": "clearErrors()",
+          "nome": "limparErros",
+          "assinatura": "limparErros()",
           "parametros": []
         },
         {
           "categoria": "funcao",
-          "nome": "setFromErroNormalizado",
-          "assinatura": "setFromErroNormalizado(normalizedError: ErroNormalizado | null)",
+          "nome": "aplicarErroNormalizado",
+          "assinatura": "aplicarErroNormalizado(erroNormalizado: ErroNormalizado | null)",
           "parametros": [
-            "normalizedError"
+            "erroNormalizado"
           ]
         },
         {
           "categoria": "funcao",
-          "nome": "hasErrors",
-          "assinatura": "hasErrors()",
+          "nome": "temErros",
+          "assinatura": "temErros()",
           "parametros": []
         }
       ]
@@ -43380,15 +43453,15 @@
         {
           "categoria": "funcao",
           "nome": "useMapaCompetenciasMutacoes",
-          "assinatura": "useMapaCompetenciasMutacoes({\n                                                codigoSubprocesso,\n                                                competencias,\n                                                fluxoMapa,\n                                                notify,\n                                                clearErrors,\n                                                aplicarErroNormalizado,\n                                                sincronizarMapa,\n                                            }: UseMapaCompetenciasMutacoesParams)",
+          "assinatura": "useMapaCompetenciasMutacoes({\n                                                codigoSubprocesso,\n                                                competencias,\n                                                fluxoMapa,\n                                                notify,\n                                                limparErros,\n                                                aplicarErroNormalizado,\n                                                sincronizarMapa,\n                                            }: UseMapaCompetenciasMutacoesParams)",
           "parametros": [
-            "{\n                                                codigoSubprocesso,\n                                                competencias,\n                                                fluxoMapa,\n                                                notify,\n                                                clearErrors,\n                                                aplicarErroNormalizado,\n                                                sincronizarMapa,\n                                            }: UseMapaCompetenciasMutacoesParams"
+            "{\n                                                codigoSubprocesso,\n                                                competencias,\n                                                fluxoMapa,\n                                                notify,\n                                                limparErros,\n                                                aplicarErroNormalizado,\n                                                sincronizarMapa,\n                                            }: UseMapaCompetenciasMutacoesParams"
           ]
         },
         {
           "categoria": "funcao",
-          "nome": "handleErrors",
-          "assinatura": "handleErrors(error: unknown)",
+          "nome": "tratarErros",
+          "assinatura": "tratarErros(error: unknown)",
           "parametros": [
             "error"
           ]
@@ -43446,9 +43519,9 @@
         {
           "categoria": "funcao",
           "nome": "removerAtividadeAssociada",
-          "assinatura": "removerAtividadeAssociada(competenciaId: number, codigoAtividade: number)",
+          "assinatura": "removerAtividadeAssociada(codigoCompetencia: number, codigoAtividade: number)",
           "parametros": [
-            "competenciaId",
+            "codigoCompetencia",
             "codigoAtividade"
           ]
         },
@@ -43584,8 +43657,8 @@
         },
         {
           "categoria": "funcao",
-          "nome": "handleConfirmarSugestoes",
-          "assinatura": "handleConfirmarSugestoes()",
+          "nome": "confirmarSugestoes",
+          "assinatura": "confirmarSugestoes()",
           "parametros": []
         }
       ]
@@ -43749,22 +43822,22 @@
         },
         {
           "categoria": "funcao",
-          "nome": "setContextoUsuarioTemaEscuro",
-          "assinatura": "setContextoUsuarioTemaEscuro(codigoUsuario: string | null | undefined)",
+          "nome": "definirContextoUsuarioTemaEscuro",
+          "assinatura": "definirContextoUsuarioTemaEscuro(codigoUsuario: string | null | undefined)",
           "parametros": [
             "codigoUsuario"
           ]
         },
         {
           "categoria": "funcao",
-          "nome": "getTemaEscuro",
-          "assinatura": "getTemaEscuro()",
+          "nome": "obterTemaEscuro",
+          "assinatura": "obterTemaEscuro()",
           "parametros": []
         },
         {
           "categoria": "funcao",
-          "nome": "setTemaEscuro",
-          "assinatura": "setTemaEscuro(novoValor: boolean)",
+          "nome": "definirTemaEscuro",
+          "assinatura": "definirTemaEscuro(novoValor: boolean)",
           "parametros": [
             "novoValor"
           ]
@@ -48650,9 +48723,9 @@
         {
           "categoria": "funcao",
           "nome": "useMapaDisponibilizacao",
-          "assinatura": "useMapaDisponibilizacao({\n                                            competencias,\n                                            existeCompetenciaSemAtividade,\n                                            atividadesSemCompetencia,\n                                            mostrarModalDisponibilizar,\n                                            clearErrors,\n                                            executarComSubprocesso,\n                                            disponibilizarMapaFluxo,\n                                            concluirAcaoPainel,\n                                            aplicarErroNormalizado,\n                                        }: DependenciasMapaDisponibilizacao)",
+          "assinatura": "useMapaDisponibilizacao({\n                                            competencias,\n                                            existeCompetenciaSemAtividade,\n                                            atividadesSemCompetencia,\n                                            mostrarModalDisponibilizar,\n                                            limparErros,\n                                            executarComSubprocesso,\n                                            disponibilizarMapaFluxo,\n                                            concluirAcaoPainel,\n                                            aplicarErroNormalizado,\n                                        }: DependenciasMapaDisponibilizacao)",
           "parametros": [
-            "{\n                                            competencias,\n                                            existeCompetenciaSemAtividade,\n                                            atividadesSemCompetencia,\n                                            mostrarModalDisponibilizar,\n                                            clearErrors,\n                                            executarComSubprocesso,\n                                            disponibilizarMapaFluxo,\n                                            concluirAcaoPainel,\n                                            aplicarErroNormalizado,\n                                        }: DependenciasMapaDisponibilizacao"
+            "{\n                                            competencias,\n                                            existeCompetenciaSemAtividade,\n                                            atividadesSemCompetencia,\n                                            mostrarModalDisponibilizar,\n                                            limparErros,\n                                            executarComSubprocesso,\n                                            disponibilizarMapaFluxo,\n                                            concluirAcaoPainel,\n                                            aplicarErroNormalizado,\n                                        }: DependenciasMapaDisponibilizacao"
           ]
         },
         {
@@ -49050,9 +49123,9 @@
         {
           "categoria": "funcao",
           "nome": "useProcessoAcoes",
-          "assinatura": "useProcessoAcoes({\n                                     codProcesso,\n                                     processo,\n                                     carregarContextoCompleto,\n                                     clearError,\n                                     registrarErro,\n                                     notify,\n                                 }: Dependencias)",
+          "assinatura": "useProcessoAcoes({\n                                     codProcesso,\n                                     processo,\n                                     carregarContextoCompleto,\n                                     limparErro,\n                                     registrarErro,\n                                     notify,\n                                 }: Dependencias)",
           "parametros": [
-            "{\n                                     codProcesso,\n                                     processo,\n                                     carregarContextoCompleto,\n                                     clearError,\n                                     registrarErro,\n                                     notify,\n                                 }: Dependencias"
+            "{\n                                     codProcesso,\n                                     processo,\n                                     carregarContextoCompleto,\n                                     limparErro,\n                                     registrarErro,\n                                     notify,\n                                 }: Dependencias"
           ]
         },
         {
@@ -49098,8 +49171,8 @@
       "membros": [
         {
           "categoria": "funcao",
-          "nome": "clearError",
-          "assinatura": "clearError()",
+          "nome": "limparErro",
+          "assinatura": "limparErro()",
           "parametros": []
         },
         {
@@ -49460,8 +49533,8 @@
         },
         {
           "categoria": "funcao",
-          "nome": "clearError",
-          "assinatura": "clearError()",
+          "nome": "limparErro",
+          "assinatura": "limparErro()",
           "parametros": []
         },
         {
@@ -49531,8 +49604,8 @@
       "membros": [
         {
           "categoria": "funcao",
-          "nome": "clearError",
-          "assinatura": "clearError()",
+          "nome": "limparErro",
+          "assinatura": "limparErro()",
           "parametros": []
         },
         {

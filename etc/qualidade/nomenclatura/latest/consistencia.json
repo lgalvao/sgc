@@ -1,13 +1,13 @@
 {
-  "geradoEm": "2026-05-20T19:14:26.784Z",
+  "geradoEm": "2026-05-20T19:56:53.936Z",
   "base": "/home/runner/work/sgc/sgc",
   "inventarioFonte": "/home/runner/work/sgc/sgc/etc/qualidade/nomenclatura/latest/simbolos.json",
   "indicadores": {
-    "arquivos": 1128,
+    "arquivos": 1129,
     "tiposForaPadrao": 0,
     "membrosForaPadrao": 321,
-    "parametrosForaPadrao": 7,
-    "parametrosComId": 5,
+    "parametrosForaPadrao": 8,
+    "parametrosComId": 1,
     "pacotesJavaForaPadrao": 0
   },
   "formatosArquivos": {
@@ -1038,6 +1038,7 @@
         "etc/scripts/backend/testes-analisar.js",
         "etc/scripts/backend/testes-gerar-stub.js",
         "etc/scripts/backend/testes-priorizar.js",
+        "etc/scripts/codigo/idioma-consistencia-auditar.js",
         "etc/scripts/codigo/nomes-consistencia-auditar.js",
         "etc/scripts/codigo/nomes-simbolos-coletar.js",
         "etc/scripts/codigo/smells-auditar.js",
@@ -3505,6 +3506,12 @@
       "formato": "outro"
     },
     {
+      "arquivo": "etc/scripts/codigo/idioma-consistencia-auditar.js",
+      "membro": "escreverLinha(`Score total (menor = melhor)",
+      "parametro": "(menor",
+      "formato": "outro"
+    },
+    {
       "arquivo": "frontend/src/components/processo/SubprocessoResumoHeader.stories.ts",
       "membro": "formatTipoResponsabilidade(_: ResponsavelDto | null)",
       "parametro": "_",
@@ -3537,29 +3544,9 @@
   ],
   "parametrosComId": [
     {
-      "arquivo": "backend/src/main/java/sgc/feedback/FeedbackController.java",
-      "membro": "exibirScreenshot(@PathVariable UUID id)",
-      "parametro": "id"
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/feedback/FeedbackService.java",
-      "membro": "obterScreenshot(UUID id)",
-      "parametro": "id"
-    },
-    {
-      "arquivo": "backend/src/test/java/sgc/fixture/UnidadeFixture.java",
-      "membro": "unidadeComId(Long id)",
-      "parametro": "id"
-    },
-    {
       "arquivo": "e2e/helpers/helpers-processos.ts",
       "membro": "obterAcaoBloco(page: Page, testId: string)",
       "parametro": "testId"
-    },
-    {
-      "arquivo": "frontend/src/composables/useMapaCompetenciasMutacoes.ts",
-      "membro": "removerAtividadeAssociada(competenciaId: number, codigoAtividade: number)",
-      "parametro": "competenciaId"
     }
   ],
   "pacotesJavaForaPadrao": []
