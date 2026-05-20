@@ -22,7 +22,7 @@ Fluxo principal:
 
 6. O usuário confirma.
 
-7. Se a seleção incluir alguma unidade com equipe própria e unidades subordinadas, o sistema mostra um diálogo com a
+7. Se a seleção incluir alguma unidade interoperacional, o sistema mostra um diálogo com a
    mensagem `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo de mapeamento.`, apresentando essas unidades já selecionadas.
 
 8. O usuário confirma a seleção complementar das unidades mostradas no diálogo.
@@ -33,7 +33,7 @@ Fluxo principal:
 10. O sistema muda a situação do processo para 'Em andamento';
 
 11. O sistema cria internamente um subprocesso para cada unidade participante direta, que seja do tipo Operacional ou
-   unidade com equipe própria e unidades subordinadas confirmada no diálogo complementar (unidade do tipo Intermediária nunca participa diretamente), com os seguintes campos e valores
+   interoperacional confirmada no diálogo complementar (unidade do tipo Intermediária nunca participa diretamente), com os seguintes campos e valores
    iniciais:
 
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.

@@ -1,5 +1,5 @@
 import {mount} from "@vue/test-utils";
-import {describe, expect, it, vi} from "vitest";
+import {afterEach, describe, expect, it, vi} from "vitest";
 import InputData from "@/components/comum/InputData.vue";
 import {logger, obterHojeFormatado} from "@/utils";
 import {flattenTree} from "@/utils/treeUtils";
@@ -22,6 +22,15 @@ const BFormInputStub = {
 };
 
 describe("InputData.vue", () => {
+    const userAgentOriginal = navigator.userAgent;
+
+    afterEach(() => {
+        Object.defineProperty(window.navigator, "userAgent", {
+            value: userAgentOriginal,
+            configurable: true
+        });
+    });
+
     const criarWrapper = (props = {}) => mount(InputData, {
         props: {
             modelValue: "2026-03-27",
@@ -59,6 +68,17 @@ describe("InputData.vue", () => {
         expect(trigger.attributes("aria-label")).toBe("Abrir calendário");
         expect(trigger.attributes("role")).toBe("button");
         expect(trigger.attributes("tabindex")).toBe("0");
+    });
+
+    it("não deve renderizar botão extra do calendário no Firefox", () => {
+        Object.defineProperty(window.navigator, "userAgent", {
+            value: "Mozilla/5.0 Firefox/126.0",
+            configurable: true
+        });
+
+        const wrapper = criarWrapper();
+
+        expect(wrapper.find("button").exists()).toBe(false);
     });
 
     it("deve abrir o seletor nativo ao pressionar Enter ou Espaço", async () => {

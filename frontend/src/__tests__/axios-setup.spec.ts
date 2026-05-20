@@ -242,6 +242,19 @@ describe("axios-setup", () => {
         expect(router.push).not.toHaveBeenCalled();
     });
 
+    it("deve tratar erro de rede durante descarte da pagina como cancelamento", async () => {
+        window.dispatchEvent(new Event('pagehide'));
+        const config = requestInterceptor({method: 'get', url: '/processos/1/detalhes', headers: {}});
+        const error = {isAxiosError: true, config, message: 'Network Error'};
+
+        await expect(responseErrorInterceptor(error as any)).rejects.toMatchObject({
+            code: 'ERR_CANCELED',
+            name: 'CanceledError'
+        });
+        expect(logger.error).not.toHaveBeenCalledWith("[axios] Erro global:", expect.anything());
+        window.dispatchEvent(new Event('pageshow'));
+    });
+
     it("deve bloquear requisicoes autenticadas durante transicao de sessao", async () => {
         iniciarTransicaoSessao();
 

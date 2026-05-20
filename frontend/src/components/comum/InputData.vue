@@ -14,6 +14,7 @@
         @update:model-value="(val) => $emit('update:modelValue', String(val))"
     />
     <BInputGroupText
+        v-if="mostrarBotaoCalendario"
         aria-label="Abrir calendário"
         class="cursor-pointer"
         role="button"
@@ -28,6 +29,7 @@
 </template>
 
 <script lang="ts" setup>
+import {computed} from "vue";
 import {BFormInput, BInputGroup, BInputGroupText} from "bootstrap-vue-next";
 import {ref} from "vue";
 
@@ -47,6 +49,13 @@ defineEmits<{
 }>();
 
 const inputRef = ref<InstanceType<typeof BFormInput> | null>(null);
+
+const mostrarBotaoCalendario = computed(() => {
+  if (typeof navigator === "undefined") {
+    return true;
+  }
+  return !navigator.userAgent.toLowerCase().includes("firefox");
+});
 
 function abrirCalendario() {
   if (inputRef.value?.$el) {

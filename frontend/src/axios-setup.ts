@@ -26,6 +26,25 @@ type ErroCanceladoHttp = {
 
 const controladoresPendentes = new Set<AbortController>();
 let sessaoEmTransicao = false;
+let paginaEmDescarte = false;
+
+function registrarLifecyclePagina() {
+    if (globalThis.window === undefined) {
+        return;
+    }
+
+    globalThis.window.addEventListener('pagehide', () => {
+        paginaEmDescarte = true;
+    });
+    globalThis.window.addEventListener('beforeunload', () => {
+        paginaEmDescarte = true;
+    });
+    globalThis.window.addEventListener('pageshow', () => {
+        paginaEmDescarte = false;
+    });
+}
+
+registrarLifecyclePagina();
 
 export function setRouter(router: Router) {
     routerInstance = router;
@@ -114,6 +133,13 @@ export function isErroCanceladoHttp(error: unknown): boolean {
 
     const erroCancelado = error as ErroCanceladoHttp;
     return erroCancelado.code === "ERR_CANCELED" || erroCancelado.name === "CanceledError";
+}
+
+function marcarErroComoCancelado(error: import('axios').AxiosError, motivo: string) {
+    error.code = "ERR_CANCELED";
+    error.name = "CanceledError";
+    error.message = motivo;
+    return error;
 }
 
 function isRequisicaoPermitidaDuranteTransicao(url?: string): boolean {
@@ -219,6 +245,10 @@ const handleResponseError = (error: import('axios').AxiosError) => {
     const config = error?.config as ConfiguracaoMonitorada;
     const metadados = config?.metadadosMonitoramento;
     limparControleCancelamento(config);
+
+    if (!error?.response && paginaEmDescarte) {
+        return Promise.reject(marcarErroComoCancelado(error, "Requisição cancelada por descarte da página"));
+    }
 
     if (isErroCanceladoHttp(error)) {
         return Promise.reject(error);

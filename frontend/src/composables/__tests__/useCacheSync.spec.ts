@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {useCacheSync} from '../useCacheSync';
 import {useUnidadeStore} from '@/stores/unidade';
 import {useOrganizacaoStore} from '@/stores/organizacao';
@@ -11,6 +11,8 @@ import {logger} from '@/utils';
 
 // Global to hold the last created instance
 let lastInstance: EventSourceMock | null = null;
+const instanciasCriadas: EventSourceMock[] = [];
+const fechamentosPendentes: Array<() => void> = [];
 
 // Mock EventSource
 class EventSourceMock {
@@ -28,6 +30,7 @@ class EventSourceMock {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         lastInstance = self;
+        instanciasCriadas.push(self);
     }
 
     addEventListener(event: string, callback: (event: any) => void) {
@@ -67,6 +70,7 @@ describe('useCacheSync', () => {
         subprocessoStore = useSubprocessoStore();
         mapasStore = useMapasStore();
         lastInstance = null;
+        instanciasCriadas.length = 0;
         vi.clearAllMocks();
         vi.spyOn(unidadeStore, 'invalidar');
         vi.spyOn(organizacaoStore, 'invalidar');
@@ -77,14 +81,20 @@ describe('useCacheSync', () => {
         vi.spyOn(logger, 'warn').mockImplementation(() => logger);
     });
 
+    afterEach(() => {
+        while (fechamentosPendentes.length > 0) {
+            fechamentosPendentes.pop()?.();
+        }
+    });
+
     it('deve conectar ao EventSource na URL correta', () => {
         const closeSync = useCacheSync();
+        fechamentosPendentes.push(closeSync);
         expect(lastInstance?.url).toBe('/api/eventos');
-        closeSync();
     });
 
     it('deve invalidar apenas os caches organizacionais quando receber o evento org-cache-refreshed', () => {
-        useCacheSync();
+        fechamentosPendentes.push(useCacheSync());
 
         lastInstance?.emit('org-cache-refreshed', {});
 
@@ -110,7 +120,7 @@ describe('useCacheSync', () => {
         } as any);
         painelStore.definirDados([{codigo: 1} as any], [{codigo: 2} as any]);
 
-        useCacheSync();
+        fechamentosPendentes.push(useCacheSync());
         lastInstance?.emit('org-cache-refreshed', {});
 
         expect(painelStore.dadosValidos()).toBe(false);
@@ -129,7 +139,7 @@ describe('useCacheSync', () => {
     });
 
     it('não deve fechar a conexão em caso de erro transitório durante reconexão', () => {
-        useCacheSync();
+        fechamentosPendentes.push(useCacheSync());
         if (lastInstance) {
             lastInstance.readyState = EventSourceMock.CONNECTING;
         }
@@ -143,7 +153,7 @@ describe('useCacheSync', () => {
     });
 
     it('não deve logar warning quando a conexão SSE já estiver fechada', () => {
-        useCacheSync();
+        fechamentosPendentes.push(useCacheSync());
         if (lastInstance) {
             lastInstance.readyState = EventSourceMock.CLOSED;
         }
@@ -158,7 +168,7 @@ describe('useCacheSync', () => {
 
     it('não deve logar warning ao encerrar a conexão manualmente', () => {
         const closeSync = useCacheSync();
-
+        fechamentosPendentes.push(closeSync);
         closeSync();
 
         if (lastInstance?.onerror) {
@@ -170,9 +180,29 @@ describe('useCacheSync', () => {
 
     it('deve fechar a conexao ao chamar a funcao de retorno', () => {
         const closeSync = useCacheSync();
+        fechamentosPendentes.push(closeSync);
 
         closeSync();
 
         expect(lastInstance?.close).toHaveBeenCalled();
+    });
+
+    it('deve fechar a conexao ao receber pagehide', () => {
+        fechamentosPendentes.push(useCacheSync());
+
+        window.dispatchEvent(new Event('pagehide'));
+
+        expect(lastInstance?.close).toHaveBeenCalled();
+    });
+
+    it('deve reabrir a conexao ao receber pageshow apos pagehide', () => {
+        fechamentosPendentes.push(useCacheSync());
+        const primeiraInstancia = lastInstance;
+
+        window.dispatchEvent(new Event('pagehide'));
+        window.dispatchEvent(new Event('pageshow'));
+
+        expect(instanciasCriadas).toHaveLength(2);
+        expect(lastInstance).not.toBe(primeiraInstancia);
     });
 });

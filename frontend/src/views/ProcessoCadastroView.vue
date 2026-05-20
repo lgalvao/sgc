@@ -115,6 +115,7 @@ import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoA
 import ProcessoCadastroModais from "@/components/processo/ProcessoCadastroModais.vue";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
+import {isErroCanceladoHttp} from "@/axios-setup";
 import {logger} from "@/utils";
 import {deveNotificarGlobalmente, ehErroAxios, extrairErrosGenericos, normalizarErro} from "@/utils/apiError";
 import {useDiagnosticoOrganizacionalAlert} from "@/composables/useDiagnosticoOrganizacionalAlert";
@@ -277,6 +278,9 @@ async function carregarProcessoParaEdicao(codProcesso: number) {
     await buscarUnidadesParaProcesso(processo.tipo, processo.codigo);
     await nextTick();
   } catch (error) {
+    if (isErroCanceladoHttp(error)) {
+      return;
+    }
     notify(TEXTOS.processo.cadastro.ERRO_CARREGAR_DETALHES, 'danger');
     logger.error("Erro ao carregar processo:", error);
   } finally {
