@@ -80,6 +80,9 @@ criarComandoScript(frontendA11y, "processar", "Processa os resultados do crawler
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 const codigoSmells = codigo.command("smells").description("Auditorias de cheiros de codigo.");
 criarComandoScript(codigoSmells, "auditar", "Gera snapshot de sinais de complexidade acidental e codigo defensivo.", "etc/scripts/codigo/smells-auditar.js");
+const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
+criarComandoScript(codigoNomes, "coletar-simbolos", "Gera inventario de pacotes, arquivos, tipos e membros.", "etc/scripts/codigo/nomes-simbolos-coletar.js");
+criarComandoScript(codigoNomes, "auditar-consistencia", "Audita padroes e divergencias de nomenclatura.", "etc/scripts/codigo/nomes-consistencia-auditar.js");
 
 const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
 criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");

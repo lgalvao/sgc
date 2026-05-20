@@ -82,6 +82,8 @@ node etc/scripts/sgc.js frontend a11y processar
 
 ```bash
 node etc/scripts/sgc.js codigo smells auditar
+node etc/scripts/sgc.js codigo nomes coletar-simbolos
+node etc/scripts/sgc.js codigo nomes auditar-consistencia
 ```
 
 ### E2E
