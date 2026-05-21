@@ -281,6 +281,71 @@ class SubprocessoAcessoServiceTest {
         assertThat(permissoes.habilitarHomologarMapa()).isFalse();
     }
 
+    @Test
+    void podeVerSugestoesTrueParaAdminEmProcessoFinalizadoComSugestoes() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+
+        SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
+                subprocesso, Perfil.ADMIN, true, true, true, false);
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
+
+        assertThat(dto.podeVerSugestoes()).isTrue();
+    }
+
+    @Test
+    void podeVerSugestoesFalseParaServidorEmProcessoFinalizadoComSugestoes() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+
+        SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
+                subprocesso, Perfil.SERVIDOR, true, true, true, false);
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
+
+        assertThat(dto.podeVerSugestoes()).isFalse();
+    }
+
+    @Test
+    void podeVerSugestoesFalseParaAdminEmProcessoFinalizadoSemSugestoes() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+
+        SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
+                subprocesso, Perfil.ADMIN, true, true, true, false);
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
+
+        assertThat(dto.podeVerSugestoes()).isFalse();
+    }
+
+    @Test
+    void devePermitirDevolverMapaParaGestorEmProcessoFinalizado() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+
+        SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
+                subprocesso, Perfil.GESTOR, true, true, true, false);
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
+
+        assertThat(dto.podeDevolverMapa()).isTrue();
+    }
+
+    @Test
+    void naoDevePermitirDevolverMapaParaChefeEmProcessoFinalizado() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+
+        SubprocessoConsultaService.ContextoConsultaSubprocesso contexto = createContexto(
+                subprocesso, Perfil.CHEFE, true, true, true, false);
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
+
+        assertThat(dto.podeDevolverMapa()).isFalse();
+    }
+
     private SubprocessoConsultaService.ContextoConsultaSubprocesso createContexto(
             Subprocesso subprocesso, Perfil perfil, boolean mesmaUnidade, boolean isHierarquia,
             boolean processoFinalizado, boolean temMapaVigente) {

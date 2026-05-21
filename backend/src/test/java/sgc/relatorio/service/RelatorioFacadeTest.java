@@ -16,6 +16,7 @@ import sgc.processo.service.*;
 import sgc.relatorio.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
+import sgc.comum.erros.ErroAcessoNegado;
 
 import java.io.*;
 import java.util.*;
@@ -565,4 +566,235 @@ class RelatorioFacadeTest {
         verify(mapaManutencaoService, never()).mapaVigenteUnidade(anyLong());
     }
 
+    private void mockContextoUsuario(Perfil perfil, Long unidadeAtivaCodigo) {
+        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+            "111111111111",
+            unidadeAtivaCodigo,
+            perfil
+        ));
+    }
+
+    @Test
+    @DisplayName("Deve permitir obter relatório de mapas para gestor dentro de sua hierarquia")
+    void devePermitirObterRelatorioMapasParaGestorDentroDeSuaHierarquia() {
+        mockContextoUsuario(Perfil.GESTOR, 1L);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setSigla("U1");
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setSigla("U2");
+
+        Subprocesso sp1 = new Subprocesso();
+        sp1.setUnidade(u1);
+        sp1.setMapa(new Mapa());
+        sp1.getMapa().setCodigo(10L);
+        sp1.getMapa().setSubprocesso(sp1);
+
+        Subprocesso sp2 = new Subprocesso();
+        sp2.setUnidade(u2);
+        sp2.setMapa(new Mapa());
+        sp2.getMapa().setCodigo(20L);
+        sp2.getMapa().setSubprocesso(sp2);
+
+        UnidadeMapa mapa1 = UnidadeMapa.builder().unidadeCodigo(1L).mapaVigente(sp1.getMapa()).build();
+        UnidadeMapa mapa2 = UnidadeMapa.builder().unidadeCodigo(2L).mapaVigente(sp2.getMapa()).build();
+
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of(mapa1, mapa2));
+
+        List<RelatorioMapaDto> resultado = relatorioService.obterRelatorioMapas(List.of(1L, 2L));
+
+        assertThat(resultado).hasSize(2);
+        verify(unidadeHierarquiaService).buscarIdsDescendentes(1L);
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroAcessoNegado para gestor ao consultar unidade fora de sua hierarquia")
+    void deveLancarErroAcessoNegadoParaGestorAoConsultarUnidadeForaDeSuaHierarquia() {
+        mockContextoUsuario(Perfil.GESTOR, 1L);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
+
+        assertThatThrownBy(() -> relatorioService.obterRelatorioMapas(List.of(1L, 3L)))
+                .isInstanceOf(ErroAcessoNegado.class)
+                .hasMessageContaining("Usuário não possui permissão para gerar relatório para uma ou mais unidades selecionadas.");
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroAcessoNegado para outro perfil que não gestor ou admin ao obter relatório de mapas")
+    void deveLancarErroAcessoNegadoParaOutroPerfilQueNaoGestorOuAdminAoObterRelatorioMapas() {
+        mockContextoUsuario(Perfil.CHEFE, 1L);
+
+        assertThatThrownBy(() -> relatorioService.obterRelatorioMapas(List.of(1L)))
+                .isInstanceOf(ErroAcessoNegado.class)
+                .hasMessageContaining("Usuário não possui permissão para gerar relatório de mapas vigentes.");
+    }
+
+    @Test
+    @DisplayName("Deve permitir obter relatório de mapa vigente para gestor dentro de sua hierarquia")
+    void devePermitirObterRelatorioMapaVigenteParaGestorDentroDeSuaHierarquia() {
+        mockContextoUsuario(Perfil.GESTOR, 1L);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
+
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setSigla("U2");
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(20L);
+
+        when(unidadeService.buscarPorCodigo(2L)).thenReturn(u2);
+        when(unidadeService.buscarMapaVigente(2L)).thenReturn(Optional.of(mapa));
+
+        RelatorioMapaDto resultado = relatorioService.obterRelatorioMapaVigenteUnidade(2L);
+
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.codigoUnidade()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroAcessoNegado para gestor ao obter relatório de mapa de unidade fora de sua hierarquia")
+    void deveLancarErroAcessoNegadoParaGestorAoObterRelatorioMapaDeUnidadeForaDeSuaHierarquia() {
+        mockContextoUsuario(Perfil.GESTOR, 1L);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
+
+        assertThatThrownBy(() -> relatorioService.obterRelatorioMapaVigenteUnidade(3L))
+                .isInstanceOf(ErroAcessoNegado.class)
+                .hasMessageContaining("Usuário não possui permissão para gerar relatório de mapa vigente desta unidade.");
+    }
+
+    @Test
+    @DisplayName("Deve permitir obter relatório de mapa vigente para chefe de sua própria unidade")
+    void devePermitirObterRelatorioMapaVigenteParaChefeDeSuaPropriaUnidade() {
+        mockContextoUsuario(Perfil.CHEFE, 1L);
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setSigla("U1");
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(u1);
+        when(unidadeService.buscarMapaVigente(1L)).thenReturn(Optional.of(mapa));
+
+        RelatorioMapaDto resultado = relatorioService.obterRelatorioMapaVigenteUnidade(1L);
+
+        assertThat(resultado).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroAcessoNegado para chefe ao obter relatório de mapa vigente de outra unidade")
+    void deveLancarErroAcessoNegadoParaChefeAoObterRelatorioMapaVigenteDeOutraUnidade() {
+        mockContextoUsuario(Perfil.CHEFE, 1L);
+
+        assertThatThrownBy(() -> relatorioService.obterRelatorioMapaVigenteUnidade(2L))
+                .isInstanceOf(ErroAcessoNegado.class)
+                .hasMessageContaining("Usuário não possui permissão para gerar relatório de mapa vigente desta unidade.");
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroAcessoNegado para servidor ao obter relatório de mapa vigente")
+    void deveLancarErroAcessoNegadoParaServidorAoObterRelatorioMapaVigente() {
+        mockContextoUsuario(Perfil.SERVIDOR, 1L);
+
+        assertThatThrownBy(() -> relatorioService.obterRelatorioMapaVigenteUnidade(1L))
+                .isInstanceOf(ErroAcessoNegado.class)
+                .hasMessageContaining("Usuário não possui permissão para gerar relatório de mapa vigente desta unidade.");
+    }
+
+    @Test
+    @DisplayName("Deve gerar relatório de unidades sem mapas vigentes quando não há unidades pendentes")
+    void deveGerarRelatorioUnidadesSemMapasVigentesQuandoNaoHaUnidadesPendentes() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of());
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve gerar relatório de unidades sem mapas vigentes com ordenações e agrupamentos complexos")
+    void deveGerarRelatorioUnidadesSemMapasVigentesComOrdenacoesEAgrupamentosComplexos() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+
+        // 1. Configurar códigos das unidades sem mapa vigente
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(11L, 12L, 13L, 14L, 16L));
+
+        // 2. Montar árvore hierárquica contendo unidades, subunidades, secretarias e zonas eleitorais
+        UnidadeDto raiz = new UnidadeDto();
+        raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
+        raiz.setNome("Unidade Raiz");
+
+        // Secretaria B (para testar ordenação alfabética com Secretaria A)
+        UnidadeDto secretariaB = new UnidadeDto();
+        secretariaB.setCodigo(10L);
+        secretariaB.setSigla("SEC-B");
+        secretariaB.setNome("SECRETARIA B");
+        secretariaB.setTipo("SECRETARIA");
+
+        // Subunidades do tipo ZONA ELEITORAL para testar agrupamento visual
+        // ZE 02 (número) e ZE 10 (número maior) e ZE 99999999999999999999 (estouro de inteiro para NumberFormatException)
+        UnidadeDto subSecB1 = new UnidadeDto();
+        subSecB1.setCodigo(11L);
+        subSecB1.setSigla("ZE 02");
+        subSecB1.setNome("ZONA ELEITORAL 02");
+        subSecB1.setTipo("ZONA ELEITORAL");
+
+        UnidadeDto subSecB2 = new UnidadeDto();
+        subSecB2.setCodigo(12L);
+        subSecB2.setSigla("ZE 10");
+        subSecB2.setNome("ZONA ELEITORAL 10");
+        subSecB2.setTipo("ZONA ELEITORAL");
+
+        UnidadeDto subSecB3 = new UnidadeDto();
+        subSecB3.setCodigo(16L);
+        subSecB3.setSigla("ZE 99999999999999999999");
+        subSecB3.setNome("ZONA ELEITORAL LIMITE");
+        subSecB3.setTipo("ZONA ELEITORAL");
+
+        secretariaB.setSubunidades(List.of(subSecB1, subSecB2, subSecB3));
+
+        // Secretaria A
+        UnidadeDto secretariaA = new UnidadeDto();
+        secretariaA.setCodigo(20L);
+        secretariaA.setSigla("SEC-A");
+        secretariaA.setNome("SECRETARIA A");
+        secretariaA.setTipo("SECRETARIA");
+
+        // Subunidade com sigla vazia/em branco
+        UnidadeDto subSecA1 = new UnidadeDto();
+        subSecA1.setCodigo(13L);
+        subSecA1.setSigla("  "); // em branco
+        subSecA1.setNome("SUB-A1");
+        subSecA1.setTipo("COMUM");
+
+        // Subunidade com sigla nula e nome vazio para testar fallback
+        UnidadeDto subSecA2 = new UnidadeDto();
+        subSecA2.setCodigo(14L);
+        subSecA2.setSigla(null);
+        subSecA2.setNome("");
+        subSecA2.setTipo(null);
+
+        // Subunidade que não está sem mapa e não deve aparecer
+        UnidadeDto subSecA3 = new UnidadeDto();
+        subSecA3.setCodigo(15L);
+        subSecA3.setSigla("OK");
+        subSecA3.setNome("SUB-OK");
+        subSecA3.setSubunidades(List.of());
+
+        secretariaA.setSubunidades(List.of(subSecA1, subSecA2, subSecA3));
+
+        raiz.setSubunidades(List.of(secretariaB, secretariaA));
+
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(raiz));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
 }

@@ -199,6 +199,39 @@ class UnidadeHierarquiaServiceTest {
     }
 
     @Test
+    @DisplayName("buscarSiglaSuperior deve retornar vazio quando unidade nao tem superior")
+    void buscarSiglaSuperior_DeveRetornarVazioQuandoUnidadeNaoTemSuperior() {
+        when(selfProvider.getObject()).thenReturn(service);
+        when(unidadeService.buscarPorSigla(unidadeRaiz.getSigla())).thenReturn(unidadeRaiz);
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+
+        Optional<String> superior = service.buscarSiglaSuperior(unidadeRaiz.getSigla());
+
+        assertThat(superior).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarArvoreComElegibilidade deve retornar arvore vazia quando nao ha unidades")
+    void buscarArvoreComElegibilidade_DeveRetornarArvoreVaziaQuandoNaoHaUnidades() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of());
+
+        List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(info -> true);
+
+        assertThat(resultado).isEmpty();
+    }
+
+    @Test
+    @DisplayName("deve buscar siglas subordinadas a partir de unidade folha profunda")
+    void deveBuscarSiglasSubordinadasAPartirDeUnidadeFolhaProfunda() {
+        when(selfProvider.getObject()).thenReturn(service);
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(hierarquiaBasica());
+
+        List<String> siglas = service.buscarSiglasSubordinadas(unidadeOperacional.getSigla());
+
+        assertThat(siglas).containsExactly(unidadeOperacional.getSigla());
+    }
+
+    @Test
     @DisplayName("Deve buscar subordinadas diretas")
     void deveBuscarSubordinadasDiretas() {
         when(unidadeRepo.findByUnidadeSuperiorCodigo(1L)).thenReturn(List.of(unidadeIntermediaria));

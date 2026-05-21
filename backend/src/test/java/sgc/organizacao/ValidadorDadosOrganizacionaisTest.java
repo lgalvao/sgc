@@ -354,4 +354,142 @@ class ValidadorDadosOrganizacionaisTest {
                 .extracting(GrupoViolacaoOrganizacionalDto::tipo)
                 .contains("Titular referenciado ausente na VW_USUARIO");
     }
+
+    @Test
+    @DisplayName("diagnosticar resolve conflito de chaves ao carregar responsabilidades duplicadas na mesma unidade")
+    void diagnosticarResponsabilidadeDuplicadaMesmaUnidade() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(10L, "OPER", TipoUnidade.OPERACIONAL, "111")
+        ));
+        // Duas responsabilidades cadastradas para a mesma unidade 10L
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(10L, "111"),
+                new ResponsabilidadeLeitura(10L, "222")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+    }
+
+    @Test
+    @DisplayName("diagnosticar resolve conflito ao carregar usuarios com titulos eleitorais duplicados")
+    void diagnosticarUsuariosDuplicadosDoRepositorio() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(10L, "OPER", TipoUnidade.OPERACIONAL, "111")
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(10L, "111")
+        ));
+        // Repositório retorna dois usuários com o mesmo título eleitoral
+        Usuario u1 = usuario("111");
+        Usuario u2 = usuario("111");
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(u1, u2));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+    }
+
+    @Test
+    @DisplayName("diagnosticar acusa violacao quando responsabilidade possui usuario titulo vazio ou em branco")
+    void diagnosticarResponsabilidadeComUsuarioVazio() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(10L, "OPER", TipoUnidade.OPERACIONAL, "111")
+        ));
+        // Responsabilidade com usuário em branco
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(10L, "   ")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("Unidade sem responsável");
+    }
+
+    @Test
+    @DisplayName("diagnosticar acusa violacao para unidade intermediaria com responsavel com usuario titulo em branco")
+    void diagnosticarUnidadeIntermediariaComResponsavelDeUsuarioVazio() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INT", "INT", "111", TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
+        ));
+        // Responsabilidade do intermediário com usuário em branco
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(1L, "   "),
+                new ResponsabilidadeLeitura(2L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        // Possui gestor
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("codigos")) {
+                return List.of(Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L));
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        // Acusa Unidade sem responsável para o 1L devido ao usuario_titulo em branco, mas nao entra no validarGestorResponsavel porque estaVazio do responsavel e true
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("Unidade sem responsável")
+                .doesNotContain("Responsavel de unidade intermediaria sem perfil GESTOR correspondente");
+    }
+
+    @Test
+    @DisplayName("diagnosticar cobre desvios adicionais de integridade de perfis sem codigo de unidade")
+    void diagnosticarCobreDesviosDeIntegridadePerfisSemUnidadeCodigo() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(10L, "OPER", TipoUnidade.OPERACIONAL, "111")
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(10L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("codigos")) {
+                // Perfil com usuario_titulo nulo, mas unidade_codigo e nulo (e nao nulo mas derivado de unidade sem responsavel)
+                // Isso exercita a integridade de perfis onde a violacao nao e filtrada!
+                Map<String, Object> linhaInvalida = new HashMap<>();
+                linhaInvalida.put("usuario_titulo", null);
+                linhaInvalida.put("perfil", "GESTOR");
+                linhaInvalida.put("unidade_codigo", null);
+                return List.of(linhaInvalida);
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("VW_USUARIO_PERFIL_UNIDADE com usuario_titulo nulo");
+    }
+
+    @Test
+    @DisplayName("diagnosticar cobre branches da funcao extrairSigla")
+    void diagnosticarCobreBranchesExtrairSigla() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(1L, "  ", TipoUnidade.OPERACIONAL, null)
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of());
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        // O detalhe gerado e: "sigla=  , tipo=OPERACIONAL". 
+        // O extrairSigla comeca em sigla=, o final e a virgula.
+        // A substring extraida e "  ". Como isBlank() e true, ela retorna null.
+        assertThat(diagnostico.resumo()).doesNotContain("Há unidades atualmente sem responsável efetivo");
+    }
 }
