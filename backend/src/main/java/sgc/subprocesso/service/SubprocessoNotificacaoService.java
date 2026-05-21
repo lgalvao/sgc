@@ -99,10 +99,6 @@ public class SubprocessoNotificacaoService {
                 .build());
     }
 
-    public void notificarHomologacaoCadastro(Subprocesso sp) {
-        criarNotificacaoHomologacao(sp, TipoTransicao.CADASTRO_HOMOLOGADO, TipoNotificacao.CADASTRO_HOMOLOGADO, "cadastro-homologado");
-    }
-
     public void notificarHomologacaoMapa(Subprocesso sp) {
         criarNotificacaoHomologacao(sp, TipoTransicao.MAPA_HOMOLOGADO, TipoNotificacao.MAPA_HOMOLOGADO, "mapa-homologado");
     }

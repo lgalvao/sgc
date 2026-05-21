@@ -129,7 +129,7 @@ public class CadastroFluxoService {
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco", true));
+        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco"));
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {
@@ -227,10 +227,6 @@ public class CadastroFluxoService {
     }
 
     private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
-        executarHomologacao(sp, usuario, observacoes, false);
-    }
-
-    private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean notificarUnidade) {
         FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         log.info("Homologando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
@@ -246,18 +242,6 @@ public class CadastroFluxoService {
                 .usuario(usuario)
                 .observacoes(normalizarTexto(observacoes))
                 .build());
-
-        executarEfeitosDerivadosHomologacaoCadastro(sp);
-        if (notificarUnidade) {
-            notificacaoService.notificarHomologacaoCadastro(sp);
-        }
-    }
-
-    private void executarEfeitosDerivadosHomologacaoCadastro(Subprocesso sp) {
-        String descAlerta = REVISAO == sp.getProcesso().getTipo()
-                ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
-                : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
-        alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, unidadeService.buscarAdmin(), sp.getUnidade());
     }
 
     private void executarReabertura(ReaberturaCommand cmd) {

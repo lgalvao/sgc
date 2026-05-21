@@ -386,23 +386,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve renderizar cadastro homologado conforme CDU-23")
-    void deveRenderizarCadastroHomologado() {
-        Context context = new Context();
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("nomeProcesso", "Processo cadastro 2026");
-
-        String html = templateEngine.process("cadastro-homologado", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
-                .contains("O cadastro de atividades e conhecimentos da sua unidade foi homologado no processo")
-                .contains("Processo cadastro 2026")
-                .contains("Acompanhe o processo no Sistema de Gestão de Competências")
-                .contains("https://sgc.tre-pe.jus.br");
-    }
-
-    @Test
     @DisplayName("Deve renderizar mapa homologado conforme CDU-26")
     void deveRenderizarMapaHomologado() {
         Context context = new Context();
