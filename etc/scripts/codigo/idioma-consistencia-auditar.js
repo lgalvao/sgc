@@ -35,7 +35,6 @@ const NOMES_INGLES_EXATOS = new Set([
 ]);
 
 // Sufixos de identificador que deveriam ser `Codigo` no SGC
-const SUFIXOS_ID = /^(?:.*[A-Z]|^)id$|Id$/;
 const SUFIXOS_ID_FINAL = /Id$/;
 const NOME_EXATO_ID = /^id$/;
 
