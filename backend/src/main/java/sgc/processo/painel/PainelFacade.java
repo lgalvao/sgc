@@ -169,7 +169,7 @@ public class PainelFacade {
         List<Long> missingIds = new ArrayList<>();
         displayIds.forEach(codUnidade -> {
             String sigla = existingSiglas.get(codUnidade);
-            if (sigla != null && !sigla.isBlank()) {
+            if (sigla != null) {
                 siglas.add(sigla);
             } else {
                 missingIds.add(codUnidade);
@@ -193,7 +193,11 @@ public class PainelFacade {
         if (cache.containsKey(codUnidade)) return cache.get(codUnidade);
 
         List<Long> children = mapaPaiFilhos.get(codUnidade);
-        if (children == null || children.isEmpty()) {
+        if (children == null) {
+            cache.put(codUnidade, false);
+            return false;
+        }
+        if (children.isEmpty()) {
             cache.put(codUnidade, false);
             return false;
         }

@@ -26067,26 +26067,6 @@
       ]
     },
     {
-      "caminho": "backend/src/test/java/sgc/organizacao/service/UnidadeMapaVigenteHomExploracaoTest.java",
-      "linguagem": "java",
-      "pacote": "sgc.organizacao.service",
-      "tipos": [
-        {
-          "categoria": "class",
-          "nome": "UnidadeMapaVigenteHomExploracaoTest"
-        }
-      ],
-      "membros": [
-        {
-          "categoria": "metodo",
-          "nome": "inspecionarMapaVigenteDaUnidade732",
-          "assinatura": "inspecionarMapaVigenteDaUnidade732()",
-          "retorno": "void",
-          "parametros": []
-        }
-      ]
-    },
-    {
       "caminho": "backend/src/test/java/sgc/organizacao/service/UnidadeServiceTest.java",
       "linguagem": "java",
       "pacote": "sgc.organizacao.service",

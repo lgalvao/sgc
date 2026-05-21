@@ -100,6 +100,19 @@ class FiltroJwtTest {
     }
 
     @Test
+    @DisplayName("Deve ignorar cookies com nome diferente de jwtToken")
+    void deveIgnorarCookiesComNomeDiferente() throws ServletException, IOException {
+        Cookie c1 = new Cookie("outroCookie", "valor");
+        Cookie c2 = new Cookie("jwtToken", "token-cookie");
+        when(request.getCookies()).thenReturn(new Cookie[]{c1, c2});
+
+        filtro.doFilterInternal(request, response, filterChain);
+
+        verify(jwtService).validarToken("token-cookie");
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
     @DisplayName("Deve lidar com cookies nulos")
     void deveLidarComCookiesNulos() throws ServletException, IOException {
         when(request.getCookies()).thenReturn(null);
@@ -123,4 +136,17 @@ class FiltroJwtTest {
         filtro.doFilterInternal(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
     }
+
+    @Test
+    @DisplayName("Deve ignorar quando array de cookies for vazio")
+    void deveIgnorarQuandoCookiesForArrayVazio() throws ServletException, IOException {
+        when(request.getCookies()).thenReturn(new Cookie[0]);
+        when(request.getHeader("Authorization")).thenReturn(null);
+
+        filtro.doFilterInternal(request, response, filterChain);
+
+        verify(filterChain).doFilter(request, response);
+        verifyNoInteractions(jwtService);
+    }
+
 }

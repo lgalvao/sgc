@@ -400,7 +400,51 @@ class FiltroMonitoramentoHttpTest {
         request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_METODO, 123);
         request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_CAMINHO, "/api/filtro");
         assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("sem-http");
+
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_METODO, "GET");
+        request.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_HTTP_CAMINHO, 123);
+        assertThat(FiltroMonitoramentoHttp.obterDescricaoHttpAtual()).isEqualTo("sem-http");
         org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
     }
 
+    @Test
+    @DisplayName("Deve logar Java lento ao final da requisicao")
+    void deveLogarJavaLentoAoFinalDaRequisicao() throws ServletException, IOException {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
+        properties.setTempoHttpLentoMs(0);
+
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/lento");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filtro.doFilter(request, response, (req, res) -> {
+            org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(
+                    new org.springframework.web.context.request.ServletRequestAttributes((HttpServletRequest) req)
+            );
+            FiltroMonitoramentoHttp.registrarJavaLento("sgc.exemplo.ClasseLenta", "processar", 150.75);
+            org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+        });
+
+        assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("Deve ignorar Java lentos com atributo invalido")
+    void deveIgnorarJavaLentosComAtributoInvalido() throws ServletException, IOException {
+        MonitoramentoProperties properties = new MonitoramentoProperties();
+        properties.setModo(MonitoramentoProperties.Modo.SIM);
+
+        FiltroMonitoramentoHttp filtro = new FiltroMonitoramentoHttp(properties);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/teste");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filtro.doFilter(request, response, (req, res) -> {
+            req.setAttribute(FiltroMonitoramentoHttp.ATRIBUTO_JAVA_LENTOS, "nao-eh-uma-lista");
+        });
+
+        assertThat(response.getHeader(FiltroMonitoramentoHttp.HEADER_CORRELACAO_ID)).isNotBlank();
+    }
+
 }
+

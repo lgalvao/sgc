@@ -192,6 +192,7 @@ class HierarquiaServiceTest {
     void deveRetornarFalsoSeAlvoNaoTemSuperiorAoVerificarImediata() {
         Unidade alvo = criarUnidade(1L, null);
         Unidade superior = criarUnidade(2L, null);
+        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(null);
 
         assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isFalse();
     }
@@ -202,6 +203,15 @@ class HierarquiaServiceTest {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(3L, null);
         when(unidadeHierarquiaService.buscarCodigoPai(3L)).thenReturn(99L);
+        assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false quando superior imediata não tem código")
+    void deveRetornarFalseQuandoSuperiorNaoTemCodigo() {
+        Unidade superior = criarUnidade(null, null);
+        Unidade alvo = criarUnidade(3L, null);
+        when(unidadeHierarquiaService.buscarCodigoPai(3L)).thenReturn(1L);
 
         assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isFalse();
     }

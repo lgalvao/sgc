@@ -280,6 +280,34 @@ class PainelFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve cobrir children vazio na lógica de isCovered")
+    void deveCobrirChildrenVazioNaLogicaDeIsCovered() {
+        Processo p = mock(Processo.class);
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+
+        UnidadeProcesso up2 = new UnidadeProcesso();
+        up2.setUnidadeCodigo(2L);
+        up2.setSigla("U2");
+
+        when(p.getParticipantes()).thenReturn(List.of(up2));
+
+        Map<Long, List<Long>> hierarquia = new HashMap<>();
+        hierarquia.put(0L, List.of(1L));
+        hierarquia.put(1L, List.of(2L, 3L));
+        hierarquia.put(2L, new ArrayList<>());
+        hierarquia.put(3L, new ArrayList<>());
+
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U2");
+    }
+
+
+    @Test
     @DisplayName("Deve cobrir sigla ausente no snapshot")
     void deveCobrirSiglaAusente() {
         Processo p = mock(Processo.class);

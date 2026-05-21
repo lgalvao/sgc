@@ -72,6 +72,16 @@ class GerenciadorJwtTest {
     }
 
     @Test
+    @DisplayName("Deve falhar na inicialização se segredo é nulo")
+    void failInitNullSecret() {
+        when(jwtProperties.secret()).thenReturn(null);
+
+        assertThatThrownBy(() -> gerenciador.verificarSegurancaChave())
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("mínimo 32 caracteres");
+    }
+
+    @Test
     @DisplayName("Deve validar token com sucesso")
     void validateSuccess() {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
@@ -109,6 +119,22 @@ class GerenciadorJwtTest {
 
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
         assertThat(result).isEmpty(); // Deve falhar no null check dos claims
+    }
+
+    @Test
+    @DisplayName("Deve retornar empty para token com subject nulo mas outros claims presentes")
+    void validateNullSubjectWithOtherClaims() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = Jwts.builder()
+                .subject(null) // subject nulo
+                .claim("perfil", Perfil.SERVIDOR.name())
+                .claim("unidade", 10L)
+                .signWith(Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
+        assertThat(result).isEmpty();
     }
 
     @Test

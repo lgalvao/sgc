@@ -52,8 +52,6 @@ public class SubprocessoNotificacaoService {
 
     private void criarNotificacoesTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
-        if (!tipoTransicao.enviaEmail()) return;
-
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
         criarNotificacaoDireta(cmd, variaveis);
 

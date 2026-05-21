@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import pc from "picocolors";
 import { resolverNaRaiz } from "../lib/caminhos.js";
-import { extrairCoberturaJacoco, deveExcluirClasse } from "../lib/dominios/cobertura-java.js";
+import { deveExcluirClasse } from "../lib/dominios/cobertura-java.js";
 import { parseStringPromise } from "xml2js";
 
 async function main() {
@@ -67,8 +67,6 @@ async function main() {
         let classesMantidasCount = 0;
 
         for (const pacote of parsed.report.package ?? []) {
-            const nomePacote = pacote.$.name.replaceAll("/", ".");
-
             for (const classNode of pacote.class ?? []) {
                 const nomeClasse = classNode.$.name.replaceAll("/", ".");
                 totalClasses++;

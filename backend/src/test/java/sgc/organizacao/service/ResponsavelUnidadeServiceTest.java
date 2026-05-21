@@ -442,7 +442,6 @@ class ResponsavelUnidadeServiceTest {
 
             when(configAplicacao.isAmbienteTestes()).thenReturn(false);
             when(configAplicacao.getUrlAcessoProd()).thenReturn("   ");
-            when(configAplicacao.getUrlAcessoHom()).thenReturn("http://localhost:5173");
 
             service.criarAtribuicaoTemporaria(codUnidade, request);
 

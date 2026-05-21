@@ -85,6 +85,22 @@ class SubprocessoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("obterSugestoes deve retornar SugestoesDto vazia quando o mapa for nulo")
+    void obterSugestoesDeveRetornarVaziaQuandoMapaForNulo() {
+        Long codSubprocesso = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setMapa(null);
+
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
+
+        SugestoesDto result = service.obterSugestoes(codSubprocesso);
+
+        assertThat(result).isNotNull();
+        assertThat(result.sugestoes()).isEmpty();
+    }
+
+    @Test
     @DisplayName("listarPorProcessoEUnidadeCodigosESituacoes deve retornar vazio quando lista de unidades ou situacoes estiver vazia")
     void listarPorProcessoEUnidadeCodigosESituacoesDeveRetornarVazio() {
         assertThat(service.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(), List.of(SituacaoSubprocesso.NAO_INICIADO))).isEmpty();

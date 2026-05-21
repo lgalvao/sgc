@@ -40,6 +40,9 @@ public class HierarquiaService {
 
     public boolean isSuperiorImediata(Unidade alvo, Unidade superior) {
         Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(alvo.getCodigo());
-        return codigoPai != null && codigoPai.equals(superior.getCodigo());
+        if (codigoPai == null) {
+            return false;
+        }
+        return codigoPai.equals(superior.getCodigo());
     }
 }

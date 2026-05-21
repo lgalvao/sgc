@@ -121,5 +121,44 @@ class AnaliseHistoricoServiceTest {
                 .hasMessage("Unidade 99 ausente no histórico de análises");
     }
 
+    @Test
+    @DisplayName("deve lançar exceção quando o nome do analista for nulo ou em branco")
+    void deveLancarExcecaoQuandoNomeAnalistaForBrancoOuNulo() {
+        Analise analise = Analise.builder()
+                .unidadeCodigo(10L)
+                .usuarioTitulo("analista1")
+                .build();
 
+        UnidadeResumoLeitura unidade = new UnidadeResumoLeitura(10L, "Unidade Teste", "UT", TipoUnidade.OPERACIONAL);
+        when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+
+        when(usuarioService.buscarConsultasPorTitulos(anyCollection()))
+                .thenReturn(List.of(new UsuarioConsultaLeitura("analista1", "mat1", "   ", "email", "ramal", 10L, "UT", "UT", TipoUnidade.OPERACIONAL, "tit1", 10L)));
+
+        assertThatThrownBy(() -> analiseHistoricoService.converter(analise))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Usuário analista1 ausente ou sem nome no histórico de análises");
+    }
+
+    @Test
+    @DisplayName("deve lidar com duplicidades de consultas de usuários na merge function do toMap")
+    void deveLidarComDuplicidadesDeConsultasDeUsuarios() {
+        Analise analise = Analise.builder()
+                .unidadeCodigo(10L)
+                .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                .usuarioTitulo("analista1")
+                .build();
+
+        UnidadeResumoLeitura unidade = new UnidadeResumoLeitura(10L, "Unidade Teste", "UT", TipoUnidade.OPERACIONAL);
+        when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+
+        UsuarioConsultaLeitura u1 = new UsuarioConsultaLeitura("analista1", "mat1", "Nome A", "email", "ramal", 10L, "UT", "UT", TipoUnidade.OPERACIONAL, "tit1", 10L);
+        UsuarioConsultaLeitura u2 = new UsuarioConsultaLeitura("analista1", "mat1", "Nome B", "email", "ramal", 10L, "UT", "UT", TipoUnidade.OPERACIONAL, "tit1", 10L);
+        when(usuarioService.buscarConsultasPorTitulos(anyCollection()))
+                .thenReturn(List.of(u1, u2));
+
+        AnaliseHistoricoDto dto = analiseHistoricoService.converter(analise);
+
+        assertThat(dto.usuarioNome()).isEqualTo("Nome A");
+    }
 }

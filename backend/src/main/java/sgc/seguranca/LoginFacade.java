@@ -131,10 +131,7 @@ public class LoginFacade {
                 .toList();
     }
 
-    private UnidadeResumoDto toUnidadeResumoObrigatoria(@Nullable UsuarioPerfilAutorizacaoLeitura atribuicao) {
-        if (atribuicao == null) {
-            throw new IllegalStateException("Unidade ausente na autorização de login");
-        }
+    private UnidadeResumoDto toUnidadeResumoObrigatoria(UsuarioPerfilAutorizacaoLeitura atribuicao) {
         return UnidadeResumoDto.fromResumoObrigatorio(
                 atribuicao.unidadeCodigo(),
                 atribuicao.unidadeNome(),

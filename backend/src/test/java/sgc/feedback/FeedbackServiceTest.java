@@ -518,6 +518,21 @@ class FeedbackServiceTest {
     }
 
     @Test
+    @DisplayName("deve ignorar screenshot quando screenshotDir estiver em branco")
+    void deveIgnorarScreenshotComDirEmBranco() {
+        propriedades = new FeedbackPropriedades("   ", 5_242_880L);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        configurarUsuarioMock();
+        var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", null);
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().codigo(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+
+        service.registrar(payload, screenshot);
+
+        verify(repo).save(argThat(r -> r.getCaminhoScreenshot() == null));
+    }
+
+    @Test
     @DisplayName("deve usar caminho padrão quando screenshotDir for nulo na resolução de caminho")
     void deveUsarCaminhosPadraoQuandoScreenshotDirForNuloNaResolucao() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);

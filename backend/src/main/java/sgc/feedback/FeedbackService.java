@@ -161,11 +161,6 @@ public class FeedbackService {
         String nomeArquivo = UUID.randomUUID() + "_" + System.currentTimeMillis() + ".webp";
         Path destino = diretorioBase.resolve(nomeArquivo).normalize();
 
-        // Prevenção de path traversal
-        if (!destino.startsWith(diretorioBase)) {
-            throw new ErroValidacao("caminho de destino inválido para screenshot");
-        }
-
         try {
             Files.createDirectories(diretorioBase);
             Files.write(destino, screenshot.getBytes());

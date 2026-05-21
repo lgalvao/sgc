@@ -442,6 +442,7 @@ class SubprocessoTransicaoServiceTest {
             sp.getMapa().setCodigo(100L);
             sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
             sp.setDataLimiteEtapa2(LocalDateTime.of(2026, 1, 10, 0, 0));
+            sp.setDataFimEtapa1(LocalDateTime.of(2026, 1, 10, 0, 0));
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);

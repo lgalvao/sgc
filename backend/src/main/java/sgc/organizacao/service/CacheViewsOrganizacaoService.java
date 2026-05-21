@@ -107,9 +107,7 @@ public class CacheViewsOrganizacaoService {
             Long codigoUnidadeCompetencia = usuario.unidadeCompetenciaCodigo();
             UnidadeHierarquiaLeitura unidadeCompetencia = unidadesPorCodigo.get(codigoUnidadeCompetencia);
             if (unidadeCompetencia != null && !Objects.equals(usuario.tituloEleitoral(), unidadeCompetencia.tituloTitular())) {
-                if (codigoUnidadeCompetencia != null) {
-                    perfis.add(new UsuarioPerfilLeitura(usuario.tituloEleitoral(), codigoUnidadeCompetencia, Perfil.SERVIDOR));
-                }
+                perfis.add(new UsuarioPerfilLeitura(usuario.tituloEleitoral(), codigoUnidadeCompetencia, Perfil.SERVIDOR));
             }
         });
 

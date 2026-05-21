@@ -397,4 +397,45 @@ class SgcPermissionEvaluatorTest {
         assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.EDITAR_CADASTRO)).isTrue();
         verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
     }
+
+    @Test
+    @DisplayName("verificarPermissao: Negação de escrita com log quando unidade do usuário difere da localização do subprocesso")
+    void verificarPermissaoNegacaoEscritaComLog() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(10L);
+        sp.setUnidade(Unidade.builder().codigo(5L).build());
+        sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
+
+        Usuario usuario = Usuario.builder()
+                .perfilAtivo(Perfil.CHEFE)
+                .unidadeAtivaCodigo(6L)
+                .tituloEleitoral("123456789012")
+                .build();
+
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(Unidade.builder().codigo(7L).build());
+
+        assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.EDITAR_CADASTRO)).isFalse();
+        verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
+    }
+
+    @Test
+    @DisplayName("verificarPermissaoSilenciosa: Negação de escrita sem log quando unidade do usuário difere da localização do subprocesso")
+    void verificarPermissaoSilenciosaNegacaoEscritaSemLog() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(10L);
+        sp.setUnidade(Unidade.builder().codigo(5L).build());
+        sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
+
+        Usuario usuario = Usuario.builder()
+                .perfilAtivo(Perfil.CHEFE)
+                .unidadeAtivaCodigo(6L)
+                .tituloEleitoral("123456789012")
+                .build();
+
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(Unidade.builder().codigo(7L).build());
+
+        assertThat(evaluator.verificarPermissaoSilenciosa(usuario, sp, AcaoPermissao.EDITAR_CADASTRO)).isFalse();
+        verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
+    }
 }
+
