@@ -110,6 +110,9 @@ Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 | `GET /api/admin/notificacoes/listar`                       | Listar notificações administrativas | 38 |
 | `POST /api/admin/notificacoes/{codigo}/reenviar`           | Reenfileirar notificação com falha definitiva | 38 |
 | `GET /api/admin/notificacoes/leitor-email-testes`          | Consultar URL do leitor de e-mails de testes | 38 |
+| `POST /api/feedback`                                       | Registrar feedback contextual       | 55 |
+| `GET /api/feedback/listar`                                 | Listar feedbacks enviados           | 54 |
+| `GET /api/feedback/{codigo}/screenshot`                    | Exibir screenshot de feedback       | 54 |
 
 ### 4.3 Ações de Relatórios (Acesso por ADMIN ou Hierarquia)
 

@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
@@ -57,6 +58,12 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
+
+    @Autowired
+    private AlertaRepo alertaRepo;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -199,6 +206,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
         unidade = unidadeRepo.findById(unidade.getCodigo()).orElseThrow();
+        final Long codigoUnidadeSuperior = unidadeSuperior.getCodigo();
 
         mapaOriginal.setSugestoes("Sugestões legadas");
         mapaOriginal.setObservacoesDisponibilizacao("Observações legadas");
@@ -253,6 +261,56 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigo(subprocessoCriado.getCodigo());
         assertThat(movs).hasSize(1);
         assertThat(movs.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_PROCESSO_INICIADO);
+        assertThat(movs.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
+        assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("U_REV");
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO)
+                .toList();
+        assertThat(notificacoes).hasSize(2);
+
+        NotificacaoEmail notificacaoParticipante = notificacoes.stream()
+                .filter(n -> "U_REV".equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Notificação da unidade participante não encontrada"));
+        assertThat(notificacaoParticipante.getDestinatario()).isEqualTo("u_rev@tre-pe.jus.br");
+        assertThat(notificacaoParticipante.getAssunto())
+                .isEqualTo("SGC: Início de processo de revisão do mapa de competências");
+        assertThat(notificacaoParticipante.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>U_REV</strong>")
+                .contains("Comunicamos o início do processo <strong>Processo de Revisão para Iniciar</strong> para a sua unidade.")
+                .contains("Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos no Sistema de Gestão de")
+                .contains("O prazo para conclusão desta etapa do processo é");
+        assertThat(notificacaoParticipante.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
+
+        NotificacaoEmail notificacaoSuperior = notificacoes.stream()
+                .filter(n -> "U_SUP".equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Notificação da unidade superior não encontrada"));
+        assertThat(notificacaoSuperior.getDestinatario()).isEqualTo("u_sup@tre-pe.jus.br");
+        assertThat(notificacaoSuperior.getAssunto())
+                .isEqualTo("SGC: Início de processo de revisão do mapa de competências em unidades subordinadas");
+        assertThat(notificacaoSuperior.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>U_SUP</strong>")
+                .contains("Comunicamos o início do processo <strong>Processo de Revisão para Iniciar</strong> nas unidades")
+                .contains("<strong>U_REV</strong>")
+                .contains("Estas unidades já podem iniciar a revisão do cadastro de atividades e conhecimentos")
+                .contains("Acompanhe o processo no Sistema de Gestão de Competências");
+        assertThat(notificacaoSuperior.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
+
+        List<Alerta> alertas = alertaRepo.findAll();
+        assertThat(alertas).anyMatch(alerta ->
+                alerta.getUnidadeDestino() != null
+                        && Objects.equals(alerta.getUnidadeDestino().getCodigo(), unidade.getCodigo())
+                        && "Início do processo".equals(alerta.getDescricao())
+                        && "ADMIN".equals(alerta.getUnidadeOrigem().getSigla())
+        );
+        assertThat(alertas).anyMatch(alerta ->
+                alerta.getUnidadeDestino() != null
+                        && Objects.equals(alerta.getUnidadeDestino().getCodigo(), codigoUnidadeSuperior)
+                        && "Início do processo em unidade(s) subordinada(s)".equals(alerta.getDescricao())
+                        && "ADMIN".equals(alerta.getUnidadeOrigem().getSigla())
+        );
 
         aguardarEmail(2);
         assertThat(algumEmailPara("u_rev@tre-pe.jus.br")).isTrue();

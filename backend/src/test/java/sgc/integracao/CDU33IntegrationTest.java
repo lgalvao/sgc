@@ -40,6 +40,9 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
 
     @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
+
+    @Autowired
     private EntityManager entityManager;
 
     private Subprocesso subprocesso;
@@ -106,6 +109,13 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
 
         assertThat(movimentacaoExiste).isTrue();
 
+        Movimentacao movimentacao = movimentacoes.stream()
+                .filter(m -> m.getDescricao().contains(Mensagens.HIST_REVISAO_REABERTA))
+                .findFirst()
+                .orElseThrow();
+        assertThat(movimentacao.getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
+        assertThat(movimentacao.getUnidadeDestino().getSigla()).isEqualTo(spReaberto.getUnidade().getSigla());
+
         // Verificar se foi criado um alerta
         List<Alerta> alerts = alertaRepo.findAll();
         assertThat(alerts).isNotEmpty();
@@ -113,7 +123,8 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
             Long unidadeDestinoCodigo = a.getUnidadeDestino().getCodigo();
             Long unidadeSpReabertoCodigo = spReaberto.getUnidade().getCodigo();
             return Objects.equals(unidadeDestinoCodigo, unidadeSpReabertoCodigo) &&
-                    a.getDescricao().contains("reaberta");
+                    a.getDescricao().contains("Revisão de cadastro da unidade %s reaberta pela ADMIN. Justificativa: %s"
+                            .formatted(spReaberto.getUnidade().getSigla(), request.justificativa()));
         });
 
         assertThat(alertaExiste).isTrue();
@@ -146,6 +157,46 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         assertThat(quantidadeAlertasSuperiores)
                 .as("CDU-33 deve criar alerta apenas para a superior direta")
                 .isEqualTo(1);
+
+        Unidade unidadeSuperior = Optional.ofNullable(spReaberto.getUnidade().getUnidadeSuperior()).orElseThrow();
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.REVISAO_CADASTRO_REABERTA)
+                .toList();
+        assertThat(notificacoes).hasSize(2);
+
+        NotificacaoEmail notificacaoUnidade = notificacoes.stream()
+                .filter(n -> spReaberto.getUnidade().getSigla().equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Notificação da unidade reaberta não encontrada"));
+        assertThat(notificacaoUnidade.getAssunto())
+                .isEqualTo("SGC: Reabertura de revisão de cadastro - %s".formatted(spReaberto.getUnidade().getSigla()));
+        assertThat(notificacaoUnidade.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(spReaberto.getUnidade().getSigla()))
+                .contains("A revisão do cadastro de atividades da sua unidade foi reaberta para ajustes")
+                .contains("Processo CDU-33")
+                .contains(request.justificativa());
+        assertThat(notificacaoUnidade.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
+
+        NotificacaoEmail notificacaoSuperior = notificacoes.stream()
+                .filter(n -> unidadeSuperior.getSigla().equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Notificação da unidade superior não encontrada"));
+        assertThat(notificacaoSuperior.getAssunto())
+                .isEqualTo("SGC: Reabertura de revisão de cadastro - %s".formatted(spReaberto.getUnidade().getSigla()));
+        assertThat(notificacaoSuperior.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidadeSuperior.getSigla()))
+                .contains("revisão do cadastro de atividades da unidade <strong>%s</strong> foi reaberta para ajustes"
+                        .formatted(spReaberto.getUnidade().getSigla()))
+                .contains("Processo CDU-33")
+                .contains(request.justificativa());
+        assertThat(notificacaoSuperior.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
+
+        aguardarEmail(2);
+        assertThat(algumEmailPara(notificacaoUnidade.getDestinatario())).isTrue();
+        assertThat(algumEmailPara(notificacaoSuperior.getDestinatario())).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Reabertura de revisão de cadastro - %s".formatted(spReaberto.getUnidade().getSigla()))).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Reabertura de revisão de cadastro - %s".formatted(spReaberto.getUnidade().getSigla()))).isTrue();
     }
 
     @Test

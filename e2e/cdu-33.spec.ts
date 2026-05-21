@@ -97,6 +97,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+        await expect(linhaMovimentacao).toContainText('ADMIN');
+        await expect(linhaMovimentacao).toContainText(UNIDADE_ALVO);
     });
 
     test('Cenário complementar: unidade alvo visualiza alerta de reabertura de revisão no painel', async ({
@@ -108,6 +110,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descRevisao);
         await expect(tabelaAlertas).toContainText(/Revisão de cadastro.*reaberta/i);
+        await expect(tabelaAlertas).toContainText(/Justificativa:\s*Ajuste necessário/i);
         await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 

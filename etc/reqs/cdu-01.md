@@ -51,18 +51,25 @@ Ator: Qualquer pessoa autorizada a acessar o sistema (com qualquer dos perfis).
     - Link `Painel`, para tela `Painel`
     - Menu de unidades, de acordo com as regras:
         - Se ADMIN: Link `Unidades`, para a tela `Unidades`, que apresenta a hierarquia completa de unidades do TRE-PE
-        - Se GESTOR: CHEFE, ou SERVIDOR: Link `Minha unidade`, para a tela `Detalhe da unidade`, que apresenta os dados
+        - Se GESTOR, CHEFE ou SERVIDOR: Link `Minha unidade`, para a tela `Detalhe da unidade`, que apresenta os dados
           da unidade do usuário logado
-    - Link `Relatórios`, para tela `Relatórios`
+    - Link `Relatórios`, para tela `Relatórios`, exibido apenas para os perfis `ADMIN` e `GESTOR`
     - Link `Histórico`, para tela `Histórico de processos`
 
    9.1.2. Itens adicionais, alinhados à direita:
     - Para todos os perfis:
-        - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`).
+        - Texto fixo, sem interatividade:
+            - para `ADMIN`: `ADMIN`
+            - para os demais perfis: `[Perfil] - [Sigla da unidade]` (ex. `CHEFE - SESEL`)
         - `Ícone de logout` - faz logout e mostra tela `Login`
     - Se perfil ADMIN:
-        - Mostrar apenas 'ADMIN' sem a sigla da unidade
-        - Mostrar adicionalmente dois ícones para acesso as telas  `Configurações` e `Administradores`
+        - Mostrar adicionalmente os seguintes ícones e controles de navegação:
+            - `Notificações`: acesso à tela de acompanhamento de notificações por e-mail.
+            - `Configurações`: acesso à tela de configurações do sistema.
+            - `Administradores`: acesso à tela de administração de usuários administradores.
+            - `Tema`: alterna entre tema claro e modo escuro em toda a interface do sistema. A preferência é persistida por usuário neste navegador.
+        - Se o ambiente for de homologação ou testes, mostrar adicionalmente:
+            - menu `Ações especiais`, com acesso às telas `Feedbacks` e `Limpeza de processos`
 
    9.2. O `Conteúdo` compõe a parte central onde serão 'encaixadas' todas as telas.
 

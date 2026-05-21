@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.*;
 import org.springframework.test.web.servlet.request.*;
 import org.springframework.test.web.servlet.result.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.comum.ComumDtos.*;
 import sgc.comum.*;
 import sgc.fixture.*;
@@ -39,10 +40,16 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     private AnaliseRepo analiseRepo;
 
     @Autowired
+    private AlertaRepo alertaRepo;
+
+    @Autowired
     private EntityManager entityManager;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -179,6 +186,33 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacaoDevolucao.getUnidadeDestino().getSigla())
                 .isEqualTo(unidade.getSigla());
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_DEVOLVIDO)
+                .toList();
+        assertThat(notificacoes).isNotEmpty();
+
+        NotificacaoEmail notificacao = notificacoes.stream()
+                .filter(n -> "SEDESENV-TEST".equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV-TEST");
+        assertThat(notificacao.getDestinatario()).isEqualTo("sedesenv-test@tre-pe.jus.br");
+        assertThat(notificacao.getAssunto())
+                .isEqualTo("SGC: Cadastro de atividades e conhecimentos devolvido para ajustes - SEDESENV-TEST");
+        assertThat(notificacao.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>SEDESENV-TEST</strong>")
+                .contains("foi devolvido para ajustes")
+                .contains("Processo de Teste CDU-13")
+                .contains(observacoes);
+        assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+
+        List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocessoAtualizado.getProcesso().getCodigo());
+        assertThat(alertas).anyMatch(alerta ->
+                alerta.getUnidadeDestino() != null
+                        && Objects.equals(alerta.getUnidadeDestino().getCodigo(), unidade.getCodigo())
+                        && "Cadastro da unidade SEDESENV-TEST devolvido para ajustes".equals(alerta.getDescricao())
+        );
     }
 
     @Test
@@ -225,6 +259,23 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .isEqualTo("ADMIN");
         assertThat(movimentacaoAceite.getDescricao())
                 .isEqualTo(Mensagens.HIST_CADASTRO_ACEITO);
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_ACEITO)
+                .toList();
+        assertThat(notificacoes).isNotEmpty();
+
+        NotificacaoEmail notificacao = notificacoes.stream()
+                .filter(n -> "ADMIN".equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("ADMIN");
+        assertThat(notificacao.getAssunto())
+                .isEqualTo("SGC: Cadastro de atividades e conhecimentos submetido para análise - SEDESENV-TEST");
+        assertThat(notificacao.getCorpoHtml())
+                .contains("foi submetido para análise por essa unidade")
+                .contains("Processo de Teste CDU-13");
+        assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
     }
 
     @Test

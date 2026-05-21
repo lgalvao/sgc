@@ -403,6 +403,24 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Deve renderizar cadastro reaberto da unidade superior conforme CDU-32")
+    void deveRenderizarCadastroReabertoSuperior() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("observacoes", "Ajustar atividades duplicadas.");
+
+        String html = templateEngine.process("cadastro-reaberto-superior", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("cadastro de atividades da unidade <strong>SESEL</strong> foi")
+                .contains("Ajustar atividades duplicadas.")
+                .contains("Após a conclusão dos ajustes, o cadastro será submetido novamente para sua análise")
+                .contains("Sistema de Gestão de Competências");
+    }
+
+    @Test
     @DisplayName("Deve renderizar revisão de cadastro reaberta conforme CDU-33")
     void deveRenderizarRevisaoCadastroReaberta() {
         Context context = new Context();
@@ -419,6 +437,24 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Revisão 2026")
                 .contains("Ajustar descrições das atividades.")
                 .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar revisão de cadastro reaberta da unidade superior conforme CDU-33")
+    void deveRenderizarRevisaoCadastroReabertaSuperior() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Revisão 2026");
+        context.setVariable("observacoes", "Ajustar descrições das atividades.");
+
+        String html = templateEngine.process("revisao-cadastro-reaberta-superior", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("revisão do cadastro de atividades da unidade <strong>SESEL</strong> foi reaberta para ajustes")
+                .contains("Revisão 2026")
+                .contains("Ajustar descrições das atividades.");
     }
 
 }

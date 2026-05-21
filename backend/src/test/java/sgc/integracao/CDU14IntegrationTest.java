@@ -44,6 +44,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
+    @Autowired
     private EntityManager entityManager;
     private Unidade unidadeChefe;
     private Usuario chefe;
@@ -203,6 +205,22 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
             assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
+
+            List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                    .filter(n -> n.getTipoNotificacao() == TipoNotificacao.REVISAO_CADASTRO_DEVOLVIDA)
+                    .toList();
+            assertThat(notificacoes).anySatisfy(notificacao -> {
+                assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo(unidadeChefe.getSigla());
+                assertThat(notificacao.getDestinatario()).isEqualTo("%s@tre-pe.jus.br".formatted(unidadeChefe.getSigla().toLowerCase(Locale.ROOT)));
+                assertThat(notificacao.getAssunto())
+                        .isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos devolvida para ajustes - %s"
+                                .formatted(unidadeChefe.getSigla()));
+                assertThat(notificacao.getCorpoHtml())
+                        .contains("foi devolvida para ajustes")
+                        .contains("Processo revisão CDU-14")
+                        .contains("Ajustar");
+                assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+            });
         }
     }
 
@@ -235,6 +253,19 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite
             aguardarEmail(2);
             assertThat(algumEmailContem("submetid")).isTrue();
+
+            List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                    .filter(n -> n.getTipoNotificacao() == TipoNotificacao.REVISAO_CADASTRO_ACEITA)
+                    .toList();
+            assertThat(notificacoes).anySatisfy(notificacao -> {
+                assertThat(notificacao.getAssunto())
+                        .isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos submetida para análise - %s"
+                                .formatted(unidadeChefe.getSigla()));
+                assertThat(notificacao.getCorpoHtml())
+                        .contains("foi submetida para análise por essa unidade")
+                        .contains("Processo revisão CDU-14");
+                assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+            });
         }
     }
 

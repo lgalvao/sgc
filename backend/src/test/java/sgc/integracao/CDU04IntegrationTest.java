@@ -45,6 +45,9 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private Unidade unidadeLivre;
@@ -134,6 +137,21 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
         long alertasCount = alertaRepo.count();
         assertThat(alertasCount).isGreaterThan(0);
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO)
+                .toList();
+        assertThat(notificacoes).hasSize(1);
+
+        NotificacaoEmail notificacao = notificacoes.getFirst();
+        assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("U_LIVRE_MAPP");
+        assertThat(notificacao.getDestinatario()).isEqualTo("u_livre_mapp@tre-pe.jus.br");
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Início de processo de mapeamento de competências");
+        assertThat(notificacao.getCorpoHtml())
+                .contains("Comunicamos o início do processo <strong>Processo mapeamento teste CDU-04</strong> para a sua unidade.")
+                .contains("cadastro de atividades e conhecimentos")
+                .contains("O prazo para conclusão desta etapa do processo é");
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
 
         aguardarEmail(1);
         assertThat(algumEmailPara("u_livre_mapp@tre-pe.jus.br")).isTrue();

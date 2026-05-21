@@ -78,7 +78,7 @@ Ator: GESTOR e ADMIN
 
    8.10. O sistema cria internamente um alerta com:
 
-    - Descrição: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
+    - Descrição: "Validação do mapa da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvida para ajustes"
     - Processo: [DESCRICAO_PROCESSO]
     - Data/hora: Data/hora atual
     - Unidade de origem: [SIGLA_UNIDADE_ANALISE]
@@ -91,12 +91,12 @@ Ator: GESTOR e ADMIN
    9.1. Usuário clica em `Registrar aceite`.
 
    9.2. O sistema abre um modal (título "Aceitar mapa") com o texto "Confirma o aceite da validação do mapa?", um campo
-   de observação opcional e os botões `Confirmar` ou `Aceitar`.
+   de observação opcional e os botões `Aceitar` e `Cancelar`.
 
    9.3. Caso o usuário escolha o `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela
    `Mapa de competências`.
 
-   9.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
+   9.4. O usuário opcionalmente informa a observação e escolhe `Aceitar`.
 
    9.5. O sistema registra uma análise de validação para o subprocesso com:
 
@@ -121,12 +121,12 @@ Ator: GESTOR e ADMIN
 
    A validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi submetida para análise por essa unidade. 
    
-   A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+   A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
    ```
 
    9.8. O sistema cria internamente um alerta com:
 
-    - Descrição: "Validação do mapa da [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
+    - Descrição: "Validação do mapa da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
     - Processo: [DESCRICAO_PROCESSO]
     - Data/hora: Data/hora atual
     - Unidade de origem: [SIGLA_UNIDADE_ANALISE]
@@ -139,7 +139,7 @@ Ator: GESTOR e ADMIN
     10.1. Usuário escolhe `Homologar`.
 
     10.2. O sistema abre um diálogo de confirmação (título 'Homologar mapa') com a pergunta 'Confirma a homologação do
-    mapa?' e os botões `Confirmar` ou `Homologar`.
+    mapa?' e os botões `Homologar` e `Cancelar`.
 
     10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na
     mesma tela.

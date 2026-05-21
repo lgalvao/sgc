@@ -567,6 +567,12 @@ seja considerado lido automaticamente). O efeito das alterações é imediato.
 **RN-13.04** — O perfil **ADMIN** pode acompanhar notificações administrativas de e-mail, visualizar detalhes, abrir preview do conteúdo quando disponível e reenfileirar notificações com falha definitiva.
 > Fonte: `cdu-38.md`
 
+**RN-13.05** — O perfil **ADMIN** pode consultar os feedbacks enviados pelos usuários, visualizar seus detalhes, inspecionar metadados de contexto e ampliar a captura de tela associada quando ela estiver disponível no servidor.
+> Fonte: `cdu-54.md`
+
+**RN-13.06** — Usuários autenticados podem enviar feedback contextual sobre a tela atual, com classificação, descrição textual, metadados automáticos e captura de tela opcional, desde que o widget e o endpoint de feedback estejam disponíveis no ambiente.
+> Fonte: `cdu-55.md`
+
 ---
 
 ## 14. Atribuição temporária de Responsabilidade

@@ -211,9 +211,28 @@ public class SubprocessoNotificacaoService {
     }
 
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp, boolean paraSuperior) {
-        String base = tipo.getDescMovimentacao();
+        String base = switch (tipo) {
+            case CADASTRO_ACEITO -> "Cadastro de atividades e conhecimentos submetido para análise";
+            case CADASTRO_DEVOLVIDO -> "Cadastro de atividades e conhecimentos devolvido para ajustes";
+            case CADASTRO_DISPONIBILIZADO -> "Cadastro de atividades e conhecimentos disponibilizado";
+            case CADASTRO_REABERTO -> "Reabertura de cadastro de atividades";
+            case REVISAO_CADASTRO_ACEITA -> "Revisão do cadastro de atividades e conhecimentos submetida para análise";
+            case REVISAO_CADASTRO_DEVOLVIDA -> "Revisão do cadastro de atividades e conhecimentos devolvida para ajustes";
+            case REVISAO_CADASTRO_DISPONIBILIZADA -> "Revisão do cadastro de atividades e conhecimentos disponibilizada";
+            case REVISAO_CADASTRO_REABERTA -> "Reabertura de revisão de cadastro";
+            default -> tipo.getDescMovimentacao();
+        };
+        boolean incluirSigla = paraSuperior
+                || tipo == TipoTransicao.CADASTRO_ACEITO
+                || tipo == TipoTransicao.CADASTRO_DEVOLVIDO
+                || tipo == TipoTransicao.CADASTRO_DISPONIBILIZADO
+                || tipo == TipoTransicao.CADASTRO_REABERTO
+                || tipo == TipoTransicao.REVISAO_CADASTRO_ACEITA
+                || tipo == TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA
+                || tipo == TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA
+                || tipo == TipoTransicao.REVISAO_CADASTRO_REABERTA;
 
-        return paraSuperior
+        return incluirSigla
                 ? "SGC: %s - %s".formatted(base, sp.getUnidade().getSigla())
                 : "SGC: %s".formatted(base);
     }

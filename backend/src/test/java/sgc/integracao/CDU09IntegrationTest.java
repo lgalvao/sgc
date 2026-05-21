@@ -40,6 +40,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private MapaManutencaoService mapaManutencaoService;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     @Test
     @WithMockChefe("3") // Fernanda oliveira - Chefe da Unidade 8 no data.sql
@@ -124,6 +126,22 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                     var alertas = alertaRepo.findByProcessoCodigo(processoCodigo);
                     assertThat(alertas.stream().anyMatch(a -> a.getUnidadeDestino() != null && a.getUnidadeDestino().getCodigo() == 6L)).isTrue();
                 });
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_DISPONIBILIZADO)
+                .toList();
+        assertThat(notificacoes).hasSize(1);
+
+        NotificacaoEmail notificacao = notificacoes.getFirst();
+        assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
+        assertThat(notificacao.getDestinatario()).isEqualTo("cosis@tre-pe.jus.br");
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos disponibilizado - SEDESENV");
+        assertThat(notificacao.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A unidade <strong>SEDESENV</strong> disponibilizou o cadastro de atividades e")
+                .contains("processo <strong>")
+                .contains("A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências");
+        assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
 
         assertThat(atualizado.getDataFimEtapa1()).isNotNull();
 

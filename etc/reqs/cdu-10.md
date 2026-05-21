@@ -17,7 +17,7 @@ Ator: CHEFE
 
 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos` preenchida com os dados cadastrados/revisados até o
    momento.
-   4.1. Além dos dados do cadastro, será mostrada a checkbox `Dipsonibilização sem mudanças`.
+   4.1. Além dos dados do cadastro, será mostrada a checkbox `Disponibilização sem mudanças`.
 
 5. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser habilitado, além dos botões fixos
    da tela, o botão `Histórico de análise`.
@@ -36,21 +36,21 @@ Ator: CHEFE
 8. Se o usuário decidir disponibilizar sem mudanças, marca o checkbox `Disponibilização sem mudanças`. Este checkbox só
    deve estar habilitado caso realmente não tenham sido feitas mudanças no cadastro **em relação ao mapa vigente da unidade**.
 
-8. Se houver mudanças, ou se o usuário clicar no checkbox, o sistema muda a situação do subprocesso para 'Revisão do cadastro em andamento' e habilita o botão `Disponibilizar`.
+9. Se houver mudanças, ou se o usuário clicar no checkbox, o sistema muda a situação do subprocesso para 'Revisão do cadastro em andamento' e habilita o botão `Disponibilizar`.
 
-   8.1. Se o usuário, desmarcar o checkbox, o sistema muda a situação do subprocesso de volta a 'Não iniciado' e
+   9.1. Se o usuário desmarcar o checkbox, o sistema muda a situação do subprocesso de volta a 'Não iniciado' e
    desativa o botão `Disponibilizar`, até que sejam feitas mudanças no cadastro (e o cadastro esteja válido).
 
 9. O usuário clica no botão `Disponibilizar`.
 
 10. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a
     disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades
-    superiores" / Botões `Confirmar` e `Cancelar`.
+    superiores" / Botões `Disponibilizar` e `Cancelar`.
 
 10.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma
 tela.
 
-11. O usuário escolhe `Confirmar`.
+11. O usuário escolhe `Disponibilizar`.
 
 12. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro disponibilizada'
 

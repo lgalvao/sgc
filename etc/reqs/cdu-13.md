@@ -136,17 +136,17 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
 
 10.9. O sistema mostra a mensagem "Aceite registrado" e redireciona para o Painel.
 
-1. Se optar por **homologar** (apenas para perfil ADMIN):
+11. Se optar por **homologar** (apenas para perfil ADMIN):
 
    11.1. Usuário escolhe `Homologar`.
 
    11.2. O sistema abre um modal de confirmação (título "Homologação do cadastro") com a
-   pergunta "Confirma a homologação?" e os botões `Confirmar` ou `Cancelar`.
+   pergunta "Confirma a homologação?" e os botões `Homologar` e `Cancelar`.
 
    11.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro,
-   permanecendona mesma tela.
+   permanecendo na mesma tela.
 
-   11.4. Usuário escolhe `Confirmar`.
+   11.4. Usuário escolhe `Homologar`.
 
    11.5. O sistema registra uma movimentação para o subprocesso:
 

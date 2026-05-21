@@ -2,17 +2,24 @@
 
 **Ator:** ADMIN
 
+## Pré-condições
+
+- Login realizado com perfil ADMIN
+- Processo do tipo Revisão
+- Ao menos um subprocesso na situação 'Mapa homologado'
+
 ## Fluxo principal
 
 1. O ADMIN acessa o Painel.
 
-2. O ADMIN seleciona o subprocesso da unidade solicitante.
+2. O ADMIN seleciona o subprocesso da unidade solicitante que esteja com a situação 'Mapa homologado' do processo de
+   revisão.
 
 3. O ADMIN seleciona a opção "Reabrir revisão de cadastro".
 
 4. O sistema solicita uma justificativa.
 
-5. O usuário informa a justificativa e confirma.
+5. O usuário informa a justificativa e escolhe `Reabrir`.
 
 6. O sistema altera a situação do subprocesso para `REVISAO_CADASTRO_EM_ANDAMENTO`.
 
@@ -21,7 +28,6 @@
     - `Unidade origem`: ADMIN
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Reabertura de revisão de cadastro'
-    - `Observação`: [JUSTIFICATIVA]
 
 8. O sistema envia notificações por e-mail para a unidade solicitante e a unidade superior.
 
@@ -56,14 +62,14 @@
 9. O sistema cria internamente alertas:
 
    9.1. Para a unidade solicitante:
-    - `Descrição`: "Revisão de cadastro reaberta"
+    - `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE] reaberta pela ADMIN. Justificativa: [JUSTIFICATIVA]"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
    9.2. Para a unidade superior:
-    - `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta"
+    - `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta pela ADMIN"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN

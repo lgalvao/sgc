@@ -3,6 +3,7 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
+import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
@@ -26,6 +27,9 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
+
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Processo processo;
     private Subprocesso subprocesso;
@@ -125,6 +129,20 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codProcesso").value(processo.getCodigo()))
                 .andExpect(jsonPath("$.codSubprocesso").value(subprocesso.getCodigo()));
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.PROCESSO_FINALIZADO)
+                .toList();
+        assertThat(notificacoes).hasSize(1);
+
+        NotificacaoEmail notificacao = notificacoes.getFirst();
+        assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("CDU21-UND");
+        assertThat(notificacao.getDestinatario()).isEqualTo("cdu21-und@tre-pe.jus.br");
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Finalização do processo Processo CDU-21");
+        assertThat(notificacao.getCorpoHtml())
+                .contains("Comunicamos a finalização do processo <strong>Processo CDU-21</strong> para a sua unidade.")
+                .contains("menu \"Minha unidade\"");
+        assertThat(notificacao.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
 
         aguardarEmail(1);
         assertThat(algumEmailPara("cdu21-und@tre-pe.jus.br")).isTrue();

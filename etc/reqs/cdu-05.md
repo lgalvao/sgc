@@ -17,15 +17,15 @@ Fluxo principal:
 3. O usuário clica no botão `Iniciar processo`.
 
 4. O sistema mostra diálogo de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas
-   as unidades participantes serão notificadas por e-mail.", botões Confirmar e Cancelar.
+   as unidades participantes serão notificadas por e-mail.", botões Iniciar e Cancelar.
 
 5. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de iniciação do processo, permanecendo na
    mesma tela.
 
-6. O usuário confirma.
+6. O usuário escolhe `Iniciar`.
 
 7. Se a seleção incluir alguma unidade interoperacional, o sistema mostra um diálogo com a
-   mensagem `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo de mapeamento.`, apresentando essas unidades já selecionadas.
+   mensagem `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo.`, apresentando essas unidades já selecionadas.
 
 8. O usuário confirma a seleção complementar das unidades mostradas no diálogo.
 
@@ -54,7 +54,7 @@ Fluxo principal:
 
 14. O sistema envia notificações por e-mail para todas as unidades participantes.
 
-    12.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo este modelo:
+    14.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo este modelo:
 
     ```text
         Assunto: SGC: Início de processo de revisão do mapa de competências
@@ -62,16 +62,16 @@ Fluxo principal:
         Prezado(a) responsável pela [SIGLA_UNIDADE],
         
         Comunicamos o início do processo [DESCRICAO_PROCESSO] para a sua unidade.
-        Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos no O sistema de Gestão de Competências ([URL_SISTEMA]).
+        Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos no Sistema de Gestão de Competências ([URL_SISTEMA]).
         
         O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
     ```
 
-    12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
+    14.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
     unidades operacionais e interoperacionais subordinadas a elas, segundo o modelo:
 
     ```text
-        Assunto: SGC: Início de processo de mapeamento de competências em unidades subordinadas
+        Assunto: SGC: Início de processo de revisão do mapa de competências em unidades subordinadas
 
         Prezado(a) responsável pela [SIGLA_UNIDADE],
         
@@ -83,19 +83,19 @@ Fluxo principal:
     ```
 
 15. O sistema cria internamente alertas para todas as unidades participantes.
-    13.1. Para cada unidade **operacional** será criado um alerta com estes campos/valores:
+    15.1. Para cada unidade **operacional** será criado um alerta com estes campos/valores:
     - `Descrição`: "Início do processo"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE].
 
-    13.2. Para cada unidade **intermediária** será criado um alerta com estes campos/valores:
+    15.2. Para cada unidade **intermediária** será criado um alerta com estes campos/valores:
     - `Descrição`: "Início do processo em unidade(s) subordinada(s)"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE].
 
-    13.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de
+    15.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de
     unidade intermediária, como especificado acima.

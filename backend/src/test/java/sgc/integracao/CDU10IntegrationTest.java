@@ -10,6 +10,7 @@ import org.springframework.security.core.*;
 import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
@@ -45,6 +46,10 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
 
     private Unidade unidadeSuperior;
     private Subprocesso subprocessoRevisao;
@@ -217,5 +222,31 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
         List<Analise> analisesDepois = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
         assertThat(analisesDepois).hasSize(2); // Histórico é mantido
+
+        Subprocesso atualizado = subprocessoRepo.findById(subprocessoId).orElseThrow();
+        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.REVISAO_CADASTRO_DISPONIBILIZADA)
+                .toList();
+        assertThat(notificacoes).hasSize(1);
+
+        NotificacaoEmail notificacao = notificacoes.getFirst();
+        assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
+        assertThat(notificacao.getDestinatario()).isEqualTo("cosis@tre-pe.jus.br");
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada - SESEL");
+        assertThat(notificacao.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("A unidade <strong>SESEL</strong> concluiu a revisão e")
+                .contains("disponibilizou seu cadastro de atividades e conhecimentos do processo")
+                .contains("A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências");
+        assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+
+        List<Alerta> alertas = alertaRepo.findAll();
+        assertThat(alertas).anyMatch(alerta ->
+                alerta.getUnidadeDestino() != null
+                        && Objects.equals(alerta.getUnidadeDestino().getCodigo(), unidadeSuperior.getCodigo())
+                        && "Revisão do cadastro da unidade SESEL disponibilizada para análise".equals(alerta.getDescricao())
+        );
     }
 }

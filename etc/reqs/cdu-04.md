@@ -16,14 +16,14 @@ Fluxo principal:
 3. O usuário clica no botão `Iniciar processo`.
 
 4. O sistema mostra modal de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas
-   as unidades participantes serão notificadas por e-mail.", com botões `Confirmar` e `Cancelar`.
+   as unidades participantes serão notificadas por e-mail.", com botões `Iniciar` e `Cancelar`.
 
 5. Caso o usuário `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma tela.
 
-6. O usuário confirma.
+6. O usuário escolhe `Iniciar`.
 
 7. Se a seleção incluir alguma unidade interoperacional, o sistema mostra um diálogo com a
-   mensagem `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo de mapeamento.`, apresentando essas unidades já selecionadas.
+   mensagem `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo.`, apresentando essas unidades já selecionadas.
 
 8. O usuário confirma a seleção complementar das unidades mostradas no diálogo.
 

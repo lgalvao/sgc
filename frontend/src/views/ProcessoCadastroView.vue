@@ -204,7 +204,7 @@ const salvarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.v
 const iniciarDesabilitado = computed(() => isFormInvalid.value || isLoadingData.value || anyLoading.value);
 const tituloModalUnidadesComEquipePropria = "Selecionar unidades participantes";
 const textoModalUnidadesComEquipePropria =
-    "A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo de mapeamento.";
+    "A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo.";
 
 const unidadesComEquipePropriaSelecionadas = computed(() =>
     listarUnidadesComEquipePropriaSelecionadas(unidades.value, unidadesSelecionadas.value)
