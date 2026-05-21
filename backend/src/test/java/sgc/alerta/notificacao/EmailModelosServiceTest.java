@@ -93,6 +93,60 @@ class EmailModelosServiceTest {
             assertThat(context.getVariable("siglasSubordinadas")).isEqualTo(siglasSubordinadas);
             assertThat(context.getVariable("hasSubordinadas")).isEqualTo(true);
         }
+
+        @Test
+        @DisplayName("Deve criar email de início com tipo REVISAO e participante verdadeiro")
+        void criarEmailInicioProcessoRevisaoEParticipante() {
+            LocalDateTime dataLimite = LocalDateTime.of(2026, 4, 30, 0, 0);
+            emailModelosService.criarEmailInicioProcessoConsolidado(
+                    "UT",
+                    "Processo teste",
+                    dataLimite,
+                    "REVISAO",
+                    true,
+                    List.of()
+            );
+
+            Context context = contextCaptor.getValue();
+            assertThat(context.getVariable("titulo"))
+                    .isEqualTo("SGC: Início de processo de revisão do mapa de competências");
+        }
+
+        @Test
+        @DisplayName("Deve criar email de início com tipo DIAGNOSTICO e participante falso")
+        void criarEmailInicioProcessoDiagnosticoEParticipanteFalso() {
+            LocalDateTime dataLimite = LocalDateTime.of(2026, 4, 30, 0, 0);
+            emailModelosService.criarEmailInicioProcessoConsolidado(
+                    "UT",
+                    "Processo teste",
+                    dataLimite,
+                    "DIAGNOSTICO",
+                    false,
+                    List.of()
+            );
+
+            Context context = contextCaptor.getValue();
+            assertThat(context.getVariable("titulo"))
+                    .isEqualTo("SGC: Início de processo de diagnóstico em unidades subordinadas");
+        }
+
+        @Test
+        @DisplayName("Deve criar email de início com tipo default inexistente convertendo para minúsculas")
+        void criarEmailInicioProcessoDefaultInexistente() {
+            LocalDateTime dataLimite = LocalDateTime.of(2026, 4, 30, 0, 0);
+            emailModelosService.criarEmailInicioProcessoConsolidado(
+                    "UT",
+                    "Processo teste",
+                    dataLimite,
+                    "COMPETENCIAS",
+                    true,
+                    List.of()
+            );
+
+            Context context = contextCaptor.getValue();
+            assertThat(context.getVariable("titulo"))
+                    .isEqualTo("SGC: Início de processo de competencias");
+        }
     }
 
     @Test

@@ -372,6 +372,85 @@ class ResponsavelUnidadeServiceTest {
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessage(Mensagens.ATRIBUICAO_TEMPORARIA_SOBREPOSTA);
         }
+
+        @Test
+        @DisplayName("Deve criar atribuição e usar URL de produção quando não for ambiente de testes")
+        void deveCriarAtribuicaoEUsarUrlDeProducao() {
+            Long codUnidade = 1L;
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
+                    "123",
+                    LocalDate.of(2026, 5, 13),
+                    LocalDate.of(2026, 5, 30),
+                    "Justificativa"
+            );
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(codUnidade);
+            unidade.setSigla("UNIT");
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+            usuario.setNome("Usuario Teste");
+            usuario.setEmail("usuario@tre-pe.jus.br");
+
+            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+                    .thenReturn(Alerta.builder().codigo(10L).build());
+            when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
+                    .thenReturn("<html>email</html>");
+
+            when(configAplicacao.isAmbienteTestes()).thenReturn(false);
+            when(configAplicacao.getUrlAcessoProd()).thenReturn("https://sgc.tre-pe.jus.br");
+
+            service.criarAtribuicaoTemporaria(codUnidade, request);
+
+            ArgumentCaptor<EmailModelosService.EmailAtribuicaoTemporariaCommand> emailCaptor =
+                    ArgumentCaptor.forClass(EmailModelosService.EmailAtribuicaoTemporariaCommand.class);
+            verify(emailModelosService).criarEmailAtribuicaoTemporaria(emailCaptor.capture());
+            assertThat(emailCaptor.getValue().urlSistema()).isEqualTo("https://sgc.tre-pe.jus.br");
+        }
+
+        @Test
+        @DisplayName("Deve usar URL padrão quando URL de produção for nula ou em branco")
+        void deveUsarUrlPadraoQuandoUrlDeProducaoForNulaOuEmBranco() {
+            Long codUnidade = 1L;
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
+                    "123",
+                    LocalDate.of(2026, 5, 13),
+                    LocalDate.of(2026, 5, 30),
+                    "Justificativa"
+            );
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(codUnidade);
+            unidade.setSigla("UNIT");
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+            usuario.setNome("Usuario Teste");
+            usuario.setEmail("usuario@tre-pe.jus.br");
+
+            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+                    .thenReturn(Alerta.builder().codigo(10L).build());
+            when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
+                    .thenReturn("<html>email</html>");
+
+            when(configAplicacao.isAmbienteTestes()).thenReturn(false);
+            when(configAplicacao.getUrlAcessoProd()).thenReturn("   ");
+            when(configAplicacao.getUrlAcessoHom()).thenReturn("http://localhost:5173");
+
+            service.criarAtribuicaoTemporaria(codUnidade, request);
+
+            ArgumentCaptor<EmailModelosService.EmailAtribuicaoTemporariaCommand> emailCaptor =
+                    ArgumentCaptor.forClass(EmailModelosService.EmailAtribuicaoTemporariaCommand.class);
+            verify(emailModelosService).criarEmailAtribuicaoTemporaria(emailCaptor.capture());
+            assertThat(emailCaptor.getValue().urlSistema()).isEqualTo("http://localhost:5173");
+        }
     }
 
     @Nested
@@ -427,6 +506,36 @@ class ResponsavelUnidadeServiceTest {
 
             verify(atribuicaoTemporariaRepo).delete(atribuicao);
             verify(cacheOrganizacaoService).invalidarAposCommit();
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar atualização de atribuição quando pertencer a outra unidade")
+        void deveRejeitarAtualizacaoDeAtribuicaoQuandoPertencerAOutraUnidade() {
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(1L);
+
+            Unidade unidadeDiferente = new Unidade();
+            unidadeDiferente.setCodigo(2L);
+
+            AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
+            atribuicao.setCodigo(9L);
+            atribuicao.setUnidade(unidadeDiferente);
+
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
+                    "123",
+                    LocalDate.of(2026, 5, 13),
+                    LocalDate.of(2026, 5, 30),
+                    "Atualizada"
+            );
+
+            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(atribuicaoTemporariaRepo.findById(9L)).thenReturn(Optional.of(atribuicao));
+
+            assertThatThrownBy(() -> service.atualizarAtribuicaoTemporaria(1L, 9L, request))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessage("A atribuição temporária não pertence à unidade informada.");
+
+            verify(atribuicaoTemporariaRepo, never()).save(any());
         }
     }
 

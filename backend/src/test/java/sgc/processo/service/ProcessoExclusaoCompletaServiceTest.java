@@ -102,4 +102,19 @@ class ProcessoExclusaoCompletaServiceTest {
         verify(cacheA, never()).clear();
         verify(cacheB, never()).clear();
     }
+
+    @Test
+    @DisplayName("deve lidar com query de tabela existente retornando null")
+    void deveLidarComQueryDeTabelaExistenteRetornandoNull() {
+        when(processoRepo.existsById(10L)).thenReturn(true);
+        when(cacheManager.getCacheNames()).thenReturn(Set.of());
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(null);
+
+        service.excluirCompleto(10L);
+
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.avaliacao_servidor"), anyLong(), anyLong());
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.ocupacao_critica"), anyLong(), anyLong());
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.diagnostico"), anyLong());
+        verify(jdbcTemplate).update(eq("DELETE FROM sgc.processo WHERE codigo = ?"), eq(10L));
+    }
 }
