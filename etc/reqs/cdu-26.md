@@ -37,6 +37,10 @@
 
 9. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
+   Observação: embora a homologação não altere a localização atual do subprocesso (a movimentação permanece interna à
+   unidade `ADMIN`), neste caso o sistema ainda deve comunicar a unidade participante, por se tratar de marco terminal e
+   relevante do subprocesso.
+
    9.1. O sistema registra uma movimentação para o subprocesso:
 
     - `Data/hora`: [Data/hora atual]

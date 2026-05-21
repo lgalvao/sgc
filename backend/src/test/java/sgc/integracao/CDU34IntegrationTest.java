@@ -8,6 +8,7 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.test.web.servlet.result.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
@@ -32,6 +33,8 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
     private Unidade unidade;
     private Processo processo;
 
@@ -83,20 +86,37 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Verificar se foi criado um alerta
-        boolean alertaExiste = alertaRepo.findAll().stream()
-                .anyMatch(a -> a.getUnidadeDestino() != null &&
-                        a.getUnidadeDestino().getCodigo().equals(unidade.getCodigo()) &&
-                        a.getDescricao().toLowerCase().contains("lembrete"));
-        assertThat(alertaExiste).isTrue();
+        List<Alerta> alertas = alertaRepo.findAll().stream()
+                .filter(a -> a.getUnidadeDestino() != null
+                        && a.getUnidadeDestino().getCodigo().equals(unidade.getCodigo()))
+                .toList();
+        assertThat(alertas).anySatisfy(alerta -> {
+            assertThat(alerta.getDescricao()).isEqualTo(
+                    "Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em "
+                            + processo.getDataLimite().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+            );
+            assertThat(alerta.getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
+        });
 
-        boolean alertaDescricaoCorreta = alertaRepo.findAll().stream()
-                .anyMatch(a -> a.getUnidadeDestino() != null
-                        && a.getUnidadeDestino().getCodigo().equals(unidade.getCodigo())
-                        && ("Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em "
-                        + processo.getDataLimite().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                        .equals(a.getDescricao()));
-        assertThat(alertaDescricaoCorreta).isTrue();
+        NotificacaoEmail notificacao = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO)
+                .filter(n -> unidade.getSigla().equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Notificação de lembrete não encontrada no outbox"));
+        assertThat(notificacao.getDestinatario()).isEqualTo("stic@tre-pe.jus.br");
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Lembrete de prazo - " + processo.getDescricao());
+        assertThat(notificacao.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidade.getSigla()))
+                .contains("Este é um lembrete de que o prazo para a conclusão da etapa atual do processo")
+                .contains(processo.getDescricao())
+                .contains(processo.getDataLimite().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                .contains("Acesse o sistema para concluir essas pendências");
+        assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+
+        aguardarEmail(1);
+        assertThat(algumEmailPara("stic@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Lembrete de prazo - " + processo.getDescricao())).isTrue();
+        assertThat(algumEmailContem("Este é um lembrete de que o prazo para a conclusão da etapa atual do processo")).isTrue();
     }
 
     @Test

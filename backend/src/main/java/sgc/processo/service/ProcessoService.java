@@ -406,7 +406,7 @@ public class ProcessoService {
 
         criarAlertaLembretePrazo(processo, unidade, dataLimiteText);
 
-        String assunto = "SGC: Lembrete - " + processo.getDescricao();
+        String assunto = "SGC: Lembrete de prazo - " + processo.getDescricao();
         String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
                 .formatted(codProcesso, unidadeCodigo, LocalDate.now());
         enfileirarNotificacaoUnidade(

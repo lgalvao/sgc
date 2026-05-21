@@ -33,28 +33,8 @@ Já existe um apoio inicial para triagem em [auditar-cobertura-notificacoes.mjs]
 
 ---
 
-## 2. Diagnóstico: refinamentos ainda em aberto
-
-O módulo de Diagnóstico já não é mais uma lacuna estrutural de requisitos. A pendência atual é de refinamento dentro da
-própria série `CDU-39` a `CDU-53`.
-
-Pontos ainda explicitamente abertos nos documentos:
-
-- `cdu-39.md`: campos e modelos de comunicação ainda assumidos por paralelismo;
-- `cdu-41.md`, `cdu-42.md`, `cdu-43.md`, `cdu-45.md`, `cdu-46.md`: hipóteses operacionais ainda marcadas para
-  refinamento;
-- `cdu-48.md` a `cdu-53.md`: monitoramento, ocupações críticas e relatórios ainda com recortes mínimos assumidos;
-- `_intro-glossario.md`: conceitos de `gap de competência` e `ocupações críticas` ainda marcados para validação.
-
----
-
-## 3. Prioridade recomendada
+## 2. Prioridade recomendada
 
 ### Alta
 
 - Planejar a correção gradual da cobertura de comunicações em testes de integração dos CDUs que enviam e-mail.
-
-### Contínua
-
-- Refinar os CDUs de Diagnóstico à medida que novas validações de negócio ocorrerem, preservando os marcadores
-  `PENDÊNCIA DE REFINAMENTO` enquanto houver hipótese ainda não fechada.
