@@ -221,4 +221,43 @@ class UnidadeServiceTest {
         verify(unidadeMapaRepo).save(existente);
         verify(cacheOrganizacaoService).invalidarAposCommit();
     }
+
+    @Test
+    @DisplayName("buscarMapasPorUnidades - Retorna vazio se a lista de unidades for vazia")
+    void buscarMapasPorUnidades_ListaVazia() {
+        List<UnidadeMapa> resultado = service.buscarMapasPorUnidades(List.of());
+        assertThat(resultado).isEmpty();
+        verifyNoInteractions(unidadeMapaRepo);
+    }
+
+    @Test
+    @DisplayName("definirMapasVigentesEmBloco - Retorna imediatamente se o mapa de parâmetros for vazio")
+    void definirMapasVigentesEmBloco_MapaVazio() {
+        service.definirMapasVigentesEmBloco(Map.of());
+        verifyNoInteractions(unidadeMapaRepo, cacheOrganizacaoService);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @DisplayName("definirMapasVigentesEmBloco - Salva os mapas vigentes informados em bloco e invalida cache")
+    void definirMapasVigentesEmBloco_SalvaEmBloco() {
+        Mapa mapa1 = new Mapa();
+        Mapa mapa2 = new Mapa();
+        Map<Long, Mapa> novosMapas = Map.of(10L, mapa1, 20L, mapa2);
+
+        UnidadeMapa existente = new UnidadeMapa();
+        existente.setUnidadeCodigo(10L);
+
+        when(unidadeMapaRepo.findAllById(novosMapas.keySet())).thenReturn(List.of(existente));
+
+        service.definirMapasVigentesEmBloco(novosMapas);
+
+        verify(unidadeMapaRepo).saveAll(argThat(lista -> {
+            List<UnidadeMapa> l = (List<UnidadeMapa>) lista;
+            return l.size() == 2 &&
+                    l.stream().anyMatch(um -> Objects.equals(um.getUnidadeCodigoPersistido(), 10L) && um.getMapaVigente() == mapa1) &&
+                    l.stream().anyMatch(um -> Objects.equals(um.getUnidadeCodigoPersistido(), 20L) && um.getMapaVigente() == mapa2);
+        }));
+        verify(cacheOrganizacaoService).invalidarAposCommit();
+    }
 }
