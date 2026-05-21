@@ -492,4 +492,69 @@ class ValidadorDadosOrganizacionaisTest {
         // A substring extraida e "  ". Como isBlank() e true, ela retorna null.
         assertThat(diagnostico.resumo()).doesNotContain("Há unidades atualmente sem responsável efetivo");
     }
+
+    @Test
+    @DisplayName("diagnosticar acusa violacao para unidade intermediaria com responsavel que nao possui perfil GESTOR correspondente")
+    void diagnosticarUnidadeIntermediariaComResponsavelSemPerfilGestorCorrespondente() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INT", "INT", "111", TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
+        ));
+        // Responsabilidade da intermediária com um usuário "222"
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(1L, "222"),
+                new ResponsabilidadeLeitura(2L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111"), usuario("222")));
+        // Possui gestor "111", mas o responsável "222" não tem perfil gestor na unidade 1L
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("codigos")) {
+                return List.of(
+                    Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L),
+                    Map.of("usuario_titulo", "222", "perfil", "SERVIDOR", "unidade_codigo", 1L)
+                );
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("Responsavel de unidade intermediaria sem perfil GESTOR correspondente");
+    }
+
+    @Test
+    @DisplayName("diagnosticar nao acusa violacao para unidade intermediaria quando responsavel possui perfil GESTOR correspondente")
+    void diagnosticarUnidadeIntermediariaComResponsavelComPerfilGestorCorrespondente() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "INT", "INT", "111", TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(2L, "OP", "OP", "111", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, 1L)
+        ));
+        // Responsabilidade da intermediária com usuário "222"
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(1L, "222"),
+                new ResponsabilidadeLeitura(2L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111"), usuario("222")));
+        // Responsável "222" tem perfil GESTOR na unidade 1L
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
+            Map<?, ?> parametros = invocacao.getArgument(1);
+            if (parametros.containsKey("codigos")) {
+                return List.of(
+                    Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L),
+                    Map.of("usuario_titulo", "222", "perfil", "GESTOR", "unidade_codigo", 1L)
+                );
+            }
+            return List.of();
+        });
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        // Não deve ter a violação de responsável sem perfil gestor correspondente
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .doesNotContain("Responsavel de unidade intermediaria sem perfil GESTOR correspondente");
+    }
 }
