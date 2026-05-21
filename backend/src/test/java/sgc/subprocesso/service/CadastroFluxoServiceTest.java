@@ -331,6 +331,126 @@ class CadastroFluxoServiceTest {
         assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_HOMOLOGADA);
     }
 
+    @Test
+    @DisplayName("disponibilizar deve falhar quando unidade for raiz ou intermediaria")
+    void disponibilizarDeveFalharQuandoUnidadeForRaizOuIntermediaria() {
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        u.setTipo(TipoUnidade.RAIZ);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setProcesso(p);
+        sp.setUnidade(u);
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+
+        assertThatThrownBy(() -> service.disponibilizarCadastro(100L))
+                .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+    }
+
+    @Test
+    @DisplayName("iniciarRevisaoCadastro deve lançar erro se o processo estiver finalizado")
+    void iniciarRevisaoCadastroDeveLancarErroSeProcessoFinalizado() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).situacao(SituacaoProcesso.FINALIZADO).build());
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+
+        assertThatThrownBy(() -> service.iniciarRevisaoCadastro(100L))
+                .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+    }
+
+    @Test
+    @DisplayName("homologar deve falhar se o mapa for nulo")
+    void homologarDeveFalharSeMapaForNulo() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setMapa(null);
+        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+
+        assertThatThrownBy(() -> service.homologar(100L, "Obs"))
+                .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+    }    @Test
+    @DisplayName("normalizarTexto deve tratar strings corretamente")
+    void normalizarTextoDeveTratarStringsCorretamente() throws Exception {
+        java.lang.reflect.Method metodo = CadastroFluxoService.class.getDeclaredMethod("normalizarTexto", String.class);
+        metodo.setAccessible(true);
+
+        assertThat(metodo.invoke(null, (Object) null)).isNull();
+        assertThat(metodo.invoke(null, "")).isNull();
+        assertThat(metodo.invoke(null, "    ")).isNull();
+        assertThat(metodo.invoke(null, "  texto com espaco  ")).isEqualTo("texto com espaco");
+    }
+
+    @Test
+    @DisplayName("iniciarRevisaoCadastro deve funcionar mesmo com processo nulo")
+    void iniciarRevisaoCadastroDeveFuncionarMesmoComProcessoNulo() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setSituacao(NAO_INICIADO);
+        sp.setMapa(new sgc.mapa.model.Mapa());
+        sp.getMapa().setCodigo(1000L);
+        sp.setUnidade(new Unidade());
+        sp.setProcesso(null);
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+
+        service.iniciarRevisaoCadastro(100L);
+
+        assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @Test
+    @DisplayName("criarAlertasReabertura nao deve criar alertas para superior quando nao houver superior imediato")
+    void criarAlertasReaberturaSemSuperiorImediato() {
+        Processo p = new Processo();
+        Unidade u = new Unidade();
+        u.setCodigo(20L);
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setProcesso(p);
+        sp.setUnidade(u);
+        sp.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(null);
+
+        service.reabrirCadastro(100L, "justificativa");
+
+        verify(alertaService, times(1)).criarAlertaReaberturaCadastro(p, u);
+        verify(alertaService, never()).criarAlertaReaberturaCadastroSuperior(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("obterContextoCadastro deve lancar excecao para tipo de processo sem fluxo de cadastro")
+    void obterContextoCadastroTipoSemFluxoDeveLancarExcecao() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.DIAGNOSTICO);
+        sp.setProcesso(p);
+
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+
+        assertThatThrownBy(() -> service.homologar(1L, "Obs"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("sem fluxo de cadastro definido");
+    }
+
     private Subprocesso criarSubprocesso(TipoProcesso tipoProcesso, SituacaoSubprocesso situacao, Unidade unidade) {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);

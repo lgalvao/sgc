@@ -103,4 +103,85 @@ class ConfiguracaoServiceTest {
         assertThatThrownBy(() -> configuracaoService.buscarPorCodigo(id))
                 .isInstanceOf(ErroConfiguracao.class);
     }
+
+    @Test
+    @DisplayName("buscarValorInteiro deve retornar o valor padrão se a configuração não existir")
+    void buscarValorInteiroInexistenteDeveRetornarPadrao() {
+        String chave = "CHAVE_TESTE";
+        when(configuracaoRepo.findByChave(chave)).thenReturn(Optional.empty());
+
+        int resultado = configuracaoService.buscarValorInteiro(chave, 42);
+
+        assertThat(resultado).isEqualTo(42);
+    }
+
+    @Test
+    @DisplayName("buscarValorInteiro deve retornar o valor convertido se for válido")
+    void buscarValorInteiroValidoDeveRetornarConvertido() {
+        String chave = "CHAVE_TESTE";
+        Configuracao configuracao = new Configuracao();
+        configuracao.setChave(chave);
+        configuracao.setValor("15");
+        when(configuracaoRepo.findByChave(chave)).thenReturn(Optional.of(configuracao));
+
+        int resultado = configuracaoService.buscarValorInteiro(chave, 42);
+
+        assertThat(resultado).isEqualTo(15);
+    }
+
+    @Test
+    @DisplayName("buscarValorInteiro deve lançar erro se o valor for menor que 1")
+    void buscarValorInteiroMenorQueUmDeveLancarErro() {
+        String chave = "CHAVE_TESTE";
+        Configuracao configuracao = new Configuracao();
+        configuracao.setChave(chave);
+        configuracao.setValor("0");
+        when(configuracaoRepo.findByChave(chave)).thenReturn(Optional.of(configuracao));
+
+        assertThatThrownBy(() -> configuracaoService.buscarValorInteiro(chave, 42))
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("deve ser maior ou igual a 1");
+    }
+
+    @Test
+    @DisplayName("buscarValorInteiro deve lançar erro se o valor possuir formato inválido")
+    void buscarValorInteiroInvalidoDeveLancarErro() {
+        String chave = "CHAVE_TESTE";
+        Configuracao configuracao = new Configuracao();
+        configuracao.setChave(chave);
+        configuracao.setValor("invalido");
+        when(configuracaoRepo.findByChave(chave)).thenReturn(Optional.of(configuracao));
+
+        assertThatThrownBy(() -> configuracaoService.buscarValorInteiro(chave, 42))
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("possui valor inválido");
+    }
+
+    @Test
+    @DisplayName("buscarDiasInativacaoProcesso deve retornar valor da configuração")
+    void buscarDiasInativacaoProcessoDeveRetornarValor() {
+        Configuracao configuracao = new Configuracao();
+        configuracao.setChave(ConfiguracaoService.CHAVE_DIAS_INATIVACAO_PROCESSO);
+        configuracao.setValor("5");
+        when(configuracaoRepo.findByChave(ConfiguracaoService.CHAVE_DIAS_INATIVACAO_PROCESSO))
+                .thenReturn(Optional.of(configuracao));
+
+        int resultado = configuracaoService.buscarDiasInativacaoProcesso();
+
+        assertThat(resultado).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("buscarDiasAlertaNovo deve retornar valor da configuração")
+    void buscarDiasAlertaNovoDeveRetornarValor() {
+        Configuracao configuracao = new Configuracao();
+        configuracao.setChave(ConfiguracaoService.CHAVE_DIAS_ALERTA_NOVO);
+        configuracao.setValor("2");
+        when(configuracaoRepo.findByChave(ConfiguracaoService.CHAVE_DIAS_ALERTA_NOVO))
+                .thenReturn(Optional.of(configuracao));
+
+        int resultado = configuracaoService.buscarDiasAlertaNovo();
+
+        assertThat(resultado).isEqualTo(2);
+    }
 }

@@ -67,6 +67,9 @@ public class CadastroFluxoService {
     public void iniciarRevisaoCadastro(Long codSubprocesso) {
         log.info("Iniciando revisão do cadastro do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO) {
+            throw new sgc.comum.erros.ErroValidacao("Não é permitido iniciar revisão de cadastro em processo finalizado.");
+        }
         validacaoService.validarSituacaoPermitida(sp, NAO_INICIADO);
 
         sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);

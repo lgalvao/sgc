@@ -797,4 +797,169 @@ class RelatorioFacadeTest {
 
         verify(document, atLeastOnce()).add(any());
     }
+
+    @Test
+    @DisplayName("Deve lançar ErroEntidadeNaoEncontrada quando subprocesso não tem mapa")
+    void deveLancarErroEntidadeNaoEncontradaQuandoSubprocessoNaoTemMapa() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setMapa(null);
+
+        when(consultaService.buscarSubprocessoComMapa(100L)).thenReturn(sp);
+
+        assertThatThrownBy(() -> relatorioService.obterRelatorioMapaAtual(100L))
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("não encontrado");
+    }
+
+    @Test
+    @DisplayName("Deve gerar relatório de andamento com localização nula")
+    void deveGerarRelatorioAndamentoComLocalizacaoNula() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo p = new Processo();
+        p.setDescricao("Processo Teste");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        sp.getUnidade().setNome("Unidade 1");
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataLimiteEtapa1(java.time.LocalDateTime.now());
+
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(new HashMap<>());
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioAndamento(1L, out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve formatar datas nulas como traço no relatório de andamento")
+    void deveFormatarDataFimNulaComoTracoNoRelatorioAndamento() {
+        Unidade u = new Unidade();
+        u.setSigla("U1");
+        u.setCodigo(1L);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(u);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataLimiteEtapa1(null);
+        sp.setDataFimEtapa1(null);
+        sp.setDataLimiteEtapa2(null);
+        sp.setDataFimEtapa2(null);
+
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, u));
+
+        List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().dataLimiteEtapa1()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve gerar relatório de andamento com titular igual ao responsável")
+    void deveGerarRelatorioAndamentoComTitularIgualAoResponsavel() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo p = new Processo();
+        p.setDescricao("Processo Teste");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        sp.getUnidade().setNome("Unidade 1");
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataLimiteEtapa1(java.time.LocalDateTime.now());
+        sp.setDataLimiteEtapa2(java.time.LocalDateTime.now());
+
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(
+                1L, UnidadeResponsavelDto.builder().titularNome("Carlos").substitutoNome(null).build()
+        ));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, sp.getUnidade()));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioAndamento(1L, out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve gerar relatório de unidades sem mapas vigentes cobrindo variações extremas")
+    void deveGerarRelatorioUnidadesSemMapasVigentesComVariacoesDeNomesESiglas() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(10L, 11L, 12L));
+
+        UnidadeDto raiz = new UnidadeDto();
+        raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
+        raiz.setNome("Unidade Raiz");
+
+        // Unidade com sigla nula, nome nulo
+        UnidadeDto u1 = new UnidadeDto();
+        u1.setCodigo(10L);
+        u1.setSigla(null);
+        u1.setNome(null);
+        u1.setTipo("ZONA ELEITORAL");
+
+        // Unidade com sigla vazia, nome preenchido
+        UnidadeDto u2 = new UnidadeDto();
+        u2.setCodigo(11L);
+        u2.setSigla("");
+        u2.setNome("ZONA ELEITORAL TESTE");
+        u2.setTipo(null);
+
+        // Unidade com sigla igual ao nome
+        UnidadeDto u3 = new UnidadeDto();
+        u3.setCodigo(12L);
+        u3.setSigla("SEC");
+        u3.setNome("SEC");
+        u3.setTipo("SECRETARIA");
+
+        raiz.setSubunidades(List.of(u1, u2, u3));
+
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(raiz));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve formatar situação com múltiplos underscores de forma robusta")
+    void deveFormatarSituacaoComMultiplosUnderscores() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo p = new Processo();
+        p.setDescricao("Processo Teste");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        sp.getUnidade().setNome("Unidade 1");
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, sp.getUnidade()));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioAndamento(1L, out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
 }
+

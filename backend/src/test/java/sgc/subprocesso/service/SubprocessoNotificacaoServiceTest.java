@@ -404,4 +404,82 @@ class SubprocessoNotificacaoServiceTest {
         return usuario;
     }
 
+    @Test
+    @DisplayName("nao deve enfileirar email para superior quando superior for nulo")
+    void naoDeveEnfileirarEmailParaSuperiorQuandoSuperiorForNulo() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade superiorImediato = criarUnidade(20L, "SUP1", "Superior imediato");
+        Unidade destino = criarUnidade(30L, "DEST", "Unidade destino");
+        destino.setUnidadeSuperior(superiorImediato);
+
+        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
+        origem.setUnidadeSuperior(superiorImediato);
+
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(destino.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
+        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of());
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .build());
+
+        verify(notificacaoService, times(1)).enfileirar(any());
+    }
+
+    @Test
+    @DisplayName("registrarComunicacoesTransicao deve ignorar envio de e-mails para transições sem template configurado")
+    void registrarComunicacoesTransicao_DeveIgnorarEnvioDeEmailsQuandoNaoHouverTemplate() {
+        Unidade origem = criarUnidade(10L, "ORIG", "Origem");
+        Unidade destino = criarUnidade(20L, "DEST", "Destino");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.MAPA_HOMOLOGADO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .build());
+
+        verifyNoInteractions(alertaService, notificacaoService);
+    }
+
+    @Test
+    @DisplayName("obterTemplateObrigatorio deve lancar IllegalStateException quando template for nulo ou em branco")
+    void obterTemplateObrigatorio_DeveLancarErroQuandoNuloOuEmBranco() throws Exception {
+        java.lang.reflect.Method metodo = SubprocessoNotificacaoService.class.getDeclaredMethod("obterTemplateObrigatorio", String.class, String.class);
+        metodo.setAccessible(true);
+
+        // Caso 1: Nulo
+        assertThatThrownBy(() -> {
+            try {
+                metodo.invoke(service, null, "contexto nulo");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }).isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("Template ausente para contexto nulo");
+
+        // Caso 2: Em branco
+        assertThatThrownBy(() -> {
+            try {
+                metodo.invoke(service, "   ", "contexto vazio");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }).isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("Template ausente para contexto vazio");
+    }
 }

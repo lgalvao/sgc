@@ -199,4 +199,34 @@ class CacheViewsOrganizacaoServiceTest {
     void evictarPerfisUnidade() {
         cacheService.evictarPerfisUnidade();
     }
+
+    @Test
+    @DisplayName("listarTodosPerfisUnidade deve cobrir caminhos nulos de unidade e titular")
+    void listarTodosPerfisUnidade_CaminhosNulosETitular() {
+        UsuarioConsultaLeitura titular = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("123")
+                .unidadeCompetenciaCodigo(10L)
+                .build();
+        when(usuarioRepo.listarTodasConsultas()).thenReturn(List.of(titular));
+
+        UnidadeHierarquiaLeitura unidade = UnidadeHierarquiaLeitura.builder()
+                .codigo(10L)
+                .tipo(TipoUnidade.OPERACIONAL)
+                .tituloTitular("123")
+                .situacao(SituacaoUnidade.ATIVA)
+                .build();
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(unidade));
+
+        when(responsabilidadeRepo.listarTodasLeituras()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(999L, "123")
+        ));
+
+        when(administradorRepo.findAll()).thenReturn(List.of());
+        when(selfProvider.getIfAvailable(org.mockito.ArgumentMatchers.any())).thenReturn(cacheService);
+        when(environment.acceptsProfiles(Profiles.of("test"))).thenReturn(false);
+
+        List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
+
+        assertThat(result).isEmpty();
+    }
 }

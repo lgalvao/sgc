@@ -695,17 +695,24 @@ class ImpactoMapaServiceTest {
             compVigente.setCodigo(50L);
             compVigente.setDescricao("Competencia X");
 
+            Conhecimento cRemovido = new Conhecimento();
+            cRemovido.setDescricao("Java 8");
+            Conhecimento cAdicionado = new Conhecimento();
+            cAdicionado.setDescricao("Java 21");
+            Conhecimento cMantido = new Conhecimento();
+            cMantido.setDescricao("Java Básico");
+
             Atividade aVigente = new Atividade();
             aVigente.setCodigo(10L);
             aVigente.setDescricao("Descrição Antiga");
-            aVigente.setConhecimentos(Set.of());
+            aVigente.setConhecimentos(Set.of(cRemovido, cMantido));
             aVigente.setCompetencias(Set.of(compVigente));
             compVigente.setAtividades(Set.of(aVigente));
 
             Atividade aAtual = new Atividade();
             aAtual.setCodigo(11L);
             aAtual.setDescricao("Descrição Nova");
-            aAtual.setConhecimentos(Set.of());
+            aAtual.setConhecimentos(Set.of(cAdicionado, cMantido));
             aAtual.setCompetencias(Set.of(compVigente));
 
             when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L)).thenReturn(List.of(aVigente));
@@ -750,16 +757,18 @@ class ImpactoMapaServiceTest {
             cRemovido.setDescricao("Java 8");
             Conhecimento cAdicionado = new Conhecimento();
             cAdicionado.setDescricao("Java 21");
+            Conhecimento cMantido = new Conhecimento();
+            cMantido.setDescricao("Java Básico");
 
             Atividade aVigente = new Atividade();
             aVigente.setCodigo(10L);
             aVigente.setDescricao("Desenvolvimento");
-            aVigente.setConhecimentos(Set.of(cRemovido));
+            aVigente.setConhecimentos(Set.of(cRemovido, cMantido));
 
             Atividade aAtual = new Atividade();
             aAtual.setCodigo(10L); // Mesma atividade (ID fixo no DTO ou descrição igual)
             aAtual.setDescricao("Desenvolvimento");
-            aAtual.setConhecimentos(Set.of(cAdicionado));
+            aAtual.setConhecimentos(Set.of(cAdicionado, cMantido));
 
             Competencia comp = new Competencia();
             comp.setCodigo(50L);
@@ -1103,6 +1112,53 @@ class ImpactoMapaServiceTest {
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(50L)).thenReturn(List.of(aVigente));
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(51L)).thenReturn(List.of(aAtual));
         when(competenciaRepo.findByMapa_Codigo(50L)).thenReturn(List.of());
+
+        mockUsuarioAutenticado(usuarioAdmin());
+        ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);
+
+        assertThat(response.alteradas()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("verificarImpactos deve ignorar quando competencias vigentes e atuais diferem na heuristica")
+    void verificarImpactosDeveIgnorarQuandoCompetenciasDiferentesNaHeuristica() {
+        mockAcessoLivre();
+        Subprocesso sp = criarSubprocessoParaImpacto(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 202L);
+        sp.setCodigo(4L);
+
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCodigo(50L);
+        Mapa mapaAtual = new Mapa();
+        mapaAtual.setCodigo(51L);
+
+        when(mapaRepo.buscarMapaVigentePorUnidade(202L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(4L)).thenReturn(Optional.of(mapaAtual));
+
+        Competencia compAtual = new Competencia();
+        compAtual.setCodigo(70L);
+        compAtual.setDescricao("Comp Atual");
+        compAtual.setAtividades(Set.of());
+
+        Atividade aVigente = new Atividade();
+        aVigente.setCodigo(30L);
+        aVigente.setDescricao("Desc Antiga");
+        aVigente.setConhecimentos(Set.of());
+        aVigente.setCompetencias(Set.of());
+
+        Atividade aAtual = new Atividade();
+        aAtual.setCodigo(31L);
+        aAtual.setDescricao("Desc Nova");
+        aAtual.setConhecimentos(Set.of());
+        aAtual.setCompetencias(Set.of(compAtual));
+
+        Competencia compVigente = new Competencia();
+        compVigente.setCodigo(80L);
+        compVigente.setDescricao("Comp Vigente");
+        compVigente.setAtividades(Set.of(aVigente));
+
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(50L)).thenReturn(List.of(aVigente));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(51L)).thenReturn(List.of(aAtual));
+        when(competenciaRepo.findByMapa_Codigo(50L)).thenReturn(List.of(compVigente));
 
         mockUsuarioAutenticado(usuarioAdmin());
         ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp);

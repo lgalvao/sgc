@@ -2206,5 +2206,110 @@ class ProcessoServiceTest {
         verify(processoRepo, never()).save(any());
     }
 
+    @Test
+    @DisplayName("criarProcesso deve lançar ErroValidacao quando unidade selecionada for intermediária")
+    void criarProcesso_DeveLancarErroValidacaoQuandoUnidadeForIntermediaria() {
+        CriarProcessoRequest req = new CriarProcessoRequest(
+                "Processo Teste",
+                MAPEAMENTO,
+                LocalDateTime.now().plusDays(10),
+                List.of(20L)
+        );
+
+        Unidade unidadeIntermediaria = new Unidade();
+        unidadeIntermediaria.setCodigo(20L);
+        unidadeIntermediaria.setSigla("INT-1");
+        unidadeIntermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        unidadeIntermediaria.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+
+        when(unidadeService.buscarPorCodigos(any())).thenReturn(List.of(unidadeIntermediaria));
+
+        assertThatThrownBy(() -> processoService.criar(req))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("inválida");
+    }
+
+    @Test
+    @DisplayName("iniciarProcessos deve lançar ErroValidacao quando a lista de unidades para processar for vazia")
+    void iniciarProcessos_DeveLancarErroValidacaoQuandoUnidadesParaProcessarForVazio() {
+        Long codProcesso = 1L;
+        Processo p = new Processo();
+        p.setCodigo(codProcesso);
+        p.setTipo(MAPEAMENTO);
+        p.setSituacao(CRIADO);
+
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+
+        List<Long> unidades = List.of();
+
+        assertThatThrownBy(() -> processoService.iniciar(codProcesso, unidades))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining(Mensagens.SEM_UNIDADES_PARTICIPANTES);
+    }
+
+    @Test
+    @DisplayName("iniciarSubprocessos deve exercitar switch de tipos de processo")
+    void iniciarSubprocessos_DeveExercitarSwitchDeTiposDeProcesso() {
+        Long codProcesso = 1L;
+        
+        Processo p1 = new Processo();
+        p1.setCodigo(codProcesso);
+        p1.setTipo(DIAGNOSTICO);
+        p1.setSituacao(CRIADO);
+        p1.setDataLimite(LocalDateTime.now().plusDays(10));
+
+        Unidade u1 = new Unidade();
+        u1.setCodigo(10L);
+        u1.setTipo(TipoUnidade.OPERACIONAL);
+        u1.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+        u1.setSigla("SIGLA");
+
+        UnidadeMapa um = new UnidadeMapa();
+        um.setUnidadeCodigo(10L);
+
+        mockarResponsaveisEfetivos();
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(p1);
+        when(unidadeService.buscarPorCodigos(any())).thenReturn(List.of(u1));
+        lenient().when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L));
+        lenient().when(unidadeHierarquiaService.buscarIdsDescendentes(any())).thenReturn(List.of());
+        lenient().when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
+
+        List<Long> unidades = List.of(10L);
+
+        assertThatCode(() -> processoService.iniciar(codProcesso, unidades))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("podeDisponibilizarEmBloco deve exercitar todas as combinações de situações de subprocesso")
+    void podeDisponibilizarEmBloco_DeveExercitarTodasAsCombinacoesDeSituacoes() {
+        Long codProcesso = 1L;
+        
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(unidade);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), any())).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(sp.getCodigo(), unidade));
+        when(permissionEvaluator.verificarPermissaoSilenciosa(any(), any(), any())).thenReturn(true);
+
+        List<SubprocessoElegivelDto> resultado = processoService.listarSubprocessosElegiveis(codProcesso);
+        assertThat(resultado).isNotEmpty();
+
+        sp.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        List<SubprocessoElegivelDto> resultado2 = processoService.listarSubprocessosElegiveis(codProcesso);
+        assertThat(resultado2).isEmpty();
+    }
 }
 }
+

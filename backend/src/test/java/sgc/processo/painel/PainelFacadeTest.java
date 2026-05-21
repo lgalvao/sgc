@@ -520,6 +520,70 @@ class PainelFacadeTest {
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEmpty();
     }
 
+    @Test
+    @DisplayName("listarProcessos - deve cobrir todas as ramificações de siglas nulas, vazias e válidas")
+    void listarProcessos_RamificacoesSiglas() {
+        Processo p = mock(Processo.class);
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla(null);
+
+        UnidadeProcesso up2 = new UnidadeProcesso();
+        up2.setUnidadeCodigo(2L);
+        up2.setSigla("");
+
+        UnidadeProcesso up3 = new UnidadeProcesso();
+        up3.setUnidadeCodigo(3L);
+        up3.setSigla("   ");
+
+        UnidadeProcesso up4 = new UnidadeProcesso();
+        up4.setUnidadeCodigo(4L);
+        up4.setSigla("VAL");
+
+        when(p.getParticipantes()).thenReturn(List.of(up1, up2, up3, up4));
+
+        Map<Long, List<Long>> hierarquia = new HashMap<>();
+        hierarquia.put(0L, List.of(1L, 2L, 3L, 4L));
+
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+
+        when(unidadeService.buscarSiglasPorCodigos(argThat(list -> list.contains(1L) && list.contains(2L) && list.contains(3L))))
+                .thenReturn(List.of("U1", "U2", "U3"));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1", "U2", "U3", "VAL");
+    }
+
+    @Test
+    @DisplayName("listarProcessos - deve cobrir ramificações de hierarquia sem filhos (folhas)")
+    void listarProcessos_HierarquiaSemFilhos() {
+        Processo p = mock(Processo.class);
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla("U1");
+
+        when(p.getParticipantes()).thenReturn(List.of(up1));
+
+        Map<Long, List<Long>> hierarquia = new HashMap<>();
+        hierarquia.put(0L, List.of(2L, 3L));
+        hierarquia.put(3L, Collections.emptyList());
+
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        assertThat(result).isNotEmpty();
+    }
+
     private Processo criarProcesso(Long codigo, SituacaoProcesso situacao) {
         Processo p = new Processo();
         p.setCodigo(codigo);

@@ -439,6 +439,38 @@ class SubprocessoServiceTest {
                 verify(subprocessoRepo).save(sp);
                 assertThat(sp.getSituacao()).isEqualTo(REVISAO_MAPA_AJUSTADO);
             }
+
+            @Test
+            @DisplayName("removerCompetencia deve manter situacao inalterada se ficou vazio mas situacao nao for editavel")
+            void removerCompetencia_FicouVazioEmSituacaoNaoEditavel() {
+                Subprocesso sp = criarSubprocessoComMapa(1L);
+                sp.setSituacaoForcada(NAO_INICIADO);
+                sp.getMapa().setCodigo(100L);
+
+                when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+                when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of());
+                when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
+
+                service.removerCompetencia(1L, 10L);
+
+                assertThat(sp.getSituacao()).isEqualTo(NAO_INICIADO);
+                verify(subprocessoRepo, never()).save(sp);
+            }
+
+            @Test
+            @DisplayName("atualizarCompetencia deve lancar IllegalStateException se subprocesso nao possuir mapa associado")
+            void atualizarCompetencia_DeveLancarErroQuandoSubprocessoSemMapa() {
+                Subprocesso sp = new Subprocesso();
+                sp.setCodigo(1L);
+                sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+                sp.setMapa(null);
+
+                when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+
+                assertThatThrownBy(() -> service.atualizarCompetencia(1L, 10L, new AtualizarCompetenciaRequest("Desc", List.of())))
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessageContaining("Subprocesso 1 sem mapa associado");
+            }
         }
 
         @Nested

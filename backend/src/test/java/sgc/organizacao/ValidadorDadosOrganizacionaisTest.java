@@ -506,13 +506,13 @@ class ValidadorDadosOrganizacionaisTest {
                 new ResponsabilidadeLeitura(2L, "111")
         ));
         when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111"), usuario("222")));
-        // Possui gestor "111", mas o responsável "222" não tem perfil gestor na unidade 1L
+        // Possui gestor "111", mas o responsável "222" não tem perfil gestor na unidade 1L (invertendo ordem para avaliar SERVIDOR antes)
         when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
             Map<?, ?> parametros = invocacao.getArgument(1);
             if (parametros.containsKey("codigos")) {
                 return List.of(
-                    Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L),
-                    Map.of("usuario_titulo", "222", "perfil", "SERVIDOR", "unidade_codigo", 1L)
+                    Map.of("usuario_titulo", "222", "perfil", "SERVIDOR", "unidade_codigo", 1L),
+                    Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L)
                 );
             }
             return List.of();
@@ -538,11 +538,12 @@ class ValidadorDadosOrganizacionaisTest {
                 new ResponsabilidadeLeitura(2L, "111")
         ));
         when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111"), usuario("222")));
-        // Responsável "222" tem perfil GESTOR na unidade 1L
+        // Responsável "222" tem perfil GESTOR na unidade 1L, adicionando também um perfil SERVIDOR antes para exercitar branches
         when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenAnswer(invocacao -> {
             Map<?, ?> parametros = invocacao.getArgument(1);
             if (parametros.containsKey("codigos")) {
                 return List.of(
+                    Map.of("usuario_titulo", "111", "perfil", "SERVIDOR", "unidade_codigo", 1L),
                     Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L),
                     Map.of("usuario_titulo", "222", "perfil", "GESTOR", "unidade_codigo", 1L)
                 );
@@ -556,5 +557,21 @@ class ValidadorDadosOrganizacionaisTest {
         assertThat(diagnostico.grupos())
                 .extracting(GrupoViolacaoOrganizacionalDto::tipo)
                 .doesNotContain("Responsavel de unidade intermediaria sem perfil GESTOR correspondente");
+    }
+
+    @Test
+    @DisplayName("extrairSigla deve exercitar todos os branches e casos de borda do extrator de sigla")
+    void extrairSigla_DeveExercitarTodosOsBranches() {
+        // 1. inicio < 0
+        assertThat(validador.extrairSigla("sem o prefixo correspondente")).isNull();
+
+        // 2. fim < 0
+        assertThat(validador.extrairSigla("sigla=OPER")).isEqualTo("OPER");
+
+        // 3. sigla isBlank
+        assertThat(validador.extrairSigla("sigla=   ")).isNull();
+
+        // 4. caso normal com vírgula
+        assertThat(validador.extrairSigla("sigla=OPER, tipo=OPERACIONAL")).isEqualTo("OPER");
     }
 }

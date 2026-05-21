@@ -8,6 +8,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.*;
 
 import java.util.*;
@@ -165,5 +166,36 @@ class MapaManutencaoServiceTest {
 
         verify(conhecimentoRepo, never()).findByAtividade_Codigo(anyLong());
         verify(conhecimentoRepo).save(conhecimento);
+    }
+
+    @Test
+    @DisplayName("buscarMapasPorSubprocessos deve retornar lista vazia quando a coleção informada estiver vazia")
+    void buscarMapasPorSubprocessos_DeveRetornarListaVaziaQuandoColecaoForVazia() {
+        List<Mapa> resultado = mapaService.buscarMapasPorSubprocessos(List.of());
+
+        assertThat(resultado).isEmpty();
+        verifyNoInteractions(mapaRepo);
+    }
+
+    @Test
+    @DisplayName("criarMapa deve usar estado inicial padrão com valores nulos quando command não possuir estado inicial")
+    void criarMapa_DeveUsarEstadoInicialPadraoQuandoCommandNaoPossuirEstadoInicial() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        when(repo.buscar(Subprocesso.class, 1L)).thenReturn(subprocesso);
+
+        CriarMapaCommand command = new CriarMapaCommand(1L, null);
+
+        mapaService.criarMapa(command);
+
+        ArgumentCaptor<Mapa> mapaCaptor = ArgumentCaptor.forClass(Mapa.class);
+        verify(mapaRepo).save(mapaCaptor.capture());
+
+        Mapa mapaSalvo = mapaCaptor.getValue();
+        assertThat(mapaSalvo.getSubprocesso()).isEqualTo(subprocesso);
+        assertThat(mapaSalvo.getDataHoraDisponibilizado()).isNull();
+        assertThat(mapaSalvo.getObservacoesDisponibilizacao()).isNull();
+        assertThat(mapaSalvo.getSugestoes()).isNull();
+        assertThat(mapaSalvo.getDataHoraHomologado()).isNull();
     }
 }

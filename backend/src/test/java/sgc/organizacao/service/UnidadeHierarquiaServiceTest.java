@@ -392,5 +392,48 @@ class UnidadeHierarquiaServiceTest {
             UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
             assertThat(operacionalDto.isElegivel()).isFalse();
         }
+
+        @Test
+        @DisplayName("montarHierarquia deve ignorar DTOs ausentes no mapa de unidades")
+        void montarHierarquia_DeveIgnorarDtosAusentesNoMapa() throws Exception {
+            List<UnidadeHierarquiaLeitura> unidadesMutantes = new ArrayList<UnidadeHierarquiaLeitura>() {
+                private int iteracoes = 0;
+                @Override
+                public Iterator<UnidadeHierarquiaLeitura> iterator() {
+                    iteracoes++;
+                    if (iteracoes == 1) {
+                        return List.of(new UnidadeHierarquiaLeitura(1L, "Nome 1", "U1", "T1", TipoUnidade.RAIZ, SituacaoUnidade.ATIVA, null)).iterator();
+                    } else {
+                        return List.of(new UnidadeHierarquiaLeitura(2L, "Nome 2", "U2", "T2", TipoUnidade.RAIZ, SituacaoUnidade.ATIVA, null)).iterator();
+                    }
+                }
+            };
+
+            java.lang.reflect.Method metodo = UnidadeHierarquiaService.class.getDeclaredMethod("montarHierarquia", List.class, Map.class, Predicate.class);
+            metodo.setAccessible(true);
+
+            List<UnidadeDto> resultado = (List<UnidadeDto>) metodo.invoke(service, unidadesMutantes, new HashMap<Long, String>(), null);
+
+            assertThat(resultado).isEmpty();
+        }
+
+        @Test
+        @DisplayName("copiarArvore deve tratar subunidades nulas e inicializar lista vazia")
+        void copiarArvore_DeveTratarSubunidadesNulas() throws Exception {
+            java.lang.reflect.Method metodo = UnidadeHierarquiaService.class.getDeclaredMethod("copiarArvore", UnidadeDto.class);
+            metodo.setAccessible(true);
+
+            UnidadeDto dto = UnidadeDto.builder()
+                    .codigo(1L)
+                    .nome("Unidade Teste")
+                    .sigla("UT")
+                    .subunidades(null)
+                    .build();
+
+            UnidadeDto resultado = (UnidadeDto) metodo.invoke(service, dto);
+
+            assertThat(resultado.getSubunidades()).isEmpty();
+            assertThat(resultado.getCodigo()).isEqualTo(1L);
+        }
     }
 }

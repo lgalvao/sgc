@@ -432,4 +432,58 @@ class AlertaFacadeTest {
                     .doesNotThrowAnyException();
         }
     }
+
+    @Test
+    @DisplayName("obterUnidadeObrigatoria deve lancar excecao quando a unidade nao for encontrada no mapa")
+    void obterUnidadeObrigatoriaAusenteDeveLancarExcecao() throws Exception {
+        java.lang.reflect.Method metodo = AlertaFacade.class.getDeclaredMethod("obterUnidadeObrigatoria", Map.class, Long.class);
+        metodo.setAccessible(true);
+
+        Map<Long, Unidade> map = new HashMap<>();
+
+        assertThatThrownBy(() -> {
+            try {
+                metodo.invoke(alertaFacade, map, 999L);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getTargetException();
+            }
+        })
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("ausente na construção de alertas");
+    }
+
+    @Test
+    @DisplayName("criarAlertasProcessoIniciado deve processar unidades operacionais e intermediarias corretamente")
+    void criarAlertasProcessoIniciadoOperacionaisEIntermediarias() {
+        Processo processo = new Processo();
+        processo.setCodigo(10L);
+
+        Unidade raiz = new Unidade();
+        raiz.setCodigo(1L);
+        raiz.setTipo(TipoUnidade.RAIZ);
+        raiz.setSigla("RAIZ");
+
+        Unidade operacional = new Unidade();
+        operacional.setCodigo(4L);
+        operacional.setTipo(TipoUnidade.OPERACIONAL);
+        operacional.setSigla("OPER");
+
+        Unidade intermediaria = new Unidade();
+        intermediaria.setCodigo(5L);
+        intermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        intermediaria.setSigla("INTM");
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(4L)).thenReturn(Collections.emptyList());
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(5L)).thenReturn(Collections.emptyList());
+        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(operacional, intermediaria));
+
+        assertThat(alertas).hasSize(2);
+        assertThat(alertas)
+                .anyMatch(a -> a.getUnidadeDestino().equals(operacional) && a.getDescricao().contains("Início do processo"))
+                .anyMatch(a -> a.getUnidadeDestino().equals(intermediaria) && a.getDescricao().contains("Início do processo em unidade(s) subordinada(s)"));
+    }
 }
+

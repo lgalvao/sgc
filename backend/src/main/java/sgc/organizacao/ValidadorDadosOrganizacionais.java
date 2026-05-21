@@ -120,7 +120,7 @@ public class ValidadorDadosOrganizacionais {
     }
 
     @Nullable
-    private String extrairSigla(String detalhe) {
+    String extrairSigla(String detalhe) {
 
         String prefixo = "sigla=";
         int inicio = detalhe.indexOf(prefixo);
